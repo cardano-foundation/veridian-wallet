@@ -43,9 +43,15 @@ import {
 } from "./globals/constants";
 import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
 import { LoadingType } from "./pages/LoadingPage/LoadingPage.types";
-import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
-import SystemThreatAlert from "./pages/SystemThreatAlert/SystemThreatAlert";
+import {
+  EMULATOR_THREATS,
+  initializeFreeRASP,
+  ThreatCheck,
+  ThreatName,
+} from "../security/freerasp";
+import { SystemThreatAlert } from "./pages/SystemThreatAlert/SystemThreatAlert";
 import { ConfigurationService } from "../core/configuration";
+import { i18n } from "../i18n";
 
 setupIonicReact();
 
@@ -89,7 +95,10 @@ const App = () => {
 
   const checkSecurity = () => {
     if (isFreeRASPInitialized && Capacitor.isNativePlatform()) {
-      if (threatsDetected.length > 0) {
+      const threats = threatsDetected.filter(
+        (threat) => !EMULATOR_THREATS.includes(threat.name)
+      );
+      if (threats.length > 0) {
         ExitApp.exitApp();
       }
     }
@@ -262,8 +271,14 @@ const App = () => {
   }
 
   if (isFreeRASPInitialized && !freeRASPInitResult.success) {
+    return <SystemThreatAlert errors={[i18n.t("systemthreats.initerror")]} />;
+  }
+
+  if (threatsDetected.length > 0) {
     return (
-      <SystemThreatAlert error={freeRASPInitResult.error || "Unknown error"} />
+      <SystemThreatAlert
+        errors={threatsDetected.map((threat) => threat.description)}
+      />
     );
   }
 

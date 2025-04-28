@@ -929,7 +929,35 @@ describe("System threat alert", () => {
     });
 
     await waitFor(() => {
-      expect(ExitApp.exitApp).toHaveBeenCalled();
+      expect(ExitApp.exitApp).toBeCalled();
+    });
+  });
+
+  test("Catch emulator threat and avoid closing the app", async () => {
+    startFreeRASPMock = startFreeRASP as jest.Mock;
+    startFreeRASPMock.mockResolvedValue(true);
+
+    const { getByText } = render(
+      <Provider store={storeMocked}>
+        <App />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(startFreeRASPMock).toHaveBeenCalled();
+    });
+
+    await act(async () => {
+      const simulatorAction = (startFreeRASPMock.mock.calls[0][1] as any)
+        .simulator;
+
+      simulatorAction();
+    });
+
+    await waitFor(() => {
+      expect(getByText("Threats Detected")).toBeVisible();
+      expect(getByText(Eng_Trans.systemthreats.rules.simulator)).toBeVisible();
+      expect(ExitApp.exitApp).not.toBeCalled();
     });
   });
 
@@ -1035,7 +1063,10 @@ describe("System threat alert", () => {
     });
 
     await waitFor(() => {
-      expect(ExitApp.exitApp).toHaveBeenCalled();
+      expect(getByText("Threats Detected")).toBeVisible();
+      expect(
+        getByText(Eng_Trans.systemthreats.rules.privilegedaccess)
+      ).toBeVisible();
     });
   });
 });
