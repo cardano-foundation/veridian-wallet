@@ -22,11 +22,6 @@ export enum ThreatName {
   DEVICE_ID = "Device ID",
 }
 
-export const EMULATOR_THREATS = [
-  ThreatName.SIMULATOR,
-  ThreatName.SECURE_HARDWARE_NOT_AVAILABLE,
-];
-
 export interface ThreatCheck {
   name: ThreatName;
   description: string;
