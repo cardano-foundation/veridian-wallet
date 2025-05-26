@@ -10,7 +10,6 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { StrictMode, useEffect, useState } from "react";
-import { ExitApp } from "@jimcase/capacitor-exit-app";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Routes } from "../routes";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -44,8 +43,9 @@ import {
 import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
 import { LoadingType } from "./pages/LoadingPage/LoadingPage.types";
 import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
-import SystemThreatAlert from "./pages/SystemThreatAlert/SystemThreatAlert";
+import { SystemThreatAlert } from "./pages/SystemThreatAlert/SystemThreatAlert";
 import { ConfigurationService } from "../core/configuration";
+import { i18n } from "../i18n";
 
 setupIonicReact();
 
@@ -86,19 +86,6 @@ const App = () => {
 
     initConfiguration();
   }, []);
-
-  const checkSecurity = () => {
-    if (isFreeRASPInitialized && Capacitor.isNativePlatform()) {
-      if (threatsDetected.length > 0) {
-        ExitApp.exitApp();
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
-    checkSecurity();
-  }, [isFreeRASPInitialized, threatsDetected]);
 
   useEffect(() => {
     const handleUnknownPromiseError = (event: PromiseRejectionEvent) => {
@@ -262,8 +249,14 @@ const App = () => {
   }
 
   if (isFreeRASPInitialized && !freeRASPInitResult.success) {
+    return <SystemThreatAlert errors={[i18n.t("systemthreats.initerror")]} />;
+  }
+
+  if (threatsDetected.length > 0) {
     return (
-      <SystemThreatAlert error={freeRASPInitResult.error || "Unknown error"} />
+      <SystemThreatAlert
+        errors={threatsDetected.map((threat) => threat.description)}
+      />
     );
   }
 

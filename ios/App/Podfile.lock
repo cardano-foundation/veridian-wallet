@@ -65,8 +65,6 @@ PODS:
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
   - GTMSessionFetcher/Core (3.5.0)
-  - JimcaseCapacitorExitApp (1.0.7):
-    - Capacitor
   - MLImage (1.0.0-beta6)
   - MLKitBarcodeScanning (6.0.0):
     - MLKitCommon (~> 12.0)
@@ -119,7 +117,6 @@ DEPENDENCIES:
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - "EvvaCapacitorSecureStoragePlugin (from `../../node_modules/@evva/capacitor-secure-storage-plugin`)"
-  - "JimcaseCapacitorExitApp (from `../../node_modules/@jimcase/capacitor-exit-app`)"
 
 SPEC REPOS:
   trunk:
@@ -179,8 +176,6 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/status-bar"
   EvvaCapacitorSecureStoragePlugin:
     :path: "../../node_modules/@evva/capacitor-secure-storage-plugin"
-  JimcaseCapacitorExitApp:
-    :path: "../../node_modules/@jimcase/capacitor-exit-app"
 
 SPEC CHECKSUMS:
   AparajitaCapacitorBiometricAuth: 3057403ee3e9e390e57bfb92b576f439157951b8
@@ -208,7 +203,6 @@ SPEC CHECKSUMS:
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  JimcaseCapacitorExitApp: 499b429827d7d0cacf1b7a0faf18bf88e4b6cc78
   MLImage: 0ad1c5f50edd027672d8b26b0fee78a8b4a0fc56
   MLKitBarcodeScanning: 0a3064da0a7f49ac24ceb3cb46a5bc67496facd2
   MLKitCommon: 07c2c33ae5640e5380beaaa6e4b9c249a205542d
@@ -219,6 +213,6 @@ SPEC CHECKSUMS:
   SQLCipher: 77fbe633cd84db04b07876dd50766b4924b57d61
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
 
-PODFILE CHECKSUM: ef0d222c85763e963d3ab216ae37e81f4007042b
+PODFILE CHECKSUM: edddec9e8109b205b25d5fc1413526aaa8b9f97f
 
 COCOAPODS: 1.15.2

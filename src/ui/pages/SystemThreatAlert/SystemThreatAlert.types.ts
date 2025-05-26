@@ -1,3 +1,3 @@
 export interface SystemThreatAlertProps {
-  error: string;
+  errors: string[];
 }
