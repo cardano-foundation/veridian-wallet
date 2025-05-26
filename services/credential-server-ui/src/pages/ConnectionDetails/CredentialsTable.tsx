@@ -17,6 +17,8 @@ import { useNavigate } from "react-router";
 import { AppTable, useTable } from "../../components/AppTable";
 import { AppTableHeader } from "../../components/AppTable/AppTable.types";
 import { DropdownMenu } from "../../components/DropdownMenu";
+import { filter, FilterBar } from "../../components/FilterBar";
+import { FilterData } from "../../components/FilterBar/FilterBar.types";
 import { RoleIndex } from "../../components/NavBar/constants/roles";
 import { PopupModal } from "../../components/PopupModal";
 import { RoutePath } from "../../const/route";
@@ -31,8 +33,6 @@ import {
   CredentialsTableProps,
   CredentialsTableRow,
 } from "./ConnectionDetails.types";
-import { filter, FilterBar } from "../../components/FilterBar";
-import { FilterData } from "../../components/FilterBar/FilterBar.types";
 const headers: AppTableHeader<CredentialsTableRow>[] = [
   {
     id: "name",
@@ -164,6 +164,8 @@ const CredentialsTable = ({
             const isItemSelected = selected.includes(row.id);
             const labelId = `enhanced-table-checkbox-${index}`;
             const isRevoked = row.status !== 0;
+            const attributeKey = Object.keys(row.data.sad.a)[2];
+
             return (
               <TableRow
                 hover
@@ -199,7 +201,7 @@ const CredentialsTable = ({
                 </TableCell>
                 <TableCell align="left">
                   <Tooltip
-                    title={row.attribute}
+                    title={`${attributeKey}: ${row.attribute}`}
                     placement="top"
                   >
                     <span>{row.attribute}</span>

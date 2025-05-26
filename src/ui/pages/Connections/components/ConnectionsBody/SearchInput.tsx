@@ -1,7 +1,7 @@
 import { IonSearchbar } from "@ionic/react";
 import { i18n } from "../../../../../i18n";
 import "./ConnectionsBody.scss";
-import { SearchInputProps } from "./ConnectionsBody.types";
+import { SearchInputProps } from "../SearchInput/SearchInput.types";
 
 const SearchInput = ({ onFocus, onInputChange, value }: SearchInputProps) => {
   const showCancel = value ? "always" : "focus";

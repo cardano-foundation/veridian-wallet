@@ -7,6 +7,7 @@ import {
   issueAcdcCredential,
   revokeCredential,
   contactCredentials,
+  schemas,
 } from "./apis/credential.api";
 import { createShortenUrl, getFullUrl } from "./apis/shorten.api";
 import { schemaApi } from "./apis/schema.api";
@@ -23,6 +24,7 @@ router.get(config.path.schemaOobi, schemaApi);
 router.post(config.path.resolveOobi, resolveOobi);
 router.get(config.path.contacts, contactList);
 router.get(config.path.contactCredentials, contactCredentials);
+router.get(config.path.schemas, schemas);
 router.post(config.path.requestDisclosure, requestDisclosure);
 router.post(config.path.revokeCredential, revokeCredential);
 router.delete(config.path.deleteContact, deleteContact);

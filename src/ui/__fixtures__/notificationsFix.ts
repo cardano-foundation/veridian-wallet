@@ -97,20 +97,6 @@ const notificationsFix: KeriaNotification[] = [
     a: {
       r: "/local/signrequest/",
       d: "EMT02ZHUhpnr4gFFk104B-pLwb2bJC8aip2VYmbPztnk",
-      m: "",
-      payload: {
-        identifier: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRc",
-        payload: JSON.stringify({
-          action: "Sign custom Certificate",
-          actionText: "Sign custom Certificate",
-          id: "2658fb7d-cd12-48c3-bc95-23e73616b79f",
-          address:
-            "stake_test1uzpq2pktpnj54e64kfgjkm8nrptdwfj7s7fvhp40e98qsusd9z7ek",
-          event: "Sign custom Certificate",
-          network: "PREPROD",
-          slot: "40262407",
-        }),
-      },
     },
     connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
     read: false,
@@ -118,4 +104,15 @@ const notificationsFix: KeriaNotification[] = [
   },
 ];
 
-export { notificationsFix };
+const connectInstructionsFix = {
+  id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMm2",
+  createdAt: new Date(now.getTime() + 120 * -60000).toISOString(),
+  a: {
+    name: "ServerToConnectTo",
+  },
+  connectionId: "singleton",
+  read: false,
+  groupReplied: false,
+};
+
+export { notificationsFix, connectInstructionsFix };

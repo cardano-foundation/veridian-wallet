@@ -26,7 +26,7 @@ import { i18n } from "../../../../../i18n";
 import { RoutePath } from "../../../../../routes";
 import { useAppDispatch } from "../../../../../store/hooks";
 import {
-  getBiometricsCacheCache,
+  getBiometricsCache,
   setEnableBiometricsCache,
 } from "../../../../../store/reducers/biometricsCache";
 import {
@@ -54,7 +54,7 @@ import { OptionIndex, OptionProps, SettingsProps } from "./Settings.types";
 
 const Settings = ({ switchView, handleClose }: SettingsProps) => {
   const dispatch = useAppDispatch();
-  const biometricsCache = useSelector(getBiometricsCacheCache);
+  const biometricsCache = useSelector(getBiometricsCache);
   const [option, setOption] = useState<number | null>(null);
   const { biometricInfo, handleBiometricAuth } = useBiometricAuth();
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
@@ -183,35 +183,35 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
   const handleOptionClick = async (item: OptionProps) => {
     setOption(item.index);
     switch (item.index) {
-    case OptionIndex.BiometricUpdate: {
-      handleBiometricUpdate();
-      break;
-    }
-    case OptionIndex.ChangePin: {
-      openVerify();
-      break;
-    }
-    case OptionIndex.ManagePassword: {
-      switchView && switchView(SubMenuKey.ManagePassword);
-      break;
-    }
-    case OptionIndex.Contact: {
-      break;
-    }
-    case OptionIndex.Documentation: {
-      openBrowserLink(DOCUMENTATION_LINK);
-      break;
-    }
-    case OptionIndex.Term: {
-      switchView && switchView(SubMenuKey.TermsAndPrivacy);
-      break;
-    }
-    case OptionIndex.RecoverySeedPhrase: {
-      switchView && switchView(SubMenuKey.RecoverySeedPhrase);
-      break;
-    }
-    default:
-      return;
+      case OptionIndex.BiometricUpdate: {
+        handleBiometricUpdate();
+        break;
+      }
+      case OptionIndex.ChangePin: {
+        openVerify();
+        break;
+      }
+      case OptionIndex.ManagePassword: {
+        switchView && switchView(SubMenuKey.ManagePassword);
+        break;
+      }
+      case OptionIndex.Contact: {
+        break;
+      }
+      case OptionIndex.Documentation: {
+        openBrowserLink(DOCUMENTATION_LINK);
+        break;
+      }
+      case OptionIndex.Term: {
+        switchView && switchView(SubMenuKey.TermsAndPrivacy);
+        break;
+      }
+      case OptionIndex.RecoverySeedPhrase: {
+        switchView && switchView(SubMenuKey.RecoverySeedPhrase);
+        break;
+      }
+      default:
+        return;
     }
   };
 
@@ -237,19 +237,19 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
 
   const onVerify = () => {
     switch (option) {
-    case 0: {
-      biometricAuth();
-      break;
-    }
-    case 1: {
-      setChangePinIsOpen(true);
-      break;
-    }
-    case OptionIndex.DeleteAccount:
-      deleteAccount();
-      break;
-    default:
-      return;
+      case 0: {
+        biometricAuth();
+        break;
+      }
+      case 1: {
+        setChangePinIsOpen(true);
+        break;
+      }
+      case OptionIndex.DeleteAccount:
+        deleteAccount();
+        break;
+      default:
+        return;
     }
     setOption(null);
   };

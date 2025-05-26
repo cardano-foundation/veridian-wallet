@@ -2,22 +2,22 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 import { Box, Button } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { IssueCredentialModal } from "../../components/IssueCredentialModal";
 import { RoleIndex } from "../../components/NavBar/constants/roles";
 import { PageHeader } from "../../components/PageHeader";
-import { CredentialMap } from "../../const";
+import { RoutePath } from "../../const/route";
 import { i18n } from "../../i18n";
 import { useAppSelector } from "../../store/hooks";
 import { getRoleView } from "../../store/reducers";
+import "./CredentialDetails.scss";
 import { CredentialInfoCard } from "./CredentialInfoCard";
 import { CredentialTable } from "./CredentialsTable";
-import "./CredentialDetails.scss";
-import { IssueCredentialModal } from "../../components/IssueCredentialModal";
-import { RoutePath } from "../../const/route";
 
 export const CredentialDetails = () => {
   const [open, setOpen] = useState(false);
   const roleViewIndex = useAppSelector(getRoleView) as RoleIndex;
   const credentials = useAppSelector((state) => state.connections.credentials);
+  const schemas = useAppSelector((state) => state.schemasCache.schemas);
   const nav = useNavigate();
   const { id } = useParams();
 
@@ -25,7 +25,7 @@ export const CredentialDetails = () => {
     if (roleViewIndex !== RoleIndex.ISSUER) nav(RoutePath.Connections);
   }, [nav, roleViewIndex]);
 
-  const schema = CredentialMap[String(id)] || "";
+  const schemaName = schemas.find((item) => item.$id === id)?.title || "";
 
   const displayCredentials = useMemo(
     () => credentials.filter((item) => item.schema.$id === id),
@@ -54,7 +54,7 @@ export const CredentialDetails = () => {
         />
         <Box className="credential-detail-page-container">
           <CredentialInfoCard
-            schemaName={schema}
+            schemaName={schemaName}
             creationDate={new Date()}
           />
           <CredentialTable credentials={displayCredentials} />

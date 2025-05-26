@@ -266,6 +266,10 @@ class Agent {
     );
     await this.signifyApi.deleteNotification(grantNotification.i);
   }
+
+  async schemas() {
+    return await this.signifyApi.schemas();
+  }
 }
 
 export { Agent };

@@ -129,6 +129,11 @@ const PageHeader = ({
 
   const hasAction = backButton || closeButton || actionButton;
 
+  const actionButtonClasses = combineClassNames({
+    "has-action": !!hasAction,
+    "has-progressbar": !!progressBar,
+  });
+
   return (
     <IonHeader
       className={`ion-no-border page-header ${
@@ -212,9 +217,9 @@ const PageHeader = ({
           </div>
         )}
 
-        {!progressBar && (
+        {(!!actionButton || !!additionalButtons) && (
           <IonButtons
-            className={hasAction ? "has-action" : undefined}
+            className={actionButtonClasses}
             slot="end"
           >
             {actionButton && !actionButtonLabel && (

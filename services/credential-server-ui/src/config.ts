@@ -38,6 +38,7 @@ const config = {
     resolveOobi: "/resolveOobi",
     requestDisclosure: "/requestDisclosure",
     revokeCredential: "/revokeCredential",
+    schemas: "/schemas",
   },
 };
 

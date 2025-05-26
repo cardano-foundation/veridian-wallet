@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { Agent } from "../agent";
-import { ACDC_SCHEMAS } from "../utils/schemas";
 import { log } from "../log";
 import { SignifyApi } from "../modules/signify";
+import { ACDC_SCHEMAS } from "../utils/schemas";
 
 async function issueAcdcCredential(
   req: Request,
@@ -80,9 +80,18 @@ async function revokeCredential(req: Request, res: Response): Promise<void> {
   }
 }
 
+async function schemas(req: Request, res: Response) {
+  const schemas = await Agent.agent.schemas();
+  res.status(200).send({
+    success: true,
+    data: schemas,
+  });
+}
+
 export {
+  contactCredentials,
   issueAcdcCredential,
   requestDisclosure,
   revokeCredential,
-  contactCredentials,
+  schemas,
 };

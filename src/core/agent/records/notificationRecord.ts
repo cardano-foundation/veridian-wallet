@@ -27,7 +27,6 @@ class NotificationRecord extends BaseRecord {
   connectionId!: string;
   receivingPre!: string;
   linkedRequest!: LinkedRequest;
-
   credentialId?: string;
   groupReplied?: boolean;
   groupInitiatorPre?: string;

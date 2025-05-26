@@ -26,6 +26,7 @@ import { CredentialDetails } from "./pages/CredentialDetails";
 import { RequestPresentation } from "./pages/RequestPresentation";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { fetchSchemas } from "./store/reducers/schemasSlice";
 
 const App = () => {
   const MAX_TOAST_MESSAGES = 10;
@@ -36,6 +37,10 @@ const App = () => {
 
   useEffect(() => {
     dispatch(fetchContacts());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchSchemas());
   }, [dispatch]);
 
   useEffect(() => {

@@ -1,15 +1,15 @@
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
 import {
-  setAuthentication,
-  setCurrentRoute,
-} from "../../store/reducers/stateCache";
-import {
   clearSeedPhraseCache,
   setSeedPhraseCache,
 } from "../../store/reducers/seedPhraseCache";
-import { DataProps, NextRoute, StoreState } from "./nextRoute.types";
+import {
+  setAuthentication,
+  setCurrentRoute,
+} from "../../store/reducers/stateCache";
 import { RoutePath, TabsRoutePath } from "../paths";
+import { DataProps, NextRoute, StoreState } from "./nextRoute.types";
 
 const getNextRootRoute = (data: DataProps) => {
   const authentication = data.store.stateCache.authentication;
@@ -17,6 +17,10 @@ const getNextRootRoute = (data: DataProps) => {
   let path = RoutePath.ONBOARDING;
 
   if (authentication.passcodeIsSet) {
+    path = RoutePath.SETUP_BIOMETRICS;
+  }
+
+  if (authentication.finishSetupBiometrics) {
     path = RoutePath.CREATE_PASSWORD;
   }
 
@@ -68,7 +72,11 @@ const getNextSetPasscodeRoute = (store: StoreState) => {
   const seedPhraseIsSet = !!store.seedPhraseCache?.seedPhrase;
   const ssiAgentIsSet = store.stateCache.authentication.ssiAgentIsSet;
 
-  let nextPath = RoutePath.CREATE_PASSWORD;
+  let nextPath = RoutePath.SETUP_BIOMETRICS;
+
+  if (store.stateCache.authentication.finishSetupBiometrics) {
+    nextPath = RoutePath.CREATE_PASSWORD;
+  }
 
   if (seedPhraseIsSet) {
     nextPath = RoutePath.SSI_AGENT;
@@ -90,6 +98,7 @@ const updateStoreAfterSetPasscodeRoute = (data: DataProps) => {
     firstAppLaunch: false,
   });
 };
+
 const updateStoreAfterVerifySeedPhraseRoute = (data: DataProps) => {
   return setAuthentication({
     ...data.store.stateCache.authentication,
@@ -154,6 +163,14 @@ const updateStoreAfterCreatePassword = (data: DataProps) => {
   });
 };
 
+const updateAfterSetupBiometrics = (data: DataProps) => {
+  const finishedSetup = data.state?.finishedSetup;
+  return setAuthentication({
+    ...data.store.stateCache.authentication,
+    finishSetupBiometrics: finishedSetup,
+  });
+};
+
 const getNextRoute = (
   currentPath: string,
   data: DataProps
@@ -183,6 +200,10 @@ const nextRoute: Record<string, NextRoute> = {
   [RoutePath.SET_PASSCODE]: {
     nextPath: (data: DataProps) => getNextSetPasscodeRoute(data.store),
     updateRedux: [updateStoreAfterSetPasscodeRoute],
+  },
+  [RoutePath.SETUP_BIOMETRICS]: {
+    nextPath: (data: DataProps) => getNextRootRoute(data),
+    updateRedux: [updateAfterSetupBiometrics],
   },
   [RoutePath.GENERATE_SEED_PHRASE]: {
     nextPath: () => getNextGenerateSeedPhraseRoute(),
@@ -219,17 +240,17 @@ const nextRoute: Record<string, NextRoute> = {
 };
 
 export {
+  getNextCreatePasswordRoute,
+  getNextCreateSSIAgentRoute,
+  getNextGenerateSeedPhraseRoute,
+  getNextOnboardingRoute,
   getNextRootRoute,
   getNextRoute,
-  getNextOnboardingRoute,
   getNextSetPasscodeRoute,
-  updateStoreAfterSetPasscodeRoute,
-  getNextGenerateSeedPhraseRoute,
   getNextVerifySeedPhraseRoute,
+  updateStoreAfterCreatePassword,
+  updateStoreAfterSetPasscodeRoute,
+  updateStoreAfterVerifySeedPhraseRoute,
   updateStoreCurrentRoute,
   updateStoreSetSeedPhrase,
-  updateStoreAfterVerifySeedPhraseRoute,
-  getNextCreatePasswordRoute,
-  updateStoreAfterCreatePassword,
-  getNextCreateSSIAgentRoute,
 };

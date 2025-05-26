@@ -44,6 +44,14 @@
     "cancelbtn": "Cancel",
     "backbtn": "Back"
   },
+  "setupbiometrics": {
+    "title": "Enable biometrics",
+    "description": "Use biometrics for quicker access to your Veridian wallet. You can turn this on or off anytime in settings.",
+    "button": {
+      "enable": "Enable biometrics",
+      "skip": "Set up later"
+    }
+  },
   "generateseedphrase": {
     "onboarding": {
       "title": "Your recovery phrase",
@@ -801,6 +809,14 @@
         "rightbrace": "Right brace",
         "tilde": "Tilde"
       }
+    },
+    "setuppassword": {
+      "title": "Create a password",
+      "description": "Add extra protection for sensitive actions. If you skip this for now, your PIN will be used instead — you can always set a password later.",
+      "button": {
+        "enable": "Add a password",
+        "skip": "Set up later"
+      }
     }
   },
   "ssiagent": {
@@ -1320,12 +1336,12 @@
           "subtitle": "Connect with {{connection}}",
           "description": "You should have received an email explaining how to create a connection between your wallet and with the {{connection}} team.",
           "steps": {
-            "one": "Open the email subject “Connect with {{connection}} via your Identity Wallet”",
-            "two": "Find the QR code within the email",
-            "three": "Open the scanner using the button at the bottom of this notification or from the wallet’s navigation tab",
-            "four": "Scan the QR code or paste the Connection ID and advance",
-            "five": "Accept the connection to continue",
-            "six": "Wait for {{connection}} to accept"
+            "one": "Make sure your identifier is set up in the wallet",
+            "two": "Open the email subject “Connect with {{connection}} via your Identity Wallet”",
+            "three": "Find the QR code within the email",
+            "four": "Open the scanner using the button at the bottom of this notification or from the wallet’s navigation tab",
+            "five": "Scan the QR code or paste the Connection ID and advance",
+            "six": "You're now connected with {{connection}}"
           },
           "button": {
             "label": "Scan now"

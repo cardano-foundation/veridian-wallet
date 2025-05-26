@@ -15,7 +15,7 @@ import { i18n } from "../../../i18n";
 import { PublicRoutes, RoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getBiometricsCacheCache,
+  getBiometricsCache,
   setEnableBiometricsCache,
 } from "../../../store/reducers/biometricsCache";
 import {
@@ -57,7 +57,7 @@ const LockPageContainer = () => {
   const preventBiometricOnEvent = useRef(false);
 
   const { handleBiometricAuth } = useBiometricAuth();
-  const biometricsCache = useSelector(getBiometricsCacheCache);
+  const biometricsCache = useSelector(getBiometricsCache);
   const firstAppLaunch = useSelector(getFirstAppLaunch);
   const [openRecoveryAuth, setOpenRecoveryAuth] = useState(false);
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();

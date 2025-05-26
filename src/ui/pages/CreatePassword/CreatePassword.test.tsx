@@ -1,7 +1,12 @@
 import { IonButton, IonIcon, IonInput, IonLabel } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
 import { ionFireEvent } from "@ionic/react-test-utils";
-import { render, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  queryByText,
+  render,
+  waitFor,
+} from "@testing-library/react";
 import { act } from "react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
@@ -17,6 +22,8 @@ import {
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { CreatePassword } from "./CreatePassword";
+import { BasicRecord } from "../../../core/agent/records";
+import { MiscRecordId } from "../../../core/agent/agent.types";
 
 jest.mock("../../components/CustomInput", () => ({
   CustomInput: (props: CustomInputProps) => {
@@ -62,7 +69,9 @@ jest.mock("../../components/CustomInput", () => ({
   },
 }));
 
-const createOrUpdateBasicRecordMock = jest.fn();
+const createOrUpdateBasicRecordMock = jest.fn((_: unknown) =>
+  Promise.resolve(true)
+);
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
@@ -112,10 +121,10 @@ describe("Create Password Page", () => {
       dispatch: dispatchMock,
     };
 
-    test("Render", () => {
+    test("Render", async () => {
       const path = RoutePath.CREATE_PASSWORD;
 
-      const { getByTestId, queryByTestId } = render(
+      const { getByTestId, queryByTestId, getByText } = render(
         <Provider store={storeMocked}>
           <MemoryRouter initialEntries={[path]}>
             <Route
@@ -126,7 +135,27 @@ describe("Create Password Page", () => {
         </Provider>
       );
 
-      expect(getByTestId("progress-bar")).toBeInTheDocument();
+      expect(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.title)
+      ).toBeVisible();
+      expect(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.description)
+      ).toBeVisible();
+      expect(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.button.enable)
+      ).toBeVisible();
+      expect(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.button.skip)
+      ).toBeVisible();
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.button.enable)
+      );
+
+      await waitFor(() => {
+        expect(getByTestId("progress-bar")).toBeInTheDocument();
+      });
+
       expect(queryByTestId("close-button")).not.toBeInTheDocument();
       expect(getByTestId("create-password-title")).toBeInTheDocument();
       expect(getByTestId("create-password-title")).toHaveTextContent(
@@ -152,12 +181,71 @@ describe("Create Password Page", () => {
       expect(getByTestId("primary-button-create-password")).toHaveTextContent(
         EN_TRANSLATIONS.createpassword.button.continue
       );
-      expect(
-        getByTestId("tertiary-button-create-password")
-      ).toBeInTheDocument();
-      expect(getByTestId("tertiary-button-create-password")).toHaveTextContent(
-        EN_TRANSLATIONS.createpassword.button.skip
+    });
+    test("User Action: Skip on setup page", async () => {
+      const handleClear = jest.fn();
+      const setPasswordIsSet = jest.fn();
+
+      const history = createMemoryHistory();
+      history.push(RoutePath.CREATE_PASSWORD);
+
+      const { getByText, findByText, queryByText } = render(
+        <IonReactMemoryRouter
+          initialEntries={[RoutePath.CREATE_PASSWORD]}
+          history={history}
+        >
+          <Provider store={storeMocked}>
+            <CreatePassword
+              handleClear={handleClear}
+              setPasswordIsSet={setPasswordIsSet}
+            />
+          </Provider>
+        </IonReactMemoryRouter>
       );
+
+      expect(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.button.skip)
+      ).toBeVisible();
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.button.skip)
+      );
+
+      const alertTitle = await findByText(
+        EN_TRANSLATIONS.createpassword.alert.text
+      );
+
+      await waitFor(() => {
+        expect(alertTitle).toBeVisible();
+      });
+
+      const mockDate = new Date(1466424490000);
+      const spy = jest
+        .spyOn(global, "Date")
+        .mockImplementation((() => mockDate) as never);
+
+      act(() => {
+        fireEvent.click(
+          getByText(EN_TRANSLATIONS.createpassword.alert.button.confirm)
+        );
+      });
+
+      await waitFor(() => {
+        expect(
+          queryByText(EN_TRANSLATIONS.createpassword.alert.text)
+        ).toBeNull();
+      });
+
+      await waitFor(() => {
+        expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+          new BasicRecord({
+            id: MiscRecordId.APP_PASSWORD_SKIPPED,
+            content: { value: true },
+          })
+        );
+      });
+
+      spy.mockRestore();
     });
 
     test("Submit password", async () => {
@@ -167,7 +255,7 @@ describe("Create Password Page", () => {
       const history = createMemoryHistory();
       history.push(RoutePath.CREATE_PASSWORD);
 
-      const { getByTestId } = render(
+      const { getByTestId, getByText } = render(
         <IonReactMemoryRouter history={history}>
           <Provider store={storeMocked}>
             <CreatePassword
@@ -177,6 +265,14 @@ describe("Create Password Page", () => {
           </Provider>
         </IonReactMemoryRouter>
       );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.button.enable)
+      );
+
+      await waitFor(() => {
+        expect(getByTestId("progress-bar")).toBeInTheDocument();
+      });
 
       const input = getByTestId("create-password-input");
       const confirmInput = getByTestId("confirm-password-input");

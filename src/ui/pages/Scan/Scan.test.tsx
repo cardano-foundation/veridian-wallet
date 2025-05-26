@@ -8,7 +8,6 @@ import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
 import { OobiType } from "../../../core/agent/agent.types";
 import { TabsRoutePath } from "../../../routes/paths";
-import { store } from "../../../store";
 import { showConnections } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { OperationType } from "../../globals/types";

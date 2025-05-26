@@ -26,6 +26,7 @@ interface AuthenticationCacheProps {
   recoveryWalletProgress: boolean;
   loginAttempt: LoginAttempts;
   firstAppLaunch: boolean;
+  finishSetupBiometrics?: boolean;
 }
 
 enum IncomingRequestType {

@@ -443,4 +443,8 @@ export class SignifyApi {
     }
     return op;
   }
+
+  async schemas() {
+    return await this.client.schemas().list();
+  }
 }

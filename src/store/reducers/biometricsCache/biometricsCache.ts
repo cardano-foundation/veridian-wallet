@@ -20,12 +20,12 @@ const biometricsCacheSlice = createSlice({
 const { setEnableBiometricsCache, clearBiometricsCache } =
   biometricsCacheSlice.actions;
 
-const getBiometricsCacheCache = (state: RootState) => state.biometricsCache;
+const getBiometricsCache = (state: RootState) => state.biometricsCache;
 
 export {
   initialState,
   setEnableBiometricsCache,
-  getBiometricsCacheCache,
+  getBiometricsCache,
   biometricsCacheSlice,
   clearBiometricsCache,
 };
