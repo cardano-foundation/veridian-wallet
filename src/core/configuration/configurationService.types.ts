@@ -7,10 +7,6 @@ enum OptionalFeature {
   ConnectWallet = "CONNECT_WALLET",
 }
 
-enum CustomContent {
-  Intro = "INTRO",
-}
-
 enum IndividualOnlyMode {
   FirstTime = "FirstTime",
   Always = "Always",
@@ -31,7 +27,6 @@ interface NotificationsConfig {
 
 interface AppFeaturesConfig {
   cut: OptionalFeature[];
-  customContent: CustomContent[];
   customise?: {
     identifiers?: IdentifiersConfig;
     notifications?: NotificationsConfig;
@@ -50,5 +45,5 @@ interface Configuration {
   features: AppFeaturesConfig;
 }
 
+export { IndividualOnlyMode, OptionalFeature };
 export type { Configuration };
-export { OptionalFeature, CustomContent, IndividualOnlyMode };

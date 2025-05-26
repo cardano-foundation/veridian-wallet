@@ -1,6 +1,5 @@
 import {
   Configuration,
-  CustomContent,
   IndividualOnlyMode,
   OptionalFeature,
 } from "./configurationService.types";
@@ -94,24 +93,14 @@ class ConfigurationService {
       return this.invalid("features must be an object");
     }
 
-    const { cut, customContent, customise } = features;
+    const { cut, customise } = features;
     if (!Array.isArray(cut)) {
       return this.invalid("features.cut must be a array");
-    }
-
-    if (!Array.isArray(customContent)) {
-      return this.invalid("features.customContent must be a array");
     }
 
     for (const feature of cut) {
       if (!Object.values(OptionalFeature).includes(feature)) {
         return this.invalid("Invalid features.cut value");
-      }
-    }
-
-    for (const content of customContent) {
-      if (!Object.values(CustomContent).includes(content)) {
-        return this.invalid("Invalid features.customContent value");
       }
     }
 
