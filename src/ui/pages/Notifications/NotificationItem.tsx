@@ -77,9 +77,9 @@ const NotificationItem = ({
         });
       case NotificationRoute.HumanReadableMessage:
         return item.a.m as string;
-      case NotificationRoute.LocalConnectInstructions:
+      case NotificationRoute.LocalSingletonConnectInstructions:
         return t("tabs.notifications.tab.labels.connectinstructions", {
-          connection: connectionName || t("connections.unknown"),
+          connection: item.a.name || t("connections.unknown"),
         });
       default:
         return "";
@@ -95,7 +95,7 @@ const NotificationItem = ({
         return fingerPrintOutline;
       case NotificationRoute.RemoteSignReq:
         return documentOutline;
-      case NotificationRoute.LocalConnectInstructions:
+      case NotificationRoute.LocalSingletonConnectInstructions:
         return personCircleOutline;
       default:
         return idCardOutline;

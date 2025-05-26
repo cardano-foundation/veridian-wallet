@@ -133,7 +133,6 @@ const App = () => {
         OperationType.MULTI_SIG_RECEIVER_SCAN,
         OperationType.SCAN_SSI_BOOT_URL,
         OperationType.SCAN_SSI_CONNECT_URL,
-        OperationType.SCAN_REMOTE_CONNECTION,
       ].includes(currentOperation)
     );
   }, [currentOperation]);

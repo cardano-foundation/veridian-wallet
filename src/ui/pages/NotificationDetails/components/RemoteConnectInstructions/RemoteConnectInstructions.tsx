@@ -17,10 +17,10 @@ function RemoteConnectInstructions({
   handleBack,
 }: NotificationDetailsProps) {
   const dispatch = useAppDispatch();
-  const connection = "Connection"; // TODO: change hardcoded value to dynamic
+  const connection = notificationDetails.a.name;
 
   const handleClick = () => {
-    dispatch(setCurrentOperation(OperationType.SCAN_REMOTE_CONNECTION));
+    dispatch(setCurrentOperation(OperationType.SCAN_CONNECTION));
   };
 
   return (
@@ -65,15 +65,15 @@ function RemoteConnectInstructions({
           <ol className="tips">
             <li>
               {i18n.t(
-                "tabs.notifications.details.connectinstructions.steps.one",
-                {
-                  connection: connection,
-                }
+                "tabs.notifications.details.connectinstructions.steps.one"
               )}
             </li>
             <li>
               {i18n.t(
-                "tabs.notifications.details.connectinstructions.steps.two"
+                "tabs.notifications.details.connectinstructions.steps.two",
+                {
+                  connection: connection,
+                }
               )}
             </li>
             <li>

@@ -68,8 +68,8 @@ const CreateIdentifier = ({
   const initalState = {
     id: "",
     displayName:
-      ConfigurationService.env.features.identifiers?.creation?.defaultName ||
-      "",
+      ConfigurationService.env.features.customise?.identifiers?.creation
+        ?.defaultName || "",
     selectedAidType: groupId ? 1 : 0,
     selectedTheme: 0,
     color: IdentifierColor.One,
@@ -289,8 +289,8 @@ const CreateIdentifier = ({
   );
 
   const hiddenTypeSelect =
-    ConfigurationService.env.features.identifiers?.creation?.individualOnly ===
-      IndividualOnlyMode.Always ||
+    ConfigurationService.env.features.customise?.identifiers?.creation
+      ?.individualOnly === IndividualOnlyMode.Always ||
     multiSigGroup ||
     individualFirstCreate;
 

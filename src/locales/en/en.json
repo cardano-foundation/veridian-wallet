@@ -1320,12 +1320,12 @@
           "subtitle": "Connect with {{connection}}",
           "description": "You should have received an email explaining how to create a connection between your wallet and with the {{connection}} team.",
           "steps": {
-            "one": "Open the email subject “Connect with {{connection}} via your Identity Wallet”",
-            "two": "Find the QR code within the email",
-            "three": "Open the scanner using the button at the bottom of this notification or from the wallet’s navigation tab",
-            "four": "Scan the QR code or paste the Connection ID and advance",
-            "five": "Accept the connection to continue",
-            "six": "Wait for {{connection}} to accept"
+            "one": "Make sure your identifier is set up in the wallet",
+            "two": "Open the email subject “Connect with {{connection}} via your Identity Wallet”",
+            "three": "Find the QR code within the email",
+            "four": "Open the scanner using the button at the bottom of this notification or from the wallet’s navigation tab",
+            "five": "Scan the QR code or paste the Connection ID and advance",
+            "six": "You're now connected with {{connection}}"
           },
           "button": {
             "label": "Scan now"

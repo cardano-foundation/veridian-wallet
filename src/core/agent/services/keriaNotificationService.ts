@@ -55,6 +55,8 @@ class KeriaNotificationService extends AgentService {
     "Out of order notification received, unable to process right now";
   static readonly DUPLICATE_ISSUANCE =
     "Duplicate IPEX grant message for same credential, may be out-of-order TEL updates for revocation";
+  static readonly SINGLETON_ROUTE_REQUIRED = "singleton";
+  static readonly SINGLETON_PRE = "singleton_pre"; // Dummy prefix to re-use within singleton notifications where unused (better than setting to optional, as weakens rest of code)
 
   static readonly POLL_KERIA_INTERVAL = 2000;
   static readonly CHECK_READINESS_INTERNAL = 25;
@@ -953,6 +955,50 @@ class KeriaNotificationService extends AgentService {
       connectionId: result.connectionId,
       read: result.read,
       groupReplied: result.linkedRequest.current !== undefined,
+    };
+  }
+
+  async createSingletonNotification(
+    route: NotificationRoute,
+    a = {}
+  ): Promise<KeriaNotification | undefined> {
+    // These notifications are generally only created once, one per local notification route.
+    if (!/^\/local\/singleton/.test(route)) {
+      throw new Error(KeriaNotificationService.SINGLETON_ROUTE_REQUIRED);
+    }
+
+    // Only create once. If deleted by the user, it can be created again, but generally other logic prevents that.
+    if (
+      (
+        await this.notificationStorage.findAllByQuery({
+          route: NotificationRoute.LocalSingletonConnectInstructions,
+        })
+      ).length > 0
+    ) {
+      return;
+    }
+
+    const notification: NotificationRecordStorageProps = {
+      id: randomSalt(),
+      createdAt: new Date(),
+      a: {
+        ...a,
+        r: route,
+      },
+      read: false,
+      route,
+      connectionId: KeriaNotificationService.SINGLETON_PRE,
+      receivingPre: KeriaNotificationService.SINGLETON_PRE,
+    };
+
+    await this.notificationStorage.save(notification);
+    return {
+      id: notification.id,
+      createdAt: notification.createdAt.toISOString(),
+      a: notification.a,
+      connectionId: notification.connectionId,
+      read: notification.read,
+      groupReplied: false,
     };
   }
 

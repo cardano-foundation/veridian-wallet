@@ -16,17 +16,26 @@ enum IndividualOnlyMode {
   Always = "Always",
 }
 
-interface IdentifierConfig {
+interface IdentifiersConfig {
   creation?: {
     individualOnly?: IndividualOnlyMode;
     defaultName?: string;
   };
 }
 
+interface NotificationsConfig {
+  connectInstructions?: {
+    connectionName: string;
+  };
+}
+
 interface AppFeaturesConfig {
   cut: OptionalFeature[];
-  identifiers?: IdentifierConfig;
   customContent: CustomContent[];
+  customise?: {
+    identifiers?: IdentifiersConfig;
+    notifications?: NotificationsConfig;
+  };
 }
 
 interface Configuration {
