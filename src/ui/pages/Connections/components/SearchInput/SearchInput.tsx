@@ -1,7 +1,6 @@
 import { IonSearchbar } from "@ionic/react";
+import { SearchInputProps } from "./SearchInput.types";
 import { i18n } from "../../../../../i18n";
-import "./ConnectionsBody.scss";
-import { SearchInputProps } from "../SearchInput/SearchInput.types";
 
 const SearchInput = ({ onFocus, onInputChange, value }: SearchInputProps) => {
   const showCancel = value ? "always" : "focus";
@@ -11,16 +10,15 @@ const SearchInput = ({ onFocus, onInputChange, value }: SearchInputProps) => {
     onFocus?.(false);
   };
 
-  const handleCancer = () => {
+  const handleCancel = () => {
     onFocus?.(false);
   };
 
   return (
     <IonSearchbar
       className="connection-search-input"
-      data-testid="search-bar"
       showCancelButton={showCancel}
-      onIonCancel={handleCancer}
+      onIonCancel={handleCancel}
       debounce={100}
       onIonFocus={() => onFocus?.(true)}
       onIonBlur={handleBlur}
