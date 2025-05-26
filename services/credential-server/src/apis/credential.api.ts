@@ -38,7 +38,8 @@ async function requestDisclosure(
 
 async function contactCredentials(req: Request, res: Response): Promise<void> {
   const { contactId } = req.query;
-  const data = await Agent.agent.contactCredentials(contactId as string);
+  const data = (await Agent.agent.contactCredentials(contactId as string))
+    .credentialsList;
 
   res.status(200).send({
     success: true,
@@ -84,7 +85,7 @@ async function schemas(req: Request, res: Response) {
   const schemas = await Agent.agent.schemas();
   res.status(200).send({
     success: true,
-    data: schemas,
+    data: schemas.schemasList,
   });
 }
 

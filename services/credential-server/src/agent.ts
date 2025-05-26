@@ -1,10 +1,14 @@
-import { randomPasscode, ready as signifyReady } from "signify-ts";
+import { HabState, randomPasscode, ready as signifyReady } from "signify-ts";
 import { config } from "./config";
 import { SignifyApi } from "./modules/signify/signifyApi";
-import { NotificationRoute } from "./modules/signify/signifyApi.type";
+import {
+  NotificationRoute,
+  SchemasListResult,
+} from "./modules/signify/signifyApi.type";
 import { readFile, writeFile } from "fs/promises";
 import { existsSync, mkdirSync } from "fs";
 import path from "path";
+import { BranFileContent } from "./agent.type";
 
 class Agent {
   static readonly ISSUER_AID_NAME = "issuer";
@@ -24,9 +28,9 @@ class Agent {
   signifyApi!: SignifyApi;
   signifyApiIssuer!: SignifyApi;
 
-  private issuerAid;
-  private holderAid;
-  private qviCredentialId;
+  private issuerAid!: HabState;
+  private holderAid!: HabState;
+  private qviCredentialId!: string;
 
   private constructor() {
     this.signifyApi = new SignifyApi();
@@ -42,8 +46,8 @@ class Agent {
 
   async start(): Promise<void> {
     await signifyReady();
-    let bran;
-    let issuerBran;
+    let bran: string;
+    let issuerBran: string;
     const bransFilePath = "./data/brans.json";
     const dirPath = path.dirname(bransFilePath);
     if (!existsSync(dirPath)) {
@@ -69,7 +73,7 @@ class Agent {
         })
       );
     } else {
-      const bransData = JSON.parse(bransFileContent);
+      const bransData: BranFileContent = JSON.parse(bransFileContent);
       bran = bransData.bran;
       issuerBran = bransData.issuerBran;
     }
@@ -144,7 +148,8 @@ class Agent {
   async pollNotifications() {
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const notifications = await this.signifyApi.getNotifications();
+      const notifications = (await this.signifyApi.getNotifications())
+        .notifications;
       for (const notif of notifications.notes) {
         await this.processNotification(notif);
       }
@@ -241,10 +246,12 @@ class Agent {
 
     // wait for notification
     const getHolderNotifications = async () => {
-      let holderNotifications = await this.signifyApi.getNotifications();
+      let holderNotifications = (await this.signifyApi.getNotifications())
+        .notifications;
 
       while (!holderNotifications.total) {
-        holderNotifications = await this.signifyApi.getNotifications();
+        holderNotifications = (await this.signifyApi.getNotifications())
+          .notifications;
         await new Promise((resolve) => setTimeout(resolve, 250));
       }
 
@@ -267,7 +274,7 @@ class Agent {
     await this.signifyApi.deleteNotification(grantNotification.i);
   }
 
-  async schemas() {
+  async schemas(): Promise<SchemasListResult> {
     return await this.signifyApi.schemas();
   }
 }

@@ -7,11 +7,21 @@ import {
   Serder,
   State,
   Contact,
+  HabState,
 } from "signify-ts";
 import { waitAndGetDoneOp } from "./utils";
 import { config } from "../../config";
 import { Agent } from "../../agent";
 import { randomSalt } from "../../utils/utils";
+import {
+  CredentialsListResult,
+  ExchangeMsg,
+  LeCredential,
+  Notifications,
+  Credential,
+  QviCredential,
+  SchemasListResult,
+} from "./signifyApi.type";
 
 export class SignifyApi {
   static readonly DEFAULT_ROLE = "agent";
@@ -72,18 +82,18 @@ export class SignifyApi {
     await waitAndGetDoneOp(this.client, await locRes.op());
   }
 
-  async getIdentifierByName(name: string): Promise<any> {
+  async getIdentifierByName(name: string): Promise<HabState> {
     return this.client.identifiers().get(name);
   }
 
-  async getOobi(signifyName: string): Promise<any> {
+  async getOobi(signifyName: string): Promise<string> {
     const result = await this.client
       .oobis()
       .get(signifyName, SignifyApi.DEFAULT_ROLE);
     return result.oobis[0];
   }
 
-  async resolveOobi(url: string): Promise<any> {
+  async resolveOobi(url: string): Promise<Operation> {
     const urlObj = new URL(url);
     const alias = urlObj.searchParams.get("name") ?? randomSalt();
     urlObj.searchParams.delete("name");
@@ -110,7 +120,7 @@ export class SignifyApi {
     return operation;
   }
 
-  async createRegistry(name: string) {
+  async createRegistry(name: string): Promise<string> {
     const result = await this.client
       .registries()
       .create({ name, registryName: "vLEI" });
@@ -119,7 +129,7 @@ export class SignifyApi {
     return registries[0].regk;
   }
 
-  async getRegistry(name: string) {
+  async getRegistry(name: string): Promise<string> {
     const registries = await this.client.registries().list(name);
     return registries[0].regk;
   }
@@ -176,7 +186,7 @@ export class SignifyApi {
     issuerName: string,
     registryId: string,
     recipientPrefix: string
-  ) {
+  ): Promise<string> {
     await this.resolveOobi(
       `${config.oobiEndpoint}/oobi/${Agent.QVI_SCHEMA_SAID}`
     );
@@ -211,7 +221,7 @@ export class SignifyApi {
       ancAttachment: issuerCredential.ancAttachment,
       datetime,
     });
-    const smg = await this.client
+    const smg: Operation = await this.client
       .ipex()
       .submitGrant(issuerName, grant, gsigs, gend, [recipientPrefix]);
     await waitAndGetDoneOp(
@@ -235,7 +245,7 @@ export class SignifyApi {
       recipient: issuerAidPrefix,
       datetime: new Date().toISOString().replace("Z", "000+00:00"),
     });
-    const op = await this.client
+    const op: Operation = await this.client
       .ipex()
       .submitAdmit(holderAidName, admit, sigs, aend, [issuerAidPrefix]);
     await waitAndGetDoneOp(
@@ -252,14 +262,16 @@ export class SignifyApi {
     holderAidName: string,
     legalEntityAidPrefix: string,
     attribute: { [key: string]: string }
-  ) {
+  ): Promise<string> {
     await this.resolveOobi(
       `${config.oobiEndpoint}/oobi/${Agent.LE_SCHEMA_SAID}`
     );
     await this.resolveOobi(
       `${config.oobiEndpoint}/oobi/${Agent.QVI_SCHEMA_SAID}`
     );
-    const qviCredential = await this.client.credentials().get(qviCredentialId);
+    const qviCredential: QviCredential = await this.client
+      .credentials()
+      .get(qviCredentialId);
 
     const result = await this.client.credentials().issue(holderAidName, {
       ri: registryId,
@@ -286,7 +298,9 @@ export class SignifyApi {
       })[1],
     });
 
-    const leCredential = await this.client.credentials().get(result.acdc.ked.d);
+    const leCredential: LeCredential = await this.client
+      .credentials()
+      .get(result.acdc.ked.d);
 
     await waitAndGetDoneOp(
       this.client,
@@ -341,20 +355,24 @@ export class SignifyApi {
     return contacts;
   }
 
-  async deleteContact(id: string): Promise<any> {
+  async deleteContact(id: string): Promise<void> {
     return this.client.contacts().delete(id);
   }
 
   async contactCredentials(
     issuerPrefix: string,
     connectionId: string
-  ): Promise<any> {
-    return this.client.credentials().list({
+  ): Promise<CredentialsListResult> {
+    const credentialsList = await this.client.credentials().list({
       filter: {
         "-i": issuerPrefix,
         "-a-i": connectionId,
       },
     });
+    return {
+      count: credentialsList.length,
+      credentialsList,
+    };
   }
 
   async agreeToAcdcFromOffer(
@@ -370,15 +388,18 @@ export class SignifyApi {
     await this.client.ipex().submitAgree(senderName, apply, sigs, [recipient]);
   }
 
-  async getNotifications() {
-    return this.client.notifications().list();
+  async getNotifications(): Promise<Notifications> {
+    const notifications = await this.client.notifications().list();
+    return {
+      notifications,
+    };
   }
 
   async deleteNotification(said: string) {
     return this.client.notifications().delete(said);
   }
 
-  async getExchangeMsg(said: string) {
+  async getExchangeMsg(said: string): Promise<ExchangeMsg> {
     return this.client.exchanges().get(said);
   }
 
@@ -388,7 +409,7 @@ export class SignifyApi {
     credentialId: string
   ) {
     // TODO: If the credential does not exist, this will throw 500 at the moment. Will change this later
-    let credential = await this.client
+    let credential: Credential = await this.client
       .credentials()
       .get(credentialId)
       .catch(() => undefined);
@@ -418,7 +439,7 @@ export class SignifyApi {
       iss: new Serder(credential.iss),
       datetime,
     });
-    const submitGrantOp = await this.client
+    const submitGrantOp: Operation = await this.client
       .ipex()
       .submitGrant(issuerName, grant, gsigs, gend, [holder]);
     await waitAndGetDoneOp(
@@ -428,9 +449,7 @@ export class SignifyApi {
       this.opRetryInterval
     );
   }
-  /**
-   * Note - op must be of type any here until Signify cleans up its typing.
-   */
+
   private async waitAndGetDoneOp(
     op: Operation,
     timeout: number,
@@ -444,7 +463,11 @@ export class SignifyApi {
     return op;
   }
 
-  async schemas() {
-    return await this.client.schemas().list();
+  async schemas(): Promise<SchemasListResult> {
+    const schemasList = await this.client.schemas().list();
+    return {
+      count: schemasList.length,
+      schemasList,
+    };
   }
 }
