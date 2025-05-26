@@ -45,6 +45,7 @@ describe("NextRoute", () => {
             lockedUntil: Date.now(),
           },
           firstAppLaunch: false,
+          finishSetupBiometrics: false,
         },
         showConnections: false,
         toastMsgs: [],
@@ -120,7 +121,7 @@ describe("NextRoute", () => {
     const result = getNextOnboardingRoute(data as DataProps);
 
     expect(result).toEqual({
-      pathname: RoutePath.CREATE_PASSWORD,
+      pathname: RoutePath.SETUP_BIOMETRICS,
     });
   });
 
@@ -150,6 +151,7 @@ describe("NextRoute", () => {
             passwordIsSet: true,
             passwordIsSkipped: false,
             ssiAgentIsUrl: "",
+            finishSetupBiometrics: true,
           },
           currentOperation: OperationType.IDLE,
           queueIncomingRequest: {
@@ -185,6 +187,7 @@ describe("NextRoute", () => {
             passwordIsSkipped: false,
             ssiAgentIsSet: true,
             ssiAgentUrl: "http://keria.com",
+            finishSetupBiometrics: true,
           },
           currentOperation: OperationType.IDLE,
           queueIncomingRequest: {
@@ -220,6 +223,7 @@ describe("NextRoute", () => {
             passwordIsSkipped: false,
             ssiAgentIsSet: false,
             ssiAgentUrl: "",
+            finishSetupBiometrics: true,
           },
           currentOperation: OperationType.IDLE,
           queueIncomingRequest: {
@@ -244,7 +248,7 @@ describe("NextRoute", () => {
     const result = getNextSetPasscodeRoute(storeMock);
 
     expect(result).toEqual({
-      pathname: RoutePath.CREATE_PASSWORD,
+      pathname: RoutePath.SETUP_BIOMETRICS,
     });
   });
 
@@ -309,6 +313,7 @@ describe("getNextRoute", () => {
           lockedUntil: Date.now(),
         },
         firstAppLaunch: false,
+        finishSetupBiometrics: false,
       },
       showConnections: false,
       toastMsgs: [],
@@ -375,7 +380,7 @@ describe("getNextRoute", () => {
     });
 
     expect(result.nextPath).toEqual({
-      pathname: RoutePath.CREATE_PASSWORD,
+      pathname: RoutePath.SETUP_BIOMETRICS,
     });
 
     storeMock.stateCache.authentication.passcodeIsSet = false;
@@ -406,7 +411,7 @@ describe("getNextRoute", () => {
 
     const result = getNextSetPasscodeRoute(storeMock);
     expect(result).toEqual({
-      pathname: RoutePath.CREATE_PASSWORD,
+      pathname: RoutePath.SETUP_BIOMETRICS,
     });
   });
 });

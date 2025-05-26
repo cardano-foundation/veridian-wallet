@@ -44,6 +44,14 @@
     "cancelbtn": "Cancel",
     "backbtn": "Back"
   },
+  "setupbiometrics": {
+    "title": "Enable biometrics",
+    "description": "Use biometrics for quicker access to your Veridian wallet. You can turn this on or off anytime in settings.",
+    "button": {
+      "enable": "Enable biometrics",
+      "skip": "Set up later"
+    }
+  },
   "generateseedphrase": {
     "onboarding": {
       "title": "Your recovery phrase",
@@ -800,6 +808,14 @@
         "verticalbar": "Vertical bar",
         "rightbrace": "Right brace",
         "tilde": "Tilde"
+      }
+    },
+    "setuppassword": {
+      "title": "Create a password",
+      "description": "Add extra protection for sensitive actions. If you skip this for now, your PIN will be used instead — you can always set a password later.",
+      "button": {
+        "enable": "Add a password",
+        "skip": "Set up later"
       }
     }
   },

@@ -133,6 +133,7 @@ describe("Onboarding Page", () => {
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: false,
+          finishSetupBiometrics: true,
         },
         currentOperation: OperationType.IDLE,
       },

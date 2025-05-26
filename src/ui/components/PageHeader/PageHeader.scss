@@ -35,6 +35,12 @@
       min-width: 10%;
     }
 
+    ion-buttons.has-progressbar {
+      .action-button-label {
+        --padding-start: 1rem;
+      }
+    }
+
     ion-buttons ion-button {
       color: var(--ion-color-neutral-700);
       --ion-toolbar-color: var(--ion-color-neutral-700);

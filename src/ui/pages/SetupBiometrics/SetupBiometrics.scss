@@ -1,0 +1,48 @@
+.set-biometrics {
+  .responsive-page-content {
+    justify-content: space-between;
+
+    .page-info {
+      text-align: center;
+      margin-top: 5rem;
+
+      ion-icon {
+        width: 5rem;
+        height: 5rem;
+        color: var(--ion-color-primary-700);
+      }
+
+      h1 {
+        margin: 1.5rem 0 0.75rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      p {
+        font-weight: 500;
+      }
+    }
+  }
+
+  .page-header {
+    ion-toolbar {
+      --background: transparent;
+    }
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .responsive-page-content {
+      .page-info {
+        margin-top: 3.5rem;
+
+        h1 {
+          font-size: 1.25rem;
+        }
+
+        p {
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+}
