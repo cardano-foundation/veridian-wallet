@@ -19,7 +19,6 @@ export enum ThreatName {
   OBFUSCATION_ISSUES = "Obfuscation Issues",
   DEVELOPER_MODE = "Developer Mode",
   ADB_ENABLED = "ADB Enabled",
-  DEVICE_ID = "Device ID",
 }
 
 export interface ThreatCheck {
@@ -117,11 +116,8 @@ export const initializeFreeRASP = async (
     devMode: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     adbEnabled: () => {},
-    deviceID: createThreatAction(
-      setThreatsDetected,
-      ThreatName.DEVICE_ID,
-      i18n.t("systemthreats.rules.deviceid")
-    ),
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    deviceID: () => {},
   };
 
   const freeRASPConfig = {

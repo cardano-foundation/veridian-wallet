@@ -6,7 +6,7 @@ import { PasscodeModuleProps } from "./PasscodeModule.types";
 import "./PasscodeModule.scss";
 import { PASSCODE_MAPPING } from "../../globals/types";
 import { useBiometricAuth } from "../../hooks/useBiometricsHook";
-import { getBiometricsCacheCache } from "../../../store/reducers/biometricsCache";
+import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import faceIdIcon from "../../assets/images/face-id.png";
 
 const PasscodeModule = ({
@@ -17,7 +17,7 @@ const PasscodeModule = ({
   handleRemove,
   handleBiometricButtonClick,
 }: PasscodeModuleProps) => {
-  const biometricsCache = useSelector(getBiometricsCacheCache);
+  const biometricsCache = useSelector(getBiometricsCache);
   const { biometricInfo } = useBiometricAuth();
   const numbers = PASSCODE_MAPPING.numbers;
   const labels = PASSCODE_MAPPING.labels;

@@ -218,7 +218,6 @@ const Scanner = forwardRef(
           (isFullPageScan &&
             [
               OperationType.SCAN_CONNECTION,
-              OperationType.SCAN_REMOTE_CONNECTION,
               OperationType.SCAN_WALLET_CONNECTION,
               OperationType.SCAN_SSI_BOOT_URL,
               OperationType.SCAN_SSI_CONNECT_URL,
@@ -817,10 +816,10 @@ const Scanner = forwardRef(
               currentOperation === OperationType.MULTI_SIG_RECEIVER_SCAN
                 ? `${i18n.t("createidentifier.scan.pasteoobi")}`
                 : currentOperation === OperationType.SCAN_WALLET_CONNECTION
-                ? i18n.t(
+                  ? i18n.t(
                     "tabs.menu.tab.items.connectwallet.inputpidmodal.header"
                   )
-                : `${i18n.t("createidentifier.scan.pastecontents")}`
+                  : `${i18n.t("createidentifier.scan.pastecontents")}`
             }`,
             actionButton: true,
             actionButtonDisabled: !pastedValue,

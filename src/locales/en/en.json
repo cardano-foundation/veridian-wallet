@@ -44,6 +44,14 @@
     "cancelbtn": "Cancel",
     "backbtn": "Back"
   },
+  "setupbiometrics": {
+    "title": "Enable biometrics",
+    "description": "Use biometrics for quicker access to your Veridian wallet. You can turn this on or off anytime in settings.",
+    "button": {
+      "enable": "Enable biometrics",
+      "skip": "Set up later"
+    }
+  },
   "generateseedphrase": {
     "onboarding": {
       "title": "Your recovery phrase",
@@ -801,6 +809,14 @@
         "rightbrace": "Right brace",
         "tilde": "Tilde"
       }
+    },
+    "setuppassword": {
+      "title": "Create a password",
+      "description": "Add extra protection for sensitive actions. If you skip this for now, your PIN will be used instead — you can always set a password later.",
+      "button": {
+        "enable": "Add a password",
+        "skip": "Set up later"
+      }
     }
   },
   "ssiagent": {
@@ -1320,12 +1336,12 @@
           "subtitle": "Connect with {{connection}}",
           "description": "You should have received an email explaining how to create a connection between your wallet and with the {{connection}} team.",
           "steps": {
-            "one": "Open the email subject “Connect with {{connection}} via your Identity Wallet”",
-            "two": "Find the QR code within the email",
-            "three": "Open the scanner using the button at the bottom of this notification or from the wallet’s navigation tab",
-            "four": "Scan the QR code or paste the Connection ID and advance",
-            "five": "Accept the connection to continue",
-            "six": "Wait for {{connection}} to accept"
+            "one": "Make sure your identifier is set up in the wallet",
+            "two": "Open the email subject “Connect with {{connection}} via your Identity Wallet”",
+            "three": "Find the QR code within the email",
+            "four": "Open the scanner using the button at the bottom of this notification or from the wallet’s navigation tab",
+            "five": "Scan the QR code or paste the Connection ID and advance",
+            "six": "You're now connected with {{connection}}"
           },
           "button": {
             "label": "Scan now"
@@ -1953,7 +1969,6 @@
     "obfuscationissues": "Obfuscation Issues",
     "developermode": "Developer Mode",
     "adbenabled": "ADB Enabled",
-    "deviceId": "Device ID Issues",
     "alert": "Security threats detected. Please resolve the issues listed, then close and reopen the app to continue.",
     "help": "Help",
     "rules": {
@@ -1967,8 +1982,7 @@
       "securehardwarenotavailable": "Indicates that secure hardware features, such as a secure enclave or trusted execution environment (TEE), are unavailable. While this may be tolerable in some cases, it can reduce security.",
       "obfuscationissues": "Indicates potential issues with code obfuscation, which is a security measure used to protect the app's code from reverse engineering. Lack of proper obfuscation increases security risks, especially on Android.",
       "developermode": "Detects if the device has developer mode enabled, which may indicate an increased risk of debugging or modification attempts, particularly on Android.",
-      "adbenabled": "Indicates whether Android Debug Bridge (ADB) is enabled on the device, which can allow unauthorized access or debugging of the app.",
-      "deviceid": "Ensures that the device ID remains consistent. Unexpected changes in the device ID may indicate a security risk, such as device cloning or manipulation."
+      "adbenabled": "Indicates whether Android Debug Bridge (ADB) is enabled on the device, which can allow unauthorized access or debugging of the app."
     }
   }
 }

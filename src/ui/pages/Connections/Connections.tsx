@@ -53,6 +53,7 @@ import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayo
 import { PageHeader } from "../../components/PageHeader";
 import { ConnectionDetails } from "../ConnectionDetails";
 import { CreateIdentifier } from "../../components/CreateIdentifier";
+import { SearchInput } from "./components/SearchInput";
 
 const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
   ({ showConnections, setShowConnections }, ref) => {
@@ -295,13 +296,24 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
           activeStatus={true}
           customClass={classes}
           header={
-            <PageHeader
-              hardwareBackButtonConfig={backHardwareConfig}
-              backButton={true}
-              onBack={handleDone}
-              title={`${i18n.t("connections.page.title")}`}
-              additionalButtons={<AdditionalButtons />}
-            />
+            <div className="connections-header-area">
+              <PageHeader
+                hardwareBackButtonConfig={backHardwareConfig}
+                backButton={true}
+                onBack={handleDone}
+                title={`${i18n.t("connections.page.title")}`}
+                additionalButtons={<AdditionalButtons />}
+              />
+              {!showPlaceholder && (
+                <div className="search-input-row">
+                  <SearchInput
+                    onInputChange={setSearch}
+                    value={search}
+                    onFocus={setHideHeader}
+                  />
+                </div>
+              )}
+            </div>
           }
         >
           {showPlaceholder ? (

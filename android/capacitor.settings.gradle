@@ -47,9 +47,6 @@ project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacit
 include ':evva-capacitor-secure-storage-plugin'
 project(':evva-capacitor-secure-storage-plugin').projectDir = new File('../node_modules/@evva/capacitor-secure-storage-plugin/android')
 
-include ':jimcase-capacitor-exit-app'
-project(':jimcase-capacitor-exit-app').projectDir = new File('../node_modules/@jimcase/capacitor-exit-app/android')
-
 include ':capacitor-freerasp'
 project(':capacitor-freerasp').projectDir = new File('../node_modules/capacitor-freerasp/android')
 

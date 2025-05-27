@@ -5,7 +5,10 @@ import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { connectionsForNotifications } from "../../../../__fixtures__/connectionsFix";
 import { filteredIdentifierMapFix } from "../../../../__fixtures__/filteredIdentifierFix";
-import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
+import {
+  connectInstructionsFix,
+  notificationsFix,
+} from "../../../../__fixtures__/notificationsFix";
 import { RemoteConnectInstructions } from "./RemoteConnectInstructions";
 
 const mockStore = configureStore();
@@ -52,14 +55,14 @@ describe("Receive credential", () => {
       dispatch: dispatchMock,
     };
 
-    const connectionName = "Connection";
+    const connectionName = "ServerToConnectTo";
     const { getAllByText, getByText } = render(
       <Provider store={storeMocked}>
         <RemoteConnectInstructions
           pageId="creadential-request"
           activeStatus
           handleBack={jest.fn()}
-          notificationDetails={notificationsFix[7]}
+          notificationDetails={connectInstructionsFix}
         />
       </Provider>
     );
@@ -90,15 +93,15 @@ describe("Receive credential", () => {
     ).toBeVisible();
     expect(
       getByText(
-        EN_TRANSLATIONS.tabs.notifications.details.connectinstructions.steps.one.replace(
-          "{{connection}}",
-          connectionName
-        )
+        EN_TRANSLATIONS.tabs.notifications.details.connectinstructions.steps.one
       )
     ).toBeVisible();
     expect(
       getByText(
-        EN_TRANSLATIONS.tabs.notifications.details.connectinstructions.steps.two
+        EN_TRANSLATIONS.tabs.notifications.details.connectinstructions.steps.two.replace(
+          "{{connection}}",
+          connectionName
+        )
       )
     ).toBeVisible();
     expect(
@@ -121,7 +124,7 @@ describe("Receive credential", () => {
     ).toBeVisible();
     expect(
       getByText(
-        EN_TRANSLATIONS.tabs.notifications.details.connectinstructions.steps.one.replace(
+        EN_TRANSLATIONS.tabs.notifications.details.connectinstructions.steps.six.replace(
           "{{connection}}",
           connectionName
         )

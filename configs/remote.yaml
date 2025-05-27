@@ -7,4 +7,3 @@ security:
     enabled: false
 features:
   cut: []
-  customContent: []

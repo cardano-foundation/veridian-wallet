@@ -14,7 +14,7 @@ import "./SystemThreatAlert.scss";
 import { SystemThreatAlertProps } from "./SystemThreatAlert.types";
 import { SUPPORT_EMAIL } from "../../globals/constants";
 
-const SystemThreatAlert: React.FC<SystemThreatAlertProps> = ({ error }) => {
+const SystemThreatAlert: React.FC<SystemThreatAlertProps> = ({ errors }) => {
   const pageId = "system-threat-alert-page";
 
   return (
@@ -39,11 +39,14 @@ const SystemThreatAlert: React.FC<SystemThreatAlertProps> = ({ error }) => {
           })}
         </p>
         <CardDetailsBlock className="system-threats">
-          <p className="init-error">
-            {i18n.t("systemthreats.initerror", {
-              defaultValue: error,
-            })}
-          </p>
+          {errors.map((error, i) => (
+            <p
+              key={`threat-errortext-${i}`}
+              className="threat-error"
+            >
+              {error}
+            </p>
+          ))}
         </CardDetailsBlock>
         <InfoCard
           content={i18n.t("systemthreats.alert")}
@@ -59,4 +62,4 @@ const SystemThreatAlert: React.FC<SystemThreatAlertProps> = ({ error }) => {
   );
 };
 
-export default SystemThreatAlert;
+export { SystemThreatAlert };

@@ -1,5 +1,5 @@
-import { StateCacheProps } from "../../store/reducers/stateCache";
 import { SeedPhraseCacheProps } from "../../store/reducers/seedPhraseCache";
+import { StateCacheProps } from "../../store/reducers/stateCache";
 import { RoutePath, TabsRoutePath } from "../paths";
 
 interface PageState {
@@ -26,4 +26,4 @@ interface DataProps {
   payload?: PayloadProps;
 }
 
-export type { PageState, PayloadProps, StoreState, DataProps, NextRoute };
+export type { DataProps, NextRoute, PageState, PayloadProps, StoreState };

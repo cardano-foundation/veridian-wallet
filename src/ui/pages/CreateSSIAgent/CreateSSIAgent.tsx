@@ -49,6 +49,8 @@ import { showError } from "../../utils/error";
 import { openBrowserLink } from "../../utils/openBrowserLink";
 import { isValidHttpUrl } from "../../utils/urlChecker";
 import "./CreateSSIAgent.scss";
+import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
+import { addNotification } from "../../../store/reducers/notificationsCache";
 
 const SSI_URLS_EMPTY = "SSI url is empty";
 const SEED_PHRASE_EMPTY = "Invalid seed phrase";
@@ -87,8 +89,8 @@ const CreateSSIAgent = () => {
 
   const isRecoveryMode = stateCache.authentication.recoveryWalletProgress;
   const isIndividualOnlyFirstCreateMode =
-    ConfigurationService.env.features.identifiers?.creation?.individualOnly ===
-    IndividualOnlyMode.FirstTime;
+    ConfigurationService.env.features.customise?.identifiers?.creation
+      ?.individualOnly === IndividualOnlyMode.FirstTime;
 
   useEffect(() => {
     if (!ssiAgent.bootUrl && !ssiAgent.connectUrl) {
@@ -166,15 +168,32 @@ const CreateSSIAgent = () => {
     );
   };
 
-  const updateFirstInstallValue = async (value: boolean) => {
+  const updateFirstInstallValue = async (firstInstall: boolean) => {
     try {
-      dispatch(setShowWelcomePage(value));
-      if (value) {
+      if (firstInstall) {
+        if (
+          ConfigurationService.env.features.customise?.notifications
+            ?.connectInstructions
+        ) {
+          const connectNotification =
+            await Agent.agent.keriaNotifications.createSingletonNotification(
+              NotificationRoute.LocalSingletonConnectInstructions,
+              {
+                name: ConfigurationService.env.features.customise?.notifications
+                  .connectInstructions.connectionName,
+              }
+            );
+
+          if (connectNotification) {
+            dispatch(addNotification(connectNotification));
+          }
+        }
+
         await Agent.agent.basicStorage.createOrUpdateBasicRecord(
           new BasicRecord({
             id: MiscRecordId.APP_FIRST_INSTALL,
             content: {
-              value: value,
+              value: firstInstall,
             },
           })
         );
@@ -183,6 +202,7 @@ const CreateSSIAgent = () => {
           MiscRecordId.APP_FIRST_INSTALL
         );
       }
+      dispatch(setShowWelcomePage(firstInstall));
     } catch (e) {
       showError("Unable to set first app launch", e);
     }

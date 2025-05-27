@@ -164,16 +164,7 @@ const CredentialsTable = ({ credentials }: CredentialTableProps) => {
             const isItemSelected = selected.includes(row.id);
             const labelId = `enhanced-table-checkbox-${index}`;
             const isRevoked = row.status !== 0;
-
-            const attributeDescriptionObject =
-              row.data.schema.properties.a.oneOf[1].properties?.[
-                Object.keys(row.data.sad.a)[2]
-              ];
-
-            const attributeKey =
-              typeof attributeDescriptionObject === "object"
-                ? attributeDescriptionObject.description
-                : attributeDescriptionObject;
+            const attributeKey = Object.keys(row.data.sad.a)[2];
 
             return (
               <TableRow

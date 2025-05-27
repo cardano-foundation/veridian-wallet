@@ -11,7 +11,7 @@ enum NotificationRoute {
   HumanReadableMessage = "/exn/hmessage",
   // Notifications from our wallet to give further feedback to the user
   LocalAcdcRevoked = "/local/acdc/revoked",
-  LocalConnectInstructions = "/local/connectinstructions",
+  LocalSingletonConnectInstructions = "/local/singleton/connectinstructions",
 }
 
 enum ExchangeRoute {
