@@ -1,10 +1,7 @@
 import { HabState, randomPasscode, ready as signifyReady } from "signify-ts";
 import { config } from "./config";
 import { SignifyApi } from "./modules/signify/signifyApi";
-import {
-  NotificationRoute,
-  SchemasListResult,
-} from "./modules/signify/signifyApi.type";
+import { NotificationRoute } from "./modules/signify/signifyApi.type";
 import { readFile, writeFile } from "fs/promises";
 import { existsSync, mkdirSync } from "fs";
 import path from "path";
@@ -274,7 +271,7 @@ class Agent {
     await this.signifyApi.deleteNotification(grantNotification.i);
   }
 
-  async schemas(): Promise<SchemasListResult> {
+  async schemas() {
     return await this.signifyApi.schemas();
   }
 }

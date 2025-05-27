@@ -14,13 +14,10 @@ import { config } from "../../config";
 import { Agent } from "../../agent";
 import { randomSalt } from "../../utils/utils";
 import {
-  CredentialsListResult,
   ExchangeMsg,
   LeCredential,
-  Notifications,
   Credential,
   QviCredential,
-  SchemasListResult,
 } from "./signifyApi.type";
 
 export class SignifyApi {
@@ -359,20 +356,13 @@ export class SignifyApi {
     return this.client.contacts().delete(id);
   }
 
-  async contactCredentials(
-    issuerPrefix: string,
-    connectionId: string
-  ): Promise<CredentialsListResult> {
-    const credentialsList = await this.client.credentials().list({
+  async contactCredentials(issuerPrefix: string, connectionId: string) {
+    return this.client.credentials().list({
       filter: {
         "-i": issuerPrefix,
         "-a-i": connectionId,
       },
     });
-    return {
-      count: credentialsList.length,
-      credentialsList,
-    };
   }
 
   async agreeToAcdcFromOffer(
@@ -388,11 +378,8 @@ export class SignifyApi {
     await this.client.ipex().submitAgree(senderName, apply, sigs, [recipient]);
   }
 
-  async getNotifications(): Promise<Notifications> {
-    const notifications = await this.client.notifications().list();
-    return {
-      notifications,
-    };
+  async getNotifications() {
+    return this.client.notifications().list();
   }
 
   async deleteNotification(said: string) {
@@ -463,11 +450,7 @@ export class SignifyApi {
     return op;
   }
 
-  async schemas(): Promise<SchemasListResult> {
-    const schemasList = await this.client.schemas().list();
-    return {
-      count: schemasList.length,
-      schemasList,
-    };
+  async schemas() {
+    return this.client.schemas().list();
   }
 }

@@ -4,25 +4,6 @@ enum NotificationRoute {
   ExnIpexOffer = "/exn/ipex/offer",
 }
 
-type SchemasListResult = {
-  count: number;
-  schemasList: any[];
-};
-
-type CredentialsListResult = {
-  count: number;
-  credentialsList: any[];
-};
-
-type Notifications = {
-  notifications: any;
-};
-
-type ExchangesListResult = {
-  count: number;
-  exchangesList: any[];
-};
-
 type Credential = {
   status: {
     s: string;
@@ -52,10 +33,6 @@ type ExchangeMsg = {
 
 export {
   NotificationRoute,
-  SchemasListResult,
-  CredentialsListResult,
-  Notifications,
-  ExchangesListResult,
   Credential,
   QviCredential,
   LeCredential,
