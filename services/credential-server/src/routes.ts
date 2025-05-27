@@ -9,15 +9,12 @@ import {
   contactCredentials,
   schemas,
 } from "./apis/credential.api";
-import { createShortenUrl, getFullUrl } from "./apis/shorten.api";
 import { schemaApi } from "./apis/schema.api";
 import { contactList, deleteContact } from "./apis/contact.api";
 import { resolveOobi } from "./apis/oobi.api";
 
 const router: Router = express.Router();
 router.get(config.path.ping, ping);
-router.get(config.path.shorten, getFullUrl);
-router.post(config.path.createShorten, createShortenUrl);
 router.get(config.path.keriOobi, keriOobiApi);
 router.post(config.path.issueAcdcCredential, issueAcdcCredential);
 router.get(config.path.schemaOobi, schemaApi);

@@ -14,8 +14,6 @@ const config = {
   },
   path: {
     ping: "/ping",
-    shorten: "/shorten/:id",
-    createShorten: "/shorten",
     keriOobi: "/keriOobi",
     issueAcdcCredential: "/issueAcdcCredential",
     schemaOobi: "/oobi/:id",
