@@ -1,11 +1,11 @@
 import { HabState, randomPasscode, ready as signifyReady } from "signify-ts";
 import { config } from "./config";
 import { SignifyApi } from "./modules/signify/signifyApi";
-import { NotificationRoute } from "./modules/signify/signifyApi.type";
+import { NotificationRoute } from "./modules/signify/signifyApi.types";
 import { readFile, writeFile } from "fs/promises";
 import { existsSync, mkdirSync } from "fs";
 import path from "path";
-import { BranFileContent } from "./agent.type";
+import { BranFileContent } from "./agent.types";
 
 class Agent {
   static readonly ISSUER_AID_NAME = "issuer";

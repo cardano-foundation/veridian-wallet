@@ -18,7 +18,7 @@ import {
   LeCredential,
   Credential,
   QviCredential,
-} from "./signifyApi.type";
+} from "./signifyApi.types";
 
 export class SignifyApi {
   static readonly DEFAULT_ROLE = "agent";
