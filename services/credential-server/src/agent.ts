@@ -145,8 +145,7 @@ class Agent {
   async pollNotifications() {
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const notifications = (await this.signifyApi.getNotifications())
-        .notifications;
+      const notifications = await this.signifyApi.getNotifications();
       for (const notif of notifications.notes) {
         await this.processNotification(notif);
       }
@@ -243,12 +242,10 @@ class Agent {
 
     // wait for notification
     const getHolderNotifications = async () => {
-      let holderNotifications = (await this.signifyApi.getNotifications())
-        .notifications;
+      let holderNotifications = await this.signifyApi.getNotifications();
 
       while (!holderNotifications.total) {
-        holderNotifications = (await this.signifyApi.getNotifications())
-          .notifications;
+        holderNotifications = await this.signifyApi.getNotifications();
         await new Promise((resolve) => setTimeout(resolve, 250));
       }
 

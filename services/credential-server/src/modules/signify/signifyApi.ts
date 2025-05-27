@@ -352,7 +352,7 @@ export class SignifyApi {
     return contacts;
   }
 
-  async deleteContact(id: string): Promise<void> {
+  async deleteContact(id: string) {
     return this.client.contacts().delete(id);
   }
 
