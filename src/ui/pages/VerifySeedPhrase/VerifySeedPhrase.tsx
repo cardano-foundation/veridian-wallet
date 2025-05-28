@@ -219,11 +219,11 @@ const VerifySeedPhrase = () => {
           primaryButtonDisabled={
             !(originalSeedPhrase.length == seedPhraseSelected.length)
           }
-          tertiaryButtonText={`${i18n.t(
-            "generateseedphrase.onboarding.button.switch"
-          )}`}
-          tertiaryButtonAction={() => setSwitchModeModal(true)}
-          tertiaryButtonIcon={refreshOutline}
+          // tertiaryButtonText={`${i18n.t(
+          //   "generateseedphrase.onboarding.button.switch"
+          // )}`}
+          // tertiaryButtonAction={() => setSwitchModeModal(true)}
+          // tertiaryButtonIcon={refreshOutline}
         />
       </div>
       <AlertFail

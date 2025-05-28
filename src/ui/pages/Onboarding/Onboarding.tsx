@@ -64,10 +64,10 @@ const Onboarding = () => {
         pageId={pageId}
         primaryButtonText={`${i18n.t("onboarding.getstarted.button.label")}`}
         primaryButtonAction={() => handleNavigation(false)}
-        tertiaryButtonText={`${i18n.t(
-          "onboarding.alreadywallet.button.label"
-        )}`}
-        tertiaryButtonAction={() => handleNavigation(true)}
+        // tertiaryButtonText={`${i18n.t(
+        //   "onboarding.alreadywallet.button.label"
+        // )}`}
+        // tertiaryButtonAction={() => handleNavigation(true)}
       />
     </ResponsivePageLayout>
   );

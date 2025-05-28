@@ -509,9 +509,9 @@ const CreateSSIAgent = () => {
             primaryButtonText={`${i18n.t("ssiagent.button.validate")}`}
             primaryButtonAction={() => handleValidate()}
             primaryButtonDisabled={!validated || loading}
-            tertiaryButtonText={buttonLabel}
-            tertiaryButtonAction={() => setSwitchModeModal(true)}
-            tertiaryButtonIcon={isRecoveryMode ? addOutline : refreshOutline}
+            // tertiaryButtonText={buttonLabel}
+            // tertiaryButtonAction={() => setSwitchModeModal(true)}
+            // tertiaryButtonIcon={isRecoveryMode ? addOutline : refreshOutline}
           />
         </div>
       </ScrollablePageLayout>

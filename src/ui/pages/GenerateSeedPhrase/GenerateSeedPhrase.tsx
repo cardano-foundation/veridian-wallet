@@ -175,11 +175,11 @@ const GenerateSeedPhrase = () => {
           setAlertConfirmIsOpen(true);
         }}
         primaryButtonDisabled={hideSeedPhrase || !checked}
-        tertiaryButtonText={`${i18n.t(
-          "generateseedphrase.onboarding.button.switch"
-        )}`}
-        tertiaryButtonAction={() => setSwitchModeModal(true)}
-        tertiaryButtonIcon={refreshOutline}
+        // tertiaryButtonText={`${i18n.t(
+        //   "generateseedphrase.onboarding.button.switch"
+        // )}`}
+        // tertiaryButtonAction={() => setSwitchModeModal(true)}
+        // tertiaryButtonIcon={refreshOutline}
       />
       <TermsModal
         name="terms-of-use"
