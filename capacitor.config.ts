@@ -6,11 +6,11 @@ const config: CapacitorConfig = {
   appName: "Veridian",
   webDir: "build",
   android: {
-    webContentsDebuggingEnabled: true,
+    webContentsDebuggingEnabled: process.env.ENVIRONMENT !== "prod",
     adjustMarginsForEdgeToEdge: "disable",
   },
   ios: {
-    webContentsDebuggingEnabled: true,
+    webContentsDebuggingEnabled: process.env.ENVIRONMENT !== "prod",
   },
   plugins: {
     CapacitorSQLite: {
