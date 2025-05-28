@@ -164,6 +164,7 @@ const CredentialsTable = ({ credentials }: CredentialTableProps) => {
             const isItemSelected = selected.includes(row.id);
             const labelId = `enhanced-table-checkbox-${index}`;
             const isRevoked = row.status !== 0;
+            const attributeKey = Object.keys(row.data.sad.a)[2];
 
             return (
               <TableRow
@@ -189,7 +190,7 @@ const CredentialsTable = ({ credentials }: CredentialTableProps) => {
                 </TableCell>
                 <TableCell align="left">
                   <Tooltip
-                    title={row.attribute}
+                    title={`${attributeKey}: ${row.attribute}`}
                     placement="top"
                   >
                     <span>{row.attribute}</span>

@@ -1,6 +1,5 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { Capacitor } from "@capacitor/core";
-import { useMemo } from "react";
 import { Agent } from "../../../../core/agent/agent";
 import { MiscRecordId } from "../../../../core/agent/agent.types";
 import { BasicRecord } from "../../../../core/agent/records";
@@ -15,7 +14,7 @@ const useCameraDirection = () => {
   const dispatch = useAppDispatch();
   const cameraDirection = useAppSelector(getCameraDirection);
 
-  const supportMultiCamera = useMemo(() => Capacitor.isNativePlatform(), []);
+  const supportMultiCamera = Capacitor.isNativePlatform();
 
   const changeCameraDirection = () => {
     const newDirection =

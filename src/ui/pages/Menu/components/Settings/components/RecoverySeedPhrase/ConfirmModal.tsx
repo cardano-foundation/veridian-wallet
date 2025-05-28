@@ -1,14 +1,14 @@
 import { IonCheckbox, IonItem, IonList } from "@ionic/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { i18n } from "../../../../../../../i18n";
 import { OptionModal } from "../../../../../../components/OptionsModal";
 import { PageFooter } from "../../../../../../components/PageFooter";
+import { Verification } from "../../../../../../components/Verification";
+import "./RecoverySeedPhrase.scss";
 import {
   ConditionItemProps,
   ConfirmModalProps,
 } from "./RecoverySeedPhrase.types";
-import "./RecoverySeedPhrase.scss";
-import { Verification } from "../../../../../../components/Verification";
 
 const ConditionItem = ({
   text,
@@ -62,19 +62,16 @@ const ConfirmModal = ({
     setConfirmCondition([...confirmCondition]);
   };
 
-  const headerOptions = useMemo(
-    () => ({
-      closeButton: true,
-      closeButtonLabel: `${i18n.t(
-        "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.button.cancel"
-      )}`,
-      closeButtonAction: resetModal,
-      title: `${i18n.t(
-        "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.title"
-      )}`,
-    }),
-    [resetModal]
-  );
+  const headerOptions = {
+    closeButton: true,
+    closeButtonLabel: `${i18n.t(
+      "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.button.cancel"
+    )}`,
+    closeButtonAction: resetModal,
+    title: `${i18n.t(
+      "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.title"
+    )}`,
+  };
 
   const handleAuthentication = () => {
     setIsOpen(false);

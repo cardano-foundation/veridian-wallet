@@ -1,12 +1,12 @@
-import { IonList, IonItem, IonLabel, IonCheckbox } from "@ionic/react";
+import { IonCheckbox, IonItem, IonLabel, IonList } from "@ionic/react";
 import { useState } from "react";
+import { ConnectionShortDetails } from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
+import { FallbackIcon } from "../../FallbackIcon";
 import { PageFooter } from "../../PageFooter";
 import { PageHeader } from "../../PageHeader";
 import { ScrollablePageLayout } from "../../layout/ScrollablePageLayout";
 import { IdentifierStageProps, Stage } from "../CreateGroupIdentifier.types";
-import KeriLogo from "../../../assets/images/KeriGeneric.jpg";
-import { ConnectionShortDetails } from "../../../../core/agent/agent.types";
 
 const GroupMembers = ({
   state,
@@ -69,8 +69,8 @@ const GroupMembers = ({
                 }`}
               >
                 <IonLabel className="connection-item">
-                  <img
-                    src={connection?.logo || KeriLogo}
+                  <FallbackIcon
+                    src={connection?.logo}
                     className="connection-logo"
                     data-testid="identifier-stage-2-logo"
                     alt="connection-logo"

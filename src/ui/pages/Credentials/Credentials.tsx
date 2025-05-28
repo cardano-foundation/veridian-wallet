@@ -4,14 +4,17 @@ import {
   IonLabel,
   useIonViewWillEnter,
 } from "@ionic/react";
+import { t } from "i18next";
 import { peopleOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { t } from "i18next";
 import { Agent } from "../../../core/agent/agent";
+import { MiscRecordId } from "../../../core/agent/agent.types";
+import { BasicRecord } from "../../../core/agent/records";
 import {
   CredentialShortDetails,
   CredentialStatus,
 } from "../../../core/agent/services/credentialService.types";
+import { IdentifierType } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -34,6 +37,9 @@ import {
 import { ArchivedCredentials } from "../../components/ArchivedCredentials";
 import { CardSlider } from "../../components/CardSlider";
 import { CardsPlaceholder } from "../../components/CardsPlaceholder";
+import { FilterChip } from "../../components/FilterChip/FilterChip";
+import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types";
+import { FilteredItemsPlaceholder } from "../../components/FilteredItemsPlaceholder";
 import { TabLayout } from "../../components/layout/TabLayout";
 import { ListHeader } from "../../components/ListHeader";
 import { RemovePendingAlert } from "../../components/RemovePendingAlert";
@@ -47,13 +53,7 @@ import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { StartAnimationSource } from "../Identifiers/Identifiers.types";
 import "./Credentials.scss";
-import { IdentifierType } from "../../../core/agent/services/identifier.types";
 import { CredentialsFilters } from "./Credentials.types";
-import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types";
-import { FilterChip } from "../../components/FilterChip/FilterChip";
-import { BasicRecord } from "../../../core/agent/records";
-import { MiscRecordId } from "../../../core/agent/agent.types";
-import { FilteredItemsPlaceholder } from "../../components/FilteredItemsPlaceholder";
 
 const CLEAR_STATE_DELAY = 1000;
 
@@ -104,14 +104,11 @@ const Credentials = () => {
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
 
-  const revokedCreds = useMemo(
-    () => credsCache.filter((item) => item.status === CredentialStatus.REVOKED),
-    [credsCache]
+  const revokedCreds = credsCache.filter(
+    (item) => item.status === CredentialStatus.REVOKED
   );
-
-  const pendingCreds = useMemo(
-    () => credsCache.filter((item) => item.status === CredentialStatus.PENDING),
-    [credsCache]
+  const pendingCreds = credsCache.filter(
+    (item) => item.status === CredentialStatus.PENDING
   );
   const confirmedCreds = useMemo(
     () =>
@@ -160,7 +157,7 @@ const Credentials = () => {
         (cred) => cred.identifierType !== IdentifierType.Individual
       )
     );
-  }, [confirmedCreds, credsCache, pendingCreds]);
+  }, [confirmedCreds, credsCache, pendingCreds.length]);
 
   useOnlineStatusEffect(fetchArchivedCreds);
 
@@ -222,14 +219,11 @@ const Credentials = () => {
     );
   };
 
-  const deletePendingCheck = useMemo(
-    () => ({
-      title: i18n.t("tabs.credentials.tab.deletepending.title"),
-      description: i18n.t("tabs.credentials.tab.deletepending.description"),
-      button: i18n.t("tabs.credentials.tab.deletepending.button"),
-    }),
-    []
-  );
+  const deletePendingCheck = {
+    title: i18n.t("tabs.credentials.tab.deletepending.title"),
+    description: i18n.t("tabs.credentials.tab.deletepending.description"),
+    button: i18n.t("tabs.credentials.tab.deletepending.button"),
+  };
 
   const deletePendingCred = async () => {
     if (!deletedPendingItem) return;

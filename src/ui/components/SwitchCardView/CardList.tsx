@@ -1,6 +1,8 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
+import { IpexCommunicationService } from "../../../core/agent/services/ipexCommunicationService";
+import BackgroundRome from "../../assets/images/rome-bg.png";
 import { CardType } from "../../globals/types";
 import { formatShortDate } from "../../utils/formatters";
 import { getTheme } from "../../utils/theme";
@@ -8,8 +10,6 @@ import { CardList as BaseCardList, CardItem } from "../CardList";
 import { CardTheme } from "../CardTheme";
 import "./SwitchCardView.scss";
 import { CardListProps } from "./SwitchCardView.types";
-import BackgroundRome from "../../assets/images/rome-bg.png";
-import { IpexCommunicationService } from "../../../core/agent/services/ipexCommunicationService";
 
 const CardList = ({
   cardsData,
@@ -17,30 +17,28 @@ const CardList = ({
   testId,
   onCardClick,
 }: CardListProps) => {
-  const cardListData = useMemo(() => {
-    return cardsData.map(
-      (item): CardItem<IdentifierShortDetails | CredentialShortDetails> => {
-        if (cardTypes === CardType.IDENTIFIERS) {
-          const identifier = item as IdentifierShortDetails;
+  const cardListData = cardsData.map(
+    (item): CardItem<IdentifierShortDetails | CredentialShortDetails> => {
+      if (cardTypes === CardType.IDENTIFIERS) {
+        const identifier = item as IdentifierShortDetails;
 
-          return {
-            id: item.id,
-            title: identifier.displayName,
-            subtitle: formatShortDate(identifier.createdAtUTC),
-            data: identifier,
-          };
-        }
-
-        const cred = item as CredentialShortDetails;
         return {
           id: item.id,
-          title: cred.credentialType,
-          subtitle: formatShortDate(cred.issuanceDate),
-          data: cred,
+          title: identifier.displayName,
+          subtitle: formatShortDate(identifier.createdAtUTC),
+          data: identifier,
         };
       }
-    );
-  }, [cardsData, cardTypes]);
+
+      const cred = item as CredentialShortDetails;
+      return {
+        id: item.id,
+        title: cred.credentialType,
+        subtitle: formatShortDate(cred.issuanceDate),
+        data: cred,
+      };
+    }
+  );
 
   const renderStartSlot = useCallback(
     (data: IdentifierShortDetails | CredentialShortDetails) => {

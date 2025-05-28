@@ -3,6 +3,13 @@ import { Box, Button } from "@mui/material";
 import { enqueueSnackbar, VariantType } from "notistack";
 import { useEffect, useMemo, useState } from "react";
 import { Trans } from "react-i18next";
+import { i18n } from "../../i18n";
+import { CredentialService } from "../../services";
+import { CredentialIssueRequest } from "../../services/credential.types";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { savePresentationRequest } from "../../store/reducers/connectionsSlice";
+import { PresentationRequestStatus } from "../../store/reducers/connectionsSlice.types";
+import { PopupModal } from "../PopupModal";
 import { InputAttribute } from "./InputAttribute";
 import "./RequestPresentationModal.scss";
 import {
@@ -12,14 +19,7 @@ import {
 } from "./RequestPresentationModal.types";
 import { Review } from "./Review";
 import { SelectList } from "./SelectList";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { CredentialMap } from "../../const";
-import { CredentialIssueRequest } from "../../services/credential.types";
-import { CredentialService } from "../../services";
-import { i18n } from "../../i18n";
-import { savePresentationRequest } from "../../store/reducers/connectionsSlice";
-import { PresentationRequestStatus } from "../../store/reducers/connectionsSlice.types";
-import { PopupModal } from "../PopupModal";
+import { IGNORE_ATTRIBUTES } from "../../const";
 
 const RESET_TIMEOUT = 1000;
 
@@ -29,6 +29,7 @@ const RequestPresentationModal = ({
   connectionId,
 }: RequestPresentationModalProps) => {
   const connections = useAppSelector((state) => state.connections.contacts);
+  const schemas = useAppSelector((state) => state.schemasCache.schemas);
   const dispatch = useAppDispatch();
 
   const [currentStage, setCurrentStage] = useState(
@@ -39,9 +40,11 @@ const RequestPresentationModal = ({
   >(connectionId);
   const [selectedCredTemplate, setSelectedCredTemplate] = useState<string>();
   const [attributes, setAttributes] = useState<Record<string, string>>({});
+
   const credTemplateType = selectedCredTemplate
-    ? CredentialMap[selectedCredTemplate]
+    ? schemas.find((item) => item.$id === selectedCredTemplate)?.title
     : undefined;
+
   const triggerToast = (message: string, variant: VariantType) => {
     enqueueSnackbar(message, {
       variant,
@@ -101,13 +104,7 @@ const RequestPresentationModal = ({
         !selectedConnection) ||
       loading
     );
-  }, [
-    currentStage,
-    selectedCredTemplate,
-    selectedConnection,
-    attributes,
-    loading,
-  ]);
+  }, [currentStage, selectedCredTemplate, selectedConnection, loading]);
 
   const requestPresentationCred = async () => {
     if (!selectedCredTemplate || !selectedConnection || !credTemplateType)
@@ -227,12 +224,10 @@ const RequestPresentationModal = ({
         );
       }
       case RequestPresentationStage.SelectCredentialType: {
-        const data: SelectListData[] = Object.entries(CredentialMap).map(
-          ([key, value]) => ({
-            id: key,
-            text: value,
-          })
-        );
+        const data: SelectListData[] = schemas.map((schema) => ({
+          id: schema.$id,
+          text: schema.title,
+        }));
 
         return (
           <SelectList
@@ -242,15 +237,26 @@ const RequestPresentationModal = ({
           />
         );
       }
-      case RequestPresentationStage.InputAttribute:
+      case RequestPresentationStage.InputAttribute: {
+        const schema = schemas.find(
+          (item) => item.$id === selectedCredTemplate
+        );
+        const schemaRequiredAttributes =
+          schema?.properties.a.oneOf[1].required || [];
+
+        const requiredAttributes = schemaRequiredAttributes.filter(
+          (item) => !IGNORE_ATTRIBUTES.includes(item)
+        );
+
         return (
           <InputAttribute
             attributeOptional={true}
             value={attributes}
             setValue={updateAttributes}
-            credentialType={credTemplateType}
+            attributes={requiredAttributes}
           />
         );
+      }
       case RequestPresentationStage.Review:
         return (
           <Review

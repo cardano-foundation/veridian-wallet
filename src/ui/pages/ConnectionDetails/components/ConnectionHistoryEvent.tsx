@@ -5,8 +5,8 @@ import {
 } from "../../../../core/agent/agent.types";
 import { ConnectionHistoryType } from "../../../../core/agent/services/connectionService.types";
 import { i18n } from "../../../../i18n";
-import KeriLogo from "../../../assets/images/KeriGeneric.jpg";
 import { CardTheme } from "../../../components/CardTheme";
+import { FallbackIcon } from "../../../components/FallbackIcon";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -31,8 +31,8 @@ const ConnectionHistoryEvent = ({
       <div className="connection-details-logo">
         {historyItem.type ===
         ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT ? (
-            <img
-              src={connectionDetails?.logo || KeriLogo}
+            <FallbackIcon
+              src={connectionDetails?.logo}
               alt="connection-logo"
             />
           ) : (
@@ -83,8 +83,8 @@ const ConnectionHistoryEvent = ({
       data-testid="connection-history-event-connection"
     >
       <div className="connection-details-logo">
-        <img
-          src={connectionDetails?.logo || KeriLogo}
+        <FallbackIcon
+          src={connectionDetails?.logo}
           alt="connection-logo"
         />
       </div>

@@ -1,6 +1,5 @@
 import { IonAccordion, IonAccordionGroup, IonItem } from "@ionic/react";
 import { chevronForwardOutline } from "ionicons/icons";
-import { useMemo } from "react";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -28,7 +27,7 @@ const CardDetailsAttribute = ({
 
   const isObjectAttribute = typeof attributeValue === "object";
 
-  const nativeAttribute = useMemo(() => {
+  const nativeAttribute = (() => {
     if (isObjectAttribute) {
       return "";
     }
@@ -41,7 +40,7 @@ const CardDetailsAttribute = ({
       )} (${getUTCOffset(attributeValueStr)})`;
 
     return attributeValueStr;
-  }, [attributeValue, isObjectAttribute]);
+  })();
 
   const detailItemsClass = combineClassNames("attribute-item", className);
 

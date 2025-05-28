@@ -1,6 +1,6 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { closeOutline, refreshOutline } from "ionicons/icons";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
@@ -15,12 +15,12 @@ import { Alert as AlertFail } from "../../components/Alert";
 import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
 import { SeedPhraseModule } from "../../components/SeedPhraseModule";
-import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
-import { useAppIonRouter } from "../../hooks";
-import "./VerifySeedPhrase.scss";
-import { showError } from "../../utils/error";
 import { SwitchOnboardingModeModal } from "../../components/SwitchOnboardingModeModal";
 import { OnboardingMode } from "../../components/SwitchOnboardingModeModal/SwitchOnboardingModeModal.types";
+import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
+import { useAppIonRouter } from "../../hooks";
+import { showError } from "../../utils/error";
+import "./VerifySeedPhrase.scss";
 
 const VerifySeedPhrase = () => {
   const pageId = "verify-seed-phrase";
@@ -34,10 +34,7 @@ const VerifySeedPhrase = () => {
   const ionRouter = useAppIonRouter();
   const [showSwitchModeModal, setSwitchModeModal] = useState(false);
 
-  const originalSeedPhrase = useMemo(
-    () => seedPhraseStore.seedPhrase.split(" "),
-    [seedPhraseStore.seedPhrase]
-  );
+  const originalSeedPhrase = seedPhraseStore.seedPhrase.split(" ");
 
   const sortSeedPhrase = useCallback(() => {
     setSeedPhraseRemaining(

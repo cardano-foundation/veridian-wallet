@@ -1,17 +1,10 @@
 import { IonSearchbar } from "@ionic/react";
-import { useMemo } from "react";
 import { i18n } from "../../../../../i18n";
 import "./ConnectionsBody.scss";
-import { SearchInputProps } from "./ConnectionsBody.types";
+import { SearchInputProps } from "../SearchInput/SearchInput.types";
 
 const SearchInput = ({ onFocus, onInputChange, value }: SearchInputProps) => {
-  const showCancel = useMemo(() => {
-    if (value) {
-      return "always";
-    }
-
-    return value ? "always" : "focus";
-  }, [value]);
+  const showCancel = value ? "always" : "focus";
 
   const handleBlur = () => {
     if (value) return;

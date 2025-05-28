@@ -1,3 +1,34 @@
+const bootAndConnectMock = jest.fn();
+const recoverKeriaAgentMock = jest.fn();
+const basicStorageDeleteMock = jest.fn();
+const createOrUpdateBasicRecordMock = jest.fn();
+const createSingletonNotificationMock = jest.fn();
+const browserMock = jest.fn();
+
+let customiseMockValue: {
+  identifiers: { creation: { individualOnly: string } };
+  notifications?: { connectInstructions: { connectionName: string } };
+} = {
+  identifiers: {
+    creation: {
+      individualOnly: "FirstTime",
+    },
+  },
+};
+const defaultConfigMock = {
+  ConfigurationService: {
+    env: {
+      features: {
+        cut: [],
+        customContent: [],
+        get customise() {
+          return customiseMockValue;
+        },
+      },
+    },
+  },
+};
+
 import { IonButton, IonIcon, IonInput, IonLabel } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
 import { ionFireEvent } from "@ionic/react-test-utils";
@@ -19,32 +50,14 @@ import {
 } from "../../globals/constants";
 import { OperationType } from "../../globals/types";
 import { CreateSSIAgent } from "./CreateSSIAgent";
+import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
+import { KeriaNotificationService } from "../../../core/agent/services";
 
-jest.mock("../../../core/configuration/configurationService", () => ({
-  ConfigurationService: {
-    env: {
-      features: {
-        cut: [],
-        customContent: [],
-        identifiers: {
-          creation: {
-            individualOnly: "FirstTime",
-          },
-        },
-      },
-    },
-  },
-}));
-
-const bootAndConnectMock = jest.fn((...args: unknown[]) =>
-  Promise.resolve(args)
+jest.mock(
+  "../../../core/configuration/configurationService",
+  () => defaultConfigMock
 );
-const recoverKeriaAgentMock = jest.fn();
-const basicStorageDeleteMock = jest.fn();
-const createOrUpdateBasicRecordMock = jest.fn();
-
 jest.mock("../../../core/agent/agent", () => ({
-  ...jest.requireActual("../../../core/agent/agent"),
   Agent: {
     KERIA_CONNECTION_BROKEN: "The app is not connected to KERIA at the moment",
     KERIA_BOOT_FAILED_BAD_NETWORK: "Failed to boot due to network connectivity",
@@ -58,12 +71,14 @@ jest.mock("../../../core/agent/agent", () => ({
     MISSING_DATA_ON_KERIA:
       "Attempted to fetch data by ID on KERIA, but was not found. May indicate stale data records in the local database.",
     agent: {
-      bootAndConnect: (...args: unknown[]) => bootAndConnectMock(...args),
-      recoverKeriaAgent: (...args: unknown[]) => recoverKeriaAgentMock(...args),
+      bootAndConnect: bootAndConnectMock,
+      recoverKeriaAgent: recoverKeriaAgentMock,
       basicStorage: {
-        deleteById: (...args: unknown[]) => basicStorageDeleteMock(...args),
-        createOrUpdateBasicRecord: (...args: unknown[]) =>
-          createOrUpdateBasicRecordMock(...args),
+        deleteById: basicStorageDeleteMock,
+        createOrUpdateBasicRecord: createOrUpdateBasicRecordMock,
+      },
+      keriaNotifications: {
+        createSingletonNotification: createSingletonNotificationMock,
       },
     },
   },
@@ -78,13 +93,10 @@ jest.mock("@ionic/react", () => ({
   },
 }));
 
-const browserMock = jest.fn(({ link }: { link: string }) =>
-  Promise.resolve(link)
-);
 jest.mock("@capacitor/browser", () => ({
   ...jest.requireActual("@capacitor/browser"),
   Browser: {
-    open: (params: never) => browserMock(params),
+    open: browserMock,
   },
 }));
 
@@ -433,8 +445,230 @@ describe("SSI agent page", () => {
     });
 
     await waitFor(() => {
-      expect(createOrUpdateBasicRecordMock).toBeCalled();
+      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.APP_FIRST_INSTALL,
+          content: { value: true },
+        })
+      );
     });
+
+    await waitFor(() => {
+      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.INDIVIDUAL_FIRST_CREATE,
+          content: { value: true },
+        })
+      );
+    });
+
+    expect(createSingletonNotificationMock).not.toBeCalled();
+  });
+
+  test("Connect and create connect instructions notification", async () => {
+    const connectInstructionsNote = {
+      id: "0AD1nIXv84vzwaKecSZY2wo1",
+      createdAt: new Date(),
+      a: { r: NotificationRoute.LocalSingletonConnectInstructions },
+      read: false,
+      route: NotificationRoute.LocalSingletonConnectInstructions,
+      connectionId: KeriaNotificationService.SINGLETON_PRE,
+      receivingPre: KeriaNotificationService.SINGLETON_PRE,
+    };
+    createSingletonNotificationMock.mockResolvedValueOnce(
+      connectInstructionsNote
+    );
+
+    customiseMockValue = {
+      identifiers: {
+        creation: {
+          individualOnly: "FirstTime",
+        },
+      },
+      notifications: {
+        connectInstructions: {
+          connectionName: "ConnectionNameFromConfig",
+        },
+      },
+    };
+
+    const mockStore = configureStore();
+    const initialState = {
+      stateCache: {
+        authentication: {
+          passcodeIsSet: true,
+          seedPhraseIsSet: true,
+          passwordIsSet: true,
+          passwordIsSkipped: true,
+          loggedIn: false,
+          userName: "",
+          time: 0,
+          ssiAgentIsSet: false,
+          ssiAgentUrl: "",
+        },
+      },
+      ssiAgentCache: {
+        bootUrl:
+          "https://dev.keria-boot.cf-keripy.metadata.dev.cf-deployments.org",
+        connectUrl:
+          "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org",
+      },
+    };
+
+    const storeMocked = {
+      ...mockStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    const history = createMemoryHistory();
+    history.push(RoutePath.SSI_AGENT);
+
+    const { getByTestId } = render(
+      <IonReactMemoryRouter history={history}>
+        <Provider store={storeMocked}>
+          <CreateSSIAgent />
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("primary-button-create-ssi-agent"));
+    });
+
+    expect(bootAndConnectMock).toBeCalledWith({
+      bootUrl:
+        "https://dev.keria-boot.cf-keripy.metadata.dev.cf-deployments.org",
+      url: "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org",
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("ssi-spinner-container")).toBeVisible();
+    });
+
+    await waitFor(() => {
+      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.APP_FIRST_INSTALL,
+          content: { value: true },
+        })
+      );
+    });
+
+    await waitFor(() => {
+      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.INDIVIDUAL_FIRST_CREATE,
+          content: { value: true },
+        })
+      );
+    });
+
+    expect(createSingletonNotificationMock).toBeCalledWith(
+      NotificationRoute.LocalSingletonConnectInstructions,
+      { name: "ConnectionNameFromConfig" }
+    );
+    expect(dispatchMock).toBeCalledWith({
+      type: "notificationsCache/addNotification",
+      payload: connectInstructionsNote,
+    });
+  });
+
+  test("Connect and create connect instructions notification", async () => {
+    createSingletonNotificationMock.mockResolvedValueOnce(undefined);
+
+    customiseMockValue = {
+      identifiers: {
+        creation: {
+          individualOnly: "FirstTime",
+        },
+      },
+      notifications: {
+        connectInstructions: {
+          connectionName: "ConnectionNameFromConfig",
+        },
+      },
+    };
+
+    const mockStore = configureStore();
+    const initialState = {
+      stateCache: {
+        authentication: {
+          passcodeIsSet: true,
+          seedPhraseIsSet: true,
+          passwordIsSet: true,
+          passwordIsSkipped: true,
+          loggedIn: false,
+          userName: "",
+          time: 0,
+          ssiAgentIsSet: false,
+          ssiAgentUrl: "",
+        },
+      },
+      ssiAgentCache: {
+        bootUrl:
+          "https://dev.keria-boot.cf-keripy.metadata.dev.cf-deployments.org",
+        connectUrl:
+          "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org",
+      },
+    };
+
+    const storeMocked = {
+      ...mockStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    const history = createMemoryHistory();
+    history.push(RoutePath.SSI_AGENT);
+
+    const { getByTestId } = render(
+      <IonReactMemoryRouter history={history}>
+        <Provider store={storeMocked}>
+          <CreateSSIAgent />
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("primary-button-create-ssi-agent"));
+    });
+
+    expect(bootAndConnectMock).toBeCalledWith({
+      bootUrl:
+        "https://dev.keria-boot.cf-keripy.metadata.dev.cf-deployments.org",
+      url: "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org",
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("ssi-spinner-container")).toBeVisible();
+    });
+
+    await waitFor(() => {
+      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.APP_FIRST_INSTALL,
+          content: { value: true },
+        })
+      );
+    });
+
+    await waitFor(() => {
+      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.INDIVIDUAL_FIRST_CREATE,
+          content: { value: true },
+        })
+      );
+    });
+
+    expect(createSingletonNotificationMock).toBeCalledWith(
+      NotificationRoute.LocalSingletonConnectInstructions,
+      { name: "ConnectionNameFromConfig" }
+    );
+    expect(dispatchMock).not.toBeCalledWith(
+      expect.objectContaining({
+        type: "notificationsCache/addNotification",
+      })
+    );
   });
 
   test("Open SSI Agent info modal (Onboarding)", async () => {
@@ -465,6 +699,7 @@ describe("SSI agent page", () => {
       });
     });
   });
+
   test("Show switch onboarding modal", async () => {
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
@@ -528,7 +763,7 @@ describe("SSI agent page: recovery mode", () => {
     expect(getByTestId("connect-url-input")).toBeVisible();
   });
 
-  test("Connect and boot success", async () => {
+  test("Connect success", async () => {
     const mockStore = configureStore();
     const initialState = {
       stateCache: {
@@ -579,6 +814,12 @@ describe("SSI agent page: recovery mode", () => {
     await waitFor(() => {
       expect(basicStorageDeleteMock).toBeCalledWith(
         MiscRecordId.APP_RECOVERY_WALLET
+      );
+    });
+
+    await waitFor(() => {
+      expect(basicStorageDeleteMock).toBeCalledWith(
+        MiscRecordId.APP_FIRST_INSTALL
       );
     });
   });

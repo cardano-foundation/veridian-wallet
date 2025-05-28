@@ -1,11 +1,5 @@
 import { IonButton, IonList } from "@ionic/react";
-import {
-  forwardRef,
-  useCallback,
-  useImperativeHandle,
-  useMemo,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { KeriaNotification } from "../../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../../i18n";
@@ -26,11 +20,8 @@ const EarlierNotification = forwardRef<
     SHOWN_EARLIER_NOTIFICATION
   );
 
-  const displayNotificationsEarlier = useMemo(() => {
-    if (displayLength >= data.length) return data;
-
-    return data.slice(0, displayLength);
-  }, [displayLength, data]);
+  const displayNotificationsEarlier =
+    displayLength >= data.length ? data : data.slice(0, displayLength);
 
   const shouldDisplayExpandNotificationsEarlierButton =
     data.length > displayLength && displayLength === SHOWN_EARLIER_NOTIFICATION;

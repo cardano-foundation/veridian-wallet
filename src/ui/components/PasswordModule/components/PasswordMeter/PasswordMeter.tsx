@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Trans } from "react-i18next";
 import { i18n } from "../../../../../i18n";
 import { passwordStrengthChecker } from "../../../../utils/passwordStrengthChecker";
@@ -9,7 +8,7 @@ import { PasswordMeterProps, StrongLevel } from "./PasswordMeter.types";
 const PasswordMeter = ({ password }: PasswordMeterProps) => {
   const strongLevel = passwordStrengthChecker.getPasswordStrength(password);
 
-  const label = useMemo(() => {
+  const label = (() => {
     switch (strongLevel) {
       case StrongLevel.Strong:
         return i18n.t("createpassword.meter.strengthlevel.strong");
@@ -18,7 +17,7 @@ const PasswordMeter = ({ password }: PasswordMeterProps) => {
       default:
         return i18n.t("createpassword.meter.strengthlevel.weak");
     }
-  }, [strongLevel]);
+  })();
 
   const classes = combineClassNames(
     "level-container",

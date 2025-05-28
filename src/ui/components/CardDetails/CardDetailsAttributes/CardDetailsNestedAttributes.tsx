@@ -1,15 +1,14 @@
-import { useMemo } from "react";
 import {
   formatShortDate,
   formatTimeToSec,
   getUTCOffset,
 } from "../../../utils/formatters";
+import { combineClassNames } from "../../../utils/style";
+import { CardDetailsBlock } from "../CardDetailsBlock";
 import { CardDetailsItem } from "../CardDetailsItem";
+import "./CardDetailsAttributes.scss";
 import { CardDetailsNestedAttributesProps } from "./CardDetailsAttributes.types";
 import { reservedKeysFilter } from "./CardDetailsAttributes.utils";
-import "./CardDetailsAttributes.scss";
-import { CardDetailsBlock } from "../CardDetailsBlock";
-import { combineClassNames } from "../../../utils/style";
 
 const CardDetailsNestedAttributes = ({
   attribute,
@@ -17,12 +16,12 @@ const CardDetailsNestedAttributes = ({
   itemProps,
 }: CardDetailsNestedAttributesProps) => {
   const key = attribute[0];
-  const item = attribute[1] as any;
+  const item = attribute[1];
   const dateRegex =
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3,6}([+-]\d{2}:\d{2}|Z)$/;
 
-  const cardDetailInfo = useMemo(() => {
-    if (dateRegex.test(item))
+  const cardDetailInfo = (() => {
+    if (typeof item === "string" && dateRegex.test(item))
       return `${formatShortDate(item)} - ${formatTimeToSec(
         item
       )} (${getUTCOffset(item)}))`;
@@ -32,7 +31,7 @@ const CardDetailsNestedAttributes = ({
     if (isValuedType) return item;
 
     return "";
-  }, []);
+  })();
 
   const { className, ...restItemProps } =
     typeof itemProps === "function" ? itemProps(key) : itemProps || {};
@@ -45,7 +44,10 @@ const CardDetailsNestedAttributes = ({
     }
   );
 
-  const infoTestId = dateRegex.test(item) ? "cred-detail-time" : undefined;
+  const infoTestId =
+    typeof item === "string" && dateRegex.test(item)
+      ? "cred-detail-time"
+      : undefined;
   const innerCardKeyValue = cardKeyValue || `${reservedKeysFilter(key)}:`;
 
   return (
@@ -60,7 +62,7 @@ const CardDetailsNestedAttributes = ({
       />
       {isObjectItem && (
         <CardDetailsBlock className="card-details-nested-content">
-          {Object.entries(item).map((sub: any, i: number) => {
+          {Object.entries(item).map((sub, i: number) => {
             return (
               <CardDetailsNestedAttributes
                 key={i}

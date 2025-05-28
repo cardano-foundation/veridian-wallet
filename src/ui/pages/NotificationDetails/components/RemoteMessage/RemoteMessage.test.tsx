@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { legacy_createStore as createStore } from "redux";
-import { RemoteSignConfirmation } from "./RemoteSignConfirmation";
+import { RemoteMessage } from "./RemoteMessage";
 
 const mockStore = (initialState: any) => createStore(() => initialState);
 const dispatchMock = jest.fn();
@@ -37,7 +37,7 @@ jest.mock("@capacitor/browser", () => ({
   },
 }));
 
-describe("RemoteSignConfirmation", () => {
+describe("RemoteMessage", () => {
   test("renders the component with correct title, subtitle, and description", async () => {
     const mockValue = {
       m: "Message",
@@ -47,12 +47,12 @@ describe("RemoteSignConfirmation", () => {
       l: { t: "Link", a: "https://www.google.com/" },
     };
 
-    getHumanReadableMessageMock.mockResolvedValue(mockValue);
     const storeMocked = {
       ...mockStore(initialState),
       dispatch: dispatchMock,
     };
 
+    getHumanReadableMessageMock.mockResolvedValue(mockValue);
     const mockNotificationDetails = {
       id: "123",
       createdAt: new Date().toISOString(),
@@ -64,7 +64,7 @@ describe("RemoteSignConfirmation", () => {
 
     render(
       <Provider store={storeMocked}>
-        <RemoteSignConfirmation
+        <RemoteMessage
           pageId="sign-confirmation"
           activeStatus
           handleBack={jest.fn()}
@@ -111,7 +111,7 @@ describe("RemoteSignConfirmation", () => {
 
     const { queryByTestId } = render(
       <Provider store={storeMocked}>
-        <RemoteSignConfirmation
+        <RemoteMessage
           pageId="sign-confirmation"
           activeStatus
           handleBack={jest.fn()}

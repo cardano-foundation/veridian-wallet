@@ -1,6 +1,6 @@
 import { IonIcon, IonItem, IonText } from "@ionic/react";
 import { alertCircleOutline, checkmark, closeOutline } from "ionicons/icons";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SecureStorage } from "../../../core/storage";
 import { i18n } from "../../../i18n";
 import { CardDetailsBlock } from "../../components/CardDetails";
@@ -25,7 +25,7 @@ const RequirementItem = ({ name, value, status }: RequirementItemProps) => {
     "not-met": status === MetRequirementStatus.NotMetRequirement,
   });
 
-  const icon = useMemo(() => {
+  const icon = (() => {
     switch (status) {
       case MetRequirementStatus.MetRequirement:
         return checkmark;
@@ -34,7 +34,7 @@ const RequirementItem = ({ name, value, status }: RequirementItemProps) => {
       default:
         return null;
     }
-  }, [status]);
+  })();
 
   return (
     <IonItem
@@ -127,8 +127,8 @@ const SystemCompatibilityAlert: React.FC<SystemCompatibilityAlertProps> = ({
                 isKeyStoreSupported === undefined
                   ? "N/A"
                   : isKeyStoreSupported
-                  ? "Yes"
-                  : "No"
+                    ? "Yes"
+                    : "No"
               }
             />
           </>
@@ -157,8 +157,8 @@ const SystemCompatibilityAlert: React.FC<SystemCompatibilityAlertProps> = ({
                 isKeyStoreSupported === undefined
                   ? "N/A"
                   : isKeyStoreSupported
-                  ? "Yes"
-                  : "No"
+                    ? "Yes"
+                    : "No"
               }
             />
           </>

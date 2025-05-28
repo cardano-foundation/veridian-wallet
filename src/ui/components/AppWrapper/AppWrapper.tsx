@@ -520,6 +520,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
+      const finishSetupBiometrics = await Agent.agent.basicStorage.findById(
+        MiscRecordId.BIOMETRICS_SETUP
+      );
+
       dispatch(
         setAuthentication({
           ...authentication,
@@ -533,6 +537,8 @@ const AppWrapper = (props: { children: ReactNode }) => {
           ssiAgentUrl: (keriaConnectUrlRecord?.content?.url as string) ?? "",
           recoveryWalletProgress: !!recoveryWalletProgress?.content.value,
           loginAttempt,
+          finishSetupBiometrics: !!finishSetupBiometrics?.content
+            .value as boolean,
         })
       );
 

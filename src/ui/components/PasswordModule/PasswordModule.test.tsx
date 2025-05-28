@@ -133,7 +133,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          isOnboarding={true}
           onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
@@ -147,7 +146,6 @@ describe("Password Module", () => {
     expect(getByTestId("create-hint-input")).toBeVisible();
 
     expect(getByTestId("primary-button-password-module")).toBeVisible();
-    expect(getByTestId("tertiary-button-password-module")).toBeVisible();
   });
 
   test("Validate password", async () => {
@@ -157,7 +155,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          isOnboarding={true}
           onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
@@ -248,7 +245,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          isOnboarding={true}
           onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
@@ -276,7 +272,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          isOnboarding={true}
           onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
@@ -299,55 +294,6 @@ describe("Password Module", () => {
     });
   });
 
-  test("Skip password", async () => {
-    const { getByTestId, getByText, findByText, unmount, queryByText } = render(
-      <Provider store={storeMocked(initialState)}>
-        <PasswordModule
-          title="Password Module"
-          description="Description"
-          testId="password-module"
-          isOnboarding={true}
-          onCreateSuccess={onCreateSuccesMock}
-        />
-      </Provider>
-    );
-
-    fireEvent.click(getByTestId("tertiary-button-password-module"));
-
-    const alertTitle = await findByText(TRANSLATIONS.createpassword.alert.text);
-
-    await waitFor(() => {
-      expect(alertTitle).toBeVisible();
-    });
-
-    const mockDate = new Date(1466424490000);
-    const spy = jest
-      .spyOn(global, "Date")
-      .mockImplementation((() => mockDate) as never);
-
-    act(() => {
-      fireEvent.click(
-        getByText(TRANSLATIONS.createpassword.alert.button.confirm)
-      );
-    });
-
-    await waitFor(() => {
-      expect(queryByText(TRANSLATIONS.createpassword.alert.text)).toBeNull();
-    });
-
-    await waitFor(() => {
-      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
-        new BasicRecord({
-          id: MiscRecordId.APP_PASSWORD_SKIPPED,
-          content: { value: true },
-        })
-      );
-    });
-
-    spy.mockRestore();
-    unmount();
-  });
-
   test("Submit password", async () => {
     const { getByTestId } = render(
       <Provider store={storeMocked(initialState)}>
@@ -355,7 +301,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          isOnboarding={true}
           onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
@@ -430,7 +375,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          isOnboarding={false}
           onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
@@ -512,7 +456,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          isOnboarding={false}
           onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>

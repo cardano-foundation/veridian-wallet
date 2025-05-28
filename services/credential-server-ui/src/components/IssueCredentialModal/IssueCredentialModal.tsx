@@ -2,7 +2,6 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import { Box, Button } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { Trans } from "react-i18next";
-import { CredentialMap } from "../../const";
 import { i18n } from "../../i18n";
 import { CredentialService } from "../../services";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -19,6 +18,7 @@ import {
 } from "./IssueCredentialModal.types";
 import { IssueCredListTemplate } from "./IssueCredListTemplate";
 import { Review } from "./Review";
+import { IGNORE_ATTRIBUTES } from "../../const";
 
 const RESET_TIMEOUT = 1000;
 
@@ -29,6 +29,7 @@ const IssueCredentialModal = ({
   connectionId,
 }: IssueCredentialModalProps) => {
   const connections = useAppSelector((state) => state.connections.contacts);
+  const schemas = useAppSelector((state) => state.schemasCache.schemas);
   const dispatch = useAppDispatch();
   const [currentStage, setCurrentStage] = useState(
     calcInitStage(credentialTypeId, connectionId)
@@ -40,8 +41,8 @@ const IssueCredentialModal = ({
 
   const [loading, setLoading] = useState(false);
 
-  const credTemplateType = selectedCredTemplate
-    ? CredentialMap[selectedCredTemplate]
+  const credTemplateName = selectedCredTemplate
+    ? schemas.find((item) => item.$id === selectedCredTemplate)?.title
     : undefined;
 
   useEffect(() => {
@@ -216,12 +217,10 @@ const IssueCredentialModal = ({
         );
       }
       case IssueCredentialStage.SelectCredentialType: {
-        const data: IssueCredListData[] = Object.entries(CredentialMap).map(
-          ([key, value]) => ({
-            id: key,
-            text: value,
-          })
-        );
+        const data: IssueCredListData[] = schemas.map((schema) => ({
+          id: schema.$id,
+          text: schema.title,
+        }));
 
         return (
           <IssueCredListTemplate
@@ -231,18 +230,29 @@ const IssueCredentialModal = ({
           />
         );
       }
-      case IssueCredentialStage.InputAttribute:
+      case IssueCredentialStage.InputAttribute: {
+        const schema = schemas.find(
+          (item) => item.$id === selectedCredTemplate
+        );
+        const schemaRequiredAttributes =
+          schema?.properties.a.oneOf[1].required || [];
+
+        const requiredAttributes = schemaRequiredAttributes.filter(
+          (item) => !IGNORE_ATTRIBUTES.includes(item)
+        );
+
         return (
           <InputAttribute
             value={attributes}
             setValue={updateAttributes}
-            credentialType={credTemplateType}
+            attributes={requiredAttributes}
           />
         );
+      }
       case IssueCredentialStage.Review:
         return (
           <Review
-            credentialType={credTemplateType}
+            credentialType={credTemplateName}
             attribute={attributes}
             connectionId={selectedConnection}
             connections={connections}

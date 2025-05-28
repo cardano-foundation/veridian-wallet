@@ -1,12 +1,8 @@
 import { IonCheckbox, IonChip, IonIcon, IonItemOption } from "@ionic/react";
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useState,
-} from "react";
 import { hourglassOutline } from "ionicons/icons";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { Agent } from "../../../../../core/agent/agent";
+import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
@@ -26,9 +22,13 @@ import {
   setWalletConnectionsCache,
 } from "../../../../../store/reducers/walletConnectionsCache";
 import { Alert } from "../../../../components/Alert";
-import { CardItem, CardList } from "../../../../components/CardList";
+import { CardList } from "../../../../components/CardList";
 import { CardsPlaceholder } from "../../../../components/CardsPlaceholder";
+import { CreateIdentifier } from "../../../../components/CreateIdentifier";
+import { ANIMATION_DURATION } from "../../../../components/SideSlider/SideSlider.types";
+import { Verification } from "../../../../components/Verification";
 import { OperationType, ToastMsgType } from "../../../../globals/types";
+import { showError } from "../../../../utils/error";
 import { ConfirmConnectModal } from "../ConfirmConnectModal";
 import "./ConnectWallet.scss";
 import {
@@ -36,12 +36,6 @@ import {
   ActionType,
   ConnectWalletOptionRef,
 } from "./ConnectWallet.types";
-import { Agent } from "../../../../../core/agent/agent";
-import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
-import { ANIMATION_DURATION } from "../../../../components/SideSlider/SideSlider.types";
-import { Verification } from "../../../../components/Verification";
-import { showError } from "../../../../utils/error";
-import { CreateIdentifier } from "../../../../components/CreateIdentifier";
 
 const ConnectWallet = forwardRef<ConnectWalletOptionRef, object>(
   (props, ref) => {
@@ -71,19 +65,17 @@ const ConnectWallet = forwardRef<ConnectWalletOptionRef, object>(
     const [createIdentifierModalIsOpen, setCreateIdentifierModalIsOpen] =
       useState(false);
 
-    const displayConnection = useMemo((): CardItem<ConnectionData>[] => {
-      return connections.map((connection) => {
-        const dAppName = connection.name ? connection.name : connection.id;
-        return {
-          id: connection.id,
-          title: dAppName,
-          url: connection.url,
-          subtitle: connection.url,
-          image: connection.iconB64,
-          data: connection,
-        };
-      });
-    }, [connections]);
+    const displayConnection = connections.map((connection) => {
+      const dAppName = connection.name ? connection.name : connection.id;
+      return {
+        id: connection.id,
+        title: dAppName,
+        url: connection.url,
+        subtitle: connection.url,
+        image: connection.iconB64,
+        data: connection,
+      };
+    });
 
     useImperativeHandle(ref, () => ({
       openConnectWallet: handleScanQR,

@@ -1,21 +1,21 @@
 import { IonButton, IonIcon, IonItem, IonLabel, IonList } from "@ionic/react";
 import { copyOutline, trashOutline } from "ionicons/icons";
-import { QRCode } from "react-qrcode-logo";
 import { useEffect, useState } from "react";
+import { QRCode } from "react-qrcode-logo";
+import { CreationStatus } from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { getIdentifiersCache } from "../../../../store/reducers/identifiersCache";
 import { setToastMsg } from "../../../../store/reducers/stateCache";
-import KeriLogo from "../../../assets/images/KeriGeneric.jpg";
 import { ToastMsgType } from "../../../globals/types";
 import { writeToClipboard } from "../../../utils/clipboard";
+import { FallbackIcon } from "../../FallbackIcon";
 import { PageFooter } from "../../PageFooter";
 import { PageHeader } from "../../PageHeader";
 import { Spinner } from "../../Spinner";
 import { SpinnerConverage } from "../../Spinner/Spinner.type";
 import { ScrollablePageLayout } from "../../layout/ScrollablePageLayout";
 import { IdentifierStage1BodyProps } from "../CreateGroupIdentifier.types";
-import { getIdentifiersCache } from "../../../../store/reducers/identifiersCache";
-import { CreationStatus } from "../../../../core/agent/agent.types";
 
 const SetupConnectionBodyResume = ({
   componentId,
@@ -154,8 +154,8 @@ const SetupConnectionBodyResume = ({
               return (
                 <IonItem key={index}>
                   <IonLabel className="connection-item">
-                    <img
-                      src={connection?.logo || KeriLogo}
+                    <FallbackIcon
+                      src={connection?.logo}
                       className="connection-logo"
                       data-testid="identifier-stage-1-logo"
                       alt="connection-logo"

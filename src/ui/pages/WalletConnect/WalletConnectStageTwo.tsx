@@ -12,7 +12,6 @@ import {
   setIsConnecting,
   setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
-import KeriLogo from "../../assets/images/KeriGeneric.jpg";
 import { CardItem, CardList } from "../../components/CardList";
 import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
@@ -44,7 +43,6 @@ const WalletConnectStageTwo = ({
       (identifier): CardItem<IdentifierShortDetails> => ({
         id: identifier.id,
         title: identifier.displayName,
-        image: KeriLogo,
         data: identifier,
       })
     );

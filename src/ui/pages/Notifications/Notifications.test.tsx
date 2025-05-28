@@ -415,13 +415,14 @@ describe("Notifications Tab", () => {
 
     const mockOnClick = jest.fn();
     const mockOptionClick = jest.fn();
+    const customConnectionName = "Test Connection";
 
-    const { getAllByText, getByTestId } = render(
+    const { getByTestId } = render(
       <Provider
         store={mockStore({
           connectionsCache: {
             connections: {
-              "connection-test-id": { label: "Test Connection" },
+              "connection-test-id": { label: customConnectionName },
             },
           },
         })}
@@ -435,16 +436,20 @@ describe("Notifications Tab", () => {
       </Provider>
     );
 
-    const matchingElements = getAllByText((_, element) => {
-      if (!element) return false;
-      const text = element.textContent || "";
-      return (
-        text.includes("Sign CSO Certificate") &&
-        text.includes("Test Connection")
-      );
-    });
+    const notificationElement = getByTestId("notifications-tab-item-label");
 
-    expect(matchingElements.length).toBeGreaterThan(0);
-    expect(matchingElements[0]).toBeVisible();
+    const stripHtmlTags = (html: string) => html.replace(/<[^>]*>/g, "");
+
+    const expectedTextWithoutTime = stripHtmlTags(
+      EN_TRANSLATIONS.tabs.notifications.tab.labels.sign.replace(
+        "{{connection}}",
+        customConnectionName
+      )
+    );
+
+    const timeDifferenceText = "0m";
+    const expectedText = `${expectedTextWithoutTime}${timeDifferenceText}`;
+
+    expect(notificationElement).toHaveTextContent(expectedText);
   });
 });

@@ -1,6 +1,5 @@
 import {
   Configuration,
-  CustomContent,
   IndividualOnlyMode,
   OptionalFeature,
 } from "./configurationService.types";
@@ -13,7 +12,8 @@ class ConfigurationService {
   private static configurationEnv: Configuration;
 
   static readonly INVALID_ENVIRONMENT_FILE = "Configuration file is invalid: ";
-  static readonly NOT_FOUND_ENVIRONMENT_FILE = "Can not read environment file";
+  static readonly CANNOT_LOAD_ENVIRONMENT_FILE =
+    "Can not load environment file";
 
   async start() {
     await new Promise((rs, rj) => {
@@ -36,8 +36,12 @@ class ConfigurationService {
 
           rs(true);
         })
-        .catch(() => {
-          rj(new Error(ConfigurationService.NOT_FOUND_ENVIRONMENT_FILE));
+        .catch((e) => {
+          rj(
+            new Error(ConfigurationService.CANNOT_LOAD_ENVIRONMENT_FILE, {
+              cause: e,
+            })
+          );
         });
     });
   }
@@ -86,10 +90,10 @@ class ConfigurationService {
 
     const { features } = data;
     if (typeof features !== "object") {
-      return this.invalid("Missing top-level features object");
+      return this.invalid("features must be an object");
     }
 
-    const { cut, customContent, identifiers } = features;
+    const { cut, customise } = features;
     if (!Array.isArray(cut)) {
       return this.invalid("features.cut must be a array");
     }
@@ -100,21 +104,28 @@ class ConfigurationService {
       }
     }
 
-    for (const content of customContent) {
-      if (!Object.values(CustomContent).includes(content)) {
-        return this.invalid("Invalid features.customContent value");
+    if (customise) {
+      const { identifiers, notifications } = customise;
+      if (identifiers?.creation?.individualOnly) {
+        if (
+          !Object.values(IndividualOnlyMode).includes(
+            identifiers.creation.individualOnly
+          )
+        ) {
+          return this.invalid(
+            "Invalid features.customise.identifiers.creation value"
+          );
+        }
       }
-    }
 
-    if (identifiers?.creation?.individualOnly) {
-      if (
-        !Object.values(IndividualOnlyMode).includes(
-          identifiers.creation.individualOnly
-        )
-      ) {
-        return this.invalid(
-          "Invalid identifiers.creation.individualOnly value"
-        );
+      if (notifications?.connectInstructions) {
+        if (
+          typeof notifications?.connectInstructions.connectionName !== "string"
+        ) {
+          return this.invalid(
+            "Invalid customise.notifications.connectinstructions.connectionName value"
+          );
+        }
       }
     }
 

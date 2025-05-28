@@ -24,8 +24,6 @@ const config = {
     invitationWithCredential: "/offerCredentialWithConnection",
     invitationWithCredentialConnectionless:
       "/offerCredentialWithConnectionLess",
-    shorten: "/shorten/:id",
-    createShorten: "/shorten",
     credentials: {
       summit: "/credentials/schemas/summit/v1",
     },
@@ -38,6 +36,7 @@ const config = {
     resolveOobi: "/resolveOobi",
     requestDisclosure: "/requestDisclosure",
     revokeCredential: "/revokeCredential",
+    schemas: "/schemas",
   },
 };
 

@@ -1,7 +1,6 @@
 import { Share } from "@capacitor/share";
 import { IonButton, IonIcon } from "@ionic/react";
 import { copyOutline, openOutline, qrCodeOutline } from "ionicons/icons";
-import { useMemo } from "react";
 import { QRCode } from "react-qrcode-logo";
 import { i18n } from "../../../i18n";
 import { useAppDispatch } from "../../../store/hooks";
@@ -23,14 +22,14 @@ const ShareConnection = ({
   const componentId = "share-connection-modal";
   const dispatch = useAppDispatch();
 
-  const subtitle = useMemo(() => {
+  const subtitle = (() => {
     switch (shareLocation) {
       case ShareType.Connection:
         return i18n.t("shareidentifier.subtitle.connection");
       default:
         return i18n.t("shareidentifier.subtitle.identifier");
     }
-  }, [shareLocation]);
+  })();
 
   const nativeShare = () => {
     Share.share({

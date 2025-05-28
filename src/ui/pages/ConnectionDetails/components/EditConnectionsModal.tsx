@@ -1,22 +1,21 @@
 import { IonButton, IonIcon, IonModal } from "@ionic/react";
-import { createOutline, addOutline } from "ionicons/icons";
+import { addOutline, createOutline } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
-import { i18n } from "../../../../i18n";
-import { ConnectionNote } from "./ConnectionNote";
-import ConnectionDetailsHeader from "./ConnectionDetailsHeader";
 import { Agent } from "../../../../core/agent/agent";
-import { setToastMsg } from "../../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../../globals/types";
-import { useAppDispatch } from "../../../../store/hooks";
-import { EditConnectionsModalProps } from "./EditConnectionsModal.types";
-import KeriLogo from "../../../../ui/assets/images/KeriGeneric.jpg";
-import "./EditConnectionsModal.scss";
 import { ConnectionNoteDetails } from "../../../../core/agent/agent.types";
+import { i18n } from "../../../../i18n";
+import { useAppDispatch } from "../../../../store/hooks";
+import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { Alert } from "../../../components/Alert";
-import { PageHeader } from "../../../components/PageHeader";
 import { ScrollablePageLayout } from "../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../components/PageFooter";
+import { PageHeader } from "../../../components/PageHeader";
+import { ToastMsgType } from "../../../globals/types";
 import { showError } from "../../../utils/error";
+import ConnectionDetailsHeader from "./ConnectionDetailsHeader";
+import { ConnectionNote } from "./ConnectionNote";
+import "./EditConnectionsModal.scss";
+import { EditConnectionsModalProps } from "./EditConnectionsModal.types";
 
 export const EditConnectionsContainer = ({
   notes,
@@ -172,7 +171,7 @@ export const EditConnectionsContainer = ({
       >
         <div className="connection-details-content">
           <ConnectionDetailsHeader
-            logo={connectionDetails?.logo || KeriLogo}
+            logo={connectionDetails?.logo}
             label={connectionDetails?.label}
             date={connectionDetails?.createdAtUTC}
           />

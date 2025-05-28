@@ -1,15 +1,14 @@
-import { CredentialType } from "../../const";
 import { Contact } from "../../pages/Connections/components/ConnectionsTable/ConnectionsTable.types";
 
 interface ReviewProps {
-  credentialType?: CredentialType;
+  credentialType?: string;
   connectionId?: string;
   attribute: Record<string, string>;
   connections: Contact[];
 }
 
 interface InputAttributeProps {
-  credentialType?: CredentialType;
+  attributes: string[];
   value: Record<string, string>;
   setValue: (key: string, value: string) => void;
 }
@@ -40,11 +39,11 @@ enum IssueCredentialStage {
   Review,
 }
 
-export type {
-  IssueCredentialModalProps,
-  IssueCredListTemplateProps,
-  InputAttributeProps,
-  ReviewProps,
-  IssueCredListData,
-};
 export { IssueCredentialStage };
+export type {
+  InputAttributeProps,
+  IssueCredentialModalProps,
+  IssueCredListData,
+  IssueCredListTemplateProps,
+  ReviewProps,
+};

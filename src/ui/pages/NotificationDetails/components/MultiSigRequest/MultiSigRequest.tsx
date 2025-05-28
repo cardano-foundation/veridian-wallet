@@ -11,8 +11,8 @@ import {
 import { personCircleOutline } from "ionicons/icons";
 import { useCallback, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
-import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
 import { MultiSigIcpRequestDetails } from "../../../../../core/agent/services/identifier.types";
+import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
 import { MultiSigService } from "../../../../../core/agent/services/multiSigService";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
@@ -20,8 +20,8 @@ import {
   getNotificationsCache,
   setNotificationsCache,
 } from "../../../../../store/reducers/notificationsCache";
-import KeriLogo from "../../../../assets/images/KeriGeneric.jpg";
 import { Alert as AlertDecline } from "../../../../components/Alert";
+import { FallbackIcon } from "../../../../components/FallbackIcon";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
@@ -242,9 +242,9 @@ const MultiSigRequest = ({
                               size="1.25"
                               className="multisig-connection-logo"
                             >
-                              <img
+                              <FallbackIcon
                                 data-testid={`other-multisig-connection-logo-${index}`}
-                                src={connection.logo || KeriLogo}
+                                src={connection.logo}
                                 alt="multisig-connection-logo"
                               />
                             </IonCol>

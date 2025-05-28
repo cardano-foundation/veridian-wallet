@@ -1,6 +1,7 @@
+import { FallbackIcon } from "../../../components/FallbackIcon";
 import { formatShortDate } from "../../../utils/formatters";
-import { ConnectionDetailsHeaderProps } from "./ConnectionDetailsHeader.types";
 import "./ConnectionDetailsHeader.scss";
+import { ConnectionDetailsHeaderProps } from "./ConnectionDetailsHeader.types";
 
 const ConnectionDetailsHeader = ({
   logo,
@@ -10,7 +11,7 @@ const ConnectionDetailsHeader = ({
   return (
     <div className="connection-details-header">
       <div className="connection-details-logo">
-        <img
+        <FallbackIcon
           src={logo}
           alt="connection-logo"
         />

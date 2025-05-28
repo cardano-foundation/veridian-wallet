@@ -43,7 +43,6 @@
     "@ionic/react": "^8.4.3",
     "@ionic/react-router": "^8.4.3",
     "@ionic/storage": "^3.0.6",
-    "@jimcase/capacitor-exit-app": "^1.0.7",
     "@reduxjs/toolkit": "^1.9.5",
     "bip39": "^3.0.4",
     "capacitor-freerasp": "^1.10.0",

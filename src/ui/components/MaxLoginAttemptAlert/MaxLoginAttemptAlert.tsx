@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { i18n } from "../../../i18n";
-import { MaxLoginAttemptAlertProps } from "./MaxLoginAttemptAlert.types";
 import "./MaxLoginAttemptAlert.scss";
+import { MaxLoginAttemptAlertProps } from "./MaxLoginAttemptAlert.types";
 
 const DURATION_STEP = 5000;
 
@@ -28,7 +28,7 @@ const MaxLoginAttemptAlert = ({ lockDuration }: MaxLoginAttemptAlertProps) => {
     };
   }, [lockDuration, remainLockTime]);
 
-  const durationText = useMemo(() => {
+  const durationText = (() => {
     const remainMinute = remainLockTime / 1000 / 60;
 
     let displayHours = Math.floor(remainMinute / 60);
@@ -71,7 +71,7 @@ const MaxLoginAttemptAlert = ({ lockDuration }: MaxLoginAttemptAlertProps) => {
     }
 
     return text;
-  }, [remainLockTime]);
+  })();
 
   return (
     <div

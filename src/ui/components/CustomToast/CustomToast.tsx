@@ -1,6 +1,6 @@
 import { createAnimation, IonToast } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
@@ -8,9 +8,9 @@ import {
   removeToastMessage,
 } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
-import { ToastMessageProps } from "./CustomToast.types";
-import "./CustomToast.scss";
 import { useScreenSize } from "../../hooks";
+import "./CustomToast.scss";
+import { ToastMessageProps } from "./CustomToast.types";
 
 const TOAST_HEIGHT = 52;
 // Toast height on small screen
@@ -32,11 +32,11 @@ const CustomToast = ({
   const username = authentication.userName;
 
   // Note: caculate toast position
-  const toastPosition = useMemo(() => {
+  const toastPosition = (() => {
     const isSmallDevice = width >= 250 && width <= 370;
 
     return index * ((isSmallDevice ? SMALL_TOAST_HEIGHT : TOAST_HEIGHT) + 8);
-  }, [index, width]);
+  })();
 
   const endAnimation = useCallback((baseEl: HTMLElement) => {
     return createAnimation()

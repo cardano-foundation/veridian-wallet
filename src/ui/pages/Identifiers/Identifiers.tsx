@@ -285,20 +285,17 @@ const Identifiers = () => {
     }
   };
 
-  const deletePendingCheck = useMemo(
-    () => ({
-      title: i18n.t("tabs.identifiers.deletepending.title"),
-      description: i18n.t(
-        deletedPendingItem?.creationStatus === CreationStatus.FAILED
-          ? "tabs.identifiers.deletepending.witnesserror"
-          : deletedPendingItem?.groupMetadata?.groupId
-            ? "tabs.identifiers.deletepending.mutilsigdescription"
-            : "tabs.identifiers.deletepending.description"
-      ),
-      button: i18n.t("tabs.identifiers.deletepending.button"),
-    }),
-    [deletedPendingItem]
-  );
+  const deletePendingCheck = {
+    title: i18n.t("tabs.identifiers.deletepending.title"),
+    description: i18n.t(
+      deletedPendingItem?.creationStatus === CreationStatus.FAILED
+        ? "tabs.identifiers.deletepending.witnesserror"
+        : deletedPendingItem?.groupMetadata?.groupId
+          ? "tabs.identifiers.deletepending.mutilsigdescription"
+          : "tabs.identifiers.deletepending.description"
+    ),
+    button: i18n.t("tabs.identifiers.deletepending.button"),
+  };
 
   const handleConnections = () => {
     dispatch(showConnections(true));

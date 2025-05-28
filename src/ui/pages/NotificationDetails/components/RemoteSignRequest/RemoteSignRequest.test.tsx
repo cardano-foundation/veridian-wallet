@@ -6,8 +6,8 @@ import { TabsRoutePath } from "../../../../../routes/paths";
 import { connectionsForNotifications } from "../../../../__fixtures__/connectionsFix";
 import { filteredIdentifierMapFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
-import { RemoteSignRequest } from "./RemoteSignRequest";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
+import { RemoteSignRequest } from "./RemoteSignRequest";
 
 const mockStore = configureStore();
 const dispatchMock = jest.fn();
@@ -80,9 +80,6 @@ describe("Receive credential", () => {
       ...mockStore(initialState),
       dispatch: dispatchMock,
     };
-    // TODO: Matching the hardcoded value in the component
-    // Remember to remove this hardcoded value once the component is refactored
-    const customCertificateName = "CSO Certificate";
     const { getAllByText, getByText } = render(
       <Provider store={storeMocked}>
         <RemoteSignRequest
@@ -96,10 +93,7 @@ describe("Receive credential", () => {
 
     expect(
       getAllByText(
-        `${EN_TRANSLATIONS.tabs.notifications.details.sign.title.replace(
-          "{{certificate}}",
-          customCertificateName
-        )}`
+        `${EN_TRANSLATIONS.tabs.notifications.details.sign.title}`
       )[0]
     ).toBeVisible();
     expect(

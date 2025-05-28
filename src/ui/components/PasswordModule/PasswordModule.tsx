@@ -1,10 +1,11 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
-import { informationCircleOutline } from "ionicons/icons";
-import { useSelector } from "react-redux";
 import { IonIcon } from "@ionic/react";
+import { informationCircleOutline } from "ionicons/icons";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { useSelector } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
+import { AuthService } from "../../../core/agent/services";
 import { KeyStoreKeys } from "../../../core/storage";
 import { i18n } from "../../../i18n";
 import { useAppDispatch } from "../../../store/hooks";
@@ -18,19 +19,18 @@ import {
   errorMessages,
   passwordStrengthChecker,
 } from "../../utils/passwordStrengthChecker";
-import { Alert as AlertCancel, Alert as AlertExisting } from "../Alert";
+import { combineClassNames } from "../../utils/style";
+import { Alert as AlertExisting } from "../Alert";
 import { CustomInput } from "../CustomInput";
 import { ErrorMessage } from "../ErrorMessage";
 import { PageFooter } from "../PageFooter";
 import "./PasswordModule.scss";
 import { PasswordModuleProps, PasswordModuleRef } from "./PasswordModule.types";
 import { PasswordMeter } from "./components/PasswordMeter";
-import { combineClassNames } from "../../utils/style";
 import { SymbolModal } from "./components/SymbolModal";
-import { AuthService } from "../../../core/agent/services";
 
 const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
-  ({ title, isOnboarding, description, testId, onCreateSuccess }, ref) => {
+  ({ title, description, testId, onCreateSuccess }, ref) => {
     const dispatch = useAppDispatch();
     const stateCache = useSelector(getStateCache);
     const authentication = stateCache.authentication;
@@ -39,7 +39,6 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
     const [confirmPasswordFocus, setConfirmPasswordFocus] = useState(false);
     const [createPasswordFocus, setCreatePasswordFocus] = useState(false);
     const [hintValue, setHintValue] = useState("");
-    const [alertCancelIsOpen, setAlertCancelIsOpen] = useState(false);
     const [alertExistingIsOpen, setAlertExistingIsOpen] = useState(false);
     const [isOpenSymbol, setIsOpenSymbol] = useState(false);
 
@@ -76,18 +75,7 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
     }));
 
     const handleContinue = async (skipped: boolean) => {
-      if (skipped) {
-        await Agent.agent.basicStorage
-          .createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.APP_PASSWORD_SKIPPED,
-              content: { value: skipped },
-            })
-          )
-          .catch((e) => {
-            showError("Unable to skip set password", e, dispatch);
-          });
-      } else {
+      if (!skipped) {
         if (authentication.passwordIsSet) {
           try {
             if (
@@ -287,23 +275,8 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
             primaryButtonText={`${i18n.t("createpassword.button.continue")}`}
             primaryButtonAction={() => handleContinue(false)}
             primaryButtonDisabled={!validated}
-            tertiaryButtonText={
-              isOnboarding
-                ? `${i18n.t("createpassword.button.skip")}`
-                : undefined
-            }
-            tertiaryButtonAction={() => setAlertCancelIsOpen(true)}
           />
         </div>
-        <AlertCancel
-          isOpen={alertCancelIsOpen}
-          setIsOpen={setAlertCancelIsOpen}
-          dataTestId="create-password-alert-skip"
-          headerText={`${i18n.t("createpassword.alert.text")}`}
-          confirmButtonText={`${i18n.t("createpassword.alert.button.confirm")}`}
-          cancelButtonText={`${i18n.t("createpassword.alert.button.cancel")}`}
-          actionConfirm={() => handleContinue(true)}
-        />
         <AlertExisting
           isOpen={alertExistingIsOpen}
           setIsOpen={setAlertExistingIsOpen}

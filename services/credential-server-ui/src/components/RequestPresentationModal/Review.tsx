@@ -1,8 +1,7 @@
 import { Box, Typography } from "@mui/material";
-import { ReviewProps } from "./RequestPresentationModal.types";
 import CredentialBG from "../../assets/credential-bg.svg";
-import { CredentialTypeAttributes } from "../../const";
 import { i18n } from "../../i18n";
+import { ReviewProps } from "./RequestPresentationModal.types";
 
 const Review = ({
   credentialType,
@@ -12,7 +11,15 @@ const Review = ({
 }: ReviewProps) => {
   if (!credentialType || !connectionId) return null;
 
-  const credAttributes = CredentialTypeAttributes[credentialType];
+  const credAttributes = Object.keys(attribute).map((key) => {
+    const inputLabelText = key.replace(/([a-z])([A-Z])/g, "$1 $2");
+
+    return {
+      key: key,
+      label: `${inputLabelText.at(0)?.toUpperCase()}${inputLabelText.slice(1)}`,
+    };
+  });
+
   const connectionName = connections.find(
     (item) => item.id === connectionId
   )?.alias;

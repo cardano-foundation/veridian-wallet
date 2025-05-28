@@ -1,5 +1,5 @@
 import { IonModal, isPlatform } from "@ionic/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -44,20 +44,12 @@ const InputRequest = () => {
     ? nameChecker.getError(inputValue)
     : undefined;
 
-  const showModal = useMemo(() => {
-    return (
-      (authentication.loggedIn &&
-        (authentication.userName === undefined ||
-          authentication.userName?.length === 0) &&
-        currentRoute?.path?.includes(TabsRoutePath.ROOT)) ||
-      !!missingAliasUrl
-    );
-  }, [
-    authentication.loggedIn,
-    authentication.userName,
-    currentRoute?.path,
-    missingAliasUrl,
-  ]);
+  const showModal =
+    (authentication.loggedIn &&
+      (authentication.userName === undefined ||
+        authentication.userName?.length === 0) &&
+      currentRoute?.path?.includes(TabsRoutePath.ROOT)) ||
+    !!missingAliasUrl;
 
   useEffect(() => {
     if (!showModal) {
@@ -152,13 +144,9 @@ const InputRequest = () => {
     setUserName();
   };
 
-  const title = useMemo(() => {
-    if (missingAliasUrl) {
-      return i18n.t("inputrequest.title.connectionalias");
-    }
-
-    return i18n.t("inputrequest.title.username");
-  }, [missingAliasUrl]);
+  const title = missingAliasUrl
+    ? i18n.t("inputrequest.title.connectionalias")
+    : i18n.t("inputrequest.title.username");
 
   return (
     <IonModal

@@ -1,0 +1,16 @@
+.fallback-default-logo {
+  background-color: var(--ion-color-neutral-800);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  flex-grow: 0;
+  flex-shrink: 0;
+
+  ion-icon {
+    width: 100%;
+    height: 100%;
+  }
+}

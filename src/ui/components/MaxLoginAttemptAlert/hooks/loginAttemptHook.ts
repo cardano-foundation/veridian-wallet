@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../../core/agent/agent";
 import { LoginAttempts } from "../../../../core/agent/services/auth.types";
 import { i18n } from "../../../../i18n";
@@ -17,24 +17,24 @@ const useLoginAttempt = () => {
 
   const remainAttempt = MAX_LOGIN_ATTEMPT - loginAttempt.attempts;
 
-  const errorMessage = useMemo(() => {
+  const errorMessage = (() => {
     switch (remainAttempt) {
-    case 5:
-    case 4:
-      return undefined;
-    case 3:
-    case 2:
-      return i18n.t("lockpage.attempterror", {
-        attempt: remainAttempt,
-      });
-    case 1:
-      return i18n.t("lockpage.attempterror", {
-        attempt: 1,
-      });
-    default:
-      return undefined;
+      case 5:
+      case 4:
+        return undefined;
+      case 3:
+      case 2:
+        return i18n.t("lockpage.attempterror", {
+          attempt: remainAttempt,
+        });
+      case 1:
+        return i18n.t("lockpage.attempterror", {
+          attempt: 1,
+        });
+      default:
+        return undefined;
     }
-  }, [remainAttempt]);
+  })();
 
   const setLoginAttempt = useCallback(
     (value: LoginAttempts) => {
@@ -43,11 +43,11 @@ const useLoginAttempt = () => {
     [dispatch]
   );
 
-  const lockDuration = useMemo(() => {
+  const lockDuration = (() => {
     if (remainAttempt > 0) return 0;
 
     return loginAttempt.lockedUntil - Date.now();
-  }, [loginAttempt.lockedUntil, remainAttempt]);
+  })();
 
   const [isLock, setIsLock] = useState(lockDuration > 0);
 

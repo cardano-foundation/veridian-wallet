@@ -1,19 +1,19 @@
-import { IonCard, IonItem, IonLabel, IonIcon } from "@ionic/react";
+import { IonCard, IonIcon, IonItem, IonLabel } from "@ionic/react";
 import { pencilOutline } from "ionicons/icons";
 import { useEffect, useState } from "react";
+import { Agent } from "../../../../core/agent/agent";
+import { ConnectionShortDetails } from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
+import { useAppDispatch } from "../../../../store/hooks";
+import { setToastMsg } from "../../../../store/reducers/stateCache";
+import { ToastMsgType } from "../../../globals/types";
+import { showError } from "../../../utils/error";
+import { Alert } from "../../Alert";
+import { FallbackIcon } from "../../FallbackIcon";
 import { PageFooter } from "../../PageFooter";
 import { PageHeader } from "../../PageHeader";
 import { ScrollablePageLayout } from "../../layout/ScrollablePageLayout";
 import { IdentifierStageProps, Stage } from "../CreateGroupIdentifier.types";
-import { Alert } from "../../Alert";
-import { useAppDispatch } from "../../../../store/hooks";
-import { setToastMsg } from "../../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../../globals/types";
-import { Agent } from "../../../../core/agent/agent";
-import KeriLogo from "../../../assets/images/KeriGeneric.jpg";
-import { showError } from "../../../utils/error";
-import { ConnectionShortDetails } from "../../../../core/agent/agent.types";
 
 const Summary = ({
   state,
@@ -121,8 +121,8 @@ const Summary = ({
                   className="identifier-list-item"
                 >
                   <IonLabel>
-                    <img
-                      src={connection?.logo || KeriLogo}
+                    <FallbackIcon
+                      src={connection?.logo}
                       className="connection-logo"
                       alt="connection-logo"
                       data-testid={`identifier-stage-3-connection-logo-${index}`}

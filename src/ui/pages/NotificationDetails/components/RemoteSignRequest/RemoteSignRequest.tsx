@@ -12,6 +12,7 @@ import { RemoteSignRequest as RemoteSignRequestModel } from "../../../../../core
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../store/reducers/connectionsCache";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import {
   CardBlock,
   CardDetailsAttributes,
@@ -24,12 +25,12 @@ import { PageHeader } from "../../../../components/PageHeader";
 import { Spinner } from "../../../../components/Spinner";
 import { SpinnerConverage } from "../../../../components/Spinner/Spinner.type";
 import { Verification } from "../../../../components/Verification";
+import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { combineClassNames } from "../../../../utils/style";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./RemoteSignRequest.scss";
-import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../../../globals/types";
+import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 
 function ellipsisText(text: string) {
   return `${text.substring(0, 8)}...${text.slice(-8)}`;
@@ -38,9 +39,9 @@ function ellipsisText(text: string) {
 const RemoteSignRequest = ({
   pageId,
   activeStatus,
-  notificationDetails,
   handleBack,
 }: NotificationDetailsProps) => {
+  const notificationDetails = notificationsFix[7];
   const dispatch = useAppDispatch();
   const connections = useAppSelector(getConnectionsCache);
   const [isSigningObject, setIsSigningObject] = useState(false);
@@ -75,25 +76,14 @@ const RemoteSignRequest = ({
 
   const signDetails = useMemo(() => {
     if (!requestData?.payload) {
+      setIsSigningObject(true);
       return {};
     }
 
-    let signContent;
-    try {
-      signContent = requestData.payload;
-      if (signContent["id"]) {
-        signContent["id"] = ellipsisText(`${signContent["id"]}`);
-      }
-
-      if (signContent["address"]) {
-        signContent["address"] = ellipsisText(`${signContent["address"]}`);
-      }
-
+    if (typeof requestData.payload === "object") {
       setIsSigningObject(true);
-    } catch (error) {
-      signContent = requestData.payload;
     }
-    return signContent;
+    return requestData.payload;
   }, [requestData]);
 
   const handleSign = async () => {
@@ -114,9 +104,10 @@ const RemoteSignRequest = ({
 
   const itemProps = useCallback((key?: string) => {
     return {
-      copyButton: ["id", "address"].includes(key || ""),
+      copyButton: false,
       className: "sign-info-item",
       keyValue: `${reservedKeysFilter(key || "")}:`,
+      mask: false,
     };
   }, []);
 
@@ -182,14 +173,12 @@ const RemoteSignRequest = ({
         customClass="custom-sign-request"
         header={
           <PageHeader
-            closeButton
-            closeButtonLabel={`${t(
+            closeButton={true}
+            closeButtonAction={handleBack}
+            closeButtonLabel={`${i18n.t(
               "tabs.notifications.details.buttons.close"
             )}`}
-            closeButtonAction={handleBack}
-            title={`${t("tabs.notifications.details.sign.title", {
-              certificate: "CSO Certificate", // TODO: change hardcoded value to dynamic
-            })}`}
+            title={`${i18n.t("tabs.notifications.details.sign.title")}`}
           />
         }
         footer={

@@ -1,11 +1,13 @@
 import { IonModal } from "@ionic/react";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getStateCache,
   setAuthentication,
 } from "../../../store/reducers/stateCache";
+import { BackEventPriorityType } from "../../globals/types";
+import { combineClassNames } from "../../utils/style";
 import { CreatePasscodeModule } from "../CreatePasscodeModule";
 import { PageHeader } from "../PageHeader";
 import { PasswordModule } from "../PasswordModule";
@@ -16,8 +18,6 @@ import {
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import "./ForgotAuthInfo.scss";
 import { ForgotAuthInfoProps, ForgotType } from "./ForgotAuthInfo.types";
-import { combineClassNames } from "../../utils/style";
-import { BackEventPriorityType } from "../../globals/types";
 
 const ForgotAuthInfo = ({
   isOpen,
@@ -61,7 +61,7 @@ const ForgotAuthInfo = ({
     handleClose(skipped);
   };
 
-  const pageTitle = useMemo(() => {
+  const pageTitle = (() => {
     if (step === 0) {
       return type === ForgotType.Passcode
         ? "forgotauth.passcode.title"
@@ -73,7 +73,7 @@ const ForgotAuthInfo = ({
         ? "forgotauth.newpasscode.reenterpasscode"
         : "forgotauth.newpasscode.title"
       : "forgotauth.newpassword.title";
-  }, [type, reEnterPasscodeStep, step]);
+  })();
 
   const seedPhraseDescription =
     type === ForgotType.Passcode
@@ -129,7 +129,6 @@ const ForgotAuthInfo = ({
             testId={pageId}
             description={`${i18n.t("forgotauth.newpassword.description")}`}
             onCreateSuccess={handleCreatePasswordSuccess}
-            isOnboarding={false}
           />
         )}
       </ScrollablePageLayout>

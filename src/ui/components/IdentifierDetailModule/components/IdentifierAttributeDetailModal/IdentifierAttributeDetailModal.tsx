@@ -3,7 +3,6 @@ import { i18n } from "../../../../../i18n";
 import { useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
-import KeriLogo from "../../../../assets/images/KeriGeneric.jpg";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../../../components/PageHeader";
@@ -43,49 +42,48 @@ const IdentifierAttributeDetailModal = ({
       }
 
       return {
-        image: KeriLogo,
         title: name,
         isCurrentUser: !memberConnection?.label,
       };
     });
 
     switch (view) {
-    case DetailView.SigningThreshold:
-      return (
-        <SigningThreshold
-          data={data}
-          setViewType={setViewType}
-        />
-      );
-    case DetailView.RotationThreshold:
-      return (
-        <RotationThreshold
-          data={data}
-          setViewType={setViewType}
-        />
-      );
-    case DetailView.GroupMember: {
-      return (
-        <List
-          bottomText={`${i18n.t(
-            `tabs.identifiers.details.detailmodal.${view}.bottomtext`,
-            { members: members?.length || 0 }
-          )}`}
-          title={`${i18n.t(
-            `tabs.identifiers.details.detailmodal.${view}.title`
-          )}`}
-          data={members || []}
-          mask
-        />
-      );
-    }
-    default:
-      return (
-        <Advanced
-          currentUserIndex={currentUserIndex}
-          data={data}
-        />
-      );
+      case DetailView.SigningThreshold:
+        return (
+          <SigningThreshold
+            data={data}
+            setViewType={setViewType}
+          />
+        );
+      case DetailView.RotationThreshold:
+        return (
+          <RotationThreshold
+            data={data}
+            setViewType={setViewType}
+          />
+        );
+      case DetailView.GroupMember: {
+        return (
+          <List
+            bottomText={`${i18n.t(
+              `tabs.identifiers.details.detailmodal.${view}.bottomtext`,
+              { members: members?.length || 0 }
+            )}`}
+            title={`${i18n.t(
+              `tabs.identifiers.details.detailmodal.${view}.title`
+            )}`}
+            data={members || []}
+            mask
+          />
+        );
+      }
+      default:
+        return (
+          <Advanced
+            currentUserIndex={currentUserIndex}
+            data={data}
+          />
+        );
     }
   };
 

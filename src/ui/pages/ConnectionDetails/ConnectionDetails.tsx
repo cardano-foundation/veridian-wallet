@@ -1,5 +1,3 @@
-import { ellipsisVertical } from "ionicons/icons";
-import { useCallback, useState } from "react";
 import {
   IonLabel,
   IonSegment,
@@ -7,40 +5,41 @@ import {
   IonSpinner,
   IonText,
 } from "@ionic/react";
+import { ellipsisVertical } from "ionicons/icons";
+import { useCallback, useState } from "react";
 import { i18n } from "../../../i18n";
 import { formatShortDate } from "../../utils/formatters";
 import "./ConnectionDetails.scss";
 
-import { RoutePath } from "../../../routes";
-import { useAppDispatch } from "../../../store/hooks";
-import {
-  setCurrentOperation,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
-import { ConnectionOptions } from "../../components/ConnectionOptions";
-import { Alert as AlertDeleteConnection } from "../../components/Alert";
-import { removeConnectionCache } from "../../../store/reducers/connectionsCache";
-import { OperationType, ToastMsgType } from "../../globals/types";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionDetails as ConnectionData,
   ConnectionHistoryItem,
   ConnectionNoteDetails,
 } from "../../../core/agent/agent.types";
-import ConnectionDetailsHeader from "./components/ConnectionDetailsHeader";
-import { EditConnectionsModal } from "./components/EditConnectionsModal";
+import { RoutePath } from "../../../routes";
+import { useAppDispatch } from "../../../store/hooks";
+import { removeConnectionCache } from "../../../store/reducers/connectionsCache";
+import {
+  setCurrentOperation,
+  setToastMsg,
+} from "../../../store/reducers/stateCache";
+import { Alert as AlertDeleteConnection } from "../../components/Alert";
+import { CardDetailsBlock } from "../../components/CardDetails";
+import { CloudError } from "../../components/CloudError";
+import { ConnectionOptions } from "../../components/ConnectionOptions";
 import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
-import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
-import KeriLogo from "../../assets/images/KeriGeneric.jpg";
-import { CardDetailsBlock } from "../../components/CardDetails";
-import { ConnectionNotes } from "./components/ConnectionNotes";
-import { useOnlineStatusEffect } from "../../hooks";
-import { ConnectionHistoryEvent } from "./components/ConnectionHistoryEvent";
 import { Verification } from "../../components/Verification";
-import { CloudError } from "../../components/CloudError";
+import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
+import { OperationType, ToastMsgType } from "../../globals/types";
+import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { ConnectionDetailsProps } from "./ConnectionDetails.types";
+import ConnectionDetailsHeader from "./components/ConnectionDetailsHeader";
+import { ConnectionHistoryEvent } from "./components/ConnectionHistoryEvent";
+import { ConnectionNotes } from "./components/ConnectionNotes";
+import { EditConnectionsModal } from "./components/EditConnectionsModal";
 
 const ConnectionDetails = ({
   connectionShortDetails,
@@ -222,7 +221,7 @@ const ConnectionDetails = ({
         >
           <div className="connection-details-content">
             <ConnectionDetailsHeader
-              logo={connectionDetails?.logo || KeriLogo}
+              logo={connectionDetails?.logo}
               label={connectionDetails?.label}
               date={connectionDetails?.createdAtUTC}
             />
@@ -294,7 +293,7 @@ const ConnectionDetails = ({
                     deleteButtonAction={() => deleteButtonAction()}
                   />
                 )}
-                </div>
+              </div>
             ) : (
               <div
                 className="connection-notes-tab"

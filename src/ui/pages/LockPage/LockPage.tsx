@@ -5,7 +5,7 @@ import {
 import { App, AppState } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
@@ -15,7 +15,7 @@ import { i18n } from "../../../i18n";
 import { PublicRoutes, RoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getBiometricsCacheCache,
+  getBiometricsCache,
   setEnableBiometricsCache,
 } from "../../../store/reducers/biometricsCache";
 import {
@@ -57,7 +57,7 @@ const LockPageContainer = () => {
   const preventBiometricOnEvent = useRef(false);
 
   const { handleBiometricAuth } = useBiometricAuth();
-  const biometricsCache = useSelector(getBiometricsCacheCache);
+  const biometricsCache = useSelector(getBiometricsCache);
   const firstAppLaunch = useSelector(getFirstAppLaunch);
   const [openRecoveryAuth, setOpenRecoveryAuth] = useState(false);
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
@@ -162,7 +162,7 @@ const LockPageContainer = () => {
     return;
   };
 
-  const error = useMemo(() => {
+  const error = (() => {
     if (!passcodeIncorrect || isLock) return undefined;
 
     if (errorMessage) return errorMessage;
@@ -170,7 +170,7 @@ const LockPageContainer = () => {
     if (passcode.length === 6) return `${i18n.t("lockpage.error")}`;
 
     return undefined;
-  }, [errorMessage, passcode.length, passcodeIncorrect, isLock]);
+  })();
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {

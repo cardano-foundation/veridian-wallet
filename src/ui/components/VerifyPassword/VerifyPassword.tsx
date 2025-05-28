@@ -1,5 +1,5 @@
 import { IonButton } from "@ionic/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { KeyStoreKeys } from "../../../core/storage";
@@ -94,19 +94,16 @@ const VerifyPassword = ({
     setOpenRecoveryAuth(true);
   };
 
-  const headerOptions = useMemo(
-    () => ({
-      closeButton: true,
-      closeButtonLabel: `${i18n.t("verifypassword.cancel")}`,
-      closeButtonAction: () => setIsOpen(false, true),
-      title: `${i18n.t("verifypassword.title")}`,
-      actionButton: true,
-      actionButtonDisabled: !verifyPasswordValue.length,
-      actionButtonAction: () => setAttempts(attempts - 1),
-      actionButtonLabel: `${i18n.t("verifypassword.confirm")}`,
-    }),
-    [attempts, setIsOpen, verifyPasswordValue.length]
-  );
+  const headerOptions = {
+    closeButton: true,
+    closeButtonLabel: `${i18n.t("verifypassword.cancel")}`,
+    closeButtonAction: () => setIsOpen(false, true),
+    title: `${i18n.t("verifypassword.title")}`,
+    actionButton: true,
+    actionButtonDisabled: !verifyPasswordValue.length,
+    actionButtonAction: () => setAttempts(attempts - 1),
+    actionButtonLabel: `${i18n.t("verifypassword.confirm")}`,
+  };
 
   const handleDissmissShowHint = () => {
     setAlertHintIsOpen(false);

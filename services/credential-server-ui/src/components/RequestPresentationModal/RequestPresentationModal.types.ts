@@ -1,8 +1,7 @@
-import { CredentialType } from "../../const";
 import { Contact } from "../../pages/Connections/components/ConnectionsTable/ConnectionsTable.types";
 
 interface ReviewProps {
-  credentialType?: CredentialType;
+  credentialType?: string;
   connectionId?: string;
   attribute: Record<string, string>;
   connections: Contact[];
@@ -10,7 +9,7 @@ interface ReviewProps {
 
 interface InputAttributeProps {
   attributeOptional?: boolean;
-  credentialType?: CredentialType;
+  attributes: string[];
   value: Record<string, string>;
   setValue: (key: string, value: string) => void;
 }
@@ -44,7 +43,7 @@ export { RequestPresentationStage };
 export type {
   InputAttributeProps,
   RequestPresentationModalProps,
+  ReviewProps,
   SelectListData,
   SelectListProps,
-  ReviewProps,
 };

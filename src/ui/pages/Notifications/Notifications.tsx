@@ -1,5 +1,5 @@
 import { IonList, useIonViewWillEnter } from "@ionic/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import {
@@ -9,26 +9,26 @@ import {
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
   getNotificationsCache,
   markNotificationAsRead,
 } from "../../../store/reducers/notificationsCache";
 import { setCurrentRoute } from "../../../store/reducers/stateCache";
+import { Alert } from "../../components/Alert";
 import { CredentialDetailModal } from "../../components/CredentialDetailModule";
+import { FilterChip } from "../../components/FilterChip/FilterChip";
+import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types";
 import { TabLayout } from "../../components/layout/TabLayout";
 import { showError } from "../../utils/error";
 import { timeDifference } from "../../utils/formatters";
+import { IdentifiersFilters } from "../Identifiers/Identifiers.types";
 import { NotificationFilters } from "./Notification.types";
 import { NotificationItem } from "./NotificationItem";
 import "./Notifications.scss";
 import { EarlierNotification } from "./components";
 import { EarlierNotificationRef } from "./components/EarlierNotification.types";
 import { NotificationOptionsModal } from "./components/NotificationOptionsModal";
-import { FilterChip } from "../../components/FilterChip/FilterChip";
-import { IdentifiersFilters } from "../Identifiers/Identifiers.types";
-import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types";
-import { Alert } from "../../components/Alert";
-import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 
 const Notifications = () => {
   const pageId = "notifications-tab";
@@ -55,7 +55,7 @@ const Notifications = () => {
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
 
-  const filteredNotification = useMemo(() => {
+  const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
       return notifications;
     }
@@ -73,7 +73,7 @@ const Notifications = () => {
         NotificationRoute.LocalAcdcRevoked,
       ].includes(notification.a.r as NotificationRoute)
     );
-  }, [notifications, selectedFilter]);
+  })();
 
   const notificationsNew = filteredNotification.filter(
     (notification) =>
@@ -81,14 +81,10 @@ const Notifications = () => {
       timeDifference(notification.createdAt)[1] === "h"
   );
 
-  const notificationsEarlier = useMemo(
-    () =>
-      filteredNotification.filter(
-        (notification) =>
-          timeDifference(notification.createdAt)[1] !== "h" &&
-          timeDifference(notification.createdAt)[1] !== "m"
-      ),
-    [filteredNotification]
+  const notificationsEarlier = filteredNotification.filter(
+    (notification) =>
+      timeDifference(notification.createdAt)[1] !== "h" &&
+      timeDifference(notification.createdAt)[1] !== "m"
   );
 
   useIonViewWillEnter(() => {

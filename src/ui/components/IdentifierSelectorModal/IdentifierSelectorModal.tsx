@@ -1,11 +1,10 @@
 import { IonCheckbox, IonContent, IonModal } from "@ionic/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { useAppSelector } from "../../../store/hooks";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
-import KeriLogo from "../../assets/images/KeriGeneric.jpg";
 import { CardItem, CardList } from "../CardList";
 import { PageFooter } from "../PageFooter";
 import { PageHeader } from "../PageHeader";
@@ -24,22 +23,21 @@ const IdentifierSelectorModal = ({
   const [selectedIdentifier, setSelectedIdentifier] =
     useState<IdentifierShortDetails | null>(null);
 
-  const displayIdentifiers = useMemo(() => {
+  const displayIdentifiers = (() => {
     const result = identifiers
       ? identifiers
       : Object.values(identifierCache)
-          .filter((item) => item.creationStatus === CreationStatus.COMPLETE)
-          .filter((item) => !item.groupMetadata?.groupId);
+        .filter((item) => item.creationStatus === CreationStatus.COMPLETE)
+        .filter((item) => !item.groupMetadata?.groupId);
 
     return result.map(
       (identifier): CardItem<IdentifierShortDetails> => ({
         id: identifier.id,
         title: identifier.displayName,
-        image: KeriLogo,
         data: identifier,
       })
     );
-  }, [identifierCache, identifiers]);
+  })();
 
   const handleSelectIdentifier = (data: IdentifierShortDetails) => {
     setSelectedIdentifier(selectedIdentifier?.id === data.id ? null : data);

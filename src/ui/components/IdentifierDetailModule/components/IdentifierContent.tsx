@@ -4,13 +4,12 @@ import {
   keyOutline,
   refreshOutline,
 } from "ionicons/icons";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { i18n } from "../../../../i18n";
 import { useAppSelector } from "../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../store/reducers/connectionsCache";
 import { getIdentifiersCache } from "../../../../store/reducers/identifiersCache";
 import { getAuthentication } from "../../../../store/reducers/stateCache";
-import KeriLogo from "../../../assets/images/KeriGeneric.jpg";
 import { CardDetailsContent } from "../../../components/CardDetails";
 import {
   CardBlock,
@@ -26,6 +25,7 @@ import {
 import { IdentifierAttributeDetailModal } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal";
 import { DetailView } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal.types";
 import { IdentifierContentProps } from "./IdentifierContent.types";
+import { FallbackIcon } from "../../FallbackIcon";
 
 const DISPLAY_MEMBERS = 3;
 
@@ -45,26 +45,21 @@ const IdentifierContent = ({
     setOpenDetailModal(true);
   }, []);
 
-  const isMultiSig = useMemo(() => {
-    const identifier = identifiersData[cardData.id];
+  const isMultiSig =
+    cardData.groupMemberPre || identifiersData[cardData.id]?.groupMemberPre;
 
-    return cardData.groupMemberPre || (identifier && identifier.groupMemberPre);
-  }, [cardData.id, cardData.groupMemberPre, identifiersData]);
+  const members = cardData.members
+    ?.map((member) => {
+      const memberConnection = multisignConnectionsCache[member];
+      let name = memberConnection?.label || member;
 
-  const members = useMemo(() => {
-    return cardData.members
-      ?.map((member) => {
-        const memberConnection = multisignConnectionsCache[member];
-        let name = memberConnection?.label || member;
+      if (!memberConnection?.label) {
+        name = userName;
+      }
 
-        if (!memberConnection?.label) {
-          name = userName;
-        }
-
-        return name;
-      })
-      .slice(0, DISPLAY_MEMBERS);
-  }, [cardData.members, multisignConnectionsCache, userName]);
+      return name;
+    })
+    .slice(0, DISPLAY_MEMBERS);
 
   const openGroupMember = () => openPropDetailModal(DetailView.GroupMember);
 
@@ -83,7 +78,7 @@ const IdentifierContent = ({
                 <CardDetailsItem
                   key={index}
                   info={item}
-                  customIcon={KeriLogo}
+                  startSlot={<FallbackIcon />}
                   className="member"
                   testId={`group-member-${index}`}
                 />

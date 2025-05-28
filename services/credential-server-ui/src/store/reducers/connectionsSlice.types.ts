@@ -1,4 +1,4 @@
-import { CredentialType } from "../../const";
+import { Schema } from "./schemasSlice.types";
 
 interface A {
   d: string;
@@ -14,19 +14,6 @@ interface Sad {
   ri: string;
   s: string;
   a: A;
-}
-
-interface Schema {
-  $id: string;
-  $schema: string;
-  title: string;
-  description: string;
-  type: string;
-  credentialType: string;
-  version: string;
-  properties: Record<string, number | string>;
-  additionalProperties: boolean;
-  required: string[];
 }
 
 interface Status {
@@ -56,11 +43,11 @@ enum PresentationRequestStatus {
 interface PresentationRequestData {
   id: string;
   connectionName: string;
-  credentialType: CredentialType;
+  credentialType: string;
   attribute: string;
   requestDate: number;
   status: PresentationRequestStatus;
 }
 
-export type { Credential, PresentationRequestData };
 export { PresentationRequestStatus };
+export type { Credential, PresentationRequestData };

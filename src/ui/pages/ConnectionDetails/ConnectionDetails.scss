@@ -70,9 +70,10 @@
         border-radius: 0.25rem;
       }
 
-      img {
+      .fallback-logo {
         width: 2.75rem;
         border-radius: 2.5rem;
+        height: 2.75rem;
 
         &.credential-miniature {
           height: 1.56rem;
@@ -130,7 +131,7 @@
       padding: 0.65rem 0.8rem;
 
       .connection-details-logo {
-        img {
+        .fallback-logo {
           height: 2.2rem;
           width: 2.2rem;
           border-radius: 2.2rem;

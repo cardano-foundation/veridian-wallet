@@ -10,21 +10,11 @@ import { DataProps } from "../../../routes/nextRoute/nextRoute.types";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getStateCache } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
-import introImg0 from "../../assets/images/intro-0.png";
-import introImg1 from "../../assets/images/intro-1.png";
-import introImg2 from "../../assets/images/intro-2.png";
-import introImg3 from "../../assets/images/intro-3.png";
+import { Intro } from "../../components/Intro";
 import { PageFooter } from "../../components/PageFooter";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
 import { useExitAppWithDoubleTap } from "../../hooks/exitAppWithDoubleTapHook";
 import "./Onboarding.scss";
-import { SlideItem } from "./components/Slides/Slides.types";
-import { Slides } from "./components/Slides";
-import { ConfigurationService } from "../../../core/configuration";
-import { CustomContent } from "../../../core/configuration/configurationService.types";
-import { Intro } from "../../components/CustomContent";
-
-export type IntroImg0Type = typeof introImg0;
 
 const Onboarding = () => {
   const pageId = "onboarding";
@@ -33,36 +23,10 @@ const Onboarding = () => {
   const stateCache = useAppSelector(getStateCache);
   const [hiddenPage, setHiddenPage] = useState(false);
   useExitAppWithDoubleTap(hiddenPage);
-  const customIntro = ConfigurationService.env.features.customContent.includes(
-    CustomContent.Intro
-  );
 
   useEffect(() => {
     setHiddenPage(history?.location?.pathname !== RoutePath.ONBOARDING);
   }, [hiddenPage, history?.location?.pathname]);
-
-  const items: SlideItem[] = [
-    {
-      title: `${i18n.t("onboarding.slides.0.title")}`,
-      description: `${i18n.t("onboarding.slides.0.description")}`,
-      image: introImg0,
-    },
-    {
-      title: `${i18n.t("onboarding.slides.1.title")}`,
-      description: `${i18n.t("onboarding.slides.1.description")}`,
-      image: introImg1,
-    },
-    {
-      title: `${i18n.t("onboarding.slides.2.title")}`,
-      description: `${i18n.t("onboarding.slides.2.description")}`,
-      image: introImg2,
-    },
-    {
-      title: `${i18n.t("onboarding.slides.3.title")}`,
-      description: `${i18n.t("onboarding.slides.3.description")}`,
-      image: introImg3,
-    },
-  ];
 
   const handleNavigation = (isRecoveryMode: boolean) => {
     const data: DataProps = {
@@ -95,7 +59,7 @@ const Onboarding = () => {
 
   return (
     <ResponsivePageLayout pageId={pageId}>
-      {customIntro ? <Intro /> : <Slides items={items} />}
+      <Intro />
       <PageFooter
         pageId={pageId}
         primaryButtonText={`${i18n.t("onboarding.getstarted.button.label")}`}

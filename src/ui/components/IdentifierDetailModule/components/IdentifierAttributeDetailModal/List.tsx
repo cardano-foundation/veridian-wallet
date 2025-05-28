@@ -4,6 +4,7 @@ import { i18n } from "../../../../../i18n";
 import { CardBlock, CardDetailsItem } from "../../../../components/CardDetails";
 import { ListHeader } from "../../../../components/ListHeader";
 import { ListProps } from "./IdentifierAttributeDetailModal.types";
+import { FallbackIcon } from "../../../FallbackIcon";
 
 const List = ({ data, title, bottomText, fullText, mask }: ListProps) => {
   return (
@@ -18,7 +19,7 @@ const List = ({ data, title, bottomText, fullText, mask }: ListProps) => {
             <CardDetailsItem
               key={index}
               info={item.title}
-              customIcon={item.image}
+              startSlot={<FallbackIcon src={item.image} />}
               className="member"
               testId={`group-member-${item.title}`}
               mask={mask}

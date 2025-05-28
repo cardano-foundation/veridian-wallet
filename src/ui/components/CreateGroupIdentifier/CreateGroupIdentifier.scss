@@ -224,9 +224,10 @@ ion-modal.create-group-identifier-modal {
         }
 
         ion-label {
-          img {
+          .fallback-logo {
             width: 2.75rem;
             height: 2.75rem;
+            display: block;
           }
 
           .connection-name {
@@ -347,7 +348,7 @@ ion-modal.create-group-identifier-modal {
           font-weight: 500;
           color: var(--ion-color-neutral-700);
 
-          img {
+          .fallback-logo {
             width: 1.5rem;
             height: 1.5rem;
           }
@@ -366,7 +367,6 @@ ion-modal.create-group-identifier-modal {
         ion-icon {
           font-size: 1.5rem;
           color: var(--ion-color-neutral-700);
-          opacity: 0.5;
         }
       }
     }

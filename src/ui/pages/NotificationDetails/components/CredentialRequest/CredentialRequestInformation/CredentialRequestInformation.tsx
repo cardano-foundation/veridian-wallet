@@ -1,6 +1,6 @@
 import { IonIcon, IonSpinner, IonText } from "@ionic/react";
 import { chevronForward, warningOutline } from "ionicons/icons";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { Agent } from "../../../../../../core/agent/agent";
 import { NotificationRoute } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../../../../i18n";
@@ -13,7 +13,6 @@ import {
   setNotificationsCache,
 } from "../../../../../../store/reducers/notificationsCache";
 import { setToastMsg } from "../../../../../../store/reducers/stateCache";
-import KeriLogo from "../../../../../assets/images/KeriGeneric.jpg";
 import { Alert as AlertDecline } from "../../../../../components/Alert";
 import {
   CardDetailsAttributes,
@@ -23,6 +22,7 @@ import {
   MemberAcceptStatus,
   MultisigMember,
 } from "../../../../../components/CredentialDetailModule/components";
+import { FallbackIcon } from "../../../../../components/FallbackIcon";
 import { InfoCard } from "../../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../../components/PageFooter";
@@ -161,7 +161,7 @@ const CredentialRequestInformation = ({
 
   const handleClose = () => setViewCredId(undefined);
 
-  const headerAlertMessage = useMemo(() => {
+  const headerAlertMessage = (() => {
     if (!isGroup) return null;
 
     if (reachedThreshold) {
@@ -201,15 +201,9 @@ const CredentialRequestInformation = ({
     }
 
     return null;
-  }, [
-    isGroup,
-    reachedThreshold,
-    isGroupInitiator,
-    isJoinGroup,
-    groupInitiatorJoined,
-  ]);
+  })();
 
-  const primaryButtonText = useMemo(() => {
+  const primaryButtonText = (() => {
     if (isGroupInitiator) {
       return groupInitiatorJoined
         ? i18n.t("tabs.notifications.details.buttons.ok")
@@ -226,15 +220,9 @@ const CredentialRequestInformation = ({
     }
 
     return i18n.t("tabs.notifications.details.buttons.ok");
-  }, [
-    isGroupInitiator,
-    groupInitiatorJoined,
-    isJoinGroup,
-    reachedThreshold,
-    missingProposedCred,
-  ]);
+  })();
 
-  const memberDeclineButtonText = useMemo(() => {
+  const memberDeclineButtonText = (() => {
     return isGroupInitiator ||
       (!isGroupInitiator && !groupInitiatorJoined) ||
       isJoinGroup ||
@@ -242,13 +230,7 @@ const CredentialRequestInformation = ({
       missingProposedCred
       ? undefined
       : `${i18n.t("tabs.notifications.details.buttons.decline")}`;
-  }, [
-    isGroupInitiator,
-    groupInitiatorJoined,
-    isJoinGroup,
-    reachedThreshold,
-    missingProposedCred,
-  ]);
+  })();
 
   const groupInitiatorDeclineButtonText =
     reachedThreshold ||
@@ -351,7 +333,7 @@ const CredentialRequestInformation = ({
               )}`}
             >
               <div className="request-from-content">
-                <img src={KeriLogo} />
+                <FallbackIcon />
                 <p>
                   {linkedGroup?.memberInfos.at(0)?.name ||
                     i18n.t("connections.unknown")}
@@ -371,7 +353,7 @@ const CredentialRequestInformation = ({
                 )}`}
               >
                 <div className="request-from-content">
-                  <img src={KeriLogo} />
+                  <FallbackIcon />
                   <p>
                     {credentialRequest.schema.name ||
                       i18n.t("connections.unknown")}
@@ -405,7 +387,7 @@ const CredentialRequestInformation = ({
             )}`}
           >
             <div className="request-from-content">
-              <img src={connection?.logo || KeriLogo} />
+              <FallbackIcon src={connection?.logo} />
               <p>{connection?.label || i18n.t("connections.unknown")}</p>
             </div>
           </CardDetailsBlock>

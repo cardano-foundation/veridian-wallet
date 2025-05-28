@@ -44,6 +44,7 @@ enum MiscRecordId {
   MULTISIG_IDENTIFIERS_PENDING_CREATION = "multisig-identifiers-pending-creation",
   APP_FIRST_INSTALL = "app-first-install",
   INDIVIDUAL_FIRST_CREATE = "individual-first-create",
+  BIOMETRICS_SETUP = "biometrics-setup",
 }
 
 interface ConnectionShortDetails {

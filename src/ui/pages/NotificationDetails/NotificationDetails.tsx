@@ -1,4 +1,4 @@
-import { ElementType, useCallback, useEffect, useMemo, useRef } from "react";
+import { ElementType, useCallback, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   KeriaNotification,
@@ -8,12 +8,12 @@ import { TabsRoutePath } from "../../../routes/paths";
 import { useAppSelector } from "../../../store/hooks";
 import { getNotificationsCache } from "../../../store/reducers/notificationsCache";
 import { useAppIonRouter } from "../../hooks";
+import { RemoteSignRequest } from "./components/RemoteSignRequest";
+import { RemoteMessage } from "./components/RemoteMessage";
 import { CredentialRequest } from "./components/CredentialRequest";
 import { MultiSigRequest } from "./components/MultiSigRequest";
 import { ReceiveCredential } from "./components/ReceiveCredential";
 import { RemoteConnectInstructions } from "./components/RemoteConnectInstructions";
-import { RemoteSignConfirmation } from "./components/RemoteSignConfirmation";
-import { RemoteSignRequest } from "./components/RemoteSignRequest";
 
 const NotificationDetails = () => {
   const pageId = "notification-details";
@@ -21,9 +21,9 @@ const NotificationDetails = () => {
   const notificationCache = useAppSelector(getNotificationsCache);
   const { id } = useParams<{ id: string }>();
 
-  const notificationDetails = useMemo(() => {
-    return notificationCache.find((notification) => notification.id === id);
-  }, [id, notificationCache]);
+  const notificationDetails = notificationCache.find(
+    (notification) => notification.id === id
+  );
 
   const currentNotification = useRef<KeriaNotification | undefined>(
     notificationDetails
@@ -48,8 +48,9 @@ const NotificationDetails = () => {
       [NotificationRoute.ExnIpexApply]: CredentialRequest,
       [NotificationRoute.MultiSigExn]: ReceiveCredential,
       [NotificationRoute.RemoteSignReq]: RemoteSignRequest,
-      [NotificationRoute.HumanReadableMessage]: RemoteSignConfirmation,
-      [NotificationRoute.LocalConnectInstructions]: RemoteConnectInstructions,
+      [NotificationRoute.HumanReadableMessage]: RemoteMessage,
+      [NotificationRoute.LocalSingletonConnectInstructions]:
+        RemoteConnectInstructions,
       [NotificationRoute.MultiSigRpy]: null,
       [NotificationRoute.ExnIpexOffer]: null,
       [NotificationRoute.ExnIpexAgree]: null,

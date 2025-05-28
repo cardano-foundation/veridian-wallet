@@ -12,6 +12,7 @@ import {
   settingsOutline,
 } from "ionicons/icons";
 import { useEffect, useMemo, useState } from "react";
+import { ConfigurationService } from "../../../core/configuration";
 import { OptionalFeature } from "../../../core/configuration/configurationService.types";
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
@@ -30,7 +31,6 @@ import { SubMenu } from "./components/SubMenu";
 import { emptySubMenu, SubMenuItems } from "./components/SubMenuItems";
 import "./Menu.scss";
 import { MenuItemProps, SubMenuKey } from "./Menu.types";
-import { ConfigurationService } from "../../../core/configuration";
 
 const Menu = () => {
   const pageId = "menu-tab";
@@ -54,12 +54,12 @@ const Menu = () => {
 
   const handleOpenUrl = (key: SubMenuKey) => {
     switch (key) {
-    case SubMenuKey.Connections: {
-      dispatch(showConnections(true));
-      break;
-    }
-    default:
-      return;
+      case SubMenuKey.Connections: {
+        dispatch(showConnections(true));
+        break;
+      }
+      default:
+        return;
     }
   };
 
@@ -104,13 +104,10 @@ const Menu = () => {
   const closeSetting = () => setShowSubMenu(false);
   const subMenuItems = SubMenuItems(showSelectedOption, closeSetting);
 
-  const selectSubmenu = useMemo(() => {
-    // NOTE: emptySubMenu is returned for unavailable selected options to not break the animation
-    // by keeping the SubMenu component in the DOM
-    return selectedOption !== undefined
+  const selectSubmenu =
+    selectedOption !== undefined
       ? subMenuItems.get(selectedOption) || emptySubMenu
       : emptySubMenu;
-  }, [selectedOption, subMenuItems]);
 
   const AdditionalButtons = () => {
     return (

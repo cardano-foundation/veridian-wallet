@@ -1,30 +1,25 @@
 import { Box } from "@mui/material";
-import { CredentialTypeAttributes } from "../../const";
 import { i18n } from "../../i18n";
 import { AppInput } from "../AppInput";
 import { InputAttributeProps } from "./IssueCredentialModal.types";
 
 const InputAttribute = ({
-  credentialType,
+  attributes,
   value,
   setValue,
 }: InputAttributeProps) => {
-  if (!credentialType) return null;
-
-  const attributes = CredentialTypeAttributes[credentialType];
-
   return (
     <Box className="input-attribute">
       {attributes.map((attribute) => {
+        const inputLabelText = attribute.replace(/([a-z])([A-Z])/g, "$1 $2");
+
         return (
           <AppInput
-            key={attribute.key}
+            key={attribute}
             fullWidth
-            label={i18n.t(
-              `pages.credentialDetails.issueCredential.inputAttribute.label.${attribute.label.toLowerCase()}`
-            )}
-            value={value[attribute.key] || ""}
-            onChange={(e) => setValue(attribute.key, e.target.value)}
+            label={`${inputLabelText.at(0)?.toUpperCase()}${inputLabelText.slice(1)}`}
+            value={value[attribute] || ""}
+            onChange={(e) => setValue(attribute, e.target.value)}
             placeholder={i18n.t(
               "pages.credentialDetails.issueCredential.inputAttribute.placeholder"
             )}

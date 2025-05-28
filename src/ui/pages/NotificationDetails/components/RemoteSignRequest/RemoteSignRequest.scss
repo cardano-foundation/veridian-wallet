@@ -95,6 +95,25 @@
             & > ion-item:last-of-type {
               margin-bottom: 0.5rem;
             }
+
+            .sign-info-item {
+              .card-details-info-block-data {
+                display: flex;
+                align-items: center;
+                min-width: 0;
+
+                .card-details-info-block-key {
+                  flex-shrink: 1;
+                }
+
+                span {
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  display: inline-block;
+                }
+              }
+            }
           }
         }
 
@@ -104,6 +123,7 @@
           height: 1.25rem;
         }
       }
+
       .card-details-nested-content {
         & > .card-details-info-block-inner {
           padding: 1rem;
@@ -135,6 +155,7 @@
           }
         }
       }
+
       .sign-string {
         display: block;
         padding: 0.75rem 0;
