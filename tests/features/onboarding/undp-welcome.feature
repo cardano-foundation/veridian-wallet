@@ -1,7 +1,7 @@
 Feature: OnboardingAddingIdentifierWelcome
 
   Background:
-    Given user is onboarded with skipped password creation successful
+    Given user is onboarded with skipped password creation
 
   Scenario: C2546 WelcomeMessage - is displayed
     Then user can see Welcome message

@@ -46,6 +46,14 @@ export class CreatePasswordScreen {
     return $("[data-testid=\"password-accept-criteria\"]");
   }
 
+  get addPasswordButton() {
+    return $("[data-testid='primary-button']");
+  }
+
+  get setUpLaterButton() {
+    return $("[data-testid='tertiary-button']");
+  }
+
   async loads() {
     await expect(this.screenTitle).toBeDisplayed();
     await expect(this.screenTitle).toHaveText(CreatePassword.Title);
