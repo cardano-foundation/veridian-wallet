@@ -25,7 +25,9 @@ const Section = ({ title, content, componentId, altIsOpen }: TermsSection) => {
         data-testid="privacy-policy-modal-switch"
         onClick={() => altIsOpen && altIsOpen(true)}
       >
-        {i18n.t("generateseedphrase.termsandconditions.privacy")}
+        {i18n.t("privacypolicy.intro.title", {
+          ns: "privacypolicy",
+        })}
       </u>
     );
   };
@@ -37,7 +39,9 @@ const Section = ({ title, content, componentId, altIsOpen }: TermsSection) => {
         className="unstyled-link"
       >
         <u data-testid="support-link-handler">
-          {i18n.t("generateseedphrase.termsandconditions.support")}
+          {i18n.t("termsofuse.support", {
+            ns: "termsofuse",
+          })}
         </u>
       </a>
     );

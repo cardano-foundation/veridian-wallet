@@ -149,8 +149,7 @@
     "termsandconditions": {
       "text": "I have read and agree to the <0>{{clickableTerms}}</0> and <1>{{clickablePrivacy}}</1>.",
       "terms": "Terms of Use",
-      "privacy": "Privacy Policy",
-      "support": "Veridian Wallet Support"
+      "privacy": "Privacy Policy"
     }
   },
   "lockpage": {
