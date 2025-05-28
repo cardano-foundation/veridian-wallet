@@ -3,6 +3,7 @@ import { Agent } from "../agent";
 import { log } from "../log";
 import { SignifyApi } from "../modules/signify";
 import { ACDC_SCHEMAS } from "../utils/schemas";
+import { HOLDER_AID_NAME } from "../consts";
 
 async function issueAcdcCredential(
   req: Request,
@@ -28,8 +29,15 @@ async function requestDisclosure(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
   const { schemaSaid, aid, attributes } = req.body;
-  await Agent.agent.requestDisclosure(schemaSaid, aid, attributes);
+
+  await signifyApi.requestDisclosure(
+    HOLDER_AID_NAME,
+    schemaSaid,
+    aid,
+    attributes
+  );
   res.status(200).send({
     success: true,
     data: "Apply schema successfully",
@@ -37,8 +45,15 @@ async function requestDisclosure(
 }
 
 async function contactCredentials(req: Request, res: Response): Promise<void> {
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
   const { contactId } = req.query;
-  const data = await Agent.agent.contactCredentials(contactId as string);
+
+  const issuer = await signifyApi.getIdentifierByName(HOLDER_AID_NAME);
+
+  const data = await signifyApi.contactCredentials(
+    issuer.prefix,
+    contactId as string
+  );
 
   res.status(200).send({
     success: true,
@@ -47,10 +62,11 @@ async function contactCredentials(req: Request, res: Response): Promise<void> {
 }
 
 async function revokeCredential(req: Request, res: Response): Promise<void> {
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
   const { credentialId, holder } = req.body;
 
   try {
-    await Agent.agent.revokeCredential(credentialId, holder);
+    await signifyApi.revokeCredential(HOLDER_AID_NAME, holder, credentialId);
     res.status(200).send({
       success: true,
       data: "Revoke credential successfully",
@@ -81,7 +97,9 @@ async function revokeCredential(req: Request, res: Response): Promise<void> {
 }
 
 async function schemas(req: Request, res: Response) {
-  const schemas = await Agent.agent.schemas();
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
+
+  const schemas = await signifyApi.schemas();
   res.status(200).send({
     success: true,
     data: schemas,
