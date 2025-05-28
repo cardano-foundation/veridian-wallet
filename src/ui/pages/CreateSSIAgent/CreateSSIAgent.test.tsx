@@ -40,6 +40,8 @@ import configureStore from "redux-mock-store";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
+import SSI_CREATE from "../../../locales/en/aboutssiagentcreate.json";
+import SSI_RECOVERY from "../../../locales/en/aboutssiagentrecovery.json";
 import { RoutePath } from "../../../routes";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import { setCurrentOperation } from "../../../store/reducers/stateCache";
@@ -678,14 +680,12 @@ describe("SSI agent page", () => {
       </Provider>
     );
 
+    expect(getByText(SSI_CREATE.aboutssiagentcreate.intro.title)).toBeVisible();
     expect(
-      getByText(EN_TRANSLATIONS.aboutssiagentcreate.intro.title)
+      getByText(SSI_CREATE.aboutssiagentcreate.sections[0].content[0].text)
     ).toBeVisible();
     expect(
-      getByText(EN_TRANSLATIONS.aboutssiagentcreate.sections[0].content[0].text)
-    ).toBeVisible();
-    expect(
-      getByText(EN_TRANSLATIONS.aboutssiagentcreate.sections[0].content[1].text)
+      getByText(SSI_CREATE.aboutssiagentcreate.sections[0].content[1].text)
     ).toBeVisible();
     expect(
       getByText(EN_TRANSLATIONS.ssiagent.button.onboardingdocumentation)
@@ -832,17 +832,13 @@ describe("SSI agent page: recovery mode", () => {
     );
 
     expect(
-      getByText(EN_TRANSLATIONS.aboutssiagentrecovery.intro.title)
+      getByText(SSI_RECOVERY.aboutssiagentrecovery.intro.title)
     ).toBeVisible();
     expect(
-      getByText(
-        EN_TRANSLATIONS.aboutssiagentrecovery.sections[0].content[0].text
-      )
+      getByText(SSI_RECOVERY.aboutssiagentrecovery.sections[0].content[0].text)
     ).toBeVisible();
     expect(
-      getByText(
-        EN_TRANSLATIONS.aboutssiagentrecovery.sections[0].content[1].text
-      )
+      getByText(SSI_RECOVERY.aboutssiagentrecovery.sections[0].content[1].text)
     ).toBeVisible();
     expect(
       getByText(EN_TRANSLATIONS.ssiagent.button.recoverydocumentation)
