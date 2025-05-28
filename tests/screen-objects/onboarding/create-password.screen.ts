@@ -39,7 +39,7 @@ export class CreatePasswordScreen {
   }
 
   get skipButton() {
-    return $("[data-testid=\"tertiary-button-create-password\"]");
+    return $("[data-testid='action-button']");
   }
 
   get passwordAcceptCriteriaParagraph() {
