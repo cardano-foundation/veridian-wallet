@@ -12,7 +12,7 @@ import { CreateGroupIdentifier } from "../../../../components/CreateGroupIdentif
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
-import { DISCORD_LINK } from "../../../../globals/constants";
+import { SUPPORT_LINK } from "../../../../globals/constants";
 import { openBrowserLink } from "../../../../utils/openBrowserLink";
 import "./ErrorPage.scss";
 import { ErrorPageProps } from "./ErrorPage.types";
@@ -55,7 +55,7 @@ const ErrorPage = ({
     return (
       <u
         data-testid="support-link-browser-handler"
-        onClick={() => openBrowserLink(DISCORD_LINK)}
+        onClick={() => openBrowserLink(SUPPORT_LINK)}
       >
         {i18n.t(
           "tabs.notifications.details.identifier.errorpage.help.supportchannel"
