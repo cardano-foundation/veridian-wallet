@@ -2,40 +2,76 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { config } from "./config";
-import { Agent } from "./agent";
 import router from "./routes";
 import { log } from "./log";
-import { ready as signifyReady, randomPasscode } from "signify-ts";
+import { ready as signifyReady } from "signify-ts";
 import { SignifyApi } from "./modules/signify";
-import path from "path";
-import { existsSync, mkdirSync } from "fs";
-import { readFile, writeFile } from "fs/promises";
-import { BranFileContent } from "./agent.types";
 
-async function getBrans(): Promise<BranFileContent> {
-  const bransFilePath = "./data/brans.json";
-  const dirPath = path.dirname(bransFilePath);
+import { HOLDER_AID_NAME, ISSUER_AID_NAME } from "./consts";
+import { PollingService } from "./services/pollingService";
+import { createQVICredential } from "./services/qviCredential";
+import { loadBrans } from "./utils/utils";
 
-  if (!existsSync(dirPath)) {
-    mkdirSync(dirPath, { recursive: true });
+async function initKeri(
+  signifyApi: SignifyApi,
+  signifyApiIssuer: SignifyApi
+): Promise<string> {
+  /* eslint-disable no-console */
+  const existingKeriIssuerRegistryRegk = await signifyApiIssuer
+    .getRegistry(ISSUER_AID_NAME)
+    .catch((e) => {
+      console.error(e);
+      return undefined;
+    });
+  const existingKeriRegistryRegk = await signifyApi
+    .getRegistry(HOLDER_AID_NAME)
+    .catch((e) => {
+      console.error(e);
+      return undefined;
+    });
+
+  let keriIssuerRegistryRegk;
+  let keriRegistryRegk;
+
+  // Issuer
+  if (existingKeriIssuerRegistryRegk) {
+    keriIssuerRegistryRegk = existingKeriIssuerRegistryRegk;
+  } else {
+    await signifyApiIssuer
+      .createIdentifier(ISSUER_AID_NAME)
+      .catch((e) => console.error(e));
+    keriIssuerRegistryRegk = await signifyApiIssuer
+      .createRegistry(ISSUER_AID_NAME)
+      .catch((e) => console.error(e));
   }
 
-  let bransFileContent = "";
-  if (existsSync(bransFilePath)) {
-    bransFileContent = await readFile(bransFilePath, "utf8");
-    try {
-      const data = JSON.parse(bransFileContent);
-      if (data.bran && data.issuerBran) {
-        return data;
-      }
-    } catch {}
+  // Holder
+  if (existingKeriRegistryRegk) {
+    keriRegistryRegk = existingKeriRegistryRegk;
+  } else {
+    await signifyApi
+      .createIdentifier(HOLDER_AID_NAME)
+      .catch((e) => console.error(e));
+    await signifyApi.addIndexerRole(HOLDER_AID_NAME);
+    keriRegistryRegk = await signifyApi
+      .createRegistry(HOLDER_AID_NAME)
+      .catch((e) => console.error(e));
   }
 
-  const bran = randomPasscode();
-  const issuerBran = randomPasscode();
-  const newContent = { bran, issuerBran };
-  await writeFile(bransFilePath, JSON.stringify(newContent));
-  return newContent;
+  const qviCredentialId = await createQVICredential(
+    signifyApi,
+    signifyApiIssuer,
+    keriIssuerRegistryRegk
+  ).catch((e) => {
+    console.error(e);
+    return "";
+  });
+
+  // Start polling service
+  const pollingService = new PollingService(signifyApi);
+  pollingService.start();
+
+  return qviCredentialId;
 }
 
 async function startSignifyApi(
@@ -43,7 +79,7 @@ async function startSignifyApi(
   signifyApiIssuer: SignifyApi
 ) {
   await signifyReady();
-  const brans = await getBrans();
+  const brans = await loadBrans();
 
   if (brans) {
     await signifyApi.start(brans.bran);
@@ -69,10 +105,11 @@ async function startServer() {
     const signifyApiIssuer = new SignifyApi();
     app.set("signifyApi", signifyApi);
     app.set("signifyApiIssuer", signifyApiIssuer);
-    await Agent.agent.start(signifyApi, signifyApiIssuer);
     await startSignifyApi(signifyApi, signifyApiIssuer);
 
-    await Agent.agent.initKeri();
+    const qviCredentialId = await initKeri(signifyApi, signifyApiIssuer);
+    app.set("qviCredentialId", qviCredentialId);
+
     log(`Listening on port ${config.port}`);
   });
 }

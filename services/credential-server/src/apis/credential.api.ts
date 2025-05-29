@@ -1,23 +1,48 @@
 import { NextFunction, Request, Response } from "express";
-import { Agent } from "../agent";
 import { log } from "../log";
 import { SignifyApi } from "../modules/signify";
 import { ACDC_SCHEMAS } from "../utils/schemas";
-import { HOLDER_AID_NAME } from "../consts";
+import { HOLDER_AID_NAME, LE_SCHEMA_SAID } from "../consts";
 
 async function issueAcdcCredential(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
+  const qviCredentialId = req.app.get("qviCredentialId");
+
   const { schemaSaid, aid, attribute } = req.body;
+
   if (!ACDC_SCHEMAS[schemaSaid]) {
     res.status(409).send({
       success: false,
       data: "",
     });
+    return;
   }
-  await Agent.agent.issueAcdcCredentialByAid(schemaSaid, aid, attribute);
+
+  const keriRegistryRegk = await signifyApi.getRegistry(HOLDER_AID_NAME);
+  const holderAid = await signifyApi.getIdentifierByName(HOLDER_AID_NAME);
+
+  if (schemaSaid === LE_SCHEMA_SAID) {
+    await signifyApi.leChainedCredential(
+      qviCredentialId,
+      keriRegistryRegk,
+      holderAid.name,
+      aid,
+      attribute
+    );
+  } else {
+    await signifyApi.issueCredential(
+      HOLDER_AID_NAME,
+      keriRegistryRegk,
+      schemaSaid,
+      aid,
+      attribute
+    );
+  }
+
   res.status(200).send({
     success: true,
     data: "Credential offered",
