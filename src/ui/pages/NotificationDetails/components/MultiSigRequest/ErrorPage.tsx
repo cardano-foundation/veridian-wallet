@@ -57,7 +57,7 @@ const ErrorPage = ({
         href={SUPPORT_EMAIL}
       >
         {i18n.t(
-          "tabs.notifications.details.identifier.errorpage.help.supportchannel"
+          "tabs.notifications.details.identifier.errorpage.help.emailaddress"
         )}
       </a>
     );
