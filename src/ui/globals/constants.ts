@@ -4,7 +4,6 @@ const MAX_FAVOURITES = 5;
 const DOUBLE_TAP_DELAY = 300;
 
 // Links
-const DISCORD_LINK = "https://discord.com/invite/9yNneV8Ktv";
 const SUPPORT_EMAIL = "mailto:support@veridian.id";
 const DOCUMENTATION_LINK = "https://docs.veridian.id/";
 const ONBOARDING_DOCUMENTATION_LINK =
@@ -25,7 +24,6 @@ export {
   MAX_FAVOURITES,
   DOUBLE_TAP_DELAY,
   SUPPORT_EMAIL,
-  DISCORD_LINK,
   DOCUMENTATION_LINK,
   ONBOARDING_DOCUMENTATION_LINK,
   RECOVERY_DOCUMENTATION_LINK,

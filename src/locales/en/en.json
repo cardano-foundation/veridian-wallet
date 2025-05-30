@@ -892,8 +892,8 @@
             },
             "help": {
               "title": "Need help?",
-              "detailtext": "If you need assistance, please message us on our <0>{{discordSupportChannel}}</0>.",
-              "supportchannel": "Discord support channel"
+              "detailtext": "If you need assistance, please email us - <0>{{emailAddress}}</0>.",
+              "emailaddress": "support@veridian.id"
             },
             "continuesetup": "Continue setup"
           }

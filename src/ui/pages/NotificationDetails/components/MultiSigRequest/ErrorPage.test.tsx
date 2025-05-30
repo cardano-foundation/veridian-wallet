@@ -128,7 +128,7 @@ describe("Multisign error feedback", () => {
     expect(
       getByText(
         EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage.help.detailtext.replace(
-          "<0>{{discordSupportChannel}}</0>",
+          "<0>{{emailAddress}}</0>",
           ""
         )
       )
@@ -137,7 +137,7 @@ describe("Multisign error feedback", () => {
     expect(
       getByText(
         EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage.help
-          .supportchannel
+          .emailaddress
       )
     ).toBeVisible();
 
