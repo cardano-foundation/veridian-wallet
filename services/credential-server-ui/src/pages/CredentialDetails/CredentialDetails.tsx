@@ -21,10 +21,6 @@ export const CredentialDetails = () => {
   const nav = useNavigate();
   const { id } = useParams();
 
-  useEffect(() => {
-    if (roleViewIndex !== RoleIndex.ISSUER) nav(RoutePath.Connections);
-  }, [nav, roleViewIndex]);
-
   const schemaName = schemas.find((item) => item.$id === id)?.title || "";
 
   const displayCredentials = useMemo(
