@@ -197,6 +197,9 @@ describe("Cred Details page - current not archived credential", () => {
       identifiersCache: {
         identifiers: {},
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     storeMocked = {

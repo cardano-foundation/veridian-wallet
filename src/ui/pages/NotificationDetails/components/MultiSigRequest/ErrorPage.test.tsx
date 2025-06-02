@@ -63,6 +63,9 @@ const initialState = {
   identifiersCache: {
     identifiers: multisignIdentifierFix,
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 describe("Multisign error feedback", () => {

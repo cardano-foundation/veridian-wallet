@@ -55,6 +55,9 @@ describe("Create Identifier modal", () => {
     identifiersCache: {
       identifiers: {},
     },
+    biometricsCache: {
+      enabled: false,
+    },
   };
 
   const dispatchMock = jest.fn();

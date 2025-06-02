@@ -100,6 +100,9 @@ const initialState = {
   identifiersCache: {
     identifiers: filteredIdentifierMapFix,
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 describe("Credential request - choose request", () => {
@@ -252,6 +255,9 @@ describe("Credential request - choose request", () => {
       identifiersCache: {
         identifiers: {},
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -391,6 +397,9 @@ describe("Credential request - choose request", () => {
         notifications: notificationsFix,
         notificationDetailCache: null,
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -502,6 +511,9 @@ describe("Credential request - choose request", () => {
     },
     notificationsCache: {
       notifications: notificationsFix,
+    },
+    biometricsCache: {
+      enabled: false,
     },
   };
 

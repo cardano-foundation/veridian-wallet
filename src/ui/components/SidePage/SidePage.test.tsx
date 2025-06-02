@@ -65,6 +65,9 @@ describe("Side Page: wallet connect", () => {
       pendingConnection: "pending-meerkat",
       walletConnections: [],
     },
+    biometricsCache: {
+      enabled: false,
+    },
   };
 
   const mockStore = configureStore();
@@ -127,6 +130,9 @@ describe("Side Page: incoming request", () => {
       identifiers: [...identifierFix],
     },
     walletConnectionsCache: {},
+    biometricsCache: {
+      enabled: false,
+    },
   };
 
   const mockStore = configureStore();

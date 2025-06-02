@@ -14,7 +14,10 @@ import {
   removeFavouritesCredsCache,
 } from "../../../store/reducers/credsCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
-import { connectionsFix, connectionsMapFix } from "../../__fixtures__/connectionsFix";
+import {
+  connectionsFix,
+  connectionsMapFix,
+} from "../../__fixtures__/connectionsFix";
 import { credsFixAcdc, revokedCredFixs } from "../../__fixtures__/credsFix";
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
 import { ToastMsgType } from "../../globals/types";
@@ -355,6 +358,9 @@ describe("Cred Detail Module - current not archived credential", () => {
       connectionsCache: {
         connections: connectionsMapFix,
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -426,6 +432,9 @@ describe("Cred Detail Module - current not archived credential", () => {
       },
       connectionsCache: {
         connections: connectionsMapFix,
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -508,9 +517,11 @@ describe("Cred Detail Module - current not archived credential", () => {
   });
 
   test("Can view connection details, and cannot delete the connection from this view", async () => {
-    getConnectionShortDetailByIdMock.mockResolvedValue(initiatorConnectionShortDetails);
+    getConnectionShortDetailByIdMock.mockResolvedValue(
+      initiatorConnectionShortDetails
+    );
     getConnectionByIdMock.mockResolvedValueOnce(connectionsFix[2]);
-    
+
     const { getByTestId, queryByTestId } = render(
       <Provider store={storeMocked}>
         <CredentialDetailModule
@@ -534,7 +545,9 @@ describe("Cred Detail Module - current not archived credential", () => {
     });
 
     await waitFor(() => {
-      expect(queryByTestId("delete-button-connection-details")).not.toBeInTheDocument();
+      expect(
+        queryByTestId("delete-button-connection-details")
+      ).not.toBeInTheDocument();
     });
 
     act(() => {
@@ -542,10 +555,14 @@ describe("Cred Detail Module - current not archived credential", () => {
     });
 
     await waitFor(() => {
-      expect(getByTestId("connection-options-manage-button")).toBeInTheDocument();
+      expect(
+        getByTestId("connection-options-manage-button")
+      ).toBeInTheDocument();
     });
 
-    expect(queryByTestId("delete-button-connection-options")).not.toBeInTheDocument();
+    expect(
+      queryByTestId("delete-button-connection-options")
+    ).not.toBeInTheDocument();
   });
 });
 

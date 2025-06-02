@@ -84,7 +84,9 @@ const initialState = {
   notificationsCache: {
     notifications: notificationsFix,
   },
-
+  biometricsCache: {
+    enabled: false,
+  },
   identifiersCache: {
     identifiers: filteredIdentifierFix,
   },

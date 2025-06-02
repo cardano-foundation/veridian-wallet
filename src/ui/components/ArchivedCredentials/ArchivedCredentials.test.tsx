@@ -62,6 +62,9 @@ const initialStateEmpty = {
   notificationsCache: {
     notifications: [],
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 let mockedStore: Store<unknown, AnyAction>;
@@ -282,6 +285,9 @@ describe("Archived and revoked credentials", () => {
             },
           },
         ],
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 

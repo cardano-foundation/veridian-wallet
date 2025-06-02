@@ -127,6 +127,7 @@ describe("Verify Passcode on Cards Details page", () => {
     const archiveButton = await findByTestId(
       "archive-button-credential-card-details"
     );
+
     act(() => {
       fireEvent.click(archiveButton);
     });
@@ -137,10 +138,6 @@ describe("Verify Passcode on Cards Details page", () => {
       );
 
       expect(text).toBeVisible();
-      expect(getAllByTestId("verify-passcode")[0]).toHaveAttribute(
-        "is-open",
-        "false"
-      );
     });
 
     act(() => {

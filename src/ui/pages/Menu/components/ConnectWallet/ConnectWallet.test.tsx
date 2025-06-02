@@ -664,10 +664,10 @@ describe("Wallet connect", () => {
     });
 
     fireEvent.click(
-      getAllByText(
+      getByText(
         EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet
           .disconnectbeforecreatealert.confirm
-      )[1]
+      )
     );
 
     await waitFor(() => {
