@@ -1,15 +1,17 @@
-import { fireEvent, render, waitFor } from "@testing-library/react";
-import configureStore from "redux-mock-store";
-import { act, useState } from "react";
 import {
+  AndroidBiometryStrength,
   BiometryError,
   BiometryErrorType,
   BiometryType,
   CheckBiometryResult,
 } from "@aparajita/capacitor-biometric-auth";
+import { fireEvent, render, waitFor } from "@testing-library/react";
+import { act, useState } from "react";
 import { Provider } from "react-redux";
-import { useBiometricAuth } from "./useBiometricsHook";
+import configureStore from "redux-mock-store";
+import ENG from "../../locales/en/en.json";
 import { store } from "../../store";
+import { useBiometricAuth } from "./useBiometricsHook";
 
 const checkBiometry = jest.fn(
   (): Promise<CheckBiometryResult> =>
@@ -26,14 +28,14 @@ const checkBiometry = jest.fn(
     })
 );
 
-const authenticate = jest.fn(() => Promise.resolve(true));
+const authenticate = jest.fn((params: unknown) => Promise.resolve(true));
 const addResumeListener = jest.fn();
 
 jest.mock("@aparajita/capacitor-biometric-auth", () => ({
   ...jest.requireActual("@aparajita/capacitor-biometric-auth"),
   BiometricAuth: {
     checkBiometry: () => checkBiometry(),
-    authenticate: () => authenticate(),
+    authenticate: (params: unknown) => authenticate(params),
     addResumeListener: () => addResumeListener(),
   },
 }));
@@ -206,11 +208,26 @@ describe("Biometric hook", () => {
   });
 
   test("throw error when add event", async () => {
+    const initState = {
+      stateCache: {
+        routes: [],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+          firstAppLaunch: false,
+        },
+        isOnline: true,
+      },
+      biometricsCache: {
+        enabled: true,
+      },
+    };
     const mockStore = configureStore();
     const dispatchMock = jest.fn();
-
     const storeMocked = {
-      ...mockStore(store),
+      ...mockStore(initState),
       dispatch: dispatchMock,
     };
 
@@ -226,6 +243,55 @@ describe("Biometric hook", () => {
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalled();
+    });
+  });
+
+  test("Config fallback text is password when password setup is true", async () => {
+    const initState = {
+      stateCache: {
+        routes: [],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: true,
+          firstAppLaunch: false,
+        },
+        isOnline: true,
+      },
+      biometricsCache: {
+        enabled: true,
+      },
+    };
+    const mockStore = configureStore();
+    const dispatchMock = jest.fn();
+
+    const storeMocked = {
+      ...mockStore(initState),
+      dispatch: dispatchMock,
+    };
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <TestComponent />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("handle-biometric-btn"));
+    });
+
+    await waitFor(() => {
+      expect(checkBiometry).toBeCalled();
+      expect(authenticate).toBeCalledWith({
+        reason: ENG.biometry.reason,
+        cancelTitle: ENG.biometry.canceltitle,
+        iosFallbackTitle: ENG.biometry.iosfallbackPasswordtitle,
+        androidTitle: ENG.biometry.androidtitle,
+        androidSubtitle: ENG.biometry.androidsubtitle,
+        androidConfirmationRequired: false,
+        androidBiometryStrength: AndroidBiometryStrength.strong,
+      });
     });
   });
 });
