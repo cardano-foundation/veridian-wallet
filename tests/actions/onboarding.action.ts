@@ -25,7 +25,9 @@ Given(/^user is onboarded with skipped password creation$/, async function () {
   if (await BiometricScreen.biometricTitleText.isExisting()) {
     await BiometricScreen.setUpLaterButton.click();
   }
-  await CreatePasswordScreen.setUpLaterButton.click();
+  if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
+    await CreatePasswordScreen.setUpLaterButton.click();
+  }
   await AlertModal.clickConfirmButtonOf(CreatePasswordScreen.alertModal);
   await generateRecoveryPhraseOf();
   await recoveryPhrase().select(recoveryPhraseWords);

@@ -46,6 +46,10 @@ export class CreatePasswordScreen {
     return $("[data-testid=\"password-accept-criteria\"]");
   }
 
+  get pageInforTitle() {
+    return $(".setup-password > .page-info");
+  }
+
   get addPasswordButton() {
     return $("[data-testid='primary-button']");
   }

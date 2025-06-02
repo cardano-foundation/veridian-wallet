@@ -84,5 +84,7 @@ Then(
   }
 );
 Given(/^user tap on Add a password on Create a password screen$/, async function() {
-  await CreatePasswordScreen.addPasswordButton.click();
+  if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
+    await CreatePasswordScreen.addPasswordButton.click();
+  }
 });
