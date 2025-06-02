@@ -48,7 +48,9 @@ Given(/^user is onboarded with a password creation$/, async function () {
   if (await BiometricScreen.biometricTitleText.isExisting()) {
     await BiometricScreen.setUpLaterButton.click();
   }
-  await CreatePasswordScreen.addPasswordButton.click();
+  if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
+    await CreatePasswordScreen.addPasswordButton.click();
+  }
   (global as any).generatedPassword = await returnPassword(10);
   await CreatePasswordScreen.createPasswordInput.addValue(
     (global as any).generatedPassword
