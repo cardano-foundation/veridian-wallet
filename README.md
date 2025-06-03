@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="src/assets/icon-only.png" alt="Cardano Foundation | Veridian Wallet" height="150" />
+  <img src="src/assets/icon-only.png" alt="Cardano Foundation | Identity Wallet" height="150" />
   <hr />
   <h1 align="center" style="border-bottom: none">Veridian Wallet | Cardano Foundation</h1>
 
