@@ -262,4 +262,42 @@ describe("Sign request", () => {
       getByText(JSON.parse(signObjectFix.payload.payload).data.id)
     ).toBeVisible();
   });
+
+  test("Incoming request is empty", async () => {
+    const initialState = {
+      stateCache: {
+        routes: [TabsRoutePath.IDENTIFIERS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+        },
+        queueIncomingRequest: {
+          isProcessing: true,
+          queues: [],
+          isPaused: false,
+        },
+      },
+      biometricsCache: {
+        enabled: false,
+      },
+    };
+
+    const storeMocked = {
+      ...mockStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    const { queryByText } = render(
+      <Provider store={storeMocked}>
+        <IncomingRequest
+          open={true}
+          setOpenPage={jest.fn()}
+        />
+      </Provider>
+    );
+
+    expect(queryByText(requestData.peerConnection?.name)).toBeNull();
+  });
 });
