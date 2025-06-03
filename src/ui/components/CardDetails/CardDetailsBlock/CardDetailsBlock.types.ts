@@ -6,6 +6,7 @@ interface CardDetailsBlockProps {
   children?: ReactNode;
   className?: string;
   onClick?: () => void;
+  dataTestId?: string;
 }
 
 enum FlatBorderType {

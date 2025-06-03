@@ -124,7 +124,7 @@ const VerifyPassword = ({
         modalIsOpen={isOpen}
         componentId="verify-password"
         customClasses="verify-password-modal"
-        onDismiss={() => resetModal()}
+        onDismiss={resetModal}
         header={headerOptions}
       >
         <form className="password-input-container">
