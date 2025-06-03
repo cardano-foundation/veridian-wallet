@@ -71,7 +71,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
         cancelTitle: i18n.t("biometry.canceltitle") as string,
         iosFallbackTitle: i18n.t(
           !isLockPage && passwordIsSet
-            ? "biometry.iosfallbackPasswordtitle"
+            ? "biometry.iosfallbackpasswordtitle"
             : "biometry.iosfallbacktitle"
         ) as string,
         androidTitle: i18n.t("biometry.androidtitle") as string,

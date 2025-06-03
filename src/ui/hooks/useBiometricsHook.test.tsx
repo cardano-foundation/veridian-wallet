@@ -286,7 +286,7 @@ describe("Biometric hook", () => {
       expect(authenticate).toBeCalledWith({
         reason: ENG.biometry.reason,
         cancelTitle: ENG.biometry.canceltitle,
-        iosFallbackTitle: ENG.biometry.iosfallbackPasswordtitle,
+        iosFallbackTitle: ENG.biometry.iosfallbackpasswordtitle,
         androidTitle: ENG.biometry.androidtitle,
         androidSubtitle: ENG.biometry.androidsubtitle,
         androidConfirmationRequired: false,
