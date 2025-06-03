@@ -1,6 +1,6 @@
 ## Splashscreen and Icons  
 
-To customize the app icons and splash screens, the Identity Wallet uses the [@capacitor/assets](https://github.com/ionic-team/capacitor-assets) package.  
+To customize the app icons and splash screens, the Veridian Wallet uses the [@capacitor/assets](https://github.com/ionic-team/capacitor-assets) package.  
 
 ### Steps to Customize  
 
