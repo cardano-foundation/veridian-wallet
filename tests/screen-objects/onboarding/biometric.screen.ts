@@ -2,18 +2,6 @@ import { expect } from "expect-webdriverio";
 import { Biometric } from "../../constants/text.constants";
 
 export class BiometricScreen {
-  get biometricWarningText() {
-    return $("[data-testid='alert-setup-biometry'] .alert-title.sc-ion-alert-md")
-  }
-
-  get confirmButton() {
-    return $("[data-testid='alert-setup-biometry-confirm-button']");
-  }
-
-  get cancelButton() {
-    return $("[data-testid='alert-setup-biometry-cancel-button']");
-  }
-
   get cancelBiometricText() {
     return $("[data-testid='alert-cancel-biometry'] .alert-title.sc-ion-alert-md")
   }
@@ -22,23 +10,35 @@ export class BiometricScreen {
     return $("[data-testid='alert-cancel-biometry-confirm-button']");
   }
 
+  get biometricTitleText() {
+    return $(".page-info > h1");
+  }
+
+  get biometricSubTitleText() {
+    return $(".page-info > p");
+  }
+
+  get enableBiometricButton() {
+    return $("[data-testid='primary-button']");
+  }
+
+  get setUpLaterButton() {
+    return $("[data-testid='tertiary-button']");
+  }
+
   async loads() {
-    await expect(this.biometricWarningText).toBeDisplayed();
-    await expect(this.biometricWarningText).toHaveText(Biometric.Description);
-    await expect(this.confirmButton).toBeExisting();
-    await expect(this.cancelButton).toBeExisting();
+    await expect(this.biometricTitleText).toBeDisplayed();
+    await expect(this.biometricTitleText).toHaveText(Biometric.Title);
+    await expect(this.biometricSubTitleText).toBeDisplayed();
+    await expect(this.biometricSubTitleText).toHaveText(Biometric.SubTitle);
+    await expect(this.enableBiometricButton).toBeExisting();
+    await expect(this.setUpLaterButton).toBeExisting();
   }
 
   async cancelBiometricLoads() {
-    await expect(this.biometricWarningText).not.toBeDisplayed();
+    await expect(this.biometricTitleText).not.toBeDisplayed();
     await expect(this.cancelBiometricText).toBeDisplayed();
     await expect(this.cancelBiometricText).toHaveText(Biometric.DescriptionCancelBiometric)
-  }
-
-  async handleBiometricPopup() {
-    await this.cancelButton.click();
-    await this.cancelBiometricLoads();
-    await this.okButton.click();
   }
 }
 

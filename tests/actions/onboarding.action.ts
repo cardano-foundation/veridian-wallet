@@ -22,10 +22,12 @@ Given(/^user is onboarded with skipped password creation$/, async function () {
   await PasscodeScreen.enterPasscode(
     (this.passcode = await PasscodeScreen.createAndEnterRandomPasscode())
   );
-  if (await BiometricScreen.biometricWarningText.isExisting()) {
-    await BiometricScreen.handleBiometricPopup();
+  if (await BiometricScreen.biometricTitleText.isExisting()) {
+    await BiometricScreen.setUpLaterButton.click();
   }
-  await CreatePasswordScreen.skipButton.click();
+  if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
+    await CreatePasswordScreen.setUpLaterButton.click();
+  }
   await AlertModal.clickConfirmButtonOf(CreatePasswordScreen.alertModal);
   await generateRecoveryPhraseOf();
   await recoveryPhrase().select(recoveryPhraseWords);
@@ -43,8 +45,11 @@ Given(/^user is onboarded with a password creation$/, async function () {
   await PasscodeScreen.enterPasscode(
     (this.passcode = await PasscodeScreen.createAndEnterRandomPasscode())
   );
-  if (await BiometricScreen.biometricWarningText.isExisting()) {
-    await BiometricScreen.handleBiometricPopup();
+  if (await BiometricScreen.biometricTitleText.isExisting()) {
+    await BiometricScreen.setUpLaterButton.click();
+  }
+  if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
+    await CreatePasswordScreen.addPasswordButton.click();
   }
   (global as any).generatedPassword = await returnPassword(10);
   await CreatePasswordScreen.createPasswordInput.addValue(

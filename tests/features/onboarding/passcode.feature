@@ -26,4 +26,6 @@ Feature: Passcode
   Scenario: C177 Passcode - user can set a new passcode
     Given user enter a generated passcode on Passcode screen
     When user re-enter passcode on Passcode screen
+    And user skip Biometric popup if it exist
+    And user tap on Add a password on Create a password screen
     Then user can see Create Password screen
