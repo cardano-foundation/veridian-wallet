@@ -7,6 +7,7 @@ const InputAttribute = ({
   attributes,
   value,
   setValue,
+  required,
 }: InputAttributeProps) => {
   return (
     <Box className="input-attribute">
@@ -17,7 +18,7 @@ const InputAttribute = ({
           <AppInput
             key={attribute}
             fullWidth
-            label={`${inputLabelText.at(0)?.toUpperCase()}${inputLabelText.slice(1)}`}
+            label={`${inputLabelText.at(0)?.toUpperCase()}${inputLabelText.slice(1)} ${required ? "" : " (optional)"}`}
             value={value[attribute] || ""}
             onChange={(e) => setValue(attribute, e.target.value)}
             placeholder={i18n.t(

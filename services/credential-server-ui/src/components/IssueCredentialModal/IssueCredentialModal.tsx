@@ -234,19 +234,24 @@ const IssueCredentialModal = ({
         const schema = schemas.find(
           (item) => item.$id === selectedCredTemplate
         );
-        const schemaRequiredAttributes =
-          schema?.properties.a.oneOf[1].required || [];
-
-        const requiredAttributes = schemaRequiredAttributes.filter(
-          (item) => !IGNORE_ATTRIBUTES.includes(item)
+        const properties = schema?.properties.a.oneOf[1].properties || {};
+        const requiredList = schema?.properties.a.oneOf[1].required || [];
+        const attributeKeys = Object.keys(properties).filter(
+          (key) => !IGNORE_ATTRIBUTES.includes(key)
         );
 
         return (
-          <InputAttribute
-            value={attributes}
-            setValue={updateAttributes}
-            attributes={requiredAttributes}
-          />
+          <>
+            {attributeKeys.map((attribute) => (
+              <InputAttribute
+                key={attribute}
+                value={attributes}
+                setValue={updateAttributes}
+                attributes={[attribute]}
+                required={requiredList.includes(attribute)}
+              />
+            ))}
+          </>
         );
       }
       case IssueCredentialStage.Review:
