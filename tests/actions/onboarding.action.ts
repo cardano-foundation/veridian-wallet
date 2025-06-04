@@ -15,7 +15,7 @@ import VerifySeedPhraseScreen from "../screen-objects/onboarding/verify-your-rec
 import WelcomeModal from "../screen-objects/components/welcome.modal.js";
 import { returnPassword } from "../helpers/generate";
 import BiometricScreen from "../screen-objects/onboarding/biometric.screen";
-import UNDPWelcomeScreen from "../screen-objects/onboarding/undp-welcome.screen";
+import WelcomeMessageScreen from "../screen-objects/onboarding/welcome-message.screen";
 
 Given(/^user is onboarded with skipped password creation$/, async function () {
   await OnboardingScreen.tapOnGetStartedButton();
@@ -74,5 +74,5 @@ Given(/^user is onboarded with a password creation$/, async function () {
 });
 
 Given(/^user skip UNDP flavor application if it exist$/, async function () {
-  await UNDPWelcomeScreen.handleSkipUNDPScreen();
+  await WelcomeMessageScreen.handleSkipUNDPScreen();
 });
