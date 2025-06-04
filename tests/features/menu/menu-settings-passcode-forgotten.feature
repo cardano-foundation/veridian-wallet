@@ -2,6 +2,7 @@ Feature: Menu setting passcode forgotten
 
   Background:
     Given user is onboarded with skipped password creation
+    And user tap skip button on Welcome screen
     And user tap Menu button on Tab bar
     And user tap Settings button on Menu screen
     And user tap on Change Passcode button on Menu screen

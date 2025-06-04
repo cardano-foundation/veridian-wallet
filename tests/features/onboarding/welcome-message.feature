@@ -1,4 +1,4 @@
-Feature: OnboardingAddingIdentifierWelcome
+Feature: WelcomeMessage
 
   Background:
     Given user is onboarded with skipped password creation
