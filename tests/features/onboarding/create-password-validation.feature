@@ -4,6 +4,7 @@ Feature: CreatePasswordValidation
     Given user tap Get Started button on Onboarding screen
     And user generate passcode on Passcode screen
     And user skip Biometric popup if it exist
+    And user tap on Add a password on Create a password screen
 
   Scenario Outline: <caseId> CreatePasswordValidation - user can set <name> password length
     Given user generated a password of <length> characters

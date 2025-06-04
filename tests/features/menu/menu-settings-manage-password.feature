@@ -2,7 +2,7 @@ Feature: Menu setting manage password
 
   Background:
     Given user is onboarded with skipped password creation
-    And user skip UNDP flavor application if it exist
+    And user tap skip button on Welcome screen
     And user tap Menu button on Tab bar
     And user tap Settings button on Menu screen
     And user tap on Manage Operation Password button on Menu screen

@@ -2,7 +2,7 @@ Feature: IndividualIdentifierEdit
 
   Background:
     Given user is onboarded with skipped password creation
-    And user skip UNDP flavor application if it exist
+    And user tap skip button on Welcome screen
 
   Scenario: C152 IndividualIdentifierEdit - User can cancel edit for Individual default identifier
     Given identifier is created and user can see Identifier Card Details screen for Individual

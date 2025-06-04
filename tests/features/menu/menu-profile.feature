@@ -2,7 +2,7 @@ Feature: Menu Profile
 
   Background:
     Given user is onboarded with skipped password creation
-    And user skip UNDP flavor application if it exist
+    And user tap skip button on Welcome screen
 
   Scenario: C387 MenuProfile - Loads
     Given user tap Menu button on Tab bar
