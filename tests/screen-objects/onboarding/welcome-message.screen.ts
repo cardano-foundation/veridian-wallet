@@ -1,7 +1,7 @@
 import { expect } from "expect-webdriverio";
 import { WelcomeMessage } from "../../constants/text.constants";
 
-export class UNDPWelcomeScreen {
+export class WelcomeMessageScreen {
 
   get welcomeBoard() {
     return $(".content");
@@ -60,7 +60,7 @@ export class UNDPWelcomeScreen {
     }
   }
 
-  async handleSkipUNDPScreen() {
+  async handleSkipWelcomeScreen() {
     if (await this.skipButton.isExisting()) {
       await this.skipButton.click();
     }
@@ -68,4 +68,4 @@ export class UNDPWelcomeScreen {
 }
 
 
-export default new UNDPWelcomeScreen();
+export default new WelcomeMessageScreen();

@@ -39,11 +39,23 @@ export class CreatePasswordScreen {
   }
 
   get skipButton() {
-    return $("[data-testid=\"tertiary-button-create-password\"]");
+    return $("[data-testid='action-button']");
   }
 
   get passwordAcceptCriteriaParagraph() {
     return $("[data-testid=\"password-accept-criteria\"]");
+  }
+
+  get pageInforTitle() {
+    return $(".setup-password > .page-info");
+  }
+
+  get addPasswordButton() {
+    return $("[data-testid='primary-button']");
+  }
+
+  get setUpLaterButton() {
+    return $("[data-testid='tertiary-button']");
   }
 
   async loads() {

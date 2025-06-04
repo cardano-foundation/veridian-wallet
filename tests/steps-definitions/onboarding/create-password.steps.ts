@@ -6,7 +6,7 @@ import { returnPassword } from "../../helpers/generate.js";
 import { CreatePassword } from "../../constants/text.constants.js";
 
 Given(/^skip Create Password screen$/, async function () {
-  await CreatePasswordScreen.skipButton.click();
+  await CreatePasswordScreen.setUpLaterButton.click();
   await AlertModal.clickConfirmButtonOf(CreatePasswordScreen.alertModal);
 });
 
@@ -83,3 +83,8 @@ Then(
     );
   }
 );
+Given(/^user tap on Add a password on Create a password screen$/, async function() {
+  if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
+    await CreatePasswordScreen.addPasswordButton.click();
+  }
+});

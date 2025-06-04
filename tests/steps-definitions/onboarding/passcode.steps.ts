@@ -8,8 +8,10 @@ Given(
   /^user enter a generated passcode on Passcode screen$/,
   async function () {
     this.passcode = await PasscodeScreen.createAndEnterRandomPasscode();
-    if (await MenuPasscodeScreen.changePinTitle.getText() != Passcode.TitleReEnterNewPasscode) {
-      await PasscodeScreen.enterPasscode(this.passcode);
+    if (await MenuPasscodeScreen.changePinTitle.isExisting()) {
+      if (await MenuPasscodeScreen.changePinTitle.getText() != Passcode.TitleReEnterNewPasscode) {
+        await PasscodeScreen.enterPasscode(this.passcode);
+      }
     }
   }
 );
