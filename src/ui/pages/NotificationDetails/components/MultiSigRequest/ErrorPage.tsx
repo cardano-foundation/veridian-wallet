@@ -12,8 +12,7 @@ import { CreateGroupIdentifier } from "../../../../components/CreateGroupIdentif
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
-import { DISCORD_LINK } from "../../../../globals/constants";
-import { openBrowserLink } from "../../../../utils/openBrowserLink";
+import { SUPPORT_EMAIL } from "../../../../globals/constants";
 import "./ErrorPage.scss";
 import { ErrorPageProps } from "./ErrorPage.types";
 
@@ -51,16 +50,16 @@ const ErrorPage = ({
     onFinishSetup();
   };
 
-  const HandleDiscordLink = () => {
+  const HandleEmail = () => {
     return (
-      <u
+      <a
         data-testid="support-link-browser-handler"
-        onClick={() => openBrowserLink(DISCORD_LINK)}
+        href={SUPPORT_EMAIL}
       >
         {i18n.t(
-          "tabs.notifications.details.identifier.errorpage.help.supportchannel"
+          "tabs.notifications.details.identifier.errorpage.help.emailaddress"
         )}
-      </u>
+      </a>
     );
   };
 
@@ -143,7 +142,7 @@ const ErrorPage = ({
               i18nKey={i18n.t(
                 "tabs.notifications.details.identifier.errorpage.help.detailtext"
               )}
-              components={[<HandleDiscordLink key="" />]}
+              components={[<HandleEmail key="" />]}
             />
           </IonText>
         </div>
