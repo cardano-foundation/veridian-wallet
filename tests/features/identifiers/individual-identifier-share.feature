@@ -2,7 +2,7 @@ Feature: IndividualIdentifierShare
 
   Background:
     Given user is onboarded with skipped password creation
-    And user skip UNDP flavor application if it exist
+    And user tap skip button on Welcome screen
     And identifier is created and user can see Identifier Card Details screen for Individual
 
   Scenario: C155 IndividualIdentifierShare - Copy identifier

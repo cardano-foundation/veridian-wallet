@@ -2,7 +2,7 @@ Feature: IndividualIdentifierDetails
 
   Background:
     Given user is onboarded with skipped password creation
-    And user skip UNDP flavor application if it exist
+    And user tap skip button on Welcome screen
 
   Scenario: C150 IndividualIdentifierDetails - Done button on card details screen of Individual identifier works correctly
     Given user add Individual identifier through plus icon

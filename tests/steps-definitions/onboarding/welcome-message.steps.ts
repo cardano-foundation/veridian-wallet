@@ -20,6 +20,6 @@ When(/^user tap Cancel button on Add and Identifier screen$/, async function() {
 });
 
 Given(/^user tap Skip button on Welcome message$/, async function() {
-  await WelcomeMessageScreen.handleSkipUNDPScreen();
+  await WelcomeMessageScreen.handleSkipWelcomeScreen();
   await WelcomeMessageScreen.welcomeScreenInvisible();
 });

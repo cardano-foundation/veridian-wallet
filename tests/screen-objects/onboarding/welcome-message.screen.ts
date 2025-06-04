@@ -60,7 +60,7 @@ export class WelcomeMessageScreen {
     }
   }
 
-  async handleSkipUNDPScreen() {
+  async handleSkipWelcomeScreen() {
     if (await this.skipButton.isExisting()) {
       await this.skipButton.click();
     }

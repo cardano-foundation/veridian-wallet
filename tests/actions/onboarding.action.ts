@@ -73,6 +73,6 @@ Given(/^user is onboarded with a password creation$/, async function () {
   await Assert.toast(`Welcome, ${this.userName}!`);
 });
 
-Given(/^user skip UNDP flavor application if it exist$/, async function () {
-  await WelcomeMessageScreen.handleSkipUNDPScreen();
+Given(/^user tap skip button on Welcome screen$/, async function () {
+  await WelcomeMessageScreen.handleSkipWelcomeScreen();
 });
