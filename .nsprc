@@ -10,5 +10,13 @@
   "1103618": {
     "active": true,
     "notes": "SSRF attacks on the Appium server when e2e testing do not impact the wallet."
+  },
+  "1105256": {
+    "active": true,
+    "notes": "Not relevant to open source project."
+  },
+  "1105257": {
+    "active": true,
+    "notes": "Not relevant to open source project."
   }
 }
