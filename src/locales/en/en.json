@@ -1495,6 +1495,7 @@
     "reason": "Please authenticate",
     "canceltitle": "Cancel",
     "iosfallbacktitle": "Enter Passcode",
+    "iosfallbackpasswordtitle": "Enter Password",
     "androidtitle": "Authentication",
     "androidsubtitle": "Authentication using biometrics",
     "setupbiometryheader": "Do you want to allow “Veridian” to use biometrics?",

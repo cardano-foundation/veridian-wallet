@@ -62,6 +62,9 @@ const initialState = {
   credsArchivedCache: {
     creds: [],
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 describe("Credential request information", () => {

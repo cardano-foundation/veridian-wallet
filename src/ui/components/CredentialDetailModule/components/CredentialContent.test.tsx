@@ -57,8 +57,37 @@ jest.mock("../../../../core/agent/agent", () => ({
 
 describe("Creds content", () => {
   test("Render ACDC cedential content", () => {
+    const state = {
+      stateCache: {
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+          passwordIsSkipped: true,
+        },
+      },
+      credsCache: { creds: [], favourites: [] },
+      credsArchivedCache: { creds: [] },
+      identifiersCache: {
+        identifiers: [],
+      },
+      connectionsCache: {
+        multisigConnections: {},
+      },
+      biometricsCache: {
+        enabled: false,
+      },
+    };
+
+    const mockStore = configureStore();
+    const storeMocked = {
+      ...mockStore(state),
+      dispatch: jest.fn(),
+    };
+
     const { getByText, getByTestId } = render(
-      <Provider store={store}>
+      <Provider store={storeMocked}>
         <CredentialContent
           cardData={credsFixAcdc[0]}
           joinedCredRequestMembers={[]}
@@ -167,6 +196,9 @@ describe("Creds content", () => {
         multisigConnections: {
           [connectionDetailsFix.id]: connectionDetailsFix,
         },
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 

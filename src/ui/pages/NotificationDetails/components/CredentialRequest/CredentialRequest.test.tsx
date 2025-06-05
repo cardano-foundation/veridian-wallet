@@ -59,6 +59,9 @@ const initialState = {
   identifiersCache: {
     identifiers: filteredIdentifierFix,
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 describe("Credential request", () => {
@@ -211,6 +214,9 @@ describe("Credential request: Multisig", () => {
           label: "Member 5",
         },
       },
+    },
+    biometricsCache: {
+      enabled: false,
     },
   };
 

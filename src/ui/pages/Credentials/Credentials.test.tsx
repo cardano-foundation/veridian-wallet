@@ -90,6 +90,9 @@ const initialStateEmpty = {
       favouriteIndex: 0,
     },
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 const initialStateFull = {
@@ -133,6 +136,9 @@ const initialStateFull = {
       viewType: null,
       favouriteIndex: 0,
     },
+  },
+  biometricsCache: {
+    enabled: false,
   },
 };
 
@@ -182,6 +188,9 @@ const archivedAndRevokedState = {
       viewType: null,
       favouriteIndex: 0,
     },
+  },
+  biometricsCache: {
+    enabled: false,
   },
 };
 
@@ -472,6 +481,9 @@ describe("Creds Tab", () => {
       },
       connectionsCache: {
         connections: connectionsFix,
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 

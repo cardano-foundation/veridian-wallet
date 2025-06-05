@@ -56,7 +56,7 @@ const LockPageContainer = () => {
   const [passcodeIncorrect, setPasscodeIncorrect] = useState(false);
   const preventBiometricOnEvent = useRef(false);
 
-  const { handleBiometricAuth } = useBiometricAuth();
+  const { handleBiometricAuth } = useBiometricAuth(true);
   const biometricsCache = useSelector(getBiometricsCache);
   const firstAppLaunch = useSelector(getFirstAppLaunch);
   const [openRecoveryAuth, setOpenRecoveryAuth] = useState(false);

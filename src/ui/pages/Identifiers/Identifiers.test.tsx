@@ -123,6 +123,9 @@ const initialState = {
   connectionsCache: {
     connections: connectionsFix,
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -193,6 +196,9 @@ describe("Identifiers Tab", () => {
       },
       connectionsCache: {
         connections: connectionsFix,
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -392,6 +398,9 @@ describe("Identifiers Tab", () => {
       connectionsCache: {
         connections: connectionsFix,
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -497,6 +506,9 @@ describe("Identifiers Tab", () => {
       connectionsCache: {
         connections: [],
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -560,6 +572,9 @@ describe("Identifiers Tab", () => {
       },
       connectionsCache: {
         connections: [],
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -631,6 +646,9 @@ describe("Identifiers Tab", () => {
       connectionsCache: {
         connections: [],
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -684,6 +702,9 @@ describe("Identifiers Tab", () => {
       },
       connectionsCache: {
         connections: [],
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -740,6 +761,9 @@ describe("Identifiers Tab", () => {
       },
       connectionsCache: {
         connections: connectionsFix,
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -843,6 +867,9 @@ describe("Identifiers Tab", () => {
       connectionsCache: {
         connections: connectionsFix,
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -908,6 +935,9 @@ describe("Identifiers Tab", () => {
       },
       connectionsCache: {
         connections: connectionsFix,
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -984,6 +1014,9 @@ describe("Identifiers Tab", () => {
       },
       connectionsCache: {
         connections: [],
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 

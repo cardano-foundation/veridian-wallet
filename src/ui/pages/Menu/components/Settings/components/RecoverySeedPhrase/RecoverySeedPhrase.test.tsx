@@ -53,6 +53,9 @@ const initialState = {
     isOnline: true,
     currentOperation: OperationType.IDLE,
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 const mockStore = configureStore();
