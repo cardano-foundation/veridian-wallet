@@ -31,6 +31,18 @@ export class ScanScreen {
     return $("[data-testid='app-error-alert-confirm-button']");
   }
 
+  get connectionTitle() {
+    return $("[data-testid='connections-title']");
+  }
+
+  get listConnection(): string[] {
+    return ["[data-testid*='connection-group'] ion-item"];
+  }
+
+  get pendingIcon() {
+    return $("[data-testid*='connection-group'] .md.ion-activatable");
+  }
+
   async loads() {
     await expect(this.scannerText).toBeDisplayed();
     await expect(this.scannerText).toHaveText(ScanContent.ScannerText);
@@ -49,6 +61,12 @@ export class ScanScreen {
 
   async clickConfirmButtonOf(locator: string) {
     await findAndClickLocator(`${locator}`);
+  }
+
+  async checkListConnection(length: number) {
+    await expect(this.connectionTitle).toHaveText("Connections");
+    await expect(this.listConnection).toHaveLength(length);
+    await expect(this.pendingIcon).not.toBeDisplayed();
   }
 }
 
