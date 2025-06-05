@@ -127,10 +127,11 @@ const VerifyPassword = ({
         <form className="password-input-container">
           <CustomInput
             dataTestId="verify-password-value"
-            hiddenInput={true}
-            autofocus={true}
+            hiddenInput
+            autofocus
             onChangeInput={setVerifyPasswordValue}
             value={verifyPasswordValue}
+            error={showError}
           />
           {showError ? (
             <ErrorMessage
