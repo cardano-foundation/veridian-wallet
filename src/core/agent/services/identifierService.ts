@@ -438,10 +438,7 @@ class IdentifierService extends AgentService {
       PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
     }
 
-    await this.identifierStorage.updateIdentifierMetadata(identifier, {
-      isDeleted: true,
-      pendingDeletion: false,
-    });
+    await this.identifierStorage.deleteIdentifierMetadata(identifier);
   }
 
   async removeIdentifiersPendingDeletion(): Promise<void> {
