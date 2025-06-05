@@ -12,6 +12,7 @@ import { ErrorMessage, MESSAGE_MILLISECONDS } from "../ErrorMessage";
 import { ForgotAuthInfo } from "../ForgotAuthInfo";
 import { ForgotType } from "../ForgotAuthInfo/ForgotAuthInfo.types";
 import { OptionModal } from "../OptionsModal";
+import { PageFooter } from "../PageFooter";
 import "./VerifyPassword.scss";
 import { VerifyPasswordProps } from "./VerifyPassword.types";
 
@@ -99,10 +100,6 @@ const VerifyPassword = ({
     closeButtonLabel: `${i18n.t("verifypassword.cancel")}`,
     closeButtonAction: () => setIsOpen(false, true),
     title: `${i18n.t("verifypassword.title")}`,
-    actionButton: true,
-    actionButtonDisabled: !verifyPasswordValue.length,
-    actionButtonAction: () => setAttempts(attempts - 1),
-    actionButtonLabel: `${i18n.t("verifypassword.confirm")}`,
   };
 
   const handleDissmissShowHint = () => {
@@ -144,13 +141,14 @@ const VerifyPassword = ({
             <div className="error-placeholder" />
           )}
         </form>
+
         <div className="forgot-actions">
           {storedHint ? (
             <IonButton
               shape="round"
               expand="block"
-              fill="outline"
-              className="secondary-button"
+              fill="clear"
+              className="tertiary-button"
               onClick={() => setAlertChoiceIsOpen(true)}
               data-testid="forgot-hint-btn"
             >
@@ -160,8 +158,8 @@ const VerifyPassword = ({
             <IonButton
               shape="round"
               expand="block"
-              fill="outline"
-              className="secondary-button"
+              fill="clear"
+              className="tertiary-button"
               data-testid="reset-password"
               onClick={handleRecoveryPassword}
             >
@@ -169,6 +167,10 @@ const VerifyPassword = ({
             </IonButton>
           )}
         </div>
+        <PageFooter
+          primaryButtonAction={() => setAttempts(attempts - 1)}
+          primaryButtonText={`${i18n.t("verifypassword.confirm")}`}
+        />
       </OptionModal>
       <Alert
         isOpen={alertChoiceIsOpen}
@@ -176,13 +178,26 @@ const VerifyPassword = ({
         dataTestId="alert-choice"
         headerText={i18n.t("verifypassword.alert.choice.title")}
         confirmButtonText={`${i18n.t(
-          "verifypassword.alert.button.seepasswordhint"
-        )}`}
-        secondaryConfirmButtonText={`${i18n.t(
           "verifypassword.alert.button.resetmypassword"
         )}`}
-        actionConfirm={handleShowHint}
-        actionSecondaryConfirm={handleRecoveryPassword}
+        cancelButtonText={`${i18n.t("verifypassword.alert.button.cancel")}`}
+        customButtons={[
+          {
+            id: "see-hint",
+            text: i18n.t("verifypassword.alert.button.seepasswordhint"),
+            role: "confirm",
+            cssClass: "secondary-button show-hint",
+            htmlAttributes: {
+              "data-testid": "see-hint-button",
+            },
+            handler: () => {
+              handleShowHint();
+              setAlertChoiceIsOpen(false);
+            },
+          },
+        ]}
+        actionConfirm={handleRecoveryPassword}
+        actionCancel={handleDissmissForgotPassword}
         actionDismiss={handleDissmissForgotPassword}
       />
       <Alert

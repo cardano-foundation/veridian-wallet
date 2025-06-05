@@ -60,7 +60,7 @@
   }
 }
 
-button.alert-button {
+button.alert-button.default-btn {
   &.sc-ion-alert-ios,
   &.sc-ion-alert-md {
     margin: 0;
@@ -72,7 +72,7 @@ button.alert-button {
     border-radius: 1rem !important;
     border: none;
 
-    &:first-child {
+    &.confirm-btn {
       background: var(--ion-color-primary-700) !important;
       color: var(--ion-color-neutral-100);
       margin-bottom: 0.5rem;

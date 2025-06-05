@@ -148,14 +148,10 @@ describe("Verify Password", () => {
 
     const passwordInput = await findByTestId("verify-password-value");
 
-    const confirmButton = await findByTestId("action-button");
+    const confirmButton = await findByTestId("primary-button");
 
     act(() => {
       ionFireEvent.ionInput(passwordInput, "1111");
-    });
-
-    await waitFor(() => {
-      expect(confirmButton.getAttribute("disabled")).toBe("false");
     });
 
     act(() => {
@@ -204,14 +200,10 @@ describe("Verify Password", () => {
     });
 
     const passwordInput = getByTestId("verify-password-value");
-    const confirmButton = getByTestId("action-button");
+    const confirmButton = getByTestId("primary-button");
 
     act(() => {
       ionFireEvent.ionInput(passwordInput, "1111");
-    });
-
-    await waitFor(() => {
-      expect(confirmButton.getAttribute("disabled")).toBe("false");
     });
 
     act(() => {
