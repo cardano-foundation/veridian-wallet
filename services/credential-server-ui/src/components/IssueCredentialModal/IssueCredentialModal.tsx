@@ -259,15 +259,21 @@ const IssueCredentialModal = ({
           />
         ));
       }
-      case IssueCredentialStage.Review:
+      case IssueCredentialStage.Review: {
+        const nonEmptyAttributes = Object.fromEntries(
+          Object.entries(attributes).filter(
+            ([_, v]) => v !== undefined && v !== null && String(v).trim() !== ""
+          )
+        );
         return (
           <Review
             credentialType={credTemplateName}
-            attribute={attributes}
+            attribute={nonEmptyAttributes}
             connectionId={selectedConnection}
             connections={connections}
           />
         );
+      }
       default:
         return null;
     }
