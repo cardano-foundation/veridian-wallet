@@ -20,14 +20,13 @@ import { IssueCredListTemplate } from "./IssueCredListTemplate";
 import { Review } from "./Review";
 import { IGNORE_ATTRIBUTES } from "../../const";
 
-const RESET_TIMEOUT = 1000;
-
 const IssueCredentialModal = ({
   open,
   onClose,
   credentialTypeId,
   connectionId,
 }: IssueCredentialModalProps) => {
+  const RESET_TIMEOUT = 1000;
   const connections = useAppSelector((state) => state.connections.contacts);
   const schemas = useAppSelector((state) => state.schemasCache.schemas);
   const dispatch = useAppDispatch();
@@ -38,8 +37,23 @@ const IssueCredentialModal = ({
   const [selectedCredTemplate, setSelectedCredTemplate] =
     useState(credentialTypeId);
   const [attributes, setAttributes] = useState<Record<string, string>>({});
-
   const [loading, setLoading] = useState(false);
+  const schema = schemas.find((item) => item.$id === selectedCredTemplate);
+  const properties = schema?.properties?.a?.oneOf?.[1]?.properties || {};
+  const requiredList = schema?.properties?.a?.oneOf?.[1]?.required || [];
+  const attributeKeys = Object.keys(properties).filter(
+    (key) => !IGNORE_ATTRIBUTES.includes(key)
+  );
+  const renderedRequiredList = requiredList.filter((key) =>
+    attributeKeys.includes(key)
+  );
+  const allRequiredAttributesFilled =
+    currentStage !== IssueCredentialStage.InputAttribute
+      ? true
+      : renderedRequiredList.every(
+          (key) =>
+            attributes[key] !== undefined && attributes[key].trim() !== ""
+        );
 
   const credTemplateName = selectedCredTemplate
     ? schemas.find((item) => item.$id === selectedCredTemplate)?.title
@@ -96,15 +110,15 @@ const IssueCredentialModal = ({
       (currentStage === IssueCredentialStage.SelectConnection &&
         !selectedConnection) ||
       (currentStage === IssueCredentialStage.InputAttribute &&
-        Object.values(attributes).every((item) => !item)) ||
+        !allRequiredAttributesFilled) ||
       loading
     );
   }, [
     currentStage,
     selectedCredTemplate,
     selectedConnection,
-    attributes,
     loading,
+    allRequiredAttributesFilled,
   ]);
 
   const issueCred = async () => {
@@ -114,11 +128,14 @@ const IssueCredentialModal = ({
 
     const schemaSaid = selectedCredTemplate;
     let objAttributes = {};
-    const attribute: Record<string, string> = {};
-
-    Object.entries(attributes).forEach(([key, value]) => {
-      if (key && value) attribute[key] = value;
-    });
+    const attribute = Object.fromEntries(
+      Object.entries(attributes).filter(
+        ([_, v]) =>
+          v !== undefined &&
+          v !== null &&
+          !(typeof v === "string" && v.trim() === "")
+      )
+    );
 
     if (Object.keys(attribute).length) {
       objAttributes = {
@@ -163,6 +180,9 @@ const IssueCredentialModal = ({
             className="neutral-button"
             startIcon={<ArrowBackOutlinedIcon />}
             onClick={() => {
+              if (currentStage !== IssueCredentialStage.Review) {
+                setAttributes({});
+              }
               setCurrentStage(
                 getBackStage(currentStage, !credentialTypeId) ||
                   IssueCredentialStage.SelectConnection
@@ -231,33 +251,32 @@ const IssueCredentialModal = ({
         );
       }
       case IssueCredentialStage.InputAttribute: {
-        const schema = schemas.find(
-          (item) => item.$id === selectedCredTemplate
-        );
-        const schemaRequiredAttributes =
-          schema?.properties.a.oneOf[1].required || [];
-
-        const requiredAttributes = schemaRequiredAttributes.filter(
-          (item) => !IGNORE_ATTRIBUTES.includes(item)
-        );
-
-        return (
+        return attributeKeys.map((attribute) => (
           <InputAttribute
+            key={attribute}
             value={attributes}
             setValue={updateAttributes}
-            attributes={requiredAttributes}
+            attributes={[attribute]}
+            required={requiredList.includes(attribute)}
+            properties={properties}
           />
-        );
+        ));
       }
-      case IssueCredentialStage.Review:
+      case IssueCredentialStage.Review: {
+        const nonEmptyAttributes = Object.fromEntries(
+          Object.entries(attributes).filter(
+            ([_, v]) => v !== undefined && v !== null && String(v).trim() !== ""
+          )
+        );
         return (
           <Review
             credentialType={credTemplateName}
-            attribute={attributes}
+            attribute={nonEmptyAttributes}
             connectionId={selectedConnection}
             connections={connections}
           />
         );
+      }
       default:
         return null;
     }

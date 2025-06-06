@@ -11,6 +11,7 @@ interface InputAttributeProps {
   attributes: string[];
   value: Record<string, string>;
   setValue: (key: string, value: string) => void;
+  required: boolean;
 }
 
 interface IssueCredListData {
