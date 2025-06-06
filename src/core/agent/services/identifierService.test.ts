@@ -1171,12 +1171,20 @@ describe("Single sig service of agent", () => {
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
     expect(connections.deleteConnectionById).toBeCalledWith("group-id");
-    expect(identifierStorage.deleteIdentifierMetadata).toBeCalledWith(
-      identifierMetadataRecord.id
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      "manageAid",
+      {
+        isDeleted: true,
+        pendingDeletion: false,
+      }
     );
     expect(updateIdentifierMock).toBeCalledWith(localMember.id, {
       name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${localMember.groupMetadata.groupId}:${localMember.displayName}`,
     });
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      identifierMetadataRecord.id,
+      { isDeleted: true, pendingDeletion: false }
+    );
     expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
       name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
     });
@@ -1240,8 +1248,9 @@ describe("Single sig service of agent", () => {
     expect(identifierStorage.getIdentifierMetadata).toBeCalledWith(
       identifierMetadataRecord.id
     );
-    expect(identifierStorage.deleteIdentifierMetadata).toBeCalledWith(
-      identifierMetadataRecord.id
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      identifierMetadataRecord.id,
+      { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
       name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
