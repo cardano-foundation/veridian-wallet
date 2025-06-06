@@ -1,4 +1,4 @@
-const ACDC_SCHEMAS = {
+export const ACDC_SCHEMAS = {
   "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao": {
     $id: "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao",
     $schema: "http://json-schema.org/draft-07/schema#",
@@ -319,11 +319,3 @@ const ACDC_SCHEMAS = {
     required: ["i", "ri", "s", "d", "e", "r"],
   },
 };
-
-const ACDC_SCHEMAS_ID = [
-  "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao",
-  "EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb",
-  "ENPXp1vQzRF6JwIuS-mp2U8Uf1MoADoP_GqQ62VsDZWY",
-];
-
-export { ACDC_SCHEMAS, ACDC_SCHEMAS_ID };

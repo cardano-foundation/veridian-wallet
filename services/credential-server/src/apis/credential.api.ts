@@ -1,44 +1,82 @@
 import { NextFunction, Request, Response } from "express";
-import { Agent } from "../agent";
 import { log } from "../log";
 import { SignifyApi } from "../modules/signify";
 import { ACDC_SCHEMAS } from "../utils/schemas";
+import { ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
 
-async function issueAcdcCredential(
+export async function issueAcdcCredential(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
+  const qviCredentialId = req.app.get("qviCredentialId");
+
   const { schemaSaid, aid, attribute } = req.body;
+
   if (!ACDC_SCHEMAS[schemaSaid]) {
     res.status(409).send({
       success: false,
       data: "",
     });
+    return;
   }
-  await Agent.agent.issueAcdcCredentialByAid(schemaSaid, aid, attribute);
+
+  const keriRegistryRegk = await signifyApi.getRegistry(ISSUER_NAME);
+  const holderAid = await signifyApi.getIdentifierByName(ISSUER_NAME);
+
+  if (schemaSaid === LE_SCHEMA_SAID) {
+    await signifyApi.leChainedCredential(
+      qviCredentialId,
+      keriRegistryRegk,
+      holderAid.name,
+      aid,
+      attribute
+    );
+  } else {
+    await signifyApi.issueCredential(
+      ISSUER_NAME,
+      keriRegistryRegk,
+      schemaSaid,
+      aid,
+      attribute
+    );
+  }
+
   res.status(200).send({
     success: true,
     data: "Credential offered",
   });
 }
 
-async function requestDisclosure(
+export async function requestDisclosure(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
   const { schemaSaid, aid, attributes } = req.body;
-  await Agent.agent.requestDisclosure(schemaSaid, aid, attributes);
+
+  await signifyApi.requestDisclosure(ISSUER_NAME, schemaSaid, aid, attributes);
   res.status(200).send({
     success: true,
     data: "Apply schema successfully",
   });
 }
 
-async function contactCredentials(req: Request, res: Response): Promise<void> {
+export async function contactCredentials(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
   const { contactId } = req.query;
-  const data = await Agent.agent.contactCredentials(contactId as string);
+
+  const issuer = await signifyApi.getIdentifierByName(ISSUER_NAME);
+
+  const data = await signifyApi.contactCredentials(
+    issuer.prefix,
+    contactId as string
+  );
 
   res.status(200).send({
     success: true,
@@ -46,11 +84,15 @@ async function contactCredentials(req: Request, res: Response): Promise<void> {
   });
 }
 
-async function revokeCredential(req: Request, res: Response): Promise<void> {
+export async function revokeCredential(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
   const { credentialId, holder } = req.body;
 
   try {
-    await Agent.agent.revokeCredential(credentialId, holder);
+    await signifyApi.revokeCredential(ISSUER_NAME, holder, credentialId);
     res.status(200).send({
       success: true,
       data: "Revoke credential successfully",
@@ -80,18 +122,12 @@ async function revokeCredential(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function schemas(req: Request, res: Response) {
-  const schemas = await Agent.agent.schemas();
+export async function schemas(req: Request, res: Response) {
+  const signifyApi: SignifyApi = req.app.get("signifyApi");
+
+  const schemas = await signifyApi.schemas();
   res.status(200).send({
     success: true,
     data: schemas,
   });
 }
-
-export {
-  contactCredentials,
-  issueAcdcCredential,
-  requestDisclosure,
-  revokeCredential,
-  schemas,
-};

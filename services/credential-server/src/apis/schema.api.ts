@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ACDC_SCHEMAS } from "../utils/schemas";
 
-async function schemaApi(req: Request, res: Response) {
+export async function schemaApi(req: Request, res: Response) {
   const { id } = req.params;
   const data = ACDC_SCHEMAS[id];
   if (!data) {
@@ -10,5 +10,3 @@ async function schemaApi(req: Request, res: Response) {
   }
   res.send(data);
 }
-
-export { schemaApi };
