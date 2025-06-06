@@ -1,5 +1,4 @@
 import { Box } from "@mui/material";
-import { useEffect } from "react";
 import { i18n } from "../../i18n";
 import { AppInput } from "../AppInput";
 import { InputAttributeProps } from "./IssueCredentialModal.types";
@@ -16,18 +15,6 @@ const InputAttribute = ({
   required,
   properties,
 }: InputAttributeProps & { properties: Record<string, AttributeSchema> }) => {
-  useEffect(() => {
-    attributes.forEach((attribute) => {
-      const defaultValue = properties?.[attribute]?.default;
-      if (
-        (value[attribute] === undefined || value[attribute] === "") &&
-        (typeof defaultValue === "string" || typeof defaultValue === "number")
-      ) {
-        setValue(attribute, String(defaultValue));
-      }
-    });
-  }, [attributes, value, properties, setValue]);
-
   return (
     <Box className="input-attribute">
       {attributes.map((attribute) => {
@@ -38,27 +25,10 @@ const InputAttribute = ({
             ? "number"
             : "string";
 
-        const defaultValue = properties?.[attribute]?.default;
-        let inputValue =
-          value[attribute] !== undefined && value[attribute] !== ""
-            ? value[attribute]
-            : typeof defaultValue === "string" ||
-                typeof defaultValue === "number" ||
-                defaultValue == null
-              ? defaultValue
-              : "";
-
-        if (type === "string") {
-          inputValue =
-            inputValue === undefined || inputValue === null
-              ? ""
-              : String(inputValue);
-        } else if (type === "number") {
-          inputValue =
-            inputValue === undefined || inputValue === null || inputValue === ""
-              ? null
-              : Number(inputValue);
-        }
+        const inputValue: string =
+          value[attribute] !== undefined && value[attribute] !== null
+            ? String(value[attribute])
+            : "";
 
         return (
           <AppInput
