@@ -19,6 +19,7 @@ import {
   Credential,
   QviCredential,
 } from "./signifyApi.types";
+import { ACDC_SCHEMAS_ID } from "../../utils/schemas";
 
 export class SignifyApi {
   static readonly DEFAULT_ROLE = "agent";
@@ -54,6 +55,12 @@ export class SignifyApi {
       await this.client.boot();
       await this.client.connect();
     }
+
+    await Promise.allSettled(
+      ACDC_SCHEMAS_ID.map((schemaId) =>
+        this.resolveOobi(`${config.oobiEndpoint}/oobi/${schemaId}`)
+      )
+    );
   }
 
   async createIdentifier(name: string): Promise<void> {
@@ -138,8 +145,6 @@ export class SignifyApi {
     recipient: string,
     attribute: { [key: string]: string }
   ) {
-    await this.resolveOobi(`${config.oobiEndpoint}/oobi/${schemaId}`);
-
     let vcdata = {};
     if (
       schemaId === Agent.RARE_EVO_DEMO_SCHEMA_SAID ||
