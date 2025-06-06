@@ -2,89 +2,61 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { config } from "./config";
-import router from "./routes";
 import { log } from "./log";
 import { ready as signifyReady } from "signify-ts";
 import { SignifyApi } from "./modules/signify";
-
-import { HOLDER_AID_NAME, ISSUER_AID_NAME } from "./consts";
+import { router } from "./routes";
+import { ISSUER_NAME, QVI_NAME } from "./consts";
 import { PollingService } from "./services/pollingService";
-import { createQVICredential } from "./services/qviCredential";
 import { loadBrans } from "./utils/utils";
+import { createQVICredential } from "./modules/signify/utils";
 
-async function initKeri(
+async function getSignifyClient(
+  bran: string,
+  aidName: string
+): Promise<SignifyApi> {
+  await signifyReady();
+
+  const signifyApi = new SignifyApi();
+  await signifyApi.start(bran);
+
+  const existingRegistry = await signifyApi.getRegistry(aidName).catch((e) => {
+    console.error(e);
+    return undefined;
+  });
+
+  if (!existingRegistry) {
+    await signifyApi.createIdentifier(aidName).catch((e) => console.error(e));
+
+    if (aidName === ISSUER_NAME) {
+      await signifyApi.addIndexerRole(aidName);
+    }
+
+    await signifyApi.createRegistry(aidName).catch((e) => console.error(e));
+  }
+
+  return signifyApi;
+}
+
+async function initializeCredentials(
   signifyApi: SignifyApi,
   signifyApiIssuer: SignifyApi
 ): Promise<string> {
-  /* eslint-disable no-console */
-  const existingKeriIssuerRegistryRegk = await signifyApiIssuer
-    .getRegistry(ISSUER_AID_NAME)
-    .catch((e) => {
-      console.error(e);
-      return undefined;
-    });
-  const existingKeriRegistryRegk = await signifyApi
-    .getRegistry(HOLDER_AID_NAME)
-    .catch((e) => {
-      console.error(e);
-      return undefined;
-    });
-
-  let keriIssuerRegistryRegk;
-  let keriRegistryRegk;
-
-  // Issuer
-  if (existingKeriIssuerRegistryRegk) {
-    keriIssuerRegistryRegk = existingKeriIssuerRegistryRegk;
-  } else {
-    await signifyApiIssuer
-      .createIdentifier(ISSUER_AID_NAME)
-      .catch((e) => console.error(e));
-    keriIssuerRegistryRegk = await signifyApiIssuer
-      .createRegistry(ISSUER_AID_NAME)
-      .catch((e) => console.error(e));
-  }
-
-  // Holder
-  if (existingKeriRegistryRegk) {
-    keriRegistryRegk = existingKeriRegistryRegk;
-  } else {
-    await signifyApi
-      .createIdentifier(HOLDER_AID_NAME)
-      .catch((e) => console.error(e));
-    await signifyApi.addIndexerRole(HOLDER_AID_NAME);
-    keriRegistryRegk = await signifyApi
-      .createRegistry(HOLDER_AID_NAME)
-      .catch((e) => console.error(e));
-  }
+  const issuerRegistry = await signifyApiIssuer.getRegistry(QVI_NAME);
 
   const qviCredentialId = await createQVICredential(
     signifyApi,
     signifyApiIssuer,
-    keriIssuerRegistryRegk
+    issuerRegistry
   ).catch((e) => {
     console.error(e);
     return "";
   });
 
-  // Start polling service
   const pollingService = new PollingService(signifyApi);
   pollingService.start();
 
   return qviCredentialId;
-}
-
-async function startSignifyApi(
-  signifyApi: SignifyApi,
-  signifyApiIssuer: SignifyApi
-) {
-  await signifyReady();
-  const brans = await loadBrans();
-
-  if (brans) {
-    await signifyApi.start(brans.bran);
-    await signifyApiIssuer.start(brans.issuerBran);
-  }
 }
 
 async function startServer() {
@@ -101,13 +73,17 @@ async function startServer() {
   });
 
   app.listen(config.port, async () => {
-    const signifyApi = new SignifyApi();
-    const signifyApiIssuer = new SignifyApi();
+    const brans = await loadBrans();
+    const signifyApi = await getSignifyClient(brans.bran, ISSUER_NAME);
+    const signifyApiIssuer = await getSignifyClient(brans.issuerBran, QVI_NAME);
+
     app.set("signifyApi", signifyApi);
     app.set("signifyApiIssuer", signifyApiIssuer);
-    await startSignifyApi(signifyApi, signifyApiIssuer);
 
-    const qviCredentialId = await initKeri(signifyApi, signifyApiIssuer);
+    const qviCredentialId = await initializeCredentials(
+      signifyApi,
+      signifyApiIssuer
+    );
     app.set("qviCredentialId", qviCredentialId);
 
     log(`Listening on port ${config.port}`);

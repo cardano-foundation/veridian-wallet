@@ -1,6 +1,6 @@
 import { SignifyApi } from "../modules/signify/signifyApi";
 import { NotificationRoute } from "../modules/signify/signifyApi.types";
-import { HOLDER_AID_NAME } from "../consts";
+import { ISSUER_NAME } from "../consts";
 
 export class PollingService {
   constructor(private signifyApi: SignifyApi) {}
@@ -29,7 +29,7 @@ export class PollingService {
       case NotificationRoute.ExnIpexOffer: {
         const msg = await this.signifyApi.getExchangeMsg(notif.a.d!);
         await this.signifyApi.agreeToAcdcFromOffer(
-          HOLDER_AID_NAME,
+          ISSUER_NAME,
           msg.exn.d,
           msg.exn.i
         );

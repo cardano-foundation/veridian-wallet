@@ -13,7 +13,7 @@ import { schemaApi } from "./apis/schema.api";
 import { contactList, deleteContact } from "./apis/contact.api";
 import { resolveOobi } from "./apis/oobi.api";
 
-const router: Router = express.Router();
+export const router: Router = express.Router();
 router.get(config.path.ping, ping);
 router.get(config.path.keriOobi, keriOobiApi);
 router.post(config.path.issueAcdcCredential, issueAcdcCredential);
@@ -25,5 +25,3 @@ router.get(config.path.schemas, schemas);
 router.post(config.path.requestDisclosure, requestDisclosure);
 router.post(config.path.revokeCredential, revokeCredential);
 router.delete(config.path.deleteContact, deleteContact);
-
-export default router;

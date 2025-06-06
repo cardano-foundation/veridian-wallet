@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 
-async function resolveOobi(req: Request, res: Response, next: NextFunction) {
+export async function resolveOobi(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const signifyApi: any = req.app.get("signifyApi");
   const { oobi } = req.body;
 
@@ -10,5 +14,3 @@ async function resolveOobi(req: Request, res: Response, next: NextFunction) {
     data: "OOBI resolved successfully",
   });
 }
-
-export { resolveOobi };

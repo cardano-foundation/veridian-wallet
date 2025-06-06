@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { log } from "../log";
 import { SignifyApi } from "../modules/signify";
 import { ACDC_SCHEMAS } from "../utils/schemas";
-import { HOLDER_AID_NAME, LE_SCHEMA_SAID } from "../consts";
+import { ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
 
-async function issueAcdcCredential(
+export async function issueAcdcCredential(
   req: Request,
   res: Response,
   next: NextFunction
@@ -22,8 +22,8 @@ async function issueAcdcCredential(
     return;
   }
 
-  const keriRegistryRegk = await signifyApi.getRegistry(HOLDER_AID_NAME);
-  const holderAid = await signifyApi.getIdentifierByName(HOLDER_AID_NAME);
+  const keriRegistryRegk = await signifyApi.getRegistry(ISSUER_NAME);
+  const holderAid = await signifyApi.getIdentifierByName(ISSUER_NAME);
 
   if (schemaSaid === LE_SCHEMA_SAID) {
     await signifyApi.leChainedCredential(
@@ -35,7 +35,7 @@ async function issueAcdcCredential(
     );
   } else {
     await signifyApi.issueCredential(
-      HOLDER_AID_NAME,
+      ISSUER_NAME,
       keriRegistryRegk,
       schemaSaid,
       aid,
@@ -49,7 +49,7 @@ async function issueAcdcCredential(
   });
 }
 
-async function requestDisclosure(
+export async function requestDisclosure(
   req: Request,
   res: Response,
   next: NextFunction
@@ -57,23 +57,21 @@ async function requestDisclosure(
   const signifyApi: SignifyApi = req.app.get("signifyApi");
   const { schemaSaid, aid, attributes } = req.body;
 
-  await signifyApi.requestDisclosure(
-    HOLDER_AID_NAME,
-    schemaSaid,
-    aid,
-    attributes
-  );
+  await signifyApi.requestDisclosure(ISSUER_NAME, schemaSaid, aid, attributes);
   res.status(200).send({
     success: true,
     data: "Apply schema successfully",
   });
 }
 
-async function contactCredentials(req: Request, res: Response): Promise<void> {
+export async function contactCredentials(
+  req: Request,
+  res: Response
+): Promise<void> {
   const signifyApi: SignifyApi = req.app.get("signifyApi");
   const { contactId } = req.query;
 
-  const issuer = await signifyApi.getIdentifierByName(HOLDER_AID_NAME);
+  const issuer = await signifyApi.getIdentifierByName(ISSUER_NAME);
 
   const data = await signifyApi.contactCredentials(
     issuer.prefix,
@@ -86,12 +84,15 @@ async function contactCredentials(req: Request, res: Response): Promise<void> {
   });
 }
 
-async function revokeCredential(req: Request, res: Response): Promise<void> {
+export async function revokeCredential(
+  req: Request,
+  res: Response
+): Promise<void> {
   const signifyApi: SignifyApi = req.app.get("signifyApi");
   const { credentialId, holder } = req.body;
 
   try {
-    await signifyApi.revokeCredential(HOLDER_AID_NAME, holder, credentialId);
+    await signifyApi.revokeCredential(ISSUER_NAME, holder, credentialId);
     res.status(200).send({
       success: true,
       data: "Revoke credential successfully",
@@ -121,7 +122,7 @@ async function revokeCredential(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function schemas(req: Request, res: Response) {
+export async function schemas(req: Request, res: Response) {
   const signifyApi: SignifyApi = req.app.get("signifyApi");
 
   const schemas = await signifyApi.schemas();
@@ -130,11 +131,3 @@ async function schemas(req: Request, res: Response) {
     data: schemas,
   });
 }
-
-export {
-  contactCredentials,
-  issueAcdcCredential,
-  requestDisclosure,
-  revokeCredential,
-  schemas,
-};

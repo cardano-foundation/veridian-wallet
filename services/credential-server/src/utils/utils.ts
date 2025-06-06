@@ -5,11 +5,11 @@ import { existsSync, mkdirSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
 import { randomPasscode } from "signify-ts";
 
-function randomSalt(): string {
+export function randomSalt(): string {
   return new Salter({}).qb64;
 }
 
-async function loadBrans(): Promise<BranFileContent> {
+export async function loadBrans(): Promise<BranFileContent> {
   const bransFilePath = "./data/brans.json";
   const dirPath = path.dirname(bransFilePath);
 
@@ -20,12 +20,10 @@ async function loadBrans(): Promise<BranFileContent> {
   let bransFileContent = "";
   if (existsSync(bransFilePath)) {
     bransFileContent = await readFile(bransFilePath, "utf8");
-    try {
-      const data = JSON.parse(bransFileContent);
-      if (data.bran && data.issuerBran) {
-        return data;
-      }
-    } catch {}
+    const data = JSON.parse(bransFileContent);
+    if (data.bran && data.issuerBran) {
+      return data;
+    }
   }
 
   const bran = randomPasscode();
@@ -34,5 +32,3 @@ async function loadBrans(): Promise<BranFileContent> {
   await writeFile(bransFilePath, JSON.stringify(newContent));
   return newContent;
 }
-
-export { randomSalt, loadBrans };

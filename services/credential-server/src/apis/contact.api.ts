@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 
-async function contactList(_: Request, res: Response, next: NextFunction) {
+export async function contactList(
+  _: Request,
+  res: Response,
+  next: NextFunction
+) {
   const signifyApi = res.app.get("signifyApi");
 
   const data = await signifyApi.contacts();
@@ -10,7 +14,11 @@ async function contactList(_: Request, res: Response, next: NextFunction) {
   });
 }
 
-async function deleteContact(req: Request, res: Response, next: NextFunction) {
+export async function deleteContact(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const signifyApi = res.app.get("signifyApi");
   const { id } = req.query;
 
@@ -20,5 +28,3 @@ async function deleteContact(req: Request, res: Response, next: NextFunction) {
     data,
   });
 }
-
-export { contactList, deleteContact };
