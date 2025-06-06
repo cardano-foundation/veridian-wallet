@@ -4,7 +4,6 @@ import {
   InputBase,
   InputBaseProps,
   InputLabel,
-  styled,
 } from "@mui/material";
 import { i18n } from "../../i18n";
 import "./AppInput.scss";
@@ -16,35 +15,6 @@ interface AppInputProps extends InputBaseProps {
   errorMessage?: string;
   type?: "string" | "number";
 }
-
-const CustomInput = styled(InputBase)(({ theme }) => ({
-  "label + &": {
-    marginTop: theme.spacing(3),
-  },
-  "&": {
-    borderRadius: "0.5rem",
-    border: "1px solid var(--color-neutral-400)",
-    "& input": {
-      padding: "1rem 1.25rem",
-    },
-    "&.Mui-focused": {
-      borderWidth: "2px",
-      borderStyle: "solid",
-      borderColor: theme.palette.primary.main,
-    },
-    "&.MuiInputBase-adornedStart": {
-      paddingLeft: "1rem",
-      input: {
-        padding: "1rem 0.5rem",
-      },
-    },
-  },
-  "&.Mui-error": {
-    borderWidth: "2px",
-    borderStyle: "solid",
-    borderColor: theme.palette.error.main,
-  },
-}));
 
 const AppInput = ({
   label,
@@ -90,7 +60,10 @@ const AppInput = ({
     {type === "number" ? (
       <NumberInput
         id={id}
+        label={label}
+        optional={optional}
         error={error}
+        errorMessage={errorMessage}
         value={
           typeof value === "number"
             ? value
@@ -105,7 +78,7 @@ const AppInput = ({
         hideActionButtons={hideActionButtons}
       />
     ) : (
-      <CustomInput
+      <InputBase
         {...inputProps}
         id={id}
         error={error}

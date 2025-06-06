@@ -2,14 +2,16 @@ import * as React from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import {
-  IconButton,
+  FormControl,
   InputAdornment,
   Stack,
   TextField,
-  type IconButtonProps,
+  FormHelperText,
   type TextFieldProps,
 } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 import { i18n } from "../../../i18n";
+import "./NumberInput.scss";
 
 type NumberInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
   hideActionButtons?: boolean;
@@ -18,6 +20,9 @@ type NumberInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
   onChange?: (value: number | null) => void;
   step?: number;
   value?: number | null;
+  label: string;
+  optional?: boolean;
+  errorMessage?: string;
 };
 
 const NumberInput = React.forwardRef<HTMLDivElement, NumberInputProps>(
@@ -31,6 +36,12 @@ const NumberInput = React.forwardRef<HTMLDivElement, NumberInputProps>(
       size,
       step = 1,
       value: valueProp,
+      label,
+      optional,
+      error,
+      errorMessage,
+      id,
+      className,
       ...rest
     } = props;
 
@@ -50,7 +61,7 @@ const NumberInput = React.forwardRef<HTMLDivElement, NumberInputProps>(
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value.replace(/[^\d-]/g, ""); // Only digits and minus
+      const val = e.target.value.replace(/[^\d-]/g, "");
       if (val === "" || val === "-") {
         setValue(null);
         return;
@@ -77,68 +88,74 @@ const NumberInput = React.forwardRef<HTMLDivElement, NumberInputProps>(
     };
 
     const handleBlur = () => {
-      if (value === null || value === undefined || !Number.isInteger(value)) {
-        setValue(min > -Infinity ? min : 0);
-      }
-    };
-
-    const commonAdornmentButtonProps: IconButtonProps = {
-      edge: "end",
-      sx: { p: size !== "small" ? "1px" : 0 },
+      if (value === null || value === undefined) return;
+      const num = Number(value);
+      if (num > max) setValue(max);
+      else if (num < min) setValue(min);
     };
 
     return (
-      <TextField
-        {...rest}
-        ref={ref}
-        value={value ?? ""}
-        disabled={disabled}
-        size={size}
-        inputProps={{
-          inputMode: "numeric",
-          pattern: "[0-9]*",
-          min,
-          max,
-          step,
-        }}
-        onChange={handleInputChange}
-        onBlur={handleBlur}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowUp") {
-            event.preventDefault();
-            increment();
-          } else if (event.key === "ArrowDown") {
-            event.preventDefault();
-            decrement();
-          }
-        }}
-        slotProps={{
-          input: {
-            endAdornment: !hideActionButtons && (
-              <InputAdornment position="end">
-                <Stack>
-                  <IconButton
-                    aria-label={i18n.t("NumberInput.incrementAriaLabel")}
-                    disabled={disabled || (value ?? 0) + step > max}
-                    onClick={increment}
-                    {...commonAdornmentButtonProps}
-                  >
-                    <KeyboardArrowUpIcon fontSize={size} />
-                  </IconButton>
-                  <IconButton
-                    aria-label={i18n.t("NumberInput.decrementAriaLabel")}
-                    disabled={disabled || (value ?? 0) - step < min}
-                    onClick={decrement}
-                    {...commonAdornmentButtonProps}
-                  >
-                    <KeyboardArrowDownIcon fontSize={size} />
-                  </IconButton>
-                </Stack>
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
+      <FormControl
+        variant="standard"
+        className={`app-input number-input ${className ?? ""}`}
+        error={!!error}
+      >
+        <TextField
+          {...rest}
+          id={id}
+          inputRef={ref}
+          label={undefined}
+          value={value ?? ""}
+          disabled={disabled}
+          size={size}
+          error={!!error}
+          onChange={handleInputChange}
+          onBlur={handleBlur}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowUp") {
+              event.preventDefault();
+              increment();
+            } else if (event.key === "ArrowDown") {
+              event.preventDefault();
+              decrement();
+            }
+          }}
+          slotProps={{
+            input: {
+              inputProps: {
+                inputMode: "numeric",
+                pattern: "[0-9]*",
+                min,
+                max,
+                step,
+              },
+              endAdornment: !hideActionButtons && (
+                <InputAdornment position="end">
+                  <Stack>
+                    <IconButton
+                      className="number-input-btn"
+                      aria-label={i18n.t("NumberInput.incrementAriaLabel")}
+                      disabled={disabled || (value ?? 0) + step > max}
+                      onClick={increment}
+                    >
+                      <KeyboardArrowUpIcon fontSize={size} />
+                    </IconButton>
+                    <IconButton
+                      className="number-input-btn"
+                      aria-label={i18n.t("NumberInput.decrementAriaLabel")}
+                      disabled={disabled || (value ?? 0) - step < min}
+                      onClick={decrement}
+                    >
+                      <KeyboardArrowDownIcon fontSize={size} />
+                    </IconButton>
+                  </Stack>
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+        {error && <FormHelperText error>{errorMessage}</FormHelperText>}
+      </FormControl>
     );
   }
 );
