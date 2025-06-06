@@ -128,11 +128,14 @@ const IssueCredentialModal = ({
 
     const schemaSaid = selectedCredTemplate;
     let objAttributes = {};
-    const attribute: Record<string, string> = {};
-
-    Object.entries(attributes).forEach(([key, value]) => {
-      if (key && value) attribute[key] = value;
-    });
+    const attribute = Object.fromEntries(
+      Object.entries(attributes).filter(
+        ([_, v]) =>
+          v !== undefined &&
+          v !== null &&
+          !(typeof v === "string" && v.trim() === "")
+      )
+    );
 
     if (Object.keys(attribute).length) {
       objAttributes = {

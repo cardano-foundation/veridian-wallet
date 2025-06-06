@@ -13,7 +13,7 @@ interface AppInputProps extends InputBaseProps {
   label: string;
   optional?: boolean;
   errorMessage?: string;
-  type?: "string" | "number";
+  type?: "string" | "integer";
 }
 
 const AppInput = ({
@@ -57,7 +57,7 @@ const AppInput = ({
         <span className="app-input-optional">{i18n.t("general.optional")}</span>
       )}
     </InputLabel>
-    {type === "number" ? (
+    {type === "integer" ? (
       <NumberInput
         id={id}
         label={label}

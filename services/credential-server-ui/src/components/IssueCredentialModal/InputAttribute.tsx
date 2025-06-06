@@ -20,10 +20,7 @@ const InputAttribute = ({
       {attributes.map((attribute) => {
         const inputLabelText = attribute.replace(/([a-z])([A-Z])/g, "$1 $2");
         const schemaType = properties?.[attribute]?.type;
-        const type =
-          schemaType === "integer" || schemaType === "number"
-            ? "number"
-            : "string";
+        const type = schemaType === "integer" ? "integer" : "string";
 
         const inputValue: string =
           value[attribute] !== undefined && value[attribute] !== null
@@ -39,8 +36,8 @@ const InputAttribute = ({
             optional={!required}
             value={inputValue}
             onChange={
-              type === "number"
-                ? (val) => setValue(attribute, val == null ? "" : String(val))
+              type === "integer"
+                ? (val) => setValue(attribute, val == null ? "" : val)
                 : (e) => setValue(attribute, e.target.value)
             }
             placeholder={i18n.t(
