@@ -37,7 +37,8 @@ const InputAttribute = ({
             value={inputValue}
             onChange={
               type === "integer"
-                ? (val) => setValue(attribute, val == null ? "" : val)
+                ? // @ts-expect-error -- suppress type error for controlled number input
+                  (val) => setValue(attribute, val == null ? "" : val)
                 : (e) => setValue(attribute, e.target.value)
             }
             placeholder={i18n.t(
