@@ -43,6 +43,10 @@ export class ScanScreen {
     return $("[data-testid*='connection-group'] .md.ion-activatable");
   }
 
+  get addedToast() {
+    return $("[message='New connection added']");
+  }
+
   async loads() {
     await expect(this.scannerText).toBeDisplayed();
     await expect(this.scannerText).toHaveText(ScanContent.ScannerText);
@@ -67,6 +71,12 @@ export class ScanScreen {
     await expect(this.connectionTitle).toHaveText("Connections");
     await expect(this.listConnection).toHaveLength(length);
     await expect(this.pendingIcon).not.toBeDisplayed();
+  }
+
+  async checkToast() {
+    if (await this.addedToast.getAttribute("message") == "New connection added") {
+      await this.addedToast.waitForDisplayed({reverse: true});
+    }
   }
 }
 

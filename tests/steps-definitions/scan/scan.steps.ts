@@ -1,6 +1,5 @@
 import { When, Then } from "@wdio/cucumber-framework";
 import ScanScreen from "../../screen-objects/scan/scan.screen";
-import Assert from "../../helpers/assert";
 import { Scan } from "../../constants/text.constants";
 
 When(/^user click on scan button$/, async function () {
@@ -27,5 +26,6 @@ When(/^user paste content$/, async function() {
 });
 
 Then(/^connection setup successfully$/, async function() {
+  await ScanScreen.checkToast();
   await ScanScreen.checkListConnection(1);
 });
