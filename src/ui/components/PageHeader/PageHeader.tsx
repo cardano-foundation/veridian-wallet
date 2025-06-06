@@ -217,7 +217,7 @@ const PageHeader = ({
           </div>
         )}
 
-        {(!!actionButton || !!additionalButtons) && (
+        {(!!actionButton || !!additionalButtons || hasAction) && (
           <IonButtons
             className={actionButtonClasses}
             slot="end"

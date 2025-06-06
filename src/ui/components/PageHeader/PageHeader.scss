@@ -62,6 +62,10 @@
         font-size: 1rem;
         font-weight: 700;
 
+        & > * {
+          color: var(--ion-color-neutral-700);
+        }
+
         &.md {
           font-size: 0.8rem;
         }

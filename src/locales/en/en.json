@@ -1194,7 +1194,7 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "button": {
-      "forgot": "I've forgotten my password"
+      "forgot": "Forgotten your password?"
     },
     "error": {
       "hasNoMatch": "Password didn't match"
@@ -1204,9 +1204,10 @@
         "title": "Would you like to see your password hint or reset your password?"
       },
       "button": {
-        "seepasswordhint": "See my password hint",
-        "resetmypassword": "Reset my password",
-        "tryagain": "Great, I'll try again!"
+        "seepasswordhint": "View hint",
+        "resetmypassword": "Reset password",
+        "tryagain": "Try again",
+        "cancel": "Cancel"
       },
       "hint": {
         "title": "Your password hint is"

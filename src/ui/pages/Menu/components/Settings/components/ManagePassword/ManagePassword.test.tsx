@@ -303,7 +303,7 @@ describe("Manage password", () => {
       );
     });
 
-    fireEvent.click(getByTestId("action-button"));
+    fireEvent.click(getByTestId("primary-button"));
 
     await waitFor(() => {
       expect(deletePasswordMock).toBeCalled();
@@ -369,7 +369,7 @@ describe("Manage password", () => {
     });
 
     act(() => {
-      fireEvent.click(getByTestId("action-button"));
+      fireEvent.click(getByTestId("primary-button"));
     });
 
     await waitFor(() => {

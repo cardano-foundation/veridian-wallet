@@ -20,14 +20,16 @@ const Alert = ({
   actionSecondaryConfirm,
   actionCancel,
   actionDismiss,
+  customButtons,
 }: AlertProps) => {
-  const buttons: AlertButton[] = [];
+  const buttons: AlertButton[] = customButtons ? [...customButtons] : [];
 
   if (confirmButtonText && actionConfirm) {
     buttons.push({
       id: "confirm-alert-button",
       text: confirmButtonText,
       role: "confirm",
+      cssClass: "confirm-btn default-btn",
       htmlAttributes: {
         "data-testid": `${dataTestId}-confirm-button`,
       },
@@ -43,6 +45,7 @@ const Alert = ({
       id: "secondary-confirm-alert-button",
       text: secondaryConfirmButtonText,
       role: "confirm",
+      cssClass: "default-btn",
       htmlAttributes: {
         "data-testid": `${dataTestId}-secondary-confirm-button`,
       },
@@ -58,6 +61,7 @@ const Alert = ({
       id: "cancel-alert-button",
       text: cancelButtonText,
       role: "cancel",
+      cssClass: "default-btn",
       htmlAttributes: {
         "data-testid": `${dataTestId}-cancel-button`,
       },
