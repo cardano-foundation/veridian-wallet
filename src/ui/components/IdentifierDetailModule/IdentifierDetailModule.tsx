@@ -50,6 +50,7 @@ import { IdentifierContent } from "./components/IdentifierContent";
 import { RotateKeyModal } from "./components/RotateKeyModal";
 import "./IdentifierDetailModule.scss";
 import { IdentifierDetailModuleProps } from "./IdentifierDetailModule.types";
+import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 
 const IdentifierDetailModule = ({
   identifierDetailId,
@@ -62,6 +63,7 @@ const IdentifierDetailModule = ({
   const history = useHistory();
   const dispatch = useAppDispatch();
   const stateCache = useAppSelector(getStateCache);
+  const biometrics = useAppSelector(getBiometricsCache);
   const favouritesIdentifiersData = useAppSelector(
     getFavouritesIdentifiersCache
   );
@@ -218,7 +220,7 @@ const IdentifierDetailModule = ({
   };
 
   const handleAuthentication = () => {
-    setHidden(!passwordAuthentication);
+    setHidden(!passwordAuthentication && !biometrics.enabled);
     setVerifyIsOpen(true);
   };
 

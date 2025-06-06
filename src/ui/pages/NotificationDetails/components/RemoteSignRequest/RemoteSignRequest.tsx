@@ -1,5 +1,4 @@
 import { IonIcon, IonText } from "@ionic/react";
-import { t } from "i18next";
 import {
   chevronDownOutline,
   chevronUpOutline,
@@ -30,7 +29,6 @@ import { showError } from "../../../../utils/error";
 import { combineClassNames } from "../../../../utils/style";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./RemoteSignRequest.scss";
-import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 
 function ellipsisText(text: string) {
   return `${text.substring(0, 8)}...${text.slice(-8)}`;
@@ -40,8 +38,8 @@ const RemoteSignRequest = ({
   pageId,
   activeStatus,
   handleBack,
+  notificationDetails,
 }: NotificationDetailsProps) => {
-  const notificationDetails = notificationsFix[7];
   const dispatch = useAppDispatch();
   const connections = useAppSelector(getConnectionsCache);
   const [isSigningObject, setIsSigningObject] = useState(false);

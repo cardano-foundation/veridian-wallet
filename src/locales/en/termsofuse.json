@@ -1,0 +1,177 @@
+{
+  "termsofuse": {
+    "done": "Done",
+    "intro": {
+      "title": "Terms of Use",
+      "text": "These Terms of Use set forth the legally binding terms and conditions for your use of the Veridian wallet (“Veridian”). Veridian is a decentralized identity management application developed by the Cardano Foundation (Cardano Stiftung) (the “Foundation”), which enables you to generate, manage, and control your digital identity through cryptographic keys and verifiable credentials using the Key Event Receipt Infrastructure (KERI) protocol.\n\nPlease read these Terms carefully. By accessing or using Veridian, you agree to be bound by these Terms, including any additional guidelines or rules referenced herein. If you do not agree to these Terms, please do not use Veridian."
+    },
+    "support": "Veridian Wallet Support",
+    "sections": [
+      {
+        "content": [
+          {
+            "subtitle": "1. Eligibility",
+            "text": "By using Veridian, you represent and warrant that you are of legal age to form a binding contract in your jurisdiction, and have not previously been suspended or removed from using Veridian. If you are using Veridian on behalf of a legal entity, you further represent and warrant that (i) the entity is duly organized under applicable laws, and (ii) you are duly authorized to act on its behalf."
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "subtitle": "2. Licence and Use",
+            "text": ""
+          },
+          {
+            "subtitle": "2.1. Licence Grant",
+            "text": "The Cardano Foundation grants you a limited, non-exclusive, non-transferable licence to access and use Veridian for your digital identity management purposes, subject to these terms."
+          },
+          {
+            "subtitle": "2.2. Restrictions on Use",
+            "text": "You agree not to:",
+            "nested": [
+              "Modify, distribute, or create derivative works based on Veridian.",
+              "Compromise the security or integrity of the Wallet or its underlying systems.",
+              "Use Veridian for any unlawful or unauthorised purpose."
+            ]
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "subtitle": "3. User Responsibilities",
+            "text": "You are responsible for:"
+          },
+          {
+            "subtitle": "3.1. Security of Digital Identity",
+            "text": "Maintaining the security and confidentiality of your passwords, cryptographic keys, digital identity (AID), and any credentials generated or stored in Veridian. Loss or compromise of this information may result in irrecoverable loss of access to your digital identity."
+          },
+          {
+            "subtitle": "3.2. Associated information, Credentials",
+            "text": "The accuracy and maintenance of any optional information you choose to bind or associate with your digital identity."
+          },
+          {
+            "subtitle": "3.3. Compliance with Laws",
+            "text": "Compliance with all applicable laws and regulations when using Veridian."
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "subtitle": "4. Intellectual property",
+            "text": "All intellectual property rights in and to Veridian, including its design, features, and underlying technology, are owned by the Cardano Foundation or its licensors. Nothing in these Terms grants you any right or license to use any trademark, logo, or service mark displayed in Veridian without the prior written consent of the Cardano Foundation."
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "subtitle": "5. Third Party Services",
+            "text": "Veridian may interface with third-party services (such as cloud agents or blockchain networks) to provide its functionality. The Cardano Foundation is not responsible for the performance or reliability of these third-party services, and your use of such services is governed by their respective terms and policies."
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "subtitle": "6. Disclaimers and Limitation of Liability",
+            "text": ""
+          },
+          {
+            "subtitle": "6.1. Disclaimer of Warranties",
+            "text": "Veridian is provided on an “as is” and “as available” basis without warranties of any kind, either express or implied. The Foundation makes no representations and expressly disclaims all warranties about the suitability, merchantability, fitness for purpose, reliability, availability, timeliness, security, title and non-infringement, accuracy or completeness, data synched to or made available from the products, product content, or any consulting services we provide for any associated purpose."
+          },
+          {
+            "subtitle": "6.2. No Indirect Damages",
+            "text": "To the fullest extent permitted by law, the Foundation shall not be liable for any indirect, incidental, consequential, punitive, or special damages (including loss of profits, revenue, or data) arising out of your use of Veridian."
+          },
+          {
+            "subtitle": "6.3. Limitation of Liability",
+            "text": "The aggregate liability of the Foundation, whether in contract, tort, or otherwise, is limited to the maximum extent permitted by applicable law. In any event, if fees have been paid for use of Veridian, our total liability shall not exceed the total amounts paid in the twelve months preceding the claim. If no fees are payable, our liability will be limited to one hundred US Dollars."
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "subtitle": "7. Indemnification",
+            "text": "You agree to fully indemnify, defend and hold the Foundation Entities, including their directors, officers, employees, consultants, and other representatives, harmless from and against any claims, damages, losses, costs (including reasonable legal fees), and other expenses resulting directly or indirectly from: (a) any breach or noncompliance of these Terms of Use by you or your affiliates, inclusive of policies mentioned herein; (b) allegations that materials you provide or convey to the Products violate the intellectual property rights of a third party; (c) your or your affiliates' use of Third-Party Products; and/or (d) any negligent or intentional misconduct by you. You shall not agree to any settlement that (i) obligates Us in any manner; (ii) demands an admission from Us; or (iii) assigns liability beyond these indemnifications or restricts Us, without obtaining Our prior written approval."
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "subtitle": "8. General Provisions",
+            "text": ""
+          },
+          {
+            "subtitle": "8.1. Service Changes",
+            "text": "We reserve the right to modify, update, limit, or revoke your access to Veridian at any time, for any reason, without prior notice, at our sole discretion."
+          },
+          {
+            "subtitle": "8.2. Privacy Policy",
+            "text": "By using Veridian, you acknowledge that our <0>{{PrivacyPolicy}}</0> applies to you, and your continued use constitutes acceptance of the <0>{{PrivacyPolicy}}</0>."
+          },
+          {
+            "subtitle": "8.3. Feedback",
+            "text": "We welcome your feedback and suggestions regarding Veridian, and you can provide your thoughts at <1>{{VeridianSupport}}</1>. By providing feedback, you grant us permission to use, share, and build upon your input without any obligation or compensation to you."
+          },
+          {
+            "subtitle": "8.4. Amendments",
+            "text": "We may modify these Terms at any time. The revised version will become effective on the next business day after posting. Your continued use of Veridian constitutes your acceptance of the modified Terms. If you do not agree with any changes, you must notify us in writing within thirty (30) days of notice."
+          },
+          {
+            "subtitle": "8.5. Assignment",
+            "text": "You may not assign, transfer, or sublicense your rights or obligations under these Terms without our prior written consent. We may assign or transfer our rights at our discretion."
+          },
+          {
+            "subtitle": "8.6. Waiver and Severability",
+            "text": "Our failure to enforce any provision of these Terms shall not constitute a waiver of that provision. If any provision is found to be invalid or unenforceable, the remaining provisions shall continue in full force and effect."
+          },
+          {
+            "subtitle": "8.7. Application Provider Terms",
+            "text": "These Terms of Use are between you and the Foundation only, and not with an application service or application platform provider (such as Apple, Inc., or Google Inc.), which may provide you the Veridian wallet application subject to their own terms of use."
+          },
+          {
+            "subtitle": "8.8. Entire Agreement",
+            "text": "These Terms constitute the entire agreement between you and the Cardano Foundation regarding your use of Veridian and supersede all prior communications, agreements, and understandings."
+          },
+          {
+            "subtitle": "8.9. Disputes",
+            "text": "If you have a dispute with the Foundation or a claim to raise in relation to Veridian, you agree to contact us using the form at <1>{{VeridianSupport}}</1> to attempt to resolve the issue informally first."
+          },
+          {
+            "subtitle": "8.10. Survival",
+            "text": "The provisions relating to disclaimers, limitations of liability, indemnification, governing law, and any other provisions intended to survive termination shall continue to apply after termination of your use of Veridian."
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "subtitle": "9. Governing Law and Jurisdiction",
+            "text": ""
+          },
+          {
+            "subtitle": "9.1. Governing Law",
+            "text": "These Terms shall be governed by and construed in accordance with the laws of Switzerland."
+          },
+          {
+            "subtitle": "9.2. Jurisdiction",
+            "text": "Any disputes arising out of or in connection with these Terms that are not resolved through informal dispute resolution set forth in section 8.9 shall be subject to the exclusive jurisdiction of the courts located in Zug, Switzerland."
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "subtitle": "10. Contact us",
+            "text": "If you have any questions, concerns, or feedback regarding these Terms, please contact us at:\n\nCardano Foundation,\nDammstrasse 16,\n6300, Zug,\nSwitzerland\nAttn: Legal"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -8,16 +8,18 @@ import {
   CheckBiometryResult,
 } from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
 import { PluginListenerHandle } from "@capacitor/core";
-import { t } from "i18next";
 import { useEffect, useState } from "react";
+import { i18n } from "../../i18n";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { getAuthentication } from "../../store/reducers/stateCache";
 import { useActivityTimer } from "../components/AppWrapper/hooks/useActivityTimer";
 import { showError } from "../utils/error";
-import { useAppDispatch } from "../../store/hooks";
 
-const useBiometricAuth = () => {
+const useBiometricAuth = (isLockPage?: boolean) => {
   const dispatch = useAppDispatch();
   const [biometricInfo, setBiometricInfo] = useState<CheckBiometryResult>();
   const { setPauseTimestamp } = useActivityTimer();
+  const { passwordIsSet } = useAppSelector(getAuthentication);
 
   useEffect(() => {
     checkBiometrics();
@@ -65,11 +67,15 @@ const useBiometricAuth = () => {
 
     try {
       await BiometricAuth.authenticate({
-        reason: t("biometry.reason") as string,
-        cancelTitle: t("biometry.canceltitle") as string,
-        iosFallbackTitle: t("biometry.iosfallbacktitle") as string,
-        androidTitle: t("biometry.androidtitle") as string,
-        androidSubtitle: t("biometry.androidsubtitle") as string,
+        reason: i18n.t("biometry.reason") as string,
+        cancelTitle: i18n.t("biometry.canceltitle") as string,
+        iosFallbackTitle: i18n.t(
+          !isLockPage && passwordIsSet
+            ? "biometry.iosfallbackpasswordtitle"
+            : "biometry.iosfallbacktitle"
+        ) as string,
+        androidTitle: i18n.t("biometry.androidtitle") as string,
+        androidSubtitle: i18n.t("biometry.androidsubtitle") as string,
         androidConfirmationRequired: false,
         androidBiometryStrength: AndroidBiometryStrength.strong,
       });

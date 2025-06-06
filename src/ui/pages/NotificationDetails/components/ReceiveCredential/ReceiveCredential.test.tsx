@@ -99,6 +99,9 @@ const initialState = {
   identifiersCache: {
     identifiers: filteredIdentifierMapFix,
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 jest.mock("@ionic/react", () => ({
@@ -269,6 +272,9 @@ describe("Receive credential", () => {
       identifiersCache: {
         identifiers: filteredIdentifierMapFix,
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -325,6 +331,9 @@ describe("Receive credential", () => {
       },
       identifiersCache: {
         identifiers: filteredIdentifierMapFix,
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -459,6 +468,9 @@ describe("Credential request: Multisig", () => {
     },
     identifiersCache: {
       identifiers: filteredIdentifierMapFix,
+    },
+    biometricsCache: {
+      enabled: false,
     },
   };
 

@@ -68,7 +68,10 @@ const initialState = {
   },
   credsArchivedCache: {
     creds: [],
-  }
+  },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 describe("Notification Detail", () => {

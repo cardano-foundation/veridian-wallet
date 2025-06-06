@@ -52,6 +52,7 @@ import {
   BackReason,
   CredentialDetailModuleProps,
 } from "./CredentialDetailModule.types";
+import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 
 const CredentialDetailModule = ({
   pageId,
@@ -69,6 +70,7 @@ const CredentialDetailModule = ({
   const setSelected = isLightMode ? props.setSelected : undefined;
   const dispatch = useAppDispatch();
   const credsCache = useAppSelector(getCredsCache);
+  const biometrics = useAppSelector(getBiometricsCache);
   const favouritesCredsCache = useAppSelector(getFavouritesCredsCache);
   const passwordAuthentication =
     useAppSelector(getAuthentication).passwordIsSet;
@@ -396,7 +398,7 @@ const CredentialDetailModule = ({
   };
 
   const handleAuthentication = () => {
-    setHidden(!passwordAuthentication);
+    setHidden(!passwordAuthentication && !biometrics.enabled);
     setVerifyIsOpen(true);
   };
 

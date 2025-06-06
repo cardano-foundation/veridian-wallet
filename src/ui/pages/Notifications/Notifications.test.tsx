@@ -85,6 +85,9 @@ const initialState = {
   notificationsCache: {
     notifications: [],
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 const fullState = {
@@ -106,6 +109,9 @@ const fullState = {
   credsCache: {
     creds: [],
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 const filterTestData = {
@@ -122,6 +128,9 @@ const filterTestData = {
   },
   notificationsCache: {
     notifications: [notificationsFix[0], notificationsFix[3]],
+  },
+  biometricsCache: {
+    enabled: false,
   },
 };
 
@@ -143,6 +152,9 @@ const emptyConnection = {
       notificationsFix[3],
       notificationsFix[4],
     ],
+  },
+  biometricsCache: {
+    enabled: false,
   },
 };
 

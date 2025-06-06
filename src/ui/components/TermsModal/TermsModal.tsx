@@ -25,7 +25,9 @@ const Section = ({ title, content, componentId, altIsOpen }: TermsSection) => {
         data-testid="privacy-policy-modal-switch"
         onClick={() => altIsOpen && altIsOpen(true)}
       >
-        {i18n.t("generateseedphrase.termsandconditions.privacy")}
+        {i18n.t("privacypolicy.intro.title", {
+          ns: "privacypolicy",
+        })}
       </u>
     );
   };
@@ -37,7 +39,9 @@ const Section = ({ title, content, componentId, altIsOpen }: TermsSection) => {
         className="unstyled-link"
       >
         <u data-testid="support-link-handler">
-          {i18n.t("generateseedphrase.termsandconditions.support")}
+          {i18n.t("termsofuse.support", {
+            ns: "termsofuse",
+          })}
         </u>
       </a>
     );
@@ -49,7 +53,9 @@ const Section = ({ title, content, componentId, altIsOpen }: TermsSection) => {
         data-testid="support-link-handler"
         onClick={() => openBrowserLink(FEDERAL_DATA_PROTECTION_LINK)}
       >
-        {i18n.t("privacypolicy.link.federaldataprotection")}
+        {i18n.t("privacypolicy.link.federaldataprotection", {
+          ns: "privacypolicy",
+        })}
       </u>
     );
   };
@@ -60,7 +66,7 @@ const Section = ({ title, content, componentId, altIsOpen }: TermsSection) => {
         data-testid="support-link-handler"
         onClick={() => openBrowserLink(DATA_PROTECTION_AUTHORITIES_LINK)}
       >
-        {i18n.t("privacypolicy.link.link")}
+        {i18n.t("privacypolicy.link.link", { ns: "privacypolicy" })}
       </u>
     );
   };
@@ -151,9 +157,10 @@ const TermsModal = ({
   const nameNoDash = name.replace(/-/g, "");
   const componentId = name + "-modal";
   const termsObject: TermsObject = t(nameNoDash, {
+    ns: nameNoDash,
     returnObjects: true,
   });
-  const introText = `${i18n.t(`${nameNoDash}.intro.text`)}`;
+  const introText = `${i18n.t(`${nameNoDash}.intro.text`, { ns: nameNoDash })}`;
   const sections = termsObject.sections;
 
   const closeModal = () => setIsOpen(false);
@@ -170,9 +177,11 @@ const TermsModal = ({
         header={
           <PageHeader
             closeButton={true}
-            closeButtonLabel={`${i18n.t(`${nameNoDash}.done`)}`}
+            closeButtonLabel={`${i18n.t(`${nameNoDash}.done`, {
+              ns: nameNoDash,
+            })}`}
             closeButtonAction={closeModal}
-            title={`${i18n.t(`${nameNoDash}.intro.title`)}`}
+            title={`${i18n.t(`${nameNoDash}.intro.title`, { ns: nameNoDash })}`}
           />
         }
       >

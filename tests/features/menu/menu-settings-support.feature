@@ -2,6 +2,7 @@ Feature: Menu Settings Support
 
   Background:
     Given user is onboarded with skipped password creation
+    And user tap skip button on Welcome screen
     And user tap Menu button on Tab bar
 
   Scenario: C420 MenuSettingsSupport - App version

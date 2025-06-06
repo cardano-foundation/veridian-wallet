@@ -4,6 +4,7 @@ Feature: CreatePassword
     Given user tap Get Started button on Onboarding screen
     And user generate passcode on Passcode screen
     And user skip Biometric popup if it exist
+    And user tap on Add a password on Create a password screen
 
   Scenario: C160 CreatePassword - user can cancel skipping password creation
     Given user tap Skip button on Create Password screen

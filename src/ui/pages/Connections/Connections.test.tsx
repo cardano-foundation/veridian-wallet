@@ -116,6 +116,9 @@ const initialStateFull = {
   identifiersCache: {
     identifiers: filteredIdentifierFix,
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 let mockedStore: Store<unknown, AnyAction>;
@@ -160,6 +163,9 @@ describe("Connections page", () => {
       },
       identifiersCache: {
         identifiers: filteredIdentifierFix,
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
     const mockStore = configureStore();
@@ -222,6 +228,9 @@ describe("Connections page", () => {
       },
       identifiersCache: {
         identifiers: {},
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
     const mockStore = configureStore();
@@ -336,6 +345,9 @@ describe("Connections page", () => {
       connectionsCache: {
         connections: [],
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -405,6 +417,9 @@ describe("Connections page", () => {
       },
       connectionsCache: {
         connections: connectionsFix,
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -513,6 +528,9 @@ describe("Connections page from Credentials tab", () => {
       connectionsCache: {
         connections: [],
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMocked = {
@@ -607,6 +625,9 @@ describe("Connections page from Credentials tab", () => {
       },
       connectionsCache: {
         connections: connectionsFix,
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 

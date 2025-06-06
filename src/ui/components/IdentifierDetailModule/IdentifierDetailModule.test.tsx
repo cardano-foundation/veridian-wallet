@@ -127,6 +127,9 @@ const initialStateKeri = {
   connectionsCache: {
     multisigConnections: {},
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 const storeMockedAidKeri = {
@@ -476,6 +479,9 @@ describe("Individual Identifier details page", () => {
       connectionsCache: {
         multisigConnections: {},
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMockedAidKeri = {
@@ -673,6 +679,9 @@ describe("Group Identifier details page", () => {
         },
       },
     },
+    biometricsCache: {
+      enabled: false,
+    },
   };
 
   const storeMockedAidKeri = {
@@ -745,6 +754,9 @@ describe("Group Identifier details page", () => {
             groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
           },
         },
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -1090,6 +1102,9 @@ describe("Group Identifier details page", () => {
       connectionsCache: {
         multisigConnections: {},
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMockedAidKeri = {
@@ -1151,6 +1166,9 @@ describe("Checking the Identifier Details Page when information is missing from 
       },
       connectionsCache: {
         multisigConnections: {},
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 
@@ -1313,6 +1331,9 @@ describe("Favourite identifier", () => {
       connectionsCache: {
         multisigConnections: {},
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMockedAidKeri = {
@@ -1380,6 +1401,9 @@ describe("Favourite identifier", () => {
       connectionsCache: {
         multisigConnections: {},
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const storeMockedAidKeri = {
@@ -1446,6 +1470,9 @@ describe("Favourite identifier", () => {
       },
       connectionsCache: {
         multisigConnections: {},
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 

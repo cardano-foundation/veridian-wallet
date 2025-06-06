@@ -61,6 +61,9 @@ const initialState = {
   identifiersCache: {
     identifiers: filteredIdentifierMapFix,
   },
+  biometricsCache: {
+    enabled: false,
+  },
 };
 
 describe("Receive credential", () => {

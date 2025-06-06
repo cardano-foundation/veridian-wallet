@@ -95,6 +95,9 @@ describe("Create group identifier - Setup Connection", () => {
         connections: [connectionsFix[3]],
       },
     },
+    biometricsCache: {
+      enabled: false,
+    },
   };
 
   const stage1State = {
@@ -370,6 +373,9 @@ describe("Create group identifier - Setup Connection", () => {
           connections: [connectionsFix[3]],
         },
       },
+      biometricsCache: {
+        enabled: false,
+      },
     };
 
     const stage1State = {
@@ -548,6 +554,9 @@ describe("Create group identifier - Setup Connection", () => {
           groupId: "b75838e5-98cb-46cf-9233-8bf3beca4cd3",
           connections: [],
         },
+      },
+      biometricsCache: {
+        enabled: false,
       },
     };
 

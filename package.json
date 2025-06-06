@@ -10,7 +10,7 @@
     "build:e2e": "npm run build:local && npx cap sync",
     "build:ios:flags": "find ios/xcconfig-overwrites -name '*.release.xcconfig' -exec sh -c 'cp \"$1\" \"ios/App/Pods/Target Support Files/$(basename $(dirname \"$1\"))/\"' _ {} \\;",
     "build:android:proguard": "cp android/proguard-overwrites/proguard-rules.pro node_modules/capacitor-freerasp/android/proguard-rules.pro",
-    "build:release": "cross-env ENVIRONMENT=prod webpack --config webpack.prod.cjs && npx cap sync",
+    "build:release": "cross-env ENVIRONMENT=prod webpack --config webpack.prod.cjs && ENVIRONMENT=prod npx cap sync",
     "prettier": "npx prettier --write './src/**/*.{ts,tsx,scss}' 'services/{credential-server,credential-server-ui}/src/**/*.{ts,tsx,scss}'",
     "eslint": "eslint 'src/**/*.{ts,tsx}'",
     "test": "jest",

@@ -22,6 +22,7 @@ import {
   RARE_EVO_DEMO_SCHEMA_SAID,
   QVI_SCHEMA_SAID,
   LE_SCHEMA_SAID,
+  ACDC_SCHEMAS_ID,
 } from "../../consts";
 
 export class SignifyApi {
@@ -58,6 +59,12 @@ export class SignifyApi {
       await this.client.boot();
       await this.client.connect();
     }
+
+    await Promise.allSettled(
+      ACDC_SCHEMAS_ID.map((schemaId) =>
+        this.resolveOobi(`${config.oobiEndpoint}/oobi/${schemaId}`)
+      )
+    );
   }
 
   async createIdentifier(name: string): Promise<void> {
@@ -142,8 +149,6 @@ export class SignifyApi {
     recipient: string,
     attribute: { [key: string]: string }
   ) {
-    await this.resolveOobi(`${config.oobiEndpoint}/oobi/${schemaId}`);
-
     let vcdata = {};
     if (
       schemaId === RARE_EVO_DEMO_SCHEMA_SAID ||

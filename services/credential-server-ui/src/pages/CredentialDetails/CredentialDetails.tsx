@@ -1,11 +1,10 @@
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import { Box, Button } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { IssueCredentialModal } from "../../components/IssueCredentialModal";
 import { RoleIndex } from "../../components/NavBar/constants/roles";
 import { PageHeader } from "../../components/PageHeader";
-import { RoutePath } from "../../const/route";
 import { i18n } from "../../i18n";
 import { useAppSelector } from "../../store/hooks";
 import { getRoleView } from "../../store/reducers";
@@ -20,10 +19,6 @@ export const CredentialDetails = () => {
   const schemas = useAppSelector((state) => state.schemasCache.schemas);
   const nav = useNavigate();
   const { id } = useParams();
-
-  useEffect(() => {
-    if (roleViewIndex !== RoleIndex.ISSUER) nav(RoutePath.Connections);
-  }, [nav, roleViewIndex]);
 
   const schemaName = schemas.find((item) => item.$id === id)?.title || "";
 

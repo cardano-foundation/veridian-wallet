@@ -5,7 +5,7 @@ import {
 import { App, AppState } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
@@ -56,7 +56,7 @@ const LockPageContainer = () => {
   const [passcodeIncorrect, setPasscodeIncorrect] = useState(false);
   const preventBiometricOnEvent = useRef(false);
 
-  const { handleBiometricAuth } = useBiometricAuth();
+  const { handleBiometricAuth } = useBiometricAuth(true);
   const biometricsCache = useSelector(getBiometricsCache);
   const firstAppLaunch = useSelector(getFirstAppLaunch);
   const [openRecoveryAuth, setOpenRecoveryAuth] = useState(false);
@@ -172,7 +172,7 @@ const LockPageContainer = () => {
     return undefined;
   })();
 
-  useEffect(() => {
+  const outFocusAfterLockPage = useCallback(() => {
     if (Capacitor.isNativePlatform()) {
       // NOTE: focus to passcode button when open lock page to close keyboard and unfocus any textbox
       Keyboard.hide();
@@ -181,7 +181,13 @@ const LockPageContainer = () => {
   }, []);
 
   useEffect(() => {
+    outFocusAfterLockPage();
+  }, [outFocusAfterLockPage]);
+
+  useEffect(() => {
     const handleAppStateChange = async (state: AppState) => {
+      outFocusAfterLockPage();
+
       if (state.isActive && !preventBiometricOnEvent.current) {
         handleUseBiometrics();
       }
