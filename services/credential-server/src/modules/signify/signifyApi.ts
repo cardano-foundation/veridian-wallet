@@ -454,7 +454,6 @@ export class SignifyApi {
   }
 
   async schemas() {
-    console.log("Fetching schemas from Signify...");
     return this.client.schemas().list();
   }
 }
