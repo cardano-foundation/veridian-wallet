@@ -73,6 +73,16 @@ Given(/^user is onboarded with a password creation$/, async function () {
   await Assert.toast(`Welcome, ${this.userName}!`);
 });
 
+Given(/^user is onboarded with skipped onboarding flag ON$/, async function() {
+  await PasscodeScreen.enterPasscodeSkip(1);
+  await SsiAgentDetailsScreen.tapOnValidatedButton();
+  this.userName = faker.person.firstName();
+  await WelcomeModal.nameInput.setValue(this.userName);
+  await WelcomeModal.confirmButton.waitForClickable();
+  await WelcomeModal.confirmButton.click();
+  await Assert.toast(`Welcome, ${this.userName}!`);
+});
+
 Given(/^user tap skip button on Welcome screen$/, async function () {
   await WelcomeMessageScreen.handleSkipWelcomeScreen();
 });
