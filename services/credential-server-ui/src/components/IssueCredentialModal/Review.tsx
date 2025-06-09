@@ -25,7 +25,7 @@ const Review = ({
 
   return (
     <Box className="review-stage">
-      <Box sx={{ textAlign: "left", marginBottom: "1.5rem" }}>
+      <Box sx={{ textAlign: "left" }}>
         <Typography variant="subtitle1">
           {i18n.t("pages.credentialDetails.issueCredential.review.credential")}
         </Typography>
@@ -34,7 +34,6 @@ const Review = ({
             display: "flex",
             alignItems: "center",
             gap: 1,
-            marginBottom: "1.5rem",
           }}
         >
           <img
@@ -50,7 +49,7 @@ const Review = ({
           </Typography>
         </Box>
       </Box>
-      <Box sx={{ textAlign: "left", marginBottom: "1.5rem" }}>
+      <Box sx={{ textAlign: "left" }}>
         <Typography variant="subtitle1">
           {i18n.t("pages.credentialDetails.issueCredential.review.issueTo")}
         </Typography>
