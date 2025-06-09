@@ -15,8 +15,6 @@ async function getSignifyClient(
   bran: string,
   aidName: string
 ): Promise<SignifyApi> {
-  await signifyReady();
-
   const signifyApi = new SignifyApi();
   await signifyApi.start(bran);
 
@@ -73,6 +71,7 @@ async function startServer() {
   });
 
   app.listen(config.port, async () => {
+    await signifyReady();
     const brans = await loadBrans();
     const signifyApi = await getSignifyClient(brans.bran, ISSUER_NAME);
     const signifyApiIssuer = await getSignifyClient(brans.issuerBran, QVI_NAME);
