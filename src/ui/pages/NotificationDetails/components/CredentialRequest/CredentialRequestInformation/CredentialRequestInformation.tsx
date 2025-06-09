@@ -344,6 +344,7 @@ const CredentialRequestInformation = ({
           {linkedGroup?.linkedRequest.current && (
             <>
               <CardDetailsBlock
+                dataTestId="proposed-cred"
                 onClick={showProvidedCred}
                 className={`proposed-cred ${
                   missingProposedCred ? "missing-proposed-cred" : ""
@@ -454,7 +455,7 @@ const CredentialRequestInformation = ({
       <LightCredentialDetailModal
         credId={viewCredId || ""}
         isOpen={!!viewCredId}
-        setIsOpen={() => setViewCredId(undefined)}
+        setIsOpen={handleClose}
         onClose={handleClose}
         joinedCredRequestMembers={linkedGroup?.memberInfos}
         viewOnly

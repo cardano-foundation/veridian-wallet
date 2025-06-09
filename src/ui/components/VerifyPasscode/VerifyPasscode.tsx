@@ -74,12 +74,14 @@ const VerifyPasscode = ({
     setOpenRecoveryAuth(true);
   };
 
+  const onClose = () => handleClearState(true);
+
   return (
     <IonModal
       isOpen={isOpen}
       className={componentId}
       data-testid={componentId}
-      onDidDismiss={() => handleClearState(true)}
+      onDidDismiss={onClose}
     >
       <ResponsivePageLayout
         activeStatus={isOpen}
@@ -87,7 +89,7 @@ const VerifyPasscode = ({
           <PageHeader
             closeButton={true}
             closeButtonLabel={`${i18n.t("verifypasscode.cancel")}`}
-            closeButtonAction={() => handleClearState(true)}
+            closeButtonAction={onClose}
           />
         }
         pageId={`${componentId}-content`}
