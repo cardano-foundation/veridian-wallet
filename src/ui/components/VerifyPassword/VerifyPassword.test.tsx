@@ -269,7 +269,7 @@ describe("Verify Password", () => {
       ).toBeVisible();
     });
 
-    fireEvent.click(getByText(ENG_Trans.verifypassword.alert.button.tryagain));
+    fireEvent.click(getByTestId("alert-tryagain-confirm-button"));
 
     await waitFor(() => {
       expect(queryByText(ENG_Trans.verifypassword.alert.hint.title)).toBeNull();
@@ -333,9 +333,7 @@ describe("Verify Password", () => {
       ).toBeVisible();
     });
 
-    fireEvent.click(
-      getAllByText(ENG_Trans.verifypassword.alert.button.resetmypassword)[1]
-    );
+    fireEvent.click(getByTestId("alert-tryagain-secondary-confirm-button"));
 
     await waitFor(() => {
       expect(getByText(ENG_Trans.forgotauth.password.title)).toBeVisible();
