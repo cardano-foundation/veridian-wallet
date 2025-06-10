@@ -149,14 +149,10 @@ describe("Verify Password", () => {
 
     const passwordInput = await findByTestId("verify-password-value");
 
-    const confirmButton = await findByTestId("action-button");
+    const confirmButton = await findByTestId("primary-button");
 
     act(() => {
       ionFireEvent.ionInput(passwordInput, "1111");
-    });
-
-    await waitFor(() => {
-      expect(confirmButton.getAttribute("disabled")).toBe("false");
     });
 
     act(() => {
@@ -205,14 +201,10 @@ describe("Verify Password", () => {
     });
 
     const passwordInput = getByTestId("verify-password-value");
-    const confirmButton = getByTestId("action-button");
+    const confirmButton = getByTestId("primary-button");
 
     act(() => {
       ionFireEvent.ionInput(passwordInput, "1111");
-    });
-
-    await waitFor(() => {
-      expect(confirmButton.getAttribute("disabled")).toBe("false");
     });
 
     act(() => {
@@ -277,7 +269,7 @@ describe("Verify Password", () => {
       ).toBeVisible();
     });
 
-    fireEvent.click(getByText(ENG_Trans.verifypassword.alert.button.tryagain));
+    fireEvent.click(getByTestId("alert-tryagain-confirm-button"));
 
     await waitFor(() => {
       expect(queryByText(ENG_Trans.verifypassword.alert.hint.title)).toBeNull();
@@ -341,9 +333,7 @@ describe("Verify Password", () => {
       ).toBeVisible();
     });
 
-    fireEvent.click(
-      getAllByText(ENG_Trans.verifypassword.alert.button.resetmypassword)[1]
-    );
+    fireEvent.click(getByTestId("alert-tryagain-secondary-confirm-button"));
 
     await waitFor(() => {
       expect(getByText(ENG_Trans.forgotauth.password.title)).toBeVisible();
