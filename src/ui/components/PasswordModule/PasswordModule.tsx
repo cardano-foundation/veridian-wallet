@@ -287,7 +287,7 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
           confirmButtonText={`${i18n.t(
             "tabs.menu.tab.settings.sections.security.managepassword.page.alert.ok"
           )}`}
-          actionConfirm={() => handleClearExisting()}
+          actionConfirm={handleClearExisting}
         />
         <SymbolModal
           isOpen={isOpenSymbol}
