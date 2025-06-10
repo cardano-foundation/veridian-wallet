@@ -391,13 +391,13 @@ class IpexCommunicationService extends AgentService {
       "-a-i": exchange.exn.rp,
       ...(Object.keys(attributes).length > 0
         ? {
-          ...Object.fromEntries(
-            Object.entries(attributes).map(([key, value]) => [
-              "-a-" + key,
-              value,
-            ])
-          ),
-        }
+            ...Object.fromEntries(
+              Object.entries(attributes).map(([key, value]) => [
+                "-a-" + key,
+                value,
+              ])
+            ),
+          }
         : {}),
     };
 
@@ -425,7 +425,7 @@ class IpexCommunicationService extends AgentService {
         };
       }),
       attributes: attributes,
-      identifier: exchange.exn.a.i,
+      identifier: exchange.exn.rp,
     };
   }
 
@@ -684,7 +684,7 @@ class IpexCommunicationService extends AgentService {
       offerExn.i,
       offerExn.p,
       offerExn.e.acdc,
-      offerExn.a.i,
+      offerExn.rp,
       offerExn
     );
 
@@ -1108,12 +1108,13 @@ class IpexCommunicationService extends AgentService {
       .exchanges()
       .get(grantNoteRecord.a.d as string);
 
-    const multisigAid = await this.props.signifyClient
+    const recipientPrefix = grantExn.exn.rp;
+    const multisigAidDetails = await this.props.signifyClient
       .identifiers()
-      .get(grantExn.exn.a.i);
+      .get(recipientPrefix);
     const members = await this.props.signifyClient
       .identifiers()
-      .members(grantExn.exn.a.i);
+      .members(recipientPrefix);
     const memberAids = members.signing.map((member: any) => member.aid);
 
     const othersJoined: string[] = [];
@@ -1126,7 +1127,7 @@ class IpexCommunicationService extends AgentService {
     }
 
     return {
-      threshold: multisigAid.state.kt,
+      threshold: multisigAidDetails.state.kt,
       members: memberAids,
       othersJoined: othersJoined,
       linkedRequest: grantNoteRecord.linkedRequest,
@@ -1145,12 +1146,13 @@ class IpexCommunicationService extends AgentService {
       .exchanges()
       .get(applyNoteRecord.a.d as string);
 
-    const multisigAid = await this.props.signifyClient
+    const recipientPrefix = applyExn.exn.rp;
+    const multisigAidDetails = await this.props.signifyClient
       .identifiers()
-      .get(applyExn.exn.a.i);
+      .get(recipientPrefix);
     const members = await this.props.signifyClient
       .identifiers()
-      .members(applyExn.exn.a.i);
+      .members(recipientPrefix);
     const memberAids = members.signing.map((member: any) => member.aid);
 
     const othersJoined: string[] = [];
@@ -1163,7 +1165,7 @@ class IpexCommunicationService extends AgentService {
     }
 
     return {
-      threshold: multisigAid.state.kt,
+      threshold: multisigAidDetails.state.kt,
       members: memberAids,
       othersJoined: othersJoined,
       linkedRequest: applyNoteRecord.linkedRequest,
@@ -1192,7 +1194,7 @@ class IpexCommunicationService extends AgentService {
     const indexerOobiResult = await (
       await fetch(`${agentBase}/indexer/${prefix}`)
     ).text();
-    const schemaBase = indexerOobiResult.split("\"url\":\"")[1].split("\"")[0];
+    const schemaBase = indexerOobiResult.split('"url":"')[1].split('"')[0];
 
     return `${schemaBase}/oobi/${said}`;
   }
