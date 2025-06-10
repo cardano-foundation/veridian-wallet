@@ -3,55 +3,108 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { config } from "./config";
 import { log } from "./log";
-import { ready as signifyReady } from "signify-ts";
-import { SignifyApi } from "./modules/signify";
+import { ready as signifyReady, SignifyClient, Tier } from "signify-ts";
 import { router } from "./routes";
-import { ISSUER_NAME, QVI_NAME } from "./consts";
+import { ISSUER_NAME, QVI_NAME, ACDC_SCHEMAS_ID } from "./consts";
 import { PollingService } from "./services/pollingService";
 import { loadBrans } from "./utils/utils";
-import { createQVICredential } from "./modules/signify/utils";
+import {
+  createQVICredential,
+  DEFAULT_ROLE,
+  getRegistry,
+  resolveOobi,
+  waitAndGetDoneOp,
+} from "./utils/signify";
 
 async function getSignifyClient(
   bran: string,
   aidName: string
-): Promise<SignifyApi> {
-  const signifyApi = new SignifyApi();
-  await signifyApi.start(bran);
+): Promise<SignifyClient> {
+  await signifyReady();
 
-  const existingRegistry = await signifyApi.getRegistry(aidName).catch((e) => {
+  const client = new SignifyClient(
+    config.keria.url,
+    bran,
+    Tier.low,
+    config.keria.bootUrl
+  );
+
+  try {
+    await client.connect();
+  } catch (err) {
+    await client.boot();
+    await client.connect();
+  }
+
+  await Promise.allSettled(
+    ACDC_SCHEMAS_ID.map((schemaId) =>
+      resolveOobi(client, `${config.oobiEndpoint}/oobi/${schemaId}`)
+    )
+  );
+
+  const existingRegistry = await getRegistry(client, aidName).catch((e) => {
     console.error(e);
     return undefined;
   });
 
   if (!existingRegistry) {
-    await signifyApi.createIdentifier(aidName).catch((e) => console.error(e));
-
-    if (aidName === ISSUER_NAME) {
-      await signifyApi.addIndexerRole(aidName);
+    // Create Identifier
+    try {
+      const result = await client.identifiers().create(aidName);
+      await waitAndGetDoneOp(client, await result.op());
+      await client
+        .identifiers()
+        .addEndRole(aidName, DEFAULT_ROLE, client.agent!.pre);
+    } catch (e) {
+      console.error(e);
     }
 
-    await signifyApi.createRegistry(aidName).catch((e) => console.error(e));
+    // Add Indexer role if it's the issuer
+    if (aidName === ISSUER_NAME) {
+      const prefix = (await client.identifiers().get(aidName)).prefix;
+
+      const endResult = await client
+        .identifiers()
+        .addEndRole(aidName, "indexer", prefix);
+      await waitAndGetDoneOp(client, await endResult.op());
+
+      const locRes = await client.identifiers().addLocScheme(aidName, {
+        url: config.oobiEndpoint,
+        scheme: new URL(config.oobiEndpoint).protocol.replace(":", ""),
+      });
+      await waitAndGetDoneOp(client, await locRes.op());
+    }
+
+    // Create Registry
+    try {
+      const result = await client
+        .registries()
+        .create({ name: aidName, registryName: "vLEI" });
+      await result.op();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  return signifyApi;
+  return client;
 }
 
 async function initializeCredentials(
-  signifyApi: SignifyApi,
-  signifyApiIssuer: SignifyApi
+  client: SignifyClient,
+  issuerClient: SignifyClient
 ): Promise<string> {
-  const issuerRegistry = await signifyApiIssuer.getRegistry(QVI_NAME);
+  const issuerRegistry = await getRegistry(issuerClient, QVI_NAME);
 
   const qviCredentialId = await createQVICredential(
-    signifyApi,
-    signifyApiIssuer,
+    client,
+    issuerClient,
     issuerRegistry
   ).catch((e) => {
     console.error(e);
     return "";
   });
 
-  const pollingService = new PollingService(signifyApi);
+  const pollingService = new PollingService(client);
   pollingService.start();
 
   return qviCredentialId;
@@ -73,15 +126,18 @@ async function startServer() {
   app.listen(config.port, async () => {
     await signifyReady();
     const brans = await loadBrans();
-    const signifyApi = await getSignifyClient(brans.bran, ISSUER_NAME);
-    const signifyApiIssuer = await getSignifyClient(brans.issuerBran, QVI_NAME);
+    const signifyClient = await getSignifyClient(brans.bran, ISSUER_NAME);
+    const signifyClientIssuer = await getSignifyClient(
+      brans.issuerBran,
+      QVI_NAME
+    );
 
-    app.set("signifyApi", signifyApi);
-    app.set("signifyApiIssuer", signifyApiIssuer);
+    app.set("signifyClient", signifyClient);
+    app.set("signifyClientIssuer", signifyClientIssuer);
 
     const qviCredentialId = await initializeCredentials(
-      signifyApi,
-      signifyApiIssuer
+      signifyClient,
+      signifyClientIssuer
     );
     app.set("qviCredentialId", qviCredentialId);
 
