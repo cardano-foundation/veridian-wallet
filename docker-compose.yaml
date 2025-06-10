@@ -3,7 +3,7 @@ services:
   keria:
     container_name: idw-keria
     restart: unless-stopped
-    image: cardanofoundation/cf-idw-keria:1.1.0-PR1167-430ccbd-GHRUN14796620369
+    image: cardanofoundation/cf-idw-keria:1.1.0-PR1223-25dbe26-GHRUN15555427316
     environment:
       - KERI_AGENT_CORS=true
       - ALLOW_INTRODUCTIONS=true
