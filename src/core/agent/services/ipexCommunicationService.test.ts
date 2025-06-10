@@ -2537,7 +2537,7 @@ describe("IPEX communication service of agent", () => {
       s: QVISchema,
       lastStatus: { s: "0", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
-      identifierId: memberIdentifierRecord.id,
+      identifierId: grantForIssuanceExnMessage.exn.rp,
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
   });
@@ -2568,7 +2568,7 @@ describe("IPEX communication service of agent", () => {
       s: QVISchema,
       lastStatus: { s: "0", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
-      identifierId: memberIdentifierRecord.id,
+      identifierId: grantForIssuanceExnMessage.exn.rp,
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
     expect(connections.resolveOobi).toBeCalledWith(
@@ -2615,7 +2615,7 @@ describe("IPEX communication service of agent", () => {
       s: QVISchema,
       lastStatus: { s: "1", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
-      identifierId: memberIdentifierRecord.id,
+      identifierId: grantForIssuanceExnMessage.exn.rp,
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
   });

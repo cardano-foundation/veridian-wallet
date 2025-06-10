@@ -108,7 +108,7 @@ class IpexCommunicationService extends AgentService {
       .get(grantNoteRecord.a.d as string);
 
     const holder = await this.identifierStorage.getIdentifierMetadata(
-      grantExn.exn.a.i
+      grantExn.exn.rp
     );
     if (!holder) {
       throw new Error(IpexCommunicationService.ISSUEE_NOT_FOUND_LOCALLY);
@@ -220,8 +220,9 @@ class IpexCommunicationService extends AgentService {
 
     const msgSaid = applyNoteRecord.a.d as string;
     const applyExn = await this.props.signifyClient.exchanges().get(msgSaid);
+
     const discloser = await this.identifierStorage.getIdentifierMetadata(
-      applyExn.exn.a.i
+      applyExn.exn.rp
     );
 
     let op: Operation;
@@ -308,7 +309,7 @@ class IpexCommunicationService extends AgentService {
     }
 
     const discloser = await this.identifierStorage.getIdentifierMetadata(
-      agreeExn.exn.a.i
+      agreeExn.exn.rp
     );
 
     let op: Operation;
@@ -983,7 +984,7 @@ class IpexCommunicationService extends AgentService {
         dt: new Date(credentialState.dt).toISOString(),
       },
       status: CredentialStatus.PENDING,
-      identifierId: exchange.exn.a.i,
+      identifierId: exchange.exn.rp,
       connectionId: exchange.exn.i,
     };
   }
