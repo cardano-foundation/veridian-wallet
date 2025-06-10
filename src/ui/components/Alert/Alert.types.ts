@@ -1,3 +1,5 @@
+import { AlertButton } from "@ionic/react";
+
 interface AlertProps {
   isOpen: boolean;
   backdropDismiss?: boolean;
@@ -13,6 +15,7 @@ interface AlertProps {
   actionSecondaryConfirm?: () => void;
   actionCancel?: () => void;
   actionDismiss?: () => void;
+  customButtons?: AlertButton[];
 }
 
 export type { AlertProps };

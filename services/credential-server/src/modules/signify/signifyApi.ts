@@ -11,7 +11,6 @@ import {
 } from "signify-ts";
 import { waitAndGetDoneOp } from "./utils";
 import { config } from "../../config";
-import { Agent } from "../../agent";
 import { randomSalt } from "../../utils/utils";
 import {
   ExchangeMsg,
@@ -19,6 +18,12 @@ import {
   Credential,
   QviCredential,
 } from "./signifyApi.types";
+import {
+  RARE_EVO_DEMO_SCHEMA_SAID,
+  QVI_SCHEMA_SAID,
+  LE_SCHEMA_SAID,
+  ACDC_SCHEMAS_ID,
+} from "../../consts";
 
 export class SignifyApi {
   static readonly DEFAULT_ROLE = "agent";
@@ -54,6 +59,12 @@ export class SignifyApi {
       await this.client.boot();
       await this.client.connect();
     }
+
+    await Promise.allSettled(
+      ACDC_SCHEMAS_ID.map((schemaId) =>
+        this.resolveOobi(`${config.oobiEndpoint}/oobi/${schemaId}`)
+      )
+    );
   }
 
   async createIdentifier(name: string): Promise<void> {
@@ -138,12 +149,10 @@ export class SignifyApi {
     recipient: string,
     attribute: { [key: string]: string }
   ) {
-    await this.resolveOobi(`${config.oobiEndpoint}/oobi/${schemaId}`);
-
     let vcdata = {};
     if (
-      schemaId === Agent.RARE_EVO_DEMO_SCHEMA_SAID ||
-      schemaId === Agent.QVI_SCHEMA_SAID
+      schemaId === RARE_EVO_DEMO_SCHEMA_SAID ||
+      schemaId === QVI_SCHEMA_SAID
     ) {
       vcdata = attribute;
     } else {
@@ -184,16 +193,14 @@ export class SignifyApi {
     registryId: string,
     recipientPrefix: string
   ): Promise<string> {
-    await this.resolveOobi(
-      `${config.oobiEndpoint}/oobi/${Agent.QVI_SCHEMA_SAID}`
-    );
+    await this.resolveOobi(`${config.oobiEndpoint}/oobi/${QVI_SCHEMA_SAID}`);
 
     const vcdata = {
       LEI: "5493001KJTIIGC8Y1R17",
     };
     const result = await this.client.credentials().issue(issuerName, {
       ri: registryId,
-      s: Agent.QVI_SCHEMA_SAID,
+      s: QVI_SCHEMA_SAID,
       a: {
         i: recipientPrefix,
         ...vcdata,
@@ -260,19 +267,15 @@ export class SignifyApi {
     legalEntityAidPrefix: string,
     attribute: { [key: string]: string }
   ): Promise<string> {
-    await this.resolveOobi(
-      `${config.oobiEndpoint}/oobi/${Agent.LE_SCHEMA_SAID}`
-    );
-    await this.resolveOobi(
-      `${config.oobiEndpoint}/oobi/${Agent.QVI_SCHEMA_SAID}`
-    );
+    await this.resolveOobi(`${config.oobiEndpoint}/oobi/${LE_SCHEMA_SAID}`);
+    await this.resolveOobi(`${config.oobiEndpoint}/oobi/${QVI_SCHEMA_SAID}`);
     const qviCredential: QviCredential = await this.client
       .credentials()
       .get(qviCredentialId);
 
     const result = await this.client.credentials().issue(holderAidName, {
       ri: registryId,
-      s: Agent.LE_SCHEMA_SAID,
+      s: LE_SCHEMA_SAID,
       a: {
         i: legalEntityAidPrefix,
         ...attribute,

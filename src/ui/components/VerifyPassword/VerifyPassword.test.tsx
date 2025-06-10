@@ -3,17 +3,18 @@ const verifySecretMock = jest.fn();
 import { IonInput } from "@ionic/react";
 import { ionFireEvent } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import { render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
 import { Agent } from "../../../core/agent/agent";
+import { BasicRecord } from "../../../core/agent/records";
 import { SecureStorage } from "../../../core/storage";
+import ENG_Trans from "../../../locales/en/en.json";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { VerifyPassword } from "./VerifyPassword";
-import { BasicRecord } from "../../../core/agent/records";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
 
@@ -148,14 +149,10 @@ describe("Verify Password", () => {
 
     const passwordInput = await findByTestId("verify-password-value");
 
-    const confirmButton = await findByTestId("action-button");
+    const confirmButton = await findByTestId("primary-button");
 
     act(() => {
       ionFireEvent.ionInput(passwordInput, "1111");
-    });
-
-    await waitFor(() => {
-      expect(confirmButton.getAttribute("disabled")).toBe("false");
     });
 
     act(() => {
@@ -204,14 +201,10 @@ describe("Verify Password", () => {
     });
 
     const passwordInput = getByTestId("verify-password-value");
-    const confirmButton = getByTestId("action-button");
+    const confirmButton = getByTestId("primary-button");
 
     act(() => {
       ionFireEvent.ionInput(passwordInput, "1111");
-    });
-
-    await waitFor(() => {
-      expect(confirmButton.getAttribute("disabled")).toBe("false");
     });
 
     act(() => {
@@ -244,7 +237,7 @@ describe("Verify Password", () => {
     const setIsOpenMock = jest.fn();
     const onVerifyMock = jest.fn();
 
-    const { getByTestId } = render(
+    const { getByTestId, getByText, queryByText } = render(
       <Provider store={storeMocked}>
         <VerifyPassword
           isOpen={true}
@@ -257,5 +250,127 @@ describe("Verify Password", () => {
     await waitFor(() => {
       expect(getByTestId("forgot-hint-btn")).toBeVisible();
     });
+
+    fireEvent.click(getByTestId("forgot-hint-btn"));
+
+    await waitFor(() => {
+      expect(
+        getByText(ENG_Trans.verifypassword.alert.choice.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(ENG_Trans.verifypassword.alert.button.seepasswordhint)
+    );
+
+    await waitFor(() => {
+      expect(
+        getByText(ENG_Trans.verifypassword.alert.hint.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("alert-tryagain-confirm-button"));
+
+    await waitFor(() => {
+      expect(queryByText(ENG_Trans.verifypassword.alert.hint.title)).toBeNull();
+    });
+  });
+
+  test("Recovery password", async () => {
+    jest.spyOn(Agent.agent.basicStorage, "findById").mockResolvedValue(
+      Promise.resolve({
+        content: {
+          value: "1111",
+        },
+      } as any)
+    );
+
+    const mockStore = configureStore();
+    const dispatchMock = jest.fn();
+    storeMocked = {
+      ...mockStore(initialStateWithPassword),
+      dispatch: dispatchMock,
+    };
+
+    const setIsOpenMock = jest.fn();
+    const onVerifyMock = jest.fn();
+
+    const {
+      getByTestId,
+      getByText,
+      getAllByTestId,
+      queryByText,
+      getAllByText,
+    } = render(
+      <Provider store={storeMocked}>
+        <VerifyPassword
+          isOpen={true}
+          setIsOpen={setIsOpenMock}
+          onVerify={onVerifyMock}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("forgot-hint-btn")).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("forgot-hint-btn"));
+
+    await waitFor(() => {
+      expect(
+        getByText(ENG_Trans.verifypassword.alert.choice.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(ENG_Trans.verifypassword.alert.button.seepasswordhint)
+    );
+
+    await waitFor(() => {
+      expect(
+        getByText(ENG_Trans.verifypassword.alert.hint.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("alert-tryagain-secondary-confirm-button"));
+
+    await waitFor(() => {
+      expect(getByText(ENG_Trans.forgotauth.password.title)).toBeVisible();
+    });
+  });
+
+  test("Close verify password", async () => {
+    jest.spyOn(Agent.agent.basicStorage, "findById").mockResolvedValue(
+      Promise.resolve({
+        content: {
+          value: "1111",
+        },
+      } as any)
+    );
+
+    const mockStore = configureStore();
+    const dispatchMock = jest.fn();
+    storeMocked = {
+      ...mockStore(initialStateWithPassword),
+      dispatch: dispatchMock,
+    };
+
+    const setIsOpenMock = jest.fn();
+    const onVerifyMock = jest.fn();
+
+    const { getAllByText } = render(
+      <Provider store={storeMocked}>
+        <VerifyPassword
+          isOpen={true}
+          setIsOpen={setIsOpenMock}
+          onVerify={onVerifyMock}
+        />
+      </Provider>
+    );
+
+    fireEvent.click(getAllByText(ENG_Trans.verifypassword.cancel)[0]);
+
+    expect(setIsOpenMock).toBeCalled();
   });
 });

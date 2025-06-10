@@ -21,11 +21,13 @@ const CardBlock = ({
   });
 
   const buttonTestId = testId ? `${testId}-nav-button` : undefined;
+  const containerTestId = testId ? `${testId}-card-block` : undefined;
 
   return (
     <CardDetailsBlock
       onClick={!copyContent ? onClick : undefined}
       className={classes}
+      dataTestId={containerTestId}
     >
       {title && (
         <CardDetailsItem

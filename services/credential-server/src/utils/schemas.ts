@@ -1,4 +1,4 @@
-const ACDC_SCHEMAS = {
+export const ACDC_SCHEMAS = {
   "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao": {
     $id: "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao",
     $schema: "http://json-schema.org/draft-07/schema#",
@@ -319,5 +319,3 @@ const ACDC_SCHEMAS = {
     required: ["i", "ri", "s", "d", "e", "r"],
   },
 };
-
-export { ACDC_SCHEMAS };
