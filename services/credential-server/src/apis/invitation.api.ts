@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ISSUER_NAME } from "../consts";
-import { getOobi } from "../utils/signify";
+import { getOobi } from "../utils/utils";
 import { SignifyClient } from "signify-ts";
 
 export async function keriOobiApi(

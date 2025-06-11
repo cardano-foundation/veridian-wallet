@@ -7,21 +7,17 @@ import { ready as signifyReady, SignifyClient, Tier } from "signify-ts";
 import { router } from "./routes";
 import { ISSUER_NAME, QVI_NAME, ACDC_SCHEMAS_ID } from "./consts";
 import { PollingService } from "./services/pollingService";
-import { loadBrans } from "./utils/utils";
 import {
   createQVICredential,
   DEFAULT_ROLE,
   getRegistry,
+  loadBrans,
+  REGISTRIES_NOT_FOUND,
   resolveOobi,
   waitAndGetDoneOp,
-} from "./utils/signify";
+} from "./utils/utils";
 
-async function getSignifyClient(
-  bran: string,
-  aidName: string
-): Promise<SignifyClient> {
-  await signifyReady();
-
+async function getSignifyClient(bran: string): Promise<SignifyClient> {
   const client = new SignifyClient(
     config.keria.url,
     bran,
@@ -42,27 +38,42 @@ async function getSignifyClient(
     )
   );
 
-  const existingRegistry = await getRegistry(client, aidName).catch((e) => {
-    console.error(e);
-    return undefined;
-  });
+  return client;
+}
 
-  if (!existingRegistry) {
-    // Create Identifier
-    try {
+async function ensureIdentifierExists(
+  client: SignifyClient,
+  aidName: string
+): Promise<void> {
+  try {
+    await client.identifiers().get(aidName);
+  } catch (e: any) {
+    if (e.status === 404 || e.code === 404 || e.message?.includes("404")) {
       const result = await client.identifiers().create(aidName);
       await waitAndGetDoneOp(client, await result.op());
-      await client
-        .identifiers()
-        .addEndRole(aidName, DEFAULT_ROLE, client.agent!.pre);
-    } catch (e) {
-      console.error(e);
+      await client.identifiers().get(aidName);
+    } else {
+      throw e;
     }
+  }
+}
 
-    // Add Indexer role if it's the issuer
-    if (aidName === ISSUER_NAME) {
-      const prefix = (await client.identifiers().get(aidName)).prefix;
+async function ensureEndRoles(
+  client: SignifyClient,
+  aidName: string
+): Promise<void> {
+  try {
+    await client
+      .identifiers()
+      .addEndRole(aidName, DEFAULT_ROLE, client.agent!.pre);
+  } catch (e) {
+    console.error("Error adding default end role:", e);
+  }
 
+  if (aidName === ISSUER_NAME) {
+    const prefix = (await client.identifiers().get(aidName)).prefix;
+
+    try {
       const endResult = await client
         .identifiers()
         .addEndRole(aidName, "indexer", prefix);
@@ -73,20 +84,32 @@ async function getSignifyClient(
         scheme: new URL(config.oobiEndpoint).protocol.replace(":", ""),
       });
       await waitAndGetDoneOp(client, await locRes.op());
-    }
-
-    // Create Registry
-    try {
-      const result = await client
-        .registries()
-        .create({ name: aidName, registryName: "vLEI" });
-      await result.op();
     } catch (e) {
-      console.error(e);
+      console.error("Error adding indexer role:", e);
     }
   }
+}
 
-  return client;
+async function ensureRegistryExists(
+  client: SignifyClient,
+  aidName: string
+): Promise<void> {
+  try {
+    await getRegistry(client, aidName);
+  } catch (e: any) {
+    if (e.message.includes(REGISTRIES_NOT_FOUND)) {
+      try {
+        const result = await client
+          .registries()
+          .create({ name: aidName, registryName: "vLEI" });
+        await waitAndGetDoneOp(client, await result.op());
+      } catch (createError) {
+        console.error("Error creating registry:", createError);
+      }
+    } else {
+      throw e;
+    }
+  }
 }
 
 async function initializeCredentials(
@@ -126,11 +149,21 @@ async function startServer() {
   app.listen(config.port, async () => {
     await signifyReady();
     const brans = await loadBrans();
-    const signifyClient = await getSignifyClient(brans.bran, ISSUER_NAME);
-    const signifyClientIssuer = await getSignifyClient(
-      brans.issuerBran,
-      QVI_NAME
-    );
+
+    const signifyClient = await getSignifyClient(brans.bran);
+    const signifyClientIssuer = await getSignifyClient(brans.issuerBran);
+
+    // Ensure identifiers exist first
+    await ensureIdentifierExists(signifyClient, ISSUER_NAME);
+    await ensureIdentifierExists(signifyClientIssuer, QVI_NAME);
+
+    // Add end roles before creating registries (KERIA bug workaround)
+    await ensureEndRoles(signifyClient, ISSUER_NAME);
+    await ensureEndRoles(signifyClientIssuer, QVI_NAME);
+
+    // Now create registries
+    await ensureRegistryExists(signifyClient, ISSUER_NAME);
+    await ensureRegistryExists(signifyClientIssuer, QVI_NAME);
 
     app.set("signifyClient", signifyClient);
     app.set("signifyClientIssuer", signifyClientIssuer);

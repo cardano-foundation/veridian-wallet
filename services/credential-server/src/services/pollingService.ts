@@ -1,4 +1,4 @@
-import { NotificationRoute } from "../utils/signifyApi.types";
+import { NotificationRoute } from "../utils/utils.types";
 import { ISSUER_NAME } from "../consts";
 import { SignifyClient } from "signify-ts";
 

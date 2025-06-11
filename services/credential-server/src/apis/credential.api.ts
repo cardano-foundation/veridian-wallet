@@ -8,18 +8,8 @@ import {
   RARE_EVO_DEMO_SCHEMA_SAID,
 } from "../consts";
 import { Operation, Saider, Serder, SignifyClient } from "signify-ts";
-import {
-  getRegistry,
-  OP_TIMEOUT,
-  resolveOobi,
-  waitAndGetDoneOp,
-} from "../utils/signify";
-import {
-  Credential,
-  LeCredential,
-  QviCredential,
-} from "../utils/signifyApi.types";
-import { config } from "../config";
+import { getRegistry, OP_TIMEOUT, waitAndGetDoneOp } from "../utils/utils";
+import { Credential, QviCredential } from "../utils/utils.types";
 
 export const UNKNOW_SCHEMA_ID = "Unknow Schema ID: ";
 export const CREDENTIAL_NOT_FOUND = "Not found credential with ID: ";
@@ -47,14 +37,15 @@ export async function issueAcdcCredential(
   const keriRegistryRegk = await getRegistry(client, ISSUER_NAME);
   const holderAid = await client.identifiers().get(ISSUER_NAME);
 
+  let issueParams: any;
+  let grantParams: any;
+
   if (schemaSaid === LE_SCHEMA_SAID) {
-    await resolveOobi(client, `${config.oobiEndpoint}/oobi/${LE_SCHEMA_SAID}`);
-    await resolveOobi(client, `${config.oobiEndpoint}/oobi/${QVI_SCHEMA_SAID}`);
     const qviCredential: QviCredential = await client
       .credentials()
       .get(qviCredentialId);
 
-    const result = await client.credentials().issue(holderAid.name, {
+    issueParams = {
       ri: keriRegistryRegk,
       s: LE_SCHEMA_SAID,
       a: {
@@ -77,57 +68,70 @@ export async function issueAcdcCredential(
           s: qviCredential.sad.s,
         },
       })[1],
-    });
+    };
 
-    const leCredential: LeCredential = await client
-      .credentials()
-      .get(result.acdc.ked.d);
-
-    await waitAndGetDoneOp(client, result.op, OP_TIMEOUT);
-
-    const [grant, gsigs, gend] = await client.ipex().grant({
+    grantParams = {
       senderName: holderAid.name,
-      acdc: new Serder(leCredential.sad),
-      anc: new Serder(leCredential.anc),
-      iss: new Serder(leCredential.iss),
-      ancAttachment: leCredential.ancAttachment,
       recipient: aid,
-      datetime: new Date().toISOString().replace("Z", "000+00:00"),
-    });
-    await client.ipex().submitGrant(holderAid.name, grant, gsigs, gend, [aid]);
-    return result.acdc.ked.d;
-  } else {
-    let vcdata = {};
-    if (
-      schemaSaid === RARE_EVO_DEMO_SCHEMA_SAID ||
-      schemaSaid === QVI_SCHEMA_SAID
-    ) {
-      vcdata = attribute;
-    } else {
-      throw new Error(UNKNOW_SCHEMA_ID + schemaSaid);
-    }
-
-    const result = await client.credentials().issue(ISSUER_NAME, {
+      ancAttachment: true,
+    };
+  } else if (
+    schemaSaid === RARE_EVO_DEMO_SCHEMA_SAID ||
+    schemaSaid === QVI_SCHEMA_SAID
+  ) {
+    issueParams = {
       ri: keriRegistryRegk,
       s: schemaSaid,
       a: {
         i: aid,
-        ...vcdata,
+        ...attribute,
       },
-    });
-    await waitAndGetDoneOp(client, result.op, OP_TIMEOUT);
+    };
 
-    const datetime = new Date().toISOString().replace("Z", "000+00:00");
-    const [grant, gsigs, gend] = await client.ipex().grant({
+    grantParams = {
       senderName: ISSUER_NAME,
       recipient: aid,
-      acdc: result.acdc,
-      iss: result.iss,
-      anc: result.anc,
-      datetime,
-    });
-    await client.ipex().submitGrant(ISSUER_NAME, grant, gsigs, gend, [aid]);
+    };
+  } else {
+    throw new Error(UNKNOW_SCHEMA_ID + schemaSaid);
   }
+
+  const issuerName =
+    schemaSaid === LE_SCHEMA_SAID ? holderAid.name : ISSUER_NAME;
+  const result = await client.credentials().issue(issuerName, issueParams);
+  await waitAndGetDoneOp(client, result.op, OP_TIMEOUT);
+
+  let credential: any;
+  if (schemaSaid === LE_SCHEMA_SAID) {
+    credential = await client.credentials().get(result.acdc.ked.d);
+  } else {
+    credential = result;
+  }
+
+  const datetime = new Date().toISOString().replace("Z", "000+00:00");
+  const [grant, gsigs, gend] = await client.ipex().grant({
+    ...grantParams,
+    acdc:
+      schemaSaid === LE_SCHEMA_SAID
+        ? new Serder(credential.sad)
+        : credential.acdc,
+    anc:
+      schemaSaid === LE_SCHEMA_SAID
+        ? new Serder(credential.anc)
+        : credential.anc,
+    iss:
+      schemaSaid === LE_SCHEMA_SAID
+        ? new Serder(credential.iss)
+        : credential.iss,
+    ...(schemaSaid === LE_SCHEMA_SAID && {
+      ancAttachment: credential.ancAttachment,
+    }),
+    datetime,
+  });
+
+  await client
+    .ipex()
+    .submitGrant(grantParams.senderName, grant, gsigs, gend, [aid]);
 
   res.status(200).send({
     success: true,
@@ -187,18 +191,31 @@ export async function revokeCredential(
   const { credentialId, holder } = req.body;
 
   try {
-    // TODO: If the credential does not exist, this will throw 500 at the moment. Will change this later
+    // Get the credential first
     let credential: Credential = await client
       .credentials()
       .get(credentialId)
       .catch(() => undefined);
+
+    // Handle credential not found
     if (!credential) {
-      throw new Error(`${CREDENTIAL_NOT_FOUND} ${credentialId}`);
-    }
-    if (credential.status.s === "1") {
-      throw new Error(CREDENTIAL_REVOKED_ALREADY);
+      res.status(404).send({
+        success: false,
+        data: `${CREDENTIAL_NOT_FOUND} ${credentialId}`,
+      });
+      return;
     }
 
+    // Handle already revoked credential
+    if (credential.status.s === "1") {
+      res.status(409).send({
+        success: false,
+        data: CREDENTIAL_REVOKED_ALREADY,
+      });
+      return;
+    }
+
+    // Proceed with revocation
     await client.credentials().revoke(ISSUER_NAME, credentialId);
 
     while (credential.status.s !== "1") {
@@ -222,6 +239,7 @@ export async function revokeCredential(
       .ipex()
       .submitGrant(ISSUER_NAME, grant, gsigs, gend, [holder]);
     await waitAndGetDoneOp(client, submitGrantOp, OP_TIMEOUT);
+
     res.status(200).send({
       success: true,
       data: "Revoke credential successfully",
@@ -230,22 +248,10 @@ export async function revokeCredential(
     const errorMessage = (error as Error).message;
     log({ error: errorMessage });
 
-    if (errorMessage === CREDENTIAL_REVOKED_ALREADY) {
-      res.status(409).send({
-        success: false,
-        data: errorMessage,
-      });
-    } else if (new RegExp(`${CREDENTIAL_NOT_FOUND}`, "gi").test(errorMessage)) {
-      res.status(404).send({
-        success: false,
-        data: errorMessage,
-      });
-    } else {
-      res.status(500).send({
-        success: false,
-        data: errorMessage,
-      });
-    }
+    res.status(500).send({
+      success: false,
+      data: errorMessage,
+    });
   }
 }
 
