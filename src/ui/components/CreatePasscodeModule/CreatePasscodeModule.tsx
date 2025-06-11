@@ -275,20 +275,16 @@ const CreatePasscodeModule = forwardRef<
           handlePinChange={handlePinChange}
           handleRemove={handleRemove}
         />
-        {originalPassCode !== "" ? (
-          <PageFooter
-            pageId={testId}
-            secondaryButtonText={`${i18n.t(
-              "createpasscodemodule.cantremember"
-            )}`}
-            secondaryButtonAction={() => handleClearState()}
-          />
-        ) : (
-          <div
-            className="forgot-your-passcode-placeholder"
-            data-testid="forgot-your-passcode-placeholder"
-          />
-        )}
+        <PageFooter
+          pageId={testId}
+          customClass={originalPassCode == "" ? "hide" : ""}
+          secondaryButtonText={`${i18n.t("createpasscodemodule.cantremember")}`}
+          secondaryButtonAction={() => handleClearState()}
+        >
+          {originalPassCode == "" && (
+            <span data-testid="forgot-your-passcode-placeholder" />
+          )}
+        </PageFooter>
         <Alert
           isOpen={showSetupBiometricsAlert}
           setIsOpen={setShowSetupBiometricsAlert}
