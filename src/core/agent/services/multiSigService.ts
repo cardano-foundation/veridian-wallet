@@ -7,6 +7,11 @@ import {
   Serder,
   Siger,
   State,
+  b,
+  Cigar,
+  Signer,
+  reply,
+  Serials,
 } from "signify-ts";
 import {
   AgentServicesProps,
@@ -39,7 +44,7 @@ import { EventTypes, GroupCreatedEvent } from "../event.types";
 import { ConnectionService } from "./connectionService";
 import { IdentifierService } from "./identifierService";
 import { StorageMessage } from "../../storage/storage.types";
-
+import { RpyRoute } from "./connectionService.types";
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
   static readonly CANNOT_GET_KEYSTATE_OF_IDENTIFIER =
@@ -149,6 +154,9 @@ class MultiSigService extends AgentService {
         }
       );
     await this.inceptGroup(mHab, states, inceptionData);
+
+    // Share witness OOBIs with other group members
+    await this.shareWitnessOobis(groupConnections);
 
     const multisigId = inceptionData.icp.i;
     const creationStatus = CreationStatus.PENDING;
@@ -323,6 +331,36 @@ class MultiSigService extends AgentService {
     );
   }
 
+  private async shareWitnessOobis(
+    groupConnections: ConnectionShortDetails[],
+  ): Promise<void> {
+    const {toad, witnesses, witnessOobis } = await this.identifiers.getAvailableWitnesses();
+
+    debugger
+    const signer = new Signer({ transferable: false });
+    const rpyData = {
+      cid: signer.verfer.qb64,
+      oobis: witnessOobis,
+    };
+
+    const rpy = reply(
+      RpyRoute.INTRODUCE,
+      rpyData,
+      undefined,
+      undefined,
+      Serials.JSON
+    );
+    const sig = signer.sign(new Uint8Array(b(rpy.raw)));
+    const ims = d(
+      messagize(rpy, undefined, undefined, undefined, [sig as Cigar])
+    );
+
+    debugger
+    for (const connection of groupConnections) {
+      await this.props.signifyClient.replies().submitRpy(connection.id, ims);
+    }
+  }
+
   @OnlineOnly
   async getMultisigIcpDetails(
     notificationSaid: string
@@ -436,6 +474,12 @@ class MultiSigService extends AgentService {
       )
     );
 
+    console.log("exn", exn);
+    debugger
+    
+    mHab.state.b = exn.e.icp.b;
+    mHab.state.bt = exn.e.icp.bt;
+
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
@@ -449,6 +493,11 @@ class MultiSigService extends AgentService {
           notificationSaid,
         }
       );
+
+    // Use witness set from the exchange message instead of copying from member's state
+    // inceptionData.icp.b = exn.e.icp.b;
+    // inceptionData.icp.bt = exn.e.icp.bt;
+
     await this.inceptGroup(mHab, states, inceptionData);
 
     const multisigId = inceptionData.icp.i;
