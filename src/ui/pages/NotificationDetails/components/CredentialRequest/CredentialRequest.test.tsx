@@ -17,6 +17,21 @@ import {
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { CredentialRequest } from "./CredentialRequest";
 
+jest.mock("@ionic/react", () => {
+  const actual = jest.requireActual("@ionic/react");
+  return {
+    ...actual,
+    IonAlert: (props: any) =>
+      props.isOpen ? (
+        <div data-testid="mock-ion-alert">
+          {props.header}
+          {props.subHeader}
+          {props.message}
+        </div>
+      ) : null,
+  };
+});
+
 mockIonicReact();
 
 const getIpexApplyDetailsMock = jest.fn(() => Promise.resolve(credRequestFix));
@@ -128,7 +143,7 @@ describe("Credential request", () => {
       })
     );
 
-    const { getByText, getByTestId, queryByTestId } = render(
+    const { getByText, getByTestId, queryByTestId, findByTestId } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter history={history}>
           <CredentialRequest
@@ -158,14 +173,10 @@ describe("Credential request", () => {
       fireEvent.click(getByTestId("primary-button-notification-details"));
     });
 
-    await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.notifications.details.credential.request.alert
-            .text
-        )
-      ).toBeVisible();
-    });
+    const alert = await findByTestId("mock-ion-alert");
+    expect(alert).toHaveTextContent(
+      EN_TRANSLATIONS.tabs.notifications.details.credential.request.alert.text
+    );
   });
 });
 

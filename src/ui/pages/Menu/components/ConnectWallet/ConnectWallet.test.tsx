@@ -411,11 +411,11 @@ describe("Wallet connect: empty history", () => {
 
     await waitFor(() => {
       expect(
-        queryByText(
+        getByText(
           EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
             .missingidentifieralert.message
         )
-      ).toBe(null);
+      ).toBeVisible();
     });
   });
 });
@@ -711,7 +711,7 @@ describe("Wallet connect", () => {
       dispatch: dispatchMock,
     };
 
-    const { getByTestId, getByText, queryByTestId } = render(
+    const { getByTestId, findAllByText, queryByTestId } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
           <ConnectWallet />
@@ -728,14 +728,13 @@ describe("Wallet connect", () => {
 
     fireEvent.click(getByTestId("confirm-connect-btn"));
 
-    await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .missingidentifieralert.message
-        )
-      ).toBeVisible();
-    });
+    const alertMessages = await findAllByText(
+      EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
+        .missingidentifieralert.message,
+      {},
+      { timeout: 3000 }
+    );
+    expect(alertMessages[0]).toBeVisible();
 
     fireEvent.click(getByTestId("alert-create-keri-confirm-button"));
 

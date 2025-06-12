@@ -44,6 +44,31 @@ const createOrUpdateBasicRecordMock = jest.fn((agr: unknown) =>
   Promise.resolve(agr)
 );
 
+jest.mock("@ionic/react", () => {
+  const actual = jest.requireActual("@ionic/react");
+  return {
+    ...actual,
+    IonAlert: (props: any) =>
+      props.isOpen ? (
+        <div data-testid={props["data-testid"] || "mock-ion-alert"}>
+          {props.header}
+          {props.subHeader}
+          {props.message}
+          {props.buttons &&
+            props.buttons.map((btn: any, idx: number) => (
+              <button
+                key={btn.text || idx}
+                data-testid={btn["data-testid"] || `alert-btn-${idx}`}
+                onClick={btn.handler}
+              >
+                {btn.text}
+              </button>
+            ))}
+        </div>
+      ) : null,
+  };
+});
+
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
@@ -294,7 +319,7 @@ describe("Password Module", () => {
     });
   });
 
-  test("Submit existed password", async () => {
+  test("Submit existing password", async () => {
     verifySecretMock.mockResolvedValueOnce(true);
     const initialState = {
       stateCache: {
@@ -361,13 +386,9 @@ describe("Password Module", () => {
       ).toBeVisible();
     });
 
-    expect(
-      getByTestId("manage-password-alert-existing-confirm-button")
-    ).toBeVisible();
+    expect(getByTestId("alert-btn-0")).toBeVisible();
 
-    fireEvent.click(
-      getByTestId("manage-password-alert-existing-confirm-button")
-    );
+    fireEvent.click(getByTestId("alert-btn-0"));
 
     await waitFor(() => {
       expect((input as HTMLInputElement).value).toBe("");

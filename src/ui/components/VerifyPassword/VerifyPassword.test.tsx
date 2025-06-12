@@ -3,12 +3,7 @@ const verifySecretMock = jest.fn();
 import { IonInput } from "@ionic/react";
 import { ionFireEvent } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import {
-  fireEvent,
-  getByTestId,
-  render,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
@@ -115,6 +110,10 @@ describe("Verify Password", () => {
       ...mockStore(initialStateNoPassword),
       dispatch: dispatchMock,
     };
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = "";
   });
 
   test("Verify failed", async () => {
@@ -358,7 +357,7 @@ describe("Verify Password", () => {
     const setIsOpenMock = jest.fn();
     const onVerifyMock = jest.fn();
 
-    const { getAllByText, getByTestId } = render(
+    const { getByTestId, getAllByTestId } = render(
       <Provider store={storeMocked}>
         <VerifyPassword
           isOpen={true}
@@ -372,8 +371,17 @@ describe("Verify Password", () => {
       expect(getByTestId("forgot-hint-btn")).toBeVisible();
     });
 
-    fireEvent.click(getAllByText(ENG_Trans.verifypassword.cancel)[0]);
+    const closeButtons = getAllByTestId("close-button");
+    const enabledClose = closeButtons.find(
+      (btn) => !btn.hasAttribute("disabled")
+    );
+    if (!enabledClose) {
+      throw new Error("No enabled close button found");
+    }
+    fireEvent.click(enabledClose);
 
-    expect(setIsOpenMock).toBeCalled();
+    await waitFor(() => {
+      expect(setIsOpenMock).toBeCalled();
+    });
   });
 });
