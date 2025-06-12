@@ -10,6 +10,7 @@ import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
+import { filteredIdentifierMapFix } from "../../../../../__fixtures__/filteredIdentifierFix";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -34,6 +35,14 @@ jest.mock("../../../../../../core/agent/agent", () => ({
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
+      },
+      credentials: {
+        getCredentialDetailsById: jest.fn(() =>
+          Promise.resolve(credsFixAcdc[0])
+        ),
+      },
+      connections: {
+        getConnectionShortDetailById: jest.fn(() => Promise.resolve([])),
       },
     },
   },
@@ -65,6 +74,9 @@ const initialState = {
   },
   biometricsCache: {
     enabled: false,
+  },
+  identifiersCache: {
+    identifiers: filteredIdentifierMapFix,
   },
 };
 

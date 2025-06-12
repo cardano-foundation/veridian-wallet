@@ -488,17 +488,24 @@ describe("SetPasscode Page", () => {
       </IonReactRouter>
     );
 
-    passcodeFiller(getByText, getByTestId, "193212");
-
     expect(
       getByText(EN_TRANSLATIONS.setpasscode.reenterpasscode)
     ).toBeInTheDocument();
 
-    await waitFor(() =>
+    await passcodeFiller(getByText, getByTestId, "193212");
+
+    await waitFor(() => {
+      expect(verifySecretMock).toBeCalledWith(
+        KeyStoreKeys.APP_PASSCODE,
+        "193212"
+      );
+    });
+
+    await waitFor(() => {
       expect(
         getByText(EN_TRANSLATIONS.createpasscodemodule.cantremember)
-      ).toBeInTheDocument()
-    );
+      ).toBeInTheDocument();
+    });
 
     passcodeFiller(getByText, getByTestId, "193212");
 

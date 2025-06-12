@@ -175,7 +175,7 @@ describe("Multisign request", () => {
       expect(getByTestId("passcode-button-1")).toBeVisible();
     });
 
-    passcodeFiller(getByText, getByTestId, "193212");
+    await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
       expect(verifySecretMock).toHaveBeenCalledWith(

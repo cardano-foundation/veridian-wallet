@@ -112,6 +112,10 @@ describe("Verify Password", () => {
     };
   });
 
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
   test("Verify failed", async () => {
     verifySecretMock.mockResolvedValue(false);
     jest.spyOn(Agent.agent.basicStorage, "findById").mockResolvedValue(
@@ -295,13 +299,7 @@ describe("Verify Password", () => {
     const setIsOpenMock = jest.fn();
     const onVerifyMock = jest.fn();
 
-    const {
-      getByTestId,
-      getByText,
-      getAllByTestId,
-      queryByText,
-      getAllByText,
-    } = render(
+    const { getByTestId, getByText } = render(
       <Provider store={storeMocked}>
         <VerifyPassword
           isOpen={true}
@@ -359,7 +357,7 @@ describe("Verify Password", () => {
     const setIsOpenMock = jest.fn();
     const onVerifyMock = jest.fn();
 
-    const { getAllByText } = render(
+    const { getByTestId, getAllByTestId } = render(
       <Provider store={storeMocked}>
         <VerifyPassword
           isOpen={true}
@@ -369,8 +367,21 @@ describe("Verify Password", () => {
       </Provider>
     );
 
-    fireEvent.click(getAllByText(ENG_Trans.verifypassword.cancel)[0]);
+    await waitFor(() => {
+      expect(getByTestId("forgot-hint-btn")).toBeVisible();
+    });
 
-    expect(setIsOpenMock).toBeCalled();
+    const closeButtons = getAllByTestId("close-button");
+    const enabledClose = closeButtons.find(
+      (btn) => !btn.hasAttribute("disabled")
+    );
+    if (!enabledClose) {
+      throw new Error("No enabled close button found");
+    }
+    fireEvent.click(enabledClose);
+
+    await waitFor(() => {
+      expect(setIsOpenMock).toBeCalled();
+    });
   });
 });

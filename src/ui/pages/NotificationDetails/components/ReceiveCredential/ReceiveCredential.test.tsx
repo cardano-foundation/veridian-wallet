@@ -13,12 +13,12 @@ import { showGenericError } from "../../../../../store/reducers/stateCache";
 import { connectionsForNotifications } from "../../../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../../../__fixtures__/credsFix";
 import {
-  filteredIdentifierMapFix,
   filteredIdentifierFix,
+  filteredIdentifierMapFix,
 } from "../../../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
-import { passcodeFillerWithAct } from "../../../../utils/passcodeFiller";
+import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { ReceiveCredential } from "./ReceiveCredential";
 
 jest.useFakeTimers();
@@ -126,7 +126,7 @@ describe("Receive credential", () => {
       ...mockStore(initialState),
       dispatch: dispatchMock,
     };
-    const { getAllByText, getByText, getByTestId } = render(
+    const { getAllByText, getByText, getByTestId, queryByText } = render(
       <Provider store={storeMocked}>
         <ReceiveCredential
           pageId="creadential-request"
@@ -143,6 +143,12 @@ describe("Receive credential", () => {
       )[0]
     ).toBeVisible();
 
+    expect(
+      queryByText(
+        EN_TRANSLATIONS.tabs.notifications.details.identifier.alert.textdecline
+      )
+    ).toBeNull();
+
     act(() => {
       fireEvent.click(getByTestId("decline-button-creadential-request"));
     });
@@ -156,10 +162,12 @@ describe("Receive credential", () => {
       ).toBeVisible();
     });
 
-    act(() => {
-      fireEvent.click(
-        getByTestId("multisig-request-alert-decline-confirm-button")
-      );
+    fireEvent.click(
+      getByTestId("multisig-request-alert-decline-confirm-button")
+    );
+
+    await waitFor(() => {
+      expect(deleteNotificationMock).toBeCalled();
     });
 
     await waitFor(() => {
@@ -203,7 +211,7 @@ describe("Receive credential", () => {
       expect(getByTestId("passcode-button-1")).toBeVisible();
     });
 
-    await passcodeFillerWithAct(getByText, getByTestId, "193212");
+    await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
       expect(verifySecretMock).toHaveBeenCalledWith(
