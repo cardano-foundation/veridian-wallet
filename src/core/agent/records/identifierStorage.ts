@@ -102,6 +102,8 @@ class IdentifierStorage {
   ): Promise<IdentifierMetadataRecord | null> {
     const records = await this.storageService.findAllByQuery(
       {
+        isDeleted: false,
+        pendingDeletion: false,
         groupId,
       },
       IdentifierMetadataRecord
