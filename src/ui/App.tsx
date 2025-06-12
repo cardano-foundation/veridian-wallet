@@ -87,6 +87,7 @@ const App = () => {
     initConfiguration();
   }, []);
 
+  /*
   useEffect(() => {
     const handleUnknownPromiseError = (event: PromiseRejectionEvent) => {
       event.preventDefault();
@@ -109,7 +110,7 @@ const App = () => {
       );
       window.removeEventListener("error", handleUnknownError);
     };
-  }, [dispatch]);
+  }, [dispatch]);*/
 
   useEffect(() => {
     setShowScan(
