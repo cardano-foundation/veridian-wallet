@@ -355,7 +355,6 @@ class MultiSigService extends AgentService {
       messagize(rpy, undefined, undefined, undefined, [sig as Cigar])
     );
 
-    debugger
     for (const connection of groupConnections) {
       await this.props.signifyClient.replies().submitRpy(connection.id, ims);
     }
@@ -474,9 +473,6 @@ class MultiSigService extends AgentService {
       )
     );
 
-    console.log("exn", exn);
-    debugger
-    
     mHab.state.b = exn.e.icp.b;
     mHab.state.bt = exn.e.icp.bt;
 
@@ -493,11 +489,6 @@ class MultiSigService extends AgentService {
           notificationSaid,
         }
       );
-
-    // Use witness set from the exchange message instead of copying from member's state
-    // inceptionData.icp.b = exn.e.icp.b;
-    // inceptionData.icp.bt = exn.e.icp.bt;
-
     await this.inceptGroup(mHab, states, inceptionData);
 
     const multisigId = inceptionData.icp.i;
