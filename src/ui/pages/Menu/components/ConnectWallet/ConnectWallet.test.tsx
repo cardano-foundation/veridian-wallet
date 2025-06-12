@@ -711,7 +711,7 @@ describe("Wallet connect", () => {
       dispatch: dispatchMock,
     };
 
-    const { getByTestId, getAllByTestId, getAllByText } = render(
+    const { getByTestId, getByText, queryByTestId } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
           <ConnectWallet />
@@ -723,20 +723,21 @@ describe("Wallet connect", () => {
 
     await waitFor(() => {
       expect(getByTestId("confirm-connect-btn")).toBeVisible();
+      expect(queryByTestId("create-identifier-modal")).toBeNull();
     });
 
     fireEvent.click(getByTestId("confirm-connect-btn"));
 
     await waitFor(() => {
       expect(
-        getAllByText(
+        getByText(
           EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
             .missingidentifieralert.message
-        )[0]
+        )
       ).toBeVisible();
     });
 
-    fireEvent.click(getAllByTestId("alert-create-keri-confirm-button")[0]);
+    fireEvent.click(getByTestId("alert-create-keri-confirm-button"));
 
     await waitFor(() => {
       expect(getByTestId("create-identifier-modal")).toBeVisible();
