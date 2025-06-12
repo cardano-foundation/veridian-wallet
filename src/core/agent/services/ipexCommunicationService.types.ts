@@ -1,6 +1,6 @@
 import { Operation } from "signify-ts";
 import { LinkedRequest } from "../records/notificationRecord.types";
-
+import { JSONObject } from "../agent.types";
 interface CredentialsMatchingApply {
   schema: {
     name: string;
@@ -10,7 +10,7 @@ interface CredentialsMatchingApply {
     connectionId: string;
     acdc: any;
   }[];
-  attributes: Record<string, unknown>;
+  attributes: JSONObject;
   identifier: string;
 }
 

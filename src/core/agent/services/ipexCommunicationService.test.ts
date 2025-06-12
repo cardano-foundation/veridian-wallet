@@ -1160,7 +1160,7 @@ describe("Receive group ACDC progress", () => {
 
     notificationStorage.findById.mockResolvedValueOnce(grantNoteRecord);
     getExchangeMock.mockImplementationOnce(() => ({
-      exn: { e: { acdc: { d: "credentialSaid" } }, a: { i: "i" } },
+      exn: { e: { acdc: { d: "credentialSaid" } }, rp: "i" },
     }));
 
     identifiersGetMock = jest.fn().mockResolvedValueOnce({
@@ -1225,7 +1225,7 @@ describe("Receive group ACDC progress", () => {
 
     notificationStorage.findById.mockResolvedValueOnce(grantNoteRecord);
     getExchangeMock.mockImplementationOnce(() => ({
-      exn: { e: { acdc: { d: "credentialSaid" } }, a: { i: "i" } },
+      exn: { e: { acdc: { d: "credentialSaid" } }, rp: "i" },
     }));
 
     identifiersGetMock = jest.fn().mockResolvedValueOnce({
@@ -1666,7 +1666,7 @@ describe("Offer ACDC group progress", () => {
     };
     notificationStorage.findById.mockResolvedValueOnce(applyNoteRecord);
     getExchangeMock.mockImplementationOnce(() => ({
-      exn: { a: { i: "i" } },
+      exn: { rp: "i" },
     }));
     identifiersGetMock = jest.fn().mockResolvedValueOnce({
       state: {
@@ -1714,7 +1714,7 @@ describe("Offer ACDC group progress", () => {
       a: { d: "d" },
     };
     getExchangeMock.mockImplementation(() => ({
-      exn: { a: { i: "i" } },
+      exn: { rp: "i" },
     }));
     identifiersGetMock = jest.fn().mockResolvedValue({
       state: {
@@ -2246,7 +2246,7 @@ describe("IPEX communication service of agent", () => {
         fullName: "Mr. John Lucas Smith",
         licenseNumber: "SMITH01192OP",
       },
-      identifier: "uuid",
+      identifier: "id",
     });
     expect(credentialListMock).toBeCalledWith({
       filter: expect.objectContaining({
@@ -2537,7 +2537,7 @@ describe("IPEX communication service of agent", () => {
       s: QVISchema,
       lastStatus: { s: "0", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
-      identifierId: memberIdentifierRecord.id,
+      identifierId: grantForIssuanceExnMessage.exn.rp,
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
   });
@@ -2568,7 +2568,7 @@ describe("IPEX communication service of agent", () => {
       s: QVISchema,
       lastStatus: { s: "0", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
-      identifierId: memberIdentifierRecord.id,
+      identifierId: grantForIssuanceExnMessage.exn.rp,
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
     expect(connections.resolveOobi).toBeCalledWith(
@@ -2615,7 +2615,7 @@ describe("IPEX communication service of agent", () => {
       s: QVISchema,
       lastStatus: { s: "1", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
-      identifierId: memberIdentifierRecord.id,
+      identifierId: grantForIssuanceExnMessage.exn.rp,
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
   });
