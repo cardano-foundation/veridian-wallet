@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import "./IncomingRequest.scss";
 import { SidePageContentProps } from "../../components/SidePage/SidePage.types";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -10,10 +10,11 @@ import {
 import { SignRequest } from "./components/SignRequest"; // Import SignRequest component
 import {
   IncomingRequestType,
-  PeerConnectSigningEventRequest,
+  IncomingRequestProps,
 } from "../../../store/reducers/stateCache/stateCache.types";
 import { getConnectedWallet } from "../../../store/reducers/walletConnectionsCache";
 import { ToastMsgType } from "../../globals/types";
+import { VerifyRequest } from "./components/VerifyRequest";
 
 const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
   const pageId = "incoming-request";
@@ -27,12 +28,13 @@ const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
     ) {
       return;
     } else {
-      return queueIncomingRequest.queues[0] as PeerConnectSigningEventRequest;
+      return queueIncomingRequest.queues[0];
     }
   }, [queueIncomingRequest]);
   const [initiateAnimation, setInitiateAnimation] = useState(false);
-  const [requestData, setRequestData] =
-    useState<PeerConnectSigningEventRequest>();
+  const [requestData, setRequestData] = useState<
+    IncomingRequestProps | undefined
+  >();
   const ANIMATION_DELAY = 4000;
   const [blur, setBlur] = useState(false);
 
@@ -43,20 +45,32 @@ const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
   // the correct component. Please consider this if in the future we need to add more use cases.
   // The old code can be found in PR #550.
 
+  const handleReset = useCallback(() => {
+    setInitiateAnimation(false);
+    setOpenPage(false);
+    setBlur(false);
+
+    setTimeout(() => {
+      dispatch(dequeueIncomingRequest());
+    }, 500);
+  }, [dispatch, setOpenPage]);
+
   useEffect(() => {
     if (!incomingRequest) {
+      setRequestData(undefined);
       return;
     }
     if (
       incomingRequest.type === IncomingRequestType.PEER_CONNECT_SIGN &&
       (!connectedWallet ||
-        connectedWallet.id !== incomingRequest.peerConnection?.id)
+        connectedWallet.id !== incomingRequest.peerConnection.id)
     ) {
       handleReset();
+      return;
     }
     setRequestData(incomingRequest);
     setOpenPage(true);
-  }, [connectedWallet, incomingRequest, setOpenPage]);
+  }, [connectedWallet, incomingRequest, setOpenPage, handleReset]);
 
   useEffect(() => {
     if (blur) {
@@ -66,33 +80,31 @@ const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
     }
   }, [blur]);
 
-  const handleReset = () => {
-    setInitiateAnimation(false);
-    setOpenPage(false);
-    setBlur(false);
-
-    setTimeout(() => {
-      dispatch(dequeueIncomingRequest());
-    }, 500);
-  };
-
   const handleCancel = async () => {
-    if (!incomingRequest) {
+    if (!requestData) {
       return handleReset();
     }
-    incomingRequest.signTransaction?.payload.approvalCallback(false);
+    if (requestData.type === IncomingRequestType.PEER_CONNECT_SIGN) {
+      requestData.signTransaction.payload.approvalCallback(false);
+    } else if (requestData.type === IncomingRequestType.PEER_CONNECT_VERIFY) {
+      requestData.verifyTransaction.payload.approvalCallback(false);
+    }
     handleReset();
   };
 
   const handleAccept = async () => {
-    if (!incomingRequest) {
+    if (!requestData) {
       return handleReset();
     }
     setInitiateAnimation(true);
-    incomingRequest.signTransaction?.payload.approvalCallback(true);
+    if (requestData.type === IncomingRequestType.PEER_CONNECT_SIGN) {
+      requestData.signTransaction.payload.approvalCallback(true);
+    } else if (requestData.type === IncomingRequestType.PEER_CONNECT_VERIFY) {
+      requestData.verifyTransaction.payload.approvalCallback(true);
+    }
     setTimeout(() => {
       handleReset();
-      dispatch(setToastMsg(ToastMsgType.SIGN_SUCCESSFUL));
+      dispatch(setToastMsg(ToastMsgType.SIGN_SUCCESSFUL)); // Consider making this toast type-specific
     }, ANIMATION_DELAY);
   };
 
@@ -100,18 +112,36 @@ const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
     return null;
   }
 
-  return (
-    <SignRequest
-      pageId={pageId}
-      activeStatus={open}
-      blur={blur}
-      setBlur={setBlur}
-      requestData={requestData}
-      initiateAnimation={initiateAnimation}
-      handleAccept={handleAccept}
-      handleCancel={handleCancel}
-    />
-  );
+  switch (requestData.type) {
+    case IncomingRequestType.PEER_CONNECT_SIGN:
+      return (
+        <SignRequest
+          pageId={pageId}
+          activeStatus={open}
+          blur={blur}
+          setBlur={setBlur}
+          requestData={requestData}
+          initiateAnimation={initiateAnimation}
+          handleAccept={handleAccept}
+          handleCancel={handleCancel}
+        />
+      );
+    case IncomingRequestType.PEER_CONNECT_VERIFY:
+      return (
+        <VerifyRequest
+          pageId={pageId}
+          activeStatus={open}
+          blur={blur}
+          setBlur={setBlur}
+          requestData={requestData}
+          initiateAnimation={initiateAnimation}
+          handleAccept={handleAccept}
+          handleCancel={handleCancel}
+        />
+      );
+    default:
+      return null;
+  }
 };
 
 export { IncomingRequest };

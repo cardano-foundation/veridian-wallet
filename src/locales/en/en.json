@@ -1459,8 +1459,19 @@
         "data": "Data"
       }
     },
+    "verify": {
+      "title": "Verify",
+      "identifier": "Identifier",
+      "sequence": "Secuence",
+      "signature": "Signature",
+      "transaction": {
+        "data": "Data",
+        "payload": "Payload"
+      }
+    },
     "button": {
       "acceptoffer": "Accept credential",
+      "verify": "Verify",
       "cancel": "Cancel",
       "back": "Back",
       "accept": "Accept",

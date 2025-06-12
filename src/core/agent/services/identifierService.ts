@@ -1,4 +1,4 @@
-import { HabState, Operation, Signer } from "signify-ts";
+import { Cigar, HabState, Operation, Signer, Verfer } from "signify-ts";
 import {
   CreateIdentifierResult,
   IdentifierDetails,
@@ -744,6 +744,64 @@ class IdentifierService extends AgentService {
         id: notificationId,
       },
     });
+  }
+
+  @OnlineOnly
+  async signInteractionEvent(identifier: string, digest: string): Promise<any> {
+    const data = [
+      {
+        d: digest,
+      },
+    ];
+
+    return await this.props.signifyClient
+      .identifiers()
+      .interact(identifier, data);
+  }
+
+  @OnlineOnly
+  async verifySignature(
+    identifier: string,
+    oobi: string,
+    payload: string,
+    signature: string
+  ): Promise<boolean> {
+    try {
+      const sig = new Cigar({ qb64: signature });
+      const pubKey = (
+        await this.props.signifyClient.keyStates().get(identifier)
+      )[0].k[0];
+      const verfer = new Verfer({ qb64: pubKey });
+      const verified: boolean = verfer.verify(sig.raw, payload);
+      return verified;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  @OnlineOnly
+  async verifyInteraction(
+    identifier: string,
+    oobi: string,
+    payload: string,
+    sequence: string
+  ): Promise<boolean> {
+    try {
+      const operation = await this.props.signifyClient
+        .keyStates()
+        .query(identifier, sequence);
+      if (!operation.done) {
+        throw new Error("Failed to query key states");
+      }
+
+      const kels = await this.props.signifyClient.keyEvents().get(identifier);
+      const foundItem = kels.find((item: any) => item.ked.s === sequence);
+
+      const digestInKel = foundItem.ked.a[0].d;
+      return digestInKel === payload;
+    } catch (error) {
+      return false;
+    }
   }
 
   async getAvailableWitnesses(): Promise<{

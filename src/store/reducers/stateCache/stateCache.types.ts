@@ -1,6 +1,9 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
-import { PeerConnectSigningEvent } from "../../../core/cardano/walletConnect/peerConnection.types";
+import {
+  PeerConnectSigningEvent,
+  PeerConnectVerifyingEvent,
+} from "../../../core/cardano/walletConnect/peerConnection.types";
 import { OperationType, ToastMsgType } from "../../../ui/globals/types";
 import { ConnectionData } from "../walletConnectionsCache";
 
@@ -31,6 +34,7 @@ interface AuthenticationCacheProps {
 
 enum IncomingRequestType {
   PEER_CONNECT_SIGN = "peer-connect-sign",
+  PEER_CONNECT_VERIFY = "peer-connect-verify",
 }
 
 type PeerConnectSigningEventRequest = {
@@ -39,7 +43,15 @@ type PeerConnectSigningEventRequest = {
   peerConnection: ConnectionData;
 };
 
-type IncomingRequestProps = PeerConnectSigningEventRequest;
+type PeerConnectVerifyingEventRequest = {
+  type: IncomingRequestType.PEER_CONNECT_VERIFY;
+  verifyTransaction: PeerConnectVerifyingEvent;
+  peerConnection: ConnectionData;
+};
+
+type IncomingRequestProps =
+  | PeerConnectSigningEventRequest
+  | PeerConnectVerifyingEventRequest;
 
 interface QueueProps<T> {
   isPaused: boolean;
@@ -84,6 +96,7 @@ export type {
   IncomingRequestProps,
   PayloadData,
   PeerConnectSigningEventRequest,
+  PeerConnectVerifyingEventRequest,
   QueueProps,
   StateCacheProps,
   ToastStackItem,

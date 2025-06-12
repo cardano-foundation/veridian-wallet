@@ -112,7 +112,7 @@ const Demo: React.FC = () => {
     if (peerConnectWalletInfo) {
       onPeerConnectAccept();
       connect(peerConnectWalletInfo.name).then(async () => {
-        if (peerConnectWalletInfo.name === "idw_p2p") {
+        if (peerConnectWalletInfo.name === "veridian_p2p") {
           const start = Date.now();
           const interval = 100;
           const timeout = 5000;
@@ -152,10 +152,10 @@ const Demo: React.FC = () => {
 
     if (
       window.cardano &&
-      window.cardano["idw_p2p"]
+      window.cardano["veridian_p2p"]
     ) {
       setError("");
-      const api = window.cardano["idw_p2p"];
+      const api = window.cardano["veridian_p2p"];
       const enabledApi = await api.enable();
       try {
         const signedMessage = await enabledApi.experimental.signKeri(

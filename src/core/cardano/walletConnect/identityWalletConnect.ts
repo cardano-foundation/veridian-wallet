@@ -11,8 +11,10 @@ import {
   PeerConnectionEventTypes,
   PeerConnectionError,
   TxSignError,
+  PeerConnectVerifyingEvent,
 } from "./peerConnection.types";
 import { CoreEventEmitter } from "../../agent/event";
+import { PeerConnection } from "./peerConnection";
 
 class IdentityWalletConnect extends CardanoPeerConnect {
   private selectedAid: string;
@@ -24,6 +26,23 @@ class IdentityWalletConnect extends CardanoPeerConnect {
     identifier: string,
     payload: string
   ) => Promise<string | { error: PeerConnectionError }>;
+  signInteraction: (
+    identifier: string,
+    payload: string
+  ) => Promise<string | { error: PeerConnectionError }>;
+  verifySignature: (
+    identifier: string,
+    oobi: string,
+    payload: string,
+    signature: string
+  ) => Promise<{ verified: boolean } | { error: PeerConnectionError }>;
+  verifyKeriInteraction: (
+    identifier: string,
+    oobi: string,
+    payload: string,
+    sequencer: string
+  ) => Promise<{ verified: boolean } | { error: PeerConnectionError }>;
+  disable: () => void;
 
   constructor(
     walletInfo: IWalletInfo,
@@ -89,6 +108,147 @@ class IdentityWalletConnect extends CardanoPeerConnect {
       } else {
         return { error: TxSignError.UserDeclined };
       }
+    };
+
+    this.verifySignature = async (
+      identifier: string,
+      oobi: string,
+      payload: string,
+      signature: string
+    ): Promise<{ verified: boolean } | { error: PeerConnectionError }> => {
+      let approved: boolean | undefined = undefined;
+      // Closure that updates approved variable
+      const approvalCallback = (approvalStatus: boolean) => {
+        approved = approvalStatus;
+      };
+      this.eventEmitter.emit<PeerConnectVerifyingEvent>({
+        type: PeerConnectionEventTypes.PeerConnectVerify,
+        payload: {
+          identifier,
+          oobi,
+          payload,
+          signature,
+          interaction: false,
+          approvalCallback,
+        },
+      });
+      const startTime = Date.now();
+      // Wait until approved is true or false
+      while (approved === undefined) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, IdentityWalletConnect.TIMEOUT_INTERVAL)
+        );
+        if (Date.now() > startTime + IdentityWalletConnect.MAX_SIGN_TIME) {
+          return { error: TxSignError.TimeOut };
+        }
+      }
+
+      if (approved) {
+        const verified: boolean = await Agent.agent.identifiers.verifySignature(
+          identifier,
+          oobi,
+          payload,
+          signature
+        );
+        return {
+          verified,
+        };
+      } else {
+        return { error: TxSignError.UserDeclined };
+      }
+    };
+
+    this.verifyKeriInteraction = async (
+      identifier: string,
+      oobi: string,
+      payload: string,
+      sequence: string
+    ): Promise<{ verified: boolean } | { error: PeerConnectionError }> => {
+      let approved: boolean | undefined = undefined;
+      // Closure that updates approved variable
+      const approvalCallback = (approvalStatus: boolean) => {
+        approved = approvalStatus;
+      };
+      this.eventEmitter.emit<PeerConnectVerifyingEvent>({
+        type: PeerConnectionEventTypes.PeerConnectVerify,
+        payload: {
+          identifier,
+          oobi,
+          payload,
+          sequence,
+          interaction: true,
+          approvalCallback,
+        },
+      });
+      const startTime = Date.now();
+      // Wait until approved is true or false
+      while (approved === undefined) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, IdentityWalletConnect.TIMEOUT_INTERVAL)
+        );
+        if (Date.now() > startTime + IdentityWalletConnect.MAX_SIGN_TIME) {
+          return { error: TxSignError.TimeOut };
+        }
+      }
+
+      if (approved) {
+        const verified: boolean =
+          await Agent.agent.identifiers.verifyInteraction(
+            identifier,
+            oobi,
+            payload,
+            sequence
+          );
+        return {
+          verified,
+        };
+      } else {
+        return { error: TxSignError.UserDeclined };
+      }
+    };
+
+    this.signInteraction = async (
+      identifier: string,
+      payload: string
+    ): Promise<string | { error: PeerConnectionError }> => {
+      let approved: boolean | undefined = undefined;
+      // Closure that updates approved variable
+      const approvalCallback = (approvalStatus: boolean) => {
+        approved = approvalStatus;
+      };
+      this.eventEmitter.emit<PeerConnectSigningEvent>({
+        type: PeerConnectionEventTypes.PeerConnectSign,
+        payload: {
+          identifier,
+          payload,
+          interaction: true,
+          approvalCallback,
+        },
+      });
+      const startTime = Date.now();
+      // Wait until approved is true or false
+      while (approved === undefined) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, IdentityWalletConnect.TIMEOUT_INTERVAL)
+        );
+        if (Date.now() > startTime + IdentityWalletConnect.MAX_SIGN_TIME) {
+          return { error: TxSignError.TimeOut };
+        }
+      }
+      if (approved) {
+        const r = await Agent.agent.identifiers.signInteractionEvent(
+          identifier,
+          payload
+        );
+
+        return r;
+      } else {
+        return { error: TxSignError.UserDeclined };
+      }
+    };
+
+    this.disable = (): void => {
+      PeerConnection.peerConnection.disconnectDApp(null, false);
     };
   }
 

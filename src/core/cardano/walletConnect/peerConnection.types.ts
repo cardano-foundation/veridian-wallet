@@ -9,10 +9,28 @@ interface ExperimentalAPIFunctions {
     identifier: string,
     payload: string
   ) => Promise<string | { error: PeerConnectionError }>;
+  signInteraction: (
+    identifier: string,
+    payload: string
+  ) => Promise<string | { error: PeerConnectionError }>;
+  verifySignature: (
+    identifier: string,
+    oobi: string,
+    payload: string,
+    signature: string
+  ) => Promise<{ verified: boolean } | { error: PeerConnectionError }>;
+  verifyKeriInteraction: (
+    identifier: string,
+    oobi: string,
+    payload: string,
+    sequencer: string
+  ) => Promise<{ verified: boolean } | { error: PeerConnectionError }>;
+  disable: () => void;
 }
 
 enum PeerConnectionEventTypes {
   PeerConnectSign = "PeerConnectSign",
+  PeerConnectVerify = "PeerConnectVerify",
   PeerConnected = "PeerConnected",
   PeerDisconnected = "PeerDisconnected",
   PeerConnectionBroken = "PeerConnectionBroken",
@@ -23,6 +41,20 @@ interface PeerConnectSigningEvent extends BaseEventEmitter {
   payload: {
     identifier: string;
     payload: string;
+    interaction?: boolean;
+    approvalCallback: (approvalStatus: boolean) => void;
+  };
+}
+
+interface PeerConnectVerifyingEvent extends BaseEventEmitter {
+  type: typeof PeerConnectionEventTypes.PeerConnectVerify;
+  payload: {
+    identifier: string;
+    oobi: string;
+    payload: string;
+    signature?: string;
+    sequence?: string;
+    interaction?: boolean;
     approvalCallback: (approvalStatus: boolean) => void;
   };
 }
@@ -78,4 +110,5 @@ export type {
   PeerConnectionBrokenEvent,
   PeerConnectionError,
   PeerConnection,
+  PeerConnectVerifyingEvent,
 };

@@ -8,6 +8,7 @@ import { CoreEventEmitter } from "../../agent/event";
 import {
   ExperimentalAPIFunctions,
   PeerConnectSigningEvent,
+  PeerConnectVerifyingEvent,
   PeerConnectedEvent,
   PeerConnectionBrokenEvent,
   PeerConnectionEventTypes,
@@ -22,7 +23,7 @@ class PeerConnection {
 
   private walletInfo = {
     address: "",
-    name: "idw_p2p",
+    name: "veridian_p2p",
     icon: ICON_BASE64,
     version: packageInfo.version,
     requestAutoconnect: true,
@@ -42,6 +43,12 @@ class PeerConnection {
     callback: (event: PeerConnectSigningEvent) => void
   ) {
     this.eventEmitter.on(PeerConnectionEventTypes.PeerConnectSign, callback);
+  }
+
+  onPeerConnectRequestVerifyStateChanged(
+    callback: (event: PeerConnectVerifyingEvent) => void
+  ) {
+    this.eventEmitter.on(PeerConnectionEventTypes.PeerConnectVerify, callback);
   }
 
   onPeerConnectedStateChanged(callback: (event: PeerConnectedEvent) => void) {
@@ -143,6 +150,10 @@ class PeerConnection {
       new ExperimentalContainer<ExperimentalAPIFunctions>({
         getKeriIdentifier: this.identityWalletConnect.getKeriIdentifier,
         signKeri: this.identityWalletConnect.signKeri,
+        signInteraction: this.identityWalletConnect.signInteraction,
+        verifySignature: this.identityWalletConnect.verifySignature,
+        verifyKeriInteraction: this.identityWalletConnect.verifyKeriInteraction,
+        disable: this.identityWalletConnect.disable,
       })
     );
   }
@@ -180,11 +191,13 @@ class PeerConnection {
     SecureStorage.set(KeyStoreKeys.MEERKAT_SEED, seed);
   }
 
-  disconnectDApp(dAppIdentifier: string, isBroken?: boolean) {
+  disconnectDApp(dAppIdentifier: string | null, isBroken?: boolean) {
     if (this.identityWalletConnect === undefined) {
       throw new Error(PeerConnection.PEER_CONNECTION_START_PENDING);
     }
-    this.identityWalletConnect.disconnect(dAppIdentifier);
+    this.identityWalletConnect.disconnect(
+      dAppIdentifier ? dAppIdentifier : this.connectedDAppAddress
+    );
 
     if (isBroken) {
       this.eventEmitter.emit<PeerConnectionBrokenEvent>({
