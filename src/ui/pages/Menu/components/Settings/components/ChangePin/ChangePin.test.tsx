@@ -109,7 +109,7 @@ describe("ChangePin Modal", () => {
       )
     ).toBeInTheDocument();
     expect(getByTestId("passcode-module-container")).toBeInTheDocument();
-    expect(getByTestId("forgot-your-passcode-placeholder")).toBeInTheDocument();
+    expect(getByTestId("change-pin-footer")).toHaveClass("hide");
   });
 
   test("Renders Re-enter Passcode when first time passcode is set", async () => {
@@ -143,8 +143,9 @@ describe("ChangePin Modal", () => {
     await waitFor(() =>
       expect(
         queryByText(EN_TRANSLATIONS.createpasscodemodule.cantremember)
-      ).toBeInTheDocument()
+      ).toBeVisible()
     );
+    expect(getByTestId("change-pin-footer")).not.toHaveClass("hide");
   });
 
   test("Set passcode and close modal when second passcode is entered correctly", async () => {
