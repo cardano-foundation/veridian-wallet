@@ -7,7 +7,7 @@ import {
   AndroidBiometryStrength,
   CheckBiometryResult,
 } from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
-import { PluginListenerHandle } from "@capacitor/core";
+import { Capacitor, PluginListenerHandle } from "@capacitor/core";
 import { useEffect, useState } from "react";
 import { i18n } from "../../i18n";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -22,7 +22,9 @@ const useBiometricAuth = (isLockPage?: boolean) => {
   const { passwordIsSet } = useAppSelector(getAuthentication);
 
   useEffect(() => {
-    checkBiometrics();
+    if (Capacitor.isNativePlatform()) {
+      checkBiometrics();
+    }
   }, []);
 
   useEffect(() => {

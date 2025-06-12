@@ -54,6 +54,9 @@ jest.mock("../../../core/agent/agent", () => ({
         ),
         getCredentials: jest.fn(() => Promise.resolve([])),
       },
+      connections: {
+        getConnectionShortDetailById: jest.fn(),
+      },
     },
   },
 }));
@@ -251,7 +254,7 @@ describe("Notifications Tab", () => {
     const history = createMemoryHistory();
     history.push(TabsRoutePath.NOTIFICATIONS);
 
-    const { getByTestId } = render(
+    const { getByTestId, getByText, queryByText } = render(
       <IonReactMemoryRouter history={history}>
         <Provider store={storeMocked}>
           <Notifications />
@@ -275,6 +278,12 @@ describe("Notifications Tab", () => {
     });
 
     expect(readNotificationMock).toBeCalledWith(notificationsFix[0].id);
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.tabs.notifications.tab.unknownissuer.text)
+      ).toBeVisible();
+    });
   });
 
   test("Cannot open notification from unknown issuer", async () => {

@@ -320,6 +320,7 @@ describe("Cred Detail Module - current not archived credential", () => {
 
     dateSpy.mockRestore();
   });
+
   test("Remove favourite credential", async () => {
     const mockNow = 1466424490000;
 
@@ -473,7 +474,7 @@ describe("Cred Detail Module - current not archived credential", () => {
   });
 
   test("archive credential", async () => {
-    const { getByText, getByTestId, queryByText, findByText, unmount } = render(
+    const { getByText, getByTestId, findByText, unmount } = render(
       <Provider store={storeMocked}>
         <CredentialDetailModule
           pageId="credential-card-details"
@@ -507,7 +508,7 @@ describe("Cred Detail Module - current not archived credential", () => {
       expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
     });
 
-    passcodeFiller(getByText, getByTestId, "193212");
+    await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
       expect(archiveCredential).toBeCalled();

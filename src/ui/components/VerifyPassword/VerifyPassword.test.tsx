@@ -3,7 +3,12 @@ const verifySecretMock = jest.fn();
 import { IonInput } from "@ionic/react";
 import { ionFireEvent } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  getByTestId,
+  render,
+  waitFor,
+} from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
@@ -295,13 +300,7 @@ describe("Verify Password", () => {
     const setIsOpenMock = jest.fn();
     const onVerifyMock = jest.fn();
 
-    const {
-      getByTestId,
-      getByText,
-      getAllByTestId,
-      queryByText,
-      getAllByText,
-    } = render(
+    const { getByTestId, getByText } = render(
       <Provider store={storeMocked}>
         <VerifyPassword
           isOpen={true}
@@ -359,7 +358,7 @@ describe("Verify Password", () => {
     const setIsOpenMock = jest.fn();
     const onVerifyMock = jest.fn();
 
-    const { getAllByText } = render(
+    const { getAllByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <VerifyPassword
           isOpen={true}
@@ -368,6 +367,10 @@ describe("Verify Password", () => {
         />
       </Provider>
     );
+
+    await waitFor(() => {
+      expect(getByTestId("forgot-hint-btn")).toBeVisible();
+    });
 
     fireEvent.click(getAllByText(ENG_Trans.verifypassword.cancel)[0]);
 

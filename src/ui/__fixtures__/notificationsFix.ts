@@ -92,7 +92,7 @@ const notificationsFix: KeriaNotification[] = [
     groupReplied: false,
   },
   {
-    id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMm2",
+    id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMm3",
     createdAt: new Date(now.getTime() + 120 * -60000).toISOString(),
     a: {
       r: "/local/signrequest/",
@@ -105,7 +105,7 @@ const notificationsFix: KeriaNotification[] = [
 ];
 
 const connectInstructionsFix = {
-  id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMm2",
+  id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMm4",
   createdAt: new Date(now.getTime() + 120 * -60000).toISOString(),
   a: {
     name: "ServerToConnectTo",
