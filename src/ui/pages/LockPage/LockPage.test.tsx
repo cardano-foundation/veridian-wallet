@@ -455,10 +455,14 @@ describe("Lock Page: Max login attempt", () => {
     expect(getByText(EN_TRANSLATIONS.lockpage.title)).toBeInTheDocument();
     expect(getByText(EN_TRANSLATIONS.lockpage.description)).toBeInTheDocument();
 
-    passcodeFiller(getByText, getByTestId, "193213");
+    await passcodeFiller(getByText, getByTestId, "193213");
 
     await waitFor(() => {
-      expect(getByText("3 attempt remaining")).toBeInTheDocument();
+      expect(
+        getByText(
+          EN_TRANSLATIONS.lockpage.attempterror.replace("{{attempt}}", "3")
+        )
+      ).toBeInTheDocument();
       expect(incrementLoginAttemptMock).toBeCalled();
     });
   });

@@ -39,6 +39,10 @@
       .action-button-label {
         --padding-start: 1rem;
       }
+
+      &.md {
+        min-width: auto;
+      }
     }
 
     ion-buttons ion-button {
