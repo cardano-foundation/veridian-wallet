@@ -749,6 +749,7 @@ class IdentifierService extends AgentService {
   async getAvailableWitnesses(): Promise<{
     toad: number;
     witnesses: string[];
+    witnessOobis: string[];
   }> {
     const config = await this.props.signifyClient.config().get();
     if (!config.iurls) {
@@ -756,21 +757,24 @@ class IdentifierService extends AgentService {
     }
 
     const witnesses = [];
+    const witnessOobis = [];
     for (const oobi of config.iurls) {
       const role = new URL(oobi).searchParams.get(OobiQueryParams.ROLE);
       if (role === "witness") {
         witnesses.push(oobi.split("/oobi/")[1].split("/")[0]); // EID - endpoint identifier
+        witnessOobis.push(oobi);
       }
     }
 
     const uniquew = [...new Set(witnesses)];
+    const uniqueOobis = [...new Set(witnessOobis)];
     if (uniquew.length >= 12)
-      return { toad: 8, witnesses: uniquew.slice(0, 12) };
+      return { toad: 8, witnesses: uniquew.slice(0, 12), witnessOobis: uniqueOobis.slice(0, 12) };
     if (uniquew.length >= 10)
-      return { toad: 7, witnesses: uniquew.slice(0, 10) };
-    if (uniquew.length >= 9) return { toad: 6, witnesses: uniquew.slice(0, 9) };
-    if (uniquew.length >= 7) return { toad: 5, witnesses: uniquew.slice(0, 7) };
-    if (uniquew.length >= 6) return { toad: 4, witnesses: uniquew.slice(0, 6) };
+      return { toad: 7, witnesses: uniquew.slice(0, 10), witnessOobis: uniqueOobis.slice(0, 10) };
+    if (uniquew.length >= 9) return { toad: 6, witnesses: uniquew.slice(0, 9), witnessOobis: uniqueOobis.slice(0, 9) };
+    if (uniquew.length >= 7) return { toad: 5, witnesses: uniquew.slice(0, 7), witnessOobis: uniqueOobis.slice(0, 7) };
+    if (uniquew.length >= 6) return { toad: 4, witnesses: uniquew.slice(0, 6), witnessOobis: uniqueOobis.slice(0, 6) };
 
     throw new Error(IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE);
   }
