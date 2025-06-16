@@ -10,6 +10,7 @@ import { PollingService } from "./services/pollingService";
 import {
   createQVICredential,
   DEFAULT_ROLE,
+  getEndRoles,
   getRegistry,
   loadBrans,
   REGISTRIES_NOT_FOUND,
@@ -48,7 +49,8 @@ async function ensureIdentifierExists(
   try {
     await client.identifiers().get(aidName);
   } catch (e: any) {
-    if (e.status === 404 || e.code === 404 || e.message?.includes("404")) {
+    const status = e.message.split(" - ")[1];
+    if (/404/gi.test(status)) {
       const result = await client.identifiers().create(aidName);
       await waitAndGetDoneOp(client, await result.op());
       await client.identifiers().get(aidName);
@@ -62,12 +64,14 @@ async function ensureEndRoles(
   client: SignifyClient,
   aidName: string
 ): Promise<void> {
-  try {
+  const roles = await getEndRoles(client, aidName, DEFAULT_ROLE);
+
+  const hasDefaultRole = roles.some((role) => role.role === DEFAULT_ROLE);
+
+  if (!hasDefaultRole) {
     await client
       .identifiers()
       .addEndRole(aidName, DEFAULT_ROLE, client.agent!.pre);
-  } catch (e) {
-    console.error("Error adding default end role:", e);
   }
 
   if (aidName === ISSUER_NAME) {

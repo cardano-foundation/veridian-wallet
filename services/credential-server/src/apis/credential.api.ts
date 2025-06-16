@@ -1,12 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { log } from "../log";
 import { ACDC_SCHEMAS } from "../utils/schemas";
-import {
-  ISSUER_NAME,
-  LE_SCHEMA_SAID,
-  QVI_SCHEMA_SAID,
-  RARE_EVO_DEMO_SCHEMA_SAID,
-} from "../consts";
+import { ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
 import { Operation, Saider, Serder, SignifyClient } from "signify-ts";
 import { getRegistry, OP_TIMEOUT, waitAndGetDoneOp } from "../utils/utils";
 import { Credential, QviCredential } from "../utils/utils.types";
@@ -75,10 +69,7 @@ export async function issueAcdcCredential(
       recipient: aid,
       ancAttachment: true,
     };
-  } else if (
-    schemaSaid === RARE_EVO_DEMO_SCHEMA_SAID ||
-    schemaSaid === QVI_SCHEMA_SAID
-  ) {
+  } else {
     issueParams = {
       ri: keriRegistryRegk,
       s: schemaSaid,
@@ -92,8 +83,6 @@ export async function issueAcdcCredential(
       senderName: ISSUER_NAME,
       recipient: aid,
     };
-  } else {
-    throw new Error(UNKNOW_SCHEMA_ID + schemaSaid);
   }
 
   const issuerName =
@@ -190,69 +179,59 @@ export async function revokeCredential(
   const client: SignifyClient = req.app.get("signifyClient");
   const { credentialId, holder } = req.body;
 
-  try {
-    // Get the credential first
-    let credential: Credential = await client
+  // Get the credential first
+  let credential: Credential = await client
+    .credentials()
+    .get(credentialId)
+    .catch(() => undefined);
+
+  // Handle credential not found
+  if (!credential) {
+    res.status(404).send({
+      success: false,
+      data: `${CREDENTIAL_NOT_FOUND} ${credentialId}`,
+    });
+    return;
+  }
+
+  // Handle already revoked credential
+  if (credential.status.s === "1") {
+    res.status(409).send({
+      success: false,
+      data: CREDENTIAL_REVOKED_ALREADY,
+    });
+    return;
+  }
+
+  // Proceed with revocation
+  await client.credentials().revoke(ISSUER_NAME, credentialId);
+
+  while (credential.status.s !== "1") {
+    credential = await client
       .credentials()
       .get(credentialId)
       .catch(() => undefined);
-
-    // Handle credential not found
-    if (!credential) {
-      res.status(404).send({
-        success: false,
-        data: `${CREDENTIAL_NOT_FOUND} ${credentialId}`,
-      });
-      return;
-    }
-
-    // Handle already revoked credential
-    if (credential.status.s === "1") {
-      res.status(409).send({
-        success: false,
-        data: CREDENTIAL_REVOKED_ALREADY,
-      });
-      return;
-    }
-
-    // Proceed with revocation
-    await client.credentials().revoke(ISSUER_NAME, credentialId);
-
-    while (credential.status.s !== "1") {
-      credential = await client
-        .credentials()
-        .get(credentialId)
-        .catch(() => undefined);
-      await new Promise((resolve) => setTimeout(resolve, 250));
-    }
-
-    const datetime = new Date().toISOString().replace("Z", "000+00:00");
-    const [grant, gsigs, gend] = await client.ipex().grant({
-      senderName: ISSUER_NAME,
-      recipient: holder,
-      acdc: new Serder(credential.sad),
-      anc: new Serder(credential.anc),
-      iss: new Serder(credential.iss),
-      datetime,
-    });
-    const submitGrantOp: Operation = await client
-      .ipex()
-      .submitGrant(ISSUER_NAME, grant, gsigs, gend, [holder]);
-    await waitAndGetDoneOp(client, submitGrantOp, OP_TIMEOUT);
-
-    res.status(200).send({
-      success: true,
-      data: "Revoke credential successfully",
-    });
-  } catch (error) {
-    const errorMessage = (error as Error).message;
-    log({ error: errorMessage });
-
-    res.status(500).send({
-      success: false,
-      data: errorMessage,
-    });
+    await new Promise((resolve) => setTimeout(resolve, 250));
   }
+
+  const datetime = new Date().toISOString().replace("Z", "000+00:00");
+  const [grant, gsigs, gend] = await client.ipex().grant({
+    senderName: ISSUER_NAME,
+    recipient: holder,
+    acdc: new Serder(credential.sad),
+    anc: new Serder(credential.anc),
+    iss: new Serder(credential.iss),
+    datetime,
+  });
+  const submitGrantOp: Operation = await client
+    .ipex()
+    .submitGrant(ISSUER_NAME, grant, gsigs, gend, [holder]);
+  await waitAndGetDoneOp(client, submitGrantOp, OP_TIMEOUT);
+
+  res.status(200).send({
+    success: true,
+    data: "Revoke credential successfully",
+  });
 }
 
 export async function schemas(req: Request, res: Response) {

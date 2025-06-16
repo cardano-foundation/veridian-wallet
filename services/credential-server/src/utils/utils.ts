@@ -196,3 +196,18 @@ export async function getOobi(
   const result = await client.oobis().get(signifyName, DEFAULT_ROLE);
   return result.oobis[0];
 }
+
+export async function getEndRoles(
+  client: SignifyClient,
+  alias: string,
+  role?: string
+): Promise<any> {
+  const path =
+    role !== undefined
+      ? `/identifiers/${alias}/endroles/${role}`
+      : `/identifiers/${alias}/endroles`;
+  const response: Response = await client.fetch(path, "GET", null);
+  if (!response.ok) throw new Error(await response.text());
+  const result = await response.json();
+  return result;
+}
