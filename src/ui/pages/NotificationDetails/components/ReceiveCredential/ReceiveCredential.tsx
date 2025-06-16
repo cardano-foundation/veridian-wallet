@@ -137,11 +137,11 @@ const ReceiveCredential = ({
       setInitiateAnimation(false);
       showError("Unable to get group members", e, dispatch);
     }
-  }, [dispatch, notificationDetails.id]);
+  }, [dispatch, notificationDetails]);
 
   const getAcdc = useCallback(async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(!credDetail);
 
       const credential =
         await Agent.agent.ipexCommunications.getAcdcFromIpexGrant(
