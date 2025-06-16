@@ -20,9 +20,9 @@ import {
   setNotificationsCache,
 } from "../../../../../../store/reducers/notificationsCache";
 import { setToastMsg } from "../../../../../../store/reducers/stateCache";
-import { CardDetailsBlock } from "../../../../../components/CardDetails";
 import { CardItem, CardList } from "../../../../../components/CardList";
 import { BackReason } from "../../../../../components/CredentialDetailModule/CredentialDetailModule.types";
+import { InfoCard } from "../../../../../components/InfoCard";
 import { PageFooter } from "../../../../../components/PageFooter";
 import { PageHeader } from "../../../../../components/PageHeader";
 import { Verification } from "../../../../../components/Verification";
@@ -242,21 +242,11 @@ const ChooseCredential = ({
           </IonSegmentButton>
         </IonSegment>
         {segmentValue === "revoked" && (
-          <CardDetailsBlock className="user-tips">
-            <div>
-              <p>
-                {i18n.t(
-                  "tabs.notifications.details.credential.request.choosecredential.disclaimer"
-                )}
-              </p>
-            </div>
-            <div className="disclaimer-icon">
-              <IonIcon
-                icon={informationCircleOutline}
-                slot="icon-only"
-              />
-            </div>
-          </CardDetailsBlock>
+          <InfoCard
+            content={i18n.t(
+              "tabs.notifications.details.credential.request.choosecredential.disclaimer"
+            )}
+          />
         )}
         {segmentValue === "active" && activeCredentials.length === 0 && (
           <h2 className="title">
