@@ -95,6 +95,16 @@ const Summary = ({
             title={`${i18n.t("createidentifier.confirm.title")}`}
           />
         }
+        footer={
+          <PageFooter
+            pageId={componentId}
+            customClass="identifier-stage-3"
+            primaryButtonText={`${i18n.t("createidentifier.confirm.continue")}`}
+            primaryButtonAction={async () => handleContinue()}
+            secondaryButtonText={`${i18n.t("createidentifier.confirm.cancel")}`}
+            secondaryButtonAction={() => setAlertIsOpen(true)}
+          />
+        }
       >
         <p className="multisig-subtitle">
           {i18n.t("createidentifier.confirm.subtitle")}
@@ -171,14 +181,6 @@ const Summary = ({
           </IonCard>
         </div>
       </ScrollablePageLayout>
-      <PageFooter
-        pageId={componentId}
-        customClass="identifier-stage-3"
-        primaryButtonText={`${i18n.t("createidentifier.confirm.continue")}`}
-        primaryButtonAction={async () => handleContinue()}
-        secondaryButtonText={`${i18n.t("createidentifier.confirm.cancel")}`}
-        secondaryButtonAction={() => setAlertIsOpen(true)}
-      />
       <Alert
         isOpen={alertIsOpen}
         setIsOpen={setAlertIsOpen}

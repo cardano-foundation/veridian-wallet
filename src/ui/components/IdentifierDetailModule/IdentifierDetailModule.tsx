@@ -381,7 +381,7 @@ const IdentifierDetailModule = ({
                 cardData={cardData}
                 setCardData={setCardData}
                 oobi={oobi}
-                handleDeleteIdentifier={() => setAlertIsOpen(true)}
+                handleDeleteIdentifier={deleteButtonAction}
                 restrictedOptions={restrictedOptions}
               />
             </>

@@ -44,68 +44,68 @@ const SetupThreshold = ({
   });
 
   return (
-    <>
-      <ScrollablePageLayout
-        pageId={componentId + "-content"}
-        header={
-          <PageHeader
-            closeButton={true}
-            closeButtonLabel={`${i18n.t("createidentifier.back")}`}
-            closeButtonAction={() => {
-              setState((prevState) => ({
-                ...prevState,
-                threshold: 1,
-                identifierCreationStage: Stage.Members,
-              }));
-            }}
-            title={`${i18n.t("createidentifier.threshold.title")}`}
-          />
-        }
-      >
-        <p className="multisig-subtitle">
-          {i18n.t("createidentifier.threshold.subtitle")}
-        </p>
-        <div className="identifier-threshold">
-          <div className="identifier-threshold-title">
-            {i18n.t("createidentifier.threshold.label")}
-          </div>
-          <div className="identifier-threshold-items">
-            <div className="identifier-threshold-amount">{state.threshold}</div>
-            <div className="identifier-threshold-controls">
-              <IonButton
-                shape="round"
-                className={decreaseButtonClass}
-                data-testid="decrease-threshold-button"
-                onClick={() => updateThreshold(-1)}
-              >
-                <IonIcon
-                  slot="icon-only"
-                  icon={removeOutline}
-                  color="primary"
-                />
-              </IonButton>
-              <IonButton
-                shape="round"
-                className={increaseButtonClass}
-                data-testid="increase-threshold-button"
-                onClick={() => updateThreshold(1)}
-              >
-                <IonIcon
-                  slot="icon-only"
-                  icon={addOutline}
-                  color="primary"
-                />
-              </IonButton>
-            </div>
+    <ScrollablePageLayout
+      pageId={componentId + "-content"}
+      header={
+        <PageHeader
+          closeButton={true}
+          closeButtonLabel={`${i18n.t("createidentifier.back")}`}
+          closeButtonAction={() => {
+            setState((prevState) => ({
+              ...prevState,
+              threshold: 1,
+              identifierCreationStage: Stage.Members,
+            }));
+          }}
+          title={`${i18n.t("createidentifier.threshold.title")}`}
+        />
+      }
+      footer={
+        <PageFooter
+          pageId={componentId}
+          primaryButtonText={`${i18n.t("createidentifier.threshold.continue")}`}
+          primaryButtonAction={() => handleContinue()}
+        />
+      }
+    >
+      <p className="multisig-subtitle">
+        {i18n.t("createidentifier.threshold.subtitle")}
+      </p>
+      <div className="identifier-threshold">
+        <div className="identifier-threshold-title">
+          {i18n.t("createidentifier.threshold.label")}
+        </div>
+        <div className="identifier-threshold-items">
+          <div className="identifier-threshold-amount">{state.threshold}</div>
+          <div className="identifier-threshold-controls">
+            <IonButton
+              shape="round"
+              className={decreaseButtonClass}
+              data-testid="decrease-threshold-button"
+              onClick={() => updateThreshold(-1)}
+            >
+              <IonIcon
+                slot="icon-only"
+                icon={removeOutline}
+                color="primary"
+              />
+            </IonButton>
+            <IonButton
+              shape="round"
+              className={increaseButtonClass}
+              data-testid="increase-threshold-button"
+              onClick={() => updateThreshold(1)}
+            >
+              <IonIcon
+                slot="icon-only"
+                icon={addOutline}
+                color="primary"
+              />
+            </IonButton>
           </div>
         </div>
-      </ScrollablePageLayout>
-      <PageFooter
-        pageId={componentId}
-        primaryButtonText={`${i18n.t("createidentifier.threshold.continue")}`}
-        primaryButtonAction={() => handleContinue()}
-      />
-    </>
+      </div>
+    </ScrollablePageLayout>
   );
 };
 

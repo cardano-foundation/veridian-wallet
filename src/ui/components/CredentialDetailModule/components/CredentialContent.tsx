@@ -23,28 +23,56 @@ import {
   FlatBorderType,
 } from "../../CardDetails";
 import { CardTheme } from "../../CardTheme";
+import { FallbackIcon } from "../../FallbackIcon";
 import { IdentifierDetailModal } from "../../IdentifierDetailModule";
 import { ListHeader } from "../../ListHeader";
 import { ReadMore } from "../../ReadMore";
-import { CredentialContentProps } from "./CredentialContent.types";
+import {
+  CredentialContentProps,
+  IssuedIdentifierProps,
+  IssuerProps,
+} from "./CredentialContent.types";
 import { MultisigMember } from "./MultisigMember";
 import { MemberAcceptStatus } from "./MultisigMember.types";
-import { FallbackIcon } from "../../FallbackIcon";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
 
-const CredentialContent = ({
-  cardData,
-  joinedCredRequestMembers,
+const RelatedIdentifier = ({ identifierId }: IssuedIdentifierProps) => {
+  const identifiers = useAppSelector(getIdentifiersCache);
+  const [openIdentifierDetail, setOpenIdentifierDetail] = useState(false);
+  const identifier = identifiers[identifierId];
+
+  return (
+    <>
+      {identifier && (
+        <CardBlock
+          title={i18n.t("tabs.credentials.details.relatedidentifier")}
+          onClick={() => setOpenIdentifierDetail(true)}
+          testId="related-identifier-section"
+        >
+          <CardDetailsItem
+            info={identifier?.displayName || ""}
+            className="related-identifier"
+            testId="related-identifier-name"
+            startSlot={<CardTheme {...getTheme(identifier.theme || 0)} />}
+          />
+        </CardBlock>
+      )}
+      <IdentifierDetailModal
+        isOpen={openIdentifierDetail}
+        setIsOpen={setOpenIdentifierDetail}
+        identifierDetailId={identifierId}
+        pageId="credential-related-identifier"
+      />
+    </>
+  );
+};
+
+const Issuer = ({
   connectionShortDetails,
   setOpenConnectionlModal,
-}: CredentialContentProps) => {
-  const identifiers = useAppSelector(getIdentifiersCache);
-
-  const [openIdentifierDetail, setOpenIdentifierDetail] = useState(false);
+}: IssuerProps) => {
   const [showMissingIssuerModal, setShowMissingIssuerModal] = useState(false);
-
-  const identifier = identifiers[cardData.identifierId];
 
   const openConnection = () => {
     if (connectionShortDetails) {
@@ -56,6 +84,45 @@ const CredentialContent = ({
 
   const closeAlert = () => setShowMissingIssuerModal(false);
 
+  return (
+    <>
+      <CardBlock
+        title={i18n.t("tabs.credentials.details.issuer")}
+        onClick={openConnection}
+        testId="issuer"
+      >
+        <CardDetailsItem
+          info={
+            connectionShortDetails
+              ? connectionShortDetails.label
+              : i18n.t("connections.unknown")
+          }
+          startSlot={<FallbackIcon />}
+          className="member"
+          testId={"credential-details-issuer"}
+        />
+      </CardBlock>
+      <Alert
+        dataTestId="cred-missing-issuer-alert"
+        headerText={i18n.t("tabs.credentials.details.alert.missingissuer.text")}
+        confirmButtonText={`${i18n.t(
+          "tabs.credentials.details.alert.missingissuer.confirm"
+        )}`}
+        isOpen={showMissingIssuerModal}
+        setIsOpen={setShowMissingIssuerModal}
+        actionConfirm={closeAlert}
+        actionDismiss={closeAlert}
+      />
+    </>
+  );
+};
+
+const CredentialContent = ({
+  cardData,
+  joinedCredRequestMembers,
+  connectionShortDetails,
+  setOpenConnectionlModal,
+}: CredentialContentProps) => {
   return (
     <>
       <ListHeader title={i18n.t("tabs.credentials.details.about")} />
@@ -119,22 +186,10 @@ const CredentialContent = ({
           fullText
         />
       </CardBlock>
-      <CardBlock
-        title={i18n.t("tabs.credentials.details.issuer")}
-        onClick={openConnection}
-        testId="issuer"
-      >
-        <CardDetailsItem
-          info={
-            connectionShortDetails
-              ? connectionShortDetails.label
-              : i18n.t("connections.unknown")
-          }
-          startSlot={<FallbackIcon />}
-          className="member"
-          testId={"credential-details-issuer"}
-        />
-      </CardBlock>
+      <Issuer
+        connectionShortDetails={connectionShortDetails}
+        setOpenConnectionlModal={setOpenConnectionlModal}
+      />
       <div className="credential-details-split-section">
         <CardBlock
           copyContent={cardData.id}
@@ -175,37 +230,7 @@ const CredentialContent = ({
           )} (${getUTCOffset(cardData.lastStatus.dt)})`}
         </p>
       </CardBlock>
-      {identifier && (
-        <CardBlock
-          title={i18n.t("tabs.credentials.details.relatedidentifier")}
-          onClick={() => setOpenIdentifierDetail(true)}
-          testId="related-identifier-section"
-        >
-          <CardDetailsItem
-            info={identifier?.displayName || ""}
-            className="related-identifier"
-            testId="related-identifier-name"
-            startSlot={<CardTheme {...getTheme(identifier.theme || 0)} />}
-          />
-        </CardBlock>
-      )}
-      <IdentifierDetailModal
-        isOpen={openIdentifierDetail}
-        setIsOpen={setOpenIdentifierDetail}
-        identifierDetailId={cardData.identifierId}
-        pageId="credential-related-identifier"
-      />
-      <Alert
-        dataTestId="cred-missing-issuer-alert"
-        headerText={i18n.t("tabs.credentials.details.alert.missingissuer.text")}
-        confirmButtonText={`${i18n.t(
-          "tabs.credentials.details.alert.missingissuer.confirm"
-        )}`}
-        isOpen={showMissingIssuerModal}
-        setIsOpen={setShowMissingIssuerModal}
-        actionConfirm={closeAlert}
-        actionDismiss={closeAlert}
-      />
+      <RelatedIdentifier identifierId={cardData.identifierId} />
     </>
   );
 };

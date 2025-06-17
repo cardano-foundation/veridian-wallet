@@ -58,6 +58,18 @@ const SetupConnectionBodyResume = ({
             title={`${i18n.t("createidentifier.share.title")}`}
           />
         }
+        footer={
+          groupMetadata?.groupInitiator && (
+            <PageFooter
+              pageId="initiate-multi-sig"
+              primaryButtonText={`${i18n.t(
+                "createidentifier.share.initiatebutton"
+              )}`}
+              primaryButtonAction={handleInitiateMultiSig}
+              primaryButtonDisabled={!scannedConections?.length}
+            />
+          )
+        }
       >
         <p className="multisig-share-note">
           {i18n.t(
@@ -184,16 +196,6 @@ const SetupConnectionBodyResume = ({
           {i18n.t("createidentifier.share.delete")}
         </IonButton>
       </ScrollablePageLayout>
-      {groupMetadata?.groupInitiator && (
-        <PageFooter
-          pageId="initiate-multi-sig"
-          primaryButtonText={`${i18n.t(
-            "createidentifier.share.initiatebutton"
-          )}`}
-          primaryButtonAction={handleInitiateMultiSig}
-          primaryButtonDisabled={!scannedConections?.length}
-        />
-      )}
     </>
   );
 };
