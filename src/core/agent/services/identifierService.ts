@@ -756,25 +756,50 @@ class IdentifierService extends AgentService {
       throw new Error(IdentifierService.MISCONFIGURED_AGENT_CONFIGURATION);
     }
 
-    const witnesses = [];
-    const witnessOobis = [];
-    for (const oobi of config.iurls) {
-      const role = new URL(oobi).searchParams.get(OobiQueryParams.ROLE);
-      if (role === "witness") {
-        witnesses.push(oobi.split("/oobi/")[1].split("/")[0]); // EID - endpoint identifier
-        witnessOobis.push(oobi);
-      }
-    }
+    const witnessObjects = config.iurls
+      .filter(
+        (oobi) =>
+          new URL(oobi).searchParams.get(OobiQueryParams.ROLE) === "witness"
+      )
+      .map((oobi) => ({
+        eid: oobi.split("/oobi/")[1].split("/")[0],
+        oobi,
+      }));
 
-    const uniquew = [...new Set(witnesses)];
-    const uniqueOobis = [...new Set(witnessOobis)];
-    if (uniquew.length >= 12)
-      return { toad: 8, witnesses: uniquew.slice(0, 12), witnessOobis: uniqueOobis.slice(0, 12) };
-    if (uniquew.length >= 10)
-      return { toad: 7, witnesses: uniquew.slice(0, 10), witnessOobis: uniqueOobis.slice(0, 10) };
-    if (uniquew.length >= 9) return { toad: 6, witnesses: uniquew.slice(0, 9), witnessOobis: uniqueOobis.slice(0, 9) };
-    if (uniquew.length >= 7) return { toad: 5, witnesses: uniquew.slice(0, 7), witnessOobis: uniqueOobis.slice(0, 7) };
-    if (uniquew.length >= 6) return { toad: 4, witnesses: uniquew.slice(0, 6), witnessOobis: uniqueOobis.slice(0, 6) };
+    const uniqueWitnesses = [
+      ...new Map(witnessObjects.map((w) => [w.eid, w])).values(),
+    ];
+
+    if (uniqueWitnesses.length >= 12)
+      return {
+        toad: 8,
+        witnesses: uniqueWitnesses.slice(0, 12).map((w) => w.eid),
+        witnessOobis: uniqueWitnesses.slice(0, 12).map((w) => w.oobi),
+      };
+    if (uniqueWitnesses.length >= 10)
+      return {
+        toad: 7,
+        witnesses: uniqueWitnesses.slice(0, 10).map((w) => w.eid),
+        witnessOobis: uniqueWitnesses.slice(0, 10).map((w) => w.oobi),
+      };
+    if (uniqueWitnesses.length >= 9)
+      return {
+        toad: 6,
+        witnesses: uniqueWitnesses.slice(0, 9).map((w) => w.eid),
+        witnessOobis: uniqueWitnesses.slice(0, 9).map((w) => w.oobi),
+      };
+    if (uniqueWitnesses.length >= 7)
+      return {
+        toad: 5,
+        witnesses: uniqueWitnesses.slice(0, 7).map((w) => w.eid),
+        witnessOobis: uniqueWitnesses.slice(0, 7).map((w) => w.oobi),
+      };
+    if (uniqueWitnesses.length >= 6)
+      return {
+        toad: 4,
+        witnesses: uniqueWitnesses.slice(0, 6).map((w) => w.eid),
+        witnessOobis: uniqueWitnesses.slice(0, 6).map((w) => w.oobi),
+      };
 
     throw new Error(IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE);
   }

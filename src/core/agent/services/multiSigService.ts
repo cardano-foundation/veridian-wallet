@@ -156,7 +156,7 @@ class MultiSigService extends AgentService {
     await this.inceptGroup(mHab, states, inceptionData);
 
     // Share witness OOBIs with other group members
-    await this.shareWitnessOobis(groupConnections);
+    await this.shareWitnessOobis(mHab, groupConnections);
 
     const multisigId = inceptionData.icp.i;
     const creationStatus = CreationStatus.PENDING;
@@ -332,15 +332,15 @@ class MultiSigService extends AgentService {
   }
 
   private async shareWitnessOobis(
-    groupConnections: ConnectionShortDetails[],
+    mHab: HabState,
+    groupConnections: ConnectionShortDetails[]
   ): Promise<void> {
-    const {toad, witnesses, witnessOobis } = await this.identifiers.getAvailableWitnesses();
+    const { toad, witnesses, witnessOobis } =
+      await this.identifiers.getAvailableWitnesses();
 
-    debugger
-    const signer = new Signer({ transferable: false });
     const rpyData = {
-      cid: signer.verfer.qb64,
-      oobis: witnessOobis,
+      cid: mHab.prefix,
+      oobi: witnessOobis,
     };
 
     const rpy = reply(
@@ -350,10 +350,10 @@ class MultiSigService extends AgentService {
       undefined,
       Serials.JSON
     );
-    const sig = signer.sign(new Uint8Array(b(rpy.raw)));
-    const ims = d(
-      messagize(rpy, undefined, undefined, undefined, [sig as Cigar])
-    );
+    const keeper = this.props.signifyClient.manager!.get(mHab);
+    const sigs = await keeper.sign(b(rpy.raw));
+    const sigers = sigs.map((sig: string) => new Siger({ qb64: sig }));
+    const ims = d(messagize(rpy, sigers));
 
     for (const connection of groupConnections) {
       await this.props.signifyClient.replies().submitRpy(connection.id, ims);
