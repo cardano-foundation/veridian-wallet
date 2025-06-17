@@ -1484,16 +1484,17 @@ describe("Favourite identifier", () => {
     const history = createMemoryHistory();
     history.push(path);
 
-    const { getByTestId, queryByTestId, getByText, unmount } = render(
-      <Provider store={storeMockedAidKeri}>
-        <IdentifierDetailModule
-          identifierDetailId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
-          pageId={pageId}
-          navAnimation
-        />
-      </Provider>
-    );
+    const { getByTestId, queryByTestId, getByText, unmount, queryByText } =
+      render(
+        <Provider store={storeMockedAidKeri}>
+          <IdentifierDetailModule
+            identifierDetailId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
+            onClose={jest.fn()}
+            pageId={pageId}
+            navAnimation
+          />
+        </Provider>
+      );
 
     await waitFor(() => {
       expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
@@ -1514,6 +1515,12 @@ describe("Favourite identifier", () => {
     fireEvent.click(
       getByTestId("alert-confirm-identifier-delete-details-confirm-button")
     );
+
+    await waitFor(() => {
+      expect(
+        queryByText(EN_TRANSLATIONS.tabs.identifiers.details.delete.alert.title)
+      ).toBeNull();
+    });
 
     await waitFor(() => {
       expect(getByTestId("verify-passcode")).toBeInTheDocument();

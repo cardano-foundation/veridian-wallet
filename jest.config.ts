@@ -9,7 +9,7 @@ export default {
   ],
   coverageDirectory: "coverage",
   coverageProvider: "v8",
-  coverageReporters: ["clover", "json", "lcov", "text", "text-summary"],
+  coverageReporters: ["clover", "json", "lcov"],
   coverageThreshold: {
     global: {
       statements: 80,
@@ -47,5 +47,5 @@ export default {
     "\\.yaml$": "jest-transform-yaml",
   },
   setupFilesAfterEnv: ["jest-canvas-mock", "<rootDir>/src/setupTests.ts"],
-  setupFiles: ["<rootDir>/src/ui/__mocks__/swiper.tsx"]
+  setupFiles: ["<rootDir>/src/ui/__mocks__/swiper.tsx"],
 };

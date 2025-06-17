@@ -12,6 +12,8 @@ import {
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { ArchivedCredentialsContainer } from "./ArchivedCredentials";
+import { credsFixAcdc } from "../../__fixtures__/credsFix";
+import { filteredIdentifierMapFix } from "../../__fixtures__/filteredIdentifierFix";
 
 const deleteCredentialsMock = jest.fn((id: string) => Promise.resolve(true));
 const deleteNotificationMock = jest.fn(() => Promise.resolve(true));
@@ -29,12 +31,18 @@ jest.mock("../../../core/agent/agent", () => ({
         archiveCredential: jest.fn(),
         markCredentialPendingDeletion: (id: string) =>
           markCredentialPendingDeletionMock(id),
+        getCredentialDetailsById: jest.fn(() =>
+          Promise.resolve(credsFixAcdc[0])
+        ),
       },
       keriaNotifications: {
         deleteNotificationRecordById: () => deleteNotificationMock(),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
+      },
+      connections: {
+        getConnectionShortDetailById: jest.fn(() => Promise.resolve([])),
       },
     },
   },
@@ -64,6 +72,13 @@ const initialStateEmpty = {
   },
   biometricsCache: {
     enabled: false,
+  },
+  connectionsCache: {
+    connections: {},
+    multisigConnections: {},
+  },
+  identifiersCache: {
+    identifiers: filteredIdentifierMapFix,
   },
 };
 
@@ -288,6 +303,14 @@ describe("Archived and revoked credentials", () => {
       },
       biometricsCache: {
         enabled: false,
+      },
+      connectionsCache: {
+        connections: {},
+        multisigConnections: {},
+      },
+
+      identifiersCache: {
+        identifiers: filteredIdentifierMapFix,
       },
     };
 

@@ -6,7 +6,7 @@ services:
     image: "rcmorano/alpine-bash-jq-curl"
     environment:
       - KERIA_PASSCODE=${KERIA_PASSCODE:-DLDRW3f108LaQB2qscJOd}
-      - KERIA_CURLS=${KERIA_CURLS:-http://keria:3901}
+      - KERIA_CURLS=${KERIA_CURLS:-http://keria-prod:3902}
       - KERIA_IURLS=${KERIA_IURLS:-http://witness:5642/oobi/dummy1 http://witness:5643/oobi/dummy2}
     volumes:
       - keria-config:/config
@@ -17,7 +17,7 @@ services:
         target: /configmap/backer-oobis.json.tpl
     entrypoint: ["bash", "/keria-init.sh"]
 
-  keria:
+  keria-prod:
     profiles: [keria,production]
     restart: unless-stopped
     image: ${KERIA_IMAGE:-cardanofoundation/cf-idw-keria:main}
@@ -60,6 +60,11 @@ services:
       - "traefik.http.routers.keria-boot-http.entrypoints=web"
       - "traefik.http.routers.keria-boot-http.middlewares=redirect-to-https"
 
+    ports:
+      - 3904:3901
+      - 3905:3902
+      - 3906:3903
+
   witness-init:
     profiles: [witness-init]
     restart: no
@@ -70,6 +75,8 @@ services:
       - KERIA_CURLS_PROTO=${KERIA_CURLS_PROTO:-https}
       - KERIA_CURLS_EXTERNAL_HOST_TLD=${PUBLIC_DOMAIN:-example.com}
       - WITNESS_COUNT=${WITNESS_COUNT:-6}
+      - DEPLOYMENT_MODE=${DEPLOYMENT_MODE:-cloud}
+      - BASE_HTTP_PORT=5642
     volumes:
       - witnesses-config:/usr/local/var/keri
     configs:
@@ -134,6 +141,8 @@ services:
       - "traefik.http.routers.witness1-http.entrypoints=web"
       - "traefik.http.routers.witness1-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    networks:
+      - veridian-network
 
   witness-2:
     profiles: [witness,production]
@@ -364,12 +373,30 @@ configs:
           mkdir -p $${KERI_VAR_DIR}/data
           mkdir -p $${KERI_SCRIPT_DIR}/keri/cf
           set -e
-          export KERIA_CURLS="$${KERIA_CURLS_PROTO}://witness-$${WITNESS_COUNTER}.$${KERIA_CURLS_EXTERNAL_HOST_TLD}"
+          
+          # Set KERIA_CURLS based on deployment mode
+          if [ "$${DEPLOYMENT_MODE}" = "local" ]; then
+            export KERIA_CURLS="$${KERIA_CURLS_PROTO}://witness-$${WITNESS_COUNTER}:$$(( BASE_HTTP_PORT + WITNESS_COUNTER ))"
+            echo "Local deployment mode - Setting KERIA_CURLS to: $${KERIA_CURLS}"
+          else
+            export KERIA_CURLS="$${KERIA_CURLS_PROTO}://witness-$${WITNESS_COUNTER}.$${KERIA_CURLS_EXTERNAL_HOST_TLD}"
+            echo "Cloud deployment mode - Setting KERIA_CURLS to: $${KERIA_CURLS}"
+          fi
+          
+          echo "Rendering KERIA_CURLS..."
           export KERIA_RENDERED_CURLS=$$(for keria_curl in $${KERIA_CURLS}; do echo $$keria_curl; done | jq -cRn '[inputs]')
+          echo "KERIA_RENDERED_CURLS: $${KERIA_RENDERED_CURLS}"
+          
           export WITNESS_NAME="wit$${WITNESS_COUNTER}"
           envsubst < /configmap/witness.json.tpl > $${KERI_SCRIPT_DIR}/keri/cf/$${WITNESS_NAME}.json
+          
+          echo "Generated config file contents:"
           cat $${KERI_SCRIPT_DIR}/keri/cf/$${WITNESS_NAME}.json
           kli init --name $${WITNESS_NAME} --nopasscode --config-dir $${KERI_SCRIPT_DIR} --config-file $${WITNESS_NAME}.json
           kli incept --name $${WITNESS_NAME} --alias $${WITNESS_NAME} --config $${KERI_SCRIPT_DIR} --file /configmap/wil-witness-sample.json
+          
+          echo "Witness $${WITNESS_NAME} initialization completed."
+        else
+          echo "Config file already exists for witness $${WITNESS_COUNTER}, skipping initialization."
         fi
       done

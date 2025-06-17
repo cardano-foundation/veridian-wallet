@@ -32,6 +32,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
       },
       connections: {
         getMultisigLinkedContacts: () => mockGetMultisigConnection(),
+        getOobi: jest.fn(),
       },
     },
   },

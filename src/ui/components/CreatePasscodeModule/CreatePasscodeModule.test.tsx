@@ -122,7 +122,7 @@ describe("SetPasscode Page", () => {
 
   test("Renders Create Passcode page with title and description", () => {
     require("@ionic/react");
-    const { getByText } = render(
+    const { getByText, getByTestId } = render(
       <Provider store={store}>
         <CreatePasscodeModule
           title={EN_TRANSLATIONS.setpasscode.enterpasscode}
@@ -138,6 +138,7 @@ describe("SetPasscode Page", () => {
     expect(
       getByText(EN_TRANSLATIONS.setpasscode.description)
     ).toBeInTheDocument();
+    expect(getByTestId("set-passcode-footer")).toHaveClass("hide");
   });
 
   test("The user can add and remove digits from the passcode", () => {
@@ -240,7 +241,7 @@ describe("SetPasscode Page", () => {
     );
   });
 
-  test("Display an consecutive passcode", async () => {
+  test("Display a consecutive passcode", async () => {
     verifySecretMock.mockResolvedValue(true);
     isReverseConsecutiveMock.mockImplementation(() => true);
     const { getByText, queryByText, getByTestId } = render(
@@ -488,17 +489,24 @@ describe("SetPasscode Page", () => {
       </IonReactRouter>
     );
 
-    passcodeFiller(getByText, getByTestId, "193212");
-
     expect(
       getByText(EN_TRANSLATIONS.setpasscode.reenterpasscode)
     ).toBeInTheDocument();
 
-    await waitFor(() =>
+    await passcodeFiller(getByText, getByTestId, "193212");
+
+    await waitFor(() => {
+      expect(verifySecretMock).toBeCalledWith(
+        KeyStoreKeys.APP_PASSCODE,
+        "193212"
+      );
+    });
+
+    await waitFor(() => {
       expect(
         getByText(EN_TRANSLATIONS.createpasscodemodule.cantremember)
-      ).toBeInTheDocument()
-    );
+      ).toBeInTheDocument();
+    });
 
     passcodeFiller(getByText, getByTestId, "193212");
 

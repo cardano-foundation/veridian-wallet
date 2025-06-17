@@ -10,5 +10,13 @@
   "1103618": {
     "active": true,
     "notes": "SSRF attacks on the Appium server when e2e testing do not impact the wallet."
+  },
+  "1105443": {
+    "active": true,
+    "notes": "This is not a sub dependency of any imported runtime dependency."
+  },
+  "1105444": {
+    "active": true,
+    "notes": "This is not a sub dependency of any imported runtime dependency."
   }
 }

@@ -1,6 +1,6 @@
 import { IonReactMemoryRouter } from "@ionic/react-router";
 import { mockIonicReact } from "@ionic/react-test-utils";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor, cleanup } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -53,6 +53,9 @@ jest.mock("../../../core/agent/agent", () => ({
           Promise.resolve(credsFixAcdc[0])
         ),
         getCredentials: jest.fn(() => Promise.resolve([])),
+      },
+      connections: {
+        getConnectionShortDetailById: jest.fn(),
       },
     },
   },
@@ -159,6 +162,10 @@ const emptyConnection = {
 };
 
 describe("Notifications Tab", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   test("Renders empty Notifications Tab", () => {
     const storeMocked = {
       ...mockStore(initialState),
@@ -251,7 +258,7 @@ describe("Notifications Tab", () => {
     const history = createMemoryHistory();
     history.push(TabsRoutePath.NOTIFICATIONS);
 
-    const { getByTestId } = render(
+    const { getByTestId, getByText, queryByText } = render(
       <IonReactMemoryRouter history={history}>
         <Provider store={storeMocked}>
           <Notifications />
@@ -275,6 +282,12 @@ describe("Notifications Tab", () => {
     });
 
     expect(readNotificationMock).toBeCalledWith(notificationsFix[0].id);
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.tabs.notifications.tab.unknownissuer.text)
+      ).toBeVisible();
+    });
   });
 
   test("Cannot open notification from unknown issuer", async () => {
@@ -286,7 +299,7 @@ describe("Notifications Tab", () => {
     const history = createMemoryHistory();
     history.push(TabsRoutePath.NOTIFICATIONS);
 
-    const { getByTestId, getByText } = render(
+    const { getByTestId, getByText, findByText } = render(
       <IonReactMemoryRouter history={history}>
         <Provider store={storeMocked}>
           <Notifications />
@@ -306,11 +319,10 @@ describe("Notifications Tab", () => {
       );
     });
 
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.tabs.notifications.tab.unknownissuer.text)
-      ).toBeVisible();
-    });
+    const unknownIssuerText = await findByText(
+      EN_TRANSLATIONS.tabs.notifications.tab.unknownissuer.text
+    );
+    expect(unknownIssuerText).toBeInTheDocument();
   });
 
   test("Cannot open notification from unknown presentation connection", async () => {
