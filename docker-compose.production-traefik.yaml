@@ -1,10 +1,5 @@
 name: veridian-prod
 
-networks:
-  veridian-network:
-    external: true
-    name: veridian-network
-
 services:
   keria-init:
     profiles: [keria-init]
@@ -21,8 +16,6 @@ services:
       - source: backer-oobis_json_tpl
         target: /configmap/backer-oobis.json.tpl
     entrypoint: ["bash", "/keria-init.sh"]
-    networks:
-      - veridian-network
 
   keria-prod:
     profiles: [keria,production]
@@ -71,8 +64,6 @@ services:
       - 3904:3901
       - 3905:3902
       - 3906:3903
-    networks:
-      - veridian-network
 
   witness-init:
     profiles: [witness-init]
@@ -96,8 +87,6 @@ services:
       - source: wil-witness-sample.json
         target: /configmap/wil-witness-sample.json
     entrypoint: ["bash", "-c", "bash /configmap/witness-init.sh"]
-    networks:
-      - veridian-network
 
   witness-0:
     profiles: [witness,production]
@@ -125,8 +114,6 @@ services:
       - "traefik.http.routers.witness0-http.entrypoints=web"
       - "traefik.http.routers.witness0-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    networks:
-      - veridian-network
 
   witness-1:
     profiles: [witness,production]
@@ -183,8 +170,6 @@ services:
       - "traefik.http.routers.witness2-http.entrypoints=web"
       - "traefik.http.routers.witness2-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    networks:
-      - veridian-network
 
   witness-3:
     profiles: [witness,production]
@@ -212,8 +197,6 @@ services:
       - "traefik.http.routers.witness3-http.entrypoints=web"
       - "traefik.http.routers.witness3-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    networks:
-      - veridian-network
 
   witness-4:
     profiles: [witness,production]
@@ -241,8 +224,6 @@ services:
       - "traefik.http.routers.witness4-http.entrypoints=web"
       - "traefik.http.routers.witness4-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    networks:
-      - veridian-network
 
   witness-5:
     profiles: [witness,production]
@@ -270,8 +251,6 @@ services:
       - "traefik.http.routers.witness5-http.entrypoints=web"
       - "traefik.http.routers.witness5-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    networks:
-      - veridian-network
 
   cred-issuance:
     profiles: [cred-issuance,production]
@@ -293,8 +272,6 @@ services:
       - "traefik.http.routers.credentials-http.entrypoints=web"
       - "traefik.http.routers.credentials-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    networks:
-      - veridian-network
 
   cred-issuance-ui:
     profiles: [cred-issuance,production]
@@ -312,8 +289,6 @@ services:
       - "traefik.http.routers.credentials-ui-http.entrypoints=web"
       - "traefik.http.routers.credentials-ui-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    networks:
-      - veridian-network
 
   traefik:
     profiles: [traefik,production]
@@ -337,8 +312,6 @@ services:
     volumes:
       - "/var/lib/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    networks:
-      - veridian-network
 
 volumes:
   keria-data:
