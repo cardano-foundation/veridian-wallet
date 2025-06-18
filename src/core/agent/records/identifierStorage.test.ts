@@ -115,13 +115,23 @@ describe("Identifier storage test", () => {
   });
 
   test("Can get an identifier by group ID (first found, as should only be one)", async () => {
+    const groupIdToSearch = "test-group-id";
     storageService.findAllByQuery.mockResolvedValue([identifierMetadataRecord]);
     expect(
-      await identifierStorage.getIdentifierMetadataByGroupId("id")
+      await identifierStorage.getIdentifierMetadataByGroupId(groupIdToSearch)
     ).toEqual(identifierMetadataRecord);
+    expect(storageService.findAllByQuery).toHaveBeenCalledWith(
+      {
+        isDeleted: false,
+        pendingDeletion: false,
+        groupId: groupIdToSearch,
+      },
+      IdentifierMetadataRecord
+    );
+
     storageService.findAllByQuery.mockResolvedValueOnce([]);
     expect(
-      await identifierStorage.getIdentifierMetadataByGroupId("id")
+      await identifierStorage.getIdentifierMetadataByGroupId(groupIdToSearch)
     ).toEqual(null);
   });
 });
