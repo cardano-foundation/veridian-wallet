@@ -1,11 +1,11 @@
-import express from "express";
-import cors from "cors";
 import bodyParser from "body-parser";
+import cors from "cors";
+import express from "express";
+import { SignifyClient, ready as signifyReady, Tier } from "signify-ts";
 import { config } from "./config";
+import { ACDC_SCHEMAS_ID, ISSUER_NAME, QVI_NAME } from "./consts";
 import { log } from "./log";
-import { ready as signifyReady, SignifyClient, Tier } from "signify-ts";
 import { router } from "./routes";
-import { ISSUER_NAME, QVI_NAME, ACDC_SCHEMAS_ID } from "./consts";
 import { PollingService } from "./services/pollingService";
 import {
   createQVICredential,
@@ -77,7 +77,7 @@ async function ensureEndRoles(
   if (aidName === ISSUER_NAME) {
     const prefix = (await client.identifiers().get(aidName)).prefix;
 
-    try {
+    if (prefix) {
       const endResult = await client
         .identifiers()
         .addEndRole(aidName, "indexer", prefix);
@@ -88,8 +88,6 @@ async function ensureEndRoles(
         scheme: new URL(config.oobiEndpoint).protocol.replace(":", ""),
       });
       await waitAndGetDoneOp(client, await locRes.op());
-    } catch (e) {
-      console.error("Error adding indexer role:", e);
     }
   }
 }
@@ -102,14 +100,10 @@ async function ensureRegistryExists(
     await getRegistry(client, aidName);
   } catch (e: any) {
     if (e.message.includes(REGISTRIES_NOT_FOUND)) {
-      try {
-        const result = await client
-          .registries()
-          .create({ name: aidName, registryName: "vLEI" });
-        await waitAndGetDoneOp(client, await result.op());
-      } catch (createError) {
-        console.error("Error creating registry:", createError);
-      }
+      const result = await client
+        .registries()
+        .create({ name: aidName, registryName: "vLEI" });
+      await waitAndGetDoneOp(client, await result.op());
     } else {
       throw e;
     }
