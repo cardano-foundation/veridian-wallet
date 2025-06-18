@@ -107,9 +107,7 @@ export async function issueAcdcCredential(
       schemaSaid === LE_SCHEMA_SAID
         ? new Serder(credential.iss)
         : credential.iss,
-    ...(schemaSaid === LE_SCHEMA_SAID && {
-      ancAttachment: credential.ancatc[0],
-    }),
+    ancAttachment: credential.ancatc?.[0],
     datetime,
   });
 
@@ -175,7 +173,7 @@ export async function revokeCredential(
   const { credentialId, holder } = req.body;
 
   // Get the credential first
-  let credential: Credential = await client
+  let credential = await client
     .credentials()
     .get(credentialId)
     .catch((error) => {
@@ -228,6 +226,7 @@ export async function revokeCredential(
     anc: new Serder(credential.anc),
     iss: new Serder(credential.iss),
     datetime,
+    ancAttachment: credential.ancatc?.[0],
   });
   const submitGrantOp: Operation = await client
     .ipex()
