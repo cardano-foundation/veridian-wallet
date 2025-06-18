@@ -335,28 +335,31 @@ class MultiSigService extends AgentService {
     mHab: HabState,
     groupConnections: ConnectionShortDetails[]
   ): Promise<void> {
-    const { toad, witnesses, witnessOobis } =
-      await this.identifiers.getAvailableWitnesses();
+    const { witnessOobis } = await this.identifiers.getAvailableWitnesses();
+    const signer = new Signer({ transferable: false });
 
-    const rpyData = {
-      cid: mHab.prefix,
-      oobi: witnessOobis,
-    };
+    for (const oobi of witnessOobis) {
+      const rpyData = {
+        cid: signer.verfer.qb64,
+        oobi: oobi,
+      };
 
-    const rpy = reply(
-      RpyRoute.INTRODUCE,
-      rpyData,
-      undefined,
-      undefined,
-      Serials.JSON
-    );
-    const keeper = this.props.signifyClient.manager!.get(mHab);
-    const sigs = await keeper.sign(b(rpy.raw));
-    const sigers = sigs.map((sig: string) => new Siger({ qb64: sig }));
-    const ims = d(messagize(rpy, sigers));
+      const rpy = reply(
+        RpyRoute.INTRODUCE,
+        rpyData,
+        undefined,
+        undefined,
+        Serials.JSON
+      );
 
-    for (const connection of groupConnections) {
-      await this.props.signifyClient.replies().submitRpy(connection.id, ims);
+      const sig = signer.sign(b(rpy.raw));
+      const ims = d(
+        messagize(rpy, undefined, undefined, undefined, [sig as Cigar])
+      );
+
+      for (const connection of groupConnections) {
+        await this.props.signifyClient.replies().submitRpy(connection.id, ims);
+      }
     }
   }
 

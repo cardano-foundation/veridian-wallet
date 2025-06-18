@@ -770,38 +770,31 @@ class IdentifierService extends AgentService {
       ...new Map(witnessObjects.map((w) => [w.eid, w])).values(),
     ];
 
-    if (uniqueWitnesses.length >= 12)
-      return {
-        toad: 8,
-        witnesses: uniqueWitnesses.slice(0, 12).map((w) => w.eid),
-        witnessOobis: uniqueWitnesses.slice(0, 12).map((w) => w.oobi),
-      };
-    if (uniqueWitnesses.length >= 10)
-      return {
-        toad: 7,
-        witnesses: uniqueWitnesses.slice(0, 10).map((w) => w.eid),
-        witnessOobis: uniqueWitnesses.slice(0, 10).map((w) => w.oobi),
-      };
-    if (uniqueWitnesses.length >= 9)
-      return {
-        toad: 6,
-        witnesses: uniqueWitnesses.slice(0, 9).map((w) => w.eid),
-        witnessOobis: uniqueWitnesses.slice(0, 9).map((w) => w.oobi),
-      };
-    if (uniqueWitnesses.length >= 7)
-      return {
-        toad: 5,
-        witnesses: uniqueWitnesses.slice(0, 7).map((w) => w.eid),
-        witnessOobis: uniqueWitnesses.slice(0, 7).map((w) => w.oobi),
-      };
-    if (uniqueWitnesses.length >= 6)
-      return {
-        toad: 4,
-        witnesses: uniqueWitnesses.slice(0, 6).map((w) => w.eid),
-        witnessOobis: uniqueWitnesses.slice(0, 6).map((w) => w.oobi),
-      };
+    const witnessConfigs = [
+      { minCount: 12, maxCount: 12, toad: 8 },
+      { minCount: 10, maxCount: 11, toad: 7 },
+      { minCount: 9, maxCount: 9, toad: 6 },
+      { minCount: 7, maxCount: 8, toad: 5 },
+      { minCount: 6, maxCount: 6, toad: 4 },
+    ];
 
-    throw new Error(IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE);
+    const witnessConfig = witnessConfigs.find(
+      (wc) =>
+        uniqueWitnesses.length >= wc.minCount &&
+        uniqueWitnesses.length <= wc.maxCount
+    );
+
+    if (!witnessConfig) {
+      throw new Error(IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE);
+    }
+
+    const selectedWitnesses = uniqueWitnesses.slice(0, witnessConfig.maxCount);
+
+    return {
+      toad: witnessConfig.toad,
+      witnesses: selectedWitnesses.map((w) => w.eid),
+      witnessOobis: selectedWitnesses.map((w) => w.oobi),
+    };
   }
 
   private async searchByName(name: string): Promise<HabState | undefined> {
