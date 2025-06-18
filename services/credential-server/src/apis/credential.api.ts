@@ -3,11 +3,10 @@ import { Operation, Saider, Serder, SignifyClient } from "signify-ts";
 import { ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
 import { ACDC_SCHEMAS } from "../utils/schemas";
 import { getRegistry, OP_TIMEOUT, waitAndGetDoneOp } from "../utils/utils";
-import { Credential, QviCredential } from "../utils/utils.types";
+import { QviCredential } from "../utils/utils.types";
 
 export const UNKNOW_SCHEMA_ID = "Unknow Schema ID: ";
 export const CREDENTIAL_NOT_FOUND = "Not found credential with ID: ";
-export const AID_NOT_FOUND = "Not found aid with ID: ";
 export const CREDENTIAL_REVOKED_ALREADY =
   "The credential has been revoked already";
 
@@ -95,18 +94,9 @@ export async function issueAcdcCredential(
   const datetime = new Date().toISOString().replace("Z", "000+00:00");
   const [grant, gsigs, gend] = await client.ipex().grant({
     ...grantParams,
-    acdc:
-      schemaSaid === LE_SCHEMA_SAID
-        ? new Serder(credential.sad)
-        : credential.acdc,
-    anc:
-      schemaSaid === LE_SCHEMA_SAID
-        ? new Serder(credential.anc)
-        : credential.anc,
-    iss:
-      schemaSaid === LE_SCHEMA_SAID
-        ? new Serder(credential.iss)
-        : credential.iss,
+    acdc: new Serder(credential.sad),
+    anc: new Serder(credential.anc),
+    iss: new Serder(credential.iss),
     ancAttachment: credential.ancatc?.[0],
     datetime,
   });
