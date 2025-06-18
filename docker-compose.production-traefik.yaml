@@ -1,5 +1,34 @@
 name: veridian-prod
 
+x-witness-common: &witness-common
+  profiles: [witness,production,local]
+  restart: unless-stopped
+  image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
+  environment:
+    - PYTHONUNBUFFERED=1
+    - PYTHONIOENCODING=UTF-8
+    - INITIAL_HTTP_PORT=5642
+    - INITIAL_TCP_PORT=5632
+    - KERI_VAR_DIR=/usr/local/var/keri
+    - KERI_SCRIPT_DIR=/usr/local/var/keri/scripts
+    - LOG_LEVEL=INFO
+  entrypoint: ["bash", "-c", "export WITNESS_NO=$$(hostname | awk -F- '{print $$NF}'); exec kli witness start --loglevel $${LOG_LEVEL} --name wit$${WITNESS_NO} --alias wit$${WITNESS_NO} -H $$(( INITIAL_HTTP_PORT + WITNESS_NO ))"]
+  volumes:
+    - witnesses-config:/usr/local/var/keri
+
+x-keria-common: &keria-common
+  restart: unless-stopped
+  image: ${KERIA_IMAGE:-cardanofoundation/cf-idw-keria:main}
+  environment:
+    - KERI_AGENT_CORS=${KERI_AGENT_CORS:-true}
+    - KERIA_PASSCODE=${KERIA_PASSCODE:-CHANGEME}
+    - ALLOW_INTRODUCTIONS=${ALLOW_INTRODUCTIONS:-true}
+    - REMOTE_SIGNING=${REMOTE_SIGNING:-true}
+  volumes:
+    - keria-data:/usr/local/var/keri
+    - keria-config:/keria/scripts/keri/cf
+  entrypoint: keria start --config-file backer-oobis --config-dir ./scripts --loglevel INFO
+
 services:
   keria-init:
     profiles: [keria-init]
@@ -19,16 +48,7 @@ services:
 
   keria-local:
     profiles: [keria-local,local]
-    restart: unless-stopped
-    image: ${KERIA_IMAGE:-cardanofoundation/cf-idw-keria:main}
-    environment:
-      - KERI_AGENT_CORS=true
-      - ALLOW_INTRODUCTIONS=true
-      - REMOTE_SIGNING=true
-    volumes:
-      - keria-data-local:/usr/local/var/keri
-      - keria-config:/keria/scripts/keri/cf
-    entrypoint: keria start --config-file backer-oobis --config-dir ./scripts --loglevel DEBUG
+    <<: *keria-common
     ports:
       - 3904:3901
       - 3905:3902
@@ -36,17 +56,7 @@ services:
 
   keria:
     profiles: [keria,production]
-    restart: unless-stopped
-    image: ${KERIA_IMAGE:-cardanofoundation/cf-idw-keria:main}
-    environment:
-      - KERI_AGENT_CORS=${KERI_AGENT_CORS:-true}
-      - KERIA_PASSCODE=${KERIA_PASSCODE:-DLDRW3f108LaQB2qscJOd}
-      - ALLOW_INTRODUCTIONS=${ALLOW_INTRODUCTIONS:-true}
-      - REMOTE_SIGNING=${REMOTE_SIGNING:-true}
-    volumes:
-      - keria-data:/usr/local/var/keri
-      - keria-config:/keria/scripts/keri/cf
-    entrypoint: keria start --config-file backer-oobis --config-dir ./scripts --loglevel INFO
+    <<: *keria-common
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -103,19 +113,7 @@ services:
   witness-0:
     profiles: [witness,production,local]
     hostname: witness-0
-    restart: unless-stopped
-    image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
-    environment:
-        - PYTHONUNBUFFERED=1
-        - PYTHONIOENCODING=UTF-8
-        - INITIAL_HTTP_PORT=5642
-        - INITIAL_TCP_PORT=5632
-        - KERI_VAR_DIR=/usr/local/var/keri
-        - KERI_SCRIPT_DIR=/usr/local/var/keri/scripts
-        - LOG_LEVEL=INFO
-    entrypoint: ["bash", "-c", "export WITNESS_NO=$$(hostname | awk -F- '{print $$NF}'); exec kli witness start --loglevel $${LOG_LEVEL} --name wit$${WITNESS_NO} --alias wit$${WITNESS_NO} -H $$(( INITIAL_HTTP_PORT + $$(( WITNESS_NO )) )) -T $$(( INITIAL_TCP_PORT + $$(( WITNESS_NO )) )) --config-file $${KERI_SCRIPT_DIR}/keri/cf/wit$${WITNESS_NO}.json"]
-    volumes:
-        - witnesses-config:/usr/local/var/keri
+    <<: *witness-common
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.witness0.rule=Host(`witness-0.${PUBLIC_DOMAIN}`)"
@@ -130,19 +128,7 @@ services:
   witness-1:
     profiles: [witness,production,local]
     hostname: witness-1
-    restart: unless-stopped
-    image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
-    environment:
-        - PYTHONUNBUFFERED=1
-        - PYTHONIOENCODING=UTF-8
-        - INITIAL_HTTP_PORT=5642
-        - INITIAL_TCP_PORT=5632
-        - KERI_VAR_DIR=/usr/local/var/keri
-        - KERI_SCRIPT_DIR=/usr/local/var/keri/scripts
-        - LOG_LEVEL=INFO
-    entrypoint: ["bash", "-c", "export WITNESS_NO=$$(hostname | awk -F- '{print $$NF}'); exec kli witness start --loglevel $${LOG_LEVEL} --name wit$${WITNESS_NO} --alias wit$${WITNESS_NO} -H $$(( INITIAL_HTTP_PORT + $$(( WITNESS_NO )) )) -T $$(( INITIAL_TCP_PORT + $$(( WITNESS_NO )) )) --config-file $${KERI_SCRIPT_DIR}/keri/cf/wit$${WITNESS_NO}.json"]
-    volumes:
-        - witnesses-config:/usr/local/var/keri
+    <<: *witness-common
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.witness1.rule=Host(`witness-1.${PUBLIC_DOMAIN}`)"
@@ -157,19 +143,7 @@ services:
   witness-2:
     profiles: [witness,production,local]
     hostname: witness-2
-    restart: unless-stopped
-    image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
-    environment:
-        - PYTHONUNBUFFERED=1
-        - PYTHONIOENCODING=UTF-8
-        - INITIAL_HTTP_PORT=5642
-        - INITIAL_TCP_PORT=5632
-        - KERI_VAR_DIR=/usr/local/var/keri
-        - KERI_SCRIPT_DIR=/usr/local/var/keri/scripts
-        - LOG_LEVEL=INFO
-    entrypoint: ["bash", "-c", "export WITNESS_NO=$$(hostname | awk -F- '{print $$NF}'); exec kli witness start --loglevel $${LOG_LEVEL} --name wit$${WITNESS_NO} --alias wit$${WITNESS_NO} -H $$(( INITIAL_HTTP_PORT + $$(( WITNESS_NO )) )) -T $$(( INITIAL_TCP_PORT + $$(( WITNESS_NO )) )) --config-file $${KERI_SCRIPT_DIR}/keri/cf/wit$${WITNESS_NO}.json"]
-    volumes:
-        - witnesses-config:/usr/local/var/keri
+    <<: *witness-common
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.witness2.rule=Host(`witness-2.${PUBLIC_DOMAIN}`)"
@@ -184,19 +158,7 @@ services:
   witness-3:
     profiles: [witness,production,local]
     hostname: witness-3
-    restart: unless-stopped
-    image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
-    environment:
-        - PYTHONUNBUFFERED=1
-        - PYTHONIOENCODING=UTF-8
-        - INITIAL_HTTP_PORT=5642
-        - INITIAL_TCP_PORT=5632
-        - KERI_VAR_DIR=/usr/local/var/keri
-        - KERI_SCRIPT_DIR=/usr/local/var/keri/scripts
-        - LOG_LEVEL=INFO
-    entrypoint: ["bash", "-c", "export WITNESS_NO=$$(hostname | awk -F- '{print $$NF}'); exec kli witness start --loglevel $${LOG_LEVEL} --name wit$${WITNESS_NO} --alias wit$${WITNESS_NO} -H $$(( INITIAL_HTTP_PORT + $$(( WITNESS_NO )) )) -T $$(( INITIAL_TCP_PORT + $$(( WITNESS_NO )) )) --config-file $${KERI_SCRIPT_DIR}/keri/cf/wit$${WITNESS_NO}.json"]
-    volumes:
-        - witnesses-config:/usr/local/var/keri
+    <<: *witness-common
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.witness3.rule=Host(`witness-3.${PUBLIC_DOMAIN}`)"
@@ -211,19 +173,7 @@ services:
   witness-4:
     profiles: [witness,production,local]
     hostname: witness-4
-    restart: unless-stopped
-    image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
-    environment:
-        - PYTHONUNBUFFERED=1
-        - PYTHONIOENCODING=UTF-8
-        - INITIAL_HTTP_PORT=5642
-        - INITIAL_TCP_PORT=5632
-        - KERI_VAR_DIR=/usr/local/var/keri
-        - KERI_SCRIPT_DIR=/usr/local/var/keri/scripts
-        - LOG_LEVEL=INFO
-    entrypoint: ["bash", "-c", "export WITNESS_NO=$$(hostname | awk -F- '{print $$NF}'); exec kli witness start --loglevel $${LOG_LEVEL} --name wit$${WITNESS_NO} --alias wit$${WITNESS_NO} -H $$(( INITIAL_HTTP_PORT + $$(( WITNESS_NO )) )) -T $$(( INITIAL_TCP_PORT + $$(( WITNESS_NO )) )) --config-file $${KERI_SCRIPT_DIR}/keri/cf/wit$${WITNESS_NO}.json"]
-    volumes:
-        - witnesses-config:/usr/local/var/keri
+    <<: *witness-common
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.witness4.rule=Host(`witness-4.${PUBLIC_DOMAIN}`)"
@@ -238,19 +188,7 @@ services:
   witness-5:
     profiles: [witness,production,local]
     hostname: witness-5
-    restart: unless-stopped
-    image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
-    environment:
-        - PYTHONUNBUFFERED=1
-        - PYTHONIOENCODING=UTF-8
-        - INITIAL_HTTP_PORT=5642
-        - INITIAL_TCP_PORT=5632
-        - KERI_VAR_DIR=/usr/local/var/keri
-        - KERI_SCRIPT_DIR=/usr/local/var/keri/scripts
-        - LOG_LEVEL=INFO
-    entrypoint: ["bash", "-c", "export WITNESS_NO=$$(hostname | awk -F- '{print $$NF}'); exec kli witness start --loglevel $${LOG_LEVEL} --name wit$${WITNESS_NO} --alias wit$${WITNESS_NO} -H $$(( INITIAL_HTTP_PORT + $$(( WITNESS_NO )) )) -T $$(( INITIAL_TCP_PORT + $$(( WITNESS_NO )) )) --config-file $${KERI_SCRIPT_DIR}/keri/cf/wit$${WITNESS_NO}.json"]
-    volumes:
-        - witnesses-config:/usr/local/var/keri
+    <<: *witness-common
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.witness5.rule=Host(`witness-5.${PUBLIC_DOMAIN}`)"
@@ -325,7 +263,6 @@ services:
 
 volumes:
   keria-data:
-  keria-data-local:
   keria-config:
   issuer-server-data:
   witnesses-config:
