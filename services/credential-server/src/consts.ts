@@ -9,3 +9,7 @@ export const ACDC_SCHEMAS_ID = [
   LE_SCHEMA_SAID,
   RARE_EVO_DEMO_SCHEMA_SAID,
 ];
+export enum EndRole {
+  AGENT = "agent",
+  INDEXER = "indexer",
+}

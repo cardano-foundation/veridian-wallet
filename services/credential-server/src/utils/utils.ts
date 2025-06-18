@@ -1,20 +1,19 @@
-import { BranFileContent } from "./utils.types";
-import path from "path";
 import { existsSync, mkdirSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
+import path from "path";
 import {
   Operation,
+  randomPasscode,
+  Salter,
   Serder,
   SignifyClient,
   State,
-  randomPasscode,
-  Salter,
 } from "signify-ts";
 import { config } from "../config";
-import { QVI_NAME, ISSUER_NAME, QVI_SCHEMA_SAID } from "../consts";
+import { EndRole, ISSUER_NAME, QVI_NAME, QVI_SCHEMA_SAID } from "../consts";
+import { BranFileContent } from "./utils.types";
 
 export const OP_TIMEOUT = 15000;
-export const DEFAULT_ROLE = "agent";
 export const FAILED_TO_RESOLVE_OOBI =
   "Failed to resolve OOBI, operation not completing...";
 export const REGISTRIES_NOT_FOUND = "No registries found for";
@@ -193,7 +192,7 @@ export async function getOobi(
   client: SignifyClient,
   signifyName: string
 ): Promise<string> {
-  const result = await client.oobis().get(signifyName, DEFAULT_ROLE);
+  const result = await client.oobis().get(signifyName, EndRole.AGENT);
   return result.oobis[0];
 }
 

@@ -3,13 +3,12 @@ import cors from "cors";
 import express from "express";
 import { SignifyClient, ready as signifyReady, Tier } from "signify-ts";
 import { config } from "./config";
-import { ACDC_SCHEMAS_ID, ISSUER_NAME, QVI_NAME } from "./consts";
+import { ACDC_SCHEMAS_ID, EndRole, ISSUER_NAME, QVI_NAME } from "./consts";
 import { log } from "./log";
 import { router } from "./routes";
 import { PollingService } from "./services/pollingService";
 import {
   createQVICredential,
-  DEFAULT_ROLE,
   getEndRoles,
   getRegistry,
   loadBrans,
@@ -64,30 +63,35 @@ async function ensureEndRoles(
   client: SignifyClient,
   aidName: string
 ): Promise<void> {
-  const roles = await getEndRoles(client, aidName, DEFAULT_ROLE);
+  const roles = await getEndRoles(client, aidName, EndRole.AGENT);
 
-  const hasDefaultRole = roles.some((role) => role.role === DEFAULT_ROLE);
+  const hasDefaultRole = roles.some((role) => role.role === EndRole.AGENT);
 
   if (!hasDefaultRole) {
     await client
       .identifiers()
-      .addEndRole(aidName, DEFAULT_ROLE, client.agent!.pre);
+      .addEndRole(aidName, EndRole.AGENT, client.agent!.pre);
   }
 
   if (aidName === ISSUER_NAME) {
+    if (roles.some((role) => role.role === EndRole.INDEXER)) {
+      return;
+    }
+
     const prefix = (await client.identifiers().get(aidName)).prefix;
 
-    if (prefix) {
+    try {
       const endResult = await client
         .identifiers()
         .addEndRole(aidName, "indexer", prefix);
       await waitAndGetDoneOp(client, await endResult.op());
-
       const locRes = await client.identifiers().addLocScheme(aidName, {
         url: config.oobiEndpoint,
         scheme: new URL(config.oobiEndpoint).protocol.replace(":", ""),
       });
       await waitAndGetDoneOp(client, await locRes.op());
+    } catch (e) {
+      console.error("Error adding indexer role:", e);
     }
   }
 }

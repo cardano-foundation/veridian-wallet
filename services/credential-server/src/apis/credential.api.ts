@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import { ACDC_SCHEMAS } from "../utils/schemas";
-import { ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
 import { Operation, Saider, Serder, SignifyClient } from "signify-ts";
+import { ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
+import { ACDC_SCHEMAS } from "../utils/schemas";
 import { getRegistry, OP_TIMEOUT, waitAndGetDoneOp } from "../utils/utils";
 import { Credential, QviCredential } from "../utils/utils.types";
 
 export const UNKNOW_SCHEMA_ID = "Unknow Schema ID: ";
 export const CREDENTIAL_NOT_FOUND = "Not found credential with ID: ";
+export const AID_NOT_FOUND = "Not found aid with ID: ";
 export const CREDENTIAL_REVOKED_ALREADY =
   "The credential has been revoked already";
 
@@ -90,13 +91,7 @@ export async function issueAcdcCredential(
   const result = await client.credentials().issue(issuerName, issueParams);
   await waitAndGetDoneOp(client, result.op, OP_TIMEOUT);
 
-  let credential: any;
-  if (schemaSaid === LE_SCHEMA_SAID) {
-    credential = await client.credentials().get(result.acdc.ked.d);
-  } else {
-    credential = result;
-  }
-
+  const credential = await client.credentials().get(result.acdc.ked.d);
   const datetime = new Date().toISOString().replace("Z", "000+00:00");
   const [grant, gsigs, gend] = await client.ipex().grant({
     ...grantParams,
@@ -113,7 +108,7 @@ export async function issueAcdcCredential(
         ? new Serder(credential.iss)
         : credential.iss,
     ...(schemaSaid === LE_SCHEMA_SAID && {
-      ancAttachment: credential.ancAttachment,
+      ancAttachment: credential.ancatc[0],
     }),
     datetime,
   });
@@ -183,16 +178,17 @@ export async function revokeCredential(
   let credential: Credential = await client
     .credentials()
     .get(credentialId)
-    .catch(() => undefined);
-
-  // Handle credential not found
-  if (!credential) {
-    res.status(404).send({
-      success: false,
-      data: `${CREDENTIAL_NOT_FOUND} ${credentialId}`,
+    .catch((error) => {
+      const status = error.message.split(" - ")[1];
+      if (/404/gi.test(status)) {
+        res.status(404).send({
+          success: false,
+          data: `${CREDENTIAL_NOT_FOUND} ${credentialId}`,
+        });
+      } else {
+        throw error;
+      }
     });
-    return;
-  }
 
   // Handle already revoked credential
   if (credential.status.s === "1") {
@@ -210,7 +206,17 @@ export async function revokeCredential(
     credential = await client
       .credentials()
       .get(credentialId)
-      .catch(() => undefined);
+      .catch((error) => {
+        const status = error.message.split(" - ")[1];
+        if (/404/gi.test(status)) {
+          res.status(404).send({
+            success: false,
+            data: `${CREDENTIAL_NOT_FOUND} ${credentialId}`,
+          });
+        } else {
+          throw error;
+        }
+      });
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
 
