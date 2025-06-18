@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import { SignifyClient, ready as signifyReady, Tier } from "signify-ts";
 import { config } from "./config";
-import { ACDC_SCHEMAS_ID, EndRole, ISSUER_NAME, QVI_NAME } from "./consts";
+import { ACDC_SCHEMAS_ID, ISSUER_NAME, QVI_NAME } from "./consts";
 import { log } from "./log";
 import { router } from "./routes";
 import { PollingService } from "./services/pollingService";
@@ -16,6 +16,7 @@ import {
   resolveOobi,
   waitAndGetDoneOp,
 } from "./utils/utils";
+import { EndRole } from "./server.types";
 
 async function getSignifyClient(bran: string): Promise<SignifyClient> {
   const client = new SignifyClient(
@@ -73,26 +74,21 @@ async function ensureEndRoles(
       .addEndRole(aidName, EndRole.AGENT, client.agent!.pre);
   }
 
-  if (aidName === ISSUER_NAME) {
-    if (roles.some((role) => role.role === EndRole.INDEXER)) {
-      return;
-    }
-
+  if (
+    aidName === ISSUER_NAME &&
+    !roles.some((role) => role.role === EndRole.INDEXER)
+  ) {
     const prefix = (await client.identifiers().get(aidName)).prefix;
 
-    try {
-      const endResult = await client
-        .identifiers()
-        .addEndRole(aidName, "indexer", prefix);
-      await waitAndGetDoneOp(client, await endResult.op());
-      const locRes = await client.identifiers().addLocScheme(aidName, {
-        url: config.oobiEndpoint,
-        scheme: new URL(config.oobiEndpoint).protocol.replace(":", ""),
-      });
-      await waitAndGetDoneOp(client, await locRes.op());
-    } catch (e) {
-      console.error("Error adding indexer role:", e);
-    }
+    const endResult = await client
+      .identifiers()
+      .addEndRole(aidName, "indexer", prefix);
+    await waitAndGetDoneOp(client, await endResult.op());
+    const locRes = await client.identifiers().addLocScheme(aidName, {
+      url: config.oobiEndpoint,
+      scheme: new URL(config.oobiEndpoint).protocol.replace(":", ""),
+    });
+    await waitAndGetDoneOp(client, await locRes.op());
   }
 }
 

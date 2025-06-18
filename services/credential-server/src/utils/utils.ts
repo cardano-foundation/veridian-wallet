@@ -10,8 +10,9 @@ import {
   State,
 } from "signify-ts";
 import { config } from "../config";
-import { EndRole, ISSUER_NAME, QVI_NAME, QVI_SCHEMA_SAID } from "../consts";
+import { ISSUER_NAME, QVI_NAME, QVI_SCHEMA_SAID } from "../consts";
 import { BranFileContent } from "./utils.types";
+import { EndRole } from "../server.types";
 
 export const OP_TIMEOUT = 15000;
 export const FAILED_TO_RESOLVE_OOBI =

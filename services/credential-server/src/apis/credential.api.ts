@@ -201,20 +201,7 @@ export async function revokeCredential(
   await client.credentials().revoke(ISSUER_NAME, credentialId);
 
   while (credential.status.s !== "1") {
-    credential = await client
-      .credentials()
-      .get(credentialId)
-      .catch((error) => {
-        const status = error.message.split(" - ")[1];
-        if (/404/gi.test(status)) {
-          res.status(404).send({
-            success: false,
-            data: `${CREDENTIAL_NOT_FOUND} ${credentialId}`,
-          });
-        } else {
-          throw error;
-        }
-      });
+    credential = await client.credentials().get(credentialId);
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
 
