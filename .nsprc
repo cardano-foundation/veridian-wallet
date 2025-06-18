@@ -13,10 +13,10 @@
   },
   "1105443": {
     "active": true,
-    "notes": "This is not a sub dependency of any imported runtime dependency."
+    "notes": "REDS attacks on @capacitor/assets and the Appium server when e2e testing do not impact the wallet."
   },
   "1105444": {
     "active": true,
-    "notes": "This is not a sub dependency of any imported runtime dependency."
+    "notes": "REDS attacks on @capacitor/assets and the Appium server when e2e testing do not impact the wallet."
   }
 }

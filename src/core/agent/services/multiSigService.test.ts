@@ -220,6 +220,7 @@ describe("Oobi/endrole", () => {
         },
         d: "EFme1_S0eHc-C6HpcaWpFZnKJGX4f91IBCDmiM6vBQOR",
       },
+      rp: "EFPEKHhywRg2Naa-Gx0jiAAXYnQ5y92vDniHAk8beEA_",
     };
     groupGetRequestMock.mockResolvedValue([
       {
