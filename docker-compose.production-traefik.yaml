@@ -34,7 +34,7 @@ services:
       - 3905:3902
       - 3906:3903
 
-  keria-prod:
+  keria:
     profiles: [keria,production]
     restart: unless-stopped
     image: ${KERIA_IMAGE:-cardanofoundation/cf-idw-keria:main}
