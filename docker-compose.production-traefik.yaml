@@ -17,6 +17,23 @@ services:
         target: /configmap/backer-oobis.json.tpl
     entrypoint: ["bash", "/keria-init.sh"]
 
+  keria-local:
+    profiles: [keria-local,local]
+    restart: unless-stopped
+    image: ${KERIA_IMAGE:-cardanofoundation/cf-idw-keria:main}
+    environment:
+      - KERI_AGENT_CORS=true
+      - ALLOW_INTRODUCTIONS=true
+      - REMOTE_SIGNING=true
+    volumes:
+      - keria-data-local:/usr/local/var/keri
+      - keria-config:/keria/scripts/keri/cf
+    entrypoint: keria start --config-file backer-oobis --config-dir ./scripts --loglevel DEBUG
+    ports:
+      - 3904:3901
+      - 3905:3902
+      - 3906:3903
+
   keria-prod:
     profiles: [keria,production]
     restart: unless-stopped
@@ -60,11 +77,6 @@ services:
       - "traefik.http.routers.keria-boot-http.entrypoints=web"
       - "traefik.http.routers.keria-boot-http.middlewares=redirect-to-https"
 
-    ports:
-      - 3904:3901
-      - 3905:3902
-      - 3906:3903
-
   witness-init:
     profiles: [witness-init]
     restart: no
@@ -89,7 +101,7 @@ services:
     entrypoint: ["bash", "-c", "bash /configmap/witness-init.sh"]
 
   witness-0:
-    profiles: [witness,production]
+    profiles: [witness,production,local]
     hostname: witness-0
     restart: unless-stopped
     image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
@@ -116,7 +128,7 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   witness-1:
-    profiles: [witness,production]
+    profiles: [witness,production,local]
     hostname: witness-1
     restart: unless-stopped
     image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
@@ -141,11 +153,9 @@ services:
       - "traefik.http.routers.witness1-http.entrypoints=web"
       - "traefik.http.routers.witness1-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    networks:
-      - veridian-network
 
   witness-2:
-    profiles: [witness,production]
+    profiles: [witness,production,local]
     hostname: witness-2
     restart: unless-stopped
     image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
@@ -172,7 +182,7 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   witness-3:
-    profiles: [witness,production]
+    profiles: [witness,production,local]
     hostname: witness-3
     restart: unless-stopped
     image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
@@ -199,7 +209,7 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   witness-4:
-    profiles: [witness,production]
+    profiles: [witness,production,local]
     hostname: witness-4
     restart: unless-stopped
     image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
@@ -226,7 +236,7 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   witness-5:
-    profiles: [witness,production]
+    profiles: [witness,production,local]
     hostname: witness-5
     restart: unless-stopped
     image: ${WITNESS_IMAGE:-weboftrust/keri:1.1.26}
@@ -253,7 +263,7 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   cred-issuance:
-    profiles: [cred-issuance,production]
+    profiles: [cred-issuance,production,local]
     image: ${CRED_IMAGE:-cardanofoundation/cf-cred-issuance:main}
     restart: unless-stopped
     environment:
@@ -274,7 +284,7 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   cred-issuance-ui:
-    profiles: [cred-issuance,production]
+    profiles: [cred-issuance,production,local]
     image: ${CRED_UI_IMAGE:-cardanofoundation/cf-cred-issuance-ui:main}
     restart: unless-stopped
     environment:
@@ -315,6 +325,7 @@ services:
 
 volumes:
   keria-data:
+  keria-data-local:
   keria-config:
   issuer-server-data:
   witnesses-config:

@@ -1,10 +1,5 @@
 version: "3.9"
 
-networks:
-  veridian-network:
-    name: veridian-network
-    external: true
-
 services:
   keria:
     container_name: idw-keria
@@ -22,8 +17,6 @@ services:
       - 3901:3901
       - 3902:3902
       - 3903:3903
-    networks:
-      - veridian-network
 
   witnesses:
     container_name: idw-witnesses
@@ -46,8 +39,6 @@ services:
       - 5645:5645
       - 5646:5646
       - 5647:5647
-    networks:
-      - veridian-network
 
   cred-issuance:
     container_name: cred-issuance
@@ -63,8 +54,6 @@ services:
       - 3001:3001
     volumes:
       - issuer-server-data:/app/data
-    networks:
-      - veridian-network
 
   cred-issuance-ui:
     container_name: cred-issuance-ui
@@ -76,8 +65,6 @@ services:
       - VITE_SERVER_URL=${VITE_SERVER_URL:-http://localhost:3001}
     ports:
       - 3000:80
-    networks:
-      - veridian-network
 
 volumes:
   keria-data:
