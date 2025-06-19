@@ -335,13 +335,13 @@ class MultiSigService extends AgentService {
     mHab: HabState,
     groupConnections: ConnectionShortDetails[]
   ): Promise<void> {
-    const { witnessOobis } = await this.identifiers.getAvailableWitnesses();
+    const { witnesses } = await this.identifiers.getAvailableWitnesses();
     const signer = new Signer({ transferable: false });
 
-    for (const oobi of witnessOobis) {
+    for (const witness of witnesses) {
       const rpyData = {
         cid: signer.verfer.qb64,
-        oobi: oobi,
+        oobi: witness.oobi,
       };
 
       const rpy = reply(

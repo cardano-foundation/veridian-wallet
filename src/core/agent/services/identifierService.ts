@@ -263,7 +263,7 @@ class IdentifierService extends AgentService {
     try {
       const result = await this.props.signifyClient.identifiers().create(name, {
         toad,
-        wits: witnesses,
+        wits: witnesses.map((w) => w.eid),
       });
       await result.op();
       identifier = result.serder.ked.i;
@@ -748,53 +748,36 @@ class IdentifierService extends AgentService {
 
   async getAvailableWitnesses(): Promise<{
     toad: number;
-    witnesses: string[];
-    witnessOobis: string[];
+    witnesses: Array<{ eid: string; oobi: string }>;
   }> {
     const config = await this.props.signifyClient.config().get();
     if (!config.iurls) {
       throw new Error(IdentifierService.MISCONFIGURED_AGENT_CONFIGURATION);
     }
 
-    const witnessObjects = config.iurls
-      .filter(
-        (oobi) =>
-          new URL(oobi).searchParams.get(OobiQueryParams.ROLE) === "witness"
-      )
-      .map((oobi) => ({
-        eid: oobi.split("/oobi/")[1].split("/")[0],
-        oobi,
-      }));
-
-    const uniqueWitnesses = [
-      ...new Map(witnessObjects.map((w) => [w.eid, w])).values(),
-    ];
-
-    const witnessConfigs = [
-      { minCount: 12, maxCount: 12, toad: 8 },
-      { minCount: 10, maxCount: 11, toad: 7 },
-      { minCount: 9, maxCount: 9, toad: 6 },
-      { minCount: 7, maxCount: 8, toad: 5 },
-      { minCount: 6, maxCount: 6, toad: 4 },
-    ];
-
-    const witnessConfig = witnessConfigs.find(
-      (wc) =>
-        uniqueWitnesses.length >= wc.minCount &&
-        uniqueWitnesses.length <= wc.maxCount
-    );
-
-    if (!witnessConfig) {
-      throw new Error(IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE);
+    const witnesses: Array<[string, { eid: string; oobi: string }]> = [];
+    for (const oobi of config.iurls) {
+      const role = new URL(oobi).searchParams.get(OobiQueryParams.ROLE);
+      if (role === "witness") {
+        const eid = oobi.split("/oobi/")[1].split("/")[0];
+        witnesses.push([eid, { eid, oobi }]);
+      }
     }
 
-    const selectedWitnesses = uniqueWitnesses.slice(0, witnessConfig.maxCount);
+    const uniqueWitnesses = [...new Map(witnesses).values()];
 
-    return {
-      toad: witnessConfig.toad,
-      witnesses: selectedWitnesses.map((w) => w.eid),
-      witnessOobis: selectedWitnesses.map((w) => w.oobi),
-    };
+    if (uniqueWitnesses.length >= 12)
+      return { toad: 8, witnesses: uniqueWitnesses.slice(0, 12) };
+    if (uniqueWitnesses.length >= 10)
+      return { toad: 7, witnesses: uniqueWitnesses.slice(0, 10) };
+    if (uniqueWitnesses.length >= 9)
+      return { toad: 6, witnesses: uniqueWitnesses.slice(0, 9) };
+    if (uniqueWitnesses.length >= 7)
+      return { toad: 5, witnesses: uniqueWitnesses.slice(0, 7) };
+    if (uniqueWitnesses.length >= 6)
+      return { toad: 4, witnesses: uniqueWitnesses.slice(0, 6) };
+
+    throw new Error(IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE);
   }
 
   private async searchByName(name: string): Promise<HabState | undefined> {
