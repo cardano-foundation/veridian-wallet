@@ -22,8 +22,3 @@ Please include a summary of the changes and a brief description about this PR.
 
 - [ ] This PR has been tested/validated in iOS, Android and browser.
 - [ ] Added new unit tests, if relevant.
-
-### Design Review
-
-- [ ] In case this PR contains changes to the UI, add some screenshots and/or videos to show the changes on relevant devices.
-
