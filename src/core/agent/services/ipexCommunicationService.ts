@@ -123,10 +123,12 @@ class IpexCommunicationService extends AgentService {
       true
     );
 
-    const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {}).map(
-      // Chained schemas, will be resolved in admit/multisigAdmit
-      (key) => grantExn.exn.e.acdc.e?.[key]?.s
-    );
+    const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {})
+      .map(
+        // Chained schemas, will be resolved in admit/multisigAdmit
+        (key) => grantExn.exn.e.acdc.e?.[key]?.s
+      )
+      .filter((schema) => !!schema);
     allSchemaSaids.push(schemaSaid);
 
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
@@ -391,13 +393,13 @@ class IpexCommunicationService extends AgentService {
       "-a-i": exchange.exn.rp,
       ...(Object.keys(attributes).length > 0
         ? {
-            ...Object.fromEntries(
-              Object.entries(attributes).map(([key, value]) => [
-                "-a-" + key,
-                value,
-              ])
-            ),
-          }
+          ...Object.fromEntries(
+            Object.entries(attributes).map(([key, value]) => [
+              "-a-" + key,
+              value,
+            ])
+          ),
+        }
         : {}),
     };
 
@@ -602,9 +604,9 @@ class IpexCommunicationService extends AgentService {
     const connectionId = grantExn.exn.i;
 
     const schemaSaid = grantExn.exn.e.acdc.s;
-    const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {}).map(
-      (key) => grantExn.exn.e.acdc.e?.[key]?.s
-    );
+    const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {})
+      .map((key) => grantExn.exn.e.acdc.e?.[key]?.s)
+      .filter((schema) => !!schema);
     allSchemaSaids.push(schemaSaid);
 
     const { op } = await this.submitMultisigAdmit(
@@ -1194,7 +1196,7 @@ class IpexCommunicationService extends AgentService {
     const indexerOobiResult = await (
       await fetch(`${agentBase}/indexer/${prefix}`)
     ).text();
-    const schemaBase = indexerOobiResult.split('"url":"')[1].split('"')[0];
+    const schemaBase = indexerOobiResult.split("\"url\":\"")[1].split("\"")[0];
 
     return `${schemaBase}/oobi/${said}`;
   }
