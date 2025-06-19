@@ -4,17 +4,19 @@
    ✓ Write a good description that explains what this PR is meant to do.
    ✓ Keep PRs small, and manageable for reviewers.
    ✓ Set as draft until ready, and self-reviewed.
+   ✓ Keep screenshots small using <img src="URL_HERE" width="35%">.
+   ✓ Make sure you have all green ticks on GitHub actions before asking for a review.
 -->
 
 ## Description
 
-Please include a summary of the changes and a brief description about this PR
+Please include a summary of the changes and a brief description about this PR.
 
 ## Checklist before requesting a review
 
 ### Issue ticket number and link
 
-- [ ] This PR has a valid ticket number or issue: [link]
+- [ ] This PR has a valid ticket number or issue: [**TICKET_NUMBER**](link)
 
 ### Testing & Validation
 
@@ -23,32 +25,5 @@ Please include a summary of the changes and a brief description about this PR
 
 ### Design Review
 
-- [ ] If this PR contains changes to the UI, it has gone through a design review with UX Designer or Product owner.
-- [ ] In case PR contains changes to the UI, add some screenshots to notice the differences
----
-#### IOS
-##### _Before_
+- [ ] In case this PR contains changes to the UI, add some screenshots and/or videos to show the changes on relevant devices.
 
-[comment]: <> (Add screenshots)
-
-##### _After_
-
-[comment]: <> (Add screenshots)
-
-#### Android
-##### _Before_
-
-[comment]: <> (Add screenshots)
-
-##### _After_
-
-[comment]: <> (Add screenshots)
-
-#### Browser
-##### _Before_
-
-[comment]: <> (Add screenshots)
-
-##### _After_
-
-[comment]: <> (Add screenshots)
