@@ -64,7 +64,7 @@ async function ensureEndRoles(
   client: SignifyClient,
   aidName: string
 ): Promise<void> {
-  const roles = await getEndRoles(client, aidName, EndRole.AGENT);
+  const roles = await getEndRoles(client, aidName);
 
   const hasDefaultRole = roles.some((role) => role.role === EndRole.AGENT);
 
