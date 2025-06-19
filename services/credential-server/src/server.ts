@@ -1,11 +1,13 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
+import { join } from "path";
 import { SignifyClient, ready as signifyReady, Tier } from "signify-ts";
 import { config } from "./config";
 import { ACDC_SCHEMAS_ID, ISSUER_NAME, QVI_NAME } from "./consts";
 import { log } from "./log";
 import { router } from "./routes";
+import { EndRole } from "./server.types";
 import { PollingService } from "./services/pollingService";
 import {
   createQVICredential,
@@ -16,7 +18,6 @@ import {
   resolveOobi,
   waitAndGetDoneOp,
 } from "./utils/utils";
-import { EndRole } from "./server.types";
 
 async function getSignifyClient(bran: string): Promise<SignifyClient> {
   const client = new SignifyClient(
@@ -134,6 +135,14 @@ async function initializeCredentials(
 async function startServer() {
   const app = express();
   app.use("/static", express.static("static"));
+  app.use(
+    "/oobi",
+    express.static(join(__dirname, "schemas"), {
+      setHeaders: (res) => {
+        res.setHeader("Content-Type", "application/schema+json");
+      },
+    })
+  );
   app.use(cors());
   app.use(bodyParser.json());
   app.use(router);

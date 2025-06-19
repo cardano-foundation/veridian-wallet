@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { ACDC_SCHEMAS } from "../utils/schemas";
+import { SignifyClient } from "signify-ts";
 
 export async function schemaApi(req: Request, res: Response) {
-  const { id } = req.params;
-  const data = ACDC_SCHEMAS[id];
-  if (!data) {
-    res.status(404).send("Schema for given SAID not found");
-    return;
-  }
-  res.send(data);
+  const client: SignifyClient = req.app.get("signifyClient");
+
+  const schemas = await client.schemas().list();
+  res.status(200).send({
+    success: true,
+    data: schemas,
+  });
 }
