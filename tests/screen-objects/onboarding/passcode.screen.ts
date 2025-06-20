@@ -25,6 +25,10 @@ export class PasscodeScreen {
     return $('[data-testid="error-message-text"]');
   }
 
+  get passcodePoint() {
+    return $$(".passcode-module-circle-row > div");
+  }
+
   async digitButton(digit: number, parentElement = "") {
     return $(
       `${parentElement} [data-testid="passcode-button-${digit}"]`.trimStart()
@@ -60,6 +64,13 @@ export class PasscodeScreen {
     //clicking digits on the screen
     for (const digit of passcode) {
       await digitButtonMap[digit]();
+    }
+  }
+
+  async enterPasscodeSkip(digit: number, parentElement = "") {
+    for (let i = 0; i < await this.passcodePoint.length; i++) {
+      await (await this.digitButton(digit, parentElement)).click();
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
 
