@@ -1,4 +1,4 @@
-import { Schema, SchemaDetail } from "./schemasSlice.types";
+import { SchemaDetail } from "./schemasSlice.types";
 
 interface A {
   d: string;
