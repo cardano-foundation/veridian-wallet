@@ -40,7 +40,7 @@ export interface Dt {
   type: string;
   format: string;
 }
-export interface Schema {
+export interface SchemaDetail {
   $id: string;
   $schema: string;
   title: string;
@@ -51,4 +51,9 @@ export interface Schema {
   properties: SchemaProperties;
   additionalProperties: boolean;
   required: string[];
+}
+
+export interface Schema {
+  id: string;
+  name: string;
 }

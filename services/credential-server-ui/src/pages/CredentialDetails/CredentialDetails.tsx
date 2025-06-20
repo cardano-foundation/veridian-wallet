@@ -20,7 +20,7 @@ export const CredentialDetails = () => {
   const nav = useNavigate();
   const { id } = useParams();
 
-  const schemaName = schemas.find((item) => item.$id === id)?.title || "";
+  const schemaName = schemas.find((item) => item.id === id)?.name || "";
 
   const displayCredentials = useMemo(
     () => credentials.filter((item) => item.schema.$id === id),

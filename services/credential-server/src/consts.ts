@@ -9,3 +9,18 @@ export const ACDC_SCHEMAS_ID = [
   LE_SCHEMA_SAID,
   RARE_EVO_DEMO_SCHEMA_SAID,
 ];
+
+export const ACDC_SCHEMAS = [
+  {
+    id: QVI_SCHEMA_SAID,
+    name: "Qualified vLEI Issuer Credential",
+  },
+  {
+    id: RARE_EVO_DEMO_SCHEMA_SAID,
+    name: "Rare EVO 2024 Attendee",
+  },
+  {
+    id: LE_SCHEMA_SAID,
+    name: "Legal Entity vLEI Credential",
+  },
+];

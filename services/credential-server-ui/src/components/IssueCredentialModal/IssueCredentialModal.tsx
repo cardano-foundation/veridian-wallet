@@ -2,6 +2,8 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import { Box, Button } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { Trans } from "react-i18next";
+import { IGNORE_ATTRIBUTES } from "../../const";
+import { useSchemaDetail } from "../../hooks/SchemaDetail";
 import { i18n } from "../../i18n";
 import { CredentialService } from "../../services";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -18,7 +20,6 @@ import {
 } from "./IssueCredentialModal.types";
 import { IssueCredListTemplate } from "./IssueCredListTemplate";
 import { Review } from "./Review";
-import { IGNORE_ATTRIBUTES } from "../../const";
 
 const IssueCredentialModal = ({
   open,
@@ -38,7 +39,7 @@ const IssueCredentialModal = ({
     useState(credentialTypeId);
   const [attributes, setAttributes] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const schema = schemas.find((item) => item.$id === selectedCredTemplate);
+  const schema = useSchemaDetail(selectedCredTemplate);
   const properties = schema?.properties?.a?.oneOf?.[1]?.properties || {};
   const requiredList = schema?.properties?.a?.oneOf?.[1]?.required || [];
   const attributeKeys = Object.keys(properties).filter(
@@ -54,10 +55,6 @@ const IssueCredentialModal = ({
           (key) =>
             attributes[key] !== undefined && attributes[key].trim() !== ""
         );
-
-  const credTemplateName = selectedCredTemplate
-    ? schemas.find((item) => item.$id === selectedCredTemplate)?.title
-    : undefined;
 
   useEffect(() => {
     if (!open) return;
@@ -238,8 +235,8 @@ const IssueCredentialModal = ({
       }
       case IssueCredentialStage.SelectCredentialType: {
         const data: IssueCredListData[] = schemas.map((schema) => ({
-          id: schema.$id,
-          text: schema.title,
+          id: schema.id,
+          text: schema.name,
         }));
 
         return (
@@ -270,7 +267,7 @@ const IssueCredentialModal = ({
         );
         return (
           <Review
-            credentialType={credTemplateName}
+            credentialType={schema?.title}
             attribute={nonEmptyAttributes}
             connectionId={selectedConnection}
             connections={connections}
