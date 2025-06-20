@@ -24,6 +24,7 @@ import {
   linkedContacts,
   queuedIdentifier,
   queuedJoin,
+  getAvailableWitnesses,
 } from "../../__fixtures__/agent/multiSigFixtures";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { EventTypes } from "../event.types";
@@ -111,6 +112,9 @@ const signifyClient = jest.mocked({
     send: sendExchangesMock,
     createExchangeMessage: createExchangeMessageMock,
   }),
+  replies: () => ({
+    submitRpy: jest.fn().mockResolvedValue({}),
+  }),
   agent: {
     pre: "pre",
   },
@@ -160,6 +164,7 @@ const connections = jest.mocked({
 const identifiers = jest.mocked({
   getIdentifiers: jest.fn(),
   rotateIdentifier: jest.fn(),
+  getAvailableWitnesses: jest.fn(),
 });
 
 const multiSigService = new MultiSigService(
@@ -340,6 +345,16 @@ describe("Creation of multi-sig", () => {
       })
     );
     identifierCreateIcpDataMock.mockResolvedValue(inceptionDataFix);
+
+    identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
+
+    getMemberMock.mockReturnValue({
+      sign: jest
+        .fn()
+        .mockResolvedValue([
+          "AACK3Pk2vKzotWjsUnbhKqs7P68NoeyIN5Ae7aGYl3ALCXDOk72Mby9kCu_vSpezqZzjWP9D2tQzwyvGCY26ovoE",
+        ]),
+    });
 
     await multiSigService.createGroup(
       memberPrefix,
@@ -524,6 +539,16 @@ describe("Creation of multi-sig", () => {
       })
     );
 
+    identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
+
+    getMemberMock.mockReturnValue({
+      sign: jest
+        .fn()
+        .mockResolvedValue([
+          "AACK3Pk2vKzotWjsUnbhKqs7P68NoeyIN5Ae7aGYl3ALCXDOk72Mby9kCu_vSpezqZzjWP9D2tQzwyvGCY26ovoE",
+        ]),
+    });
+
     await multiSigService.createGroup(
       memberPrefix,
       linkedContacts,
@@ -629,6 +654,16 @@ describe("Creation of multi-sig", () => {
     identifierStorage.createIdentifierMetadataRecord.mockRejectedValueOnce(
       new Error(StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG)
     );
+
+    identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
+
+    getMemberMock.mockReturnValue({
+      sign: jest
+        .fn()
+        .mockResolvedValue([
+          "AACK3Pk2vKzotWjsUnbhKqs7P68NoeyIN5Ae7aGYl3ALCXDOk72Mby9kCu_vSpezqZzjWP9D2tQzwyvGCY26ovoE",
+        ]),
+    });
 
     await multiSigService.createGroup(
       memberPrefix,
@@ -771,6 +806,16 @@ describe("Creation of multi-sig", () => {
     markNotificationMock.mockResolvedValue({ status: "done" });
     notificationStorage.deleteById = jest.fn();
 
+    identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
+
+    getMemberMock.mockReturnValue({
+      sign: jest
+        .fn()
+        .mockResolvedValue([
+          "AACK3Pk2vKzotWjsUnbhKqs7P68NoeyIN5Ae7aGYl3ALCXDOk72Mby9kCu_vSpezqZzjWP9D2tQzwyvGCY26ovoE",
+        ]),
+    });
+
     await multiSigService.joinGroup("id", "d");
 
     expect(identifierCreateIcpDataMock).toBeCalledWith("0:Identifier 2", {
@@ -778,8 +823,15 @@ describe("Creation of multi-sig", () => {
       mhab: getMemberIdentifierResponse,
       isith: 2,
       nsith: 2,
-      toad: 3,
-      wits: [],
+      toad: 4,
+      wits: [
+        "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha",
+        "BLskRTInXnMxWaGqcpSyMgo0nYbalW99cGZESrz3zapM",
+        "BIKKuvBwpmDVA4Ds-EpL5bt9OqPzWPja2LigFYZN2YfX",
+        "BM35JN8XeJSEfpxopjn5jr7tAHCE5749f0OobhMLCorE",
+        "BIj15u5V11bkbtAxMA7gcNJZcax-7TgaBMLsQnMHpYHP",
+        "BF2rZTW79z4IXocYRQnjjsOuvFUQv-ptCf8Yltd7PfsM",
+      ],
       states: [
         resolvedOobiOpResponse.op.response,
         getMemberIdentifierResponse.state,

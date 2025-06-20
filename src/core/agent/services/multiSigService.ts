@@ -245,7 +245,9 @@ class MultiSigService extends AgentService {
     states: State[],
     groupName: string,
     threshold: number,
-    queuedProps: QueuedGroupProps
+    queuedProps: QueuedGroupProps,
+    toad?: string,
+    wits?: string[]
   ): Promise<CreateIdentifierBody> {
     // For distributed reliability, store name and inception data so we can re-try on start-up
     // Hence we ignore duplicate errors
@@ -266,8 +268,8 @@ class MultiSigService extends AgentService {
         mhab: mHab,
         isith: threshold,
         nsith: threshold,
-        toad: Number(mHab.state.bt),
-        wits: mHab.state.b,
+        toad: Number(toad ?? mHab.state.bt),
+        wits: wits ?? mHab.state.b,
         states: states,
         rstates: states,
       });
@@ -336,11 +338,11 @@ class MultiSigService extends AgentService {
     groupConnections: ConnectionShortDetails[]
   ): Promise<void> {
     const { witnesses } = await this.identifiers.getAvailableWitnesses();
-    const signer = new Signer({ transferable: false });
+    const keeper = this.props.signifyClient.manager!.get(mHab);
 
     for (const witness of witnesses) {
       const rpyData = {
-        cid: signer.verfer.qb64,
+        cid: mHab.prefix,
         oobi: witness.oobi,
       };
 
@@ -352,10 +354,13 @@ class MultiSigService extends AgentService {
         Serials.JSON
       );
 
-      const sig = signer.sign(b(rpy.raw));
-      const ims = d(
-        messagize(rpy, undefined, undefined, undefined, [sig as Cigar])
-      );
+      const sigs = await keeper.sign(b(rpy.raw));
+      const sigers = sigs.map((sig: string) => new Siger({ qb64: sig }));
+      const seal = [
+        "SealEvent",
+        { i: mHab.prefix, s: mHab.state.ee.s, d: mHab.state.ee.d },
+      ];
+      const ims = d(messagize(rpy, sigers, seal));
 
       for (const connection of groupConnections) {
         await this.props.signifyClient.replies().submitRpy(connection.id, ims);
@@ -476,9 +481,6 @@ class MultiSigService extends AgentService {
       )
     );
 
-    mHab.state.b = exn.e.icp.b;
-    mHab.state.bt = exn.e.icp.bt;
-
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
@@ -490,7 +492,9 @@ class MultiSigService extends AgentService {
           initiator: false,
           notificationId,
           notificationSaid,
-        }
+        },
+        exn.e.icp.bt,
+        exn.e.icp.b
       );
     await this.inceptGroup(mHab, states, inceptionData);
 
