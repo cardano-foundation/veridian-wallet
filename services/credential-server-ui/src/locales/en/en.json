@@ -275,5 +275,9 @@
     "settings": {
       "title": "Settings"
     }
+  },
+  "reduxStoreErrors": {
+    "fetchSchema": "Unable to get list schema",
+    "fetchSchemaDetail": "Unable to get schema detail"
   }
 }

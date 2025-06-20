@@ -1,4 +1,4 @@
-import { Schema } from "./schemasSlice.types";
+import { Schema, SchemaDetail } from "./schemasSlice.types";
 
 interface A {
   d: string;
@@ -32,7 +32,7 @@ interface Credential {
   pre: string;
   contactId: string;
   status: Status;
-  schema: Schema;
+  schema: SchemaDetail;
   sad: Sad;
 }
 
