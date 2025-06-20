@@ -134,6 +134,7 @@ async function initializeCredentials(
 
 async function startServer() {
   const app = express();
+  app.use(cors());
   app.use("/static", express.static("static"));
   app.use(
     "/oobi",
@@ -143,7 +144,6 @@ async function startServer() {
       },
     })
   );
-  app.use(cors());
   app.use(bodyParser.json());
   app.use(router);
   app.use((err, req, res, next) => {
