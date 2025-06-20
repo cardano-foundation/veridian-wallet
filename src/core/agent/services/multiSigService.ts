@@ -7,6 +7,11 @@ import {
   Serder,
   Siger,
   State,
+  b,
+  Cigar,
+  Signer,
+  reply,
+  Serials,
 } from "signify-ts";
 import {
   AgentServicesProps,
@@ -39,7 +44,7 @@ import { EventTypes, GroupCreatedEvent } from "../event.types";
 import { ConnectionService } from "./connectionService";
 import { IdentifierService } from "./identifierService";
 import { StorageMessage } from "../../storage/storage.types";
-
+import { RpyRoute } from "./connectionService.types";
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
   static readonly CANNOT_GET_KEYSTATE_OF_IDENTIFIER =
@@ -150,6 +155,9 @@ class MultiSigService extends AgentService {
       );
     await this.inceptGroup(mHab, states, inceptionData);
 
+    // Share witness OOBIs with other group members
+    await this.shareWitnessOobis(mHab, groupConnections);
+
     const multisigId = inceptionData.icp.i;
     const creationStatus = CreationStatus.PENDING;
 
@@ -237,7 +245,9 @@ class MultiSigService extends AgentService {
     states: State[],
     groupName: string,
     threshold: number,
-    queuedProps: QueuedGroupProps
+    queuedProps: QueuedGroupProps,
+    toad?: string,
+    wits?: string[]
   ): Promise<CreateIdentifierBody> {
     // For distributed reliability, store name and inception data so we can re-try on start-up
     // Hence we ignore duplicate errors
@@ -258,8 +268,8 @@ class MultiSigService extends AgentService {
         mhab: mHab,
         isith: threshold,
         nsith: threshold,
-        toad: Number(mHab.state.bt),
-        wits: mHab.state.b,
+        toad: Number(toad ?? mHab.state.bt),
+        wits: wits ?? mHab.state.b,
         states: states,
         rstates: states,
       });
@@ -321,6 +331,41 @@ class MultiSigService extends AgentService {
       embeds,
       recp
     );
+  }
+
+  private async shareWitnessOobis(
+    mHab: HabState,
+    groupConnections: ConnectionShortDetails[]
+  ): Promise<void> {
+    const { witnesses } = await this.identifiers.getAvailableWitnesses();
+    const keeper = this.props.signifyClient.manager!.get(mHab);
+
+    for (const witness of witnesses) {
+      const rpyData = {
+        cid: mHab.prefix,
+        oobi: witness.oobi,
+      };
+
+      const rpy = reply(
+        RpyRoute.INTRODUCE,
+        rpyData,
+        undefined,
+        undefined,
+        Serials.JSON
+      );
+
+      const sigs = await keeper.sign(b(rpy.raw));
+      const sigers = sigs.map((sig: string) => new Siger({ qb64: sig }));
+      const seal = [
+        "SealEvent",
+        { i: mHab.prefix, s: mHab.state.ee.s, d: mHab.state.ee.d },
+      ];
+      const ims = d(messagize(rpy, sigers, seal));
+
+      for (const connection of groupConnections) {
+        await this.props.signifyClient.replies().submitRpy(connection.id, ims);
+      }
+    }
   }
 
   @OnlineOnly
@@ -447,7 +492,9 @@ class MultiSigService extends AgentService {
           initiator: false,
           notificationId,
           notificationSaid,
-        }
+        },
+        exn.e.icp.bt,
+        exn.e.icp.b
       );
     await this.inceptGroup(mHab, states, inceptionData);
 

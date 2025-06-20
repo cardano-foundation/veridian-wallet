@@ -2081,10 +2081,15 @@ describe("Single sig service of agent", () => {
       ],
     });
 
-    expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
-      toad: 4,
-      witnesses: [...witnessEids.slice(0, 6)],
-    });
+    const witnesses = await identifierService.getAvailableWitnesses();
+    expect(witnesses.toad).toBe(4);
+    expect(witnesses.witnesses.map((w) => w.eid)).toStrictEqual(
+      witnessEids.slice(0, 6)
+    );
+    expect(WITNESSES).toEqual(
+      expect.arrayContaining(witnesses.witnesses.map((w) => w.oobi))
+    );
+
     expect(getAgentConfigMock).toBeCalled();
   });
 
@@ -2104,10 +2109,15 @@ describe("Single sig service of agent", () => {
       iurls: [...WITNESSES.slice(0, 6), ...WITNESSES.slice(0, 6)],
     });
 
-    expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
-      toad: 4,
-      witnesses: [...witnessEids.slice(0, 6)],
-    });
+    const witnesses = await identifierService.getAvailableWitnesses();
+    expect(witnesses.toad).toBe(4);
+    expect(witnesses.witnesses.map((w) => w.eid)).toStrictEqual(
+      witnessEids.slice(0, 6)
+    );
+    expect(WITNESSES).toEqual(
+      expect.arrayContaining(witnesses.witnesses.map((w) => w.oobi))
+    );
+
     expect(getAgentConfigMock).toBeCalled();
   });
 
@@ -2115,58 +2125,89 @@ describe("Single sig service of agent", () => {
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: WITNESSES.slice(0, 7),
     });
-    expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
-      toad: 5,
-      witnesses: [...witnessEids.slice(0, 7)],
-    });
+
+    let witnesses = await identifierService.getAvailableWitnesses();
+    expect(witnesses.toad).toBe(5);
+    expect(witnesses.witnesses.map((w) => w.eid)).toStrictEqual(
+      witnessEids.slice(0, 7)
+    );
+    // any oobi from witnesses must be in the WITNESSES array
+    expect(WITNESSES).toEqual(
+      expect.arrayContaining(witnesses.witnesses.map((w) => w.oobi))
+    );
 
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: WITNESSES.slice(0, 8),
     });
-    expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
-      toad: 5,
-      witnesses: [...witnessEids.slice(0, 7)],
-    });
+
+    witnesses = await identifierService.getAvailableWitnesses();
+    expect(witnesses.toad).toBe(5);
+    expect(witnesses.witnesses.map((w) => w.eid)).toStrictEqual(
+      witnessEids.slice(0, 7)
+    );
+    expect(WITNESSES).toEqual(
+      expect.arrayContaining(witnesses.witnesses.map((w) => w.oobi))
+    );
 
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: WITNESSES.slice(0, 9),
     });
-    expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
-      toad: 6,
-      witnesses: [...witnessEids.slice(0, 9)],
-    });
+    witnesses = await identifierService.getAvailableWitnesses();
+    expect(witnesses.toad).toBe(6);
+    expect(witnesses.witnesses.map((w) => w.eid)).toStrictEqual(
+      witnessEids.slice(0, 9)
+    );
+    expect(WITNESSES).toEqual(
+      expect.arrayContaining(witnesses.witnesses.map((w) => w.oobi))
+    );
 
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: WITNESSES.slice(0, 10),
     });
-    expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
-      toad: 7,
-      witnesses: [...witnessEids.slice(0, 10)],
-    });
+    witnesses = await identifierService.getAvailableWitnesses();
+    expect(witnesses.toad).toBe(7);
+    expect(witnesses.witnesses.map((w) => w.eid)).toStrictEqual(
+      witnessEids.slice(0, 10)
+    );
+    expect(WITNESSES).toEqual(
+      expect.arrayContaining(witnesses.witnesses.map((w) => w.oobi))
+    );
 
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: WITNESSES.slice(0, 11),
     });
-    expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
-      toad: 7,
-      witnesses: [...witnessEids.slice(0, 10)],
-    });
+    witnesses = await identifierService.getAvailableWitnesses();
+    expect(witnesses.toad).toBe(7);
+    expect(witnesses.witnesses.map((w) => w.eid)).toStrictEqual(
+      witnessEids.slice(0, 10)
+    );
+    expect(WITNESSES).toEqual(
+      expect.arrayContaining(witnesses.witnesses.map((w) => w.oobi))
+    );
 
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: WITNESSES.slice(0, 12),
     });
-    expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
-      toad: 8,
-      witnesses: [...witnessEids.slice(0, 12)],
-    });
+    witnesses = await identifierService.getAvailableWitnesses();
+    expect(witnesses.toad).toBe(8);
+    expect(witnesses.witnesses.map((w) => w.eid)).toStrictEqual(
+      witnessEids.slice(0, 12)
+    );
+    expect(WITNESSES).toEqual(
+      expect.arrayContaining(witnesses.witnesses.map((w) => w.oobi))
+    );
 
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: WITNESSES,
     });
-    expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
-      toad: 8,
-      witnesses: [...witnessEids.slice(0, 12)],
-    });
+    witnesses = await identifierService.getAvailableWitnesses();
+    expect(witnesses.toad).toBe(8);
+    expect(witnesses.witnesses.map((w) => w.eid)).toStrictEqual(
+      witnessEids.slice(0, 12)
+    );
+    expect(WITNESSES).toEqual(
+      expect.arrayContaining(witnesses.witnesses.map((w) => w.oobi))
+    );
   });
 });
 
