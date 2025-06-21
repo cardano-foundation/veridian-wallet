@@ -1,8 +1,7 @@
 Feature: WelcomeBack
 
   Background:
-    Given user is onboarded with skipped password creation
-    And user had already setup a identity
+    Given user had already setup a identity
 
   Scenario: C227 WelcomeBack - incorrect passcode
     When user type in wrong passcode
