@@ -764,7 +764,13 @@ class IdentifierService extends AgentService {
       }
     }
 
-    const uniqueWitnesses = [...new Map(witnesses).values()];
+    const witnessMap = new Map();
+    for (const [key, value] of witnesses) {
+      if (!witnessMap.has(key)) {
+        witnessMap.set(key, value);
+      }
+    }
+    const uniqueWitnesses = [...witnessMap.values()];
 
     if (uniqueWitnesses.length >= 12)
       return { toad: 8, witnesses: uniqueWitnesses.slice(0, 12) };
