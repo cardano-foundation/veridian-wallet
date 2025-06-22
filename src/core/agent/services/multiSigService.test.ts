@@ -60,6 +60,7 @@ const getExchangesMock = jest.fn();
 const markNotificationMock = jest.fn();
 const createExchangeMessageMock = jest.fn();
 const getMemberMock = jest.fn();
+const submitRpyMock = jest.fn();
 
 const signifyClient = jest.mocked({
   connect: jest.fn(),
@@ -113,7 +114,7 @@ const signifyClient = jest.mocked({
     createExchangeMessage: createExchangeMessageMock,
   }),
   replies: () => ({
-    submitRpy: jest.fn().mockResolvedValue({}),
+    submitRpy: submitRpyMock,
   }),
   agent: {
     pre: "pre",
@@ -362,6 +363,8 @@ describe("Creation of multi-sig", () => {
       linkedContacts.length + 1
     );
 
+    expect(submitRpyMock).toBeCalledTimes(6);
+
     expect(identifierCreateIcpDataMock).toBeCalledWith("0:Identifier 2", {
       algo: "group",
       mhab: getMemberIdentifierResponse,
@@ -556,6 +559,7 @@ describe("Creation of multi-sig", () => {
       true
     );
 
+    expect(submitRpyMock).toBeCalledTimes(6);
     expect(identifierSubmitIcpDataMock).toBeCalledWith(inceptionDataFix);
     expect(sendExchangesMock).toBeCalledWith(
       memberMetadataRecord.id,
@@ -672,6 +676,7 @@ describe("Creation of multi-sig", () => {
       true
     );
 
+    expect(submitRpyMock).toBeCalledTimes(6);
     expect(identifierSubmitIcpDataMock).toBeCalledWith(inceptionDataFix);
     expect(sendExchangesMock).toBeCalledWith(
       memberMetadataRecord.id,
