@@ -255,6 +255,11 @@ const witnessEids = WITNESSES.map(
   (oobi: string) => oobi.split("/oobi/")[1].split("/")[0]
 );
 
+const witnessObjects = WITNESSES.map((oobi: string) => ({
+  eid: oobi.split("/oobi/")[1].split("/")[0],
+  oobi,
+}));
+
 describe("Single sig service of agent", () => {
   beforeAll(async () => {
     await ready();
@@ -2083,8 +2088,9 @@ describe("Single sig service of agent", () => {
 
     expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
       toad: 4,
-      witnesses: [...witnessEids.slice(0, 6)],
+      witnesses: witnessObjects.slice(0, 6),
     });
+
     expect(getAgentConfigMock).toBeCalled();
   });
 
@@ -2106,8 +2112,9 @@ describe("Single sig service of agent", () => {
 
     expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
       toad: 4,
-      witnesses: [...witnessEids.slice(0, 6)],
+      witnesses: witnessObjects.slice(0, 6),
     });
+
     expect(getAgentConfigMock).toBeCalled();
   });
 
@@ -2115,17 +2122,19 @@ describe("Single sig service of agent", () => {
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: WITNESSES.slice(0, 7),
     });
+
     expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
       toad: 5,
-      witnesses: [...witnessEids.slice(0, 7)],
+      witnesses: witnessObjects.slice(0, 7),
     });
 
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: WITNESSES.slice(0, 8),
     });
+
     expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
       toad: 5,
-      witnesses: [...witnessEids.slice(0, 7)],
+      witnesses: witnessObjects.slice(0, 7),
     });
 
     getAgentConfigMock.mockResolvedValueOnce({
@@ -2133,7 +2142,7 @@ describe("Single sig service of agent", () => {
     });
     expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
       toad: 6,
-      witnesses: [...witnessEids.slice(0, 9)],
+      witnesses: witnessObjects.slice(0, 9),
     });
 
     getAgentConfigMock.mockResolvedValueOnce({
@@ -2141,7 +2150,7 @@ describe("Single sig service of agent", () => {
     });
     expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
       toad: 7,
-      witnesses: [...witnessEids.slice(0, 10)],
+      witnesses: witnessObjects.slice(0, 10),
     });
 
     getAgentConfigMock.mockResolvedValueOnce({
@@ -2149,7 +2158,7 @@ describe("Single sig service of agent", () => {
     });
     expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
       toad: 7,
-      witnesses: [...witnessEids.slice(0, 10)],
+      witnesses: witnessObjects.slice(0, 10),
     });
 
     getAgentConfigMock.mockResolvedValueOnce({
@@ -2157,7 +2166,7 @@ describe("Single sig service of agent", () => {
     });
     expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
       toad: 8,
-      witnesses: [...witnessEids.slice(0, 12)],
+      witnesses: witnessObjects.slice(0, 12),
     });
 
     getAgentConfigMock.mockResolvedValueOnce({
@@ -2165,7 +2174,7 @@ describe("Single sig service of agent", () => {
     });
     expect(await identifierService.getAvailableWitnesses()).toStrictEqual({
       toad: 8,
-      witnesses: [...witnessEids.slice(0, 12)],
+      witnesses: witnessObjects.slice(0, 12),
     });
   });
 });
