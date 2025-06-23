@@ -310,6 +310,32 @@ describe("Usage of multi-sig", () => {
   });
 });
 
+const expectAllWitnessIntroductions = () => {
+  expect(submitRpyMock).toHaveBeenCalledTimes(
+    getAvailableWitnesses.witnesses.length
+  );
+
+  getAvailableWitnesses.witnesses.forEach((witness, index) => {
+    expect(submitRpyMock).toHaveBeenNthCalledWith(
+      index + 1,
+      linkedContacts[0].id,
+      expect.stringContaining(
+        `"a":{"cid":"EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8","oobi":"${witness.oobi}"}`
+      )
+    );
+    expect(submitRpyMock).toHaveBeenNthCalledWith(
+      index + 1,
+      linkedContacts[0].id,
+      expect.stringContaining("\"t\":\"rpy\"")
+    );
+    expect(submitRpyMock).toHaveBeenNthCalledWith(
+      index + 1,
+      linkedContacts[0].id,
+      expect.stringContaining("\"r\":\"/introduce\"")
+    );
+  });
+};
+
 describe("Creation of multi-sig", () => {
   beforeAll(() => {
     eventEmitter.emit = jest.fn();
@@ -363,8 +389,7 @@ describe("Creation of multi-sig", () => {
       linkedContacts.length + 1
     );
 
-    expect(submitRpyMock).toBeCalledTimes(6);
-
+    expectAllWitnessIntroductions();
     expect(identifierCreateIcpDataMock).toBeCalledWith("0:Identifier 2", {
       algo: "group",
       mhab: getMemberIdentifierResponse,
@@ -559,7 +584,7 @@ describe("Creation of multi-sig", () => {
       true
     );
 
-    expect(submitRpyMock).toBeCalledTimes(6);
+    expectAllWitnessIntroductions();
     expect(identifierSubmitIcpDataMock).toBeCalledWith(inceptionDataFix);
     expect(sendExchangesMock).toBeCalledWith(
       memberMetadataRecord.id,
@@ -676,7 +701,7 @@ describe("Creation of multi-sig", () => {
       true
     );
 
-    expect(submitRpyMock).toBeCalledTimes(6);
+    expectAllWitnessIntroductions();
     expect(identifierSubmitIcpDataMock).toBeCalledWith(inceptionDataFix);
     expect(sendExchangesMock).toBeCalledWith(
       memberMetadataRecord.id,
