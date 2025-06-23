@@ -26,6 +26,14 @@ export class SsiAgentDetailsScreen {
     return $("[data-testid=\"primary-button-create-ssi-agent\"]");
   }
 
+  get bootUrlInputText() {
+    return $("#boot-url-input");
+  }
+
+  get connectUrlInputText() {
+    return $("#connect-url-input");
+  }
+
   async tapOnValidatedButton() {
     await expect(this.validateButton).toBeDisplayed();
     await expect(this.validateButton).toBeEnabled();
