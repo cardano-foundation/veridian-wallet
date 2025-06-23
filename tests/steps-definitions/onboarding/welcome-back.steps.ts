@@ -3,9 +3,27 @@ import WelcomeBackScreen from "../../screen-objects/onboarding/welcome-back.scre
 import PasscodeScreen from "../../screen-objects/onboarding/passcode.screen";
 import ForgotPasscodeScreen from "../../screen-objects/onboarding/forgot-passcode.screen";
 import { WelcomeBack } from "../../constants/text.constants";
+import OnboardingScreen from "../../screen-objects/onboarding/onboarding.screen";
+import BiometricScreen from "../../screen-objects/onboarding/biometric.screen";
+import CreatePasswordScreen from "../../screen-objects/onboarding/create-password.screen";
+import AlertModal from "../../screen-objects/components/alert.modal";
 
 Given(/^user had already setup a identity$/, async function () {
   if (await WelcomeBackScreen.welcomeBackTitle.isDisplayed()) {
+    await WelcomeBackScreen.loads();
+  } else {
+    await OnboardingScreen.tapOnGetStartedButton();
+    await PasscodeScreen.enterPasscode(
+      (this.passcode = await PasscodeScreen.createAndEnterRandomPasscode())
+    );
+    if (await BiometricScreen.biometricTitleText.isExisting()) {
+      await BiometricScreen.setUpLaterButton.click();
+    }
+    if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
+      await CreatePasswordScreen.setUpLaterButton.click();
+    }
+    await AlertModal.clickConfirmButtonOf(CreatePasswordScreen.alertModal);
+    await new Promise((resolve) => setTimeout(resolve, 62000));
     await WelcomeBackScreen.loads();
   }
 });
