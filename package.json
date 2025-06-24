@@ -156,7 +156,7 @@
     "axios": "^1.8.2",
     "base-x": "^4.0.0",
     "ipaddr.js": "^2.2.0",
-    "validate.js": "^0.13.2"
+    "validate.js": "^0.13.1"
   },
   "eslintConfig": {
     "extends": [
