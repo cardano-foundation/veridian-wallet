@@ -10,20 +10,15 @@
   .alert {
     margin-top: 0.75rem;
     margin-bottom: 1.75rem;
+    background: rgba(var(--ion-color-error-800-rgb), 0.1);
 
-    .card-details-info-block-inner {
-      background: rgba(var(--ion-color-error-800-rgb), 0.1);
-      padding: 1rem 1.25rem;
-      display: flex;
+    p {
+      font-size: 1rem;
+      line-height: 1.375rem;
+    }
 
-      .alert-icon {
-        width: 1.5rem;
-        height: 1.5rem;
-
-        ion-icon {
-          color: var(--ion-color-danger);
-        }
-      }
+    ion-icon {
+      color: var(--ion-color-danger);
     }
   }
 
@@ -33,12 +28,6 @@
     line-height: 1.5rem;
     margin-bottom: 0.5rem;
     color: var(--ion-color-neutral-800);
-  }
-
-  .detail-text {
-    color: var(--ion-color-neutral-700);
-    font-size: 1rem;
-    line-height: 1.375rem;
   }
 
   .instructions {
@@ -70,7 +59,7 @@
     .alert {
       margin-bottom: 1.5rem;
 
-      .card-details-info-block-inner {
+      p {
         font-size: 0.85rem;
       }
     }

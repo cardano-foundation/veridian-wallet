@@ -6,26 +6,10 @@
   .user-tips {
     margin-top: 0.75rem;
     margin-bottom: 1.5rem !important;
+    margin-inline: 0;
 
     p {
       margin: 0 0 0.5rem;
-    }
-
-    .card-details-info-block-inner {
-      background: var(--ion-color-neutral-300);
-      padding: 1rem 1.25rem;
-      display: flex;
-      flex-direction: row;
-
-      .alert-icon {
-        margin-left: 0.25rem;
-        width: 1.5rem;
-        height: 1.5rem;
-
-        ion-icon {
-          color: var(--ion-color-neutral-700);
-        }
-      }
     }
 
     @media screen and (min-width: 250px) and (max-width: 370px) {
