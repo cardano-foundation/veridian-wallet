@@ -60,7 +60,6 @@ export class PasscodeScreen {
     for (let i = 0; i < 10; i++) {
       digitButtonMap[i] = async () => {
         await (await this.digitButton(i, parentElement)).click();
-        await delay(100);
       };
     }
     //clicking digits on the screen
@@ -69,9 +68,10 @@ export class PasscodeScreen {
     }
   }
 
-  async enterPasscodeSkip(digit: number, parentElement = "") {
+  async enterPasscodeSkip() {
+    const numberInput = 1;
     for (let i = 0; i < await this.passcodePoint.length; i++) {
-      await (await this.digitButton(digit, parentElement)).click();
+      await this.enterPasscode([numberInput]);
       await delay(100);
     }
   }

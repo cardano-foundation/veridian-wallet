@@ -34,7 +34,7 @@ Given(/^user is onboarded with skipped password creation$/, async function () {
     await recoveryPhrase().select(recoveryPhraseWords);
     await VerifySeedPhraseScreen.verifyButton.click();
   } else {
-    await PasscodeScreen.enterPasscodeSkip(1);
+    await PasscodeScreen.enterPasscodeSkip();
   }
   await SsiAgentDetailsScreen.tapOnValidatedButton();
   this.userName = faker.person.firstName();
@@ -71,7 +71,7 @@ Given(/^user is onboarded with a password creation$/, async function () {
     await recoveryPhrase().select(recoveryPhraseWords);
     await VerifySeedPhraseScreen.verifyButton.click();
   } else {
-    await PasscodeScreen.enterPasscodeSkip(1);
+    await PasscodeScreen.enterPasscodeSkip();
   }
   await SsiAgentDetailsScreen.tapOnValidatedButton();
   this.userName = faker.person.firstName();
