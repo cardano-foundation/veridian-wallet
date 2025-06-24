@@ -3,6 +3,7 @@ import { generateRandomNumbersArray } from "../../helpers/generate.js";
 import { log } from "../../helpers/logger.js";
 import { Passcode } from "../../constants/text.constants.js";
 import BaseModal from "../components/base.modal.js";
+import { delay } from "../base.screen";
 
 export class PasscodeScreen {
   get cantRememberButton() {
@@ -59,6 +60,7 @@ export class PasscodeScreen {
     for (let i = 0; i < 10; i++) {
       digitButtonMap[i] = async () => {
         await (await this.digitButton(i, parentElement)).click();
+        await delay(100);
       };
     }
     //clicking digits on the screen
@@ -70,7 +72,7 @@ export class PasscodeScreen {
   async enterPasscodeSkip(digit: number, parentElement = "") {
     for (let i = 0; i < await this.passcodePoint.length; i++) {
       await (await this.digitButton(digit, parentElement)).click();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await delay(100);
     }
   }
 
