@@ -1,10 +1,15 @@
 import { Dict } from "signify-ts";
 
-enum NotificationRoute {
+export type BranFileContent = {
+  bran: string;
+  issuerBran: string;
+};
+
+export enum NotificationRoute {
   ExnIpexOffer = "/exn/ipex/offer",
 }
 
-type Credential = {
+export type Credential = {
   status: {
     s: string;
   };
@@ -13,28 +18,20 @@ type Credential = {
   iss: Dict<any>;
 };
 
-type QviCredential = {
+export type QviCredential = {
   sad: Dict<any>;
 };
 
-type LeCredential = {
+export type LeCredential = {
   sad: Dict<any>;
   anc: Dict<any>;
   iss: Dict<any>;
   ancAttachment: string;
 };
 
-type ExchangeMsg = {
+export type ExchangeMsg = {
   exn: {
     d: string;
     i: string;
   };
-};
-
-export {
-  NotificationRoute,
-  Credential,
-  QviCredential,
-  LeCredential,
-  ExchangeMsg,
 };

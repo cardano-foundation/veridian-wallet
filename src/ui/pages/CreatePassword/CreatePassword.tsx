@@ -94,6 +94,7 @@ const CreatePassword = ({
     <>
       <ScrollablePageLayout
         pageId={pageId}
+        customClass={isOnboarding ? "has-header-skip" : undefined}
         header={
           <PageHeader
             currentPath={isOnboarding ? RoutePath.CREATE_PASSWORD : undefined}

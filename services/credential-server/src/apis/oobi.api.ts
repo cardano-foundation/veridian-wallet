@@ -1,13 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import { Agent } from "../agent";
+import { SignifyClient } from "signify-ts";
+import { resolveOobi as resolveOobiFromUtils } from "../utils/utils";
 
-async function resolveOobi(req: Request, res: Response, next: NextFunction) {
+export async function resolveOobi(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const client: SignifyClient = req.app.get("signifyClient");
   const { oobi } = req.body;
-  await Agent.agent.resolveOobi(oobi);
+
+  await resolveOobiFromUtils(client, oobi);
   res.status(200).send({
     success: true,
     data: "OOBI resolved successfully",
   });
 }
-
-export { resolveOobi };

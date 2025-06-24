@@ -40,19 +40,7 @@
     margin: 0;
   }
 
-  .forgot-your-passcode-placeholder {
-    height: 4.625rem;
-  }
-
-  @media screen and (min-height: 300px) and (max-height: 600px) {
-    .forgot-your-passcode-placeholder {
-      height: 2rem;
-    }
-  }
-
-  @media screen and (min-height: 300px) and (max-height: 600px) {
-    .forgot-your-passcode-placeholder {
-      height: 4.5rem;
-    }
+  .hide {
+    visibility: hidden;
   }
 }

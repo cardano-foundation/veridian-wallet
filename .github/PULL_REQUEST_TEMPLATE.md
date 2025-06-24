@@ -1,57 +1,29 @@
+<!--
+* Please:
+   ✓ Set a good, conventional commit style PR title.
+   ✓ Write a good description that explains what this PR is meant to do.
+   ✓ Keep PRs small, and manageable for reviewers.
+   ✓ Set as draft until ready, and self-reviewed.
+   ✓ Keep screenshots small using <img src="URL_HERE" width="35%">.
+   ✓ Make sure you have all green ticks on GitHub actions before asking for a review.
+-->
+
 ## Description
 
-Please include a summary of the changes and a brief description about this PR
+Please include a summary of the changes and a brief description about this PR.
 
 ## Checklist before requesting a review
 
 ### Issue ticket number and link
 
-- [ ] This PR has a valid ticket number or issue: [link]
+- [ ] This PR has a valid ticket number or issue: [**TICKET_NUMBER**](link)
 
 ### Testing & Validation
 
-- [ ] This PR has been tested/validated in IOS, Android and browser.
-- [ ] The code has been tested locally with test coverage match expectations.
-- [ ] Added new Unit/Component testing (if relevant).
-
-### Security
-
-- [ ] No secrets are being committed (i.e. credentials, PII)
-- [ ] This PR does not have any significant security implications
-
-### Code Review
-
-- [ ] There is no unused functionality or blocks of commented out code (otherwise, please explain below)
-- [ ] In addition to this PR, all relevant documentation (e.g. Confluence) and architecture diagrams (e.g. Miro) were updated
+- [ ] This PR has been tested/validated in iOS, Android and browser.
+- [ ] Added new unit tests, if relevant.
 
 ### Design Review
 
-- [ ] If this PR contains changes to the UI, it has gone through a design review with UX Designer or Product owner.
-- [ ] In case PR contains changes to the UI, add some screenshots to notice the differences
----
-#### IOS
-##### _Before_
+- [ ] In case this PR contains changes to the UI, add some screenshots and/or videos to show the changes on relevant devices.
 
-[comment]: <> (Add screenshots)
-
-##### _After_
-
-[comment]: <> (Add screenshots)
-
-#### Android
-##### _Before_
-
-[comment]: <> (Add screenshots)
-
-##### _After_
-
-[comment]: <> (Add screenshots)
-
-#### Browser
-##### _Before_
-
-[comment]: <> (Add screenshots)
-
-##### _After_
-
-[comment]: <> (Add screenshots)

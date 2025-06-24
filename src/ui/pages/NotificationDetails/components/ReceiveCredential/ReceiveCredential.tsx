@@ -231,6 +231,7 @@ const ReceiveCredential = ({
   };
 
   const handleDecline = async () => {
+    closeDeclineAlert();
     try {
       await Agent.agent.keriaNotifications.deleteNotificationRecordById(
         notificationDetails.id,
@@ -320,6 +321,8 @@ const ReceiveCredential = ({
       : `${i18n.t("tabs.notifications.details.buttons.decline")}`;
 
   const theme = getTheme(identifier?.theme || 0);
+
+  const closeDeclineAlert = () => setAlertDeclineIsOpen(false);
 
   return (
     <>
@@ -515,9 +518,9 @@ const ReceiveCredential = ({
         cancelButtonText={`${i18n.t(
           "tabs.notifications.details.buttons.cancel"
         )}`}
-        actionConfirm={() => handleDecline()}
-        actionCancel={() => setAlertDeclineIsOpen(false)}
-        actionDismiss={() => setAlertDeclineIsOpen(false)}
+        actionConfirm={handleDecline}
+        actionCancel={closeDeclineAlert}
+        actionDismiss={closeDeclineAlert}
       />
       <Alert
         dataTestId="missing-issuer-alert"

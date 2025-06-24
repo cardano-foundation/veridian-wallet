@@ -41,8 +41,8 @@ export const Credentials = () => {
   const roleViewIndex = useAppSelector(getRoleView) as RoleIndex;
   const schemaCaches = useAppSelector((state) => state.schemasCache.schemas);
   const tableRows: CredentialTemplateRow[] = schemaCaches.map((row) => ({
-    id: row.$id,
-    name: row.title,
+    id: row.id,
+    name: row.name,
     date: new Date().getTime(),
   }));
   const nav = useNavigate();

@@ -6,6 +6,22 @@ import EngTrans from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
 import { Verification } from "./Verification";
 
+jest.mock("../../../core/agent/agent", () => ({
+  Agent: {
+    agent: {
+      credentials: {
+        getCredentialDetailsById: jest.fn(),
+      },
+      basicStorage: {
+        findById: jest.fn(),
+      },
+      auth: {
+        verifySecret: jest.fn(),
+      },
+    },
+  },
+}));
+
 const handleBiometricAuthMock = jest.fn(() =>
   Promise.resolve<
     | boolean

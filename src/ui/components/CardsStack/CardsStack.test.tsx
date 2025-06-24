@@ -54,6 +54,9 @@ jest.mock("../../../core/agent/agent", () => ({
       basicStorage: {
         deleteById: jest.fn(),
       },
+      connections: {
+        getConnectionShortDetailById: jest.fn(),
+      },
     },
   },
 }));

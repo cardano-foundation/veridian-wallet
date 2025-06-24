@@ -10,6 +10,7 @@ import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
+import { filteredIdentifierMapFix } from "../../../../../__fixtures__/filteredIdentifierFix";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -19,6 +20,7 @@ jest.mock("@ionic/react", () => ({
 
 const deleteNotificationMock = jest.fn((id: string) => Promise.resolve(id));
 const joinMultisigOfferMock = jest.fn();
+const getOfferedCredentialSaid = jest.fn(() => "cred-id");
 
 jest.mock("../../../../../../core/agent/agent", () => ({
   Agent: {
@@ -29,10 +31,18 @@ jest.mock("../../../../../../core/agent/agent", () => ({
       },
       ipexCommunications: {
         joinMultisigOffer: () => joinMultisigOfferMock(),
-        getOfferedCredentialSaid: jest.fn(() => "cred-id"),
+        getOfferedCredentialSaid: () => getOfferedCredentialSaid(),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
+      },
+      credentials: {
+        getCredentialDetailsById: jest.fn(() =>
+          Promise.resolve(credsFixAcdc[0])
+        ),
+      },
+      connections: {
+        getConnectionShortDetailById: jest.fn(() => Promise.resolve([])),
       },
     },
   },
@@ -64,6 +74,9 @@ const initialState = {
   },
   biometricsCache: {
     enabled: false,
+  },
+  identifiersCache: {
+    identifiers: filteredIdentifierMapFix,
   },
 };
 
@@ -112,6 +125,10 @@ describe("Credential request information", () => {
 
     fireEvent.click(
       getByTestId("multisig-request-alert-decline-confirm-button")
+    );
+
+    fireEvent.click(
+      getByTestId("multisig-request-alert-decline-cancel-button")
     );
 
     await waitFor(() => {
@@ -1809,5 +1826,81 @@ describe("Credential request information: multisig", () => {
 
     unmount();
     document.getElementsByTagName("body")[0].innerHTML = "";
+  });
+
+  test("Open proposed cred", async () => {
+    const linkedGroup = {
+      linkedRequest: {
+        accepted: true,
+        current: "EKfweht5lOkjaguB5dz42BMkfejhBFIF9-ghumzCJ6nv",
+        previous: undefined,
+      },
+      threshold: "2",
+      members: ["member-1", "member-2", "member-3"],
+      othersJoined: ["member-1"],
+      memberInfos: [
+        {
+          aid: "member-1",
+          name: "Member 1",
+          joined: true,
+        },
+        {
+          aid: "member-2",
+          name: "Member 2",
+          joined: true,
+        },
+        {
+          aid: "member-3",
+          name: "Member 3",
+          joined: false,
+        },
+      ],
+    };
+
+    const storeMocked = {
+      ...mockStore({
+        ...initialState,
+        credsCache: {
+          creds: [{ ...credsFixAcdc[0], id: "cred-id" }],
+        },
+      }),
+      dispatch: dispatchMock,
+    };
+
+    const back = jest.fn();
+
+    const { getByTestId, getByText, queryByTestId } = render(
+      <Provider store={storeMocked}>
+        <CredentialRequestInformation
+          pageId="multi-sign"
+          activeStatus
+          onBack={back}
+          onAccept={jest.fn()}
+          userAID="member-2"
+          notificationDetails={notificationsFix[4]}
+          credentialRequest={credRequestFix}
+          linkedGroup={linkedGroup}
+          onReloadData={jest.fn()}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getOfferedCredentialSaid).toBeCalled();
+    });
+
+    expect(getByTestId("proposed-cred-card")).toBeVisible();
+
+    fireEvent.click(getByTestId("proposed-cred-card"));
+
+    await waitFor(() => {
+      expect(getByTestId("request-cred-detail-modal")).toBeVisible();
+    });
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.tabs.credentials.details.done));
+
+    await waitFor(() => {
+      expect(queryByTestId("request-cred-detail-modal")).toBeNull();
+    });
   });
 });

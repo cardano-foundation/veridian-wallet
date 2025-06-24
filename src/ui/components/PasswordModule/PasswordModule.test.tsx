@@ -44,6 +44,31 @@ const createOrUpdateBasicRecordMock = jest.fn((agr: unknown) =>
   Promise.resolve(agr)
 );
 
+jest.mock("@ionic/react", () => {
+  const actual = jest.requireActual("@ionic/react");
+  return {
+    ...actual,
+    IonAlert: (props: any) =>
+      props.isOpen ? (
+        <div data-testid={props["data-testid"] || "mock-ion-alert"}>
+          {props.header}
+          {props.subHeader}
+          {props.message}
+          {props.buttons &&
+            props.buttons.map((btn: any, idx: number) => (
+              <button
+                key={btn.text || idx}
+                data-testid={btn["data-testid"] || `alert-btn-${idx}`}
+                onClick={btn.handler}
+              >
+                {btn.text}
+              </button>
+            ))}
+        </div>
+      ) : null,
+  };
+});
+
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
@@ -294,6 +319,84 @@ describe("Password Module", () => {
     });
   });
 
+  test("Submit existing password", async () => {
+    verifySecretMock.mockResolvedValueOnce(true);
+    const initialState = {
+      stateCache: {
+        routes: [RoutePath.TABS_MENU],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          seedPhraseIsSet: true,
+          passwordIsSet: true,
+        },
+        currentOperation: OperationType.IDLE,
+      },
+      seedPhraseCache: {
+        seedPhrase: "",
+        bran: "",
+      },
+      cryptoAccountsCache: {
+        cryptoAccounts: [],
+      },
+      biometricsCache: {
+        enabled: false,
+      },
+    };
+
+    const { getByTestId, queryByText, getByText } = render(
+      <Provider store={storeMocked(initialState)}>
+        <PasswordModule
+          title="Password Module"
+          description="Description"
+          testId="password-module"
+          onCreateSuccess={onCreateSuccesMock}
+        />
+      </Provider>
+    );
+
+    expect(queryByText(TRANSLATIONS.createpassword.button.skip)).toBe(null);
+
+    const input = getByTestId("create-password-input");
+    const confirmInput = getByTestId("confirm-password-input");
+    const hintInput = getByTestId("create-hint-input");
+
+    act(() => {
+      ionFireEvent.ionInput(input, "Passssssss1@");
+      ionFireEvent.ionInput(confirmInput, "Passssssss1@");
+      ionFireEvent.ionInput(hintInput, "hint");
+    });
+
+    expect(
+      queryByText(
+        TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
+          .page.alert.existingpassword
+      )
+    ).toBeNull();
+
+    fireEvent.click(getByTestId("primary-button-password-module"));
+
+    await waitFor(() => {
+      expect(
+        getByText(
+          TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
+            .page.alert.existingpassword
+        )
+      ).toBeVisible();
+    });
+
+    expect(getByTestId("alert-btn-0")).toBeVisible();
+
+    fireEvent.click(getByTestId("alert-btn-0"));
+
+    await waitFor(() => {
+      expect((input as HTMLInputElement).value).toBe("");
+      expect((confirmInput as HTMLInputElement).value).toBe("");
+      expect((hintInput as HTMLInputElement).value).toBe("");
+    });
+  });
+
   test("Submit password", async () => {
     const { getByTestId } = render(
       <Provider store={storeMocked(initialState)}>
@@ -338,91 +441,12 @@ describe("Password Module", () => {
           content: { value: "hint" },
         })
       );
-    });
-
-    spy.mockRestore();
-  });
-
-  test("Submit password on manage password page", async () => {
-    verifySecretMock.mockResolvedValueOnce(true);
-    const initialState = {
-      stateCache: {
-        routes: [RoutePath.TABS_MENU],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          seedPhraseIsSet: true,
-          passwordIsSet: true,
-        },
-        currentOperation: OperationType.IDLE,
-      },
-      seedPhraseCache: {
-        seedPhrase: "",
-        bran: "",
-      },
-      cryptoAccountsCache: {
-        cryptoAccounts: [],
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const { getByTestId, queryByText, unmount, findByText } = render(
-      <Provider store={storeMocked(initialState)}>
-        <PasswordModule
-          title="Password Module"
-          description="Description"
-          testId="password-module"
-          onCreateSuccess={onCreateSuccesMock}
-        />
-      </Provider>
-    );
-
-    expect(queryByText(TRANSLATIONS.createpassword.button.skip)).toBe(null);
-
-    const input = getByTestId("create-password-input");
-    const confirmInput = getByTestId("confirm-password-input");
-    const hintInput = getByTestId("create-hint-input");
-
-    act(() => {
-      ionFireEvent.ionInput(input, "Passssssss1@");
-      ionFireEvent.ionInput(confirmInput, "Passssssss1@");
-      ionFireEvent.ionInput(hintInput, "hint");
-    });
-
-    fireEvent.click(getByTestId("primary-button-password-module"));
-
-    const alertTitle = await findByText(
-      TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword.page
-        .alert.existingpassword
-    );
-
-    await waitFor(() => {
-      expect(alertTitle).toBeVisible();
-    });
-
-    fireEvent.click(
-      getByTestId("manage-password-alert-existing-confirm-button")
-    );
-
-    await waitFor(() => {
-      expect(
-        queryByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-            .page.alert.existingpassword
-        )
-      ).toBeNull();
-    });
-
-    await waitFor(() => {
       expect((input as HTMLInputElement).value).toBe("");
       expect((confirmInput as HTMLInputElement).value).toBe("");
       expect((hintInput as HTMLInputElement).value).toBe("");
     });
 
-    unmount();
+    spy.mockRestore();
   });
 
   test("Open symbol modal", async () => {

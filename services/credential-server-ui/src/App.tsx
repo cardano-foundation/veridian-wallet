@@ -27,6 +27,7 @@ import { RequestPresentation } from "./pages/RequestPresentation";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { fetchSchemas } from "./store/reducers/schemasSlice";
+import { ReduxError } from "./components/ReduxError/ReduxError";
 
 const App = () => {
   const MAX_TOAST_MESSAGES = 10;
@@ -122,6 +123,7 @@ const App = () => {
           </BrowserRouter>
         </SnackbarProvider>
       </ThemeProvider>
+      <ReduxError />
     </LocalizationProvider>
   );
 };

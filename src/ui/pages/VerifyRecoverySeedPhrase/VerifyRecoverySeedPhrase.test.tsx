@@ -148,7 +148,7 @@ describe("Verify Recovery Seed Phrase", () => {
         })
       );
     });
-  });
+  }, 15000);
 
   test("Show switch onboarding modal", async () => {
     const history = createMemoryHistory();

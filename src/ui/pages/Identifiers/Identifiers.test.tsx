@@ -2,12 +2,7 @@ const verifySecretMock = jest.fn();
 
 import { IonReactMemoryRouter } from "@ionic/react-router";
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import {
-  fireEvent,
-  render,
-  RenderResult,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -35,10 +30,10 @@ import {
   NAVIGATION_DELAY,
 } from "../../components/CardsStack";
 import { OperationType } from "../../globals/types";
+import { passcodeFiller } from "../../utils/passcodeFiller";
 import { IdentifierDetails } from "../IdentifierDetails";
 import { Identifiers } from "./Identifiers";
 import { IdentifiersFilters } from "./Identifiers.types";
-import { passcodeFiller } from "../../utils/passcodeFiller";
 
 const deleteIdentifierMock = jest.fn();
 const markIdentifierPendingDelete = jest.fn();
@@ -77,6 +72,10 @@ jest.mock("../../../core/agent/agent", () => ({
       },
       auth: {
         verifySecret: verifySecretMock,
+      },
+      connections: {
+        getOobi: jest.fn(),
+        getMultisigLinkedContacts: jest.fn(),
       },
     },
   },
@@ -829,7 +828,7 @@ describe("Identifiers Tab", () => {
       expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
     });
 
-    passcodeFiller(getByText, getByTestId, "193212");
+    await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
       expect(markIdentifierPendingDelete).toBeCalled();
