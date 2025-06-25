@@ -7,30 +7,36 @@ import CreatePasswordScreen from "../../screen-objects/onboarding/create-passwor
 import AlertModal from "../../screen-objects/components/alert.modal";
 import { generateRecoveryPhraseOf, recoveryPhraseWords } from "./verify-your-recovery-phrase.steps";
 import { recoveryPhrase } from "../../helpers/recovery-phrase";
-import VerifyYourRecoveryPhraseScreen from "../../screen-objects/onboarding/verify-your-recovery-phrase.screen";
 import { SSIAgent } from "../../constants/text.constants";
 import WelcomeModal  from "../../screen-objects/components/welcome.modal";
 import MenuSettingsSupportScreen from "../../screen-objects/menu/menu-settings-support.screen";
+import VerifySeedPhraseScreen from "../../screen-objects/onboarding/verify-your-recovery-phrase.screen";
+import SwitchRecoverWalletScreen from "../../screen-objects/onboarding/switch-recover-wallet.screen";
+import RecoverWalletScreen from "../../screen-objects/onboarding/recover-wallet.screen";
 
 Then(/^user can see SSI Agent Details screen$/, async function () {
   await SsiAgentDetailsScreen.loads();
 });
 
 Given(/^user generate passcode and skip password and verify recovery phrase$/, async function() {
-  await OnboardingScreen.tapOnGetStartedButton();
-  await PasscodeScreen.enterPasscode(
-    (this.passcode = await PasscodeScreen.createAndEnterRandomPasscode())
-  );
-  if (await BiometricScreen.biometricTitleText.isExisting()) {
-    await BiometricScreen.setUpLaterButton.click();
+  if (await OnboardingScreen.getStartedButton.isExisting()) {
+    await OnboardingScreen.tapOnGetStartedButton();
+    await PasscodeScreen.enterPasscode(
+      (this.passcode = await PasscodeScreen.createAndEnterRandomPasscode())
+    );
+    if (await BiometricScreen.biometricTitleText.isExisting()) {
+      await BiometricScreen.setUpLaterButton.click();
+    }
+    if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
+      await CreatePasswordScreen.setUpLaterButton.click();
+    }
+    await AlertModal.clickConfirmButtonOf(CreatePasswordScreen.alertModal);
+    await generateRecoveryPhraseOf();
+    await recoveryPhrase().select(recoveryPhraseWords);
+    await VerifySeedPhraseScreen.verifyButton.click();
+  } else {
+    await PasscodeScreen.enterPasscodeSkip();
   }
-  if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
-    await CreatePasswordScreen.setUpLaterButton.click();
-  }
-  await AlertModal.clickConfirmButtonOf(CreatePasswordScreen.alertModal);
-  await generateRecoveryPhraseOf();
-  await recoveryPhrase().select(recoveryPhraseWords);
-  await VerifyYourRecoveryPhraseScreen.verifyButton.click();
 });
 
 When(/^user edit Boot URL on SSI Agent Details screen$/, async function() {
@@ -79,4 +85,18 @@ Then(/^user can see Onboarding documentation$/, async function() {
   await MenuSettingsSupportScreen.navigateToAnotherWebview();
   await MenuSettingsSupportScreen.checkTitle("Onboarding");
 
+});
+
+When(/^user tap Switch to recover a wallet button on SSI Agent Details screen$/, async function() {
+  await SsiAgentDetailsScreen.switchToRecoveryWalletButton.click();
+});
+
+When(/^user tap Continue button on Before you switch modal for recover a wallet flow$/, async function() {
+  await SwitchRecoverWalletScreen.loads();
+  await SwitchRecoverWalletScreen.confirmCheckbox.click();
+  await SwitchRecoverWalletScreen.continueButton.click();
+});
+
+Then(/^user can see Recover Wallet screen$/, async function() {
+  await RecoverWalletScreen.loads()
 });

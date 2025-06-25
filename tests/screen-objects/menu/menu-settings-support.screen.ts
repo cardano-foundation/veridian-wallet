@@ -1,6 +1,7 @@
 import { expect } from "expect-webdriverio";
 import { driver } from "@wdio/globals";
 import { log } from "../../helpers/logger";
+import { delay } from "../base.screen";
 
 export class MenuSettingsSupportScreen {
   get termsOfUseItem() {
@@ -40,6 +41,7 @@ export class MenuSettingsSupportScreen {
     log.info(`Contexts: ${contexts}`);
     for (let i = contexts.length - 1; i >= 1; i--) {
       await driver.switchContext(contexts[i]);
+      await delay(100);
     }
   }
 
