@@ -9,6 +9,8 @@ import { generateRecoveryPhraseOf, recoveryPhraseWords } from "./verify-your-rec
 import { recoveryPhrase } from "../../helpers/recovery-phrase";
 import VerifyYourRecoveryPhraseScreen from "../../screen-objects/onboarding/verify-your-recovery-phrase.screen";
 import { SSIAgent } from "../../constants/text.constants";
+import WelcomeModal  from "../../screen-objects/components/welcome.modal";
+import MenuSettingsSupportScreen from "../../screen-objects/menu/menu-settings-support.screen";
 
 Then(/^user can see SSI Agent Details screen$/, async function () {
   await SsiAgentDetailsScreen.loads();
@@ -36,6 +38,45 @@ When(/^user edit Boot URL on SSI Agent Details screen$/, async function() {
 });
 
 Then(/^user can see new value for Boot URL on SSI Agent Details screen$/, async function() {
-  const actualValue = await SsiAgentDetailsScreen.bootUrlInputText.getAttribute("value");
-  expect(actualValue).toBe(SSIAgent.BootURL);
+  const actualBootURL = await SsiAgentDetailsScreen.bootUrlInputText.getAttribute("value");
+  expect(actualBootURL).toBe(SSIAgent.BootURL);
+});
+
+When(/^user edit Connect URL on SSI Agent Details screen$/, async function() {
+  await SsiAgentDetailsScreen.connectUrlInput.setValue(SSIAgent.ConnectURL);
+});
+
+Then(/^user can see new value for Connect URL on SSI Agent Details screen$/, async function() {
+  const actualConnectURL = await SsiAgentDetailsScreen.connectUrlInputText.getAttribute("value");
+  expect(actualConnectURL).toBe(SSIAgent.ConnectURL);
+});
+
+When(/^user tap Validate button on SSI Agent Details screen$/, async function() {
+  await SsiAgentDetailsScreen.tapOnValidatedButton();
+});
+
+Then(/^user can see Welcome modal$/, async function() {
+  await WelcomeModal.loads();
+});
+
+When(/^user tap Get more information button on SSI Agent Details screen$/, async function() {
+  await SsiAgentDetailsScreen.getInformationButton.click();
+});
+
+Then(/^user can see About SSI agent modal$/, async function() {
+  await SsiAgentDetailsScreen.checkAboutSSIAgentScreen();
+});
+
+When(/^user tap Done button on About SSI agent modal$/, async function() {
+  await SsiAgentDetailsScreen.doneButton.click();
+});
+
+When(/^user tap Onboarding documentation button on About SSI agent modal$/, async function() {
+  await SsiAgentDetailsScreen.onboardingDocumentationButton.click()
+});
+
+Then(/^user can see Onboarding documentation$/, async function() {
+  await MenuSettingsSupportScreen.navigateToAnotherWebview();
+  await MenuSettingsSupportScreen.checkTitle("Onboarding");
+
 });

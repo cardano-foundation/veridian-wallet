@@ -38,8 +38,9 @@ export class MenuSettingsSupportScreen {
   async navigateToAnotherWebview() {
     const contexts = await driver.getContexts();
     log.info(`Contexts: ${contexts}`);
-    await driver.switchContext("WEBVIEW_org.cardanofoundation.idw");
-    await driver.switchContext("WEBVIEW_chrome");
+    for (let i = contexts.length - 1; i >= 1; i--) {
+      await driver.switchContext(contexts[i]);
+    }
   }
 
   async checkTitle(titleText: string) {

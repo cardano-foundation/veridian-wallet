@@ -32,6 +32,11 @@ export enum WelcomeMessage {
 export enum SSIAgent {
   BootURL = "http://127.0.0.1:3903",
   ConnectURL = "http://127.0.0.1:3901",
+  TitleAboutSSIAgent = "About SSI agent",
+}
+
+export enum WelcomeModalText {
+  Title = "Welcome! What should we call you?",
 }
 
 export enum PrivacyPolicy {

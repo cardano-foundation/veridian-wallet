@@ -41,8 +41,8 @@ Feature: SSIAgent
     And user tap Continue button on Before you switch modal for recover a wallet flow
     Then user can see Recover Wallet screen
 
-    Scenario: C202 SSIAgent - user can go back from recover a wallet screen
-      When user tap Switch to recover a wallet button on SSI Agent Details screen
-      Then user can see Before you switch modal for recover a wallet flow
-      When user tap Back button on Before you switch modal for recover a wallet flow
-      Then user can see SSI Agent Details screen
+  Scenario: C202 SSIAgent - user can go back from recover a wallet screen
+    When user tap Switch to recover a wallet button on SSI Agent Details screen
+    Then user can see Before you switch modal for recover a wallet flow
+    When user tap Back button on Before you switch modal for recover a wallet flow
+    Then user can see SSI Agent Details screen
