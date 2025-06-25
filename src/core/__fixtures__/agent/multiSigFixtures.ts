@@ -595,8 +595,15 @@ const getRequestMultisigIcp = {
           "EN9Gd-_TlXafq_8EEHOy_HZQyqYLj2_fW_JvbyNeDvpC",
           "EOWP49ymarMj78Xjct0UnN25e9kRHYdKqQ6ZfK0YxQ85",
         ],
-        bt: "0",
-        b: [],
+        bt: "4",
+        b: [
+          "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha",
+          "BLskRTInXnMxWaGqcpSyMgo0nYbalW99cGZESrz3zapM",
+          "BIKKuvBwpmDVA4Ds-EpL5bt9OqPzWPja2LigFYZN2YfX",
+          "BM35JN8XeJSEfpxopjn5jr7tAHCE5749f0OobhMLCorE",
+          "BIj15u5V11bkbtAxMA7gcNJZcax-7TgaBMLsQnMHpYHP",
+          "BF2rZTW79z4IXocYRQnjjsOuvFUQv-ptCf8Yltd7PfsM",
+        ],
         c: [],
         a: [],
       },
@@ -856,6 +863,36 @@ const queuedJoin: QueuedGroupCreation & { initiator: false } = {
   notificationSaid: "notification-said",
 };
 
+const getAvailableWitnesses = {
+  toad: 4,
+  witnesses: [
+    {
+      eid: "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha",
+      oobi: "http://witness-demo:5642/oobi/BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha/witness",
+    },
+    {
+      eid: "BLskRTInXnMxWaGqcpSyMgo0nYbalW99cGZESrz3zapM",
+      oobi: "http://witness-demo:5643/oobi/BLskRTInXnMxWaGqcpSyMgo0nYbalW99cGZESrz3zapM/witness",
+    },
+    {
+      eid: "BIKKuvBwpmDVA4Ds-EpL5bt9OqPzWPja2LigFYZN2YfX",
+      oobi: "http://witness-demo:5644/oobi/BIKKuvBwpmDVA4Ds-EpL5bt9OqPzWPja2LigFYZN2YfX/witness",
+    },
+    {
+      eid: "BM35JN8XeJSEfpxopjn5jr7tAHCE5749f0OobhMLCorE",
+      oobi: "http://witness-demo:5645/oobi/BM35JN8XeJSEfpxopjn5jr7tAHCE5749f0OobhMLCorE/witness",
+    },
+    {
+      eid: "BIj15u5V11bkbtAxMA7gcNJZcax-7TgaBMLsQnMHpYHP",
+      oobi: "http://witness-demo:5646/oobi/BIj15u5V11bkbtAxMA7gcNJZcax-7TgaBMLsQnMHpYHP/witness",
+    },
+    {
+      eid: "BF2rZTW79z4IXocYRQnjjsOuvFUQv-ptCf8Yltd7PfsM",
+      oobi: "http://witness-demo:5647/oobi/BF2rZTW79z4IXocYRQnjjsOuvFUQv-ptCf8Yltd7PfsM/witness",
+    },
+  ],
+};
+
 export {
   memberMetadataRecord,
   getMemberIdentifierResponse,
@@ -880,4 +917,5 @@ export {
   linkedContacts,
   queuedIdentifier,
   queuedJoin,
+  getAvailableWitnesses,
 };
