@@ -159,7 +159,6 @@ const LockPageContainer = () => {
 
   const resetPasscode = async () => {
     setOpenRecoveryAuth(true);
-    return;
   };
 
   const error = (() => {

@@ -10,14 +10,20 @@ interface MemberInfo {
 enum DetailView {
   Attributes = "attributes",
 }
-
-interface CredentialContentProps {
-  cardData: ACDCDetails;
-  joinedCredRequestMembers?: MemberInfo[];
+interface IssuerProps {
   connectionShortDetails: ConnectionShortDetails | undefined;
   setOpenConnectionlModal: (value: boolean) => void;
 }
 
-export type { CredentialContentProps };
+interface CredentialContentProps extends IssuerProps {
+  cardData: ACDCDetails;
+  joinedCredRequestMembers?: MemberInfo[];
+}
+
+interface IssuedIdentifierProps {
+  identifierId: string;
+}
+
+export type { CredentialContentProps, IssuedIdentifierProps, IssuerProps };
 
 export { DetailView };

@@ -1,4 +1,4 @@
-import { IonIcon, IonText } from "@ionic/react";
+import { IonText } from "@ionic/react";
 import { alertCircleOutline } from "ionicons/icons";
 import { useState } from "react";
 import { Trans } from "react-i18next";
@@ -9,6 +9,7 @@ import { getMultisigConnectionsCache } from "../../../../../store/reducers/conne
 import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
 import { CreateGroupIdentifier } from "../../../../components/CreateGroupIdentifier";
+import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
@@ -92,19 +93,13 @@ const ErrorPage = ({
           />
         }
       >
-        <CardDetailsBlock className="alert">
-          <IonText className="alert-text">
-            {i18n.t(
-              "tabs.notifications.details.identifier.errorpage.alerttext"
-            )}
-          </IonText>
-          <div className="alert-icon">
-            <IonIcon
-              icon={alertCircleOutline}
-              slot="icon-only"
-            />
-          </div>
-        </CardDetailsBlock>
+        <InfoCard
+          className="alert"
+          content={i18n.t(
+            "tabs.notifications.details.identifier.errorpage.alerttext"
+          )}
+          icon={alertCircleOutline}
+        />
         <div className="instructions">
           <h2 className="title">
             {i18n.t(

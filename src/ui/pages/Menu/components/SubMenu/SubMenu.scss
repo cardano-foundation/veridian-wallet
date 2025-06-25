@@ -28,6 +28,12 @@
     height: 86vh;
   }
 
+  &.recovery-seed-phrase {
+    &.md {
+      padding-bottom: 0 !important;
+    }
+  }
+
   &.recovery-seed-phrase .recovery-phrase-content {
     display: flex;
     flex-direction: column;
