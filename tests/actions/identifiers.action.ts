@@ -23,7 +23,7 @@ export async function inputAndReturnIdentifierName() {
   return identifierName;
 }
 
-async function addChosenIdentifierType() {
+export async function addChosenIdentifierType() {
   const identifierName = inputAndReturnIdentifierName();
   await AddAnIdentifierModal.createIdentifierButton.waitForClickable();
   await AddAnIdentifierModal.createIdentifierButton.click();

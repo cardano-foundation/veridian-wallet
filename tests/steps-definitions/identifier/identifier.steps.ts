@@ -3,6 +3,7 @@ import { expect } from "expect-webdriverio";
 import Assert from "../../helpers/assert.js";
 import IdentifiersScreen from "../../screen-objects/identifiers/identifiers.screen.js";
 import { Message } from "../../constants/toast.constants.js";
+import { addChosenIdentifierType } from "../../actions/identifiers.action";
 
 Given(
   /^user tap Add an identifier button on the Identifiers screen$/,
@@ -57,3 +58,8 @@ Then(
     await expect(await IdentifiersScreen.identityFavouriteCard(0)).toBeDisplayed();
   }
 );
+
+Given(/^user create new Identifier$/, async function() {
+  await IdentifiersScreen.addAnIdentifierButton.click();
+  await addChosenIdentifierType();
+});
