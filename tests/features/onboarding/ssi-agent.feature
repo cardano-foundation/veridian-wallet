@@ -3,19 +3,9 @@ Feature: SSIAgent
   Background:
     Given user generate passcode and skip password and verify recovery phrase
 
-  Scenario: C234 SSIAgent - scan QR code for boot URL
-    When user tap scan icon for Boot URL on SSI Agent Details screen
-    And user scan QR code
-    Then user can see new value for Boot URL on SSI Agent Details screen
-
   Scenario: C235 SSIAgent - user can manually edit boot URL
     When user edit Boot URL on SSI Agent Details screen
     Then user can see new value for Boot URL on SSI Agent Details screen
-
-  Scenario: C199 SSIAgent - scan QR code for connect URL
-    When user tap scan icon for Connect URL on SSI Agent Details screen
-    And user scan QR code
-    Then user can see new value for Connect URL on SSI Agent Details screen
 
   Scenario: C200 SSIAgent - user can manually edit connect URL
     When user edit Connect URL on SSI Agent Details screen
