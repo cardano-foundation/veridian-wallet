@@ -7,6 +7,7 @@ import {
 import { t } from "i18next";
 import { peopleOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -16,7 +17,7 @@ import {
 } from "../../../core/agent/services/credentialService.types";
 import { IdentifierType } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
-import { TabsRoutePath } from "../../../routes/paths";
+import { RoutePath, TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getCredsArchivedCache,
@@ -93,6 +94,7 @@ const AdditionalButtons = ({
 const Credentials = () => {
   const pageId = "credentials-tab";
   const dispatch = useAppDispatch();
+  const history = useHistory();
   const credsCache = useAppSelector(getCredsCache);
   const archivedCreds = useAppSelector(getCredsArchivedCache);
   const credentialsFiltersCache = useAppSelector(getCredentialsFilters);
@@ -176,8 +178,7 @@ const Credentials = () => {
   };
 
   const handleAvatarClick = () => {
-    // TODO: Implement avatar click functionality
-    console.log("Avatar clicked");
+    history.push(RoutePath.PROFILES);
   };
 
   useIonViewWillEnter(() => {
@@ -343,8 +344,8 @@ const Credentials = () => {
                   selectedFilter === CredentialsFilters.All
                     ? confirmedCreds
                     : selectedFilter === CredentialsFilters.Individual
-                    ? individualCredentials
-                    : groupCredentials
+                      ? individualCredentials
+                      : groupCredentials
                 }
                 onShowCardDetails={() => handleShowNavAnimation("cards")}
                 title={`${i18n.t("tabs.credentials.tab.allcreds")}`}

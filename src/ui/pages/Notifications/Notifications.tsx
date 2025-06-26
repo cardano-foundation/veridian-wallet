@@ -7,7 +7,7 @@ import {
   NotificationRoute,
 } from "../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../i18n";
-import { TabsRoutePath } from "../../../routes/paths";
+import { RoutePath, TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
@@ -200,8 +200,7 @@ const Notifications = () => {
   };
 
   const handleAvatarClick = () => {
-    // TODO: Implement avatar click functionality
-    console.log("Avatar clicked");
+    history.push(RoutePath.PROFILES);
   };
 
   return (

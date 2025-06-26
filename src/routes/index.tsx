@@ -1,5 +1,5 @@
 import { IonRouterOutlet } from "@ionic/react";
-import { useEffect } from "react";
+import { Component, useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -21,6 +21,7 @@ import { VerifyRecoverySeedPhrase } from "../ui/pages/VerifyRecoverySeedPhrase";
 import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
+import { Profiles } from "../ui/pages/Profiles";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
@@ -72,10 +73,14 @@ const Routes = () => {
         component={VerifyRecoverySeedPhrase}
         exact
       />
-
       <Route
         path={RoutePath.SSI_AGENT}
         component={CreateSSIAgent}
+        exact
+      />
+      <Route
+        path={RoutePath.PROFILES}
+        component={Profiles}
         exact
       />
       {tabsRoutes.map((tab, index: number) => {

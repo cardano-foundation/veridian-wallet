@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
@@ -57,11 +58,13 @@ import { CreateIdentifier } from "../../components/CreateIdentifier";
 import { SearchInput } from "./components/SearchInput";
 import { Avatar } from "../../components/Avatar";
 import { AvatarProps } from "../../components/Avatar/Avatar.types";
+import { RoutePath } from "../../../routes";
 
 const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
   ({ showConnections, setShowConnections }, ref) => {
     const pageId = "connections";
     const dispatch = useAppDispatch();
+    const history = useHistory();
     const stateCache = useAppSelector(getStateCache);
     const connectionsCache = useAppSelector(getConnectionsCache);
     const identifierCache = useAppSelector(getIdentifiersCache);
@@ -299,8 +302,7 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
     };
 
     const handleAvatarClick = () => {
-      // TODO: Implement avatar click functionality
-      console.log("Avatar clicked");
+      history.push(RoutePath.PROFILES);
     };
 
     return connectionShortDetails && openConnectionlModal ? (
