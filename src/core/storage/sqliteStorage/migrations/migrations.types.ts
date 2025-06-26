@@ -1,8 +1,10 @@
 import { SQLiteDBConnection } from "@capacitor-community/sqlite";
+import { SignifyClient } from "signify-ts";
 
 enum MigrationType {
   SQL,
   TS,
+  CLOUD,
 }
 
 type BaseMigration = {
@@ -24,6 +26,12 @@ type TsMigration = BaseMigration & {
   >;
 };
 
+type CloudMigration = BaseMigration & {
+  type: MigrationType.CLOUD;
+  cloudMigrationStatements: (signifyClient: SignifyClient) => Promise<void>;
+  requiresKeriaConnection: boolean;
+};
+
 export { MigrationType };
 
-export type { SqlMigration, TsMigration };
+export type { SqlMigration, TsMigration, CloudMigration };
