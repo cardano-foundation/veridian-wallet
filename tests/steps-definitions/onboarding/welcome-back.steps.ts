@@ -7,6 +7,7 @@ import OnboardingScreen from "../../screen-objects/onboarding/onboarding.screen"
 import BiometricScreen from "../../screen-objects/onboarding/biometric.screen";
 import CreatePasswordScreen from "../../screen-objects/onboarding/create-password.screen";
 import AlertModal from "../../screen-objects/components/alert.modal";
+import { delay } from "../../screen-objects/base.screen";
 
 Given(/^user had already setup a identity$/, async function () {
   if (await WelcomeBackScreen.welcomeBackTitle.isDisplayed()) {
@@ -23,7 +24,7 @@ Given(/^user had already setup a identity$/, async function () {
       await CreatePasswordScreen.setUpLaterButton.click();
     }
     await AlertModal.clickConfirmButtonOf(CreatePasswordScreen.alertModal);
-    await new Promise((resolve) => setTimeout(resolve, 62000));
+    await delay(62000);
     await WelcomeBackScreen.loads();
   }
 });
@@ -48,7 +49,7 @@ When(
       for (let i = 0; i < maximumAttempts; i++) {
         this.passcode = await PasscodeScreen.createAndEnterRandomPasscode();
       }
-      await new Promise((resolve) => setTimeout(resolve, 62000));
+      await delay(62000);
       await PasscodeScreen.enterPasscode(this.passcode);
     }
   }
