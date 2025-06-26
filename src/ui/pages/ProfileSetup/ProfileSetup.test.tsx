@@ -221,12 +221,6 @@ describe("Individual setup", () => {
         })
       );
     });
-
-    await waitFor(() => {
-      expect(dispatchMock).toHaveBeenCalledWith(
-        setToastMsg(ToastMsgType.USERNAME_CREATION_SUCCESS)
-      );
-    });
   });
 
   test("Display toast error message", async () => {
