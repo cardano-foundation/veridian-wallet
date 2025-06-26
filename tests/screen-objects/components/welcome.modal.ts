@@ -1,5 +1,5 @@
-import { BaseModal } from "./base.modal.js";
 import { expect } from "expect-webdriverio";
+import { BaseModal } from "./base.modal.js";
 import { WelcomeModalText } from "../../constants/text.constants";
 
 export class WelcomeModal extends BaseModal {

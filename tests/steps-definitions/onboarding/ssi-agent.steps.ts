@@ -100,3 +100,11 @@ When(/^user tap Continue button on Before you switch modal for recover a wallet 
 Then(/^user can see Recover Wallet screen$/, async function() {
   await RecoverWalletScreen.loads()
 });
+
+Then(/^user can see Before you switch modal for recover a wallet flow$/, async function() {
+  await SwitchRecoverWalletScreen.loads();
+});
+
+When(/^user tap Back button on Before you switch modal for recover a wallet flow$/, async function() {
+  await SwitchRecoverWalletScreen.backButton.click();
+});
