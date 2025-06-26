@@ -36,65 +36,67 @@ const GroupMembers = ({
   };
 
   return (
-    <>
-      <ScrollablePageLayout
-        pageId={componentId + "-content"}
-        header={
-          <PageHeader
-            closeButton={true}
-            closeButtonAction={() => {
-              setState((prevState) => ({
-                ...prevState,
-                identifierCreationStage: Stage.SetupConnection,
-                selectedConnections: [],
-              }));
-            }}
-            closeButtonLabel={`${i18n.t("createidentifier.back")}`}
-            title={`${i18n.t("createidentifier.connections.title")}`}
-          />
-        }
-      >
-        <p className="multisig-subtitle">
-          {i18n.t("createidentifier.connections.subtitle")}
-        </p>
-        <IonList>
-          {state.scannedConections.map((connection, index) => {
-            return (
-              <IonItem
-                key={index}
-                onClick={() => handleSelectConnection(connection)}
-                className={`${
-                  selectedConnections.includes(connection) &&
-                  "selected-connection"
-                }`}
-              >
-                <IonLabel className="connection-item">
-                  <FallbackIcon
-                    src={connection?.logo}
-                    className="connection-logo"
-                    data-testid="identifier-stage-2-logo"
-                    alt="connection-logo"
-                  />
-                  <span className="connection-name">{connection.label}</span>
-                  <IonCheckbox
-                    checked={selectedConnections.includes(connection)}
-                    data-testid={`connection-checkbox-${index}`}
-                    onIonChange={() => handleSelectConnection(connection)}
-                    aria-label={`connection-checkbox-${index}`}
-                  />
-                </IonLabel>
-              </IonItem>
-            );
-          })}
-        </IonList>
-      </ScrollablePageLayout>
-      <PageFooter
-        pageId={componentId}
-        primaryButtonText={`${i18n.t("createidentifier.connections.continue")}`}
-        primaryButtonAction={() => handleContinue()}
-        primaryButtonDisabled={!selectedConnections.length}
-      />
-    </>
+    <ScrollablePageLayout
+      pageId={componentId + "-content"}
+      header={
+        <PageHeader
+          closeButton={true}
+          closeButtonAction={() => {
+            setState((prevState) => ({
+              ...prevState,
+              identifierCreationStage: Stage.SetupConnection,
+              selectedConnections: [],
+            }));
+          }}
+          closeButtonLabel={`${i18n.t("createidentifier.back")}`}
+          title={`${i18n.t("createidentifier.connections.title")}`}
+        />
+      }
+      footer={
+        <PageFooter
+          pageId={componentId}
+          primaryButtonText={`${i18n.t(
+            "createidentifier.connections.continue"
+          )}`}
+          primaryButtonAction={() => handleContinue()}
+          primaryButtonDisabled={!selectedConnections.length}
+        />
+      }
+    >
+      <p className="multisig-subtitle">
+        {i18n.t("createidentifier.connections.subtitle")}
+      </p>
+      <IonList>
+        {state.scannedConections.map((connection, index) => {
+          return (
+            <IonItem
+              key={index}
+              onClick={() => handleSelectConnection(connection)}
+              className={`${
+                selectedConnections.includes(connection) &&
+                "selected-connection"
+              }`}
+            >
+              <IonLabel className="connection-item">
+                <FallbackIcon
+                  src={connection?.logo}
+                  className="connection-logo"
+                  data-testid="identifier-stage-2-logo"
+                  alt="connection-logo"
+                />
+                <span className="connection-name">{connection.label}</span>
+                <IonCheckbox
+                  checked={selectedConnections.includes(connection)}
+                  data-testid={`connection-checkbox-${index}`}
+                  onIonChange={() => handleSelectConnection(connection)}
+                  aria-label={`connection-checkbox-${index}`}
+                />
+              </IonLabel>
+            </IonItem>
+          );
+        })}
+      </IonList>
+    </ScrollablePageLayout>
   );
 };
 

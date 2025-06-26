@@ -45,3 +45,4 @@ const IdentifierDetailModal = ({
 };
 
 export { IdentifierDetailModal };
+export default IdentifierDetailModal;

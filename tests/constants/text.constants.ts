@@ -29,6 +29,11 @@ export enum WelcomeMessage {
   Description = "You're in the perfect spot to create your secure and private digital identity. Let's begin by adding your first identifier!",
 }
 
+export enum Scan {
+  ValidContent = "https://keria-ext.dev.idw-sandboxes.cf-deployments.org/oobi/EMNJSzxcbs5iMsVrbUuusC4HJD4OnViw9KklvAw4n09k/agent/EBuxdKcxfPY0qoNb08DM-lsV7zQ027wqq6C_h5rq-eK5?name=CF%20Credential%20Issuance",
+  InvalidContent = "https://www.google.com/",
+}
+
 export enum WelcomeBack {
   Title = "Welcome back",
   IncorrectMessage = "Incorrect passcode",
@@ -180,4 +185,9 @@ export enum TermsOfUse {
   Section6Content2 = "These Terms of Use are between you and the Foundation only, and not with an application service or application platform provider (such as Apple, Inc., or Google Inc.), which may provide you the application subject to its own terms of use.",
   Section6Subtitle1 = "a. Amendment:",
   Section6Subtitle2 = "b. Application Provider Terms:",
+}
+
+export enum ScanContent {
+  ScannerText = "Align the QR code within the frame to scan",
+  ErrorMessage = "Something went wrong. Please try again.",
 }

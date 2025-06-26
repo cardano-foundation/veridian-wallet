@@ -7,7 +7,7 @@
         "test": "test",
         "start": "node build/server.js",
         "dev": "npx nodemon",
-        "build": "rimraf ./build && tsc"
+        "build": "rimraf ./build && tsc && copyfiles -u 1 src/schemas/* build"
     },
     "author": "",
     "license": "ISC",
@@ -19,6 +19,7 @@
         "signify-ts": "github:WebOfTrust/signify-ts#1a20279b10cdc9a7fb53e121073ccdcae744974c"
     },
     "devDependencies": {
+        "copyfiles": "^2.4.1",
         "nodemon": "^3.0.1",
         "rimraf": "^5.0.1",
         "ts-node": "^10.9.1"

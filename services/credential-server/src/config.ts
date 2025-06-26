@@ -16,7 +16,6 @@ export const config = {
     ping: "/ping",
     keriOobi: "/keriOobi",
     issueAcdcCredential: "/issueAcdcCredential",
-    schemaOobi: "/oobi/:id",
     contacts: "/contacts",
     contactCredentials: "/contactCredentials",
     resolveOobi: "/resolveOobi",

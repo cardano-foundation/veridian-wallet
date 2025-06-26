@@ -10,33 +10,21 @@
   }
 
   .user-tips {
-    margin-top: 0.75rem;
-    margin-bottom: 1.75rem;
+    margin-top: 1.75rem;
+    margin-bottom: 1.5rem;
+    flex-direction: row;
+    padding: 1rem 1.25rem;
+    background: var(--ion-color-neutral-300);
 
     p {
       margin: 0 0 0.5rem;
     }
 
-    .card-details-info-block-inner {
-      background: var(--ion-color-neutral-300);
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: row;
-      margin-bottom: 1.5rem;
-
-      .alert-icon {
-        width: 1.5rem;
-        height: 1.5rem;
-
-        ion-icon {
-          color: var(--ion-color-neutral-700);
-        }
-      }
-    }
-
     .tips {
       margin: 0;
       padding-left: 1.25rem;
+      font-size: 1rem;
+      font-weight: 500;
 
       li:not(:last-child) {
         margin-bottom: 0.5rem;

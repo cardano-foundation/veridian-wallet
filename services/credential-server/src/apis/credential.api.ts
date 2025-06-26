@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Operation, Saider, Serder, SignifyClient } from "signify-ts";
-import { ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
-import { ACDC_SCHEMAS } from "../utils/schemas";
+import { ACDC_SCHEMAS_ID, ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
 import { getRegistry, OP_TIMEOUT, waitAndGetDoneOp } from "../utils/utils";
 import { QviCredential } from "../utils/utils.types";
 
@@ -20,7 +19,7 @@ export async function issueAcdcCredential(
 
   const { schemaSaid, aid, attribute } = req.body;
 
-  if (!ACDC_SCHEMAS[schemaSaid]) {
+  if (!ACDC_SCHEMAS_ID.some((schemaId) => schemaId === schemaSaid)) {
     res.status(409).send({
       success: false,
       data: "",
@@ -213,15 +212,5 @@ export async function revokeCredential(
   res.status(200).send({
     success: true,
     data: "Revoke credential successfully",
-  });
-}
-
-export async function schemas(req: Request, res: Response) {
-  const client: SignifyClient = req.app.get("signifyClient");
-
-  const schemas = await client.schemas().list();
-  res.status(200).send({
-    success: true,
-    data: schemas,
   });
 }

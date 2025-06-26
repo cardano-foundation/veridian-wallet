@@ -3,6 +3,8 @@ import { Box, Button } from "@mui/material";
 import { enqueueSnackbar, VariantType } from "notistack";
 import { useEffect, useMemo, useState } from "react";
 import { Trans } from "react-i18next";
+import { IGNORE_ATTRIBUTES } from "../../const";
+import { useSchemaDetail } from "../../hooks/SchemaDetail";
 import { i18n } from "../../i18n";
 import { CredentialService } from "../../services";
 import { CredentialIssueRequest } from "../../services/credential.types";
@@ -19,7 +21,6 @@ import {
 } from "./RequestPresentationModal.types";
 import { Review } from "./Review";
 import { SelectList } from "./SelectList";
-import { IGNORE_ATTRIBUTES } from "../../const";
 
 const RESET_TIMEOUT = 1000;
 
@@ -41,9 +42,9 @@ const RequestPresentationModal = ({
   const [selectedCredTemplate, setSelectedCredTemplate] = useState<string>();
   const [attributes, setAttributes] = useState<Record<string, string>>({});
 
-  const credTemplateType = selectedCredTemplate
-    ? schemas.find((item) => item.$id === selectedCredTemplate)?.title
-    : undefined;
+  const schema = useSchemaDetail(selectedCredTemplate);
+
+  const credTemplateType = selectedCredTemplate ? schema?.title : undefined;
 
   const triggerToast = (message: string, variant: VariantType) => {
     enqueueSnackbar(message, {
@@ -225,8 +226,8 @@ const RequestPresentationModal = ({
       }
       case RequestPresentationStage.SelectCredentialType: {
         const data: SelectListData[] = schemas.map((schema) => ({
-          id: schema.$id,
-          text: schema.title,
+          id: schema.id,
+          text: schema.name,
         }));
 
         return (
@@ -238,9 +239,6 @@ const RequestPresentationModal = ({
         );
       }
       case RequestPresentationStage.InputAttribute: {
-        const schema = schemas.find(
-          (item) => item.$id === selectedCredTemplate
-        );
         const schemaRequiredAttributes =
           schema?.properties.a.oneOf[1].required || [];
 

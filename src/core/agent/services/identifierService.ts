@@ -263,7 +263,7 @@ class IdentifierService extends AgentService {
     try {
       const result = await this.props.signifyClient.identifiers().create(name, {
         toad,
-        wits: witnesses,
+        wits: witnesses.map((w) => w.eid),
       });
       await result.op();
       identifier = result.serder.ked.i;
@@ -748,29 +748,40 @@ class IdentifierService extends AgentService {
 
   async getAvailableWitnesses(): Promise<{
     toad: number;
-    witnesses: string[];
+    witnesses: Array<{ eid: string; oobi: string }>;
   }> {
     const config = await this.props.signifyClient.config().get();
     if (!config.iurls) {
       throw new Error(IdentifierService.MISCONFIGURED_AGENT_CONFIGURATION);
     }
 
-    const witnesses = [];
+    const witnesses: Array<[string, { eid: string; oobi: string }]> = [];
     for (const oobi of config.iurls) {
       const role = new URL(oobi).searchParams.get(OobiQueryParams.ROLE);
       if (role === "witness") {
-        witnesses.push(oobi.split("/oobi/")[1].split("/")[0]); // EID - endpoint identifier
+        const eid = oobi.split("/oobi/")[1].split("/")[0];
+        witnesses.push([eid, { eid, oobi }]);
       }
     }
 
-    const uniquew = [...new Set(witnesses)];
-    if (uniquew.length >= 12)
-      return { toad: 8, witnesses: uniquew.slice(0, 12) };
-    if (uniquew.length >= 10)
-      return { toad: 7, witnesses: uniquew.slice(0, 10) };
-    if (uniquew.length >= 9) return { toad: 6, witnesses: uniquew.slice(0, 9) };
-    if (uniquew.length >= 7) return { toad: 5, witnesses: uniquew.slice(0, 7) };
-    if (uniquew.length >= 6) return { toad: 4, witnesses: uniquew.slice(0, 6) };
+    const witnessMap = new Map();
+    for (const [key, value] of witnesses) {
+      if (!witnessMap.has(key)) {
+        witnessMap.set(key, value);
+      }
+    }
+    const uniqueWitnesses = [...witnessMap.values()];
+
+    if (uniqueWitnesses.length >= 12)
+      return { toad: 8, witnesses: uniqueWitnesses.slice(0, 12) };
+    if (uniqueWitnesses.length >= 10)
+      return { toad: 7, witnesses: uniqueWitnesses.slice(0, 10) };
+    if (uniqueWitnesses.length >= 9)
+      return { toad: 6, witnesses: uniqueWitnesses.slice(0, 9) };
+    if (uniqueWitnesses.length >= 7)
+      return { toad: 5, witnesses: uniqueWitnesses.slice(0, 7) };
+    if (uniqueWitnesses.length >= 6)
+      return { toad: 4, witnesses: uniqueWitnesses.slice(0, 6) };
 
     throw new Error(IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE);
   }

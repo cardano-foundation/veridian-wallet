@@ -1,14 +1,13 @@
-import { useState } from "react";
 import { alertCircleOutline } from "ionicons/icons";
-import { IonIcon } from "@ionic/react";
-import { Alert } from "../Alert";
-import { OptionModal } from "../OptionsModal";
-import { RemovePendingAlertProps } from "./RemovePendingAlert.types";
+import { useState } from "react";
 import { i18n } from "../../../i18n";
+import { Alert } from "../Alert";
+import { InfoCard } from "../InfoCard";
+import { OptionModal } from "../OptionsModal";
 import { PageFooter } from "../PageFooter";
-import "./RemovePendingAlert.scss";
-import { CardDetailsBlock } from "../CardDetails";
 import { Verification } from "../Verification";
+import "./RemovePendingAlert.scss";
+import { RemovePendingAlertProps } from "./RemovePendingAlert.types";
 
 const RemovePendingAlert = ({
   pageId,
@@ -55,15 +54,11 @@ const RemovePendingAlert = ({
           title: firstCheckProps.title,
         }}
       >
-        <CardDetailsBlock className="user-tips">
-          <p className="alert-description">{firstCheckProps.description}</p>
-          <div className="alert-icon">
-            <IonIcon
-              icon={alertCircleOutline}
-              slot="icon-only"
-            />
-          </div>
-        </CardDetailsBlock>
+        <InfoCard
+          className="user-tips"
+          icon={alertCircleOutline}
+          content={firstCheckProps.description}
+        />
         <PageFooter
           pageId={alertId}
           deleteButtonText={firstCheckProps.button}

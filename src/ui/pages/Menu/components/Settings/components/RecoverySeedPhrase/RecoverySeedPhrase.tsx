@@ -1,16 +1,15 @@
-import { IonIcon } from "@ionic/react";
 import { alertCircleOutline } from "ionicons/icons";
 import { useCallback, useState } from "react";
+import { Agent } from "../../../../../../../core/agent/agent";
 import { i18n } from "../../../../../../../i18n";
+import { useAppDispatch } from "../../../../../../../store/hooks";
+import { InfoCard } from "../../../../../../components/InfoCard";
 import { PageFooter } from "../../../../../../components/PageFooter";
 import { SeedPhraseModule } from "../../../../../../components/SeedPhraseModule";
-import "./RecoverySeedPhrase.scss";
-import { CardDetailsBlock } from "../../../../../../components/CardDetails";
-import { ConfirmModal } from "./ConfirmModal";
-import { Agent } from "../../../../../../../core/agent/agent";
 import { useOnlineStatusEffect } from "../../../../../../hooks";
 import { showError } from "../../../../../../utils/error";
-import { useAppDispatch } from "../../../../../../../store/hooks";
+import { ConfirmModal } from "./ConfirmModal";
+import "./RecoverySeedPhrase.scss";
 import { RecoverySeedPhraseProps } from "./RecoverySeedPhrase.types";
 
 const RecoverySeedPhrase = ({ onClose }: RecoverySeedPhraseProps) => {
@@ -56,7 +55,10 @@ const RecoverySeedPhrase = ({ onClose }: RecoverySeedPhraseProps) => {
   return (
     <>
       <div className="recovery-page-container">
-        <CardDetailsBlock className="user-tips">
+        <InfoCard
+          className="user-tips"
+          icon={alertCircleOutline}
+        >
           <div>
             <p>
               {i18n.t(
@@ -81,13 +83,7 @@ const RecoverySeedPhrase = ({ onClose }: RecoverySeedPhraseProps) => {
               </li>
             </ol>
           </div>
-          <div className="alert-icon">
-            <IonIcon
-              icon={alertCircleOutline}
-              slot="icon-only"
-            />
-          </div>
-        </CardDetailsBlock>
+        </InfoCard>
         <SeedPhraseModule
           testId="seed-phrase-container"
           seedPhrase={seedPhrase}

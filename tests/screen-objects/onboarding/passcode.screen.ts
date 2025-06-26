@@ -3,6 +3,7 @@ import { generateRandomNumbersArray } from "../../helpers/generate.js";
 import { log } from "../../helpers/logger.js";
 import { Passcode } from "../../constants/text.constants.js";
 import BaseModal from "../components/base.modal.js";
+import { delay } from "../base.screen";
 
 export class PasscodeScreen {
   get cantRememberButton() {
@@ -23,6 +24,10 @@ export class PasscodeScreen {
 
   get errorMessageText() {
     return $('[data-testid="error-message-text"]');
+  }
+
+  get passcodePoint() {
+    return $$(".passcode-module-circle-row > div");
   }
 
   async digitButton(digit: number, parentElement = "") {
@@ -60,6 +65,14 @@ export class PasscodeScreen {
     //clicking digits on the screen
     for (const digit of passcode) {
       await digitButtonMap[digit]();
+    }
+  }
+
+  async enterPasscodeSkip() {
+    const numberInput = 1;
+    for (let i = 0; i < await this.passcodePoint.length; i++) {
+      await this.enterPasscode([numberInput]);
+      await delay(100);
     }
   }
 
