@@ -6,37 +6,36 @@ import {
   IonTabButton,
   IonTabs,
 } from "@ionic/react";
-import { Redirect, Route } from "react-router";
 import {
-  notifications,
-  notificationsOutline,
+  apps,
+  appsOutline,
   fingerPrint,
   fingerPrintOutline,
   idCard,
   idCardOutline,
+  notifications,
+  notificationsOutline,
   scan,
   scanOutline,
-  apps,
-  appsOutline,
 } from "ionicons/icons";
 import { ComponentType } from "react";
+import { Redirect, Route } from "react-router";
 import { useLocation } from "react-router-dom";
 import { i18n } from "../../../../i18n";
-import "./TabsMenu.scss";
+import { getNextRootRoute } from "../../../../routes/nextRoute";
 import { RoutePath, TabsRoutePath } from "../../../../routes/paths";
-import { Identifiers } from "../../../pages/Identifiers";
-import { Credentials } from "../../../pages/Credentials";
-import { Scan } from "../../../pages/Scan";
-import { Notifications } from "../../../pages/Notifications";
-import { Menu } from "../../../pages/Menu";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { getNotificationsCache } from "../../../../store/reducers/notificationsCache";
 import {
-  getShowWelcomePage,
   getStateCache,
   setCurrentRoute,
 } from "../../../../store/reducers/stateCache";
-import { getNextRootRoute } from "../../../../routes/nextRoute";
+import { Credentials } from "../../../pages/Credentials";
+import { Identifiers } from "../../../pages/Identifiers";
+import { Menu } from "../../../pages/Menu";
+import { Notifications } from "../../../pages/Notifications";
+import { Scan } from "../../../pages/Scan";
+import "./TabsMenu.scss";
 
 const tabsRoutes = [
   {
@@ -78,7 +77,6 @@ const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
   const notificationsCounter = notifications.filter(
     (notification) => !notification.read
   ).length;
-  const showWelcomePage = useAppSelector(getShowWelcomePage);
 
   const handleTabClick = (tabPath: string) => {
     dispatch(setCurrentRoute({ path: tabPath }));
@@ -96,7 +94,7 @@ const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
         <Redirect
           exact
           from={TabsRoutePath.ROOT}
-          to={TabsRoutePath.IDENTIFIERS}
+          to={TabsRoutePath.CREDENTIALS}
         />
         <Route
           path={path}
@@ -108,7 +106,6 @@ const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
       <IonTabBar
         slot="bottom"
         data-testid="tabs-menu"
-        className={showWelcomePage ? "ion-hide" : undefined}
       >
         {tabsRoutes.map((tab, index: number) => {
           return (

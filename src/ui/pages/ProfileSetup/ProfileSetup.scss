@@ -1,0 +1,20 @@
+.profile-setup {
+  &.profiletype {
+    padding: 0;
+    --padding: 1.25rem;
+
+    ion-header {
+      padding: var(--padding);
+      padding-bottom: 0;
+    }
+
+    .page-footer {
+      padding: var(--padding);
+      padding-top: 0;
+    }
+
+    @media screen and (min-width: 250px) and (max-width: 370px) {
+      --padding: 0.9rem;
+    }
+  }
+}

@@ -7,6 +7,7 @@ import {
 import {
   setAuthentication,
   setCurrentRoute,
+  setIsSetupProfile,
 } from "../../store/reducers/stateCache";
 import { RoutePath, TabsRoutePath } from "../paths";
 import { DataProps, NextRoute, StoreState } from "./nextRoute.types";
@@ -35,7 +36,9 @@ const getNextRootRoute = (data: DataProps) => {
   }
 
   if (authentication.ssiAgentIsSet) {
-    path = RoutePath.TABS_MENU;
+    path = data.store.stateCache.isSetupProfile
+      ? RoutePath.PROFILE_SETUP
+      : RoutePath.TABS_MENU;
   }
 
   return { pathname: path };
@@ -131,8 +134,10 @@ const getNextVerifySeedPhraseRoute = () => {
   return { pathname: nextPath };
 };
 
-const getNextCreateSSIAgentRoute = () => {
-  const nextPath = RoutePath.TABS_MENU;
+const getNextCreateSSIAgentRoute = (data: DataProps) => {
+  const nextPath = data.state?.shouldSetupProfile
+    ? RoutePath.PROFILE_SETUP
+    : RoutePath.TABS_MENU;
   return { pathname: nextPath };
 };
 
@@ -154,13 +159,21 @@ const getNextCreatePasswordRoute = (data: DataProps) => {
   return { pathname: RoutePath.GENERATE_SEED_PHRASE };
 };
 
+const getNextProfileSetupRoute = () => {
+  return { pathname: TabsRoutePath.CREDENTIALS };
+};
+
 const updateStoreAfterCreatePassword = (data: DataProps) => {
   const skipped = data.state?.skipped;
-  return setAuthentication({
+  return {
     ...data.store.stateCache.authentication,
     passwordIsSet: !skipped,
     passwordIsSkipped: skipped,
-  });
+  };
+};
+
+const updateStoreAfterSetupProfile = (data: DataProps) => {
+  return setIsSetupProfile(data.state?.isSetupProfile);
 };
 
 const updateAfterSetupBiometrics = (data: DataProps) => {
@@ -218,12 +231,16 @@ const nextRoute: Record<string, NextRoute> = {
     updateRedux: [],
   },
   [RoutePath.SSI_AGENT]: {
-    nextPath: () => getNextCreateSSIAgentRoute(),
+    nextPath: (data: DataProps) => getNextCreateSSIAgentRoute(data),
     updateRedux: [updateStoreAfterSetupSSI, clearSeedPhraseCache],
   },
   [RoutePath.CREATE_PASSWORD]: {
     nextPath: (data: DataProps) => getNextCreatePasswordRoute(data),
     updateRedux: [updateStoreAfterCreatePassword],
+  },
+  [RoutePath.PROFILE_SETUP]: {
+    nextPath: () => getNextProfileSetupRoute(),
+    updateRedux: [updateStoreAfterSetupProfile],
   },
   [TabsRoutePath.CREDENTIAL_DETAILS]: {
     nextPath: () => getNextCredentialDetailsRoute(),

@@ -57,7 +57,7 @@ import {
   setIsOnline,
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
-  setShowWelcomePage,
+  setIsSetupProfile,
   setToastMsg,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
@@ -499,7 +499,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       );
 
       if (firstInstall) {
-        dispatch(setShowWelcomePage(firstInstall.content.value as boolean));
+        dispatch(setIsSetupProfile(firstInstall.content.value as boolean));
       }
 
       const passwordSkipped = await Agent.agent.basicStorage.findById(

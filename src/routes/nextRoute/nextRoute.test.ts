@@ -282,7 +282,9 @@ describe("NextRoute", () => {
   });
 
   test("should return correct route for /ssiagent", () => {
-    const result = getNextCreateSSIAgentRoute();
+    const result = getNextCreateSSIAgentRoute({
+      store: {} as any,
+    });
 
     expect(result).toEqual({
       pathname: RoutePath.TABS_MENU,

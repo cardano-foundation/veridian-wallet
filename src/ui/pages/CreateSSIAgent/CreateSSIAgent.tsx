@@ -28,7 +28,7 @@ import {
   getStateCache,
   setCurrentOperation,
   setRecoveryCompleteNoInterruption,
-  setShowWelcomePage,
+  setIsSetupProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { CustomInput } from "../../components/CustomInput";
@@ -202,7 +202,7 @@ const CreateSSIAgent = () => {
           MiscRecordId.APP_FIRST_INSTALL
         );
       }
-      dispatch(setShowWelcomePage(firstInstall));
+      dispatch(setIsSetupProfile(firstInstall));
     } catch (e) {
       showError("Unable to set first app launch", e);
     }
@@ -301,12 +301,18 @@ const CreateSSIAgent = () => {
 
       const { nextPath, updateRedux } = getNextRoute(RoutePath.SSI_AGENT, {
         store: { stateCache },
+        state: {
+          shouldSetupProfile: true,
+        },
       });
 
       updateReduxState(
         nextPath.pathname,
         {
           store: { stateCache },
+          state: {
+            shouldSetupProfile: true,
+          },
         },
         dispatch,
         updateRedux
