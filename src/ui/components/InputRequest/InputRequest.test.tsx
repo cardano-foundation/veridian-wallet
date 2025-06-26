@@ -182,6 +182,7 @@ describe("SetUserName component", () => {
           },
           firstAppLaunch: true,
           userName: "testUser",
+          defaultProfile: "",
         })
       );
     });

@@ -209,6 +209,7 @@ describe("Profile page", () => {
             lockedUntil: 0,
           },
           firstAppLaunch: false,
+          defaultProfile: "",
         })
       );
     });

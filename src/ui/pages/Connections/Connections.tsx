@@ -25,6 +25,7 @@ import {
 } from "../../../store/reducers/connectionsCache";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
+  getAuthentication,
   getStateCache,
   setCurrentOperation,
   setToastMsg,
@@ -54,6 +55,8 @@ import { PageHeader } from "../../components/PageHeader";
 import { ConnectionDetails } from "../ConnectionDetails";
 import { CreateIdentifier } from "../../components/CreateIdentifier";
 import { SearchInput } from "./components/SearchInput";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
 const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
   ({ showConnections, setShowConnections }, ref) => {
@@ -256,20 +259,31 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
       dispatch(updateShowConnections(false));
     };
 
-    const AdditionalButtons = () => {
+    const AdditionalButtons = ({
+      handleAvatarClick,
+    }: {
+      handleAvatarClick: AvatarProps["handleAvatarClick"];
+    }) => {
+      const authData = useAppSelector(getAuthentication);
       return (
-        <IonButton
-          shape="round"
-          className="add-button"
-          data-testid="add-connection-button"
-          onClick={handleConnectModal}
-        >
-          <IonIcon
-            slot="icon-only"
-            icon={addOutline}
-            color="primary"
+        <>
+          <IonButton
+            shape="round"
+            className="add-button"
+            data-testid="add-connection-button"
+            onClick={handleConnectModal}
+          >
+            <IonIcon
+              slot="icon-only"
+              icon={addOutline}
+              color="primary"
+            />
+          </IonButton>
+          <Avatar
+            id={authData.defaultProfile}
+            handleAvatarClick={handleAvatarClick}
           />
-        </IonButton>
+        </>
       );
     };
 
@@ -282,6 +296,11 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
     const handleCloseConnectionModal = () => {
       setConnectionShortDetails(undefined);
       setOpenConnectionlModal(false);
+    };
+
+    const handleAvatarClick = () => {
+      // TODO: Implement avatar click functionality
+      console.log("Avatar clicked");
     };
 
     return connectionShortDetails && openConnectionlModal ? (
@@ -302,7 +321,9 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
                 backButton={true}
                 onBack={handleDone}
                 title={`${i18n.t("connections.page.title")}`}
-                additionalButtons={<AdditionalButtons />}
+                additionalButtons={
+                  <AdditionalButtons handleAvatarClick={handleAvatarClick} />
+                }
               />
               {!showPlaceholder && (
                 <div className="search-input-row">

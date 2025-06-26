@@ -30,6 +30,7 @@ import {
   setCredsCache,
 } from "../../../store/reducers/credsCache";
 import {
+  getAuthentication,
   setCurrentRoute,
   setToastMsg,
   showConnections,
@@ -54,14 +55,19 @@ import { combineClassNames } from "../../utils/style";
 import { StartAnimationSource } from "../Identifiers/Identifiers.types";
 import "./Credentials.scss";
 import { CredentialsFilters } from "./Credentials.types";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
 const CLEAR_STATE_DELAY = 1000;
 
 const AdditionalButtons = ({
   handleConnections,
+  handleAvatarClick,
 }: {
   handleConnections: () => void;
+  handleAvatarClick: AvatarProps["handleAvatarClick"];
 }) => {
+  const authData = useAppSelector(getAuthentication);
   return (
     <>
       <IonButton
@@ -76,6 +82,10 @@ const AdditionalButtons = ({
           color="primary"
         />
       </IonButton>
+      <Avatar
+        id={authData.defaultProfile}
+        handleAvatarClick={handleAvatarClick}
+      />
     </>
   );
 };
@@ -163,6 +173,11 @@ const Credentials = () => {
 
   const handleConnections = () => {
     dispatch(showConnections(true));
+  };
+
+  const handleAvatarClick = () => {
+    // TODO: Implement avatar click functionality
+    console.log("Avatar clicked");
   };
 
   useIonViewWillEnter(() => {
@@ -287,7 +302,10 @@ const Credentials = () => {
         customClass={tabClasses}
         title={`${i18n.t("tabs.credentials.tab.title")}`}
         additionalButtons={
-          <AdditionalButtons handleConnections={handleConnections} />
+          <AdditionalButtons
+            handleConnections={handleConnections}
+            handleAvatarClick={handleAvatarClick}
+          />
         }
         placeholder={
           showPlaceholder && (
@@ -325,8 +343,8 @@ const Credentials = () => {
                   selectedFilter === CredentialsFilters.All
                     ? confirmedCreds
                     : selectedFilter === CredentialsFilters.Individual
-                      ? individualCredentials
-                      : groupCredentials
+                    ? individualCredentials
+                    : groupCredentials
                 }
                 onShowCardDetails={() => handleShowNavAnimation("cards")}
                 title={`${i18n.t("tabs.credentials.tab.allcreds")}`}

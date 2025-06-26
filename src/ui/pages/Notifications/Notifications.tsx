@@ -14,7 +14,10 @@ import {
   getNotificationsCache,
   markNotificationAsRead,
 } from "../../../store/reducers/notificationsCache";
-import { setCurrentRoute } from "../../../store/reducers/stateCache";
+import {
+  getAuthentication,
+  setCurrentRoute,
+} from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
 import { CredentialDetailModal } from "../../components/CredentialDetailModule";
 import { FilterChip } from "../../components/FilterChip/FilterChip";
@@ -29,6 +32,22 @@ import "./Notifications.scss";
 import { EarlierNotification } from "./components";
 import { EarlierNotificationRef } from "./components/EarlierNotification.types";
 import { NotificationOptionsModal } from "./components/NotificationOptionsModal";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
+
+const AdditionalButtons = ({
+  handleAvatarClick,
+}: {
+  handleAvatarClick: AvatarProps["handleAvatarClick"];
+}) => {
+  const authData = useAppSelector(getAuthentication);
+  return (
+    <Avatar
+      id={authData.defaultProfile}
+      handleAvatarClick={handleAvatarClick}
+    />
+  );
+};
 
 const Notifications = () => {
   const pageId = "notifications-tab";
@@ -180,12 +199,20 @@ const Notifications = () => {
     setOpenUnknownPresentConnectionAlert(false);
   };
 
+  const handleAvatarClick = () => {
+    // TODO: Implement avatar click functionality
+    console.log("Avatar clicked");
+  };
+
   return (
     <>
       <TabLayout
         pageId={pageId}
         header={true}
         title={`${i18n.t("tabs.notifications.tab.header")}`}
+        additionalButtons={
+          <AdditionalButtons handleAvatarClick={handleAvatarClick} />
+        }
       >
         <div className="notifications-tab-chips">
           {filterOptions.map((option) => (
