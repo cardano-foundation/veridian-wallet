@@ -108,6 +108,7 @@ const initialState = {
         lockedUntil: 0,
       },
       firstAppLaunch: false,
+      defaultProfile: "",
     },
   },
   walletConnectionsCache: {

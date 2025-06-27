@@ -5,14 +5,15 @@ import "./Avatar.scss";
 import { AvatarProps } from "./Avatar.types";
 
 const Avatar = ({ id, handleAvatarClick }: AvatarProps) => {
-  const identifiersDataCache = useAppSelector(getIdentifiersCache);
+  const identifiersDataCache = useAppSelector(getIdentifiersCache) || {};
   const getAvatarContent = (id: string) => {
-    const entries = Object.entries(identifiersDataCache).sort(
+    const cache = identifiersDataCache;
+    const entries = Object.entries(cache).sort(
       ([, a], [, b]) =>
         new Date(a.createdAtUTC).getTime() - new Date(b.createdAtUTC).getTime()
     );
     const index = entries.findIndex(([key]) => key === id);
-    const item = identifiersDataCache[id];
+    const item = cache[id];
     const firstLetter = item?.displayName?.charAt(0).toUpperCase() || "";
     const rank = index >= 0 ? index % 5 : 0; // ranks cycle from 0 to 4
     return { firstLetter, rank };

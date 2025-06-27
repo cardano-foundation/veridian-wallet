@@ -97,6 +97,7 @@ describe("SetUserName component", () => {
           lockedUntil: 0,
         },
         firstAppLaunch: true,
+        defaultProfile: "",
       },
     },
     connectionsCache: {
