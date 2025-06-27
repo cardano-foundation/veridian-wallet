@@ -1,24 +1,21 @@
+const createIdentifierMock = jest.fn(() => Promise.resolve());
+
 import { IonInput, IonLabel } from "@ionic/react";
+import { IonReactMemoryRouter } from "@ionic/react-router";
 import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
+import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import { IonReactMemoryRouter } from "@ionic/react-router";
-import { createMemoryHistory } from "history";
 import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
-import {
-  setAuthentication,
-  setCurrentRoute,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
+import { TabsRoutePath } from "../../../routes/paths";
+import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
-import { ToastMsgType } from "../../globals/types";
 import { ProfileSetup } from "./ProfileSetup";
-import { TabsRoutePath } from "../../../routes/paths";
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
@@ -32,6 +29,9 @@ jest.mock("../../../core/agent/agent", () => ({
         deleteById: jest.fn(() => {
           return Promise.resolve(true);
         }),
+      },
+      identifiers: {
+        createIdentifier: createIdentifierMock,
       },
     },
   },
@@ -201,67 +201,10 @@ describe("Individual setup", () => {
     });
 
     await waitFor(() => {
-      expect(dispatchMock).toHaveBeenCalledWith(
-        setAuthentication({
-          loggedIn: true,
-          time: 0,
-          passcodeIsSet: true,
-          seedPhraseIsSet: true,
-          passwordIsSet: false,
-          passwordIsSkipped: true,
-          ssiAgentIsSet: true,
-          ssiAgentUrl: "http://keria.com",
-          recoveryWalletProgress: false,
-          loginAttempt: {
-            attempts: 0,
-            lockedUntil: 0,
-          },
-          firstAppLaunch: true,
-          userName: "testUser",
-        })
-      );
-    });
-  });
-
-  test("Display toast error message", async () => {
-    const { getByText, getByTestId } = render(
-      <Provider store={storeMocked}>
-        <ProfileSetup />
-      </Provider>
-    );
-
-    expect(
-      getByText(EN_TRANSLATIONS.setupprofile.button.confirm)
-    ).toBeVisible();
-
-    fireEvent.click(getByText(EN_TRANSLATIONS.setupprofile.button.confirm));
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.setupprofile.profilesetup.title)
-      ).toBeVisible();
-    });
-
-    ionFireEvent.ionInput(getByTestId("profile-user-name"), "testUser");
-
-    await waitFor(() => {
-      expect((getByTestId("profile-user-name") as HTMLInputElement).value).toBe(
-        "testUser"
-      );
-    });
-
-    jest
-      .spyOn(Agent.agent.basicStorage, "createOrUpdateBasicRecord")
-      .mockImplementation(() => {
-        return Promise.reject("Error");
+      expect(createIdentifierMock).toBeCalledWith({
+        displayName: "testUser",
+        theme: 0,
       });
-
-    fireEvent.click(getByText(EN_TRANSLATIONS.inputrequest.button.confirm));
-
-    await waitFor(() => {
-      expect(dispatchMock).toHaveBeenCalledWith(
-        setToastMsg(ToastMsgType.USERNAME_CREATION_ERROR)
-      );
     });
   });
 

@@ -6,17 +6,27 @@ import {
   refreshOutline,
   scanOutline,
 } from "ionicons/icons";
-import { MouseEvent as ReactMouseEvent, useEffect, useState } from "react";
+import {
+  MouseEvent as ReactMouseEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
+import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { ConfigurationService } from "../../../core/configuration";
 import { IndividualOnlyMode } from "../../../core/configuration/configurationService.types";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { setIndividualFirstCreate } from "../../../store/reducers/identifiersCache";
+import {
+  getIdentifiersCache,
+  setIndividualFirstCreate,
+} from "../../../store/reducers/identifiersCache";
+import { addNotification } from "../../../store/reducers/notificationsCache";
 import { getSeedPhraseCache } from "../../../store/reducers/seedPhraseCache";
 import {
   clearSSIAgent,
@@ -27,8 +37,8 @@ import {
 import {
   getStateCache,
   setCurrentOperation,
-  setRecoveryCompleteNoInterruption,
   setIsSetupProfile,
+  setRecoveryCompleteNoInterruption,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { CustomInput } from "../../components/CustomInput";
@@ -49,8 +59,6 @@ import { showError } from "../../utils/error";
 import { openBrowserLink } from "../../utils/openBrowserLink";
 import { isValidHttpUrl } from "../../utils/urlChecker";
 import "./CreateSSIAgent.scss";
-import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
-import { addNotification } from "../../../store/reducers/notificationsCache";
 
 const SSI_URLS_EMPTY = "SSI url is empty";
 const SEED_PHRASE_EMPTY = "Invalid seed phrase";
@@ -74,6 +82,7 @@ const CreateSSIAgent = () => {
   const ssiAgent = useAppSelector(getSSIAgent);
   const seedPhraseCache = useAppSelector(getSeedPhraseCache);
   const stateCache = useAppSelector(getStateCache);
+  const identifiers = useAppSelector(getIdentifiersCache);
 
   const ionRouter = useAppIonRouter();
   const dispatch = useAppDispatch();
@@ -88,6 +97,7 @@ const CreateSSIAgent = () => {
   const [showSwitchModeModal, setSwitchModeModal] = useState(false);
 
   const isRecoveryMode = stateCache.authentication.recoveryWalletProgress;
+  const isOnline = stateCache.isOnline;
   const isIndividualOnlyFirstCreateMode =
     ConfigurationService.env.features.customise?.identifiers?.creation
       ?.individualOnly === IndividualOnlyMode.FirstTime;
@@ -130,9 +140,9 @@ const CreateSSIAgent = () => {
 
   const validated = validBootUrl && validConnectUrl;
 
-  const handleClearState = () => {
+  const handleClearState = useCallback(() => {
     dispatch(clearSSIAgent());
-  };
+  }, [dispatch]);
 
   const handleError = (error: Error) => {
     const errorMessage = error.message;
@@ -168,45 +178,45 @@ const CreateSSIAgent = () => {
     );
   };
 
-  const updateFirstInstallValue = async (firstInstall: boolean) => {
-    try {
-      if (firstInstall) {
-        if (
-          ConfigurationService.env.features.customise?.notifications
-            ?.connectInstructions
-        ) {
-          const connectNotification =
-            await Agent.agent.keriaNotifications.createSingletonNotification(
-              NotificationRoute.LocalSingletonConnectInstructions,
-              {
-                name: ConfigurationService.env.features.customise?.notifications
-                  .connectInstructions.connectionName,
-              }
-            );
+  const updateIsSetupProfile = useCallback(
+    async (mustSetupProfile: boolean) => {
+      try {
+        if (mustSetupProfile) {
+          if (
+            ConfigurationService.env.features.customise?.notifications
+              ?.connectInstructions
+          ) {
+            const connectNotification =
+              await Agent.agent.keriaNotifications.createSingletonNotification(
+                NotificationRoute.LocalSingletonConnectInstructions,
+                {
+                  name: ConfigurationService.env.features.customise
+                    ?.notifications.connectInstructions.connectionName,
+                }
+              );
 
-          if (connectNotification) {
-            dispatch(addNotification(connectNotification));
+            if (connectNotification) {
+              dispatch(addNotification(connectNotification));
+            }
           }
+
+          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+            new BasicRecord({
+              id: MiscRecordId.IS_SETUP_PROFILE,
+              content: {
+                value: mustSetupProfile,
+              },
+            })
+          );
         }
 
-        await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-          new BasicRecord({
-            id: MiscRecordId.APP_FIRST_INSTALL,
-            content: {
-              value: firstInstall,
-            },
-          })
-        );
-      } else {
-        await Agent.agent.basicStorage.deleteById(
-          MiscRecordId.APP_FIRST_INSTALL
-        );
+        dispatch(setIsSetupProfile(mustSetupProfile));
+      } catch (e) {
+        showError("Unable to set first app launch", e);
       }
-      dispatch(setIsSetupProfile(firstInstall));
-    } catch (e) {
-      showError("Unable to set first app launch", e);
-    }
-  };
+    },
+    [dispatch]
+  );
 
   const handleRecoveryWallet = async () => {
     setLoading(true);
@@ -230,25 +240,7 @@ const CreateSSIAgent = () => {
 
       dispatch(setRecoveryCompleteNoInterruption());
 
-      await updateFirstInstallValue(false);
-
-      const { nextPath, updateRedux } = getNextRoute(RoutePath.SSI_AGENT, {
-        store: { stateCache },
-      });
-
-      updateReduxState(
-        nextPath.pathname,
-        {
-          store: { stateCache },
-        },
-        dispatch,
-        updateRedux
-      );
-
-      Agent.agent.basicStorage.deleteById(MiscRecordId.APP_RECOVERY_WALLET);
-
-      ionRouter.push(nextPath.pathname, "forward", "push");
-      handleClearState();
+      // Note: We need to wait load data from db before go to next page
     } catch (e) {
       const errorMessage = (e as Error).message;
 
@@ -261,10 +253,44 @@ const CreateSSIAgent = () => {
       }
 
       handleError(e as Error);
-    } finally {
-      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    async function handAfterRecoveryWallet() {
+      const shouldSetupProfile = Object.values(identifiers).length === 0;
+
+      await updateIsSetupProfile(shouldSetupProfile);
+
+      const { nextPath, updateRedux } = getNextRoute(RoutePath.SSI_AGENT, {
+        store: { stateCache },
+        state: {
+          shouldSetupProfile,
+        },
+      });
+
+      updateReduxState(
+        nextPath.pathname,
+        {
+          store: { stateCache },
+        },
+        dispatch,
+        updateRedux
+      );
+
+      await Agent.agent.basicStorage
+        .deleteById(MiscRecordId.APP_RECOVERY_WALLET)
+        .catch((e) => showError("Unable to detele recovery key", e));
+
+      ionRouter.push(nextPath.pathname, "forward", "push");
+      handleClearState();
+    }
+
+    // Note: If user is recovering their wallet and old data has been loaded
+    if (isRecoveryMode && isOnline) {
+      handAfterRecoveryWallet();
+    }
+  }, [dispatch, handleClearState, stateCache, updateIsSetupProfile]);
 
   const handleCreateSSI = async () => {
     setLoading(true);
@@ -284,7 +310,7 @@ const CreateSSIAgent = () => {
         url: connectUrl,
       });
 
-      await updateFirstInstallValue(true);
+      await updateIsSetupProfile(true);
 
       if (isIndividualOnlyFirstCreateMode) {
         await Agent.agent.basicStorage

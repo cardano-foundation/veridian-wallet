@@ -1,6 +1,6 @@
 const bootAndConnectMock = jest.fn();
-const recoverKeriaAgentMock = jest.fn();
-const basicStorageDeleteMock = jest.fn();
+const recoverKeriaAgentMock = jest.fn(() => Promise.resolve());
+const basicStorageDeleteMock = jest.fn(() => Promise.resolve());
 const createOrUpdateBasicRecordMock = jest.fn(() => Promise.resolve());
 const createSingletonNotificationMock = jest.fn();
 const browserMock = jest.fn();
@@ -44,7 +44,11 @@ import SSI_CREATE from "../../../locales/en/aboutssiagentcreate.json";
 import SSI_RECOVERY from "../../../locales/en/aboutssiagentrecovery.json";
 import { RoutePath } from "../../../routes";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
-import { setCurrentOperation } from "../../../store/reducers/stateCache";
+import {
+  setAuthentication,
+  setCurrentOperation,
+  setIsOnline,
+} from "../../../store/reducers/stateCache";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import {
   ONBOARDING_DOCUMENTATION_LINK,
@@ -54,6 +58,8 @@ import { OperationType } from "../../globals/types";
 import { CreateSSIAgent } from "./CreateSSIAgent";
 import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { KeriaNotificationService } from "../../../core/agent/services";
+import { store } from "../../../store";
+import { setSeedPhraseCache } from "../../../store/reducers/seedPhraseCache";
 
 jest.mock(
   "../../../core/configuration/configurationService",
@@ -449,7 +455,7 @@ describe("SSI agent page", () => {
     await waitFor(() => {
       expect(createOrUpdateBasicRecordMock).toBeCalledWith(
         expect.objectContaining({
-          id: MiscRecordId.APP_FIRST_INSTALL,
+          id: MiscRecordId.IS_SETUP_PROFILE,
           content: { value: true },
         })
       );
@@ -550,7 +556,7 @@ describe("SSI agent page", () => {
     await waitFor(() => {
       expect(createOrUpdateBasicRecordMock).toBeCalledWith(
         expect.objectContaining({
-          id: MiscRecordId.APP_FIRST_INSTALL,
+          id: MiscRecordId.IS_SETUP_PROFILE,
           content: { value: true },
         })
       );
@@ -647,7 +653,7 @@ describe("SSI agent page", () => {
     await waitFor(() => {
       expect(createOrUpdateBasicRecordMock).toBeCalledWith(
         expect.objectContaining({
-          id: MiscRecordId.APP_FIRST_INSTALL,
+          id: MiscRecordId.IS_SETUP_PROFILE,
           content: { value: true },
         })
       );
@@ -791,17 +797,49 @@ describe("SSI agent page: recovery mode", () => {
       },
     };
 
-    const storeMocked = {
-      ...mockStore(initialState),
-      dispatch: dispatchMock,
-    };
+    store.dispatch(
+      setAuthentication({
+        passcodeIsSet: true,
+        seedPhraseIsSet: true,
+        passwordIsSet: true,
+        passwordIsSkipped: true,
+        loggedIn: false,
+        userName: "",
+        time: 0,
+        ssiAgentIsSet: false,
+        ssiAgentUrl: "",
+        recoveryWalletProgress: true,
+        loginAttempt: {
+          attempts: 0,
+          lockedUntil: 0,
+        },
+        firstAppLaunch: false,
+      })
+    );
+
+    store.dispatch(
+      setBootUrl(
+        "https://dev.keria-boot.cf-keripy.metadata.dev.cf-deployments.org"
+      )
+    );
+    store.dispatch(
+      setConnectUrl(
+        "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org"
+      )
+    );
+    store.dispatch(
+      setSeedPhraseCache({
+        seedPhrase: "mock-seed",
+        bran: "",
+      })
+    );
 
     const history = createMemoryHistory();
     history.push(RoutePath.SSI_AGENT);
 
     const { getByTestId } = render(
       <IonReactMemoryRouter history={history}>
-        <Provider store={storeMocked}>
+        <Provider store={store}>
           <CreateSSIAgent />
         </Provider>
       </IonReactMemoryRouter>
@@ -812,14 +850,16 @@ describe("SSI agent page: recovery mode", () => {
     });
 
     await waitFor(() => {
-      expect(basicStorageDeleteMock).toBeCalledWith(
-        MiscRecordId.APP_RECOVERY_WALLET
-      );
+      expect(recoverKeriaAgentMock).toBeCalled();
+    });
+
+    act(() => {
+      store.dispatch(setIsOnline(true));
     });
 
     await waitFor(() => {
       expect(basicStorageDeleteMock).toBeCalledWith(
-        MiscRecordId.APP_FIRST_INSTALL
+        MiscRecordId.APP_RECOVERY_WALLET
       );
     });
   });

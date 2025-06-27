@@ -2,20 +2,24 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
+import { IdentifierService } from "../../../core/agent/services";
+import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppSelector } from "../../../store/hooks";
 import {
+  getIndividualFirstCreateSetting,
+  setIndividualFirstCreate,
+} from "../../../store/reducers/identifiersCache";
+import {
   getStateCache,
-  setAuthentication,
+  showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
 import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
-import { ToastMsgType } from "../../globals/types";
 import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
@@ -24,15 +28,18 @@ import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import "./ProfileSetup.scss";
 import { SetupProfileStep } from "./ProfileSetup.types";
+import { Spinner } from "../../components/Spinner";
+import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
 
 export const ProfileSetup = () => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
-  const { authentication } = stateCache;
+  const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
   const dispatch = useDispatch();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
   const [userName, setUserName] = useState("");
+  const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
 
   const title = i18n.t(`setupprofile.${step}.title`);
@@ -54,37 +61,45 @@ export const ProfileSetup = () => {
       setStep(SetupProfileStep.SetupType);
   };
 
-  const updateUserName = async () => {
+  const createIdentifier = async () => {
     const error = nameChecker.getError(userName);
 
     if (error) return;
 
+    const metadata: CreateIdentifierInputs = {
+      displayName: userName,
+      theme: 0,
+    };
+
     try {
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.USER_NAME,
-          content: {
-            userName: userName,
-          },
-        })
-      );
+      setLoading(true);
+      await Agent.agent.identifiers.createIdentifier(metadata);
+      await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
+      if (individualFirstCreate) {
+        await Agent.agent.basicStorage
+          .deleteById(MiscRecordId.INDIVIDUAL_FIRST_CREATE)
+          .then(() => dispatch(setIndividualFirstCreate(false)));
+      }
 
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          userName,
-        })
-      );
-
-      await Agent.agent.basicStorage.deleteById(MiscRecordId.APP_FIRST_INSTALL);
       setStep(SetupProfileStep.FinishSetup);
-    } catch (error) {
-      showError(
-        "Unable to create user name",
-        error,
-        dispatch,
-        ToastMsgType.USERNAME_CREATION_ERROR
-      );
+    } catch (e) {
+      const errorMessage = (e as Error).message;
+
+      if (
+        errorMessage.includes(
+          IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE
+        ) ||
+        errorMessage.includes(
+          IdentifierService.MISCONFIGURED_AGENT_CONFIGURATION
+        )
+      ) {
+        dispatch(showNoWitnessAlert(true));
+        return;
+      }
+
+      showError("Unable to create identifier", e, dispatch);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,7 +124,7 @@ export const ProfileSetup = () => {
 
   const handleChangeStep = () => {
     if (step === SetupProfileStep.SetupProfile) {
-      updateUserName();
+      createIdentifier();
       return;
     }
 
@@ -166,6 +181,10 @@ export const ProfileSetup = () => {
           SetupProfileStep.SetupProfile === step && !userName
         }
         pageId={pageId}
+      />
+      <Spinner
+        show={isLoading}
+        coverage={SpinnerConverage.Screen}
       />
     </ResponsivePageLayout>
   );

@@ -22,14 +22,10 @@ import { ComponentType } from "react";
 import { Redirect, Route } from "react-router";
 import { useLocation } from "react-router-dom";
 import { i18n } from "../../../../i18n";
-import { getNextRootRoute } from "../../../../routes/nextRoute";
-import { RoutePath, TabsRoutePath } from "../../../../routes/paths";
+import { TabsRoutePath } from "../../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { getNotificationsCache } from "../../../../store/reducers/notificationsCache";
-import {
-  getStateCache,
-  setCurrentRoute,
-} from "../../../../store/reducers/stateCache";
+import { setCurrentRoute } from "../../../../store/reducers/stateCache";
 import { Credentials } from "../../../pages/Credentials";
 import { Identifiers } from "../../../pages/Identifiers";
 import { Menu } from "../../../pages/Menu";
@@ -70,7 +66,6 @@ const tabsRoutes = [
   },
 ];
 const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
-  const stateCache = useAppSelector(getStateCache);
   const location = useLocation();
   const dispatch = useAppDispatch();
   const notifications = useAppSelector(getNotificationsCache);
@@ -81,12 +76,6 @@ const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
   const handleTabClick = (tabPath: string) => {
     dispatch(setCurrentRoute({ path: tabPath }));
   };
-
-  const exactPath = getNextRootRoute({ store: { stateCache: stateCache } });
-
-  if (exactPath.pathname !== RoutePath.TABS_MENU) {
-    return <Redirect to={exactPath.pathname} />;
-  }
 
   return (
     <IonTabs>
