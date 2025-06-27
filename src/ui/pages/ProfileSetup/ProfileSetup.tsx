@@ -23,7 +23,7 @@ import { PageHeader } from "../../components/PageHeader";
 import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
-import { FinishSetup } from "./components/FinishSetup";
+import { Welcome } from "./components/Welcome";
 import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import "./ProfileSetup.scss";
@@ -146,7 +146,7 @@ export const ProfileSetup = () => {
           />
         );
       case SetupProfileStep.FinishSetup:
-        return <FinishSetup userName={userName} />;
+        return <Welcome userName={userName} />;
       case SetupProfileStep.SetupType:
       default:
         return (
@@ -178,7 +178,7 @@ export const ProfileSetup = () => {
         primaryButtonText={getButtonText()}
         primaryButtonAction={handleChangeStep}
         primaryButtonDisabled={
-          SetupProfileStep.SetupProfile === step && !userName
+          (SetupProfileStep.SetupProfile === step && !userName) || isLoading
         }
         pageId={pageId}
       />

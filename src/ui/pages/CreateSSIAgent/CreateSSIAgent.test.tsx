@@ -36,16 +36,16 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
-import EN_TRANSLATIONS from "../../../locales/en/en.json";
+import { KeriaNotificationService } from "../../../core/agent/services";
+import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import SSI_CREATE from "../../../locales/en/aboutssiagentcreate.json";
 import SSI_RECOVERY from "../../../locales/en/aboutssiagentrecovery.json";
+import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {
-  setAuthentication,
   setCurrentOperation,
   setIsOnline,
 } from "../../../store/reducers/stateCache";
@@ -55,11 +55,8 @@ import {
   RECOVERY_DOCUMENTATION_LINK,
 } from "../../globals/constants";
 import { OperationType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { CreateSSIAgent } from "./CreateSSIAgent";
-import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
-import { KeriaNotificationService } from "../../../core/agent/services";
-import { store } from "../../../store";
-import { setSeedPhraseCache } from "../../../store/reducers/seedPhraseCache";
 
 jest.mock(
   "../../../core/configuration/configurationService",
@@ -150,7 +147,6 @@ jest.mock("../../components/CustomInput", () => ({
 }));
 
 describe("SSI agent page", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     ssiAgentCache: {
@@ -158,6 +154,7 @@ describe("SSI agent page", () => {
       connectUrl: undefined,
     },
     stateCache: {
+      routes: [],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -168,7 +165,7 @@ describe("SSI agent page", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -242,13 +239,13 @@ describe("SSI agent page", () => {
   });
 
   test("Display error when input invalid boot url", async () => {
-    const mockStore = configureStore();
     const initialState = {
       ssiAgentCache: {
         bootUrl: "11111",
         connectUrl: undefined,
       },
       stateCache: {
+        routes: [],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -259,7 +256,7 @@ describe("SSI agent page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -281,13 +278,13 @@ describe("SSI agent page", () => {
   });
 
   test("Display error when input invalid connect url", async () => {
-    const mockStore = configureStore();
     const initialState = {
       ssiAgentCache: {
         bootUrl: undefined,
         connectUrl: "11111",
       },
       stateCache: {
+        routes: [],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -298,7 +295,7 @@ describe("SSI agent page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -320,13 +317,13 @@ describe("SSI agent page", () => {
   });
 
   test("Remove last slash", async () => {
-    const mockStore = configureStore();
     const initialState = {
       ssiAgentCache: {
         bootUrl: undefined,
         connectUrl: "https://connectUrl.com/",
       },
       stateCache: {
+        routes: [],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -337,7 +334,7 @@ describe("SSI agent page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -359,13 +356,13 @@ describe("SSI agent page", () => {
   });
 
   test("Display error when input invalid urls", async () => {
-    const mockStore = configureStore();
     const initialState = {
       ssiAgentCache: {
         bootUrl: "11111",
         connectUrl: "11111",
       },
       stateCache: {
+        routes: [],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -376,7 +373,7 @@ describe("SSI agent page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -399,9 +396,9 @@ describe("SSI agent page", () => {
   });
 
   test("Connect and boot success", async () => {
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
+        routes: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -423,7 +420,7 @@ describe("SSI agent page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -500,9 +497,9 @@ describe("SSI agent page", () => {
       },
     };
 
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
+        routes: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -524,7 +521,7 @@ describe("SSI agent page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -597,9 +594,9 @@ describe("SSI agent page", () => {
       },
     };
 
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
+        routes: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -621,7 +618,7 @@ describe("SSI agent page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -726,7 +723,6 @@ describe("SSI agent page", () => {
 });
 
 describe("SSI agent page: recovery mode", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     ssiAgentCache: {
@@ -734,6 +730,7 @@ describe("SSI agent page: recovery mode", () => {
       connectUrl: undefined,
     },
     stateCache: {
+      routes: [],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -744,7 +741,7 @@ describe("SSI agent page: recovery mode", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -770,9 +767,9 @@ describe("SSI agent page: recovery mode", () => {
   });
 
   test("Connect success", async () => {
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
+        routes: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -797,42 +794,7 @@ describe("SSI agent page: recovery mode", () => {
       },
     };
 
-    store.dispatch(
-      setAuthentication({
-        passcodeIsSet: true,
-        seedPhraseIsSet: true,
-        passwordIsSet: true,
-        passwordIsSkipped: true,
-        loggedIn: false,
-        userName: "",
-        time: 0,
-        ssiAgentIsSet: false,
-        ssiAgentUrl: "",
-        recoveryWalletProgress: true,
-        loginAttempt: {
-          attempts: 0,
-          lockedUntil: 0,
-        },
-        firstAppLaunch: false,
-      })
-    );
-
-    store.dispatch(
-      setBootUrl(
-        "https://dev.keria-boot.cf-keripy.metadata.dev.cf-deployments.org"
-      )
-    );
-    store.dispatch(
-      setConnectUrl(
-        "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org"
-      )
-    );
-    store.dispatch(
-      setSeedPhraseCache({
-        seedPhrase: "mock-seed",
-        bran: "",
-      })
-    );
+    const store = makeTestStore(initialState);
 
     const history = createMemoryHistory();
     history.push(RoutePath.SSI_AGENT);
@@ -898,9 +860,9 @@ describe("SSI agent page: show error", () => {
   const dispatchMock = jest.fn();
 
   test("Invalid boot url", async () => {
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
+        routes: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -926,7 +888,7 @@ describe("SSI agent page: show error", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -957,9 +919,9 @@ describe("SSI agent page: show error", () => {
   });
 
   test("Invalid connect url", async () => {
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
+        routes: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -985,7 +947,7 @@ describe("SSI agent page: show error", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1016,9 +978,9 @@ describe("SSI agent page: show error", () => {
   });
 
   test("Mismatch url", async () => {
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
+        routes: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -1044,7 +1006,7 @@ describe("SSI agent page: show error", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1075,9 +1037,9 @@ describe("SSI agent page: show error", () => {
   });
 
   test("Network error", async () => {
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
+        routes: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -1103,7 +1065,7 @@ describe("SSI agent page: show error", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

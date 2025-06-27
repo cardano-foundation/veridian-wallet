@@ -1,15 +1,15 @@
 import { IonContent } from "@ionic/react";
-import { FinishSetupProps } from "./FinishSetup.types";
+import { FinishSetupProps } from "./Welcome.types";
 import { i18n } from "../../../../../i18n";
-import Welcome from "../../../../assets/images/welcome.png";
-import "./FinishSetup.scss";
+import WelcomeImage from "../../../../assets/images/welcome.png";
+import "./Welcome.scss";
 
-const FinishSetup = ({ userName }: FinishSetupProps) => {
+const Welcome = ({ userName }: FinishSetupProps) => {
   return (
     <IonContent className="finish-setup">
       <div className="container">
         <img
-          src={Welcome}
+          src={WelcomeImage}
           alt="welcome"
         />
         <h3>
@@ -21,4 +21,4 @@ const FinishSetup = ({ userName }: FinishSetupProps) => {
   );
 };
 
-export { FinishSetup };
+export { Welcome };

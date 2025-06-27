@@ -7,7 +7,6 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
@@ -16,6 +15,7 @@ import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import { ProfileSetup } from "./ProfileSetup";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
@@ -74,9 +74,7 @@ jest.mock("signify-ts", () => ({
 }));
 
 describe("Individual setup", () => {
-  const mockStore = configureStore();
-  const dispatchMock = jest.fn();
-  const initialState = {
+  const mockStore = makeTestStore({
     stateCache: {
       routes: ["/"],
       authentication: {
@@ -103,10 +101,12 @@ describe("Individual setup", () => {
       identifiers: filteredIdentifierFix,
       favourites: [],
     },
-  };
+  });
+
+  const dispatchMock = jest.fn();
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...mockStore,
     dispatch: dispatchMock,
   };
 
@@ -140,7 +140,7 @@ describe("Individual setup", () => {
   });
 
   test("Renders profile setup screen", async () => {
-    const { getByText, getByTestId } = render(
+    const { getByText } = render(
       <Provider store={storeMocked}>
         <ProfileSetup />
       </Provider>

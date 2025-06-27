@@ -106,6 +106,12 @@ const stateCacheSlice = createSlice({
       state.currentOperation = action.payload;
     },
     setToastMsg: (state, action: PayloadAction<ToastMsgType>) => {
+      if (
+        state.isSetupProfile &&
+        action.payload === ToastMsgType.IDENTIFIER_UPDATED
+      )
+        return;
+
       state.toastMsgs = [
         {
           id: new Salter({}).qb64,

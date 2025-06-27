@@ -17,4 +17,10 @@
       --padding: 0.9rem;
     }
   }
+
+  .spinner-container {
+    margin-top: 0 !important;
+    background: rgba(var(--ion-color-neutral-700-rgb), 0.2);
+    backdrop-filter: blur(0.25rem);
+  }
 }
