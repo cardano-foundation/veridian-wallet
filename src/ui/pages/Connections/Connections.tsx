@@ -302,7 +302,8 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
     };
 
     const handleAvatarClick = () => {
-      history.push(RoutePath.PROFILES);
+      // TODO: Add Handle avatar click once this page will be refactored.
+      //history.push(RoutePath.PROFILES);
     };
 
     return connectionShortDetails && openConnectionlModal ? (
