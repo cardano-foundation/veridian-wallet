@@ -128,7 +128,7 @@ describe("Edit Connection Modal", () => {
     expect(getByTestId("close-button")).toBeVisible();
     expect(getByTestId("add-note-button")).toBeVisible();
     expect(
-      getByText(EN_TRANSLATIONS.connections.details.nocurrentnotesext)
+      getByText(EN_TRANSLATIONS.tabs.connections.details.nocurrentnotesext)
     ).toBeVisible();
   });
 
@@ -214,7 +214,8 @@ describe("Edit Connection Modal", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deletenote.title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote
+            .title
         )
       ).toBeVisible();
     });
@@ -228,7 +229,8 @@ describe("Edit Connection Modal", () => {
       );
       expect(
         queryByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deletenote.title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote
+            .title
         )
       ).toBeNull();
     });
@@ -305,11 +307,11 @@ describe("Edit Connection Modal", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.notes)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.notes)
       ).toBeVisible();
       expect(getAllByTestId("connection-note").length).toBe(1);
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.title)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.title)
       ).toBeVisible();
     });
 
@@ -486,7 +488,8 @@ describe("Edit Connection Modal", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deletenote.title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote
+            .title
         )
       ).toBeVisible();
     });

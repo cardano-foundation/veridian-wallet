@@ -1293,7 +1293,7 @@ describe("Scanner", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_Translation.connections.page.indentifierselector.title)
+        getByText(EN_Translation.tabs.connections.tab.indentifierselector.title)
       ).toBeVisible();
     });
 

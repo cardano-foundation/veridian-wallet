@@ -77,10 +77,6 @@
     display: flex;
     flex-direction: row;
     margin-bottom: 0 !important;
-
-    .connections-list {
-      height: 100%;
-    }
   }
 
   .alphabet-selector {
@@ -110,24 +106,28 @@
 
     @media screen and (min-width: 250px) and (max-width: 375px) {
       ion-button {
-        height: 0.75rem;
+        height: 0.65rem;
         width: 1.25rem;
         font-size: 0.65rem;
-        min-height: 0.8rem;
+        min-height: 0.65rem;
         line-height: 0.8rem;
       }
     }
   }
 
   .connections-list {
-    --top-space-space: 7.5rem;
-    height: calc(100vh - (var(--top-space-space) + var(--ion-safe-area-top)));
+    --top-space: 12.75rem;
+    height: calc(100vh - (var(--top-space) + var(--ion-safe-area-top)));
+
+    @media screen and (min-width: 250px) and (max-width: 370px) {
+      --top-space: 10.53125rem;
+    }
 
     &.md {
-      --top-space-space: calc(8.125rem + var(--ion-safe-area-bottom));
+      --top-space: calc(8.125rem + var(--ion-safe-area-bottom));
 
       @media screen and (min-width: 250px) and (max-width: 370px) {
-        --top-space-space: calc(7.625rem + var(--ion-safe-area-bottom));
+        --top-space: calc(7.625rem + var(--ion-safe-area-bottom));
       }
     }
 

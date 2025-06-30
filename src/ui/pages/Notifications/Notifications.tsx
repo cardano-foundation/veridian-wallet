@@ -19,6 +19,8 @@ import {
   setCurrentRoute,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 import { CredentialDetailModal } from "../../components/CredentialDetailModule";
 import { FilterChip } from "../../components/FilterChip/FilterChip";
 import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types";
@@ -32,8 +34,6 @@ import "./Notifications.scss";
 import { EarlierNotification } from "./components";
 import { EarlierNotificationRef } from "./components/EarlierNotification.types";
 import { NotificationOptionsModal } from "./components/NotificationOptionsModal";
-import { Avatar } from "../../components/Avatar";
-import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
 const Notifications = () => {
   const pageId = "notifications-tab";
@@ -60,11 +60,6 @@ const Notifications = () => {
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
   const authData = useAppSelector(getAuthentication);
-  const [defaultProfile, setDefaultProfile] = useState("");
-
-  useEffect(() => {
-    setDefaultProfile(authData.defaultProfile);
-  }, [authData]);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
@@ -202,7 +197,7 @@ const Notifications = () => {
   }) => {
     return (
       <Avatar
-        id={defaultProfile}
+        id={authData.defaultProfile}
         handleAvatarClick={handleAvatarClick}
       />
     );

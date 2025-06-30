@@ -16,14 +16,16 @@ enum RoutePath {
 
 enum TabsRoutePath {
   ROOT = "/tabs",
-  IDENTIFIERS = "/tabs/identifiers",
   CREDENTIALS = "/tabs/credentials",
-  SCAN = "/tabs/scan",
+  CONNECTIONS = "/tabs/connections",
   NOTIFICATIONS = "/tabs/notifications",
-  MENU = "/tabs/menu",
-  IDENTIFIER_DETAILS = "/tabs/identifiers/:id",
+  CONNECTIONS_DETAILS = "/tabs/connections/:id",
   CREDENTIAL_DETAILS = "/tabs/credentials/:id",
   NOTIFICATION_DETAILS = "/tabs/notifications/:id",
+  IDENTIFIERS = "/tabs/identifiers",
+  SCAN = "/tabs/scan",
+  MENU = "/tabs/menu",
+  IDENTIFIER_DETAILS = "/tabs/identifiers/:id",
 }
 
 const PublicRoutes = [
