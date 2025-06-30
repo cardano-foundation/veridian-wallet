@@ -68,7 +68,7 @@ const ChooseCredential = ({
     (cred): CardItem<RequestCredential> => {
       const connection =
         connections?.[cred.connectionId]?.label ||
-        i18n.t("connections.unknown");
+        i18n.t("tabs.connections.unknown");
 
       return {
         id: cred.acdc.d,

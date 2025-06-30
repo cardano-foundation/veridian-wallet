@@ -418,7 +418,9 @@ const ReceiveCredential = ({
                 {i18n.t("tabs.notifications.details.credential.receive.from")}
               </span>
               <span className="issuer-name">
-                <strong>{connection || i18n.t("connections.unknown")}</strong>
+                <strong>
+                  {connection || i18n.t("tabs.connections.unknown")}
+                </strong>
                 {!connection && (
                   <IonIcon
                     onClick={() => setShowMissingIssuerModal(true)}

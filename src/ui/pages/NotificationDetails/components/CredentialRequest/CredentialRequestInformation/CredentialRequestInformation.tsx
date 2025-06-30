@@ -336,7 +336,7 @@ const CredentialRequestInformation = ({
                 <FallbackIcon />
                 <p>
                   {linkedGroup?.memberInfos.at(0)?.name ||
-                    i18n.t("connections.unknown")}
+                    i18n.t("tabs.connections.unknown")}
                 </p>
               </div>
             </CardDetailsBlock>
@@ -357,7 +357,7 @@ const CredentialRequestInformation = ({
                   <FallbackIcon />
                   <p>
                     {credentialRequest.schema.name ||
-                      i18n.t("connections.unknown")}
+                      i18n.t("tabs.connections.unknown")}
                   </p>
                 </div>
                 {missingProposedCred ? (
@@ -389,7 +389,7 @@ const CredentialRequestInformation = ({
           >
             <div className="request-from-content">
               <FallbackIcon src={connection?.logo} />
-              <p>{connection?.label || i18n.t("connections.unknown")}</p>
+              <p>{connection?.label || i18n.t("tabs.connections.unknown")}</p>
             </div>
           </CardDetailsBlock>
           <CardDetailsBlock
