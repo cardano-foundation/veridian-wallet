@@ -1,4 +1,4 @@
-.avatar-button {
+ion-button.avatar-button {
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 1.5rem;
@@ -26,5 +26,11 @@
     font-style: normal;
     font-weight: 500;
     line-height: 2.0625rem;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 375px) {
+    span {
+      font-size: 1.2rem;
+    }
   }
 }
