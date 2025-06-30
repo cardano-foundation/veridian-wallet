@@ -1,4 +1,5 @@
 import { expect } from "expect-webdriverio";
+import { Credentials } from "../../constants/text.constants";
 
 export class CredentialsScreen {
   get credentialsTitleText() {
@@ -11,9 +12,9 @@ export class CredentialsScreen {
 
   async loads() {
     await expect(this.credentialsTitleText).toBeDisplayed();
-    await expect(this.credentialsTitleText).toHaveText("Credentials");
+    await expect(this.credentialsTitleText).toHaveText(Credentials.Title);
     await expect(this.credentialsContentText).toBeDisplayed();
-    await expect(this.credentialsContentText).toHaveText("No credentials yet. They will appear here once a connection issues them.")
+    await expect(this.credentialsContentText).toHaveText(Credentials.ContentText);
   }
 }
 

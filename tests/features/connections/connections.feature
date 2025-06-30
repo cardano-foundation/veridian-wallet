@@ -2,6 +2,7 @@ Feature: Connections
 
   Background:
     Given user is onboarded with skipped password creation
+    And user tap skip button on Welcome screen
 
   Scenario: C209 Connections - back to Credentials screen
     Given user tap Credentials button on Tab bar

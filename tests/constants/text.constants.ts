@@ -179,3 +179,13 @@ export enum ScanContent {
   ScannerText = "Align the QR code within the frame to scan",
   ErrorMessage = "Something went wrong. Please try again.",
 }
+
+export enum Credentials {
+  Title = "Credentials",
+  ContentText = "No credentials yet. They will appear here once a connection issues them.",
+}
+
+export enum Connections {
+  Title = "Connections",
+  TitleModal = "Add a connection",
+}
