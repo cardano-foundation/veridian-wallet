@@ -11,6 +11,7 @@ enum RoutePath {
   VERIFY_RECOVERY_SEED_PHRASE = "/verifyrecoveryseedphrase",
   SETUP_BIOMETRICS = "/setup-biometrics",
   PROFILES = "/profiles",
+  PROFILE_SETUP = "/profile-setup",
 }
 
 enum TabsRoutePath {

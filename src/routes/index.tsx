@@ -1,5 +1,5 @@
 import { IonRouterOutlet } from "@ionic/react";
-import { Component, useEffect } from "react";
+import { useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -22,6 +22,7 @@ import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
 import { Profiles } from "../ui/pages/Profiles";
+import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
@@ -116,6 +117,11 @@ const Routes = () => {
       <Route
         path={TabsRoutePath.NOTIFICATION_DETAILS}
         component={NotificationDetails}
+        exact
+      />
+      <Route
+        path={RoutePath.PROFILE_SETUP}
+        component={ProfileSetup}
         exact
       />
       <Redirect
