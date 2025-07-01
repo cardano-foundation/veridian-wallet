@@ -55,9 +55,9 @@ import {
   setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
+  setIsSetupProfile,
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
-  setShowWelcomePage,
   setToastMsg,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
@@ -356,7 +356,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let userName: { userName: string } = { userName: "" };
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -453,13 +452,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const appUserNameRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.USER_NAME
-      );
-      if (appUserNameRecord) {
-        userName = appUserNameRecord.content as { userName: string };
-      }
-
       const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX
       );
@@ -495,11 +487,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
       }
 
       const firstInstall = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_FIRST_INSTALL
+        MiscRecordId.IS_SETUP_PROFILE
       );
 
       if (firstInstall) {
-        dispatch(setShowWelcomePage(firstInstall.content.value as boolean));
+        dispatch(setIsSetupProfile(firstInstall.content.value as boolean));
       }
 
       const passwordSkipped = await Agent.agent.basicStorage.findById(
@@ -527,7 +519,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(
         setAuthentication({
           ...authentication,
-          userName: userName.userName as string,
           passcodeIsSet,
           seedPhraseIsSet,
           passwordIsSet,
