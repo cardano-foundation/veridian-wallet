@@ -32,6 +32,9 @@ jest.mock("../../../core/agent/agent", () => ({
       },
       identifiers: {
         createIdentifier: createIdentifierMock,
+        getIdentifiers: jest.fn(() => {
+          return Promise.resolve([]);
+        }),
       },
     },
   },
@@ -78,6 +81,7 @@ describe("Individual setup", () => {
     stateCache: {
       routes: ["/"],
       authentication: {
+        defaultProfile: "",
         loggedIn: true,
         time: 0,
         passcodeIsSet: true,
