@@ -22,8 +22,6 @@ import {
 } from "../../../store/reducers/identifiersCache";
 import { MultiSigGroup } from "../../../store/reducers/identifiersCache/identifiersCache.types";
 import {
-  getAuthentication,
-  setAuthentication,
   setToastMsg,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
@@ -67,7 +65,6 @@ const CreateIdentifier = ({
   const [keyboardIsOpen, setKeyboardIsOpen] = useState(false);
   const componentId = "create-identifier-modal";
   const dispatch = useAppDispatch();
-  const authentication = useAppSelector(getAuthentication);
   const initalState = {
     id: "",
     displayName:
@@ -85,7 +82,9 @@ const CreateIdentifier = ({
   const [multiSigGroup, setMultiSigGroup] = useState<
     MultiSigGroup | undefined
   >();
+
   const [openAIDInfo, setOpenAIDInfo] = useState(false);
+
   const [duplicateName, setDuplicateName] = useState(false);
   const [inputChange, setInputChange] = useState(false);
   const localValidateMessage = inputChange
@@ -177,13 +176,8 @@ const CreateIdentifier = ({
         throw new Error(DUPLICATE_NAME);
       }
 
-      // Check if this is the first identifier
-      const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
-      const isFirstIdentifier = storedIdentifiers.length === 0;
-
       const { identifier, createdAt } =
         await Agent.agent.identifiers.createIdentifier(metadata);
-
       if (multiSigGroup) {
         const connections =
           await Agent.agent.connections.getMultisigLinkedContacts(
@@ -220,16 +214,6 @@ const CreateIdentifier = ({
               : ToastMsgType.IDENTIFIER_CREATED
         )
       );
-
-      // Only update default profile if this is the first identifier
-      if (isFirstIdentifier) {
-        dispatch(
-          setAuthentication({
-            ...authentication,
-            defaultProfile: identifier,
-          })
-        );
-      }
     } catch (e) {
       const errorMessage = (e as Error).message;
 
