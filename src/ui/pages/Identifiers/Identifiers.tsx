@@ -21,7 +21,6 @@ import {
 } from "../../../store/reducers/identifiersCache";
 import {
   getCurrentOperation,
-  getShowWelcomePage,
   setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
@@ -46,7 +45,6 @@ import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import "./Identifiers.scss";
 import { IdentifiersFilters, StartAnimationSource } from "./Identifiers.types";
-import { Welcome } from "./components/Welcome";
 
 const CLEAR_STATE_DELAY = 500;
 interface AdditionalButtonsProps {
@@ -96,7 +94,6 @@ const Identifiers = () => {
   const currentOperation = useAppSelector(getCurrentOperation);
   const openMultiSigId = useAppSelector(getOpenMultiSig);
   const identifiersFiltersCache = useAppSelector(getIdentifiersFilters);
-  const showWelcomePage = useAppSelector(getShowWelcomePage);
 
   const [favIdentifiers, setFavIdentifiers] = useState<
     IdentifierShortDetails[]
@@ -339,7 +336,7 @@ const Identifiers = () => {
     <>
       <TabLayout
         pageId={pageId}
-        header={!showWelcomePage}
+        header
         customClass={tabClasses}
         title={`${i18n.t("tabs.identifiers.tab.title")}`}
         additionalButtons={
@@ -349,22 +346,18 @@ const Identifiers = () => {
           />
         }
         placeholder={
-          showWelcomePage ? (
-            <Welcome onCreateGroupIdentifier={handleMultiSigClick} />
-          ) : (
-            showPlaceholder && (
-              <CardsPlaceholder
-                buttonLabel={`${i18n.t("tabs.identifiers.tab.create")}`}
-                buttonAction={handleCreateIdentifier}
-                testId={pageId}
-              >
-                <span className="placeholder-spacer" />
-              </CardsPlaceholder>
-            )
+          showPlaceholder && (
+            <CardsPlaceholder
+              buttonLabel={`${i18n.t("tabs.identifiers.tab.create")}`}
+              buttonAction={handleCreateIdentifier}
+              testId={pageId}
+            >
+              <span className="placeholder-spacer" />
+            </CardsPlaceholder>
           )
         }
       >
-        {!showPlaceholder && !showWelcomePage && (
+        {!showPlaceholder && (
           <>
             {!!favIdentifiers.length && (
               <div

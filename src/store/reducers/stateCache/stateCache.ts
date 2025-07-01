@@ -106,6 +106,12 @@ const stateCacheSlice = createSlice({
       state.currentOperation = action.payload;
     },
     setToastMsg: (state, action: PayloadAction<ToastMsgType>) => {
+      if (
+        state.isSetupProfile &&
+        action.payload === ToastMsgType.IDENTIFIER_UPDATED
+      )
+        return;
+
       state.toastMsgs = [
         {
           id: new Salter({}).qb64,
@@ -184,8 +190,8 @@ const stateCacheSlice = createSlice({
         forceInitApp: (state.forceInitApp || 0) + 1,
       };
     },
-    setShowWelcomePage: (state, action: PayloadAction<boolean | undefined>) => {
-      state.showWelcomePage = action.payload;
+    setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
+      state.isSetupProfile = action.payload;
     },
   },
 });
@@ -216,7 +222,7 @@ const {
   showNoWitnessAlert,
   clearStateCache,
   showGlobalLoading,
-  setShowWelcomePage,
+  setIsSetupProfile,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -249,8 +255,8 @@ const getShowNoWitnessAlert = (state: RootState) =>
 const getToastMgs = (state: RootState) => state.stateCache.toastMsgs;
 const getForceInitApp = (state: RootState) => state.stateCache.forceInitApp;
 const getGlobalLoading = (state: RootState) => state.stateCache.showLoading;
-const getShowWelcomePage = (state: RootState) =>
-  state.stateCache.showWelcomePage;
+const getShowSetupProfilePage = (state: RootState) =>
+  state.stateCache.isSetupProfile;
 
 export type {
   AuthenticationCacheProps,
@@ -278,7 +284,7 @@ export {
   getShowCommonError,
   getShowConnections,
   getShowNoWitnessAlert,
-  getShowWelcomePage,
+  getShowSetupProfilePage,
   getStateCache,
   getToastMgs,
   getToastMsgs,
@@ -300,7 +306,7 @@ export {
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
   setRecoveryCompleteNoInterruption,
-  setShowWelcomePage,
+  setIsSetupProfile,
   setToastMsg,
   showConnections,
   showGenericError,
