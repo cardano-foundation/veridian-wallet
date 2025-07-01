@@ -1,4 +1,6 @@
-const createIdentifierMock = jest.fn(() => Promise.resolve());
+const createIdentifierMock = jest.fn(() =>
+  Promise.resolve({ identifier: { displayName: "testUser" } })
+);
 
 import { IonInput, IonLabel } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
@@ -301,7 +303,7 @@ describe("Individual setup", () => {
         return Promise.resolve();
       });
 
-    fireEvent.click(getByText(EN_TRANSLATIONS.inputrequest.button.confirm));
+    fireEvent.click(getByTestId("primary-button-profile-setup"));
 
     await waitFor(() => {
       expect(
