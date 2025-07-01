@@ -35,20 +35,6 @@ import { NotificationOptionsModal } from "./components/NotificationOptionsModal"
 import { Avatar } from "../../components/Avatar";
 import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
-const AdditionalButtons = ({
-  handleAvatarClick,
-}: {
-  handleAvatarClick: AvatarProps["handleAvatarClick"];
-}) => {
-  const authData = useAppSelector(getAuthentication);
-  return (
-    <Avatar
-      id={authData.defaultProfile}
-      handleAvatarClick={handleAvatarClick}
-    />
-  );
-};
-
 const Notifications = () => {
   const pageId = "notifications-tab";
   const dispatch = useAppDispatch();
@@ -73,6 +59,12 @@ const Notifications = () => {
     openUnknownPresentConnectionAlert,
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
+  const authData = useAppSelector(getAuthentication);
+  const [defaultProfile, setDefaultProfile] = useState("");
+
+  useEffect(() => {
+    setDefaultProfile(authData.defaultProfile);
+  }, [authData]);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
@@ -201,6 +193,19 @@ const Notifications = () => {
 
   const handleAvatarClick = () => {
     history.push(RoutePath.PROFILES);
+  };
+
+  const AdditionalButtons = ({
+    handleAvatarClick,
+  }: {
+    handleAvatarClick: AvatarProps["handleAvatarClick"];
+  }) => {
+    return (
+      <Avatar
+        id={defaultProfile}
+        handleAvatarClick={handleAvatarClick}
+      />
+    );
   };
 
   return (

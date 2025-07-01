@@ -58,13 +58,11 @@ import { CreateIdentifier } from "../../components/CreateIdentifier";
 import { SearchInput } from "./components/SearchInput";
 import { Avatar } from "../../components/Avatar";
 import { AvatarProps } from "../../components/Avatar/Avatar.types";
-import { RoutePath } from "../../../routes";
 
 const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
   ({ showConnections, setShowConnections }, ref) => {
     const pageId = "connections";
     const dispatch = useAppDispatch();
-    const history = useHistory();
     const stateCache = useAppSelector(getStateCache);
     const connectionsCache = useAppSelector(getConnectionsCache);
     const identifierCache = useAppSelector(getIdentifiersCache);
@@ -97,10 +95,16 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
     const [hideHeader, setHideHeader] = useState(false);
     const [openConnectionlModal, setOpenConnectionlModal] = useState(false);
     const [search, setSearch] = useState("");
+    const authData = useAppSelector(getAuthentication);
+    const [defaultProfile, setDefaultProfile] = useState("");
 
     useEffect(() => {
       setShowPlaceholder(Object.keys(connectionsCache).length === 0);
     }, [connectionsCache]);
+
+    useEffect(() => {
+      setDefaultProfile(authData.defaultProfile);
+    }, [authData]);
 
     useEffect(() => {
       const fetchConnectionDetails = async () => {
@@ -267,7 +271,6 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
     }: {
       handleAvatarClick: AvatarProps["handleAvatarClick"];
     }) => {
-      const authData = useAppSelector(getAuthentication);
       return (
         <>
           <IonButton
@@ -283,7 +286,7 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
             />
           </IonButton>
           <Avatar
-            id={authData.defaultProfile}
+            id={defaultProfile}
             handleAvatarClick={handleAvatarClick}
           />
         </>

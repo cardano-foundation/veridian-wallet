@@ -61,36 +61,6 @@ import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
 const CLEAR_STATE_DELAY = 1000;
 
-const AdditionalButtons = ({
-  handleConnections,
-  handleAvatarClick,
-}: {
-  handleConnections: () => void;
-  handleAvatarClick: AvatarProps["handleAvatarClick"];
-}) => {
-  const authData = useAppSelector(getAuthentication);
-  return (
-    <>
-      <IonButton
-        shape="round"
-        className="connections-button"
-        data-testid="connections-button"
-        onClick={handleConnections}
-      >
-        <IonIcon
-          slot="icon-only"
-          icon={peopleOutline}
-          color="primary"
-        />
-      </IonButton>
-      <Avatar
-        id={authData.defaultProfile}
-        handleAvatarClick={handleAvatarClick}
-      />
-    </>
-  );
-};
-
 const Credentials = () => {
   const pageId = "credentials-tab";
   const dispatch = useAppDispatch();
@@ -115,7 +85,8 @@ const Credentials = () => {
     CredentialShortDetails[]
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
-
+  const authData = useAppSelector(getAuthentication);
+  const [defaultProfile, setDefaultProfile] = useState("");
   const revokedCreds = credsCache.filter(
     (item) => item.status === CredentialStatus.REVOKED
   );
@@ -127,6 +98,10 @@ const Credentials = () => {
       credsCache.filter((item) => item.status === CredentialStatus.CONFIRMED),
     [credsCache]
   );
+
+  useEffect(() => {
+    setDefaultProfile(authData.defaultProfile);
+  }, [authData]);
 
   const fetchArchivedCreds = useCallback(async () => {
     try {
@@ -293,6 +268,35 @@ const Credentials = () => {
       .then(() => {
         dispatch(setCredentialsFilters(filter as CredentialsFilters));
       });
+  };
+
+  const AdditionalButtons = ({
+    handleConnections,
+    handleAvatarClick,
+  }: {
+    handleConnections: () => void;
+    handleAvatarClick: AvatarProps["handleAvatarClick"];
+  }) => {
+    return (
+      <>
+        <IonButton
+          shape="round"
+          className="connections-button"
+          data-testid="connections-button"
+          onClick={handleConnections}
+        >
+          <IonIcon
+            slot="icon-only"
+            icon={peopleOutline}
+            color="primary"
+          />
+        </IonButton>
+        <Avatar
+          id={defaultProfile}
+          handleAvatarClick={handleAvatarClick}
+        />
+      </>
+    );
   };
 
   return (
