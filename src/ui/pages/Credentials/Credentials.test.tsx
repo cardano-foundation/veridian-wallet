@@ -401,50 +401,6 @@ describe("Creds Tab", () => {
     });
   });
 
-  test("Toggle Connections view", async () => {
-    const storeMocked = {
-      ...mockStore(initialStateEmpty),
-      dispatch: dispatchMock,
-    };
-    const { getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
-        <Provider store={storeMocked}>
-          <Credentials />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    act(() => {
-      fireEvent.click(getByTestId("connections-button"));
-    });
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(showConnections(true));
-    });
-  });
-
-  test("Show Connections placeholder", async () => {
-    const storeMocked = {
-      ...mockStore(initialStateEmpty),
-      dispatch: dispatchMock,
-    };
-    const { getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
-        <Provider store={storeMocked}>
-          <Credentials />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    act(() => {
-      fireEvent.click(getByTestId("connections-button"));
-    });
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(showConnections(true));
-    });
-  });
-
   test("Remove pending cred alert", async () => {
     const mockStore = configureStore();
     const dispatchMock = jest.fn();

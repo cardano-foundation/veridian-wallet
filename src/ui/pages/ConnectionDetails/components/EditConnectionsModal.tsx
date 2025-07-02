@@ -159,13 +159,13 @@ export const EditConnectionsContainer = ({
         header={
           <PageHeader
             closeButton={true}
-            closeButtonLabel={`${i18n.t("connections.details.cancel")}`}
+            closeButtonLabel={`${i18n.t("tabs.connections.details.cancel")}`}
             closeButtonAction={() => {
               setModalIsOpen(false);
             }}
             actionButton={true}
             actionButtonAction={confirm}
-            actionButtonLabel={`${i18n.t("connections.details.confirm")}`}
+            actionButtonLabel={`${i18n.t("tabs.connections.details.confirm")}`}
           />
         }
       >
@@ -179,7 +179,7 @@ export const EditConnectionsContainer = ({
             {updatedNotes.length ? (
               <>
                 <h3 className="note-title">
-                  {i18n.t("connections.details.notes")}
+                  {i18n.t("tabs.connections.details.notes")}
                 </h3>
                 {updatedNotes.map((note) => (
                   <ConnectionNote
@@ -193,13 +193,13 @@ export const EditConnectionsContainer = ({
             ) : (
               <>
                 <p className="connection-details-info-block-nonotes">
-                  {i18n.t("connections.details.nocurrentnotesext")}
+                  {i18n.t("tabs.connections.details.nocurrentnotesext")}
                 </p>
                 <PageFooter
                   pageId="edit-connections-modal"
                   primaryButtonIcon={addOutline}
                   primaryButtonText={`${i18n.t(
-                    "connections.details.options.labels.add"
+                    "tabs.connections.details.options.labels.add"
                   )}`}
                   primaryButtonAction={handleAddNewNote}
                 />
@@ -226,13 +226,13 @@ export const EditConnectionsContainer = ({
         setIsOpen={setAlertDeleteNoteIsOpen}
         dataTestId="alert-confirm-delete-note"
         headerText={i18n.t(
-          "connections.details.options.alert.deletenote.title"
+          "tabs.connections.details.options.alert.deletenote.title"
         )}
         confirmButtonText={`${i18n.t(
-          "connections.details.options.alert.deletenote.confirm"
+          "tabs.connections.details.options.alert.deletenote.confirm"
         )}`}
         cancelButtonText={`${i18n.t(
-          "connections.details.options.alert.deletenote.cancel"
+          "tabs.connections.details.options.alert.deletenote.cancel"
         )}`}
         actionConfirm={handleDeleteNote}
         actionCancel={cancelDeleteNote}

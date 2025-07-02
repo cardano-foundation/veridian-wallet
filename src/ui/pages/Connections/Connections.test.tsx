@@ -83,7 +83,7 @@ const mockSetShowConnections = jest.fn();
 
 const initialStateFull = {
   stateCache: {
-    routes: [TabsRoutePath.IDENTIFIERS],
+    routes: [TabsRoutePath.CONNECTIONS],
     authentication: {
       loggedIn: true,
       time: Date.now(),
@@ -123,7 +123,7 @@ const initialStateFull = {
 
 let mockedStore: Store<unknown, AnyAction>;
 
-describe("Connections page", () => {
+describe("Connections tab", () => {
   const dispatchMock = jest.fn();
 
   beforeEach(() => {
@@ -138,7 +138,7 @@ describe("Connections page", () => {
     verifySecretMock.mockResolvedValue(true);
   });
 
-  test("Render connections page empty", async () => {
+  test("Render connections tab empty", async () => {
     const initialStateFull = {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],
@@ -177,12 +177,9 @@ describe("Connections page", () => {
     };
 
     const { getByTestId, getByText } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
         <Provider store={mockedStore}>
-          <Connections
-            setShowConnections={mockSetShowConnections}
-            showConnections={true}
-          />
+          <Connections />
         </Provider>
       </MemoryRouter>
     );
@@ -203,12 +200,14 @@ describe("Connections page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.page.indentifierselector.title)
+        getByText(
+          EN_TRANSLATIONS.tabs.connections.tab.indentifierselector.title
+        )
       ).toBeVisible();
     });
   });
 
-  test("Render connections page empty (no self pagination)", async () => {
+  test("Render connections tab empty (no self pagination)", async () => {
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.MENU],
@@ -242,12 +241,9 @@ describe("Connections page", () => {
     };
 
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
         <Provider store={mockedStore}>
-          <Connections
-            setShowConnections={mockSetShowConnections}
-            showConnections={true}
-          />
+          <Connections />
         </Provider>
       </MemoryRouter>
     );
@@ -263,21 +259,19 @@ describe("Connections page", () => {
     });
   });
 
-  test("It renders connections page successfully", async () => {
+  test("It renders connections tab successfully", async () => {
     const { getByTestId, getByText, getAllByText } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
         <Provider store={mockedStore}>
-          <Connections
-            setShowConnections={mockSetShowConnections}
-            showConnections={true}
-          />
+          <Connections />
         </Provider>
       </MemoryRouter>
     );
     const addConnectionBtn = getByTestId("add-connection-button");
     expect(addConnectionBtn).toBeInTheDocument();
-    const title = getByTestId("connections-title");
-    expect(title).toBeInTheDocument();
+    expect(
+      getByText(EN_TRANSLATIONS.tabs.connections.tab.title)
+    ).toBeInTheDocument();
     expect(getByText(connectionsFix[0].label)).toBeInTheDocument();
     expect(
       getByText(formatShortDate(connectionsFix[0].createdAtUTC))
@@ -288,10 +282,7 @@ describe("Connections page", () => {
   test("It shows available sharing ID", async () => {
     const { getByTestId } = render(
       <Provider store={mockedStore}>
-        <Connections
-          setShowConnections={mockSetShowConnections}
-          showConnections={true}
-        />
+        <Connections />
       </Provider>
     );
     act(() => {
@@ -321,7 +312,7 @@ describe("Connections page", () => {
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CONNECTIONS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -356,10 +347,7 @@ describe("Connections page", () => {
     };
     const { getByTestId, queryByText, findByText, unmount } = render(
       <Provider store={storeMocked}>
-        <Connections
-          setShowConnections={mockSetShowConnections}
-          showConnections={true}
-        />
+        <Connections />
       </Provider>
     );
 
@@ -372,7 +360,7 @@ describe("Connections page", () => {
     fireEvent.click(getByTestId("add-connection-modal-provide-qr-code"));
 
     const text = await findByText(
-      EN_TRANSLATIONS.connections.page.alert.message
+      EN_TRANSLATIONS.tabs.connections.tab.alert.message
     );
     await waitFor(() => {
       expect(text).toBeVisible();
@@ -382,7 +370,7 @@ describe("Connections page", () => {
 
     await waitFor(() => {
       expect(
-        queryByText(EN_TRANSLATIONS.connections.page.alert.message)
+        queryByText(EN_TRANSLATIONS.tabs.connections.tab.alert.message)
       ).toBeNull();
     });
 
@@ -394,7 +382,7 @@ describe("Connections page", () => {
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CONNECTIONS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -430,10 +418,7 @@ describe("Connections page", () => {
 
     const { getByTestId, getByText, queryByTestId } = render(
       <Provider store={storeMocked}>
-        <Connections
-          showConnections={true}
-          setShowConnections={jest.fn()}
-        />
+        <Connections />
       </Provider>
     );
 
@@ -475,22 +460,6 @@ describe("Connections page", () => {
       expect(getByTestId("empty-search-connection")).toBeVisible();
       expect(queryByTestId("connection-group-0")).toBe(null);
     });
-  });
-});
-
-describe("Connections page from Credentials tab", () => {
-  const dispatchMock = jest.fn();
-
-  beforeEach(() => {
-    jest.resetAllMocks();
-    const mockStore = configureStore();
-
-    mockedStore = {
-      ...mockStore(initialStateFull),
-      dispatch: dispatchMock,
-    };
-
-    verifySecretMock.mockResolvedValue(true);
   });
 
   test("It allows to create an Identifier when no Identifiers are available", async () => {
@@ -540,10 +509,7 @@ describe("Connections page from Credentials tab", () => {
 
     const { getByTestId, getByText } = render(
       <Provider store={storeMocked}>
-        <Connections
-          showConnections={true}
-          setShowConnections={jest.fn()}
-        />
+        <Connections />
       </Provider>
     );
 
@@ -561,31 +527,29 @@ describe("Connections page from Credentials tab", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.page.alert.message)
+        getByText(EN_TRANSLATIONS.tabs.connections.tab.alert.message)
       ).toBeVisible();
     });
   });
 
   test("Redirect to connection detail when click on connection item", async () => {
     const history = createMemoryHistory();
-    history.push(TabsRoutePath.IDENTIFIERS);
+    history.push(TabsRoutePath.CONNECTIONS);
 
     getConnectionByIdMock.mockResolvedValueOnce(connectionsFix[2]);
 
     const { getByTestId, getByText } = render(
       <Provider store={mockedStore}>
-        <Connections
-          setShowConnections={mockSetShowConnections}
-          showConnections={true}
-        />
+        <Connections />
       </Provider>
     );
 
     await waitFor(() => {
       const addConnectionBtn = getByTestId("add-connection-button");
       expect(addConnectionBtn).toBeInTheDocument();
-      const title = getByTestId("connections-title");
-      expect(title).toBeInTheDocument();
+      expect(
+        getByText(EN_TRANSLATIONS.tabs.connections.tab.title)
+      ).toBeInTheDocument();
     });
 
     act(() => {
@@ -602,7 +566,7 @@ describe("Connections page from Credentials tab", () => {
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIER_DETAILS, TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.IDENTIFIER_DETAILS, TabsRoutePath.CONNECTIONS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -637,12 +601,9 @@ describe("Connections page from Credentials tab", () => {
     };
 
     const { getByTestId, getByText, unmount } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
         <Provider store={storeMocked}>
-          <Connections
-            setShowConnections={mockSetShowConnections}
-            showConnections={true}
-          />
+          <Connections />
         </Provider>
       </MemoryRouter>
     );
@@ -657,26 +618,28 @@ describe("Connections page from Credentials tab", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.page.deletepending.title)
+        getByText(EN_TRANSLATIONS.tabs.connections.tab.deletepending.title)
       ).toBeVisible();
       expect(
-        getByText(EN_TRANSLATIONS.connections.page.deletepending.description)
+        getByText(
+          EN_TRANSLATIONS.tabs.connections.tab.deletepending.description
+        )
       ).toBeVisible();
       expect(
-        getByText(EN_TRANSLATIONS.connections.page.deletepending.button)
+        getByText(EN_TRANSLATIONS.tabs.connections.tab.deletepending.button)
       ).toBeVisible();
     });
 
     act(() => {
       fireEvent.click(
-        getByText(EN_TRANSLATIONS.connections.page.deletepending.button)
+        getByText(EN_TRANSLATIONS.tabs.connections.tab.deletepending.button)
       );
     });
 
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.connections.page.deletepending.secondchecktitle
+          EN_TRANSLATIONS.tabs.connections.tab.deletepending.secondchecktitle
         )
       ).toBeVisible();
     });

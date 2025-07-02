@@ -42,7 +42,7 @@ const ConnectionHistoryEvent = ({
       <p className="connection-details-history-event-info">
         <span className="connection-details-history-text">
           {historyItem.type === ConnectionHistoryType.CREDENTIAL_ISSUANCE &&
-            i18next.t("connections.details.issuance", {
+            i18next.t("tabs.connections.details.issuance", {
               credential: historyItem.credentialType
                 ?.replace(/([A-Z][a-z])/g, " $1")
                 .replace(/^ /, "")
@@ -51,15 +51,15 @@ const ConnectionHistoryEvent = ({
             })}
           {historyItem.type ===
             ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT &&
-            i18next.t("connections.details.requestpresent", {
+            i18next.t("tabs.connections.details.requestpresent", {
               issuer: connectionDetails?.label,
             })}
           {historyItem.type === ConnectionHistoryType.CREDENTIAL_PRESENTED &&
-            i18n.t("connections.details.presented", {
+            i18n.t("tabs.connections.details.presented", {
               credentialType: historyItem.credentialType,
             })}
           {historyItem.type === ConnectionHistoryType.CREDENTIAL_REVOKED &&
-            i18next.t("connections.details.update", {
+            i18next.t("tabs.connections.details.update", {
               credential: historyItem.credentialType
                 ?.replace(/([A-Z][a-z])/g, " $1")
                 .replace(/^ /, "")
@@ -90,7 +90,7 @@ const ConnectionHistoryEvent = ({
       </div>
       <p className="connection-details-history-event-info">
         <span className="connection-details-history-text">
-          {i18next.t("connections.details.connectedwith", {
+          {i18next.t("tabs.connections.details.connectedwith", {
             issuer: connectionDetails?.label,
           })}
         </span>

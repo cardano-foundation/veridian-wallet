@@ -37,6 +37,8 @@ import {
   showConnections,
 } from "../../../store/reducers/stateCache";
 import { ArchivedCredentials } from "../../components/ArchivedCredentials";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 import { CardSlider } from "../../components/CardSlider";
 import { CardsPlaceholder } from "../../components/CardsPlaceholder";
 import { FilterChip } from "../../components/FilterChip/FilterChip";
@@ -56,8 +58,6 @@ import { combineClassNames } from "../../utils/style";
 import { StartAnimationSource } from "../Identifiers/Identifiers.types";
 import "./Credentials.scss";
 import { CredentialsFilters } from "./Credentials.types";
-import { Avatar } from "../../components/Avatar";
-import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
 const CLEAR_STATE_DELAY = 1000;
 
@@ -86,7 +86,6 @@ const Credentials = () => {
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
   const authData = useAppSelector(getAuthentication);
-  const [defaultProfile, setDefaultProfile] = useState("");
   const revokedCreds = credsCache.filter(
     (item) => item.status === CredentialStatus.REVOKED
   );
@@ -98,10 +97,6 @@ const Credentials = () => {
       credsCache.filter((item) => item.status === CredentialStatus.CONFIRMED),
     [credsCache]
   );
-
-  useEffect(() => {
-    setDefaultProfile(authData.defaultProfile);
-  }, [authData]);
 
   const fetchArchivedCreds = useCallback(async () => {
     try {
@@ -292,7 +287,7 @@ const Credentials = () => {
           />
         </IonButton>
         <Avatar
-          id={defaultProfile}
+          id={authData.defaultProfile}
           handleAvatarClick={handleAvatarClick}
         />
       </>
@@ -348,8 +343,8 @@ const Credentials = () => {
                   selectedFilter === CredentialsFilters.All
                     ? confirmedCreds
                     : selectedFilter === CredentialsFilters.Individual
-                      ? individualCredentials
-                      : groupCredentials
+                    ? individualCredentials
+                    : groupCredentials
                 }
                 onShowCardDetails={() => handleShowNavAnimation("cards")}
                 title={`${i18n.t("tabs.credentials.tab.allcreds")}`}
