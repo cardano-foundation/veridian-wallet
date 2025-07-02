@@ -9,6 +9,11 @@ import { versionCompare } from "./utils";
 import { MIGRATIONS } from "./migrations";
 import { MigrationType, CloudMigration } from "./migrations/migrations.types";
 import { KeyStoreKeys, SecureStorage } from "../secureStorage";
+import { BasicStorage } from "../../agent/records/basicStorage";
+import { SqliteStorage } from "./sqliteStorage";
+import { BasicRecord } from "../../agent/records/basicRecord";
+import { Agent } from "../../agent/agent";
+import { MiscRecordId } from "../../agent/agent.types";
 
 class SqliteSession {
   static readonly VERSION_DATABASE_KEY = "VERSION_DATABASE_KEY";
@@ -17,8 +22,8 @@ class SqliteSession {
   static readonly INSERT_KV_SQL =
     "INSERT OR REPLACE INTO kv (key,value) VALUES (?,?)";
   static readonly BASE_VERSION = "0.0.0";
-
   private sessionInstance?: SQLiteDBConnection;
+  private basicStorageService!: BasicStorage;
 
   get session() {
     return this.sessionInstance;
@@ -101,6 +106,7 @@ class SqliteSession {
       );
     }
     await this.sessionInstance.open();
+    this.basicStorageService = new BasicStorage(new SqliteStorage<BasicRecord>(this.session!));
     await this.migrateDb();
   }
 
@@ -131,7 +137,6 @@ class SqliteSession {
 
     const missedCloudMigrations = orderedMigrations.filter(migration => 
       migration.type === MigrationType.CLOUD &&
-      migration.requiresKeriaConnection &&
       versionCompare(migration.version, currentLocalVersion) <= 0 && // Migration version is at or before current local version
       !cloudMigrationStatus[migration.version] // But cloud migration wasn't completed
     );
@@ -190,29 +195,19 @@ class SqliteSession {
   }
 
   private async performCloudMigration(migration: CloudMigration, isRecoveryValidation: boolean = false): Promise<void> {
-    // Dynamic import to avoid circular dependencies
-    const { Agent } = await import("../../agent/agent");
-    const { MiscRecordId } = await import("../../agent/agent.types");
-    
     const isKeriaConfigured = await this.isKeriaConfigured();
     
     if (!isKeriaConfigured) {
-      if (migration.requiresKeriaConnection) {
-        const action = isRecoveryValidation ? 'recovery validation' : 'initial migration';
-        console.log(`Skipping cloud migration ${migration.version} during ${action} - KERIA not configured`);
-        return;
-      }
+      const action = isRecoveryValidation ? 'recovery validation' : 'initial migration';
+      console.log(`Skipping cloud migration ${migration.version} during ${action} - KERIA not configured`);
+      return;
     } else {
-      const wasOnline = Agent.agent.getKeriaOnlineStatus();
-      
       try {
-        if (!wasOnline) {
-          await this.temporaryKeriaConnection();
-        }
+        await this.temporaryKeriaConnection();
         
         const action = isRecoveryValidation ? 'recovery validation' : 'migration';
         console.log(`Starting cloud ${action} ${migration.version}`);
-        const signifyClient = (Agent.agent as any).agentServicesProps.signifyClient;
+        const signifyClient = Agent.agent.client;
         await migration.cloudMigrationStatements(signifyClient);
         console.log(`Completed cloud ${action} ${migration.version}`);
         
@@ -223,32 +218,22 @@ class SqliteSession {
         const action = isRecoveryValidation ? 'recovery validation' : 'migration';
         console.error(`Cloud ${action} ${migration.version} failed:`, error);
         throw error;
-      } finally {
-        if (!wasOnline) {
-          Agent.agent.markAgentStatus(false);
-        }
       }
     }
   }
 
   private async isKeriaConfigured(): Promise<boolean> {
     try {
-      const { MiscRecordId } = await import("../../agent/agent.types");
-      const connectUrlRecord = await this.getKv(MiscRecordId.KERIA_CONNECT_URL);
-      return !!(connectUrlRecord?.url);
-    } catch {
+      const connectUrlRecord = await this.basicStorageService.findById(MiscRecordId.KERIA_CONNECT_URL);
+      return !!(connectUrlRecord?.content?.url);
+    } catch (error) {
       return false;
     }
   }
 
   private async temporaryKeriaConnection(): Promise<void> {
-    const { Agent } = await import("../../agent/agent");
-    const { MiscRecordId } = await import("../../agent/agent.types");
-    
-    const connectUrlRecord = await this.getKv(MiscRecordId.KERIA_CONNECT_URL);
-    if (connectUrlRecord?.url) {
-      await Agent.agent.start(connectUrlRecord.url);
-    }
+    const connectUrlRecord = await this.basicStorageService.findById(MiscRecordId.KERIA_CONNECT_URL);
+    await Agent.agent.start(connectUrlRecord?.content?.url as string);
   }
 }
 

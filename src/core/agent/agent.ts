@@ -202,6 +202,10 @@ class Agent {
     return this.authService;
   }
 
+  get client() {
+    return this.agentServicesProps.signifyClient;
+  }
+
   private constructor() {
     this.storageSession = Capacitor.isNativePlatform()
       ? new SqliteSession()

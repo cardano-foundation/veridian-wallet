@@ -29,7 +29,6 @@ type TsMigration = BaseMigration & {
 type CloudMigration = BaseMigration & {
   type: MigrationType.CLOUD;
   cloudMigrationStatements: (signifyClient: SignifyClient) => Promise<void>;
-  requiresKeriaConnection: boolean;
 };
 
 export { MigrationType };
