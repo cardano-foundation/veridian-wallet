@@ -34,6 +34,16 @@ export enum Scan {
   InvalidContent = "https://www.google.com/",
 }
 
+export enum SSIAgent {
+  BootURL = "http://127.0.0.1:3903",
+  ConnectURL = "http://127.0.0.1:3901",
+  TitleAboutSSIAgent = "About SSI agent",
+}
+
+export enum WelcomeModalText {
+  Title = "Welcome! What should we call you?",
+}
+
 export enum WelcomeBack {
   Title = "Welcome back",
   IncorrectMessage = "Incorrect passcode",
