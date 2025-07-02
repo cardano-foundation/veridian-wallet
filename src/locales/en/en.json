@@ -1590,5 +1590,9 @@
       "developermode": "Detects if the device has developer mode enabled, which may indicate an increased risk of debugging or modification attempts, particularly on Android.",
       "adbenabled": "Indicates whether Android Debug Bridge (ADB) is enabled on the device, which can allow unauthorized access or debugging of the app."
     }
+  },
+  "profiles": {
+    "title": "Profiles",
+    "cancel": "Cancel"
   }
 }

@@ -13,6 +13,8 @@ import {
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
 import {
+  getAuthentication,
+  setAuthentication,
   getStateCache,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
@@ -35,6 +37,7 @@ export const ProfileSetup = () => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
+  const authentication = useAppSelector(getAuthentication);
   const dispatch = useDispatch();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
@@ -73,12 +76,31 @@ export const ProfileSetup = () => {
 
     try {
       setLoading(true);
-      await Agent.agent.identifiers.createIdentifier(metadata);
+
+      // Check if this is the first identifier
+      const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
+      const isFirstIdentifier = storedIdentifiers.length === 0;
+
+      // Create the identifier
+      const { identifier } = await Agent.agent.identifiers.createIdentifier(
+        metadata
+      );
+
       await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       if (individualFirstCreate) {
         await Agent.agent.basicStorage
           .deleteById(MiscRecordId.INDIVIDUAL_FIRST_CREATE)
           .then(() => dispatch(setIndividualFirstCreate(false)));
+      }
+
+      // Set as default if it's the first identifier
+      if (isFirstIdentifier) {
+        dispatch(
+          setAuthentication({
+            ...authentication,
+            defaultProfile: identifier,
+          })
+        );
       }
 
       setStep(SetupProfileStep.FinishSetup);

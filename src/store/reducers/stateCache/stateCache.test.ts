@@ -115,6 +115,7 @@ describe("State Cache", () => {
         lockedUntil: Date.now(),
       },
       firstAppLaunch: false,
+      defaultProfile: "",
     };
     const action = setAuthentication(authentication);
     const nextState = stateCacheSlice.reducer(initialState, action);
@@ -218,5 +219,35 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialStateMock, action);
     expect(nextState.queueIncomingRequest.queues.length).toEqual(1);
     expect(nextState.queueIncomingRequest.isProcessing).toEqual(true);
+  });
+
+  test("should set defaultProfile in authentication cache", () => {
+    const authentication: AuthenticationCacheProps = {
+      loggedIn: true,
+      userName: "testuser",
+      time: Date.now(),
+      passcodeIsSet: true,
+      seedPhraseIsSet: true,
+      passwordIsSet: true,
+      passwordIsSkipped: false,
+      ssiAgentIsSet: true,
+      ssiAgentUrl: "",
+      recoveryWalletProgress: false,
+      loginAttempt: {
+        attempts: 0,
+        lockedUntil: Date.now(),
+      },
+      firstAppLaunch: false,
+      defaultProfile: "profile-123",
+    };
+    const action = setAuthentication(authentication);
+    const nextState = stateCacheSlice.reducer(initialState, action);
+
+    expect(nextState.authentication.defaultProfile).toEqual("profile-123");
+    expect(nextState.authentication).toEqual(authentication);
+
+    const rootState = { stateCache: nextState } as RootState;
+    expect(getAuthentication(rootState).defaultProfile).toEqual("profile-123");
+    expect(getStateCache(rootState)).toEqual(nextState);
   });
 });

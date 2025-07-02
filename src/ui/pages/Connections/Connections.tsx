@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
@@ -25,6 +26,7 @@ import {
 } from "../../../store/reducers/connectionsCache";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
+  getAuthentication,
   getStateCache,
   setCurrentOperation,
   setToastMsg,
@@ -54,6 +56,8 @@ import { PageHeader } from "../../components/PageHeader";
 import { ConnectionDetails } from "../ConnectionDetails";
 import { CreateIdentifier } from "../../components/CreateIdentifier";
 import { SearchInput } from "./components/SearchInput";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
 const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
   ({ showConnections, setShowConnections }, ref) => {
@@ -91,10 +95,16 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
     const [hideHeader, setHideHeader] = useState(false);
     const [openConnectionlModal, setOpenConnectionlModal] = useState(false);
     const [search, setSearch] = useState("");
+    const authData = useAppSelector(getAuthentication);
+    const [defaultProfile, setDefaultProfile] = useState("");
 
     useEffect(() => {
       setShowPlaceholder(Object.keys(connectionsCache).length === 0);
     }, [connectionsCache]);
+
+    useEffect(() => {
+      setDefaultProfile(authData.defaultProfile);
+    }, [authData]);
 
     useEffect(() => {
       const fetchConnectionDetails = async () => {
@@ -256,20 +266,30 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
       dispatch(updateShowConnections(false));
     };
 
-    const AdditionalButtons = () => {
+    const AdditionalButtons = ({
+      handleAvatarClick,
+    }: {
+      handleAvatarClick: AvatarProps["handleAvatarClick"];
+    }) => {
       return (
-        <IonButton
-          shape="round"
-          className="add-button"
-          data-testid="add-connection-button"
-          onClick={handleConnectModal}
-        >
-          <IonIcon
-            slot="icon-only"
-            icon={addOutline}
-            color="primary"
+        <>
+          <IonButton
+            shape="round"
+            className="add-button"
+            data-testid="add-connection-button"
+            onClick={handleConnectModal}
+          >
+            <IonIcon
+              slot="icon-only"
+              icon={addOutline}
+              color="primary"
+            />
+          </IonButton>
+          <Avatar
+            id={defaultProfile}
+            handleAvatarClick={handleAvatarClick}
           />
-        </IonButton>
+        </>
       );
     };
 
@@ -282,6 +302,11 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
     const handleCloseConnectionModal = () => {
       setConnectionShortDetails(undefined);
       setOpenConnectionlModal(false);
+    };
+
+    const handleAvatarClick = () => {
+      // TODO: Add Handle avatar click once this page will be refactored.
+      //history.push(RoutePath.PROFILES);
     };
 
     return connectionShortDetails && openConnectionlModal ? (
@@ -302,7 +327,9 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
                 backButton={true}
                 onBack={handleDone}
                 title={`${i18n.t("connections.page.title")}`}
-                additionalButtons={<AdditionalButtons />}
+                additionalButtons={
+                  <AdditionalButtons handleAvatarClick={handleAvatarClick} />
+                }
               />
               {!showPlaceholder && (
                 <div className="search-input-row">

@@ -10,6 +10,7 @@ enum RoutePath {
   CONNECTION_DETAILS = "/connectiondetails",
   VERIFY_RECOVERY_SEED_PHRASE = "/verifyrecoveryseedphrase",
   SETUP_BIOMETRICS = "/setup-biometrics",
+  PROFILES = "/profiles",
   PROFILE_SETUP = "/profile-setup",
 }
 

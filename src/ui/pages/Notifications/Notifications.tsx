@@ -7,14 +7,17 @@ import {
   NotificationRoute,
 } from "../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../i18n";
-import { TabsRoutePath } from "../../../routes/paths";
+import { RoutePath, TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
   getNotificationsCache,
   markNotificationAsRead,
 } from "../../../store/reducers/notificationsCache";
-import { setCurrentRoute } from "../../../store/reducers/stateCache";
+import {
+  getAuthentication,
+  setCurrentRoute,
+} from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
 import { CredentialDetailModal } from "../../components/CredentialDetailModule";
 import { FilterChip } from "../../components/FilterChip/FilterChip";
@@ -29,6 +32,8 @@ import "./Notifications.scss";
 import { EarlierNotification } from "./components";
 import { EarlierNotificationRef } from "./components/EarlierNotification.types";
 import { NotificationOptionsModal } from "./components/NotificationOptionsModal";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
 const Notifications = () => {
   const pageId = "notifications-tab";
@@ -54,6 +59,12 @@ const Notifications = () => {
     openUnknownPresentConnectionAlert,
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
+  const authData = useAppSelector(getAuthentication);
+  const [defaultProfile, setDefaultProfile] = useState("");
+
+  useEffect(() => {
+    setDefaultProfile(authData.defaultProfile);
+  }, [authData]);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
@@ -180,12 +191,32 @@ const Notifications = () => {
     setOpenUnknownPresentConnectionAlert(false);
   };
 
+  const handleAvatarClick = () => {
+    history.push(RoutePath.PROFILES);
+  };
+
+  const AdditionalButtons = ({
+    handleAvatarClick,
+  }: {
+    handleAvatarClick: AvatarProps["handleAvatarClick"];
+  }) => {
+    return (
+      <Avatar
+        id={defaultProfile}
+        handleAvatarClick={handleAvatarClick}
+      />
+    );
+  };
+
   return (
     <>
       <TabLayout
         pageId={pageId}
         header={true}
         title={`${i18n.t("tabs.notifications.tab.header")}`}
+        additionalButtons={
+          <AdditionalButtons handleAvatarClick={handleAvatarClick} />
+        }
       >
         <div className="notifications-tab-chips">
           {filterOptions.map((option) => (

@@ -20,6 +20,7 @@ const initialState: StateCacheProps = {
   authentication: {
     loggedIn: false,
     userName: "",
+    defaultProfile: "",
     time: 0,
     passcodeIsSet: false,
     seedPhraseIsSet: false,
