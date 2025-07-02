@@ -34,6 +34,18 @@ export enum Scan {
   InvalidContent = "https://www.google.com/",
 }
 
+export enum WelcomeBack {
+  Title = "Welcome back",
+  IncorrectMessage = "Incorrect passcode",
+  LoginUnavailableTitle = "Login unavailable",
+}
+
+export enum ForgotPasscode {
+  Title = "Forgot passcode",
+  Description = "Please verify your recovery phrase to reset your passcode. To start typing click on the first option.",
+  DescriptionPopup = "If you've forgotten your passcode, please verify your recovery phrase to gain access to your wallet",
+}
+
 export enum PrivacyPolicy {
   Title = "Privacy Policy",
   Intro = "Cardano Foundation (referred to as “Foundation” “We” “Our” or “Us”) is committed to innovating in digital identity management while prioritising user privacy and data protection. This Privacy Policy specifically applies to the Identity Wallet developed by the Cardano Foundation (the “Identity Wallet”) and the website http://identity.cardanofoundation.org/ (the “Products”). The Identity Wallet is a product designed to facilitate the creation and management of digital identities using Key Event Receipt Infrastructure (KERI) and Decentralized Identifiers (DIDs), operating without linking to any real-world names or personal identifiable information (PII). The Identity Wallet does not require users to submit emails, names, phone numbers, or any documents. Instead, it provides a framework for users to manage their own digital identities autonomously. This is achieved by securely storing private key material on the user's device for identification purposes, enabling users to control their own identity information and securely communicate with other users and entities. This policy outlines our practices regarding the collection, use, disclosure, and protection of any data associated with the Identity Wallet. Note that this policy may differ from other privacy policies pertaining to different CF products or services.\n\nPlease read this Privacy Policy carefully.",
