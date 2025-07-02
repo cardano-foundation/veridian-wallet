@@ -232,9 +232,17 @@ const Connections = () => {
             color="primary"
           />
         </IonButton>
-        <Avatar id={auth.defaultProfile} />
+        <Avatar
+          id={auth.defaultProfile}
+          handleAvatarClick={handleAvatarClick}
+        />
       </>
     );
+  };
+
+  const handleAvatarClick = () => {
+    // TODO: Add Handle avatar click once this page will be refactored.
+    //history.push(RoutePath.PROFILES);
   };
 
   const classes = combineClassNames({
