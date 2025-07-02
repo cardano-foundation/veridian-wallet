@@ -7,6 +7,7 @@ import {
 import {
   setAuthentication,
   setCurrentRoute,
+  setIsSetupProfile,
 } from "../../store/reducers/stateCache";
 import { RoutePath, TabsRoutePath } from "../paths";
 import { DataProps, NextRoute, StoreState } from "./nextRoute.types";
@@ -14,7 +15,7 @@ import { DataProps, NextRoute, StoreState } from "./nextRoute.types";
 const getNextRootRoute = (data: DataProps) => {
   const authentication = data.store.stateCache.authentication;
 
-  let path = RoutePath.ONBOARDING;
+  let path: string = RoutePath.ONBOARDING;
 
   if (authentication.passcodeIsSet) {
     path = RoutePath.SETUP_BIOMETRICS;
@@ -35,7 +36,9 @@ const getNextRootRoute = (data: DataProps) => {
   }
 
   if (authentication.ssiAgentIsSet) {
-    path = RoutePath.TABS_MENU;
+    path = data.store.stateCache.isSetupProfile
+      ? RoutePath.PROFILE_SETUP
+      : TabsRoutePath.CREDENTIALS;
   }
 
   return { pathname: path };
@@ -72,7 +75,7 @@ const getNextSetPasscodeRoute = (store: StoreState) => {
   const seedPhraseIsSet = !!store.seedPhraseCache?.seedPhrase;
   const ssiAgentIsSet = store.stateCache.authentication.ssiAgentIsSet;
 
-  let nextPath = RoutePath.SETUP_BIOMETRICS;
+  let nextPath: string = RoutePath.SETUP_BIOMETRICS;
 
   if (store.stateCache.authentication.finishSetupBiometrics) {
     nextPath = RoutePath.CREATE_PASSWORD;
@@ -83,7 +86,7 @@ const getNextSetPasscodeRoute = (store: StoreState) => {
   }
 
   if (ssiAgentIsSet) {
-    nextPath = RoutePath.TABS_MENU;
+    nextPath = TabsRoutePath.CREDENTIALS;
   }
 
   return { pathname: nextPath };
@@ -131,8 +134,10 @@ const getNextVerifySeedPhraseRoute = () => {
   return { pathname: nextPath };
 };
 
-const getNextCreateSSIAgentRoute = () => {
-  const nextPath = RoutePath.TABS_MENU;
+const getNextCreateSSIAgentRoute = (data: DataProps) => {
+  const nextPath = data.state?.shouldSetupProfile
+    ? RoutePath.PROFILE_SETUP
+    : TabsRoutePath.CREDENTIALS;
   return { pathname: nextPath };
 };
 
@@ -154,6 +159,10 @@ const getNextCreatePasswordRoute = (data: DataProps) => {
   return { pathname: RoutePath.GENERATE_SEED_PHRASE };
 };
 
+const getNextProfileSetupRoute = () => {
+  return { pathname: TabsRoutePath.CREDENTIALS };
+};
+
 const updateStoreAfterCreatePassword = (data: DataProps) => {
   const skipped = data.state?.skipped;
   return setAuthentication({
@@ -161,6 +170,10 @@ const updateStoreAfterCreatePassword = (data: DataProps) => {
     passwordIsSet: !skipped,
     passwordIsSkipped: skipped,
   });
+};
+
+const updateStoreAfterSetupProfile = (data: DataProps) => {
+  return setIsSetupProfile(data.state?.isSetupProfile);
 };
 
 const updateAfterSetupBiometrics = (data: DataProps) => {
@@ -218,12 +231,16 @@ const nextRoute: Record<string, NextRoute> = {
     updateRedux: [],
   },
   [RoutePath.SSI_AGENT]: {
-    nextPath: () => getNextCreateSSIAgentRoute(),
+    nextPath: (data: DataProps) => getNextCreateSSIAgentRoute(data),
     updateRedux: [updateStoreAfterSetupSSI, clearSeedPhraseCache],
   },
   [RoutePath.CREATE_PASSWORD]: {
     nextPath: (data: DataProps) => getNextCreatePasswordRoute(data),
     updateRedux: [updateStoreAfterCreatePassword],
+  },
+  [RoutePath.PROFILE_SETUP]: {
+    nextPath: () => getNextProfileSetupRoute(),
+    updateRedux: [updateStoreAfterSetupProfile],
   },
   [TabsRoutePath.CREDENTIAL_DETAILS]: {
     nextPath: () => getNextCredentialDetailsRoute(),

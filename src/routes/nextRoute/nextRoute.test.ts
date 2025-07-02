@@ -15,6 +15,7 @@ import { OperationType } from "../../ui/globals/types";
 import { IdentifiersFilters } from "../../ui/pages/Identifiers/Identifiers.types";
 import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
+import { TabsRoutePath } from "../paths";
 
 describe("NextRoute", () => {
   let localStorageMock: any;
@@ -46,6 +47,7 @@ describe("NextRoute", () => {
           },
           firstAppLaunch: false,
           finishSetupBiometrics: false,
+          defaultProfile: "",
         },
         showConnections: false,
         toastMsgs: [],
@@ -202,7 +204,7 @@ describe("NextRoute", () => {
     const result = getNextOnboardingRoute(data as DataProps);
 
     expect(result).toEqual({
-      pathname: RoutePath.TABS_MENU,
+      pathname: TabsRoutePath.CREDENTIALS,
     });
   });
 
@@ -282,10 +284,12 @@ describe("NextRoute", () => {
   });
 
   test("should return correct route for /ssiagent", () => {
-    const result = getNextCreateSSIAgentRoute();
+    const result = getNextCreateSSIAgentRoute({
+      store: {} as any,
+    });
 
     expect(result).toEqual({
-      pathname: RoutePath.TABS_MENU,
+      pathname: TabsRoutePath.CREDENTIALS,
     });
   });
 });
@@ -314,6 +318,7 @@ describe("getNextRoute", () => {
         },
         firstAppLaunch: false,
         finishSetupBiometrics: false,
+        defaultProfile: "",
       },
       showConnections: false,
       toastMsgs: [],

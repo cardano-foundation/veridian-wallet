@@ -450,13 +450,7 @@
           "placeholder": "You haven’t created any {{ type }} identifiers yet."
         },
         "pendingidentifiers": "Pending identifiers",
-        "multisigidentifiers": "For groups",
-        "welcome": {
-          "skip": "Skip",
-          "welcometext": "Welcome, {{name}}",
-          "text": "You're in the perfect spot to create your secure and private digital identity. Let's begin by adding your first identifier!",
-          "add": "Add an Identifier"
-        }
+        "multisigidentifiers": "For groups"
       },
       "deletepending": {
         "title": "Identifier options",
@@ -1533,6 +1527,37 @@
     },
     "noinfo": "No device information available."
   },
+  "setupprofile": {
+    "profiletype": {
+      "title": "Profile type",
+      "description": "Which type of profile do you want to create?",
+      "individual": {
+        "title": "Individual",
+        "text": "Just for you — a personal profile that’ll support recovery and multiple devices soon."
+      },
+      "group": {
+        "title": "Group",
+        "text": "Made for teams — a shared profile where members co-manage signing and recovery together."
+      }
+    },
+    "profilesetup": {
+      "title": "Profile setup",
+      "description": "Add information about you to establish connections and receive credentials",
+      "form": {
+        "input": "Username",
+        "placeholder": "e.g. JohnSmith25"
+      }
+    },
+    "finishsetup": {
+      "greeting": "Welcome, {{name}}",
+      "text": "Securely manage credentials, build trusted connections, and stay informed with real-time updates — all in Veridian. Create multiple profiles to keep things organized by location or role."
+    },
+    "button": {
+      "back": "Back",
+      "confirm": "Confirm",
+      "started": "Get started"
+    }
+  },
   "systemthreats": {
     "title": "Threats Detected",
     "description": "The following security threats have been detected on your device.",
@@ -1565,5 +1590,9 @@
       "developermode": "Detects if the device has developer mode enabled, which may indicate an increased risk of debugging or modification attempts, particularly on Android.",
       "adbenabled": "Indicates whether Android Debug Bridge (ADB) is enabled on the device, which can allow unauthorized access or debugging of the app."
     }
+  },
+  "profiles": {
+    "title": "Profiles",
+    "cancel": "Cancel"
   }
 }

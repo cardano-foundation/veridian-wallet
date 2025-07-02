@@ -80,6 +80,7 @@ const initialState = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+      defaultProfile: "",
     },
   },
   connectionsCache: {
@@ -100,6 +101,7 @@ const fullState = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+      defaultProfile: "",
     },
   },
   connectionsCache: {
@@ -124,6 +126,7 @@ const filterTestData = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+      defaultProfile: "",
     },
   },
   connectionsCache: {
@@ -144,6 +147,7 @@ const emptyConnection = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+      defaultProfile: "",
     },
   },
   connectionsCache: {

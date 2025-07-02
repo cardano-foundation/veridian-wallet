@@ -1,0 +1,16 @@
+.setup-profile {
+  .title {
+    text-align: center;
+    margin: 0.75rem 0 1.5rem;
+  }
+
+  .error-message {
+    text-align: left;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .title {
+      margin: 0.5rem 0 1rem;
+    }
+  }
+}

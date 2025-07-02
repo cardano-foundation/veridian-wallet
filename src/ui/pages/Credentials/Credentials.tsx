@@ -7,6 +7,7 @@ import {
 import { t } from "i18next";
 import { peopleOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -16,7 +17,7 @@ import {
 } from "../../../core/agent/services/credentialService.types";
 import { IdentifierType } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
-import { TabsRoutePath } from "../../../routes/paths";
+import { RoutePath, TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getCredsArchivedCache,
@@ -30,6 +31,7 @@ import {
   setCredsCache,
 } from "../../../store/reducers/credsCache";
 import {
+  getAuthentication,
   setCurrentRoute,
   setToastMsg,
   showConnections,
@@ -54,35 +56,15 @@ import { combineClassNames } from "../../utils/style";
 import { StartAnimationSource } from "../Identifiers/Identifiers.types";
 import "./Credentials.scss";
 import { CredentialsFilters } from "./Credentials.types";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
 const CLEAR_STATE_DELAY = 1000;
-
-const AdditionalButtons = ({
-  handleConnections,
-}: {
-  handleConnections: () => void;
-}) => {
-  return (
-    <>
-      <IonButton
-        shape="round"
-        className="connections-button"
-        data-testid="connections-button"
-        onClick={handleConnections}
-      >
-        <IonIcon
-          slot="icon-only"
-          icon={peopleOutline}
-          color="primary"
-        />
-      </IonButton>
-    </>
-  );
-};
 
 const Credentials = () => {
   const pageId = "credentials-tab";
   const dispatch = useAppDispatch();
+  const history = useHistory();
   const credsCache = useAppSelector(getCredsCache);
   const archivedCreds = useAppSelector(getCredsArchivedCache);
   const credentialsFiltersCache = useAppSelector(getCredentialsFilters);
@@ -103,7 +85,8 @@ const Credentials = () => {
     CredentialShortDetails[]
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
-
+  const authData = useAppSelector(getAuthentication);
+  const [defaultProfile, setDefaultProfile] = useState("");
   const revokedCreds = credsCache.filter(
     (item) => item.status === CredentialStatus.REVOKED
   );
@@ -115,6 +98,10 @@ const Credentials = () => {
       credsCache.filter((item) => item.status === CredentialStatus.CONFIRMED),
     [credsCache]
   );
+
+  useEffect(() => {
+    setDefaultProfile(authData.defaultProfile);
+  }, [authData]);
 
   const fetchArchivedCreds = useCallback(async () => {
     try {
@@ -163,6 +150,10 @@ const Credentials = () => {
 
   const handleConnections = () => {
     dispatch(showConnections(true));
+  };
+
+  const handleAvatarClick = () => {
+    history.push(RoutePath.PROFILES);
   };
 
   useIonViewWillEnter(() => {
@@ -279,6 +270,35 @@ const Credentials = () => {
       });
   };
 
+  const AdditionalButtons = ({
+    handleConnections,
+    handleAvatarClick,
+  }: {
+    handleConnections: () => void;
+    handleAvatarClick: AvatarProps["handleAvatarClick"];
+  }) => {
+    return (
+      <>
+        <IonButton
+          shape="round"
+          className="connections-button"
+          data-testid="connections-button"
+          onClick={handleConnections}
+        >
+          <IonIcon
+            slot="icon-only"
+            icon={peopleOutline}
+            color="primary"
+          />
+        </IonButton>
+        <Avatar
+          id={defaultProfile}
+          handleAvatarClick={handleAvatarClick}
+        />
+      </>
+    );
+  };
+
   return (
     <>
       <TabLayout
@@ -287,7 +307,10 @@ const Credentials = () => {
         customClass={tabClasses}
         title={`${i18n.t("tabs.credentials.tab.title")}`}
         additionalButtons={
-          <AdditionalButtons handleConnections={handleConnections} />
+          <AdditionalButtons
+            handleConnections={handleConnections}
+            handleAvatarClick={handleAvatarClick}
+          />
         }
         placeholder={
           showPlaceholder && (
