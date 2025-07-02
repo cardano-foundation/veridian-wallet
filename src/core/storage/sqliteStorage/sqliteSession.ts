@@ -141,15 +141,16 @@ class SqliteSession {
       !cloudMigrationStatus[migration.version] // But cloud migration wasn't completed
     );
 
-    if (missedCloudMigrations.length > 0) {
-      console.log(`Found ${missedCloudMigrations.length} missed cloud migrations to run`);
-      
-      for (const migration of missedCloudMigrations) {
-        console.log(`Running missed cloud migration: ${migration.version}`);
-        await this.performCloudMigration(migration as CloudMigration, true);
-      }
-    } else {
+    if (missedCloudMigrations.length == 0) {
       console.log('No missed cloud migrations found');
+      return;
+    }
+        
+    console.log(`Found ${missedCloudMigrations.length} missed cloud migrations to run`);
+    
+    for (const migration of missedCloudMigrations) {
+      console.log(`Running missed cloud migration: ${migration.version}`);
+      await this.performCloudMigration(migration as CloudMigration, true);
     }
   }
 
@@ -200,35 +201,23 @@ class SqliteSession {
     if (!isKeriaConfigured) {
       const action = isRecoveryValidation ? 'recovery validation' : 'initial migration';
       console.log(`Skipping cloud migration ${migration.version} during ${action} - KERIA not configured`);
-      return;
     } else {
-      try {
-        await this.temporaryKeriaConnection();
-        
-        const action = isRecoveryValidation ? 'recovery validation' : 'migration';
-        console.log(`Starting cloud ${action} ${migration.version}`);
-        const signifyClient = Agent.agent.client;
-        await migration.cloudMigrationStatements(signifyClient);
-        console.log(`Completed cloud ${action} ${migration.version}`);
-        
-        // Mark cloud migration as complete
-        await this.markCloudMigrationComplete(migration.version);
-        
-      } catch (error) {
-        const action = isRecoveryValidation ? 'recovery validation' : 'migration';
-        console.error(`Cloud ${action} ${migration.version} failed:`, error);
-        throw error;
-      }
+      await this.temporaryKeriaConnection();
+      
+      const action = isRecoveryValidation ? 'recovery validation' : 'migration';
+      console.log(`Starting cloud ${action} ${migration.version}`);
+      const signifyClient = Agent.agent.client;
+      await migration.cloudMigrationStatements(signifyClient);
+      console.log(`Completed cloud ${action} ${migration.version}`);
+      
+      // Mark cloud migration as complete
+      await this.markCloudMigrationComplete(migration.version);
     }
   }
 
   private async isKeriaConfigured(): Promise<boolean> {
-    try {
       const connectUrlRecord = await this.basicStorageService.findById(MiscRecordId.KERIA_CONNECT_URL);
       return !!(connectUrlRecord?.content?.url);
-    } catch (error) {
-      return false;
-    }
   }
 
   private async temporaryKeriaConnection(): Promise<void> {
