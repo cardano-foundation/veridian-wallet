@@ -43,6 +43,8 @@ import { ConnectionsOptionModal } from "./components/ConnectionsOptionModal";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
+import { RoutePath } from "../../../routes";
+import { useHistory } from "react-router-dom";
 
 const Connections = () => {
   const pageId = "connections";
@@ -80,6 +82,7 @@ const Connections = () => {
   const [openConnectionlModal, setOpenConnectionlModal] = useState(false);
   const [search, setSearch] = useState("");
   const auth = useAppSelector(getAuthentication);
+  const history = useHistory();
 
   useEffect(() => {
     setShowPlaceholder(Object.keys(connectionsCache).length === 0);
@@ -242,7 +245,7 @@ const Connections = () => {
 
   const handleAvatarClick = () => {
     // TODO: Add Handle avatar click once this page will be refactored.
-    //history.push(RoutePath.PROFILES);
+    history.push(RoutePath.PROFILES);
   };
 
   const classes = combineClassNames({
