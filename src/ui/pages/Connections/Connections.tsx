@@ -244,7 +244,6 @@ const Connections = () => {
   };
 
   const handleAvatarClick = () => {
-    // TODO: Add Handle avatar click once this page will be refactored.
     history.push(RoutePath.PROFILES);
   };
 
