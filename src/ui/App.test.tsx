@@ -202,7 +202,6 @@ const initialState = {
       },
     },
     toastMsgs: [],
-    showConnections: false,
     currentOperation: OperationType.IDLE,
     queueIncomingRequest: {
       isProcessing: false,

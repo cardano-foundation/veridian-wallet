@@ -1,38 +1,35 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { PeerConnectionEventTypes } from "../../../core/cardano/walletConnect/peerConnection.types";
+import { RoutePath } from "../../../routes";
+import { OperationType } from "../../../ui/globals/types";
+import { RootState } from "../../index";
 import {
   AuthenticationCacheProps,
   CurrentRouteCacheProps,
+  dequeueIncomingRequest,
+  enqueueIncomingRequest,
   getAuthentication,
   getCurrentOperation,
   getCurrentRoute,
   getStateCache,
   initialState,
+  login,
   logout,
   setAuthentication,
-  enqueueIncomingRequest,
   setCurrentOperation,
   setCurrentRoute,
+  setIsOnline,
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
-  dequeueIncomingRequest,
+  showGenericError,
   StateCacheProps,
   stateCacheSlice,
-  login,
-  setIsOnline,
-  showGenericError,
-  showConnections,
-  clearStateCache,
 } from "./stateCache";
-import { RootState } from "../../index";
-import { RoutePath } from "../../../routes";
-import { OperationType } from "../../../ui/globals/types";
 import {
   IncomingRequestProps,
   IncomingRequestType,
-  InitializationPhase,
   PeerConnectSigningEventRequest,
 } from "./stateCache.types";
-import { PeerConnectionEventTypes } from "../../../core/cardano/walletConnect/peerConnection.types";
 
 const signingRequest: PeerConnectSigningEventRequest = {
   type: IncomingRequestType.PEER_CONNECT_SIGN,
@@ -66,13 +63,6 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialState, action);
 
     expect(nextState.showGenericError).toEqual(true);
-  });
-
-  test("should set showConnections", () => {
-    const action = showConnections(true);
-    const nextState = stateCacheSlice.reducer(initialState, action);
-
-    expect(nextState.showConnections).toEqual(true);
   });
 
   test("should set the current route cache", () => {

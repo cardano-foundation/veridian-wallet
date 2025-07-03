@@ -3,6 +3,10 @@
     padding: 0;
     --padding: 1.25rem;
 
+    &.md {
+      padding-bottom: calc(var(--ion-safe-area-bottom) + 1.25rem);
+    }
+
     ion-header {
       padding: var(--padding);
       padding-bottom: 0;

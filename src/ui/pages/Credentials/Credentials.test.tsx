@@ -12,10 +12,7 @@ import {
   setCredentialsFilters,
   setCredsCache,
 } from "../../../store/reducers/credsCache";
-import {
-  setCurrentRoute,
-  showConnections,
-} from "../../../store/reducers/stateCache";
+import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { pendingCredFixs } from "../../__fixtures__/credsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
@@ -65,7 +62,6 @@ const initialStateEmpty = {
       passcodeIsSet: true,
     },
     isOnline: true,
-    showConnections: false,
   },
   seedPhraseCache: {},
   credsCache: {
