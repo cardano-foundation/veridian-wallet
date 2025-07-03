@@ -5,6 +5,7 @@ enum MigrationType {
   SQL,
   TS,
   CLOUD,
+  HYBRID,
 }
 
 type BaseMigration = {
@@ -31,6 +32,17 @@ type CloudMigration = BaseMigration & {
   cloudMigrationStatements: (signifyClient: SignifyClient) => Promise<void>;
 };
 
+type HybridMigration = BaseMigration & {
+  type: MigrationType.HYBRID;
+  localMigrationStatements: (session: SQLiteDBConnection) => Promise<
+    {
+      statement: string;
+      values?: unknown[];
+    }[]
+  >;
+  cloudMigrationStatements: (signifyClient: SignifyClient) => Promise<void>;
+};
+
 export { MigrationType };
 
-export type { SqlMigration, TsMigration, CloudMigration };
+export type { SqlMigration, TsMigration, CloudMigration, HybridMigration };

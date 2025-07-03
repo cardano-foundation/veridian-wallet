@@ -7,7 +7,7 @@ import { Capacitor } from "@capacitor/core";
 import { randomPasscode } from "signify-ts";
 import { versionCompare } from "./utils";
 import { MIGRATIONS } from "./migrations";
-import { MigrationType, CloudMigration } from "./migrations/migrations.types";
+import { MigrationType, CloudMigration, HybridMigration } from "./migrations/migrations.types";
 import { KeyStoreKeys, SecureStorage } from "../secureStorage";
 import { BasicStorage } from "../../agent/records/basicStorage";
 import { SqliteStorage } from "./sqliteStorage";
@@ -121,12 +121,6 @@ class SqliteSession {
    */
   async validateCloudMigrationsOnRecovery(): Promise<void> {
     console.log('Validating cloud migrations after recovery...');
-    
-    const isKeriaConfigured = await this.isKeriaConfigured();
-    if (!isKeriaConfigured) {
-      console.log('KERIA not configured, skipping cloud migration validation');
-      return;
-    }
 
     const currentLocalVersion = await this.getCurrentVersionDatabase();
     const cloudMigrationStatus = await this.getCloudMigrationStatus();
@@ -136,7 +130,7 @@ class SqliteSession {
     );
 
     const missedCloudMigrations = orderedMigrations.filter(migration => 
-      migration.type === MigrationType.CLOUD &&
+      (migration.type === MigrationType.CLOUD || migration.type === MigrationType.HYBRID) &&
       versionCompare(migration.version, currentLocalVersion) <= 0 && // Migration version is at or before current local version
       !cloudMigrationStatus[migration.version] // But cloud migration wasn't completed
     );
@@ -150,7 +144,7 @@ class SqliteSession {
     
     for (const migration of missedCloudMigrations) {
       console.log(`Running missed cloud migration: ${migration.version}`);
-      await this.performCloudMigration(migration as CloudMigration, true);
+      await this.performCloudMigration(migration as CloudMigration | HybridMigration, true);
     }
   }
 
@@ -178,6 +172,13 @@ class SqliteSession {
       } else if (migration.type === MigrationType.CLOUD) {
         // Handle cloud migrations
         await this.performCloudMigration(migration);
+      } else if (migration.type === MigrationType.HYBRID) {
+        // Handle hybrid migrations (both local and cloud)
+        const statements = await migration.localMigrationStatements(this.session!);
+        migrationStatements.push(...statements);
+        
+        // Perform cloud migration after local migration
+        await this.performCloudMigration(migration);
       }
 
       // Update version for all migration types
@@ -195,9 +196,8 @@ class SqliteSession {
     }
   }
 
-  private async performCloudMigration(migration: CloudMigration, isRecoveryValidation: boolean = false): Promise<void> {
+  private async performCloudMigration(migration: CloudMigration | HybridMigration, isRecoveryValidation: boolean = false): Promise<void> {
     const isKeriaConfigured = await this.isKeriaConfigured();
-    
     if (!isKeriaConfigured) {
       const action = isRecoveryValidation ? 'recovery validation' : 'initial migration';
       console.log(`Skipping cloud migration ${migration.version} during ${action} - KERIA not configured`);
