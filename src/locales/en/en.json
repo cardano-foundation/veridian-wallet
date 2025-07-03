@@ -1116,11 +1116,6 @@
             "confirm": "Confirm"
           }
         },
-        "alert": {
-          "message": "To create a connection, you need to create an identifier. Would you like to create one now?",
-          "confirm": "Create identifier",
-          "cancel": "Cancel"
-        },
         "deletepending": {
           "title": "Connection options",
           "description": "This connection is pending. You’ll be notified once they accept. If you no longer require this connection, tap “Delete connection” to remove.",
@@ -1173,13 +1168,6 @@
       },
       "unknown": "Unknown"
     }
-  },
-  "connectmodal": {
-    "title": "Add a",
-    "scan": "Scan QR Code",
-    "connect": "Scan to connect",
-    "provide": "Provide QR Code",
-    "close": "Done"
   },
   "verifypassword": {
     "title": "Enter password",
@@ -1592,5 +1580,39 @@
   "profiles": {
     "title": "Profiles",
     "cancel": "Cancel"
+  },
+  "scan": {
+    "title": "Align the QR code within the frame to scan",
+    "permissionalert": "Enable the camera in your device settings to start scanning",
+    "cameraunavailable": "We're unable to access your camera.",
+    "pastecontentbutton": "Paste contents",
+    "inputmodal": {
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "pastecontents": "Paste contents"
+    }
+  },
+  "shareprofile": {
+    "buttons": {
+      "provide": "Provide",
+      "scan": "Scan",
+      "close": "Close"
+    },
+    "shareoobi": {
+      "title": "Share profile",
+      "description": "To connect, share your profile by showing your QR code, sending the link, or using another method.",
+      "button": "Share"
+    },
+    "scan": {
+      "title": "Align the QR code within the frame to scan",
+      "permissionalert": "Enable the camera in your device settings to start scanning",
+      "cameraunavailable": "We're unable to access your camera.",
+      "pastecontentbutton": "Paste contents",
+      "inputmodal": {
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "pastecontents": "Paste contents"
+      }
+    }
   }
 }

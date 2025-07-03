@@ -1,0 +1,151 @@
+.share-profile-oobi {
+  ‰ &.md {
+    .share-profile-body {
+      margin-bottom: 0;
+    }
+  }
+
+  .share-profile-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  p.share-profile-subtitle {
+    text-align: center;
+    margin: 0 0 5.5rem;
+  }
+
+  .share-profile-body-component {
+    display: flex;
+    flex-direction: column;
+  }
+
+  ion-icon {
+    width: 1.475rem;
+    height: 1.475rem;
+    margin: 0;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    ion-icon {
+      width: 1.18rem;
+      height: 1.18rem;
+      margin: 0;
+    }
+
+    p.share-profile-subtitle {
+      margin-bottom: 2.5rem;
+    }
+  }
+
+  .share-qr {
+    #react-qrcode-logo {
+      width: 70vw !important;
+      height: 70vw !important;
+      padding: 1.5rem;
+      margin: 0 auto 1.5rem;
+      background-color: var(--ion-color-neutral-100);
+      box-shadow: 0rem 0.125rem 0.25rem
+        rgba(var(--ion-color-neutral-500-rgb), 0.2);
+      border-radius: 1rem;
+    }
+
+    .share-qr-code-blur-overlay-container {
+      width: 70vw !important;
+      height: 70vw !important;
+      padding: 1.5rem;
+      margin: 0 auto 1.5rem;
+      border-radius: 1rem;
+      position: absolute;
+      left: calc(50% - 35vw);
+      box-shadow: 0rem 0.125rem 0.25rem
+        rgba(var(--ion-color-neutral-500-rgb), 0.2);
+
+      .share-qr-code-blur-overlay-inner {
+        display: none;
+      }
+
+      ion-icon {
+        width: 5rem;
+        height: 5rem;
+        opacity: 1;
+        text-align: center;
+        margin: 0 auto;
+      }
+    }
+
+    &.blur {
+      #react-qrcode-logo {
+        filter: blur(0.5rem);
+        opacity: 0.3;
+      }
+
+      .share-qr-code-blur-overlay-container {
+        .share-qr-code-blur-overlay-inner {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+
+          ion-icon {
+            width: 5rem;
+            height: 5rem;
+            opacity: 1;
+            text-align: center;
+            margin: 0 auto;
+          }
+        }
+      }
+    }
+  }
+
+  .share-profile-divider {
+    display: flex;
+    margin-bottom: 1rem;
+
+    .share-profile-divider-line {
+      border-bottom: 1px solid var(--ion-color-neutral-300);
+      display: flex;
+      flex-grow: 2;
+      margin-bottom: 0.5rem;
+    }
+    .share-profile-divider-text {
+      margin-inline: 0.5rem;
+    }
+  }
+
+  .share-profile-option {
+    display: flex;
+    height: 2.875rem;
+
+    > * {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .share-qr {
+      #react-qrcode-logo,
+      .share-qr-code-blur-overlay-container {
+        padding: 1.2rem;
+      }
+    }
+
+    .share-profile-body-component,
+    .share-profile-divider-text {
+      font-size: 0.8rem;
+    }
+
+    .share-profile-option {
+      height: 2.3rem;
+    }
+  }
+}
