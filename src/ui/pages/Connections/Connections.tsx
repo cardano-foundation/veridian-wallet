@@ -128,7 +128,7 @@ const Connections = () => {
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${auth.defaultProfile}`,
-        identifier.displayName
+        identifier?.displayName || ""
       );
       if (oobiValue) {
         setOobi(oobiValue);
@@ -136,7 +136,7 @@ const Connections = () => {
     } catch (e) {
       showError("Unable to fetch connection oobi", e, dispatch);
     }
-  }, [auth.defaultProfile, identifier.displayName, dispatch]);
+  }, [auth.defaultProfile, identifier?.displayName, dispatch]);
 
   useOnlineStatusEffect(fetchOobi);
 
