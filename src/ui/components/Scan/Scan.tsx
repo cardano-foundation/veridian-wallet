@@ -57,15 +57,16 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const mobileweb = platforms.includes("mobileweb");
 
     const stopScan = useCallback(async () => {
-      isHandlingQR.current = false;
-      setScanning(false);
-      document?.querySelector("body")?.classList.remove("scanner-active");
-
+      const permission = await checkPermission();
       if (permission) {
         await BarcodeScanner.stopScan();
         await BarcodeScanner.removeAllListeners();
       }
-    }, [permission]);
+
+      isHandlingQR.current = false;
+      setScanning(false);
+      document?.querySelector("body")?.classList.remove("scan-active");
+    }, []);
 
     const handleScanValue = useCallback(
       async (result: string) => {
@@ -117,11 +118,11 @@ const Scan = forwardRef<ScanRef, ScanProps>(
           }
         }
 
-        document?.querySelector("body")?.classList.add("scanner-active");
+        document?.querySelector("body")?.classList.add("scan-active");
         setScanning(true);
-        document?.querySelector("body")?.classList.add("scanner-active");
+        document?.querySelector("body")?.classList.add("scan-active");
         document
-          ?.querySelector("body.scanner-active > div:last-child")
+          ?.querySelector("body.scan-active > div:last-child")
           ?.classList.remove("hide");
       }
     }, [
@@ -163,6 +164,8 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     }, [cameraDirection]);
 
     useEffect(() => {
+      if (mobileweb) return;
+
       if (!loggedIn) {
         stopScan();
         return;
@@ -173,7 +176,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       return () => {
         stopScan();
       };
-    }, [loggedIn]);
+    }, [stopScan, loggedIn]);
 
     const handleSubmitPastedValue = async () => {
       await handleScanValue(pastedValue);

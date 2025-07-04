@@ -1,16 +1,23 @@
-body.scanner-active > div#root div.app-router {
-  display: none;
-}
-
-.share-profile-modal {
-  &.scan {
-    --background: transparent;
+body.scan-active {
+  div.app-router {
+    display: none;
   }
 
+  .share-profile-modal {
+    &.scan {
+      --background: transparent;
+    }
+
+    .share-profile.responsive-page-layout {
+      &.scan {
+        background: transparent;
+      }
+    }
+  }
+}
+.share-profile-modal {
   .share-profile.responsive-page-layout {
     &.scan {
-      background: transparent;
-
       .page-header {
         .close-button-label > h4 {
           color: var(--ion-color-neutral-200) !important;
