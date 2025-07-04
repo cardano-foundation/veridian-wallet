@@ -109,9 +109,9 @@ class PeerConnection {
           }
           await Agent.agent.peerConnectionMetadataStorage.updatePeerConnectionMetadata(
             address,
+            selectedAid,
             {
               name,
-              selectedAid,
               url,
               iconB64: iconB64,
             }
@@ -151,9 +151,11 @@ class PeerConnection {
     if (this.identityWalletConnect === undefined) {
       throw new Error(PeerConnection.PEER_CONNECTION_START_PENDING);
     }
+    const connectingIdentifier =
+      await this.identityWalletConnect.getKeriIdentifier();
     const existingPeerConnection =
       await Agent.agent.peerConnectionMetadataStorage
-        .getPeerConnectionMetadata(dAppIdentifier)
+        .getPeerConnectionMetadata(dAppIdentifier, connectingIdentifier.id)
         .catch((error) => {
           if (
             error.message ===

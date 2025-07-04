@@ -56,7 +56,7 @@ interface PeerConnection {
   name?: string;
   url?: string;
   iconB64?: string;
-  selectedAid?: string;
+  selectedAid: string;
   createdAt?: string;
 }
 

@@ -6,14 +6,14 @@ interface PeerConnectionMetadataRecordProps {
   url?: string;
   createdAt?: Date;
   iconB64?: string;
-  selectedAid?: string;
+  selectedAid: string;
 }
 
 class PeerConnectionMetadataRecord extends BaseRecord {
   name?: string;
   url?: string;
   iconB64?: string;
-  selectedAid?: string;
+  selectedAid: string;
 
   static readonly type = "PeerConnectionMetadataRecord";
   readonly type = PeerConnectionMetadataRecord.type;
@@ -21,14 +21,19 @@ class PeerConnectionMetadataRecord extends BaseRecord {
   constructor(props: PeerConnectionMetadataRecordProps) {
     super();
 
-    if (props) {
-      this.id = props.id;
-      this.name = props.name ?? "";
-      this.url = props.url ?? "";
-      this.selectedAid = props.selectedAid ?? "";
-      this.createdAt = props.createdAt ?? new Date();
-      this.iconB64 = props.iconB64 ?? "";
-    }
+    this.id = PeerConnectionMetadataRecord.getCompositeId(
+      props.id,
+      props.selectedAid
+    );
+    this.name = props.name ?? "";
+    this.url = props.url ?? "";
+    this.selectedAid = props.selectedAid;
+    this.createdAt = props.createdAt ?? new Date();
+    this.iconB64 = props.iconB64 ?? "";
+  }
+
+  static getCompositeId(dAppId: string, aid: string): string {
+    return `${dAppId}:${aid}`;
   }
 
   getTags() {

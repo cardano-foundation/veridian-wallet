@@ -14,8 +14,11 @@ class PeerConnectionStorage {
     this.storageService = storageService;
   }
 
-  async getPeerConnection(id: string): Promise<PeerConnection> {
-    const metadata = await this.getPeerConnectionMetadata(id);
+  async getPeerConnection(
+    dAppId: string,
+    aid: string
+  ): Promise<PeerConnection> {
+    const metadata = await this.getPeerConnectionMetadata(dAppId, aid);
     return {
       id: metadata.id,
       iconB64: metadata.iconB64,
@@ -27,10 +30,11 @@ class PeerConnectionStorage {
   }
 
   async getPeerConnectionMetadata(
-    id: string
+    dAppId: string,
+    aid: string
   ): Promise<PeerConnectionMetadataRecord> {
     const metadata = await this.storageService.findById(
-      id,
+      PeerConnectionMetadataRecord.getCompositeId(dAppId, aid),
       PeerConnectionMetadataRecord
     );
     if (!metadata) {
@@ -56,22 +60,21 @@ class PeerConnectionStorage {
   }
 
   async updatePeerConnectionMetadata(
-    id: string,
+    dAppId: string,
+    aid: string,
     metadata: Partial<
-      Pick<
-        PeerConnectionMetadataRecord,
-        "name" | "url" | "iconB64" | "selectedAid"
-      >
+      Pick<PeerConnectionMetadataRecord, "name" | "url" | "iconB64">
     >
   ): Promise<void> {
-    const identifierMetadataRecord = await this.getPeerConnectionMetadata(id);
+    const identifierMetadataRecord = await this.getPeerConnectionMetadata(
+      dAppId,
+      aid
+    );
     if (metadata.name !== undefined)
       identifierMetadataRecord.name = metadata.name;
     if (metadata.url !== undefined) identifierMetadataRecord.url = metadata.url;
     if (metadata.iconB64 !== undefined)
       identifierMetadataRecord.iconB64 = metadata.iconB64;
-    if (metadata.selectedAid !== undefined)
-      identifierMetadataRecord.selectedAid = metadata.selectedAid;
     await this.storageService.update(identifierMetadataRecord);
   }
 
@@ -82,8 +85,13 @@ class PeerConnectionStorage {
     await this.storageService.save(record);
   }
 
-  async deletePeerConnectionMetadataRecord(id: string): Promise<void> {
-    await this.storageService.deleteById(id);
+  async deletePeerConnectionMetadataRecord(
+    dAppId: string,
+    aid: string
+  ): Promise<void> {
+    await this.storageService.deleteById(
+      PeerConnectionMetadataRecord.getCompositeId(dAppId, aid)
+    );
   }
 }
 
