@@ -2,7 +2,6 @@ Feature: Menu setting recovery phrase
 
   Background:
     Given user is onboarded with skipped password creation
-    And user tap skip button on Welcome screen
     And user tap Menu button on Tab bar
     And user tap Settings button on Menu screen
     And user tap on Recovery Phrase button on Menu screen

@@ -33,7 +33,6 @@ export async function addChosenIdentifierType() {
 async function addChosenIdentifierTypeByPlusIcon() {
   await MenuToolbar.addButton.click();
   const identifierName = await addChosenIdentifierType();
-  await Assert.toast(Message.NewIdentifierCreatedSuccessfully);
   return identifierName;
 }
 
@@ -42,7 +41,7 @@ Given(
   async function (identifierType: string) {
     this.identifierType = identifierType;
     this.identifierName = await addChosenIdentifierTypeByPlusIcon();
-    await (await IdentifierScreen.identityAllCard(0)).click();
+    await (await IdentifierScreen.identityAllCard(1)).click();
     await IdentifierCardDetailsScreen.loads(this.identifierName);
   }
 );

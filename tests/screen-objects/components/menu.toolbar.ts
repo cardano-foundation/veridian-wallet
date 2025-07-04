@@ -11,7 +11,7 @@ export class MenuToolbar {
   }
 
   get connectionsButton() {
-    return $("[data-testid=\"connections-button\"]");
+    return $("[data-testid='tab-title-identifiers'] + ion-buttons [data-testid='connections-button']");
   }
 
   async clickBackArrowIcon() {

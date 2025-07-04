@@ -2,7 +2,7 @@ Feature: IndividualIdentifier
 
   Background:
     Given user is onboarded with skipped password creation
-    And user tap skip button on Welcome screen
+    And user navigate to Identifiers tab
 
   Scenario: C135 IndividualIdentifier - Cancel adding an identifier from Add an identifier button
     Given user tap Add an identifier button on the Identifiers screen

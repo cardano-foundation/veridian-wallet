@@ -16,6 +16,8 @@ import WelcomeModal from "../screen-objects/components/welcome.modal.js";
 import { returnPassword } from "../helpers/generate";
 import BiometricScreen from "../screen-objects/onboarding/biometric.screen";
 import WelcomeMessageScreen from "../screen-objects/onboarding/welcome-message.screen";
+import ProfileModal from "../screen-objects/components/profile.modal";
+import TabBar from "../screen-objects/components/tab.bar";
 
 Given(/^user is onboarded with skipped password creation$/, async function () {
   if (await OnboardingScreen.getStartedButton.isExisting()) {
@@ -37,11 +39,12 @@ Given(/^user is onboarded with skipped password creation$/, async function () {
     await PasscodeScreen.enterPasscodeSkip();
   }
   await SsiAgentDetailsScreen.tapOnValidatedButton();
+  await ProfileModal.confirmButton.click();
   this.userName = faker.person.firstName();
-  await WelcomeModal.nameInput.setValue(this.userName);
-  await WelcomeModal.confirmButton.waitForClickable();
-  await WelcomeModal.confirmButton.click();
-  await Assert.toast(`Welcome, ${this.userName}!`);
+  await ProfileModal.usernameTextbox.setValue(this.userName);
+  await ProfileModal.confirmButton.click();
+  await WelcomeMessageScreen.checkTitleText(`Welcome, ${this.userName}`)
+  await WelcomeMessageScreen.getStartedButton.click();
 });
 
 Given(/^user is onboarded with a password creation$/, async function () {
@@ -74,13 +77,18 @@ Given(/^user is onboarded with a password creation$/, async function () {
     await PasscodeScreen.enterPasscodeSkip();
   }
   await SsiAgentDetailsScreen.tapOnValidatedButton();
+  await ProfileModal.confirmButton.click();
   this.userName = faker.person.firstName();
-  await WelcomeModal.nameInput.setValue(this.userName);
-  await WelcomeModal.confirmButton.waitForClickable();
-  await WelcomeModal.confirmButton.click();
-  await Assert.toast(`Welcome, ${this.userName}!`);
+  await ProfileModal.usernameTextbox.setValue(this.userName);
+  await ProfileModal.confirmButton.click();
+  await WelcomeMessageScreen.checkTitleText(`Welcome, ${this.userName}`)
+  await WelcomeMessageScreen.getStartedButton.click();
 });
 
 Given(/^user tap skip button on Welcome screen$/, async function () {
   await WelcomeMessageScreen.handleSkipWelcomeScreen();
+});
+
+Given(/^user navigate to Identifiers tab$/, async function() {
+  await TabBar.identityTabButton.click();
 });

@@ -7,11 +7,15 @@ export class WelcomeMessageScreen {
     return $(".content");
   }
   get titleText() {
-    return $(".content > h2");
+    return $(".container> h3");
   }
 
   get welcomeText() {
     return $(".content > p");
+  }
+
+  get getStartedButton() {
+    return $("[data-testid='primary-button-profile-setup']");
   }
 
   get addIdentifierButton() {
@@ -64,6 +68,11 @@ export class WelcomeMessageScreen {
     if (await this.skipButton.isExisting()) {
       await this.skipButton.click();
     }
+  }
+
+  async checkTitleText(title :string) {
+    await expect(this.titleText).toBeDisplayed();
+    await expect(this.titleText).toHaveText(title);
   }
 }
 
