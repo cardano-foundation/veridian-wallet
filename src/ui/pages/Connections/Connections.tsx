@@ -1,11 +1,13 @@
 import { IonButton, IonIcon, useIonViewWillEnter } from "@ionic/react";
 import { useCallback, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
   ConnectionStatus,
 } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
+import { RoutePath } from "../../../routes";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
@@ -14,6 +16,7 @@ import {
   removeConnectionCache,
   setOpenConnectionId,
 } from "../../../store/reducers/connectionsCache";
+import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
   getStateCache,
@@ -37,13 +40,12 @@ import { ConnectionsBody } from "./components/ConnectionsBody";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
-import { RoutePath } from "../../../routes";
-import { useHistory } from "react-router-dom";
 
 const Connections = () => {
   const pageId = "connections-tab";
   const dispatch = useAppDispatch();
   const stateCache = useAppSelector(getStateCache);
+  const identifiers = useAppSelector(getIdentifiersCache);
   const connectionsCache = useAppSelector(getConnectionsCache);
   const openDetailId = useAppSelector(getOpenConnectionId);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
@@ -56,12 +58,13 @@ const Connections = () => {
   const [deletePendingItem, setDeletePendingItem] =
     useState<ConnectionShortDetails | null>(null);
   const [openDeletePendingAlert, setOpenDeletePendingAlert] = useState(false);
-  const userName = stateCache.authentication.userName;
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
   const auth = useAppSelector(getAuthentication);
   const history = useHistory();
+  const defaultProfile = stateCache.authentication.defaultProfile;
+  const identifier = identifiers[defaultProfile];
 
   const showPlaceholder = Object.keys(connectionsCache).length === 0;
 
@@ -125,7 +128,7 @@ const Connections = () => {
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${auth.defaultProfile}`,
-        userName
+        identifier.displayName
       );
       if (oobiValue) {
         setOobi(oobiValue);
@@ -133,7 +136,7 @@ const Connections = () => {
     } catch (e) {
       showError("Unable to fetch connection oobi", e, dispatch);
     }
-  }, [auth.defaultProfile, userName, dispatch]);
+  }, [auth.defaultProfile, identifier.displayName, dispatch]);
 
   useOnlineStatusEffect(fetchOobi);
 

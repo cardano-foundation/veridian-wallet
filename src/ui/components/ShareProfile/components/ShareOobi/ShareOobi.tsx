@@ -19,9 +19,6 @@ const ShareOobi = ({ oobi }: ShareOobiProps) => {
 
   return (
     <div className="share-profile-oobi">
-      <p className="share-profile-subtitle">
-        {i18n.t("shareprofile.shareoobi.description")}
-      </p>
       <div className="share-profile-body">
         <div
           className={`share-profile-body-component share-qr ${

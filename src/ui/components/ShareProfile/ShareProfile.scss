@@ -15,8 +15,13 @@ body.scan-active {
     }
   }
 }
+
 .share-profile-modal {
   .share-profile.responsive-page-layout {
+    p.share-profile-subtitle {
+      text-align: center;
+    }
+
     &.scan {
       .page-header {
         .close-button-label > h4 {

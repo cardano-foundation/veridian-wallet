@@ -69,7 +69,12 @@ const ShareProfile = ({ isOpen, setIsOpen, oobi }: ShareProfileProps) => {
         }
       >
         {tab === Tab.ShareOobi ? (
-          <ShareOobi oobi={oobi} />
+          <>
+            <p className="share-profile-subtitle">
+              {i18n.t("shareprofile.shareoobi.description")}
+            </p>
+            <ShareOobi oobi={oobi} />
+          </>
         ) : (
           <>
             <div className="placeholder"></div>

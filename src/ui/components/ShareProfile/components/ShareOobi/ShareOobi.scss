@@ -1,5 +1,5 @@
 .share-profile-oobi {
-  ‰ &.md {
+  &.md {
     .share-profile-body {
       margin-bottom: 0;
     }
@@ -9,11 +9,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-
-  p.share-profile-subtitle {
-    text-align: center;
-    margin: 0 0 5.5rem;
   }
 
   .share-profile-body-component {
