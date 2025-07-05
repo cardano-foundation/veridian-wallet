@@ -43,6 +43,7 @@ import { IncomingRequestType } from "../../../store/reducers/stateCache/stateCac
 import {
   ConnectionData,
   setConnectedWallet,
+  setPendingConnection,
   setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
 import { ToastMsgType } from "../../globals/types";
@@ -133,12 +134,18 @@ jest.mock("../../../core/agent/agent", () => ({
       peerConnectionMetadataStorage: {
         getAllPeerConnectionMetadata: jest.fn(),
         getPeerConnectionMetadata: jest.fn(),
-        getPeerConnection: jest.fn(),
+
+        createPeerConnectionMetadataRecord: jest.fn(),
+        updatePeerConnectionMetadata: jest.fn(),
+      },
+      peerConnectionAccounts: {
+        save: jest.fn(),
       },
       basicStorage: {
         findById: jest.fn(),
         save: jest.fn(),
       },
+      devPreload: jest.fn(),
     },
   },
 }));
@@ -211,6 +218,7 @@ const peerConnection: ConnectionData = {
   iconB64: "icon",
   selectedAid: "identifier",
   url: "http://localhost:3000",
+  createdAt: new Date(),
 };
 
 const identifierAddedEvent: IdentifierAddedEvent = {
@@ -321,14 +329,20 @@ describe("Peer connection states changed handler", () => {
       jest.fn().mockResolvedValue([peerConnection]);
     await peerConnectedChangeHandler(peerConnectedEvent, dispatch);
     await waitFor(() => {
-      expect(dispatch).toBeCalledWith(setConnectedWallet(peerConnection));
+      expect(dispatch).toHaveBeenCalledWith(
+        setWalletConnectionsCache([peerConnection])
+      );
+      expect(dispatch).toHaveBeenCalledWith(
+        setConnectedWallet({
+          ...peerConnection,
+          createdAt: expect.any(Date),
+        })
+      );
+      expect(dispatch).toHaveBeenCalledWith(
+        setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS)
+      );
+      expect(dispatch).toHaveBeenCalledWith(setPendingConnection(null));
     });
-    expect(dispatch).toBeCalledWith(
-      setWalletConnectionsCache([peerConnection])
-    );
-    expect(dispatch).toBeCalledWith(
-      setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS)
-    );
   });
 
   test("handle peer disconnected event", async () => {
@@ -344,7 +358,7 @@ describe("Peer connection states changed handler", () => {
   });
 
   test("handle peer sign request event", async () => {
-    Agent.agent.peerConnectionMetadataStorage.getPeerConnection = jest
+    Agent.agent.peerConnectionMetadataStorage.getPeerConnectionMetadata = jest
       .fn()
       .mockResolvedValue(peerConnection);
     await peerConnectRequestSignChangeHandler(peerSignRequestEvent, dispatch);

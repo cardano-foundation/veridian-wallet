@@ -33,6 +33,8 @@ import {
   IdentifierStorage,
   PeerConnectionMetadataRecord,
   PeerConnectionStorage,
+  PeerConnectionAccountRecord,
+  PeerConnectionAccountStorage,
   NotificationRecord,
   NotificationStorage,
 } from "./records";
@@ -80,6 +82,7 @@ class Agent {
   private connectionStorage!: ConnectionStorage;
   private notificationStorage!: NotificationStorage;
   private peerConnectionStorage!: PeerConnectionStorage;
+  private peerConnectionAccountStorage!: PeerConnectionAccountStorage;
   private operationPendingStorage!: OperationPendingStorage;
 
   private identifierService!: IdentifierService;
@@ -164,6 +167,10 @@ class Agent {
 
   get peerConnectionMetadataStorage() {
     return this.peerConnectionStorage;
+  }
+
+  get peerConnectionAccounts() {
+    return this.peerConnectionAccountStorage;
   }
 
   get basicStorage() {
@@ -446,6 +453,9 @@ class Agent {
     );
     this.peerConnectionStorage = new PeerConnectionStorage(
       this.getStorageService<PeerConnectionMetadataRecord>(this.storageSession)
+    );
+    this.peerConnectionAccountStorage = new PeerConnectionAccountStorage(
+      this.getStorageService<PeerConnectionAccountRecord>(this.storageSession)
     );
     this.operationPendingStorage = new OperationPendingStorage(
       this.getStorageService<OperationPendingRecord>(this.storageSession),
