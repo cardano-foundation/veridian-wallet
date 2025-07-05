@@ -47,7 +47,6 @@ describe("Connection service of agent", () => {
           id: record.id,
           iconB64: record.iconB64,
           name: record.name,
-          selectedAid: record.selectedAid,
           url: record.url,
           createdAt: record.createdAt.toISOString(),
         })
@@ -67,17 +66,10 @@ describe("Connection service of agent", () => {
   test("Should get peer connection", async () => {
     storageService.findById.mockResolvedValue(peerConnectionMetadataRecord);
     expect(
-      await peerConnectionStorage.getPeerConnection(
+      await peerConnectionStorage.getPeerConnectionMetadata(
         peerConnectionMetadataRecord.id
       )
-    ).toEqual({
-      id: peerConnectionMetadataRecord.id,
-      iconB64: peerConnectionMetadataRecord.iconB64,
-      name: peerConnectionMetadataRecord.name,
-      selectedAid: peerConnectionMetadataRecord.selectedAid,
-      url: peerConnectionMetadataRecord.url,
-      createdAt: peerConnectionMetadataRecord.createdAt.toISOString(),
-    });
+    ).toEqual(peerConnectionMetadataRecord);
   });
 
   test("Should throw if peerConnection metadata record is missing", async () => {

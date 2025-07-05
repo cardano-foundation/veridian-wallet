@@ -20,11 +20,10 @@
     "jsx": "react-jsx",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": [
-      "node",
-      "@wdio/globals/types",
-      "@wdio/cucumber-framework",
-    ]
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["src/*"]
+    }
   },
   "include": [
     "src",

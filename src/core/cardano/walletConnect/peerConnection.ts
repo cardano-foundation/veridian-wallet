@@ -14,7 +14,10 @@ import {
   PeerDisconnectedEvent,
 } from "./peerConnection.types";
 import { Agent } from "../../agent/agent";
-import { PeerConnectionStorage } from "../../agent/records";
+import {
+  PeerConnectionMetadataRecord,
+  PeerConnectionAccountRecord,
+} from "../../agent/records";
 
 class PeerConnection {
   static readonly PEER_CONNECTION_START_PENDING =
@@ -107,15 +110,39 @@ class PeerConnection {
           ) {
             iconB64 = icon;
           }
-          await Agent.agent.peerConnectionMetadataStorage.updatePeerConnectionMetadata(
-            address,
-            {
-              name,
-              selectedAid,
-              url,
-              iconB64: iconB64,
+          // Create or update PeerConnectionMetadataRecord
+          try {
+            await Agent.agent.peerConnectionMetadataStorage.getPeerConnectionMetadata(
+              address
+            );
+            await Agent.agent.peerConnectionMetadataStorage.updatePeerConnectionMetadata(
+              address,
+              { name, url, iconB64 }
+            );
+          } catch (error) {
+            if (
+              error instanceof Error &&
+              error.message === "Peer connection metadata record does not exist"
+            ) {
+              await Agent.agent.peerConnectionMetadataStorage.createPeerConnectionMetadataRecord(
+                {
+                  id: address,
+                  name,
+                  url,
+                  iconB64: iconB64,
+                }
+              );
+            } else {
+              throw error;
             }
-          );
+          }
+
+          // Create or update PeerConnectionAccountRecord
+          const peerConnectionAccount = new PeerConnectionAccountRecord({
+            peerConnectionId: address,
+            accountId: selectedAid,
+          });
+          await Agent.agent.peerConnectionAccounts.save(peerConnectionAccount);
           this.eventEmitter.emit<PeerConnectedEvent>({
             type: PeerConnectionEventTypes.PeerConnected,
             payload: {
@@ -151,30 +178,36 @@ class PeerConnection {
     if (this.identityWalletConnect === undefined) {
       throw new Error(PeerConnection.PEER_CONNECTION_START_PENDING);
     }
-    const existingPeerConnection =
-      await Agent.agent.peerConnectionMetadataStorage
-        .getPeerConnectionMetadata(dAppIdentifier)
-        .catch((error) => {
-          if (
-            error.message ===
-            PeerConnectionStorage.PEER_CONNECTION_METADATA_RECORD_MISSING
-          ) {
-            return undefined;
-          } else {
-            throw error;
-          }
-        });
-    if (!existingPeerConnection) {
-      const connectingIdentifier =
-        await this.identityWalletConnect.getKeriIdentifier();
-      await Agent.agent.peerConnectionMetadataStorage.createPeerConnectionMetadataRecord(
-        {
-          id: dAppIdentifier,
-          selectedAid: connectingIdentifier.id,
-          iconB64: ICON_BASE64,
-        }
+    try {
+      await Agent.agent.peerConnectionMetadataStorage.getPeerConnectionMetadata(
+        dAppIdentifier
       );
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Peer connection metadata record does not exist"
+      ) {
+        const connectingIdentifier =
+          await this.identityWalletConnect.getKeriIdentifier();
+        await Agent.agent.peerConnectionMetadataStorage.createPeerConnectionMetadataRecord(
+          {
+            id: dAppIdentifier,
+            iconB64: ICON_BASE64,
+          }
+        );
+      } else {
+        throw error;
+      }
     }
+
+    const connectingIdentifier =
+      await this.identityWalletConnect.getKeriIdentifier();
+    const peerConnectionAccount = new PeerConnectionAccountRecord({
+      peerConnectionId: dAppIdentifier,
+      accountId: connectingIdentifier.id,
+    });
+    await Agent.agent.peerConnectionAccounts.save(peerConnectionAccount);
+
     const seed = this.identityWalletConnect.connect(dAppIdentifier);
 
     SecureStorage.set(KeyStoreKeys.MEERKAT_SEED, seed);

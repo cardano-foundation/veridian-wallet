@@ -8,26 +8,6 @@ import { PeerConnection } from "./peerConnection";
 import { KeyStoreKeys, SecureStorage } from "../../storage";
 require("fake-indexeddb/auto");
 
-jest.mock("../../agent/agent", () => ({
-  Agent: {
-    agent: {
-      connections: {
-        getConnectionShortDetailById: jest.fn(),
-        getMultisigLinkedContacts: jest.fn(),
-        getOobi: jest.fn(),
-      },
-      identifiers: {
-        getIdentifier: jest.fn(),
-        updateIdentifier: jest.fn(),
-      },
-      getKeriaOnlineStatus: jest.fn(),
-      peerConnectionMetadataStorage: {
-        createPeerConnectionMetadataRecord: jest.fn(),
-        getPeerConnectionMetadata: jest.fn(),
-      },
-    },
-  },
-}));
 const EXISTING_KEY = "keythatexists";
 const EXISTING_VALUE = "valuethatexists";
 
@@ -47,10 +27,50 @@ jest.mock("../../storage", () => ({
   },
 }));
 
+const mockAgentAgent = {
+  connections: {
+    getConnectionShortDetailById: jest.fn(),
+    getMultisigLinkedContacts: jest.fn(),
+    getOobi: jest.fn(),
+  },
+  identifiers: {
+    getIdentifier: jest.fn(),
+    updateIdentifier: jest.fn(),
+  },
+  getKeriaOnlineStatus: jest.fn(),
+  peerConnectionMetadataStorage: {
+    createPeerConnectionMetadataRecord: jest.fn(),
+    getPeerConnectionMetadata: jest.fn(),
+    updatePeerConnectionMetadata: jest.fn(),
+  },
+  peerConnectionAccounts: {
+    save: jest.fn(),
+  },
+};
+
+jest.mock("../../agent/agent", () => ({
+  Agent: {
+    get agent() {
+      return mockAgentAgent;
+    },
+  },
+}));
+
 describe("PeerConnection", () => {
   let peerConnection: PeerConnection;
 
   beforeEach(() => {
+    (Agent.agent as any).peerConnectionAccounts = {
+      save: jest.fn(),
+    };
+    (Agent.agent as any).peerConnectionMetadataStorage = {
+      createPeerConnectionMetadataRecord: jest.fn(),
+      getPeerConnectionMetadata: jest.fn(),
+      updatePeerConnectionMetadata: jest.fn(),
+    };
+    (Agent.agent as any).peerConnectionAccounts = {
+      save: jest.fn(),
+    };
     peerConnection = PeerConnection.peerConnection;
   });
 
@@ -94,7 +114,7 @@ describe("PeerConnection", () => {
     Agent.agent.peerConnectionMetadataStorage.getPeerConnectionMetadata = jest
       .fn()
       .mockRejectedValue(
-        new Error(PeerConnectionStorage.PEER_CONNECTION_METADATA_RECORD_MISSING)
+        new Error("Peer connection metadata record does not exist")
       );
     const connectSpy = jest
       .spyOn(IdentityWalletConnect.prototype, "connect")
