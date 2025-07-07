@@ -35,6 +35,10 @@ export class MenuPasscodeScreen extends PasscodeScreen {
     return $('[data-testid="verify-passcode-description"]');
   }
 
+  get setPasscodeDescriptionText() {
+    return $("[data-testid='set-passcode-description']");
+  }
+
   async tapOnCancelButton() {
     await expect(this.cancelButton).toBeDisplayed();
     await expect(this.cancelButton).toBeEnabled();
@@ -64,8 +68,8 @@ export class MenuPasscodeScreen extends PasscodeScreen {
   async loads() {
     await expect(this.changePinTitle).toBeDisplayed();
     await expect(this.changePinTitle).toHaveText(Passcode.TitleNewPasscode);
-    await expect(this.screenDescriptionText).toBeDisplayed();
-    await expect(this.screenDescriptionText).toHaveText(
+    await expect(this.setPasscodeDescriptionText).toBeDisplayed();
+    await expect(this.setPasscodeDescriptionText).toHaveText(
       Passcode.DescriptionNewPasscode
     );
     for (let i = 0; i < 10; i++) {
