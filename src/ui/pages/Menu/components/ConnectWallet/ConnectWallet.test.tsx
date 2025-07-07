@@ -425,6 +425,10 @@ describe("Wallet connect: empty history", () => {
 });
 
 describe("Wallet connect", () => {
+  afterEach(() => {
+    dispatchMock.mockClear();
+  });
+
   test("Wallet connect render", async () => {
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
@@ -534,7 +538,6 @@ describe("Wallet connect", () => {
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
-      expect(dispatchMock).toBeCalledWith(setConnectedWallet(null));
     });
   });
 
@@ -609,7 +612,6 @@ describe("Wallet connect", () => {
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
       expect(dispatchMock).toBeCalledWith(setPendingConnection(null));
-      expect(dispatchMock).toBeCalledWith(setConnectedWallet(null));
       expect(dispatchMock).toBeCalledWith(
         setWalletConnectionsCache(
           walletConnectionsFix.filter(

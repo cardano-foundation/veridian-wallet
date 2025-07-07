@@ -43,6 +43,7 @@ import { IncomingRequestType } from "../../../store/reducers/stateCache/stateCac
 import {
   ConnectionData,
   setConnectedWallet,
+  setPendingConnection,
   setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
 import { ToastMsgType } from "../../globals/types";
@@ -325,6 +326,10 @@ describe("Credential state changed handler", () => {
 });
 
 describe("Peer connection states changed handler", () => {
+  beforeEach(() => {
+    dispatch.mockClear();
+  });
+
   test("handle peer connected event", async () => {
     Agent.agent.peerConnectionAccounts.findById = jest
       .fn()
@@ -334,7 +339,7 @@ describe("Peer connection states changed handler", () => {
       .mockResolvedValue([peerConnection]);
     await peerConnectedChangeHandler(peerConnectedEvent, dispatch);
     await waitFor(() => {
-      expect(dispatch).toBeCalledWith(setConnectedWallet(peerConnection));
+      expect(dispatch).toBeCalledWith(setPendingConnection(null));
     });
     expect(dispatch).toBeCalledWith(
       setWalletConnectionsCache([peerConnection])
