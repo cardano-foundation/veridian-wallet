@@ -17,6 +17,7 @@ import { Agent } from "../../agent/agent";
 import {
   PeerConnectionMetadataRecord,
   PeerConnectionAccountRecord,
+  PeerConnectionStorage,
 } from "../../agent/records";
 
 class PeerConnection {
@@ -122,7 +123,8 @@ class PeerConnection {
           } catch (error) {
             if (
               error instanceof Error &&
-              error.message === "Peer connection metadata record does not exist"
+              error.message ===
+                PeerConnectionStorage.PEER_CONNECTION_METADATA_RECORD_MISSING
             ) {
               await Agent.agent.peerConnectionMetadataStorage.createPeerConnectionMetadataRecord(
                 {
@@ -185,7 +187,8 @@ class PeerConnection {
     } catch (error) {
       if (
         error instanceof Error &&
-        error.message === "Peer connection metadata record does not exist"
+        error.message ===
+          PeerConnectionStorage.PEER_CONNECTION_METADATA_RECORD_MISSING
       ) {
         const connectingIdentifier =
           await this.identityWalletConnect.getKeriIdentifier();

@@ -114,7 +114,7 @@ describe("PeerConnection", () => {
     Agent.agent.peerConnectionMetadataStorage.getPeerConnectionMetadata = jest
       .fn()
       .mockRejectedValue(
-        new Error("Peer connection metadata record does not exist")
+        new Error(PeerConnectionStorage.PEER_CONNECTION_METADATA_RECORD_MISSING)
       );
     const connectSpy = jest
       .spyOn(IdentityWalletConnect.prototype, "connect")
