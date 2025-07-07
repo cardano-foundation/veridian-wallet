@@ -91,9 +91,9 @@ jest.mock("../core/agent/agent", () => ({
         onRemoveNotification: jest.fn(),
       },
       onKeriaStatusStateChanged: jest.fn(),
-      peerConnectionMetadataStorage: {
-        getAllPeerConnectionMetadata: jest.fn(),
-        getPeerConnectionMetadata: jest.fn(),
+      peerConnectionAccounts: {
+        getAll: jest.fn(),
+        findById: jest.fn(),
       },
       basicStorage: {
         findById: jest.fn(),

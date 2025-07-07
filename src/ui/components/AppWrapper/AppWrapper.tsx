@@ -71,6 +71,7 @@ import {
   setIdentifierViewTypeCache,
 } from "../../../store/reducers/viewTypeCache";
 import {
+  ConnectionData,
   getConnectedWallet,
   setConnectedWallet,
   setPendingConnection,
@@ -141,25 +142,33 @@ const peerConnectRequestSignChangeHandler = async (
 ) => {
   const connectedDAppAddress =
     PeerConnection.peerConnection.getConnectedDAppAddress();
-  const peerConnection =
-    await Agent.agent.peerConnectionMetadataStorage.getPeerConnection(
-      connectedDAppAddress
+  const peerConnectionRecord =
+    await Agent.agent.peerConnectionAccounts.findById(connectedDAppAddress);
+  if (peerConnectionRecord) {
+    const peerConnection: ConnectionData = {
+      id: peerConnectionRecord.id,
+      name: peerConnectionRecord.name,
+      url: peerConnectionRecord.url,
+      createdAt: peerConnectionRecord.createdAt?.toISOString(),
+      iconB64: peerConnectionRecord.iconB64,
+      selectedAid: peerConnectionRecord.accountId,
+    };
+
+    dispatch(
+      setQueueIncomingRequest({
+        signTransaction: event,
+        peerConnection,
+        type: IncomingRequestType.PEER_CONNECT_SIGN,
+      })
     );
-  dispatch(
-    setQueueIncomingRequest({
-      signTransaction: event,
-      peerConnection,
-      type: IncomingRequestType.PEER_CONNECT_SIGN,
-    })
-  );
+  }
 };
 
 const peerConnectedChangeHandler = async (
   event: PeerConnectedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  const existingConnections =
-    await Agent.agent.peerConnectionMetadataStorage.getAllPeerConnectionMetadata();
+  const existingConnections = await Agent.agent.peerConnectionAccounts.getAll();
   dispatch(setWalletConnectionsCache(existingConnections));
   const connectedWallet = existingConnections.find(
     (connection) => connection.id === event.payload.dAppAddress
@@ -338,7 +347,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       );
       const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
       const storedPeerConnections =
-        await Agent.agent.peerConnectionMetadataStorage.getAllPeerConnectionMetadata();
+        await Agent.agent.peerConnectionAccounts.getAll();
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();
 

@@ -11,7 +11,10 @@ import {
   setCurrentOperation,
   setToastMsg,
 } from "../../../../../store/reducers/stateCache";
-import { setPendingConnection } from "../../../../../store/reducers/walletConnectionsCache";
+import {
+  setConnectedWallet,
+  setPendingConnection,
+} from "../../../../../store/reducers/walletConnectionsCache";
 import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 import { OperationType, ToastMsgType } from "../../../../globals/types";
@@ -32,9 +35,9 @@ jest.mock("../../../../../core/configuration", () => ({
 jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
-      peerConnectionMetadataStorage: {
-        getAllPeerConnectionMetadata: jest.fn(),
-        deletePeerConnectionMetadataRecord: jest.fn(),
+      peerConnectionAccounts: {
+        getAll: jest.fn().mockResolvedValue(walletConnectionsFix),
+        deleteById: jest.fn(),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
@@ -530,6 +533,7 @@ describe("Wallet connect", () => {
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
+      expect(dispatchMock).toBeCalledWith(setConnectedWallet(null));
     });
   });
 
@@ -604,6 +608,7 @@ describe("Wallet connect", () => {
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
       expect(dispatchMock).toBeCalledWith(setPendingConnection(null));
+      expect(dispatchMock).toBeCalledWith(setConnectedWallet(null));
     });
   });
 

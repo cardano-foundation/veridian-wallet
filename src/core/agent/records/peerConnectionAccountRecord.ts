@@ -9,6 +9,9 @@ interface PeerConnectionAccountRecordStorageProps {
   accountId: string;
   creationStatus?: CreationStatus;
   pendingDeletion?: boolean;
+  name?: string;
+  url?: string;
+  iconB64?: string;
 }
 
 class PeerConnectionAccountRecord extends BaseRecord {
@@ -16,6 +19,9 @@ class PeerConnectionAccountRecord extends BaseRecord {
   accountId!: string;
   creationStatus!: CreationStatus;
   pendingDeletion!: boolean;
+  name?: string;
+  url?: string;
+  iconB64?: string;
 
   static readonly type = "PeerConnectionAccountRecord";
   readonly type = PeerConnectionAccountRecord.type;
@@ -29,6 +35,9 @@ class PeerConnectionAccountRecord extends BaseRecord {
       this.accountId = props.accountId;
       this.creationStatus = props.creationStatus ?? CreationStatus.COMPLETE;
       this.pendingDeletion = props.pendingDeletion ?? false;
+      this.name = props.name;
+      this.url = props.url;
+      this.iconB64 = props.iconB64;
       this._tags = props.tags ?? {};
     }
   }
@@ -40,6 +49,9 @@ class PeerConnectionAccountRecord extends BaseRecord {
       accountId: this.accountId,
       pendingDeletion: this.pendingDeletion,
       creationStatus: this.creationStatus,
+      name: this.name,
+      url: this.url,
+      iconB64: this.iconB64,
     };
   }
 }

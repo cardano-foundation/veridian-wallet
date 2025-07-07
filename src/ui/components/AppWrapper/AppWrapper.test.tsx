@@ -130,10 +130,9 @@ jest.mock("../../../core/agent/agent", () => ({
       },
       getKeriaOnlineStatus: jest.fn(),
       onKeriaStatusStateChanged: jest.fn(),
-      peerConnectionMetadataStorage: {
-        getAllPeerConnectionMetadata: jest.fn(),
-        getPeerConnectionMetadata: jest.fn(),
-        getPeerConnection: jest.fn(),
+      peerConnectionAccounts: {
+        getAll: jest.fn(),
+        findById: jest.fn(),
       },
       basicStorage: {
         findById: jest.fn(),
@@ -314,11 +313,12 @@ describe("Credential state changed handler", () => {
 
 describe("Peer connection states changed handler", () => {
   test("handle peer connected event", async () => {
-    Agent.agent.peerConnectionMetadataStorage.getPeerConnectionMetadata = jest
+    Agent.agent.peerConnectionAccounts.findById = jest
       .fn()
       .mockResolvedValue(peerConnection);
-    Agent.agent.peerConnectionMetadataStorage.getAllPeerConnectionMetadata =
-      jest.fn().mockResolvedValue([peerConnection]);
+    Agent.agent.peerConnectionAccounts.getAll = jest
+      .fn()
+      .mockResolvedValue([peerConnection]);
     await peerConnectedChangeHandler(peerConnectedEvent, dispatch);
     await waitFor(() => {
       expect(dispatch).toBeCalledWith(setConnectedWallet(peerConnection));
@@ -344,7 +344,7 @@ describe("Peer connection states changed handler", () => {
   });
 
   test("handle peer sign request event", async () => {
-    Agent.agent.peerConnectionMetadataStorage.getPeerConnection = jest
+    Agent.agent.peerConnectionAccounts.findById = jest
       .fn()
       .mockResolvedValue(peerConnection);
     await peerConnectRequestSignChangeHandler(peerSignRequestEvent, dispatch);

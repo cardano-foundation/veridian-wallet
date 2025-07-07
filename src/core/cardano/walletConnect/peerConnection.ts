@@ -14,7 +14,6 @@ import {
   PeerDisconnectedEvent,
 } from "./peerConnection.types";
 import { Agent } from "../../agent/agent";
-import { PeerConnectionStorage } from "../../agent/records";
 
 class PeerConnection {
   static readonly PEER_CONNECTION_START_PENDING =
@@ -107,15 +106,13 @@ class PeerConnection {
           ) {
             iconB64 = icon;
           }
-          await Agent.agent.peerConnectionMetadataStorage.updatePeerConnectionMetadata(
-            address,
-            {
-              name,
-              selectedAid,
-              url,
-              iconB64: iconB64,
-            }
-          );
+          await Agent.agent.peerConnectionAccounts.save({
+            peerConnectionId: address,
+            accountId: selectedAid,
+            name,
+            url,
+            iconB64: iconB64,
+          });
           this.eventEmitter.emit<PeerConnectedEvent>({
             type: PeerConnectionEventTypes.PeerConnected,
             payload: {
@@ -151,29 +148,19 @@ class PeerConnection {
     if (this.identityWalletConnect === undefined) {
       throw new Error(PeerConnection.PEER_CONNECTION_START_PENDING);
     }
+    const connectingIdentifier =
+      await this.identityWalletConnect.getKeriIdentifier();
     const existingPeerConnection =
-      await Agent.agent.peerConnectionMetadataStorage
-        .getPeerConnectionMetadata(dAppIdentifier)
-        .catch((error) => {
-          if (
-            error.message ===
-            PeerConnectionStorage.PEER_CONNECTION_METADATA_RECORD_MISSING
-          ) {
-            return undefined;
-          } else {
-            throw error;
-          }
-        });
-    if (!existingPeerConnection) {
-      const connectingIdentifier =
-        await this.identityWalletConnect.getKeriIdentifier();
-      await Agent.agent.peerConnectionMetadataStorage.createPeerConnectionMetadataRecord(
-        {
-          id: dAppIdentifier,
-          selectedAid: connectingIdentifier.id,
-          iconB64: ICON_BASE64,
-        }
+      await Agent.agent.peerConnectionAccounts.findByPeerConnectionAndAccount(
+        dAppIdentifier,
+        connectingIdentifier.id
       );
+    if (!existingPeerConnection) {
+      await Agent.agent.peerConnectionAccounts.save({
+        peerConnectionId: dAppIdentifier,
+        accountId: connectingIdentifier.id,
+        iconB64: ICON_BASE64,
+      });
     }
     const seed = this.identityWalletConnect.connect(dAppIdentifier);
 
