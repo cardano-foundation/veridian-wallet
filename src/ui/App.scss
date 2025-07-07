@@ -52,7 +52,8 @@ body {
     display: none;
   }
 
-  &.scanner-active {
+  &.scanner-active,
+  &.scan-active {
     background-color: transparent;
 
     > div:last-child {

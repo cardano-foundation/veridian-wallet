@@ -6,7 +6,6 @@ import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { store } from "../../../store";
-import { showConnections } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { Menu } from "./Menu";
@@ -58,7 +57,6 @@ const initialState = {
       time: Date.now(),
       passcodeIsSet: true,
     },
-    showConnections: false,
   },
   biometricsCache: {
     enable: false,
@@ -144,31 +142,6 @@ describe("Menu Tab", () => {
       expect(getByTestId("profile-title")).toHaveTextContent(
         EN_TRANSLATIONS.tabs.menu.tab.items.profile.tabheader
       );
-    });
-  });
-
-  test("Open Connections view", async () => {
-    const { getByTestId, getByText } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.MENU]}>
-        <Provider store={storeMocked}>
-          <Menu />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    expect(getByTestId("menu-tab")).toBeInTheDocument();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connections.title)
-    ).toBeInTheDocument();
-    const connectionsButton = getByTestId(
-      `menu-input-item-${SubMenuKey.Connections}`
-    );
-    act(() => {
-      fireEvent.click(connectionsButton);
-    });
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(showConnections(true));
     });
   });
 

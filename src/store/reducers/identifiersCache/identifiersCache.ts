@@ -140,6 +140,9 @@ export const {
 const getIdentifiersCache = (state: RootState) =>
   state.identifiersCache?.identifiers;
 
+const getDefaultProfile = (state: RootState) =>
+  Object.values(state.identifiersCache?.identifiers).at(0);
+
 const getFavouritesIdentifiersCache = (state: RootState) =>
   state.identifiersCache.favourites;
 
@@ -166,4 +169,5 @@ export {
   getScanGroupId,
   getIdentifiersFilters,
   getIndividualFirstCreateSetting,
+  getDefaultProfile,
 };

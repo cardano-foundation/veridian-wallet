@@ -1,11 +1,5 @@
-import {
-  IonButton,
-  IonIcon,
-  IonLabel,
-  useIonViewWillEnter,
-} from "@ionic/react";
+import { IonButton, IonLabel, useIonViewWillEnter } from "@ionic/react";
 import { t } from "i18next";
-import { peopleOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
@@ -34,7 +28,6 @@ import {
   getAuthentication,
   setCurrentRoute,
   setToastMsg,
-  showConnections,
 } from "../../../store/reducers/stateCache";
 import { ArchivedCredentials } from "../../components/ArchivedCredentials";
 import { Avatar } from "../../components/Avatar";
@@ -142,10 +135,6 @@ const Credentials = () => {
   }, [confirmedCreds, credsCache, pendingCreds.length]);
 
   useOnlineStatusEffect(fetchArchivedCreds);
-
-  const handleConnections = () => {
-    dispatch(showConnections(true));
-  };
 
   const handleAvatarClick = () => {
     history.push(RoutePath.PROFILES);
@@ -266,26 +255,12 @@ const Credentials = () => {
   };
 
   const AdditionalButtons = ({
-    handleConnections,
     handleAvatarClick,
   }: {
-    handleConnections: () => void;
     handleAvatarClick: AvatarProps["handleAvatarClick"];
   }) => {
     return (
       <>
-        <IonButton
-          shape="round"
-          className="connections-button"
-          data-testid="connections-button"
-          onClick={handleConnections}
-        >
-          <IonIcon
-            slot="icon-only"
-            icon={peopleOutline}
-            color="primary"
-          />
-        </IonButton>
         <Avatar
           id={authData.defaultProfile}
           handleAvatarClick={handleAvatarClick}
@@ -302,10 +277,7 @@ const Credentials = () => {
         customClass={tabClasses}
         title={`${i18n.t("tabs.credentials.tab.title")}`}
         additionalButtons={
-          <AdditionalButtons
-            handleConnections={handleConnections}
-            handleAvatarClick={handleAvatarClick}
-          />
+          <AdditionalButtons handleAvatarClick={handleAvatarClick} />
         }
         placeholder={
           showPlaceholder && (
@@ -343,8 +315,8 @@ const Credentials = () => {
                   selectedFilter === CredentialsFilters.All
                     ? confirmedCreds
                     : selectedFilter === CredentialsFilters.Individual
-                    ? individualCredentials
-                    : groupCredentials
+                      ? individualCredentials
+                      : groupCredentials
                 }
                 onShowCardDetails={() => handleShowNavAnimation("cards")}
                 title={`${i18n.t("tabs.credentials.tab.allcreds")}`}
