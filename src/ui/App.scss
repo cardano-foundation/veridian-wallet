@@ -303,6 +303,10 @@ ion-segment {
       &::part(indicator-background) {
         background: var(--ion-color-primary-700);
       }
+
+      &.md {
+        --color-checked: var(--ion-color-primary-700);
+      }
     }
   }
 
