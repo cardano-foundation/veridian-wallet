@@ -149,7 +149,7 @@ const peerConnectRequestSignChangeHandler = async (
       id: peerConnectionRecord.id,
       name: peerConnectionRecord.name,
       url: peerConnectionRecord.url,
-      createdAt: peerConnectionRecord.createdAt?.toISOString(),
+      createdAt: peerConnectionRecord.createdAt,
       iconB64: peerConnectionRecord.iconB64,
       selectedAid: peerConnectionRecord.accountId,
     };

@@ -204,12 +204,25 @@ const peerConnectionBrokenEvent: PeerConnectionBrokenEvent = {
   payload: {},
 };
 
-const peerConnection: ConnectionData = {
-  id: "dApp-address",
+const mockPeerConnectionAccountRecord = {
+  id: "dApp-address_identifier",
+  peerConnectionId: "dApp-address",
+  accountId: "identifier",
+  creationStatus: CreationStatus.COMPLETE,
+  pendingDeletion: false,
   name: "dApp-name",
-  iconB64: "icon",
-  selectedAid: "identifier",
   url: "http://localhost:3000",
+  iconB64: "icon",
+  createdAt: new Date(),
+};
+
+const peerConnection: ConnectionData = {
+  id: mockPeerConnectionAccountRecord.id,
+  name: mockPeerConnectionAccountRecord.name,
+  url: mockPeerConnectionAccountRecord.url,
+  createdAt: mockPeerConnectionAccountRecord.createdAt,
+  iconB64: mockPeerConnectionAccountRecord.iconB64,
+  selectedAid: mockPeerConnectionAccountRecord.accountId,
 };
 
 const identifierAddedEvent: IdentifierAddedEvent = {
@@ -346,12 +359,19 @@ describe("Peer connection states changed handler", () => {
   test("handle peer sign request event", async () => {
     Agent.agent.peerConnectionAccounts.findById = jest
       .fn()
-      .mockResolvedValue(peerConnection);
+      .mockResolvedValue(mockPeerConnectionAccountRecord);
     await peerConnectRequestSignChangeHandler(peerSignRequestEvent, dispatch);
     expect(dispatch).toBeCalledWith(
       setQueueIncomingRequest({
         signTransaction: peerSignRequestEvent,
-        peerConnection: peerConnection,
+        peerConnection: {
+          id: peerConnection.id,
+          name: peerConnection.name,
+          url: peerConnection.url,
+          createdAt: peerConnection.createdAt,
+          iconB64: peerConnection.iconB64,
+          selectedAid: peerConnection.selectedAid,
+        },
         type: IncomingRequestType.PEER_CONNECT_SIGN,
       })
     );

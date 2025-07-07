@@ -14,6 +14,7 @@ import {
 import {
   setConnectedWallet,
   setPendingConnection,
+  setWalletConnectionsCache,
 } from "../../../../../store/reducers/walletConnectionsCache";
 import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
@@ -609,6 +610,13 @@ describe("Wallet connect", () => {
       );
       expect(dispatchMock).toBeCalledWith(setPendingConnection(null));
       expect(dispatchMock).toBeCalledWith(setConnectedWallet(null));
+      expect(dispatchMock).toBeCalledWith(
+        setWalletConnectionsCache(
+          walletConnectionsFix.filter(
+            (connection) => connection.id !== walletConnectionsFix[0].id
+          )
+        )
+      );
     });
   });
 
