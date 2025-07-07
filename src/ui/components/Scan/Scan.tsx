@@ -57,6 +57,8 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const mobileweb = platforms.includes("mobileweb");
 
     const stopScan = useCallback(async () => {
+      if (!Capacitor.isNativePlatform()) return;
+
       const permission = await checkPermission();
       if (permission) {
         await BarcodeScanner.stopScan();
