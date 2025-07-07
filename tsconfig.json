@@ -26,7 +26,6 @@
     }
   },
   "include": [
-    "src",
-    "tests"
+    "src"
   ]
 }

@@ -1,12 +1,11 @@
-import { SignifyClient } from "signify-ts";
-import { PeerConnectionAccountRecord } from "@src/core/agent/records";
-import { CreationStatus } from "@src/core/agent/agent.types";
-import { MigrationType, HybridMigration } from "./migrations.types";
+import { PeerConnectionAccountRecord } from "../../../agent/records";
+import { CreationStatus } from "../../../agent/agent.types";
+import { MigrationType, TsMigration } from "./migrations.types";
 
-export const DATA_V002: HybridMigration = {
-  type: MigrationType.HYBRID,
+export const DATA_V002: TsMigration = {
+  type: MigrationType.TS,
   version: "0.0.2",
-  localMigrationStatements: async (session) => {
+  migrationStatements: async (session) => {
     // Get all identifiers from local database
     const identifierResult = await session.query(
       "SELECT * FROM items WHERE category = ?",
@@ -69,10 +68,5 @@ export const DATA_V002: HybridMigration = {
     }
 
     return statements;
-  },
-
-  cloudMigrationStatements: async (signifyClient: SignifyClient) => {
-    // Cloud migration for peer connections is not implemented yet.
-    // is it needed?
   },
 };

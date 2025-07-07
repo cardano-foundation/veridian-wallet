@@ -12,11 +12,13 @@ import { CredentialRequestInformation } from "./CredentialRequestInformation";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
 import { filteredIdentifierMapFix } from "../../../../../__fixtures__/filteredIdentifierFix";
 
-jest.mock("@ionic/react", () => ({
-  ...jest.requireActual("@ionic/react"),
-  IonModal: ({ children, isOpen, ...props }: any) =>
-    isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
-}));
+afterEach(() => {
+  jest.clearAllMocks();
+  const portal = document.querySelector("body > .ion-portals");
+  if (portal) {
+    portal.innerHTML = "";
+  }
+});
 
 const deleteNotificationMock = jest.fn((id: string) => Promise.resolve(id));
 const joinMultisigOfferMock = jest.fn();
@@ -880,12 +882,12 @@ describe("Credential request information: multisig", () => {
     });
 
     await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.notifications.details.credential.request
-            .information.alert.textdecline
-        )
-      ).toBeVisible();
+      const declineMessages = getAllByText(
+        EN_TRANSLATIONS.tabs.notifications.details.credential.request
+          .information.alert.textdecline
+      );
+      expect(declineMessages.length).toBeGreaterThan(0);
+      expect(declineMessages[declineMessages.length - 1]).toBeVisible();
     });
 
     act(() => {
@@ -908,7 +910,6 @@ describe("Credential request information: multisig", () => {
     });
 
     unmount();
-    document.getElementsByTagName("body")[0].innerHTML = "";
   });
 
   test("Member open request and accepts proposal from initiator, even if proposed credential is archived", async () => {
@@ -1025,12 +1026,12 @@ describe("Credential request information: multisig", () => {
     });
 
     await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.notifications.details.credential.request
-            .information.alert.textdecline
-        )
-      ).toBeVisible();
+      const declineMessages = getAllByText(
+        EN_TRANSLATIONS.tabs.notifications.details.credential.request
+          .information.alert.textdecline
+      );
+      expect(declineMessages.length).toBeGreaterThan(0);
+      expect(declineMessages[declineMessages.length - 1]).toBeVisible();
     });
 
     act(() => {
@@ -1053,7 +1054,6 @@ describe("Credential request information: multisig", () => {
     });
 
     unmount();
-    document.getElementsByTagName("body")[0].innerHTML = "";
   });
 
   test("Member opens request after already accepting but before reaching threshold", async () => {
@@ -1157,7 +1157,6 @@ describe("Credential request information: multisig", () => {
     expect(back).toBeCalled();
 
     unmount();
-    document.getElementsByTagName("body")[0].innerHTML = "";
   });
 
   test("Member opens request after already accepting and reaching threshold", async () => {
@@ -1261,7 +1260,6 @@ describe("Credential request information: multisig", () => {
     expect(back).toBeCalled();
 
     unmount();
-    document.getElementsByTagName("body")[0].innerHTML = "";
   });
 
   test("Member opens request before accepting but threshold has already been reached", async () => {
@@ -1365,7 +1363,6 @@ describe("Credential request information: multisig", () => {
     expect(back).toBeCalled();
 
     unmount();
-    document.getElementsByTagName("body")[0].innerHTML = "";
   });
 
   test("Member opens request before accepting but proposed credential is missing, before threshold is met", async () => {
@@ -1480,7 +1477,6 @@ describe("Credential request information: multisig", () => {
     expect(back).toBeCalled();
 
     unmount();
-    document.getElementsByTagName("body")[0].innerHTML = "";
   });
 
   test("Member opens request before accepting but proposed credential is missing, after threshold met", async () => {
@@ -1595,7 +1591,6 @@ describe("Credential request information: multisig", () => {
     expect(back).toBeCalled();
 
     unmount();
-    document.getElementsByTagName("body")[0].innerHTML = "";
   });
 
   test("Member opens request after accepting but proposed credential is missing, before threshold is met", async () => {
@@ -1710,7 +1705,6 @@ describe("Credential request information: multisig", () => {
     expect(back).toBeCalled();
 
     unmount();
-    document.getElementsByTagName("body")[0].innerHTML = "";
   });
 
   test("Member opens request after accepting but proposed credential is missing, after threshold is met", async () => {
@@ -1825,7 +1819,6 @@ describe("Credential request information: multisig", () => {
     expect(back).toBeCalled();
 
     unmount();
-    document.getElementsByTagName("body")[0].innerHTML = "";
   });
 
   test("Open proposed cred", async () => {
@@ -1869,7 +1862,7 @@ describe("Credential request information: multisig", () => {
 
     const back = jest.fn();
 
-    const { getByTestId, getByText, queryByTestId } = render(
+    const { getByTestId, getByText, queryByTestId, unmount } = render(
       <Provider store={storeMocked}>
         <CredentialRequestInformation
           pageId="multi-sign"
@@ -1902,5 +1895,6 @@ describe("Credential request information: multisig", () => {
     await waitFor(() => {
       expect(queryByTestId("request-cred-detail-modal")).toBeNull();
     });
+    unmount();
   });
 });

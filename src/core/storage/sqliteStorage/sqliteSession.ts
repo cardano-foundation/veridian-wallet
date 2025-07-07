@@ -102,19 +102,27 @@ class SqliteSession {
         for (const sqlStatement of migration.sql) {
           migrationStatements.push({ statement: sqlStatement });
         }
-      } else {
+      } else if (migration.type === MigrationType.TS) {
         const statements = await migration.migrationStatements(this.session!);
         migrationStatements.push(...statements);
+      } else if (migration.type === MigrationType.HYBRID) {
+        const statements = await migration.localMigrationStatements(
+          this.session!
+        );
+        migrationStatements.push(...statements);
       }
+      // CLOUD migrations are handled separately and don't produce local SQL statements.
 
-      migrationStatements.push({
-        statement: SqliteSession.INSERT_KV_SQL,
-        values: [
-          SqliteSession.VERSION_DATABASE_KEY,
-          JSON.stringify(migration.version),
-        ],
-      });
-      await this.session!.executeTransaction(migrationStatements);
+      if (migrationStatements.length > 0) {
+        migrationStatements.push({
+          statement: SqliteSession.INSERT_KV_SQL,
+          values: [
+            SqliteSession.VERSION_DATABASE_KEY,
+            JSON.stringify(migration.version),
+          ],
+        });
+        await this.session!.executeTransaction(migrationStatements);
+      }
     }
   }
 }

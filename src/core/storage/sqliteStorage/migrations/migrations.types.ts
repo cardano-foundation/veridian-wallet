@@ -3,6 +3,7 @@ import { SQLiteDBConnection } from "@capacitor-community/sqlite";
 enum MigrationType {
   SQL,
   TS,
+  HYBRID,
 }
 
 type BaseMigration = {
@@ -24,6 +25,16 @@ type TsMigration = BaseMigration & {
   >;
 };
 
+type HybridMigration = BaseMigration & {
+  type: MigrationType.HYBRID;
+  localMigrationStatements: (session: SQLiteDBConnection) => Promise<
+    {
+      statement: string;
+      values?: unknown[];
+    }[]
+  >;
+};
+
 export { MigrationType };
 
-export type { SqlMigration, TsMigration };
+export type { SqlMigration, TsMigration, HybridMigration };
