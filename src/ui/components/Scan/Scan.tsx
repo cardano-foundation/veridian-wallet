@@ -183,6 +183,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const handleSubmitPastedValue = async () => {
       await handleScanValue(pastedValue);
       setScanning(true);
+      setPasteModalIsOpen(false);
     };
 
     const containerClass = combineClassNames("profile-scanner", {
