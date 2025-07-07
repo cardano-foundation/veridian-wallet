@@ -145,7 +145,7 @@ jest.mock("../../../core/agent/agent", () => ({
         findById: jest.fn(),
         save: jest.fn(),
       },
-      devPreload: jest.fn(),
+      devPreload: jest.fn().mockResolvedValue(undefined),
     },
   },
 }));
