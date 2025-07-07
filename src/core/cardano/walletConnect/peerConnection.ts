@@ -155,7 +155,7 @@ class PeerConnection {
         dAppIdentifier,
         connectingIdentifier.id
       );
-    if (!existingPeerConnection) {
+    if (existingPeerConnection.length === 0) {
       await Agent.agent.peerConnectionAccounts.save({
         peerConnectionId: dAppIdentifier,
         accountId: connectingIdentifier.id,

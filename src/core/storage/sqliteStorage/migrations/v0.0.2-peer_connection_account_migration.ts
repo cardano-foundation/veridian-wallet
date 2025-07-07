@@ -46,6 +46,9 @@ export const DATA_V002: TsMigration = {
           creationStatus:
             peerConnectionData.creationStatus || CreationStatus.COMPLETE,
           pendingDeletion: peerConnectionData.pendingDeletion || false,
+          name: peerConnectionData.name,
+          url: peerConnectionData.url,
+          iconB64: peerConnectionData.iconB64,
         });
 
         statements.push({
