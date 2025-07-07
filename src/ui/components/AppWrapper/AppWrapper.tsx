@@ -170,8 +170,11 @@ const peerConnectedChangeHandler = async (
 ) => {
   const existingConnections = await Agent.agent.peerConnectionAccounts.getAll();
   dispatch(setWalletConnectionsCache(existingConnections));
+  const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
   const connectedWallet = existingConnections.find(
-    (connection) => connection.id === event.payload.dAppAddress
+    (connection) =>
+      connection.id === newConnectionId ||
+      connection.peerConnectionId === event.payload.dAppAddress
   );
   if (connectedWallet) {
     dispatch(setConnectedWallet(connectedWallet));
@@ -185,7 +188,7 @@ const peerDisconnectedChangeHandler = async (
   connectedWalletId: string | null,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  // The connectedWalletId is a composite key (dAppAddress_accountId),
+  // The connectedWalletId is a composite key (dAppAddress:accountId),
   // while the event only provides the dAppAddress.
   if (
     connectedWalletId &&

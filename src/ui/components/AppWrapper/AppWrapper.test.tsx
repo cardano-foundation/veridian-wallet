@@ -206,7 +206,7 @@ const peerConnectionBrokenEvent: PeerConnectionBrokenEvent = {
 };
 
 const mockPeerConnectionAccountRecord = {
-  id: "dApp-address_identifier",
+  id: "dApp-address:identifier",
   peerConnectionId: "dApp-address",
   accountId: "identifier",
   creationStatus: CreationStatus.COMPLETE,
