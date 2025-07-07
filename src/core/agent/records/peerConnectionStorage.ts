@@ -14,6 +14,18 @@ class PeerConnectionStorage {
     this.storageService = storageService;
   }
 
+  async getPeerConnection(id: string): Promise<PeerConnection> {
+    const metadata = await this.getPeerConnectionMetadata(id);
+    return {
+      id: metadata.id,
+      iconB64: metadata.iconB64,
+      name: metadata.name,
+      selectedAid: metadata.selectedAid,
+      url: metadata.url,
+      createdAt: metadata.createdAt.toISOString(),
+    };
+  }
+
   async getPeerConnectionMetadata(
     id: string
   ): Promise<PeerConnectionMetadataRecord> {
@@ -37,6 +49,7 @@ class PeerConnectionStorage {
       id: record.id,
       iconB64: record.iconB64,
       name: record.name,
+      selectedAid: record.selectedAid,
       url: record.url,
       createdAt: record.createdAt.toISOString(),
     }));
@@ -45,7 +58,10 @@ class PeerConnectionStorage {
   async updatePeerConnectionMetadata(
     id: string,
     metadata: Partial<
-      Pick<PeerConnectionMetadataRecord, "name" | "url" | "iconB64">
+      Pick<
+        PeerConnectionMetadataRecord,
+        "name" | "url" | "iconB64" | "selectedAid"
+      >
     >
   ): Promise<void> {
     const identifierMetadataRecord = await this.getPeerConnectionMetadata(id);
@@ -54,6 +70,8 @@ class PeerConnectionStorage {
     if (metadata.url !== undefined) identifierMetadataRecord.url = metadata.url;
     if (metadata.iconB64 !== undefined)
       identifierMetadataRecord.iconB64 = metadata.iconB64;
+    if (metadata.selectedAid !== undefined)
+      identifierMetadataRecord.selectedAid = metadata.selectedAid;
     await this.storageService.update(identifierMetadataRecord);
   }
 

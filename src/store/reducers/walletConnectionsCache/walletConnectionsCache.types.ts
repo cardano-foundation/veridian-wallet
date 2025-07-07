@@ -2,7 +2,7 @@ interface ConnectionData {
   id: string;
   name?: string;
   url?: string;
-  createdAt?: Date;
+  createdAt?: string;
   iconB64?: string;
   selectedAid?: string;
 }

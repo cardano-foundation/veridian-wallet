@@ -41,7 +41,6 @@ jest.mock("../core/agent/agent", () => ({
           mnemonic: "",
         })
       ),
-      devPreload: jest.fn(),
       identifiers: {
         getIdentifiers: jest.fn().mockResolvedValue([]),
         syncKeriaIdentifiers: jest.fn(),
@@ -95,12 +94,6 @@ jest.mock("../core/agent/agent", () => ({
       peerConnectionMetadataStorage: {
         getAllPeerConnectionMetadata: jest.fn(),
         getPeerConnectionMetadata: jest.fn(),
-        createPeerConnectionMetadataRecord: jest.fn(),
-        updatePeerConnectionMetadata: jest.fn(),
-        getPeerConnection: jest.fn(),
-      },
-      peerConnectionAccounts: {
-        save: jest.fn(),
       },
       basicStorage: {
         findById: jest.fn(),

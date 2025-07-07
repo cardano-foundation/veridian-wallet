@@ -11,13 +11,13 @@ const wipeSessionMock = jest.fn();
 
 import { SignifyClient, ready as signifyReady, Tier } from "signify-ts";
 import { mnemonicToEntropy } from "bip39";
-import { AgentUrls, MiscRecordId } from "@src/core/agent/agent.types";
-import { Agent } from "@src/core/agent/agent";
-import { KeyStoreKeys, SecureStorage } from "@src/core/storage";
-import { CoreEventEmitter } from "@src/core/agent/event";
-import { EventTypes } from "@src/core/agent/event.types";
-import { PeerConnection } from "@src/core/cardano/walletConnect/peerConnection";
-import { IdentifierService } from "@src/core/agent/services";
+import { AgentUrls, MiscRecordId } from "./agent.types";
+import { Agent } from "./agent";
+import { KeyStoreKeys, SecureStorage } from "../storage";
+import { CoreEventEmitter } from "./event";
+import { EventTypes } from "./event.types";
+import { PeerConnection } from "../cardano/walletConnect/peerConnection";
+import { IdentifierService } from "./services";
 
 jest.mock("signify-ts", () => ({
   SignifyClient: jest.fn(),

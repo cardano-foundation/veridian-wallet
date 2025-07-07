@@ -142,7 +142,7 @@ const peerConnectRequestSignChangeHandler = async (
   const connectedDAppAddress =
     PeerConnection.peerConnection.getConnectedDAppAddress();
   const peerConnection =
-    await Agent.agent.peerConnectionMetadataStorage.getPeerConnectionMetadata(
+    await Agent.agent.peerConnectionMetadataStorage.getPeerConnection(
       connectedDAppAddress
     );
   dispatch(
@@ -160,26 +160,12 @@ const peerConnectedChangeHandler = async (
 ) => {
   const existingConnections =
     await Agent.agent.peerConnectionMetadataStorage.getAllPeerConnectionMetadata();
-  dispatch(
-    setWalletConnectionsCache(
-      existingConnections.map((connection) => ({
-        ...connection,
-        createdAt: connection.createdAt
-          ? new Date(connection.createdAt)
-          : undefined,
-      }))
-    )
-  );
+  dispatch(setWalletConnectionsCache(existingConnections));
   const connectedWallet = existingConnections.find(
     (connection) => connection.id === event.payload.dAppAddress
   );
   if (connectedWallet) {
-    dispatch(
-      setConnectedWallet({
-        ...connectedWallet,
-        createdAt: new Date(connectedWallet.createdAt as string),
-      })
-    );
+    dispatch(setConnectedWallet(connectedWallet));
   }
   dispatch(setPendingConnection(null));
   dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
@@ -361,14 +347,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(setConnectionsCache(connectionsDetails));
       dispatch(setMultisigConnectionsCache(multisigConnectionsDetails));
-      dispatch(
-        setWalletConnectionsCache(
-          storedPeerConnections.map((connection) => ({
-            ...connection,
-            createdAt: new Date(connection.createdAt as string),
-          }))
-        )
-      );
+      dispatch(setWalletConnectionsCache(storedPeerConnections));
       dispatch(setNotificationsCache(notifications));
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
