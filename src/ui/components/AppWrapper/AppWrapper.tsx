@@ -182,10 +182,15 @@ const peerConnectedChangeHandler = async (
 
 const peerDisconnectedChangeHandler = async (
   event: PeerDisconnectedEvent,
-  connectedMeerKat: string | null,
+  connectedWalletId: string | null,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  if (connectedMeerKat === event.payload.dAppAddress) {
+  // The connectedWalletId is a composite key (dAppAddress_accountId),
+  // while the event only provides the dAppAddress.
+  if (
+    connectedWalletId &&
+    connectedWalletId.includes(event.payload.dAppAddress)
+  ) {
     dispatch(setConnectedWallet(null));
     dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
   }
