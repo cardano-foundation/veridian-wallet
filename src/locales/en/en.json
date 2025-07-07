@@ -1579,7 +1579,13 @@
   },
   "profiles": {
     "title": "Profiles",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "options": {
+      "manage": "Manage profile",
+      "add": "Add profile",
+      "join": "Join a group",
+      "settings": "Settings"
+    }
   },
   "scan": {
     "title": "Align the QR code within the frame to scan",

@@ -7,7 +7,7 @@ import {
   NotificationRoute,
 } from "../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../i18n";
-import { RoutePath, TabsRoutePath } from "../../../routes/paths";
+import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
@@ -34,6 +34,7 @@ import "./Notifications.scss";
 import { EarlierNotification } from "./components";
 import { EarlierNotificationRef } from "./components/EarlierNotification.types";
 import { NotificationOptionsModal } from "./components/NotificationOptionsModal";
+import { Profiles } from "../Profiles";
 
 const Notifications = () => {
   const pageId = "notifications-tab";
@@ -52,6 +53,7 @@ const Notifications = () => {
     null
   );
   const [isOpenCredModal, setIsOpenCredModal] = useState(false);
+  const [openProfiles, setOpenProfiles] = useState(false);
   const [viewCred, setViewCred] = useState("");
   const [openUnknownConnectionAlert, setOpenUnknownConnectionAlert] =
     useState(false);
@@ -187,7 +189,7 @@ const Notifications = () => {
   };
 
   const handleAvatarClick = () => {
-    history.push(RoutePath.PROFILES);
+    setOpenProfiles(true);
   };
 
   const AdditionalButtons = ({
@@ -270,6 +272,10 @@ const Notifications = () => {
           />
         )}
       </TabLayout>
+      <Profiles
+        isOpen={openProfiles}
+        setIsOpen={setOpenProfiles}
+      />
       <CredentialDetailModal
         pageId="revoke-credential"
         isOpen={isOpenCredModal}
