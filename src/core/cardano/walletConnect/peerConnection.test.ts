@@ -85,8 +85,10 @@ describe("PeerConnection", () => {
 
   test("should connect with a DApp if there is not existing connection", async () => {
     const dAppIdentifier = "testDApp";
+    const accountId = "testAid";
+    const peerConnectionId = `${dAppIdentifier}:${accountId}`;
     Agent.agent.identifiers.getIdentifier = jest.fn().mockResolvedValue({
-      id: "testAid",
+      id: accountId,
     });
     Agent.agent.connections.getOobi = jest.fn().mockResolvedValue("test-oobi");
     Agent.agent.peerConnectionAccounts.findByPeerConnectionAndAccount = jest
@@ -96,14 +98,14 @@ describe("PeerConnection", () => {
       .spyOn(IdentityWalletConnect.prototype, "connect")
       .mockReturnValue("seed");
 
-    await peerConnection.start("testAid");
-    await peerConnection.connectWithDApp(dAppIdentifier);
+    await peerConnection.start(accountId);
+    await peerConnection.connectWithDApp(peerConnectionId);
     expect(
       Agent.agent.peerConnectionAccounts.findByPeerConnectionAndAccount
-    ).toHaveBeenCalledWith(dAppIdentifier, "testAid");
+    ).toHaveBeenCalledWith(dAppIdentifier, accountId);
     expect(Agent.agent.peerConnectionAccounts.save).toHaveBeenCalledWith({
       peerConnectionId: dAppIdentifier,
-      accountId: "testAid",
+      accountId: accountId,
       iconB64: ICON_BASE64,
     });
     expect(connectSpy).toHaveBeenCalledWith(dAppIdentifier);
@@ -115,6 +117,8 @@ describe("PeerConnection", () => {
 
   test("should connect with a DApp if there is an existing connection", async () => {
     const dAppIdentifier = "testDApp";
+    const accountId = "testAid";
+    const peerConnectionId = `${dAppIdentifier}:${accountId}`;
     Agent.agent.peerConnectionAccounts.findByPeerConnectionAndAccount = jest
       .fn()
       .mockResolvedValue([{} as PeerConnectionAccountRecord]);
@@ -122,11 +126,11 @@ describe("PeerConnection", () => {
       .spyOn(IdentityWalletConnect.prototype, "connect")
       .mockReturnValue("seed");
 
-    await peerConnection.start("testAid");
-    await peerConnection.connectWithDApp(dAppIdentifier);
+    await peerConnection.start(accountId);
+    await peerConnection.connectWithDApp(peerConnectionId);
     expect(
       Agent.agent.peerConnectionAccounts.findByPeerConnectionAndAccount
-    ).toHaveBeenCalledWith(dAppIdentifier, "testAid");
+    ).toHaveBeenCalledWith(dAppIdentifier, accountId);
     expect(Agent.agent.peerConnectionAccounts.save).not.toBeCalled();
     expect(connectSpy).toHaveBeenCalledWith(dAppIdentifier);
     expect(SecureStorage.set).toHaveBeenCalledWith(
