@@ -67,81 +67,108 @@ import {
   pendingGroupIdentifierFix,
 } from "../../__fixtures__/filteredIdentifierFix";
 
-jest.mock("../../../core/agent/agent", () => ({
-  Agent: {
-    agent: {
-      start: jest.fn(),
-      setupLocalDependencies: jest.fn(),
-      auth: {
-        getLoginAttempts: jest.fn(() =>
-          Promise.resolve({
-            attempts: 0,
-            lockedUntil: Date.now(),
-          })
-        ),
-      },
-      identifiers: {
-        getIdentifiers: jest.fn().mockResolvedValue([]),
-        syncKeriaIdentifiers: jest.fn(),
-        onIdentifierAdded: jest.fn(),
-        getAvailableWitnesses: jest.fn(),
-      },
-      multiSigs: {
-        getMultisigIcpDetails: jest.fn().mockResolvedValue({}),
-        onGroupAdded: jest.fn(),
-      },
-      connections: {
-        getConnections: jest.fn().mockResolvedValue([]),
-        getMultisigConnections: jest.fn().mockResolvedValue([]),
-        onConnectionStateChanged: jest.fn(),
-        getConnectionShortDetails: jest.fn(),
-        isConnectionRequestSent: jest.fn(),
-        isConnectionResponseReceived: jest.fn(),
-        isConnectionRequestReceived: jest.fn(),
-        isConnectionResponseSent: jest.fn(),
-        isConnectionConnected: jest.fn(),
-        getConnectionShortDetailById: getConnectionShortDetailByIdMock,
-        getUnhandledConnections: jest.fn(),
-        syncKeriaContacts: jest.fn(),
-      },
-      credentials: {
-        getCredentials: jest.fn().mockResolvedValue([]),
-        onCredentialStateChanged: jest.fn(),
-        isCredentialOfferReceived: jest.fn(),
-        isCredentialRequestSent: jest.fn(),
-        createMetadata: jest.fn(),
-        isCredentialDone: jest.fn(),
-        updateMetadataCompleted: jest.fn(),
-        onAcdcStateChanged: jest.fn(),
-        syncKeriaCredentials: jest.fn(),
-      },
-      messages: {
-        onBasicMessageStateChanged: jest.fn(),
-        pickupMessagesFromMediator: jest.fn(),
-      },
-      keriaNotifications: {
-        pollNotifications: jest.fn(),
-        pollLongOperations: jest.fn(),
-        getNotifications: jest.fn(),
-        onNewNotification: jest.fn(),
-        onLongOperationSuccess: jest.fn(),
-        onLongOperationFailure: jest.fn(),
-        onRemoveNotification: jest.fn(),
-        stopPolling: jest.fn(),
-      },
-      getKeriaOnlineStatus: jest.fn(),
-      onKeriaStatusStateChanged: jest.fn(),
-      peerConnectionAccounts: {
-        getAll: jest.fn(),
-        findById: jest.fn(),
-      },
-      basicStorage: {
-        findById: jest.fn(),
-        save: jest.fn(),
+jest.mock("../../../core/agent/agent", () => {
+  const mockPeerConnectionAccountRecordPlainObject = {
+    id: "dApp-address:identifier",
+    peerConnectionId: "dApp-address",
+    accountId: "identifier",
+    creationStatus: "complete",
+    pendingDeletion: false,
+    name: "dApp-name",
+    url: "http://localhost:3000",
+    iconB64: "icon",
+    createdAt: new Date().toISOString(), // Directly provide ISO string
+  };
+
+  const peerConnection = {
+    id: mockPeerConnectionAccountRecordPlainObject.id,
+    name: mockPeerConnectionAccountRecordPlainObject.name,
+    url: mockPeerConnectionAccountRecordPlainObject.url,
+    createdAt: mockPeerConnectionAccountRecordPlainObject.createdAt,
+    iconB64: mockPeerConnectionAccountRecordPlainObject.iconB64,
+    selectedAid: mockPeerConnectionAccountRecordPlainObject.accountId,
+  };
+
+  return {
+    Agent: {
+      agent: {
+        start: jest.fn(),
+        setupLocalDependencies: jest.fn(),
+        auth: {
+          getLoginAttempts: jest.fn(() =>
+            Promise.resolve({
+              attempts: 0,
+              lockedUntil: Date.now(),
+            })
+          ),
+        },
+        identifiers: {
+          getIdentifiers: jest.fn().mockResolvedValue([]),
+          syncKeriaIdentifiers: jest.fn(),
+          onIdentifierAdded: jest.fn(),
+          getAvailableWitnesses: jest.fn(),
+        },
+        multiSigs: {
+          getMultisigIcpDetails: jest.fn().mockResolvedValue({}),
+          onGroupAdded: jest.fn(),
+        },
+        connections: {
+          getConnections: jest.fn().mockResolvedValue([]),
+          getMultisigConnections: jest.fn().mockResolvedValue([]),
+          onConnectionStateChanged: jest.fn(),
+          getConnectionShortDetails: jest.fn(),
+          isConnectionRequestSent: jest.fn(),
+          isConnectionResponseReceived: jest.fn(),
+          isConnectionRequestReceived: jest.fn(),
+          isConnectionResponseSent: jest.fn(),
+          isConnectionConnected: jest.fn(),
+          getConnectionShortDetailById: getConnectionShortDetailByIdMock,
+          getUnhandledConnections: jest.fn(),
+          syncKeriaContacts: jest.fn(),
+        },
+        credentials: {
+          getCredentials: jest.fn().mockResolvedValue([]),
+          onCredentialStateChanged: jest.fn(),
+          isCredentialOfferReceived: jest.fn(),
+          isCredentialRequestSent: jest.fn(),
+          createMetadata: jest.fn(),
+          isCredentialDone: jest.fn(),
+          updateMetadataCompleted: jest.fn(),
+          onAcdcStateChanged: jest.fn(),
+          syncKeriaCredentials: jest.fn(),
+        },
+        messages: {
+          onBasicMessageStateChanged: jest.fn(),
+          pickupMessagesFromMediator: jest.fn(),
+        },
+        keriaNotifications: {
+          pollNotifications: jest.fn(),
+          pollLongOperations: jest.fn(),
+          getNotifications: jest.fn(),
+          onNewNotification: jest.fn(),
+          onLongOperationSuccess: jest.fn(),
+          onLongOperationFailure: jest.fn(),
+          onRemoveNotification: jest.fn(),
+          stopPolling: jest.fn(),
+        },
+        getKeriaOnlineStatus: jest.fn(),
+        onKeriaStatusStateChanged: jest.fn(),
+        peerConnectionAccounts: {
+          getAll: jest
+            .fn()
+            .mockResolvedValue([mockPeerConnectionAccountRecordPlainObject]),
+          findById: jest
+            .fn()
+            .mockResolvedValue(mockPeerConnectionAccountRecordPlainObject),
+        },
+        basicStorage: {
+          findById: jest.fn(),
+          save: jest.fn(),
+        },
       },
     },
-  },
-}));
+  };
+});
 
 describe("App Wrapper", () => {
   test("renders children components", async () => {
@@ -205,25 +232,29 @@ const peerConnectionBrokenEvent: PeerConnectionBrokenEvent = {
   payload: {},
 };
 
-const mockPeerConnectionAccountRecord = {
-  id: "dApp-address:identifier",
-  peerConnectionId: "dApp-address",
-  accountId: "identifier",
-  creationStatus: CreationStatus.COMPLETE,
-  pendingDeletion: false,
-  name: "dApp-name",
-  url: "http://localhost:3000",
-  iconB64: "icon",
-  createdAt: new Date().toISOString(),
-};
+import { PeerConnectionAccountRecord } from "../../../core/agent/records";
+
+const mockPeerConnectionAccountRecordInstance = new PeerConnectionAccountRecord(
+  {
+    id: "dApp-address:identifier",
+    peerConnectionId: "dApp-address",
+    accountId: "identifier",
+    creationStatus: CreationStatus.COMPLETE,
+    pendingDeletion: false,
+    name: "dApp-name",
+    url: "http://localhost:3000",
+    iconB64: "icon",
+    createdAt: new Date(),
+  }
+);
 
 const peerConnection: ConnectionData = {
-  id: mockPeerConnectionAccountRecord.id,
-  name: mockPeerConnectionAccountRecord.name,
-  url: mockPeerConnectionAccountRecord.url,
-  createdAt: mockPeerConnectionAccountRecord.createdAt,
-  iconB64: mockPeerConnectionAccountRecord.iconB64,
-  selectedAid: mockPeerConnectionAccountRecord.accountId,
+  id: mockPeerConnectionAccountRecordInstance.id,
+  name: mockPeerConnectionAccountRecordInstance.name,
+  url: mockPeerConnectionAccountRecordInstance.url,
+  createdAt: mockPeerConnectionAccountRecordInstance.createdAt?.toISOString(),
+  iconB64: mockPeerConnectionAccountRecordInstance.iconB64,
+  selectedAid: mockPeerConnectionAccountRecordInstance.accountId,
 };
 
 const identifierAddedEvent: IdentifierAddedEvent = {
@@ -333,10 +364,10 @@ describe("Peer connection states changed handler", () => {
   test("handle peer connected event", async () => {
     Agent.agent.peerConnectionAccounts.findById = jest
       .fn()
-      .mockResolvedValue(peerConnection);
+      .mockResolvedValue(mockPeerConnectionAccountRecordInstance);
     Agent.agent.peerConnectionAccounts.getAll = jest
       .fn()
-      .mockResolvedValue([peerConnection]);
+      .mockResolvedValue([mockPeerConnectionAccountRecordInstance]);
     await peerConnectedChangeHandler(peerConnectedEvent, dispatch);
     await waitFor(() => {
       expect(dispatch).toBeCalledWith(setPendingConnection(null));
@@ -364,7 +395,7 @@ describe("Peer connection states changed handler", () => {
   test("handle peer sign request event", async () => {
     Agent.agent.peerConnectionAccounts.findById = jest
       .fn()
-      .mockResolvedValue(mockPeerConnectionAccountRecord);
+      .mockResolvedValue(mockPeerConnectionAccountRecordInstance);
     await peerConnectRequestSignChangeHandler(peerSignRequestEvent, dispatch);
     expect(dispatch).toBeCalledWith(
       setQueueIncomingRequest({
@@ -373,7 +404,8 @@ describe("Peer connection states changed handler", () => {
           id: peerConnection.id,
           name: peerConnection.name,
           url: peerConnection.url,
-          createdAt: peerConnection.createdAt,
+          createdAt:
+            mockPeerConnectionAccountRecordInstance.createdAt?.toISOString(),
           iconB64: peerConnection.iconB64,
           selectedAid: peerConnection.selectedAid,
         },
