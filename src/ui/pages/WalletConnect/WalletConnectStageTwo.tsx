@@ -61,10 +61,13 @@ const WalletConnectStageTwo = ({
       if (selectedIdentifier && pendingDAppMeerkat && !startingMeerkat) {
         setStartingMeerkat(true);
         await PeerConnection.peerConnection.start(selectedIdentifier.id);
-        await PeerConnection.peerConnection.connectWithDApp(pendingDAppMeerkat);
+        await PeerConnection.peerConnection.connectWithDApp(
+          `${pendingDAppMeerkat}:${selectedIdentifier.id}`
+        );
         const existingConnection = existingConnections.find(
           (connection) => connection.id === pendingDAppMeerkat
         );
+
         if (existingConnection) {
           const updatedConnections = [];
           for (const connection of existingConnections) {

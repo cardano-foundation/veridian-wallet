@@ -159,21 +159,23 @@ class PeerConnection {
     );
   }
 
-  async connectWithDApp(dAppIdentifier: string) {
+  async connectWithDApp(peerConnectionId: string) {
     if (this.identityWalletConnect === undefined) {
       throw new Error(PeerConnection.PEER_CONNECTION_START_PENDING);
     }
-    const connectingIdentifier =
-      await this.identityWalletConnect.getKeriIdentifier();
+
+    const dAppIdentifier = peerConnectionId.split(":")[0];
+    const connectingIdentifier = peerConnectionId.split(":")[1];
+
     const existingPeerConnection =
       await Agent.agent.peerConnectionAccounts.findByPeerConnectionAndAccount(
         dAppIdentifier,
-        connectingIdentifier.id
+        connectingIdentifier
       );
     if (existingPeerConnection.length === 0) {
       await Agent.agent.peerConnectionAccounts.save({
         peerConnectionId: dAppIdentifier,
-        accountId: connectingIdentifier.id,
+        accountId: connectingIdentifier,
         iconB64: ICON_BASE64,
       });
     }
