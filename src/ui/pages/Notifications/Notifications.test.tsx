@@ -299,7 +299,7 @@ describe("Notifications Tab", () => {
     const history = createMemoryHistory();
     history.push(TabsRoutePath.NOTIFICATIONS);
 
-    const { getByTestId, getByText, findByText } = render(
+    const { getByTestId, findByTestId, findByText } = render(
       <IonReactMemoryRouter history={history}>
         <Provider store={storeMocked}>
           <Notifications />
@@ -319,10 +319,12 @@ describe("Notifications Tab", () => {
       );
     });
 
-    const unknownIssuerText = await findByText(
+    const alert = await findByTestId("alert-unknown-issuer");
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute(
+      "header",
       EN_TRANSLATIONS.tabs.notifications.tab.unknownissuer.text
     );
-    expect(unknownIssuerText).toBeInTheDocument();
   });
 
   test("Cannot open notification from unknown presentation connection", async () => {
