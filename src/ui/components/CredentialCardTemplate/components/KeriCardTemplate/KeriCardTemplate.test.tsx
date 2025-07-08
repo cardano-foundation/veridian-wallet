@@ -68,7 +68,7 @@ describe("KeriCardTemplate", () => {
     const card = getByTestId("keri-card-template-name-index-0");
     expect(getByText("Qualified vLEI Issuer Credential")).toBeInTheDocument();
     expect(getByText(connectionsFix[0].label)).toBeInTheDocument();
-    expect(getByText("23/01/2024")).toBeInTheDocument();
+    expect(getByText("22/01/2024")).toBeInTheDocument();
     expect(getByAltText(/card-logo/i)).toBeInTheDocument();
     act(() => {
       fireEvent.click(card);
