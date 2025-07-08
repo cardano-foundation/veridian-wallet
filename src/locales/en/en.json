@@ -1534,6 +1534,16 @@
         "placeholder": "e.g. JohnSmith25"
       }
     },
+    "groupsetup": {
+      "title": "Group setup",
+      "description": "Create a group name for other members to join your group, or join an existing group",
+      "form": {
+        "input": "Group name",
+        "placeholder": "e.g. Company Name",
+        "or": "or",
+        "joingroup": "Join existing group"
+      }
+    },
     "finishsetup": {
       "greeting": "Welcome, {{name}}",
       "text": "Securely manage credentials, build trusted connections, and stay informed with real-time updates — all in Veridian. Create multiple profiles to keep things organized by location or role."
