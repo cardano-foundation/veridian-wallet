@@ -80,15 +80,6 @@ jest.mock("../../../core/agent/agent", () => {
     createdAt: new Date().toISOString(), // Directly provide ISO string
   };
 
-  const peerConnection = {
-    id: mockPeerConnectionAccountRecordPlainObject.id,
-    name: mockPeerConnectionAccountRecordPlainObject.name,
-    url: mockPeerConnectionAccountRecordPlainObject.url,
-    createdAt: mockPeerConnectionAccountRecordPlainObject.createdAt,
-    iconB64: mockPeerConnectionAccountRecordPlainObject.iconB64,
-    selectedAid: mockPeerConnectionAccountRecordPlainObject.accountId,
-  };
-
   return {
     Agent: {
       agent: {
