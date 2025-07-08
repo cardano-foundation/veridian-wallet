@@ -137,7 +137,6 @@ const CredentialsTable = ({ credentials }: CredentialTableProps) => {
         i18n.t("pages.credentialDetails.table.toast.error"),
         "error"
       );
-      console.error("Error deleting contact:", error);
     }
   };
 

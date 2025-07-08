@@ -16,8 +16,9 @@ export class PeerConnectionAccountStorage {
 
   async getPeerConnection(id: string): Promise<PeerConnection> {
     const metadata = await this.getPeerConnectionAccount(id);
+
     return {
-      id: metadata.id,
+      id: metadata.id.split(":")[0],
       iconB64: metadata.iconB64,
       name: metadata.name,
       selectedAid: metadata.getDappIdentifier(),

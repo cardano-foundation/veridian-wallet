@@ -7,7 +7,7 @@ interface WalletConnectStageOneProps {
 
 interface WalletConnectStageTwoProps {
   isOpen: boolean;
-  peerConnectionId: string;
+  pendingDAppMeerkat: string;
   onClose: () => void;
   onBackClick: () => void;
   className?: string;
