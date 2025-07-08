@@ -305,7 +305,7 @@ describe("Wallet Connect Stage Two", () => {
       <Provider store={storeMocked}>
         <WalletConnectStageTwo
           isOpen={true}
-          pendingDAppMeerkat={"pending-meerkat"}
+          peerConnectionId={"pending-meerkat"}
           onClose={handleCancel}
           onBackClick={handleChangeStage}
         />
@@ -337,7 +337,7 @@ describe("Wallet Connect Stage Two", () => {
       <Provider store={storeMocked}>
         <WalletConnectStageTwo
           isOpen={true}
-          pendingDAppMeerkat={"pending-meerkat"}
+          peerConnectionId={"pending-meerkat"}
           onClose={handleCancel}
           onBackClick={handleChangeStage}
         />

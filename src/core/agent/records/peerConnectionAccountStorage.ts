@@ -1,3 +1,4 @@
+import { PeerConnection } from "../../cardano/walletConnect/peerConnection.types";
 import { StorageService } from "../../storage/storage.types";
 import {
   PeerConnectionAccountRecord,
@@ -5,60 +6,78 @@ import {
 } from "./peerConnectionAccountRecord";
 
 export class PeerConnectionAccountStorage {
+  static readonly PEER_CONNECTION_ACCOUNT_RECORD_MISSING =
+    "Peer connection account record does not exist";
   private storageService: StorageService<PeerConnectionAccountRecord>;
 
   constructor(storageService: StorageService<PeerConnectionAccountRecord>) {
     this.storageService = storageService;
   }
 
-  save(
-    props: PeerConnectionAccountRecordStorageProps
+  async getPeerConnection(id: string): Promise<PeerConnection> {
+    const metadata = await this.getPeerConnectionAccount(id);
+    return {
+      id: metadata.id,
+      iconB64: metadata.iconB64,
+      name: metadata.name,
+      selectedAid: metadata.getDappIdentifier(),
+      url: metadata.url,
+      createdAt: metadata.createdAt.toISOString(),
+    };
+  }
+
+  private async getPeerConnectionAccount(
+    id: string // compositionId: <dappId>:<identifier>
   ): Promise<PeerConnectionAccountRecord> {
-    const record = new PeerConnectionAccountRecord(props);
-    return this.storageService.save(record);
-  }
-
-  delete(record: PeerConnectionAccountRecord): Promise<void> {
-    return this.storageService.delete(record);
-  }
-
-  deleteById(id: string): Promise<void> {
-    return this.storageService.deleteById(id);
-  }
-
-  update(record: PeerConnectionAccountRecord): Promise<void> {
-    return this.storageService.update(record);
-  }
-
-  findById(id: string): Promise<PeerConnectionAccountRecord | null> {
-    return this.storageService.findById(id, PeerConnectionAccountRecord);
-  }
-
-  findAllByQuery(query: any): Promise<PeerConnectionAccountRecord[]> {
-    return this.storageService.findAllByQuery(
-      query,
+    const metadata = await this.storageService.findById(
+      id,
       PeerConnectionAccountRecord
     );
+    if (!metadata) {
+      throw new Error(
+        PeerConnectionAccountStorage.PEER_CONNECTION_ACCOUNT_RECORD_MISSING
+      );
+    }
+    return metadata;
   }
 
-  getAll(): Promise<PeerConnectionAccountRecord[]> {
-    return this.storageService.getAll(PeerConnectionAccountRecord);
+  async getAllPeerConnectionAccount(): Promise<PeerConnection[]> {
+    const records = await this.storageService.getAll(
+      PeerConnectionAccountRecord
+    );
+    return records.map((record) => ({
+      id: record.id,
+      iconB64: record.iconB64,
+      name: record.name,
+      selectedAid: record.getIdentifier(),
+      url: record.url,
+      createdAt: record.createdAt.toISOString(),
+    }));
   }
 
-  findByPeerConnectionId(
-    peerConnectionId: string
-  ): Promise<PeerConnectionAccountRecord[]> {
-    return this.findAllByQuery({ peerConnectionId });
+  async updatePeerConnectionAccount(
+    id: string,
+    metadata: Partial<
+      Pick<PeerConnectionAccountRecord, "name" | "url" | "iconB64">
+    >
+  ): Promise<void> {
+    const identifierMetadataRecord = await this.getPeerConnectionAccount(id);
+    if (metadata.name !== undefined)
+      identifierMetadataRecord.name = metadata.name;
+    if (metadata.url !== undefined) identifierMetadataRecord.url = metadata.url;
+    if (metadata.iconB64 !== undefined)
+      identifierMetadataRecord.iconB64 = metadata.iconB64;
+    await this.storageService.update(identifierMetadataRecord);
   }
 
-  findByAccountId(accountId: string): Promise<PeerConnectionAccountRecord[]> {
-    return this.findAllByQuery({ accountId });
+  async createPeerConnectionAccountRecord(
+    data: PeerConnectionAccountRecordStorageProps
+  ): Promise<void> {
+    const record = new PeerConnectionAccountRecord(data);
+    await this.storageService.save(record);
   }
 
-  findByPeerConnectionAndAccount(
-    peerConnectionId: string,
-    accountId: string
-  ): Promise<PeerConnectionAccountRecord[]> {
-    return this.findAllByQuery({ peerConnectionId, accountId });
+  async deletePeerConnectionAccountRecord(id: string): Promise<void> {
+    await this.storageService.deleteById(id);
   }
 }

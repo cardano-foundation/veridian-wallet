@@ -230,8 +230,6 @@ const mockPeerConnectionAccountRecordInstance = new PeerConnectionAccountRecord(
     id: "dApp-address:identifier",
     peerConnectionId: "dApp-address",
     accountId: "identifier",
-    creationStatus: CreationStatus.COMPLETE,
-    pendingDeletion: false,
     name: "dApp-name",
     url: "http://localhost:3000",
     iconB64: "icon",
@@ -245,7 +243,6 @@ const peerConnection: ConnectionData = {
   url: mockPeerConnectionAccountRecordInstance.url,
   createdAt: mockPeerConnectionAccountRecordInstance.createdAt?.toISOString(),
   iconB64: mockPeerConnectionAccountRecordInstance.iconB64,
-  selectedAid: mockPeerConnectionAccountRecordInstance.accountId,
 };
 
 const identifierAddedEvent: IdentifierAddedEvent = {
@@ -353,10 +350,10 @@ describe("Peer connection states changed handler", () => {
   });
 
   test("handle peer connected event", async () => {
-    Agent.agent.peerConnectionAccounts.findById = jest
+    Agent.agent.peerConnectionAccounts.getPeerConnection = jest
       .fn()
       .mockResolvedValue(mockPeerConnectionAccountRecordInstance);
-    Agent.agent.peerConnectionAccounts.getAll = jest
+    Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount = jest
       .fn()
       .mockResolvedValue([mockPeerConnectionAccountRecordInstance]);
     await peerConnectedChangeHandler(peerConnectedEvent, dispatch);
@@ -384,7 +381,7 @@ describe("Peer connection states changed handler", () => {
   });
 
   test("handle peer sign request event", async () => {
-    Agent.agent.peerConnectionAccounts.findById = jest
+    Agent.agent.peerConnectionAccounts.getPeerConnection = jest
       .fn()
       .mockResolvedValue(mockPeerConnectionAccountRecordInstance);
     await peerConnectRequestSignChangeHandler(peerSignRequestEvent, dispatch);

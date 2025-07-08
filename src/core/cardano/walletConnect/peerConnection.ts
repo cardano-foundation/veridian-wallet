@@ -108,7 +108,7 @@ class PeerConnection {
           }
 
           const peerConnectionRecord =
-            await Agent.agent.peerConnectionAccounts.findById(
+            await Agent.agent.peerConnectionAccounts.getPeerConnection(
               `${address}:${selectedAid}`
             );
 
@@ -116,17 +116,20 @@ class PeerConnection {
             peerConnectionRecord.name = name;
             peerConnectionRecord.url = url;
             peerConnectionRecord.iconB64 = iconB64;
-            await Agent.agent.peerConnectionAccounts.update(
+            await Agent.agent.peerConnectionAccounts.updatePeerConnectionAccount(
+              `${address}:${selectedAid}`,
               peerConnectionRecord
             );
           } else {
-            await Agent.agent.peerConnectionAccounts.save({
-              peerConnectionId: address,
-              accountId: selectedAid,
-              name,
-              url,
-              iconB64: iconB64,
-            });
+            await Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord(
+              {
+                peerConnectionId: address,
+                accountId: selectedAid,
+                name,
+                url,
+                iconB64: iconB64,
+              }
+            );
           }
           this.eventEmitter.emit<PeerConnectedEvent>({
             type: PeerConnectionEventTypes.PeerConnected,
@@ -166,18 +169,18 @@ class PeerConnection {
 
     const dAppIdentifier = peerConnectionId.split(":")[0];
     const connectingIdentifier = peerConnectionId.split(":")[1];
-
     const existingPeerConnection =
-      await Agent.agent.peerConnectionAccounts.findByPeerConnectionAndAccount(
-        dAppIdentifier,
-        connectingIdentifier
+      await Agent.agent.peerConnectionAccounts.getPeerConnection(
+        peerConnectionId
       );
-    if (existingPeerConnection.length === 0) {
-      await Agent.agent.peerConnectionAccounts.save({
-        peerConnectionId: dAppIdentifier,
-        accountId: connectingIdentifier,
-        iconB64: ICON_BASE64,
-      });
+    if (!existingPeerConnection) {
+      await Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord(
+        {
+          peerConnectionId: dAppIdentifier,
+          accountId: connectingIdentifier,
+          iconB64: ICON_BASE64,
+        }
+      );
     }
     const seed = this.identityWalletConnect.connect(dAppIdentifier);
 

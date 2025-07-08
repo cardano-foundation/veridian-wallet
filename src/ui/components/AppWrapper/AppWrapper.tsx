@@ -143,7 +143,7 @@ const peerConnectRequestSignChangeHandler = async (
   const connectedDAppAddress =
     PeerConnection.peerConnection.getConnectedDAppAddress();
   const peerConnectionRecord =
-    await Agent.agent.peerConnectionAccounts.findById(
+    await Agent.agent.peerConnectionAccounts.getPeerConnection(
       `${connectedDAppAddress}:${event.payload.identifier}`
     );
 
@@ -152,9 +152,9 @@ const peerConnectRequestSignChangeHandler = async (
       id: peerConnectionRecord.id,
       name: peerConnectionRecord.name,
       url: peerConnectionRecord.url,
-      createdAt: peerConnectionRecord.createdAt?.toISOString(),
+      createdAt: peerConnectionRecord.createdAt,
       iconB64: peerConnectionRecord.iconB64,
-      selectedAid: peerConnectionRecord.accountId,
+      selectedAid: peerConnectionRecord.selectedAid,
     };
 
     dispatch(
@@ -171,15 +171,16 @@ const peerConnectedChangeHandler = async (
   event: PeerConnectedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  const existingConnections = await Agent.agent.peerConnectionAccounts.getAll();
+  const existingConnections =
+    await Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount();
   const mappedExistingConnections: ConnectionData[] = existingConnections.map(
     (pc) => ({
       id: pc.id,
       name: pc.name,
       url: pc.url,
-      createdAt: pc.createdAt?.toISOString(),
+      createdAt: pc.createdAt,
       iconB64: pc.iconB64,
-      selectedAid: pc.accountId,
+      selectedAid: pc.selectedAid,
     })
   );
   dispatch(setWalletConnectionsCache(mappedExistingConnections));
@@ -359,22 +360,21 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const connectionsDetails = await Agent.agent.connections.getConnections();
       const multisigConnectionsDetails =
         await Agent.agent.connections.getMultisigConnections();
-
       const credsCache = await Agent.agent.credentials.getCredentials();
       const credsArchivedCache = await Agent.agent.credentials.getCredentials(
         true
       );
       const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
       const storedPeerConnections =
-        await Agent.agent.peerConnectionAccounts.getAll();
+        await Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount();
       const mappedPeerConnections: ConnectionData[] = storedPeerConnections.map(
         (pc) => ({
           id: pc.id,
           name: pc.name,
           url: pc.url,
-          createdAt: pc.createdAt?.toISOString(),
+          createdAt: pc.createdAt,
           iconB64: pc.iconB64,
-          selectedAid: pc.accountId,
+          selectedAid: pc.selectedAid,
         })
       );
       const notifications =

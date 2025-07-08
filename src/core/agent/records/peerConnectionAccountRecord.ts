@@ -1,24 +1,16 @@
-import { BaseRecord, Tags } from "../../storage/storage.types";
-import { CreationStatus } from "../agent.types";
+import { BaseRecord } from "../../storage/storage.types";
 
 interface PeerConnectionAccountRecordStorageProps {
   id?: string;
-  createdAt?: Date;
-  tags?: Tags;
-  peerConnectionId: string;
-  accountId: string;
-  creationStatus?: CreationStatus;
-  pendingDeletion?: boolean;
   name?: string;
   url?: string;
+  createdAt?: Date;
   iconB64?: string;
+  peerConnectionId: string;
+  accountId: string;
 }
 
 class PeerConnectionAccountRecord extends BaseRecord {
-  peerConnectionId!: string;
-  accountId!: string;
-  creationStatus!: CreationStatus;
-  pendingDeletion!: boolean;
   name?: string;
   url?: string;
   iconB64?: string;
@@ -30,28 +22,24 @@ class PeerConnectionAccountRecord extends BaseRecord {
     super();
     if (props) {
       this.id = props.id ?? `${props.peerConnectionId}:${props.accountId}`;
-      this.createdAt = props.createdAt ?? new Date();
-      this.peerConnectionId = props.peerConnectionId;
-      this.accountId = props.accountId;
-      this.creationStatus = props.creationStatus ?? CreationStatus.COMPLETE;
-      this.pendingDeletion = props.pendingDeletion ?? false;
       this.name = props.name;
       this.url = props.url;
+      this.createdAt = props.createdAt ?? new Date();
       this.iconB64 = props.iconB64;
-      this._tags = props.tags ?? {};
     }
+  }
+
+  getDappIdentifier() {
+    return this.id.split(":")[0];
+  }
+
+  getIdentifier() {
+    return this.id.split(":")[1];
   }
 
   getTags() {
     return {
       ...this._tags,
-      peerConnectionId: this.peerConnectionId,
-      accountId: this.accountId,
-      pendingDeletion: this.pendingDeletion,
-      creationStatus: this.creationStatus,
-      name: this.name,
-      url: this.url,
-      iconB64: this.iconB64,
     };
   }
 }

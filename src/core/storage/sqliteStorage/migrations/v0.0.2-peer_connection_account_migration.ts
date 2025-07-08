@@ -61,9 +61,6 @@ export const DATA_V002: TsMigration = {
         const peerConnectionAccountRecord = new PeerConnectionAccountRecord({
           peerConnectionId: peerConnectionData.id,
           accountId: identifierData.id,
-          creationStatus:
-            peerConnectionData.creationStatus || CreationStatus.COMPLETE,
-          pendingDeletion: peerConnectionData.pendingDeletion || false,
           name: peerConnectionData.name,
           url: peerConnectionData.url,
           iconB64: peerConnectionData.iconB64,

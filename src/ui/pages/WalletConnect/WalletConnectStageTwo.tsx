@@ -24,7 +24,7 @@ import { WalletConnectStageTwoProps } from "./WalletConnect.types";
 
 const WalletConnectStageTwo = ({
   isOpen,
-  pendingDAppMeerkat,
+  peerConnectionId,
   className,
   onBackClick,
   onClose,
@@ -58,14 +58,15 @@ const WalletConnectStageTwo = ({
 
   const handleConnectWallet = async () => {
     try {
+      const pendingDAppMeerkat = peerConnectionId.split(":")[0];
+      const identifier = peerConnectionId.split(":")[1];
+
       if (selectedIdentifier && pendingDAppMeerkat && !startingMeerkat) {
         setStartingMeerkat(true);
-        await PeerConnection.peerConnection.start(selectedIdentifier.id);
-        await PeerConnection.peerConnection.connectWithDApp(
-          `${pendingDAppMeerkat}:${selectedIdentifier.id}`
-        );
+        await PeerConnection.peerConnection.start(identifier);
+        await PeerConnection.peerConnection.connectWithDApp(peerConnectionId);
         const existingConnection = existingConnections.find(
-          (connection) => connection.id === pendingDAppMeerkat
+          (connection) => connection.id === peerConnectionId
         );
 
         if (existingConnection) {
