@@ -3,4 +3,15 @@ interface ProfilesProps {
   setIsOpen: (value: boolean) => void;
 }
 
-export type { ProfilesProps };
+interface OptionButtonProps {
+  icon: string;
+  text: string;
+  action: () => void;
+}
+
+interface ProfileItemsProps {
+  id: string;
+  onClick?: () => void;
+}
+
+export type { ProfilesProps, OptionButtonProps, ProfileItemsProps };
