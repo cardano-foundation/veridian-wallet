@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppDispatch , useAppSelector } from "../../../store/hooks";
+import { Salter } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -8,15 +8,15 @@ import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
   getStateCache,
   showNoWitnessAlert,
-  updateCurrentProfile,
+  updateCurrentProfile
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
@@ -27,6 +27,7 @@ import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
 import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
+import { SetupGroup } from "./components/SetupGroup";
 import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import { Welcome } from "./components/Welcome";
@@ -41,13 +42,17 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
   const [userName, setUserName] = useState("");
+  const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
 
   const isModal = !!onClose;
 
   const title = i18n.t(`setupprofile.${step}.title`);
-  const back = [SetupProfileStep.SetupProfile].includes(step)
+  const back = [
+    SetupProfileStep.SetupProfile,
+    SetupProfileStep.SetupGroup,
+  ].includes(step)
     ? i18n.t("setupprofile.button.back")
     : isModal
       ? i18n.t("setupprofile.button.cancel")
@@ -63,11 +68,20 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   };
 
   const handleBack = () => {
-    if (step === SetupProfileStep.SetupProfile) {
+    if (
+      step === SetupProfileStep.SetupGroup ||
+      (step === SetupProfileStep.SetupProfile &&
+        profileType !== ProfileType.Group)
+    ) {
       setStep(SetupProfileStep.SetupType);
       return;
     }
 
+    if (step === SetupProfileStep.SetupProfile) {
+      setStep(SetupProfileStep.SetupGroup);
+      return;
+    }
+  
     onClose?.(true);
   };
 
@@ -76,10 +90,20 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
     if (error) return;
 
+    const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
-      displayName: userName,
+      displayName: isGroup ? groupName : userName,
       theme: 0,
     };
+
+    if (isGroup) {
+      const groupMetadata = {
+        groupId: new Salter({}).qb64,
+        groupInitiator: true,
+        groupCreated: false,
+      };
+      metadata.groupMetadata = groupMetadata;
+    }
 
     try {
       setLoading(true);
@@ -88,6 +112,17 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
       );
+
+      if (isGroup) {
+        await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+          new BasicRecord({
+            id: MiscRecordId.USER_NAME,
+            content: {
+              userName,
+            },
+          })
+        );
+      }
 
       if (individualFirstCreate) {
         await Agent.agent.basicStorage
@@ -105,7 +140,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
       if (isModal) {
         onClose();
-        navToCredetials();
+        navToCredentials();
         return;
       }
 
@@ -132,7 +167,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
   };
 
-  const navToCredetials = () => {
+  const navToCredentials = () => {
     const { nextPath, updateRedux } = getNextRoute(RoutePath.PROFILE_SETUP, {
       store: { stateCache },
       state: {
@@ -151,6 +186,10 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     ionRouter.push(nextPath.pathname);
   };
 
+  const handleOpenScan = () => {
+    // TODO: implement on next ticket
+  };
+
   const handleChangeStep = () => {
     if (step === SetupProfileStep.SetupProfile) {
       createIdentifier();
@@ -158,7 +197,15 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
 
     if (step === SetupProfileStep.FinishSetup) {
-      navToCredetials();
+      navToCredentials();
+      return;
+    }
+
+    if (
+      profileType === ProfileType.Group &&
+      step === SetupProfileStep.SetupType
+    ) {
+      setStep(SetupProfileStep.SetupGroup);
       return;
     }
 
@@ -172,6 +219,14 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           <SetupProfile
             userName={userName}
             onChangeUserName={setUserName}
+          />
+        );
+      case SetupProfileStep.SetupGroup:
+        return (
+          <SetupGroup
+            groupName={groupName}
+            onChangeGroupName={setGroupName}
+            onClickJoinGroupButton={handleOpenScan}
           />
         );
       case SetupProfileStep.FinishSetup:
@@ -207,7 +262,9 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         primaryButtonText={getButtonText()}
         primaryButtonAction={handleChangeStep}
         primaryButtonDisabled={
-          (SetupProfileStep.SetupProfile === step && !userName) || isLoading
+          (SetupProfileStep.SetupGroup === step && !groupName) ||
+          (SetupProfileStep.SetupProfile === step && !userName) ||
+          isLoading
         }
         pageId={pageId}
       />
