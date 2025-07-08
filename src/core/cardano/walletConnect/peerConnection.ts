@@ -106,13 +106,28 @@ class PeerConnection {
           ) {
             iconB64 = icon;
           }
-          await Agent.agent.peerConnectionAccounts.save({
-            peerConnectionId: address,
-            accountId: selectedAid,
-            name,
-            url,
-            iconB64: iconB64,
-          });
+
+          const peerConnectionRecord =
+            await Agent.agent.peerConnectionAccounts.findById(
+              `${address}:${selectedAid}`
+            );
+
+          if (peerConnectionRecord) {
+            peerConnectionRecord.name = name;
+            peerConnectionRecord.url = url;
+            peerConnectionRecord.iconB64 = iconB64;
+            await Agent.agent.peerConnectionAccounts.update(
+              peerConnectionRecord
+            );
+          } else {
+            await Agent.agent.peerConnectionAccounts.save({
+              peerConnectionId: address,
+              accountId: selectedAid,
+              name,
+              url,
+              iconB64: iconB64,
+            });
+          }
           this.eventEmitter.emit<PeerConnectedEvent>({
             type: PeerConnectionEventTypes.PeerConnected,
             payload: {

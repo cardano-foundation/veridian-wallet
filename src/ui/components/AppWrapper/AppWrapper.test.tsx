@@ -214,7 +214,7 @@ const mockPeerConnectionAccountRecord = {
   name: "dApp-name",
   url: "http://localhost:3000",
   iconB64: "icon",
-  createdAt: new Date(),
+  createdAt: new Date().toISOString(),
 };
 
 const peerConnection: ConnectionData = {
@@ -428,7 +428,7 @@ describe("KERIA operation state changed handler", () => {
     const connectionMock = {
       id: "id",
       creationStatus: CreationStatus.PENDING,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       alias: "CF Credential Issuance",
       oobi: "http://oobi.com/",
     };

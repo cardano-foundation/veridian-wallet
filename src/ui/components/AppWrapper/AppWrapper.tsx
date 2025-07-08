@@ -149,7 +149,7 @@ const peerConnectRequestSignChangeHandler = async (
       id: peerConnectionRecord.id,
       name: peerConnectionRecord.name,
       url: peerConnectionRecord.url,
-      createdAt: peerConnectionRecord.createdAt,
+      createdAt: peerConnectionRecord.createdAt?.toISOString(),
       iconB64: peerConnectionRecord.iconB64,
       selectedAid: peerConnectionRecord.accountId,
     };
@@ -169,12 +169,20 @@ const peerConnectedChangeHandler = async (
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
   const existingConnections = await Agent.agent.peerConnectionAccounts.getAll();
-  dispatch(setWalletConnectionsCache(existingConnections));
+  const mappedExistingConnections: ConnectionData[] = existingConnections.map(
+    (pc) => ({
+      id: pc.id,
+      name: pc.name,
+      url: pc.url,
+      createdAt: pc.createdAt?.toISOString(),
+      iconB64: pc.iconB64,
+      selectedAid: pc.accountId,
+    })
+  );
+  dispatch(setWalletConnectionsCache(mappedExistingConnections));
   const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
-  const connectedWallet = existingConnections.find(
-    (connection) =>
-      connection.id === newConnectionId ||
-      connection.peerConnectionId === event.payload.dAppAddress
+  const connectedWallet = mappedExistingConnections.find(
+    (connection) => connection.id === newConnectionId
   );
   if (connectedWallet) {
     dispatch(setConnectedWallet(connectedWallet));
@@ -356,6 +364,16 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
       const storedPeerConnections =
         await Agent.agent.peerConnectionAccounts.getAll();
+      const mappedPeerConnections: ConnectionData[] = storedPeerConnections.map(
+        (pc) => ({
+          id: pc.id,
+          name: pc.name,
+          url: pc.url,
+          createdAt: pc.createdAt?.toISOString(),
+          iconB64: pc.iconB64,
+          selectedAid: pc.accountId,
+        })
+      );
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();
 
@@ -364,7 +382,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(setConnectionsCache(connectionsDetails));
       dispatch(setMultisigConnectionsCache(multisigConnectionsDetails));
-      dispatch(setWalletConnectionsCache(storedPeerConnections));
+      dispatch(setWalletConnectionsCache(mappedPeerConnections));
       dispatch(setNotificationsCache(notifications));
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
