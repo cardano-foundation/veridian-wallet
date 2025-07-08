@@ -143,7 +143,10 @@ const peerConnectRequestSignChangeHandler = async (
   const connectedDAppAddress =
     PeerConnection.peerConnection.getConnectedDAppAddress();
   const peerConnectionRecord =
-    await Agent.agent.peerConnectionAccounts.findById(connectedDAppAddress);
+    await Agent.agent.peerConnectionAccounts.findById(
+      `${connectedDAppAddress}:${event.payload.identifier}`
+    );
+
   if (peerConnectionRecord) {
     const peerConnection: ConnectionData = {
       id: peerConnectionRecord.id,
