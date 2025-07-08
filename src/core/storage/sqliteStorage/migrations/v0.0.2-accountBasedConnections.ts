@@ -6,11 +6,8 @@ import { CreationStatus } from "../../../agent/agent.types";
 
 export const DATA_V002: HybridMigration = {
   type: MigrationType.HYBRID,
-  version: "0.1.0",
+  version: "0.0.2",
   localMigrationStatements: async (session) => {
-    console.log('Starting local SQLite migration: Converting connections to account-based model (items table)');
-    
-    // Get all identifiers from local database
     const identifierResult = await session.query(
       "SELECT * FROM items WHERE category = ?",
       ["IdentifierMetadataRecord"]
@@ -25,7 +22,6 @@ export const DATA_V002: HybridMigration = {
     }
     
     const identifiers = identifierResult.values || [];
-    console.log(`Found ${identifiers.length} identifiers in local database`);
     
     // Get all connection records from items
     const connectionResult = await session.query(
@@ -34,8 +30,6 @@ export const DATA_V002: HybridMigration = {
     );
     
     const connections = connectionResult.values || [];
-    console.log(`Found ${connections.length} connections to migrate`);
-    
     const statements: { statement: string; values?: unknown[] }[] = [];
     
     for (const connection of connections) {
@@ -43,9 +37,12 @@ export const DATA_V002: HybridMigration = {
       
       // Create ContactRecord
       const contactRecord = new ContactRecord({
+        id: connectionData.id,
+        createdAt: connectionData.createdAtUTC,
         alias: connectionData.alias,
         oobi: connectionData.oobi,
         groupId: connectionData.groupId,
+        tags: connectionData.tags,
       });
       
       // Insert ContactRecord into items
@@ -59,175 +56,121 @@ export const DATA_V002: HybridMigration = {
         ]
       });
       
-      // Create ConnectionPairRecords for each identifier
       for (const identifier of identifiers) {
         const identifierData = JSON.parse(identifier.value);
-        
-        const connectionPairRecord = new ConnectionPairRecord({
-          contactId: contactRecord.id,
-          accountId: identifierData.id,
-          creationStatus: connectionData.creationStatus || CreationStatus.PENDING,
-          pendingDeletion: connectionData.pendingDeletion || false,
-        });
-        
-        statements.push({
-          statement: "INSERT OR IGNORE INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
-          values: [
-            connectionPairRecord.id,
-            "ConnectionPairRecord",
-            connectionPairRecord.id,
-            JSON.stringify(connectionPairRecord)
-          ]
-        });
+        if(connectionData.sharedIdentifier === identifierData.id) {
+          const connectionPairRecord = new ConnectionPairRecord({
+            contactId: contactRecord.id,
+            accountId: identifierData.id,
+            creationStatus: connectionData.creationStatus || CreationStatus.PENDING,
+            pendingDeletion: connectionData.pendingDeletion || false,
+          });
+
+          statements.push({
+            statement: "INSERT OR IGNORE INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
+            values: [
+              connectionPairRecord.id,
+              "ConnectionPairRecord",
+              connectionPairRecord.id,
+              JSON.stringify(connectionPairRecord)
+            ]
+          });
+        }
       }
-      
-      // Delete original ConnectionRecord from items
-      statements.push({
-        statement: "DELETE FROM items WHERE id = ?",
-        values: [connection.id]
-      });
     }
     
-    console.log(`Local migration completed: ${connections.length} connections migrated to account-based model (items table)`);
     return statements;
   },
   
   cloudMigrationStatements: async (signifyClient: SignifyClient) => {
-    // console.log('Starting cloud KERIA migration: Converting connections to account-based model');
+    console.log('Starting cloud KERIA migration: Converting connections to account-based model');
     
-    // // Get all identifiers (these become accounts)
-    // const identifiers = await signifyClient.identifiers().list();
+    const identifiers = (await signifyClient.identifiers().list()).aids;
+    console.log(`Found ${identifiers.length} identifiers/accounts`);
+
+    if(identifiers.length === 0) {
+      console.log('No identifiers found, skipping migration');
+      return;
+    }
+
+    const oldestIdentifier = identifiers.sort((a: any, b: any) =>   
+      new Date(a.icp_dt).getTime() - new Date(b.icp_dt).getTime()
+    )[0];
+
+    const oldestIdentifierPrefix = oldestIdentifier.prefix;
     
-    // if (identifiers.length === 0) {
-    //   console.log('No identifiers found, deleting all contacts');
-      
-    //   const contacts = await signifyClient.contacts().list();
-    //   for (const contact of contacts) {
-    //     await signifyClient.contacts().delete(contact.id);
-    //   }
-      
-    //   console.log(`Deleted ${contacts.length} contacts due to no identifiers`);
-    //   return;
-    // }
+    const contacts = await signifyClient.contacts().list();
+    console.log(`Found ${contacts.length} connections to migrate`);
     
-    // console.log(`Found ${identifiers.length} identifiers/accounts`);
-    
-    // const contacts = await signifyClient.contacts().list();
-    // console.log(`Found ${contacts.length} connections to migrate`);
-    
-    // for (const contact of contacts) {
-    //   const connectionData = await signifyClient.contacts().get(contact.id);
-      
-    //   // Check if already migrated
-    //   if (connectionData.accountBasedMigration) {
-    //     console.log(`Connection ${contact.alias || contact.id} already migrated`);
-    //     continue;
-    //   }
-      
-    //   console.log(`Migrating connection: ${contact.alias || contact.id}`);
-      
-    //   const updates: Record<string, any> = {};
-    //   const keysToDelete: string[] = [];
-    //   const historyItems: Array<{ key: string; data: any; accountId?: string }> = [];
-    //   const notes: Array<{ key: string; data: any }> = [];
-    //   let createdAt: string | undefined;
-      
-    //          // Collect all history items and notes
-    //    Object.keys(connectionData).forEach((key) => {
-    //      if (key === 'createdAt') {
-    //        createdAt = connectionData[key] as string;
-    //      } else if (key.startsWith(KeriaContactKeyPrefix.HISTORY_IPEX) || 
-    //                 key.startsWith(KeriaContactKeyPrefix.HISTORY_REVOKE)) {
-           
-    //        const historyItem = JSON.parse(connectionData[key] as string);
-    //        historyItems.push({ key, data: historyItem });
-    //      } else if (key.startsWith(KeriaContactKeyPrefix.CONNECTION_NOTE)) {
-    //        const note = JSON.parse(connectionData[key] as string);
-    //        notes.push({ key, data: note });
-    //      }
-    //    });
-      
-    //   // Process history items - associate with relevant identifiers
-    //   const processedAccountIds = new Set<string>();
-      
-    //   for (const historyItem of historyItems) {
-    //     let targetAccountId: string | undefined;
-        
-    //     // Try to find matching identifier based on rp field or a.i field
-    //     if (historyItem.data.rp) {
-    //       targetAccountId = identifiers.find((id: any) => id.prefix === historyItem.data.rp)?.prefix;
-    //     } else if (historyItem.data.a?.i) {
-    //       targetAccountId = identifiers.find((id: any) => id.prefix === historyItem.data.a.i)?.prefix;
-    //     }
-        
-    //     if (targetAccountId) {
-    //       historyItem.accountId = targetAccountId;
-    //       processedAccountIds.add(targetAccountId);
+    for (const contact of contacts) {
+      const contractUpdates: Record<string, any> = {};
+
+      const keysToDelete: string[] = [];
+      const historyItems: Array<{ key: string; data: any}> = [];
+      let noteKey: string | undefined;
+
+      Object.keys(contact).forEach((key) => {
+        if (key.startsWith(KeriaContactKeyPrefix.HISTORY_IPEX) || 
+                  key.startsWith(KeriaContactKeyPrefix.HISTORY_REVOKE)) {
           
-    //       // Create account-based history key
-    //       const accountBasedKey = `${historyItem.key}:${targetAccountId}`;
-    //       const accountBasedItem = {
-    //         ...historyItem.data,
-    //         accountId: targetAccountId,
-    //         migratedFrom: historyItem.key,
-    //         migratedAt: new Date().toISOString()
-    //       };
-          
-    //       updates[accountBasedKey] = JSON.stringify(accountBasedItem);
-    //     }
+          historyItems.push({ key, data: contact[key] });
+        } else if (key.startsWith(KeriaContactKeyPrefix.CONNECTION_NOTE)) {
+          noteKey = key;
+        }
+      });
+
+      const associatedIdentifierPrefix = contact.sharedIdentifier;
+
+      if (historyItems.length === 0) {
+        contractUpdates[`${oldestIdentifierPrefix}:createdAt`] = contact['createdAt'];
+        keysToDelete.push('createdAt');
         
-    //     keysToDelete.push(historyItem.key);
-    //   }
-      
-    //   // If no history items exist, associate everything with the oldest identifier
-    //   if (historyItems.length === 0 && identifiers.length > 0) {
-    //     const oldestIdentifier = identifiers.sort((a: any, b: any) => 
-    //       new Date(a.created).getTime() - new Date(b.created).getTime()
-    //     )[0];
-        
-    //     processedAccountIds.add(oldestIdentifier.prefix);
-    //   }
-      
-    //   // Process notes - associate with accounts that have history items
-    //   for (const note of notes) {
-    //     for (const accountId of processedAccountIds) {
-    //       const accountBasedKey = `${note.key}:${accountId}`;
-    //       const accountBasedNote = {
-    //         ...note.data,
-    //         accountId: accountId,
-    //         migratedFrom: note.key,
-    //         migratedAt: new Date().toISOString()
-    //       };
-          
-    //       updates[accountBasedKey] = JSON.stringify(accountBasedNote);
-    //     }
-        
-    //     keysToDelete.push(note.key);
-    //   }
-      
-    //   // Create createdAt fields for each account with history items
-    //   if (createdAt) {
-    //     for (const accountId of processedAccountIds) {
-    //       updates[`${accountId}:createdAt`] = createdAt;
-    //     }
-    //     keysToDelete.push('createdAt');
-    //   }
-      
-    //   // Mark as migrated
-    //   updates.accountBasedMigration = JSON.stringify({
-    //     version: "1.2.0",
-    //     migratedAt: new Date().toISOString(),
-    //     accountIds: Array.from(processedAccountIds),
-    //     originalKeysRemoved: keysToDelete.length
-    //   });
-      
-    //   // Apply all updates to this connection
-    //   if (Object.keys(updates).length > 0) {
-    //     await signifyClient.contacts().update(contact.id, updates);
-    //     console.log(`Migrated connection ${contact.alias || contact.id}: ${keysToDelete.length} global entries -> ${processedAccountIds.size} accounts`);
-    //   }
-    // }
+        // update note to be prefixed with the oldest identifier prefix
+        if(noteKey) {
+          const newPrefixedNote = `${oldestIdentifierPrefix}:${noteKey}`;
+          contractUpdates[newPrefixedNote] = contact[noteKey];
+          keysToDelete.push(noteKey);
+        }
+      }
+
+      if(associatedIdentifierPrefix) {
+        const associatedIdentifier = identifiers.find((id: any) => id.prefix === associatedIdentifierPrefix);
+        if(associatedIdentifier) {
+          contractUpdates[`${associatedIdentifierPrefix}:createdAt`] = contact['createdAt'];
+          keysToDelete.push('createdAt');
+
+          // update history items to be prefixed with the associated identifier prefix
+          for(const historyItem of historyItems) {
+            const newPrefixedHistoryItem = `${associatedIdentifierPrefix}:${historyItem.key}`;
+            contractUpdates[newPrefixedHistoryItem] = historyItem.data;
+            keysToDelete.push(historyItem.key);
+          }
+
+          // update note to be prefixed with the associated identifier prefix
+          if(noteKey) {
+            const newPrefixedNote = `${associatedIdentifierPrefix}:${noteKey}`;
+            contractUpdates[newPrefixedNote] = contact[noteKey];
+            keysToDelete.push(noteKey);
+          }
+        } else {
+          console.log(`Connection ${contact.alias || contact.id} has no associated identifier, skipping`);
+          continue;
+        }
+      }
+
+      // Delete all keys that are prefixed with the oldest identifier prefix
+      // for(const key of keysToDelete) {
+      //   contractUpdates[key] = null;
+      // }
+
+      //Apply all updates to this connection
+      try {
+        await signifyClient.contacts().update(contact.id, contractUpdates);
+      } catch(e) {
+        console.error(`Error migrating connection ${contact.alias || contact.id}: ${e}`);
+      }
+    }
     
-    // console.log(`Cloud migration completed: ${contacts.length} connections migrated to account-based model`);
+    console.log(`Cloud migration completed: ${contacts.length} connections migrated to account-based model`);
   },
 }; 

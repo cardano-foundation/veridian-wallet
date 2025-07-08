@@ -173,12 +173,10 @@ class SqliteSession {
         // Handle cloud migrations
         await this.performCloudMigration(migration);
       } else if (migration.type === MigrationType.HYBRID) {
-        // Handle hybrid migrations (both local and cloud)
         const statements = await migration.localMigrationStatements(this.session!);
         migrationStatements.push(...statements);
         
-        // Perform cloud migration after local migration
-        await this.performCloudMigration(migration);
+        await this.performCloudMigration(migration, true);
       }
 
       // Update version for all migration types
