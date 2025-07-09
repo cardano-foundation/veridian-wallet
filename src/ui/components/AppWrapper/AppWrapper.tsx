@@ -359,14 +359,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
       const storedPeerConnections =
         await Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount();
-      const mappedStoredPeerConnections = storedPeerConnections.map(
-        (connection) => {
-          return {
-            ...connection,
-            id: connection.id.split(":")[0],
-          };
-        }
-      );
 
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();
@@ -376,7 +368,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(setConnectionsCache(connectionsDetails));
       dispatch(setMultisigConnectionsCache(multisigConnectionsDetails));
-      dispatch(setWalletConnectionsCache(mappedStoredPeerConnections));
+      dispatch(setWalletConnectionsCache(storedPeerConnections));
       dispatch(setNotificationsCache(notifications));
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
