@@ -47,7 +47,7 @@ export class PeerConnectionAccountStorage {
       PeerConnectionAccountRecord
     );
     return records.map((record) => ({
-      id: record.id,
+      id: record.getDappIdentifier(),
       iconB64: record.iconB64,
       name: record.name,
       selectedAid: record.getIdentifier(),
