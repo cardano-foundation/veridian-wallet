@@ -33,13 +33,13 @@ const ConnectionNote = ({
       <div className="connection-details-info-block-line">
         <div className="connection-details-info-block-data">
           <div className="connection-details-info-block-title">
-            <span>{i18n.t("connections.details.title")}</span>
+            <span>{i18n.t("tabs.connections.details.title")}</span>
             <span data-testid="title-length">
               {newTitle.length}/{TITLE_MAX_LENGTH}
             </span>
           </div>
           <IonInput
-            aria-label={`${i18n.t("connections.details.title")}`}
+            aria-label={`${i18n.t("tabs.connections.details.title")}`}
             data-testid={`edit-connections-modal-note-title-${id}`}
             onIonInput={(e) => setNewTitle(`${e.target.value ?? ""}`)}
             onIonBlur={submitNoteChange}
@@ -49,7 +49,7 @@ const ConnectionNote = ({
         </div>
         <div className="connection-details-info-block-data">
           <div className="connection-details-info-block-title">
-            <span>{i18n.t("connections.details.message")}</span>
+            <span>{i18n.t("tabs.connections.details.message")}</span>
             <span>
               {newMessage.length}/{MESSAGE_MAX_LENGTH}
             </span>

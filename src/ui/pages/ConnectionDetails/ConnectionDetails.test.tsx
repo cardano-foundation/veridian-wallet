@@ -160,7 +160,7 @@ describe("ConnectionDetails Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.label)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.label)
       ).toBeVisible();
     });
 
@@ -200,8 +200,8 @@ describe("ConnectionDetails Page", () => {
     await waitFor(() =>
       expect(
         getByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deleteconnection
-            .title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert
+            .deleteconnection.title
         )
       ).toBeVisible()
     );
@@ -380,17 +380,23 @@ describe("ConnectionDetails Page", () => {
       expect(getByTestId("action-button")).toBeInTheDocument()
     );
 
-    expect(queryByTestId("delete-button-connection-details")).not.toBeInTheDocument();
+    expect(
+      queryByTestId("delete-button-connection-details")
+    ).not.toBeInTheDocument();
 
     act(() => {
       fireEvent.click(getByTestId("action-button"));
     });
 
     await waitFor(() => {
-      expect(getByTestId("connection-options-manage-button")).toBeInTheDocument();
+      expect(
+        getByTestId("connection-options-manage-button")
+      ).toBeInTheDocument();
     });
 
-    expect(queryByTestId("delete-button-connection-options")).not.toBeInTheDocument();
+    expect(
+      queryByTestId("delete-button-connection-options")
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -453,7 +459,7 @@ describe("Checking the Connection Details Page when no notes are available", () 
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.nocurrentnotesext)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.nocurrentnotesext)
       ).toBeVisible();
     });
   });
@@ -586,7 +592,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.connectedwith.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.connectedwith.replace(
             "{{ issuer }}",
             connectionDetails.label
           )}`
@@ -606,7 +612,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.issuance.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.issuance.replace(
             "{{ credential }}",
             historyEvents[0].credentialType
               ?.replace(/([A-Z][a-z])/g, " $1")
@@ -628,7 +634,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.requestpresent.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.requestpresent.replace(
             "{{ issuer }}",
             connectionDetails.label
           )}`
@@ -647,7 +653,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.presented.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.presented.replace(
             "{{ credentialType }}",
             historyEvents[3].credentialType
           )}`
@@ -664,7 +670,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.update.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.update.replace(
             "{{ credential }}",
             historyEvents[1].credentialType
               ?.replace(/([A-Z][a-z])/g, " $1")
@@ -713,7 +719,7 @@ describe("Checking the Connection Details Page when connection is missing from t
     await waitFor(() => {
       expect(getByTestId("connection-details-cloud-error-page")).toBeVisible();
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.clouderror, {
+        getByText(EN_TRANSLATIONS.tabs.connections.details.clouderror, {
           normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
         })
       ).toBeVisible();
@@ -726,8 +732,8 @@ describe("Checking the Connection Details Page when connection is missing from t
     await waitFor(() =>
       expect(
         getAllByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deleteconnection
-            .title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert
+            .deleteconnection.title
         )[0]
       ).toBeVisible()
     );

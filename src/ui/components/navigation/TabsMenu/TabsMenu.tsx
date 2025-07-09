@@ -7,16 +7,12 @@ import {
   IonTabs,
 } from "@ionic/react";
 import {
-  apps,
-  appsOutline,
-  fingerPrint,
-  fingerPrintOutline,
   idCard,
   idCardOutline,
   notifications,
   notificationsOutline,
-  scan,
-  scanOutline,
+  peopleCircle,
+  peopleCircleOutline,
 } from "ionicons/icons";
 import { ComponentType } from "react";
 import { Redirect, Route } from "react-router";
@@ -26,20 +22,12 @@ import { TabsRoutePath } from "../../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { getNotificationsCache } from "../../../../store/reducers/notificationsCache";
 import { setCurrentRoute } from "../../../../store/reducers/stateCache";
+import { Connections } from "../../../pages/Connections";
 import { Credentials } from "../../../pages/Credentials";
-import { Identifiers } from "../../../pages/Identifiers";
-import { Menu } from "../../../pages/Menu";
 import { Notifications } from "../../../pages/Notifications";
-import { Scan } from "../../../pages/Scan";
 import "./TabsMenu.scss";
 
 const tabsRoutes = [
-  {
-    label: i18n.t("tabsmenu.label.identifiers"),
-    path: TabsRoutePath.IDENTIFIERS,
-    component: Identifiers,
-    icon: [fingerPrint, fingerPrintOutline],
-  },
   {
     label: i18n.t("tabsmenu.label.creds"),
     path: TabsRoutePath.CREDENTIALS,
@@ -47,22 +35,16 @@ const tabsRoutes = [
     icon: [idCard, idCardOutline],
   },
   {
-    label: i18n.t("tabsmenu.label.scan"),
-    path: TabsRoutePath.SCAN,
-    component: Scan,
-    icon: [scan, scanOutline],
+    label: i18n.t("tabsmenu.label.connections"),
+    path: TabsRoutePath.CONNECTIONS,
+    component: Connections,
+    icon: [peopleCircle, peopleCircleOutline],
   },
   {
     label: i18n.t("tabsmenu.label.notifications"),
     path: TabsRoutePath.NOTIFICATIONS,
     component: Notifications,
     icon: [notifications, notificationsOutline],
-  },
-  {
-    label: i18n.t("tabsmenu.label.menu"),
-    path: TabsRoutePath.MENU,
-    component: Menu,
-    icon: [apps, appsOutline],
   },
 ];
 const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {

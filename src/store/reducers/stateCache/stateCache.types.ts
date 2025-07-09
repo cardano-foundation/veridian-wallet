@@ -64,7 +64,6 @@ interface StateCacheProps {
   cameraDirection?: LensFacing;
   showGenericError?: boolean;
   showNoWitnessAlert?: boolean;
-  showConnections: boolean;
   toastMsgs: ToastStackItem[];
   forceInitApp?: number;
   showLoading?: boolean;

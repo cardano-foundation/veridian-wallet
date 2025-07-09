@@ -1,11 +1,5 @@
-import {
-  IonButton,
-  IonIcon,
-  IonLabel,
-  useIonViewWillEnter,
-} from "@ionic/react";
+import { IonButton, IonLabel, useIonViewWillEnter } from "@ionic/react";
 import { t } from "i18next";
-import { peopleOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
@@ -34,9 +28,10 @@ import {
   getAuthentication,
   setCurrentRoute,
   setToastMsg,
-  showConnections,
 } from "../../../store/reducers/stateCache";
 import { ArchivedCredentials } from "../../components/ArchivedCredentials";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 import { CardSlider } from "../../components/CardSlider";
 import { CardsPlaceholder } from "../../components/CardsPlaceholder";
 import { FilterChip } from "../../components/FilterChip/FilterChip";
@@ -56,8 +51,6 @@ import { combineClassNames } from "../../utils/style";
 import { StartAnimationSource } from "../Identifiers/Identifiers.types";
 import "./Credentials.scss";
 import { CredentialsFilters } from "./Credentials.types";
-import { Avatar } from "../../components/Avatar";
-import { AvatarProps } from "../../components/Avatar/Avatar.types";
 
 const CLEAR_STATE_DELAY = 1000;
 
@@ -86,7 +79,6 @@ const Credentials = () => {
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
   const authData = useAppSelector(getAuthentication);
-  const [defaultProfile, setDefaultProfile] = useState("");
   const revokedCreds = credsCache.filter(
     (item) => item.status === CredentialStatus.REVOKED
   );
@@ -98,10 +90,6 @@ const Credentials = () => {
       credsCache.filter((item) => item.status === CredentialStatus.CONFIRMED),
     [credsCache]
   );
-
-  useEffect(() => {
-    setDefaultProfile(authData.defaultProfile);
-  }, [authData]);
 
   const fetchArchivedCreds = useCallback(async () => {
     try {
@@ -147,10 +135,6 @@ const Credentials = () => {
   }, [confirmedCreds, credsCache, pendingCreds.length]);
 
   useOnlineStatusEffect(fetchArchivedCreds);
-
-  const handleConnections = () => {
-    dispatch(showConnections(true));
-  };
 
   const handleAvatarClick = () => {
     history.push(RoutePath.PROFILES);
@@ -271,28 +255,14 @@ const Credentials = () => {
   };
 
   const AdditionalButtons = ({
-    handleConnections,
     handleAvatarClick,
   }: {
-    handleConnections: () => void;
     handleAvatarClick: AvatarProps["handleAvatarClick"];
   }) => {
     return (
       <>
-        <IonButton
-          shape="round"
-          className="connections-button"
-          data-testid="connections-button"
-          onClick={handleConnections}
-        >
-          <IonIcon
-            slot="icon-only"
-            icon={peopleOutline}
-            color="primary"
-          />
-        </IonButton>
         <Avatar
-          id={defaultProfile}
+          id={authData.defaultProfile}
           handleAvatarClick={handleAvatarClick}
         />
       </>
@@ -307,10 +277,7 @@ const Credentials = () => {
         customClass={tabClasses}
         title={`${i18n.t("tabs.credentials.tab.title")}`}
         additionalButtons={
-          <AdditionalButtons
-            handleConnections={handleConnections}
-            handleAvatarClick={handleAvatarClick}
-          />
+          <AdditionalButtons handleAvatarClick={handleAvatarClick} />
         }
         placeholder={
           showPlaceholder && (

@@ -6,6 +6,7 @@ import { PageFooter } from "../PageFooter";
 const CardsPlaceholder = ({
   buttonLabel,
   buttonAction,
+  buttonIcon,
   testId,
   children,
 }: CardsPlaceholderProps) => {
@@ -21,7 +22,7 @@ const CardsPlaceholder = ({
       {buttonLabel && buttonAction && (
         <PageFooter
           pageId={testId}
-          primaryButtonIcon={addOutline}
+          primaryButtonIcon={buttonIcon || addOutline}
           primaryButtonText={buttonLabel}
           primaryButtonAction={buttonAction}
         />

@@ -93,11 +93,13 @@ describe("Identifier Selector Modal", () => {
     await waitForIonicReact();
 
     expect(
-      getByText(EN_TRANSLATIONS.connections.page.indentifierselector.title)
+      getByText(EN_TRANSLATIONS.tabs.connections.tab.indentifierselector.title)
     ).toBeVisible();
 
     expect(
-      getByText(EN_TRANSLATIONS.connections.page.indentifierselector.message)
+      getByText(
+        EN_TRANSLATIONS.tabs.connections.tab.indentifierselector.message
+      )
     ).toBeVisible();
 
     expect(getByTestId(`card-item-${identifierCache[2].id}`)).toBeVisible();
