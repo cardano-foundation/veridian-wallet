@@ -4,14 +4,14 @@ import { MigrationType, TsMigration } from "./migrations.types";
 
 export const DATA_V002: TsMigration = {
   type: MigrationType.TS,
-  version: "0.0.2",
+  version: "1.2.0",
   migrationStatements: async (session) => {
     // eslint-disable-next-line no-console
     console.log("Running migration v0.0.2: Peer Connection Account Migration");
 
     // Get all identifiers from local database
     const identifierResult = await session.query(
-      "SELECT * FROM items WHERE category = ?",
+      "SELECT * FROM items WHERE category = ? AND value NOT LIKE '%\"isDeleted\":true%'",
       ["IdentifierMetadataRecord"]
     );
 
@@ -27,7 +27,7 @@ export const DATA_V002: TsMigration = {
       ];
     }
 
-    const identifiers = identifierResult.values || [];
+    const identifiers = identifierResult.values;
 
     // Get all peer connection records from items
     const peerConnectionResult = await session.query(
@@ -42,7 +42,14 @@ export const DATA_V002: TsMigration = {
       } peer connections to migrate.`
     );
 
-    const peerConnections = peerConnectionResult.values || [];
+    const parsedIdentifiers = identifiers.map((id: any) =>
+      JSON.parse(id.value)
+    );
+    const identifierMap = new Map(
+      parsedIdentifiers.map((id: any) => [id.id, id])
+    );
+
+    const peerConnections = peerConnectionResult.values;
 
     const statements: { statement: string; values?: unknown[] }[] = [];
 
@@ -51,23 +58,26 @@ export const DATA_V002: TsMigration = {
       console.log(`Processing peer connection: ${peerConnection.id}`);
       const peerConnectionData = JSON.parse(peerConnection.value);
 
-      // Create PeerConnectionAccountRecords for each identifier
-      for (const identifier of identifiers) {
-        const identifierData = JSON.parse(identifier.value);
-        // eslint-disable-next-line no-console
-        console.log(
-          `  - Creating PeerConnectionAccountRecord for identifier: ${identifierData.id}`
+      let selectedAidForNewRecord: string | undefined = undefined;
+      if (peerConnectionData.selectedAid) {
+        const matchingIdentifier = identifierMap.get(
+          peerConnectionData.selectedAid
         );
+        if (matchingIdentifier && !matchingIdentifier.isDeleted) {
+          selectedAidForNewRecord = matchingIdentifier.id;
+        }
+      }
+
+      if (selectedAidForNewRecord) {
         const peerConnectionAccountRecord = new PeerConnectionAccountRecord({
-          id: peerConnectionData.id,
-          selectedAid: identifierData.id,
+          id: peerConnectionData.id, // This is the dAppAddress
+          selectedAid: selectedAidForNewRecord, // This is the identifier AID
           name: peerConnectionData.name,
           url: peerConnectionData.url,
           iconB64: peerConnectionData.iconB64,
         });
         // eslint-disable-next-line no-console
         console.log(`    - New record ID: ${peerConnectionAccountRecord.id}`);
-
         statements.push({
           statement:
             "INSERT OR IGNORE INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
@@ -78,9 +88,15 @@ export const DATA_V002: TsMigration = {
             JSON.stringify(peerConnectionAccountRecord),
           ],
         });
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(
+          `  - No valid identifier found for peer connection: ${peerConnection.id}. Scheduling for deletion.`
+        );
       }
 
       // Delete original PeerConnectionMetadataRecord from items
+      // This delete should happen regardless of whether a new record was created or not.
       // eslint-disable-next-line no-console
       console.log(
         `  - Scheduling deletion for old peer connection record: ${peerConnection.id}`
