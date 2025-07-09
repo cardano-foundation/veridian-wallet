@@ -182,15 +182,11 @@ const peerConnectedChangeHandler = async (
   dispatch(setWalletConnectionsCache(mappedStoredPeerConnections));
   const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
   const connectedWallet = existingConnections.find(
-    (connection) => connection.id === newConnectionId
+    (connection) =>
+      `${connection.id}:${connection.selectedAid}` === newConnectionId
   );
   if (connectedWallet) {
-    dispatch(
-      setConnectedWallet({
-        ...connectedWallet,
-        id: connectedWallet.id.split(":")[0],
-      })
-    );
+    dispatch(setConnectedWallet(connectedWallet));
   }
   dispatch(setPendingConnection(null));
   dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
