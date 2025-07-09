@@ -156,6 +156,7 @@ const AddConnectionModal = ({
       await handleGetContacts();
       resetModal();
     } catch (error) {
+      console.error("Error resolving OOBI:", error);
       triggerToast(
         i18n.t("pages.connections.addConnection.modal.toast.error"),
         "error"
@@ -209,10 +210,12 @@ const AddConnectionModal = ({
         setLoading(false);
         setShowQR(true);
       } catch (e) {
+        console.error(e);
         setLoading(false);
         setErrorOnRequest(true);
       }
     } catch (error) {
+      console.error("Error while trying to connect to the server.", error);
       setLoading(false);
       setErrorOnRequest(true);
     }
