@@ -5,6 +5,7 @@ ion-button.avatar-button {
   &::part(native) {
     width: 2.75rem;
     height: 2.75rem;
+    padding: 0;
   }
 
   &.rank-0 {
