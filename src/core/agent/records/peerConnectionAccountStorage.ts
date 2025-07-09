@@ -18,10 +18,10 @@ export class PeerConnectionAccountStorage {
     const metadata = await this.getPeerConnectionAccount(id);
 
     return {
-      id: metadata.id.split(":")[0],
+      id: metadata.getDappIdentifier(),
       iconB64: metadata.iconB64,
       name: metadata.name,
-      selectedAid: metadata.getDappIdentifier(),
+      selectedAid: metadata.getIdentifier(),
       url: metadata.url,
       createdAt: metadata.createdAt.toISOString(),
     };
