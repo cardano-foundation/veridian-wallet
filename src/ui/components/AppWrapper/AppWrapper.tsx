@@ -173,13 +173,8 @@ const peerConnectedChangeHandler = async (
 ) => {
   const existingConnections =
     await Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount();
-  const mappedStoredPeerConnections = existingConnections.map((connection) => {
-    return {
-      ...connection,
-      id: connection.id.split(":")[0],
-    };
-  });
-  dispatch(setWalletConnectionsCache(mappedStoredPeerConnections));
+
+  dispatch(setWalletConnectionsCache(existingConnections));
   const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
   const connectedWallet = existingConnections.find(
     (connection) =>
