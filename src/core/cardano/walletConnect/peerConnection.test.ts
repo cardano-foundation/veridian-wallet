@@ -95,21 +95,21 @@ describe("PeerConnection", () => {
     Agent.agent.connections.getOobi = jest.fn().mockResolvedValue("test-oobi");
     Agent.agent.peerConnectionAccounts.getPeerConnection = jest
       .fn()
-      .mockResolvedValue([]);
+      .mockResolvedValue(undefined);
     const connectSpy = jest
       .spyOn(IdentityWalletConnect.prototype, "connect")
       .mockReturnValue("seed");
 
     await peerConnection.start(accountId);
-    await peerConnection.connectWithDApp(dAppIdentifier);
+    await peerConnection.connectWithDApp(peerConnectionId);
     expect(
       Agent.agent.peerConnectionAccounts.getPeerConnection
-    ).toHaveBeenCalledWith(dAppIdentifier);
+    ).toHaveBeenCalledWith(peerConnectionId);
     expect(
       Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord
     ).toHaveBeenCalledWith({
-      peerConnectionId: dAppIdentifier,
-      accountId: accountId,
+      id: dAppIdentifier,
+      selectedAid: accountId,
       iconB64: expect.any(String),
     });
     expect(connectSpy).toHaveBeenCalledWith(dAppIdentifier);
@@ -125,16 +125,16 @@ describe("PeerConnection", () => {
     const peerConnectionId = `${dAppIdentifier}:${accountId}`;
     Agent.agent.peerConnectionAccounts.getPeerConnection = jest
       .fn()
-      .mockResolvedValue([{} as PeerConnectionAccountRecord]);
+      .mockResolvedValue({} as PeerConnectionAccountRecord);
     const connectSpy = jest
       .spyOn(IdentityWalletConnect.prototype, "connect")
       .mockReturnValue("seed");
 
     await peerConnection.start(accountId);
-    await peerConnection.connectWithDApp(dAppIdentifier);
+    await peerConnection.connectWithDApp(peerConnectionId);
     expect(
       Agent.agent.peerConnectionAccounts.getPeerConnection
-    ).toHaveBeenCalledWith(dAppIdentifier);
+    ).toHaveBeenCalledWith(peerConnectionId);
     expect(
       Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord
     ).not.toBeCalled();
