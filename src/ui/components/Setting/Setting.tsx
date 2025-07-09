@@ -42,11 +42,7 @@ export const Settings = ({ show, setShow }: SettingsProps) => {
       case SettingScreen.TermsAndPrivacy:
         return <TermsAndPrivacy />;
       case SettingScreen.RecoverySeedPhrase:
-        return (
-          <RecoverySeedPhrase
-            onClose={() => setScreen(SettingScreen.Settings)}
-          />
-        );
+        return <RecoverySeedPhrase onClose={handleClose} />;
       default:
         return (
           <SettingList

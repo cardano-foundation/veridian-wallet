@@ -5,21 +5,19 @@ import {
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act, useState } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
-import { Agent } from "../../../../../core/agent/agent";
-import { MiscRecordId } from "../../../../../core/agent/agent.types";
-import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
-import { TabsRoutePath } from "../../../../../routes/paths";
-import { store } from "../../../../../store";
-import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { DOCUMENTATION_LINK } from "../../../../globals/constants";
-import { ToastMsgType } from "../../../../globals/types";
-import { passcodeFiller } from "../../../../utils/passcodeFiller";
-import { SubMenuKey } from "../../Menu.types";
-import { Settings } from "./Settings";
-import { OptionIndex } from "./Settings.types";
+import { Agent } from "../../../core/agent/agent";
+import { MiscRecordId } from "../../../core/agent/agent.types";
+import EN_TRANSLATIONS from "../../../locales/en/en.json";
+import { store } from "../../../store";
+import { setToastMsg } from "../../../store/reducers/stateCache";
+import { DOCUMENTATION_LINK } from "../../globals/constants";
+import { ToastMsgType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
+import { passcodeFiller } from "../../utils/passcodeFiller";
+import { Settings } from "./Setting";
+import { OptionIndex } from "./Setting.types";
 
-jest.mock("../../../../../store/utils", () => ({
+jest.mock("../../../store/utils", () => ({
   CLEAR_STORE_ACTIONS: [],
 }));
 
@@ -68,7 +66,7 @@ let useBiometricAuthMock = jest.fn(() => {
   };
 });
 
-jest.mock("../../../../hooks/useBiometricsHook", () => {
+jest.mock("../../hooks/useBiometricsHook", () => {
   return {
     useBiometricAuth: () => useBiometricAuthMock(),
   };
@@ -83,7 +81,7 @@ jest.mock("capacitor-native-settings", () => ({
   },
 }));
 
-jest.mock("../../../../../core/agent/agent", () => ({
+jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       basicStorage: {
@@ -112,62 +110,50 @@ describe("Settings page", () => {
   test("Renders Settings page", () => {
     const { getByText } = render(
       <Provider store={store}>
-        <Settings />
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
       </Provider>
     );
 
     expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.title)
+      getByText(EN_TRANSLATIONS.settings.sections.security.title)
     ).toBeInTheDocument();
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin.title
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.changepin.title)
     ).toBeInTheDocument();
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.biometry
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).toBeInTheDocument();
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-          .title
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.managepassword.title)
     ).toBeInTheDocument();
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase
-          .title
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.seedphrase.title)
     ).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.settings.sections.support.title)
+      getByText(EN_TRANSLATIONS.settings.sections.support.title)
     ).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.settings.sections.support.contact)
+      getByText(EN_TRANSLATIONS.settings.sections.support.contact)
     ).toBeInTheDocument();
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.support.learnmore
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.support.learnmore)
     ).toBeInTheDocument();
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.support.terms.title
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.support.terms.title)
     ).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.settings.sections.support.version)
+      getByText(EN_TRANSLATIONS.settings.sections.support.version)
     ).toBeInTheDocument();
   });
 
   test("Enable biometrics toggle", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -181,20 +167,21 @@ describe("Settings page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <Settings />
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
       </Provider>
     );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.biometry
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).toBeInTheDocument();
 
     act(() => {
@@ -220,11 +207,10 @@ describe("Settings page", () => {
   });
 
   test("Disable biometrics toggle", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -238,20 +224,21 @@ describe("Settings page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <Settings />
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
       </Provider>
     );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.biometry
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).toBeInTheDocument();
 
     act(() => {
@@ -277,11 +264,10 @@ describe("Settings page", () => {
   });
 
   test("Open setting page when biometrics not available", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -295,7 +281,7 @@ describe("Settings page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -318,32 +304,34 @@ describe("Settings page", () => {
 
     const { queryByText } = render(
       <Provider store={storeMocked}>
-        <Settings />
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
       </Provider>
     );
 
     expect(
-      queryByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.biometry
-      )
+      queryByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).not.toBeInTheDocument();
   });
 
   test("Open documentation link", async () => {
     const { getByText, getByTestId } = render(
       <Provider store={store}>
-        <Settings />
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
       </Provider>
     );
 
     expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.settings.sections.support.contact)
+      getByText(EN_TRANSLATIONS.settings.sections.support.contact)
     ).toBeInTheDocument();
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.support.learnmore
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.support.learnmore)
     ).toBeInTheDocument();
 
     act(() => {
@@ -359,18 +347,18 @@ describe("Settings page", () => {
     });
   });
 
-  test("Switch page", async () => {
-    const switchViewMock = jest.fn();
+  test("Open term and privacy", async () => {
     const { getByText, getByTestId } = render(
       <Provider store={store}>
-        <Settings switchView={switchViewMock} />
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
       </Provider>
     );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.support.terms.title
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.support.terms.title)
     ).toBeInTheDocument();
 
     act(() => {
@@ -378,14 +366,31 @@ describe("Settings page", () => {
     });
 
     await waitFor(() => {
-      expect(switchViewMock).toBeCalledWith(SubMenuKey.TermsAndPrivacy);
+      expect(
+        getByText(
+          EN_TRANSLATIONS.settings.sections.support.terms.submenu.privacy
+        )
+      );
+      expect(
+        getByText(
+          EN_TRANSLATIONS.settings.sections.support.terms.submenu.termsofuse
+        )
+      );
     });
+  });
+
+  test("Open manage password", async () => {
+    const { getByText, getByTestId } = render(
+      <Provider store={store}>
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
+      </Provider>
+    );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-          .title
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.managepassword.title)
     ).toBeInTheDocument();
 
     act(() => {
@@ -395,14 +400,26 @@ describe("Settings page", () => {
     });
 
     await waitFor(() => {
-      expect(switchViewMock).toBeCalledWith(SubMenuKey.ManagePassword);
+      expect(
+        getByText(
+          EN_TRANSLATIONS.settings.sections.security.managepassword.page.title
+        )
+      );
     });
+  });
+
+  test("Open seedphrase screen", async () => {
+    const { getByText, getByTestId } = render(
+      <Provider store={store}>
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
+      </Provider>
+    );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase
-          .title
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.seedphrase.title)
     ).toBeInTheDocument();
 
     act(() => {
@@ -412,22 +429,26 @@ describe("Settings page", () => {
     });
 
     await waitFor(() => {
-      expect(switchViewMock).toBeCalledWith(SubMenuKey.RecoverySeedPhrase);
+      expect(
+        getByText(
+          EN_TRANSLATIONS.settings.sections.security.seedphrase.page.title
+        )
+      ).toBeInTheDocument();
     });
   });
 
   test("Open change passcode", async () => {
-    const switchViewMock = jest.fn();
     const { getByText, getByTestId } = render(
       <Provider store={store}>
-        <Settings switchView={switchViewMock} />
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
       </Provider>
     );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin.title
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.changepin.title)
     ).toBeInTheDocument();
 
     act(() => {
@@ -443,8 +464,7 @@ describe("Settings page", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin
-            .createpasscode
+          EN_TRANSLATIONS.settings.sections.security.changepin.createpasscode
         )
       ).toBeVisible();
     });
@@ -474,31 +494,28 @@ describe("Settings page", () => {
     };
 
     const dispatchMock = jest.fn();
-    const mockStore = configureStore();
     const storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: dispatchMock,
     };
 
     const switchViewMock = jest.fn();
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <Settings switchView={switchViewMock} />
+        <Settings
+          show
+          setShow={jest.fn()}
+        />
       </Provider>
     );
 
     fireEvent.click(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.deleteaccount.button
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.deleteaccount.button)
     );
 
     await waitFor(() => {
       expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.settings.sections.deleteaccount.alert
-            .title
-        )
+        getByText(EN_TRANSLATIONS.settings.sections.deleteaccount.alert.title)
       );
     });
 

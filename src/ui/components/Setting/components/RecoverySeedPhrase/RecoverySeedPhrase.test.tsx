@@ -9,7 +9,7 @@ import { RoutePath } from "../../../../../routes";
 import { OperationType } from "../../../../globals/types";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 
-jest.mock("../../../../../../../core/agent/agent", () => ({
+jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       getMnemonic: jest.fn(() => Promise.resolve("")),
@@ -20,7 +20,7 @@ jest.mock("../../../../../../../core/agent/agent", () => ({
   },
 }));
 
-jest.mock("../../../../../../hooks/useBiometricsHook", () => ({
+jest.mock("../../../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: jest.fn(() => ({
     biometricsIsEnabled: false,
     biometricInfo: {

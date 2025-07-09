@@ -16,14 +16,14 @@ import { ManagePassword } from "./ManagePassword";
 
 const deletePasswordMock = jest.fn();
 
-jest.mock("../../../../../../../core/storage", () => ({
-  ...jest.requireActual("../../../../../../../core/storage"),
+jest.mock("../../../../../core/storage", () => ({
+  ...jest.requireActual("../../../../../core/storage"),
   SecureStorage: {
     delete: () => deletePasswordMock(),
   },
 }));
 
-jest.mock("../../../../../../../core/agent/agent", () => ({
+jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       basicStorage: {
@@ -39,7 +39,7 @@ jest.mock("../../../../../../../core/agent/agent", () => ({
   },
 }));
 
-jest.mock("../../../../../../hooks/useBiometricsHook", () => ({
+jest.mock("../../../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: jest.fn(() => ({
     biometricsIsEnabled: false,
     biometricInfo: {
@@ -59,7 +59,7 @@ jest.mock("@ionic/react", () => ({
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
 }));
 
-jest.mock("../../../../../../components/CustomInput", () => ({
+jest.mock("../../../CustomInput", () => ({
   CustomInput: (props: CustomInputProps) => {
     return (
       <>

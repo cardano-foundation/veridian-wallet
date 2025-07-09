@@ -11,7 +11,7 @@ import { store } from "../../../../../store";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { ChangePin } from "./ChangePin";
 
-jest.mock("../../../../../../utils/passcodeChecker", () => ({
+jest.mock("../../../../utils/passcodeChecker", () => ({
   isRepeat: () => false,
   isConsecutive: () => false,
   isReverseConsecutive: () => false,
@@ -19,7 +19,7 @@ jest.mock("../../../../../../utils/passcodeChecker", () => ({
 
 const mockSetIsOpen = jest.fn();
 
-jest.mock("../../../../../../../core/agent/agent", () => ({
+jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       basicStorage: {
@@ -38,7 +38,7 @@ jest.mock("../../../../../../../core/agent/agent", () => ({
 
 const useBiometricAuthMock = jest.fn();
 
-jest.mock("../../../../../../hooks/useBiometricsHook", () => ({
+jest.mock("../../../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: () => useBiometricAuthMock(),
 }));
 

@@ -370,8 +370,8 @@ describe("Password Module", () => {
 
     expect(
       queryByText(
-        TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-          .page.alert.existingpassword
+        TRANSLATIONS.settings.sections.security.managepassword.page.alert
+          .existingpassword
       )
     ).toBeNull();
 
@@ -380,8 +380,8 @@ describe("Password Module", () => {
     await waitFor(() => {
       expect(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-            .page.alert.existingpassword
+          TRANSLATIONS.settings.sections.security.managepassword.page.alert
+            .existingpassword
         )
       ).toBeVisible();
     });
