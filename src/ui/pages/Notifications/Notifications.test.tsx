@@ -299,7 +299,7 @@ describe("Notifications Tab", () => {
     const history = createMemoryHistory();
     history.push(TabsRoutePath.NOTIFICATIONS);
 
-    const { getByTestId, findByTestId, findByText } = render(
+    const { getByTestId, findByTestId, findAllByTestId } = render(
       <IonReactMemoryRouter history={history}>
         <Provider store={storeMocked}>
           <Notifications />
@@ -319,9 +319,9 @@ describe("Notifications Tab", () => {
       );
     });
 
-    const alert = await findByTestId("alert-unknown-issuer");
-    expect(alert).toBeInTheDocument();
-    expect(alert).toHaveAttribute(
+    const alerts = await findAllByTestId("alert-unknown-issuer");
+    expect(alerts[0]).toBeInTheDocument();
+    expect(alerts[0]).toHaveAttribute(
       "header",
       EN_TRANSLATIONS.tabs.notifications.tab.unknownissuer.text
     );

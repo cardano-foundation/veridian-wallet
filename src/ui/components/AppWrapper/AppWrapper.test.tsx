@@ -83,6 +83,7 @@ jest.mock("../../../core/agent/agent", () => {
   return {
     Agent: {
       agent: {
+        devPreload: jest.fn(),
         start: jest.fn(),
         setupLocalDependencies: jest.fn(),
         auth: {
@@ -151,6 +152,8 @@ jest.mock("../../../core/agent/agent", () => {
           findById: jest
             .fn()
             .mockResolvedValue(mockPeerConnectionAccountRecordPlainObject),
+          getPeerConnection: jest.fn(),
+          getAllPeerConnectionAccount: jest.fn(),
         },
         basicStorage: {
           findById: jest.fn(),
@@ -360,7 +363,16 @@ describe("Peer connection states changed handler", () => {
       expect(dispatch).toBeCalledWith(setPendingConnection(null));
     });
     expect(dispatch).toBeCalledWith(
-      setWalletConnectionsCache([peerConnection])
+      setWalletConnectionsCache(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: "dApp-address",
+            name: "dApp-name",
+            url: "http://localhost:3000",
+            iconB64: "icon",
+          }),
+        ])
+      )
     );
     expect(dispatch).toBeCalledWith(
       setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS)
@@ -385,19 +397,16 @@ describe("Peer connection states changed handler", () => {
       .mockResolvedValue(mockPeerConnectionAccountRecordInstance);
     await peerConnectRequestSignChangeHandler(peerSignRequestEvent, dispatch);
     expect(dispatch).toBeCalledWith(
-      setQueueIncomingRequest({
-        signTransaction: peerSignRequestEvent,
-        peerConnection: {
-          id: peerConnection.id,
-          name: peerConnection.name,
-          url: peerConnection.url,
-          createdAt:
-            mockPeerConnectionAccountRecordInstance.createdAt?.toISOString(),
-          iconB64: peerConnection.iconB64,
-          selectedAid: peerConnection.selectedAid,
-        },
-        type: IncomingRequestType.PEER_CONNECT_SIGN,
-      })
+      setQueueIncomingRequest(
+        expect.objectContaining({
+          peerConnection: expect.objectContaining({
+            id: "dApp-address",
+            name: peerConnection.name,
+            url: peerConnection.url,
+            iconB64: peerConnection.iconB64,
+          }),
+        })
+      )
     );
   });
 

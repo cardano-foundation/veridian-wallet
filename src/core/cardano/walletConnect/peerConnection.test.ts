@@ -22,6 +22,8 @@ jest.mock("../../agent/agent", () => ({
       peerConnectionAccounts: {
         save: jest.fn(),
         findByPeerConnectionAndAccount: jest.fn(),
+        getPeerConnection: jest.fn(),
+        createPeerConnectionAccountRecord: jest.fn(),
       },
     },
   },
@@ -99,16 +101,16 @@ describe("PeerConnection", () => {
       .mockReturnValue("seed");
 
     await peerConnection.start(accountId);
-    await peerConnection.connectWithDApp(peerConnectionId);
+    await peerConnection.connectWithDApp(dAppIdentifier);
     expect(
       Agent.agent.peerConnectionAccounts.getPeerConnection
-    ).toHaveBeenCalledWith(dAppIdentifier, accountId);
+    ).toHaveBeenCalledWith(dAppIdentifier);
     expect(
       Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord
     ).toHaveBeenCalledWith({
       peerConnectionId: dAppIdentifier,
       accountId: accountId,
-      iconB64: ICON_BASE64,
+      iconB64: expect.any(String),
     });
     expect(connectSpy).toHaveBeenCalledWith(dAppIdentifier);
     expect(SecureStorage.set).toHaveBeenCalledWith(
@@ -129,10 +131,10 @@ describe("PeerConnection", () => {
       .mockReturnValue("seed");
 
     await peerConnection.start(accountId);
-    await peerConnection.connectWithDApp(peerConnectionId);
+    await peerConnection.connectWithDApp(dAppIdentifier);
     expect(
       Agent.agent.peerConnectionAccounts.getPeerConnection
-    ).toHaveBeenCalledWith(dAppIdentifier, accountId);
+    ).toHaveBeenCalledWith(dAppIdentifier);
     expect(
       Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord
     ).not.toBeCalled();

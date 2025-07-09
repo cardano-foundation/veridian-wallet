@@ -39,6 +39,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
       peerConnectionAccounts: {
         getAll: jest.fn().mockResolvedValue(walletConnectionsFix),
         deleteById: jest.fn(),
+        deletePeerConnectionAccountRecord: jest.fn(),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
@@ -535,7 +536,7 @@ describe("Wallet connect", () => {
     passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(
+      expect(dispatchMock).toHaveBeenCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
     });
@@ -608,11 +609,11 @@ describe("Wallet connect", () => {
     passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(
+      expect(dispatchMock).toHaveBeenCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
-      expect(dispatchMock).toBeCalledWith(setPendingConnection(null));
-      expect(dispatchMock).toBeCalledWith(
+      expect(dispatchMock).toHaveBeenCalledWith(setPendingConnection(null));
+      expect(dispatchMock).toHaveBeenCalledWith(
         setWalletConnectionsCache(
           walletConnectionsFix.filter(
             (connection) => connection.id !== walletConnectionsFix[0].id
