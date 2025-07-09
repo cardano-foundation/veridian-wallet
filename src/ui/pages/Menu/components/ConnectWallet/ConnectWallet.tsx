@@ -146,9 +146,7 @@ const ConnectWallet = forwardRef<ConnectWalletOptionRef, object>(
 
     const disconnectWallet = () => {
       if (!connectedWallet) return;
-      PeerConnection.peerConnection.disconnectDApp(
-        connectedWallet?.id.split(":")[0]
-      );
+      PeerConnection.peerConnection.disconnectDApp(connectedWallet?.id);
     };
 
     const toggleConnected = () => {
