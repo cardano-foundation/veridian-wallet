@@ -228,8 +228,7 @@ import { PeerConnectionAccountRecord } from "../../../core/agent/records";
 const mockPeerConnectionAccountRecordInstance = new PeerConnectionAccountRecord(
   {
     id: "dApp-address:identifier",
-    peerConnectionId: "dApp-address",
-    accountId: "identifier",
+    selectedAid: "identifier",
     name: "dApp-name",
     url: "http://localhost:3000",
     iconB64: "icon",

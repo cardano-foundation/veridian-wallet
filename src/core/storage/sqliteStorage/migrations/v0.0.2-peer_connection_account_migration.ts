@@ -59,8 +59,8 @@ export const DATA_V002: TsMigration = {
           `  - Creating PeerConnectionAccountRecord for identifier: ${identifierData.id}`
         );
         const peerConnectionAccountRecord = new PeerConnectionAccountRecord({
-          peerConnectionId: peerConnectionData.id,
-          accountId: identifierData.id,
+          id: peerConnectionData.id,
+          selectedAid: identifierData.id,
           name: peerConnectionData.name,
           url: peerConnectionData.url,
           iconB64: peerConnectionData.iconB64,

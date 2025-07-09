@@ -107,31 +107,16 @@ class PeerConnection {
           ) {
             iconB64 = icon;
           }
+          const peerConnectionId = `${address}:${selectedAid}`;
+          await Agent.agent.peerConnectionAccounts.updatePeerConnectionAccount(
+            peerConnectionId,
+            {
+              name,
+              url,
+              iconB64,
+            }
+          );
 
-          const peerConnectionRecord =
-            await Agent.agent.peerConnectionAccounts.getPeerConnection(
-              `${address}:${selectedAid}`
-            );
-
-          if (peerConnectionRecord) {
-            peerConnectionRecord.name = name;
-            peerConnectionRecord.url = url;
-            peerConnectionRecord.iconB64 = iconB64;
-            await Agent.agent.peerConnectionAccounts.updatePeerConnectionAccount(
-              `${address}:${selectedAid}`,
-              peerConnectionRecord
-            );
-          } else {
-            await Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord(
-              {
-                peerConnectionId: address,
-                accountId: selectedAid,
-                name,
-                url,
-                iconB64: iconB64,
-              }
-            );
-          }
           this.eventEmitter.emit<PeerConnectedEvent>({
             type: PeerConnectionEventTypes.PeerConnected,
             payload: {
@@ -183,12 +168,11 @@ class PeerConnection {
           throw error;
         }
       });
-
     if (!existingPeerConnection) {
       await Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord(
         {
-          peerConnectionId: dAppIdentifier,
-          accountId: connectingIdentifier,
+          id: dAppIdentifier,
+          selectedAid: connectingIdentifier,
           iconB64: ICON_BASE64,
         }
       );

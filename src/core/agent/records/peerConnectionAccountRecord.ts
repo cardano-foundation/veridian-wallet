@@ -6,8 +6,7 @@ interface PeerConnectionAccountRecordStorageProps {
   url?: string;
   createdAt?: Date;
   iconB64?: string;
-  peerConnectionId: string;
-  accountId: string;
+  selectedAid: string;
 }
 
 class PeerConnectionAccountRecord extends BaseRecord {
@@ -21,7 +20,7 @@ class PeerConnectionAccountRecord extends BaseRecord {
   constructor(props: PeerConnectionAccountRecordStorageProps) {
     super();
     if (props) {
-      this.id = props.id ?? `${props.peerConnectionId}:${props.accountId}`;
+      this.id = props.id ?? `${props.id}:${props.selectedAid}`;
       this.name = props.name;
       this.url = props.url;
       this.createdAt = props.createdAt ?? new Date();
