@@ -149,7 +149,7 @@ const peerConnectRequestSignChangeHandler = async (
 
   if (peerConnectionRecord) {
     const peerConnection: ConnectionData = {
-      id: peerConnectionRecord.id.split(":")[0],
+      id: peerConnectionRecord.id,
       name: peerConnectionRecord.name,
       url: peerConnectionRecord.url,
       createdAt: peerConnectionRecord.createdAt,
