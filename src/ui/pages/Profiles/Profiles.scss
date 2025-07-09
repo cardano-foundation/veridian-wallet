@@ -9,12 +9,16 @@
   .profiles-selected-profile {
     margin: 2rem 0 1.5rem;
 
+    @media screen and (min-width: 250px) and (max-width: 374px) {
+      margin: 1.2rem 0;
+    }
+
     .profiles-list-item {
       padding-bottom: 0.62rem;
     }
 
     .profiles-options-button {
-      margin: 0;
+      margin-block: 0;
     }
   }
 
@@ -29,12 +33,26 @@
     width: 100%;
     padding: 1rem 0;
 
+    @media screen and (min-width: 250px) and (max-width: 374px) {
+      padding: 0.8rem 0;
+    }
+
     &-avatar {
       margin-right: 1rem;
+
+      @media screen and (min-width: 250px) and (max-width: 374px) {
+        margin-right: 0.8rem;
+      }
     }
 
     &-name {
       align-content: center;
+      display: flex;
+      flex-wrap: wrap;
+
+      @media screen and (min-width: 250px) and (max-width: 374px) {
+        font-size: 0.8rem;
+      }
     }
   }
 
@@ -55,6 +73,10 @@
       border-radius: 0.5rem;
       padding: 0.5rem 1rem 0.5rem 0.75rem;
       border: 1px solid var(--ion-color-neutral-400);
+
+      @media screen and (min-width: 250px) and (max-width: 374px) {
+        font-size: 0.8rem;
+      }
     }
 
     &:not(:last-child) {
@@ -66,9 +88,20 @@
       height: 1.5rem;
       width: 1.5rem;
     }
+
+    @media screen and (min-width: 250px) and (max-width: 374px) {
+      ion-icon {
+        height: 1.2rem;
+        width: 1.2rem;
+      }
+    }
   }
 
   > *:last-child {
     margin-bottom: 2.25rem;
+
+    @media screen and (min-width: 250px) and (max-width: 374px) {
+      margin-bottom: 1.8rem;
+    }
   }
 }
