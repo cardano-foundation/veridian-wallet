@@ -1,10 +1,10 @@
 interface ConnectionData {
-  id: string;
+  id: string; //<dappId>
   name?: string;
   url?: string;
   createdAt?: string;
   iconB64?: string;
-  selectedAid?: string;
+  selectedAid?: string; // <aid>
 }
 
 interface WalletConnectState {

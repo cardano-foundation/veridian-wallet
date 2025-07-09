@@ -157,7 +157,7 @@ class PeerConnection {
     const connectingIdentifier = peerConnectionId.split(":")[1];
 
     const existingPeerConnection = await Agent.agent.peerConnectionAccounts
-      .getPeerConnection(peerConnectionId)
+      .getPeerConnection(`${dAppIdentifier}:${connectingIdentifier}`)
       .catch((error) => {
         if (
           error.message ===
@@ -168,6 +168,7 @@ class PeerConnection {
           throw error;
         }
       });
+
     if (!existingPeerConnection) {
       await Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord(
         {

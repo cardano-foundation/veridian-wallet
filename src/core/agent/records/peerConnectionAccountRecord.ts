@@ -20,7 +20,7 @@ class PeerConnectionAccountRecord extends BaseRecord {
   constructor(props: PeerConnectionAccountRecordStorageProps) {
     super();
     if (props) {
-      this.id = props.id ?? `${props.id}:${props.selectedAid}`;
+      this.id = `${props.id}:${props.selectedAid}`;
       this.name = props.name;
       this.url = props.url;
       this.createdAt = props.createdAt ?? new Date();

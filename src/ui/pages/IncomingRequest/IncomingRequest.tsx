@@ -68,7 +68,7 @@ const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
 
   const handleReset = () => {
     setInitiateAnimation(false);
-    setOpenPage(false);
+    // setOpenPage(false);
     setBlur(false);
 
     setTimeout(() => {

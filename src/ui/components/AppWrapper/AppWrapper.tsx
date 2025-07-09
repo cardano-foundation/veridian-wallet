@@ -149,7 +149,7 @@ const peerConnectRequestSignChangeHandler = async (
 
   if (peerConnectionRecord) {
     const peerConnection: ConnectionData = {
-      id: peerConnectionRecord.id,
+      id: peerConnectionRecord.id.split(":")[0],
       name: peerConnectionRecord.name,
       url: peerConnectionRecord.url,
       createdAt: peerConnectionRecord.createdAt,
@@ -173,23 +173,24 @@ const peerConnectedChangeHandler = async (
 ) => {
   const existingConnections =
     await Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount();
-  const mappedExistingConnections: ConnectionData[] = existingConnections.map(
-    (pc) => ({
-      id: pc.id,
-      name: pc.name,
-      url: pc.url,
-      createdAt: pc.createdAt,
-      iconB64: pc.iconB64,
-      selectedAid: pc.selectedAid,
-    })
-  );
-  dispatch(setWalletConnectionsCache(mappedExistingConnections));
+  const mappedStoredPeerConnections = existingConnections.map((connection) => {
+    return {
+      ...connection,
+      id: connection.id.split(":")[0],
+    };
+  });
+  dispatch(setWalletConnectionsCache(mappedStoredPeerConnections));
   const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
-  const connectedWallet = mappedExistingConnections.find(
+  const connectedWallet = existingConnections.find(
     (connection) => connection.id === newConnectionId
   );
   if (connectedWallet) {
-    dispatch(setConnectedWallet(connectedWallet));
+    dispatch(
+      setConnectedWallet({
+        ...connectedWallet,
+        id: connectedWallet.id.split(":")[0],
+      })
+    );
   }
   dispatch(setPendingConnection(null));
   dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
@@ -367,16 +368,15 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
       const storedPeerConnections =
         await Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount();
-      const mappedPeerConnections: ConnectionData[] = storedPeerConnections.map(
-        (pc) => ({
-          id: pc.id,
-          name: pc.name,
-          url: pc.url,
-          createdAt: pc.createdAt,
-          iconB64: pc.iconB64,
-          selectedAid: pc.selectedAid,
-        })
+      const mappedStoredPeerConnections = storedPeerConnections.map(
+        (connection) => {
+          return {
+            ...connection,
+            id: connection.id.split(":")[0],
+          };
+        }
       );
+
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();
 
@@ -385,7 +385,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(setConnectionsCache(connectionsDetails));
       dispatch(setMultisigConnectionsCache(multisigConnectionsDetails));
-      dispatch(setWalletConnectionsCache(mappedPeerConnections));
+      dispatch(setWalletConnectionsCache(mappedStoredPeerConnections));
       dispatch(setNotificationsCache(notifications));
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
