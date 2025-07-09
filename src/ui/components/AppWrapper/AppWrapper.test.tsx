@@ -366,7 +366,7 @@ describe("Peer connection states changed handler", () => {
       setWalletConnectionsCache(
         expect.arrayContaining([
           expect.objectContaining({
-            id: "dApp-address",
+            id: mockPeerConnectionAccountRecordInstance.id,
             name: "dApp-name",
             url: "http://localhost:3000",
             iconB64: "icon",
@@ -399,12 +399,14 @@ describe("Peer connection states changed handler", () => {
     expect(dispatch).toBeCalledWith(
       setQueueIncomingRequest(
         expect.objectContaining({
+          type: IncomingRequestType.PEER_CONNECT_SIGN,
           peerConnection: expect.objectContaining({
-            id: "dApp-address",
+            id: peerConnection.id,
             name: peerConnection.name,
             url: peerConnection.url,
             iconB64: peerConnection.iconB64,
           }),
+          signTransaction: peerSignRequestEvent,
         })
       )
     );
