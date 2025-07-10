@@ -1,13 +1,14 @@
 import { PeerConnectionPairRecord } from "../../../agent/records";
-import { CreationStatus } from "../../../agent/agent.types";
 import { MigrationType, TsMigration } from "./migrations.types";
 
-export const DATA_V002: TsMigration = {
+export const DATA_V1200: TsMigration = {
   type: MigrationType.TS,
-  version: "1.2.0",
+  version: "1.2.0.0",
   migrationStatements: async (session) => {
     // eslint-disable-next-line no-console
-    console.log("Running migration v0.0.2: Peer Connection Account Migration");
+    console.log(
+      "Running migration v1.2.0.0: Peer Connection Account Migration"
+    );
 
     // Get all identifiers from local database
     const identifierResult = await session.query(
@@ -109,7 +110,7 @@ export const DATA_V002: TsMigration = {
 
     // eslint-disable-next-line no-console
     console.log(
-      `Migration v0.0.2 generated ${statements.length} SQL statements.`
+      `Migration v1.2.0.0 generated ${statements.length} SQL statements.`
     );
     return statements;
   },

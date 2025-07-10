@@ -76,7 +76,7 @@ export class PeerConnectionPairStorage {
     await this.storageService.save(record);
   }
 
-  async deletepeerConnectionPairRecord(id: string): Promise<void> {
+  async deletePeerConnectionPairRecord(id: string): Promise<void> {
     await this.storageService.deleteById(id);
   }
 }
