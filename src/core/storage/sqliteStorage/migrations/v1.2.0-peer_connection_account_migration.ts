@@ -12,7 +12,7 @@ export const DATA_V1200: TsMigration = {
 
     // Get all identifiers from local database
     const identifierResult = await session.query(
-      "SELECT * FROM items WHERE category = ? AND value NOT LIKE '%\"isDeleted\":true%'",
+      "SELECT * FROM items WHERE category = ? AND value NOT LIKE '%\"isDeleted\":true%' AND value NOT LIKE '%\"pendingDeletion\":true%'",
       ["IdentifierMetadataRecord"]
     );
 
