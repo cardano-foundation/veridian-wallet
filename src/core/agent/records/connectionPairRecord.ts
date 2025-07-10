@@ -7,14 +7,14 @@ interface ConnectionPairRecordStorageProps {
   createdAt?: Date;
   tags?: Tags;
   contactId: string;
-  accountId: string;
+  identifier: string;
   creationStatus?: CreationStatus;
   pendingDeletion?: boolean;
 }
 
 class ConnectionPairRecord extends BaseRecord {
   contactId!: string;
-  accountId!: string;
+  identifier!: string;
   creationStatus!: CreationStatus;
   pendingDeletion!: boolean;
 
@@ -27,7 +27,7 @@ class ConnectionPairRecord extends BaseRecord {
       this.id = props.id ?? randomSalt();
       this.createdAt = props.createdAt ?? new Date();
       this.contactId = props.contactId;
-      this.accountId = props.accountId;
+      this.identifier = props.identifier;
       this.creationStatus = props.creationStatus ?? CreationStatus.PENDING;
       this.pendingDeletion = props.pendingDeletion ?? false;
       this._tags = props.tags ?? {};
@@ -38,7 +38,7 @@ class ConnectionPairRecord extends BaseRecord {
     return {
       ...this._tags,
       contactId: this.contactId,
-      accountId: this.accountId,
+      identifier: this.identifier,
       pendingDeletion: this.pendingDeletion,
       creationStatus: this.creationStatus,
     };
