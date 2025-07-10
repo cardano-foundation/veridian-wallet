@@ -1,6 +1,6 @@
 import { IdentityWalletConnect } from "./identityWalletConnect";
 import { Agent } from "../../agent/agent";
-import { PeerConnectionAccountRecord } from "../../agent/records";
+import { PeerConnectionPairRecord } from "../../agent/records";
 import { PeerConnection } from "./peerConnection";
 import { KeyStoreKeys, SecureStorage } from "../../storage";
 import ICON_BASE64 from "../../../assets/icon-only";
@@ -23,7 +23,7 @@ jest.mock("../../agent/agent", () => ({
         save: jest.fn(),
         findByPeerConnectionAndAccount: jest.fn(),
         getPeerConnection: jest.fn(),
-        createPeerConnectionAccountRecord: jest.fn(),
+        createPeerConnectionPairRecord: jest.fn(),
       },
     },
   },
@@ -106,7 +106,7 @@ describe("PeerConnection", () => {
       Agent.agent.peerConnectionAccounts.getPeerConnection
     ).toHaveBeenCalledWith(peerConnectionId);
     expect(
-      Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord
+      Agent.agent.peerConnectionAccounts.createPeerConnectionPairRecord
     ).toHaveBeenCalledWith({
       id: dAppIdentifier,
       selectedAid: accountId,
@@ -125,7 +125,7 @@ describe("PeerConnection", () => {
     const peerConnectionId = `${dAppIdentifier}:${accountId}`;
     Agent.agent.peerConnectionAccounts.getPeerConnection = jest
       .fn()
-      .mockResolvedValue({} as PeerConnectionAccountRecord);
+      .mockResolvedValue({} as PeerConnectionPairRecord);
     const connectSpy = jest
       .spyOn(IdentityWalletConnect.prototype, "connect")
       .mockReturnValue("seed");
@@ -136,7 +136,7 @@ describe("PeerConnection", () => {
       Agent.agent.peerConnectionAccounts.getPeerConnection
     ).toHaveBeenCalledWith(peerConnectionId);
     expect(
-      Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord
+      Agent.agent.peerConnectionAccounts.createPeerConnectionPairRecord
     ).not.toBeCalled();
     expect(connectSpy).toHaveBeenCalledWith(dAppIdentifier);
     expect(SecureStorage.set).toHaveBeenCalledWith(

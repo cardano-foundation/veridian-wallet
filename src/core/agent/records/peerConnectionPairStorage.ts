@@ -1,16 +1,16 @@
 import { PeerConnection } from "../../cardano/walletConnect/peerConnection.types";
 import { StorageService } from "../../storage/storage.types";
 import {
-  PeerConnectionAccountRecord,
-  PeerConnectionAccountRecordStorageProps,
-} from "./peerConnectionAccountRecord";
+  PeerConnectionPairRecord,
+  PeerConnectionPairRecordProps,
+} from "./peerConnectionPairRecord";
 
-export class PeerConnectionAccountStorage {
+export class PeerConnectionPairStorage {
   static readonly PEER_CONNECTION_ACCOUNT_RECORD_MISSING =
     "Peer connection account record does not exist";
-  private storageService: StorageService<PeerConnectionAccountRecord>;
+  private storageService: StorageService<PeerConnectionPairRecord>;
 
-  constructor(storageService: StorageService<PeerConnectionAccountRecord>) {
+  constructor(storageService: StorageService<PeerConnectionPairRecord>) {
     this.storageService = storageService;
   }
 
@@ -29,23 +29,21 @@ export class PeerConnectionAccountStorage {
 
   private async getPeerConnectionAccount(
     id: string // compositionId: <dappId>:<identifier>
-  ): Promise<PeerConnectionAccountRecord> {
+  ): Promise<PeerConnectionPairRecord> {
     const metadata = await this.storageService.findById(
       id,
-      PeerConnectionAccountRecord
+      PeerConnectionPairRecord
     );
     if (!metadata) {
       throw new Error(
-        PeerConnectionAccountStorage.PEER_CONNECTION_ACCOUNT_RECORD_MISSING
+        PeerConnectionPairStorage.PEER_CONNECTION_ACCOUNT_RECORD_MISSING
       );
     }
     return metadata;
   }
 
   async getAllPeerConnectionAccount(): Promise<PeerConnection[]> {
-    const records = await this.storageService.getAll(
-      PeerConnectionAccountRecord
-    );
+    const records = await this.storageService.getAll(PeerConnectionPairRecord);
     return records.map((record) => ({
       id: record.getDappIdentifier(),
       iconB64: record.iconB64,
@@ -59,7 +57,7 @@ export class PeerConnectionAccountStorage {
   async updatePeerConnectionAccount(
     id: string,
     metadata: Partial<
-      Pick<PeerConnectionAccountRecord, "name" | "url" | "iconB64">
+      Pick<PeerConnectionPairRecord, "name" | "url" | "iconB64">
     >
   ): Promise<void> {
     const identifierMetadataRecord = await this.getPeerConnectionAccount(id);
@@ -71,14 +69,14 @@ export class PeerConnectionAccountStorage {
     await this.storageService.update(identifierMetadataRecord);
   }
 
-  async createPeerConnectionAccountRecord(
-    data: PeerConnectionAccountRecordStorageProps
+  async createPeerConnectionPairRecord(
+    data: PeerConnectionPairRecordProps
   ): Promise<void> {
-    const record = new PeerConnectionAccountRecord(data);
+    const record = new PeerConnectionPairRecord(data);
     await this.storageService.save(record);
   }
 
-  async deletePeerConnectionAccountRecord(id: string): Promise<void> {
+  async deletepeerConnectionPairRecord(id: string): Promise<void> {
     await this.storageService.deleteById(id);
   }
 }

@@ -1,4 +1,4 @@
-import { PeerConnectionAccountRecord } from "../../../agent/records";
+import { PeerConnectionPairRecord } from "../../../agent/records";
 import { CreationStatus } from "../../../agent/agent.types";
 import { MigrationType, TsMigration } from "./migrations.types";
 
@@ -69,7 +69,7 @@ export const DATA_V002: TsMigration = {
       }
 
       if (selectedAidForNewRecord) {
-        const peerConnectionAccountRecord = new PeerConnectionAccountRecord({
+        const peerConnectionPairRecord = new PeerConnectionPairRecord({
           id: peerConnectionData.id, // This is the dAppAddress
           selectedAid: selectedAidForNewRecord, // This is the identifier AID
           name: peerConnectionData.name,
@@ -77,15 +77,15 @@ export const DATA_V002: TsMigration = {
           iconB64: peerConnectionData.iconB64,
         });
         // eslint-disable-next-line no-console
-        console.log(`    - New record ID: ${peerConnectionAccountRecord.id}`);
+        console.log(`    - New record ID: ${peerConnectionPairRecord.id}`);
         statements.push({
           statement:
             "INSERT OR IGNORE INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
           values: [
-            peerConnectionAccountRecord.id,
-            "PeerConnectionAccountRecord",
-            peerConnectionAccountRecord.id,
-            JSON.stringify(peerConnectionAccountRecord),
+            peerConnectionPairRecord.id,
+            "peerConnectionPairRecord",
+            peerConnectionPairRecord.id,
+            JSON.stringify(peerConnectionPairRecord),
           ],
         });
       } else {

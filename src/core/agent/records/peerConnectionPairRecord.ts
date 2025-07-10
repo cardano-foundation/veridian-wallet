@@ -1,6 +1,6 @@
 import { BaseRecord, Tags } from "../../storage/storage.types";
 
-interface PeerConnectionAccountRecordStorageProps {
+interface PeerConnectionPairRecordProps {
   id?: string;
   name?: string;
   url?: string;
@@ -10,16 +10,16 @@ interface PeerConnectionAccountRecordStorageProps {
   tags?: Tags;
 }
 
-class PeerConnectionAccountRecord extends BaseRecord {
+class PeerConnectionPairRecord extends BaseRecord {
   name?: string;
   url?: string;
   iconB64?: string;
   selectedAid!: string;
 
-  static readonly type = "PeerConnectionAccountRecord";
-  readonly type = PeerConnectionAccountRecord.type;
+  static readonly type = "peerConnectionPairRecord";
+  readonly type = PeerConnectionPairRecord.type;
 
-  constructor(props: PeerConnectionAccountRecordStorageProps) {
+  constructor(props: PeerConnectionPairRecordProps) {
     super();
     if (props) {
       this.id = `${props.id}:${props.selectedAid}`;
@@ -51,5 +51,5 @@ class PeerConnectionAccountRecord extends BaseRecord {
   }
 }
 
-export type { PeerConnectionAccountRecordStorageProps };
-export { PeerConnectionAccountRecord };
+export type { PeerConnectionPairRecordProps };
+export { PeerConnectionPairRecord };

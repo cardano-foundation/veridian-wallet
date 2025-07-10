@@ -33,8 +33,8 @@ import {
   IdentifierStorage,
   NotificationRecord,
   NotificationStorage,
-  PeerConnectionAccountRecord,
-  PeerConnectionAccountStorage,
+  PeerConnectionPairRecord,
+  PeerConnectionPairStorage,
 } from "./records";
 import { KeyStoreKeys, SecureStorage } from "../storage";
 import { SqliteSession } from "../storage/sqliteStorage/sqliteSession";
@@ -81,7 +81,7 @@ class Agent {
   private notificationStorage!: NotificationStorage;
 
   private operationPendingStorage!: OperationPendingStorage;
-  private peerConnectionAccountStorage!: PeerConnectionAccountStorage;
+  private peerConnectionPeerStorage!: PeerConnectionPairStorage;
   private identifierService!: IdentifierService;
   private multiSigService!: MultiSigService;
   private ipexCommunicationService!: IpexCommunicationService;
@@ -167,7 +167,7 @@ class Agent {
   }
 
   get peerConnectionAccounts() {
-    return this.peerConnectionAccountStorage;
+    return this.peerConnectionPeerStorage;
   }
 
   get basicStorage() {
@@ -453,8 +453,8 @@ class Agent {
       this.getStorageService<OperationPendingRecord>(this.storageSession),
       this.agentServicesProps.eventEmitter
     );
-    this.peerConnectionAccountStorage = new PeerConnectionAccountStorage(
-      this.getStorageService<PeerConnectionAccountRecord>(this.storageSession)
+    this.peerConnectionPeerStorage = new PeerConnectionPairStorage(
+      this.getStorageService<PeerConnectionPairRecord>(this.storageSession)
     );
     this.connections.onConnectionRemoved();
     this.connections.onConnectionAdded();

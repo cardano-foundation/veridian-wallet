@@ -14,7 +14,7 @@ import {
   PeerDisconnectedEvent,
 } from "./peerConnection.types";
 import { Agent } from "../../agent/agent";
-import { PeerConnectionAccountStorage } from "../../agent/records";
+import { PeerConnectionPairStorage } from "../../agent/records";
 
 class PeerConnection {
   static readonly PEER_CONNECTION_START_PENDING =
@@ -161,7 +161,7 @@ class PeerConnection {
       .catch((error) => {
         if (
           error.message ===
-          PeerConnectionAccountStorage.PEER_CONNECTION_ACCOUNT_RECORD_MISSING
+          PeerConnectionPairStorage.PEER_CONNECTION_ACCOUNT_RECORD_MISSING
         ) {
           return undefined;
         } else {
@@ -170,13 +170,11 @@ class PeerConnection {
       });
 
     if (!existingPeerConnection) {
-      await Agent.agent.peerConnectionAccounts.createPeerConnectionAccountRecord(
-        {
-          id: dAppIdentifier,
-          selectedAid: connectingIdentifier,
-          iconB64: ICON_BASE64,
-        }
-      );
+      await Agent.agent.peerConnectionAccounts.createPeerConnectionPairRecord({
+        id: dAppIdentifier,
+        selectedAid: connectingIdentifier,
+        iconB64: ICON_BASE64,
+      });
     }
     const seed = this.identityWalletConnect.connect(dAppIdentifier);
     SecureStorage.set(KeyStoreKeys.MEERKAT_SEED, seed);
