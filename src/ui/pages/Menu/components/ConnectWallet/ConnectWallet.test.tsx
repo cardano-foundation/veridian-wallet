@@ -39,7 +39,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
       peerConnectionAccounts: {
         getAll: jest.fn().mockResolvedValue(walletConnectionsFix),
         deleteById: jest.fn(),
-        deletepeerConnectionPairRecord: jest.fn(),
+        deletePeerConnectionPairRecord: jest.fn(),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
