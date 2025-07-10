@@ -20,7 +20,7 @@ describe("Peer Connection Record", () => {
     });
     settingsRecord.getTags();
     expect(settingsRecord.type).toBe(PeerConnectionPairRecord.type);
-    expect(settingsRecord.id).toBe(mockData.id);
+    expect(settingsRecord.id).toBe("id:aid");
     expect(settingsRecord.name).toBe(mockData.name);
     expect(settingsRecord.url).toBe(mockData.url);
     expect(settingsRecord.selectedAid).toBe(mockData.selectedAid);
