@@ -92,7 +92,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           <Avatar id={id} />
         </div>
         <div className="profiles-list-item-name">
-          {identifiersDataCache[id].displayName}
+          {identifiersDataCache[id]?.displayName}
         </div>
       </div>
     );
