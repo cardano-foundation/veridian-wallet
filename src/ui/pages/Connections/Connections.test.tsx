@@ -192,6 +192,62 @@ describe("Connections tab", () => {
     });
   });
 
+  test("Open profile", async () => {
+    const initialStateFull = {
+      stateCache: {
+        routes: [TabsRoutePath.CREDENTIALS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+        },
+      },
+      seedPhraseCache: {},
+      credsCache: {
+        creds: filteredCredsFix,
+        favourites: [
+          {
+            id: filteredCredsFix[0].id,
+            time: 1,
+          },
+        ],
+      },
+      connectionsCache: {
+        connections: [],
+      },
+      identifiersCache: {
+        identifiers: filteredIdentifierFix,
+      },
+      biometricsCache: {
+        enabled: false,
+      },
+    };
+    const dispatchMock = jest.fn();
+
+    const mockedStore = {
+      ...makeTestStore(initialStateFull),
+      dispatch: dispatchMock,
+    };
+
+    const { getByTestId, getByText } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+        <Provider store={mockedStore}>
+          <Connections />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("avatar-button")).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("avatar-button"));
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeVisible();
+    });
+  });
+
   test("It renders connections tab successfully", async () => {
     const { getByTestId, getByText, getAllByText } = render(
       <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>

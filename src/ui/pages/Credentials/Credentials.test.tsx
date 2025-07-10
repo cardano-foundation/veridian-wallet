@@ -240,6 +240,29 @@ describe("Creds Tab", () => {
     expect(getByText("Credentials")).toBeInTheDocument();
   });
 
+  test("Open profile", async () => {
+    const storeMocked = {
+      ...mockStore(initialStateEmpty),
+      dispatch: dispatchMock,
+    };
+    const { getByText, getByTestId } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
+        <Provider store={storeMocked}>
+          <Credentials />
+        </Provider>
+      </MemoryRouter>
+    );
+    await waitFor(() => {
+      expect(getByTestId("avatar-button")).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("avatar-button"));
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeVisible();
+    });
+  });
+
   test("Renders Creds Card placeholder", () => {
     const storeMocked = {
       ...mockStore(initialStateEmpty),

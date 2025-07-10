@@ -86,6 +86,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     return (
       <div
         className="profiles-list-item"
+        data-testid={`profiles-list-item-${id}`}
         onClick={onClick}
       >
         <div className="profiles-list-item-avatar">
