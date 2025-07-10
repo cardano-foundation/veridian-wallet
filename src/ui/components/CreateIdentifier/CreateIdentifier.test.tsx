@@ -1,5 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import { IonInput, IonLabel, setupIonicReact } from "@ionic/react";
+import { ready } from "signify-ts";
 import { ionFireEvent, mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
@@ -105,6 +106,9 @@ jest.mock("../CustomInput", () => ({
 }));
 
 describe("Create Identifier modal", () => {
+  beforeAll(async () => {
+    await ready();
+  });
   const mockStore = configureStore();
   beforeEach(() => {
     mockGetMultisigConnection.mockImplementation((): any =>

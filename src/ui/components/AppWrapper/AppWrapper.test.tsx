@@ -145,13 +145,7 @@ jest.mock("../../../core/agent/agent", () => {
         },
         getKeriaOnlineStatus: jest.fn(),
         onKeriaStatusStateChanged: jest.fn(),
-        peerConnectionAccounts: {
-          getAll: jest
-            .fn()
-            .mockResolvedValue([mockPeerConnectionPairRecordPlainObject]),
-          findById: jest
-            .fn()
-            .mockResolvedValue(mockPeerConnectionPairRecordPlainObject),
+        peerConnectionPair: {
           getPeerConnection: jest.fn(),
           getAllPeerConnectionAccount: jest.fn(),
         },
@@ -350,10 +344,10 @@ describe("Peer connection states changed handler", () => {
   });
 
   test("handle peer connected event", async () => {
-    Agent.agent.peerConnectionAccounts.getPeerConnection = jest
+    Agent.agent.peerConnectionPair.getPeerConnection = jest
       .fn()
       .mockResolvedValue(mockPeerConnectionPairRecordInstance);
-    Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount = jest
+    Agent.agent.peerConnectionPair.getAllPeerConnectionAccount = jest
       .fn()
       .mockResolvedValue([mockPeerConnectionPairRecordInstance]);
     await peerConnectedChangeHandler(peerConnectedEvent, dispatch);
@@ -390,7 +384,7 @@ describe("Peer connection states changed handler", () => {
   });
 
   test("handle peer sign request event", async () => {
-    Agent.agent.peerConnectionAccounts.getPeerConnection = jest
+    Agent.agent.peerConnectionPair.getPeerConnection = jest
       .fn()
       .mockResolvedValue(mockPeerConnectionPairRecordInstance);
     await peerConnectRequestSignChangeHandler(peerSignRequestEvent, dispatch);

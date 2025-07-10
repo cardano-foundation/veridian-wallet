@@ -143,7 +143,7 @@ const peerConnectRequestSignChangeHandler = async (
   const connectedDAppAddress =
     PeerConnection.peerConnection.getConnectedDAppAddress();
   const peerConnectionRecord =
-    await Agent.agent.peerConnectionAccounts.getPeerConnection(
+    await Agent.agent.peerConnectionPair.getPeerConnection(
       `${connectedDAppAddress}:${event.payload.identifier}`
     );
 
@@ -172,7 +172,7 @@ const peerConnectedChangeHandler = async (
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
   const existingConnections =
-    await Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount();
+    await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
 
   dispatch(setWalletConnectionsCache(existingConnections));
   const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
@@ -358,7 +358,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       );
       const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
       const storedPeerConnections =
-        await Agent.agent.peerConnectionAccounts.getAllPeerConnectionAccount();
+        await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
 
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();

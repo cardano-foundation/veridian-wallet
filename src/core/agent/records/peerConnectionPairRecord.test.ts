@@ -4,7 +4,7 @@ import {
 } from "./peerConnectionPairRecord";
 
 const mockData: PeerConnectionPairRecordProps = {
-  id: "id",
+  id: "id:aid",
   name: "name",
   url: "url",
   iconB64: "icon",

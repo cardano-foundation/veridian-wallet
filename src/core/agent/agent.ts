@@ -81,7 +81,7 @@ class Agent {
   private notificationStorage!: NotificationStorage;
 
   private operationPendingStorage!: OperationPendingStorage;
-  private peerConnectionPeerStorage!: PeerConnectionPairStorage;
+  private peerConnectionPairStorage!: PeerConnectionPairStorage;
   private identifierService!: IdentifierService;
   private multiSigService!: MultiSigService;
   private ipexCommunicationService!: IpexCommunicationService;
@@ -162,12 +162,8 @@ class Agent {
     return this.credentialService;
   }
 
-  get peerConnectionMetadataStorage() {
-    return this.peerConnectionAccounts;
-  }
-
-  get peerConnectionAccounts() {
-    return this.peerConnectionPeerStorage;
+  get peerConnectionPair() {
+    return this.peerConnectionPairStorage;
   }
 
   get basicStorage() {
@@ -453,7 +449,7 @@ class Agent {
       this.getStorageService<OperationPendingRecord>(this.storageSession),
       this.agentServicesProps.eventEmitter
     );
-    this.peerConnectionPeerStorage = new PeerConnectionPairStorage(
+    this.peerConnectionPairStorage = new PeerConnectionPairStorage(
       this.getStorageService<PeerConnectionPairRecord>(this.storageSession)
     );
     this.connections.onConnectionRemoved();

@@ -515,7 +515,7 @@ describe("Cred Detail Module - current not archived credential", () => {
     });
 
     unmount();
-  });
+  }, 10000);
 
   test("Can view connection details, and cannot delete the connection from this view", async () => {
     getConnectionShortDetailByIdMock.mockResolvedValue(

@@ -108,7 +108,7 @@ class PeerConnection {
             iconB64 = icon;
           }
           const peerConnectionId = `${address}:${selectedAid}`;
-          await Agent.agent.peerConnectionAccounts.updatePeerConnectionAccount(
+          await Agent.agent.peerConnectionPair.updatePeerConnectionAccount(
             peerConnectionId,
             {
               name,
@@ -153,10 +153,9 @@ class PeerConnection {
       throw new Error(PeerConnection.PEER_CONNECTION_START_PENDING);
     }
 
-    const dAppIdentifier = peerConnectionId.split(":")[0];
-    const connectingIdentifier = peerConnectionId.split(":")[1];
+    const [dAppIdentifier, connectingIdentifier] = peerConnectionId.split(":");
 
-    const existingPeerConnection = await Agent.agent.peerConnectionAccounts
+    const existingPeerConnection = await Agent.agent.peerConnectionPair
       .getPeerConnection(`${dAppIdentifier}:${connectingIdentifier}`)
       .catch((error) => {
         if (
@@ -170,8 +169,8 @@ class PeerConnection {
       });
 
     if (!existingPeerConnection) {
-      await Agent.agent.peerConnectionAccounts.createPeerConnectionPairRecord({
-        id: dAppIdentifier,
+      await Agent.agent.peerConnectionPair.createPeerConnectionPairRecord({
+        id: `${dAppIdentifier}:${connectingIdentifier}`,
         selectedAid: connectingIdentifier,
         iconB64: ICON_BASE64,
       });

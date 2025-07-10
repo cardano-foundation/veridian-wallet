@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor, within } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
@@ -38,8 +38,10 @@ jest.mock("../../../../../core/agent/agent", () => ({
     agent: {
       peerConnectionAccounts: {
         getAll: jest.fn().mockResolvedValue(walletConnectionsFix),
-        deleteById: jest.fn(),
-        deletePeerConnectionPairRecord: jest.fn(),
+        deleteById: jest.fn().mockResolvedValue(true),
+      },
+      peerConnectionPair: {
+        deletePeerConnectionPairRecord: jest.fn().mockResolvedValue(true),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
@@ -51,7 +53,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
 jest.mock("../../../../../core/cardano/walletConnect/peerConnection", () => ({
   PeerConnection: {
     peerConnection: {
-      disconnectDApp: jest.fn(),
+      disconnectDApp: jest.fn().mockResolvedValue(true),
     },
   },
 }));
@@ -752,7 +754,12 @@ describe("Wallet connect", () => {
     );
     expect(alertMessages[0]).toBeVisible();
 
-    fireEvent.click(getByTestId("alert-create-keri-confirm-button"));
+    // Acotamos la búsqueda al contenedor de la alerta que está visible
+    const alertContainer = getByTestId("alert-create-keri");
+    const confirmButton = within(alertContainer).getByTestId(
+      "alert-create-keri-confirm-button"
+    );
+    fireEvent.click(confirmButton);
 
     await waitFor(() => {
       expect(getByTestId("create-identifier-modal")).toBeVisible();

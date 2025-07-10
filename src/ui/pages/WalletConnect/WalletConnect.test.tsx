@@ -60,16 +60,6 @@ jest.mock("../../../core/cardano/walletConnect/peerConnection", () => ({
     },
   },
 }));
-jest.mock("../../../core/agent/agent", () => ({
-  Agent: {
-    agent: {
-      peerConnectionMetadataStorage: {
-        getPeerConnectionMetadata: jest.fn(),
-        getAllPeerConnectionMetadata: jest.fn(),
-      },
-    },
-  },
-}));
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),

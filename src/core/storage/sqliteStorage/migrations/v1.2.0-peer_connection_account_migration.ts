@@ -43,11 +43,14 @@ export const DATA_V1200: TsMigration = {
       } peer connections to migrate.`
     );
 
-    const parsedIdentifiers = identifiers.map((id: any) =>
-      JSON.parse(id.value)
+    const parsedIdentifiers = identifiers.map(
+      (identifierRow: { value: string }) => JSON.parse(identifierRow.value)
     );
     const identifierMap = new Map(
-      parsedIdentifiers.map((id: any) => [id.id, id])
+      parsedIdentifiers.map((parsedIdentifier: { id: string }) => [
+        parsedIdentifier.id,
+        parsedIdentifier,
+      ])
     );
 
     const peerConnections = peerConnectionResult.values ?? [];
@@ -64,14 +67,14 @@ export const DATA_V1200: TsMigration = {
         const matchingIdentifier = identifierMap.get(
           peerConnectionData.selectedAid
         );
-        if (matchingIdentifier && !matchingIdentifier.isDeleted) {
+        if (matchingIdentifier) {
           selectedAidForNewRecord = matchingIdentifier.id;
         }
       }
 
       if (selectedAidForNewRecord) {
         const peerConnectionPairRecord = new PeerConnectionPairRecord({
-          id: peerConnectionData.id, // This is the dAppAddress
+          id: `${peerConnectionData.id}:${selectedAidForNewRecord}`, // This is compositionId
           selectedAid: selectedAidForNewRecord, // This is the identifier AID
           name: peerConnectionData.name,
           url: peerConnectionData.url,
@@ -81,7 +84,7 @@ export const DATA_V1200: TsMigration = {
         console.log(`    - New record ID: ${peerConnectionPairRecord.id}`);
         statements.push({
           statement:
-            "INSERT OR IGNORE INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
+            "INSERT items (id, category, name, value) VALUES (?, ?, ?, ?)",
           values: [
             peerConnectionPairRecord.id,
             "peerConnectionPairRecord",
@@ -92,7 +95,7 @@ export const DATA_V1200: TsMigration = {
       } else {
         // eslint-disable-next-line no-console
         console.log(
-          `  - No valid identifier found for peer connection: ${peerConnection.id}. Scheduling for deletion.`
+          `  - No valid identifier found for peer connection: ${peerConnection.id}.`
         );
       }
 

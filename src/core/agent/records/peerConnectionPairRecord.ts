@@ -1,7 +1,7 @@
 import { BaseRecord, Tags } from "../../storage/storage.types";
 
 interface PeerConnectionPairRecordProps {
-  id?: string;
+  id: string;
   name?: string;
   url?: string;
   createdAt?: Date;
@@ -22,7 +22,7 @@ class PeerConnectionPairRecord extends BaseRecord {
   constructor(props: PeerConnectionPairRecordProps) {
     super();
     if (props) {
-      this.id = `${props.id}:${props.selectedAid}`;
+      this.id = props.id;
       this.name = props.name;
       this.url = props.url;
       this.createdAt = props.createdAt ?? new Date();
@@ -36,7 +36,7 @@ class PeerConnectionPairRecord extends BaseRecord {
   }
 
   getIdentifier() {
-    return this.id.split(":")[1];
+    return this.selectedAid;
   }
 
   getTags() {

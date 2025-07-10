@@ -124,7 +124,7 @@ const ConnectWallet = forwardRef<ConnectWalletOptionRef, object>(
           PeerConnection.peerConnection.disconnectDApp(connectedWallet?.id);
           dispatch(setConnectedWallet(null));
         }
-        await Agent.agent.peerConnectionAccounts.deletePeerConnectionPairRecord(
+        await Agent.agent.peerConnectionPair.deletePeerConnectionPairRecord(
           `${data.id}:${data.selectedAid}`
         );
 
