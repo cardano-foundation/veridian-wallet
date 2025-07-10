@@ -142,8 +142,6 @@ export const DATA_V1201: HybridMigration = {
 
         if(sharedIdentifier) {
           for(const historyItem of historyItems) {
-            console.log('history related to identifier', historyItem.identifier);
-            console.log('sharedIdentifierPrefix', sharedIdentifierPrefix);
             if(sharedIdentifier.prefix === historyItem.identifier) {
               const newPrefixedHistoryItem = `${sharedIdentifierPrefix}:${historyItem.key}`;
               contractUpdates[newPrefixedHistoryItem] = historyItem.data;
@@ -168,15 +166,31 @@ export const DATA_V1201: HybridMigration = {
 
       } else {
 
-        // split ipex history based on relevant identifier
+        // get splited ipex identifier
+        const splitedIdentifiers = historyItems.map((item) => item.identifier);
+        
+        if(splitedIdentifiers.length > 0) {
         // associate createdAt and all notes for every non-deleted identifier
+          for(const prefix of splitedIdentifiers) {
+            const identifier = identifiers.find((id: any) => id.prefix === prefix);
+            if(identifier) {
+              contractUpdates[`${prefix}:createdAt`] = contact['createdAt'];
+              keysToDelete.push('createdAt');
 
+              for(const noteItem of noteItems) {
+                const newPrefixedNote = `${prefix}:${noteItem.key}`;
+                contractUpdates[newPrefixedNote] = noteItem.data;
+                keysToDelete.push(noteItem.key);
+              }
+            }
+          }
+        }
       }
 
       for(const key of keysToDelete) {
         contractUpdates[key] = null;
       }
-      console.log('contractUpdates', contractUpdates);
+      
       await signifyClient.contacts().update(contact.id, contractUpdates);
     }
     
