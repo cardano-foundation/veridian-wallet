@@ -1,4 +1,4 @@
-import { BaseRecord } from "../../storage/storage.types";
+import { BaseRecord, Tags } from "../../storage/storage.types";
 
 interface PeerConnectionAccountRecordStorageProps {
   id?: string;
@@ -7,12 +7,14 @@ interface PeerConnectionAccountRecordStorageProps {
   createdAt?: Date;
   iconB64?: string;
   selectedAid: string;
+  tags?: Tags;
 }
 
 class PeerConnectionAccountRecord extends BaseRecord {
   name?: string;
   url?: string;
   iconB64?: string;
+  selectedAid!: string;
 
   static readonly type = "PeerConnectionAccountRecord";
   readonly type = PeerConnectionAccountRecord.type;
@@ -25,6 +27,12 @@ class PeerConnectionAccountRecord extends BaseRecord {
       this.url = props.url;
       this.createdAt = props.createdAt ?? new Date();
       this.iconB64 = props.iconB64;
+      this.selectedAid = props.selectedAid;
+
+      this.setTags({
+        ...(props.tags ?? {}),
+        selectedAid: props.selectedAid,
+      });
     }
   }
 
