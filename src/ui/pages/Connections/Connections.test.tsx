@@ -11,11 +11,14 @@ import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import {
+  filteredIdentifierFix,
+  filteredIdentifierMapFix,
+} from "../../__fixtures__/filteredIdentifierFix";
 import { formatShortDate } from "../../utils/formatters";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Connections } from "./Connections";
-import { makeTestStore } from "../../utils/makeTestStore";
 
 const deleteConnectionByIdMock = jest.fn();
 const getConnectionByIdMock = jest.fn();
@@ -83,6 +86,7 @@ const initialStateFull = {
   stateCache: {
     routes: [TabsRoutePath.CONNECTIONS],
     authentication: {
+      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
@@ -112,7 +116,7 @@ const initialStateFull = {
     connections: connectionsFix,
   },
   identifiersCache: {
-    identifiers: filteredIdentifierFix,
+    identifiers: filteredIdentifierMapFix,
   },
   biometricsCache: {
     enabled: false,
@@ -125,49 +129,57 @@ describe("Connections tab", () => {
   const dispatchMock = jest.fn();
 
   beforeEach(() => {
-    jest.resetAllMocks();
     mockedStore = {
       ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
-
     verifySecretMock.mockResolvedValue(true);
   });
 
   test("Render connections tab empty", async () => {
-    const initialStateFull = {
-      stateCache: {
-        routes: [TabsRoutePath.CREDENTIALS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      credsCache: {
-        creds: filteredCredsFix,
-        favourites: [
-          {
-            id: filteredCredsFix[0].id,
-            time: 1,
-          },
-        ],
-      },
-      connectionsCache: {
-        connections: [],
-      },
-      identifiersCache: {
-        identifiers: filteredIdentifierFix,
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
     const dispatchMock = jest.fn();
 
     const mockedStore = {
-      ...makeTestStore(initialStateFull),
+      ...makeTestStore({
+        stateCache: {
+          routes: [TabsRoutePath.CONNECTIONS],
+          authentication: {
+            defaultProfile: filteredIdentifierFix[0].id,
+            loggedIn: true,
+            time: Date.now(),
+            passcodeIsSet: true,
+          },
+        },
+        viewTypeCache: {
+          identifier: {
+            viewType: null,
+            favouriteIndex: 0,
+          },
+          credential: {
+            viewType: null,
+            favouriteIndex: 0,
+          },
+        },
+        seedPhraseCache: {},
+        credsCache: {
+          creds: filteredCredsFix,
+          favourites: [
+            {
+              id: filteredCredsFix[0].id,
+              time: 1,
+            },
+          ],
+        },
+        connectionsCache: {
+          connections: [],
+        },
+        identifiersCache: {
+          identifiers: filteredIdentifierMapFix,
+        },
+        biometricsCache: {
+          enabled: false,
+        },
+      }),
       dispatch: dispatchMock,
     };
 
@@ -270,39 +282,8 @@ describe("Connections tab", () => {
 
   test("Search", async () => {
     const dispatchMock = jest.fn();
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.CONNECTIONS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      identifiersCache: {
-        identifiers: {},
-      },
-      viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-        credential: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-      },
-      connectionsCache: {
-        connections: connectionsFix,
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
     const storeMocked = {
-      ...makeTestStore(initialState),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -383,39 +364,8 @@ describe("Connections tab", () => {
 
   test("Remove pending connection alert", async () => {
     const dispatchMock = jest.fn();
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.IDENTIFIER_DETAILS, TabsRoutePath.CONNECTIONS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      identifiersCache: {
-        identifiers: filteredIdentifierFix,
-      },
-      viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-        credential: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-      },
-      connectionsCache: {
-        connections: connectionsFix,
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
     const storeMocked = {
-      ...makeTestStore(initialState),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 

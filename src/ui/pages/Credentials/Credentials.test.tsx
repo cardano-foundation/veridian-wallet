@@ -3,11 +3,9 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-import configureStore from "redux-mock-store";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import { store } from "../../../store";
 import {
   setCredentialsFilters,
   setCredsCache,
@@ -16,7 +14,11 @@ import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { pendingCredFixs } from "../../__fixtures__/credsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import {
+  filteredIdentifierFix,
+  filteredIdentifierMapFix,
+} from "../../__fixtures__/filteredIdentifierFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Credentials } from "./Credentials";
 import { CredentialsFilters } from "./Credentials.types";
@@ -57,6 +59,7 @@ const initialStateEmpty = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
+      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
@@ -74,7 +77,7 @@ const initialStateEmpty = {
     connections: [],
   },
   identifiersCache: {
-    identifiers: filteredIdentifierFix,
+    identifiers: filteredIdentifierMapFix,
   },
   viewTypeCache: {
     identifier: {
@@ -95,6 +98,7 @@ const initialStateFull = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
+      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
@@ -121,7 +125,7 @@ const initialStateFull = {
     connections: connectionsFix,
   },
   identifiersCache: {
-    identifiers: filteredIdentifierFix,
+    identifiers: filteredIdentifierMapFix,
   },
   viewTypeCache: {
     identifier: {
@@ -142,6 +146,7 @@ const archivedAndRevokedState = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
+      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
@@ -170,7 +175,7 @@ const archivedAndRevokedState = {
     connections: connectionsFix,
   },
   identifiersCache: {
-    identifiers: filteredIdentifierFix,
+    identifiers: filteredIdentifierMapFix,
   },
   notificationsCache: {
     notifications: [],
@@ -193,20 +198,13 @@ const archivedAndRevokedState = {
 let mockedStore: Store<unknown, AnyAction>;
 
 describe("Creds Tab", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
 
   beforeEach(() => {
-    const mockStore = configureStore();
-    const dispatchMock = jest.fn();
-
     mockedStore = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
-
-    store.dispatch(setCredsCache([]));
-    store.dispatch(setCredentialsFilters(CredentialsFilters.All));
   });
 
   test("Renders favourites in Creds", () => {
@@ -225,7 +223,7 @@ describe("Creds Tab", () => {
 
   test("Renders Creds Tab", () => {
     const storeMocked = {
-      ...mockStore(initialStateEmpty),
+      ...makeTestStore(initialStateEmpty),
       dispatch: dispatchMock,
     };
     const { getByText, getByTestId } = render(
@@ -265,7 +263,7 @@ describe("Creds Tab", () => {
 
   test("Renders Creds Card placeholder", () => {
     const storeMocked = {
-      ...mockStore(initialStateEmpty),
+      ...makeTestStore(initialStateEmpty),
       dispatch: dispatchMock,
     };
     const { getByTestId, getByText } = render(
@@ -286,7 +284,7 @@ describe("Creds Tab", () => {
 
   test("Renders Creds Card", () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
     const { getByTestId } = render(
@@ -302,7 +300,7 @@ describe("Creds Tab", () => {
 
   test("Renders Creds Filters", () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
     };
     const { getByTestId } = render(
       <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
@@ -328,6 +326,7 @@ describe("Creds Tab", () => {
   });
 
   test("Toggle Creds Filters show Individual", async () => {
+    const store = makeTestStore(initialStateEmpty);
     store.dispatch(setCredsCache([filteredCredsFix[0]]));
 
     const { getByTestId, getByText, queryByText } = render(
@@ -374,6 +373,7 @@ describe("Creds Tab", () => {
   });
 
   test("Toggle Creds Filters show Group", async () => {
+    const store = makeTestStore(initialStateFull);
     store.dispatch(setCredsCache([filteredCredsFix[3]]));
     store.dispatch(setCredentialsFilters(CredentialsFilters.All));
 
@@ -421,12 +421,12 @@ describe("Creds Tab", () => {
   });
 
   test("Remove pending cred alert", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
+          defaultProfile: filteredIdentifierFix[0].id,
           loggedIn: true,
           time: Date.now(),
           passcodeIsSet: true,
@@ -438,7 +438,7 @@ describe("Creds Tab", () => {
       },
       seedPhraseCache: {},
       identifiersCache: {
-        identifiers: filteredIdentifierFix,
+        identifiers: filteredIdentifierMapFix,
       },
 
       credsArchivedCache: {
@@ -463,7 +463,7 @@ describe("Creds Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -531,7 +531,7 @@ describe("Creds Tab", () => {
 
   test("Show archived & revoked credentials", async () => {
     const storeMocked = {
-      ...mockStore(archivedAndRevokedState),
+      ...makeTestStore(archivedAndRevokedState),
       dispatch: dispatchMock,
     };
     const { getByTestId } = render(
@@ -547,7 +547,7 @@ describe("Creds Tab", () => {
 
   test("Open cred detail", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
     const { getByTestId } = render(
@@ -583,7 +583,7 @@ describe("Creds Tab", () => {
 
   test("Open cred archived modal", async () => {
     const storeMocked = {
-      ...mockStore(archivedAndRevokedState),
+      ...makeTestStore(archivedAndRevokedState),
       dispatch: dispatchMock,
     };
     const { getByTestId } = render(

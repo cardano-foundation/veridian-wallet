@@ -31,6 +31,42 @@ import {
   ProfilesProps,
 } from "./Profiles.types";
 
+const ProfileItem = ({ id, displayName, onClick }: ProfileItemsProps) => {
+  return (
+    <div
+      className="profiles-list-item"
+      onClick={onClick}
+      data-testid={`profiles-list-item-${id}`}
+    >
+      <div className="profiles-list-item-avatar">
+        <Avatar id={id} />
+      </div>
+      <div className="profiles-list-item-name">{displayName}</div>
+    </div>
+  );
+};
+
+const OptionButton = ({ icon, text, action }: OptionButtonProps) => {
+  return (
+    <IonButton
+      expand="block"
+      className="profiles-options-button"
+      data-testid={`profiles-option-button-${text.toLowerCase()}`}
+      onClick={action}
+    >
+      {icon && (
+        <IonIcon
+          slot="icon-only"
+          size="small"
+          icon={icon}
+          color="primary"
+        />
+      )}
+      {text}
+    </IonButton>
+  );
+};
+
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
@@ -85,44 +121,6 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     }
   };
 
-  const ProfileItem = ({ id, onClick }: ProfileItemsProps) => {
-    return (
-      <div
-        className="profiles-list-item"
-        data-testid={`profiles-list-item-${id}`}
-        onClick={onClick}
-      >
-        <div className="profiles-list-item-avatar">
-          <Avatar id={id} />
-        </div>
-        <div className="profiles-list-item-name">
-          {identifiersDataCache[id]?.displayName}
-        </div>
-      </div>
-    );
-  };
-
-  const OptionButton = ({ icon, text, action }: OptionButtonProps) => {
-    return (
-      <IonButton
-        expand="block"
-        className="profiles-options-button"
-        data-testid={`profiles-option-button-${text.toLowerCase()}`}
-        onClick={action}
-      >
-        {icon && (
-          <IonIcon
-            slot="icon-only"
-            size="small"
-            icon={icon}
-            color="primary"
-          />
-        )}
-        {text}
-      </IonButton>
-    );
-  };
-
   return (
     <>
       <IonModal
@@ -150,7 +148,10 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           }
         >
           <div className="profiles-selected-profile">
-            <ProfileItem id={defaultProfile} />
+            <ProfileItem
+              id={defaultProfile}
+              displayName={identifiersDataCache[defaultProfile]?.displayName}
+            />
             <OptionButton
               icon={personCircleOutline}
               text={`${i18n.t("profiles.options.manage")}`}
@@ -165,6 +166,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
                 onClick={async () => {
                   handleSelectProfile(identifier.id);
                 }}
+                displayName={identifiersDataCache[identifier.id]?.displayName}
               />
             ))}
           </div>

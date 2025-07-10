@@ -10,7 +10,7 @@ import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { connectionsForNotifications } from "../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
-import { filteredIdentifierMapFix } from "../../__fixtures__/filteredIdentifierFix";
+import { filteredIdentifierFix, filteredIdentifierMapFix } from "../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { NotificationFilters } from "./Notification.types";
@@ -80,7 +80,7 @@ const initialState = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
+      defaultProfile: filteredIdentifierFix[0].id,
     },
   },
   identifiersCache: {
@@ -94,7 +94,7 @@ const initialState = {
   },
   biometricsCache: {
     enabled: false,
-  },
+  }
 };
 
 const fullState = {
@@ -104,7 +104,7 @@ const fullState = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
+      defaultProfile: filteredIdentifierFix[0].id,
     },
   },
   identifiersCache: {
@@ -122,7 +122,7 @@ const fullState = {
   },
   biometricsCache: {
     enabled: false,
-  },
+  }
 };
 
 const filterTestData = {
@@ -132,7 +132,7 @@ const filterTestData = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
+      defaultProfile: filteredIdentifierFix[0].id,
     },
   },
   connectionsCache: {
@@ -146,7 +146,7 @@ const filterTestData = {
   },
   biometricsCache: {
     enabled: false,
-  },
+  }
 };
 
 const emptyConnection = {
@@ -156,7 +156,7 @@ const emptyConnection = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
+      defaultProfile: filteredIdentifierFix[0].id,
     },
   },
   connectionsCache: {
