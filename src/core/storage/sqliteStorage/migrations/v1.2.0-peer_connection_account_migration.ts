@@ -18,7 +18,7 @@ export const DATA_V002: TsMigration = {
     // eslint-disable-next-line no-console
     console.log(`Found ${identifierResult.values?.length ?? 0} identifiers.`);
 
-    if (identifierResult.values && identifierResult.values.length === 0) {
+    if (!identifierResult.values || identifierResult.values.length === 0) {
       return [
         {
           statement: "DELETE FROM items WHERE category = ?",
@@ -49,7 +49,7 @@ export const DATA_V002: TsMigration = {
       parsedIdentifiers.map((id: any) => [id.id, id])
     );
 
-    const peerConnections = peerConnectionResult.values;
+    const peerConnections = peerConnectionResult.values ?? [];
 
     const statements: { statement: string; values?: unknown[] }[] = [];
 
