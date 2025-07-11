@@ -80,7 +80,7 @@ export const DATA_V1200: TsMigration = {
           name: peerConnectionData.name,
           url: peerConnectionData.url,
           iconB64: peerConnectionData.iconB64,
-          createdAt: new Date().toISOString(),
+          createdAt: peerConnectionData.createdAt,
         };
 
         // eslint-disable-next-line no-console
