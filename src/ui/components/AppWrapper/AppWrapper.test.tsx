@@ -386,7 +386,7 @@ describe("Peer connection states changed handler", () => {
   test("handle peer sign request event", async () => {
     Agent.agent.peerConnectionPair.getPeerConnection = jest
       .fn()
-      .mockResolvedValue(mockPeerConnectionPairRecordInstance);
+      .mockResolvedValue(peerConnection);
     await peerConnectRequestSignChangeHandler(peerSignRequestEvent, dispatch);
     expect(dispatch).toBeCalledWith(
       setQueueIncomingRequest(
