@@ -1,4 +1,3 @@
-import { PeerConnectionPairRecord } from "../../../agent/records";
 import { MigrationType, TsMigration } from "./migrations.types";
 
 export const DATA_V1200: TsMigration = {
@@ -73,23 +72,27 @@ export const DATA_V1200: TsMigration = {
       }
 
       if (selectedAidForNewRecord) {
-        const peerConnectionPairRecord = new PeerConnectionPairRecord({
-          id: `${peerConnectionData.id}:${selectedAidForNewRecord}`, // This is compositionId
-          selectedAid: selectedAidForNewRecord, // This is the identifier AID
+        const newRecordId = `${peerConnectionData.id}:${selectedAidForNewRecord}`;
+        const newRecordValue = {
+          id: newRecordId,
+          type: "peerConnectionPairRecord",
+          selectedAid: selectedAidForNewRecord,
           name: peerConnectionData.name,
           url: peerConnectionData.url,
           iconB64: peerConnectionData.iconB64,
-        });
+          createdAt: new Date().toISOString(),
+        };
+
         // eslint-disable-next-line no-console
-        console.log(`    - New record ID: ${peerConnectionPairRecord.id}`);
+        console.log(`    - New record ID: ${newRecordId}`);
         statements.push({
           statement:
             "INSERT items (id, category, name, value) VALUES (?, ?, ?, ?)",
           values: [
-            peerConnectionPairRecord.id,
+            newRecordId,
             "peerConnectionPairRecord",
-            peerConnectionPairRecord.id,
-            JSON.stringify(peerConnectionPairRecord),
+            newRecordId,
+            JSON.stringify(newRecordValue),
           ],
         });
       } else {
