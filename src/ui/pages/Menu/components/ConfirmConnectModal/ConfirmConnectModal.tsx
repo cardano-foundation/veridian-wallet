@@ -48,9 +48,10 @@ const ConfirmConnectModal = ({
   );
 
   const isConnecting =
-    !!pendingConnection && pendingConnection.id === connectionData?.id;
+    !!pendingConnection &&
+    pendingConnection.meerkatId === connectionData?.meerkatId;
   const dAppName = !connectionData?.name
-    ? ellipsisText(connectionData?.id || "", 25)
+    ? ellipsisText(connectionData?.meerkatId || "", 25)
     : connectionData?.name;
 
   const buttonTitle = i18n.t(
@@ -61,8 +62,10 @@ const ConfirmConnectModal = ({
         : "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.disconnectbtn"
   );
 
-  const meerkatId = connectionData?.id
-    ? connectionData.id.substring(0, 5) + "..." + connectionData.id.slice(-5)
+  const meerkatId = connectionData?.meerkatId
+    ? connectionData.meerkatId.substring(0, 5) +
+      "..." +
+      connectionData.meerkatId.slice(-5)
     : "";
 
   const deleteConnection = () => {
@@ -117,8 +120,8 @@ const ConfirmConnectModal = ({
       {!isConnecting && connectionData?.name && (
         <div
           onClick={() => {
-            if (!connectionData?.id) return;
-            writeToClipboard(connectionData.id as string);
+            if (!connectionData?.meerkatId) return;
+            writeToClipboard(connectionData.meerkatId as string);
             dispatch(setToastMsg(ToastMsgType.COPIED_TO_CLIPBOARD));
           }}
           className="confirm-modal-id"

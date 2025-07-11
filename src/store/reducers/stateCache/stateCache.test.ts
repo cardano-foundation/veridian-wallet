@@ -42,7 +42,7 @@ const signingRequest: PeerConnectSigningEventRequest = {
       approvalCallback: () => {},
     },
   },
-  peerConnection: { id: "connection" },
+  peerConnection: { meerkatId: "connection" },
 };
 
 const signingRequestB = { ...signingRequest };

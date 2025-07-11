@@ -58,17 +58,23 @@ const WalletConnectStageTwo = ({
 
   const handleConnectWallet = async () => {
     try {
+      const peerConnectionId = `${pendingDAppMeerkat}:${selectedIdentifier?.id}`;
+
       if (selectedIdentifier && pendingDAppMeerkat && !startingMeerkat) {
         setStartingMeerkat(true);
         await PeerConnection.peerConnection.start(selectedIdentifier.id);
-        await PeerConnection.peerConnection.connectWithDApp(pendingDAppMeerkat);
+        await PeerConnection.peerConnection.connectWithDApp(peerConnectionId);
+
         const existingConnection = existingConnections.find(
-          (connection) => connection.id === pendingDAppMeerkat
+          (connection) =>
+            `${connection.meerkatId}:${connection.selectedAid}` ===
+            peerConnectionId
         );
+
         if (existingConnection) {
           const updatedConnections = [];
           for (const connection of existingConnections) {
-            if (connection.id === existingConnection.id) {
+            if (connection.meerkatId === existingConnection.meerkatId) {
               updatedConnections.push({
                 ...existingConnection,
                 selectedAid: selectedIdentifier.id,
@@ -82,7 +88,10 @@ const WalletConnectStageTwo = ({
           dispatch(
             setWalletConnectionsCache([
               ...existingConnections,
-              { id: pendingDAppMeerkat, selectedAid: selectedIdentifier.id },
+              {
+                meerkatId: pendingDAppMeerkat,
+                selectedAid: selectedIdentifier.id,
+              },
             ])
           );
         }

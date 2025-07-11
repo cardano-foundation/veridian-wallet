@@ -23,7 +23,6 @@ const SignRequest = ({
   handleCancel,
 }: RequestProps<IncomingRequestType.PEER_CONNECT_SIGN>) => {
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-
   const signDetails = (() => {
     if (!requestData.signTransaction) {
       return {};
@@ -53,7 +52,7 @@ const SignRequest = ({
         customClass={`sign-request${initiateAnimation ? " blur" : ""}`}
         header={
           <PageHeader
-            onBack={handleCancel}
+            onBack={() => handleCancel()}
             title={`${i18n.t("request.sign.title")}`}
           />
         }
@@ -63,7 +62,7 @@ const SignRequest = ({
             primaryButtonText={`${i18n.t("request.button.sign")}`}
             primaryButtonAction={() => setVerifyIsOpen(true)}
             secondaryButtonText={`${i18n.t("request.button.dontallow")}`}
-            secondaryButtonAction={handleCancel}
+            secondaryButtonAction={() => handleCancel()}
           />
         }
       >
@@ -111,8 +110,8 @@ const SignRequest = ({
       <Spinner show={initiateAnimation} />
       <Verification
         verifyIsOpen={verifyIsOpen}
-        setVerifyIsOpen={setVerifyIsOpen}
-        onVerify={handleSign}
+        setVerifyIsOpen={(isOpen) => setVerifyIsOpen(isOpen)}
+        onVerify={() => handleSign()}
       />
     </>
   );
