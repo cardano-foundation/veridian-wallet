@@ -672,9 +672,6 @@
             "text": "This credential was issued through a connection that has since been deleted or is no longer accessible. As a result, the connection details cannot be displayed."
           }
         },
-        "toast": {
-          "clipboard": "Copied to clipboard"
-        },
         "clouderror": "We couldn’t locate this credential in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this credential, tap “Delete credential” to remove."
       },
       "create": {
@@ -1429,7 +1426,9 @@
     "proposalcredfailerror": "Unable to record response",
     "deleteaccounterror": "Unable to delete account",
     "deleteaccountsuccess": "Account deleted successfully",
-    "remotesignsuccess": "Signed successfully"
+    "remotesignsuccess": "Signed successfully",
+    "profileswitched": "Profile switched",
+    "unabletoswitchprofile": "Unable to switch profile"
   },
   "request": {
     "sign": {
@@ -1579,7 +1578,13 @@
   },
   "profiles": {
     "title": "Profiles",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "options": {
+      "manage": "Manage profile",
+      "add": "Add profile",
+      "join": "Join a group",
+      "settings": "Settings"
+    }
   },
   "scan": {
     "title": "Align the QR code within the frame to scan",

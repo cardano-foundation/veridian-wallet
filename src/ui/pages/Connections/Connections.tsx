@@ -1,13 +1,11 @@
 import { IonButton, IonIcon, useIonViewWillEnter } from "@ionic/react";
 import { useCallback, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
   ConnectionStatus,
 } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
-import { RoutePath } from "../../../routes";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
@@ -40,6 +38,7 @@ import { ConnectionsBody } from "./components/ConnectionsBody";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
+import { Profiles } from "../Profiles";
 
 const Connections = () => {
   const pageId = "connections-tab";
@@ -55,6 +54,7 @@ const Connections = () => {
     MappedConnections[]
   >([]);
   const [openShareDefaultProfile, setOpenShareDefaultProfile] = useState(false);
+  const [openProfiles, setOpenProfiles] = useState(false);
   const [deletePendingItem, setDeletePendingItem] =
     useState<ConnectionShortDetails | null>(null);
   const [openDeletePendingAlert, setOpenDeletePendingAlert] = useState(false);
@@ -62,7 +62,6 @@ const Connections = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
   const auth = useAppSelector(getAuthentication);
-  const history = useHistory();
   const defaultProfile = stateCache.authentication.defaultProfile;
   const identifier = identifiers[defaultProfile];
 
@@ -140,10 +139,6 @@ const Connections = () => {
 
   useOnlineStatusEffect(fetchOobi);
 
-  const handleConnectModal = () => {
-    setOpenShareDefaultProfile(true);
-  };
-
   const handleShowConnectionDetails = (item: ConnectionShortDetails) => {
     if (
       item.status === ConnectionStatus.PENDING ||
@@ -184,6 +179,14 @@ const Connections = () => {
     dispatch(setCurrentOperation(OperationType.IDLE));
   };
 
+  const handleConnectModal = () => {
+    setOpenShareDefaultProfile(true);
+  };
+
+  const handleAvatarClick = () => {
+    setOpenProfiles(true);
+  };
+
   const AdditionalButtons = () => {
     return (
       <>
@@ -205,10 +208,6 @@ const Connections = () => {
         />
       </>
     );
-  };
-
-  const handleAvatarClick = () => {
-    history.push(RoutePath.PROFILES);
   };
 
   const classes = combineClassNames({
@@ -266,6 +265,10 @@ const Connections = () => {
         isOpen={openShareDefaultProfile}
         setIsOpen={setOpenShareDefaultProfile}
         oobi={oobi}
+      />
+      <Profiles
+        isOpen={openProfiles}
+        setIsOpen={setOpenProfiles}
       />
       <RemovePendingAlert
         pageId={pageId}

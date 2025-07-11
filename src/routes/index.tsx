@@ -21,7 +21,6 @@ import { VerifyRecoverySeedPhrase } from "../ui/pages/VerifyRecoverySeedPhrase";
 import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
-import { Profiles } from "../ui/pages/Profiles";
 import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
 
 const Routes = () => {
@@ -77,11 +76,6 @@ const Routes = () => {
       <Route
         path={RoutePath.SSI_AGENT}
         component={CreateSSIAgent}
-        exact
-      />
-      <Route
-        path={RoutePath.PROFILES}
-        component={Profiles}
         exact
       />
       {tabsRoutes.map((tab, index: number) => {

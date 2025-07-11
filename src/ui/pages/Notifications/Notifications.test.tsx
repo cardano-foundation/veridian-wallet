@@ -15,6 +15,7 @@ import { NotificationFilters } from "./Notification.types";
 import { Notifications } from "./Notifications";
 import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { NotificationItem } from "./NotificationItem";
+import { filteredIdentifierMapFix } from "../../__fixtures__/filteredIdentifierFix";
 
 mockIonicReact();
 
@@ -83,6 +84,9 @@ const initialState = {
       defaultProfile: "",
     },
   },
+  identifiersCache: {
+    identifiers: filteredIdentifierMapFix,
+  },
   connectionsCache: {
     connections: {},
   },
@@ -103,6 +107,9 @@ const fullState = {
       passcodeIsSet: true,
       defaultProfile: "",
     },
+  },
+  identifiersCache: {
+    identifiers: filteredIdentifierMapFix,
   },
   connectionsCache: {
     connections: connectionsForNotifications,
@@ -131,6 +138,9 @@ const filterTestData = {
   },
   connectionsCache: {
     connections: connectionsForNotifications,
+  },
+  identifiersCache: {
+    identifiers: filteredIdentifierMapFix,
   },
   notificationsCache: {
     notifications: [notificationsFix[0], notificationsFix[3]],
@@ -162,6 +172,9 @@ const emptyConnection = {
   },
   biometricsCache: {
     enabled: false,
+  },
+  identifiersCache: {
+    identifiers: filteredIdentifierMapFix,
   },
 };
 
@@ -198,6 +211,30 @@ describe("Notifications Tab", () => {
     ).toBeInTheDocument();
     expect(queryByTestId("notifications-tab-section-new")).toBeNull();
     expect(queryByTestId("notifications-tab-section-earlier")).toBeNull();
+  });
+
+  test("Open profile", async () => {
+    const storeMocked = {
+      ...mockStore(initialState),
+      dispatch: dispatchMock,
+    };
+    const { getByTestId, getByText } = render(
+      <Provider store={storeMocked}>
+        <MemoryRouter initialEntries={[TabsRoutePath.NOTIFICATIONS]}>
+          <Notifications />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("avatar-button")).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("avatar-button"));
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeVisible();
+    });
   });
 
   test("Filter", async () => {

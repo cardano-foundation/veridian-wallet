@@ -66,7 +66,13 @@ const CustomToast = ({
           ? `${i18n.t("toast.usernamecreationsuccess", { username })}`
           : `${i18n.t("toast." + message.toLowerCase())}`)
       }
-      color={message?.toLowerCase().includes("error") ? "danger" : "secondary"}
+      color={
+        message &&
+        (message.toLowerCase().includes("error") ||
+          message.toLowerCase().includes("unable"))
+          ? "danger"
+          : "secondary"
+      }
       position="top"
       data-testid={`confirmation-toast-${id}`}
       cssClass="confirmation-toast"

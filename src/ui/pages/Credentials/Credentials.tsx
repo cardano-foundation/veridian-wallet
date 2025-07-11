@@ -1,7 +1,6 @@
 import { IonButton, IonLabel, useIonViewWillEnter } from "@ionic/react";
 import { t } from "i18next";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -11,7 +10,7 @@ import {
 } from "../../../core/agent/services/credentialService.types";
 import { IdentifierType } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
-import { RoutePath, TabsRoutePath } from "../../../routes/paths";
+import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getCredsArchivedCache,
@@ -51,13 +50,13 @@ import { combineClassNames } from "../../utils/style";
 import { StartAnimationSource } from "../Identifiers/Identifiers.types";
 import "./Credentials.scss";
 import { CredentialsFilters } from "./Credentials.types";
+import { Profiles } from "../Profiles";
 
 const CLEAR_STATE_DELAY = 1000;
 
 const Credentials = () => {
   const pageId = "credentials-tab";
   const dispatch = useAppDispatch();
-  const history = useHistory();
   const credsCache = useAppSelector(getCredsCache);
   const archivedCreds = useAppSelector(getCredsArchivedCache);
   const credentialsFiltersCache = useAppSelector(getCredentialsFilters);
@@ -67,6 +66,7 @@ const Credentials = () => {
   const [showPlaceholder, setShowPlaceholder] = useState(true);
   const [navAnimation, setNavAnimation] =
     useState<StartAnimationSource>("none");
+  const [openProfiles, setOpenProfiles] = useState(false);
   const favouriteContainerElement = useRef<HTMLDivElement>(null);
   const [deletedPendingItem, setDeletePendingItem] =
     useState<CredentialShortDetails | null>(null);
@@ -135,10 +135,6 @@ const Credentials = () => {
   }, [confirmedCreds, credsCache, pendingCreds.length]);
 
   useOnlineStatusEffect(fetchArchivedCreds);
-
-  const handleAvatarClick = () => {
-    history.push(RoutePath.PROFILES);
-  };
 
   useIonViewWillEnter(() => {
     dispatch(setCurrentRoute({ path: TabsRoutePath.CREDENTIALS }));
@@ -254,18 +250,20 @@ const Credentials = () => {
       });
   };
 
+  const handleAvatarClick = () => {
+    setOpenProfiles(true);
+  };
+
   const AdditionalButtons = ({
     handleAvatarClick,
   }: {
     handleAvatarClick: AvatarProps["handleAvatarClick"];
   }) => {
     return (
-      <>
-        <Avatar
-          id={authData.defaultProfile}
-          handleAvatarClick={handleAvatarClick}
-        />
-      </>
+      <Avatar
+        id={authData.defaultProfile}
+        handleAvatarClick={handleAvatarClick}
+      />
     );
   };
 
@@ -367,6 +365,10 @@ const Credentials = () => {
           </>
         )}
       </TabLayout>
+      <Profiles
+        isOpen={openProfiles}
+        setIsOpen={setOpenProfiles}
+      />
       <RemovePendingAlert
         pageId={pageId}
         openFirstCheck={openDeletePendingAlert}
