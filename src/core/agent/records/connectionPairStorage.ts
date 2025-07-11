@@ -44,11 +44,11 @@ export class ConnectionPairStorage {
     return this.findAllByQuery({ contactId });
   }
 
-  findByAccountId(accountId: string): Promise<ConnectionPairRecord[]> {
-    return this.findAllByQuery({ accountId });
+  findByIdentifier(identifier: string): Promise<ConnectionPairRecord[]> {
+    return this.findAllByQuery({ identifier });
   }
 
-  findByContactAndAccount(contactId: string, accountId: string): Promise<ConnectionPairRecord[]> {
-    return this.findAllByQuery({ contactId, accountId });
+  findByContactAndIdentifier(contactId: string, identifier: string): Promise<ConnectionPairRecord[]> {
+    return this.findAllByQuery({ contactId, identifier });
   }
 } 

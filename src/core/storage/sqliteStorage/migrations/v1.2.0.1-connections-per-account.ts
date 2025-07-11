@@ -37,7 +37,7 @@ export const DATA_V1201: HybridMigration = {
         statement: "INSERT INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
         values: [
           record.id,
-          record instanceof ContactRecord ? "ContactRecord" : "ConnectionPairRecord",
+          record.type,
           record.id,
           JSON.stringify(record)
         ]
@@ -116,7 +116,13 @@ export const DATA_V1201: HybridMigration = {
     }   
     
     for (const contact of contacts) {
-      const contractUpdates: Record<string, any> = {};
+      if(contact['version'] === '1.2.0') {
+        console.log(`Contact ${contact.id} is already migrated from v1.2.0, skipping migration`);
+        continue;
+      }
+
+      const contactUpdates: Record<string, any> = {};
+      contactUpdates['version'] = '1.2.0';
 
       const keysToDelete: string[] = [];
       const historyItems: Array<{ key: string; identifier: string; data: any}> = [];
@@ -144,7 +150,7 @@ export const DATA_V1201: HybridMigration = {
           for(const historyItem of historyItems) {
             if(sharedIdentifier.prefix === historyItem.identifier) {
               const newPrefixedHistoryItem = `${sharedIdentifierPrefix}:${historyItem.key}`;
-              contractUpdates[newPrefixedHistoryItem] = historyItem.data;
+              contactUpdates[newPrefixedHistoryItem] = historyItem.data;
             }
 
             keysToDelete.push(historyItem.key);
@@ -152,11 +158,11 @@ export const DATA_V1201: HybridMigration = {
 
           for(const noteItem of noteItems) {
             const newPrefixedNote = `${sharedIdentifierPrefix}:${noteItem.key}`;
-            contractUpdates[newPrefixedNote] = noteItem.data;
+            contactUpdates[newPrefixedNote] = noteItem.data;
             keysToDelete.push(noteItem.key);
           }
 
-          contractUpdates[`${sharedIdentifierPrefix}:createdAt`] = contact['createdAt'];
+          contactUpdates[`${sharedIdentifierPrefix}:createdAt`] = contact['createdAt'];
           keysToDelete.push('createdAt');
         } else {
           // delete contact if sharedIdentifier soft deleted
@@ -166,32 +172,37 @@ export const DATA_V1201: HybridMigration = {
 
       } else {
 
-        // get splited ipex identifier
-        const splitedIdentifiers = historyItems.map((item) => item.identifier);
-        
-        if(splitedIdentifiers.length > 0) {
-        // associate createdAt and all notes for every non-deleted identifier
-          for(const prefix of splitedIdentifiers) {
-            const identifier = identifiers.find((id: any) => id.prefix === prefix);
-            if(identifier) {
-              contractUpdates[`${prefix}:createdAt`] = contact['createdAt'];
-              keysToDelete.push('createdAt');
-
-              for(const noteItem of noteItems) {
-                const newPrefixedNote = `${prefix}:${noteItem.key}`;
-                contractUpdates[newPrefixedNote] = noteItem.data;
-                keysToDelete.push(noteItem.key);
-              }
-            }
+        // associate history items to the correct identifier
+        for(const historyItem of historyItems) {
+          const identifier = identifiers.find((id: any) => id.prefix === historyItem.identifier);
+          if(identifier) {
+            contactUpdates[`${identifier.prefix}:${historyItem.key}`] = historyItem.data;
+            keysToDelete.push(historyItem.key);
           }
+        }
+
+        // associate createdAt and all notes for every non-deleted identifier
+        for(const prefix of identifiers) {
+            contactUpdates[`${prefix}:createdAt`] = contact['createdAt'];
+
+            for(const noteItem of noteItems) {
+              const newPrefixedNote = `${prefix}:${noteItem.key}`;
+              contactUpdates[newPrefixedNote] = noteItem.data;
+            }
+        }
+
+        // remove createdAt and all notes
+        keysToDelete.push('createdAt');
+        for(const noteItem of noteItems) {
+          keysToDelete.push(noteItem.key);
         }
       }
 
-      for(const key of keysToDelete) {
-        contractUpdates[key] = null;
-      }
-      
-      await signifyClient.contacts().update(contact.id, contractUpdates);
+      // for(const key of keysToDelete) {
+      //   contactUpdates[key] = null;
+      // }
+
+      await signifyClient.contacts().update(contact.id, contactUpdates);
     }
     
     console.log(`Cloud migration completed: ${contacts.length} connections migrated to account-based model`);
