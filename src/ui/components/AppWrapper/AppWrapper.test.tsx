@@ -232,7 +232,7 @@ const mockPeerConnectionPairRecordInstance = new PeerConnectionPairRecord({
 });
 
 const peerConnection: ConnectionData = {
-  id: mockPeerConnectionPairRecordInstance.id,
+  meerkatId: mockPeerConnectionPairRecordInstance.id,
   name: mockPeerConnectionPairRecordInstance.name,
   url: mockPeerConnectionPairRecordInstance.url,
   createdAt: mockPeerConnectionPairRecordInstance.createdAt?.toISOString(),
@@ -374,7 +374,7 @@ describe("Peer connection states changed handler", () => {
   test("handle peer disconnected event", async () => {
     await peerDisconnectedChangeHandler(
       peerDisconnectedEvent,
-      peerConnection.id,
+      peerConnection.meerkatId,
       dispatch
     );
     expect(dispatch).toBeCalledWith(setConnectedWallet(null));
@@ -393,7 +393,7 @@ describe("Peer connection states changed handler", () => {
         expect.objectContaining({
           type: IncomingRequestType.PEER_CONNECT_SIGN,
           peerConnection: expect.objectContaining({
-            id: peerConnection.id,
+            meerkatId: peerConnection.meerkatId,
             name: peerConnection.name,
             url: peerConnection.url,
             iconB64: peerConnection.iconB64,

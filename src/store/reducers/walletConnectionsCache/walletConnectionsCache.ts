@@ -32,7 +32,7 @@ const walletConnectionsCacheSlice = createSlice({
       state,
       action: PayloadAction<ConnectionData | null>
     ) => {
-      if (state.pendingConnection?.id !== action.payload?.id) {
+      if (state.pendingConnection?.meerkatId !== action.payload?.meerkatId) {
         state.isConnecting = false;
       }
 

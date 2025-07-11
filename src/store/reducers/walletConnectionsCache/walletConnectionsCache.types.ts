@@ -1,5 +1,5 @@
 interface ConnectionData {
-  id: string; //<dappId>
+  meerkatId: string; //<dappId>
   name?: string;
   url?: string;
   createdAt?: string;

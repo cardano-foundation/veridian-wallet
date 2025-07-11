@@ -502,7 +502,7 @@ describe("Wallet connect", () => {
 
     act(() => {
       fireEvent.click(
-        getByTestId(`delete-connections-${walletConnectionsFix[0].id}`)
+        getByTestId(`delete-connections-${walletConnectionsFix[0].meerkatId}`)
       );
     });
 
@@ -590,7 +590,7 @@ describe("Wallet connect", () => {
     });
 
     fireEvent.click(
-      getByTestId(`delete-connections-${walletConnectionsFix[0].id}`)
+      getByTestId(`delete-connections-${walletConnectionsFix[0].meerkatId}`)
     );
 
     await waitFor(() => {
@@ -618,7 +618,8 @@ describe("Wallet connect", () => {
       expect(dispatchMock).toHaveBeenCalledWith(
         setWalletConnectionsCache(
           walletConnectionsFix.filter(
-            (connection) => connection.id !== walletConnectionsFix[0].id
+            (connection) =>
+              connection.meerkatId !== walletConnectionsFix[0].meerkatId
           )
         )
       );
@@ -640,7 +641,9 @@ describe("Wallet connect", () => {
     ).toBeVisible();
 
     act(() => {
-      fireEvent.click(getByTestId(`card-item-${walletConnectionsFix[0].id}`));
+      fireEvent.click(
+        getByTestId(`card-item-${walletConnectionsFix[0].meerkatId}`)
+      );
     });
 
     await waitFor(() => {
@@ -683,7 +686,9 @@ describe("Wallet connect", () => {
     });
 
     act(() => {
-      fireEvent.click(getByTestId(`card-item-${walletConnectionsFix[1].id}`));
+      fireEvent.click(
+        getByTestId(`card-item-${walletConnectionsFix[1].meerkatId}`)
+      );
     });
 
     await waitFor(() => {
@@ -695,7 +700,7 @@ describe("Wallet connect", () => {
     });
     await waitFor(() => {
       expect(PeerConnection.peerConnection.disconnectDApp).toBeCalledWith(
-        walletConnectionsFix[1].id
+        walletConnectionsFix[1].meerkatId
       );
     });
   });
@@ -737,7 +742,9 @@ describe("Wallet connect", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(getByTestId(`card-item-${walletConnectionsFix[0].id}`));
+    fireEvent.click(
+      getByTestId(`card-item-${walletConnectionsFix[0].meerkatId}`)
+    );
 
     await waitFor(() => {
       expect(getByTestId("confirm-connect-btn")).toBeVisible();

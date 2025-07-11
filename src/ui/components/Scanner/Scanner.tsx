@@ -295,7 +295,7 @@ const Scanner = forwardRef(
         dispatch(setToastMsg(ToastMsgType.PEER_ID_SUCCESS));
         dispatch(
           setPendingConnection({
-            id,
+            meerkatId: id,
           })
         );
         dispatch(showConnectWallet(true));

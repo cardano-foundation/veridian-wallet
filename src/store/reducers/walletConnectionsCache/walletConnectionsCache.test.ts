@@ -37,7 +37,7 @@ describe("walletConnectionsCacheSlice", () => {
   it("should handle setWalletConnectionsCache", () => {
     const connections: ConnectionData[] = [
       {
-        id: "2",
+        meerkatId: "2",
         name: "Wallet name #2",
         selectedAid: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRc",
         url: "http://localhost:3001/",
@@ -53,7 +53,7 @@ describe("walletConnectionsCacheSlice", () => {
   it("should handle clearWalletConnection", () => {
     const connections: ConnectionData[] = [
       {
-        id: "2",
+        meerkatId: "2",
         name: "Wallet name #2",
         selectedAid: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRc",
         url: "http://localhost:3001/",
@@ -71,7 +71,7 @@ describe("walletConnectionsCacheSlice", () => {
 
   it("should handle setConnectedWallet", () => {
     const connection: ConnectionData = {
-      id: "2",
+      meerkatId: "2",
       name: "Wallet name #2",
       selectedAid: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRc",
       url: "http://localhost:3001/",
@@ -86,10 +86,10 @@ describe("walletConnectionsCacheSlice", () => {
     const newState = walletConnectionsCacheSlice.reducer(
       initialState,
       setPendingConnection({
-        id: "pending-meerkat",
+        meerkatId: "pending-meerkat",
       })
     );
-    expect(newState.pendingConnection?.id).toEqual("pending-meerkat");
+    expect(newState.pendingConnection?.meerkatId).toEqual("pending-meerkat");
   });
   it("should handle setIsConnecting", () => {
     const newState = walletConnectionsCacheSlice.reducer(
@@ -114,14 +114,14 @@ describe("Get wallet connections cache", () => {
       walletConnectionsCache: {
         walletConnections: [
           {
-            id: "1",
+            meerkatId: "1",
             name: "Wallet name #1",
             selectedAid: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRd",
             image: "",
             url: "http://localhost:3001/",
           },
           {
-            id: "2",
+            meerkatId: "2",
             name: "Wallet name #2",
             selectedAid: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRc",
             url: "http://localhost:3001/",
@@ -139,7 +139,7 @@ describe("Get wallet connections cache", () => {
     const state = {
       walletConnectionsCache: {
         connectedWallet: {
-          id: "1",
+          meerkatId: "1",
         },
       },
     } as RootState;
@@ -152,7 +152,7 @@ describe("Get wallet connections cache", () => {
     const state = {
       walletConnectionsCache: {
         pendingConnection: {
-          id: "pending-meerkat",
+          meerkatId: "pending-meerkat",
         },
       },
     } as RootState;

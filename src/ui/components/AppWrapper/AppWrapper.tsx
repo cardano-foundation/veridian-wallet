@@ -149,7 +149,7 @@ const peerConnectRequestSignChangeHandler = async (
 
   if (peerConnectionRecord) {
     const peerConnection: ConnectionData = {
-      id: peerConnectionRecord.id,
+      meerkatId: peerConnectionRecord.meerkatId,
       name: peerConnectionRecord.name,
       url: peerConnectionRecord.url,
       createdAt: peerConnectionRecord.createdAt,
@@ -178,7 +178,7 @@ const peerConnectedChangeHandler = async (
   const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
   const connectedWallet = existingConnections.find(
     (connection) =>
-      `${connection.id}:${connection.selectedAid}` === newConnectionId
+      `${connection.meerkatId}:${connection.selectedAid}` === newConnectionId
   );
   if (connectedWallet) {
     dispatch(setConnectedWallet(connectedWallet));
@@ -290,12 +290,12 @@ const AppWrapper = (props: { children: ReactNode }) => {
   }, [authentication.loggedIn, initializationPhase]);
 
   useEffect(() => {
-    if (!connectedWallet?.id) {
+    if (!connectedWallet?.meerkatId) {
       return;
     }
 
     const eventHandler = async (event: PeerDisconnectedEvent) => {
-      peerDisconnectedChangeHandler(event, connectedWallet.id, dispatch);
+      peerDisconnectedChangeHandler(event, connectedWallet.meerkatId, dispatch);
     };
 
     PeerConnection.peerConnection.onPeerDisconnectedStateChanged(eventHandler);
@@ -305,7 +305,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
         eventHandler
       );
     };
-  }, [connectedWallet?.id, dispatch]);
+  }, [connectedWallet?.meerkatId, dispatch]);
 
   useEffect(() => {
     if (recoveryCompleteNoInterruption) {

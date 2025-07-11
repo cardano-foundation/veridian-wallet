@@ -4,7 +4,7 @@ import { CardList } from "./CardList";
 import { walletConnectionsFix } from "../../__fixtures__/walletConnectionsFix";
 
 const displayConnection = walletConnectionsFix.map((connection, index) => ({
-  id: connection.id,
+  id: connection.meerkatId,
   title: connection.name,
   subtitle: index % 2 === 0 ? connection.selectedAid : undefined,
   image: index % 2 === 0 ? "mock-image-link" : undefined,

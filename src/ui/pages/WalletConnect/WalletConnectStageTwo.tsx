@@ -67,13 +67,14 @@ const WalletConnectStageTwo = ({
 
         const existingConnection = existingConnections.find(
           (connection) =>
-            `${connection.id}:${connection.selectedAid}` === peerConnectionId
+            `${connection.meerkatId}:${connection.selectedAid}` ===
+            peerConnectionId
         );
 
         if (existingConnection) {
           const updatedConnections = [];
           for (const connection of existingConnections) {
-            if (connection.id === existingConnection.id) {
+            if (connection.meerkatId === existingConnection.meerkatId) {
               updatedConnections.push({
                 ...existingConnection,
                 selectedAid: selectedIdentifier.id,
@@ -87,7 +88,10 @@ const WalletConnectStageTwo = ({
           dispatch(
             setWalletConnectionsCache([
               ...existingConnections,
-              { id: pendingDAppMeerkat, selectedAid: selectedIdentifier.id },
+              {
+                meerkatId: pendingDAppMeerkat,
+                selectedAid: selectedIdentifier.id,
+              },
             ])
           );
         }

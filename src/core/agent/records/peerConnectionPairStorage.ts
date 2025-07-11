@@ -18,7 +18,7 @@ export class PeerConnectionPairStorage {
     const metadata = await this.getPeerConnectionAccount(id);
 
     return {
-      id: metadata.getDappIdentifier(),
+      meerkatId: metadata.getDappIdentifier(),
       iconB64: metadata.iconB64,
       name: metadata.name,
       selectedAid: metadata.getIdentifier(),
@@ -45,7 +45,7 @@ export class PeerConnectionPairStorage {
   async getAllPeerConnectionAccount(): Promise<PeerConnection[]> {
     const records = await this.storageService.getAll(PeerConnectionPairRecord);
     return records.map((record) => ({
-      id: record.getDappIdentifier(),
+      meerkatId: record.getDappIdentifier(),
       iconB64: record.iconB64,
       name: record.name,
       selectedAid: record.getIdentifier(),
