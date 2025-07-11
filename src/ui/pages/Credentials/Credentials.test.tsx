@@ -240,7 +240,7 @@ describe("Creds Tab", () => {
 
   test("Open profile", async () => {
     const storeMocked = {
-      ...mockStore(initialStateEmpty),
+      ...makeTestStore(initialStateEmpty),
       dispatch: dispatchMock,
     };
     const { getByText, getByTestId } = render(
