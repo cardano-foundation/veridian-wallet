@@ -121,7 +121,7 @@ export const DATA_V1201: HybridMigration = {
         continue;
       }
 
-      const contactUpdates: Record<string, any> = {};
+      const contactUpdates: Record<string, unknown> = {};
       contactUpdates['version'] = '1.2.0';
 
       const keysToDelete: string[] = [];
@@ -134,12 +134,11 @@ export const DATA_V1201: HybridMigration = {
           const historyID = JSON.parse(contact[key] as string).id;
           const exchange = await signifyClient.exchanges().get(historyID);
 
-          historyItems.push({ key, identifier: exchange.exn.rp, data: contact[key] });
+          historyItems.push({ key, identifier: exchange.exn.i, data: contact[key] });
         } else if (key.startsWith(KeriaContactKeyPrefix.CONNECTION_NOTE)) {
           noteItems.push({ key, data: contact[key] });
         }
       }
-
 
       const sharedIdentifierPrefix = contact.sharedIdentifier;
 
@@ -177,8 +176,8 @@ export const DATA_V1201: HybridMigration = {
           const identifier = identifiers.find((id: any) => id.prefix === historyItem.identifier);
           if(identifier) {
             contactUpdates[`${identifier.prefix}:${historyItem.key}`] = historyItem.data;
-            keysToDelete.push(historyItem.key);
           }
+          keysToDelete.push(historyItem.key);
         }
 
         // associate createdAt and all notes for every non-deleted identifier
@@ -198,9 +197,9 @@ export const DATA_V1201: HybridMigration = {
         }
       }
 
-      // for(const key of keysToDelete) {
-      //   contactUpdates[key] = null;
-      // }
+      for(const key of keysToDelete) {
+        contactUpdates[key] = null;
+      }
 
       await signifyClient.contacts().update(contact.id, contactUpdates);
     }
