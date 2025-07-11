@@ -754,7 +754,6 @@ describe("Wallet connect", () => {
     );
     expect(alertMessages[0]).toBeVisible();
 
-    // Acotamos la búsqueda al contenedor de la alerta que está visible
     const alertContainer = getByTestId("alert-create-keri");
     const confirmButton = within(alertContainer).getByTestId(
       "alert-create-keri-confirm-button"
