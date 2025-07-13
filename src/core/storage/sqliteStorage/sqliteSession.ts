@@ -9,6 +9,9 @@ import { versionCompare } from "./utils";
 import { MIGRATIONS } from "./migrations";
 import { MigrationType, CloudMigration } from "./migrations/migrations.types";
 import { KeyStoreKeys, SecureStorage } from "../secureStorage";
+import { Agent } from "../../agent/agent";
+import { MiscRecordId } from "../../agent/agent.types";
+import { BasicStorage } from "../../agent/records/basicStorage";
 
 class SqliteSession {
   static readonly VERSION_DATABASE_KEY = "VERSION_DATABASE_KEY";
@@ -19,6 +22,8 @@ class SqliteSession {
   static readonly BASE_VERSION = "0.0.0";
 
   private sessionInstance?: SQLiteDBConnection;
+
+  private basicStorageService!: BasicStorage;
 
   get session() {
     return this.sessionInstance;
@@ -101,6 +106,8 @@ class SqliteSession {
       );
     }
     await this.sessionInstance.open();
+    // TODO: initialize this.basicStorageService
+    // this.basicStorageService = new BasicStorage(new SqliteStorage<BasicRecord>(this.session!));
     await this.migrateDb();
   }
 
@@ -240,15 +247,10 @@ class SqliteSession {
   }
 
   private async temporaryKeriaConnection(): Promise<void> {
-    const { Agent } = await import("../../agent/agent");
-    const { MiscRecordId } = await import("../../agent/agent.types");
-
-    const connectUrlRecord = (await this.getKv(
+    const connectUrlRecord = await this.basicStorageService.findById(
       MiscRecordId.KERIA_CONNECT_URL
-    )) as { url: string };
-    if (connectUrlRecord?.url) {
-      await Agent.agent.start(connectUrlRecord.url);
-    }
+    );
+    await Agent.agent.start(connectUrlRecord?.content?.url as string);
   }
 }
 

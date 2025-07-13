@@ -90,61 +90,11 @@ describe("Menu Tab", () => {
     expect(getByTestId("menu-tab")).toBeInTheDocument();
     expect(getByText(EN_TRANSLATIONS.tabs.menu.tab.header)).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
-    ).toBeInTheDocument();
-    expect(
       getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connections.title)
     ).toBeInTheDocument();
     expect(
       getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.title)
     ).toBeInTheDocument();
-  });
-
-  test("Open Profile sub-menu", async () => {
-    const { getByTestId, getByText, unmount } = render(
-      <Provider store={storeMocked}>
-        <Menu />
-      </Provider>
-    );
-
-    expect(getByTestId("menu-tab")).toBeInTheDocument();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
-    ).toBeInTheDocument();
-
-    act(() => {
-      fireEvent.click(getByTestId("settings-button"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("settings-security-items")).toBeVisible();
-    });
-
-    unmount();
-  });
-
-  test("Open Profile sub-menu", async () => {
-    const { getByTestId, getByText } = render(
-      <Provider store={storeMocked}>
-        <Menu />
-      </Provider>
-    );
-
-    expect(getByTestId("menu-tab")).toBeInTheDocument();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
-    ).toBeInTheDocument();
-    const profileButton = getByTestId(`menu-input-item-${SubMenuKey.Profile}`);
-
-    act(() => {
-      fireEvent.click(profileButton);
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("profile-title")).toHaveTextContent(
-        EN_TRANSLATIONS.tabs.menu.tab.items.profile.tabheader
-      );
-    });
   });
 
   test("Open Connections view", async () => {

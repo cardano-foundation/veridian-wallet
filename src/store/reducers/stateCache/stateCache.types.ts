@@ -15,7 +15,6 @@ interface CurrentRouteCacheProps {
 
 interface AuthenticationCacheProps {
   loggedIn: boolean;
-  userName: string;
   time: number;
   passcodeIsSet: boolean;
   seedPhraseIsSet: boolean;
@@ -56,6 +55,7 @@ interface StateCacheProps {
   initializationPhase: InitializationPhase;
   recoveryCompleteNoInterruption: boolean;
   isOnline: boolean;
+  currentAccount: string;
   routes: CurrentRouteCacheProps[];
   authentication: AuthenticationCacheProps;
   currentOperation: OperationType;

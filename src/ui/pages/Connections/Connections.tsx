@@ -86,7 +86,7 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
     const [deletePendingItem, setDeletePendingItem] =
       useState<ConnectionShortDetails | null>(null);
     const [openDeletePendingAlert, setOpenDeletePendingAlert] = useState(false);
-    const userName = stateCache.authentication.userName;
+    const userName = stateCache.currentAccount;
     const [oobi, setOobi] = useState("");
     const [hideHeader, setHideHeader] = useState(false);
     const [openConnectionlModal, setOpenConnectionlModal] = useState(false);
@@ -160,8 +160,7 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
         if (!selectedIdentifier?.id) return;
 
         const oobiValue = await Agent.agent.connections.getOobi(
-          `${selectedIdentifier.id}`,
-          userName
+          `${selectedIdentifier.id}`
         );
         if (oobiValue) {
           setOobi(oobiValue);

@@ -453,7 +453,7 @@
         "multisigidentifiers": "For groups",
         "welcome": {
           "skip": "Skip",
-          "welcometext": "Welcome, {{name}}",
+          "welcometext": "Welcome!",
           "text": "You're in the perfect spot to create your secure and private digital identity. Let's begin by adding your first identifier!",
           "add": "Add an Identifier"
         }
@@ -1023,15 +1023,6 @@
           }
         },
         "items": {
-          "profile": {
-            "title": "Profile",
-            "tabheader": "Profile",
-            "tabedit": "Edit profile",
-            "actionedit": "Edit",
-            "actionconfirm": "Confirm",
-            "actioncancel": "Cancel",
-            "name": "Name"
-          },
           "connections": {
             "title": "Connections",
             "tabheader": "Connections"
@@ -1476,7 +1467,7 @@
   },
   "inputrequest": {
     "title": {
-      "username": "Welcome! What should we call you?",
+      
       "connectionalias": "It looks like your new connection doesn't have a name yet. Let's give them one!"
     },
     "input": {

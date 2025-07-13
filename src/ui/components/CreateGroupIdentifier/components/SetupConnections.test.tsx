@@ -73,6 +73,7 @@ describe("Create group identifier - Setup Connection", () => {
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.IDENTIFIERS],
+      currentAccount: "Account1",
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -160,7 +161,7 @@ describe("Create group identifier - Setup Connection", () => {
     await waitFor(() => {
       expect(getOobiMock).toBeCalledWith(
         stage1State.newIdentifier.id,
-        initialState.stateCache.authentication.userName,
+        initialState.stateCache.currentAccount,
         stage1State.newIdentifier.groupMetadata.groupId
       );
     });

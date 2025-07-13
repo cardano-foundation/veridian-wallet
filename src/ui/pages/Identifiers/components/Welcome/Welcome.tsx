@@ -4,6 +4,7 @@ import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
   getAuthentication,
+  getCurrentAccount,
   setShowWelcomePage,
 } from "../../../../../store/reducers/stateCache";
 import IdImage from "../../../../assets/images/id.png";
@@ -23,7 +24,7 @@ interface WelcomeProps {
 
 const Welcome = ({ onCreateGroupIdentifier }: WelcomeProps) => {
   const pageId = "welcome";
-  const auth = useAppSelector(getAuthentication);
+  const currentAccount = useAppSelector(getCurrentAccount);
   const dispatch = useAppDispatch();
   const [openCreate, setOpenCreate] = useState(false);
 
@@ -67,7 +68,7 @@ const Welcome = ({ onCreateGroupIdentifier }: WelcomeProps) => {
         <div className="content">
           <h2>
             {i18n.t("tabs.identifiers.tab.welcome.welcometext", {
-              name: auth.userName || "",
+              name: currentAccount || "",
             })}
           </h2>
           <p>{i18n.t("tabs.identifiers.tab.welcome.text")}</p>

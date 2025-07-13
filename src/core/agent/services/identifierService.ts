@@ -1,4 +1,5 @@
 import { HabState, Operation, Signer } from "signify-ts";
+import { parseHabName } from "../../utils/habName";
 import {
   CreateIdentifierResult,
   IdentifierDetails,
@@ -190,27 +191,25 @@ class IdentifierService extends AgentService {
     }
 
     for (const queued of pendingIdentifiersRecord.content.queued) {
+      const parsed = parseHabName(queued);
       let metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">;
-      const splitName = queued.split(":");
-      const theme = Number(splitName[0]);
-      const groupMatch = splitName[1].match(/^(\d)-(.+)-(.+)$/);
-      if (groupMatch) {
+
+      if (parsed.isGroupMember) {
         metadata = {
-          theme,
-          displayName: splitName[2],
+          theme: parsed.theme ? parseInt(parsed.theme, 10) : 0,
+          displayName: parsed.displayName,
           groupMetadata: {
-            groupId: splitName[1].substring(2),
-            groupInitiator: splitName[1][0] === "1",
+            groupId: parsed.groupId!,
             groupCreated: false,
+            groupInitiator: parsed.isInitiator!,
           },
         };
       } else {
         metadata = {
-          theme,
-          displayName: splitName[1],
+          theme: parsed.theme ? parseInt(parsed.theme, 10) : 0,
+          displayName: parsed.displayName,
         };
       }
-
       await this.createIdentifier(metadata, true);
     }
   }
@@ -572,29 +571,22 @@ class IdentifierService extends AgentService {
         });
       }
 
-      const nameParts = identifier.name.split(":");
-      const theme =
-        nameParts[0] === IdentifierService.DELETED_IDENTIFIER_THEME
-          ? 0
-          : parseInt(nameParts[0], 10);
+      const parsed = parseHabName(identifier.name);
+      const theme = parsed.theme ? parseInt(parsed.theme, 10) : 0;
 
-      const localGroupMember = nameParts.length === 3;
       const identifierDetail = (await this.props.signifyClient
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
-      if (localGroupMember) {
-        const groupIdParts = nameParts[1].split("-");
-        const groupInitiator = groupIdParts[0] === "1";
-
+      if (parsed.isGroupMember) {
         await this.identifierStorage.createIdentifierMetadataRecord({
           id: identifier.prefix,
-          displayName: nameParts[2],
+          displayName: parsed.displayName,
           theme,
           groupMetadata: {
-            groupId: groupIdParts[1],
+            groupId: parsed.groupId!,
             groupCreated: false,
-            groupInitiator,
+            groupInitiator: parsed.isInitiator!,
           },
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
@@ -608,7 +600,7 @@ class IdentifierService extends AgentService {
 
       await this.identifierStorage.createIdentifierMetadataRecord({
         id: identifier.prefix,
-        displayName: nameParts[1],
+        displayName: parsed.displayName,
         theme,
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
@@ -624,15 +616,10 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
-      const nameParts = identifier.name.split(":");
-      const theme =
-        nameParts[0] === IdentifierService.DELETED_IDENTIFIER_THEME
-          ? 0
-          : parseInt(nameParts[0], 10);
+      const parsed = parseHabName(identifier.name);
+      const theme = parsed.theme ? parseInt(parsed.theme, 10) : 0;
 
       const groupMemberPre = identifier.group.mhab.prefix;
-      const groupIdParts = identifier.group.mhab.name.split(":")[1].split("-");
-      const groupInitiator = groupIdParts[0] === "1";
 
       const op = await this.props.signifyClient
         .operations()
@@ -653,15 +640,15 @@ class IdentifierService extends AgentService {
       // Mark as created
       await this.identifierStorage.updateIdentifierMetadata(groupMemberPre, {
         groupMetadata: {
-          groupId: groupIdParts[1],
+          groupId: parsed.groupId!,
           groupCreated: true,
-          groupInitiator,
+          groupInitiator: parsed.isInitiator!,
         },
       });
 
       await this.identifierStorage.createIdentifierMetadataRecord({
         id: identifier.prefix,
-        displayName: nameParts[1],
+        displayName: parsed.displayName,
         theme,
         groupMemberPre,
         creationStatus,

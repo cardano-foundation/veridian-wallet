@@ -62,7 +62,6 @@ const IdentifierDetailModule = ({
 }: IdentifierDetailModuleProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
   const biometrics = useAppSelector(getBiometricsCache);
   const favouritesIdentifiersData = useAppSelector(
     getFavouritesIdentifiersCache
@@ -75,7 +74,7 @@ const IdentifierDetailModule = ({
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
   const [cardData, setCardData] = useState<IdentifierDetailsCore | undefined>();
-  const userName = stateCache.authentication.userName;
+  const userName = cardData?.displayName;
   const [oobi, setOobi] = useState("");
   const [cloudError, setCloudError] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -84,10 +83,7 @@ const IdentifierDetailModule = ({
     try {
       if (!cardData?.id) return;
 
-      const oobiValue = await Agent.agent.connections.getOobi(
-        `${cardData.id}`,
-        userName
-      );
+      const oobiValue = await Agent.agent.connections.getOobi(`${cardData.id}`);
       if (oobiValue) {
         setOobi(oobiValue);
       }

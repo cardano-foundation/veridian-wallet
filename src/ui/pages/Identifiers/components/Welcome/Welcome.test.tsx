@@ -87,6 +87,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
 const initialState = {
   stateCache: {
     routes: [TabsRoutePath.IDENTIFIERS],
+    currentAccount: "Account1",
     authentication: {
       loggedIn: true,
       time: Date.now(),
@@ -141,7 +142,7 @@ describe("Welcome page", () => {
       getByText(
         ENG_TRANS.tabs.identifiers.tab.welcome.welcometext.replace(
           "{{name}}",
-          initialState.stateCache.authentication.userName
+          initialState.stateCache.currentAccount
         )
       )
     ).toBeVisible();
