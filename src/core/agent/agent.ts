@@ -202,6 +202,10 @@ class Agent {
     return this.authService;
   }
 
+  get client() {
+    return this.agentServicesProps.signifyClient;
+  }
+
   private constructor() {
     this.storageSession = Capacitor.isNativePlatform()
       ? new SqliteSession()
@@ -491,10 +495,13 @@ class Agent {
   private getStorageService<T extends BaseRecord>(
     instance: IonicSession | SqliteSession
   ) {
-    if (instance instanceof IonicSession) {
-      return new IonicStorage<T>(instance.session!);
+    if (!instance.session) {
+      throw new Error("Storage session not initialized");
     }
-    return new SqliteStorage<T>(instance.session!);
+    if (instance instanceof IonicSession) {
+      return new IonicStorage<T>(instance.session);
+    }
+    return new SqliteStorage<T>(instance.session);
   }
 
   getBranAndMnemonic(): BranAndMnemonic {
