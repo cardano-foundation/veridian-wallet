@@ -55,19 +55,11 @@ class SqliteSession {
 
   private async getCloudMigrationStatus(): Promise<Record<string, boolean>> {
     try {
-      const status = (await this.getKv(
-        SqliteSession.CLOUD_MIGRATION_STATUS_KEY
-      )) as Record<string, boolean>;
+      const status = await this.getKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY);
       return status ?? {};
     } catch (error) {
       return {};
     }
-  }
-
-  private async markCloudMigrationComplete(version: string): Promise<void> {
-    const status = await this.getCloudMigrationStatus();
-    status[version] = true;
-    await this.setKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY, status);
   }
 
   private async markCloudMigrationComplete(version: string): Promise<void> {
