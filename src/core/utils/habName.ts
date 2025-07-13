@@ -23,8 +23,12 @@ export function parseHabName(name: string): HabNameParts {
         displayName: parts[1],
         isGroupMember: true,
         isInitiator: groupParts[0] === "1",
-        groupId: groupParts[1],
-        userName: groupParts[2],
+        groupId:
+          groupParts.length === 2
+            ? groupParts[1]
+            : groupParts.slice(1, groupParts.length - 1).join("-"),
+        userName:
+          groupParts.length === 2 ? null : groupParts[groupParts.length - 1],
         theme: null,
       };
     } else {
