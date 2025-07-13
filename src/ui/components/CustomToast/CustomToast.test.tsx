@@ -53,7 +53,7 @@ describe("Custom toast", () => {
   test("It renders error message successfully", async () => {
     const toastMsg = {
       id: "1",
-      message: ToastMsgType.USERNAME_CREATION_ERROR,
+      message: ToastMsgType.UNKNOWN_ERROR,
     };
 
     const { getByTestId } = render(
