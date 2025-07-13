@@ -69,6 +69,7 @@ const SetupConnections = ({
     try {
       const oobiValue = await Agent.agent.connections.getOobi(
         identifierId,
+        state.newIdentifier.displayName,
         groupId
       );
       if (oobiValue) {

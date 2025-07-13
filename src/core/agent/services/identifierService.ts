@@ -572,7 +572,11 @@ class IdentifierService extends AgentService {
       }
 
       const parsed = parseHabName(identifier.name);
-      const theme = parsed.theme ? parseInt(parsed.theme, 10) : 0;
+      const theme =
+        parsed.theme &&
+        parsed.theme !== IdentifierService.DELETED_IDENTIFIER_THEME
+          ? parseInt(parsed.theme, 10)
+          : 0;
 
       const identifierDetail = (await this.props.signifyClient
         .identifiers()
@@ -617,7 +621,11 @@ class IdentifierService extends AgentService {
         .get(identifier.prefix)) as HabState;
 
       const parsed = parseHabName(identifier.name);
-      const theme = parsed.theme ? parseInt(parsed.theme, 10) : 0;
+      const theme =
+        parsed.theme &&
+        parsed.theme !== IdentifierService.DELETED_IDENTIFIER_THEME
+          ? parseInt(parsed.theme, 10)
+          : 0;
 
       const groupMemberPre = identifier.group.mhab.prefix;
 
@@ -637,12 +645,13 @@ class IdentifierService extends AgentService {
         });
       }
 
+      const mhabParsed = parseHabName(identifier.group.mhab.name);
       // Mark as created
       await this.identifierStorage.updateIdentifierMetadata(groupMemberPre, {
         groupMetadata: {
-          groupId: parsed.groupId!,
+          groupId: mhabParsed.groupId!,
           groupCreated: true,
-          groupInitiator: parsed.isInitiator!,
+          groupInitiator: mhabParsed.isInitiator!,
         },
       });
 

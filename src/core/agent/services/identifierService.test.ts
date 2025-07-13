@@ -1997,9 +1997,9 @@ describe("Single sig service of agent", () => {
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            "0:newDisplayName",
-            "0:1-ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inx:memberOne",
-            "0:0-ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5InT:memberTwo",
+            "v1.2.0.3:1-ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inx-memberOne:memberOne",
+            "v1.2.0.3:1-ED4KeyyTKFj-memberOne:memberOne",
+            "v1.2.0.3:0-ED4KeyyTKFj-memberTwo:memberTwo",
           ],
         },
       })
@@ -2008,13 +2008,7 @@ describe("Single sig service of agent", () => {
 
     await identifierService.processIdentifiersPendingCreation();
 
-    expect(identifierService.createIdentifier).toHaveBeenCalledWith(
-      {
-        theme: 0,
-        displayName: "newDisplayName",
-      },
-      true
-    );
+    expect(identifierService.createIdentifier).toHaveBeenCalledTimes(3);
     expect(identifierService.createIdentifier).toHaveBeenCalledWith(
       {
         theme: 0,
@@ -2030,10 +2024,22 @@ describe("Single sig service of agent", () => {
     expect(identifierService.createIdentifier).toHaveBeenCalledWith(
       {
         theme: 0,
+        displayName: "memberOne",
+        groupMetadata: {
+          groupCreated: false,
+          groupId: "ED4KeyyTKFj",
+          groupInitiator: true,
+        },
+      },
+      true
+    );
+    expect(identifierService.createIdentifier).toHaveBeenCalledWith(
+      {
+        theme: 0,
         displayName: "memberTwo",
         groupMetadata: {
           groupCreated: false,
-          groupId: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5InT",
+          groupId: "ED4KeyyTKFj",
           groupInitiator: false,
         },
       },
