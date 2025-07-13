@@ -70,6 +70,12 @@ class SqliteSession {
     await this.setKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY, status);
   }
 
+  private async markCloudMigrationComplete(version: string): Promise<void> {
+    const status = await this.getCloudMigrationStatus();
+    status[version] = true;
+    await this.setKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY, status);
+  }
+
   async open(storageName: string): Promise<void> {
     const connection = new SQLiteConnection(CapacitorSQLite);
 
