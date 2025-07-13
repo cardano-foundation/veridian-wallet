@@ -1,3 +1,4 @@
+import { current } from "@reduxjs/toolkit";
 import {
   getNextGenerateSeedPhraseRoute,
   getNextOnboardingRoute,
@@ -142,9 +143,9 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
+          currentAccount: "Account1",
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,
@@ -177,9 +178,9 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
+          currentAccount: "Account1",
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,
@@ -213,9 +214,9 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
+          currentAccount: "Account1",
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: true,

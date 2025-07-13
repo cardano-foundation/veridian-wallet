@@ -52,6 +52,7 @@ import {
   getRecoveryCompleteNoInterruption,
   setAuthentication,
   setCameraDirection,
+  setCurrentAccount,
   setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
@@ -377,7 +378,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let userName: { userName: string } = { userName: "" };
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -474,12 +474,15 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const appUserNameRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.USER_NAME
+      const appCurrentAccountRecord = await Agent.agent.basicStorage.findById(
+        MiscRecordId.CURRENT_ACCOUNT
       );
-      if (appUserNameRecord) {
-        userName = appUserNameRecord.content as { userName: string };
+
+      let currentAccount: { value: string } = { value: "" };
+      if (appCurrentAccountRecord) {
+        currentAccount = appCurrentAccountRecord.content as { value: string };
       }
+      dispatch(setCurrentAccount(currentAccount.value));
 
       const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX

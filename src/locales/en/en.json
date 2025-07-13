@@ -1402,8 +1402,6 @@
     "notesupdated": "Notes updated successfully",
     "noteremoved": "Note removed successfully",
     "maxfavouritesreached": "Maximum of 5 favourites reached",
-    "usernamecreationsuccess": "Welcome, {{username}}!",
-    "usernamecreationerror": "Unable to set name. Please try again.",
     "walletconnectiondeleted": "Delete successfully",
     "connectwalletsuccess": "Connected successfully",
     "disconnectwallet": "Disconnected successfully",

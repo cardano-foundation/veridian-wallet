@@ -193,9 +193,9 @@ const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
     routes: [TabsRoutePath.IDENTIFIERS],
+    currentAccount: "Account1",
     authentication: {
       loggedIn: true,
-      userName: "",
       time: Date.now(),
       passcodeIsSet: true,
       loginAttempt: {
@@ -352,13 +352,13 @@ describe("App", () => {
         ...initialState.stateCache,
         isOnline: false,
         initializationPhase: InitializationPhase.PHASE_TWO,
+        currentAccount: "Account1",
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
           passwordIsSet: false,
           passwordIsSkipped: true,
           loggedIn: true,
-          userName: "",
           time: 0,
           ssiAgentIsSet: true,
           ssiAgentUrl: "http://keria.com",
@@ -394,13 +394,13 @@ describe("App", () => {
         ...initialState.stateCache,
         isOnline: false,
         initializationPhase: InitializationPhase.PHASE_ONE,
+        currentAccount: "Account1",
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
           passwordIsSet: false,
           passwordIsSkipped: true,
           loggedIn: true,
-          userName: "",
           time: 0,
           ssiAgentIsSet: true,
           ssiAgentUrl: "http://keria.com",
@@ -490,9 +490,9 @@ describe("Witness availability", () => {
       stateCache: {
         isOnline: true,
         routes: [{ path: TabsRoutePath.ROOT }],
+        currentAccount: "Account1",
         authentication: {
           loggedIn: true,
-          userName: "",
           time: Date.now(),
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -585,9 +585,9 @@ describe("Witness availability", () => {
       stateCache: {
         isOnline: true,
         routes: [{ path: TabsRoutePath.ROOT }],
+        currentAccount: "Account1",
         authentication: {
           loggedIn: true,
-          userName: "",
           time: Date.now(),
           passcodeIsSet: true,
           seedPhraseIsSet: true,

@@ -52,9 +52,9 @@ const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
     routes: ["/"],
+    currentAccount: "Frank",
     authentication: {
       loggedIn: true,
-      userName: "Frank",
       time: Date.now(),
       passcodeIsSet: true,
     },

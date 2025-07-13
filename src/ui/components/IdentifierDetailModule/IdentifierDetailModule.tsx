@@ -74,7 +74,7 @@ const IdentifierDetailModule = ({
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
   const [cardData, setCardData] = useState<IdentifierDetailsCore | undefined>();
-  const userName = cardData?.displayName;
+  const displayName = cardData?.displayName;
   const [oobi, setOobi] = useState("");
   const [cloudError, setCloudError] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -90,7 +90,7 @@ const IdentifierDetailModule = ({
     } catch (e) {
       showError("Unable to fetch oobi", e, dispatch);
     }
-  }, [cardData?.id, userName, dispatch]);
+  }, [cardData?.id, displayName, dispatch]);
 
   const isFavourite = favouritesIdentifiersData?.some(
     (fav) => fav.id === identifierDetailId

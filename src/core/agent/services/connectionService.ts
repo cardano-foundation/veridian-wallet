@@ -598,17 +598,15 @@ class ConnectionService extends AgentService {
     connectionId: string,
     identifier: string
   ): Promise<void> {
-    const userName = (
-      await this.basicStorage.findExpectedById(MiscRecordId.USER_NAME)
-    ).content.userName as string;
-
     const connectionRecord = await this.getConnectionMetadataById(connectionId);
     const externalId = new URL(connectionRecord.oobi).searchParams.get(
       OobiQueryParams.EXTERNAL_ID
     );
+    const identifierMetadata =
+      await this.identifierStorage.getIdentifierMetadata(identifier);
     const oobi = await this.getOobi(
       identifier,
-      userName,
+      identifierMetadata.displayName,
       undefined,
       externalId ?? undefined
     );

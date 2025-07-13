@@ -26,7 +26,7 @@ const IdentifierAttributeDetailModal = ({
   data,
   setViewType,
 }: IdentifierAttributeDetailModalProps) => {
-  const userName = useAppSelector(getCurrentAccount);
+  const currentAccount = useAppSelector(getCurrentAccount);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
 
   const handleClose = () => {
@@ -41,7 +41,7 @@ const IdentifierAttributeDetailModal = ({
 
       if (!memberConnection?.label) {
         currentUserIndex = index;
-        name = userName;
+        name = currentAccount;
       }
 
       return {

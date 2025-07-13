@@ -93,7 +93,6 @@ const initialState = {
       time: Date.now(),
       passcodeIsSet: true,
       passwordIsSet: true,
-      userName: "Ann",
     },
   },
   viewTypeCache: {

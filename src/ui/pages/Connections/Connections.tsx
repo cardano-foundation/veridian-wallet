@@ -86,7 +86,7 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
     const [deletePendingItem, setDeletePendingItem] =
       useState<ConnectionShortDetails | null>(null);
     const [openDeletePendingAlert, setOpenDeletePendingAlert] = useState(false);
-    const userName = stateCache.currentAccount;
+    const currentAccount = stateCache.currentAccount;
     const [oobi, setOobi] = useState("");
     const [hideHeader, setHideHeader] = useState(false);
     const [openConnectionlModal, setOpenConnectionlModal] = useState(false);
@@ -168,7 +168,7 @@ const Connections = forwardRef<ConnectionsOptionRef, ConnectionsComponentProps>(
       } catch (e) {
         showError("Unable to fetch connection oobi", e, dispatch);
       }
-    }, [selectedIdentifier?.id, userName, dispatch]);
+    }, [selectedIdentifier?.id, currentAccount, dispatch]);
 
     useOnlineStatusEffect(fetchOobi);
 
