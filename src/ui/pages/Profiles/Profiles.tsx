@@ -16,7 +16,6 @@ import {
 } from "./Profiles.types";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getAuthentication,
   getCurrentAccount,
   setCurrentAccount,
   setToastMsg,

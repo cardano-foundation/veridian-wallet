@@ -6,6 +6,7 @@ import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import configureStore from "redux-mock-store";
+import { current } from "@reduxjs/toolkit";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { connectionsForNotifications } from "../../__fixtures__/connectionsFix";
@@ -77,11 +78,11 @@ const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
+    currentAccount: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
     },
   },
   identifiersCache: {
@@ -101,11 +102,11 @@ const initialState = {
 const fullState = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
+    currentAccount: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
     },
   },
   identifiersCache: {
@@ -129,11 +130,11 @@ const fullState = {
 const filterTestData = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
+    currentAccount: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
     },
   },
   connectionsCache: {
@@ -153,11 +154,11 @@ const filterTestData = {
 const emptyConnection = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
+    currentAccount: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
     },
   },
   connectionsCache: {

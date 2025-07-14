@@ -358,6 +358,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
+      let currentAccount = "";
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -454,15 +455,37 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const appCurrentAccountRecord = await Agent.agent.basicStorage.findById(
+      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
         MiscRecordId.CURRENT_ACCOUNT
       );
 
-      let currentAccount: { value: string } = { value: "" };
-      if (appCurrentAccountRecord) {
-        currentAccount = appCurrentAccountRecord.content as { value: string };
+      if (appDefaultProfileRecord) {
+        currentAccount = (
+          appDefaultProfileRecord.content as { currentAccount: string }
+        ).currentAccount;
+      } else {
+        const storedIdentifiers =
+          await Agent.agent.identifiers.getIdentifiers();
+        if (storedIdentifiers.length > 0) {
+          // If we have no default profile set, we will set the oldest identifier as default.
+          const oldest = storedIdentifiers
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(a.createdAtUTC).getTime() -
+                new Date(b.createdAtUTC).getTime()
+            )[0];
+          const id = oldest?.id || "";
+          currentAccount = id;
+
+          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+            new BasicRecord({
+              id: MiscRecordId.CURRENT_ACCOUNT,
+              content: { defaultProfile: id },
+            })
+          );
+        }
       }
-      dispatch(setCurrentAccount(currentAccount.value));
 
       const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX
@@ -544,6 +567,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
             .value as boolean,
         })
       );
+      dispatch(setCurrentAccount(currentAccount));
 
       return {
         keriaConnectUrlRecord,

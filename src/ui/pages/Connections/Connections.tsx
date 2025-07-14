@@ -53,7 +53,7 @@ const Connections = () => {
   const [mappedConnections, setMappedConnections] = useState<
     MappedConnections[]
   >([]);
-  const [openShareDefaultProfile, setOpenShareDefaultProfile] = useState(false);
+  const [openShareCurrentAccount, setOpenShareCurrentAccount] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [deletePendingItem, setDeletePendingItem] =
     useState<ConnectionShortDetails | null>(null);
@@ -179,7 +179,7 @@ const Connections = () => {
   };
 
   const handleConnectModal = () => {
-    setOpenShareDefaultProfile(true);
+    setOpenShareCurrentAccount(true);
   };
 
   const handleAvatarClick = () => {
@@ -261,8 +261,8 @@ const Connections = () => {
         />
       </TabLayout>
       <ShareProfile
-        isOpen={openShareDefaultProfile}
-        setIsOpen={setOpenShareDefaultProfile}
+        isOpen={openShareCurrentAccount}
+        setIsOpen={setOpenShareCurrentAccount}
         oobi={oobi}
       />
       <Profiles
