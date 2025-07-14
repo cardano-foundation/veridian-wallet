@@ -5,7 +5,6 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import { current } from "@reduxjs/toolkit";
 import { Agent } from "../../../../../../../core/agent/agent";
 import { BasicRecord } from "../../../../../../../core/agent/records";
 import TRANSLATIONS from "../../../../../../../locales/en/en.json";
