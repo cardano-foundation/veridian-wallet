@@ -32,7 +32,7 @@ export const DATA_V1201: HybridMigration = {
     const connections = connectionResult.values;
     const statements: { statement: string; values?: unknown[] }[] = [];
 
-    function insertRecord(record: ContactRecord | ConnectionPairRecord) {
+    function insertRecord(record: any) {
       return {
         statement: "INSERT INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
         values: [
@@ -46,26 +46,28 @@ export const DATA_V1201: HybridMigration = {
 
     for (const connection of connections || []) {
       const connectionData = JSON.parse(connection.value);
-      const contactRecord = new ContactRecord({
+      const contactRecord = {
         id: connectionData.id,
         createdAt: connectionData.createdAt,
         alias: connectionData.alias,
         oobi: connectionData.oobi,
         groupId: connectionData.groupId,
         tags: connectionData.tags,
-      });
+        type: 'ContactRecord',
+      };
 
-      const connectionPairsToInsert: ConnectionPairRecord[] = [];
+      const connectionPairsToInsert: any[] = [];
 
       if (!connectionData.sharedIdentifier) {
         // No sharedIdentifier: create pair for every non-deleted identifier
         for (const identifier of identifiers) {
-          connectionPairsToInsert.push(new ConnectionPairRecord({
+          connectionPairsToInsert.push({
             contactId: contactRecord.id,
             identifier: identifier.id,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
-          }));
+            type: 'ConnectionPairRecord',
+          });
         }
       } else {
         // Has sharedIdentifier: only create pair if identifier exists and is not deleted/pending
@@ -80,12 +82,13 @@ export const DATA_V1201: HybridMigration = {
           });
           continue;
         } else {
-          connectionPairsToInsert.push(new ConnectionPairRecord({
+          connectionPairsToInsert.push({
             contactId: contactRecord.id,
             identifier: identifier.id,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
-          }));
+            type: 'ConnectionPairRecord',
+          });
         }
       }
 
@@ -129,13 +132,20 @@ export const DATA_V1201: HybridMigration = {
       const noteItems: Array<{ key: string; data: any}> = [];
 
       for(const key of Object.keys(contact)) {
-        if (key.startsWith(KeriaContactKeyPrefix.HISTORY_IPEX) || 
-          key.startsWith(KeriaContactKeyPrefix.HISTORY_REVOKE)) {
-          const historyID = JSON.parse(contact[key] as string).id;
+        if (key.startsWith('history:ipex') || 
+          key.startsWith('history:revoke')) {
+          const historyData = JSON.parse(contact[key] as string);
+          const historyID = historyData.id;
+
           const exchange = await signifyClient.exchanges().get(historyID);
 
-          historyItems.push({ key, identifier: exchange.exn.i, data: contact[key] });
-        } else if (key.startsWith(KeriaContactKeyPrefix.CONNECTION_NOTE)) {
+          if(historyData.historyType === '3') { // 3 is CREDENTIAL_PRESENTED
+            historyItems.push({ key, identifier: exchange.exn.i, data: contact[key] });
+          } else {
+            historyItems.push({ key, identifier: exchange.exn.rp, data: contact[key] });
+          }
+
+        } else if (key.startsWith('note:')) {
           noteItems.push({ key, data: contact[key] });
         }
       }
