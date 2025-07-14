@@ -448,9 +448,6 @@
           "placeholder": "You haven’t created any {{ type }} identifiers yet."
         },
         "pendingidentifiers": "Pending identifiers",
-<<<<<<< HEAD
-        "multisigidentifiers": "For groups"
-=======
         "multisigidentifiers": "For groups",
         "welcome": {
           "skip": "Skip",
@@ -458,7 +455,6 @@
           "text": "You're in the perfect spot to create your secure and private digital identity. Let's begin by adding your first identifier!",
           "add": "Add an Identifier"
         }
->>>>>>> a222da8c (feat: wip migrate userName)
       },
       "deletepending": {
         "title": "Identifier options",

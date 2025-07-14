@@ -16,7 +16,7 @@ import {
   getCurrentAccount,
   getCurrentRoute,
 } from "../../../store/reducers/stateCache";
-import { TabsRoutePath } from "../../routes/paths";
+import { TabsRoutePath } from "../../../routes/paths";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";

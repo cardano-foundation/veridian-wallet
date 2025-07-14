@@ -5,6 +5,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
+import { current } from "@reduxjs/toolkit";
 import { Agent } from "../../../../../../../core/agent/agent";
 import { BasicRecord } from "../../../../../../../core/agent/records";
 import TRANSLATIONS from "../../../../../../../locales/en/en.json";
@@ -77,12 +78,12 @@ jest.mock("../../../../../../components/CustomInput", () => ({
 const initialState = {
   stateCache: {
     routes: [RoutePath.GENERATE_SEED_PHRASE],
+    currentAccount: "default-profile-id",
     authentication: {
       loggedIn: false,
       time: Date.now(),
       passcodeIsSet: true,
       seedPhraseIsSet: false,
-      defaultProfile: "",
     },
     currentOperation: OperationType.IDLE,
   },
@@ -237,13 +238,13 @@ describe("Manage password", () => {
     const initialState = {
       stateCache: {
         routes: [RoutePath.GENERATE_SEED_PHRASE],
+        currentAccount: "default-profile-id",
         authentication: {
           loggedIn: false,
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: true,
           seedPhraseIsSet: false,
-          defaultProfile: "",
         },
         currentOperation: OperationType.IDLE,
       },
@@ -325,13 +326,13 @@ describe("Manage password", () => {
     const initialState = {
       stateCache: {
         routes: [RoutePath.GENERATE_SEED_PHRASE],
+        currentAccount: "default-profile-id",
         authentication: {
           loggedIn: false,
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: true,
           seedPhraseIsSet: false,
-          defaultProfile: "",
         },
         currentOperation: OperationType.IDLE,
       },

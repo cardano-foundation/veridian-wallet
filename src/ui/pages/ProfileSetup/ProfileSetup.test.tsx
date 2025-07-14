@@ -82,8 +82,8 @@ describe("Individual setup", () => {
   const mockStore = makeTestStore({
     stateCache: {
       routes: ["/"],
+      currentAccount: "",
       authentication: {
-        defaultProfile: "",
         loggedIn: true,
         time: 0,
         passcodeIsSet: true,

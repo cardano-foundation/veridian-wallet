@@ -17,8 +17,10 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getAuthentication,
+  getCurrentAccount,
   getStateCache,
   setAuthentication,
+  setCurrentAccount,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
@@ -32,13 +34,12 @@ import { showError } from "../../utils/error";
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
   const authentication = useAppSelector(getAuthentication);
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const defaultProfile = stateCache.authentication.defaultProfile;
+  const currentAccountName = useAppSelector(getCurrentAccount);
   const identifiersData = Object.values(identifiersDataCache);
   const filteredIdentifiersData = identifiersData.filter(
-    (item) => item.id !== defaultProfile
+    (item) => item.id !== currentAccountName
   );
 
   const handleClose = () => {
@@ -60,16 +61,11 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     try {
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
-          content: { defaultProfile: id },
+          id: MiscRecordId.CURRENT_ACCOUNT,
+          content: { currentAccount: id },
         })
       );
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: id,
-        })
-      );
+      dispatch(setCurrentAccount(id));
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
     } catch (e) {
@@ -146,7 +142,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         }
       >
         <div className="profiles-selected-profile">
-          <ProfileItem id={defaultProfile} />
+          <ProfileItem id={currentAccountName} />
           <OptionButton
             icon={personCircleOutline}
             text={`${i18n.t("profiles.options.manage")}`}

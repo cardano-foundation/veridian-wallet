@@ -16,6 +16,7 @@ import {
 } from "../../../store/reducers/notificationsCache";
 import {
   getAuthentication,
+  getCurrentAccount,
   setCurrentRoute,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
@@ -61,7 +62,7 @@ const Notifications = () => {
     openUnknownPresentConnectionAlert,
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
-  const authData = useAppSelector(getAuthentication);
+  const currentAccountName = useAppSelector(getCurrentAccount);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
@@ -199,7 +200,7 @@ const Notifications = () => {
   }) => {
     return (
       <Avatar
-        id={authData.defaultProfile}
+        id={currentAccountName}
         handleAvatarClick={handleAvatarClick}
       />
     );

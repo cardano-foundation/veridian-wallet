@@ -12,7 +12,7 @@ import {
   setMissingAliasConnection,
   setOpenConnectionId,
 } from "../../../../store/reducers/connectionsCache";
-import { getAuthentication } from "../../../../store/reducers/stateCache";
+import { getCurrentAccount } from "../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../globals/types";
 import { showError } from "../../../utils/error";
 import { isValidConnectionUrl } from "../../../utils/urlChecker";
@@ -24,7 +24,7 @@ enum ErrorMessage {
 
 const useScanHandle = () => {
   const dispatch = useAppDispatch();
-  const defaultIdentifier = useAppSelector(getAuthentication).defaultProfile;
+  const currentAccount = useAppSelector(getCurrentAccount);
   const connections = useAppSelector(getConnectionsCache);
 
   const resolveIndividualConnection = useCallback(
@@ -52,7 +52,7 @@ const useScanHandle = () => {
             dispatch(
               setMissingAliasConnection({
                 url: content,
-                identifier: defaultIdentifier,
+                identifier: currentAccount,
               })
             );
           });
@@ -60,7 +60,7 @@ const useScanHandle = () => {
           return;
         }
 
-        if (!defaultIdentifier) return;
+        if (!currentAccount) return;
 
         const connectionId = new URL(content).pathname
           .split("/oobi/")
@@ -73,10 +73,7 @@ const useScanHandle = () => {
           );
         }
 
-        await Agent.agent.connections.connectByOobiUrl(
-          content,
-          defaultIdentifier
-        );
+        await Agent.agent.connections.connectByOobiUrl(content, currentAccount);
 
         await closeScan?.();
       } catch (e) {
@@ -124,7 +121,7 @@ const useScanHandle = () => {
         closeScan?.();
       }
     },
-    [connections, defaultIdentifier, dispatch]
+    [connections, currentAccount, dispatch]
   );
 
   return { resolveIndividualConnection };
