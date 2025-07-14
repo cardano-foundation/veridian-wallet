@@ -62,7 +62,7 @@ jobs:
           platforms: arm64
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@chore/filter-docker-repositories
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -235,7 +235,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@chore/filter-docker-repositories
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -286,13 +286,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@chore/filter-docker-repositories
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Dispatch successful build event to private repo
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-dispatch-event@main
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-dispatch-event@chore/filter-docker-repositories
         with:
           EVENT_TYPE: "${{ github.event_name }}-${{ steps.cf-gha-baseline.outputs.TRIGGERING_REF }}-${{ steps.cf-gha-baseline.outputs.BRANCH_NAME }}"
           GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_PAT }}
