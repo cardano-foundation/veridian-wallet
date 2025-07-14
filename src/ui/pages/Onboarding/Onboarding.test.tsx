@@ -132,7 +132,7 @@ describe("Onboarding Page", () => {
     };
     const storeMocked = makeTestStore(initialState);
 
-    const { getByText, queryAllByText } = render(
+    const { getByText } = render(
       <MemoryRouter initialEntries={[RoutePath.ONBOARDING]}>
         <Provider store={storeMocked}>
           <Route
@@ -156,9 +156,9 @@ describe("Onboarding Page", () => {
     });
 
     await waitFor(() => {
-      expect(queryAllByText(EN_TRANSLATIONS.createpassword.title)).toHaveLength(
-        2
-      );
+      expect(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.title)
+      ).toBeVisible();
     });
   });
 

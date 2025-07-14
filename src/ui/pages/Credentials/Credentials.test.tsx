@@ -17,10 +17,10 @@ import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { pendingCredFixs } from "../../__fixtures__/credsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Credentials } from "./Credentials";
 import { CredentialsFilters } from "./Credentials.types";
-import { makeTestStore } from "../../utils/makeTestStore";
 
 const deleteIdentifierMock = jest.fn();
 const archiveIdentifierMock = jest.fn();
@@ -241,7 +241,7 @@ describe("Creds Tab", () => {
 
   test("Open profile", async () => {
     const storeMocked = {
-      ...mockStore(initialStateEmpty),
+      ...makeTestStore(initialStateEmpty),
       dispatch: dispatchMock,
     };
     const { getByText, getByTestId } = render(
