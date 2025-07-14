@@ -207,6 +207,30 @@ describe("habName", () => {
           theme: null,
         },
       },
+      {
+        name: "v1.2.0.3:1--user123:MyGroup",
+        expected: {
+          version: "v1.2.0.3",
+          displayName: "MyGroup",
+          isGroupMember: true,
+          groupId: "",
+          isInitiator: true,
+          userName: "user123",
+          theme: null,
+        },
+      },
+      {
+        name: "01:1-gr@up!d:MyGroup",
+        expected: {
+          version: null,
+          displayName: "MyGroup",
+          isGroupMember: true,
+          groupId: "gr@up!d",
+          isInitiator: true,
+          userName: null,
+          theme: "01",
+        },
+      },
     ])(
       "should handle various edge cases for parsing: %s",
       ({ name, expected }) => {
