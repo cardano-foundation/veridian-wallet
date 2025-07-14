@@ -35,6 +35,35 @@ export const MIGRATION_V1_2_0_3: HybridMigration = {
     return statements;
   },
   cloudMigrationStatements: async (signifyClient) => {
-    // TODO
+    const pageSize = 24;
+    let returned = -1;
+    let iteration = 0;
+
+    while (returned !== 0) {
+      const start = iteration * pageSize;
+      const end = start + pageSize - 1;
+      const result = await signifyClient.identifiers().list(start, end);
+
+      const batchToProcess = result.aids;
+      returned = batchToProcess.length;
+
+      for (const identifier of batchToProcess) {
+        const currentName = identifier.name;
+        const parts = parseHabName(currentName);
+
+        if (parts.version === "v1.2.0.3") {
+          continue;
+        }
+
+        const newName = formatToV1_2_0_3({
+          ...parts,
+          userName: parts.isGroupMember ? "" : null,
+        });
+        await signifyClient
+          .identifiers()
+          .update(identifier.prefix, { name: newName });
+      }
+      iteration += 1;
+    }
   },
 };
