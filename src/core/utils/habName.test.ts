@@ -105,6 +105,18 @@ describe("habName", () => {
           theme: null,
         },
       },
+      {
+        name: "V1.2.0.3:MixedCaseVersion",
+        expected: {
+          version: "v1.2.0.3",
+          displayName: "MixedCaseVersion",
+          isGroupMember: false,
+          groupId: null,
+          isInitiator: null,
+          userName: null,
+          theme: null,
+        },
+      },
     ])("should parse new format name correctly: %s", ({ name, expected }) => {
       const result = parseHabName(name);
       expect(result).toEqual(expected);
@@ -215,6 +227,10 @@ describe("habName", () => {
       },
       {
         name: "04:1-group-with-hyphens:Group Name",
+        errorMessage: "Invalid old format name: Malformed group structure.",
+      },
+      {
+        name: "01:Name-With-Hyphen",
         errorMessage: "Invalid old format name: Malformed group structure.",
       },
       {
@@ -367,18 +383,6 @@ describe("habName", () => {
         },
         expected: "v1.2.0.3:0--:Empty Group",
       },
-      {
-        parts: {
-          version: null,
-          displayName: "Display:Name:With:Colons",
-          isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
-          theme: "XX",
-        },
-        expected: "v1.2.0.3:Display:Name:With:Colons",
-      },
     ])(
       "should handle various edge cases for formatting: %s",
       ({ parts, expected }) => {
@@ -413,6 +417,31 @@ describe("habName", () => {
       };
       const result = formatToV1_2_0_3(parts);
       expect(result).toBe("v1.2.0.3:1--user1:Malformed Group");
+    });
+
+    describe("when formatting with invalid parts", () => {
+      test("should throw if displayName contains a colon", () => {
+        const parts = {
+          displayName: "Invalid:Name",
+          isGroupMember: false,
+        } as any; // Cast to any to bypass type-checking for test
+        expect(() => formatToV1_2_0_3(parts)).toThrow(
+          "Invalid parts: displayName cannot contain colons."
+        );
+      });
+
+      test("should throw if groupId contains a colon", () => {
+        const parts = {
+          displayName: "Valid Name",
+          isGroupMember: true,
+          groupId: "invalid:group",
+          isInitiator: true,
+          userName: "user",
+        } as any; // Cast to any to bypass type-checking for test
+        expect(() => formatToV1_2_0_3(parts)).toThrow(
+          "Invalid parts: groupId cannot contain colons."
+        );
+      });
     });
   });
 });
