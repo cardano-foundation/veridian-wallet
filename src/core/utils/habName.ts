@@ -9,7 +9,7 @@ export interface HabNameParts {
 }
 
 export function parseHabName(name: string): HabNameParts {
-  if (name.startsWith("v1.2.0.3:")) {
+  if (name.toLowerCase().startsWith("v1.2.0.3:")) {
     const version = "v1.2.0.3";
     const rest = name.substring(version.length + 1);
 
@@ -126,6 +126,13 @@ export function parseHabName(name: string): HabNameParts {
 }
 
 export function formatToV1_2_0_3(parts: HabNameParts): string {
+  if (parts.displayName.includes(":")) {
+    throw new Error("Invalid parts: displayName cannot contain colons.");
+  }
+  if (parts.groupId?.includes(":")) {
+    throw new Error("Invalid parts: groupId cannot contain colons.");
+  }
+
   const version = "v1.2.0.3";
   if (parts.isGroupMember) {
     const initiator = parts.isInitiator ? "1" : "0";
