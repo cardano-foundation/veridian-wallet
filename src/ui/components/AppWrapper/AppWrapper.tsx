@@ -52,6 +52,7 @@ import {
   getRecoveryCompleteNoInterruption,
   setAuthentication,
   setCameraDirection,
+  setCurrentAccount,
   setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
@@ -357,7 +358,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let defaultProfile = "";
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -454,37 +454,15 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.DEFAULT_PROFILE
+      const appCurrentAccountRecord = await Agent.agent.basicStorage.findById(
+        MiscRecordId.CURRENT_ACCOUNT
       );
 
-      if (appDefaultProfileRecord) {
-        defaultProfile = (
-          appDefaultProfileRecord.content as { defaultProfile: string }
-        ).defaultProfile;
-      } else {
-        const storedIdentifiers =
-          await Agent.agent.identifiers.getIdentifiers();
-        if (storedIdentifiers.length > 0) {
-          // If we have no default profile set, we will set the oldest identifier as default.
-          const oldest = storedIdentifiers
-            .slice()
-            .sort(
-              (a, b) =>
-                new Date(a.createdAtUTC).getTime() -
-                new Date(b.createdAtUTC).getTime()
-            )[0];
-          const id = oldest?.id || "";
-          defaultProfile = id;
-
-          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.DEFAULT_PROFILE,
-              content: { defaultProfile: id },
-            })
-          );
-        }
+      let currentAccount: { value: string } = { value: "" };
+      if (appCurrentAccountRecord) {
+        currentAccount = appCurrentAccountRecord.content as { value: string };
       }
+      dispatch(setCurrentAccount(currentAccount.value));
 
       const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX

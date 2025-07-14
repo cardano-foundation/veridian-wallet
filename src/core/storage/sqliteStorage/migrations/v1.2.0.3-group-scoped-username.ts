@@ -2,8 +2,8 @@ import { SQLiteDBConnection } from "@capacitor-community/sqlite";
 import { MigrationType, HybridMigration } from "./migrations.types";
 import { formatToV1_2_0_3, parseHabName } from "../../../utils/habName";
 
-export const MIGRATION_V1_2_0: HybridMigration = {
-  version: "1.2.0",
+export const MIGRATION_V1_2_0_3: HybridMigration = {
+  version: "1.2.0.3",
   type: MigrationType.HYBRID,
   localMigrationStatements: async (session: SQLiteDBConnection) => {
     const statements = [];

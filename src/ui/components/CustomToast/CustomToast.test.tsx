@@ -12,9 +12,9 @@ describe("Custom toast", () => {
   const initialState = {
     stateCache: {
       routes: ["/"],
+      currentAccount: "Account1",
       authentication: {
         loggedIn: true,
-        userName: "Test",
         time: Date.now(),
         passcodeIsSet: true,
       },
@@ -65,10 +65,6 @@ describe("Custom toast", () => {
       </Provider>
     );
     expect(getByTestId("confirmation-toast-1")).toHaveAttribute(
-      "message",
-      EN_TRANSLATIONS.toast.usernamecreationerror
-    );
-    expect(getByTestId("confirmation-toast-1")).toHaveAttribute(
       "color",
       "danger"
     );
@@ -81,9 +77,9 @@ describe("Toast stack", () => {
   const initialState = {
     stateCache: {
       routes: ["/"],
+      currentAccount: "Account1",
       authentication: {
         loggedIn: true,
-        userName: "Test",
         time: Date.now(),
         passcodeIsSet: true,
       },

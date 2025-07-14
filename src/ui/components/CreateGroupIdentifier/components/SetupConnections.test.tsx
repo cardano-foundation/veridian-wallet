@@ -79,7 +79,6 @@ describe("Create group identifier - Setup Connection", () => {
         time: Date.now(),
         passcodeIsSet: true,
         passwordIsSet: false,
-        userName: "Duke",
       },
       isOnline: true,
       queueIncomingRequest: {
@@ -534,12 +533,12 @@ describe("Create group identifier - Setup Connection", () => {
     const baseState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
+        currentAccount: "Account1",
         authentication: {
           loggedIn: true,
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: false,
-          userName: "Duke",
         },
         queueIncomingRequest: {
           isProcessing: false,

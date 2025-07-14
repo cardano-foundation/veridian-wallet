@@ -1216,7 +1216,7 @@ describe("Connection service of agent", () => {
       oobi: "http://test.oobi",
     });
     basicStorage.findExpectedById.mockResolvedValue({
-      content: { userName: "Alice" },
+      content: { displayName: "Alice" },
     });
     identifierStorage.getIdentifierMetadata.mockResolvedValue(individualRecord);
     getOobiMock.mockImplementation((name: string) => {
@@ -1246,7 +1246,7 @@ describe("Connection service of agent", () => {
       oobi: "http://test.oobi?name=Bob&externalId=test123&randomQueryParam=random",
     });
     basicStorage.findExpectedById.mockResolvedValue({
-      content: { userName: "Alice" },
+      content: { displayName: "Alice" },
     });
     identifierStorage.getIdentifierMetadata.mockResolvedValue(individualRecord);
     getOobiMock.mockImplementation((name: string) => {
