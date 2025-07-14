@@ -22,8 +22,10 @@ import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
 import { Settings } from "../../components/Setting";
+import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
+import { ProfileSetup } from "../ProfileSetup";
 import "./Profiles.scss";
 import {
   OptionButtonProps,
@@ -80,6 +82,8 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   );
   const [openSetting, setOpenSetting] = useState(false);
 
+  const [openSetupProfile, setOpenSetupProfile] = useState(false);
+
   const handleClose = () => {
     setIsOpen(false);
   };
@@ -88,7 +92,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   const handleAddProfile = () => {
-    // TODO: Implement the logic to add a new profile
+    setOpenSetupProfile(true);
   };
 
   const handleJoinGroup = () => {
@@ -120,6 +124,8 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       );
     }
   };
+
+  const handleCloseSetupProfile = () => setOpenSetupProfile(false);
 
   return (
     <>
@@ -190,6 +196,17 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         show={openSetting}
         setShow={setOpenSetting}
       />
+      <SideSlider
+        isOpen={openSetupProfile}
+        renderAsModal
+      >
+        <ProfileSetup
+          onClose={(cancel) => {
+            handleCloseSetupProfile();
+            if (!cancel) setIsOpen(false);
+          }}
+        />
+      </SideSlider>
     </>
   );
 };

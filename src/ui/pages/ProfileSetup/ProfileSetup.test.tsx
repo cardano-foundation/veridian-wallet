@@ -330,3 +330,95 @@ describe("Individual setup", () => {
     });
   });
 });
+
+describe("Profile setup: use as modal", () => {
+  const mockStore = makeTestStore({
+    stateCache: {
+      routes: ["/"],
+      authentication: {
+        defaultProfile: "",
+        loggedIn: true,
+        time: 0,
+        passcodeIsSet: true,
+        seedPhraseIsSet: true,
+        passwordIsSet: false,
+        passwordIsSkipped: true,
+        ssiAgentIsSet: true,
+        ssiAgentUrl: "http://keria.com",
+        recoveryWalletProgress: false,
+        loginAttempt: {
+          attempts: 0,
+          lockedUntil: 0,
+        },
+        firstAppLaunch: false,
+      },
+    },
+    connectionsCache: {
+      connections: connectionsFix,
+    },
+    identifiersCache: {
+      identifiers: filteredIdentifierFix,
+      favourites: [],
+    },
+  });
+
+  const dispatchMock = jest.fn();
+
+  const storeMocked = {
+    ...mockStore,
+    dispatch: dispatchMock,
+  };
+
+  test("Skip welcome and dipslay credential page after setup profile", async () => {
+    const history = createMemoryHistory();
+    const onClose = jest.fn();
+    const { getByText, getByTestId } = render(
+      <IonReactMemoryRouter history={history}>
+        <Provider store={storeMocked}>
+          <ProfileSetup onClose={onClose} />
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    expect(
+      getByText(EN_TRANSLATIONS.setupprofile.button.confirm)
+    ).toBeVisible();
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.setupprofile.button.confirm));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.setupprofile.profilesetup.title)
+      ).toBeVisible();
+    });
+
+    ionFireEvent.ionInput(getByTestId("profile-user-name"), "testUser");
+
+    await waitFor(() => {
+      expect((getByTestId("profile-user-name") as HTMLInputElement).value).toBe(
+        "testUser"
+      );
+    });
+
+    jest
+      .spyOn(Agent.agent.basicStorage, "createOrUpdateBasicRecord")
+      .mockImplementation(() => {
+        return Promise.resolve();
+      });
+
+    fireEvent.click(getByTestId("primary-button-profile-setup"));
+    await waitFor(() => {
+      expect(createIdentifierMock).toBeCalledWith({
+        displayName: "testUser",
+        theme: 0,
+      });
+    });
+
+    expect(onClose).toBeCalled();
+    expect(dispatchMock).toBeCalledWith(
+      setCurrentRoute({
+        path: TabsRoutePath.CREDENTIALS,
+      })
+    );
+  });
+});

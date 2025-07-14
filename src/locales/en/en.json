@@ -1541,7 +1541,8 @@
     "button": {
       "back": "Back",
       "confirm": "Confirm",
-      "started": "Get started"
+      "started": "Get started",
+      "cancel": "Cancel"
     }
   },
   "systemthreats": {
