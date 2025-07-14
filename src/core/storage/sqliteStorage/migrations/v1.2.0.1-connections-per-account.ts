@@ -137,7 +137,7 @@ export const DATA_V1201: HybridMigration = {
 
           const exchange = await signifyClient.exchanges().get(historyID);
 
-          if(connectionHistoryTypeStringToEnumMap[historyData.historyType] === ConnectionHistoryType.CREDENTIAL_PRESENTED) {
+          if(connectionHistoryTypeNumericToStringValueMap[historyData.historyType] === 'CREDENTIAL_PRESENTED') {
             historyItems.push({ key, identifier: exchange.exn.i, data: contact[key] });
           } else {
             historyItems.push({ key, identifier: exchange.exn.rp, data: contact[key] });
@@ -217,10 +217,10 @@ export const DATA_V1201: HybridMigration = {
 }; 
 
 // Map old values to new string values for migration
-export const connectionHistoryTypeStringToEnumMap: Record<string, ConnectionHistoryType> = {
-  "0": ConnectionHistoryType.CREDENTIAL_ISSUANCE,
-  "1": ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT,
-  "2": ConnectionHistoryType.CREDENTIAL_REVOKED,
-  "3": ConnectionHistoryType.CREDENTIAL_PRESENTED,
-  "4": ConnectionHistoryType.IPEX_AGREE_COMPLETE,
-};
+const connectionHistoryTypeNumericToStringValueMap: Record<string, string> = {
+  "0": "CREDENTIAL_ISSUANCE",
+  "1": "CREDENTIAL_REQUEST_PRESENT",
+  "2": "CREDENTIAL_REVOKED",
+  "3": "CREDENTIAL_PRESENTED",
+  "4": "IPEX_AGREE_COMPLETE",
+}
