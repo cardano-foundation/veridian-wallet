@@ -442,8 +442,7 @@ describe("AppWrapper - currentAccount logic", () => {
     jest.clearAllMocks();
   });
 
-  // TODO
-  test.skip("sets currentAccount to the oldest identifier if no default profile is set", async () => {
+  test("sets currentAccount to the oldest identifier if no default profile is set", async () => {
     Agent.agent.basicStorage.findById = jest.fn().mockImplementation((id) => {
       if (id === MiscRecordId.CURRENT_ACCOUNT) return Promise.resolve(null);
       return Promise.resolve(null);
