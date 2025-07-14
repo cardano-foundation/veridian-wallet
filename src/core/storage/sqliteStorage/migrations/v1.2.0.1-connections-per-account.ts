@@ -1,8 +1,6 @@
 import { MigrationType, HybridMigration } from "./migrations.types";
 import { SignifyClient } from "signify-ts";
-import { KeriaContactKeyPrefix } from "../../../agent/services/connectionService.types";
-import { ContactRecord, ConnectionPairRecord } from "../../../agent/records";
-import { CreationStatus } from "../../../agent/agent.types";
+import { ConnectionHistoryType } from "../../../agent/services/connectionService.types";
 
 export const DATA_V1201: HybridMigration = {
   type: MigrationType.HYBRID,
@@ -139,7 +137,7 @@ export const DATA_V1201: HybridMigration = {
 
           const exchange = await signifyClient.exchanges().get(historyID);
 
-          if(historyData.historyType === '3') { // 3 is CREDENTIAL_PRESENTED
+          if(connectionHistoryTypeStringToEnumMap[historyData.historyType] === ConnectionHistoryType.CREDENTIAL_PRESENTED) {
             historyItems.push({ key, identifier: exchange.exn.i, data: contact[key] });
           } else {
             historyItems.push({ key, identifier: exchange.exn.rp, data: contact[key] });
@@ -217,3 +215,12 @@ export const DATA_V1201: HybridMigration = {
     console.log(`Cloud migration completed: ${contacts.length} connections migrated to account-based model`);
   },
 }; 
+
+// Map old values to new string values for migration
+export const connectionHistoryTypeStringToEnumMap: Record<string, ConnectionHistoryType> = {
+  "0": ConnectionHistoryType.CREDENTIAL_ISSUANCE,
+  "1": ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT,
+  "2": ConnectionHistoryType.CREDENTIAL_REVOKED,
+  "3": ConnectionHistoryType.CREDENTIAL_PRESENTED,
+  "4": ConnectionHistoryType.IPEX_AGREE_COMPLETE,
+};
