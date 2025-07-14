@@ -11,12 +11,6 @@ import {
   setMissingAliasConnection,
   setOpenConnectionId,
 } from "../../../store/reducers/connectionsCache";
-import {
-  getAuthentication,
-  getCurrentAccount,
-  getCurrentRoute,
-} from "../../../store/reducers/stateCache";
-import { TabsRoutePath } from "../../../routes/paths";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
@@ -28,9 +22,6 @@ import "./InputRequest.scss";
 const InputRequest = () => {
   const dispatch = useAppDispatch();
   const connections = useAppSelector(getConnectionsCache);
-  const authentication = useAppSelector(getAuthentication);
-  const currentAccount = useAppSelector(getCurrentAccount);
-  const currentRoute = useAppSelector(getCurrentRoute);
   const missingAliasConnection = useAppSelector(getMissingAliasConnection);
   const missingAliasUrl = missingAliasConnection?.url;
 
@@ -42,11 +33,7 @@ const InputRequest = () => {
     ? nameChecker.getError(inputValue)
     : undefined;
 
-  const showModal =
-    (authentication.loggedIn &&
-      (currentAccount === undefined || currentAccount.length === 0) &&
-      currentRoute?.path?.includes(TabsRoutePath.ROOT)) ||
-    !!missingAliasUrl;
+  const showModal = !!missingAliasUrl;
 
   useEffect(() => {
     if (!showModal) {
@@ -108,11 +95,13 @@ const InputRequest = () => {
     }
   };
 
-  const title = i18n.t("inputrequest.title.connectionalias");
+  const title = missingAliasUrl
+    ? i18n.t("inputrequest.title.connectionalias")
+    : i18n.t("inputrequest.title.username");
 
   return (
     <IonModal
-      isOpen={!!missingAliasUrl}
+      isOpen={showModal}
       id={componentId}
       data-testid={`${componentId}-modal`}
       className={missingAliasUrl ? "connection-alias" : undefined}
