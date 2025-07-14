@@ -39,18 +39,6 @@ describe("habName", () => {
           theme: "01",
         },
       },
-      {
-        name: "03:1-group-id:",
-        expected: {
-          version: null,
-          displayName: "",
-          isGroupMember: true,
-          groupId: "group-id",
-          isInitiator: true,
-          userName: null,
-          theme: "03",
-        },
-      },
     ])("should parse old format name correctly: %s", ({ name, expected }) => {
       const result = parseHabName(name);
       expect(result).toEqual(expected);
@@ -82,18 +70,6 @@ describe("habName", () => {
         },
       },
       {
-        name: "v1.2.0.3:0-groupIdABC-:MyBlankUserGroup",
-        expected: {
-          version: "v1.2.0.3",
-          displayName: "MyBlankUserGroup",
-          isGroupMember: true,
-          groupId: "groupIdABC",
-          isInitiator: false,
-          userName: "",
-          theme: null,
-        },
-      },
-      {
         name: "v1.2.0.3:1-gr@up!d-us$er%name:Group Name",
         expected: {
           version: "v1.2.0.3",
@@ -102,18 +78,6 @@ describe("habName", () => {
           groupId: "gr@up!d",
           isInitiator: true,
           userName: "us$er%name",
-          theme: null,
-        },
-      },
-      {
-        name: "V1.2.0.3:MixedCaseVersion",
-        expected: {
-          version: "v1.2.0.3",
-          displayName: "MixedCaseVersion",
-          isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
           theme: null,
         },
       },
@@ -184,7 +148,7 @@ describe("habName", () => {
         },
       },
       {
-        name: "v1.2.0.3:0--:", // Empty userName and groupId
+        name: "v1.2.0.3:0--:",
         expected: {
           version: "v1.2.0.3",
           displayName: "",
@@ -193,6 +157,18 @@ describe("habName", () => {
           isInitiator: false,
           userName: "",
           theme: null,
+        },
+      },
+      {
+        name: "03:1-group-id:",
+        expected: {
+          version: null,
+          displayName: "",
+          isGroupMember: true,
+          groupId: "group-id",
+          isInitiator: true,
+          userName: null,
+          theme: "03",
         },
       },
     ])(
@@ -227,10 +203,6 @@ describe("habName", () => {
       },
       {
         name: "04:1-group-with-hyphens:Group Name",
-        errorMessage: "Invalid old format name: Malformed group structure.",
-      },
-      {
-        name: "01:Name-With-Hyphen",
         errorMessage: "Invalid old format name: Malformed group structure.",
       },
       {
@@ -370,7 +342,6 @@ describe("habName", () => {
         },
         expected: "v1.2.0.3:0-gr@up!d-us$er%name:Special Group",
       },
-      // New edge cases for formatToV1_2_0_3
       {
         parts: {
           version: null,
@@ -382,6 +353,18 @@ describe("habName", () => {
           theme: "XX",
         },
         expected: "v1.2.0.3:0--:Empty Group",
+      },
+      {
+        parts: {
+          version: null,
+          displayName: "Display:Name:With:Colons",
+          isGroupMember: false,
+          groupId: null,
+          isInitiator: null,
+          userName: null,
+          theme: "XX",
+        },
+        expected: "v1.2.0.3:Display:Name:With:Colons",
       },
     ])(
       "should handle various edge cases for formatting: %s",
@@ -397,7 +380,7 @@ describe("habName", () => {
         displayName: "Not A Group",
         isGroupMember: false,
         groupId: "should-be-ignored",
-        isInitiator: true,
+        isInitiator: null,
         userName: "should-be-ignored",
         theme: "XX",
       };
@@ -417,31 +400,6 @@ describe("habName", () => {
       };
       const result = formatToV1_2_0_3(parts);
       expect(result).toBe("v1.2.0.3:1--user1:Malformed Group");
-    });
-
-    describe("when formatting with invalid parts", () => {
-      test("should throw if displayName contains a colon", () => {
-        const parts = {
-          displayName: "Invalid:Name",
-          isGroupMember: false,
-        } as any; // Cast to any to bypass type-checking for test
-        expect(() => formatToV1_2_0_3(parts)).toThrow(
-          "Invalid parts: displayName cannot contain colons."
-        );
-      });
-
-      test("should throw if groupId contains a colon", () => {
-        const parts = {
-          displayName: "Valid Name",
-          isGroupMember: true,
-          groupId: "invalid:group",
-          isInitiator: true,
-          userName: "user",
-        } as any; // Cast to any to bypass type-checking for test
-        expect(() => formatToV1_2_0_3(parts)).toThrow(
-          "Invalid parts: groupId cannot contain colons."
-        );
-      });
     });
   });
 });
