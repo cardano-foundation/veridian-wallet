@@ -225,11 +225,16 @@ class IdentifierService extends AgentService {
       throw new Error(IdentifierService.INVALID_THEME);
     }
 
+    // TODO: remove theme
     // For simplicity, it's up to the UI to provide a unique name
     let name = `${metadata.theme}:${metadata.displayName}`;
     if (metadata.groupMetadata) {
       const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
-      name = `${metadata.theme}:${initiatorFlag}-${metadata.groupMetadata.groupId}:${metadata.displayName}`;
+      // Add userName to the name string
+      const userNamePart = metadata.groupMetadata.userName
+        ? `-${metadata.groupMetadata.userName}`
+        : "";
+      name = `${metadata.theme}:${initiatorFlag}-${metadata.groupMetadata.groupId}${userNamePart}:${metadata.displayName}`;
     }
 
     // For distributed reliability, store name so we can re-try on start-up
