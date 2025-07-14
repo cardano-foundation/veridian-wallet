@@ -50,26 +50,6 @@ describe("Custom toast", () => {
     );
   });
 
-  test("It renders message with user name successfully", async () => {
-    const toastMsg = {
-      id: "1",
-      message: ToastMsgType.USERNAME_CREATION_SUCCESS,
-    };
-
-    const { getByTestId } = render(
-      <Provider store={storeMocked}>
-        <CustomToast
-          toastMsg={toastMsg}
-          index={0}
-        />
-      </Provider>
-    );
-    expect(getByTestId("confirmation-toast-1")).toHaveAttribute(
-      "message",
-      "Welcome, Test!"
-    );
-  });
-
   test("It renders error message successfully", async () => {
     const toastMsg = {
       id: "1",

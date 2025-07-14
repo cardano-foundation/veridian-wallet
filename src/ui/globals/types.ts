@@ -45,7 +45,6 @@ enum ToastMsgType {
   NOTES_UPDATED = "notesUpdated",
   NOTE_REMOVED = "noteRemoved",
   MAX_FAVOURITES_REACHED = "maxFavouritesReached",
-  USERNAME_CREATION_SUCCESS = "usernameCreationSuccess",
   USERNAME_CREATION_ERROR = "usernameCreationError",
   WALLET_CONNECTION_DELETED = "walletconnectiondeleted",
   CONNECT_WALLET_SUCCESS = "connectwalletsuccess",

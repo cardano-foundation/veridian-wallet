@@ -553,7 +553,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(
         setAuthentication({
           ...authentication,
-          defaultProfile,
           passcodeIsSet,
           seedPhraseIsSet,
           passwordIsSet,

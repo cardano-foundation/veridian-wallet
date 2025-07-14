@@ -6,6 +6,7 @@ import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { store } from "../../../store";
+import { showConnections } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { Menu } from "./Menu";
@@ -88,9 +89,6 @@ describe("Menu Tab", () => {
     expect(getByTestId("menu-tab")).toBeInTheDocument();
     expect(getByText(EN_TRANSLATIONS.tabs.menu.tab.header)).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
-    ).toBeInTheDocument();
-    expect(
       getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connections.title)
     ).toBeInTheDocument();
     expect(
@@ -98,50 +96,28 @@ describe("Menu Tab", () => {
     ).toBeInTheDocument();
   });
 
-  test("Open Profile sub-menu", async () => {
-    const { getByTestId, getByText, unmount } = render(
-      <Provider store={storeMocked}>
-        <Menu />
-      </Provider>
-    );
-
-    expect(getByTestId("menu-tab")).toBeInTheDocument();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
-    ).toBeInTheDocument();
-
-    act(() => {
-      fireEvent.click(getByTestId("settings-button"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("settings-security-items")).toBeVisible();
-    });
-
-    unmount();
-  });
-
-  test("Open Profile sub-menu", async () => {
+  test("Open Connections view", async () => {
     const { getByTestId, getByText } = render(
-      <Provider store={storeMocked}>
-        <Menu />
-      </Provider>
+      <MemoryRouter initialEntries={[TabsRoutePath.MENU]}>
+        <Provider store={storeMocked}>
+          <Menu />
+        </Provider>
+      </MemoryRouter>
     );
 
     expect(getByTestId("menu-tab")).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
+      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connections.title)
     ).toBeInTheDocument();
-    const profileButton = getByTestId(`menu-input-item-${SubMenuKey.Profile}`);
-
+    const connectionsButton = getByTestId(
+      `menu-input-item-${SubMenuKey.Connections}`
+    );
     act(() => {
-      fireEvent.click(profileButton);
+      fireEvent.click(connectionsButton);
     });
 
     await waitFor(() => {
-      expect(getByTestId("profile-title")).toHaveTextContent(
-        EN_TRANSLATIONS.tabs.menu.tab.items.profile.tabheader
-      );
+      expect(dispatchMock).toBeCalledWith(showConnections(true));
     });
   });
 

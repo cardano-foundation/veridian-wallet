@@ -314,6 +314,11 @@ class Agent {
       bootUrl: "",
     });
 
+    // Validate and run any missed cloud migrations after recovery
+    if (this.storageSession instanceof SqliteSession) {
+      await this.storageSession.validateCloudMigrationsOnRecovery();
+    }
+
     await this.syncWithKeria();
   }
 

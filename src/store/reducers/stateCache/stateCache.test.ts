@@ -91,7 +91,6 @@ describe("State Cache", () => {
   test("should set the authentication cache", () => {
     const authentication: AuthenticationCacheProps = {
       loggedIn: false,
-      userName: "",
       time: 0,
       passcodeIsSet: false,
       seedPhraseIsSet: false,
