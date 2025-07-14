@@ -9,6 +9,7 @@ import {
   dequeueIncomingRequest,
   enqueueIncomingRequest,
   getAuthentication,
+  getCurrentAccount,
   getCurrentOperation,
   getCurrentRoute,
   getStateCache,
@@ -16,6 +17,7 @@ import {
   login,
   logout,
   setAuthentication,
+  setCurrentAccount,
   setCurrentOperation,
   setCurrentRoute,
   setIsOnline,
@@ -128,6 +130,31 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialState, action);
     expect(nextState.authentication.loggedIn).toEqual(true);
     expect(nextState).not.toBe(initialState);
+  });
+
+  test("should return the initial currentAccount", () => {
+    // Check the initial state directly from the slice definition
+    expect(initialState.currentAccount).toEqual("Account1");
+  });
+  test("should handle setCurrentAccount action", () => {
+    const newAccount = "Account2";
+    const nextState = stateCacheSlice.reducer(
+      initialState,
+      setCurrentAccount(newAccount)
+    );
+    expect(nextState.currentAccount).toEqual(newAccount);
+  });
+
+  test("getCurrentAccount should select the current account from state", () => {
+    const mockState: Partial<RootState> = {
+      stateCache: {
+        ...initialState,
+        currentAccount: "TestAccount123",
+      },
+    };
+
+    const selectedAccount = getCurrentAccount(mockState as RootState);
+    expect(selectedAccount).toEqual("TestAccount123");
   });
 
   test("should set the currentOperation cache", () => {
