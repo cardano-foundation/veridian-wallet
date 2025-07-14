@@ -13,9 +13,9 @@ import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { formatShortDate } from "../../utils/formatters";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Connections } from "./Connections";
-import { makeTestStore } from "../../utils/makeTestStore";
 
 const deleteConnectionByIdMock = jest.fn();
 const getConnectionByIdMock = jest.fn();

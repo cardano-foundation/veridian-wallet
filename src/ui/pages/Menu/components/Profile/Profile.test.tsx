@@ -3,11 +3,11 @@ import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { setAuthentication } from "../../../../../store/reducers/stateCache";
 import { CustomInputProps } from "../../../../components/CustomInput/CustomInput.types";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 import { Menu } from "../../Menu";
 import { SubMenuKey } from "../../Menu.types";
 
@@ -116,13 +116,10 @@ const initialState = {
   },
 };
 
-const mockStore = configureStore({
-  reducer: (state = initialState, action) => state,
-});
 const dispatchMock = jest.fn();
 
 const storeMocked = {
-  ...mockStore,
+  ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
 

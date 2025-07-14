@@ -6,7 +6,6 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import {
@@ -25,6 +24,7 @@ import { passcodeFiller } from "../../utils/passcodeFiller";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CredentialDetailModule } from "./CredentialDetailModule";
 import { initiatorConnectionShortDetails } from "../../../core/__fixtures__/agent/multiSigFixtures";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
 
@@ -83,7 +83,6 @@ jest.mock("@ionic/react", () => ({
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 
 const initialStateNoPasswordCurrent = {
@@ -160,10 +159,9 @@ describe("Cred Detail Module - current not archived credential", () => {
       .mockImplementation(() => Promise.resolve(credsFixAcdc[0]));
   });
   beforeEach(() => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateNoPasswordCurrent),
+      ...makeTestStore(initialStateNoPasswordCurrent),
       dispatch: dispatchMock,
     };
   });
@@ -280,7 +278,7 @@ describe("Cred Detail Module - current not archived credential", () => {
 
   test("It changes to favourite icon on click disabled favourite button", async () => {
     const storeMocked = {
-      ...mockStore(initialStateNoPasswordCurrent),
+      ...makeTestStore(initialStateNoPasswordCurrent),
       dispatch: dispatchMock,
     };
 
@@ -365,7 +363,7 @@ describe("Cred Detail Module - current not archived credential", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialStateNoPasswordCurrent),
+      ...makeTestStore(initialStateNoPasswordCurrent),
       dispatch: dispatchMock,
     };
 
@@ -440,7 +438,7 @@ describe("Cred Detail Module - current not archived credential", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialStateNoPasswordCurrent),
+      ...makeTestStore(initialStateNoPasswordCurrent),
       dispatch: dispatchMock,
     };
 
@@ -576,9 +574,8 @@ describe("Cred Detail Module - archived", () => {
       .mockResolvedValue(credsFixAcdc[0]);
   });
   beforeEach(() => {
-    const mockStore = configureStore();
     storeMocked = {
-      ...mockStore(initialStateNoPasswordArchived),
+      ...makeTestStore(initialStateNoPasswordArchived),
       dispatch: credDispatchMock,
     };
   });
@@ -759,9 +756,8 @@ describe("Cred Detail Module - light mode", () => {
       .mockResolvedValue(credsFixAcdc[0]);
   });
   beforeEach(() => {
-    const mockStore = configureStore();
     storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: credDispatchMock,
     };
   });
@@ -843,9 +839,8 @@ describe("Cred detail - revoked", () => {
   });
 
   beforeEach(() => {
-    const mockStore = configureStore();
     storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: credDispatchMock,
     };
   });
@@ -966,9 +961,8 @@ describe("Cred detail - view only", () => {
   });
 
   beforeEach(() => {
-    const mockStore = configureStore();
     storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: credDispatchMock,
     };
   });

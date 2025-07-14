@@ -1,11 +1,11 @@
 import { fireEvent, render } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
-import { PageHeader } from "./PageHeader";
+
 import { RoutePath } from "../../../routes";
+import { makeTestStore } from "../../utils/makeTestStore";
+import { PageHeader } from "./PageHeader";
 
 describe("Page Header", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -23,7 +23,7 @@ describe("Page Header", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 

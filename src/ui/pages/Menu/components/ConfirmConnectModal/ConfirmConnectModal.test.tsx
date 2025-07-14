@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
@@ -9,6 +9,7 @@ import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 import { ToastMsgType } from "../../../../globals/types";
 import { ConfirmConnectModal } from "./ConfirmConnectModal";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -22,7 +23,6 @@ jest.mock("@ionic/react", () => ({
   ),
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
@@ -44,7 +44,7 @@ const initialState = {
 };
 
 const storeMocked = {
-  ...mockStore(initialState),
+  ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
 
@@ -188,7 +188,7 @@ describe("Confirm connect modal", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

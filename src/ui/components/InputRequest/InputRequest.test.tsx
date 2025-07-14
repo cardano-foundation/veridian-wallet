@@ -3,7 +3,6 @@ import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { StorageMessage } from "../../../core/storage/storage.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { setOpenConnectionId } from "../../../store/reducers/connectionsCache";
@@ -13,6 +12,7 @@ import { identifierFix } from "../../__fixtures__/identifierFix";
 import { ToastMsgType } from "../../globals/types";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { InputRequest } from "./InputRequest";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const connectByOobiUrl = jest.fn();
 jest.mock("../../../core/agent/agent", () => ({
@@ -72,7 +72,6 @@ jest.mock("signify-ts", () => ({
 }));
 
 describe("Set connection alias", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -103,7 +102,7 @@ describe("Set connection alias", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 

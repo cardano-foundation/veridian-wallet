@@ -14,7 +14,6 @@ import { act } from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { OperationType } from "../../globals/types";
@@ -23,6 +22,7 @@ import { SetPasscode } from "../SetPasscode";
 import { LockPage } from "./LockPage";
 import { KeyStoreKeys } from "../../../core/storage";
 import { MiscRecordId } from "../../../core/agent/agent.types";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const deleteSecureStorageMock = jest.fn();
 jest.mock("../../../core/storage", () => ({
@@ -114,11 +114,10 @@ interface StoreMockedProps {
   };
 }
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const storeMocked = (initialState: StoreMockedProps) => {
   return {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 };
@@ -233,7 +232,7 @@ describe("Lock Page", () => {
   test("Forgot passcode before verify seedphrase", async () => {
     const storeMocked = (initialState: StoreMockedProps) => {
       return {
-        ...mockStore(initialState),
+        ...makeTestStore(initialState),
         dispatch: dispatchMock,
       };
     };
@@ -442,7 +441,7 @@ describe("Lock Page: Max login attempt", () => {
     initialState.stateCache.authentication.loginAttempt.attempts = 2;
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -473,7 +472,7 @@ describe("Lock Page: Max login attempt", () => {
       Date.now() + 60000;
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -493,7 +492,7 @@ describe("Lock Page: Max login attempt", () => {
     initialState.stateCache.authentication.loginAttempt.attempts = 2;
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

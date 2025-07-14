@@ -2,7 +2,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-import configureStore from "redux-mock-store";
+
 import { CreationStatus } from "../../../../../core/agent/agent.types";
 import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
@@ -15,6 +15,7 @@ import { setPendingConnection } from "../../../../../store/reducers/walletConnec
 import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 import { OperationType, ToastMsgType } from "../../../../globals/types";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { ConnectWallet } from "./ConnectWallet";
 
@@ -57,7 +58,6 @@ jest.mock("@ionic/react", () => ({
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
@@ -83,7 +83,7 @@ const initialState = {
 };
 
 const storeMocked = {
-  ...mockStore(initialState),
+  ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
 
@@ -116,7 +116,7 @@ describe("Wallet connect: empty history", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -158,7 +158,7 @@ describe("Wallet connect: empty history", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -229,7 +229,7 @@ describe("Wallet connect: empty history", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -284,7 +284,7 @@ describe("Wallet connect: empty history", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -372,7 +372,7 @@ describe("Wallet connect: empty history", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -559,7 +559,7 @@ describe("Wallet connect", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -707,7 +707,7 @@ describe("Wallet connect", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -802,7 +802,7 @@ describe("Wallet connect", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -871,7 +871,7 @@ describe("Wallet connect", () => {
     };
 
     const updateStoreMocked = {
-      ...mockStore(updatedStore),
+      ...makeTestStore(updatedStore),
       dispatch: dispatchMock,
     };
 

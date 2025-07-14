@@ -2,11 +2,11 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { CardType } from "../../globals/types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CardSlider } from "./CardSlider";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const historyPushMock = jest.fn();
 const createOrUpdateBasicRecordMock = jest.fn();
@@ -57,10 +57,8 @@ const dispatchMock = jest.fn();
 describe("Card slider", () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    const mockStore = configureStore();
-
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
   });

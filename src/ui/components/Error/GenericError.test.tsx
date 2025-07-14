@@ -1,11 +1,11 @@
 import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { act } from "react";
 import { GenericError } from "./GenericError";
 import TRANSLATIONS from "../../../locales/en/en.json";
 import { showGenericError } from "../../../store/reducers/stateCache";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const dispatchMock = jest.fn();
 describe("Common error alert", () => {
@@ -13,14 +13,13 @@ describe("Common error alert", () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
         showGenericError: true,
       },
     };
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
   });
