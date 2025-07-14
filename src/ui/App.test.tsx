@@ -834,4 +834,110 @@ describe("System threat alert", () => {
       expect(getByText(Eng_Trans.systemthreats.rules.simulator)).toBeVisible();
     });
   });
+
+  test("Catches a threat", async () => {
+    const initialState = {
+      stateCache: {
+        routes: [{ path: TabsRoutePath.ROOT }],
+        authentication: {
+          loggedIn: true,
+          userName: "",
+          time: Date.now(),
+          passcodeIsSet: true,
+          seedPhraseIsSet: true,
+          passwordIsSet: false,
+          passwordIsSkipped: true,
+          ssiAgentIsSet: true,
+          ssiAgentUrl: "http://keria.com",
+          recoveryWalletProgress: false,
+          loginAttempt: {
+            attempts: 0,
+            lockedUntil: Date.now(),
+          },
+        },
+        toastMsgs: [],
+        queueIncomingRequest: {
+          isProcessing: false,
+          queues: [],
+          isPaused: false,
+        },
+      },
+      seedPhraseCache: {
+        seedPhrase: "",
+        bran: "",
+      },
+      identifiersCache: {
+        identifiers: {},
+        favourites: [],
+        multiSigGroup: {
+          groupId: "",
+          connections: [],
+        },
+      },
+      credsCache: { creds: [], favourites: [] },
+      credsArchivedCache: { creds: [] },
+      connectionsCache: {
+        connections: {},
+        multisigConnections: {},
+      },
+      walletConnectionsCache: {
+        walletConnections: [],
+        connectedWallet: null,
+        pendingConnection: null,
+      },
+      viewTypeCache: {
+        identifier: {
+          viewType: null,
+          favouriteIndex: 0,
+        },
+        credential: {
+          viewType: null,
+          favouriteIndex: 0,
+        },
+      },
+      biometricsCache: {
+        enabled: false,
+      },
+      ssiAgentCache: {
+        bootUrl: "",
+        connectUrl: "",
+      },
+      notificationsCache: {
+        notifications: [],
+      },
+    };
+
+    const storeMocked = {
+      ...mockStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    startFreeRASPMock = startFreeRASP as jest.Mock;
+    startFreeRASPMock.mockResolvedValue(true);
+
+    const { getByText } = render(
+      <Provider store={storeMocked}>
+        <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+          <App />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(startFreeRASPMock).toHaveBeenCalled();
+    });
+
+    await act(async () => {
+      const privilegedAccessAction = (startFreeRASPMock.mock.calls[0][1] as any)
+        .privilegedAccess;
+      privilegedAccessAction();
+    });
+
+    await waitFor(() => {
+      expect(getByText("Threats Detected")).toBeVisible();
+      expect(
+        getByText(Eng_Trans.systemthreats.rules.privilegedaccess)
+      ).toBeVisible();
+    });
+  });
 });
