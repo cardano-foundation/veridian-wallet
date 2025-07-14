@@ -18,8 +18,6 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getAuthentication,
   getCurrentAccount,
-  getStateCache,
-  setAuthentication,
   setCurrentAccount,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
@@ -34,7 +32,6 @@ import { showError } from "../../utils/error";
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
-  const authentication = useAppSelector(getAuthentication);
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
   const currentAccountName = useAppSelector(getCurrentAccount);
   const identifiersData = Object.values(identifiersDataCache);
