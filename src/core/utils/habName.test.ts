@@ -171,6 +171,42 @@ describe("habName", () => {
           theme: "03",
         },
       },
+      {
+        name: ":MyWallet",
+        expected: {
+          version: null,
+          displayName: "MyWallet",
+          isGroupMember: false,
+          groupId: null,
+          isInitiator: null,
+          userName: null,
+          theme: "",
+        },
+      },
+      {
+        name: "01:1-:MyGroup",
+        expected: {
+          version: null,
+          displayName: "MyGroup",
+          isGroupMember: true,
+          groupId: "",
+          isInitiator: true,
+          userName: null,
+          theme: "01",
+        },
+      },
+      {
+        name: "v1.2.0.3:1-some-group-:MyGroup",
+        expected: {
+          version: "v1.2.0.3",
+          displayName: "MyGroup",
+          isGroupMember: true,
+          groupId: "some-group",
+          isInitiator: true,
+          userName: "",
+          theme: null,
+        },
+      },
     ])(
       "should handle various edge cases for parsing: %s",
       ({ name, expected }) => {
