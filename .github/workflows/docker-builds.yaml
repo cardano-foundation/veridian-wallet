@@ -166,7 +166,7 @@ jobs:
               +docker-publish \
               --PUSH=true \
               --TARGET_PLATFORM="${{ matrix.platform }}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}" \
               --DOCKER_IMAGES_LABELS="${DOCKER_METADATA_OUTPUT_LABELS_COMMA_SEPARATED}" \
               --DOCKER_IMAGES_TARGETS="${DOCKER_IMAGES_TARGETS}"
@@ -185,7 +185,7 @@ jobs:
               "${DOCKER_IMAGES_TARGETS_ARG}" \
               --PUSH=true \
               --TARGET_PLATFORM="${{ matrix.platform }}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_LABELS="${DOCKER_METADATA_OUTPUT_LABELS_COMMA_SEPARATED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
             else
@@ -194,7 +194,7 @@ jobs:
               ${FORCE_BUILD} \
               --PUSH=true \
               --TARGET_PLATFORM="${{ matrix.platform }}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_LABELS="${DOCKER_METADATA_OUTPUT_LABELS_COMMA_SEPARATED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
             fi
@@ -261,7 +261,7 @@ jobs:
               --PUSH=true \
               --PLATFORMS="${PLATFORMS}" \
               --DOCKER_IMAGES_TARGETS="${DOCKER_IMAGES_TARGETS}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
           else
               if [ "${{github.event_name}}" == "pull_request" ]
@@ -273,7 +273,7 @@ jobs:
               +docker-manifests-merge \
               --PUSH=true \
               --PLATFORMS="${PLATFORMS}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
           fi
 
