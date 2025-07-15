@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT --allow-privileged github.com/cardano-foundation/cf-gha-workflows/./earthfiles/functions:chore/filter-docker-repositories AS functions
+IMPORT --allow-privileged github.com/cardano-foundation/cf-gha-workflows/./earthfiles/functions:main AS functions
 
 ARG --global DOCKER_IMAGES_TARGETS="idw-keria idw-witness cred-issuance cred-issuance-ui cip45-sample-dapp"
 
