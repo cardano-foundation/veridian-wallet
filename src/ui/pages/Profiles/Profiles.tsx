@@ -57,7 +57,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     try {
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
-          id: MiscRecordId.CURRENT_ACCOUNT,
+          id: MiscRecordId.CURRENT_PROFILE,
           content: { currentProfile: id },
         })
       );

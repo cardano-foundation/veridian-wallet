@@ -444,7 +444,7 @@ describe("AppWrapper - currentProfile logic", () => {
 
   test("sets currentProfile to the oldest identifier if no default profile is set", async () => {
     Agent.agent.basicStorage.findById = jest.fn().mockImplementation((id) => {
-      if (id === MiscRecordId.CURRENT_ACCOUNT) return Promise.resolve(null);
+      if (id === MiscRecordId.CURRENT_PROFILE) return Promise.resolve(null);
       return Promise.resolve(null);
     });
 

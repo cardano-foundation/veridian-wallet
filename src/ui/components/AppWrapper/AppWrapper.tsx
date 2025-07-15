@@ -456,7 +456,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       }
 
       const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.CURRENT_ACCOUNT
+        MiscRecordId.CURRENT_PROFILE
       );
 
       if (appDefaultProfileRecord) {
@@ -480,7 +480,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
           await Agent.agent.basicStorage.createOrUpdateBasicRecord(
             new BasicRecord({
-              id: MiscRecordId.CURRENT_ACCOUNT,
+              id: MiscRecordId.CURRENT_PROFILE,
               content: { defaultProfile: id },
             })
           );
