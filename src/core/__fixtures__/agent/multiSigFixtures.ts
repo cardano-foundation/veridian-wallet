@@ -858,7 +858,7 @@ const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
 };
 
 const queuedJoin: QueuedGroupCreation & { initiator: false } = {
-  name: "0:Identifier 2",
+  name: "1.2.0.3:0-group-id-testUser:Identifier 2",
   data: inceptionDataFix,
   initiator: false,
   notificationId: "notification-id",

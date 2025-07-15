@@ -38,7 +38,7 @@ import {
   QueuedGroupProps,
 } from "./identifier.types";
 import { MultiSigRoute, InceptMultiSigExnMessage } from "./multiSig.types";
-import { deleteNotificationRecordById, OnlineOnly } from "./utils";
+import { deleteNotificationRecordById, OnlineOnly, randomSalt } from "./utils";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { EventTypes, GroupCreatedEvent } from "../event.types";
 import { ConnectionService } from "./connectionService";
@@ -140,9 +140,7 @@ class MultiSigService extends AgentService {
     );
     const states = [mHab["state"], ...connectionStates];
 
-    const groupName = `${CURRENT_VERSION}:${
-      mHabRecord.groupMetadata.groupInitiator ? "1" : "0"
-    }-${mHabRecord.groupMetadata.groupId}-${
+    const groupName = `${CURRENT_VERSION}:1-${randomSalt()}-${
       mHabRecord.groupMetadata.userName
     }:${mHabRecord.displayName}`;
 
@@ -469,6 +467,7 @@ class MultiSigService extends AgentService {
           throw error;
         }
       });
+
     const exn = icpMsg[0].exn;
 
     const identifiers = await this.identifiers.getIdentifiers(false);
@@ -487,7 +486,8 @@ class MultiSigService extends AgentService {
     const mHab = await this.props.signifyClient
       .identifiers()
       .get(mHabRecord.id);
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
+
+    const groupName = `${CURRENT_VERSION}:0-${mHabRecord.groupMetadata.groupId}-${mHabRecord.groupMetadata.userName}:${mHabRecord.displayName}`;
 
     // @TODO - foconnor: We should error here if smids no longer matches once we have multi-sig rotation.
     const states = await Promise.all(
@@ -560,8 +560,8 @@ class MultiSigService extends AgentService {
       payload: {
         group: {
           id: multisigId,
+          theme: 0,
           displayName: mHabRecord.displayName,
-          theme: mHabRecord.theme,
           creationStatus,
           groupMemberPre: mHabRecord.id,
           createdAtUTC: multisigDetail.icp_dt,

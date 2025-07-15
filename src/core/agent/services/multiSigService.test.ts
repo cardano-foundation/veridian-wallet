@@ -1,6 +1,5 @@
 import { Serder } from "signify-ts";
-import { use } from "i18next";
-import { group } from "console";
+import * as utils from "./utils";
 import { ConnectionStatus, MiscRecordId, CreationStatus } from "../agent.types";
 import { Agent } from "../agent";
 import { CoreEventEmitter } from "../event";
@@ -186,6 +185,7 @@ const memberPrefix = "EJpKquuibYTqpwMDqEFAFs0gwq0PASAHZ_iDmSF3I2Vg";
 
 beforeEach(async () => {
   jest.resetAllMocks();
+  jest.spyOn(utils, "randomSalt").mockReturnValue("group-id");
   await new ConfigurationService().start();
 });
 
@@ -886,29 +886,32 @@ describe("Creation of multi-sig", () => {
 
     await multiSigService.joinGroup("id", "d");
 
-    expect(identifierCreateIcpDataMock).toBeCalledWith("0:Identifier 2", {
-      algo: "group",
-      mhab: getMemberIdentifierResponse,
-      isith: 2,
-      nsith: 2,
-      toad: 4,
-      wits: [
-        "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha",
-        "BLskRTInXnMxWaGqcpSyMgo0nYbalW99cGZESrz3zapM",
-        "BIKKuvBwpmDVA4Ds-EpL5bt9OqPzWPja2LigFYZN2YfX",
-        "BM35JN8XeJSEfpxopjn5jr7tAHCE5749f0OobhMLCorE",
-        "BIj15u5V11bkbtAxMA7gcNJZcax-7TgaBMLsQnMHpYHP",
-        "BF2rZTW79z4IXocYRQnjjsOuvFUQv-ptCf8Yltd7PfsM",
-      ],
-      states: [
-        resolvedOobiOpResponse.op.response,
-        getMemberIdentifierResponse.state,
-      ],
-      rstates: [
-        resolvedOobiOpResponse.op.response,
-        getMemberIdentifierResponse.state,
-      ],
-    });
+    expect(identifierCreateIcpDataMock).toBeCalledWith(
+      "1.2.0.3:0-group-id-testUser:Identifier 2",
+      {
+        algo: "group",
+        mhab: getMemberIdentifierResponse,
+        isith: 2,
+        nsith: 2,
+        toad: 4,
+        wits: [
+          "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha",
+          "BLskRTInXnMxWaGqcpSyMgo0nYbalW99cGZESrz3zapM",
+          "BIKKuvBwpmDVA4Ds-EpL5bt9OqPzWPja2LigFYZN2YfX",
+          "BM35JN8XeJSEfpxopjn5jr7tAHCE5749f0OobhMLCorE",
+          "BIj15u5V11bkbtAxMA7gcNJZcax-7TgaBMLsQnMHpYHP",
+          "BF2rZTW79z4IXocYRQnjjsOuvFUQv-ptCf8Yltd7PfsM",
+        ],
+        states: [
+          resolvedOobiOpResponse.op.response,
+          getMemberIdentifierResponse.state,
+        ],
+        rstates: [
+          resolvedOobiOpResponse.op.response,
+          getMemberIdentifierResponse.state,
+        ],
+      }
+    );
     expect(identifierSubmitIcpDataMock).toBeCalledWith(inceptionDataFix);
     expect(sendExchangesMock).toBeCalledWith(
       memberMetadataRecord.id,
