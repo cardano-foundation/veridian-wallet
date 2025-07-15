@@ -474,12 +474,13 @@ describe("Profile setup", () => {
 
       await waitFor(() => {
         expect(createIdentifierMock).toBeCalledWith({
-          displayName: "groupName",
+          displayName: "testUser",
           theme: 0,
           groupMetadata: {
             groupId: "",
             groupInitiator: true,
             groupCreated: false,
+            userName: "groupName",
           },
         });
       });

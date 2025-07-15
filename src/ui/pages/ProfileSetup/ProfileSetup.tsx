@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Salter } from "signify-ts";
+import { use } from "i18next";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { IdentifierService } from "../../../core/agent/services";
@@ -89,7 +90,7 @@ export const ProfileSetup = () => {
     const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
       // TODO: no custom displayName?
-      displayName: isGroup ? groupName : userName,
+      displayName: userName,
       theme: 0,
     };
 
