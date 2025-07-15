@@ -33,9 +33,6 @@ const initialState = {
     seedPhrase: "",
     bran: "",
   },
-  cryptoAccountsCache: {
-    cryptoAccounts: [],
-  },
   biometricsCache: {
     enabled: false,
   },
@@ -338,9 +335,6 @@ describe("Password Module", () => {
         seedPhrase: "",
         bran: "",
       },
-      cryptoAccountsCache: {
-        cryptoAccounts: [],
-      },
       biometricsCache: {
         enabled: false,
       },
@@ -466,9 +460,6 @@ describe("Password Module", () => {
       seedPhraseCache: {
         seedPhrase: "",
         bran: "",
-      },
-      cryptoAccountsCache: {
-        cryptoAccounts: [],
       },
       biometricsCache: {
         enabled: false,

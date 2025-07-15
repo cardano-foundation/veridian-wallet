@@ -106,9 +106,6 @@ interface StoreMockedProps {
     seedPhrase: string;
     bran: string;
   };
-  cryptoAccountsCache: {
-    cryptoAccounts: never[];
-  };
   biometricsCache: {
     enabled: boolean;
   };
@@ -140,9 +137,6 @@ const initialState = {
   seedPhraseCache: {
     seedPhrase: "",
     bran: "",
-  },
-  cryptoAccountsCache: {
-    cryptoAccounts: [],
   },
   biometricsCache: {
     enabled: true,
@@ -255,9 +249,6 @@ describe("Lock Page", () => {
       seedPhraseCache: {
         seedPhrase: "",
         bran: "",
-      },
-      cryptoAccountsCache: {
-        cryptoAccounts: [],
       },
       biometricsCache: {
         enabled: true,
@@ -428,9 +419,6 @@ describe("Lock Page: Max login attempt", () => {
     seedPhraseCache: {
       seedPhrase: "",
       bran: "",
-    },
-    cryptoAccountsCache: {
-      cryptoAccounts: [],
     },
     biometricsCache: {
       enabled: true,

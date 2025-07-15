@@ -22,9 +22,6 @@ const initialState = {
     seedPhrase: "",
     bran: "",
   },
-  cryptoAccountsCache: {
-    cryptoAccounts: [],
-  },
   biometricsCache: {
     enabled: false,
   },
