@@ -2,6 +2,7 @@ import {
   ConnectionDetails,
   ConnectionStatus,
 } from "../../core/agent/agent.types";
+import { ConnectionHistoryType } from "../../core/agent/services/connectionService.types";
 import CardanoLogo from "../assets/images/CardanoLogo.jpg";
 
 const connectionsFix: ConnectionDetails[] = [
@@ -24,7 +25,7 @@ const connectionsFix: ConnectionDetails[] = [
     historyItems: [
       {
         id: "1",
-        type: 1,
+        type: ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT,
         timestamp: "2017-01-14T19:23:24Z",
         credentialType: "Cardano Foundation",
       },
@@ -49,7 +50,7 @@ const connectionsFix: ConnectionDetails[] = [
     historyItems: [
       {
         id: "1",
-        type: 1,
+        type: ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT,
         timestamp: "2017-01-14T19:23:24Z",
         credentialType: "Cardano Foundation",
       },
