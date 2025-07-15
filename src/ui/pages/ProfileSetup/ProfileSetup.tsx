@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { Salter } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { IdentifierService } from "../../../core/agent/services";
@@ -15,38 +16,44 @@ import {
 import {
   getAuthentication,
   getStateCache,
-  showNoWitnessAlert,
+  setAuthentication,
   setCurrentProfile,
+  showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
 import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
+import { Spinner } from "../../components/Spinner";
+import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
 import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
-import { Welcome } from "./components/Welcome";
+import { SetupGroup } from "./components/SetupGroup";
 import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
+import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
 import { SetupProfileStep } from "./ProfileSetup.types";
-import { Spinner } from "../../components/Spinner";
-import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
+import { BasicRecord } from "../../../core/agent/records";
 
 export const ProfileSetup = () => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
-  const authentication = useAppSelector(getAuthentication);
   const dispatch = useDispatch();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
   const [userName, setUserName] = useState("");
+  const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
 
   const title = i18n.t(`setupprofile.${step}.title`);
-  const back = [SetupProfileStep.SetupProfile].includes(step)
+  const back = [
+    SetupProfileStep.SetupProfile,
+    SetupProfileStep.SetupGroup,
+  ].includes(step)
     ? i18n.t("setupprofile.button.back")
     : undefined;
 
@@ -60,8 +67,18 @@ export const ProfileSetup = () => {
   };
 
   const handleBack = () => {
-    if (step === SetupProfileStep.SetupProfile)
+    if (
+      step === SetupProfileStep.SetupGroup ||
+      (step === SetupProfileStep.SetupProfile &&
+        profileType !== ProfileType.Group)
+    ) {
       setStep(SetupProfileStep.SetupType);
+      return;
+    }
+
+    if (step === SetupProfileStep.SetupProfile) {
+      setStep(SetupProfileStep.SetupGroup);
+    }
   };
 
   const createIdentifier = async () => {
@@ -69,22 +86,40 @@ export const ProfileSetup = () => {
 
     if (error) return;
 
+    const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
-      displayName: userName,
+      // TODO: no custom displayName?
+      displayName: isGroup ? groupName : userName,
       theme: 0,
     };
 
+    if (isGroup) {
+      const groupMetadata = {
+        groupId: new Salter({}).qb64,
+        groupInitiator: true,
+        groupCreated: false,
+        userName: groupName,
+      };
+      metadata.groupMetadata = groupMetadata;
+    }
+
     try {
       setLoading(true);
-
-      // Check if this is the first identifier
-      const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
-      const isFirstIdentifier = storedIdentifiers.length === 0;
-
       // Create the identifier
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
       );
+
+      if (isGroup) {
+        await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+          new BasicRecord({
+            id: MiscRecordId.CURRENT_PROFILE,
+            content: {
+              userName,
+            },
+          })
+        );
+      }
 
       await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       if (individualFirstCreate) {
@@ -94,9 +129,7 @@ export const ProfileSetup = () => {
       }
 
       // Set as default if it's the first identifier
-      if (isFirstIdentifier) {
-        dispatch(setCurrentProfile(identifier));
-      }
+      dispatch(setCurrentProfile(identifier));
 
       setStep(SetupProfileStep.FinishSetup);
     } catch (e) {
@@ -120,7 +153,7 @@ export const ProfileSetup = () => {
     }
   };
 
-  const navToCredetials = () => {
+  const navToCredentials = () => {
     const { nextPath, updateRedux } = getNextRoute(RoutePath.PROFILE_SETUP, {
       store: { stateCache },
       state: {
@@ -139,6 +172,10 @@ export const ProfileSetup = () => {
     ionRouter.push(nextPath.pathname);
   };
 
+  const handleOpenScan = () => {
+    // TODO: implement on next ticket
+  };
+
   const handleChangeStep = () => {
     if (step === SetupProfileStep.SetupProfile) {
       createIdentifier();
@@ -146,7 +183,15 @@ export const ProfileSetup = () => {
     }
 
     if (step === SetupProfileStep.FinishSetup) {
-      navToCredetials();
+      navToCredentials();
+      return;
+    }
+
+    if (
+      profileType === ProfileType.Group &&
+      step === SetupProfileStep.SetupType
+    ) {
+      setStep(SetupProfileStep.SetupGroup);
       return;
     }
 
@@ -160,6 +205,14 @@ export const ProfileSetup = () => {
           <SetupProfile
             userName={userName}
             onChangeUserName={setUserName}
+          />
+        );
+      case SetupProfileStep.SetupGroup:
+        return (
+          <SetupGroup
+            groupName={groupName}
+            onChangeGroupName={setGroupName}
+            onClickJoinGroupButton={handleOpenScan}
           />
         );
       case SetupProfileStep.FinishSetup:
@@ -195,7 +248,9 @@ export const ProfileSetup = () => {
         primaryButtonText={getButtonText()}
         primaryButtonAction={handleChangeStep}
         primaryButtonDisabled={
-          (SetupProfileStep.SetupProfile === step && !userName) || isLoading
+          (SetupProfileStep.SetupGroup === step && !groupName) ||
+          (SetupProfileStep.SetupProfile === step && !userName) ||
+          isLoading
         }
         pageId={pageId}
       />
