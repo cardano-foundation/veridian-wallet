@@ -7,11 +7,17 @@ import { Capacitor } from "@capacitor/core";
 import { randomPasscode } from "signify-ts";
 import { versionCompare } from "./utils";
 import { MIGRATIONS } from "./migrations";
-import { MigrationType, CloudMigration } from "./migrations/migrations.types";
+import {
+  MigrationType,
+  CloudMigration,
+  HybridMigration,
+} from "./migrations/migrations.types";
 import { KeyStoreKeys, SecureStorage } from "../secureStorage";
+import { BasicStorage } from "../../agent/records/basicStorage";
+import { SqliteStorage } from "./sqliteStorage";
+import { BasicRecord } from "../../agent/records/basicRecord";
 import { Agent } from "../../agent/agent";
 import { MiscRecordId } from "../../agent/agent.types";
-import { BasicStorage } from "../../agent/records/basicStorage";
 
 class SqliteSession {
   static readonly VERSION_DATABASE_KEY = "VERSION_DATABASE_KEY";
@@ -20,16 +26,14 @@ class SqliteSession {
   static readonly INSERT_KV_SQL =
     "INSERT OR REPLACE INTO kv (key,value) VALUES (?,?)";
   static readonly BASE_VERSION = "0.0.0";
-
   private sessionInstance?: SQLiteDBConnection;
-
   private basicStorageService!: BasicStorage;
 
   get session() {
     return this.sessionInstance;
   }
 
-  private async getKv(key: string): Promise<unknown> {
+  private async getKv(key: string): Promise<any> {
     const qValues = await this.sessionInstance?.query(
       SqliteSession.GET_KV_SQL,
       [key]
@@ -40,7 +44,7 @@ class SqliteSession {
     return undefined;
   }
 
-  private async setKv(key: string, value: unknown): Promise<void> {
+  private async setKv(key: string, value: any): Promise<void> {
     await this.sessionInstance?.query(SqliteSession.INSERT_KV_SQL, [
       key,
       JSON.stringify(value),
@@ -49,9 +53,9 @@ class SqliteSession {
 
   private async getCurrentVersionDatabase(): Promise<string> {
     try {
-      const currentVersionDatabase = (await this.getKv(
+      const currentVersionDatabase = await this.getKv(
         SqliteSession.VERSION_DATABASE_KEY
-      )) as string;
+      );
       return currentVersionDatabase ?? SqliteSession.BASE_VERSION;
     } catch (error) {
       return SqliteSession.BASE_VERSION;
@@ -61,7 +65,7 @@ class SqliteSession {
   private async getCloudMigrationStatus(): Promise<Record<string, boolean>> {
     try {
       const status = await this.getKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY);
-      return (status ?? {}) as Record<string, boolean>;
+      return status ?? {};
     } catch (error) {
       return {};
     }
@@ -106,16 +110,14 @@ class SqliteSession {
       );
     }
     await this.sessionInstance.open();
-    // TODO: initialize this.basicStorageService
-    // this.basicStorageService = new BasicStorage(new SqliteStorage<BasicRecord>(this.session!));
+    this.basicStorageService = new BasicStorage(
+      new SqliteStorage<BasicRecord>(this.session!)
+    );
     await this.migrateDb();
   }
 
   async wipe(storageName: string): Promise<void> {
-    if (!this.sessionInstance) {
-      return;
-    }
-    await this.sessionInstance.close();
+    await this.sessionInstance?.close();
     await CapacitorSQLite.deleteDatabase({ database: storageName });
   }
 
@@ -124,10 +126,8 @@ class SqliteSession {
    * Should be called when KERIA connection is established after recovery
    */
   async validateCloudMigrationsOnRecovery(): Promise<void> {
-    const isKeriaConfigured = await this.isKeriaConfigured();
-    if (!isKeriaConfigured) {
-      return;
-    }
+    // eslint-disable-next-line no-console
+    console.log("Validating cloud migrations after recovery...");
 
     const currentLocalVersion = await this.getCurrentVersionDatabase();
     const cloudMigrationStatus = await this.getCloudMigrationStatus();
@@ -138,16 +138,29 @@ class SqliteSession {
 
     const missedCloudMigrations = orderedMigrations.filter(
       (migration) =>
-        migration.type === MigrationType.CLOUD &&
-        migration.requiresKeriaConnection &&
+        (migration.type === MigrationType.CLOUD ||
+          migration.type === MigrationType.HYBRID) &&
         versionCompare(migration.version, currentLocalVersion) <= 0 && // Migration version is at or before current local version
         !cloudMigrationStatus[migration.version] // But cloud migration wasn't completed
     );
 
-    if (missedCloudMigrations.length > 0) {
-      for (const migration of missedCloudMigrations) {
-        await this.performCloudMigration(migration as CloudMigration, true);
-      }
+    if (missedCloudMigrations.length == 0) {
+      // eslint-disable-next-line no-console
+      console.log("No missed cloud migrations found");
+      return;
+    }
+    // eslint-disable-next-line no-console
+    console.log(
+      `Found ${missedCloudMigrations.length} missed cloud migrations to run`
+    );
+
+    for (const migration of missedCloudMigrations) {
+      // eslint-disable-next-line no-console
+      console.log(`Running missed cloud migration: ${migration.version}`);
+      await this.performCloudMigration(
+        migration as CloudMigration | HybridMigration,
+        true
+      );
     }
   }
 
@@ -170,16 +183,18 @@ class SqliteSession {
           migrationStatements.push({ statement: sqlStatement });
         }
       } else if (migration.type === MigrationType.TS) {
-        if (!this.sessionInstance) {
-          throw new Error("Session not initialized");
-        }
-        const statements = await migration.migrationStatements(
-          this.sessionInstance
-        );
+        const statements = await migration.migrationStatements(this.session!);
         migrationStatements.push(...statements);
       } else if (migration.type === MigrationType.CLOUD) {
         // Handle cloud migrations
         await this.performCloudMigration(migration);
+      } else if (migration.type === MigrationType.HYBRID) {
+        const statements = await migration.localMigrationStatements(
+          this.session!
+        );
+        migrationStatements.push(...statements);
+
+        await this.performCloudMigration(migration, true);
       }
 
       // Update version for all migration types
@@ -192,58 +207,45 @@ class SqliteSession {
       });
 
       if (migrationStatements.length > 0) {
-        if (!this.sessionInstance) {
-          throw new Error("Session not initialized");
-        }
-        await this.sessionInstance.executeTransaction(migrationStatements);
+        await this.session!.executeTransaction(migrationStatements);
       }
     }
   }
 
   private async performCloudMigration(
-    migration: CloudMigration,
+    migration: CloudMigration | HybridMigration,
     isRecoveryValidation = false
   ): Promise<void> {
-    // Dynamic import to avoid circular dependencies
-    const { Agent } = await import("../../agent/agent");
-
     const isKeriaConfigured = await this.isKeriaConfigured();
-
     if (!isKeriaConfigured) {
-      if (migration.requiresKeriaConnection) {
-        return;
-      }
+      const action = isRecoveryValidation
+        ? "recovery validation"
+        : "initial migration";
+      // eslint-disable-next-line no-console
+      console.log(
+        `Skipping cloud migration ${migration.version} during ${action} - KERIA not configured`
+      );
     } else {
-      const wasOnline = Agent.agent.getKeriaOnlineStatus();
+      await this.temporaryKeriaConnection();
 
-      try {
-        if (!wasOnline) {
-          await this.temporaryKeriaConnection();
-        }
+      const action = isRecoveryValidation ? "recovery validation" : "migration";
+      // eslint-disable-next-line no-console
+      console.log(`Starting cloud ${action} ${migration.version}`);
+      const signifyClient = Agent.agent.client;
+      await migration.cloudMigrationStatements(signifyClient);
+      // eslint-disable-next-line no-console
+      console.log(`Completed cloud ${action} ${migration.version}`);
 
-        const signifyClient = Agent.agent.client;
-        await migration.cloudMigrationStatements(signifyClient);
-
-        // Mark cloud migration as complete
-        await this.markCloudMigrationComplete(migration.version);
-      } finally {
-        if (!wasOnline) {
-          Agent.agent.markAgentStatus(false);
-        }
-      }
+      // Mark cloud migration as complete
+      await this.markCloudMigrationComplete(migration.version);
     }
   }
 
   private async isKeriaConfigured(): Promise<boolean> {
-    try {
-      const { MiscRecordId } = await import("../../agent/agent.types");
-      const connectUrlRecord = (await this.getKv(
-        MiscRecordId.KERIA_CONNECT_URL
-      )) as { url: string };
-      return !!connectUrlRecord?.url;
-    } catch {
-      return false;
-    }
+    const connectUrlRecord = await this.basicStorageService.findById(
+      MiscRecordId.KERIA_CONNECT_URL
+    );
+    return !!connectUrlRecord?.content?.url;
   }
 
   private async temporaryKeriaConnection(): Promise<void> {
