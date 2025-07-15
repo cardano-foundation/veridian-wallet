@@ -4,7 +4,7 @@ import { BiometryType } from "@aparajita/capacitor-biometric-auth";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { IdentifierType } from "../../../../../core/agent/services/identifier.types";
 import { KeyStoreKeys } from "../../../../../core/storage";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
@@ -20,6 +20,7 @@ import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { ReceiveCredential } from "./ReceiveCredential";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 
 jest.useFakeTimers();
 
@@ -75,7 +76,6 @@ jest.mock("../../../../hooks/useBiometricsHook", () => ({
   })),
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 
 const initialState = {
@@ -123,7 +123,7 @@ describe("Receive credential", () => {
 
   test("Render and decline", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
     const { getAllByText, getByText, getByTestId, queryByText } = render(
@@ -177,7 +177,7 @@ describe("Receive credential", () => {
 
   test("Accept", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -227,7 +227,7 @@ describe("Receive credential", () => {
 
   test("Open cred detail", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -286,7 +286,7 @@ describe("Receive credential", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -346,7 +346,7 @@ describe("Receive credential", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -406,7 +406,7 @@ describe("Receive credential", () => {
 
   test("Show error when cred open", async () => {
     const storeMocked = {
-      ...mockStore({
+      ...makeTestStore({
         ...initialState,
         stateCache: {
           routes: [TabsRoutePath.NOTIFICATIONS],
@@ -483,7 +483,7 @@ describe("Credential request: Multisig", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -542,7 +542,7 @@ describe("Credential request: Multisig", () => {
 
   test("Hide alert when group initiator accept cred", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

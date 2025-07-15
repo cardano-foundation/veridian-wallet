@@ -6,7 +6,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { KeriaNotification } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { CredentialStatus } from "../../../../../../core/agent/services/credentialService.types";
 import { KeyStoreKeys, SecureStorage } from "../../../../../../core/storage";
@@ -24,6 +24,7 @@ import {
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { ACDC } from "../CredentialRequest.types";
 import { ChooseCredential } from "./ChooseCredential";
+import { makeTestStore } from "../../../../../utils/makeTestStore";
 
 mockIonicReact();
 
@@ -76,7 +77,6 @@ jest.mock("@ionic/react", () => ({
   },
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 
 const initialState = {
@@ -108,7 +108,7 @@ const initialState = {
 describe("Credential request - choose request", () => {
   test("Render full active credentials & empty revoked tab", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -187,7 +187,7 @@ describe("Credential request - choose request", () => {
 
   test("Show detail", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -261,7 +261,7 @@ describe("Credential request - choose request", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -403,7 +403,7 @@ describe("Credential request - choose request", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -519,7 +519,7 @@ describe("Credential request - choose request", () => {
 
   test("Render empty active credentials & full revoked tab", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

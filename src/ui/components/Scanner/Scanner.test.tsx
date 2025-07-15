@@ -8,7 +8,6 @@ import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { OobiType } from "../../../core/agent/agent.types";
 import EN_Translation from "../../../locales/en/en.json";
 import {
@@ -23,6 +22,7 @@ import {
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { OperationType, ToastMsgType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { Scanner } from "./Scanner";
@@ -162,8 +162,6 @@ const barcodes = [
 ];
 
 describe("Scanner", () => {
-  const mockStore = configureStore();
-
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.SCAN],
@@ -192,7 +190,7 @@ describe("Scanner", () => {
 
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -368,7 +366,7 @@ describe("Scanner", () => {
     getMultisigLinkedContactsMock.mockReturnValue(connectionsFix);
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -444,7 +442,7 @@ describe("Scanner", () => {
     isNativePlatformMock.mockImplementation(() => false);
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -495,7 +493,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -584,7 +582,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
     };
 
     const { getByText } = render(
@@ -623,7 +621,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -693,7 +691,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -765,7 +763,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -846,7 +844,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -919,7 +917,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -993,7 +991,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1065,7 +1063,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1125,7 +1123,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1173,7 +1171,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1255,7 +1253,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1348,7 +1346,7 @@ describe("Scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

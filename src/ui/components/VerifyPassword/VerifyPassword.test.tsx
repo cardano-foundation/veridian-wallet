@@ -6,7 +6,7 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { Agent } from "../../../core/agent/agent";
 import { BasicRecord } from "../../../core/agent/records";
 import { SecureStorage } from "../../../core/storage";
@@ -15,6 +15,7 @@ import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { VerifyPassword } from "./VerifyPassword";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
 
@@ -104,10 +105,9 @@ jest.mock("@ionic/react", () => ({
 describe("Verify Password", () => {
   let storeMocked: Store<unknown, AnyAction>;
   beforeEach(() => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateNoPassword),
+      ...makeTestStore(initialStateNoPassword),
       dispatch: dispatchMock,
     };
   });
@@ -127,10 +127,9 @@ describe("Verify Password", () => {
       })
     );
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateWithPassword),
+      ...makeTestStore(initialStateWithPassword),
       dispatch: dispatchMock,
     };
 
@@ -180,10 +179,9 @@ describe("Verify Password", () => {
       })
     );
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateWithPassword),
+      ...makeTestStore(initialStateWithPassword),
       dispatch: dispatchMock,
     };
 
@@ -231,10 +229,9 @@ describe("Verify Password", () => {
       } as any)
     );
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateWithPassword),
+      ...makeTestStore(initialStateWithPassword),
       dispatch: dispatchMock,
     };
 
@@ -289,10 +286,9 @@ describe("Verify Password", () => {
       } as any)
     );
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateWithPassword),
+      ...makeTestStore(initialStateWithPassword),
       dispatch: dispatchMock,
     };
 
@@ -347,10 +343,9 @@ describe("Verify Password", () => {
       } as any)
     );
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateWithPassword),
+      ...makeTestStore(initialStateWithPassword),
       dispatch: dispatchMock,
     };
 

@@ -2,15 +2,14 @@ import { render } from "@testing-library/react";
 import { Provider } from "react-redux";
 import Eng_trans from "../../../../locales/en/en.json";
 import { store } from "../../../../store";
-import { CardDetailsAttribute } from "./CardDetailsAttribute";
+import { CardDetailsExpandAttributes } from "./CardDetailsExpandAttributes";
 
-describe("Card Details Attribute", () => {
+describe("Card Details Expand Attribute", () => {
   test("Render nested value", async () => {
     const { getAllByTestId, getByText } = render(
       <Provider store={store}>
-        <CardDetailsAttribute
-          attributeKey={""}
-          attributeValue={{
+        <CardDetailsExpandAttributes
+          data={{
             a: {
               d: "EJ3HSnEqtSm3WiucWkeBbKspmEAIjf2N6wr5EKOcQ9Vl",
               i: "EJWgO4hwKxNMxu2aUpmGFMozKt9Eq2Jz8n-xXR7CYtY_",
@@ -28,7 +27,7 @@ describe("Card Details Attribute", () => {
       </Provider>
     );
 
-    expect(getAllByTestId("nested-attributes").length).toBe(3);
+    expect(getAllByTestId("nested-attributes").length).toBe(2);
     expect(
       getByText(
         Eng_trans.tabs.credentials.details.attributes.issuee.concat(":")
@@ -59,11 +58,10 @@ describe("Card Details Attribute", () => {
   });
 
   test("Ignore key", async () => {
-    const { queryAllByTestId } = render(
+    const { queryByText } = render(
       <Provider store={store}>
-        <CardDetailsAttribute
-          attributeKey={"dt"}
-          attributeValue={{
+        <CardDetailsExpandAttributes
+          data={{
             a: {
               d: "EJ3HSnEqtSm3WiucWkeBbKspmEAIjf2N6wr5EKOcQ9Vl",
               i: "EJWgO4hwKxNMxu2aUpmGFMozKt9Eq2Jz8n-xXR7CYtY_",
@@ -77,11 +75,17 @@ describe("Card Details Attribute", () => {
               version: "1.0.0",
             },
           }}
-          ignoreKeys={["dt"]}
+          ignoreKeys={["a"]}
         />
       </Provider>
     );
 
-    expect(queryAllByTestId("nested-attributes").length).toBe(0);
+    expect(queryByText("EJ3HSnEqtSm3WiucWkeBbKspmEAIjf2N6wr5EKOcQ9Vl")).toBe(
+      null
+    );
+    expect(queryByText("EJWgO4hwKxNMxu2aUpmGFMozKt9Eq2Jz8n-xXR7CYtY_")).toBe(
+      null
+    );
+    expect(queryByText("5493001KJTIIGC8Y1R17")).toBe(null);
   });
 });

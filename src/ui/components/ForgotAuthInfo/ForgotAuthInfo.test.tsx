@@ -2,13 +2,12 @@ import { BiometryType } from "@aparajita/capacitor-biometric-auth/dist/esm/defin
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { setSeedPhraseCache } from "../../../store/reducers/seedPhraseCache";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { ForgotAuthInfo } from "./ForgotAuthInfo";
 import { ForgotType } from "./ForgotAuthInfo.types";
-import { isRepeat } from "../../utils/passcodeChecker";
 
 const SEED_PHRASE_LENGTH = 18;
 
@@ -85,7 +84,6 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
 }));
 
 describe("Forgot Passcode Page", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -99,7 +97,7 @@ describe("Forgot Passcode Page", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -212,7 +210,6 @@ describe("Forgot Passcode Page", () => {
 });
 
 describe("Forgot Password Page", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -226,7 +223,7 @@ describe("Forgot Password Page", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 

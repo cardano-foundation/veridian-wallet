@@ -8,15 +8,16 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
 import { Redirect, Route } from "react-router-dom";
-import configureStore from "redux-mock-store";
+
+import { AuthService } from "../../../core/agent/services";
 import { KeyStoreKeys } from "../../../core/storage";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { store } from "../../../store";
+import { makeTestStore } from "../../utils/makeTestStore";
+import { passcodeFiller } from "../../utils/passcodeFiller";
 import { GenerateSeedPhrase } from "../GenerateSeedPhrase";
 import { SetPasscode } from "./SetPasscode";
-import { passcodeFiller } from "../../utils/passcodeFiller";
-import { AuthService } from "../../../core/agent/services";
 
 jest.mock("../../utils/passcodeChecker", () => ({
   isRepeat: () => false,
@@ -184,7 +185,7 @@ describe("SetPasscode Page", () => {
 
   test("calls handleOnBack when back button is clicked", async () => {
     require("@ionic/react");
-    const mockStore = configureStore();
+
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -202,7 +203,7 @@ describe("SetPasscode Page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

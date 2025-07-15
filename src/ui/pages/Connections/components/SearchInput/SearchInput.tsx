@@ -16,6 +16,7 @@ const SearchInput = ({ onFocus, onInputChange, value }: SearchInputProps) => {
 
   return (
     <IonSearchbar
+      data-testid="search-bar"
       className="connection-search-input"
       showCancelButton={showCancel}
       onIonCancel={handleCancel}

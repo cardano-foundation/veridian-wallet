@@ -5,7 +5,7 @@ import {
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act, useState } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { Agent } from "../../../../../core/agent/agent";
 import { MiscRecordId } from "../../../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
@@ -18,6 +18,7 @@ import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { SubMenuKey } from "../../Menu.types";
 import { Settings } from "./Settings";
 import { OptionIndex } from "./Settings.types";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 
 jest.mock("../../../../../store/utils", () => ({
   CLEAR_STORE_ACTIONS: [],
@@ -163,7 +164,6 @@ describe("Settings page", () => {
   });
 
   test("Enable biometrics toggle", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -181,7 +181,7 @@ describe("Settings page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -220,7 +220,6 @@ describe("Settings page", () => {
   });
 
   test("Disable biometrics toggle", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -238,7 +237,7 @@ describe("Settings page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -277,7 +276,6 @@ describe("Settings page", () => {
   });
 
   test("Open setting page when biometrics not available", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -295,7 +293,7 @@ describe("Settings page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -474,9 +472,9 @@ describe("Settings page", () => {
     };
 
     const dispatchMock = jest.fn();
-    const mockStore = configureStore();
+
     const storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: dispatchMock,
     };
 

@@ -2,12 +2,12 @@ import { BiometryType } from "@aparajita/capacitor-biometric-auth";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { IncomingRequestType } from "../../../store/reducers/stateCache/stateCache.types";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { signTransactionFix } from "../../__fixtures__/signTransactionFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { SidePage } from "./SidePage";
 
 jest.mock("../../../core/configuration", () => ({
@@ -70,10 +70,9 @@ describe("Side Page: wallet connect", () => {
     },
   };
 
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const mockedStore = {
-    ...mockStore(initialStateFull),
+    ...makeTestStore(initialStateFull),
     dispatch: dispatchMock,
   };
 
@@ -135,10 +134,9 @@ describe("Side Page: incoming request", () => {
     },
   };
 
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const mockedStore = {
-    ...mockStore(initialStateFull),
+    ...makeTestStore(initialStateFull),
     dispatch: dispatchMock,
   };
 

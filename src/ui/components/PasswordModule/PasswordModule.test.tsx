@@ -6,7 +6,7 @@ import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
 import { KeyStoreKeys } from "../../../core/storage";
@@ -14,6 +14,7 @@ import TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { OperationType } from "../../globals/types";
 import { StoreMockedProps } from "../../pages/LockPage/LockPage.test";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { PasswordModule } from "./PasswordModule";
 
@@ -31,9 +32,6 @@ const initialState = {
   seedPhraseCache: {
     seedPhrase: "",
     bran: "",
-  },
-  cryptoAccountsCache: {
-    cryptoAccounts: [],
   },
   biometricsCache: {
     enabled: false,
@@ -136,11 +134,11 @@ jest.mock("../../components/CustomInput", () => ({
     );
   },
 }));
-const mockStore = configureStore();
+
 const dispatchMock = jest.fn();
 const storeMocked = (initialState: StoreMockedProps) => {
   return {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 };
@@ -337,9 +335,6 @@ describe("Password Module", () => {
         seedPhrase: "",
         bran: "",
       },
-      cryptoAccountsCache: {
-        cryptoAccounts: [],
-      },
       biometricsCache: {
         enabled: false,
       },
@@ -465,9 +460,6 @@ describe("Password Module", () => {
       seedPhraseCache: {
         seedPhrase: "",
         bran: "",
-      },
-      cryptoAccountsCache: {
-        cryptoAccounts: [],
       },
       biometricsCache: {
         enabled: false,
