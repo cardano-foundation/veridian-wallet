@@ -47,18 +47,6 @@ enum MiscRecordId {
   BIOMETRICS_SETUP = "biometrics-setup",
 }
 
-interface IdentifierShortDetails {
-  id: string;
-  label: string;
-  displayName: string;
-  createdAtUTC: string;
-  creationStatus: CreationStatus;
-  groupMetadata?: {
-    groupId: string;
-    isGroup: boolean;
-  };
-}
-
 interface ConnectionShortDetails {
   id: string;
   label: string;
@@ -195,5 +183,4 @@ export type {
   AuthorizationRequestExn,
   JSONValue,
   JSONObject,
-  IdentifierShortDetails,
 };
