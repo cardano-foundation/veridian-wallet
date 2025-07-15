@@ -3,7 +3,6 @@ import { act, render, waitFor } from "@testing-library/react";
 import { startFreeRASP } from "capacitor-freerasp";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-import configureStore from "redux-mock-store";
 import { IdentifierService } from "../core/agent/services";
 import Eng_Trans from "../locales/en/en.json";
 import { TabsRoutePath } from "../routes/paths";
@@ -20,6 +19,7 @@ import {
   WEBVIEW_MIN_VERSION,
 } from "./globals/constants";
 import { OperationType } from "./globals/types";
+import { makeTestStore } from "./utils/makeTestStore";
 
 jest.mock("capacitor-freerasp", () => ({
   startFreeRASP: jest.fn(),
@@ -186,7 +186,6 @@ jest.mock("@capacitor-community/privacy-screen", () => ({
   },
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
@@ -255,7 +254,7 @@ const initialState = {
 };
 
 const storeMocked = {
-  ...mockStore(initialState),
+  ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
 
@@ -369,7 +368,7 @@ describe("App", () => {
     };
 
     const storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: dispatchMock,
     };
 
@@ -411,7 +410,7 @@ describe("App", () => {
     };
 
     const storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: dispatchMock,
     };
 
@@ -556,7 +555,7 @@ describe("Witness availability", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -651,7 +650,7 @@ describe("Witness availability", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -908,7 +907,7 @@ describe("System threat alert", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

@@ -2,12 +2,13 @@ import { BiometryType } from "@aparajita/capacitor-biometric-auth/dist/esm/defin
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import TRANSLATIONS from "../../../../../../../locales/en/en.json";
 import { RoutePath } from "../../../../../../../routes";
 import { OperationType } from "../../../../../../globals/types";
 import { passcodeFiller } from "../../../../../../utils/passcodeFiller";
 import { RecoverySeedPhrase } from "./RecoverySeedPhrase";
+import { makeTestStore } from "../../../../../../utils/makeTestStore";
 
 jest.mock("../../../../../../../core/agent/agent", () => ({
   Agent: {
@@ -58,10 +59,9 @@ const initialState = {
   },
 };
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const storeMocked = {
-  ...mockStore(initialState),
+  ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
 

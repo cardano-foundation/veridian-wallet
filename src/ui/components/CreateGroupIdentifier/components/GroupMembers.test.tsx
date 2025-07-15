@@ -3,7 +3,6 @@ import { ionFireEvent, mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { store } from "../../../../store";
 import { connectionsFix } from "../../../__fixtures__/connectionsFix";
@@ -11,13 +10,12 @@ import { GroupMembers } from "./GroupMembers";
 import { IdentifierColor } from "../../CreateIdentifier/components/IdentifierColorSelector";
 import { Stage } from "../CreateGroupIdentifier.types";
 import { CreationStatus } from "../../../../core/agent/agent.types";
+import { makeTestStore } from "../../../utils/makeTestStore";
 
 setupIonicReact();
 mockIonicReact();
 
 describe("Identifier Stage 2", () => {
-  const mockStore = configureStore();
-
   const stage2State = {
     identifierCreationStage: 0,
     displayNameValue: "",
@@ -40,7 +38,7 @@ describe("Identifier Stage 2", () => {
 
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(store.getState()),
+    ...makeTestStore(store.getState()),
     dispatch: dispatchMock,
   };
 

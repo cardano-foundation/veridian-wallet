@@ -16,8 +16,8 @@ import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
-import { ProfileSetup } from "./ProfileSetup";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { ProfileSetup } from "./ProfileSetup";
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {

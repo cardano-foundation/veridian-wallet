@@ -3,10 +3,10 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { filteredIdentifierMapFix } from "../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../__fixtures__/identifierFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { IdentifierOptions } from "./IdentifierOptions";
 
@@ -36,7 +36,6 @@ describe("Identifier Options modal", () => {
   let mockedStore: Store<unknown, AnyAction>;
   beforeEach(() => {
     jest.resetAllMocks();
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
@@ -52,7 +51,7 @@ describe("Identifier Options modal", () => {
       },
     };
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
   });
@@ -144,7 +143,6 @@ describe("Identifier Options function test", () => {
   const dispatchMock = jest.fn();
   let mockedStore: Store<unknown, AnyAction>;
   beforeAll(() => {
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
@@ -160,7 +158,7 @@ describe("Identifier Options function test", () => {
       },
     };
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
   });

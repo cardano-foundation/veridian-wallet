@@ -2,18 +2,18 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
+import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import {
   filteredCredsFix,
   revokedCredsFix,
 } from "../../__fixtures__/filteredCredsFix";
+import { filteredIdentifierMapFix } from "../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { ArchivedCredentialsContainer } from "./ArchivedCredentials";
-import { credsFixAcdc } from "../../__fixtures__/credsFix";
-import { filteredIdentifierMapFix } from "../../__fixtures__/filteredIdentifierFix";
 
 const deleteCredentialsMock = jest.fn((id: string) => Promise.resolve(true));
 const deleteNotificationMock = jest.fn(() => Promise.resolve(true));
@@ -84,12 +84,11 @@ const initialStateEmpty = {
 
 let mockedStore: Store<unknown, AnyAction>;
 describe("Archived and revoked credentials", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
 
   beforeEach(() => {
     mockedStore = {
-      ...mockStore(initialStateEmpty),
+      ...makeTestStore(initialStateEmpty),
       dispatch: dispatchMock,
     };
   });
@@ -315,7 +314,7 @@ describe("Archived and revoked credentials", () => {
     };
 
     const mockedStore = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: dispatchMock,
     };
 

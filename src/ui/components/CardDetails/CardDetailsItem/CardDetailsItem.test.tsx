@@ -1,11 +1,10 @@
 import { render } from "@testing-library/react";
 import { keyOutline } from "ionicons/icons";
-import configureStore from "redux-mock-store";
 import { Provider } from "react-redux";
 import { TabsRoutePath } from "../../../../routes/paths";
+import { makeTestStore } from "../../../utils/makeTestStore";
 import { CardDetailsItem } from "./CardDetailsItem";
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
@@ -20,7 +19,7 @@ const initialState = {
 };
 
 const storeMocked = {
-  ...mockStore(initialState),
+  ...makeTestStore(initialState),
   dispatch: jest.fn(),
 };
 

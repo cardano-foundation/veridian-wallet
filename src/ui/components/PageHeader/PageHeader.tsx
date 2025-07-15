@@ -173,6 +173,7 @@ const PageHeader = ({
                 slot="icon-only"
                 icon={closeButtonIcon || closeOutline}
                 color="primary"
+                data-testid="close-button-icon"
               />
             </IonButton>
           )}
@@ -234,6 +235,7 @@ const PageHeader = ({
                   slot="icon-only"
                   icon={actionButtonIcon}
                   color="secondary"
+                  data-testid="action-button-icon"
                 />
               </IonButton>
             )}

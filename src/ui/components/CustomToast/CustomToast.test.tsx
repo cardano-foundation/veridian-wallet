@@ -1,13 +1,12 @@
 import { render } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { ToastMsgType } from "../../globals/types";
 import { CustomToast } from "./CustomToast";
 import { ToastStack } from "./ToastStack";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 describe("Custom toast", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -22,7 +21,7 @@ describe("Custom toast", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -72,7 +71,6 @@ describe("Custom toast", () => {
 });
 
 describe("Toast stack", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -97,7 +95,7 @@ describe("Toast stack", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 

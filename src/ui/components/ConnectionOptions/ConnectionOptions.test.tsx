@@ -3,11 +3,11 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { setCurrentOperation } from "../../../store/reducers/stateCache";
 import { OperationType } from "../../globals/types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { ConnectionOptions } from "./ConnectionOptions";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -20,7 +20,6 @@ describe("Connection Options modal", () => {
   let mockedStore: Store<unknown, AnyAction>;
   beforeEach(() => {
     jest.resetAllMocks();
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
@@ -33,7 +32,7 @@ describe("Connection Options modal", () => {
       },
     };
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
   });
@@ -91,8 +90,12 @@ describe("Connection Options modal", () => {
     await waitForIonicReact();
 
     await waitFor(() =>
-      expect(queryByTestId("connection-options-manage-button")).toBeInTheDocument()
+      expect(
+        queryByTestId("connection-options-manage-button")
+      ).toBeInTheDocument()
     );
-    expect(queryByTestId("delete-button-connection-options")).not.toBeInTheDocument();
+    expect(
+      queryByTestId("delete-button-connection-options")
+    ).not.toBeInTheDocument();
   });
 });

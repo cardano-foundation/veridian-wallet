@@ -4,7 +4,7 @@ import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { Agent } from "../../../../../../../core/agent/agent";
 import { BasicRecord } from "../../../../../../../core/agent/records";
 import TRANSLATIONS from "../../../../../../../locales/en/en.json";
@@ -13,6 +13,7 @@ import { CustomInputProps } from "../../../../../../components/CustomInput/Custo
 import { OperationType } from "../../../../../../globals/types";
 import { passcodeFiller } from "../../../../../../utils/passcodeFiller";
 import { ManagePassword } from "./ManagePassword";
+import { makeTestStore } from "../../../../../../utils/makeTestStore";
 
 const deletePasswordMock = jest.fn();
 
@@ -88,10 +89,9 @@ const initialState = {
   },
 };
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const storeMocked = {
-  ...mockStore(initialState),
+  ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
 
@@ -249,10 +249,9 @@ describe("Manage password", () => {
       },
     };
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -337,10 +336,9 @@ describe("Manage password", () => {
       },
     };
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

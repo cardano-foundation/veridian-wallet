@@ -9,6 +9,7 @@ import configureStore from "redux-mock-store";
 import { StorageMessage } from "../../../core/storage/storage.types";
 import { TabsRoutePath } from "../../../routes/paths";
 import { OperationType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { Scan } from "./Scan";
 
 jest.mock("../../../core/configuration", () => ({
@@ -119,7 +120,6 @@ jest.mock("react-router-dom", () => ({
 }));
 
 describe("Scan Tab", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
 
   test("Renders Scan Tab", async () => {
@@ -146,7 +146,7 @@ describe("Scan Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -193,7 +193,7 @@ describe("Scan Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

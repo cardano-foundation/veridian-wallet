@@ -2,7 +2,7 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { ReactNode, act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { KeriaNotification } from "../../../../core/agent/services/keriaNotificationService.types";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../routes/paths";
@@ -11,6 +11,7 @@ import {
   markNotificationAsRead,
 } from "../../../../store/reducers/notificationsCache";
 import { NotificationOptionsModal } from "./NotificationOptionsModal";
+import { makeTestStore } from "../../../utils/makeTestStore";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -52,7 +53,7 @@ describe("Notification Options modal", () => {
   let mockedStore: Store<unknown, AnyAction>;
   beforeEach(() => {
     jest.resetAllMocks();
-    const mockStore = configureStore();
+
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
@@ -65,7 +66,7 @@ describe("Notification Options modal", () => {
       },
     };
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
   });
