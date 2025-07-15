@@ -850,7 +850,7 @@ const linkedContacts = [
 ];
 
 const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
-  name: "0:Identifier 2",
+  name: "1.2.0.3:1-group-id-testUser:Identifier 2",
   data: inceptionDataFix,
   initiator: true,
   groupConnections: linkedContacts,

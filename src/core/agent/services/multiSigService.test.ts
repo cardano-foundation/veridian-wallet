@@ -1,4 +1,6 @@
 import { Serder } from "signify-ts";
+import { use } from "i18next";
+import { group } from "console";
 import { ConnectionStatus, MiscRecordId, CreationStatus } from "../agent.types";
 import { Agent } from "../agent";
 import { CoreEventEmitter } from "../event";
@@ -391,29 +393,35 @@ describe("Creation of multi-sig", () => {
     );
 
     expectAllWitnessIntroductions();
-    expect(identifierCreateIcpDataMock).toBeCalledWith("0:Identifier 2", {
-      algo: "group",
-      mhab: getMemberIdentifierResponse,
-      isith: 2,
-      nsith: 2,
-      toad: 3,
-      wits: [],
-      states: [
-        getMemberIdentifierResponse.state,
-        resolvedOobiOpResponse.op.response,
-      ],
-      rstates: [
-        getMemberIdentifierResponse.state,
-        resolvedOobiOpResponse.op.response,
-      ],
-    });
+    expect(identifierCreateIcpDataMock).toBeCalledWith(
+      "1.2.0.3:1-group-id-testUser:Identifier 2",
+      {
+        algo: "group",
+        mhab: getMemberIdentifierResponse,
+        isith: 2,
+        nsith: 2,
+        toad: 3,
+        wits: [],
+        states: [
+          getMemberIdentifierResponse.state,
+          resolvedOobiOpResponse.op.response,
+        ],
+        rstates: [
+          getMemberIdentifierResponse.state,
+          resolvedOobiOpResponse.op.response,
+        ],
+      }
+    );
     expect(basicStorage.createOrUpdateBasicRecord).toBeCalledWith(
       expect.objectContaining({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
             { ...queuedIdentifier, name: "0:different identifier" },
-            queuedIdentifier,
+            {
+              ...queuedIdentifier,
+              name: "1.2.0.3:1-group-id-testUser:Identifier 2",
+            },
           ],
         },
       })
@@ -471,6 +479,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberPrefix,
           theme: 0,
+          groupMetadata: {
+            groupId: inceptionDataFix.icp.i,
+            groupInitiator: true,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -564,7 +578,12 @@ describe("Creation of multi-sig", () => {
       new BasicRecord({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [queuedIdentifier],
+          queued: [
+            {
+              ...queuedIdentifier,
+              name: "1.2.0.3:1-group-id-testUser:Identifier 2",
+            },
+          ],
         },
       })
     );
@@ -640,6 +659,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberPrefix,
           theme: 0,
+          groupMetadata: {
+            groupId: inceptionDataFix.icp.i,
+            groupInitiator: true,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -673,7 +698,12 @@ describe("Creation of multi-sig", () => {
       new BasicRecord({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [queuedIdentifier],
+          queued: [
+            {
+              ...queuedIdentifier,
+              name: "1.2.0.3:1-group-id-testUser:Identifier 2",
+            },
+          ],
         },
       })
     );
@@ -757,6 +787,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberPrefix,
           theme: 0,
+          groupMetadata: {
+            groupId: inceptionDataFix.icp.i,
+            groupInitiator: true,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -926,6 +962,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberMetadataRecord.id,
           theme: 0,
+          groupMetadata: {
+            groupId: inceptionDataFix.icp.i,
+            groupInitiator: false,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -1057,6 +1099,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberMetadataRecord.id,
           theme: 0,
+          groupMetadata: {
+            groupId: inceptionDataFix.icp.i,
+            groupInitiator: false,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -1167,6 +1215,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberMetadataRecord.id,
           theme: 0,
+          groupMetadata: {
+            groupId: inceptionDataFix.icp.i,
+            groupInitiator: false,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });

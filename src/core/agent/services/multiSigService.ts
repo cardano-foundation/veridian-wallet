@@ -45,6 +45,7 @@ import { ConnectionService } from "./connectionService";
 import { IdentifierService } from "./identifierService";
 import { StorageMessage } from "../../storage/storage.types";
 import { RpyRoute } from "./connectionService.types";
+import { CURRENT_VERSION } from "../../storage/sqliteStorage/migrations";
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
   static readonly CANNOT_GET_KEYSTATE_OF_IDENTIFIER =
@@ -138,7 +139,12 @@ class MultiSigService extends AgentService {
       )
     );
     const states = [mHab["state"], ...connectionStates];
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
+
+    const groupName = `${CURRENT_VERSION}:${
+      mHabRecord.groupMetadata.groupInitiator ? "1" : "0"
+    }-${mHabRecord.groupMetadata.groupId}-${
+      mHabRecord.groupMetadata.userName
+    }:${mHabRecord.displayName}`;
 
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
@@ -173,6 +179,12 @@ class MultiSigService extends AgentService {
         creationStatus,
         groupMemberPre: memberPrefix,
         createdAt: new Date(multisigDetail.icp_dt),
+        groupMetadata: {
+          groupId: multisigId,
+          groupInitiator: true,
+          groupCreated: false,
+          userName: mHabRecord.groupMetadata.userName,
+        },
       });
     } catch (error) {
       if (
@@ -202,6 +214,12 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: memberPrefix,
           createdAtUTC: multisigDetail.icp_dt,
+          groupMetadata: {
+            groupId: multisigId,
+            groupInitiator: mHabRecord.groupMetadata.groupInitiator,
+            groupCreated: mHabRecord.groupMetadata.groupCreated,
+            userName: mHabRecord.groupMetadata.userName,
+          },
         },
       },
     });
@@ -512,6 +530,12 @@ class MultiSigService extends AgentService {
         creationStatus,
         groupMemberPre: mHabRecord.id,
         createdAt: new Date(multisigDetail.icp_dt),
+        groupMetadata: {
+          groupId: multisigId,
+          groupInitiator: false,
+          groupCreated: false,
+          userName: mHabRecord.groupMetadata.userName,
+        },
       });
     } catch (error) {
       if (
@@ -541,6 +565,12 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: mHabRecord.id,
           createdAtUTC: multisigDetail.icp_dt,
+          groupMetadata: {
+            groupId: multisigId,
+            groupInitiator: false,
+            groupCreated: mHabRecord.groupMetadata.groupCreated,
+            userName: mHabRecord.groupMetadata.userName,
+          },
         },
       },
     });
