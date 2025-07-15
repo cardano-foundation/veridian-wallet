@@ -4,7 +4,6 @@ import { IonCol, IonGrid, IonIcon, IonModal, IonRow } from "@ionic/react";
 import { informationCircleOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Salter } from "signify-ts";
-import { use } from "i18next";
 import { Agent } from "../../../core/agent/agent";
 import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
 import { IdentifierService } from "../../../core/agent/services";
