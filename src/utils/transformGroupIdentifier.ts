@@ -22,6 +22,7 @@ export function transformGroupIdentifier(
           groupId: input.di,
           groupInitiator: true,
           groupCreated: false,
+          userName: "", // TODO
         }
         : undefined,
       groupMemberPre: input.groupMemberPre,

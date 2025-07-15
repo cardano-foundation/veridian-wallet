@@ -40,7 +40,7 @@ import {
 } from "../event.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { OobiQueryParams } from "./connectionService.types";
-import type { KeriaNotification } from "./keriaNotificationService.types";
+import { CURRENT_VERSION } from "../../storage/sqliteStorage/migrations";
 
 const UI_THEMES = [
   0, 1, 2, 3, 10, 11, 12, 13, 20, 21, 22, 23, 30, 31, 32, 33, 40, 41, 42, 43,
@@ -202,6 +202,7 @@ class IdentifierService extends AgentService {
             groupId: parsed.groupId!,
             groupCreated: false,
             groupInitiator: parsed.isInitiator!,
+            userName: parsed.userName!,
           },
         };
       } else {
@@ -225,16 +226,15 @@ class IdentifierService extends AgentService {
       throw new Error(IdentifierService.INVALID_THEME);
     }
 
-    // TODO: remove theme
-    // For simplicity, it's up to the UI to provide a unique name
-    let name = `${metadata.theme}:${metadata.displayName}`;
+    let name: string;
     if (metadata.groupMetadata) {
       const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
-      // Add userName to the name string
       const userNamePart = metadata.groupMetadata.userName
         ? `-${metadata.groupMetadata.userName}`
         : "";
-      name = `${metadata.theme}:${initiatorFlag}-${metadata.groupMetadata.groupId}${userNamePart}:${metadata.displayName}`;
+      name = `${CURRENT_VERSION}:${initiatorFlag}-${metadata.groupMetadata.groupId}${userNamePart}:${metadata.displayName}`;
+    } else {
+      name = `${metadata.theme}:${metadata.displayName}`;
     }
 
     // For distributed reliability, store name so we can re-try on start-up
@@ -596,6 +596,7 @@ class IdentifierService extends AgentService {
             groupId: parsed.groupId!,
             groupCreated: false,
             groupInitiator: parsed.isInitiator!,
+            userName: parsed.userName!,
           },
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
@@ -657,6 +658,7 @@ class IdentifierService extends AgentService {
           groupId: mhabParsed.groupId!,
           groupCreated: true,
           groupInitiator: mhabParsed.isInitiator!,
+          userName: mhabParsed.userName!,
         },
       });
 

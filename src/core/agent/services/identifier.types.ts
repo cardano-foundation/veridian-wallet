@@ -16,6 +16,7 @@ interface GroupMetadata {
 interface CreateIdentifierInputs {
   displayName: string;
   groupMetadata?: GroupMetadata;
+  theme: number;
 }
 
 interface IdentifierShortDetails {
@@ -25,6 +26,7 @@ interface IdentifierShortDetails {
   creationStatus: CreationStatus;
   groupMetadata?: GroupMetadata;
   groupMemberPre?: string;
+  theme: number;
 }
 
 interface IdentifierDetails extends IdentifierShortDetails {

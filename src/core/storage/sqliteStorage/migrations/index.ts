@@ -9,5 +9,6 @@ import { MIGRATION_V1_2_0_3 } from "./v1.2.0.3-group-scoped-username";
 
 type Migration = SqlMigration | TsMigration | CloudMigration | HybridMigration;
 const MIGRATIONS: Migration[] = [DATA_V001, MIGRATION_V1_2_0_3];
+const CURRENT_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;
 
-export { MIGRATIONS };
+export { MIGRATIONS, CURRENT_VERSION };

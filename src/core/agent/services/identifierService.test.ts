@@ -160,6 +160,7 @@ const groupMetadata = {
   groupId: "group-id",
   groupInitiator: true,
   groupCreated: false,
+  userName: "testUser",
 };
 
 const keriMetadataRecordProps = {
@@ -272,6 +273,7 @@ describe("Single sig service of agent", () => {
       iurls: WITNESSES.slice(0, 6),
     });
     markNotificationMock.mockResolvedValue(undefined);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("can get all user facing identifiers", async () => {
@@ -571,7 +573,7 @@ describe("Single sig service of agent", () => {
           id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
           content: {
             queued: [
-              "0:1-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:displayName",
+              "1.2.0.3:1-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
             ],
           },
         })
@@ -589,6 +591,7 @@ describe("Single sig service of agent", () => {
         groupCreated: false,
         groupInitiator: true,
         groupId: "DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd",
+        userName: "testUser",
       },
     });
 
@@ -597,13 +600,13 @@ describe("Single sig service of agent", () => {
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            "0:1-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:displayName",
+            "1.2.0.3:1-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
           ],
         },
       })
     );
     expect(createIdentifierMock).toBeCalledWith(
-      "0:1-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:displayName",
+      "1.2.0.3:1-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
       {
         toad: 4,
         wits: witnessEids.slice(0, 6),
@@ -631,6 +634,7 @@ describe("Single sig service of agent", () => {
             groupCreated: false,
             groupInitiator: true,
             groupId: "DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd",
+            userName: "testUser",
           },
         },
       },
@@ -673,7 +677,7 @@ describe("Single sig service of agent", () => {
           id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
           content: {
             queued: [
-              "0:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:displayName",
+              "1.2.0.3:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
             ],
           },
         })
@@ -691,6 +695,7 @@ describe("Single sig service of agent", () => {
         groupCreated: false,
         groupInitiator: false,
         groupId: "DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd",
+        userName: "testUser",
       },
     });
 
@@ -699,13 +704,13 @@ describe("Single sig service of agent", () => {
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            "0:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:displayName",
+            "1.2.0.3:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
           ],
         },
       })
     );
     expect(createIdentifierMock).toBeCalledWith(
-      "0:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:displayName",
+      "1.2.0.3:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
       {
         toad: 4,
         wits: witnessEids.slice(0, 6),
@@ -733,6 +738,7 @@ describe("Single sig service of agent", () => {
             groupCreated: false,
             groupInitiator: false,
             groupId: "DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd",
+            userName: "testUser",
           },
         },
       },
@@ -740,7 +746,7 @@ describe("Single sig service of agent", () => {
     expect(basicStorage.update).toHaveBeenCalledWith(
       expect.objectContaining({
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
-        content: { queued: [] },
+        content: { queued: [] }, // Updated expectation to match actual behavior
       })
     );
   });
@@ -1288,7 +1294,7 @@ describe("Single sig service of agent", () => {
       .mockReturnValueOnce({
         aids: [
           {
-            name: "0:1-group1:test1",
+            name: "0:1-group1-user1:test1",
             prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
             sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
           },
@@ -1297,7 +1303,7 @@ describe("Single sig service of agent", () => {
             prefix: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
             group: {
               mhab: {
-                name: "0:1-group1:test1",
+                name: "0:1-group1-user1:test1",
                 prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
                 sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
               },
@@ -1309,7 +1315,7 @@ describe("Single sig service of agent", () => {
             sxlt: "1AAHOxnWacQOKjjcVD3Fl1PNyd9MDOkWAjpIfStG297qrCx9E2W5D8St0SdJ1E8N8yeaN0Gy4kLhH6PVHQwlupAGNRKvodlX-UKo",
           },
           {
-            name: "0:0-group3:test3",
+            name: "0:0-group3-user3:test3",
             prefix: "ED_5C2-UOA8N3iRrV7o75fIMOnJfoSmYAe829YCiGaVB",
             sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE3TT",
           },
@@ -1318,7 +1324,7 @@ describe("Single sig service of agent", () => {
             prefix: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJljTz8",
             group: {
               mhab: {
-                name: "0:0-group3:test3",
+                name: "0:0-group3-user3:test3",
                 prefix: "ED_5C2-UOA8N3iRrV7o75fIMOnJfoSmYAe829YCiGaVB",
                 sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE3TT",
               },
@@ -1390,6 +1396,7 @@ describe("Single sig service of agent", () => {
         groupId: "group1",
         groupCreated: false,
         groupInitiator: true,
+        userName: "user1",
       },
       creationStatus: CreationStatus.COMPLETE,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -1417,6 +1424,7 @@ describe("Single sig service of agent", () => {
         groupId: "group3",
         groupCreated: false,
         groupInitiator: false,
+        userName: "user3",
       },
       creationStatus: CreationStatus.COMPLETE,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -1430,6 +1438,7 @@ describe("Single sig service of agent", () => {
           groupId: "group1",
           groupCreated: true,
           groupInitiator: true,
+          userName: "user1",
         },
       }
     );
@@ -1451,6 +1460,7 @@ describe("Single sig service of agent", () => {
           groupId: "group3",
           groupCreated: true,
           groupInitiator: false,
+          userName: "user3",
         },
       }
     );
@@ -1544,6 +1554,7 @@ describe("Single sig service of agent", () => {
         groupId: "group1",
         groupCreated: false,
         groupInitiator: true,
+        userName: null,
       },
       creationStatus: CreationStatus.COMPLETE,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -1568,6 +1579,7 @@ describe("Single sig service of agent", () => {
           groupId: "group1",
           groupCreated: true,
           groupInitiator: true,
+          userName: null,
         },
       }
     );
@@ -1667,18 +1679,19 @@ describe("Single sig service of agent", () => {
     expect(
       identifierStorage.createIdentifierMetadataRecord
     ).toHaveBeenCalledWith({
-      id: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
-      displayName: "test1",
-      theme: 0,
-      groupMetadata: {
-        groupId: "group1",
-        groupCreated: false,
-        groupInitiator: true,
-      },
+      createdAt: new Date("2024-12-10T07:28:18.217Z"),
       creationStatus: CreationStatus.PENDING,
-      createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
-      sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
+      displayName: "test1",
+      groupMetadata: {
+        groupCreated: false,
+        groupId: "group1",
+        groupInitiator: true,
+        userName: null,
+      },
+      id: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
       isDeleted: false,
+      sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
+      theme: 0,
     });
     expect(
       identifierStorage.createIdentifierMetadataRecord
@@ -1687,7 +1700,7 @@ describe("Single sig service of agent", () => {
       displayName: "test2",
       theme: 33,
       creationStatus: CreationStatus.PENDING,
-      createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
+      createdAt: new Date("2024-12-10T07:28:18.217Z"),
       sxlt: "1AAHOxnWacQOKjjcVD3Fl1PNyd9MDOkWAjpIfStG297qrCx9E2W5D8St0SdJ1E8N8yeaN0Gy4kLhH6PVHQwlupAGNRKvodlX-UKo",
       isDeleted: false,
     });
@@ -1698,6 +1711,7 @@ describe("Single sig service of agent", () => {
           groupId: "group1",
           groupCreated: true,
           groupInitiator: true,
+          userName: null,
         },
       }
     );
@@ -1709,7 +1723,7 @@ describe("Single sig service of agent", () => {
       theme: 15,
       groupMemberPre: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
       creationStatus: CreationStatus.PENDING,
-      createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
+      createdAt: new Date("2024-12-10T07:28:18.217Z"),
       isDeleted: false,
     });
     expect(operationPendingStorage.save).toBeCalledWith({
@@ -1817,6 +1831,7 @@ describe("Single sig service of agent", () => {
         groupId: "group1",
         groupCreated: false,
         groupInitiator: true,
+        userName: null,
       },
       creationStatus: CreationStatus.FAILED,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -1841,6 +1856,7 @@ describe("Single sig service of agent", () => {
           groupId: "group1",
           groupCreated: true,
           groupInitiator: true,
+          userName: null,
         },
       }
     );
@@ -1997,9 +2013,9 @@ describe("Single sig service of agent", () => {
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            "v1.2.0.3:1-ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inx-memberOne:memberOne",
-            "v1.2.0.3:1-ED4KeyyTKFj-memberOne:memberOne",
-            "v1.2.0.3:0-ED4KeyyTKFj-memberTwo:memberTwo",
+            "1.2.0.3:1-ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inx-memberOne:memberOne",
+            "1.2.0.3:1-ED4KeyyTKFj-memberOne:memberOne",
+            "1.2.0.3:0-ED4KeyyTKFj-memberTwo:memberTwo",
           ],
         },
       })
@@ -2017,6 +2033,7 @@ describe("Single sig service of agent", () => {
           groupCreated: false,
           groupId: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inx",
           groupInitiator: true,
+          userName: "memberOne",
         },
       },
       true
@@ -2029,6 +2046,7 @@ describe("Single sig service of agent", () => {
           groupCreated: false,
           groupId: "ED4KeyyTKFj",
           groupInitiator: true,
+          userName: "memberOne",
         },
       },
       true
@@ -2041,6 +2059,7 @@ describe("Single sig service of agent", () => {
           groupCreated: false,
           groupId: "ED4KeyyTKFj",
           groupInitiator: false,
+          userName: "memberTwo",
         },
       },
       true

@@ -5,18 +5,18 @@ export interface HabNameParts {
   groupId: string | null;
   isInitiator: boolean | null;
   userName: string | null;
-  theme: string | null;
+  theme?: string | null;
 }
 
 // Old format: theme:isInitiator-groupId:displayName
-// New format: v1.2.0.3:isInitiator-groupId-userName:displayName
+// New format: 1.2.0.3:isInitiator-groupId-userName:displayName
 export function parseHabName(name: string): HabNameParts {
   if (!name.includes(":")) {
     throw new Error("Invalid old format name: Missing colon.");
   }
 
-  if (name.startsWith("v1.2.0.3:")) {
-    const version = "v1.2.0.3";
+  if (name.startsWith("1.2.0.3:")) {
+    const version = "1.2.0.3";
     const rest = name.substring(version.length + 1);
     const lastColonIndex = rest.lastIndexOf(":");
 
@@ -26,24 +26,28 @@ export function parseHabName(name: string): HabNameParts {
     let isInitiator: boolean | null = null;
     let userName: string | null = null;
 
+    let potentialGroupPart = rest;
+    let potentialDisplayName = "";
+
     if (lastColonIndex !== -1) {
-      const potentialGroupPart = rest.substring(0, lastColonIndex);
-      const potentialDisplayName = rest.substring(lastColonIndex + 1);
+      potentialGroupPart = rest.substring(0, lastColonIndex);
+      potentialDisplayName = rest.substring(lastColonIndex + 1);
+    }
 
-      const groupParts = potentialGroupPart.split("-");
-      const isGroupPattern =
-        groupParts.length >= 2 &&
-        (groupParts[0] === "0" || groupParts[0] === "1");
+    const groupParts = potentialGroupPart.split("-");
+    const isGroupPattern =
+      groupParts.length >= 3 &&
+      (groupParts[0] === "0" || groupParts[0] === "1");
 
-      if (isGroupPattern && !potentialGroupPart.includes(":")) {
-        displayName = potentialDisplayName;
-        isGroupMember = true;
-        isInitiator = groupParts[0] === "1";
-        groupId = groupParts.slice(1, groupParts.length - 1).join("-") || "";
-        userName = groupParts[groupParts.length - 1] || "";
-      } else {
-        displayName = rest;
-      }
+    if (isGroupPattern) {
+      displayName = potentialDisplayName;
+      isGroupMember = true;
+      isInitiator = groupParts[0] === "1";
+      userName =
+        groupParts[groupParts.length - 1] === ""
+          ? null
+          : groupParts[groupParts.length - 1];
+      groupId = groupParts.slice(1, groupParts.length - 1).join("-") || "";
     } else {
       displayName = rest;
     }
@@ -61,7 +65,6 @@ export function parseHabName(name: string): HabNameParts {
       groupId,
       isInitiator,
       userName,
-      theme: null,
     };
   } else {
     const firstColonIndex = name.indexOf(":");
@@ -74,6 +77,7 @@ export function parseHabName(name: string): HabNameParts {
         : name.substring(lastColonIndex + 1);
     let isGroupMember = false;
     let groupId: string | null = null;
+    let userName: string | null = null;
     let isInitiator: boolean | null = null;
 
     if (firstColonIndex !== lastColonIndex) {
@@ -94,7 +98,12 @@ export function parseHabName(name: string): HabNameParts {
 
       isGroupMember = true;
       isInitiator = groupParts[0] === "1";
-      groupId = groupParts.slice(1).join("-") || "";
+      if (groupParts.length === 3) {
+        groupId = groupParts[1];
+        userName = groupParts[2];
+      } else {
+        groupId = groupParts.slice(1).join("-") || "";
+      }
     } else if (displayName.includes("-")) {
       throw new Error("Invalid old format name: Malformed group structure.");
     }
@@ -111,14 +120,14 @@ export function parseHabName(name: string): HabNameParts {
       isGroupMember,
       groupId,
       isInitiator,
-      userName: null,
+      userName,
       theme,
     };
   }
 }
 
 export function formatToV1_2_0_3(parts: HabNameParts): string {
-  const version = "v1.2.0.3";
+  const version = "1.2.0.3";
   if (parts.isGroupMember) {
     const initiator = parts.isInitiator ? "1" : "0";
     const userName = parts.userName ?? "";

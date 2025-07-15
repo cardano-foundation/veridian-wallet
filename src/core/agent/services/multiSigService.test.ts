@@ -520,6 +520,7 @@ describe("Creation of multi-sig", () => {
           groupId: "group-id",
           groupInitiator: false,
           groupCreated: false,
+          userName: "",
         },
       })
     );

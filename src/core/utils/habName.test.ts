@@ -1,3 +1,4 @@
+import { CURRENT_VERSION } from "../storage/sqliteStorage/migrations";
 import { parseHabName, formatToV1_2_0_3 } from "./habName";
 
 describe("habName", () => {
@@ -39,6 +40,18 @@ describe("habName", () => {
           theme: "01",
         },
       },
+      {
+        name: "0:1-group1-user1:test1",
+        expected: {
+          version: null,
+          displayName: "test1",
+          isGroupMember: true,
+          groupId: "group1",
+          isInitiator: true,
+          userName: "user1",
+          theme: "0",
+        },
+      },
     ])("should parse old format name correctly: %s", ({ name, expected }) => {
       const result = parseHabName(name);
       expect(result).toEqual(expected);
@@ -46,39 +59,36 @@ describe("habName", () => {
 
     test.each([
       {
-        name: "v1.2.0.3:MyNewWallet",
+        name: `${CURRENT_VERSION}:MyNewWallet`,
         expected: {
-          version: "v1.2.0.3",
+          version: CURRENT_VERSION,
           displayName: "MyNewWallet",
           isGroupMember: false,
           groupId: null,
           isInitiator: null,
           userName: null,
-          theme: null,
         },
       },
       {
-        name: "v1.2.0.3:1-groupId789-user123:MyNewGroup",
+        name: `${CURRENT_VERSION}:1-groupId789-user123:MyNewGroup`,
         expected: {
-          version: "v1.2.0.3",
+          version: "1.2.0.3",
           displayName: "MyNewGroup",
           isGroupMember: true,
           groupId: "groupId789",
           isInitiator: true,
           userName: "user123",
-          theme: null,
         },
       },
       {
-        name: "v1.2.0.3:1-gr@up!d-us$er%name:Group Name",
+        name: `${CURRENT_VERSION}:1-gr@up!d-us$er%name:Group Name`,
         expected: {
-          version: "v1.2.0.3",
+          version: "1.2.0.3",
           displayName: "Group Name",
           isGroupMember: true,
           groupId: "gr@up!d",
           isInitiator: true,
           userName: "us$er%name",
-          theme: null,
         },
       },
     ])("should parse new format name correctly: %s", ({ name, expected }) => {
@@ -100,63 +110,58 @@ describe("habName", () => {
         },
       },
       {
-        name: "v1.2.0.3:",
+        name: `${CURRENT_VERSION}:`,
         expected: {
-          version: "v1.2.0.3",
+          version: CURRENT_VERSION,
           displayName: "",
           isGroupMember: false,
           groupId: null,
           isInitiator: null,
           userName: null,
-          theme: null,
         },
       },
       {
-        name: "v1.2.0.3:0-group-id-user:",
+        name: `${CURRENT_VERSION}:0-group-id-user:`,
         expected: {
-          version: "v1.2.0.3",
+          version: CURRENT_VERSION,
           displayName: "",
           isGroupMember: true,
           groupId: "group-id",
           isInitiator: false,
           userName: "user",
-          theme: null,
         },
       },
       {
-        name: "v1.2.0.3:My Wallet With Spaces",
+        name: `${CURRENT_VERSION}:My Wallet With Spaces`,
         expected: {
-          version: "v1.2.0.3",
+          version: CURRENT_VERSION,
           displayName: "My Wallet With Spaces",
           isGroupMember: false,
           groupId: null,
           isInitiator: null,
           userName: null,
-          theme: null,
         },
       },
       {
-        name: "v1.2.0.3:Wallet 🚀",
+        name: `${CURRENT_VERSION}:Wallet 🚀`,
         expected: {
-          version: "v1.2.0.3",
+          version: CURRENT_VERSION,
           displayName: "Wallet 🚀",
           isGroupMember: false,
           groupId: null,
           isInitiator: null,
           userName: null,
-          theme: null,
         },
       },
       {
-        name: "v1.2.0.3:0--:",
+        name: `${CURRENT_VERSION}:0--`,
         expected: {
-          version: "v1.2.0.3",
+          version: CURRENT_VERSION,
           displayName: "",
           isGroupMember: true,
           groupId: "",
           isInitiator: false,
-          userName: "",
-          theme: null,
+          userName: null,
         },
       },
       {
@@ -165,9 +170,9 @@ describe("habName", () => {
           version: null,
           displayName: "",
           isGroupMember: true,
-          groupId: "group-id",
+          groupId: "group",
           isInitiator: true,
-          userName: null,
+          userName: "id",
           theme: "03",
         },
       },
@@ -196,27 +201,25 @@ describe("habName", () => {
         },
       },
       {
-        name: "v1.2.0.3:1-some-group-:MyGroup",
+        name: `${CURRENT_VERSION}:1-some-group-:MyGroup`,
         expected: {
-          version: "v1.2.0.3",
+          version: CURRENT_VERSION,
           displayName: "MyGroup",
           isGroupMember: true,
           groupId: "some-group",
           isInitiator: true,
-          userName: "",
-          theme: null,
+          userName: null,
         },
       },
       {
-        name: "v1.2.0.3:1--user123:MyGroup",
+        name: `${CURRENT_VERSION}:1--user123:MyGroup`,
         expected: {
-          version: "v1.2.0.3",
+          version: CURRENT_VERSION,
           displayName: "MyGroup",
           isGroupMember: true,
           groupId: "",
           isInitiator: true,
           userName: "user123",
-          theme: null,
         },
       },
       {
@@ -266,12 +269,12 @@ describe("habName", () => {
         errorMessage: "Invalid old format name: Malformed group structure.",
       },
       {
-        name: "v1.2.0.3:My:Wallet:With:Colons",
+        name: `${CURRENT_VERSION}:My:Wallet:With:Colons`,
         errorMessage:
           "Invalid new format name: Display name cannot contain colons.",
       },
       {
-        name: "v1.2.0.3:!@#$%^&*()_+-=[]{}|;':\",./<>?",
+        name: `${CURRENT_VERSION}:!@#$%^&*()_+-=[]{}|;':",./<>?`,
         errorMessage:
           "Invalid new format name: Display name cannot contain colons.",
       },
@@ -295,7 +298,7 @@ describe("habName", () => {
           userName: null,
           theme: "XX",
         },
-        expected: "v1.2.0.3:FormattedWallet",
+        expected: "1.2.0.3:FormattedWallet",
       },
       {
         parts: {
@@ -307,7 +310,7 @@ describe("habName", () => {
           userName: "formattedUser",
           theme: "XX",
         },
-        expected: "v1.2.0.3:1-groupXYZ-formattedUser:FormattedGroup",
+        expected: "1.2.0.3:1-groupXYZ-formattedUser:FormattedGroup",
       },
       {
         parts: {
@@ -319,7 +322,7 @@ describe("habName", () => {
           userName: "",
           theme: "XX",
         },
-        expected: "v1.2.0.3:0-groupUVW-:BlankUserGroup",
+        expected: "1.2.0.3:0-groupUVW-:BlankUserGroup",
       },
       {
         parts: {
@@ -331,7 +334,7 @@ describe("habName", () => {
           userName: null,
           theme: "XX",
         },
-        expected: "v1.2.0.3:1-groupRST-:NullUserGroup",
+        expected: "1.2.0.3:1-groupRST-:NullUserGroup",
       },
     ])(
       "should format gHab and mHab parts correctly: %s",
@@ -352,7 +355,7 @@ describe("habName", () => {
           userName: null,
           theme: "XX",
         },
-        expected: "v1.2.0.3:",
+        expected: "1.2.0.3:",
       },
       {
         parts: {
@@ -364,7 +367,7 @@ describe("habName", () => {
           userName: "user1",
           theme: "XX",
         },
-        expected: "v1.2.0.3:1-group123-user1:",
+        expected: "1.2.0.3:1-group123-user1:",
       },
       {
         parts: {
@@ -376,7 +379,7 @@ describe("habName", () => {
           userName: null,
           theme: "XX",
         },
-        expected: "v1.2.0.3:Group !@#$%^&*()",
+        expected: "1.2.0.3:Group !@#$%^&*()",
       },
       {
         parts: {
@@ -388,7 +391,7 @@ describe("habName", () => {
           userName: null,
           theme: "XX",
         },
-        expected: "v1.2.0.3:Group 🚀",
+        expected: "1.2.0.3:Group 🚀",
       },
       {
         parts: {
@@ -400,7 +403,7 @@ describe("habName", () => {
           userName: "us$er%name",
           theme: "XX",
         },
-        expected: "v1.2.0.3:0-gr@up!d-us$er%name:Special Group",
+        expected: "1.2.0.3:0-gr@up!d-us$er%name:Special Group",
       },
       {
         parts: {
@@ -412,7 +415,7 @@ describe("habName", () => {
           userName: "",
           theme: "XX",
         },
-        expected: "v1.2.0.3:0--:Empty Group",
+        expected: "1.2.0.3:0--:Empty Group",
       },
       {
         parts: {
@@ -424,7 +427,7 @@ describe("habName", () => {
           userName: null,
           theme: "XX",
         },
-        expected: "v1.2.0.3:Display:Name:With:Colons",
+        expected: "1.2.0.3:Display:Name:With:Colons",
       },
     ])(
       "should handle various edge cases for formatting: %s",
@@ -445,7 +448,7 @@ describe("habName", () => {
         theme: "XX",
       };
       const result = formatToV1_2_0_3(parts);
-      expect(result).toBe("v1.2.0.3:Not A Group");
+      expect(result).toBe("1.2.0.3:Not A Group");
     });
 
     test("should handle null groupId for mHab gracefully", () => {
@@ -459,7 +462,7 @@ describe("habName", () => {
         theme: "XX",
       };
       const result = formatToV1_2_0_3(parts);
-      expect(result).toBe("v1.2.0.3:1--user1:Malformed Group");
+      expect(result).toBe("1.2.0.3:1--user1:Malformed Group");
     });
   });
 });

@@ -2,8 +2,10 @@ import { SQLiteDBConnection } from "@capacitor-community/sqlite";
 import { MigrationType, HybridMigration } from "./migrations.types";
 import { formatToV1_2_0_3, parseHabName } from "../../../utils/habName";
 
+const migrationVersion = "1.2.0.3";
+
 export const MIGRATION_V1_2_0_3: HybridMigration = {
-  version: "1.2.0.3",
+  version: migrationVersion,
   type: MigrationType.HYBRID,
   localMigrationStatements: async (session: SQLiteDBConnection) => {
     const statements = [];
@@ -16,7 +18,7 @@ export const MIGRATION_V1_2_0_3: HybridMigration = {
       const currentName = identifier.displayName;
       const parts = parseHabName(currentName);
 
-      if (parts.version === "v1.2.0.3") {
+      if (parts.version === migrationVersion) {
         continue;
       }
 
@@ -51,7 +53,7 @@ export const MIGRATION_V1_2_0_3: HybridMigration = {
         const currentName = identifier.name;
         const parts = parseHabName(currentName);
 
-        if (parts.version === "v1.2.0.3") {
+        if (parts.version === migrationVersion) {
           continue;
         }
 
