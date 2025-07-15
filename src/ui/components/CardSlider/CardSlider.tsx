@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
+import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -33,6 +33,8 @@ const Card = ({
   handleShowCardDetails,
   pickedCard,
 }: CardProps) => {
+  const onShowCardDetail = () => handleShowCardDetails(index);
+
   return cardType === CardType.IDENTIFIERS ? (
     <IdentifierCardTemplate
       name={name}
@@ -40,7 +42,7 @@ const Card = ({
       index={index}
       isActive={false}
       cardData={cardData as IdentifierShortDetails}
-      onHandleShowCardDetails={() => handleShowCardDetails(index)}
+      onHandleShowCardDetails={onShowCardDetail}
       pickedCard={pickedCard === index}
     />
   ) : (
@@ -50,7 +52,7 @@ const Card = ({
       index={index}
       isActive={false}
       cardData={cardData as CredentialShortDetails}
-      onHandleShowCardDetails={() => handleShowCardDetails(index)}
+      onHandleShowCardDetails={onShowCardDetail}
       pickedCard={pickedCard === index}
     />
   );
@@ -150,7 +152,7 @@ const CardSlider = ({
         }}
         modules={[Pagination]}
         className="swiper-container"
-        onSwiper={(swiper: SwiperClass) => setSwiper(swiper)}
+        onSwiper={setSwiper}
         onSlideChange={(swiper: SwiperClass) => {
           saveFavouriteIndex(swiper.realIndex);
         }}

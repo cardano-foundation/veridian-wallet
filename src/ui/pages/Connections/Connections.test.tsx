@@ -79,6 +79,7 @@ jest.mock("@ionic/react", () => {
         />
       );
     }),
+    IonButton: (props: any) => <button {...props} />,
   };
 });
 
@@ -430,5 +431,81 @@ describe("Connections tab", () => {
     });
 
     unmount();
+  });
+
+  test("Click on alphabet list", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+        <Provider store={mockedStore}>
+          <Connections />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    expect(getByTestId("alphabet-selector")).toBeVisible();
+    expect(getByTestId("alphabet-selector-C")).toBeVisible();
+
+    fireEvent.click(getByTestId("alphabet-selector-C"));
+
+    await waitFor(() => {
+      expect(getByTestId("connections-list-alphabetic-C")).toBeVisible();
+    });
+  });
+
+  test("alphabet touch start and touch end", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+        <Provider store={mockedStore}>
+          <Connections />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    expect(getByTestId("alphabet-selector")).toBeVisible();
+    expect(getByTestId("alphabet-selector-C")).toBeVisible();
+
+    ionFireEvent.touchStart(getByTestId("alphabet-selector-C"));
+
+    await waitFor(() => {
+      expect(
+        getByTestId("alphabet-selector-C").classList.contains("active")
+      ).toBeTruthy();
+    });
+
+    fireEvent.touchEnd(document);
+    fireEvent.touchCancel(document);
+
+    await waitFor(() => {
+      expect(
+        getByTestId("alphabet-selector-C").classList.contains("active")
+      ).toBeFalsy();
+    });
+  });
+
+  test("alphabet touch move", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+        <Provider store={mockedStore}>
+          <Connections />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    expect(getByTestId("alphabet-selector")).toBeVisible();
+
+    fireEvent.touchMove(document, {
+      touches: [
+        {
+          clientX: 100,
+          clientY: 100,
+        },
+      ],
+    });
+
+    await waitFor(() => {
+      expect(
+        getByTestId("alphabet-selector-C").classList.contains("active")
+      ).toBeFalsy();
+    });
   });
 });

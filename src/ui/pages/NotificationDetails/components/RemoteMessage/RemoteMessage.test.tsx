@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { legacy_createStore as createStore } from "redux";
 import { RemoteMessage } from "./RemoteMessage";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 
 const mockStore = (initialState: any) => createStore(() => initialState);
 const dispatchMock = jest.fn();
@@ -48,7 +49,7 @@ describe("RemoteMessage", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -96,7 +97,7 @@ describe("RemoteMessage", () => {
     getHumanReadableMessageMock.mockResolvedValue(mockValue);
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

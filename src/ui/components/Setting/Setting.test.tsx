@@ -499,7 +499,6 @@ describe("Settings page", () => {
       dispatch: dispatchMock,
     };
 
-    const switchViewMock = jest.fn();
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <Settings

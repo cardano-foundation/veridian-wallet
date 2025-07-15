@@ -1,12 +1,12 @@
 import { mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { act } from "react";
 import TRANSLATIONS from "../../../locales/en/en.json";
 import { store } from "../../../store";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { ShareConnection } from "./ShareConnection";
 import { ShareConnectionProps, ShareType } from "./ShareConnection.types";
 mockIonicReact();
@@ -44,10 +44,9 @@ jest.mock("../../../core/agent/agent", () => ({
 }));
 
 describe("Share Indentifier", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(store.getState()),
+    ...makeTestStore(store.getState()),
     dispatch: dispatchMock,
   };
 

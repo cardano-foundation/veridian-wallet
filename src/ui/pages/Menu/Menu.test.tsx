@@ -1,7 +1,6 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { store } from "../../../store";
@@ -9,6 +8,7 @@ import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { Menu } from "./Menu";
 import { SubMenuKey } from "./Menu.types";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -45,7 +45,6 @@ jest.mock("@capacitor/browser", () => ({
   },
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
@@ -72,7 +71,7 @@ const initialState = {
 };
 
 const storeMocked = {
-  ...mockStore(initialState),
+  ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
 

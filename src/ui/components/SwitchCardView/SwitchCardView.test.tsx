@@ -1,7 +1,6 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import configureStore from "redux-mock-store";
 import { Provider } from "react-redux";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { CardType } from "../../globals/types";
@@ -9,6 +8,7 @@ import { SwitchCardView } from "./SwitchCardView";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
 import { connectionsMapFix } from "../../__fixtures__/connectionsFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const historyPushMock = jest.fn();
 jest.mock("../../../core/agent/agent", () => ({
@@ -60,10 +60,9 @@ const dispatchMock = jest.fn();
 describe("Card switch view list Tab", () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    const mockStore = configureStore();
 
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
   });

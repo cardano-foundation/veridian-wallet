@@ -201,6 +201,8 @@ describe("Creds Tab", () => {
   const dispatchMock = jest.fn();
 
   beforeEach(() => {
+    const dispatchMock = jest.fn();
+
     mockedStore = {
       ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
