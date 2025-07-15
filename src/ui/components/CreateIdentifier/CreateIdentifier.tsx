@@ -4,6 +4,7 @@ import { IonCol, IonGrid, IonIcon, IonModal, IonRow } from "@ionic/react";
 import { informationCircleOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Salter } from "signify-ts";
+import { use } from "i18next";
 import { Agent } from "../../../core/agent/agent";
 import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
 import { IdentifierService } from "../../../core/agent/services";
@@ -157,12 +158,14 @@ const CreateIdentifier = ({
         groupId: multiSigGroup.groupId,
         groupInitiator: false,
         groupCreated: false,
+        userName: "", // TODO: Set userName if needed
       };
     } else if (identifierData.selectedAidType == 1) {
       groupMetadata = {
         groupId: new Salter({}).qb64,
         groupInitiator: true,
         groupCreated: false,
+        userName: "", // TODO: Set userName if needed
       };
     }
     metadata.groupMetadata = groupMetadata;
