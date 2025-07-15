@@ -123,7 +123,7 @@ describe("Notifications cache", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [],
-        currentAccount: "Account1",
+        currentProfile: "Account1",
         authentication: {
           loggedIn: false,
           time: 0,

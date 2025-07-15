@@ -55,7 +55,7 @@ interface StateCacheProps {
   initializationPhase: InitializationPhase;
   recoveryCompleteNoInterruption: boolean;
   isOnline: boolean;
-  currentAccount: string;
+  currentProfile: string;
   routes: CurrentRouteCacheProps[];
   authentication: AuthenticationCacheProps;
   currentOperation: OperationType;

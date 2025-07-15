@@ -77,7 +77,7 @@ const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
-    currentAccount: "",
+    currentProfile: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),
@@ -101,7 +101,7 @@ const initialState = {
 const fullState = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
-    currentAccount: "",
+    currentProfile: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),
@@ -129,7 +129,7 @@ const fullState = {
 const filterTestData = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
-    currentAccount: "",
+    currentProfile: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),
@@ -153,7 +153,7 @@ const filterTestData = {
 const emptyConnection = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
-    currentAccount: "",
+    currentProfile: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),

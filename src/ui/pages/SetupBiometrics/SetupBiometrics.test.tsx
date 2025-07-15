@@ -74,7 +74,7 @@ const mockStore = configureStore();
 const initialState = {
   stateCache: {
     routes: [RoutePath.SETUP_BIOMETRICS],
-    currentAccount: "",
+    currentProfile: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),

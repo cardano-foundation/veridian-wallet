@@ -17,7 +17,7 @@ import {
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
-  getCurrentAccount,
+  getCurrentProfile,
   getStateCache,
   setCurrentOperation,
   setCurrentRoute,
@@ -53,7 +53,7 @@ const Connections = () => {
   const [mappedConnections, setMappedConnections] = useState<
     MappedConnections[]
   >([]);
-  const [openShareCurrentAccount, setOpenShareCurrentAccount] = useState(false);
+  const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [deletePendingItem, setDeletePendingItem] =
     useState<ConnectionShortDetails | null>(null);
@@ -61,8 +61,8 @@ const Connections = () => {
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
-  const currentAccountName = useAppSelector(getCurrentAccount);
-  const identifier = identifiers[currentAccountName];
+  const currentProfileName = useAppSelector(getCurrentProfile);
+  const identifier = identifiers[currentProfileName];
 
   const showPlaceholder = Object.keys(connectionsCache).length === 0;
 
@@ -122,10 +122,10 @@ const Connections = () => {
 
   const fetchOobi = useCallback(async () => {
     try {
-      if (!currentAccountName) return;
+      if (!currentProfileName) return;
 
       const oobiValue = await Agent.agent.connections.getOobi(
-        `${currentAccountName}`,
+        `${currentProfileName}`,
         identifier?.displayName || ""
       );
       if (oobiValue) {
@@ -134,7 +134,7 @@ const Connections = () => {
     } catch (e) {
       showError("Unable to fetch connection oobi", e, dispatch);
     }
-  }, [currentAccountName, identifier?.displayName, dispatch]);
+  }, [currentProfileName, identifier?.displayName, dispatch]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -179,7 +179,7 @@ const Connections = () => {
   };
 
   const handleConnectModal = () => {
-    setOpenShareCurrentAccount(true);
+    setOpenShareCurrentProfile(true);
   };
 
   const handleAvatarClick = () => {
@@ -202,7 +202,7 @@ const Connections = () => {
           />
         </IonButton>
         <Avatar
-          id={currentAccountName}
+          id={currentProfileName}
           handleAvatarClick={handleAvatarClick}
         />
       </>
@@ -261,8 +261,8 @@ const Connections = () => {
         />
       </TabLayout>
       <ShareProfile
-        isOpen={openShareCurrentAccount}
-        setIsOpen={setOpenShareCurrentAccount}
+        isOpen={openShareCurrentProfile}
+        setIsOpen={setOpenShareCurrentProfile}
         oobi={oobi}
       />
       <Profiles

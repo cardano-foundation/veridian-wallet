@@ -4,7 +4,7 @@ import { useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
 import {
   getAuthentication,
-  getCurrentAccount,
+  getCurrentProfile,
 } from "../../../../../store/reducers/stateCache";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
@@ -26,7 +26,7 @@ const IdentifierAttributeDetailModal = ({
   data,
   setViewType,
 }: IdentifierAttributeDetailModalProps) => {
-  const currentAccount = useAppSelector(getCurrentAccount);
+  const currentProfile = useAppSelector(getCurrentProfile);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
 
   const handleClose = () => {
@@ -41,7 +41,7 @@ const IdentifierAttributeDetailModal = ({
 
       if (!memberConnection?.label) {
         currentUserIndex = index;
-        name = currentAccount;
+        name = currentProfile;
       }
 
       return {

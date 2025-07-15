@@ -34,7 +34,7 @@ describe("getBackRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
-        currentAccount: "Account1",
+        currentProfile: "Account1",
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
@@ -187,7 +187,7 @@ describe("getPreviousRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
-        currentAccount: "Account1",
+        currentProfile: "Account1",
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,

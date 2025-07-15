@@ -12,7 +12,7 @@ describe("Custom toast", () => {
   const initialState = {
     stateCache: {
       routes: ["/"],
-      currentAccount: "Account1",
+      currentProfile: "Account1",
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -77,7 +77,7 @@ describe("Toast stack", () => {
   const initialState = {
     stateCache: {
       routes: ["/"],
-      currentAccount: "Account1",
+      currentProfile: "Account1",
       authentication: {
         loggedIn: true,
         time: Date.now(),

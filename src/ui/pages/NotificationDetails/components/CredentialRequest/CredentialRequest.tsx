@@ -7,7 +7,7 @@ import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
 import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
-import { getCurrentAccount } from "../../../../../store/reducers/stateCache";
+import { getCurrentProfile } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
 import { useOnlineStatusEffect } from "../../../../hooks";
 import { showError } from "../../../../utils/error";
@@ -26,7 +26,7 @@ const CredentialRequest = ({
   const dispatch = useAppDispatch();
   const identifiersData = useAppSelector(getIdentifiersCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
-  const currentAccount = useAppSelector(getCurrentAccount);
+  const currentProfile = useAppSelector(getCurrentProfile);
   const [requestStage, setRequestStage] = useState(0);
   const [credentialRequest, setCredentialRequest] =
     useState<CredentialsMatchingApply | null>();
@@ -55,7 +55,7 @@ const CredentialRequest = ({
       if (!memberConnection) {
         return {
           aid: member,
-          name: currentAccount,
+          name: currentProfile,
           joined: linkedGroup.linkedRequest.accepted,
         };
       }
@@ -71,7 +71,7 @@ const CredentialRequest = ({
       ...linkedGroup,
       memberInfos,
     });
-  }, [multisignConnectionsCache, notificationDetails.id, currentAccount]);
+  }, [multisignConnectionsCache, notificationDetails.id, currentProfile]);
 
   const getCrendetialRequest = useCallback(async () => {
     try {

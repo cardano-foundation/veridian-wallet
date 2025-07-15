@@ -30,7 +30,7 @@ describe("NextRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [],
-        currentAccount: "Account1",
+        currentProfile: "Account1",
         authentication: {
           loggedIn: false,
           time: 0,
@@ -142,7 +142,7 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
-          currentAccount: "Account1",
+          currentProfile: "Account1",
           authentication: {
             loggedIn: false,
             time: 0,
@@ -177,7 +177,7 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
-          currentAccount: "Account1",
+          currentProfile: "Account1",
           authentication: {
             loggedIn: false,
             time: 0,
@@ -213,7 +213,7 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
-          currentAccount: "Account1",
+          currentProfile: "Account1",
           authentication: {
             loggedIn: false,
             time: 0,
@@ -299,7 +299,7 @@ describe("getNextRoute", () => {
       initializationPhase: InitializationPhase.PHASE_TWO,
       recoveryCompleteNoInterruption: false,
       routes: [],
-      currentAccount: "Account1",
+      currentProfile: "Account1",
       authentication: {
         loggedIn: false,
         time: 0,

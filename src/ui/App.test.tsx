@@ -191,7 +191,7 @@ const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
     routes: [TabsRoutePath.IDENTIFIERS],
-    currentAccount: "Account1",
+    currentProfile: "Account1",
     authentication: {
       loggedIn: true,
       time: Date.now(),
@@ -349,7 +349,7 @@ describe("App", () => {
         ...initialState.stateCache,
         isOnline: false,
         initializationPhase: InitializationPhase.PHASE_TWO,
-        currentAccount: "Account1",
+        currentProfile: "Account1",
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
@@ -391,7 +391,7 @@ describe("App", () => {
         ...initialState.stateCache,
         isOnline: false,
         initializationPhase: InitializationPhase.PHASE_ONE,
-        currentAccount: "Account1",
+        currentProfile: "Account1",
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
@@ -487,7 +487,7 @@ describe("Witness availability", () => {
       stateCache: {
         isOnline: true,
         routes: [{ path: TabsRoutePath.ROOT }],
-        currentAccount: "Account1",
+        currentProfile: "Account1",
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -582,7 +582,7 @@ describe("Witness availability", () => {
       stateCache: {
         isOnline: true,
         routes: [{ path: TabsRoutePath.ROOT }],
-        currentAccount: "Account1",
+        currentProfile: "Account1",
         authentication: {
           loggedIn: true,
           time: Date.now(),

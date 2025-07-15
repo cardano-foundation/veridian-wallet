@@ -11,7 +11,7 @@ import { getMultisigConnectionsCache } from "../../../../store/reducers/connecti
 import { getIdentifiersCache } from "../../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
-  getCurrentAccount,
+  getCurrentProfile,
 } from "../../../../store/reducers/stateCache";
 import { CardDetailsContent } from "../../../components/CardDetails";
 import {
@@ -37,7 +37,7 @@ const IdentifierContent = ({
   onRotateKey,
 }: IdentifierContentProps) => {
   const identifiersData = useAppSelector(getIdentifiersCache);
-  const currentAccount = useAppSelector(getCurrentAccount);
+  const currentProfile = useAppSelector(getCurrentProfile);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const memberCount = cardData.members?.length || 0;
   const [openDetailModal, setOpenDetailModal] = useState(false);
@@ -57,7 +57,7 @@ const IdentifierContent = ({
       let name = memberConnection?.label || member;
 
       if (!memberConnection?.label) {
-        name = currentAccount;
+        name = currentProfile;
       }
 
       return name;

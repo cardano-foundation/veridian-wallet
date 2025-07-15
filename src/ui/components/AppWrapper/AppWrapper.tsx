@@ -52,7 +52,7 @@ import {
   getRecoveryCompleteNoInterruption,
   setAuthentication,
   setCameraDirection,
-  setCurrentAccount,
+  setCurrentProfile,
   setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
@@ -358,7 +358,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let currentAccount = "";
+      let currentProfile = "";
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -460,9 +460,9 @@ const AppWrapper = (props: { children: ReactNode }) => {
       );
 
       if (appDefaultProfileRecord) {
-        currentAccount = (
-          appDefaultProfileRecord.content as { currentAccount: string }
-        ).currentAccount;
+        currentProfile = (
+          appDefaultProfileRecord.content as { currentProfile: string }
+        ).currentProfile;
       } else {
         const storedIdentifiers =
           await Agent.agent.identifiers.getIdentifiers();
@@ -476,7 +476,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
                 new Date(b.createdAtUTC).getTime()
             )[0];
           const id = oldest?.id || "";
-          currentAccount = id;
+          currentProfile = id;
 
           await Agent.agent.basicStorage.createOrUpdateBasicRecord(
             new BasicRecord({
@@ -567,7 +567,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
             .value as boolean,
         })
       );
-      dispatch(setCurrentAccount(currentAccount));
+      dispatch(setCurrentProfile(currentProfile));
 
       return {
         keriaConnectUrlRecord,

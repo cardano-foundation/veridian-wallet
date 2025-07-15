@@ -14,10 +14,9 @@ import {
 } from "../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
-  setAuthentication,
   getStateCache,
   showNoWitnessAlert,
-  setCurrentAccount,
+  setCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
@@ -96,7 +95,7 @@ export const ProfileSetup = () => {
 
       // Set as default if it's the first identifier
       if (isFirstIdentifier) {
-        dispatch(setCurrentAccount(identifier));
+        dispatch(setCurrentProfile(identifier));
       }
 
       setStep(SetupProfileStep.FinishSetup);

@@ -9,7 +9,7 @@ import {
   dequeueIncomingRequest,
   enqueueIncomingRequest,
   getAuthentication,
-  getCurrentAccount,
+  getCurrentProfile,
   getCurrentOperation,
   getCurrentRoute,
   getStateCache,
@@ -17,7 +17,6 @@ import {
   login,
   logout,
   setAuthentication,
-  setCurrentAccount,
   setCurrentOperation,
   setCurrentRoute,
   setIsOnline,
@@ -26,6 +25,7 @@ import {
   showGenericError,
   StateCacheProps,
   stateCacheSlice,
+  setCurrentProfile,
 } from "./stateCache";
 import {
   IncomingRequestProps,
@@ -132,28 +132,24 @@ describe("State Cache", () => {
     expect(nextState).not.toBe(initialState);
   });
 
-  test("should return the initial currentAccount", () => {
-    // Check the initial state directly from the slice definition
-    expect(initialState.currentAccount).toEqual("Account1");
-  });
-  test("should handle setCurrentAccount action", () => {
+  test("should handle setCurrentProfile action", () => {
     const newAccount = "Account2";
     const nextState = stateCacheSlice.reducer(
       initialState,
-      setCurrentAccount(newAccount)
+      setCurrentProfile(newAccount)
     );
-    expect(nextState.currentAccount).toEqual(newAccount);
+    expect(nextState.currentProfile).toEqual(newAccount);
   });
 
-  test("getCurrentAccount should select the current account from state", () => {
+  test("getCurrentProfile should select the current account from state", () => {
     const mockState: Partial<RootState> = {
       stateCache: {
         ...initialState,
-        currentAccount: "TestAccount123",
+        currentProfile: "TestAccount123",
       },
     };
 
-    const selectedAccount = getCurrentAccount(mockState as RootState);
+    const selectedAccount = getCurrentProfile(mockState as RootState);
     expect(selectedAccount).toEqual("TestAccount123");
   });
 

@@ -16,8 +16,8 @@ import {
 } from "./Profiles.types";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getCurrentAccount,
-  setCurrentAccount,
+  getCurrentProfile,
+  setCurrentProfile,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
@@ -32,10 +32,10 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const currentAccountName = useAppSelector(getCurrentAccount);
+  const currentProfileName = useAppSelector(getCurrentProfile);
   const identifiersData = Object.values(identifiersDataCache);
   const filteredIdentifiersData = identifiersData.filter(
-    (item) => item.id !== currentAccountName
+    (item) => item.id !== currentProfileName
   );
 
   const handleClose = () => {
@@ -58,10 +58,10 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
           id: MiscRecordId.CURRENT_ACCOUNT,
-          content: { currentAccount: id },
+          content: { currentProfile: id },
         })
       );
-      dispatch(setCurrentAccount(id));
+      dispatch(setCurrentProfile(id));
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
     } catch (e) {
@@ -138,7 +138,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         }
       >
         <div className="profiles-selected-profile">
-          <ProfileItem id={currentAccountName} />
+          <ProfileItem id={currentProfileName} />
           <OptionButton
             icon={personCircleOutline}
             text={`${i18n.t("profiles.options.manage")}`}

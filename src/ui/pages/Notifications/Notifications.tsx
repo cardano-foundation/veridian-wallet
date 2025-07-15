@@ -15,8 +15,7 @@ import {
   markNotificationAsRead,
 } from "../../../store/reducers/notificationsCache";
 import {
-  getAuthentication,
-  getCurrentAccount,
+  getCurrentProfile,
   setCurrentRoute,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
@@ -53,6 +52,7 @@ const Notifications = () => {
   const [selectedItem, setSelectedItem] = useState<KeriaNotification | null>(
     null
   );
+
   const [isOpenCredModal, setIsOpenCredModal] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [viewCred, setViewCred] = useState("");
@@ -62,7 +62,7 @@ const Notifications = () => {
     openUnknownPresentConnectionAlert,
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
-  const currentAccountName = useAppSelector(getCurrentAccount);
+  const currentProfileName = useAppSelector(getCurrentProfile);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
@@ -200,7 +200,7 @@ const Notifications = () => {
   }) => {
     return (
       <Avatar
-        id={currentAccountName}
+        id={currentProfileName}
         handleAvatarClick={handleAvatarClick}
       />
     );
