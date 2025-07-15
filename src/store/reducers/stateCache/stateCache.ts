@@ -17,7 +17,7 @@ const initialState: StateCacheProps = {
   recoveryCompleteNoInterruption: false,
   isOnline: false,
   routes: [],
-  currentAccount: "Account1",
+  currentAccount: "",
   authentication: {
     loggedIn: false,
     time: 0,
