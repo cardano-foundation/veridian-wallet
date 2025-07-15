@@ -1,5 +1,5 @@
 import { expect } from "expect-webdriverio";
-import { SsiAgentDetails } from "../../constants/text.constants.js";
+import { SSIAgent, SsiAgentDetails } from "../../constants/text.constants.js";
 
 export class SsiAgentDetailsScreen {
   get bootUrlInput() {
@@ -26,6 +26,30 @@ export class SsiAgentDetailsScreen {
     return $("[data-testid=\"primary-button-create-ssi-agent\"]");
   }
 
+  get bootUrlInputText() {
+    return $("#boot-url-input");
+  }
+
+  get connectUrlInputText() {
+    return $("#connect-url-input");
+  }
+
+  get getInformationButton() {
+    return $("[class*='copy-button']");
+  }
+
+  get aboutSSITitleText() {
+    return $("[data-testid='about-ssi-agent-title']");
+  }
+
+  get doneButton() {
+    return $("[data-testid='close-button']");
+  }
+
+  get onboardingDocumentationButton() {
+    return $("[data-testid='open-ssi-documentation-button']");
+  }
+
   async tapOnValidatedButton() {
     await expect(this.validateButton).toBeDisplayed();
     await expect(this.validateButton).toBeEnabled();
@@ -43,6 +67,12 @@ export class SsiAgentDetailsScreen {
     await expect(this.connectUrlInput).toBeDisplayed();
     await expect(this.validateButton).toBeDisplayed();
     await expect(this.switchToRecoveryWalletButton).toBeDisplayed();
+  }
+
+  async checkAboutSSIAgentScreen() {
+    await expect(this.aboutSSITitleText).toBeDisplayed();
+    await expect(this.aboutSSITitleText).toHaveText(SSIAgent.TitleAboutSSIAgent);
+    await expect(this.doneButton).toBeDisplayed();
   }
 }
 

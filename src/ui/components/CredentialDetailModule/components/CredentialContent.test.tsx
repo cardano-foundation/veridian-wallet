@@ -162,9 +162,9 @@ describe("Creds content", () => {
       </Provider>
     );
 
-    expect(getByText(EN_TRANSLATIONS.connections.unknown)).toBeVisible();
+    expect(getByText(EN_TRANSLATIONS.tabs.connections.unknown)).toBeVisible();
 
-    fireEvent.click(getByText(EN_TRANSLATIONS.connections.unknown));
+    fireEvent.click(getByText(EN_TRANSLATIONS.tabs.connections.unknown));
 
     await waitFor(() => {
       expect(getByTestId("cred-missing-issuer-alert")).toBeVisible();

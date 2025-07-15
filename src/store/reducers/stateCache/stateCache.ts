@@ -20,6 +20,7 @@ const initialState: StateCacheProps = {
   authentication: {
     loggedIn: false,
     userName: "",
+    defaultProfile: "",
     time: 0,
     passcodeIsSet: false,
     seedPhraseIsSet: false,
@@ -40,7 +41,6 @@ const initialState: StateCacheProps = {
     queues: [],
     isPaused: false,
   },
-  showConnections: false,
   toastMsgs: [],
   forceInitApp: 0,
 };
@@ -106,6 +106,12 @@ const stateCacheSlice = createSlice({
       state.currentOperation = action.payload;
     },
     setToastMsg: (state, action: PayloadAction<ToastMsgType>) => {
+      if (
+        state.isSetupProfile &&
+        action.payload === ToastMsgType.IDENTIFIER_UPDATED
+      )
+        return;
+
       state.toastMsgs = [
         {
           id: new Salter({}).qb64,
@@ -169,9 +175,6 @@ const stateCacheSlice = createSlice({
     showGenericError: (state, action: PayloadAction<boolean | undefined>) => {
       state.showGenericError = action.payload;
     },
-    showConnections: (state, action: PayloadAction<boolean>) => {
-      state.showConnections = action.payload;
-    },
     showGlobalLoading: (state, action: PayloadAction<boolean>) => {
       state.showLoading = action.payload;
     },
@@ -184,8 +187,8 @@ const stateCacheSlice = createSlice({
         forceInitApp: (state.forceInitApp || 0) + 1,
       };
     },
-    setShowWelcomePage: (state, action: PayloadAction<boolean | undefined>) => {
-      state.showWelcomePage = action.payload;
+    setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
+      state.isSetupProfile = action.payload;
     },
   },
 });
@@ -211,12 +214,11 @@ const {
   setFirstAppLaunchComplete,
   setCameraDirection,
   showGenericError,
-  showConnections,
   removeToastMessage,
   showNoWitnessAlert,
   clearStateCache,
   showGlobalLoading,
-  setShowWelcomePage,
+  setIsSetupProfile,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -242,15 +244,13 @@ const getCameraDirection = (state: RootState) =>
   state.stateCache.cameraDirection;
 const getShowCommonError = (state: RootState) =>
   state.stateCache.showGenericError;
-const getShowConnections = (state: RootState) =>
-  state.stateCache.showConnections;
 const getShowNoWitnessAlert = (state: RootState) =>
   state.stateCache.showNoWitnessAlert;
 const getToastMgs = (state: RootState) => state.stateCache.toastMsgs;
 const getForceInitApp = (state: RootState) => state.stateCache.forceInitApp;
 const getGlobalLoading = (state: RootState) => state.stateCache.showLoading;
-const getShowWelcomePage = (state: RootState) =>
-  state.stateCache.showWelcomePage;
+const getShowSetupProfilePage = (state: RootState) =>
+  state.stateCache.isSetupProfile;
 
 export type {
   AuthenticationCacheProps,
@@ -276,9 +276,8 @@ export {
   getRecoveryCompleteNoInterruption,
   getRoutes,
   getShowCommonError,
-  getShowConnections,
   getShowNoWitnessAlert,
-  getShowWelcomePage,
+  getShowSetupProfilePage,
   getStateCache,
   getToastMgs,
   getToastMsgs,
@@ -300,9 +299,8 @@ export {
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
   setRecoveryCompleteNoInterruption,
-  setShowWelcomePage,
+  setIsSetupProfile,
   setToastMsg,
-  showConnections,
   showGenericError,
   showGlobalLoading,
   showNoWitnessAlert,

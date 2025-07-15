@@ -1,9 +1,9 @@
 import { Style, StyleOptions } from "@capacitor/status-bar";
 import { act, render, waitFor } from "@testing-library/react";
+import { startFreeRASP } from "capacitor-freerasp";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import configureStore from "redux-mock-store";
-import { startFreeRASP } from "capacitor-freerasp";
 import { IdentifierService } from "../core/agent/services";
 import Eng_Trans from "../locales/en/en.json";
 import { TabsRoutePath } from "../routes/paths";
@@ -12,14 +12,14 @@ import {
   showGenericError,
   showNoWitnessAlert,
 } from "../store/reducers/stateCache";
+import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
 import { App } from "./App";
-import { OperationType } from "./globals/types";
 import {
   ANDROID_MIN_VERSION,
   IOS_MIN_VERSION,
   WEBVIEW_MIN_VERSION,
 } from "./globals/constants";
-import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
+import { OperationType } from "./globals/types";
 
 jest.mock("capacitor-freerasp", () => ({
   startFreeRASP: jest.fn(),
@@ -202,7 +202,6 @@ const initialState = {
       },
     },
     toastMsgs: [],
-    showConnections: false,
     currentOperation: OperationType.IDLE,
     queueIncomingRequest: {
       isProcessing: false,
@@ -475,97 +474,6 @@ describe("App", () => {
     });
 
     spy.mockClear();
-  });
-  test("It renders SetUserName modal", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [{ path: TabsRoutePath.ROOT }],
-        authentication: {
-          loggedIn: true,
-          userName: "",
-          time: Date.now(),
-          passcodeIsSet: true,
-          seedPhraseIsSet: true,
-          passwordIsSet: false,
-          passwordIsSkipped: true,
-          ssiAgentIsSet: true,
-          ssiAgentUrl: "http://keria.com",
-          recoveryWalletProgress: false,
-          loginAttempt: {
-            attempts: 0,
-            lockedUntil: Date.now(),
-          },
-        },
-        toastMsgs: [],
-        queueIncomingRequest: {
-          isProcessing: false,
-          queues: [],
-          isPaused: false,
-        },
-      },
-      seedPhraseCache: {
-        seedPhrase: "",
-        bran: "",
-      },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-      walletConnectionsCache: {
-        walletConnections: [],
-        connectedWallet: null,
-        pendingConnection: null,
-      },
-      viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-        credential: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
-      },
-      notificationsCache: {
-        notifications: [],
-      },
-    };
-
-    const storeMocked = {
-      ...mockStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const { getByText } = render(
-      <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
-          <App />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(
-        getByText(Eng_Trans.inputrequest.title.username)
-      ).toBeInTheDocument();
-    });
   });
 });
 
@@ -927,7 +835,7 @@ describe("System threat alert", () => {
     });
   });
 
-  test("Catches a threat after renders SetUserName modal", async () => {
+  test("Catches a threat", async () => {
     const initialState = {
       stateCache: {
         routes: [{ path: TabsRoutePath.ROOT }],
@@ -1017,9 +925,6 @@ describe("System threat alert", () => {
 
     await waitFor(() => {
       expect(startFreeRASPMock).toHaveBeenCalled();
-      expect(
-        getByText(Eng_Trans.inputrequest.title.username)
-      ).toBeInTheDocument();
     });
 
     await act(async () => {

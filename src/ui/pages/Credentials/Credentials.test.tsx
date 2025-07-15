@@ -12,10 +12,7 @@ import {
   setCredentialsFilters,
   setCredsCache,
 } from "../../../store/reducers/credsCache";
-import {
-  setCurrentRoute,
-  showConnections,
-} from "../../../store/reducers/stateCache";
+import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { pendingCredFixs } from "../../__fixtures__/credsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
@@ -65,7 +62,6 @@ const initialStateEmpty = {
       passcodeIsSet: true,
     },
     isOnline: true,
-    showConnections: false,
   },
   seedPhraseCache: {},
   credsCache: {
@@ -244,6 +240,29 @@ describe("Creds Tab", () => {
     expect(getByText("Credentials")).toBeInTheDocument();
   });
 
+  test("Open profile", async () => {
+    const storeMocked = {
+      ...mockStore(initialStateEmpty),
+      dispatch: dispatchMock,
+    };
+    const { getByText, getByTestId } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
+        <Provider store={storeMocked}>
+          <Credentials />
+        </Provider>
+      </MemoryRouter>
+    );
+    await waitFor(() => {
+      expect(getByTestId("avatar-button")).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("avatar-button"));
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeVisible();
+    });
+  });
+
   test("Renders Creds Card placeholder", () => {
     const storeMocked = {
       ...mockStore(initialStateEmpty),
@@ -398,50 +417,6 @@ describe("Creds Tab", () => {
 
     await waitFor(() => {
       expect(getByText(filteredCredsFix[3].credentialType)).toBeVisible();
-    });
-  });
-
-  test("Toggle Connections view", async () => {
-    const storeMocked = {
-      ...mockStore(initialStateEmpty),
-      dispatch: dispatchMock,
-    };
-    const { getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
-        <Provider store={storeMocked}>
-          <Credentials />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    act(() => {
-      fireEvent.click(getByTestId("connections-button"));
-    });
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(showConnections(true));
-    });
-  });
-
-  test("Show Connections placeholder", async () => {
-    const storeMocked = {
-      ...mockStore(initialStateEmpty),
-      dispatch: dispatchMock,
-    };
-    const { getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
-        <Provider store={storeMocked}>
-          <Credentials />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    act(() => {
-      fireEvent.click(getByTestId("connections-button"));
-    });
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(showConnections(true));
     });
   });
 

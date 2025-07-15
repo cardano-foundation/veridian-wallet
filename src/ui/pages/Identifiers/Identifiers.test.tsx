@@ -16,7 +16,6 @@ import {
   setIdentifiersFilters,
   setMultiSigGroupCache,
 } from "../../../store/reducers/identifiersCache";
-import { showConnections } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import {
   failedFilteredIdentifierMapFix,
@@ -243,7 +242,6 @@ describe("Identifiers Tab", () => {
     expect(
       getByText(EN_TRANSLATIONS.tabs.identifiers.tab.title)
     ).toBeInTheDocument();
-    expect(getByTestId("connections-button")).toBeInTheDocument();
     expect(getByTestId("add-button")).toBeInTheDocument();
     expect(getByTestId("pending-identifiers-list")).toBeInTheDocument();
     expect(
@@ -671,65 +669,6 @@ describe("Identifiers Tab", () => {
         getByText(EN_TRANSLATIONS.createidentifier.share.title)
       ).toBeVisible();
     });
-  });
-
-  test("Open Connections tab", async () => {
-    const mockStore = configureStore();
-    const dispatchMock = jest.fn();
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      identifiersCache: {
-        identifiers: {},
-      },
-      viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-        credential: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-      },
-      connectionsCache: {
-        connections: [],
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const storeMocked = {
-      ...mockStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const { getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
-        <Provider store={storeMocked}>
-          <Route
-            path={TabsRoutePath.IDENTIFIERS}
-            component={Identifiers}
-          />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    expect(getByTestId("connections-button")).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("connections-button"));
-    });
-
-    expect(dispatchMock).toBeCalledWith(showConnections(true));
   });
 
   test("Remove pending identifier alert", async () => {

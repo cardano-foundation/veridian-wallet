@@ -21,6 +21,7 @@ import { VerifyRecoverySeedPhrase } from "../ui/pages/VerifyRecoverySeedPhrase";
 import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
+import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
@@ -72,7 +73,6 @@ const Routes = () => {
         component={VerifyRecoverySeedPhrase}
         exact
       />
-
       <Route
         path={RoutePath.SSI_AGENT}
         component={CreateSSIAgent}
@@ -111,6 +111,11 @@ const Routes = () => {
       <Route
         path={TabsRoutePath.NOTIFICATION_DETAILS}
         component={NotificationDetails}
+        exact
+      />
+      <Route
+        path={RoutePath.PROFILE_SETUP}
+        component={ProfileSetup}
         exact
       />
       <Redirect

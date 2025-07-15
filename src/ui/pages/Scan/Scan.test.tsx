@@ -6,13 +6,10 @@ import {
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import { OobiType } from "../../../core/agent/agent.types";
+import { StorageMessage } from "../../../core/storage/storage.types";
 import { TabsRoutePath } from "../../../routes/paths";
-import { showConnections } from "../../../store/reducers/stateCache";
-import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { OperationType } from "../../globals/types";
 import { Scan } from "./Scan";
-import { StorageMessage } from "../../../core/storage/storage.types";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -166,54 +163,6 @@ describe("Scan Tab", () => {
     });
 
     expect(getByTestId("scan-tab")).toBeInTheDocument();
-  });
-
-  test("Reset after scan", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.SCAN],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
-        toastMsgs: [],
-      },
-      identifiersCache: {
-        identifiers: {},
-        scanGroupId: "72e2f089cef6",
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-    };
-
-    const storeMocked = {
-      ...mockStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    connectByOobiUrlMock.mockImplementation(() => {
-      return {
-        type: OobiType.NORMAL,
-        connection: connectionsFix[0],
-      };
-    });
-
-    const { unmount } = render(
-      <Provider store={storeMocked}>
-        <Scan />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(showConnections(true));
-    });
-
-    unmount();
   });
 
   test("Nav to identifier after scan duplicate multisig", async () => {

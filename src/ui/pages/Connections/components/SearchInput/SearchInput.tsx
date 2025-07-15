@@ -26,7 +26,7 @@ const SearchInput = ({ onFocus, onInputChange, value }: SearchInputProps) => {
       onIonInput={(e) => {
         onInputChange(e.target.value || "");
       }}
-      placeholder={`${i18n.t("connections.page.search.placeholder")}`}
+      placeholder={`${i18n.t("tabs.connections.tab.search.placeholder")}`}
     />
   );
 };

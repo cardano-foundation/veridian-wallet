@@ -1,6 +1,6 @@
 import { IonButton, IonIcon, useIonViewWillEnter } from "@ionic/react";
 import { t } from "i18next";
-import { addOutline, peopleOutline } from "ionicons/icons";
+import { addOutline } from "ionicons/icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
@@ -21,11 +21,9 @@ import {
 } from "../../../store/reducers/identifiersCache";
 import {
   getCurrentOperation,
-  getShowWelcomePage,
   setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
-  showConnections,
 } from "../../../store/reducers/stateCache";
 import { CardSlider } from "../../components/CardSlider";
 import { CardsPlaceholder } from "../../components/CardsPlaceholder";
@@ -46,31 +44,16 @@ import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import "./Identifiers.scss";
 import { IdentifiersFilters, StartAnimationSource } from "./Identifiers.types";
-import { Welcome } from "./components/Welcome";
 
 const CLEAR_STATE_DELAY = 500;
 interface AdditionalButtonsProps {
   handleCreateIdentifier: () => void;
-  handleConnections: () => void;
 }
 const AdditionalButtons = ({
-  handleConnections,
   handleCreateIdentifier,
 }: AdditionalButtonsProps) => {
   return (
     <>
-      <IonButton
-        shape="round"
-        className="connections-button"
-        data-testid="connections-button"
-        onClick={handleConnections}
-      >
-        <IonIcon
-          slot="icon-only"
-          icon={peopleOutline}
-          color="primary"
-        />
-      </IonButton>
       <IonButton
         shape="round"
         className="add-button"
@@ -96,7 +79,6 @@ const Identifiers = () => {
   const currentOperation = useAppSelector(getCurrentOperation);
   const openMultiSigId = useAppSelector(getOpenMultiSig);
   const identifiersFiltersCache = useAppSelector(getIdentifiersFilters);
-  const showWelcomePage = useAppSelector(getShowWelcomePage);
 
   const [favIdentifiers, setFavIdentifiers] = useState<
     IdentifierShortDetails[]
@@ -297,10 +279,6 @@ const Identifiers = () => {
     button: i18n.t("tabs.identifiers.deletepending.button"),
   };
 
-  const handleConnections = () => {
-    dispatch(showConnections(true));
-  };
-
   const handleCreateIdentifier = () => {
     setCreateIdentifierModalIsOpen(true);
   };
@@ -339,32 +317,25 @@ const Identifiers = () => {
     <>
       <TabLayout
         pageId={pageId}
-        header={!showWelcomePage}
+        header
         customClass={tabClasses}
         title={`${i18n.t("tabs.identifiers.tab.title")}`}
         additionalButtons={
-          <AdditionalButtons
-            handleConnections={handleConnections}
-            handleCreateIdentifier={handleCreateIdentifier}
-          />
+          <AdditionalButtons handleCreateIdentifier={handleCreateIdentifier} />
         }
         placeholder={
-          showWelcomePage ? (
-            <Welcome onCreateGroupIdentifier={handleMultiSigClick} />
-          ) : (
-            showPlaceholder && (
-              <CardsPlaceholder
-                buttonLabel={`${i18n.t("tabs.identifiers.tab.create")}`}
-                buttonAction={handleCreateIdentifier}
-                testId={pageId}
-              >
-                <span className="placeholder-spacer" />
-              </CardsPlaceholder>
-            )
+          showPlaceholder && (
+            <CardsPlaceholder
+              buttonLabel={`${i18n.t("tabs.identifiers.tab.create")}`}
+              buttonAction={handleCreateIdentifier}
+              testId={pageId}
+            >
+              <span className="placeholder-spacer" />
+            </CardsPlaceholder>
           )
         }
       >
-        {!showPlaceholder && !showWelcomePage && (
+        {!showPlaceholder && (
           <>
             {!!favIdentifiers.length && (
               <div
