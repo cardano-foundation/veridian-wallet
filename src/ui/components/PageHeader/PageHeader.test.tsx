@@ -1,6 +1,5 @@
 import { fireEvent, render } from "@testing-library/react";
 import { Provider } from "react-redux";
-
 import { IonReactMemoryRouter } from "@ionic/react-router";
 import { createMemoryHistory } from "history";
 import { arrowBackOutline } from "ionicons/icons";
