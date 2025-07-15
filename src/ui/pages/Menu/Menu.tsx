@@ -5,7 +5,12 @@ import {
   IonRow,
   useIonViewWillEnter,
 } from "@ionic/react";
-import { linkOutline, peopleOutline, settingsOutline } from "ionicons/icons";
+import {
+  linkOutline,
+  peopleOutline,
+  personCircleOutline,
+  settingsOutline,
+} from "ionicons/icons";
 import { useEffect, useMemo, useState } from "react";
 import { ConfigurationService } from "../../../core/configuration";
 import { OptionalFeature } from "../../../core/configuration/configurationService.types";
@@ -52,6 +57,11 @@ const Menu = () => {
   };
 
   const menuItems: Omit<MenuItemProps, "onClick">[] = [
+    {
+      itemKey: SubMenuKey.Profile,
+      icon: personCircleOutline,
+      label: `${i18n.t("tabs.menu.tab.items.profile.title")}`,
+    },
     {
       itemKey: SubMenuKey.Connections,
       icon: peopleOutline,
