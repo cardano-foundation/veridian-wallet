@@ -7,6 +7,7 @@ import { CardType } from "../../globals/types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CardSlider } from "./CardSlider";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
 
 const historyPushMock = jest.fn();
 const createOrUpdateBasicRecordMock = jest.fn();
@@ -89,6 +90,36 @@ describe("Card slider", () => {
       fireEvent.click(
         getByTestId("identifier-card-template-allidentifiers-index-0")
       );
+    });
+
+    await waitFor(() => {
+      expect(historyPushMock).toBeCalled();
+    });
+  });
+
+  test("Render credentials", async () => {
+    const { getByText, getByTestId } = render(
+      <Provider store={mockedStore}>
+        <CardSlider
+          cardType={CardType.CREDENTIALS}
+          cardsData={filteredCredsFix}
+          title="title"
+          name="allcredential"
+        />
+      </Provider>
+    );
+
+    expect(getByText("title")).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(
+        getByTestId(`card-slide-container-${filteredCredsFix[0].id}`)
+      ).toBeInTheDocument();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("slide-pagination-0"));
+      fireEvent.click(getByTestId("keri-card-template-allcredential-index-0"));
     });
 
     await waitFor(() => {
