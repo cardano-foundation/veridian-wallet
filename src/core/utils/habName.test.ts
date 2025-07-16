@@ -7,43 +7,43 @@ describe("habName", () => {
       {
         name: "01:MyWallet",
         expected: {
-          version: null,
+          version: undefined,
           displayName: "MyWallet",
-          groupId: null,
+          groupId: undefined,
           isGroupMember: false,
-          isInitiator: null,
-          userName: null,
+          isInitiator: undefined,
+          userName: undefined,
           theme: "01",
         },
       },
       {
         name: "01:1-groupId123:MyGroup",
         expected: {
-          version: null,
+          version: undefined,
           displayName: "MyGroup",
           isGroupMember: true,
           groupId: "groupId123",
           isInitiator: true,
-          userName: null,
+          userName: undefined,
           theme: "01",
         },
       },
       {
         name: "01:0-groupId456:AnotherGroup",
         expected: {
-          version: null,
+          version: undefined,
           displayName: "AnotherGroup",
           isGroupMember: true,
           groupId: "groupId456",
           isInitiator: false,
-          userName: null,
+          userName: undefined,
           theme: "01",
         },
       },
       {
         name: "0:1-group1-user1:test1",
         expected: {
-          version: null,
+          version: undefined,
           displayName: "test1",
           isGroupMember: true,
           groupId: "group1",
@@ -64,9 +64,9 @@ describe("habName", () => {
           version: CURRENT_VERSION,
           displayName: "MyNewWallet",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
         },
       },
       {
@@ -100,12 +100,12 @@ describe("habName", () => {
       {
         name: "02:",
         expected: {
-          version: null,
+          version: undefined,
           displayName: "",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
           theme: "02",
         },
       },
@@ -115,9 +115,9 @@ describe("habName", () => {
           version: CURRENT_VERSION,
           displayName: "",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
         },
       },
       {
@@ -137,9 +137,9 @@ describe("habName", () => {
           version: CURRENT_VERSION,
           displayName: "My Wallet With Spaces",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
         },
       },
       {
@@ -148,9 +148,9 @@ describe("habName", () => {
           version: CURRENT_VERSION,
           displayName: "Wallet 🚀",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
         },
       },
       {
@@ -161,13 +161,13 @@ describe("habName", () => {
           isGroupMember: true,
           groupId: "",
           isInitiator: false,
-          userName: null,
+          userName: undefined,
         },
       },
       {
         name: "03:1-group-id:",
         expected: {
-          version: null,
+          version: undefined,
           displayName: "",
           isGroupMember: true,
           groupId: "group",
@@ -179,24 +179,24 @@ describe("habName", () => {
       {
         name: ":MyWallet",
         expected: {
-          version: null,
+          version: undefined,
           displayName: "MyWallet",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
           theme: "",
         },
       },
       {
         name: "01:1-:MyGroup",
         expected: {
-          version: null,
+          version: undefined,
           displayName: "MyGroup",
           isGroupMember: true,
           groupId: "",
           isInitiator: true,
-          userName: null,
+          userName: undefined,
           theme: "01",
         },
       },
@@ -208,7 +208,7 @@ describe("habName", () => {
           isGroupMember: true,
           groupId: "some-group",
           isInitiator: true,
-          userName: null,
+          userName: undefined,
         },
       },
       {
@@ -225,12 +225,12 @@ describe("habName", () => {
       {
         name: "01:1-gr@up!d:MyGroup",
         expected: {
-          version: null,
+          version: undefined,
           displayName: "MyGroup",
           isGroupMember: true,
           groupId: "gr@up!d",
           isInitiator: true,
-          userName: null,
+          userName: undefined,
           theme: "01",
         },
       },
@@ -290,19 +290,19 @@ describe("habName", () => {
     test.each([
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "FormattedWallet",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
           theme: "XX",
         },
         expected: "1.2.0.3:FormattedWallet",
       },
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "FormattedGroup",
           isGroupMember: true,
           groupId: "groupXYZ",
@@ -314,7 +314,7 @@ describe("habName", () => {
       },
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "BlankUserGroup",
           isGroupMember: true,
           groupId: "groupUVW",
@@ -326,12 +326,12 @@ describe("habName", () => {
       },
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "NullUserGroup",
           isGroupMember: true,
           groupId: "groupRST",
           isInitiator: true,
-          userName: null,
+          userName: undefined,
           theme: "XX",
         },
         expected: "1.2.0.3:1-groupRST-:NullUserGroup",
@@ -347,19 +347,19 @@ describe("habName", () => {
     test.each([
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
           theme: "XX",
         },
         expected: "1.2.0.3:",
       },
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "",
           isGroupMember: true,
           groupId: "group123",
@@ -371,31 +371,31 @@ describe("habName", () => {
       },
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "Group !@#$%^&*()",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
           theme: "XX",
         },
         expected: "1.2.0.3:Group !@#$%^&*()",
       },
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "Group 🚀",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
           theme: "XX",
         },
         expected: "1.2.0.3:Group 🚀",
       },
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "Special Group",
           isGroupMember: true,
           groupId: "gr@up!d",
@@ -407,7 +407,7 @@ describe("habName", () => {
       },
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "Empty Group",
           isGroupMember: true,
           groupId: "",
@@ -419,12 +419,12 @@ describe("habName", () => {
       },
       {
         parts: {
-          version: null,
+          version: undefined,
           displayName: "Display:Name:With:Colons",
           isGroupMember: false,
-          groupId: null,
-          isInitiator: null,
-          userName: null,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
           theme: "XX",
         },
         expected: "1.2.0.3:Display:Name:With:Colons",
@@ -439,11 +439,11 @@ describe("habName", () => {
 
     test("should ignore userName if isGroupMember is false", () => {
       const parts = {
-        version: null,
+        version: undefined,
         displayName: "Not A Group",
         isGroupMember: false,
         groupId: "should-be-ignored",
-        isInitiator: null,
+        isInitiator: undefined,
         userName: "should-be-ignored",
         theme: "XX",
       };
@@ -451,12 +451,11 @@ describe("habName", () => {
       expect(result).toBe("1.2.0.3:Not A Group");
     });
 
-    test("should handle null groupId for mHab gracefully", () => {
+    test("should handle undefined groupId for mHab gracefully", () => {
       const parts = {
-        version: null,
+        version: "0",
         displayName: "Malformed Group",
         isGroupMember: true,
-        groupId: null,
         isInitiator: true,
         userName: "user1",
         theme: "XX",

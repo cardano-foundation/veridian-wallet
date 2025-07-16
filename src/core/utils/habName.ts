@@ -1,11 +1,11 @@
 export interface HabNameParts {
-  version: string | null;
+  version?: string;
   displayName: string;
   isGroupMember: boolean;
-  groupId: string | null;
-  isInitiator: boolean | null;
-  userName: string | null;
-  theme?: string | null;
+  groupId?: string;
+  isInitiator?: boolean;
+  userName?: string;
+  theme?: string;
 }
 
 // Old format: theme:isInitiator-groupId:displayName
@@ -22,9 +22,9 @@ export function parseHabName(name: string): HabNameParts {
 
     let displayName = rest;
     let isGroupMember = false;
-    let groupId: string | null = null;
-    let isInitiator: boolean | null = null;
-    let userName: string | null = null;
+    let groupId;
+    let isInitiator;
+    let userName;
 
     let potentialGroupPart = rest;
     let potentialDisplayName = "";
@@ -45,7 +45,7 @@ export function parseHabName(name: string): HabNameParts {
       isInitiator = groupParts[0] === "1";
       userName =
         groupParts[groupParts.length - 1] === ""
-          ? null
+          ? undefined
           : groupParts[groupParts.length - 1];
       groupId = groupParts.slice(1, groupParts.length - 1).join("-") || "";
     } else {
@@ -76,9 +76,9 @@ export function parseHabName(name: string): HabNameParts {
         ? name.substring(firstColonIndex + 1)
         : name.substring(lastColonIndex + 1);
     let isGroupMember = false;
-    let groupId: string | null = null;
-    let userName: string | null = null;
-    let isInitiator: boolean | null = null;
+    let groupId;
+    let userName;
+    let isInitiator;
 
     if (firstColonIndex !== lastColonIndex) {
       const middlePart = name.substring(firstColonIndex + 1, lastColonIndex);
@@ -115,7 +115,6 @@ export function parseHabName(name: string): HabNameParts {
     }
 
     return {
-      version: null,
       displayName,
       isGroupMember,
       groupId,
