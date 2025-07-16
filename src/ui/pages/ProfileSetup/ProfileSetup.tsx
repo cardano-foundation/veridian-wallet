@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
+import { BasicRecord } from "../../../core/agent/records";
 import { IdentifierService } from "../../../core/agent/services";
 import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
@@ -14,26 +15,26 @@ import {
 } from "../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
-  setAuthentication,
   getStateCache,
+  setAuthentication,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
 import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
+import { Spinner } from "../../components/Spinner";
+import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
 import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
-import { Welcome } from "./components/Welcome";
 import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
+import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
-import { SetupProfileStep } from "./ProfileSetup.types";
-import { Spinner } from "../../components/Spinner";
-import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
+import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
 
-export const ProfileSetup = () => {
+export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
@@ -45,10 +46,14 @@ export const ProfileSetup = () => {
   const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
 
+  const isModal = !!onClose;
+
   const title = i18n.t(`setupprofile.${step}.title`);
   const back = [SetupProfileStep.SetupProfile].includes(step)
     ? i18n.t("setupprofile.button.back")
-    : undefined;
+    : isModal
+      ? i18n.t("setupprofile.button.cancel")
+      : undefined;
 
   const getButtonText = () => {
     switch (step) {
@@ -60,8 +65,12 @@ export const ProfileSetup = () => {
   };
 
   const handleBack = () => {
-    if (step === SetupProfileStep.SetupProfile)
+    if (step === SetupProfileStep.SetupProfile) {
       setStep(SetupProfileStep.SetupType);
+      return;
+    }
+
+    onClose?.(true);
   };
 
   const createIdentifier = async () => {
@@ -77,32 +86,37 @@ export const ProfileSetup = () => {
     try {
       setLoading(true);
 
-      // Check if this is the first identifier
-      const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
-      const isFirstIdentifier = storedIdentifiers.length === 0;
-
       // Create the identifier
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
       );
 
-      await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       if (individualFirstCreate) {
         await Agent.agent.basicStorage
           .deleteById(MiscRecordId.INDIVIDUAL_FIRST_CREATE)
           .then(() => dispatch(setIndividualFirstCreate(false)));
       }
 
-      // Set as default if it's the first identifier
-      if (isFirstIdentifier) {
-        dispatch(
-          setAuthentication({
-            ...authentication,
-            defaultProfile: identifier,
-          })
-        );
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.DEFAULT_PROFILE,
+          content: { defaultProfile: identifier },
+        })
+      );
+      dispatch(
+        setAuthentication({
+          ...authentication,
+          defaultProfile: identifier,
+        })
+      );
+
+      if (isModal) {
+        onClose();
+        navToCredetials();
+        return;
       }
 
+      await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       setStep(SetupProfileStep.FinishSetup);
     } catch (e) {
       const errorMessage = (e as Error).message;

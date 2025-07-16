@@ -1369,10 +1369,10 @@
   },
   "toast": {
     "copiedtoclipboard": "Copied to clipboard",
-    "identifierrequested": "Identifier request pending",
-    "identifiercreated": "Identifier pending",
-    "identifierupdated": "Identifier created",
-    "identifierdeleted": "Identifier successfully deleted",
+    "identifierrequested": "Profile request pending",
+    "identifiercreated": "Profile pending",
+    "identifierupdated": "Profile created",
+    "identifierdeleted": "Profile successfully deleted",
     "credentialdeleted": "Credential deleted successfully",
     "credentialsdeleted": "Credentials deleted successfully",
     "credentialarchived": "Credential archived successfully",
@@ -1541,7 +1541,8 @@
     "button": {
       "back": "Back",
       "confirm": "Confirm",
-      "started": "Get started"
+      "started": "Get started",
+      "cancel": "Cancel"
     }
   },
   "systemthreats": {
