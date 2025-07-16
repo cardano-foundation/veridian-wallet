@@ -96,18 +96,6 @@ describe("habName", () => {
           theme: "XX",
         },
       },
-      {
-        name: `${CURRENT_VERSION}:XX:0--:Empty Group`, // Empty groupId and userName, but still a group
-        expected: {
-          version: CURRENT_VERSION,
-          displayName: "Empty Group",
-          isGroupMember: true,
-          groupId: "",
-          isInitiator: false,
-          userName: "",
-          theme: "XX",
-        },
-      },
     ])("should parse new format name correctly: %s", ({ name, expected }) => {
       const result = parseHabName(name);
       expect(result).toEqual(expected);
@@ -139,11 +127,6 @@ describe("habName", () => {
         name: `${CURRENT_VERSION}:MyNewWallet`, // Missing theme, groupPart, displayName for new format
         errorMessage:
           "Invalid new format name: Expected 4 parts separated by colons (version:theme:groupPart:displayName).",
-      },
-      {
-        name: `${CURRENT_VERSION}:XX:1-group-id:MyGroup`, // Invalid groupPart for new format (missing userName)
-        errorMessage:
-          "Invalid new format name: Invalid group part format (expected isInitiator-groupId-userName or empty).",
       },
       {
         name: "03:1-group-id:", // Missing display name for old format

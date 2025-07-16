@@ -23,7 +23,6 @@ export function parseHabName(name: string): HabNameParts {
 
     const [version, theme, groupPart, displayName] = parts;
 
-    // Allow groupPart to be empty for non-group members
     if (!version || !theme || !displayName) {
       throw new Error(
         "Invalid new format name: Missing version, theme, or display name."
@@ -41,10 +40,14 @@ export function parseHabName(name: string): HabNameParts {
       isInitiator = groupParts[0] === "1";
       groupId = groupParts[1];
       userName = groupParts[2];
-      if (groupId.length > 0 || userName.length > 0) {
-        // Changed to OR
-        isGroupMember = true;
+
+      // Stricter validation for group parts content
+      if (groupId === "" || userName === "") {
+        throw new Error(
+          "Invalid new format name: Invalid group part format (expected isInitiator-groupId-userName or empty)."
+        );
       }
+      isGroupMember = true; // If it has 3 parts, it's a group member
     } else if (groupParts.length === 1 && groupParts[0] === "") {
       // Case for non-group member, where groupPart is empty
       isGroupMember = false;
@@ -73,7 +76,6 @@ export function parseHabName(name: string): HabNameParts {
 
     const [theme, groupPart, displayName] = parts;
 
-    // Allow groupPart to be empty for non-group members
     if (!theme || !displayName) {
       throw new Error(
         "Invalid old format name: Missing theme or display name."
@@ -89,9 +91,14 @@ export function parseHabName(name: string): HabNameParts {
       // isInitiator-groupId
       isInitiator = groupParts[0] === "1";
       groupId = groupParts[1];
-      if (groupId.length > 0) {
-        isGroupMember = true;
+
+      // Stricter validation for group parts content
+      if (groupId === "") {
+        throw new Error(
+          "Invalid old format name: Invalid group part format (expected isInitiator-groupId or empty)."
+        );
       }
+      isGroupMember = true; // If it has 2 parts, it's a group member
     } else if (groupParts.length === 1 && groupParts[0] === "") {
       // Case for non-group member, where groupPart is empty
       isGroupMember = false;
@@ -113,7 +120,7 @@ export function parseHabName(name: string): HabNameParts {
 
 export function formatToV1_2_0_3(parts: HabNameParts): string {
   const version = "1.2.0.3";
-  const themePart = parts.theme || 0; // Ensure theme is not undefined
+  const themePart = parts.theme || ""; // Ensure theme is not undefined
   const displayNamePart = parts.displayName || ""; // Ensure display name is not undefined
 
   if (parts.isGroupMember) {
