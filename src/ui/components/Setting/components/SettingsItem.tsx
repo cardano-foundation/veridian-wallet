@@ -1,7 +1,7 @@
 import { IonIcon, IonItem, IonLabel, IonNote } from "@ionic/react";
 import { chevronForward } from "ionicons/icons";
-import { SettingsItemProps } from "../Settings.types";
 import "./SettingsItem.scss";
+import { SettingsItemProps } from "../Setting.types";
 
 const SettingsItem = ({ item, handleOptionClick }: SettingsItemProps) => {
   const content = (

@@ -1,9 +1,20 @@
 import { ReactNode } from "react";
-import { SubMenuKey } from "../../Menu.types";
+
+enum SettingScreen {
+  Settings,
+  ManagePassword,
+  TermsAndPrivacy,
+  RecoverySeedPhrase,
+}
+
+interface SettingListProps {
+  switchView?: (key: SettingScreen) => void;
+  handleClose?: () => void;
+}
 
 interface SettingsProps {
-  switchView?: (key: SubMenuKey) => void;
-  handleClose?: () => void;
+  show: boolean;
+  setShow: (value: boolean) => void;
 }
 
 interface OptionProps {
@@ -32,5 +43,5 @@ interface SettingsItemProps {
   handleOptionClick: (item: OptionProps) => void;
 }
 
-export type { SettingsProps, OptionProps, SettingsItemProps };
-export { OptionIndex };
+export type { SettingsProps, OptionProps, SettingsItemProps, SettingListProps };
+export { OptionIndex, SettingScreen };

@@ -1,8 +1,6 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import { MemoryRouter } from "react-router-dom";
-
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { store } from "../../../store";
@@ -96,29 +94,6 @@ describe("Menu Tab", () => {
     expect(
       getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.title)
     ).toBeInTheDocument();
-  });
-
-  test("Open Profile sub-menu", async () => {
-    const { getByTestId, getByText, unmount } = render(
-      <Provider store={storeMocked}>
-        <Menu />
-      </Provider>
-    );
-
-    expect(getByTestId("menu-tab")).toBeInTheDocument();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
-    ).toBeInTheDocument();
-
-    act(() => {
-      fireEvent.click(getByTestId("settings-button"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("settings-security-items")).toBeVisible();
-    });
-
-    unmount();
   });
 
   test("Open Profile sub-menu", async () => {

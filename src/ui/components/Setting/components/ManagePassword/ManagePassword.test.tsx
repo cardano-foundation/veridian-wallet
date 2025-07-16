@@ -4,27 +4,26 @@ import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-
-import { Agent } from "../../../../../../../core/agent/agent";
-import { BasicRecord } from "../../../../../../../core/agent/records";
-import TRANSLATIONS from "../../../../../../../locales/en/en.json";
-import { RoutePath } from "../../../../../../../routes";
-import { CustomInputProps } from "../../../../../../components/CustomInput/CustomInput.types";
-import { OperationType } from "../../../../../../globals/types";
-import { passcodeFiller } from "../../../../../../utils/passcodeFiller";
+import { Agent } from "../../../../../core/agent/agent";
+import { BasicRecord } from "../../../../../core/agent/records";
+import TRANSLATIONS from "../../../../../locales/en/en.json";
+import { RoutePath } from "../../../../../routes";
+import { OperationType } from "../../../../globals/types";
+import { passcodeFiller } from "../../../../utils/passcodeFiller";
+import { CustomInputProps } from "../../../CustomInput/CustomInput.types";
 import { ManagePassword } from "./ManagePassword";
-import { makeTestStore } from "../../../../../../utils/makeTestStore";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 
 const deletePasswordMock = jest.fn();
 
-jest.mock("../../../../../../../core/storage", () => ({
-  ...jest.requireActual("../../../../../../../core/storage"),
+jest.mock("../../../../../core/storage", () => ({
+  ...jest.requireActual("../../../../../core/storage"),
   SecureStorage: {
     delete: () => deletePasswordMock(),
   },
 }));
 
-jest.mock("../../../../../../../core/agent/agent", () => ({
+jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       basicStorage: {
@@ -40,7 +39,7 @@ jest.mock("../../../../../../../core/agent/agent", () => ({
   },
 }));
 
-jest.mock("../../../../../../hooks/useBiometricsHook", () => ({
+jest.mock("../../../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: jest.fn(() => ({
     biometricsIsEnabled: false,
     biometricInfo: {
@@ -60,7 +59,7 @@ jest.mock("@ionic/react", () => ({
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
 }));
 
-jest.mock("../../../../../../components/CustomInput", () => ({
+jest.mock("../../../CustomInput", () => ({
   CustomInput: (props: CustomInputProps) => {
     return (
       <>
@@ -130,8 +129,8 @@ describe("Manage password", () => {
     await waitFor(() => {
       expect(
         queryByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-            .page.alert.enablemessage
+          TRANSLATIONS.settings.sections.security.managepassword.page.alert
+            .enablemessage
         )
       ).toBeVisible();
     });
@@ -154,8 +153,8 @@ describe("Manage password", () => {
     await waitFor(() => {
       expect(
         queryByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-            .page.alert.enablemessage
+          TRANSLATIONS.settings.sections.security.managepassword.page.alert
+            .enablemessage
         )
       ).toBeNull();
     });
@@ -190,8 +189,8 @@ describe("Manage password", () => {
     await waitFor(() => {
       expect(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-            .page.alert.enablemessage
+          TRANSLATIONS.settings.sections.security.managepassword.page.alert
+            .enablemessage
         )
       ).toBeVisible();
     });
@@ -205,8 +204,8 @@ describe("Manage password", () => {
     await waitFor(() => {
       expect(
         queryByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-            .page.alert.enablemessage
+          TRANSLATIONS.settings.sections.security.managepassword.page.alert
+            .enablemessage
         )
       ).toBeNull();
     });
@@ -273,8 +272,8 @@ describe("Manage password", () => {
     await waitFor(() => {
       expect(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-            .page.alert.disablemessage
+          TRANSLATIONS.settings.sections.security.managepassword.page.alert
+            .disablemessage
         )
       ).toBeVisible();
     });
@@ -286,8 +285,8 @@ describe("Manage password", () => {
     await waitFor(() => {
       expect(
         queryByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.managepassword
-            .page.alert.disablemessage
+          TRANSLATIONS.settings.sections.security.managepassword.page.alert
+            .disablemessage
         )
       ).toBeNull();
     });

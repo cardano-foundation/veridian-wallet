@@ -1,3 +1,6 @@
+interface AvatarProfilesProps {
+  defaultProfile: string;
+}
 interface ProfilesProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
@@ -11,7 +14,13 @@ interface OptionButtonProps {
 
 interface ProfileItemsProps {
   id: string;
+  displayName: string;
   onClick?: () => void;
 }
 
-export type { ProfilesProps, OptionButtonProps, ProfileItemsProps };
+export type {
+  ProfilesProps,
+  OptionButtonProps,
+  ProfileItemsProps,
+  AvatarProfilesProps,
+};

@@ -3,11 +3,9 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import { store } from "../../../store";
 import {
   setCredentialsFilters,
   setCredsCache,
@@ -16,7 +14,10 @@ import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { pendingCredFixs } from "../../__fixtures__/credsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import {
+  filteredIdentifierFix,
+  filteredIdentifierMapFix,
+} from "../../__fixtures__/filteredIdentifierFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Credentials } from "./Credentials";
@@ -58,6 +59,7 @@ const initialStateEmpty = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
+      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
@@ -75,7 +77,7 @@ const initialStateEmpty = {
     connections: [],
   },
   identifiersCache: {
-    identifiers: filteredIdentifierFix,
+    identifiers: filteredIdentifierMapFix,
   },
   viewTypeCache: {
     identifier: {
@@ -96,6 +98,7 @@ const initialStateFull = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
+      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
@@ -122,7 +125,7 @@ const initialStateFull = {
     connections: connectionsFix,
   },
   identifiersCache: {
-    identifiers: filteredIdentifierFix,
+    identifiers: filteredIdentifierMapFix,
   },
   viewTypeCache: {
     identifier: {
@@ -143,6 +146,7 @@ const archivedAndRevokedState = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
+      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
@@ -171,7 +175,7 @@ const archivedAndRevokedState = {
     connections: connectionsFix,
   },
   identifiersCache: {
-    identifiers: filteredIdentifierFix,
+    identifiers: filteredIdentifierMapFix,
   },
   notificationsCache: {
     notifications: [],
@@ -203,9 +207,6 @@ describe("Creds Tab", () => {
       ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
-
-    store.dispatch(setCredsCache([]));
-    store.dispatch(setCredentialsFilters(CredentialsFilters.All));
   });
 
   test("Renders favourites in Creds", () => {
@@ -327,6 +328,7 @@ describe("Creds Tab", () => {
   });
 
   test("Toggle Creds Filters show Individual", async () => {
+    const store = makeTestStore(initialStateEmpty);
     store.dispatch(setCredsCache([filteredCredsFix[0]]));
 
     const { getByTestId, getByText, queryByText } = render(
@@ -373,6 +375,7 @@ describe("Creds Tab", () => {
   });
 
   test("Toggle Creds Filters show Group", async () => {
+    const store = makeTestStore(initialStateFull);
     store.dispatch(setCredsCache([filteredCredsFix[3]]));
     store.dispatch(setCredentialsFilters(CredentialsFilters.All));
 
@@ -425,6 +428,7 @@ describe("Creds Tab", () => {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
+          defaultProfile: filteredIdentifierFix[0].id,
           loggedIn: true,
           time: Date.now(),
           passcodeIsSet: true,
@@ -436,7 +440,7 @@ describe("Creds Tab", () => {
       },
       seedPhraseCache: {},
       identifiersCache: {
-        identifiers: filteredIdentifierFix,
+        identifiers: filteredIdentifierMapFix,
       },
 
       credsArchivedCache: {

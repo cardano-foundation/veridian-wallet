@@ -5,13 +5,13 @@ import { BiometryType } from "@aparajita/capacitor-biometric-auth/dist/esm/defin
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import { KeyStoreKeys } from "../../../../../../../core/storage";
-import EN_TRANSLATIONS from "../../../../../../../locales/en/en.json";
-import { store } from "../../../../../../../store";
-import { passcodeFiller } from "../../../../../../utils/passcodeFiller";
+import { KeyStoreKeys } from "../../../../../core/storage";
+import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
+import { store } from "../../../../../store";
+import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { ChangePin } from "./ChangePin";
 
-jest.mock("../../../../../../utils/passcodeChecker", () => ({
+jest.mock("../../../../utils/passcodeChecker", () => ({
   isRepeat: () => false,
   isConsecutive: () => false,
   isReverseConsecutive: () => false,
@@ -19,7 +19,7 @@ jest.mock("../../../../../../utils/passcodeChecker", () => ({
 
 const mockSetIsOpen = jest.fn();
 
-jest.mock("../../../../../../../core/agent/agent", () => ({
+jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       basicStorage: {
@@ -38,7 +38,7 @@ jest.mock("../../../../../../../core/agent/agent", () => ({
 
 const useBiometricAuthMock = jest.fn();
 
-jest.mock("../../../../../../hooks/useBiometricsHook", () => ({
+jest.mock("../../../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: () => useBiometricAuthMock(),
 }));
 
@@ -92,20 +92,15 @@ describe("ChangePin Modal", () => {
     expect(getByTestId("close-button")).toBeInTheDocument();
     expect(
       getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin
-          .createpasscode
+        EN_TRANSLATIONS.settings.sections.security.changepin.createpasscode
       )
     ).toBeInTheDocument();
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin
-          .cancel
-      )
+      getByText(EN_TRANSLATIONS.settings.sections.security.changepin.cancel)
     ).toBeInTheDocument();
     expect(
       getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin
-          .description
+        EN_TRANSLATIONS.settings.sections.security.changepin.description
       )
     ).toBeInTheDocument();
     expect(getByTestId("passcode-module-container")).toBeInTheDocument();
@@ -126,18 +121,14 @@ describe("ChangePin Modal", () => {
     await passcodeFiller(getByText, getByTestId, "193212");
 
     const text = await findByText(
-      EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin
-        .reenterpasscode
+      EN_TRANSLATIONS.settings.sections.security.changepin.reenterpasscode
     );
 
     await waitFor(() => expect(text).toBeInTheDocument());
 
     await waitFor(() =>
       expect(
-        queryByText(
-          EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin
-            .back
-        )
+        queryByText(EN_TRANSLATIONS.settings.sections.security.changepin.back)
       ).toBeInTheDocument()
     );
     await waitFor(() =>
@@ -174,8 +165,7 @@ describe("ChangePin Modal", () => {
 
     await passcodeFiller(getByText, getByTestId, "193212");
     const text = await findByText(
-      EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin
-        .reenterpasscode
+      EN_TRANSLATIONS.settings.sections.security.changepin.reenterpasscode
     );
 
     await waitFor(() => {
@@ -204,10 +194,7 @@ describe("ChangePin Modal", () => {
 
     act(() => {
       fireEvent.click(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.settings.sections.security.changepin
-            .cancel
-        )
+        getByText(EN_TRANSLATIONS.settings.sections.security.changepin.cancel)
       );
     });
 
