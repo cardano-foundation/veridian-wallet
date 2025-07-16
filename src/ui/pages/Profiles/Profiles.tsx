@@ -14,16 +14,14 @@ import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
   getStateCache,
-  setAuthentication,
   setToastMsg,
   updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
-import { Settings } from "../../components/Setting";
+import { ProfileDetailModal } from "../../components/ProfileDetailModal";
 import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
@@ -34,6 +32,7 @@ import {
   ProfileItemsProps,
   ProfilesProps,
 } from "./Profiles.types";
+import { Settings } from "../../components/Settings";
 
 const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
   if (!identifier) return null;
@@ -97,6 +96,8 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     (item) => item.id !== defaultProfile
   );
   const [openSetting, setOpenSetting] = useState(false);
+  const [openProfileDetail, setOpenProfileDetail] = useState(false);
+
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
 
   const handleClose = () => {
@@ -220,6 +221,12 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           }}
         />
       </SideSlider>
+      <ProfileDetailModal
+        pageId="profile-detail"
+        isOpen={openProfileDetail}
+        setIsOpen={setOpenProfileDetail}
+        profileId={defaultProfile}
+      />
     </>
   );
 };

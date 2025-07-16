@@ -32,7 +32,7 @@ import {
   OptionProps,
   SettingListProps,
   SettingScreen,
-} from "../Setting.types";
+} from "../Settings.types";
 import { i18n } from "../../../../i18n";
 import { DOCUMENTATION_LINK, SUPPORT_EMAIL } from "../../../globals/constants";
 import { Agent } from "../../../../core/agent/agent";
