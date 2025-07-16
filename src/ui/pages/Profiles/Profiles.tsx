@@ -15,6 +15,8 @@ import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
   getCurrentProfile,
+  getStateCache,
+  setAuthentication,
   setCurrentProfile,
   setToastMsg,
 } from "../../../store/reducers/stateCache";

@@ -14,7 +14,6 @@ import {
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
   getStateCache,
   setCurrentProfile,
   showNoWitnessAlert,
