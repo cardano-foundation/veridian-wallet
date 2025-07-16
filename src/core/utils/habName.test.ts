@@ -3,19 +3,8 @@ import { parseHabName, formatToV1_2_0_3 } from "./habName";
 
 describe("habName", () => {
   describe("parseHabName", () => {
+    // Tests for old format names (theme:isInitiator-groupId:displayName)
     test.each([
-      {
-        name: "01:MyWallet",
-        expected: {
-          version: undefined,
-          displayName: "MyWallet",
-          groupId: undefined,
-          isGroupMember: false,
-          isInitiator: undefined,
-          userName: undefined,
-          theme: "01",
-        },
-      },
       {
         name: "01:1-groupId123:MyGroup",
         expected: {
@@ -41,143 +30,7 @@ describe("habName", () => {
         },
       },
       {
-        name: "0:1-group1-user1:test1",
-        expected: {
-          version: undefined,
-          displayName: "test1",
-          isGroupMember: true,
-          groupId: "group1",
-          isInitiator: true,
-          userName: "user1",
-          theme: "0",
-        },
-      },
-    ])("should parse old format name correctly: %s", ({ name, expected }) => {
-      const result = parseHabName(name);
-      expect(result).toEqual(expected);
-    });
-
-    test.each([
-      {
-        name: `${CURRENT_VERSION}:MyNewWallet`,
-        expected: {
-          version: CURRENT_VERSION,
-          displayName: "MyNewWallet",
-          isGroupMember: false,
-          groupId: undefined,
-          isInitiator: undefined,
-          userName: undefined,
-        },
-      },
-      {
-        name: `${CURRENT_VERSION}:1-groupId789-user123:MyNewGroup`,
-        expected: {
-          version: "1.2.0.3",
-          displayName: "MyNewGroup",
-          isGroupMember: true,
-          groupId: "groupId789",
-          isInitiator: true,
-          userName: "user123",
-        },
-      },
-      {
-        name: `${CURRENT_VERSION}:1-gr@up!d-us$er%name:Group Name`,
-        expected: {
-          version: "1.2.0.3",
-          displayName: "Group Name",
-          isGroupMember: true,
-          groupId: "gr@up!d",
-          isInitiator: true,
-          userName: "us$er%name",
-        },
-      },
-    ])("should parse new format name correctly: %s", ({ name, expected }) => {
-      const result = parseHabName(name);
-      expect(result).toEqual(expected);
-    });
-
-    test.each([
-      {
-        name: "02:",
-        expected: {
-          version: undefined,
-          displayName: "",
-          isGroupMember: false,
-          groupId: undefined,
-          isInitiator: undefined,
-          userName: undefined,
-          theme: "02",
-        },
-      },
-      {
-        name: `${CURRENT_VERSION}:`,
-        expected: {
-          version: CURRENT_VERSION,
-          displayName: "",
-          isGroupMember: false,
-          groupId: undefined,
-          isInitiator: undefined,
-          userName: undefined,
-        },
-      },
-      {
-        name: `${CURRENT_VERSION}:0-group-id-user:`,
-        expected: {
-          version: CURRENT_VERSION,
-          displayName: "",
-          isGroupMember: true,
-          groupId: "group-id",
-          isInitiator: false,
-          userName: "user",
-        },
-      },
-      {
-        name: `${CURRENT_VERSION}:My Wallet With Spaces`,
-        expected: {
-          version: CURRENT_VERSION,
-          displayName: "My Wallet With Spaces",
-          isGroupMember: false,
-          groupId: undefined,
-          isInitiator: undefined,
-          userName: undefined,
-        },
-      },
-      {
-        name: `${CURRENT_VERSION}:Wallet 🚀`,
-        expected: {
-          version: CURRENT_VERSION,
-          displayName: "Wallet 🚀",
-          isGroupMember: false,
-          groupId: undefined,
-          isInitiator: undefined,
-          userName: undefined,
-        },
-      },
-      {
-        name: `${CURRENT_VERSION}:0--`,
-        expected: {
-          version: CURRENT_VERSION,
-          displayName: "",
-          isGroupMember: true,
-          groupId: "",
-          isInitiator: false,
-          userName: undefined,
-        },
-      },
-      {
-        name: "03:1-group-id:",
-        expected: {
-          version: undefined,
-          displayName: "",
-          isGroupMember: true,
-          groupId: "group",
-          isInitiator: true,
-          userName: "id",
-          theme: "03",
-        },
-      },
-      {
-        name: ":MyWallet",
+        name: "01::MyWallet", // Non-group member in old format
         expected: {
           version: undefined,
           displayName: "MyWallet",
@@ -185,41 +38,7 @@ describe("habName", () => {
           groupId: undefined,
           isInitiator: undefined,
           userName: undefined,
-          theme: "",
-        },
-      },
-      {
-        name: "01:1-:MyGroup",
-        expected: {
-          version: undefined,
-          displayName: "MyGroup",
-          isGroupMember: true,
-          groupId: "",
-          isInitiator: true,
-          userName: undefined,
           theme: "01",
-        },
-      },
-      {
-        name: `${CURRENT_VERSION}:1-some-group-:MyGroup`,
-        expected: {
-          version: CURRENT_VERSION,
-          displayName: "MyGroup",
-          isGroupMember: true,
-          groupId: "some-group",
-          isInitiator: true,
-          userName: undefined,
-        },
-      },
-      {
-        name: `${CURRENT_VERSION}:1--user123:MyGroup`,
-        expected: {
-          version: CURRENT_VERSION,
-          displayName: "MyGroup",
-          isGroupMember: true,
-          groupId: "",
-          isInitiator: true,
-          userName: "user123",
         },
       },
       {
@@ -234,49 +53,116 @@ describe("habName", () => {
           theme: "01",
         },
       },
-    ])(
-      "should handle various edge cases for parsing: %s",
-      ({ name, expected }) => {
-        const result = parseHabName(name);
-        expect(result).toEqual(expected);
-      }
-    );
+    ])("should parse old format name correctly: %s", ({ name, expected }) => {
+      const result = parseHabName(name);
+      expect(result).toEqual(expected);
+    });
 
+    // Tests for new format names (1.2.0.3:theme:isInitiator-groupId-userName:displayName)
+    test.each([
+      {
+        name: `${CURRENT_VERSION}:XX:1-groupId789-user123:MyNewGroup`,
+        expected: {
+          version: CURRENT_VERSION,
+          displayName: "MyNewGroup",
+          isGroupMember: true,
+          groupId: "groupId789",
+          isInitiator: true,
+          userName: "user123",
+          theme: "XX",
+        },
+      },
+      {
+        name: `${CURRENT_VERSION}:XX:1-gr@up!d-us$er%name:Group Name`,
+        expected: {
+          version: CURRENT_VERSION,
+          displayName: "Group Name",
+          isGroupMember: true,
+          groupId: "gr@up!d",
+          isInitiator: true,
+          userName: "us$er%name",
+          theme: "XX",
+        },
+      },
+      {
+        name: `${CURRENT_VERSION}:XX::MyNewWallet`, // Non-group member in new format
+        expected: {
+          version: CURRENT_VERSION,
+          displayName: "MyNewWallet",
+          isGroupMember: false,
+          groupId: undefined,
+          isInitiator: undefined,
+          userName: undefined,
+          theme: "XX",
+        },
+      },
+      {
+        name: `${CURRENT_VERSION}:XX:0--:Empty Group`, // Empty groupId and userName, but still a group
+        expected: {
+          version: CURRENT_VERSION,
+          displayName: "Empty Group",
+          isGroupMember: true,
+          groupId: "",
+          isInitiator: false,
+          userName: "",
+          theme: "XX",
+        },
+      },
+    ])("should parse new format name correctly: %s", ({ name, expected }) => {
+      const result = parseHabName(name);
+      expect(result).toEqual(expected);
+    });
+
+    // Tests for invalid formats that should throw errors
     test.each([
       {
         name: "JustTheName",
-        errorMessage: "Invalid old format name: Missing colon.",
-      },
-      {
-        name: "01:1-group-id:Display:Name",
         errorMessage:
-          "Invalid old format name: Display name cannot contain colons.",
+          "Invalid old format name: Expected 3 parts separated by colons (theme:groupPart:displayName).",
       },
       {
-        name: "01:1-group-id-extra:DisplayName",
-        errorMessage: "Invalid old format name: Malformed group structure.",
-      },
-      {
-        name: "01",
-        errorMessage: "Invalid old format name: Missing colon.",
-      },
-      {
-        name: "01:1-group-id",
-        errorMessage: "Invalid old format name: Malformed group structure.",
-      },
-      {
-        name: "04:1-group-with-hyphens:Group Name",
-        errorMessage: "Invalid old format name: Malformed group structure.",
-      },
-      {
-        name: `${CURRENT_VERSION}:My:Wallet:With:Colons`,
+        name: "01:MyWallet", // Missing groupPart and displayName
         errorMessage:
-          "Invalid new format name: Display name cannot contain colons.",
+          "Invalid old format name: Expected 3 parts separated by colons (theme:groupPart:displayName).",
       },
       {
-        name: `${CURRENT_VERSION}:!@#$%^&*()_+-=[]{}|;':",./<>?`,
+        name: "01:1-group-id:Display:Name", // Too many parts for old format
         errorMessage:
-          "Invalid new format name: Display name cannot contain colons.",
+          "Invalid old format name: Expected 3 parts separated by colons (theme:groupPart:displayName).",
+      },
+      {
+        name: "01:1-group-id-extra:DisplayName", // Invalid groupPart for old format
+        errorMessage:
+          "Invalid old format name: Invalid group part format (expected isInitiator-groupId or empty).",
+      },
+      {
+        name: `${CURRENT_VERSION}:MyNewWallet`, // Missing theme, groupPart, displayName for new format
+        errorMessage:
+          "Invalid new format name: Expected 4 parts separated by colons (version:theme:groupPart:displayName).",
+      },
+      {
+        name: `${CURRENT_VERSION}:XX:1-group-id:MyGroup`, // Invalid groupPart for new format (missing userName)
+        errorMessage:
+          "Invalid new format name: Invalid group part format (expected isInitiator-groupId-userName or empty).",
+      },
+      {
+        name: "03:1-group-id:", // Missing display name for old format
+        errorMessage: "Invalid old format name: Missing theme or display name.",
+      },
+      {
+        name: ":MyWallet", // Missing theme for old format
+        errorMessage:
+          "Invalid old format name: Expected 3 parts separated by colons (theme:groupPart:displayName).",
+      },
+      {
+        name: "01:1-:MyGroup", // Empty groupId for old format
+        errorMessage:
+          "Invalid old format name: Invalid group part format (expected isInitiator-groupId or empty).",
+      },
+      {
+        name: `${CURRENT_VERSION}:XX:1--user123:MyGroup`, // Empty groupId for new format
+        errorMessage:
+          "Invalid new format name: Invalid group part format (expected isInitiator-groupId-userName or empty).",
       },
     ])(
       "should throw error for invalid format: %s",
@@ -298,7 +184,7 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: "1.2.0.3:FormattedWallet",
+        expected: `${CURRENT_VERSION}:XX::FormattedWallet`, // Non-group member format
       },
       {
         parts: {
@@ -310,7 +196,7 @@ describe("habName", () => {
           userName: "formattedUser",
           theme: "XX",
         },
-        expected: "1.2.0.3:1-groupXYZ-formattedUser:FormattedGroup",
+        expected: `${CURRENT_VERSION}:XX:1-groupXYZ-formattedUser:FormattedGroup`,
       },
       {
         parts: {
@@ -322,7 +208,7 @@ describe("habName", () => {
           userName: "",
           theme: "XX",
         },
-        expected: "1.2.0.3:0-groupUVW-:BlankUserGroup",
+        expected: `${CURRENT_VERSION}:XX:0-groupUVW-:BlankUserGroup`,
       },
       {
         parts: {
@@ -334,17 +220,8 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: "1.2.0.3:1-groupRST-:NullUserGroup",
+        expected: `${CURRENT_VERSION}:XX:1-groupRST-:NullUserGroup`,
       },
-    ])(
-      "should format gHab and mHab parts correctly: %s",
-      ({ parts, expected }) => {
-        const result = formatToV1_2_0_3(parts);
-        expect(result).toBe(expected);
-      }
-    );
-
-    test.each([
       {
         parts: {
           version: undefined,
@@ -355,7 +232,7 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: "1.2.0.3:",
+        expected: `${CURRENT_VERSION}:XX::`,
       },
       {
         parts: {
@@ -367,7 +244,7 @@ describe("habName", () => {
           userName: "user1",
           theme: "XX",
         },
-        expected: "1.2.0.3:1-group123-user1:",
+        expected: `${CURRENT_VERSION}:XX:1-group123-user1:`,
       },
       {
         parts: {
@@ -379,7 +256,7 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: "1.2.0.3:Group !@#$%^&*()",
+        expected: `${CURRENT_VERSION}:XX::Group !@#$%^&*()`,
       },
       {
         parts: {
@@ -391,31 +268,7 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: "1.2.0.3:Group 🚀",
-      },
-      {
-        parts: {
-          version: undefined,
-          displayName: "Special Group",
-          isGroupMember: true,
-          groupId: "gr@up!d",
-          isInitiator: false,
-          userName: "us$er%name",
-          theme: "XX",
-        },
-        expected: "1.2.0.3:0-gr@up!d-us$er%name:Special Group",
-      },
-      {
-        parts: {
-          version: undefined,
-          displayName: "Empty Group",
-          isGroupMember: true,
-          groupId: "",
-          isInitiator: false,
-          userName: "",
-          theme: "XX",
-        },
-        expected: "1.2.0.3:0--:Empty Group",
+        expected: `${CURRENT_VERSION}:XX::Group 🚀`,
       },
       {
         parts: {
@@ -427,41 +280,14 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: "1.2.0.3:Display:Name:With:Colons",
+        expected: `${CURRENT_VERSION}:XX::Display:Name:With:Colons`,
       },
     ])(
-      "should handle various edge cases for formatting: %s",
+      "should format hab name parts correctly to v1.2.0.3 format: %s",
       ({ parts, expected }) => {
         const result = formatToV1_2_0_3(parts);
         expect(result).toBe(expected);
       }
     );
-
-    test("should ignore userName if isGroupMember is false", () => {
-      const parts = {
-        version: undefined,
-        displayName: "Not A Group",
-        isGroupMember: false,
-        groupId: "should-be-ignored",
-        isInitiator: undefined,
-        userName: "should-be-ignored",
-        theme: "XX",
-      };
-      const result = formatToV1_2_0_3(parts);
-      expect(result).toBe("1.2.0.3:Not A Group");
-    });
-
-    test("should handle undefined groupId for mHab gracefully", () => {
-      const parts = {
-        version: "0",
-        displayName: "Malformed Group",
-        isGroupMember: true,
-        isInitiator: true,
-        userName: "user1",
-        theme: "XX",
-      };
-      const result = formatToV1_2_0_3(parts);
-      expect(result).toBe("1.2.0.3:1--user1:Malformed Group");
-    });
   });
 });

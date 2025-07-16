@@ -9,52 +9,48 @@ export interface HabNameParts {
 }
 
 // Old format: theme:isInitiator-groupId:displayName
-// New format: 1.2.0.3:isInitiator-groupId-userName:displayName
+// New format: 1.2.0.3:theme:isInitiator-groupId-userName:displayName
 export function parseHabName(name: string): HabNameParts {
-  if (!name.includes(":")) {
-    throw new Error("Invalid old format name: Missing colon.");
-  }
+  const parts = name.split(":");
 
   if (name.startsWith("1.2.0.3:")) {
-    const version = "1.2.0.3";
-    const rest = name.substring(version.length + 1);
-    const lastColonIndex = rest.lastIndexOf(":");
-
-    let displayName = rest;
-    let isGroupMember = false;
-    let groupId;
-    let isInitiator;
-    let userName;
-
-    let potentialGroupPart = rest;
-    let potentialDisplayName = "";
-
-    if (lastColonIndex !== -1) {
-      potentialGroupPart = rest.substring(0, lastColonIndex);
-      potentialDisplayName = rest.substring(lastColonIndex + 1);
-    }
-
-    const groupParts = potentialGroupPart.split("-");
-    const isGroupPattern =
-      groupParts.length >= 3 &&
-      (groupParts[0] === "0" || groupParts[0] === "1");
-
-    if (isGroupPattern) {
-      displayName = potentialDisplayName;
-      isGroupMember = true;
-      isInitiator = groupParts[0] === "1";
-      userName =
-        groupParts[groupParts.length - 1] === ""
-          ? undefined
-          : groupParts[groupParts.length - 1];
-      groupId = groupParts.slice(1, groupParts.length - 1).join("-") || "";
-    } else {
-      displayName = rest;
-    }
-
-    if (displayName.includes(":")) {
+    // New format
+    if (parts.length !== 4) {
       throw new Error(
-        "Invalid new format name: Display name cannot contain colons."
+        "Invalid new format name: Expected 4 parts separated by colons (version:theme:groupPart:displayName)."
+      );
+    }
+
+    const [version, theme, groupPart, displayName] = parts;
+
+    // Allow groupPart to be empty for non-group members
+    if (!version || !theme || !displayName) {
+      throw new Error(
+        "Invalid new format name: Missing version, theme, or display name."
+      );
+    }
+
+    let isGroupMember = false;
+    let groupId: string | undefined;
+    let userName: string | undefined;
+    let isInitiator: boolean | undefined;
+
+    const groupParts = groupPart.split("-");
+    if (groupParts.length === 3) {
+      // isInitiator-groupId-userName
+      isInitiator = groupParts[0] === "1";
+      groupId = groupParts[1];
+      userName = groupParts[2];
+      if (groupId.length > 0 || userName.length > 0) {
+        // Changed to OR
+        isGroupMember = true;
+      }
+    } else if (groupParts.length === 1 && groupParts[0] === "") {
+      // Case for non-group member, where groupPart is empty
+      isGroupMember = false;
+    } else {
+      throw new Error(
+        "Invalid new format name: Invalid group part format (expected isInitiator-groupId-userName or empty)."
       );
     }
 
@@ -65,52 +61,43 @@ export function parseHabName(name: string): HabNameParts {
       groupId,
       isInitiator,
       userName,
+      theme,
     };
   } else {
-    const firstColonIndex = name.indexOf(":");
-    const lastColonIndex = name.lastIndexOf(":");
-
-    const theme = name.substring(0, firstColonIndex);
-    const displayName: string =
-      lastColonIndex === firstColonIndex
-        ? name.substring(firstColonIndex + 1)
-        : name.substring(lastColonIndex + 1);
-    let isGroupMember = false;
-    let groupId;
-    let userName;
-    let isInitiator;
-
-    if (firstColonIndex !== lastColonIndex) {
-      const middlePart = name.substring(firstColonIndex + 1, lastColonIndex);
-      if (middlePart.includes(":")) {
-        throw new Error(
-          "Invalid old format name: Display name cannot contain colons."
-        );
-      }
-      const groupParts = middlePart.split("-");
-      if (
-        groupParts.length < 2 ||
-        groupParts.length > 3 ||
-        (groupParts[0] !== "0" && groupParts[0] !== "1")
-      ) {
-        throw new Error("Invalid old format name: Malformed group structure.");
-      }
-
-      isGroupMember = true;
-      isInitiator = groupParts[0] === "1";
-      if (groupParts.length === 3) {
-        groupId = groupParts[1];
-        userName = groupParts[2];
-      } else {
-        groupId = groupParts.slice(1).join("-") || "";
-      }
-    } else if (displayName.includes("-")) {
-      throw new Error("Invalid old format name: Malformed group structure.");
+    // Old format
+    if (parts.length !== 3) {
+      throw new Error(
+        "Invalid old format name: Expected 3 parts separated by colons (theme:groupPart:displayName)."
+      );
     }
 
-    if (displayName.includes(":")) {
+    const [theme, groupPart, displayName] = parts;
+
+    // Allow groupPart to be empty for non-group members
+    if (!theme || !displayName) {
       throw new Error(
-        "Invalid old format name: Display name cannot contain colons."
+        "Invalid old format name: Missing theme or display name."
+      );
+    }
+
+    let isGroupMember = false;
+    let groupId: string | undefined;
+    let isInitiator: boolean | undefined;
+
+    const groupParts = groupPart.split("-");
+    if (groupParts.length === 2) {
+      // isInitiator-groupId
+      isInitiator = groupParts[0] === "1";
+      groupId = groupParts[1];
+      if (groupId.length > 0) {
+        isGroupMember = true;
+      }
+    } else if (groupParts.length === 1 && groupParts[0] === "") {
+      // Case for non-group member, where groupPart is empty
+      isGroupMember = false;
+    } else {
+      throw new Error(
+        "Invalid old format name: Invalid group part format (expected isInitiator-groupId or empty)."
       );
     }
 
@@ -119,7 +106,6 @@ export function parseHabName(name: string): HabNameParts {
       isGroupMember,
       groupId,
       isInitiator,
-      userName,
       theme,
     };
   }
@@ -127,13 +113,17 @@ export function parseHabName(name: string): HabNameParts {
 
 export function formatToV1_2_0_3(parts: HabNameParts): string {
   const version = "1.2.0.3";
+  const themePart = parts.theme || 0; // Ensure theme is not undefined
+  const displayNamePart = parts.displayName || ""; // Ensure display name is not undefined
+
   if (parts.isGroupMember) {
-    const initiator = parts.isInitiator ? "1" : "0";
-    const userName = parts.userName ?? "";
-    return `${version}:${initiator}-${parts.groupId ?? ""}-${userName}:${
-      parts.displayName
-    }`;
+    const isInitiatorStr = parts.isInitiator ? "1" : "0";
+    const groupIdPart = parts.groupId || "";
+    const userNamePart = parts.userName || "";
+    return `${version}:${themePart}:${isInitiatorStr}-${groupIdPart}-${userNamePart}:${displayNamePart}`;
   } else {
-    return `${version}:${parts.displayName}`;
+    // For non-group members, the groupPart should be empty.
+    // The new format is version:theme::displayName (empty groupPart)
+    return `${version}:${themePart}::${displayNamePart}`;
   }
 }
