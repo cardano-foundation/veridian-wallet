@@ -297,6 +297,8 @@ class ConnectionService extends AgentService {
         }
       });
 
+    const sharedIdentifier = connection.sharedIdentifier;
+
     const notes: Array<ConnectionNoteDetails> = [];
     const historyItems: Array<ConnectionHistoryItem> = [];
 
@@ -304,13 +306,19 @@ class ConnectionService extends AgentService {
 
     Object.keys(connection).forEach((key) => {
       if (
-        key.startsWith(KeriaContactKeyPrefix.CONNECTION_NOTE) &&
+        key.startsWith(
+          `${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}`
+        ) &&
         connection[key]
       ) {
         notes.push(JSON.parse(connection[key] as string));
       } else if (
-        key.startsWith(KeriaContactKeyPrefix.HISTORY_IPEX) ||
-        key.startsWith(KeriaContactKeyPrefix.HISTORY_REVOKE)
+        key.startsWith(
+          `${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}`
+        ) ||
+        key.startsWith(
+          `${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_REVOKE}`
+        )
       ) {
         const historyItem = JSON.parse(connection[key] as string);
         if (full || !skippedHistoryTypes.includes(historyItem.type)) {
@@ -323,7 +331,7 @@ class ConnectionService extends AgentService {
       label: connection.alias,
       id: connection.id,
       status: ConnectionStatus.CONFIRMED,
-      createdAtUTC: connection.createdAt as string,
+      createdAtUTC: connection[`${sharedIdentifier}:createdAt`] as string,
       serviceEndpoints: [connection.oobi],
       notes,
       historyItems: historyItems
