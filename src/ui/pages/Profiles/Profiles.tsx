@@ -35,6 +35,7 @@ import {
 } from "./Profiles.types";
 
 const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
+  if (!identifier) return null;
   const { id, displayName, creationStatus } = identifier;
   return (
     <div
@@ -48,7 +49,7 @@ const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
       <span className="profiles-list-item-inner">
         <div className="profiles-list-item-name">{displayName}</div>
         {creationStatus === CreationStatus.PENDING && (
-          <IonChip>
+          <IonChip data-testid={`profiles-list-item-${id}-status`}>
             <IonIcon
               icon={hourglassOutline}
               color="primary"
@@ -165,7 +166,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
               text={`${i18n.t("profiles.options.manage")}`}
               action={handleOpenSettings}
               disabled={
-                identifiersDataCache[defaultProfile].creationStatus ===
+                identifiersDataCache[defaultProfile]?.creationStatus ===
                 CreationStatus.PENDING
               }
             />

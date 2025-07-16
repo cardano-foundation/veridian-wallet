@@ -19,15 +19,6 @@
 
     .profiles-options-button {
       margin-block: 0;
-
-      &.button-disabled {
-        color: var(--ion-color-neutral-800);
-        --background: var(--ion-color-neutral-400);
-
-        ion-icon {
-          --ion-color-base: var(--ion-color-neutral-800) !important;
-        }
-      }
     }
   }
 
@@ -135,6 +126,15 @@
 
     &:not(:last-child) {
       margin-bottom: 0.5rem;
+    }
+
+    &.button-disabled {
+      color: var(--ion-color-neutral-800);
+      --background: var(--ion-color-neutral-400);
+
+      ion-icon {
+        --ion-color-base: var(--ion-color-neutral-800) !important;
+      }
     }
 
     ion-icon {
