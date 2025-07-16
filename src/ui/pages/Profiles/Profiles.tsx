@@ -74,7 +74,6 @@ const OptionButton = ({ icon, text, action }: OptionButtonProps) => {
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
-  const authentication = useAppSelector(getAuthentication);
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
   const defaultProfile = useAppSelector(getCurrentProfile);
   const identifiersData = Object.values(identifiersDataCache);
@@ -196,12 +195,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         isOpen={openSetupProfile}
         renderAsModal
       >
-        <ProfileSetup
-          onClose={(cancel) => {
-            handleCloseSetupProfile();
-            if (!cancel) setIsOpen(false);
-          }}
-        />
+        <ProfileSetup />
       </SideSlider>
     </>
   );
