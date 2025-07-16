@@ -540,13 +540,7 @@
           "placeholder": "You haven’t created any {{ type }} identifiers yet."
         },
         "pendingidentifiers": "Pending identifiers",
-        "multisigidentifiers": "For groups",
-        "welcome": {
-          "skip": "Skip",
-          "welcometext": "Welcome!",
-          "text": "You're in the perfect spot to create your secure and private digital identity. Let's begin by adding your first identifier!",
-          "add": "Add an Identifier"
-        }
+        "multisigidentifiers": "For groups"
       },
       "deletepending": {
         "title": "Identifier options",
@@ -1019,6 +1013,15 @@
       "tab": {
         "header": "Menu",
         "items": {
+          "profile": {
+            "title": "Profile",
+            "tabheader": "Profile",
+            "tabedit": "Edit profile",
+            "actionedit": "Edit",
+            "actionconfirm": "Confirm",
+            "actioncancel": "Cancel",
+            "name": "Name"
+          },
           "connections": {
             "title": "Connections",
             "tabheader": "Connections"
@@ -1386,6 +1389,8 @@
     "notesupdated": "Notes updated successfully",
     "noteremoved": "Note removed successfully",
     "maxfavouritesreached": "Maximum of 5 favourites reached",
+    "usernamecreationsuccess": "Welcome, {{username}}!",
+    "usernamecreationerror": "Unable to set name. Please try again.",
     "walletconnectiondeleted": "Delete successfully",
     "connectwalletsuccess": "Connected successfully",
     "disconnectwallet": "Disconnected successfully",
@@ -1451,7 +1456,7 @@
   },
   "inputrequest": {
     "title": {
-      
+      "username": "Welcome! What should we call you?",
       "connectionalias": "It looks like your new connection doesn't have a name yet. Let's give them one!"
     },
     "input": {
@@ -1527,16 +1532,6 @@
       "form": {
         "input": "Username",
         "placeholder": "e.g. JohnSmith25"
-      }
-    },
-    "groupsetup": {
-      "title": "Group setup",
-      "description": "Create a group name for other members to join your group, or join an existing group",
-      "form": {
-        "input": "Group name",
-        "placeholder": "e.g. Company Name",
-        "or": "or",
-        "joingroup": "Join existing group"
       }
     },
     "finishsetup": {

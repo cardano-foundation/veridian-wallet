@@ -16,7 +16,7 @@ import {
 import {
   getAuthentication,
   getStateCache,
-  setAuthentication,
+  setCurrentProfile,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
@@ -38,7 +38,6 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
-  const authentication = useAppSelector(getAuthentication);
   const dispatch = useDispatch();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
@@ -99,16 +98,11 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
+          id: MiscRecordId.CURRENT_PROFILE,
           content: { defaultProfile: identifier },
         })
       );
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: identifier,
-        })
-      );
+      dispatch(setCurrentProfile(identifier));
 
       if (isModal) {
         onClose();
