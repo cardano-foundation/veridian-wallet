@@ -21,6 +21,7 @@ import {
 import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
+import { ProfileDetailModal } from "../../components/ProfileDetailModal";
 import { Settings } from "../../components/Setting";
 import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
@@ -81,6 +82,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     (item) => item.id !== defaultProfile
   );
   const [openSetting, setOpenSetting] = useState(false);
+  const [openProfileDetail, setOpenProfileDetail] = useState(false);
 
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
 
@@ -207,6 +209,12 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           }}
         />
       </SideSlider>
+      <ProfileDetailModal
+        pageId="profile-detail"
+        isOpen={openProfileDetail}
+        setIsOpen={setOpenProfileDetail}
+        profileId={defaultProfile}
+      />
     </>
   );
 };

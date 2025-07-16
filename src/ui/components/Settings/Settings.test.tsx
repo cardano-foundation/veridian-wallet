@@ -14,8 +14,8 @@ import { DOCUMENTATION_LINK } from "../../globals/constants";
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
-import { Settings } from "./Setting";
-import { OptionIndex } from "./Setting.types";
+import { Settings } from "./Settings";
+import { OptionIndex } from "./Settings.types";
 
 jest.mock("../../../store/utils", () => ({
   CLEAR_STORE_ACTIONS: [],

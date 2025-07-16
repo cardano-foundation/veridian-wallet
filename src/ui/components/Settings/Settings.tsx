@@ -6,7 +6,7 @@ import { SideSlider } from "../SideSlider";
 import { ManagePassword } from "./components/ManagePassword";
 import { SettingList } from "./components/SettingList";
 import { TermsAndPrivacy } from "./components/TermsAndPrivacy";
-import { SettingScreen, SettingsProps } from "./Setting.types";
+import { SettingScreen, SettingsProps } from "./Settings.types";
 import { RecoverySeedPhrase } from "./components/RecoverySeedPhrase";
 import "./Settings.scss";
 
