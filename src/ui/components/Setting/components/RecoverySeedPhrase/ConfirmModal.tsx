@@ -1,14 +1,14 @@
 import { IonCheckbox, IonItem, IonList } from "@ionic/react";
 import { useCallback, useState } from "react";
-import { i18n } from "../../../../../../../i18n";
-import { OptionModal } from "../../../../../../components/OptionsModal";
-import { PageFooter } from "../../../../../../components/PageFooter";
-import { Verification } from "../../../../../../components/Verification";
 import "./RecoverySeedPhrase.scss";
 import {
   ConditionItemProps,
   ConfirmModalProps,
 } from "./RecoverySeedPhrase.types";
+import { i18n } from "../../../../../i18n";
+import { OptionModal } from "../../../OptionsModal";
+import { PageFooter } from "../../../PageFooter";
+import { Verification } from "../../../Verification";
 
 const ConditionItem = ({
   text,
@@ -65,11 +65,11 @@ const ConfirmModal = ({
   const headerOptions = {
     closeButton: true,
     closeButtonLabel: `${i18n.t(
-      "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.button.cancel"
+      "settings.sections.security.seedphrase.page.confirmmodal.button.cancel"
     )}`,
     closeButtonAction: resetModal,
     title: `${i18n.t(
-      "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.title"
+      "settings.sections.security.seedphrase.page.confirmmodal.title"
     )}`,
   };
 
@@ -89,13 +89,13 @@ const ConfirmModal = ({
       >
         <p className="subtitle">
           {i18n.t(
-            "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.subtitle"
+            "settings.sections.security.seedphrase.page.confirmmodal.subtitle"
           )}
         </p>
         <IonList>
           <ConditionItem
             text={i18n.t(
-              "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.firstcondition"
+              "settings.sections.security.seedphrase.page.confirmmodal.firstcondition"
             )}
             index={0}
             checked={confirmCondition[0]}
@@ -103,7 +103,7 @@ const ConfirmModal = ({
           />
           <ConditionItem
             text={i18n.t(
-              "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.secondcondition"
+              "settings.sections.security.seedphrase.page.confirmmodal.secondcondition"
             )}
             index={1}
             checked={confirmCondition[1]}
@@ -111,7 +111,7 @@ const ConfirmModal = ({
           />
           <ConditionItem
             text={i18n.t(
-              "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.thirdcondition"
+              "settings.sections.security.seedphrase.page.confirmmodal.thirdcondition"
             )}
             index={2}
             checked={confirmCondition[2]}
@@ -121,7 +121,7 @@ const ConfirmModal = ({
         <PageFooter
           pageId="confirm-view-seedpharse"
           primaryButtonText={`${i18n.t(
-            "tabs.menu.tab.settings.sections.security.seedphrase.page.confirmmodal.button.confirm"
+            "settings.sections.security.seedphrase.page.confirmmodal.button.confirm"
           )}`}
           primaryButtonAction={handleAuthentication}
           primaryButtonDisabled={!isAcceptAll}

@@ -39,7 +39,6 @@ interface MenuItemProps {
 }
 
 enum SubMenuKey {
-  Settings,
   Profile,
   Crypto,
   Connections,

@@ -5,7 +5,6 @@ import {
 } from "@capacitor-mlkit/barcode-scanning";
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { StorageMessage } from "../../../core/storage/storage.types";
 import { TabsRoutePath } from "../../../routes/paths";
 import { OperationType } from "../../globals/types";

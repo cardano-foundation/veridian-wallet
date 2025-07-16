@@ -11,7 +11,11 @@
     margin-top: 2.25rem;
   }
 
-  ion-card {
+  .info-card {
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  ion-card:not(:first-child) {
     margin: 0;
     display: flex;
     background: var(--ion-color-neutral-100);

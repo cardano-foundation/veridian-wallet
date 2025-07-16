@@ -18,41 +18,43 @@ import {
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import pJson from "../../../../../../package.json";
-import { Agent } from "../../../../../core/agent/agent";
-import { MiscRecordId } from "../../../../../core/agent/agent.types";
-import { BasicRecord } from "../../../../../core/agent/records";
-import { i18n } from "../../../../../i18n";
-import { RoutePath } from "../../../../../routes";
-import { useAppDispatch } from "../../../../../store/hooks";
+import pJson from "../../../../../package.json";
+import "./SettingList.scss";
+import { useAppDispatch } from "../../../../store/hooks";
 import {
   getBiometricsCache,
   setEnableBiometricsCache,
-} from "../../../../../store/reducers/biometricsCache";
+} from "../../../../store/reducers/biometricsCache";
+import { useBiometricAuth } from "../../../hooks/useBiometricsHook";
+import { usePrivacyScreen } from "../../../hooks/privacyScreenHook";
+import {
+  OptionIndex,
+  OptionProps,
+  SettingListProps,
+  SettingScreen,
+} from "../Setting.types";
+import { i18n } from "../../../../i18n";
+import { DOCUMENTATION_LINK, SUPPORT_EMAIL } from "../../../globals/constants";
+import { Agent } from "../../../../core/agent/agent";
+import { BasicRecord } from "../../../../core/agent/records";
+import { MiscRecordId } from "../../../../core/agent/agent.types";
+import { showError } from "../../../utils/error";
+import { openBrowserLink } from "../../../utils/openBrowserLink";
 import {
   setToastMsg,
   showGlobalLoading,
-} from "../../../../../store/reducers/stateCache";
-import { CLEAR_STORE_ACTIONS } from "../../../../../store/utils";
-import { Alert } from "../../../../components/Alert";
-import { PageFooter } from "../../../../components/PageFooter";
-import { Verification } from "../../../../components/Verification";
-import {
-  DOCUMENTATION_LINK,
-  SUPPORT_EMAIL,
-} from "../../../../globals/constants";
-import { ToastMsgType } from "../../../../globals/types";
-import { usePrivacyScreen } from "../../../../hooks/privacyScreenHook";
-import { useBiometricAuth } from "../../../../hooks/useBiometricsHook";
-import { showError } from "../../../../utils/error";
-import { openBrowserLink } from "../../../../utils/openBrowserLink";
-import { SubMenuKey } from "../../Menu.types";
-import { ChangePin } from "./components/ChangePin";
-import { SettingsItem } from "./components/SettingsItem";
-import "./Settings.scss";
-import { OptionIndex, OptionProps, SettingsProps } from "./Settings.types";
+} from "../../../../store/reducers/stateCache";
+import { CLEAR_STORE_ACTIONS } from "../../../../store/utils";
+import { ToastMsgType } from "../../../globals/types";
+import { RoutePath } from "../../../../routes";
+import { SettingsItem } from "./SettingsItem";
+import { PageFooter } from "../../PageFooter";
+import { ChangePin } from "./ChangePin";
+import { Alert } from "../../Alert";
+import { Verification } from "../../Verification";
+import { InfoCard } from "../../InfoCard";
 
-const Settings = ({ switchView, handleClose }: SettingsProps) => {
+const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   const dispatch = useAppDispatch();
   const biometricsCache = useSelector(getBiometricsCache);
   const [option, setOption] = useState<number | null>(null);
@@ -68,21 +70,17 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
     {
       index: OptionIndex.ChangePin,
       icon: lockClosedOutline,
-      label: i18n.t("tabs.menu.tab.settings.sections.security.changepin.title"),
+      label: i18n.t("settings.sections.security.changepin.title"),
     },
     {
       index: OptionIndex.ManagePassword,
       icon: informationCircleOutline,
-      label: i18n.t(
-        "tabs.menu.tab.settings.sections.security.managepassword.title"
-      ),
+      label: i18n.t("settings.sections.security.managepassword.title"),
     },
     {
       index: OptionIndex.RecoverySeedPhrase,
       icon: keyOutline,
-      label: i18n.t(
-        "tabs.menu.tab.settings.sections.security.seedphrase.title"
-      ),
+      label: i18n.t("settings.sections.security.seedphrase.title"),
     },
   ];
 
@@ -94,7 +92,7 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
     securityItems.unshift({
       index: OptionIndex.BiometricUpdate,
       icon: fingerPrintOutline,
-      label: i18n.t("tabs.menu.tab.settings.sections.security.biometry"),
+      label: i18n.t("settings.sections.security.biometry"),
       actionIcon: (
         <IonToggle
           aria-label="Biometric Toggle"
@@ -109,23 +107,23 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
     {
       index: OptionIndex.Documentation,
       icon: libraryOutline,
-      label: i18n.t("tabs.menu.tab.settings.sections.support.learnmore"),
+      label: i18n.t("settings.sections.support.learnmore"),
     },
     {
       index: OptionIndex.Term,
       icon: checkboxOutline,
-      label: i18n.t("tabs.menu.tab.settings.sections.support.terms.title"),
+      label: i18n.t("settings.sections.support.terms.title"),
     },
     {
       index: OptionIndex.Contact,
       icon: helpCircleOutline,
-      label: i18n.t("tabs.menu.tab.settings.sections.support.contact"),
+      label: i18n.t("settings.sections.support.contact"),
       href: SUPPORT_EMAIL,
     },
     {
       index: OptionIndex.Version,
       icon: layersOutline,
-      label: i18n.t("tabs.menu.tab.settings.sections.support.version"),
+      label: i18n.t("settings.sections.support.version"),
       note: pJson.version,
     },
   ];
@@ -192,7 +190,7 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
         break;
       }
       case OptionIndex.ManagePassword: {
-        switchView && switchView(SubMenuKey.ManagePassword);
+        switchView && switchView(SettingScreen.ManagePassword);
         break;
       }
       case OptionIndex.Contact: {
@@ -203,11 +201,11 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
         break;
       }
       case OptionIndex.Term: {
-        switchView && switchView(SubMenuKey.TermsAndPrivacy);
+        switchView && switchView(SettingScreen.TermsAndPrivacy);
         break;
       }
       case OptionIndex.RecoverySeedPhrase: {
-        switchView && switchView(SubMenuKey.RecoverySeedPhrase);
+        switchView && switchView(SettingScreen.RecoverySeedPhrase);
         break;
       }
       default:
@@ -269,8 +267,12 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
 
   return (
     <>
+      <InfoCard
+        content={i18n.t("settings.sections.text")}
+        icon={informationCircleOutline}
+      />
       <div className="settings-section-title">
-        {i18n.t("tabs.menu.tab.settings.sections.security.title")}
+        {i18n.t("settings.sections.security.title")}
       </div>
       <IonCard>
         <IonList
@@ -289,7 +291,7 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
         </IonList>
       </IonCard>
       <div className="settings-section-title">
-        {i18n.t("tabs.menu.tab.settings.sections.support.title")}
+        {i18n.t("settings.sections.support.title")}
       </div>
       <IonCard>
         <IonList
@@ -309,9 +311,7 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
       </IonCard>
       <PageFooter
         deleteButtonAction={openDeleteAccountAlert}
-        deleteButtonText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.deleteaccount.button"
-        )}`}
+        deleteButtonText={`${i18n.t("settings.sections.deleteaccount.button")}`}
       />
       <ChangePin
         isOpen={changePinIsOpen}
@@ -322,13 +322,13 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
         setIsOpen={setOpenBiometricAlert}
         dataTestId="biometric-enable-alert"
         headerText={i18n.t(
-          "tabs.menu.tab.settings.sections.security.biometricsalert.message"
+          "settings.sections.security.biometricsalert.message"
         )}
         confirmButtonText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.security.biometricsalert.ok"
+          "settings.sections.security.biometricsalert.ok"
         )}`}
         cancelButtonText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.security.biometricsalert.cancel"
+          "settings.sections.security.biometricsalert.cancel"
         )}`}
         actionConfirm={openSetting}
         actionCancel={closeAlert}
@@ -338,14 +338,12 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
         isOpen={openDeleteAlert}
         setIsOpen={setOpenDeleteAlert}
         dataTestId="delete-account-alert"
-        headerText={i18n.t(
-          "tabs.menu.tab.settings.sections.deleteaccount.alert.title"
-        )}
+        headerText={i18n.t("settings.sections.deleteaccount.alert.title")}
         confirmButtonText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.deleteaccount.alert.confirm"
+          "settings.sections.deleteaccount.alert.confirm"
         )}`}
         cancelButtonText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.deleteaccount.alert.cancel"
+          "settings.sections.deleteaccount.alert.cancel"
         )}`}
         actionConfirm={openVerify}
         actionCancel={closeDeleteAlert}
@@ -360,4 +358,4 @@ const Settings = ({ switchView, handleClose }: SettingsProps) => {
   );
 };
 
-export { Settings };
+export { SettingList };

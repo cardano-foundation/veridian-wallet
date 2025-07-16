@@ -10,23 +10,20 @@ import {
 import { useSelector } from "react-redux";
 import { useRef, useState } from "react";
 import { chevronForward } from "ionicons/icons";
-import { i18n } from "../../../../../../../i18n";
-import { VerifyPassword } from "../../../../../../components/VerifyPassword";
-import { VerifyPasscode } from "../../../../../../components/VerifyPasscode";
+import { useAppDispatch } from "../../../../../store/hooks";
 import {
   getStateCache,
   setAuthentication,
   setToastMsg,
-} from "../../../../../../../store/reducers/stateCache";
-import {
-  Alert as AlertEnable,
-  Alert as AlertDisable,
-} from "../../../../../../components/Alert";
-import { CreatePassword } from "../../../../../CreatePassword";
-import { KeyStoreKeys, SecureStorage } from "../../../../../../../core/storage";
-import { useAppDispatch } from "../../../../../../../store/hooks";
-import { ToastMsgType } from "../../../../../../globals/types";
-import { showError } from "../../../../../../utils/error";
+} from "../../../../../store/reducers/stateCache";
+import { KeyStoreKeys, SecureStorage } from "../../../../../core/storage";
+import { ToastMsgType } from "../../../../globals/types";
+import { showError } from "../../../../utils/error";
+import { i18n } from "../../../../../i18n";
+import { Alert } from "../../../Alert";
+import { VerifyPassword } from "../../../VerifyPassword";
+import { VerifyPasscode } from "../../../VerifyPasscode";
+import { CreatePassword } from "../../../../pages/CreatePassword";
 
 const ManagePassword = () => {
   const dispatch = useAppDispatch();
@@ -100,13 +97,11 @@ const ManagePassword = () => {
             data-testid={"settings-item-toggle-password"}
           >
             <IonLabel>
-              {i18n.t(
-                "tabs.menu.tab.settings.sections.security.managepassword.page.enable"
-              )}
+              {i18n.t("settings.sections.security.managepassword.page.enable")}
             </IonLabel>
             <IonToggle
               aria-label={`${i18n.t(
-                "tabs.menu.tab.settings.sections.security.managepassword.page.enable"
+                "settings.sections.security.managepassword.page.enable"
               )}`}
               className="toggle-button"
               checked={passwordIsSet}
@@ -126,7 +121,7 @@ const ManagePassword = () => {
               data-testid={"settings-item-change-password"}
             >
               <IonLabel>{`${i18n.t(
-                "tabs.menu.tab.settings.sections.security.managepassword.page.change"
+                "settings.sections.security.managepassword.page.change"
               )}`}</IonLabel>
 
               <IonIcon
@@ -138,35 +133,35 @@ const ManagePassword = () => {
           </IonList>
         </IonCard>
       )}
-      <AlertEnable
+      <Alert
         isOpen={alertEnableIsOpen}
         setIsOpen={setAlertEnableIsOpen}
         dataTestId="alert-cancel-enable-password"
         headerText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.security.managepassword.page.alert.enablemessage"
+          "settings.sections.security.managepassword.page.alert.enablemessage"
         )}`}
         confirmButtonText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.security.managepassword.page.alert.confirm"
+          "settings.sections.security.managepassword.page.alert.confirm"
         )}`}
         cancelButtonText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.security.managepassword.page.alert.cancel"
+          "settings.sections.security.managepassword.page.alert.cancel"
         )}`}
         actionConfirm={() => setVerifyPasscodeIsOpen(true)}
         actionCancel={handleClear}
         actionDismiss={handleClear}
       />
-      <AlertDisable
+      <Alert
         isOpen={alertDisableIsOpen}
         setIsOpen={setAlertDisableIsOpen}
         dataTestId="alert-cancel"
         headerText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.security.managepassword.page.alert.disablemessage"
+          "settings.sections.security.managepassword.page.alert.disablemessage"
         )}`}
         confirmButtonText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.security.managepassword.page.alert.confirm"
+          "settings.sections.security.managepassword.page.alert.confirm"
         )}`}
         cancelButtonText={`${i18n.t(
-          "tabs.menu.tab.settings.sections.security.managepassword.page.alert.cancel"
+          "settings.sections.security.managepassword.page.alert.cancel"
         )}`}
         actionConfirm={() => setVerifyPasswordIsOpen(true)}
         actionCancel={handleClear}

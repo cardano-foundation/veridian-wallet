@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Salter } from "signify-ts";
-import { use } from "i18next";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
+import { BasicRecord } from "../../../core/agent/records";
 import { IdentifierService } from "../../../core/agent/services";
 import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
@@ -18,7 +17,6 @@ import {
   getAuthentication,
   getStateCache,
   setAuthentication,
-  setCurrentProfile,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
@@ -30,33 +28,32 @@ import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
 import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
-import { SetupGroup } from "./components/SetupGroup";
 import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
-import { SetupProfileStep } from "./ProfileSetup.types";
-import { BasicRecord } from "../../../core/agent/records";
+import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
 
-export const ProfileSetup = () => {
+export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
+  const authentication = useAppSelector(getAuthentication);
   const dispatch = useDispatch();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
   const [userName, setUserName] = useState("");
-  const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
 
+  const isModal = !!onClose;
+
   const title = i18n.t(`setupprofile.${step}.title`);
-  const back = [
-    SetupProfileStep.SetupProfile,
-    SetupProfileStep.SetupGroup,
-  ].includes(step)
+  const back = [SetupProfileStep.SetupProfile].includes(step)
     ? i18n.t("setupprofile.button.back")
-    : undefined;
+    : isModal
+      ? i18n.t("setupprofile.button.cancel")
+      : undefined;
 
   const getButtonText = () => {
     switch (step) {
@@ -68,18 +65,12 @@ export const ProfileSetup = () => {
   };
 
   const handleBack = () => {
-    if (
-      step === SetupProfileStep.SetupGroup ||
-      (step === SetupProfileStep.SetupProfile &&
-        profileType !== ProfileType.Group)
-    ) {
+    if (step === SetupProfileStep.SetupProfile) {
       setStep(SetupProfileStep.SetupType);
       return;
     }
 
-    if (step === SetupProfileStep.SetupProfile) {
-      setStep(SetupProfileStep.SetupGroup);
-    }
+    onClose?.(true);
   };
 
   const createIdentifier = async () => {
@@ -87,51 +78,45 @@ export const ProfileSetup = () => {
 
     if (error) return;
 
-    const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
-      // TODO: no custom displayName?
       displayName: userName,
       theme: 0,
     };
 
-    if (isGroup) {
-      const groupMetadata = {
-        groupId: new Salter({}).qb64,
-        groupInitiator: true,
-        groupCreated: false,
-        userName: groupName,
-      };
-      metadata.groupMetadata = groupMetadata;
-    }
-
     try {
       setLoading(true);
+
       // Create the identifier
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
       );
 
-      if (isGroup) {
-        await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-          new BasicRecord({
-            id: MiscRecordId.CURRENT_PROFILE,
-            content: {
-              userName,
-            },
-          })
-        );
-      }
-
-      await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       if (individualFirstCreate) {
         await Agent.agent.basicStorage
           .deleteById(MiscRecordId.INDIVIDUAL_FIRST_CREATE)
           .then(() => dispatch(setIndividualFirstCreate(false)));
       }
 
-      // Set as default if it's the first identifier
-      dispatch(setCurrentProfile(identifier));
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.DEFAULT_PROFILE,
+          content: { defaultProfile: identifier },
+        })
+      );
+      dispatch(
+        setAuthentication({
+          ...authentication,
+          defaultProfile: identifier,
+        })
+      );
 
+      if (isModal) {
+        onClose();
+        navToCredetials();
+        return;
+      }
+
+      await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       setStep(SetupProfileStep.FinishSetup);
     } catch (e) {
       const errorMessage = (e as Error).message;
@@ -154,7 +139,7 @@ export const ProfileSetup = () => {
     }
   };
 
-  const navToCredentials = () => {
+  const navToCredetials = () => {
     const { nextPath, updateRedux } = getNextRoute(RoutePath.PROFILE_SETUP, {
       store: { stateCache },
       state: {
@@ -173,10 +158,6 @@ export const ProfileSetup = () => {
     ionRouter.push(nextPath.pathname);
   };
 
-  const handleOpenScan = () => {
-    // TODO: implement on next ticket
-  };
-
   const handleChangeStep = () => {
     if (step === SetupProfileStep.SetupProfile) {
       createIdentifier();
@@ -184,15 +165,7 @@ export const ProfileSetup = () => {
     }
 
     if (step === SetupProfileStep.FinishSetup) {
-      navToCredentials();
-      return;
-    }
-
-    if (
-      profileType === ProfileType.Group &&
-      step === SetupProfileStep.SetupType
-    ) {
-      setStep(SetupProfileStep.SetupGroup);
+      navToCredetials();
       return;
     }
 
@@ -206,14 +179,6 @@ export const ProfileSetup = () => {
           <SetupProfile
             userName={userName}
             onChangeUserName={setUserName}
-          />
-        );
-      case SetupProfileStep.SetupGroup:
-        return (
-          <SetupGroup
-            groupName={groupName}
-            onChangeGroupName={setGroupName}
-            onClickJoinGroupButton={handleOpenScan}
           />
         );
       case SetupProfileStep.FinishSetup:
@@ -249,9 +214,7 @@ export const ProfileSetup = () => {
         primaryButtonText={getButtonText()}
         primaryButtonAction={handleChangeStep}
         primaryButtonDisabled={
-          (SetupProfileStep.SetupGroup === step && !groupName) ||
-          (SetupProfileStep.SetupProfile === step && !userName) ||
-          isLoading
+          (SetupProfileStep.SetupProfile === step && !userName) || isLoading
         }
         pageId={pageId}
       />

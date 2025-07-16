@@ -94,8 +94,7 @@ const Menu = () => {
     setSelectedOption(key);
   };
 
-  const closeSetting = () => setShowSubMenu(false);
-  const subMenuItems = SubMenuItems(showSelectedOption, closeSetting);
+  const subMenuItems = SubMenuItems();
 
   const selectSubmenu =
     selectedOption !== undefined
@@ -108,7 +107,6 @@ const Menu = () => {
         shape="round"
         className="settings-button"
         data-testid="settings-button"
-        onClick={() => showSelectedOption(SubMenuKey.Settings)}
       >
         <IonIcon
           slot="icon-only"

@@ -1,14 +1,14 @@
-import { useRef, useState } from "react";
 import { IonModal } from "@ionic/react";
-import "./ChangePin.scss";
+import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { ResponsivePageLayout } from "../../../../../../components/layout/ResponsivePageLayout";
-import { PageHeader } from "../../../../../../components/PageHeader";
-import { CreatePasscodeModule } from "../../../../../../components/CreatePasscodeModule";
-import { i18n } from "../../../../../../../i18n";
+import { i18n } from "../../../../../i18n";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
+import { ToastMsgType } from "../../../../globals/types";
+import { CreatePasscodeModule } from "../../../CreatePasscodeModule";
+import { ResponsivePageLayout } from "../../../layout/ResponsivePageLayout";
+import { PageHeader } from "../../../PageHeader";
+import "./ChangePin.scss";
 import { ChangePinModalProps, ChangePinModuleRef } from "./ChangePin.types";
-import { setToastMsg } from "../../../../../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../../../../../globals/types";
 
 const ChangePin = ({ isOpen, setIsOpen }: ChangePinModalProps) => {
   const pageId = "change-pin";
@@ -32,12 +32,8 @@ const ChangePin = ({ isOpen, setIsOpen }: ChangePinModalProps) => {
 
   const title =
     passCodeValue.originalPasscode.length === 0
-      ? i18n.t(
-        "tabs.menu.tab.settings.sections.security.changepin.createpasscode"
-      )
-      : i18n.t(
-        "tabs.menu.tab.settings.sections.security.changepin.reenterpasscode"
-      );
+      ? i18n.t("settings.sections.security.changepin.createpasscode")
+      : i18n.t("settings.sections.security.changepin.reenterpasscode");
 
   return (
     <IonModal
@@ -54,12 +50,8 @@ const ChangePin = ({ isOpen, setIsOpen }: ChangePinModalProps) => {
               closeButton={true}
               closeButtonLabel={`${
                 passCodeValue.originalPasscode.length === 6
-                  ? i18n.t(
-                    "tabs.menu.tab.settings.sections.security.changepin.back"
-                  )
-                  : i18n.t(
-                    "tabs.menu.tab.settings.sections.security.changepin.cancel"
-                  )
+                  ? i18n.t("settings.sections.security.changepin.back")
+                  : i18n.t("settings.sections.security.changepin.cancel")
               }`}
               closeButtonAction={handleCancel}
             />
@@ -68,7 +60,7 @@ const ChangePin = ({ isOpen, setIsOpen }: ChangePinModalProps) => {
           <CreatePasscodeModule
             title={title}
             description={`${i18n.t(
-              "tabs.menu.tab.settings.sections.security.changepin.description"
+              "settings.sections.security.changepin.description"
             )}`}
             ref={ref}
             testId={pageId}

@@ -1,9 +1,6 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import { MemoryRouter } from "react-router-dom";
-
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { store } from "../../../store";
@@ -52,9 +49,9 @@ const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
     routes: ["/"],
-    currentProfile: "Frank",
     authentication: {
       loggedIn: true,
+      userName: "Frank",
       time: Date.now(),
       passcodeIsSet: true,
     },
@@ -89,11 +86,38 @@ describe("Menu Tab", () => {
     expect(getByTestId("menu-tab")).toBeInTheDocument();
     expect(getByText(EN_TRANSLATIONS.tabs.menu.tab.header)).toBeInTheDocument();
     expect(
+      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
+    ).toBeInTheDocument();
+    expect(
       getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connections.title)
     ).toBeInTheDocument();
     expect(
       getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.title)
     ).toBeInTheDocument();
+  });
+
+  test("Open Profile sub-menu", async () => {
+    const { getByTestId, getByText } = render(
+      <Provider store={storeMocked}>
+        <Menu />
+      </Provider>
+    );
+
+    expect(getByTestId("menu-tab")).toBeInTheDocument();
+    expect(
+      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
+    ).toBeInTheDocument();
+    const profileButton = getByTestId(`menu-input-item-${SubMenuKey.Profile}`);
+
+    act(() => {
+      fireEvent.click(profileButton);
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("profile-title")).toHaveTextContent(
+        EN_TRANSLATIONS.tabs.menu.tab.items.profile.tabheader
+      );
+    });
   });
 
   test("Open Cardano connect sub-menu", async () => {

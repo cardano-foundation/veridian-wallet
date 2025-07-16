@@ -282,10 +282,10 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
           setIsOpen={setAlertExistingIsOpen}
           dataTestId="manage-password-alert-existing"
           headerText={`${i18n.t(
-            "tabs.menu.tab.settings.sections.security.managepassword.page.alert.existingpassword"
+            "settings.sections.security.managepassword.page.alert.existingpassword"
           )}`}
           confirmButtonText={`${i18n.t(
-            "tabs.menu.tab.settings.sections.security.managepassword.page.alert.ok"
+            "settings.sections.security.managepassword.page.alert.ok"
           )}`}
           actionConfirm={handleClearExisting}
         />

@@ -2,15 +2,14 @@ import { BiometryType } from "@aparajita/capacitor-biometric-auth/dist/esm/defin
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-
-import TRANSLATIONS from "../../../../../../../locales/en/en.json";
-import { RoutePath } from "../../../../../../../routes";
-import { OperationType } from "../../../../../../globals/types";
-import { passcodeFiller } from "../../../../../../utils/passcodeFiller";
+import TRANSLATIONS from "../../../../../locales/en/en.json";
 import { RecoverySeedPhrase } from "./RecoverySeedPhrase";
-import { makeTestStore } from "../../../../../../utils/makeTestStore";
+import { RoutePath } from "../../../../../routes";
+import { OperationType } from "../../../../globals/types";
+import { passcodeFiller } from "../../../../utils/passcodeFiller";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 
-jest.mock("../../../../../../../core/agent/agent", () => ({
+jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       getMnemonic: jest.fn(() => Promise.resolve("")),
@@ -21,7 +20,7 @@ jest.mock("../../../../../../../core/agent/agent", () => ({
   },
 }));
 
-jest.mock("../../../../../../hooks/useBiometricsHook", () => ({
+jest.mock("../../../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: jest.fn(() => ({
     biometricsIsEnabled: false,
     biometricInfo: {
@@ -76,32 +75,27 @@ describe("Recovery Phrase", () => {
     await waitFor(() => {
       expect(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-            .tips.one
+          TRANSLATIONS.settings.sections.security.seedphrase.page.tips.one
         )
       ).toBeVisible();
       expect(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-            .tips.two
+          TRANSLATIONS.settings.sections.security.seedphrase.page.tips.two
         )
       ).toBeVisible();
       expect(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-            .tips.three
+          TRANSLATIONS.settings.sections.security.seedphrase.page.tips.three
         )
       ).toBeVisible();
       expect(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-            .button.view
+          TRANSLATIONS.settings.sections.security.seedphrase.page.button.view
         )
       ).toBeVisible();
       expect(
         queryByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-            .button.hide
+          TRANSLATIONS.settings.sections.security.seedphrase.page.button.hide
         )
       ).toBe(null);
     });
@@ -121,23 +115,20 @@ describe("Recovery Phrase", () => {
     await waitFor(() => {
       expect(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-            .tips.one
+          TRANSLATIONS.settings.sections.security.seedphrase.page.tips.one
         )
       ).toBeVisible();
 
       expect(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-            .button.view
+          TRANSLATIONS.settings.sections.security.seedphrase.page.button.view
         )
       ).toBeVisible();
     });
 
     fireEvent.click(
       getByText(
-        TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-          .button.view
+        TRANSLATIONS.settings.sections.security.seedphrase.page.button.view
       )
     );
 
@@ -189,8 +180,7 @@ describe("Recovery Phrase", () => {
       ).toBe(true);
       expect(
         queryByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-            .button.hide
+          TRANSLATIONS.settings.sections.security.seedphrase.page.button.hide
         )
       ).toBeVisible();
     });
@@ -198,8 +188,7 @@ describe("Recovery Phrase", () => {
     act(() => {
       fireEvent.click(
         getByText(
-          TRANSLATIONS.tabs.menu.tab.settings.sections.security.seedphrase.page
-            .button.hide
+          TRANSLATIONS.settings.sections.security.seedphrase.page.button.hide
         )
       );
     });

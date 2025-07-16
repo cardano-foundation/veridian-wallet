@@ -1,9 +1,9 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import TRANSLATIONS from "../../../../../../../locales/en/en.json";
+import TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TermsAndPrivacy } from "./TermsAndPrivacy";
-import { store } from "../../../../../../../store";
+import { store } from "../../../../../store";
 
 describe("Term and Privacy", () => {
   test("Render and open term modal", async () => {
@@ -14,10 +14,7 @@ describe("Term and Privacy", () => {
     );
 
     expect(
-      getByText(
-        TRANSLATIONS.tabs.menu.tab.settings.sections.support.terms.submenu
-          .termsofuse
-      )
+      getByText(TRANSLATIONS.settings.sections.support.terms.submenu.termsofuse)
     ).toBeVisible();
 
     act(() => {
@@ -37,10 +34,7 @@ describe("Term and Privacy", () => {
     );
 
     expect(
-      getByText(
-        TRANSLATIONS.tabs.menu.tab.settings.sections.support.terms.submenu
-          .termsofuse
-      )
+      getByText(TRANSLATIONS.settings.sections.support.terms.submenu.termsofuse)
     ).toBeVisible();
 
     act(() => {
