@@ -1,7 +1,6 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { act } from "react";
+import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { store } from "../../../../store";
 import {
@@ -15,6 +14,7 @@ import {
   formatTimeToSec,
   getUTCOffset,
 } from "../../../utils/formatters";
+import { makeTestStore } from "../../../utils/makeTestStore";
 import { CredentialContent } from "./CredentialContent";
 
 Object.defineProperty(window, "matchMedia", {
@@ -80,9 +80,8 @@ describe("Creds content", () => {
       },
     };
 
-    const mockStore = configureStore();
     const storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: jest.fn(),
     };
 
@@ -162,9 +161,9 @@ describe("Creds content", () => {
       </Provider>
     );
 
-    expect(getByText(EN_TRANSLATIONS.connections.unknown)).toBeVisible();
+    expect(getByText(EN_TRANSLATIONS.tabs.connections.unknown)).toBeVisible();
 
-    fireEvent.click(getByText(EN_TRANSLATIONS.connections.unknown));
+    fireEvent.click(getByText(EN_TRANSLATIONS.tabs.connections.unknown));
 
     await waitFor(() => {
       expect(getByTestId("cred-missing-issuer-alert")).toBeVisible();
@@ -202,9 +201,8 @@ describe("Creds content", () => {
       },
     };
 
-    const mockStore = configureStore();
     const storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: jest.fn(),
     };
 

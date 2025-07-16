@@ -11,7 +11,6 @@ import { act } from "react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { TabsRoutePath } from "../../../routes/paths";
@@ -24,6 +23,7 @@ import { OperationType, ToastMsgType } from "../../globals/types";
 import { CreatePassword } from "./CreatePassword";
 import { BasicRecord } from "../../../core/agent/records";
 import { MiscRecordId } from "../../../core/agent/agent.types";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 jest.mock("../../components/CustomInput", () => ({
   CustomInput: (props: CustomInputProps) => {
@@ -114,10 +114,9 @@ describe("Create Password Page", () => {
       },
     };
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const storeMocked = {
-      ...mockStore(initialStateNoPassword),
+      ...makeTestStore(initialStateNoPassword),
       dispatch: dispatchMock,
     };
 
@@ -312,10 +311,9 @@ describe("Create Password Page", () => {
       },
     };
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const storeMocked = {
-      ...mockStore(initialStateWithPassword),
+      ...makeTestStore(initialStateWithPassword),
       dispatch: dispatchMock,
     };
 
@@ -446,10 +444,9 @@ describe("Create Password Page", () => {
       },
     };
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const storeMocked = {
-      ...mockStore(initialStateNoPassword),
+      ...makeTestStore(initialStateNoPassword),
       dispatch: dispatchMock,
     };
 

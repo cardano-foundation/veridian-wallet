@@ -3,11 +3,11 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { VerifyRecoverySeedPhrase } from "./VerifyRecoverySeedPhrase";
 import { setSeedPhraseCache } from "../../../store/reducers/seedPhraseCache";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const SEED_PHRASE_LENGTH = 18;
 
@@ -63,7 +63,6 @@ jest.mock("@ionic/react", () => {
 });
 
 describe("Verify Recovery Seed Phrase", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -77,7 +76,7 @@ describe("Verify Recovery Seed Phrase", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 

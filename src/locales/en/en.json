@@ -248,11 +248,9 @@
   },
   "tabsmenu": {
     "label": {
-      "identifiers": "Identifiers",
       "creds": "Credentials",
-      "scan": "Scan",
-      "notifications": "Notifications",
-      "menu": "Menu"
+      "connections": "Connections",
+      "notifications": "Notifications"
     }
   },
   "custominput": {
@@ -434,6 +432,98 @@
       "lowercase": "Contains a lowercase letter",
       "number": "Contains a number",
       "symbol": "Contains a symbol"
+    }
+  },
+  "settings": {
+    "sections": {
+      "header": "Settings",
+      "text": "Settings affect your whole wallet, not just the profile you're currently using.",
+      "security": {
+        "title": "Security",
+        "biometry": "Biometric authentication",
+        "biometricsalert": {
+          "message": "In order to use biometrics you need to enable this in your settings. Would you like to do this?",
+          "ok": "Go to settings",
+          "cancel": "Setup later"
+        },
+        "changepin": {
+          "title": "Change passcode",
+          "createpasscode": "Create new passcode",
+          "reenterpasscode": "Re-enter new passcode",
+          "cancel": "Cancel",
+          "back": "Back",
+          "description": "Create a new passcode to secure your wallet",
+          "cantremember": {
+            "label": "Can't remember?"
+          }
+        },
+        "managepassword": {
+          "title": "Manage operations password",
+          "page": {
+            "title": "Manage password",
+            "enable": "Enable operations password",
+            "change": "Change operations password",
+            "alert": {
+              "enablemessage": "By turning on an operations password you will be required to use this to verify any future operations instead of your passcode.",
+              "disablemessage": "By turning off your operations password you will be required to use your passcode to verify any future operations.",
+              "existingpassword": "Your new operations password must be different to your existing one.",
+              "confirm": "Continue",
+              "cancel": "Cancel",
+              "ok": "Ok"
+            }
+          }
+        },
+        "seedphrase": {
+          "title": "Recovery phrase",
+          "page": {
+            "title": "Recovery phrase",
+            "tips": {
+              "label": "Useful tips:",
+              "one": "Write down or make a copy of your recovery phrase and store it in a safe location.",
+              "two": "Double-check that your words are copied in the correct order (1 to 18).",
+              "three": "Ensure there are no spelling errors."
+            },
+            "hiddentext": "Press the ‘view recovery phrase’ button when you’re ready to see your recovery phrase. Remember to make sure nobody is looking!",
+            "button": {
+              "view": "View recovery phrase",
+              "hide": "Hide recovery phrase"
+            },
+            "confirmmodal": {
+              "title": "Stay safe",
+              "subtitle": "Confirm and acknowledge the following:",
+              "firstcondition": "Nobody else can see my screen",
+              "secondcondition": "Sharing my recovery phrase with others puts my identity at risk",
+              "thirdcondition": "Losing my recovery phrase means I will lose access to my wallet",
+              "button": {
+                "confirm": "View recovery phrase",
+                "cancel": "Cancel"
+              }
+            }
+          }
+        }
+      },
+      "support": {
+        "title": "Support & Legal",
+        "contact": "Veridian support",
+        "learnmore": "Learn more about Cardano IDW",
+        "terms": {
+          "title": "Terms and Privacy Policy",
+          "submenu": {
+            "title": "Terms & privacy",
+            "termsofuse": "Terms of use",
+            "privacy": "Privacy policy"
+          }
+        },
+        "version": "App Version"
+      },
+      "deleteaccount": {
+        "button": "Delete wallet",
+        "alert": {
+          "title": "This will delete all wallet data. You can restore your account anytime with your secret recovery phrase.",
+          "confirm": "Delete account",
+          "cancel": "Cancel"
+        }
+      }
     }
   },
   "tabs": {
@@ -673,9 +763,6 @@
             "confirm": "OK",
             "text": "This credential was issued through a connection that has since been deleted or is no longer accessible. As a result, the connection details cannot be displayed."
           }
-        },
-        "toast": {
-          "clipboard": "Copied to clipboard"
         },
         "clouderror": "We couldn’t locate this credential in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this credential, tap “Delete credential” to remove."
       },
@@ -925,97 +1012,6 @@
     "menu": {
       "tab": {
         "header": "Menu",
-        "settings": {
-          "sections": {
-            "header": "Settings",
-            "security": {
-              "title": "Security",
-              "biometry": "Biometric authentication",
-              "biometricsalert": {
-                "message": "In order to use biometrics you need to enable this in your settings. Would you like to do this?",
-                "ok": "Go to settings",
-                "cancel": "Setup later"
-              },
-              "changepin": {
-                "title": "Change passcode",
-                "createpasscode": "Create new passcode",
-                "reenterpasscode": "Re-enter new passcode",
-                "cancel": "Cancel",
-                "back": "Back",
-                "description": "Create a new passcode to secure your wallet",
-                "cantremember": {
-                  "label": "Can't remember?"
-                }
-              },
-              "managepassword": {
-                "title": "Manage operations password",
-                "page": {
-                  "title": "Manage password",
-                  "enable": "Enable operations password",
-                  "change": "Change operations password",
-                  "alert": {
-                    "enablemessage": "By turning on an operations password you will be required to use this to verify any future operations instead of your passcode.",
-                    "disablemessage": "By turning off your operations password you will be required to use your passcode to verify any future operations.",
-                    "existingpassword": "Your new operations password must be different to your existing one.",
-                    "confirm": "Continue",
-                    "cancel": "Cancel",
-                    "ok": "Ok"
-                  }
-                }
-              },
-              "seedphrase": {
-                "title": "Recovery phrase",
-                "page": {
-                  "title": "Recovery phrase",
-                  "tips": {
-                    "label": "Useful tips:",
-                    "one": "Write down or make a copy of your recovery phrase and store it in a safe location.",
-                    "two": "Double-check that your words are copied in the correct order (1 to 18).",
-                    "three": "Ensure there are no spelling errors."
-                  },
-                  "hiddentext": "Press the ‘view recovery phrase’ button when you’re ready to see your recovery phrase. Remember to make sure nobody is looking!",
-                  "button": {
-                    "view": "View recovery phrase",
-                    "hide": "Hide recovery phrase"
-                  },
-                  "confirmmodal": {
-                    "title": "Stay safe",
-                    "subtitle": "Confirm and acknowledge the following:",
-                    "firstcondition": "Nobody else can see my screen",
-                    "secondcondition": "Sharing my recovery phrase with others puts my identity at risk",
-                    "thirdcondition": "Losing my recovery phrase means I will lose access to my wallet",
-                    "button": {
-                      "confirm": "View recovery phrase",
-                      "cancel": "Cancel"
-                    }
-                  }
-                }
-              }
-            },
-            "support": {
-              "title": "Support & Legal",
-              "contact": "Veridian support",
-              "learnmore": "Learn More About Veridian",
-              "terms": {
-                "title": "Terms and Privacy Policy",
-                "submenu": {
-                  "title": "Terms & privacy",
-                  "termsofuse": "Terms of use",
-                  "privacy": "Privacy policy"
-                }
-              },
-              "version": "App Version"
-            },
-            "deleteaccount": {
-              "button": "Delete account",
-              "alert": {
-                "title": "This will delete all wallet data. You can restore your account anytime with your secret recovery phrase.",
-                "confirm": "Delete account",
-                "cancel": "Cancel"
-              }
-            }
-          }
-        },
         "items": {
           "profile": {
             "title": "Profile",
@@ -1097,91 +1093,79 @@
           }
         }
       }
-    }
-  },
-  "connections": {
-    "page": {
-      "title": "Connections",
-      "create": "Add a connection",
-      "search": {
-        "placeholder": "Search connections",
-        "connections": "Connections",
-        "noresult": {
-          "title": "No results for “{{keyword}}”",
-          "text": "Check the spelling or try a new search"
-        }
-      },
-      "indentifierselector": {
-        "title": "Choose identifier",
-        "message": "Which identifier would you like to make the connection with?",
-        "button": {
-          "cancel": "Cancel",
-          "confirm": "Confirm"
-        }
-      },
-      "alert": {
-        "message": "To create a connection, you need to create an identifier. Would you like to create one now?",
-        "confirm": "Create identifier",
-        "cancel": "Cancel"
-      },
-      "deletepending": {
-        "title": "Connection options",
-        "description": "This connection is pending. You’ll be notified once they accept. If you no longer require this connection, tap “Delete connection” to remove.",
-        "button": "Delete connection",
-        "secondchecktitle": "Are you sure you want to delete this connection?"
-      }
     },
-    "details": {
-      "done": "Done",
-      "label": "Label",
-      "date": "Date Created",
-      "endpoints": "Service Endpoints",
-      "history": "Connection History",
-      "connectedwith": "Connected with “{{ issuer }}“",
-      "issuance": "Received a “{{ credential }}“",
-      "requestpresent": "“{{ issuer }}“ has requested a credential presentation",
-      "update": "“{{ credential }}“ has been revoked",
-      "presented": "Presented “{{ credentialType }}“ credential",
-      "notavailable": "N/A",
-      "details": "Details",
-      "notes": "Notes",
-      "nocurrentnotes": "No current notes",
-      "nocurrentnotesext": "There are currently no notes associated with this connection.",
-      "cancel": "Cancel",
-      "confirm": "Confirm",
-      "title": "Title",
-      "message": "Message",
-      "delete": "Delete connection",
-      "options": {
-        "title": "Connection options",
-        "labels": {
-          "add": "Add a note",
-          "manage": "Manage notes",
-          "delete": "Delete connection"
-        },
-        "alert": {
-          "deleteconnection": {
-            "title": "Are you sure you want to delete this connection?",
-            "confirm": "Yes, I'm sure",
-            "cancel": "Cancel"
-          },
-          "deletenote": {
-            "title": "Are you sure you want to delete this note?",
-            "confirm": "Yes, I'm sure",
-            "cancel": "Cancel"
+    "connections": {
+      "tab": {
+        "title": "Connections",
+        "create": "Add a connection",
+        "search": {
+          "placeholder": "Search connections",
+          "connections": "Connections",
+          "noresult": {
+            "title": "No results for “{{keyword}}”",
+            "text": "Check the spelling or try a new search"
           }
+        },
+        "indentifierselector": {
+          "title": "Choose identifier",
+          "message": "Which identifier would you like to make the connection with?",
+          "button": {
+            "cancel": "Cancel",
+            "confirm": "Confirm"
+          }
+        },
+        "deletepending": {
+          "title": "Connection options",
+          "description": "This connection is pending. You’ll be notified once they accept. If you no longer require this connection, tap “Delete connection” to remove.",
+          "button": "Delete connection",
+          "secondchecktitle": "Are you sure you want to delete this connection?"
         }
       },
-      "clouderror": "We couldn’t locate this connection in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this connection, tap “Delete connection” to remove."
-    },
-    "unknown": "Unknown"
-  },
-  "connectmodal": {
-    "title": "Add a",
-    "scan": "Scan QR Code",
-    "connect": "Scan to connect",
-    "provide": "Provide QR Code",
-    "close": "Done"
+      "details": {
+        "done": "Done",
+        "label": "Label",
+        "date": "Date Created",
+        "endpoints": "Service Endpoints",
+        "history": "Connection History",
+        "connectedwith": "Connected with “{{ issuer }}“",
+        "issuance": "Received a “{{ credential }}“",
+        "requestpresent": "“{{ issuer }}“ has requested a credential presentation",
+        "update": "“{{ credential }}“ has been revoked",
+        "presented": "Presented “{{ credentialType }}“ credential",
+        "notavailable": "N/A",
+        "details": "Details",
+        "notes": "Notes",
+        "nocurrentnotes": "No current notes",
+        "nocurrentnotesext": "There are currently no notes associated with this connection.",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "title": "Title",
+        "message": "Message",
+        "delete": "Delete connection",
+        "options": {
+          "title": "Connection options",
+          "labels": {
+            "add": "Add a note",
+            "manage": "Manage notes",
+            "delete": "Delete connection"
+          },
+          "alert": {
+            "deleteconnection": {
+              "title": "Are you sure you want to delete this connection?",
+              "confirm": "Yes, I'm sure",
+              "cancel": "Cancel"
+            },
+            "deletenote": {
+              "title": "Are you sure you want to delete this note?",
+              "confirm": "Yes, I'm sure",
+              "cancel": "Cancel"
+            }
+          }
+        },
+        "clouderror": "We couldn’t locate this connection in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this connection, tap “Delete connection” to remove."
+      },
+      "unknown": "Unknown"
+    }
   },
   "verifypassword": {
     "title": "Enter password",
@@ -1385,10 +1369,10 @@
   },
   "toast": {
     "copiedtoclipboard": "Copied to clipboard",
-    "identifierrequested": "Identifier request pending",
-    "identifiercreated": "Identifier pending",
-    "identifierupdated": "Identifier created",
-    "identifierdeleted": "Identifier successfully deleted",
+    "identifierrequested": "Profile request pending",
+    "identifiercreated": "Profile pending",
+    "identifierupdated": "Profile created",
+    "identifierdeleted": "Profile successfully deleted",
     "credentialdeleted": "Credential deleted successfully",
     "credentialsdeleted": "Credentials deleted successfully",
     "credentialarchived": "Credential archived successfully",
@@ -1443,7 +1427,9 @@
     "proposalcredfailerror": "Unable to record response",
     "deleteaccounterror": "Unable to delete account",
     "deleteaccountsuccess": "Account deleted successfully",
-    "remotesignsuccess": "Signed successfully"
+    "remotesignsuccess": "Signed successfully",
+    "profileswitched": "Profile switched",
+    "unabletoswitchprofile": "Unable to switch profile"
   },
   "request": {
     "sign": {
@@ -1565,7 +1551,8 @@
     "button": {
       "back": "Back",
       "confirm": "Confirm",
-      "started": "Get started"
+      "started": "Get started",
+      "cancel": "Cancel"
     }
   },
   "systemthreats": {
@@ -1603,6 +1590,46 @@
   },
   "profiles": {
     "title": "Profiles",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "options": {
+      "manage": "Manage profile",
+      "add": "Add profile",
+      "join": "Join a group",
+      "settings": "Settings"
+    }
+  },
+  "scan": {
+    "title": "Align the QR code within the frame to scan",
+    "permissionalert": "Enable the camera in your device settings to start scanning",
+    "cameraunavailable": "We're unable to access your camera.",
+    "pastecontentbutton": "Paste contents",
+    "inputmodal": {
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "pastecontents": "Paste contents"
+    }
+  },
+  "shareprofile": {
+    "buttons": {
+      "provide": "Provide",
+      "scan": "Scan",
+      "close": "Close"
+    },
+    "shareoobi": {
+      "title": "Share profile",
+      "description": "To connect, share your profile by showing your QR code, sending the link, or using another method.",
+      "button": "Share"
+    },
+    "scan": {
+      "title": "Align the QR code within the frame to scan",
+      "permissionalert": "Enable the camera in your device settings to start scanning",
+      "cameraunavailable": "We're unable to access your camera.",
+      "pastecontentbutton": "Paste contents",
+      "inputmodal": {
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "pastecontents": "Paste contents"
+      }
+    }
   }
 }

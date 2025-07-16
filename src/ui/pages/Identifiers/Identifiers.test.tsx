@@ -7,7 +7,6 @@ import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { store } from "../../../store";
@@ -16,7 +15,6 @@ import {
   setIdentifiersFilters,
   setMultiSigGroupCache,
 } from "../../../store/reducers/identifiersCache";
-import { showConnections } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import {
   failedFilteredIdentifierMapFix,
@@ -30,6 +28,7 @@ import {
   NAVIGATION_DELAY,
 } from "../../components/CardsStack";
 import { OperationType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { IdentifierDetails } from "../IdentifierDetails";
 import { Identifiers } from "./Identifiers";
@@ -136,11 +135,11 @@ let mockedStore: Store<unknown, AnyAction>;
 describe("Identifiers Tab", () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    const mockStore = configureStore();
+
     const dispatchMock = jest.fn();
 
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -201,11 +200,10 @@ describe("Identifiers Tab", () => {
       },
     };
 
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
 
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -243,7 +241,6 @@ describe("Identifiers Tab", () => {
     expect(
       getByText(EN_TRANSLATIONS.tabs.identifiers.tab.title)
     ).toBeInTheDocument();
-    expect(getByTestId("connections-button")).toBeInTheDocument();
     expect(getByTestId("add-button")).toBeInTheDocument();
     expect(getByTestId("pending-identifiers-list")).toBeInTheDocument();
     expect(
@@ -369,7 +366,6 @@ describe("Identifiers Tab", () => {
   });
 
   test("Navigate from Identifiers Tab to Card Details and back", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -403,7 +399,7 @@ describe("Identifiers Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -473,7 +469,6 @@ describe("Identifiers Tab", () => {
   });
 
   test("Open multisig", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -511,7 +506,7 @@ describe("Identifiers Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -540,7 +535,6 @@ describe("Identifiers Tab", () => {
   });
 
   test("Open group identifier that create fail", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -578,7 +572,7 @@ describe("Identifiers Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -615,7 +609,6 @@ describe("Identifiers Tab", () => {
   });
 
   test("Open duplicate multisig", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -651,7 +644,7 @@ describe("Identifiers Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -673,67 +666,7 @@ describe("Identifiers Tab", () => {
     });
   });
 
-  test("Open Connections tab", async () => {
-    const mockStore = configureStore();
-    const dispatchMock = jest.fn();
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      identifiersCache: {
-        identifiers: {},
-      },
-      viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-        credential: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-      },
-      connectionsCache: {
-        connections: [],
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const storeMocked = {
-      ...mockStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const { getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
-        <Provider store={storeMocked}>
-          <Route
-            path={TabsRoutePath.IDENTIFIERS}
-            component={Identifiers}
-          />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    expect(getByTestId("connections-button")).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("connections-button"));
-    });
-
-    expect(dispatchMock).toBeCalledWith(showConnections(true));
-  });
-
   test("Remove pending identifier alert", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -767,7 +700,7 @@ describe("Identifiers Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -838,7 +771,6 @@ describe("Identifiers Tab", () => {
   });
 
   test("Open pending group identifier", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -872,7 +804,7 @@ describe("Identifiers Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -906,7 +838,6 @@ describe("Identifiers Tab", () => {
   });
 
   test("Close create identifier", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -941,7 +872,7 @@ describe("Identifiers Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -982,7 +913,6 @@ describe("Identifiers Tab", () => {
   });
 
   test("Open multisig", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -1020,7 +950,7 @@ describe("Identifiers Tab", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

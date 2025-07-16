@@ -147,7 +147,6 @@ describe("Notifications cache", () => {
           queues: [],
           isPaused: false,
         },
-        showConnections: false,
         toastMsgs: [],
       },
       seedPhraseCache: {

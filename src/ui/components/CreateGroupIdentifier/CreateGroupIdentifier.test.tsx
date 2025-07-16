@@ -3,10 +3,10 @@ import { mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATION from "../../../locales/en/en.json";
 import { setMultiSigGroupCache } from "../../../store/reducers/identifiersCache";
 import { identifierFix } from "../../__fixtures__/identifierFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CreateGroupIdentifier } from "./CreateGroupIdentifier";
 
@@ -34,8 +34,6 @@ jest.mock("../../../core/agent/agent", () => ({
 }));
 
 describe("Create Identifier modal", () => {
-  const mockStore = configureStore();
-
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.IDENTIFIERS],
@@ -62,7 +60,7 @@ describe("Create Identifier modal", () => {
 
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 

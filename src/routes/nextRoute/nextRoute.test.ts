@@ -49,7 +49,6 @@ describe("NextRoute", () => {
           finishSetupBiometrics: false,
           defaultProfile: "",
         },
-        showConnections: false,
         toastMsgs: [],
         currentOperation: OperationType.IDLE,
         queueIncomingRequest: {
@@ -320,7 +319,6 @@ describe("getNextRoute", () => {
         finishSetupBiometrics: false,
         defaultProfile: "",
       },
-      showConnections: false,
       toastMsgs: [],
       currentOperation: OperationType.IDLE,
       queueIncomingRequest: {

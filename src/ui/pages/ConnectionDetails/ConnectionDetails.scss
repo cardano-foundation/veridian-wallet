@@ -1,6 +1,10 @@
 .connection-details {
   background: var(--ion-color-neutral-200);
 
+  &.scrollable-page-layout.md {
+    padding-bottom: 0;
+  }
+
   ion-header ion-toolbar {
     --background: var(--ion-color-neutral-200);
     margin-top: 0.625rem;

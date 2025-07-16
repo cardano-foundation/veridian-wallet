@@ -38,7 +38,6 @@ import {
 } from "../../../store/reducers/credsCache";
 import {
   setFavouritesIdentifiersCache,
-  getIdentifiersCache,
   setIdentifiersCache,
   setIdentifiersFilters,
   setIndividualFirstCreate,
@@ -92,6 +91,7 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
+import { BasicRecord } from "../../../core/agent/records";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -357,7 +357,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let defaultProfile: { defaultProfile: string } = { defaultProfile: "" };
+      let defaultProfile = "";
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -459,9 +459,9 @@ const AppWrapper = (props: { children: ReactNode }) => {
       );
 
       if (appDefaultProfileRecord) {
-        defaultProfile = appDefaultProfileRecord.content as {
-          defaultProfile: string;
-        };
+        defaultProfile = (
+          appDefaultProfileRecord.content as { defaultProfile: string }
+        ).defaultProfile;
       } else {
         const storedIdentifiers =
           await Agent.agent.identifiers.getIdentifiers();
@@ -475,9 +475,17 @@ const AppWrapper = (props: { children: ReactNode }) => {
                 new Date(b.createdAtUTC).getTime()
             )[0];
           const id = oldest?.id || "";
-          defaultProfile = { defaultProfile: id };
+          defaultProfile = id;
+
+          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+            new BasicRecord({
+              id: MiscRecordId.DEFAULT_PROFILE,
+              content: { defaultProfile: id },
+            })
+          );
         }
       }
+
       const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX
       );
@@ -545,7 +553,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(
         setAuthentication({
           ...authentication,
-          defaultProfile: defaultProfile.defaultProfile as string,
+          defaultProfile,
           passcodeIsSet,
           seedPhraseIsSet,
           passwordIsSet,

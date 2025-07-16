@@ -7,7 +7,7 @@ import {
   NotificationRoute,
 } from "../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../i18n";
-import { RoutePath, TabsRoutePath } from "../../../routes/paths";
+import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
@@ -19,6 +19,8 @@ import {
   setCurrentRoute,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 import { CredentialDetailModal } from "../../components/CredentialDetailModule";
 import { FilterChip } from "../../components/FilterChip/FilterChip";
 import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types";
@@ -32,8 +34,7 @@ import "./Notifications.scss";
 import { EarlierNotification } from "./components";
 import { EarlierNotificationRef } from "./components/EarlierNotification.types";
 import { NotificationOptionsModal } from "./components/NotificationOptionsModal";
-import { Avatar } from "../../components/Avatar";
-import { AvatarProps } from "../../components/Avatar/Avatar.types";
+import { Profiles } from "../Profiles";
 
 const Notifications = () => {
   const pageId = "notifications-tab";
@@ -52,6 +53,7 @@ const Notifications = () => {
     null
   );
   const [isOpenCredModal, setIsOpenCredModal] = useState(false);
+  const [openProfiles, setOpenProfiles] = useState(false);
   const [viewCred, setViewCred] = useState("");
   const [openUnknownConnectionAlert, setOpenUnknownConnectionAlert] =
     useState(false);
@@ -60,11 +62,6 @@ const Notifications = () => {
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
   const authData = useAppSelector(getAuthentication);
-  const [defaultProfile, setDefaultProfile] = useState("");
-
-  useEffect(() => {
-    setDefaultProfile(authData.defaultProfile);
-  }, [authData]);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
@@ -192,7 +189,7 @@ const Notifications = () => {
   };
 
   const handleAvatarClick = () => {
-    history.push(RoutePath.PROFILES);
+    setOpenProfiles(true);
   };
 
   const AdditionalButtons = ({
@@ -202,7 +199,7 @@ const Notifications = () => {
   }) => {
     return (
       <Avatar
-        id={defaultProfile}
+        id={authData.defaultProfile}
         handleAvatarClick={handleAvatarClick}
       />
     );
@@ -275,6 +272,10 @@ const Notifications = () => {
           />
         )}
       </TabLayout>
+      <Profiles
+        isOpen={openProfiles}
+        setIsOpen={setOpenProfiles}
+      />
       <CredentialDetailModal
         pageId="revoke-credential"
         isOpen={isOpenCredModal}

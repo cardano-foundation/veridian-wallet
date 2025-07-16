@@ -4,7 +4,6 @@ import { mockIonicReact, waitForIonicReact } from "@ionic/react-test-utils";
 import { act } from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { KeyStoreKeys } from "../../../core/storage";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
@@ -16,6 +15,7 @@ import {
 } from "../../__fixtures__/signTransactionFix";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { IncomingRequest } from "./IncomingRequest";
+import { makeTestStore } from "../../utils/makeTestStore";
 mockIonicReact();
 
 const mockApprovalCallback = jest.fn((status: boolean) => status);
@@ -79,10 +79,9 @@ const initialState = {
 };
 
 describe("Sign request", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -134,7 +133,7 @@ describe("Sign request", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -244,7 +243,7 @@ describe("Sign request", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -285,7 +284,7 @@ describe("Sign request", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

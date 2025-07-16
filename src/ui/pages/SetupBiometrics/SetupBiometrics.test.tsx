@@ -6,13 +6,14 @@ import { IonReactMemoryRouter } from "@ionic/react-router";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { AuthService } from "../../../core/agent/services";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes/paths";
 import { setEnableBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { SetupBiometrics } from "./SetupBiometrics";
 
 jest.mock("../../utils/passcodeChecker", () => ({
@@ -69,8 +70,6 @@ jest.mock("../../hooks/privacyScreenHook", () => ({
   }),
 }));
 
-const mockStore = configureStore();
-
 const initialState = {
   stateCache: {
     routes: [RoutePath.SETUP_BIOMETRICS],
@@ -106,7 +105,7 @@ const initialState = {
 
 const dispatchMock = jest.fn();
 const storeMocked = {
-  ...mockStore(initialState),
+  ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
 

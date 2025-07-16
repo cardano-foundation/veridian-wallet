@@ -11,8 +11,8 @@ import {
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { Agent } from "../../../core/agent/agent";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import { ConfigurationService } from "../../../core/configuration";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import {
@@ -29,10 +29,10 @@ import {
   formatTimeToSec,
   getUTCOffset,
 } from "../../utils/formatters";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { AccordionKey } from "./components/IdentifierAttributeDetailModal/IdentifierAttributeDetailModal.types";
 import { IdentifierDetailModule } from "./IdentifierDetailModule";
-import { CreationStatus } from "../../../core/agent/agent.types";
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -100,7 +100,6 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 
 const initialStateKeri = {
@@ -133,7 +132,7 @@ const initialStateKeri = {
 };
 
 const storeMockedAidKeri = {
-  ...mockStore(initialStateKeri),
+  ...makeTestStore(initialStateKeri),
   dispatch: dispatchMock,
 };
 
@@ -485,7 +484,7 @@ describe("Individual Identifier details page", () => {
     };
 
     const storeMockedAidKeri = {
-      ...mockStore(initialStateKeri),
+      ...makeTestStore(initialStateKeri),
       dispatch: dispatchMock,
     };
 
@@ -685,7 +684,7 @@ describe("Group Identifier details page", () => {
   };
 
   const storeMockedAidKeri = {
-    ...mockStore(initialStateKeri),
+    ...makeTestStore(initialStateKeri),
     dispatch: dispatchMock,
   };
 
@@ -761,7 +760,7 @@ describe("Group Identifier details page", () => {
     };
 
     const storeMockedAidKeri = {
-      ...mockStore(initialStateKeri),
+      ...makeTestStore(initialStateKeri),
       dispatch: dispatchMock,
     };
 
@@ -1108,7 +1107,7 @@ describe("Group Identifier details page", () => {
     };
 
     const storeMockedAidKeri = {
-      ...mockStore(initialStateKeri),
+      ...makeTestStore(initialStateKeri),
       dispatch: dispatchMock,
     };
 
@@ -1173,7 +1172,7 @@ describe("Checking the Identifier Details Page when information is missing from 
     };
 
     const storeMockedAidKeri = {
-      ...mockStore(initialStateKeri),
+      ...makeTestStore(initialStateKeri),
       dispatch: dispatchMock,
     };
 
@@ -1337,7 +1336,7 @@ describe("Favourite identifier", () => {
     };
 
     const storeMockedAidKeri = {
-      ...mockStore(initialStateKeri),
+      ...makeTestStore(initialStateKeri),
       dispatch: dispatchMock,
     };
 
@@ -1407,7 +1406,7 @@ describe("Favourite identifier", () => {
     };
 
     const storeMockedAidKeri = {
-      ...mockStore(initialStateKeri),
+      ...makeTestStore(initialStateKeri),
       dispatch: dispatchMock,
     };
 
@@ -1477,7 +1476,7 @@ describe("Favourite identifier", () => {
     };
 
     const storeMockedAidKeri = {
-      ...mockStore(initialStateKeri),
+      ...makeTestStore(initialStateKeri),
       dispatch: dispatchMock,
     };
 

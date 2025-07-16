@@ -1,22 +1,28 @@
 ion-button.avatar-button {
-  width: 2.75rem;
-  height: 2.75rem;
+  margin: 0;
+  min-height: 2.75rem;
   border-radius: 1.5rem;
 
-  &.rank-0 {
-    --background: var(--ion-color-primary-300);
+  &::part(native) {
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
   }
-  &.rank-1 {
+
+  &.rank-0 {
     --background: var(--ion-color-primary-400);
   }
-  &.rank-2 {
-    --background: var(--ion-color-error-400);
+  &.rank-1 {
+    --background: var(--ion-color-success-400);
   }
-  &.rank-3 {
+  &.rank-2 {
     --background: var(--ion-color-warning-400);
   }
+  &.rank-3 {
+    --background: var(--ion-color-error-400);
+  }
   &.rank-4 {
-    --background: var(--ion-color-success-400);
+    --background: var(--ion-color-primary-300);
   }
 
   span {
@@ -29,6 +35,14 @@ ion-button.avatar-button {
   }
 
   @media screen and (min-width: 250px) and (max-width: 374px) {
+    min-height: 2.25rem;
+
+    &::part(native) {
+      width: 2.25rem;
+      height: 2.25rem;
+      padding: 0;
+    }
+
     span {
       font-size: 1.2rem;
     }

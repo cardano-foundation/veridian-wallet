@@ -1,19 +1,20 @@
 const verifySecretMock = jest.fn();
 
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import { fireEvent, getByText, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
-import configureStore from "redux-mock-store";
+
 import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
+import { connectionsMapFix } from "../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
 import { CredentialDetails } from "../../pages/CredentialDetails";
-import { VerifyPasscode } from "./VerifyPasscode";
-import { connectionsMapFix } from "../../__fixtures__/connectionsFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
+import { VerifyPasscode } from "./VerifyPasscode";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
 
@@ -83,19 +84,17 @@ const initialStateNoPassword = {
 describe("Verify Passcode on Cards Details page", () => {
   let storeMocked: Store<unknown, AnyAction>;
   beforeEach(() => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateNoPassword),
+      ...makeTestStore(initialStateNoPassword),
       dispatch: dispatchMock,
     };
   });
 
   test("Render passcode", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateNoPassword),
+      ...makeTestStore(initialStateNoPassword),
       dispatch: dispatchMock,
     };
 
@@ -117,10 +116,9 @@ describe("Verify Passcode on Cards Details page", () => {
   });
 
   test("Remove passcode", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     storeMocked = {
-      ...mockStore(initialStateNoPassword),
+      ...makeTestStore(initialStateNoPassword),
       dispatch: dispatchMock,
     };
 

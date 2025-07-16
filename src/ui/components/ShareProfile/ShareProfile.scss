@@ -1,0 +1,57 @@
+body.scan-active {
+  div.app-router {
+    display: none;
+  }
+
+  .share-profile-modal {
+    &.scan {
+      --background: transparent;
+    }
+
+    .share-profile.responsive-page-layout {
+      &.scan {
+        background: transparent;
+      }
+    }
+  }
+}
+
+.share-profile-modal {
+  .share-profile.responsive-page-layout {
+    p.share-profile-subtitle {
+      text-align: center;
+    }
+
+    &.scan {
+      .page-header {
+        .close-button-label > h4 {
+          color: var(--ion-color-neutral-200) !important;
+        }
+      }
+
+      .share-profile-segment {
+        --background: var(--ion-color-neutral-800);
+
+        ion-segment-button {
+          &.segment-button-checked {
+            &::part(indicator-background) {
+              background: var(--ion-color-neutral-600);
+            }
+          }
+
+          ion-label {
+            color: var(--ion-color-neutral-100);
+          }
+        }
+      }
+    }
+
+    .responsive-page-content {
+      justify-content: space-between;
+
+      & > * {
+        margin-top: 0;
+      }
+    }
+  }
+}
