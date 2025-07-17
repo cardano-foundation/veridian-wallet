@@ -79,11 +79,7 @@ const SwitchCardView = ({
     data: IdentifierShortDetails | CredentialShortDetails
   ) => {
     let pathname = "";
-    if (cardTypes === CardType.IDENTIFIERS) {
-      pathname = `${TabsRoutePath.IDENTIFIERS}/${data.id}`;
-    } else {
-      pathname = `${TabsRoutePath.CREDENTIALS}/${data.id}`;
-    }
+    pathname = `${TabsRoutePath.CREDENTIALS}/${data.id}`;
 
     dispatch(
       setCurrentRoute({

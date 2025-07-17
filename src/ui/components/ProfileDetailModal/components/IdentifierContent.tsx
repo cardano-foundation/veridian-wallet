@@ -1,8 +1,11 @@
-import { IonButton, IonIcon } from "@ionic/react";
+import { IonButton, IonCol, IonGrid, IonIcon, IonRow } from "@ionic/react";
 import {
   calendarNumberOutline,
   keyOutline,
   refreshOutline,
+  pencilOutline,
+  shareOutline,
+  appsOutline,
 } from "ionicons/icons";
 import { useCallback, useState } from "react";
 import { i18n } from "../../../../i18n";
@@ -10,13 +13,10 @@ import { useAppSelector } from "../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../store/reducers/connectionsCache";
 import { getIdentifiersCache } from "../../../../store/reducers/identifiersCache";
 import { getAuthentication } from "../../../../store/reducers/stateCache";
-import { CardDetailsContent } from "../../../components/CardDetails";
-import {
-  CardBlock,
-  FlatBorderType,
-} from "../../../components/CardDetails/CardDetailsBlock";
-import { CardDetailsItem } from "../../../components/CardDetails/CardDetailsItem";
-import { ListHeader } from "../../../components/ListHeader";
+import { CardDetailsContent } from "../../CardDetails";
+import { CardBlock, FlatBorderType } from "../../CardDetails/CardDetailsBlock";
+import { CardDetailsItem } from "../../CardDetails/CardDetailsItem";
+import { ListHeader } from "../../ListHeader";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -24,14 +24,31 @@ import {
 } from "../../../utils/formatters";
 import { IdentifierAttributeDetailModal } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal";
 import { DetailView } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal.types";
-import { IdentifierContentProps } from "./IdentifierContent.types";
+import {
+  IdentifierContentProps,
+  ProfileInformationProps,
+} from "./IdentifierContent.types";
 import { FallbackIcon } from "../../FallbackIcon";
+import { Avatar } from "../../Avatar";
+import { ShareConnection } from "../../ShareConnection";
+import { EditIdentifier } from "../../EditIdentifier";
 
 const DISPLAY_MEMBERS = 3;
+
+const ProfileInformation = ({ value, text }: ProfileInformationProps) => {
+  return (
+    <IonCol className="profile-information">
+      <p className="profile-information-value">{value}</p>
+      <p className="profile-information-text">{text}</p>
+    </IonCol>
+  );
+};
 
 const IdentifierContent = ({
   cardData,
   onRotateKey,
+  oobi,
+  setCardData,
 }: IdentifierContentProps) => {
   const identifiersData = useAppSelector(getIdentifiersCache);
   const userName = useAppSelector(getAuthentication)?.userName;
@@ -39,6 +56,13 @@ const IdentifierContent = ({
   const memberCount = cardData.members?.length || 0;
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [viewType, setViewType] = useState(DetailView.AdvancedDetail);
+  const [shareIsOpen, setShareIsOpen] = useState(false);
+  const [editorOptionsIsOpen, setEditorIsOpen] = useState(false);
+
+  const openShareModal = () => {
+    if (!cardData) return;
+    setShareIsOpen(true);
+  };
 
   const openPropDetailModal = useCallback((view: DetailView) => {
     setViewType(view);
@@ -62,15 +86,80 @@ const IdentifierContent = ({
     .slice(0, DISPLAY_MEMBERS);
 
   const openGroupMember = () => openPropDetailModal(DetailView.GroupMember);
+  const showDapp = () => {
+    // TODO: Show dapp modal
+  };
 
   return (
     <>
+      <div className="profile-info">
+        <Avatar id={cardData.id} />
+        <IonGrid>
+          <IonRow className="profile-info-row">
+            <ProfileInformation
+              value="4"
+              text={i18n.t(
+                "profiledetails.identifierdetail.information.credentials"
+              )}
+            />
+            <ProfileInformation
+              value="10"
+              text={i18n.t(
+                "profiledetails.identifierdetail.information.connections"
+              )}
+            />
+            <ProfileInformation
+              value="2"
+              text={i18n.t("profiledetails.identifierdetail.information.dapps")}
+            />
+          </IonRow>
+        </IonGrid>
+      </div>
+      <div className="identifier-details-split-section actions">
+        <IonButton
+          expand="block"
+          shape="round"
+          className="profile-button"
+          onClick={() => setEditorIsOpen(true)}
+          data-testid="edit-button"
+        >
+          <IonIcon
+            slot="icon-only"
+            size="small"
+            icon={pencilOutline}
+            color="primary"
+          />
+          <span>{i18n.t("profiledetails.options.edit")}</span>
+        </IonButton>
+        <IonButton
+          expand="block"
+          shape="round"
+          className="profile-button"
+          onClick={openShareModal}
+          data-testid="share-button"
+        >
+          <IonIcon
+            slot="icon-only"
+            size="small"
+            icon={shareOutline}
+            color="primary"
+          />
+          <span>{i18n.t("profiledetails.options.share")}</span>
+        </IonButton>
+      </div>
+      <CardBlock
+        title={i18n.t("profiledetails.identifierdetail.dapp")}
+        testId="dapp-block"
+        className="dapp-block"
+        icon={appsOutline}
+        onClick={showDapp}
+      />
       {isMultiSig && members && (
         <>
-          <ListHeader title={i18n.t("tabs.identifiers.details.group.title")} />
+          <ListHeader title={i18n.t("profiledetails.group.title")} />
           <CardBlock
             onClick={openGroupMember}
-            title={i18n.t("tabs.identifiers.details.group.groupmembers.title")}
+            title={i18n.t("profiledetails.group.groupmembers.title")}
             testId="group-member-block"
           >
             {members.map((item, index) => {
@@ -90,7 +179,7 @@ const IdentifierContent = ({
                 onClick={() => openPropDetailModal(DetailView.GroupMember)}
                 data-testid="view-member"
               >
-                {i18n.t("tabs.identifiers.details.group.button.viewmore", {
+                {i18n.t("profiledetails.group.button.viewmore", {
                   remainMembers: memberCount - DISPLAY_MEMBERS,
                 })}
               </IonButton>
@@ -98,16 +187,14 @@ const IdentifierContent = ({
           </CardBlock>
           {cardData.kt && (
             <CardBlock
-              title={i18n.t(
-                "tabs.identifiers.details.group.signingkeysthreshold.title"
-              )}
+              title={i18n.t("profiledetails.group.signingkeysthreshold.title")}
               onClick={() => openPropDetailModal(DetailView.SigningThreshold)}
               testId="signing-threshold-block"
             >
               <CardDetailsContent
                 mainContent={`${cardData.kt}`}
                 subContent={`${i18n.t(
-                  "tabs.identifiers.details.group.signingkeysthreshold.outof",
+                  "profiledetails.group.signingkeysthreshold.outof",
                   { threshold: memberCount }
                 )}`}
                 testId="signing-threshold-content"
@@ -116,15 +203,11 @@ const IdentifierContent = ({
           )}
         </>
       )}
-      <ListHeader
-        title={i18n.t("tabs.identifiers.details.identifierdetail.title")}
-      />
+      <ListHeader title={i18n.t("profiledetails.identifierdetail.title")} />
       <div className="identifier-details-split-section">
         <CardBlock
           copyContent={cardData.id}
-          title={i18n.t(
-            "tabs.identifiers.details.identifierdetail.identifierid.title"
-          )}
+          title={i18n.t("profiledetails.identifierdetail.identifierid.title")}
           testId="identifier-id-block"
         >
           <CardDetailsItem
@@ -136,9 +219,7 @@ const IdentifierContent = ({
           />
         </CardBlock>
         <CardBlock
-          title={i18n.t(
-            "tabs.identifiers.details.identifierdetail.created.title"
-          )}
+          title={i18n.t("profiledetails.identifierdetail.created.title")}
           testId="created-block"
         >
           <CardDetailsItem
@@ -159,9 +240,7 @@ const IdentifierContent = ({
           <CardBlock
             copyContent={cardData.k[0]}
             flatBorder={FlatBorderType.BOT}
-            title={i18n.t(
-              "tabs.identifiers.details.identifierdetail.signingkey.title"
-            )}
+            title={i18n.t("profiledetails.identifierdetail.signingkey.title")}
             testId="signingkey-block"
           >
             {cardData.k.map((item, index) => {
@@ -189,9 +268,7 @@ const IdentifierContent = ({
               onClick={onRotateKey}
             >
               <p>
-                {i18n.t(
-                  "tabs.identifiers.details.identifierdetail.signingkey.rotate"
-                )}
+                {i18n.t("profiledetails.identifierdetail.signingkey.rotate")}
               </p>
               <IonIcon icon={refreshOutline} />
             </IonButton>
@@ -199,19 +276,15 @@ const IdentifierContent = ({
         </>
       )}
       <CardBlock
-        title={i18n.t("tabs.identifiers.details.identifierdetail.showadvanced")}
+        title={i18n.t("profiledetails.identifierdetail.showadvanced")}
         onClick={() => openPropDetailModal(DetailView.AdvancedDetail)}
         testId="show-advanced-block"
       />
       {isMultiSig && cardData.kt && (
         <>
-          <ListHeader
-            title={i18n.t("tabs.identifiers.details.keyrotation.title")}
-          />
+          <ListHeader title={i18n.t("profiledetails.keyrotation.title")} />
           <CardBlock
-            title={i18n.t(
-              "tabs.identifiers.details.keyrotation.rotatesigningkey.title"
-            )}
+            title={i18n.t("profiledetails.keyrotation.rotatesigningkey.title")}
             onClick={() => openPropDetailModal(DetailView.RotationThreshold)}
             testId="rotate-signing-key-block"
           >
@@ -219,7 +292,7 @@ const IdentifierContent = ({
               testId="rotate-signing-key"
               mainContent={`${cardData.kt}`}
               subContent={`${i18n.t(
-                "tabs.identifiers.details.keyrotation.rotatesigningkey.outof",
+                "profiledetails.keyrotation.rotatesigningkey.outof",
                 { threshold: memberCount }
               )}`}
             />
@@ -232,6 +305,17 @@ const IdentifierContent = ({
         view={viewType}
         setViewType={setViewType}
         data={cardData}
+      />
+      <ShareConnection
+        isOpen={shareIsOpen}
+        setIsOpen={setShareIsOpen}
+        oobi={oobi}
+      />
+      <EditIdentifier
+        modalIsOpen={editorOptionsIsOpen}
+        setModalIsOpen={setEditorIsOpen}
+        setCardData={setCardData}
+        cardData={cardData}
       />
     </>
   );

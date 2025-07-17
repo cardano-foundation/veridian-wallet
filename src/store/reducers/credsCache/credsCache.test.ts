@@ -1,4 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { multisigMetadataRecord } from "../../../core/__fixtures__/agent/multiSigFixtures";
+import {
+  CredentialShortDetails,
+  CredentialStatus,
+} from "../../../core/agent/services/credentialService.types";
+import { IdentifierType } from "../../../core/agent/services/identifier.types";
+import { CredentialsFilters } from "../../../ui/pages/Credentials/Credentials.types";
+import { RootState } from "../../index";
+import { FavouriteCredential } from "./credCache.types";
 import {
   addFavouritesCredsCache,
   clearCredCache,
@@ -12,15 +21,6 @@ import {
   setFavouritesCredsCache,
   updateOrAddCredsCache,
 } from "./credsCache";
-import { RootState } from "../../index";
-import {
-  CredentialShortDetails,
-  CredentialStatus,
-} from "../../../core/agent/services/credentialService.types";
-import { IdentifierType } from "../../../core/agent/services/identifier.types";
-import { FavouriteIdentifier } from "../identifiersCache/identifiersCache.types";
-import { multisigMetadataRecord } from "../../../core/__fixtures__/agent/multiSigFixtures";
-import { CredentialsFilters } from "../../../ui/pages/Credentials/Credentials.types";
 
 describe("credsCacheSlice", () => {
   const initialState = {
@@ -134,7 +134,7 @@ describe("credsCacheSlice", () => {
   });
 
   it("should handle setFavouritesCredsCache", () => {
-    const favs: FavouriteIdentifier[] = [
+    const favs: FavouriteCredential[] = [
       {
         id: "did:example:ebfeb1f712ebc6f1c276e12ec21",
         time: 1,
@@ -148,7 +148,7 @@ describe("credsCacheSlice", () => {
   });
 
   it("should handle addFavouritesCredsCache", () => {
-    const fav: FavouriteIdentifier = {
+    const fav: FavouriteCredential = {
       id: "abcd",
       time: 1,
     };

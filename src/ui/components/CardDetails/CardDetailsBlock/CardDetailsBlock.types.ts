@@ -22,6 +22,7 @@ interface CardBlockProps {
   flatBorder?: FlatBorderType;
   className?: string;
   copyContent?: string;
+  icon?: string;
 }
 
 export type { CardDetailsBlockProps, CardBlockProps };

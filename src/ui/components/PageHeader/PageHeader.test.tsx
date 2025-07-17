@@ -171,7 +171,7 @@ describe("Page Header", () => {
   test("clicking on back button invokes beforeBack function", async () => {
     const mockBeforeBack = jest.fn();
     const history = createMemoryHistory();
-    history.push(TabsRoutePath.IDENTIFIERS);
+    history.push(TabsRoutePath.CREDENTIALS);
 
     const { getByTestId } = render(
       <IonReactMemoryRouter history={history}>

@@ -39,7 +39,7 @@ const updateStoreSetCurrentRoute = (data: DataProps) => {
 
 const getDefaultPath = (data: DataProps) => {
   if (data.store.stateCache.authentication.ssiAgentIsSet) {
-    return TabsRoutePath.IDENTIFIERS;
+    return TabsRoutePath.CREDENTIALS;
   }
 
   if (
@@ -112,9 +112,6 @@ const backRoute: Record<string, any> = {
     updateRedux: [removeCurrentRoute],
   },
   [TabsRoutePath.NOTIFICATION_DETAILS]: {
-    updateRedux: [removeCurrentRoute],
-  },
-  [TabsRoutePath.IDENTIFIER_DETAILS]: {
     updateRedux: [removeCurrentRoute],
   },
   [TabsRoutePath.CREDENTIAL_DETAILS]: {

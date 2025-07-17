@@ -22,7 +22,7 @@ import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
 import { ProfileDetailModal } from "../../components/ProfileDetailModal";
-import { Settings } from "../../components/Setting";
+import { Settings } from "../../components/Settings";
 import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
@@ -163,7 +163,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
             <OptionButton
               icon={personCircleOutline}
               text={`${i18n.t("profiles.options.manage")}`}
-              action={handleOpenSettings}
+              action={() => setOpenProfileDetail(true)}
             />
           </div>
           <div className="profiles-list">

@@ -3,9 +3,9 @@ import { i18n } from "../../../../../i18n";
 import { useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
-import { InfoCard } from "../../../../components/InfoCard";
-import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
-import { PageHeader } from "../../../../components/PageHeader";
+import { InfoCard } from "../../../InfoCard";
+import { ScrollablePageLayout } from "../../../layout/ScrollablePageLayout";
+import { PageHeader } from "../../../PageHeader";
 import { Advanced } from "./Advanced";
 import "./IdentifierAttributeDetailModal.scss";
 import {
@@ -66,12 +66,10 @@ const IdentifierAttributeDetailModal = ({
         return (
           <List
             bottomText={`${i18n.t(
-              `tabs.identifiers.details.detailmodal.${view}.bottomtext`,
+              `profiledetails.detailmodal.${view}.bottomtext`,
               { members: members?.length || 0 }
             )}`}
-            title={`${i18n.t(
-              `tabs.identifiers.details.detailmodal.${view}.title`
-            )}`}
+            title={`${i18n.t(`profiledetails.detailmodal.${view}.title`)}`}
             data={members || []}
             mask
           />
@@ -98,12 +96,10 @@ const IdentifierAttributeDetailModal = ({
           pageId={view}
           header={
             <PageHeader
-              title={`${i18n.t(
-                `tabs.identifiers.details.detailmodal.${view}.title`
-              )}`}
+              title={`${i18n.t(`profiledetails.detailmodal.${view}.title`)}`}
               closeButton
               closeButtonLabel={`${i18n.t(
-                "tabs.identifiers.details.detailmodal.button.done"
+                "profiledetails.detailmodal.button.done"
               )}`}
               closeButtonAction={handleClose}
             />
@@ -111,15 +107,13 @@ const IdentifierAttributeDetailModal = ({
         >
           <div className="attribute-description">
             <h3>
-              {i18n.t(
-                `tabs.identifiers.details.detailmodal.${view}.propexplain.title`
-              )}
+              {i18n.t(`profiledetails.detailmodal.${view}.propexplain.title`)}
             </h3>
           </div>
           <InfoCard
             className="attribute-description-content"
             content={i18n.t(
-              `tabs.identifiers.details.detailmodal.${view}.propexplain.content`
+              `profiledetails.detailmodal.${view}.propexplain.content`
             )}
           />
           {renderContent()}
