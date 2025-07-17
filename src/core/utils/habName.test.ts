@@ -30,7 +30,7 @@ describe("habName", () => {
         },
       },
       {
-        name: "01::MyWallet", // Non-group member in old format
+        name: "01:MyWallet", // Non-group member in old format
         expected: {
           version: undefined,
           displayName: "MyWallet",
@@ -85,7 +85,7 @@ describe("habName", () => {
         },
       },
       {
-        name: `${CURRENT_VERSION}:XX::MyNewWallet`, // Non-group member in new format
+        name: `${CURRENT_VERSION}:XX:MyNewWallet`, // Non-group member in new format
         expected: {
           version: CURRENT_VERSION,
           displayName: "MyNewWallet",
@@ -179,7 +179,7 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: `${CURRENT_VERSION}:XX::FormattedWallet`, // Non-group member format
+        expected: `${CURRENT_VERSION}:XX:FormattedWallet`, // Non-group member format
       },
       {
         parts: {
@@ -227,7 +227,7 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: `${CURRENT_VERSION}:XX::`,
+        expected: `${CURRENT_VERSION}:XX:`,
       },
       {
         parts: {
@@ -251,7 +251,7 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: `${CURRENT_VERSION}:XX::Group !@#$%^&*()`,
+        expected: `${CURRENT_VERSION}:XX:Group !@#$%^&*()`,
       },
       {
         parts: {
@@ -263,7 +263,7 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: `${CURRENT_VERSION}:XX::Group 🚀`,
+        expected: `${CURRENT_VERSION}:XX:Group 🚀`,
       },
       {
         parts: {
@@ -275,7 +275,7 @@ describe("habName", () => {
           userName: undefined,
           theme: "XX",
         },
-        expected: `${CURRENT_VERSION}:XX::Display:Name:With:Colons`,
+        expected: `${CURRENT_VERSION}:XX:Display:Name:With:Colons`,
       },
     ])(
       "should format hab name parts correctly to v1.2.0.3 format: %s",

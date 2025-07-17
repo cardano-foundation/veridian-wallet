@@ -77,6 +77,12 @@ export const MIGRATION_V1_2_0_3: HybridMigration = {
         const currentName = identifier.name;
         const parts = parseHabName(currentName);
 
+        if (!parts) {
+          throw new Error(
+            `Invalid identifier name format: ${currentName}. Expected format is version:theme:groupPart:displayName or version:theme:displayName.`
+          );
+        }
+
         if (parts.version === migrationVersion) {
           // eslint-disable-next-line no-console
           console.log(
