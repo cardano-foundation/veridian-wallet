@@ -96,6 +96,18 @@ describe("habName", () => {
           theme: "XX",
         },
       },
+      {
+        name: `${CURRENT_VERSION}:XX:0--:Empty Group`, // Empty groupId and userName, but still a group
+        expected: {
+          version: CURRENT_VERSION,
+          displayName: "Empty Group",
+          isGroupMember: true,
+          groupId: "",
+          isInitiator: false,
+          userName: "",
+          theme: "XX",
+        },
+      },
     ])("should parse new format name correctly: %s", ({ name, expected }) => {
       const result = parseHabName(name);
       expect(result).toEqual(expected);

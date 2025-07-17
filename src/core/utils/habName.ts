@@ -30,19 +30,16 @@ export function parseHabName(name: string): HabNameParts {
     }
 
     let isGroupMember = false;
-    let groupId;
-    let userName;
-    let isInitiator;
+    let groupId: string | undefined;
+    let userName: string | undefined;
+    let isInitiator: boolean | undefined;
 
     const groupParts = groupPart.split("-");
     if (groupParts.length === 3) {
-      // isInitiator-groupId-userName
       isInitiator = groupParts[0] === "1";
       groupId = groupParts[1];
       userName = groupParts[2];
-
-      // Stricter validation for group parts content
-      if (groupId === "" || userName === "") {
+      if (groupId === "" && userName !== "") {
         throw new Error(
           "Invalid new format name: Invalid group part format (expected isInitiator-groupId-userName or empty)."
         );
@@ -82,18 +79,16 @@ export function parseHabName(name: string): HabNameParts {
       );
     }
 
-    let isGroupMember;
-    let groupId;
-    let isInitiator;
+    let isGroupMember = false;
+    let groupId: string | undefined;
+    let isInitiator: boolean | undefined;
 
     const groupParts = groupPart.split("-");
     if (groupParts.length === 2) {
       // isInitiator-groupId
       isInitiator = groupParts[0] === "1";
       groupId = groupParts[1];
-
-      // Stricter validation for group parts content
-      if (groupId === "") {
+      if (!groupId) {
         throw new Error(
           "Invalid old format name: Invalid group part format (expected isInitiator-groupId or empty)."
         );
