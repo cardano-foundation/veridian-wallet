@@ -677,7 +677,7 @@ describe("Single sig service of agent", () => {
           id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
           content: {
             queued: [
-              "1.2.0.3:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
+              "1.2.0.3:0:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
             ],
           },
         })
@@ -746,7 +746,11 @@ describe("Single sig service of agent", () => {
     expect(basicStorage.update).toHaveBeenCalledWith(
       expect.objectContaining({
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
-        content: { queued: [] }, // Updated expectation to match actual behavior
+        content: {
+          queued: [
+            "1.2.0.3:0:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
+          ],
+        },
       })
     );
   });
@@ -994,7 +998,7 @@ describe("Single sig service of agent", () => {
     );
 
     expect(basicStorage.createOrUpdateBasicRecord).not.toBeCalled();
-    expect(createIdentifierMock).toBeCalledWith("1.2.0.3:0displayName", {
+    expect(createIdentifierMock).toBeCalledWith("1.2.0.3:0:displayName", {
       toad: 4,
       wits: witnessEids.slice(0, 6),
     });
@@ -1762,7 +1766,7 @@ describe("Single sig service of agent", () => {
       .mockReturnValueOnce({
         aids: [
           {
-            name: "1.2.0.3:0:1-group1-name:test1",
+            name: "1.2.0.3:0:1-group1:test1",
             prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
             sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
           },
@@ -2029,7 +2033,7 @@ describe("Single sig service of agent", () => {
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            "1.2.0.3:0:1-ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inx-memberOne:memberOne",
+            "1.2.0.3:0:1-ED4KeyyTKFj72B008OTGgDCrFo6y7B2B73kfyzu5Inx-memberOne:memberOne",
             "1.2.0.3:0:1-ED4KeyyTKFj-memberOne:memberOne",
             "1.2.0.3:0:0-ED4KeyyTKFj-memberTwo:memberTwo",
           ],
@@ -2047,7 +2051,7 @@ describe("Single sig service of agent", () => {
         displayName: "memberOne",
         groupMetadata: {
           groupCreated: false,
-          groupId: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inx",
+          groupId: "ED4KeyyTKFj72B008OTGgDCrFo6y7B2B73kfyzu5Inx",
           groupInitiator: true,
           userName: "memberOne",
         },
