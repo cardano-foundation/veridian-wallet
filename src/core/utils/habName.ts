@@ -8,106 +8,104 @@ export interface HabNameParts {
   theme?: string;
 }
 
-// Old format: theme:isInitiator-groupId:displayName
-// New format: 1.2.0.3:theme:isInitiator-groupId-userName:displayName
-export function parseHabName(name: string) {
+// Old format: theme:isInitiator-groupId:displayName or  theme:displayName
+// New format: version:theme:isInitiator-groupId-userName:displayName or version:theme:displayName
+export function parseHabName(name: string): HabNameParts {
   const parts = name.split(":");
 
   if (name.startsWith("1.2.0.3:")) {
-    // New format
-    if (parts.length < 2 || parts.length > 4) {
+    if (parts.length < 3 || parts.length > 4) {
       throw new Error(
-        "Invalid new format name: Expected between 2 and 4 parts separated by colons (version:theme:groupPart:displayName or version:theme:displayName)"
+        "Invalid new format name: Expected 3 or 4 parts separated by colons (version:theme:groupPart:displayName or version:theme:displayName)."
       );
     }
 
+    const version = parts[0];
+    const theme = parts[1];
+    const displayName = parts.length === 3 ? parts[2] : parts[3];
+
     if (parts.length === 3) {
       return {
-        version: parts[0],
-        theme: parts[1],
-        displayName: parts[2],
+        version,
+        theme,
+        displayName,
         isGroupMember: false,
       };
-    } else if (parts.length === 4) {
-      const groupParts = parts[2].split("-");
-
-      if (groupParts.length === 3) {
-        if (groupParts[0] !== "1" && groupParts[0] !== "0") {
-          throw new Error(
-            "Invalid new format name: isInitiator must be 1 or 0."
-          );
-        }
-
-        if (!groupParts[1] || groupParts[1].trim() === "") {
-          throw new Error("Invalid new format name: groupId cannot be empty.");
-        }
-
-        if (!groupParts[2] || groupParts[2].trim() === "") {
-          throw new Error("Invalid new format name: userName cannot be empty.");
-        }
-
-        return {
-          version: parts[0],
-          theme: parts[1],
-          isGroupMember: true,
-          isInitiator: groupParts[0] === "1",
-          groupId: groupParts[1],
-          userName: groupParts[2],
-          displayName: parts[2],
-        };
-      } else {
-        throw new Error(
-          "Invalid new format name: Invalid group part format (expected isInitiator-groupId-userName or empty)."
-        );
-      }
-    } else {
-      // Old format
-      if (parts.length < 2 || parts.length > 3) {
-        throw new Error(
-          "Invalid old format name: Expected beteen 2 and 3 parts separated by colons (theme:groupPart:displayName or theme:displayName)."
-        );
-      }
-      if (parts.length === 2) {
-        // Non-group member format
-        return {
-          theme: parts[0],
-          displayName: parts[1],
-          isGroupMember: false,
-        };
-      } else if (parts.length === 3) {
-        const groupParts = parts[1].split("-");
-        if (groupParts.length === 2) {
-          if (groupParts[0] !== "1" && groupParts[0] !== "0") {
-            throw new Error(
-              "Invalid old format name: isInitiator must be 1 or 0."
-            );
-          }
-
-          if (!groupParts[1] || groupParts[1].trim() === "") {
-            throw new Error(
-              "Invalid old format name: groupId cannot be empty."
-            );
-          }
-
-          return {
-            theme: parts[0],
-            isGroupMember: true,
-            groupId: groupParts[1],
-            isInitiator: groupParts[0] === "1",
-            displayName: parts[2],
-          };
-        } else {
-          throw new Error(
-            "Invalid old format name: Invalid group part format (expected isInitiator-groupId or empty"
-          );
-        }
-      } else {
-        throw new Error(
-          "Invalid old format name: Invalid name format (expected theme:isInitiator-groupId:displayName or theme:displayName)."
-        );
-      }
     }
+
+    const groupParts = parts[2].split("-");
+    if (groupParts.length !== 3) {
+      throw new Error(
+        "Invalid new format name: Invalid group part format (expected isInitiator-groupId-userName)"
+      );
+    }
+
+    const [isInitiatorStr, groupId, userName] = groupParts;
+    if (isInitiatorStr !== "1" && isInitiatorStr !== "0") {
+      throw new Error("Invalid new format name: isInitiator must be 1 or 0.");
+    }
+    if (!groupId || groupId.trim() === "") {
+      throw new Error("Invalid new format name: groupId cannot be empty.");
+    }
+    if (!userName || userName.trim() === "") {
+      throw new Error("Invalid new format name: userName cannot be empty.");
+    }
+
+    return {
+      version,
+      theme,
+      isGroupMember: true,
+      isInitiator: isInitiatorStr === "1",
+      groupId,
+      userName,
+      displayName,
+    };
   }
+
+  // Handle old format: theme:isInitiator-groupId:displayName or theme:displayName
+  if (parts.length < 2 || parts.length > 3) {
+    throw new Error(
+      "Invalid old format name: Expected 2 or 3 parts separated by colons (theme:groupPart:displayName or theme:displayName)."
+    );
+  }
+
+  const theme = parts[0];
+  const displayName = parts.length === 2 ? parts[1] : parts[2];
+
+  if (!theme || !displayName) {
+    throw new Error("Invalid old format name: Missing theme or display name.");
+  }
+
+  if (parts.length === 2) {
+    return {
+      theme,
+      displayName,
+      isGroupMember: false,
+    };
+  }
+
+  const groupParts = parts[1].split("-");
+  if (groupParts.length !== 2) {
+    throw new Error(
+      "Invalid old format name: Invalid group part format (expected isInitiator-groupId)."
+    );
+  }
+
+  const [isInitiatorStr, groupId] = groupParts;
+  if (isInitiatorStr !== "1" && isInitiatorStr !== "0") {
+    throw new Error("Invalid old format name: isInitiator must be 1 or 0.");
+  }
+  if (!groupId || groupId.trim() === "") {
+    throw new Error("Invalid old format name: groupId cannot be empty.");
+  }
+
+  return {
+    theme,
+    isGroupMember: true,
+    isInitiator: isInitiatorStr === "1",
+    groupId,
+    displayName,
+  };
 }
 
 export function formatToV1_2_0_3(parts: HabNameParts): string {

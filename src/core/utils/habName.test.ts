@@ -25,16 +25,6 @@ describe("habName", () => {
         },
       },
       {
-        name: "01::MyWallet", // Non-group member in old format
-        expected: {
-          displayName: "MyWallet",
-          isGroupMember: false,
-          groupId: undefined,
-          isInitiator: undefined,
-          theme: "01",
-        },
-      },
-      {
         name: "01:1-gr@up!d:MyGroup",
         expected: {
           displayName: "MyGroup",
@@ -81,21 +71,6 @@ describe("habName", () => {
           version: "1.2.0.3",
           displayName: "MyNewWallet",
           isGroupMember: false,
-          groupId: undefined,
-          isInitiator: undefined,
-          userName: undefined,
-          theme: "XX",
-        },
-      },
-      {
-        name: "1.2.0.3:XX:0--:Empty Group", // Empty groupId and userName, but still a group
-        expected: {
-          version: "1.2.0.3",
-          displayName: "Empty Group",
-          isGroupMember: true,
-          groupId: "",
-          isInitiator: false,
-          userName: "",
           theme: "XX",
         },
       },
@@ -109,27 +84,22 @@ describe("habName", () => {
       {
         name: "JustTheName",
         errorMessage:
-          "Invalid old format name: Expected 3 parts separated by colons (theme:groupPart:displayName).",
-      },
-      {
-        name: "01:MyWallet", // Missing groupPart and displayName
-        errorMessage:
-          "Invalid old format name: Expected 3 parts separated by colons (theme:groupPart:displayName).",
+          "Invalid old format name: Expected 2 or 3 parts separated by colons (theme:groupPart:displayName or theme:displayName)",
       },
       {
         name: "01:1-group-id:Display:Name", // Too many parts for old format
         errorMessage:
-          "Invalid old format name: Expected 3 parts separated by colons (theme:groupPart:displayName).",
+          "Invalid old format name: Expected 2 or 3 parts separated by colons (theme:groupPart:displayName or theme:displayName)",
       },
       {
         name: "01:1-group-id-extra:DisplayName", // Invalid groupPart for old format
         errorMessage:
-          "Invalid old format name: Invalid group part format (expected isInitiator-groupId or empty).",
+          "Invalid old format name: Invalid group part format (expected isInitiator-groupId).",
       },
       {
         name: "1.2.0.3:MyNewWallet", // Missing theme, groupPart, displayName for new format
         errorMessage:
-          "Invalid new format name: Expected 4 parts separated by colons (version:theme:groupPart:displayName).",
+          "Invalid new format name: Expected 3 or 4 parts separated by colons (version:theme:groupPart:displayName or version:theme:displayName)",
       },
       {
         name: "03:1-group-id:", // Missing display name for old format
@@ -141,8 +111,7 @@ describe("habName", () => {
       },
       {
         name: "01:1-:MyGroup", // Empty groupId for old format
-        errorMessage:
-          "Invalid old format name: Invalid group part format (expected isInitiator-groupId or empty).",
+        errorMessage: "Invalid old format name: groupId cannot be empty.",
       },
       {
         name: "1.2.0.3:XX:1--user123:MyGroup", // Empty groupId for new format
