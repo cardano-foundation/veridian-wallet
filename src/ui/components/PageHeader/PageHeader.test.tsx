@@ -1,11 +1,14 @@
 import { fireEvent, render } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
-import { PageHeader } from "./PageHeader";
+import { IonReactMemoryRouter } from "@ionic/react-router";
+import { createMemoryHistory } from "history";
+import { arrowBackOutline } from "ionicons/icons";
 import { RoutePath } from "../../../routes";
+import { makeTestStore } from "../../utils/makeTestStore";
+import { TabsRoutePath } from "../navigation/TabsMenu";
+import { PageHeader } from "./PageHeader";
 
 describe("Page Header", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -23,7 +26,7 @@ describe("Page Header", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -40,8 +43,8 @@ describe("Page Header", () => {
       </Provider>
     );
 
-    expect(getByTestId("back-button")).toBeInTheDocument();
-    expect(getByTestId("progress-bar")).toBeInTheDocument();
+    expect(getByTestId("back-button")).toBeVisible();
+    expect(getByTestId("progress-bar")).toBeVisible();
     expect(getByTestId("progress-bar")).toHaveAttribute("value", "0.66");
     expect(getByTestId("progress-bar")).toHaveAttribute("buffer", "1");
   });
@@ -58,9 +61,9 @@ describe("Page Header", () => {
       </Provider>
     );
 
-    expect(getByTestId("close-button")).toBeInTheDocument();
-    expect(getByText("Title")).toBeInTheDocument();
-    expect(getByTestId("action-button")).toBeInTheDocument();
+    expect(getByTestId("close-button")).toBeVisible();
+    expect(getByText("Title")).toBeVisible();
+    expect(getByTestId("action-button")).toBeVisible();
     expect(getByTestId("action-button")).toHaveTextContent("Action");
   });
 
@@ -78,7 +81,28 @@ describe("Page Header", () => {
         />
       </Provider>
     );
-    expect(getByTestId("action-button")).toBeInTheDocument();
+    expect(getByTestId("action-button")).toBeVisible();
+    expect(mockActionButton).not.toHaveBeenCalled();
+    fireEvent.click(getByTestId("action-button"));
+    expect(storeMocked.dispatch).not.toHaveBeenCalled();
+  });
+
+  test("Render action button icon", async () => {
+    const mockActionButton = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <PageHeader
+          closeButton={true}
+          title="Title"
+          actionButton={true}
+          actionButtonAction={mockActionButton}
+          actionButtonIcon={arrowBackOutline}
+        />
+      </Provider>
+    );
+    expect(getByTestId("action-button")).toBeVisible();
+    expect(getByTestId("action-button-icon")).toBeVisible();
     expect(mockActionButton).not.toHaveBeenCalled();
     fireEvent.click(getByTestId("action-button"));
     expect(storeMocked.dispatch).not.toHaveBeenCalled();
@@ -91,38 +115,83 @@ describe("Page Header", () => {
       <Provider store={storeMocked}>
         <PageHeader
           closeButton={true}
+          closeButtonLabel="Close"
           title="Title"
-          actionButton={true}
-          actionButtonLabel="Action"
-          actionButtonAction={mockCloseButton}
         />
       </Provider>
     );
-    expect(getByTestId("close-button")).toBeInTheDocument();
+    expect(getByTestId("close-button")).toBeVisible();
+    expect(mockCloseButton).not.toHaveBeenCalled();
+    fireEvent.click(getByTestId("close-button"));
+    expect(storeMocked.dispatch).not.toHaveBeenCalled();
+  });
+
+  test("Render close icon", async () => {
+    const mockCloseButton = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <PageHeader
+          closeButton={true}
+          title="Title"
+          closeButtonAction={mockCloseButton}
+        />
+      </Provider>
+    );
+    expect(getByTestId("close-button")).toBeVisible();
+    expect(getByTestId("close-button-icon")).toBeVisible();
     expect(mockCloseButton).not.toHaveBeenCalled();
     fireEvent.click(getByTestId("close-button"));
     expect(storeMocked.dispatch).not.toHaveBeenCalled();
   });
 
   test("clicking on back button invokes handleOnBack function", async () => {
-    const mockCloseButton = jest.fn();
+    const mockOnBack = jest.fn();
 
     const { getByTestId } = render(
       <Provider store={storeMocked}>
         <PageHeader
           backButton={true}
           currentPath={"/"}
-          closeButton={true}
-          closeButtonAction={mockCloseButton}
-          progressBar={true}
-          progressBarValue={0.5}
-          progressBarBuffer={1}
           title={"Title"}
+          onBack={mockOnBack}
         >
           <p>Content</p>
         </PageHeader>
       </Provider>
     );
-    expect(getByTestId("back-button")).toBeInTheDocument();
+
+    expect(getByTestId("back-button")).toBeVisible();
+
+    fireEvent.click(getByTestId("back-button"));
+
+    expect(mockOnBack).toBeCalled();
+  });
+
+  test("clicking on back button invokes beforeBack function", async () => {
+    const mockBeforeBack = jest.fn();
+    const history = createMemoryHistory();
+    history.push(TabsRoutePath.IDENTIFIERS);
+
+    const { getByTestId } = render(
+      <IonReactMemoryRouter history={history}>
+        <Provider store={storeMocked}>
+          <PageHeader
+            backButton={true}
+            currentPath={"/"}
+            title={"Title"}
+            beforeBack={mockBeforeBack}
+          >
+            <p>Content</p>
+          </PageHeader>
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    expect(getByTestId("back-button")).toBeVisible();
+
+    fireEvent.click(getByTestId("back-button"));
+
+    expect(mockBeforeBack).toBeCalled();
   });
 });

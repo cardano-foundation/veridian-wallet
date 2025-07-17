@@ -1,25 +1,25 @@
 import { setupIonicReact } from "@ionic/react";
-import { act } from "react";
 import { mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
+import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+import { CreationStatus } from "../../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { store } from "../../../../store";
 import {
   setCurrentOperation,
   setToastMsg,
 } from "../../../../store/reducers/stateCache";
+import { transformGroupIdentifier } from "../../../../utils/transformGroupIdentifier";
 import { connectionsFix } from "../../../__fixtures__/connectionsFix";
+import { identifierFix } from "../../../__fixtures__/identifierFix";
 import { OperationType, ToastMsgType } from "../../../globals/types";
+import { makeTestStore } from "../../../utils/makeTestStore";
+import { passcodeFiller } from "../../../utils/passcodeFiller";
 import { IdentifierColor } from "../../CreateIdentifier/components/IdentifierColorSelector";
 import { TabsRoutePath } from "../../navigation/TabsMenu";
 import { Stage } from "../CreateGroupIdentifier.types";
 import { SetupConnections } from "./SetupConnections";
-import { passcodeFiller } from "../../../utils/passcodeFiller";
-import { CreationStatus } from "../../../../core/agent/agent.types";
-import { transformGroupIdentifier } from "../../../../utils/transformGroupIdentifier";
-import { identifierFix } from "../../../__fixtures__/identifierFix";
 
 setupIonicReact();
 mockIonicReact();
@@ -68,8 +68,6 @@ jest.mock("react-router-dom", () => ({
 }));
 
 describe("Create group identifier - Setup Connection", () => {
-  const mockStore = configureStore();
-
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.IDENTIFIERS],
@@ -126,7 +124,7 @@ describe("Create group identifier - Setup Connection", () => {
 
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -186,8 +184,6 @@ describe("Create group identifier - Setup Connection", () => {
   });
 
   describe("Initial Identifier", () => {
-    const mockStore = configureStore();
-
     const stage1State = {
       identifierCreationStage: 1,
       displayNameValue: "test",
@@ -214,7 +210,7 @@ describe("Create group identifier - Setup Connection", () => {
 
     const dispatchMock = jest.fn();
     const storeMocked = {
-      ...mockStore(store.getState()),
+      ...makeTestStore(store.getState()),
       dispatch: dispatchMock,
     };
 
@@ -348,8 +344,6 @@ describe("Create group identifier - Setup Connection", () => {
   });
 
   describe("Resume Create Identifier", () => {
-    const mockStore = configureStore();
-
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
@@ -404,7 +398,7 @@ describe("Create group identifier - Setup Connection", () => {
 
     const dispatchMock = jest.fn();
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -528,8 +522,6 @@ describe("Create group identifier - Setup Connection", () => {
   });
 
   describe("Create group identifier - Setup Connection", () => {
-    const mockStore = configureStore();
-
     const baseState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
@@ -576,7 +568,7 @@ describe("Create group identifier - Setup Connection", () => {
       };
 
       const storeMockedPending = {
-        ...mockStore(pendingState),
+        ...makeTestStore(pendingState),
         dispatch: dispatchMock,
       };
 
@@ -620,7 +612,7 @@ describe("Create group identifier - Setup Connection", () => {
       };
 
       const storeMockedComplete = {
-        ...mockStore(completeState),
+        ...makeTestStore(completeState),
         dispatch: dispatchMock,
       };
 

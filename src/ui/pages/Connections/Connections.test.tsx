@@ -7,13 +7,16 @@ import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import {
+  filteredIdentifierFix,
+  filteredIdentifierMapFix,
+} from "../../__fixtures__/filteredIdentifierFix";
 import { formatShortDate } from "../../utils/formatters";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Connections } from "./Connections";
 
@@ -76,15 +79,15 @@ jest.mock("@ionic/react", () => {
         />
       );
     }),
+    IonButton: (props: any) => <button {...props} />,
   };
 });
 
-const mockSetShowConnections = jest.fn();
-
 const initialStateFull = {
   stateCache: {
-    routes: [TabsRoutePath.IDENTIFIERS],
+    routes: [TabsRoutePath.CONNECTIONS],
     authentication: {
+      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
@@ -114,7 +117,7 @@ const initialStateFull = {
     connections: connectionsFix,
   },
   identifiersCache: {
-    identifiers: filteredIdentifierFix,
+    identifiers: filteredIdentifierMapFix,
   },
   biometricsCache: {
     enabled: false,
@@ -123,22 +126,86 @@ const initialStateFull = {
 
 let mockedStore: Store<unknown, AnyAction>;
 
-describe("Connections page", () => {
+describe("Connections tab", () => {
   const dispatchMock = jest.fn();
 
   beforeEach(() => {
-    jest.resetAllMocks();
-    const mockStore = configureStore();
-
     mockedStore = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
-
     verifySecretMock.mockResolvedValue(true);
   });
 
-  test("Render connections page empty", async () => {
+  test("Render connections tab empty", async () => {
+    const dispatchMock = jest.fn();
+
+    const mockedStore = {
+      ...makeTestStore({
+        stateCache: {
+          routes: [TabsRoutePath.CONNECTIONS],
+          authentication: {
+            defaultProfile: filteredIdentifierFix[0].id,
+            loggedIn: true,
+            time: Date.now(),
+            passcodeIsSet: true,
+          },
+        },
+        viewTypeCache: {
+          identifier: {
+            viewType: null,
+            favouriteIndex: 0,
+          },
+          credential: {
+            viewType: null,
+            favouriteIndex: 0,
+          },
+        },
+        seedPhraseCache: {},
+        credsCache: {
+          creds: filteredCredsFix,
+          favourites: [
+            {
+              id: filteredCredsFix[0].id,
+              time: 1,
+            },
+          ],
+        },
+        connectionsCache: {
+          connections: [],
+        },
+        identifiersCache: {
+          identifiers: filteredIdentifierMapFix,
+        },
+        biometricsCache: {
+          enabled: false,
+        },
+      }),
+      dispatch: dispatchMock,
+    };
+
+    const { getByTestId, getByText } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+        <Provider store={mockedStore}>
+          <Connections />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    expect(getByTestId("connections-tab-cards-placeholder")).toBeVisible();
+
+    act(() => {
+      fireEvent.click(getByTestId("primary-button-connections-tab"));
+    });
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.shareprofile.shareoobi.title)
+      ).toBeVisible();
+    });
+  });
+
+  test("Open profile", async () => {
     const initialStateFull = {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],
@@ -168,116 +235,45 @@ describe("Connections page", () => {
         enabled: false,
       },
     };
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
 
     const mockedStore = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
     const { getByTestId, getByText } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
         <Provider store={mockedStore}>
-          <Connections
-            setShowConnections={mockSetShowConnections}
-            showConnections={true}
-          />
+          <Connections />
         </Provider>
       </MemoryRouter>
     );
 
-    expect(getByTestId("connections-cards-placeholder")).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-connections"));
+    await waitFor(() => {
+      expect(getByTestId("avatar-button")).toBeVisible();
     });
+
+    fireEvent.click(getByTestId("avatar-button"));
 
     await waitFor(() => {
-      expect(getByTestId("add-a-connection-title")).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("add-connection-modal-provide-qr-code"));
-    });
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.connections.page.indentifierselector.title)
-      ).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeVisible();
     });
   });
 
-  test("Render connections page empty (no self pagination)", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.MENU],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      credsCache: {
-        creds: [],
-        favourites: [],
-      },
-      connectionsCache: {
-        connections: [],
-      },
-      identifiersCache: {
-        identifiers: {},
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-    const mockStore = configureStore();
-    const dispatchMock = jest.fn();
-
-    const mockedStore = {
-      ...mockStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const { getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
-        <Provider store={mockedStore}>
-          <Connections
-            setShowConnections={mockSetShowConnections}
-            showConnections={true}
-          />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    expect(getByTestId("connections-cards-placeholder")).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-connections"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("add-a-connection-title")).toBeVisible();
-    });
-  });
-
-  test("It renders connections page successfully", async () => {
+  test("It renders connections tab successfully", async () => {
     const { getByTestId, getByText, getAllByText } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
         <Provider store={mockedStore}>
-          <Connections
-            setShowConnections={mockSetShowConnections}
-            showConnections={true}
-          />
+          <Connections />
         </Provider>
       </MemoryRouter>
     );
     const addConnectionBtn = getByTestId("add-connection-button");
     expect(addConnectionBtn).toBeInTheDocument();
-    const title = getByTestId("connections-title");
-    expect(title).toBeInTheDocument();
+    expect(
+      getByText(EN_TRANSLATIONS.tabs.connections.tab.title)
+    ).toBeInTheDocument();
     expect(getByText(connectionsFix[0].label)).toBeInTheDocument();
     expect(
       getByText(formatShortDate(connectionsFix[0].createdAtUTC))
@@ -285,155 +281,16 @@ describe("Connections page", () => {
     expect(getAllByText(connectionsFix[0].status)[0]).toBeInTheDocument();
   });
 
-  test("It shows available sharing ID", async () => {
-    const { getByTestId } = render(
-      <Provider store={mockedStore}>
-        <Connections
-          setShowConnections={mockSetShowConnections}
-          showConnections={true}
-        />
-      </Provider>
-    );
-    act(() => {
-      fireEvent.click(getByTestId("add-connection-button"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("add-connection-modal-provide-qr-code")).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("add-connection-modal-provide-qr-code"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("connection-identifier-selector-page")).toBeVisible();
-      expect(
-        getByTestId(
-          `card-item-${initialStateFull.identifiersCache.identifiers[0].id}`
-        )
-      ).toBeVisible();
-    });
-  });
-
-  test("It shows and dismiss an Alert when no Identifiers are available", async () => {
-    const mockStore = configureStore();
-    const dispatchMock = jest.fn();
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      identifiersCache: {
-        identifiers: {},
-      },
-      viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-        credential: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-      },
-      connectionsCache: {
-        connections: [],
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const storeMocked = {
-      ...mockStore(initialState),
-      dispatch: dispatchMock,
-    };
-    const { getByTestId, queryByText, findByText, unmount } = render(
-      <Provider store={storeMocked}>
-        <Connections
-          setShowConnections={mockSetShowConnections}
-          showConnections={true}
-        />
-      </Provider>
-    );
-
-    fireEvent.click(getByTestId("primary-button-connections"));
-
-    await waitFor(() => {
-      expect(getByTestId("add-connection-modal-provide-qr-code")).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("add-connection-modal-provide-qr-code"));
-
-    const text = await findByText(
-      EN_TRANSLATIONS.connections.page.alert.message
-    );
-    await waitFor(() => {
-      expect(text).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("alert-create-keri-cancel-button"));
-
-    await waitFor(() => {
-      expect(
-        queryByText(EN_TRANSLATIONS.connections.page.alert.message)
-      ).toBeNull();
-    });
-
-    unmount();
-  });
-
   test("Search", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      identifiersCache: {
-        identifiers: {},
-      },
-      viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-        credential: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-      },
-      connectionsCache: {
-        connections: connectionsFix,
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
     const { getByTestId, getByText, queryByTestId } = render(
       <Provider store={storeMocked}>
-        <Connections
-          showConnections={true}
-          setShowConnections={jest.fn()}
-        />
+        <Connections />
       </Provider>
     );
 
@@ -476,116 +333,25 @@ describe("Connections page", () => {
       expect(queryByTestId("connection-group-0")).toBe(null);
     });
   });
-});
-
-describe("Connections page from Credentials tab", () => {
-  const dispatchMock = jest.fn();
-
-  beforeEach(() => {
-    jest.resetAllMocks();
-    const mockStore = configureStore();
-
-    mockedStore = {
-      ...mockStore(initialStateFull),
-      dispatch: dispatchMock,
-    };
-
-    verifySecretMock.mockResolvedValue(true);
-  });
-
-  test("It allows to create an Identifier when no Identifiers are available", async () => {
-    const mockStore = configureStore();
-    const dispatchMock = jest.fn();
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.CREDENTIALS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      identifiersCache: {
-        identifiers: {},
-      },
-      credsCache: {
-        creds: [],
-      },
-      credsArchivedCache: {
-        creds: [],
-      },
-      viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-        credential: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-      },
-      connectionsCache: {
-        connections: [],
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const storeMocked = {
-      ...mockStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const { getByTestId, getByText } = render(
-      <Provider store={storeMocked}>
-        <Connections
-          showConnections={true}
-          setShowConnections={jest.fn()}
-        />
-      </Provider>
-    );
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-connections"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("add-connection-modal-provide-qr-code")).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("add-connection-modal-provide-qr-code"));
-    });
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.connections.page.alert.message)
-      ).toBeVisible();
-    });
-  });
 
   test("Redirect to connection detail when click on connection item", async () => {
     const history = createMemoryHistory();
-    history.push(TabsRoutePath.IDENTIFIERS);
+    history.push(TabsRoutePath.CONNECTIONS);
 
     getConnectionByIdMock.mockResolvedValueOnce(connectionsFix[2]);
 
     const { getByTestId, getByText } = render(
       <Provider store={mockedStore}>
-        <Connections
-          setShowConnections={mockSetShowConnections}
-          showConnections={true}
-        />
+        <Connections />
       </Provider>
     );
 
     await waitFor(() => {
       const addConnectionBtn = getByTestId("add-connection-button");
       expect(addConnectionBtn).toBeInTheDocument();
-      const title = getByTestId("connections-title");
-      expect(title).toBeInTheDocument();
+      expect(
+        getByText(EN_TRANSLATIONS.tabs.connections.tab.title)
+      ).toBeInTheDocument();
     });
 
     act(() => {
@@ -598,51 +364,16 @@ describe("Connections page from Credentials tab", () => {
   });
 
   test("Remove pending connection alert", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.IDENTIFIER_DETAILS, TabsRoutePath.IDENTIFIERS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-      },
-      seedPhraseCache: {},
-      identifiersCache: {
-        identifiers: filteredIdentifierFix,
-      },
-      viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-        credential: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
-      },
-      connectionsCache: {
-        connections: connectionsFix,
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
     const { getByTestId, getByText, unmount } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
         <Provider store={storeMocked}>
-          <Connections
-            setShowConnections={mockSetShowConnections}
-            showConnections={true}
-          />
+          <Connections />
         </Provider>
       </MemoryRouter>
     );
@@ -657,33 +388,35 @@ describe("Connections page from Credentials tab", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.page.deletepending.title)
+        getByText(EN_TRANSLATIONS.tabs.connections.tab.deletepending.title)
       ).toBeVisible();
       expect(
-        getByText(EN_TRANSLATIONS.connections.page.deletepending.description)
+        getByText(
+          EN_TRANSLATIONS.tabs.connections.tab.deletepending.description
+        )
       ).toBeVisible();
       expect(
-        getByText(EN_TRANSLATIONS.connections.page.deletepending.button)
+        getByText(EN_TRANSLATIONS.tabs.connections.tab.deletepending.button)
       ).toBeVisible();
     });
 
     act(() => {
       fireEvent.click(
-        getByText(EN_TRANSLATIONS.connections.page.deletepending.button)
+        getByText(EN_TRANSLATIONS.tabs.connections.tab.deletepending.button)
       );
     });
 
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.connections.page.deletepending.secondchecktitle
+          EN_TRANSLATIONS.tabs.connections.tab.deletepending.secondchecktitle
         )
       ).toBeVisible();
     });
 
     act(() => {
       fireEvent.click(
-        getByTestId("connections-delete-pending-modal-confirm-button")
+        getByTestId("connections-tab-delete-pending-modal-confirm-button")
       );
     });
 
@@ -698,5 +431,81 @@ describe("Connections page from Credentials tab", () => {
     });
 
     unmount();
+  });
+
+  test("Click on alphabet list", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+        <Provider store={mockedStore}>
+          <Connections />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    expect(getByTestId("alphabet-selector")).toBeVisible();
+    expect(getByTestId("alphabet-selector-C")).toBeVisible();
+
+    fireEvent.click(getByTestId("alphabet-selector-C"));
+
+    await waitFor(() => {
+      expect(getByTestId("connections-list-alphabetic-C")).toBeVisible();
+    });
+  });
+
+  test("alphabet touch start and touch end", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+        <Provider store={mockedStore}>
+          <Connections />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    expect(getByTestId("alphabet-selector")).toBeVisible();
+    expect(getByTestId("alphabet-selector-C")).toBeVisible();
+
+    ionFireEvent.touchStart(getByTestId("alphabet-selector-C"));
+
+    await waitFor(() => {
+      expect(
+        getByTestId("alphabet-selector-C").classList.contains("active")
+      ).toBeTruthy();
+    });
+
+    fireEvent.touchEnd(document);
+    fireEvent.touchCancel(document);
+
+    await waitFor(() => {
+      expect(
+        getByTestId("alphabet-selector-C").classList.contains("active")
+      ).toBeFalsy();
+    });
+  });
+
+  test("alphabet touch move", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+        <Provider store={mockedStore}>
+          <Connections />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    expect(getByTestId("alphabet-selector")).toBeVisible();
+
+    fireEvent.touchMove(document, {
+      touches: [
+        {
+          clientX: 100,
+          clientY: 100,
+        },
+      ],
+    });
+
+    await waitFor(() => {
+      expect(
+        getByTestId("alphabet-selector-C").classList.contains("active")
+      ).toBeFalsy();
+    });
   });
 });

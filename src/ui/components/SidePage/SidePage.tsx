@@ -1,17 +1,16 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { SideSlider } from "../SideSlider";
+import { useAppSelector } from "../../../store/hooks";
 import {
   getQueueIncomingRequest,
   getStateCache,
 } from "../../../store/reducers/stateCache";
-import { useAppSelector } from "../../../store/hooks";
 import {
   getIsConnecting,
   getPendingConnection,
 } from "../../../store/reducers/walletConnectionsCache";
-import { Connections } from "../../pages/Connections";
 import { IncomingRequest } from "../../pages/IncomingRequest";
 import { WalletConnect } from "../../pages/WalletConnect";
+import { SideSlider } from "../SideSlider";
 
 const SidePage = () => {
   const [openSidePage, setOpenSidePage] = useState(false);
@@ -23,24 +22,18 @@ const SidePage = () => {
   const canOpenIncomingRequest =
     queueIncomingRequest.queues.length > 0 && !queueIncomingRequest.isPaused;
   const canOpenPendingWalletConnection = !!pendingConnection;
-  const canOpenConnections = stateCache.showConnections;
   const DELAY_ON_PAGE_CLOSE = 500;
   const [lastContent, setLastContent] = useState<ReactNode | null>(null);
 
   useEffect(() => {
     if (!stateCache.authentication.loggedIn || isConnecting) return;
-    setOpenSidePage(
-      canOpenIncomingRequest ||
-        canOpenPendingWalletConnection ||
-        canOpenConnections
-    );
+    setOpenSidePage(canOpenIncomingRequest || canOpenPendingWalletConnection);
     if (canOpenPendingWalletConnection) {
       pauseIncommingRequestByConnection.current = true;
     }
   }, [
     canOpenIncomingRequest,
     canOpenPendingWalletConnection,
-    canOpenConnections,
     stateCache.authentication.loggedIn,
     isConnecting,
   ]);
@@ -60,15 +53,6 @@ const SidePage = () => {
         <IncomingRequest
           open={openSidePage}
           setOpenPage={setOpenSidePage}
-        />
-      );
-    }
-
-    if (canOpenConnections) {
-      return (
-        <Connections
-          showConnections={openSidePage}
-          setShowConnections={setOpenSidePage}
         />
       );
     }

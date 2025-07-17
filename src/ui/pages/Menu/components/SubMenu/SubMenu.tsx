@@ -1,11 +1,10 @@
 import { arrowBackOutline } from "ionicons/icons";
-import "./SubMenu.scss";
 import { useCallback, useMemo } from "react";
-import { SubMenuProps } from "./SubMenu.types";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../../../components/PageHeader";
 import { SideSlider } from "../../../../components/SideSlider";
-import { SubMenuKey } from "../../Menu.types";
+import "./SubMenu.scss";
+import { SubMenuProps } from "./SubMenu.types";
 
 const SubMenu = ({
   showSubMenu,
@@ -25,12 +24,8 @@ const SubMenu = ({
 }: SubMenuProps) => {
   const pageId = `sub-menu ${customPageId}`;
   const handleClose = useCallback(() => {
-    if (nestedMenu) {
-      switchView(SubMenuKey.Settings);
-    } else {
-      setShowSubMenu(false);
-    }
-  }, [nestedMenu, setShowSubMenu, switchView]);
+    setShowSubMenu(false);
+  }, [setShowSubMenu]);
 
   const hardwareBackButtonConfig = useMemo(
     () => ({

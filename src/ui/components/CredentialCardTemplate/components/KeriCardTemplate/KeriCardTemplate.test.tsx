@@ -1,7 +1,6 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { store } from "../../../../../store";
 import {
   connectionsFix,
@@ -10,6 +9,7 @@ import {
 import { shortCredsFix } from "../../../../__fixtures__/shortCredsFix";
 import { TabsRoutePath } from "../../../navigation/TabsMenu";
 import { KeriCardTemplate } from "./KeriCardTemplate";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 
 const storeState = {
   stateCache: {
@@ -44,10 +44,9 @@ const storeState = {
   },
 };
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const storeMocked = {
-  ...mockStore(storeState),
+  ...makeTestStore(storeState),
   dispatch: dispatchMock,
 };
 

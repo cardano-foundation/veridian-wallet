@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import EN_TRANSLATIONS from "../../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../../routes/paths";
 import { connectionsForNotifications } from "../../../../../__fixtures__/connectionsFix";
@@ -11,6 +11,7 @@ import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
 import { filteredIdentifierMapFix } from "../../../../../__fixtures__/filteredIdentifierFix";
+import { makeTestStore } from "../../../../../utils/makeTestStore";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -48,7 +49,6 @@ jest.mock("../../../../../../core/agent/agent", () => ({
   },
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 
 const initialState = {
@@ -83,7 +83,7 @@ const initialState = {
 describe("Credential request information", () => {
   test("Render and decline", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
     const { getByText, getByTestId, queryByText, unmount } = render(
@@ -175,7 +175,7 @@ describe("Credential request information: multisig", () => {
 
   test("Initiator open request before proposing", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -280,7 +280,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -383,7 +383,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -486,7 +486,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore({
+      ...makeTestStore({
         ...initialState,
         credsCache: {
           creds: [],
@@ -600,7 +600,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore({
+      ...makeTestStore({
         ...initialState,
         credsCache: {
           creds: [],
@@ -714,7 +714,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -799,7 +799,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -936,7 +936,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore({
+      ...makeTestStore({
         ...initialState,
         credsCache: {
           creds: [],
@@ -1086,7 +1086,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1190,7 +1190,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1294,7 +1294,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -1398,7 +1398,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore({
+      ...makeTestStore({
         ...initialState,
         credsCache: {
           creds: credsFixAcdc,
@@ -1513,7 +1513,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore({
+      ...makeTestStore({
         ...initialState,
         credsCache: {
           creds: credsFixAcdc,
@@ -1628,7 +1628,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore({
+      ...makeTestStore({
         ...initialState,
         credsCache: {
           creds: credsFixAcdc,
@@ -1743,7 +1743,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore({
+      ...makeTestStore({
         ...initialState,
         credsCache: {
           creds: credsFixAcdc,
@@ -1858,7 +1858,7 @@ describe("Credential request information: multisig", () => {
     };
 
     const storeMocked = {
-      ...mockStore({
+      ...makeTestStore({
         ...initialState,
         credsCache: {
           creds: [{ ...credsFixAcdc[0], id: "cred-id" }],

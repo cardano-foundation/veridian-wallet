@@ -95,7 +95,7 @@ const Issuer = ({
           info={
             connectionShortDetails
               ? connectionShortDetails.label
-              : i18n.t("connections.unknown")
+              : i18n.t("tabs.connections.unknown")
           }
           startSlot={<FallbackIcon />}
           className="member"

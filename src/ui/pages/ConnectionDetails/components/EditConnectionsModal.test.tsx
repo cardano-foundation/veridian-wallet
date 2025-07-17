@@ -6,7 +6,6 @@ import {
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../routes/paths";
 import { setToastMsg } from "../../../../store/reducers/stateCache";
@@ -18,6 +17,7 @@ import {
   EditConnectionsContainer,
   EditConnectionsModal,
 } from "./EditConnectionsModal";
+import { makeTestStore } from "../../../utils/makeTestStore";
 mockIonicReact();
 
 jest.mock("@ionic/react", () => ({
@@ -66,7 +66,6 @@ jest.mock("../../../../core/agent/agent", () => ({
   },
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const initialStateFull = {
   stateCache: {
@@ -100,7 +99,7 @@ describe("Edit Connection Modal", () => {
 
   test("Render edit connection modal: empty note", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
     const { getByTestId, getByText } = render(
@@ -128,13 +127,13 @@ describe("Edit Connection Modal", () => {
     expect(getByTestId("close-button")).toBeVisible();
     expect(getByTestId("add-note-button")).toBeVisible();
     expect(
-      getByText(EN_TRANSLATIONS.connections.details.nocurrentnotesext)
+      getByText(EN_TRANSLATIONS.tabs.connections.details.nocurrentnotesext)
     ).toBeVisible();
   });
 
   test("Render edit connection modal", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
     const { getByTestId } = render(
@@ -173,7 +172,7 @@ describe("Edit Connection Modal", () => {
 
   test("Delete note alert", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
     const { getByTestId, unmount, getByText, queryByText } = render(
@@ -214,7 +213,8 @@ describe("Edit Connection Modal", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deletenote.title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote
+            .title
         )
       ).toBeVisible();
     });
@@ -228,7 +228,8 @@ describe("Edit Connection Modal", () => {
       );
       expect(
         queryByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deletenote.title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote
+            .title
         )
       ).toBeNull();
     });
@@ -238,7 +239,7 @@ describe("Edit Connection Modal", () => {
 
   test("Add note", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
     const { getByTestId, getAllByTestId } = render(
@@ -271,7 +272,7 @@ describe("Edit Connection Modal", () => {
 
   test("Save process not working when user confirm empty data", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -305,11 +306,11 @@ describe("Edit Connection Modal", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.notes)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.notes)
       ).toBeVisible();
       expect(getAllByTestId("connection-note").length).toBe(1);
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.title)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.title)
       ).toBeVisible();
     });
 
@@ -324,7 +325,7 @@ describe("Edit Connection Modal", () => {
 
   test("Update note", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -376,7 +377,7 @@ describe("Edit Connection Modal", () => {
 
   test("Update unchange note", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -418,7 +419,7 @@ describe("Edit Connection Modal", () => {
 
   test("Save note", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -486,7 +487,8 @@ describe("Edit Connection Modal", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deletenote.title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote
+            .title
         )
       ).toBeVisible();
     });
@@ -523,7 +525,7 @@ describe("Edit Connection Modal", () => {
 
   test("handle error when save note", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 

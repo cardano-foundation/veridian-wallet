@@ -4,11 +4,11 @@ import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { Router } from "react-router-dom";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { store } from "../../../store";
 import { OperationType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { GenerateSeedPhrase } from "./GenerateSeedPhrase";
 
 jest.mock("../../../core/agent/agent", () => ({
@@ -41,12 +41,11 @@ interface StoreMocked {
   };
 }
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const history = createMemoryHistory();
 const storeMocked = (initialState: StoreMocked) => {
   return {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 };
@@ -191,11 +190,11 @@ describe("Generate Seed Phrase screen from Onboarding", () => {
       </Provider>
     );
     const termsCheckbox = getByTestId("terms-and-conditions-checkbox");
-    expect(termsCheckbox.hasAttribute('[checked="false"'));
-    fireEvent.ionChange(termsCheckbox, '[checked="true"');
-    expect(termsCheckbox.hasAttribute('[checked="true"'));
-    fireEvent.ionChange(termsCheckbox, '[checked="false"');
-    expect(termsCheckbox.hasAttribute('[checked="false"'));
+    expect(termsCheckbox.hasAttribute("[checked=\"false\""));
+    fireEvent.ionChange(termsCheckbox, "[checked=\"true\"");
+    expect(termsCheckbox.hasAttribute("[checked=\"true\""));
+    fireEvent.ionChange(termsCheckbox, "[checked=\"false\"");
+    expect(termsCheckbox.hasAttribute("[checked=\"false\""));
     unmount();
   });
   test("Display seed number on seed phrase segment", async () => {
@@ -227,7 +226,7 @@ describe("Generate Seed Phrase screen from Onboarding", () => {
 
     await waitFor(() => {
       const seedNumberElements = seedPhraseContainer.querySelectorAll(
-        'span[data-testid*="word-index-number"]'
+        "span[data-testid*=\"word-index-number\"]"
       );
       expect(seedNumberElements.length).toBe(18);
     });

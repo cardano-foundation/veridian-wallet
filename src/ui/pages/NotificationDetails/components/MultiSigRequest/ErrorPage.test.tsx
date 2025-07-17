@@ -2,7 +2,7 @@ import { mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import {
@@ -13,6 +13,7 @@ import { multisignIdentifierFix } from "../../../../__fixtures__/filteredIdentif
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { ErrorPage } from "./ErrorPage";
 import { CreationStatus } from "../../../../../core/agent/agent.types";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 
 mockIonicReact();
 
@@ -38,7 +39,6 @@ jest.mock("../../../../../core/agent/agent", () => ({
   },
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 
 const initialState = {
@@ -72,7 +72,7 @@ const initialState = {
 describe("Multisign error feedback", () => {
   test("Render and scan", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
     const { getByText, getByTestId } = render(

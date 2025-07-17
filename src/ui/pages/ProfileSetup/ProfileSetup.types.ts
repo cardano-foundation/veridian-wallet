@@ -4,4 +4,9 @@ enum SetupProfileStep {
   FinishSetup = "finishsetup",
 }
 
+interface ProfileSetupProps {
+  onClose?: (cancel?: boolean) => void;
+}
+
+export type { ProfileSetupProps };
 export { SetupProfileStep };
