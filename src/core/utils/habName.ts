@@ -30,9 +30,9 @@ export function parseHabName(name: string): HabNameParts {
     }
 
     let isGroupMember = false;
-    let groupId: string | undefined;
-    let userName: string | undefined;
-    let isInitiator: boolean | undefined;
+    let groupId;
+    let userName;
+    let isInitiator;
 
     const groupParts = groupPart.split("-");
     if (groupParts.length === 3) {
@@ -80,8 +80,8 @@ export function parseHabName(name: string): HabNameParts {
     }
 
     let isGroupMember = false;
-    let groupId: string | undefined;
-    let isInitiator: boolean | undefined;
+    let groupId;
+    let isInitiator;
 
     const groupParts = groupPart.split("-");
     if (groupParts.length === 2) {

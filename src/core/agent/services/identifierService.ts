@@ -232,9 +232,9 @@ class IdentifierService extends AgentService {
       const userNamePart = metadata.groupMetadata.userName
         ? `-${metadata.groupMetadata.userName}`
         : "";
-      name = `${CURRENT_VERSION}:${initiatorFlag}-${metadata.groupMetadata.groupId}${userNamePart}:${metadata.displayName}`;
+      name = `${CURRENT_VERSION}:${metadata.theme}:${initiatorFlag}-${metadata.groupMetadata.groupId}${userNamePart}:${metadata.displayName}`;
     } else {
-      name = `${metadata.theme}:${metadata.displayName}`;
+      name = `${CURRENT_VERSION}:${metadata.theme}:${metadata.displayName}`;
     }
 
     // For distributed reliability, store name so we can re-try on start-up

@@ -140,9 +140,7 @@ class MultiSigService extends AgentService {
     );
     const states = [mHab["state"], ...connectionStates];
 
-    const groupName = `${CURRENT_VERSION}:1-${randomSalt()}-${
-      mHabRecord.groupMetadata.userName
-    }:${mHabRecord.displayName}`;
+    const groupName = mHabRecord.groupMetadata.userName;
 
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
@@ -177,12 +175,6 @@ class MultiSigService extends AgentService {
         creationStatus,
         groupMemberPre: memberPrefix,
         createdAt: new Date(multisigDetail.icp_dt),
-        groupMetadata: {
-          groupId: multisigId,
-          groupInitiator: true,
-          groupCreated: false,
-          userName: mHabRecord.groupMetadata.userName,
-        },
       });
     } catch (error) {
       if (
@@ -212,12 +204,6 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: memberPrefix,
           createdAtUTC: multisigDetail.icp_dt,
-          groupMetadata: {
-            groupId: multisigId,
-            groupInitiator: mHabRecord.groupMetadata.groupInitiator,
-            groupCreated: mHabRecord.groupMetadata.groupCreated,
-            userName: mHabRecord.groupMetadata.userName,
-          },
         },
       },
     });
@@ -487,7 +473,7 @@ class MultiSigService extends AgentService {
       .identifiers()
       .get(mHabRecord.id);
 
-    const groupName = `${CURRENT_VERSION}:0-${mHabRecord.groupMetadata.groupId}-${mHabRecord.groupMetadata.userName}:${mHabRecord.displayName}`;
+    const groupName = mHabRecord.groupMetadata.userName;
 
     // @TODO - foconnor: We should error here if smids no longer matches once we have multi-sig rotation.
     const states = await Promise.all(
@@ -530,12 +516,6 @@ class MultiSigService extends AgentService {
         creationStatus,
         groupMemberPre: mHabRecord.id,
         createdAt: new Date(multisigDetail.icp_dt),
-        groupMetadata: {
-          groupId: multisigId,
-          groupInitiator: false,
-          groupCreated: false,
-          userName: mHabRecord.groupMetadata.userName,
-        },
       });
     } catch (error) {
       if (
@@ -565,12 +545,6 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: mHabRecord.id,
           createdAtUTC: multisigDetail.icp_dt,
-          groupMetadata: {
-            groupId: multisigId,
-            groupInitiator: false,
-            groupCreated: mHabRecord.groupMetadata.groupCreated,
-            userName: mHabRecord.groupMetadata.userName,
-          },
         },
       },
     });
