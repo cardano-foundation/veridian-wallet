@@ -3,13 +3,13 @@ Feature: Menu setting manage password
   Background:
     Given user is onboarded with skipped password creation
     And user tap skip button on Welcome screen
-    And user tap Menu button on Tab bar
-    And user tap Settings button on Menu screen
+    And user tap Avatar button on Tab bar
+    And user tap Settings button on Profiles screen
     And user tap on Manage Operation Password button on Menu screen
 
   Scenario: C404 MenuSettingsManagePassword - Back to Menu Settings screen
     Given user tap on Back Button on Manage Password screen
-    Then user can see Menu screen
+    Then user can see Menu Settings screen
 
   Scenario: C405 MenuSettingsManagePassword - Cancel on Operations Password modal
     Given user tap on Operation Password button on Manage Password screen

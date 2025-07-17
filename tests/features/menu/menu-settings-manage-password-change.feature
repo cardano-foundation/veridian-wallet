@@ -2,13 +2,13 @@ Feature: Menu setting manage password change
 
   Background:
     Given user is onboarded with skipped password creation
-    And user tap Menu button on Tab bar
-    And user tap Settings button on Menu screen
+    And user tap Avatar button on Tab bar
+    And user tap Settings button on Profiles screen
     And user tap on Change Passcode button on Menu screen
 
   Scenario: C410 MenuSettingsManagePasswordChange - Cancel on Enter Password modal
     Given user tap Cancel button on Passcode screen from Setting screen
-    Then user can see Menu screen
+    Then user can see Menu Settings screen
 
   Scenario: C411 MenuSettingsManagePasswordChange - Confirm on Enter Password modal
     Given user enter passcode on Verify Passcode screen

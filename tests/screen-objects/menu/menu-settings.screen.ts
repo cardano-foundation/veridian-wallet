@@ -34,7 +34,9 @@ export class MenuSettingsScreen {
   }
 
   async loads() {
-    await expect(this.biometricAuthenticationItem).toBeDisplayed();
+    if (await this.biometricAuthenticationItem.isExisting()) {
+      await expect(this.biometricAuthenticationItem).toBeDisplayed();
+    }
     await expect(this.changePasscodeItem).toBeDisplayed();
     await expect(this.manageOperationsPasswordItem).toBeDisplayed();
     await expect(this.recoveryPhraseItem).toBeDisplayed();

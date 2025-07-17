@@ -4,7 +4,7 @@ import { Passcode } from "../../constants/text.constants";
 
 export class MenuPasscodeScreen extends PasscodeScreen {
   get cancelButton() {
-    return $('[data-testid="close-button-label"]');
+    return $("[data-testid='verify-passcode-content-page'] [data-testid='close-button']");
   }
 
   get cancelButtonOnModal() {

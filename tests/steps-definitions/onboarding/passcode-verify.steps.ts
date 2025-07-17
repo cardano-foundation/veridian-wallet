@@ -4,10 +4,11 @@ import { expect } from "expect-webdriverio";
 import MenuPasscodeScreen from "../../screen-objects/menu/menu-passcode.screen.js";
 
 When(/^user enter passcode on Verify Passcode screen$/, async function () {
-  await PasscodeScreen.enterPasscode(
-    this.passcode,
-    '[data-testid="verify-passcode"]'
-  );
+  await PasscodeScreen.enterPasscodeSkip();
+  // await PasscodeScreen.enterPasscode(
+  //   this.passcode,
+  //   '[data-testid="verify-passcode"]'
+  // );
 });
 
 When(

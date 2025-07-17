@@ -21,6 +21,10 @@ export class TabBar {
     return $("#tab-button-Scan");
   }
 
+  get avatarButton() {
+    return $("[data-testid='avatar-button']");
+  }
+
   async tapOnMenuButton() {
     await expect(this.menuTabButton).toBeDisplayed();
     await expect(this.menuTabButton).toBeEnabled();

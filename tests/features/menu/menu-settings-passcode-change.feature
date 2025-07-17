@@ -2,18 +2,18 @@ Feature: Menu setting passcode change
 
   Background:
     Given user is onboarded with skipped password creation
-    And user tap Menu button on Tab bar
-    And user tap Settings button on Menu screen
+    And user tap Avatar button on Tab bar
+    And user tap Settings button on Profiles screen
     And user tap on Change Passcode button on Menu screen
 
   Scenario: C183 MenuSettingsPasscodeChange - Cancel on enter old passcode
     Given user tap Cancel button on Passcode screen from Setting screen
-    Then user can see Menu screen
+    Then user can see Menu Settings screen
 
   Scenario: C184 MenuSettingsPasscodeChange - Cancel on create new passcode
     Given user enter passcode on Verify Passcode screen
     When user tap Cancel button on Passcode screen from Setting screen
-    Then user can see Menu screen
+    Then user can see Menu Settings screen
 
   Scenario: C185 MenuSettingsPasscodeChange - Back on Re-enter new passcode
     Given user enter passcode on Verify Passcode screen

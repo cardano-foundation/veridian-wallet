@@ -5,10 +5,10 @@ Feature: Menu
     And user tap skip button on Welcome screen
 
   Scenario: C158 Menu - loads correctly
-    Given user tap Menu button on Tab bar
+    Given user tap Avatar button on Tab bar
     Then user can see Menu screen
 
   Scenario: C159 Menu - Settings screen loads correctly
-    Given user tap Menu button on Tab bar
-    When user tap Settings button on Menu screen
+    Given user tap Avatar button on Tab bar
+    When user tap Settings button on Profiles screen
     Then user can see Menu Settings screen

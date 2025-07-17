@@ -2,8 +2,8 @@ Feature: Menu setting passcode forgotten
 
   Background:
     Given user is onboarded with skipped password creation
-    And user tap Menu button on Tab bar
-    And user tap Settings button on Menu screen
+    And user tap Avatar button on Tab bar
+    And user tap Settings button on Profiles screen
     And user tap on Change Passcode button on Menu screen
 
   Scenario: C192 MenuSettingsPasscodeForgotten - Cancel modal for recovery phrase verification

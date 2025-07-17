@@ -2,7 +2,7 @@ Feature: Menu setting manage password - Enable operations password during onboar
 
   Scenario: C408 MenuSettingsManagePassword - Enable operations password during onboarding
     Given user is onboarded with a password creation
-    When user tap Menu button on Tab bar
-    And user tap Settings button on Menu screen
+    When user tap Avatar button on Tab bar
+    And user tap Settings button on Profiles screen
     And user tap on Manage Operation Password button on Menu screen
     Then user see the status of Operations Password is true

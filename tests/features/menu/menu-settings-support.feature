@@ -2,7 +2,7 @@ Feature: Menu Settings Support
 
   Background:
     Given user is onboarded with skipped password creation
-    And user tap Menu button on Tab bar
+    And user tap Avatar button on Tab bar
 
   Scenario: C420 MenuSettingsSupport - App version
     Given user click on Settings icon

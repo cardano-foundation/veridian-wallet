@@ -14,7 +14,7 @@ export class MenuOperationPasswordScreen {
   }
 
   get backButton() {
-    return $('[data-testid="close-button"]');
+    return $('[data-testid="back-button"]');
   }
 
   get operationPasswordButton() {
