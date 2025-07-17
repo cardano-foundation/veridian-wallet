@@ -1,47 +1,38 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import {
-  identifiersCacheSlice,
-  getIdentifiersCache,
-  setIdentifiersCache,
-  setFavouritesIdentifiersCache,
-  addFavouriteIdentifierCache,
-  removeFavouriteIdentifierCache,
-  getFavouritesIdentifiersCache,
-  setMultiSigGroupCache,
-  getMultiSigGroupCache,
-  updateOrAddIdentifiersCache,
-  updateCreationStatus,
-  setOpenMultiSigId,
-  getOpenMultiSig,
-  getScanGroupId,
-  setScanGroupId,
-  getIdentifiersFilters,
-  setIdentifiersFilters,
-  addGroupIdentifierCache,
-  clearIdentifierCache,
-} from "./identifiersCache";
-import { RootState } from "../../index";
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
-import {
-  CreationStatus,
   ConnectionStatus,
+  CreationStatus,
 } from "../../../core/agent/agent.types";
-import { FavouriteIdentifier, MultiSigGroup } from "./identifiersCache.types";
-import { IdentifiersFilters } from "../../../ui/pages/Identifiers/Identifiers.types";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import {
   multisignIdentifierFix,
   pendingGroupIdentifierFix,
   pendingIdentifierFix,
   pendingMemberIdentifierFix,
 } from "../../../ui/__fixtures__/filteredIdentifierFix";
+import { RootState } from "../../index";
+import {
+  addGroupIdentifierCache,
+  clearIdentifierCache,
+  getIdentifiersCache,
+  getMultiSigGroupCache,
+  getOpenMultiSig,
+  getScanGroupId,
+  identifiersCacheSlice,
+  setIdentifiersCache,
+  setMultiSigGroupCache,
+  setOpenMultiSigId,
+  setScanGroupId,
+  updateCreationStatus,
+  updateOrAddIdentifiersCache,
+} from "./identifiersCache";
+import { MultiSigGroup } from "./identifiersCache.types";
 
 describe("identifiersCacheSlice", () => {
   const initialState = {
     identifiers: {},
-    favourites: [],
     multiSigGroup: undefined,
     openMultiSigId: undefined,
-    filters: IdentifiersFilters.All,
   };
 
   test("should return the initial state", () => {
@@ -110,60 +101,6 @@ describe("identifiersCacheSlice", () => {
       setMultiSigGroupCache(multiSigGroup)
     );
     expect(newState.multiSigGroup).toEqual(multiSigGroup);
-  });
-
-  test("should handle setFavouritesIdentifiersCache", () => {
-    const favourites: FavouriteIdentifier[] = [
-      {
-        id: "abcd",
-        time: 1,
-      },
-    ];
-    const newState = identifiersCacheSlice.reducer(
-      initialState,
-      setFavouritesIdentifiersCache(favourites)
-    );
-    expect(newState.favourites).toEqual(favourites);
-  });
-
-  test("should handle addFavouriteIdentifierCache", () => {
-    const favourite: FavouriteIdentifier = {
-      id: "abcd",
-      time: 1,
-    };
-    const newState = identifiersCacheSlice.reducer(
-      initialState,
-      addFavouriteIdentifierCache(favourite)
-    );
-    expect(newState.favourites).toEqual([favourite]);
-  });
-
-  test("should handle removeFavouriteIdentifierCache", () => {
-    const initialState = {
-      identifiers: {},
-      favourites: [
-        {
-          id: "abcd",
-          time: 1,
-        },
-      ],
-      multiSigGroup: undefined,
-      filters: IdentifiersFilters.All,
-    };
-    const newState = identifiersCacheSlice.reducer(
-      initialState,
-      removeFavouriteIdentifierCache("abcd")
-    );
-    expect(newState.favourites).toEqual([]);
-  });
-
-  test("should handle setIdentifiersFilters", () => {
-    const filter: IdentifiersFilters = IdentifiersFilters.Individual;
-    const newState = identifiersCacheSlice.reducer(
-      initialState,
-      setIdentifiersFilters(filter)
-    );
-    expect(newState.filters).toEqual(filter);
   });
 
   test("should handle updateOrAddIdentifiersCache", () => {
@@ -322,35 +259,6 @@ describe("get identifier Cache", () => {
 
     const identifiersCache = getIdentifiersCache(state);
     expect(identifiersCache).toEqual(state.identifiersCache.identifiers);
-  });
-
-  test("should return the favourites cache from RootState", () => {
-    const state = {
-      identifiersCache: {
-        favourites: [
-          {
-            id: "id-1",
-            time: 1,
-          },
-          {
-            id: "id-2",
-            time: 2,
-          },
-        ],
-      },
-    } as RootState;
-    const favouriteCache = getFavouritesIdentifiersCache(state);
-    expect(favouriteCache).toEqual(state.identifiersCache.favourites);
-  });
-
-  test("should return the Identifiers Filters from RootState", () => {
-    const state = {
-      identifiersCache: {
-        filters: IdentifiersFilters.All,
-      },
-    } as RootState;
-    const filtersCache = getIdentifiersFilters(state);
-    expect(filtersCache).toEqual(state.identifiersCache.filters);
   });
 
   test("should return the multiSigGroupCache from RootState", () => {

@@ -3,7 +3,6 @@ import { RootState } from "../../store";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { OperationType } from "../../ui/globals/types";
 import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
-import { IdentifiersFilters } from "../../ui/pages/Identifiers/Identifiers.types";
 import { DataProps } from "../nextRoute/nextRoute.types";
 import { calcPreviousRoute, getBackRoute, getPreviousRoute } from "./backRoute";
 
@@ -77,12 +76,10 @@ describe("getBackRoute", () => {
       },
       identifiersCache: {
         identifiers: {},
-        favourites: [],
         multiSigGroup: {
           groupId: "",
           connections: [],
         },
-        filters: IdentifiersFilters.All,
       },
       credsCache: {
         creds: [],
@@ -245,12 +242,10 @@ describe("getPreviousRoute", () => {
       },
       identifiersCache: {
         identifiers: {},
-        favourites: [],
         multiSigGroup: {
           groupId: "",
           connections: [],
         },
-        filters: IdentifiersFilters.All,
       },
       credsCache: {
         creds: [],

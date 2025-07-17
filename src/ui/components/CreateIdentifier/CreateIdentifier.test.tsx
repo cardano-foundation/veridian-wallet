@@ -118,7 +118,7 @@ describe("Create Identifier modal", () => {
 
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -325,7 +325,7 @@ describe("Create Identifier modal", () => {
   test("Display error when display name invalid", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),

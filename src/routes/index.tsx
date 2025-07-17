@@ -12,16 +12,15 @@ import { CreatePassword } from "../ui/pages/CreatePassword";
 import { CreateSSIAgent } from "../ui/pages/CreateSSIAgent";
 import { CredentialDetails } from "../ui/pages/CredentialDetails";
 import { GenerateSeedPhrase } from "../ui/pages/GenerateSeedPhrase";
-import { IdentifierDetails } from "../ui/pages/IdentifierDetails";
 import { NotificationDetails } from "../ui/pages/NotificationDetails";
 import { Onboarding } from "../ui/pages/Onboarding";
+import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
 import { SetPasscode } from "../ui/pages/SetPasscode";
 import { SetupBiometrics } from "../ui/pages/SetupBiometrics/SetupBiometrics";
 import { VerifyRecoverySeedPhrase } from "../ui/pages/VerifyRecoverySeedPhrase";
 import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
-import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
@@ -93,11 +92,6 @@ const Routes = () => {
           />
         );
       })}
-      <Route
-        path={TabsRoutePath.IDENTIFIER_DETAILS}
-        component={IdentifierDetails}
-        exact
-      />
       <Route
         path={RoutePath.SETUP_BIOMETRICS}
         component={SetupBiometrics}

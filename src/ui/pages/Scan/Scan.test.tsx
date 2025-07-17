@@ -167,7 +167,7 @@ describe("Scan Tab", () => {
   test("Nav to identifier after scan duplicate multisig", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.SCAN, TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.SCAN, TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -210,7 +210,7 @@ describe("Scan Tab", () => {
 
     await waitFor(() => {
       expect(historyPushMock).toBeCalledWith({
-        pathname: TabsRoutePath.IDENTIFIERS,
+        pathname: TabsRoutePath.CREDENTIALS,
       });
     });
   });

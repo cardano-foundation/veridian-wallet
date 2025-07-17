@@ -11,8 +11,10 @@ import {
   AcdcStateChangedEvent,
   ConnectionStateChangedEvent,
 } from "../../../core/agent/event.types";
+import { BasicRecord } from "../../../core/agent/records";
 import { IdentifierService } from "../../../core/agent/services";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
 import {
   PeerConnectSigningEvent,
@@ -36,13 +38,11 @@ import {
   setFavouritesCredsCache,
   updateOrAddCredsCache,
 } from "../../../store/reducers/credsCache";
+import { FavouriteCredential } from "../../../store/reducers/credsCache/credCache.types";
 import {
-  setFavouritesIdentifiersCache,
   setIdentifiersCache,
-  setIdentifiersFilters,
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
-import { FavouriteIdentifier } from "../../../store/reducers/identifiersCache/identifiersCache.types";
 import { setNotificationsCache } from "../../../store/reducers/notificationsCache";
 import {
   getAuthentication,
@@ -60,13 +60,13 @@ import {
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
   setToastMsg,
-  showNoWitnessAlert,
-  updateCurrentProfile,
+  showNoWitnessAlert
 } from "../../../store/reducers/stateCache";
 import {
   IncomingRequestType,
   InitializationPhase,
 } from "../../../store/reducers/stateCache/stateCache.types";
+import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
   setCredentialViewTypeCache,
   setIdentifierFavouriteIndex,
@@ -81,7 +81,6 @@ import {
 } from "../../../store/reducers/walletConnectionsCache";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
-import { IdentifiersFilters } from "../../pages/Identifiers/Identifiers.types";
 import { showError } from "../../utils/error";
 import { Alert } from "../Alert";
 import { CardListViewType } from "../SwitchCardView";
@@ -94,9 +93,6 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
-import { BasicRecord } from "../../../core/agent/records";
-import { filterProfileData } from "../../../store/reducers/stateCache/utils";
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -460,8 +456,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let identifiersSelectedFilter: IdentifiersFilters =
-        IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
         CredentialsFilters.All;
       const passcodeIsSet = await SecureStorage.keyExists(
@@ -482,23 +476,13 @@ const AppWrapper = (props: { children: ReactNode }) => {
         MiscRecordId.APP_RECOVERY_WALLET
       );
 
-      const identifiersFavourites = await Agent.agent.basicStorage.findById(
-        MiscRecordId.IDENTIFIERS_FAVOURITES
-      );
-      if (identifiersFavourites)
-        dispatch(
-          setFavouritesIdentifiersCache(
-            identifiersFavourites.content.favourites as FavouriteIdentifier[]
-          )
-        );
-
       const credsFavourites = await Agent.agent.basicStorage.findById(
         MiscRecordId.CREDS_FAVOURITES
       );
       if (credsFavourites) {
         dispatch(
           setFavouritesCredsCache(
-            credsFavourites.content.favourites as FavouriteIdentifier[]
+            credsFavourites.content.favourites as FavouriteCredential[]
           )
         );
       }
@@ -511,17 +495,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
             indentifierViewType.content.viewType as CardListViewType
           )
         );
-      }
-
-      const indentifiersFilters = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_IDENTIFIER_SELECTED_FILTER
-      );
-      if (indentifiersFilters) {
-        identifiersSelectedFilter = indentifiersFilters.content
-          .filter as IdentifiersFilters;
-      }
-      if (identifiersSelectedFilter) {
-        dispatch(setIdentifiersFilters(identifiersSelectedFilter));
       }
 
       const credViewType = await Agent.agent.basicStorage.findById(
@@ -777,5 +750,6 @@ export {
   peerConnectRequestSignChangeHandler,
   peerConnectedChangeHandler,
   peerConnectionBrokenChangeHandler,
-  peerDisconnectedChangeHandler,
+  peerDisconnectedChangeHandler
 };
+

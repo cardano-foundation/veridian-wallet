@@ -102,7 +102,7 @@ const SetupConnections = ({
     dispatch(setScanGroupId(undefined));
     if (multiSigGroup?.groupId && !preventRedirect) {
       history.push({
-        pathname: TabsRoutePath.IDENTIFIERS,
+        pathname: TabsRoutePath.CREDENTIALS,
       });
     }
   };
@@ -213,13 +213,9 @@ const SetupConnections = ({
         isOpen={alertDeleteOpen}
         setIsOpen={setAlertDeleteOpen}
         dataTestId="alert-confirm-identifier-delete-details"
-        headerText={i18n.t("tabs.identifiers.details.delete.alert.title")}
-        confirmButtonText={`${i18n.t(
-          "tabs.identifiers.details.delete.alert.confirm"
-        )}`}
-        cancelButtonText={`${i18n.t(
-          "tabs.identifiers.details.delete.alert.cancel"
-        )}`}
+        headerText={i18n.t("profiledetails.delete.alert.title")}
+        confirmButtonText={`${i18n.t("profiledetails.delete.alert.confirm")}`}
+        cancelButtonText={`${i18n.t("profiledetails.delete.alert.cancel")}`}
         actionConfirm={() => handleAuthentication()}
         actionCancel={() => setAlertDeleteOpen(false)}
         actionDismiss={() => setAlertDeleteOpen(false)}

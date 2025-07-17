@@ -159,10 +159,8 @@ const EditIdentifier = ({
           <PageHeader
             closeButton={true}
             closeButtonAction={handleCancel}
-            closeButtonLabel={`${i18n.t(
-              "tabs.identifiers.details.options.cancel"
-            )}`}
-            title={`${i18n.t("tabs.identifiers.details.options.edit")}`}
+            closeButtonLabel={`${i18n.t("profiledetails.options.cancel")}`}
+            title={`${i18n.t("profiledetails.options.edit")}`}
           />
         }
         pageId={pageId}
@@ -171,7 +169,7 @@ const EditIdentifier = ({
             customClass={keyboardIsOpen ? "ion-hide" : undefined}
             pageId={pageId}
             primaryButtonText={`${i18n.t(
-              "tabs.identifiers.details.options.inner.confirm"
+              "profiledetails.options.inner.confirm"
             )}`}
             primaryButtonAction={handleSubmit}
             primaryButtonDisabled={!verifyDisplayName}
@@ -181,7 +179,7 @@ const EditIdentifier = ({
         <div className={`indentifier-input${hasError ? " has-error" : ""}`}>
           <CustomInput
             dataTestId="edit-name-input"
-            title={`${i18n.t("tabs.identifiers.details.options.inner.label")}`}
+            title={`${i18n.t("profiledetails.options.inner.label")}`}
             hiddenInput={false}
             autofocus={true}
             onChangeInput={handleChangeName}
@@ -195,7 +193,7 @@ const EditIdentifier = ({
           ) : null}
         </div>
         <span className="theme-input-title">{`${i18n.t(
-          "tabs.identifiers.details.options.inner.color"
+          "profiledetails.options.inner.color"
         )}`}</span>
         <div className="card-theme">
           <IdentifierColorSelector
@@ -204,7 +202,7 @@ const EditIdentifier = ({
           />
         </div>
         <span className="theme-input-title">{`${i18n.t(
-          "tabs.identifiers.details.options.inner.theme"
+          "profiledetails.options.inner.theme"
         )}`}</span>
         <div className="card-theme">
           <IdentifierThemeSelector

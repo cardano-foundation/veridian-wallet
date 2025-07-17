@@ -1,11 +1,7 @@
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
-import { IdentifiersFilters } from "../../pages/Identifiers/Identifiers.types";
 import { NotificationFilters } from "../../pages/Notifications/Notification.types";
 
-type AllowedChipFilter =
-  | NotificationFilters
-  | IdentifiersFilters
-  | CredentialsFilters;
+type AllowedChipFilter = NotificationFilters | CredentialsFilters;
 interface FilterChipProps {
   filter: AllowedChipFilter;
   label: string;

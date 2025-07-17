@@ -189,7 +189,7 @@ describe("Wallet Connect Stage One", () => {
   test("Renders show missing identifier alert", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -262,7 +262,7 @@ describe("Wallet Connect Stage One", () => {
 describe("Wallet Connect Stage Two", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -360,7 +360,7 @@ describe("Wallet Connect Stage Two", () => {
 describe("Wallet Connect Request", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),

@@ -12,7 +12,6 @@ import { RoutePath } from "../index";
 import { setAuthentication } from "../../store/reducers/stateCache";
 import { DataProps } from "./nextRoute.types";
 import { OperationType } from "../../ui/globals/types";
-import { IdentifiersFilters } from "../../ui/pages/Identifiers/Identifiers.types";
 import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { TabsRoutePath } from "../paths";
@@ -78,12 +77,10 @@ describe("NextRoute", () => {
       },
       identifiersCache: {
         identifiers: {},
-        favourites: [],
         multiSigGroup: {
           groupId: "",
           connections: [],
         },
-        filters: IdentifiersFilters.All,
       },
       credsCache: {
         creds: [],
@@ -362,12 +359,10 @@ describe("getNextRoute", () => {
     },
     identifiersCache: {
       identifiers: {},
-      favourites: [],
       multiSigGroup: {
         groupId: "",
         connections: [],
       },
-      filters: IdentifiersFilters.All,
     },
     credsCache: { creds: [], favourites: [], filters: CredentialsFilters.All },
     credsArchivedCache: { creds: [] },

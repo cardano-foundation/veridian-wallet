@@ -70,7 +70,7 @@ jest.mock("react-router-dom", () => ({
 describe("Create group identifier - Setup Connection", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -346,7 +346,7 @@ describe("Create group identifier - Setup Connection", () => {
   describe("Resume Create Identifier", () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -466,15 +466,13 @@ describe("Create group identifier - Setup Connection", () => {
 
       await waitFor(() => {
         expect(
-          getByText(EN_TRANSLATIONS.tabs.identifiers.details.delete.alert.title)
+          getByText(EN_TRANSLATIONS.profiledetails.delete.alert.title)
         ).toBeInTheDocument();
       });
 
       act(() => {
         fireEvent.click(
-          getByText(
-            EN_TRANSLATIONS.tabs.identifiers.details.delete.alert.confirm
-          )
+          getByText(EN_TRANSLATIONS.profiledetails.delete.alert.confirm)
         );
       });
 
@@ -524,7 +522,7 @@ describe("Create group identifier - Setup Connection", () => {
   describe("Create group identifier - Setup Connection", () => {
     const baseState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),

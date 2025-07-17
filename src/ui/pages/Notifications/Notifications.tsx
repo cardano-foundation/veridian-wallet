@@ -28,7 +28,6 @@ import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types"
 import { TabLayout } from "../../components/layout/TabLayout";
 import { showError } from "../../utils/error";
 import { timeDifference } from "../../utils/formatters";
-import { IdentifiersFilters } from "../Identifiers/Identifiers.types";
 import { NotificationFilters } from "./Notification.types";
 import { NotificationItem } from "./NotificationItem";
 import "./Notifications.scss";
@@ -46,9 +45,9 @@ const Notifications = () => {
   const notifications = [...notificationsCache].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
-  const [selectedFilter, setSelectedFilter] = useState<
-    NotificationFilters | IdentifiersFilters
-  >(NotificationFilters.All);
+  const [selectedFilter, setSelectedFilter] = useState<NotificationFilters>(
+    NotificationFilters.All
+  );
   const earlierNotificationRef = useRef<EarlierNotificationRef>(null);
   const [selectedItem, setSelectedItem] = useState<KeriaNotification | null>(
     null

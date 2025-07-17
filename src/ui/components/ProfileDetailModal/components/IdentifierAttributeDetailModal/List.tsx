@@ -1,8 +1,8 @@
 import { IonIcon } from "@ionic/react";
 import { star } from "ionicons/icons";
 import { i18n } from "../../../../../i18n";
-import { CardBlock, CardDetailsItem } from "../../../../components/CardDetails";
-import { ListHeader } from "../../../../components/ListHeader";
+import { CardBlock, CardDetailsItem } from "../../../CardDetails";
+import { ListHeader } from "../../../ListHeader";
 import { ListProps } from "./IdentifierAttributeDetailModal.types";
 import { FallbackIcon } from "../../../FallbackIcon";
 
@@ -28,9 +28,7 @@ const List = ({ data, title, bottomText, fullText, mask }: ListProps) => {
                 item.isCurrentUser && (
                   <div className="user-label">
                     <IonIcon icon={star} />
-                    <span>
-                      {i18n.t("tabs.identifiers.details.detailmodal.you")}
-                    </span>
+                    <span>{i18n.t("profiledetails.detailmodal.you")}</span>
                   </div>
                 )
               }
