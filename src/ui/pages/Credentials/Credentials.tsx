@@ -48,10 +48,9 @@ import { CardType, ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
-import { StartAnimationSource } from "../Identifiers/Identifiers.types";
-import "./Credentials.scss";
-import { CredentialsFilters } from "./Credentials.types";
 import { Profiles } from "../Profiles";
+import "./Credentials.scss";
+import { CredentialsFilters, StartAnimationSource } from "./Credentials.types";
 
 const CLEAR_STATE_DELAY = 1000;
 

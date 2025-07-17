@@ -433,7 +433,7 @@ const CredentialDetailModule = ({
           header={
             <PageHeader
               closeButton={true}
-              closeButtonLabel={`${i18n.t("tabs.identifiers.details.done")}`}
+              closeButtonLabel={`${i18n.t("profiledetails.done")}`}
               closeButtonAction={() => onClose?.(BackReason.CLOSE)}
             />
           }

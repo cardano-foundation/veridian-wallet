@@ -333,7 +333,7 @@ const Scanner = forwardRef(
     ) => {
       await updateConnections(groupId);
       handleReset?.(
-        TabsRoutePath.IDENTIFIERS,
+        TabsRoutePath.CREDENTIALS,
         OperationType.OPEN_MULTISIG_IDENTIFIER
       );
     };
@@ -420,7 +420,7 @@ const Scanner = forwardRef(
         }
 
         dispatch(setOpenMultiSigId(urlId));
-        handleReset?.(TabsRoutePath.IDENTIFIERS);
+        handleReset?.(TabsRoutePath.CREDENTIALS);
         return;
       } else {
         dispatch(setOpenConnectionId(urlId));

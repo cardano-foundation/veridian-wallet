@@ -22,6 +22,7 @@ import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
 import { ProfileDetailModal } from "../../components/ProfileDetailModal";
+import { Settings } from "../../components/Settings";
 import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
@@ -32,7 +33,6 @@ import {
   ProfileItemsProps,
   ProfilesProps,
 } from "./Profiles.types";
-import { Settings } from "../../components/Settings";
 
 const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
   if (!identifier) return null;

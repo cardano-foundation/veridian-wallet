@@ -12,8 +12,8 @@ import {
   CardBlock,
   CardDetailsContent,
   CardDetailsItem,
-} from "../../../../components/CardDetails";
-import { ListHeader } from "../../../../components/ListHeader";
+} from "../../../CardDetails";
+import { ListHeader } from "../../../ListHeader";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -52,9 +52,7 @@ const Advanced = ({ data, currentUserIndex }: AdvancedProps) => {
   return (
     <>
       <ListHeader
-        title={i18n.t(
-          "tabs.identifiers.details.detailmodal.advanceddetail.title"
-        )}
+        title={i18n.t("profiledetails.detailmodal.advanceddetail.title")}
       />
       {isMultisig && (
         <>
@@ -75,7 +73,7 @@ const Advanced = ({ data, currentUserIndex }: AdvancedProps) => {
               >
                 <span>
                   {i18n.t(
-                    `tabs.identifiers.details.detailmodal.advanceddetail.${
+                    `profiledetails.detailmodal.advanceddetail.${
                       !isShowSigningList ? "viewkey" : "hidekey"
                     }`,
                     {
@@ -101,9 +99,7 @@ const Advanced = ({ data, currentUserIndex }: AdvancedProps) => {
                         })}
                       >
                         <IonIcon icon={star} />
-                        <span>
-                          {i18n.t("tabs.identifiers.details.detailmodal.you")}
-                        </span>
+                        <span>{i18n.t("profiledetails.detailmodal.you")}</span>
                       </div>
                     }
                   />
@@ -120,7 +116,7 @@ const Advanced = ({ data, currentUserIndex }: AdvancedProps) => {
               >
                 <span>
                   {i18n.t(
-                    `tabs.identifiers.details.detailmodal.advanceddetail.${
+                    `profiledetails.detailmodal.advanceddetail.${
                       !isShowRotationKey ? "viewrotationkey" : "hiderotationkey"
                     }`,
                     {
@@ -148,16 +144,14 @@ const Advanced = ({ data, currentUserIndex }: AdvancedProps) => {
       )}
       {data.s && (
         <CardBlock
-          title={i18n.t(
-            "tabs.identifiers.details.keyrotation.sequencenumber.title"
-          )}
+          title={i18n.t("profiledetails.keyrotation.sequencenumber.title")}
           testId="sequence-number-block"
         >
           <CardDetailsContent
             testId="sequence-number"
             mainContent={data.s}
             subContent={`${i18n.t(
-              "tabs.identifiers.details.keyrotation.sequencenumber.lastrotate"
+              "profiledetails.keyrotation.sequencenumber.lastrotate"
             )}: ${formatShortDate(data.dt)} - ${formatTimeToSec(
               data.dt
             )} (${getUTCOffset(data.dt)})`}
