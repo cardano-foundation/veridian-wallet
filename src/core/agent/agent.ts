@@ -327,11 +327,6 @@ class Agent {
     await this.identifiers.syncKeriaIdentifiers();
     await this.credentials.syncKeriaCredentials();
 
-    // Validate and run any missed cloud migrations after recovery
-    if (this.storageSession instanceof SqliteSession) {
-      await this.storageSession.validateCloudMigrationsOnRecovery();
-    }
-
     await this.basicStorage.createOrUpdateBasicRecord(
       new BasicRecord({
         id: MiscRecordId.CLOUD_RECOVERY_STATUS,

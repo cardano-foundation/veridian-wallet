@@ -194,15 +194,20 @@ class IdentifierService extends AgentService {
       const parsed = parseHabName(queued);
       let metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">;
 
-      if (parsed.isGroupMember) {
+      if (
+        parsed.isGroupMember &&
+        parsed.groupMetadata?.groupId &&
+        parsed.groupMetadata?.userName !== undefined &&
+        parsed.groupMetadata?.groupInitiator !== undefined
+      ) {
         metadata = {
           theme: parsed.theme ? parseInt(parsed.theme, 10) : 0,
           displayName: parsed.displayName,
           groupMetadata: {
-            groupId: parsed.groupId!,
+            groupId: parsed.groupMetadata?.groupId,
             groupCreated: false,
-            groupInitiator: parsed.isInitiator!,
-            userName: parsed.userName!,
+            groupInitiator: parsed.groupMetadata?.groupInitiator,
+            userName: parsed.groupMetadata?.userName,
           },
         };
       } else {
@@ -585,16 +590,21 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
-      if (parsed.isGroupMember) {
+      if (
+        parsed.isGroupMember &&
+        parsed.groupMetadata?.groupId &&
+        parsed.groupMetadata?.userName !== undefined &&
+        parsed.groupMetadata?.groupInitiator !== undefined
+      ) {
         await this.identifierStorage.createIdentifierMetadataRecord({
           id: identifier.prefix,
           displayName: parsed.displayName,
           theme,
           groupMetadata: {
-            groupId: parsed.groupId!,
+            groupId: parsed.groupMetadata?.groupId,
             groupCreated: false,
-            groupInitiator: parsed.isInitiator!,
-            userName: parsed.userName!,
+            groupInitiator: parsed.groupMetadata?.groupInitiator,
+            userName: parsed.groupMetadata?.userName,
           },
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
@@ -647,13 +657,22 @@ class IdentifierService extends AgentService {
       }
 
       const mhabParsed = parseHabName(identifier.group.mhab.name);
+
+      if (
+        !mhabParsed.isGroupMember ||
+        !mhabParsed.groupMetadata?.groupId ||
+        mhabParsed.groupMetadata?.userName === undefined ||
+        mhabParsed.groupMetadata?.groupInitiator === undefined
+      ) {
+        throw new Error(IdentifierService.INVALID_QUEUED_DISPLAY_NAMES_FORMAT);
+      }
       // Mark as created
       await this.identifierStorage.updateIdentifierMetadata(groupMemberPre, {
         groupMetadata: {
-          groupId: mhabParsed.groupId!,
+          groupId: mhabParsed.groupMetadata?.groupId,
           groupCreated: true,
-          groupInitiator: mhabParsed.isInitiator!,
-          userName: mhabParsed.userName!,
+          groupInitiator: mhabParsed.groupMetadata?.groupInitiator,
+          userName: mhabParsed.groupMetadata?.userName,
         },
       });
 

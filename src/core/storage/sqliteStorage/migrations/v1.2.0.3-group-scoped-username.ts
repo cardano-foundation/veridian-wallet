@@ -97,7 +97,10 @@ export const MIGRATION_V1_2_0_3: HybridMigration = {
         );
         const newName = formatToV1_2_0_3({
           ...parts,
-          userName: "",
+          groupMetadata: {
+            ...parts.groupMetadata,
+            userName: parts.groupMetadata?.userName || "",
+          },
         });
         await signifyClient
           .identifiers()

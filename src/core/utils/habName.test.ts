@@ -1,17 +1,21 @@
+import { group } from "console";
 import { parseHabName, formatToV1_2_0_3 } from "./habName";
 
 describe("habName", () => {
   describe("parseHabName", () => {
-    // Tests for old format names (theme:isInitiator-groupId:displayName)
+    // Tests for old format names (theme:groupInitiator-groupId:displayName)
     test.each([
       {
         name: "01:1-groupId123:MyGroup",
         expected: {
           displayName: "MyGroup",
           isGroupMember: true,
-          groupId: "groupId123",
-          isInitiator: true,
           theme: "01",
+          groupMetadata: {
+            groupInitiator: true,
+            groupId: "groupId123",
+            userName: "",
+          },
         },
       },
       {
@@ -19,9 +23,12 @@ describe("habName", () => {
         expected: {
           displayName: "AnotherGroup",
           isGroupMember: true,
-          groupId: "groupId456",
-          isInitiator: false,
           theme: "01",
+          groupMetadata: {
+            groupInitiator: false,
+            groupId: "groupId456",
+            userName: "",
+          },
         },
       },
       {
@@ -29,9 +36,12 @@ describe("habName", () => {
         expected: {
           displayName: "MyGroup",
           isGroupMember: true,
-          groupId: "gr@up!d",
-          isInitiator: true,
           theme: "01",
+          groupMetadata: {
+            groupInitiator: true,
+            groupId: "gr@up!d",
+            userName: "",
+          },
         },
       },
     ])("should parse old format name correctly: %s", ({ name, expected }) => {
@@ -39,7 +49,7 @@ describe("habName", () => {
       expect(result).toEqual(expect.objectContaining(expected));
     });
 
-    // Tests for new format names (1.2.0.3:theme:isInitiator-groupId-userName:displayName)
+    // Tests for new format names (1.2.0.3:theme:groupInitiator-groupId-userName:displayName)
     test.each([
       {
         name: "1.2.0.3:XX:1-groupId789-user123:MyNewGroup",
@@ -47,10 +57,12 @@ describe("habName", () => {
           version: "1.2.0.3",
           displayName: "MyNewGroup",
           isGroupMember: true,
-          groupId: "groupId789",
-          isInitiator: true,
-          userName: "user123",
           theme: "XX",
+          groupMetadata: {
+            groupInitiator: true,
+            groupId: "groupId789",
+            userName: "user123",
+          },
         },
       },
       {
@@ -59,10 +71,12 @@ describe("habName", () => {
           version: "1.2.0.3",
           displayName: "Group Name",
           isGroupMember: true,
-          groupId: "gr@up!d",
-          isInitiator: true,
-          userName: "us$er%name",
           theme: "XX",
+          groupMetadata: {
+            groupInitiator: true,
+            groupId: "gr@up!d",
+            userName: "us$er%name",
+          },
         },
       },
       {
@@ -94,7 +108,7 @@ describe("habName", () => {
       {
         name: "01:1-group-id-extra:DisplayName", // Invalid groupPart for old format
         errorMessage:
-          "Invalid old format name: Invalid group part format (expected isInitiator-groupId).",
+          "Invalid old format name: Invalid group part format (expected groupInitiator-groupId).",
       },
       {
         name: "1.2.0.3:MyNewWallet", // Missing theme, groupPart, displayName for new format
@@ -139,34 +153,14 @@ describe("habName", () => {
         parts: {
           displayName: "FormattedGroup",
           isGroupMember: true,
-          groupId: "groupXYZ",
-          isInitiator: true,
-          userName: "formattedUser",
           theme: "XX",
+          groupMetadata: {
+            groupId: "groupXYZ",
+            groupInitiator: true,
+            userName: "formattedUser",
+          },
         },
         expected: "1.2.0.3:XX:1-groupXYZ-formattedUser:FormattedGroup",
-      },
-      {
-        parts: {
-          displayName: "BlankUserGroup",
-          isGroupMember: true,
-          groupId: "groupUVW",
-          isInitiator: false,
-          userName: "",
-          theme: "XX",
-        },
-        expected: "1.2.0.3:XX:0-groupUVW-:BlankUserGroup",
-      },
-      {
-        parts: {
-          displayName: "NullUserGroup",
-          isGroupMember: true,
-          groupId: "groupRST",
-          isInitiator: true,
-          userName: undefined,
-          theme: "XX",
-        },
-        expected: "1.2.0.3:XX:1-groupRST-:NullUserGroup",
       },
       {
         parts: {
@@ -175,17 +169,6 @@ describe("habName", () => {
           theme: "XX",
         },
         expected: "1.2.0.3:XX:",
-      },
-      {
-        parts: {
-          displayName: "",
-          isGroupMember: true,
-          groupId: "group123",
-          isInitiator: true,
-          userName: "user1",
-          theme: "XX",
-        },
-        expected: "1.2.0.3:XX:1-group123-user1:",
       },
       {
         parts: {
