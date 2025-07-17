@@ -32,6 +32,20 @@ export function parseHabName(name: string) {
       const groupParts = parts[2].split("-");
 
       if (groupParts.length === 3) {
+        if (groupParts[0] !== "1" && groupParts[0] !== "0") {
+          throw new Error(
+            "Invalid new format name: isInitiator must be 1 or 0."
+          );
+        }
+
+        if (!groupParts[1] || groupParts[1].trim() === "") {
+          throw new Error("Invalid new format name: groupId cannot be empty.");
+        }
+
+        if (!groupParts[2] || groupParts[2].trim() === "") {
+          throw new Error("Invalid new format name: userName cannot be empty.");
+        }
+
         return {
           version: parts[0],
           theme: parts[1],
@@ -63,6 +77,18 @@ export function parseHabName(name: string) {
       } else if (parts.length === 3) {
         const groupParts = parts[1].split("-");
         if (groupParts.length === 2) {
+          if (groupParts[0] !== "1" && groupParts[0] !== "0") {
+            throw new Error(
+              "Invalid old format name: isInitiator must be 1 or 0."
+            );
+          }
+
+          if (!groupParts[1] || groupParts[1].trim() === "") {
+            throw new Error(
+              "Invalid old format name: groupId cannot be empty."
+            );
+          }
+
           return {
             theme: parts[0],
             isGroupMember: true,
@@ -70,7 +96,15 @@ export function parseHabName(name: string) {
             isInitiator: groupParts[0] === "1",
             displayName: parts[2],
           };
+        } else {
+          throw new Error(
+            "Invalid old format name: Invalid group part format (expected isInitiator-groupId or empty"
+          );
         }
+      } else {
+        throw new Error(
+          "Invalid old format name: Invalid name format (expected theme:isInitiator-groupId:displayName or theme:displayName)."
+        );
       }
     }
   }
