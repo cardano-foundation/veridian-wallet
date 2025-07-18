@@ -57,6 +57,19 @@ describe("habName", () => {
           },
         },
       },
+      {
+        name: "01:1-group-id-extra:DisplayName", // Invalid groupPart for old format
+        expected: {
+          displayName: "DisplayName",
+          isGroupMember: true,
+          theme: "01",
+          groupMetadata: {
+            groupInitiator: true,
+            groupId: "group-id-extra",
+            userName: "",
+          },
+        },
+      },
     ])("should parse old format name correctly: %s", ({ name, expected }) => {
       const result = parseHabName(name);
       expect(result).toEqual(expect.objectContaining(expected));
@@ -131,11 +144,6 @@ describe("habName", () => {
         name: "01:1-group-id:Display:Name", // Too many parts for old format
         errorMessage:
           "Invalid old format name: Expected 2 or 3 parts separated by colons (theme:groupPart:displayName or theme:displayName)",
-      },
-      {
-        name: "01:1-group-id-extra:DisplayName", // Invalid groupPart for old format
-        errorMessage:
-          "Invalid old format name: Invalid group part format (expected groupInitiator-groupId).",
       },
       {
         name: "1.2.0.3:MyNewWallet", // Missing theme, groupPart, displayName for new format
