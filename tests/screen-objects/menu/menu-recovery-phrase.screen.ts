@@ -8,7 +8,7 @@ import { VerifyYourRecoveryPhraseScreen } from "../onboarding/verify-your-recove
 
 export class MenuRecoveryPhraseScreen {
   get backButton() {
-    return $('[data-testid="close-button"]');
+    return $("[data-testid='back-button']");
   }
 
   get screenTitle() {

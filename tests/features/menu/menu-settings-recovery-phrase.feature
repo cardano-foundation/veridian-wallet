@@ -8,7 +8,7 @@ Feature: Menu setting recovery phrase
 
   Scenario: C426 MenuSettingsRecoveryPhrase - Back to Menu Settings screen
     Given user tap on Back Button on Recovery Phrase screen
-    Then user can see Menu screen
+    Then user can see Menu Settings screen
 
   Scenario: C427 MenuSettingsRecoveryPhrase - Cancel on Stay safe modal
     Given user tap on View Recovery Button on Recovery Phrase screen

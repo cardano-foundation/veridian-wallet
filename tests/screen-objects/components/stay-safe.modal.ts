@@ -2,7 +2,7 @@ import { BaseModal } from "./base.modal.js";
 
 export class WelcomeModal extends BaseModal {
   get cancelButton() {
-    return $('[data-testid="close-button-label"]');
+    return $("[data-testid='confirm-view-seedpharse'] [data-testid='close-button']");
   }
 
   get screenCheckbox() {
