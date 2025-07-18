@@ -14,8 +14,13 @@ import {
   getNotificationsCache,
   markNotificationAsRead,
 } from "../../../store/reducers/notificationsCache";
-import { setCurrentRoute } from "../../../store/reducers/stateCache";
+import {
+  getAuthentication,
+  setCurrentRoute,
+} from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 import { CredentialDetailModal } from "../../components/CredentialDetailModule";
 import { FilterChip } from "../../components/FilterChip/FilterChip";
 import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types";
@@ -29,6 +34,7 @@ import "./Notifications.scss";
 import { EarlierNotification } from "./components";
 import { EarlierNotificationRef } from "./components/EarlierNotification.types";
 import { NotificationOptionsModal } from "./components/NotificationOptionsModal";
+import { Profiles } from "../Profiles";
 
 const Notifications = () => {
   const pageId = "notifications-tab";
@@ -47,6 +53,7 @@ const Notifications = () => {
     null
   );
   const [isOpenCredModal, setIsOpenCredModal] = useState(false);
+  const [openProfiles, setOpenProfiles] = useState(false);
   const [viewCred, setViewCred] = useState("");
   const [openUnknownConnectionAlert, setOpenUnknownConnectionAlert] =
     useState(false);
@@ -54,6 +61,7 @@ const Notifications = () => {
     openUnknownPresentConnectionAlert,
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
+  const authData = useAppSelector(getAuthentication);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
@@ -180,12 +188,32 @@ const Notifications = () => {
     setOpenUnknownPresentConnectionAlert(false);
   };
 
+  const handleAvatarClick = () => {
+    setOpenProfiles(true);
+  };
+
+  const AdditionalButtons = ({
+    handleAvatarClick,
+  }: {
+    handleAvatarClick: AvatarProps["handleAvatarClick"];
+  }) => {
+    return (
+      <Avatar
+        id={authData.defaultProfile}
+        handleAvatarClick={handleAvatarClick}
+      />
+    );
+  };
+
   return (
     <>
       <TabLayout
         pageId={pageId}
         header={true}
         title={`${i18n.t("tabs.notifications.tab.header")}`}
+        additionalButtons={
+          <AdditionalButtons handleAvatarClick={handleAvatarClick} />
+        }
       >
         <div className="notifications-tab-chips">
           {filterOptions.map((option) => (
@@ -244,6 +272,10 @@ const Notifications = () => {
           />
         )}
       </TabLayout>
+      <Profiles
+        isOpen={openProfiles}
+        setIsOpen={setOpenProfiles}
+      />
       <CredentialDetailModal
         pageId="revoke-credential"
         isOpen={isOpenCredModal}

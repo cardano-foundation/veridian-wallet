@@ -254,7 +254,7 @@ const MultiSigRequest = ({
                             >
                               <IonLabel>
                                 {connection.label ||
-                                  i18n.t("connections.unknown")}
+                                  i18n.t("tabs.connections.unknown")}
                               </IonLabel>
                             </IonCol>
                           </IonRow>

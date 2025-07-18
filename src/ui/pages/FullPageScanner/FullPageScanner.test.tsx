@@ -7,7 +7,7 @@ import {
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { OobiType } from "../../../core/agent/agent.types";
 import { TabsRoutePath } from "../../../routes/paths";
 import {
@@ -17,6 +17,7 @@ import {
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { OperationType } from "../../globals/types";
 import { FullPageScanner } from "./FullPageScanner";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -144,8 +145,6 @@ describe("Full page scanner", () => {
     );
   });
 
-  const mockStore = configureStore();
-
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.SCAN],
@@ -174,7 +173,7 @@ describe("Full page scanner", () => {
 
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -228,7 +227,7 @@ describe("Full page scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -284,7 +283,7 @@ describe("Full page scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -373,7 +372,7 @@ describe("Full page scanner", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

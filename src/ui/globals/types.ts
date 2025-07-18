@@ -83,6 +83,8 @@ enum ToastMsgType {
   DELETE_ACCOUNT_SUCCESS = "deleteaccountsuccess",
   REMOTE_SIGN_SUCCESS = "remotesignsuccess",
   UNKNOWN_ERROR = "unknownerror",
+  PROFILE_SWITCHED = "profileswitched",
+  UNABLE_TO_SWITCH_PROFILE = "unabletoswitchprofile",
 }
 
 const PASSCODE_MAPPING = {

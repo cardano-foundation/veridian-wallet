@@ -4,10 +4,10 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { filteredIdentifierMapFix } from "../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../__fixtures__/identifierFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { EditIdentifier } from "./EditIdentifier";
@@ -83,7 +83,6 @@ describe("Edit identifier", () => {
     updateMock.mockImplementation(() => Promise.resolve(true));
   });
   beforeAll(() => {
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
@@ -99,7 +98,7 @@ describe("Edit identifier", () => {
       },
     };
     mockedStore = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
   });

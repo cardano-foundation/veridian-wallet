@@ -100,7 +100,11 @@ const ConnectionsBody = ({
                       key={index}
                     >
                       <IonItemDivider id={alphabeticGroup.key}>
-                        <IonLabel>{alphabeticGroup.key}</IonLabel>
+                        <IonLabel
+                          data-testid={`connections-list-alphabetic-${alphabeticGroup.key}`}
+                        >
+                          {alphabeticGroup.key}
+                        </IonLabel>
                       </IonItemDivider>
                       <AlphabeticList
                         items={Array.from(alphabeticGroup.value)}

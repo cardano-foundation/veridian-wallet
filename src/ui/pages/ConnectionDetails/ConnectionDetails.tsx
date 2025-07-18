@@ -140,18 +140,18 @@ const ConnectionDetails = ({
 
   const connectionDetailsData = [
     {
-      title: i18n.t("connections.details.label"),
+      title: i18n.t("tabs.connections.details.label"),
       value: connectionDetails?.label,
     },
     {
-      title: i18n.t("connections.details.date"),
+      title: i18n.t("tabs.connections.details.date"),
       value: formatShortDate(`${connectionDetails?.createdAtUTC}`),
     },
     {
-      title: i18n.t("connections.details.endpoints"),
+      title: i18n.t("tabs.connections.details.endpoints"),
       value:
         connectionDetails?.serviceEndpoints?.toString() ||
-        i18n.t("connections.details.notavailable"),
+        i18n.t("tabs.connections.details.notavailable"),
     },
   ];
 
@@ -191,14 +191,14 @@ const ConnectionDetails = ({
             <PageHeader
               closeButton={true}
               closeButtonAction={handleCloseConnectionModal}
-              closeButtonLabel={`${i18n.t("connections.details.done")}`}
+              closeButtonLabel={`${i18n.t("tabs.connections.details.done")}`}
               currentPath={RoutePath.CONNECTION_DETAILS}
             />
           }
         >
           <PageFooter
             pageId={pageId}
-            deleteButtonText={`${i18n.t("connections.details.delete")}`}
+            deleteButtonText={`${i18n.t("tabs.connections.details.delete")}`}
             deleteButtonAction={() => deleteButtonAction()}
           />
         </CloudError>
@@ -211,7 +211,7 @@ const ConnectionDetails = ({
             <PageHeader
               closeButton={true}
               closeButtonAction={handleCloseConnectionModal}
-              closeButtonLabel={`${i18n.t("connections.details.done")}`}
+              closeButtonLabel={`${i18n.t("tabs.connections.details.done")}`}
               currentPath={RoutePath.CONNECTION_DETAILS}
               actionButton={true}
               actionButtonAction={() => setOptionsIsOpen(true)}
@@ -235,14 +235,16 @@ const ConnectionDetails = ({
                 data-testid="connection-details-segment-button"
               >
                 <IonLabel>{`${i18n.t(
-                  "connections.details.details"
+                  "tabs.connections.details.details"
                 )}`}</IonLabel>
               </IonSegmentButton>
               <IonSegmentButton
                 value="notes"
                 data-testid="connection-notes-segment-button"
               >
-                <IonLabel>{`${i18n.t("connections.details.notes")}`}</IonLabel>
+                <IonLabel>{`${i18n.t(
+                  "tabs.connections.details.notes"
+                )}`}</IonLabel>
               </IonSegmentButton>
             </IonSegment>
             {segmentValue === "details" ? (
@@ -265,7 +267,7 @@ const ConnectionDetails = ({
                 ))}
                 <CardDetailsBlock
                   className="connection-details-history"
-                  title={i18n.t("connections.details.history")}
+                  title={i18n.t("tabs.connections.details.history")}
                 >
                   {connectionHistory?.length > 0 &&
                     connectionHistory
@@ -289,7 +291,9 @@ const ConnectionDetails = ({
                 ) : (
                   <PageFooter
                     pageId={pageId}
-                    deleteButtonText={`${i18n.t("connections.details.delete")}`}
+                    deleteButtonText={`${i18n.t(
+                      "tabs.connections.details.delete"
+                    )}`}
                     deleteButtonAction={() => deleteButtonAction()}
                   />
                 )}
@@ -331,13 +335,13 @@ const ConnectionDetails = ({
         setIsOpen={setAlertDeleteConnectionIsOpen}
         dataTestId="alert-confirm-delete-connection"
         headerText={i18n.t(
-          "connections.details.options.alert.deleteconnection.title"
+          "tabs.connections.details.options.alert.deleteconnection.title"
         )}
         confirmButtonText={`${i18n.t(
-          "connections.details.options.alert.deleteconnection.confirm"
+          "tabs.connections.details.options.alert.deleteconnection.confirm"
         )}`}
         cancelButtonText={`${i18n.t(
-          "connections.details.options.alert.deleteconnection.cancel"
+          "tabs.connections.details.options.alert.deleteconnection.cancel"
         )}`}
         actionConfirm={() => handleAuthentication()}
         actionCancel={cancelDeleteConnection}

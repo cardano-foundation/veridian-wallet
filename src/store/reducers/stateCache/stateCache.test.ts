@@ -1,38 +1,35 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { PeerConnectionEventTypes } from "../../../core/cardano/walletConnect/peerConnection.types";
+import { RoutePath } from "../../../routes";
+import { OperationType } from "../../../ui/globals/types";
+import { RootState } from "../../index";
 import {
   AuthenticationCacheProps,
   CurrentRouteCacheProps,
+  dequeueIncomingRequest,
+  enqueueIncomingRequest,
   getAuthentication,
   getCurrentOperation,
   getCurrentRoute,
   getStateCache,
   initialState,
+  login,
   logout,
   setAuthentication,
-  enqueueIncomingRequest,
   setCurrentOperation,
   setCurrentRoute,
+  setIsOnline,
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
-  dequeueIncomingRequest,
+  showGenericError,
   StateCacheProps,
   stateCacheSlice,
-  login,
-  setIsOnline,
-  showGenericError,
-  showConnections,
-  clearStateCache,
 } from "./stateCache";
-import { RootState } from "../../index";
-import { RoutePath } from "../../../routes";
-import { OperationType } from "../../../ui/globals/types";
 import {
   IncomingRequestProps,
   IncomingRequestType,
-  InitializationPhase,
   PeerConnectSigningEventRequest,
 } from "./stateCache.types";
-import { PeerConnectionEventTypes } from "../../../core/cardano/walletConnect/peerConnection.types";
 
 const signingRequest: PeerConnectSigningEventRequest = {
   type: IncomingRequestType.PEER_CONNECT_SIGN,
@@ -66,13 +63,6 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialState, action);
 
     expect(nextState.showGenericError).toEqual(true);
-  });
-
-  test("should set showConnections", () => {
-    const action = showConnections(true);
-    const nextState = stateCacheSlice.reducer(initialState, action);
-
-    expect(nextState.showConnections).toEqual(true);
   });
 
   test("should set the current route cache", () => {
@@ -115,6 +105,7 @@ describe("State Cache", () => {
         lockedUntil: Date.now(),
       },
       firstAppLaunch: false,
+      defaultProfile: "",
     };
     const action = setAuthentication(authentication);
     const nextState = stateCacheSlice.reducer(initialState, action);
@@ -218,5 +209,35 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialStateMock, action);
     expect(nextState.queueIncomingRequest.queues.length).toEqual(1);
     expect(nextState.queueIncomingRequest.isProcessing).toEqual(true);
+  });
+
+  test("should set defaultProfile in authentication cache", () => {
+    const authentication: AuthenticationCacheProps = {
+      loggedIn: true,
+      userName: "testuser",
+      time: Date.now(),
+      passcodeIsSet: true,
+      seedPhraseIsSet: true,
+      passwordIsSet: true,
+      passwordIsSkipped: false,
+      ssiAgentIsSet: true,
+      ssiAgentUrl: "",
+      recoveryWalletProgress: false,
+      loginAttempt: {
+        attempts: 0,
+        lockedUntil: Date.now(),
+      },
+      firstAppLaunch: false,
+      defaultProfile: "profile-123",
+    };
+    const action = setAuthentication(authentication);
+    const nextState = stateCacheSlice.reducer(initialState, action);
+
+    expect(nextState.authentication.defaultProfile).toEqual("profile-123");
+    expect(nextState.authentication).toEqual(authentication);
+
+    const rootState = { stateCache: nextState } as RootState;
+    expect(getAuthentication(rootState).defaultProfile).toEqual("profile-123");
+    expect(getStateCache(rootState)).toEqual(nextState);
   });
 });

@@ -6,7 +6,6 @@ import {
 import { getDefaultNormalizer, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionHistoryItem,
@@ -26,6 +25,7 @@ import {
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { ConnectionDetails } from "./ConnectionDetails";
 import { ConnectionHistoryType } from "../../../core/agent/services/connectionService.types";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -78,7 +78,6 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const initialStateFull = {
   stateCache: {
@@ -144,7 +143,7 @@ describe("ConnectionDetails Page", () => {
 
   test("Open and Close ConnectionOptions", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -160,7 +159,7 @@ describe("ConnectionDetails Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.label)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.label)
       ).toBeVisible();
     });
 
@@ -175,7 +174,7 @@ describe("ConnectionDetails Page", () => {
 
   test("Delete button in the footer triggers a confirmation alert", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -200,8 +199,8 @@ describe("ConnectionDetails Page", () => {
     await waitFor(() =>
       expect(
         getByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deleteconnection
-            .title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert
+            .deleteconnection.title
         )
       ).toBeVisible()
     );
@@ -229,7 +228,7 @@ describe("ConnectionDetails Page", () => {
 
   test("Show loading spin when load data", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -249,7 +248,7 @@ describe("ConnectionDetails Page", () => {
 
   test("Hide loading spin after load data", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
     const handleCloseConnectionModal = jest.fn();
@@ -271,7 +270,7 @@ describe("ConnectionDetails Page", () => {
 
   test("Open Manage Connection notes modal", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -310,7 +309,7 @@ describe("ConnectionDetails Page", () => {
 
   test("We can switch between tabs", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -360,7 +359,7 @@ describe("ConnectionDetails Page", () => {
 
   test("Can restrict view to not be able to delete connection", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -430,7 +429,7 @@ describe("Checking the Connection Details Page when no notes are available", () 
 
   test("We can see the connection notes placeholder", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -459,7 +458,7 @@ describe("Checking the Connection Details Page when no notes are available", () 
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.nocurrentnotesext)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.nocurrentnotesext)
       ).toBeVisible();
     });
   });
@@ -497,7 +496,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
 
   test("We can see the connection notes being displayed", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -571,7 +570,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
       .mockResolvedValue(connectionDetails);
 
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -592,7 +591,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.connectedwith.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.connectedwith.replace(
             "{{ issuer }}",
             connectionDetails.label
           )}`
@@ -612,7 +611,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.issuance.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.issuance.replace(
             "{{ credential }}",
             historyEvents[0].credentialType
               ?.replace(/([A-Z][a-z])/g, " $1")
@@ -634,7 +633,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.requestpresent.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.requestpresent.replace(
             "{{ issuer }}",
             connectionDetails.label
           )}`
@@ -653,7 +652,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.presented.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.presented.replace(
             "{{ credentialType }}",
             historyEvents[3].credentialType
           )}`
@@ -670,7 +669,7 @@ describe("Checking the Connection Details Page when notes are available", () => 
     await waitFor(() => {
       expect(
         getByText(
-          `${EN_TRANSLATIONS.connections.details.update.replace(
+          `${EN_TRANSLATIONS.tabs.connections.details.update.replace(
             "{{ credential }}",
             historyEvents[1].credentialType
               ?.replace(/([A-Z][a-z])/g, " $1")
@@ -702,7 +701,7 @@ describe("Checking the Connection Details Page when connection is missing from t
 
   test("Connection exists in the database but not on Signify", async () => {
     const storeMocked = {
-      ...mockStore(initialStateFull),
+      ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
 
@@ -719,7 +718,7 @@ describe("Checking the Connection Details Page when connection is missing from t
     await waitFor(() => {
       expect(getByTestId("connection-details-cloud-error-page")).toBeVisible();
       expect(
-        getByText(EN_TRANSLATIONS.connections.details.clouderror, {
+        getByText(EN_TRANSLATIONS.tabs.connections.details.clouderror, {
           normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
         })
       ).toBeVisible();
@@ -732,8 +731,8 @@ describe("Checking the Connection Details Page when connection is missing from t
     await waitFor(() =>
       expect(
         getAllByText(
-          EN_TRANSLATIONS.connections.details.options.alert.deleteconnection
-            .title
+          EN_TRANSLATIONS.tabs.connections.details.options.alert
+            .deleteconnection.title
         )[0]
       ).toBeVisible()
     );

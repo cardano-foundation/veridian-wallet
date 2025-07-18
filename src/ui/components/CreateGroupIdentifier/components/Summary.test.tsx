@@ -1,18 +1,16 @@
-import { setupIonicReact } from "@ionic/react";
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+import { CreationStatus } from "../../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { store } from "../../../../store";
 import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { connectionsFix } from "../../../__fixtures__/connectionsFix";
 import { ToastMsgType } from "../../../globals/types";
 import { IdentifierColor } from "../../CreateIdentifier/components/IdentifierColorSelector";
-import { Summary } from "./Summary";
 import { Stage } from "../CreateGroupIdentifier.types";
-import { CreationStatus } from "../../../../core/agent/agent.types";
+import { Summary } from "./Summary";
+import { makeTestStore } from "../../../utils/makeTestStore";
 
 const createGroupMock = jest.fn();
 
@@ -27,8 +25,6 @@ jest.mock("../../../../core/agent/agent", () => ({
 }));
 
 describe("Create group identifier - Summary", () => {
-  const mockStore = configureStore();
-
   const stage4State = {
     identifierCreationStage: 4,
     displayNameValue: "Duke",
@@ -51,7 +47,7 @@ describe("Create group identifier - Summary", () => {
 
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(store.getState()),
+    ...makeTestStore(store.getState()),
     dispatch: dispatchMock,
   };
 

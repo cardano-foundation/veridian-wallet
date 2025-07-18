@@ -1,16 +1,15 @@
 import { fireEvent, render } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { IonReactMemoryRouter } from "@ionic/react-router";
 import { waitForIonicReact } from "@ionic/react-test-utils";
 import { act } from "react";
 import { TabsMenu, TabsRoutePath, tabsRoutes } from "./TabsMenu";
 import { setCurrentRoute } from "../../../../store/reducers/stateCache";
 import { notificationsFix } from "../../../__fixtures__/notificationsFix";
+import { makeTestStore } from "../../../utils/makeTestStore";
 
 describe("Tab menu", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -41,7 +40,7 @@ describe("Tab menu", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -90,7 +89,7 @@ describe("Tab menu", () => {
     };
 
     const storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: dispatchMock,
     };
 
@@ -126,7 +125,7 @@ describe("Tab menu", () => {
     };
 
     const storeMocked = {
-      ...mockStore(state),
+      ...makeTestStore(state),
       dispatch: dispatchMock,
     };
 

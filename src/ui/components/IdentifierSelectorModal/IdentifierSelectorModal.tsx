@@ -65,10 +65,12 @@ const IdentifierSelectorModal = ({
         activeStatus={open}
         header={
           <PageHeader
-            title={`${i18n.t("connections.page.indentifierselector.title")}`}
+            title={`${i18n.t(
+              "tabs.connections.tab.indentifierselector.title"
+            )}`}
             closeButton
             closeButtonLabel={`${i18n.t(
-              "connections.page.indentifierselector.button.cancel"
+              "tabs.connections.tab.indentifierselector.button.cancel"
             )}`}
             closeButtonAction={handleClose}
             hardwareBackButtonConfig={{
@@ -78,7 +80,7 @@ const IdentifierSelectorModal = ({
         }
       >
         <h2 className="title">
-          {i18n.t("connections.page.indentifierselector.message")}
+          {i18n.t("tabs.connections.tab.indentifierselector.message")}
         </h2>
         <IonContent className="identifier-list">
           <CardList
@@ -104,7 +106,7 @@ const IdentifierSelectorModal = ({
         </IonContent>
         <PageFooter
           primaryButtonText={`${i18n.t(
-            "connections.page.indentifierselector.button.confirm"
+            "tabs.connections.tab.indentifierselector.button.confirm"
           )}`}
           primaryButtonAction={handleConnectWallet}
           primaryButtonDisabled={!selectedIdentifier}

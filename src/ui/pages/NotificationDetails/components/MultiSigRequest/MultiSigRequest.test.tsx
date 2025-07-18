@@ -2,7 +2,7 @@ const verifySecretMock = jest.fn().mockResolvedValue(true);
 
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
+
 import { mockIonicReact } from "@ionic/react-test-utils";
 import { act } from "react";
 import { TabsRoutePath } from "../../../../../routes/paths";
@@ -18,6 +18,7 @@ import { setNotificationsCache } from "../../../../../store/reducers/notificatio
 import { MultiSigService } from "../../../../../core/agent/services/multiSigService";
 import { KeyStoreKeys } from "../../../../../core/storage";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 
 mockIonicReact();
 
@@ -65,7 +66,6 @@ jest.mock("../../../../../core/agent/agent", () => ({
   },
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 
 const initialState = {
@@ -95,7 +95,7 @@ const initialState = {
 describe("Multisign request", () => {
   test("Render and decline", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
     const { getByText, getByTestId } = render(
@@ -141,7 +141,7 @@ describe("Multisign request", () => {
 
   test("Accept", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -201,7 +201,7 @@ describe("Multisign request", () => {
 
   test("Show error page", async () => {
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 

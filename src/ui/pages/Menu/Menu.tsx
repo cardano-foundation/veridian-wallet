@@ -17,10 +17,7 @@ import { OptionalFeature } from "../../../core/configuration/configurationServic
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  setCurrentRoute,
-  showConnections,
-} from "../../../store/reducers/stateCache";
+import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import {
   getShowConnectWallet,
   showConnectWallet,
@@ -54,10 +51,6 @@ const Menu = () => {
 
   const handleOpenUrl = (key: SubMenuKey) => {
     switch (key) {
-      case SubMenuKey.Connections: {
-        dispatch(showConnections(true));
-        break;
-      }
       default:
         return;
     }
@@ -101,8 +94,7 @@ const Menu = () => {
     setSelectedOption(key);
   };
 
-  const closeSetting = () => setShowSubMenu(false);
-  const subMenuItems = SubMenuItems(showSelectedOption, closeSetting);
+  const subMenuItems = SubMenuItems();
 
   const selectSubmenu =
     selectedOption !== undefined
@@ -115,7 +107,6 @@ const Menu = () => {
         shape="round"
         className="settings-button"
         data-testid="settings-button"
-        onClick={() => showSelectedOption(SubMenuKey.Settings)}
       >
         <IonIcon
           slot="icon-only"

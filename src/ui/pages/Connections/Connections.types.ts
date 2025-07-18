@@ -10,11 +10,6 @@ interface ConnectionItemProps {
   handleShowConnectionDetails: (value: ConnectionShortDetails) => void;
 }
 
-interface ConnectionsComponentProps {
-  showConnections: boolean;
-  setShowConnections: (value: boolean) => void;
-}
-
 interface MappedConnections {
   key: string;
   value: ConnectionShortDetails[];
@@ -40,9 +35,8 @@ interface ConnectionRequestData {
 }
 
 export type {
-  ConnectionsOptionRef,
   ConnectionItemProps,
-  ConnectionsComponentProps,
-  MappedConnections,
   ConnectionRequestData,
+  ConnectionsOptionRef,
+  MappedConnections,
 };

@@ -36,13 +36,13 @@ const NotificationItem = ({
     switch (item.a.r) {
       case NotificationRoute.ExnIpexGrant:
         return t("tabs.notifications.tab.labels.exnipexgrant", {
-          connection: connectionName || t("connections.unknown"),
+          connection: connectionName || t("tabs.connections.unknown"),
         });
       case NotificationRoute.MultiSigIcp:
         return t("tabs.notifications.tab.labels.multisigicp", {
           connection:
             multisigConnectionsCache?.[item.connectionId]?.label ||
-            t("connections.unknown"),
+            t("tabs.connections.unknown"),
         });
       case NotificationRoute.ExnIpexApply: {
         if (
@@ -52,15 +52,15 @@ const NotificationItem = ({
         ) {
           const initiator = item.groupInitiatorPre
             ? multisigConnectionsCache[item.groupInitiatorPre].label
-            : t("connections.unknown");
+            : t("tabs.connections.unknown");
           return t("tabs.notifications.tab.labels.exnipexapplyproposed", {
-            connection: connectionName || t("connections.unknown"),
+            connection: connectionName || t("tabs.connections.unknown"),
             initiator,
           });
         }
 
         return t("tabs.notifications.tab.labels.exnipexapply", {
-          connection: connectionName || t("connections.unknown"),
+          connection: connectionName || t("tabs.connections.unknown"),
         });
       }
       case NotificationRoute.LocalAcdcRevoked:
@@ -69,17 +69,17 @@ const NotificationItem = ({
         });
       case NotificationRoute.MultiSigExn:
         return t("tabs.notifications.tab.labels.multisigexn", {
-          connection: connectionName || t("connections.unknown"),
+          connection: connectionName || t("tabs.connections.unknown"),
         });
       case NotificationRoute.RemoteSignReq:
         return t("tabs.notifications.tab.labels.sign", {
-          connection: connectionName || t("connections.unknown"),
+          connection: connectionName || t("tabs.connections.unknown"),
         });
       case NotificationRoute.HumanReadableMessage:
         return item.a.m as string;
       case NotificationRoute.LocalSingletonConnectInstructions:
         return t("tabs.notifications.tab.labels.connectinstructions", {
-          connection: item.a.name || t("connections.unknown"),
+          connection: item.a.name || t("tabs.connections.unknown"),
         });
       default:
         return "";

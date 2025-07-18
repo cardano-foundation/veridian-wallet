@@ -3,7 +3,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
-import configureStore from "redux-mock-store";
+
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { store } from "../../../store";
@@ -11,6 +11,7 @@ import { OperationType } from "../../globals/types";
 import { CreatePassword } from "../CreatePassword";
 import { SetPasscode } from "../SetPasscode";
 import { Onboarding } from "./index";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const exitApp = jest.fn();
 jest.mock("@capacitor/app", () => ({
@@ -112,7 +113,6 @@ describe("Onboarding Page", () => {
   });
 
   test("If the user has already set a passcode but they haven't created a password, they will be asked to create one", async () => {
-    const mockStore = configureStore();
     const initialState = {
       stateCache: {
         routes: [{ path: RoutePath.ONBOARDING }],
@@ -130,9 +130,9 @@ describe("Onboarding Page", () => {
         brand: "",
       },
     };
-    const storeMocked = mockStore(initialState);
+    const storeMocked = makeTestStore(initialState);
 
-    const { getByText, queryAllByText } = render(
+    const { getByText } = render(
       <MemoryRouter initialEntries={[RoutePath.ONBOARDING]}>
         <Provider store={storeMocked}>
           <Route
@@ -156,9 +156,9 @@ describe("Onboarding Page", () => {
     });
 
     await waitFor(() => {
-      expect(queryAllByText(EN_TRANSLATIONS.createpassword.title)).toHaveLength(
-        2
-      );
+      expect(
+        getByText(EN_TRANSLATIONS.createpassword.setuppassword.title)
+      ).toBeVisible();
     });
   });
 

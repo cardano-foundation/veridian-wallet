@@ -11,7 +11,6 @@ import { IonReactRouter } from "@ionic/react-router";
 import { act } from "react";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { KeyStoreKeys } from "../../../core/storage";
@@ -19,6 +18,7 @@ import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { store } from "../../../store";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { CreatePasscodeModule } from "./CreatePasscodeModule";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const isRepeativeMock = jest.fn(() => false);
 const isConsecutiveMock = jest.fn(() => false);
@@ -74,7 +74,6 @@ jest.mock("@ionic/react", () => {
   };
 });
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
@@ -92,7 +91,7 @@ const initialState = {
 };
 
 const storeMocked = {
-  ...mockStore(initialState),
+  ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
 

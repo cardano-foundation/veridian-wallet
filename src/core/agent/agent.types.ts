@@ -24,6 +24,7 @@ enum MiscRecordId {
   IDENTIFIERS_FAVOURITES = "identifiers-favourites",
   CREDS_FAVOURITES = "creds-favourites",
   USER_NAME = "user-name",
+  DEFAULT_PROFILE = "default-profile",
   APP_BIOMETRY = "app-biometry",
   KERIA_NOTIFICATION_MARKER = "keria-notification-marker",
   APP_IDENTIFIER_VIEW_TYPE = "app-identifier-view-type",
@@ -42,7 +43,7 @@ enum MiscRecordId {
   CLOUD_RECOVERY_STATUS = "cloud-recovery-status",
   IDENTIFIERS_PENDING_CREATION = "identifiers-pending-creation",
   MULTISIG_IDENTIFIERS_PENDING_CREATION = "multisig-identifiers-pending-creation",
-  APP_FIRST_INSTALL = "app-first-install",
+  IS_SETUP_PROFILE = "is-setup-profile",
   INDIVIDUAL_FIRST_CREATE = "individual-first-create",
   BIOMETRICS_SETUP = "biometrics-setup",
 }

@@ -5,10 +5,10 @@ import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { Route } from "react-router-dom";
-import configureStore from "redux-mock-store";
 import { KeyStoreKeys } from "../../../core/storage";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { GenerateSeedPhrase } from "../GenerateSeedPhrase";
 import { VerifySeedPhrase } from "../VerifySeedPhrase";
 
@@ -34,7 +34,6 @@ jest.mock("../../../core/storage", () => ({
 const MNEMONIC_WORDS = 18;
 
 describe("Verify Seed Phrase Page", () => {
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
@@ -54,7 +53,7 @@ describe("Verify Seed Phrase Page", () => {
   };
 
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
   test("The user can navigate from Generate to Verify Seed Phrase page", async () => {
@@ -274,7 +273,6 @@ describe("Verify Seed Phrase Page", () => {
   });
 
   test("calls handleOnBack when back button is clicked", async () => {
-    const mockStore = configureStore();
     const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
@@ -293,7 +291,7 @@ describe("Verify Seed Phrase Page", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
     const history = createMemoryHistory();
@@ -454,7 +452,7 @@ describe("Verify Seed Phrase Page", () => {
 
     await waitFor(() => {
       const seedNumberElements = matchingSeedPhraseContainer.querySelectorAll(
-        'span[data-testid*="word-index-number"]'
+        "span[data-testid*=\"word-index-number\"]"
       );
       expect(seedNumberElements.length).toBe(MNEMONIC_WORDS);
     });
@@ -476,7 +474,7 @@ describe("Verify Seed Phrase Page", () => {
 
     await waitFor(() => {
       const seedNumberElements = originalSeedPhraseContainer.querySelectorAll(
-        'span[data-testid*="word-index-number"]'
+        "span[data-testid*=\"word-index-number\"]"
       );
       expect(seedNumberElements.length).toBe(0);
     });

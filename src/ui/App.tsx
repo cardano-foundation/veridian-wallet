@@ -211,7 +211,7 @@ const App = () => {
                   <IonSpinner name="circular" />
                 </div>
               )}
-              <div className={showScan ? "ion-hide" : ""}>
+              <div className={`app-router ${showScan ? "ion-hide" : ""}`}>
                 <Routes />
               </div>
               <LockPage />
