@@ -140,10 +140,8 @@ class MultiSigService extends AgentService {
     );
     const states = [mHab["state"], ...connectionStates];
 
-    const groupMetadata = mHabRecord.groupMetadata!;
-    const initiatorFlag = groupMetadata.groupInitiator ? "1" : "0";
-    const userNamePart = groupMetadata.userName || "";
-    const groupName = `${CURRENT_VERSION}:${mHabRecord.theme}:${initiatorFlag}-${groupMetadata.groupId}-${userNamePart}:${mHabRecord.displayName}`;
+    const groupMetadata = mHabRecord.groupMetadata;
+    const groupName = `${CURRENT_VERSION}:${mHabRecord.theme}:1-${groupMetadata.groupId}-${groupMetadata.userName}:${mHabRecord.displayName}`;
 
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)

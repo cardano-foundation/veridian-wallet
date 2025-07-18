@@ -1068,6 +1068,7 @@ describe("Creation of multi-sig", () => {
           "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
           "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
         ],
+        name: "1.2.0.3:0:0-groupid-testUser:Identifier 2",
       },
       {
         icp: [
@@ -1184,6 +1185,7 @@ describe("Creation of multi-sig", () => {
           "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
           "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
         ],
+        name: "1.2.0.3:0:0-groupid-testUser:Identifier 2",
       },
       {
         icp: [
