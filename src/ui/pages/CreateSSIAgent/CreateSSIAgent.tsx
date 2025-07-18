@@ -37,6 +37,7 @@ import {
 import {
   getStateCache,
   setCurrentOperation,
+  setDefaultProfile,
   setIsSetupProfile,
   setRecoveryCompleteNoInterruption,
 } from "../../../store/reducers/stateCache";
@@ -208,6 +209,30 @@ const CreateSSIAgent = () => {
               },
             })
           );
+        } else {
+          const oldestIdentifier = Object.values(identifiers).reduce(
+            (prev, curr) => {
+              return new Date(curr.createdAtUTC) < new Date(prev.createdAtUTC)
+                ? curr
+                : prev;
+            }
+          );
+
+          if (oldestIdentifier) {
+            Agent.agent.basicStorage
+              .createOrUpdateBasicRecord(
+                new BasicRecord({
+                  id: MiscRecordId.DEFAULT_PROFILE,
+                  content: { defaultProfile: oldestIdentifier.id },
+                })
+              )
+              .then(() => {
+                dispatch(setDefaultProfile(oldestIdentifier.id));
+              })
+              .catch((e) => {
+                showError("Cannot set default profile", e);
+              });
+          }
         }
 
         dispatch(setIsSetupProfile(mustSetupProfile));
@@ -215,7 +240,7 @@ const CreateSSIAgent = () => {
         showError("Unable to set first app launch", e);
       }
     },
-    [dispatch]
+    [dispatch, identifiers]
   );
 
   const handleRecoveryWallet = async () => {
@@ -290,7 +315,16 @@ const CreateSSIAgent = () => {
     if (isRecoveryMode && isOnline) {
       handAfterRecoveryWallet();
     }
-  }, [dispatch, handleClearState, stateCache, updateIsSetupProfile]);
+  }, [
+    dispatch,
+    handleClearState,
+    stateCache,
+    updateIsSetupProfile,
+    isRecoveryMode,
+    isOnline,
+    identifiers,
+    ionRouter,
+  ]);
 
   const handleCreateSSI = async () => {
     setLoading(true);

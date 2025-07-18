@@ -226,26 +226,7 @@ describe("Creds content", () => {
     fireEvent.click(getByTestId("related-identifier-name"));
 
     await waitFor(() => {
-      expect(getByTestId("credential-related-identifier-modal")).toBeVisible();
+      expect(getByTestId("credential-related-identifier-page")).toBeVisible();
     });
-
-    await waitFor(() =>
-      expect(
-        getByTestId("identifier-card-template-default-index-0")
-      ).toBeInTheDocument()
-    );
-    expect(
-      queryByTestId("delete-button-credential-related-identifier")
-    ).not.toBeInTheDocument();
-
-    act(() => {
-      fireEvent.click(getByTestId("identifier-options-button"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("share-identifier-option")).toBeInTheDocument();
-    });
-
-    expect(queryByTestId("delete-identifier-option")).not.toBeInTheDocument();
   });
 });

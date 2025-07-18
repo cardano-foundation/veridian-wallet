@@ -61,7 +61,7 @@ jest.mock("@ionic/react", () => ({
 const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
-    routes: [TabsRoutePath.IDENTIFIERS],
+    routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
       loggedIn: true,
       time: Date.now(),
@@ -95,7 +95,7 @@ describe("Wallet connect: empty history", () => {
   test("Confirm connect modal render empty history screen", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -136,7 +136,7 @@ describe("Wallet connect: empty history", () => {
   test("Connect wallet modal: scan QR when other connection connected", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -208,7 +208,7 @@ describe("Wallet connect: empty history", () => {
   test("Connect wallet modal: scan QR", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -263,7 +263,7 @@ describe("Wallet connect: empty history", () => {
   test("Connect wallet modal: alert identifier missing when create new connect", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -334,7 +334,7 @@ describe("Wallet connect: empty history", () => {
   test("Connect wallet modal: alert identifier missing when create new connect if we only have multi-sig or group identifiers", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -536,7 +536,7 @@ describe("Wallet connect", () => {
   test("Delete pending wallet connections", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -685,7 +685,7 @@ describe("Wallet connect", () => {
   test("Wallet connect modal: alert identifier missing", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -746,7 +746,7 @@ describe("Wallet connect", () => {
   test("Show connection modal after create connect to wallet", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -816,7 +816,7 @@ describe("Wallet connect", () => {
 
     const updatedStore = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),

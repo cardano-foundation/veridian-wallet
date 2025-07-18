@@ -5,25 +5,22 @@ import {
   personCircleOutline,
   settingsOutline,
 } from "ionicons/icons";
-import { useState } from "react";
-import { Agent } from "../../../core/agent/agent";
-import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
+import { useEffect, useState } from "react";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
-  getStateCache,
-  setAuthentication,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
-import { Settings } from "../../components/Setting";
+import { ProfileDetailModal } from "../../components/ProfileDetailModal";
+import { Settings } from "../../components/Settings";
 import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
+import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { ProfileSetup } from "../ProfileSetup";
 import "./Profiles.scss";
@@ -72,16 +69,14 @@ const OptionButton = ({ icon, text, action }: OptionButtonProps) => {
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
-  const authentication = useAppSelector(getAuthentication);
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const defaultProfile = stateCache.authentication.defaultProfile;
+  const { updateDefaultProfile, defaultProfile } = useProfile();
   const identifiersData = Object.values(identifiersDataCache);
-  const filteredIdentifiersData = identifiersData.filter(
-    (item) => item.id !== defaultProfile
-  );
+  const filteredIdentifiersData = identifiersData
+    .filter((item) => item.id !== defaultProfile)
+    .sort((prev, next) => prev.displayName.localeCompare(next.displayName));
   const [openSetting, setOpenSetting] = useState(false);
-
+  const [openProfileDetail, setOpenProfileDetail] = useState(false);
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
 
   const handleClose = () => {
@@ -101,18 +96,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
 
   const handleSelectProfile = async (id: string) => {
     try {
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
-          content: { defaultProfile: id },
-        })
-      );
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: id,
-        })
-      );
+      await updateDefaultProfile(id);
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
     } catch (e) {
@@ -126,6 +110,12 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   const handleCloseSetupProfile = () => setOpenSetupProfile(false);
+
+  useEffect(() => {
+    if (!defaultProfile) {
+      setOpenSetupProfile(true);
+    }
+  }, [defaultProfile]);
 
   return (
     <>
@@ -161,7 +151,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
             <OptionButton
               icon={personCircleOutline}
               text={`${i18n.t("profiles.options.manage")}`}
-              action={handleOpenSettings}
+              action={() => setOpenProfileDetail(true)}
             />
           </div>
           <div className="profiles-list">
@@ -207,6 +197,12 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           }}
         />
       </SideSlider>
+      <ProfileDetailModal
+        pageId="profile-detail"
+        isOpen={openProfileDetail}
+        setIsOpen={setOpenProfileDetail}
+        profileId={defaultProfile}
+      />
     </>
   );
 };

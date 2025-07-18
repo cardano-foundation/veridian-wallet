@@ -1,0 +1,257 @@
+.identifier-details-module {
+  .page-header {
+    .back-button {
+      background: var(--ion-color-neutral-100) !important;
+    }
+
+    ion-title {
+      h2 {
+        text-align: left;
+      }
+
+      &.ios {
+        margin-left: 3.5rem;
+      }
+
+      &.md {
+        margin-left: 0.75rem;
+      }
+    }
+  }
+
+  .card-details-content {
+    .profile-info {
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+
+      .avatar-button {
+        margin-right: 1rem;
+
+        &::part(native) {
+          height: 4.25rem;
+          width: 4.25rem;
+        }
+
+        span {
+          font-size: 2.75rem;
+        }
+      }
+
+      .profile-information {
+        .profile-information-value {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: 500;
+          line-height: 1.5rem;
+        }
+
+        .profile-information-text {
+          margin: 0;
+          font-size: 0.625rem;
+          line-height: 1rem;
+        }
+      }
+
+      @media screen and (min-width: 250px) and (max-width: 370px) {
+        flex-direction: column;
+        margin-top: 1rem;
+
+        .avatar-button {
+          margin-right: 0;
+
+          &::part(native) {
+            height: 3rem;
+            width: 3rem;
+          }
+
+          span {
+            font-size: 2rem;
+          }
+        }
+
+        ion-grid {
+          margin: 0;
+          width: 100%;
+
+          .profile-info-row {
+            justify-content: space-between;
+          }
+
+          .profile-information {
+            text-align: center;
+          }
+        }
+      }
+    }
+
+    .card-block {
+      margin: 0.75rem 0 0;
+
+      &.dapp-block .card-details-info-block-inner {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+
+      .identifier-id {
+        .card-details-info-content {
+          display: block;
+        }
+      }
+
+      &.flat-border-top {
+        margin-top: 0.25rem;
+      }
+    }
+  }
+
+  .creation-timestamp {
+    .card-details-info-block-data {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--ion-color-neutral-700);
+
+      .card-details-info-block-key {
+        display: block;
+        font-size: 1rem;
+        color: var(--ion-color-neutral-700);
+      }
+    }
+  }
+
+  .list-header {
+    margin: 1.5rem 0 0 !important;
+  }
+
+  .member:not(:last-child) {
+    margin-bottom: 0.75rem;
+  }
+
+  .view-more-members {
+    --background: var(--ion-color-neutral-300);
+    --border-radius: 0.5rem;
+    color: var(--ion-color-neutral-800);
+    width: 100%;
+    display: block;
+    margin-top: 1.25rem;
+    --box-shadow: none;
+    --padding-top: 0.625rem;
+    --padding-bottom: 0.625rem;
+    font-size: 1rem;
+    --background-activated: var(--ion-color-neutral-400);
+
+    &::part(native) {
+      border: none;
+    }
+  }
+
+  .page-footer {
+    margin-top: 1.5rem;
+    padding: 0;
+  }
+
+  .identifier-details-split-section {
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+
+    &.actions {
+      margin-top: 1.5rem;
+    }
+
+    .card-block {
+      width: 49%;
+
+      .card-details-info-block-inner {
+        height: 100%;
+      }
+    }
+
+    .profile-button {
+      --background: var(--ion-color-neutral-100);
+      --color: var(--ion-color-neutral-700);
+      --border-radius: 0.75rem;
+      width: 48.5%;
+      --padding-top: 0.5rem;
+      --padding-bottom: 0.5rem;
+      --background-activated: var(--ion-color-neutral-300);
+      --background-focus: var(--ion-color-neutral-300);
+      --background-hover: var(--ion-color-neutral-300);
+      --box-shadow: none;
+
+      span {
+        font-size: 1rem;
+        line-height: 1.5rem;
+      }
+
+      ion-icon {
+        margin-right: 0.25rem;
+      }
+
+      @media screen and (min-width: 250px) and (max-width: 370px) {
+        span {
+          font-size: 0.8rem;
+          line-height: 1.5rem;
+        }
+      }
+    }
+  }
+
+  .rotate-keys-button {
+    width: 100%;
+    --background: transparent;
+    --box-shadow: none;
+    margin: 0;
+    --background-activated: transparent;
+    min-height: auto;
+
+    p {
+      margin: 0 0.25rem 0 0;
+    }
+
+    p,
+    ion-icon {
+      color: var(--ion-color-primary-700);
+    }
+  }
+
+  .page-header {
+    margin-top: 0.625rem;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .identifier-details-split-section {
+      flex-direction: column;
+
+      .card-block {
+        width: auto;
+      }
+
+      .profile-button {
+        width: auto;
+      }
+    }
+
+    .creation-timestamp {
+      .card-details-info-block-data {
+        font-size: 0.75rem;
+
+        .card-details-info-block-key {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .view-more-members {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.identifier-card-detail-spinner-container {
+  height: calc(100vh - 11.5rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

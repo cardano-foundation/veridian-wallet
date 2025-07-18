@@ -69,7 +69,7 @@ const CardsStack = ({
 
     if (cardsType === CardType.IDENTIFIERS) {
       const data = cardsData[index] as IdentifierDetails;
-      pathname = `${TabsRoutePath.IDENTIFIERS}/${data.id}`;
+      pathname = `${TabsRoutePath.CREDENTIALS}/${data.id}`;
     } else {
       const data = cardsData[index] as CredentialShortDetails;
       pathname = `${TabsRoutePath.CREDENTIALS}/${data.id}`;

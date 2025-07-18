@@ -1,17 +1,16 @@
+import { IonReactRouter } from "@ionic/react-router";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { Route } from "react-router-dom";
-import { IonReactRouter } from "@ionic/react-router";
-import { CLEAR_STATE_DELAY, CardsStack, NAVIGATION_DELAY } from "./CardsStack";
-import { identifierFix } from "../../__fixtures__/identifierFix";
+import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import { store } from "../../../store";
-import { IdentifierDetails } from "../../pages/IdentifierDetails";
-import { TabsRoutePath } from "../navigation/TabsMenu";
+import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
+import { identifierFix } from "../../__fixtures__/identifierFix";
 import { CardType } from "../../globals/types";
 import { CredentialDetails } from "../../pages/CredentialDetails";
-import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
-import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
+import { TabsRoutePath } from "../navigation/TabsMenu";
+import { CardsStack, NAVIGATION_DELAY } from "./CardsStack";
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
@@ -97,45 +96,6 @@ describe("Cards Stack Component", () => {
     );
     const labelPending = getByText(CredentialStatus.PENDING);
     expect(labelPending).toBeInTheDocument();
-  });
-
-  test("It navigates to Identifier Details and back", async () => {
-    jest.useFakeTimers();
-    const { findByTestId } = render(
-      <IonReactRouter>
-        <Provider store={store}>
-          <CardsStack
-            name="example"
-            cardsType={CardType.IDENTIFIERS}
-            cardsData={identifierFix}
-          />
-          <Route
-            path={TabsRoutePath.IDENTIFIER_DETAILS}
-            component={IdentifierDetails}
-          />
-        </Provider>
-      </IonReactRouter>
-    );
-
-    const firstCard = await findByTestId(
-      "identifier-card-template-example-index-0"
-    );
-    await waitFor(() => expect(firstCard).not.toHaveClass("active"));
-
-    act(() => {
-      fireEvent.click(firstCard);
-      jest.advanceTimersByTime(NAVIGATION_DELAY);
-    });
-
-    await waitFor(() => expect(firstCard).toHaveClass("active"));
-
-    const doneButton = await findByTestId("close-button");
-    act(() => {
-      fireEvent.click(doneButton);
-      jest.advanceTimersByTime(CLEAR_STATE_DELAY);
-    });
-
-    await waitFor(() => expect(firstCard).not.toHaveClass("active"));
   });
 
   test("It navigates to Credential Details", async () => {

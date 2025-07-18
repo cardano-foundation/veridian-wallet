@@ -44,7 +44,7 @@ const dispatchMock = jest.fn();
 
 const initState = {
   stateCache: {
-    routes: [TabsRoutePath.IDENTIFIERS],
+    routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
       loggedIn: true,
       time: Date.now(),
@@ -108,7 +108,7 @@ describe("Verification", () => {
   test("Show password when biometric auth fail", async () => {
     const initState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
