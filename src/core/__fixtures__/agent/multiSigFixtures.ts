@@ -845,12 +845,12 @@ const linkedContacts = [
     oobi: "http://127.0.0.1:3902/oobi/ENsj-3icUgAutHtrUHYnUPnP8RiafT5tOdVIZarFHuyP/agent/EF_dfLFGvUh9kMsV2LIJQtrkuXWG_-wxWzC_XjCWjlkQ",
     status: ConnectionStatus.CONFIRMED,
     createdAtUTC: new Date().toISOString(),
-    groupId: "group-id",
+    groupId: "groupid",
   },
 ];
 
 const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
-  name: "1.2.0.3:1-group-id-testUser:Identifier 2",
+  name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
   data: inceptionDataFix,
   initiator: true,
   groupConnections: linkedContacts,

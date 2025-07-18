@@ -442,6 +442,7 @@ describe("Creation of multi-sig", () => {
           "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
           "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
         ],
+        name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
       },
       {
         icp: [
