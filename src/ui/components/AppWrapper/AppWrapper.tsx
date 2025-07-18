@@ -69,9 +69,8 @@ import {
 } from "../../../store/reducers/stateCache/stateCache.types";
 import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
+  setCredentialFavouriteIndex,
   setCredentialViewTypeCache,
-  setIdentifierFavouriteIndex,
-  setIdentifierViewTypeCache,
 } from "../../../store/reducers/viewTypeCache";
 import {
   ConnectionData,
@@ -457,6 +456,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
+      let defaultProfile = "";
       let credentialsSelectedFilter: CredentialsFilters =
         CredentialsFilters.All;
       const passcodeIsSet = await SecureStorage.keyExists(
@@ -484,16 +484,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
         dispatch(
           setFavouritesCredsCache(
             credsFavourites.content.favourites as FavouriteCredential[]
-          )
-        );
-      }
-      const indentifierViewType = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_IDENTIFIER_VIEW_TYPE
-      );
-      if (indentifierViewType) {
-        dispatch(
-          setIdentifierViewTypeCache(
-            indentifierViewType.content.viewType as CardListViewType
           )
         );
       }
@@ -530,16 +520,36 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX
+      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
+        MiscRecordId.DEFAULT_PROFILE
       );
 
-      if (identifierFavouriteIndex) {
-        dispatch(
-          setIdentifierFavouriteIndex(
-            Number(identifierFavouriteIndex.content.favouriteIndex)
-          )
-        );
+      if (appDefaultProfileRecord) {
+        defaultProfile = (
+          appDefaultProfileRecord.content as { defaultProfile: string }
+        ).defaultProfile;
+      } else {
+        const storedIdentifiers =
+          await Agent.agent.identifiers.getIdentifiers();
+        if (storedIdentifiers.length > 0) {
+          // If we have no default profile set, we will set the oldest identifier as default.
+          const oldest = storedIdentifiers
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(a.createdAtUTC).getTime() -
+                new Date(b.createdAtUTC).getTime()
+            )[0];
+          const id = oldest?.id || "";
+          defaultProfile = id;
+
+          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+            new BasicRecord({
+              id: MiscRecordId.DEFAULT_PROFILE,
+              content: { defaultProfile: id },
+            })
+          );
+        }
       }
 
       const credFavouriteIndex = await Agent.agent.basicStorage.findById(
@@ -548,7 +558,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
       if (credFavouriteIndex) {
         dispatch(
-          setIdentifierFavouriteIndex(
+          setCredentialFavouriteIndex(
             Number(credFavouriteIndex.content.favouriteIndex)
           )
         );

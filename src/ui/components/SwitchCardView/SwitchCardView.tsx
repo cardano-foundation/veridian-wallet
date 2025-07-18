@@ -1,26 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { Agent } from "../../../core/agent/agent";
+import { MiscRecordId } from "../../../core/agent/agent.types";
+import { BasicRecord } from "../../../core/agent/records";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
-import { CardType } from "../../globals/types";
+import { TabsRoutePath } from "../../../routes/paths";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { setCurrentRoute } from "../../../store/reducers/stateCache";
+import {
+  getCredentialViewTypeCache,
+  setCredentialViewTypeCache,
+} from "../../../store/reducers/viewTypeCache";
 import { combineClassNames } from "../../utils/style";
 import { CardsStack } from "../CardsStack";
 import { ListHeader } from "../ListHeader";
 import { CardList } from "./CardList";
 import "./SwitchCardView.scss";
 import { CardListViewType, SwitchCardViewProps } from "./SwitchCardView.types";
-import { TabsRoutePath } from "../../../routes/paths";
-import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  getCredentialViewTypeCache,
-  getIdentifierViewTypeCache,
-  setCredentialViewTypeCache,
-  setIdentifierViewTypeCache,
-} from "../../../store/reducers/viewTypeCache";
-import { Agent } from "../../../core/agent/agent";
-import { setCurrentRoute } from "../../../store/reducers/stateCache";
 
 const SwitchCardView = ({
   title,
@@ -36,12 +33,8 @@ const SwitchCardView = ({
   const history = useHistory();
   const dispatch = useAppDispatch();
   const [type, setType] = useState<CardListViewType>(CardListViewType.Stack);
-  const identifierViewTypeCache = useAppSelector(getIdentifierViewTypeCache);
   const credViewTypeCache = useAppSelector(getCredentialViewTypeCache);
-  const isIdentifier = cardTypes === CardType.IDENTIFIERS;
-  const viewTypeCache = isIdentifier
-    ? identifierViewTypeCache
-    : credViewTypeCache;
+  const viewTypeCache = credViewTypeCache;
 
   const setViewType = useCallback(
     (viewType: CardListViewType) => {
@@ -49,21 +42,15 @@ const SwitchCardView = ({
       Agent.agent.basicStorage
         .createOrUpdateBasicRecord(
           new BasicRecord({
-            id: isIdentifier
-              ? MiscRecordId.APP_IDENTIFIER_VIEW_TYPE
-              : MiscRecordId.APP_CRED_VIEW_TYPE,
+            id: MiscRecordId.APP_CRED_VIEW_TYPE,
             content: { viewType },
           })
         )
         .then(() => {
-          dispatch(
-            isIdentifier
-              ? setIdentifierViewTypeCache(viewType)
-              : setCredentialViewTypeCache(viewType)
-          );
+          dispatch(setCredentialViewTypeCache(viewType));
         });
     },
-    [dispatch, isIdentifier]
+    [dispatch]
   );
 
   useEffect(() => {
