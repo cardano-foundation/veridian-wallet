@@ -14,7 +14,7 @@ const memberMetadataRecordProps: IdentifierMetadataRecordProps = {
   createdAt: now,
   theme: 0,
   groupMetadata: {
-    groupId: "group-id",
+    groupId: "groupid",
     groupInitiator: true,
     groupCreated: false,
     userName: "testUser",

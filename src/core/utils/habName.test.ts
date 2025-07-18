@@ -44,6 +44,19 @@ describe("habName", () => {
           },
         },
       },
+      {
+        name: "01:1-group-with-hyphens:MyGroup",
+        expected: {
+          displayName: "MyGroup",
+          isGroupMember: true,
+          theme: "01",
+          groupMetadata: {
+            groupInitiator: true,
+            groupId: "group-with-hyphens",
+            userName: "",
+          },
+        },
+      },
     ])("should parse old format name correctly: %s", ({ name, expected }) => {
       const result = parseHabName(name);
       expect(result).toEqual(expect.objectContaining(expected));
@@ -76,6 +89,20 @@ describe("habName", () => {
             groupInitiator: true,
             groupId: "gr@up!d",
             userName: "us$er%name",
+          },
+        },
+      },
+      {
+        name: "1.2.0.3:XX:1-group-with-hyphens-user123:MyNewGroup",
+        expected: {
+          version: "1.2.0.3",
+          displayName: "MyNewGroup",
+          isGroupMember: true,
+          theme: "XX",
+          groupMetadata: {
+            groupInitiator: true,
+            groupId: "group-with-hyphens",
+            userName: "user123",
           },
         },
       },

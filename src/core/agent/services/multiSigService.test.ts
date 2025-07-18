@@ -887,7 +887,7 @@ describe("Creation of multi-sig", () => {
     await multiSigService.joinGroup("id", "d");
 
     expect(identifierCreateIcpDataMock).toBeCalledWith(
-      "1.2.0.3:0:0-group-id-testUser:Identifier 2",
+      "1.2.0.3:0:0-groupid-testUser:Identifier 2",
       {
         algo: "group",
         mhab: getMemberIdentifierResponse,

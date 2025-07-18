@@ -35,14 +35,24 @@ export function parseHabName(name: string): HabNameParts {
       };
     }
 
-    const groupParts = parts[2].split("-");
-    if (groupParts.length !== 3) {
+    const groupPart = parts[2];
+    const firstHyphenIndex = groupPart.indexOf("-");
+    const lastHyphenIndex = groupPart.lastIndexOf("-");
+
+    if (
+      firstHyphenIndex === -1 ||
+      lastHyphenIndex === -1 ||
+      firstHyphenIndex === lastHyphenIndex
+    ) {
       throw new Error(
         "Invalid new format name: Invalid group part format (expected groupInitiator-groupId-userName)"
       );
     }
 
-    const [groupInitiatorStr, groupId, userName] = groupParts;
+    const groupInitiatorStr = groupPart.substring(0, firstHyphenIndex);
+    const groupId = groupPart.substring(firstHyphenIndex + 1, lastHyphenIndex);
+    const userName = groupPart.substring(lastHyphenIndex + 1);
+
     if (groupInitiatorStr !== "1" && groupInitiatorStr !== "0") {
       throw new Error(
         "Invalid new format name: groupInitiator must be 1 or 0."
@@ -90,14 +100,17 @@ export function parseHabName(name: string): HabNameParts {
     };
   }
 
-  const groupParts = parts[1].split("-");
-  if (groupParts.length !== 2) {
+  const groupPart = parts[1];
+  const firstHyphenIndex = groupPart.indexOf("-");
+
+  if (firstHyphenIndex === -1) {
     throw new Error(
       "Invalid old format name: Invalid group part format (expected groupInitiator-groupId)."
     );
   }
+  const groupInitiatorStr = groupPart.substring(0, firstHyphenIndex);
+  const groupId = groupPart.substring(firstHyphenIndex + 1);
 
-  const [groupInitiatorStr, groupId] = groupParts;
   if (groupInitiatorStr !== "1" && groupInitiatorStr !== "0") {
     throw new Error("Invalid old format name: groupInitiator must be 1 or 0.");
   }
