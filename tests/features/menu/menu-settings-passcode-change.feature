@@ -12,13 +12,13 @@ Feature: Menu setting passcode change
 
   Scenario: C184 MenuSettingsPasscodeChange - Cancel on create new passcode
     Given user enter passcode on Verify Passcode screen
-    When user tap Cancel button on Passcode screen from Setting screen
+    When user tap Cancel button on Passcode screen from Create new passcode
     Then user can see Menu Settings screen
 
   Scenario: C185 MenuSettingsPasscodeChange - Back on Re-enter new passcode
     Given user enter passcode on Verify Passcode screen
     When user enter a generated passcode on Passcode screen
-    And user tap Cancel button on Passcode screen from Setting screen
+    And user tap Cancel button on Passcode screen from Create new passcode
     Then user can see Create new passcode screen from Menu screen
 
   Scenario: C186 MenuSettingsPasscodeChange - Can't remember on Re-enter new passcode

@@ -19,7 +19,7 @@ export class MenuVerifyYourRecoveryPhraseScreen extends VerifyYourRecoveryPhrase
   }
 
   get cancelButton() {
-    return $$('[data-testid="close-button-label"]')[1];
+    return $("[data-testid='forgot-auth-info-modal-page'] [data-testid='close-button']");
   }
 
   get popUpDescriptionText() {

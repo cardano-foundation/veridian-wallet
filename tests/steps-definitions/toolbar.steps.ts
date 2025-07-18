@@ -4,6 +4,7 @@ import PasscodeScreen from "../screen-objects/onboarding/passcode.screen.js";
 import VerifyYourRecoveryPhraseScreen from "../screen-objects/onboarding/verify-your-recovery-phrase.screen.js";
 import BaseModal from "../screen-objects/components/base.modal.js";
 import MenuPasscodeScreen from "../screen-objects/menu/menu-passcode.screen";
+import ChangePinPage from "../screen-objects/components/change-pin-page";
 
 Given(
   /^user tap (Add|Plus) button on the screen$/,
@@ -40,3 +41,7 @@ When(
     await BaseModal.clickCloseButtonOf(VerifyYourRecoveryPhraseScreen.id);
   }
 );
+
+When(/^user tap Cancel button on Passcode screen from Create new passcode$/, async function() {
+  await ChangePinPage.tapOnCancelButton();
+});
