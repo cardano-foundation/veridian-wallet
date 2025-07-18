@@ -30,6 +30,7 @@
 
   .profiles-list-item {
     display: flex;
+    justify-content: space-between;
     width: 100%;
     padding: 1rem 0;
 
@@ -45,13 +46,57 @@
       }
     }
 
+    &-inner {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+    }
+
     &-name {
-      align-content: center;
       display: flex;
       flex-wrap: wrap;
+      align-content: center;
 
       @media screen and (min-width: 250px) and (max-width: 374px) {
         font-size: 0.8rem;
+      }
+    }
+
+    ion-chip {
+      min-height: 1.5rem;
+      line-height: 1rem;
+      border-radius: 0.25rem;
+      font-weight: 500;
+      font-size: 0.75rem;
+      color: var(--ion-color-neutral-100);
+      background: var(--ion-color-primary-700);
+      margin: 0;
+      padding: 0.25rem 0.5rem;
+
+      ion-icon {
+        width: 0.75rem;
+        height: 0.75rem;
+        margin: 0;
+        --ion-color-base: var(--ion-color-neutral-100) !important;
+      }
+
+      span {
+        text-transform: capitalize;
+        margin-left: 0.31rem;
+      }
+    }
+
+    @media screen and (min-width: 250px) and (max-width: 374px) {
+      ion-chip {
+        min-height: 1.2rem;
+        font-size: 0.65rem;
+
+        ion-icon {
+          width: 0.6rem;
+          height: 0.6rem;
+        }
       }
     }
   }
@@ -81,6 +126,15 @@
 
     &:not(:last-child) {
       margin-bottom: 0.5rem;
+    }
+
+    &.button-disabled {
+      color: var(--ion-color-neutral-800);
+      --background: var(--ion-color-neutral-400);
+
+      ion-icon {
+        --ion-color-base: var(--ion-color-neutral-800) !important;
+      }
     }
 
     ion-icon {

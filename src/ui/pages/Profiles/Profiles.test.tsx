@@ -12,6 +12,7 @@ import { Profiles } from "./Profiles";
 import { Agent } from "../../../core/agent/agent";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
+import { CreationStatus } from "../../../core/agent/agent.types";
 mockIonicReact();
 
 jest.mock("../../../core/configuration", () => ({
@@ -168,5 +169,34 @@ describe("Profiles", () => {
         setToastMsg(ToastMsgType.UNABLE_TO_SWITCH_PROFILE)
       );
     });
+  });
+
+  test("shows IonChip for identifier with creationStatus PENDING", async () => {
+    const setIsOpenMock = jest.fn();
+    const pendingIdentifier = filteredIdentifierFix.find(
+      (idObj) => idObj.creationStatus === CreationStatus.PENDING
+    );
+    if (!pendingIdentifier) {
+      throw new Error(
+        "No identifier with creationStatus PENDING found in fixture"
+      );
+    }
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <Profiles
+          isOpen
+          setIsOpen={setIsOpenMock}
+        />
+      </Provider>
+    );
+
+    const chip = await waitFor(() =>
+      getByTestId(`profiles-list-item-${pendingIdentifier.id}-status`)
+    );
+    expect(chip).toBeVisible();
+    expect(chip.textContent?.toLowerCase()).toContain(
+      CreationStatus.PENDING.toLowerCase()
+    );
   });
 });
