@@ -21,6 +21,7 @@ import {
   ToastMsgType,
 } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
+import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { Alert } from "../Alert";
@@ -58,6 +59,7 @@ const ProfileDetailModule = ({
   const [oobi, setOobi] = useState("");
   const [cloudError, setCloudError] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const { setRecentProfileAsDefault, defaultProfile } = useProfile();
 
   const fetchOobi = useCallback(async () => {
     try {
@@ -76,6 +78,8 @@ const ProfileDetailModule = ({
   }, [cardData?.id, userName, dispatch]);
 
   const getDetails = useCallback(async () => {
+    if (!profileId) return;
+
     try {
       const cardDetailsResult = await Agent.agent.identifiers.getIdentifier(
         profileId
@@ -116,6 +120,9 @@ const ProfileDetailModule = ({
       await deleteIdentifier();
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
       dispatch(removeIdentifierCache(filterId || ""));
+      if (defaultProfile === filterId) {
+        await setRecentProfileAsDefault();
+      }
     } catch (e) {
       showError(
         "Unable to delete identifier",

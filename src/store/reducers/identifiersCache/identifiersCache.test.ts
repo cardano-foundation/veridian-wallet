@@ -33,6 +33,7 @@ describe("identifiersCacheSlice", () => {
     identifiers: {},
     multiSigGroup: undefined,
     openMultiSigId: undefined,
+    profileHistories: [],
   };
 
   test("should return the initial state", () => {
