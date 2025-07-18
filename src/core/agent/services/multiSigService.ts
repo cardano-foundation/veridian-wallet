@@ -140,7 +140,10 @@ class MultiSigService extends AgentService {
     );
     const states = [mHab["state"], ...connectionStates];
 
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
+    const groupMetadata = mHabRecord.groupMetadata!;
+    const initiatorFlag = groupMetadata.groupInitiator ? "1" : "0";
+    const userNamePart = groupMetadata.userName || "";
+    const groupName = `${CURRENT_VERSION}:${mHabRecord.theme}:${initiatorFlag}-${groupMetadata.groupId}-${userNamePart}:${mHabRecord.displayName}`;
 
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
@@ -155,7 +158,7 @@ class MultiSigService extends AgentService {
           threshold,
         }
       );
-    await this.inceptGroup(mHab, states, inceptionData);
+    await this.inceptGroup(mHab, states, inceptionData, groupName);
 
     // Share witness OOBIs with other group members
     await this.shareWitnessOobis(mHab, groupConnections);
@@ -291,7 +294,8 @@ class MultiSigService extends AgentService {
   private async inceptGroup(
     mHab: HabState,
     states: State[],
-    inceptionData: CreateIdentifierBody
+    inceptionData: CreateIdentifierBody,
+    name?: string
   ): Promise<void> {
     try {
       await this.props.signifyClient
@@ -329,6 +333,7 @@ class MultiSigService extends AgentService {
         gid: serder.pre,
         smids: smids,
         rmids: smids,
+        name,
       },
       embeds,
       recp
@@ -473,7 +478,7 @@ class MultiSigService extends AgentService {
       .identifiers()
       .get(mHabRecord.id);
 
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
+    const groupName = exn.a.name;
 
     // @TODO - foconnor: We should error here if smids no longer matches once we have multi-sig rotation.
     const states = await Promise.all(
@@ -500,7 +505,7 @@ class MultiSigService extends AgentService {
         exn.e.icp.bt,
         exn.e.icp.b
       );
-    await this.inceptGroup(mHab, states, inceptionData);
+    await this.inceptGroup(mHab, states, inceptionData, groupName);
 
     const multisigId = inceptionData.icp.i;
     const creationStatus = CreationStatus.PENDING;

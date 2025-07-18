@@ -185,7 +185,7 @@ const memberPrefix = "EJpKquuibYTqpwMDqEFAFs0gwq0PASAHZ_iDmSF3I2Vg";
 
 beforeEach(async () => {
   jest.resetAllMocks();
-  jest.spyOn(utils, "randomSalt").mockReturnValue("group-id");
+  jest.spyOn(utils, "randomSalt").mockReturnValue("groupid");
   await new ConfigurationService().start();
 });
 
@@ -394,7 +394,7 @@ describe("Creation of multi-sig", () => {
 
     expectAllWitnessIntroductions();
     expect(identifierCreateIcpDataMock).toBeCalledWith(
-      "1.2.0.3:1-group-id-testUser:Identifier 2",
+      "1.2.0.3:0:1-groupid-testUser:Identifier 2",
       {
         algo: "group",
         mhab: getMemberIdentifierResponse,
@@ -420,7 +420,7 @@ describe("Creation of multi-sig", () => {
             { ...queuedIdentifier, name: "0:different identifier" },
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:1-group-id-testUser:Identifier 2",
+              name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
             },
           ],
         },
@@ -531,7 +531,7 @@ describe("Creation of multi-sig", () => {
       new IdentifierMetadataRecord({
         ...memberMetadataRecordProps,
         groupMetadata: {
-          groupId: "group-id",
+          groupId: "groupid",
           groupInitiator: false,
           groupCreated: false,
           userName: "",
@@ -581,7 +581,7 @@ describe("Creation of multi-sig", () => {
           queued: [
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:1-group-id-testUser:Identifier 2",
+              name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
             },
           ],
         },
@@ -701,7 +701,7 @@ describe("Creation of multi-sig", () => {
           queued: [
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:1-group-id-testUser:Identifier 2",
+              name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
             },
           ],
         },
@@ -887,7 +887,7 @@ describe("Creation of multi-sig", () => {
     await multiSigService.joinGroup("id", "d");
 
     expect(identifierCreateIcpDataMock).toBeCalledWith(
-      "1.2.0.3:0-group-id-testUser:Identifier 2",
+      "1.2.0.3:0:0-group-id-testUser:Identifier 2",
       {
         algo: "group",
         mhab: getMemberIdentifierResponse,
