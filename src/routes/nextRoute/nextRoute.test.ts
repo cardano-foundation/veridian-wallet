@@ -98,10 +98,6 @@ describe("NextRoute", () => {
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
@@ -376,10 +372,6 @@ describe("getNextRoute", () => {
       pendingConnection: null,
     },
     viewTypeCache: {
-      identifier: {
-        viewType: null,
-        favouriteIndex: 0,
-      },
       credential: {
         viewType: null,
         favouriteIndex: 0,
