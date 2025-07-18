@@ -351,15 +351,15 @@ class IpexCommunicationService extends AgentService {
       agreeNoteRecord.hidden = true;
     }
 
-    await this.operationPendingStorage.save({
-      id: op.name,
-      recordType: OperationPendingRecordType.ExchangePresentCredential,
-    });
-
     await this.createLinkedIpexMessageRecord(
       agreeExn,
       ConnectionHistoryType.IPEX_AGREE_COMPLETE
     );
+
+    await this.operationPendingStorage.save({
+      id: op.name,
+      recordType: OperationPendingRecordType.ExchangePresentCredential,
+    });
 
     await this.notificationStorage.update(agreeNoteRecord);
   }
