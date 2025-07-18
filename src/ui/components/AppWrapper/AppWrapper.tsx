@@ -65,9 +65,8 @@ import {
   InitializationPhase,
 } from "../../../store/reducers/stateCache/stateCache.types";
 import {
+  setCredentialFavouriteIndex,
   setCredentialViewTypeCache,
-  setIdentifierFavouriteIndex,
-  setIdentifierViewTypeCache,
 } from "../../../store/reducers/viewTypeCache";
 import {
   getConnectedWallet,
@@ -385,16 +384,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
           )
         );
       }
-      const indentifierViewType = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_IDENTIFIER_VIEW_TYPE
-      );
-      if (indentifierViewType) {
-        dispatch(
-          setIdentifierViewTypeCache(
-            indentifierViewType.content.viewType as CardListViewType
-          )
-        );
-      }
 
       const credViewType = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_CRED_VIEW_TYPE
@@ -460,25 +449,13 @@ const AppWrapper = (props: { children: ReactNode }) => {
         }
       }
 
-      const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX
-      );
-
-      if (identifierFavouriteIndex) {
-        dispatch(
-          setIdentifierFavouriteIndex(
-            Number(identifierFavouriteIndex.content.favouriteIndex)
-          )
-        );
-      }
-
       const credFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_CRED_FAVOURITE_INDEX
       );
 
       if (credFavouriteIndex) {
         dispatch(
-          setIdentifierFavouriteIndex(
+          setCredentialFavouriteIndex(
             Number(credFavouriteIndex.content.favouriteIndex)
           )
         );
