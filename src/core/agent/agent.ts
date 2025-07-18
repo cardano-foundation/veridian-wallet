@@ -35,6 +35,10 @@ import {
   PeerConnectionStorage,
   NotificationRecord,
   NotificationStorage,
+  ContactStorage,
+  ConnectionPairStorage,
+  ContactRecord,
+  ConnectionPairRecord,
 } from "./records";
 import { KeyStoreKeys, SecureStorage } from "../storage";
 import { SqliteSession } from "../storage/sqliteStorage/sqliteSession";
@@ -81,6 +85,8 @@ class Agent {
   private notificationStorage!: NotificationStorage;
   private peerConnectionStorage!: PeerConnectionStorage;
   private operationPendingStorage!: OperationPendingStorage;
+  private connectionPairStorage!: ConnectionPairStorage;
+  private contactStorage!: ContactStorage;
 
   private identifierService!: IdentifierService;
   private multiSigService!: MultiSigService;
@@ -144,7 +150,9 @@ class Agent {
         this.credentialStorage,
         this.operationPendingStorage,
         this.identifierStorage,
-        this.basicStorage
+        this.basicStorage,
+        this.connectionPairStorage,
+        this.contactStorage
       );
     }
     return this.connectionService;
@@ -433,11 +441,11 @@ class Agent {
   }
 
   async setupLocalDependencies(): Promise<void> {
-    await this.storageSession.open(walletId);
     this.agentServicesProps = {
       signifyClient: this.signifyClient,
       eventEmitter: new CoreEventEmitter(),
     };
+    await this.storageSession.open(walletId);
     this.basicStorageService = new BasicStorage(
       this.getStorageService<BasicRecord>(this.storageSession)
     );
@@ -459,6 +467,12 @@ class Agent {
     this.operationPendingStorage = new OperationPendingStorage(
       this.getStorageService<OperationPendingRecord>(this.storageSession),
       this.agentServicesProps.eventEmitter
+    );
+    this.connectionPairStorage = new ConnectionPairStorage(
+      this.getStorageService<ConnectionPairRecord>(this.storageSession)
+    );
+    this.contactStorage = new ContactStorage(
+      this.getStorageService<ContactRecord>(this.storageSession)
     );
     this.connections.onConnectionRemoved();
     this.connections.onConnectionAdded();

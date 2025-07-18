@@ -29,8 +29,10 @@ import {
 } from "../agent.types";
 import {
   BasicStorage,
+  ConnectionPairStorage,
   ConnectionRecord,
   ConnectionStorage,
+  ContactStorage,
   CredentialStorage,
   IdentifierStorage,
   OperationPendingStorage,
@@ -55,6 +57,8 @@ import {
 
 class ConnectionService extends AgentService {
   protected readonly connectionStorage!: ConnectionStorage;
+  protected readonly connectionPairStorage!: ConnectionPairStorage;
+  protected readonly contactStorage!: ContactStorage;
   protected readonly credentialStorage: CredentialStorage;
   protected readonly operationPendingStorage: OperationPendingStorage;
   protected readonly identifierStorage: IdentifierStorage;
@@ -66,7 +70,9 @@ class ConnectionService extends AgentService {
     credentialStorage: CredentialStorage,
     operationPendingStorage: OperationPendingStorage,
     identifierStorage: IdentifierStorage,
-    basicStorage: BasicStorage
+    basicStorage: BasicStorage,
+    connectionPairStorage: ConnectionPairStorage,
+    contactStorage: ContactStorage
   ) {
     super(agentServiceProps);
     this.connectionStorage = connectionStorage;
@@ -74,6 +80,8 @@ class ConnectionService extends AgentService {
     this.operationPendingStorage = operationPendingStorage;
     this.identifierStorage = identifierStorage;
     this.basicStorage = basicStorage;
+    this.connectionPairStorage = connectionPairStorage;
+    this.contactStorage = contactStorage;
   }
 
   static readonly CONNECTION_NOTE_RECORD_NOT_FOUND =
@@ -218,10 +226,26 @@ class ConnectionService extends AgentService {
   }
 
   async getConnections(): Promise<ConnectionShortDetails[]> {
-    const connections = await this.connectionStorage.findAllByQuery({
-      groupId: undefined,
+    const connections: any[] = [];
+
+    const connectionPairs = await this.connectionPairStorage.findAllByQuery({
       pendingDeletion: false,
     });
+
+    for(const connectionPair of connectionPairs) {
+      const contact = await this.contactStorage.findById(connectionPair.contactId);
+      
+      connections.push({
+        id: connectionPair.contactId,
+        alias: contact?.alias,
+        createdAt: contact?.createdAt,
+        oobi: contact?.oobi,
+        groupId: contact?.groupId,
+        creationStatus: connectionPair.creationStatus,
+        pendingDeletion: connectionPair.pendingDeletion
+      });
+    }
+
     return connections.map((connection) =>
       this.getConnectionShortDetails(connection)
     );
@@ -255,7 +279,7 @@ class ConnectionService extends AgentService {
   }
 
   private getConnectionShortDetails(
-    record: ConnectionRecord
+    record: any
   ): ConnectionShortDetails {
     let status = ConnectionStatus.PENDING;
     if (record.creationStatus === CreationStatus.COMPLETE) {
@@ -271,7 +295,8 @@ class ConnectionService extends AgentService {
       status,
       oobi: record.oobi,
     };
-    const groupId = record.getTag(OobiQueryParams.GROUP_ID);
+
+    const groupId = record instanceof ConnectionRecord ? record.getTags().groupId : record.groupId;
     if (groupId) {
       connection.groupId = groupId as string;
     }
