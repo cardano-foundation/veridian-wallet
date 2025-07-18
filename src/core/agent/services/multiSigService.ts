@@ -482,7 +482,10 @@ class MultiSigService extends AgentService {
       .identifiers()
       .get(mHabRecord.id);
 
-    const groupName = `${CURRENT_VERSION}:${mHabRecord.theme}:0-${mHabRecord.groupMetadata.groupId}-${mHabRecord.groupMetadata.userName}:${mHabRecord.displayName}`;
+    const groupMetadata = mHabRecord.groupMetadata!;
+    const initiatorFlag = "0";
+    const userNamePart = groupMetadata.userName || "";
+    const groupName = `${CURRENT_VERSION}:${mHabRecord.theme}:${initiatorFlag}-${groupMetadata.groupId}-${userNamePart}:${mHabRecord.displayName}`;
 
     // @TODO - foconnor: We should error here if smids no longer matches once we have multi-sig rotation.
     const states = await Promise.all(
