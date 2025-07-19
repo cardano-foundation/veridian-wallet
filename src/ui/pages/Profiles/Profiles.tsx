@@ -13,10 +13,7 @@ import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
   getCurrentProfile,
-  getStateCache,
-  setAuthentication,
   setCurrentProfile,
   setToastMsg,
 } from "../../../store/reducers/stateCache";

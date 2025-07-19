@@ -8,8 +8,6 @@ import {
   Siger,
   State,
   b,
-  Cigar,
-  Signer,
   reply,
   Serials,
 } from "signify-ts";
@@ -38,14 +36,13 @@ import {
   QueuedGroupProps,
 } from "./identifier.types";
 import { MultiSigRoute, InceptMultiSigExnMessage } from "./multiSig.types";
-import { deleteNotificationRecordById, OnlineOnly, randomSalt } from "./utils";
+import { deleteNotificationRecordById, OnlineOnly } from "./utils";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { EventTypes, GroupCreatedEvent } from "../event.types";
 import { ConnectionService } from "./connectionService";
 import { IdentifierService } from "./identifierService";
 import { StorageMessage } from "../../storage/storage.types";
 import { RpyRoute } from "./connectionService.types";
-import { CURRENT_VERSION } from "../../storage/sqliteStorage/migrations";
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
   static readonly CANNOT_GET_KEYSTATE_OF_IDENTIFIER =

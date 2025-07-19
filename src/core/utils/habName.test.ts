@@ -1,4 +1,3 @@
-import { group } from "console";
 import { parseHabName, formatToV1_2_0_3 } from "./habName";
 
 describe("habName", () => {
