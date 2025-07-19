@@ -62,9 +62,12 @@ export const MIGRATION_V1_2_0_3: HybridMigration = {
     let totalProcessed = 0;
 
     while (returned !== 0) {
-      const start = iteration * pageSize;
-      const end = start + pageSize - 1;
-      const result = await signifyClient.identifiers().list(start, end);
+      const result = await signifyClient
+        .identifiers()
+        .list(
+          iteration * (pageSize + 1),
+          pageSize + iteration * (pageSize + 1)
+        );
 
       const batchToProcess = result.aids;
       returned = batchToProcess.length;
