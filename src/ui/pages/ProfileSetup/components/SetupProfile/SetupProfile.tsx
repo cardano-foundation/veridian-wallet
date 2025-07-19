@@ -19,6 +19,7 @@ const SetupProfile = ({ userName, onChangeUserName }: SetupProfileProps) => {
         placeholder={`${i18n.t("setupprofile.profilesetup.form.placeholder")}`}
         value={userName}
         onChangeInput={(value) => {
+          // TODO: Check if the value is valid
           onChangeUserName(value);
           setInputChange(true);
         }}

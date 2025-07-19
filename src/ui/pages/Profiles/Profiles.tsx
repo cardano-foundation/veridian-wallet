@@ -13,9 +13,8 @@ import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
-  getStateCache,
-  setAuthentication,
+  getCurrentProfile,
+  setCurrentProfile,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
@@ -72,10 +71,8 @@ const OptionButton = ({ icon, text, action }: OptionButtonProps) => {
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
-  const authentication = useAppSelector(getAuthentication);
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const defaultProfile = stateCache.authentication.defaultProfile;
+  const defaultProfile = useAppSelector(getCurrentProfile);
   const identifiersData = Object.values(identifiersDataCache);
   const filteredIdentifiersData = identifiersData.filter(
     (item) => item.id !== defaultProfile
@@ -103,16 +100,11 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     try {
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
+          id: MiscRecordId.CURRENT_PROFILE,
           content: { defaultProfile: id },
         })
       );
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: id,
-        })
-      );
+      dispatch(setCurrentProfile(id));
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
     } catch (e) {
@@ -200,12 +192,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         isOpen={openSetupProfile}
         renderAsModal
       >
-        <ProfileSetup
-          onClose={(cancel) => {
-            handleCloseSetupProfile();
-            if (!cancel) setIsOpen(false);
-          }}
-        />
+        <ProfileSetup />
       </SideSlider>
     </>
   );

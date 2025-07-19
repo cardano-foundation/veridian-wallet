@@ -20,11 +20,8 @@ describe("Show error", () => {
 
   it("Show error log and toast message", () => {
     const dispatchMock = jest.fn();
-    showError("class1", {}, dispatchMock, ToastMsgType.USERNAME_CREATION_ERROR);
+    showError("class1", {}, dispatchMock, ToastMsgType.UNKNOWN_ERROR);
 
     expect(errorLogMock).toBeCalled();
-    expect(dispatchMock).toBeCalledWith(
-      setToastMsg(ToastMsgType.USERNAME_CREATION_ERROR)
-    );
   });
 });

@@ -26,6 +26,7 @@ const SetupGroup = ({
         placeholder={`${i18n.t("setupprofile.groupsetup.form.placeholder")}`}
         value={groupName}
         onChangeInput={(value) => {
+          // TODO: Check if the name is valid
           onChangeGroupName(value);
           setInputChange(true);
         }}

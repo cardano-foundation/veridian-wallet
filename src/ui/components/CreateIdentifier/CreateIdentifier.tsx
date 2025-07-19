@@ -157,12 +157,14 @@ const CreateIdentifier = ({
         groupId: multiSigGroup.groupId,
         groupInitiator: false,
         groupCreated: false,
+        userName: "", // TODO: Set userName if needed
       };
     } else if (identifierData.selectedAidType == 1) {
       groupMetadata = {
         groupId: new Salter({}).qb64,
         groupInitiator: true,
         groupCreated: false,
+        userName: "", // TODO: Set userName if needed
       };
     }
     metadata.groupMetadata = groupMetadata;

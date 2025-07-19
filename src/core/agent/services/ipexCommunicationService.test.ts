@@ -587,6 +587,7 @@ describe("Receive group ACDC actions", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       multisigMembers: [
@@ -775,6 +776,7 @@ describe("Receive group ACDC actions", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       multisigMembers: [
@@ -915,6 +917,7 @@ describe("Receive group ACDC actions", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       multisigMembers: [

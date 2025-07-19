@@ -212,7 +212,6 @@ class SqliteSession {
     }
   }
 
-  // eslint-disable-next-line no-console
   private async performCloudMigration(
     migration: CloudMigration | HybridMigration,
     isRecoveryValidation = false

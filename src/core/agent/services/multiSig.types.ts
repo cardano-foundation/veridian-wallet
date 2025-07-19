@@ -49,6 +49,7 @@ interface InceptMultiSigExnMessage {
       gid: string;
       smids: string[];
       rmids: string[];
+      name: string;
     };
     e: {
       icp: IcpExn;

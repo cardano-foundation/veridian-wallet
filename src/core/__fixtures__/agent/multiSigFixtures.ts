@@ -14,9 +14,10 @@ const memberMetadataRecordProps: IdentifierMetadataRecordProps = {
   createdAt: now,
   theme: 0,
   groupMetadata: {
-    groupId: "group-id",
+    groupId: "groupid",
     groupInitiator: true,
     groupCreated: false,
+    userName: "testUser",
   },
 };
 
@@ -118,6 +119,7 @@ const memberIdentifierRecord = {
     groupId: "08f22dee-8cb0-4d65-8600-a82bbc3f6fd7",
     groupInitiator: true,
     groupCreated: true,
+    userName: "testUser",
   },
   updatedAt: new Date("2024-06-28T03:55:04.260Z"),
 } as IdentifierMetadataRecordProps;
@@ -843,12 +845,12 @@ const linkedContacts = [
     oobi: "http://127.0.0.1:3902/oobi/ENsj-3icUgAutHtrUHYnUPnP8RiafT5tOdVIZarFHuyP/agent/EF_dfLFGvUh9kMsV2LIJQtrkuXWG_-wxWzC_XjCWjlkQ",
     status: ConnectionStatus.CONFIRMED,
     createdAtUTC: new Date().toISOString(),
-    groupId: "group-id",
+    groupId: "groupid",
   },
 ];
 
 const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
-  name: "0:Identifier 2",
+  name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
   data: inceptionDataFix,
   initiator: true,
   groupConnections: linkedContacts,
@@ -856,7 +858,7 @@ const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
 };
 
 const queuedJoin: QueuedGroupCreation & { initiator: false } = {
-  name: "0:Identifier 2",
+  name: "0:testUser",
   data: inceptionDataFix,
   initiator: false,
   notificationId: "notification-id",

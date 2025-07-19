@@ -1,4 +1,5 @@
 import { HabState, Operation, Signer } from "signify-ts";
+import { parseHabName } from "../../utils/habName";
 import {
   CreateIdentifierResult,
   IdentifierDetails,
@@ -39,7 +40,7 @@ import {
 } from "../event.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { OobiQueryParams } from "./connectionService.types";
-import type { KeriaNotification } from "./keriaNotificationService.types";
+import { CURRENT_VERSION } from "../../storage/sqliteStorage/migrations";
 
 const UI_THEMES = [
   0, 1, 2, 3, 10, 11, 12, 13, 20, 21, 22, 23, 30, 31, 32, 33, 40, 41, 42, 43,
@@ -190,27 +191,31 @@ class IdentifierService extends AgentService {
     }
 
     for (const queued of pendingIdentifiersRecord.content.queued) {
+      const parsed = parseHabName(queued);
       let metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">;
-      const splitName = queued.split(":");
-      const theme = Number(splitName[0]);
-      const groupMatch = splitName[1].match(/^(\d)-(.+)-(.+)$/);
-      if (groupMatch) {
+
+      if (
+        parsed.isGroupMember &&
+        parsed.groupMetadata?.groupId &&
+        parsed.groupMetadata?.userName !== undefined &&
+        parsed.groupMetadata?.groupInitiator !== undefined
+      ) {
         metadata = {
-          theme,
-          displayName: splitName[2],
+          theme: parsed.theme ? parseInt(parsed.theme, 10) : 0,
+          displayName: parsed.displayName,
           groupMetadata: {
-            groupId: splitName[1].substring(2),
-            groupInitiator: splitName[1][0] === "1",
+            groupId: parsed.groupMetadata?.groupId,
             groupCreated: false,
+            groupInitiator: parsed.groupMetadata?.groupInitiator,
+            userName: parsed.groupMetadata?.userName,
           },
         };
       } else {
         metadata = {
-          theme,
-          displayName: splitName[1],
+          theme: parsed.theme ? parseInt(parsed.theme, 10) : 0,
+          displayName: parsed.displayName,
         };
       }
-
       await this.createIdentifier(metadata, true);
     }
   }
@@ -226,11 +231,13 @@ class IdentifierService extends AgentService {
       throw new Error(IdentifierService.INVALID_THEME);
     }
 
-    // For simplicity, it's up to the UI to provide a unique name
-    let name = `${metadata.theme}:${metadata.displayName}`;
+    let name: string;
     if (metadata.groupMetadata) {
       const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
-      name = `${metadata.theme}:${initiatorFlag}-${metadata.groupMetadata.groupId}:${metadata.displayName}`;
+      const userNamePart = metadata.groupMetadata.userName || "";
+      name = `${CURRENT_VERSION}:${metadata.theme}:${initiatorFlag}-${metadata.groupMetadata.groupId}-${userNamePart}:${metadata.displayName}`;
+    } else {
+      name = `${CURRENT_VERSION}:${metadata.theme}:${metadata.displayName}`;
     }
 
     // For distributed reliability, store name so we can re-try on start-up
@@ -572,50 +579,50 @@ class IdentifierService extends AgentService {
         });
       }
 
-      const nameParts = identifier.name.split(":");
+      const parsed = parseHabName(identifier.name);
       const theme =
-        nameParts[0] === IdentifierService.DELETED_IDENTIFIER_THEME
-          ? 0
-          : parseInt(nameParts[0], 10);
+        parsed.theme &&
+        parsed.theme !== IdentifierService.DELETED_IDENTIFIER_THEME
+          ? parseInt(parsed.theme, 10)
+          : 0;
 
-      const localGroupMember = nameParts.length === 3;
       const identifierDetail = (await this.props.signifyClient
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
-      if (localGroupMember) {
-        const groupIdParts = nameParts[1].split("-");
-        const groupInitiator = groupIdParts[0] === "1";
-
+      if (
+        parsed.isGroupMember &&
+        parsed.groupMetadata?.groupId &&
+        parsed.groupMetadata?.userName !== undefined &&
+        parsed.groupMetadata?.groupInitiator !== undefined
+      ) {
         await this.identifierStorage.createIdentifierMetadataRecord({
           id: identifier.prefix,
-          displayName: nameParts[2],
+          displayName: parsed.displayName,
           theme,
           groupMetadata: {
-            groupId: groupIdParts[1],
+            groupId: parsed.groupMetadata?.groupId,
             groupCreated: false,
-            groupInitiator,
+            groupInitiator: parsed.groupMetadata?.groupInitiator,
+            userName: parsed.groupMetadata?.userName,
           },
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
           sxlt: identifierDetail.salty?.sxlt,
-          isDeleted: identifier.name.startsWith(
-            IdentifierService.DELETED_IDENTIFIER_THEME
-          ),
+          isDeleted:
+            parsed.theme === IdentifierService.DELETED_IDENTIFIER_THEME,
         });
         continue;
       }
 
       await this.identifierStorage.createIdentifierMetadataRecord({
         id: identifier.prefix,
-        displayName: nameParts[1],
+        displayName: parsed.displayName,
         theme,
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
         sxlt: identifierDetail.salty?.sxlt,
-        isDeleted: identifier.name.startsWith(
-          IdentifierService.DELETED_IDENTIFIER_THEME
-        ),
+        isDeleted: parsed.theme === IdentifierService.DELETED_IDENTIFIER_THEME,
       });
     }
 
@@ -624,15 +631,14 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
-      const nameParts = identifier.name.split(":");
+      const parsed = parseHabName(identifier.name);
       const theme =
-        nameParts[0] === IdentifierService.DELETED_IDENTIFIER_THEME
-          ? 0
-          : parseInt(nameParts[0], 10);
+        parsed.theme &&
+        parsed.theme !== IdentifierService.DELETED_IDENTIFIER_THEME
+          ? parseInt(parsed.theme, 10)
+          : 0;
 
       const groupMemberPre = identifier.group.mhab.prefix;
-      const groupIdParts = identifier.group.mhab.name.split(":")[1].split("-");
-      const groupInitiator = groupIdParts[0] === "1";
 
       const op = await this.props.signifyClient
         .operations()
@@ -650,25 +656,34 @@ class IdentifierService extends AgentService {
         });
       }
 
+      const mhabParsed = parseHabName(identifier.group.mhab.name);
+
+      if (
+        !mhabParsed.isGroupMember ||
+        !mhabParsed.groupMetadata?.groupId ||
+        mhabParsed.groupMetadata?.userName === undefined ||
+        mhabParsed.groupMetadata?.groupInitiator === undefined
+      ) {
+        throw new Error(IdentifierService.INVALID_QUEUED_DISPLAY_NAMES_FORMAT);
+      }
       // Mark as created
       await this.identifierStorage.updateIdentifierMetadata(groupMemberPre, {
         groupMetadata: {
-          groupId: groupIdParts[1],
+          groupId: mhabParsed.groupMetadata?.groupId,
           groupCreated: true,
-          groupInitiator,
+          groupInitiator: mhabParsed.groupMetadata?.groupInitiator,
+          userName: mhabParsed.groupMetadata?.userName,
         },
       });
 
       await this.identifierStorage.createIdentifierMetadataRecord({
         id: identifier.prefix,
-        displayName: nameParts[1],
+        displayName: parsed.displayName,
         theme,
         groupMemberPre,
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
-        isDeleted: identifier.name.startsWith(
-          IdentifierService.DELETED_IDENTIFIER_THEME
-        ),
+        isDeleted: parsed.theme === IdentifierService.DELETED_IDENTIFIER_THEME,
       });
     }
   }

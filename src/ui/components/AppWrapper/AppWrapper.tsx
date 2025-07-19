@@ -52,6 +52,7 @@ import {
   getRecoveryCompleteNoInterruption,
   setAuthentication,
   setCameraDirection,
+  setCurrentProfile,
   setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
@@ -357,7 +358,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let defaultProfile = "";
+      let currentProfile = "";
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -455,13 +456,13 @@ const AppWrapper = (props: { children: ReactNode }) => {
       }
 
       const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.DEFAULT_PROFILE
+        MiscRecordId.CURRENT_PROFILE
       );
 
       if (appDefaultProfileRecord) {
-        defaultProfile = (
-          appDefaultProfileRecord.content as { defaultProfile: string }
-        ).defaultProfile;
+        currentProfile = (
+          appDefaultProfileRecord.content as { currentProfile: string }
+        ).currentProfile;
       } else {
         const storedIdentifiers =
           await Agent.agent.identifiers.getIdentifiers();
@@ -475,11 +476,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
                 new Date(b.createdAtUTC).getTime()
             )[0];
           const id = oldest?.id || "";
-          defaultProfile = id;
+          currentProfile = id;
 
           await Agent.agent.basicStorage.createOrUpdateBasicRecord(
             new BasicRecord({
-              id: MiscRecordId.DEFAULT_PROFILE,
+              id: MiscRecordId.CURRENT_PROFILE,
               content: { defaultProfile: id },
             })
           );
@@ -553,7 +554,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(
         setAuthentication({
           ...authentication,
-          defaultProfile,
           passcodeIsSet,
           seedPhraseIsSet,
           passwordIsSet,
@@ -567,6 +567,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
             .value as boolean,
         })
       );
+      dispatch(setCurrentProfile(currentProfile));
 
       return {
         keriaConnectUrlRecord,

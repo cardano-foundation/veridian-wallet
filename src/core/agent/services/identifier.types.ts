@@ -10,22 +10,23 @@ interface GroupMetadata {
   groupId: string;
   groupInitiator: boolean;
   groupCreated: boolean;
+  userName: string;
 }
 
 interface CreateIdentifierInputs {
   displayName: string;
-  theme: number;
   groupMetadata?: GroupMetadata;
+  theme: number;
 }
 
 interface IdentifierShortDetails {
   id: string;
   displayName: string;
   createdAtUTC: string;
-  theme: number;
   creationStatus: CreationStatus;
   groupMetadata?: GroupMetadata;
   groupMemberPre?: string;
+  theme: number;
 }
 
 interface IdentifierDetails extends IdentifierShortDetails {

@@ -5,6 +5,7 @@ interface GroupMetadata {
   groupId: string;
   groupInitiator: boolean;
   groupCreated: boolean;
+  userName: string;
 }
 
 interface IdentifierMetadataRecordProps {

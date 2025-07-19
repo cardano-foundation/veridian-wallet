@@ -73,6 +73,7 @@ const multisignIdentifierFix: IdentifierShortDetails[] = [
       groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
       groupCreated: false,
       groupInitiator: false,
+      userName: "test",
     },
   },
 ];
@@ -88,6 +89,7 @@ const failedMultisignIdentifierFix: IdentifierShortDetails[] = [
       groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
       groupCreated: false,
       groupInitiator: false,
+      userName: "test",
     },
   },
 ];
@@ -103,6 +105,7 @@ const pendingMemberIdentifierFix: IdentifierShortDetails[] = [
       groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
       groupCreated: false,
       groupInitiator: false,
+      userName: "test",
     },
   },
 ];

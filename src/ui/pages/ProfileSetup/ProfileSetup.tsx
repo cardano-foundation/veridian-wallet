@@ -14,9 +14,8 @@ import {
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
   getStateCache,
-  setAuthentication,
+  setCurrentProfile,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
@@ -40,7 +39,6 @@ export const ProfileSetup = () => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
-  const authentication = useAppSelector(getAuthentication);
   const dispatch = useDispatch();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
@@ -88,7 +86,7 @@ export const ProfileSetup = () => {
 
     const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
-      displayName: isGroup ? groupName : userName,
+      displayName: userName,
       theme: 0,
     };
 
@@ -97,6 +95,7 @@ export const ProfileSetup = () => {
         groupId: new Salter({}).qb64,
         groupInitiator: true,
         groupCreated: false,
+        userName: groupName,
       };
       metadata.groupMetadata = groupMetadata;
     }
@@ -111,7 +110,7 @@ export const ProfileSetup = () => {
       if (isGroup) {
         await Agent.agent.basicStorage.createOrUpdateBasicRecord(
           new BasicRecord({
-            id: MiscRecordId.USER_NAME,
+            id: MiscRecordId.CURRENT_PROFILE,
             content: {
               userName,
             },
@@ -119,6 +118,7 @@ export const ProfileSetup = () => {
         );
       }
 
+      // TODO:
       await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       if (individualFirstCreate) {
         await Agent.agent.basicStorage
@@ -127,12 +127,7 @@ export const ProfileSetup = () => {
       }
 
       // Set as default if it's the first identifier
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: identifier,
-        })
-      );
+      dispatch(setCurrentProfile(identifier));
 
       setStep(SetupProfileStep.FinishSetup);
     } catch (e) {

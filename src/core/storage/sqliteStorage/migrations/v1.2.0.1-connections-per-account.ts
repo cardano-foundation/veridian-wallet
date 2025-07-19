@@ -246,6 +246,7 @@ export const DATA_V1201: HybridMigration = {
 
       await signifyClient.contacts().update(contact.id, contactUpdates);
     }
+
     // eslint-disable-next-line no-console
     console.log(
       `Cloud migration completed: ${contacts.length} connections migrated to account-based model`

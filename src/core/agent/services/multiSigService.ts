@@ -8,8 +8,6 @@ import {
   Siger,
   State,
   b,
-  Cigar,
-  Signer,
   reply,
   Serials,
 } from "signify-ts";
@@ -138,8 +136,8 @@ class MultiSigService extends AgentService {
       )
     );
     const states = [mHab["state"], ...connectionStates];
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
 
+    const groupName = `${mHabRecord.theme}:${mHabRecord.groupMetadata.userName}`;
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
@@ -153,7 +151,7 @@ class MultiSigService extends AgentService {
           threshold,
         }
       );
-    await this.inceptGroup(mHab, states, inceptionData);
+    await this.inceptGroup(mHab, states, inceptionData, groupName);
 
     // Share witness OOBIs with other group members
     await this.shareWitnessOobis(mHab, groupConnections);
@@ -202,6 +200,12 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: memberPrefix,
           createdAtUTC: multisigDetail.icp_dt,
+          groupMetadata: {
+            groupId: multisigId,
+            groupInitiator: true,
+            groupCreated: true,
+            userName: mHabRecord.groupMetadata.userName,
+          },
         },
       },
     });
@@ -289,7 +293,8 @@ class MultiSigService extends AgentService {
   private async inceptGroup(
     mHab: HabState,
     states: State[],
-    inceptionData: CreateIdentifierBody
+    inceptionData: CreateIdentifierBody,
+    name?: string
   ): Promise<void> {
     try {
       await this.props.signifyClient
@@ -327,6 +332,7 @@ class MultiSigService extends AgentService {
         gid: serder.pre,
         smids: smids,
         rmids: smids,
+        name,
       },
       embeds,
       recp
@@ -451,6 +457,7 @@ class MultiSigService extends AgentService {
           throw error;
         }
       });
+
     const exn = icpMsg[0].exn;
 
     const identifiers = await this.identifiers.getIdentifiers(false);
@@ -469,7 +476,8 @@ class MultiSigService extends AgentService {
     const mHab = await this.props.signifyClient
       .identifiers()
       .get(mHabRecord.id);
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
+
+    const groupName = `${mHabRecord.theme}:${mHabRecord.groupMetadata.userName}`;
 
     // @TODO - foconnor: We should error here if smids no longer matches once we have multi-sig rotation.
     const states = await Promise.all(
@@ -496,7 +504,7 @@ class MultiSigService extends AgentService {
         exn.e.icp.bt,
         exn.e.icp.b
       );
-    await this.inceptGroup(mHab, states, inceptionData);
+    await this.inceptGroup(mHab, states, inceptionData, groupName);
 
     const multisigId = inceptionData.icp.i;
     const creationStatus = CreationStatus.PENDING;
@@ -536,11 +544,17 @@ class MultiSigService extends AgentService {
       payload: {
         group: {
           id: multisigId,
+          theme: 0,
           displayName: mHabRecord.displayName,
-          theme: mHabRecord.theme,
           creationStatus,
           groupMemberPre: mHabRecord.id,
           createdAtUTC: multisigDetail.icp_dt,
+          groupMetadata: {
+            groupId: multisigId,
+            groupInitiator: false,
+            groupCreated: true,
+            userName: mHabRecord.groupMetadata!.userName,
+          },
         },
       },
     });
