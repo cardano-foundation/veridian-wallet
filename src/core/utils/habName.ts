@@ -141,8 +141,6 @@ export function formatToV1_2_0_3(parts: HabNameParts): string {
     const userNamePart = parts.groupMetadata.userName || "";
     return `${version}:${themePart}:${groupInitiatorStr}-${groupIdPart}-${userNamePart}:${displayNamePart}`;
   } else {
-    // For non-group members, the groupmetadata should be empty.
-    // The new format is version:theme::displayName (empty groupPart)
     return `${version}:${themePart}:${displayNamePart}`;
   }
 }
