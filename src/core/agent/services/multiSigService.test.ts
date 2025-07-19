@@ -369,7 +369,7 @@ describe("Creation of multi-sig", () => {
         content: {
           queued: [
             { ...queuedIdentifier, name: "0:different identifier" },
-            queuedIdentifier,
+            { ...queuedIdentifier, name: "0:testUser" },
           ],
         },
       })
@@ -393,25 +393,22 @@ describe("Creation of multi-sig", () => {
     );
 
     expectAllWitnessIntroductions();
-    expect(identifierCreateIcpDataMock).toBeCalledWith(
-      "1.2.0.3:0:1-groupid-testUser:Identifier 2",
-      {
-        algo: "group",
-        mhab: getMemberIdentifierResponse,
-        isith: 2,
-        nsith: 2,
-        toad: 3,
-        wits: [],
-        states: [
-          getMemberIdentifierResponse.state,
-          resolvedOobiOpResponse.op.response,
-        ],
-        rstates: [
-          getMemberIdentifierResponse.state,
-          resolvedOobiOpResponse.op.response,
-        ],
-      }
-    );
+    expect(identifierCreateIcpDataMock).toBeCalledWith("0:testUser", {
+      algo: "group",
+      mhab: getMemberIdentifierResponse,
+      isith: 2,
+      nsith: 2,
+      toad: 3,
+      wits: [],
+      states: [
+        getMemberIdentifierResponse.state,
+        resolvedOobiOpResponse.op.response,
+      ],
+      rstates: [
+        getMemberIdentifierResponse.state,
+        resolvedOobiOpResponse.op.response,
+      ],
+    });
     expect(basicStorage.createOrUpdateBasicRecord).toBeCalledWith(
       expect.objectContaining({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
@@ -420,7 +417,7 @@ describe("Creation of multi-sig", () => {
             { ...queuedIdentifier, name: "0:different identifier" },
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
+              name: "0:testUser",
             },
           ],
         },
@@ -442,7 +439,7 @@ describe("Creation of multi-sig", () => {
           "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
           "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
         ],
-        name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
+        name: "0:testUser",
       },
       {
         icp: [
@@ -582,7 +579,7 @@ describe("Creation of multi-sig", () => {
           queued: [
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
+              name: "0:testUser",
             },
           ],
         },
@@ -623,7 +620,7 @@ describe("Creation of multi-sig", () => {
           "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
           "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
         ],
-        name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
+        name: "0:testUser",
       },
       {
         icp: [
@@ -703,7 +700,7 @@ describe("Creation of multi-sig", () => {
           queued: [
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
+              name: "0:testUser",
             },
           ],
         },
@@ -752,7 +749,7 @@ describe("Creation of multi-sig", () => {
           "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
           "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
         ],
-        name: "1.2.0.3:0:1-groupid-testUser:Identifier 2",
+        name: "0:testUser",
       },
       {
         icp: [
@@ -868,7 +865,7 @@ describe("Creation of multi-sig", () => {
         content: {
           queued: [
             { ...queuedJoin, name: "0:different identifier" },
-            queuedJoin,
+            { ...queuedJoin, name: "0:testUser" },
           ],
         },
       })
@@ -889,32 +886,29 @@ describe("Creation of multi-sig", () => {
 
     await multiSigService.joinGroup("id", "d");
 
-    expect(identifierCreateIcpDataMock).toBeCalledWith(
-      "1.2.0.3:0:0-groupid-testUser:Identifier 2",
-      {
-        algo: "group",
-        mhab: getMemberIdentifierResponse,
-        isith: 2,
-        nsith: 2,
-        toad: 4,
-        wits: [
-          "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha",
-          "BLskRTInXnMxWaGqcpSyMgo0nYbalW99cGZESrz3zapM",
-          "BIKKuvBwpmDVA4Ds-EpL5bt9OqPzWPja2LigFYZN2YfX",
-          "BM35JN8XeJSEfpxopjn5jr7tAHCE5749f0OobhMLCorE",
-          "BIj15u5V11bkbtAxMA7gcNJZcax-7TgaBMLsQnMHpYHP",
-          "BF2rZTW79z4IXocYRQnjjsOuvFUQv-ptCf8Yltd7PfsM",
-        ],
-        states: [
-          resolvedOobiOpResponse.op.response,
-          getMemberIdentifierResponse.state,
-        ],
-        rstates: [
-          resolvedOobiOpResponse.op.response,
-          getMemberIdentifierResponse.state,
-        ],
-      }
-    );
+    expect(identifierCreateIcpDataMock).toBeCalledWith("0:testUser", {
+      algo: "group",
+      mhab: getMemberIdentifierResponse,
+      isith: 2,
+      nsith: 2,
+      toad: 4,
+      wits: [
+        "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha",
+        "BLskRTInXnMxWaGqcpSyMgo0nYbalW99cGZESrz3zapM",
+        "BIKKuvBwpmDVA4Ds-EpL5bt9OqPzWPja2LigFYZN2YfX",
+        "BM35JN8XeJSEfpxopjn5jr7tAHCE5749f0OobhMLCorE",
+        "BIj15u5V11bkbtAxMA7gcNJZcax-7TgaBMLsQnMHpYHP",
+        "BF2rZTW79z4IXocYRQnjjsOuvFUQv-ptCf8Yltd7PfsM",
+      ],
+      states: [
+        resolvedOobiOpResponse.op.response,
+        getMemberIdentifierResponse.state,
+      ],
+      rstates: [
+        resolvedOobiOpResponse.op.response,
+        getMemberIdentifierResponse.state,
+      ],
+    });
     expect(identifierSubmitIcpDataMock).toBeCalledWith(inceptionDataFix);
     expect(sendExchangesMock).toBeCalledWith(
       memberMetadataRecord.id,
@@ -931,7 +925,7 @@ describe("Creation of multi-sig", () => {
           "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
           "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
         ],
-        name: "1.2.0.3:0:0-groupid-testUser:Identifier 2",
+        name: "0:testUser",
       },
       {
         icp: [
@@ -1069,7 +1063,7 @@ describe("Creation of multi-sig", () => {
           "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
           "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
         ],
-        name: "1.2.0.3:0:0-groupid-testUser:Identifier 2",
+        name: "0:testUser",
       },
       {
         icp: [
@@ -1186,7 +1180,7 @@ describe("Creation of multi-sig", () => {
           "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
           "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
         ],
-        name: "1.2.0.3:0:0-groupid-testUser:Identifier 2",
+        name: "0:testUser",
       },
       {
         icp: [

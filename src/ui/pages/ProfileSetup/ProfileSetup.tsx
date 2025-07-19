@@ -88,7 +88,7 @@ export const ProfileSetup = () => {
 
     const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
-      displayName: isGroup ? groupName : userName,
+      displayName: userName,
       theme: 0,
     };
 
@@ -120,6 +120,7 @@ export const ProfileSetup = () => {
         );
       }
 
+      // TODO:
       await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       if (individualFirstCreate) {
         await Agent.agent.basicStorage

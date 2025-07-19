@@ -140,9 +140,7 @@ class MultiSigService extends AgentService {
     );
     const states = [mHab["state"], ...connectionStates];
 
-    const groupMetadata = mHabRecord.groupMetadata;
-    const groupName = `${CURRENT_VERSION}:${mHabRecord.theme}:1-${groupMetadata.groupId}-${groupMetadata.userName}:${mHabRecord.displayName}`;
-
+    const groupName = `${mHabRecord.theme}:${mHabRecord.groupMetadata.userName}`;
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
@@ -482,10 +480,7 @@ class MultiSigService extends AgentService {
       .identifiers()
       .get(mHabRecord.id);
 
-    const groupMetadata = mHabRecord.groupMetadata!;
-    const initiatorFlag = "0";
-    const userNamePart = groupMetadata.userName || "";
-    const groupName = `${CURRENT_VERSION}:${mHabRecord.theme}:${initiatorFlag}-${groupMetadata.groupId}-${userNamePart}:${mHabRecord.displayName}`;
+    const groupName = `${mHabRecord.theme}:${mHabRecord.groupMetadata.userName}`;
 
     // @TODO - foconnor: We should error here if smids no longer matches once we have multi-sig rotation.
     const states = await Promise.all(
