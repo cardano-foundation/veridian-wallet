@@ -14,7 +14,7 @@ interface OptionButtonProps {
 
 interface ProfileItemsProps {
   id: string;
-  displayName: string;
+  displayName?: string;
   onClick?: () => void;
 }
 

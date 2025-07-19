@@ -151,7 +151,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         >
           <div className="profiles-selected-profile">
             <ProfileItem
-              id={currentProfile?.id}
+              id={defaultProfileId}
               displayName={currentProfile?.displayName}
             />
             <OptionButton
