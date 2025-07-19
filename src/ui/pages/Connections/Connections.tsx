@@ -17,7 +17,7 @@ import {
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
-  getCurrentProfile,
+  getCurrentProfileId,
   getStateCache,
   setCurrentOperation,
   setCurrentRoute,
@@ -61,7 +61,7 @@ const Connections = () => {
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
-  const currentProfileName = useAppSelector(getCurrentProfile);
+  const currentProfileName = useAppSelector(getCurrentProfileId);
   const identifier = identifiers[currentProfileName];
 
   const showPlaceholder = Object.keys(connectionsCache).length === 0;

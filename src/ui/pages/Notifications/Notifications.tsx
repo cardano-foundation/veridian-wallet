@@ -15,7 +15,7 @@ import {
   markNotificationAsRead,
 } from "../../../store/reducers/notificationsCache";
 import {
-  getCurrentProfile,
+  getCurrentProfileId,
   setCurrentRoute,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
@@ -62,7 +62,7 @@ const Notifications = () => {
     openUnknownPresentConnectionAlert,
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
-  const currentProfileName = useAppSelector(getCurrentProfile);
+  const currentProfileName = useAppSelector(getCurrentProfileId);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {

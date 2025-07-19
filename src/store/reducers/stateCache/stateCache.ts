@@ -17,7 +17,7 @@ const initialState: StateCacheProps = {
   recoveryCompleteNoInterruption: false,
   isOnline: false,
   routes: [],
-  currentProfile: "",
+  currentProfileId: "",
   authentication: {
     loggedIn: false,
     time: 0,
@@ -60,8 +60,8 @@ const stateCacheSlice = createSlice({
     setRecoveryCompleteNoInterruption: (state) => {
       state.recoveryCompleteNoInterruption = true;
     },
-    setCurrentProfile: (state, action: PayloadAction<string>) => {
-      state.currentProfile = action.payload;
+    setCurrentProfileId: (state, action: PayloadAction<string>) => {
+      state.currentProfileId = action.payload;
     },
     setCurrentRoute: (state, action: PayloadAction<CurrentRouteCacheProps>) => {
       const filteredRoutes = state.routes.filter(
@@ -199,7 +199,7 @@ const {
   setInitializationPhase,
   setRecoveryCompleteNoInterruption,
   setCurrentRoute,
-  setCurrentProfile,
+  setCurrentProfileId,
   removeCurrentRoute,
   removeRoute,
   resetAllRoutes,
@@ -232,7 +232,8 @@ const getRecoveryCompleteNoInterruption = (state: RootState) =>
 const getRoutes = (state: RootState) => state.stateCache.routes;
 const getCurrentRoute = (state: RootState) =>
   state.stateCache.routes.length ? state.stateCache.routes[0] : undefined;
-const getCurrentProfile = (state: RootState) => state.stateCache.currentProfile;
+const getCurrentProfileId = (state: RootState) =>
+  state.stateCache.currentProfileId;
 const getAuthentication = (state: RootState) => state.stateCache.authentication;
 const getCurrentOperation = (state: RootState) =>
   state.stateCache.currentOperation;
@@ -270,7 +271,7 @@ export {
   getCameraDirection,
   getCurrentOperation,
   getCurrentRoute,
-  getCurrentProfile,
+  getCurrentProfileId,
   getFirstAppLaunch,
   getForceInitApp,
   getGlobalLoading,
@@ -296,7 +297,7 @@ export {
   setAuthentication,
   setCameraDirection,
   setCurrentOperation,
-  setCurrentProfile,
+  setCurrentProfileId,
   setCurrentRoute,
   setFirstAppLaunchComplete,
   setInitializationPhase,

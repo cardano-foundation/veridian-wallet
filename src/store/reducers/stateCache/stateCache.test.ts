@@ -9,7 +9,7 @@ import {
   dequeueIncomingRequest,
   enqueueIncomingRequest,
   getAuthentication,
-  getCurrentProfile,
+  getCurrentProfileId,
   getCurrentOperation,
   getCurrentRoute,
   getStateCache,
@@ -25,7 +25,7 @@ import {
   showGenericError,
   StateCacheProps,
   stateCacheSlice,
-  setCurrentProfile,
+  setCurrentProfileId,
 } from "./stateCache";
 import {
   IncomingRequestProps,
@@ -132,24 +132,24 @@ describe("State Cache", () => {
     expect(nextState).not.toBe(initialState);
   });
 
-  test("should handle setCurrentProfile action", () => {
+  test("should handle setCurrentProfileIdId action", () => {
     const newAccount = "Account2";
     const nextState = stateCacheSlice.reducer(
       initialState,
-      setCurrentProfile(newAccount)
+      setCurrentProfileId(newAccount)
     );
-    expect(nextState.currentProfile).toEqual(newAccount);
+    expect(nextState.currentProfileId).toEqual(newAccount);
   });
 
-  test("getCurrentProfile should select the current account from state", () => {
+  test("getCurrentProfileId should select the current account from state", () => {
     const mockState: Partial<RootState> = {
       stateCache: {
         ...initialState,
-        currentProfile: "TestAccount123",
+        currentProfileId: "TestAccount123",
       },
     };
 
-    const selectedAccount = getCurrentProfile(mockState as RootState);
+    const selectedAccount = getCurrentProfileId(mockState as RootState);
     expect(selectedAccount).toEqual("TestAccount123");
   });
 

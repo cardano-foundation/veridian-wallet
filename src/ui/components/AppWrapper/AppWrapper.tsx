@@ -2,6 +2,7 @@ import { TapJacking } from "@capacitor-community/tap-jacking";
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { Device } from "@capacitor/device";
 import { ReactNode, useCallback, useEffect, useState } from "react";
+import { current } from "@reduxjs/toolkit";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
@@ -52,7 +53,7 @@ import {
   getRecoveryCompleteNoInterruption,
   setAuthentication,
   setCameraDirection,
-  setCurrentProfile,
+  setCurrentProfileId,
   setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
@@ -344,6 +345,19 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();
 
+      const currentProfileId = await Agent.agent.basicStorage.findById(
+        MiscRecordId.CURRENT_PROFILE
+      );
+
+      const currentProfileName = storedIdentifiers.find(
+        (identifier) => identifier.id === currentProfileId?.content?.id
+      );
+
+      dispatch(
+        setCurrentProfileId(
+          currentProfileName?.id || storedIdentifiers[0]?.id || ""
+        )
+      );
       dispatch(setIdentifiersCache(storedIdentifiers));
       dispatch(setCredsCache(credsCache));
       dispatch(setCredsArchivedCache(credsArchivedCache));
@@ -358,7 +372,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let currentProfile = "";
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -455,38 +468,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.CURRENT_PROFILE
-      );
-
-      if (appDefaultProfileRecord) {
-        currentProfile = (
-          appDefaultProfileRecord.content as { currentProfile: string }
-        ).currentProfile;
-      } else {
-        const storedIdentifiers =
-          await Agent.agent.identifiers.getIdentifiers();
-        if (storedIdentifiers.length > 0) {
-          // If we have no default profile set, we will set the oldest identifier as default.
-          const oldest = storedIdentifiers
-            .slice()
-            .sort(
-              (a, b) =>
-                new Date(a.createdAtUTC).getTime() -
-                new Date(b.createdAtUTC).getTime()
-            )[0];
-          const id = oldest?.id || "";
-          currentProfile = id;
-
-          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.CURRENT_PROFILE,
-              content: { defaultProfile: id },
-            })
-          );
-        }
-      }
-
       const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX
       );
@@ -567,7 +548,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
             .value as boolean,
         })
       );
-      dispatch(setCurrentProfile(currentProfile));
 
       return {
         keriaConnectUrlRecord,

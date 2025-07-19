@@ -7,7 +7,7 @@ import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
 import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
-import { getCurrentProfile } from "../../../../../store/reducers/stateCache";
+import { getCurrentProfileId } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
 import { useOnlineStatusEffect } from "../../../../hooks";
 import { showError } from "../../../../utils/error";
@@ -26,7 +26,7 @@ const CredentialRequest = ({
   const dispatch = useAppDispatch();
   const identifiersData = useAppSelector(getIdentifiersCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
-  const currentProfile = useAppSelector(getCurrentProfile);
+  const currentProfile = useAppSelector(getCurrentProfileId);
   const [requestStage, setRequestStage] = useState(0);
   const [credentialRequest, setCredentialRequest] =
     useState<CredentialsMatchingApply | null>();

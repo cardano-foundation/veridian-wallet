@@ -8,8 +8,8 @@ import { Agent } from "../../../../../core/agent/agent";
 import { BasicRecord } from "../../../../../core/agent/records";
 import { MiscRecordId } from "../../../../../core/agent/agent.types";
 import {
-  getCurrentProfile,
-  setCurrentProfile,
+  getCurrentProfileId,
+  setCurrentProfileId,
 } from "../../../../../store/reducers/stateCache";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { showError } from "../../../../utils/error";
@@ -19,7 +19,7 @@ import { ErrorMessage } from "../../../../components/ErrorMessage";
 const Profile = forwardRef<ProfileOptionRef, ProfileProps>(
   ({ isEditing }, ref) => {
     const dispatch = useAppDispatch();
-    const currentProfileName = useAppSelector(getCurrentProfile);
+    const currentProfileName = useAppSelector(getCurrentProfileId);
     const [userName, setUserName] = useState(currentProfileName);
 
     const errorMessage = nameChecker.getError(userName);
@@ -43,7 +43,7 @@ const Profile = forwardRef<ProfileOptionRef, ProfileProps>(
             })
           )
           .then(() => {
-            dispatch(setCurrentProfile(userName));
+            dispatch(setCurrentProfileId(userName));
           })
           .catch((error) => {
             showError("Unable to update user name: ", error, dispatch);

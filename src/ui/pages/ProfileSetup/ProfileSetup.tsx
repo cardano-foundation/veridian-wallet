@@ -15,7 +15,7 @@ import {
 } from "../../../store/reducers/identifiersCache";
 import {
   getStateCache,
-  setCurrentProfile,
+  setCurrentProfileId,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
@@ -35,7 +35,11 @@ import "./ProfileSetup.scss";
 import { SetupProfileStep } from "./ProfileSetup.types";
 import { BasicRecord } from "../../../core/agent/records";
 
-export const ProfileSetup = () => {
+export interface ProfileSetupProps {
+  onComplete?: () => void;
+}
+
+export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
@@ -119,7 +123,7 @@ export const ProfileSetup = () => {
       }
 
       // TODO:
-      await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
+      // await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       if (individualFirstCreate) {
         await Agent.agent.basicStorage
           .deleteById(MiscRecordId.INDIVIDUAL_FIRST_CREATE)
@@ -127,7 +131,13 @@ export const ProfileSetup = () => {
       }
 
       // Set as default if it's the first identifier
-      dispatch(setCurrentProfile(identifier));
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.CURRENT_PROFILE,
+          content: { defaultProfile: identifier },
+        })
+      );
+      dispatch(setCurrentProfileId(identifier));
 
       setStep(SetupProfileStep.FinishSetup);
     } catch (e) {
@@ -181,7 +191,11 @@ export const ProfileSetup = () => {
     }
 
     if (step === SetupProfileStep.FinishSetup) {
-      navToCredentials();
+      if (onComplete) {
+        onComplete();
+      } else {
+        navToCredentials();
+      }
       return;
     }
 

@@ -30,7 +30,7 @@ describe("NextRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [],
-        currentProfile: "Account1",
+        currentProfileId: "Account1",
         authentication: {
           loggedIn: false,
           time: 0,
@@ -299,7 +299,7 @@ describe("getNextRoute", () => {
       initializationPhase: InitializationPhase.PHASE_TWO,
       recoveryCompleteNoInterruption: false,
       routes: [],
-      currentProfile: "Account1",
+      currentProfileId: "Account1",
       authentication: {
         loggedIn: false,
         time: 0,

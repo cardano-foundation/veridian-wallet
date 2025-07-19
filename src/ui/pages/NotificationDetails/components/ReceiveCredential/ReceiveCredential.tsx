@@ -29,7 +29,7 @@ import {
 } from "../../../../../store/reducers/notificationsCache";
 import {
   getAuthentication,
-  getCurrentProfile,
+  getCurrentProfileId,
 } from "../../../../../store/reducers/stateCache";
 import { Alert, Alert as AlertDecline } from "../../../../components/Alert";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
@@ -69,7 +69,7 @@ const ReceiveCredential = ({
   const dispatch = useAppDispatch();
   const notificationsCache = useAppSelector(getNotificationsCache);
   const [notifications, setNotifications] = useState(notificationsCache);
-  const currentProfile = useAppSelector(getCurrentProfile);
+  const currentProfile = useAppSelector(getCurrentProfileId);
   const connectionsCache = useAppSelector(getConnectionsCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);

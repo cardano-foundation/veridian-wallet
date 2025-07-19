@@ -13,8 +13,8 @@ import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getCurrentProfile,
-  setCurrentProfile,
+  getCurrentProfileId,
+  setCurrentProfileId,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
@@ -72,10 +72,14 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const defaultProfile = useAppSelector(getCurrentProfile);
+  const defaultProfileId = useAppSelector(getCurrentProfileId);
   const identifiersData = Object.values(identifiersDataCache);
+
+  // TODO: remove this after core API exists
+  const currentProfile = identifiersData.find((p) => p.id === defaultProfileId);
+
   const filteredIdentifiersData = identifiersData.filter(
-    (item) => item.id !== defaultProfile
+    (p) => p.id !== defaultProfileId
   );
   const [openSetting, setOpenSetting] = useState(false);
 
@@ -104,7 +108,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           content: { defaultProfile: id },
         })
       );
-      dispatch(setCurrentProfile(id));
+      dispatch(setCurrentProfileId(id));
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
     } catch (e) {
@@ -147,8 +151,8 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         >
           <div className="profiles-selected-profile">
             <ProfileItem
-              id={defaultProfile}
-              displayName={identifiersDataCache[defaultProfile]?.displayName}
+              id={currentProfile?.id}
+              displayName={currentProfile?.displayName}
             />
             <OptionButton
               icon={personCircleOutline}
@@ -192,7 +196,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         isOpen={openSetupProfile}
         renderAsModal
       >
-        <ProfileSetup />
+        <ProfileSetup onComplete={handleCloseSetupProfile} />
       </SideSlider>
     </>
   );

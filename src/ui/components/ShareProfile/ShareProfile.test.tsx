@@ -13,7 +13,7 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import {
-  getCurrentProfile,
+  getCurrentProfileId,
   logout,
   setToastMsg,
   showGenericError,
