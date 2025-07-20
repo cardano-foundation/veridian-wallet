@@ -93,6 +93,7 @@ export const DATA_V1201: HybridMigration = {
           connectionPairsToInsert.push({
             id: randomSalt(),
             contactId: contactRecord.id,
+            createdAt: connectionData.createdAt,
             identifier: identifier.id,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
@@ -115,6 +116,7 @@ export const DATA_V1201: HybridMigration = {
             id: randomSalt(),
             contactId: contactRecord.id,
             identifier: identifier.id,
+            createdAt: connectionData.createdAt,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
             tags: {

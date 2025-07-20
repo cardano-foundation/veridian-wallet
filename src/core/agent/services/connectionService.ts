@@ -238,7 +238,7 @@ class ConnectionService extends AgentService {
       connections.push({
         id: connectionPair.contactId,
         alias: contact?.alias,
-        createdAt: contact?.createdAt,
+        createdAt: connectionPair.createdAt,
         oobi: contact?.oobi,
         groupId: contact?.groupId,
         creationStatus: connectionPair.creationStatus,
