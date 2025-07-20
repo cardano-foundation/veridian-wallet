@@ -69,7 +69,7 @@ const ReceiveCredential = ({
   const dispatch = useAppDispatch();
   const notificationsCache = useAppSelector(getNotificationsCache);
   const [notifications, setNotifications] = useState(notificationsCache);
-  const currentProfile = useAppSelector(getCurrentProfileId);
+  const currentProfileId = useAppSelector(getCurrentProfileId);
   const connectionsCache = useAppSelector(getConnectionsCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
@@ -283,7 +283,7 @@ const ReceiveCredential = ({
     let name = memberConnection?.label || member;
 
     if (!memberConnection?.label) {
-      name = currentProfile;
+      name = currentProfileId;
     }
 
     return {

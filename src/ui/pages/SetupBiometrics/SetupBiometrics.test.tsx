@@ -73,7 +73,7 @@ jest.mock("../../hooks/privacyScreenHook", () => ({
 const initialState = {
   stateCache: {
     routes: [RoutePath.SETUP_BIOMETRICS],
-    currentProfile: "",
+    currentProfileId: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),

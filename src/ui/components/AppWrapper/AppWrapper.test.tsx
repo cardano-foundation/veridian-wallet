@@ -437,12 +437,12 @@ describe("Group state changed handler", () => {
   });
 });
 
-describe("AppWrapper - currentProfile logic", () => {
+describe("AppWrapper - currentProfileId logic", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test("sets currentProfile to the oldest identifier if no default profile is set", async () => {
+  test("sets currentProfileId to the oldest identifier if no default profile is set", async () => {
     Agent.agent.basicStorage.findById = jest.fn().mockImplementation((id) => {
       if (id === MiscRecordId.CURRENT_PROFILE) return Promise.resolve(null);
       return Promise.resolve(null);
@@ -465,7 +465,7 @@ describe("AppWrapper - currentProfile logic", () => {
       .mockResolvedValue(identifiers);
 
     const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
-    let currentProfile = { currentProfile: "" };
+    let currentProfileId = { currentProfileId: "" };
     if (storedIdentifiers.length > 0) {
       const oldest = storedIdentifiers
         .slice()
@@ -475,9 +475,9 @@ describe("AppWrapper - currentProfile logic", () => {
             new Date(b.createdAtUTC).getTime()
         )[0];
       const id = oldest?.id || "";
-      currentProfile = { currentProfile: id };
+      currentProfileId = { currentProfileId: id };
     }
 
-    expect(currentProfile.currentProfile).toBe("id-1");
+    expect(currentProfileId.currentProfileId).toBe("id-1");
   });
 });

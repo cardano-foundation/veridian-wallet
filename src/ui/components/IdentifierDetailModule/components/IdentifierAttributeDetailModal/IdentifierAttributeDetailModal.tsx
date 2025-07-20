@@ -26,7 +26,7 @@ const IdentifierAttributeDetailModal = ({
   data,
   setViewType,
 }: IdentifierAttributeDetailModalProps) => {
-  const currentProfile = useAppSelector(getCurrentProfileId);
+  const currentProfileId = useAppSelector(getCurrentProfileId);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
 
   const handleClose = () => {
@@ -41,7 +41,7 @@ const IdentifierAttributeDetailModal = ({
 
       if (!memberConnection?.label) {
         currentUserIndex = index;
-        name = currentProfile;
+        name = currentProfileId;
       }
 
       return {

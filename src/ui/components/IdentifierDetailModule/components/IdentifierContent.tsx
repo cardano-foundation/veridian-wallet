@@ -37,7 +37,7 @@ const IdentifierContent = ({
   onRotateKey,
 }: IdentifierContentProps) => {
   const identifiersData = useAppSelector(getIdentifiersCache);
-  const currentProfile = useAppSelector(getCurrentProfileId);
+  const currentProfileId = useAppSelector(getCurrentProfileId);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const memberCount = cardData.members?.length || 0;
   const [openDetailModal, setOpenDetailModal] = useState(false);
@@ -57,7 +57,7 @@ const IdentifierContent = ({
       let name = memberConnection?.label || member;
 
       if (!memberConnection?.label) {
-        name = currentProfile;
+        name = currentProfileId;
       }
 
       return name;

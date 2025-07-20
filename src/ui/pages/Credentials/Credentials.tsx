@@ -79,7 +79,7 @@ const Credentials = () => {
     CredentialShortDetails[]
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
-  const currentProfile = useAppSelector(getCurrentProfileId);
+  const currentProfileId = useAppSelector(getCurrentProfileId);
   const revokedCreds = credsCache.filter(
     (item) => item.status === CredentialStatus.REVOKED
   );
@@ -262,7 +262,7 @@ const Credentials = () => {
   }) => {
     return (
       <Avatar
-        id={currentProfile}
+        id={currentProfileId}
         handleAvatarClick={handleAvatarClick}
       />
     );

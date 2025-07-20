@@ -38,7 +38,7 @@ const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
-    currentProfile: filteredIdentifierFix[0].id,
+    currentProfileId: filteredIdentifierFix[0].id,
     authentication: {
       loggedIn: true,
       time: Date.now(),

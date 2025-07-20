@@ -71,7 +71,7 @@ describe("Create group identifier - Setup Connection", () => {
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.IDENTIFIERS],
-      currentProfile: "Account1",
+      currentProfileId: "Account1",
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -528,7 +528,7 @@ describe("Create group identifier - Setup Connection", () => {
     const baseState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
-        currentProfile: "Account1",
+        currentProfileId: "Account1",
         authentication: {
           loggedIn: true,
           time: Date.now(),

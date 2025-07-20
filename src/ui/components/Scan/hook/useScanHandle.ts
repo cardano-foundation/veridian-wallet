@@ -24,7 +24,7 @@ enum ErrorMessage {
 
 const useScanHandle = () => {
   const dispatch = useAppDispatch();
-  const currentProfile = useAppSelector(getCurrentProfileId);
+  const currentProfileId = useAppSelector(getCurrentProfileId);
   const connections = useAppSelector(getConnectionsCache);
 
   const resolveIndividualConnection = useCallback(
@@ -52,7 +52,7 @@ const useScanHandle = () => {
             dispatch(
               setMissingAliasConnection({
                 url: content,
-                identifier: currentProfile,
+                identifier: currentProfileId,
               })
             );
           });
@@ -60,7 +60,7 @@ const useScanHandle = () => {
           return;
         }
 
-        if (!currentProfile) return;
+        if (!currentProfileId) return;
 
         const connectionId = new URL(content).pathname
           .split("/oobi/")
@@ -73,7 +73,10 @@ const useScanHandle = () => {
           );
         }
 
-        await Agent.agent.connections.connectByOobiUrl(content, currentProfile);
+        await Agent.agent.connections.connectByOobiUrl(
+          content,
+          currentProfileId
+        );
 
         await closeScan?.();
       } catch (e) {
@@ -121,7 +124,7 @@ const useScanHandle = () => {
         closeScan?.();
       }
     },
-    [connections, currentProfile, dispatch]
+    [connections, currentProfileId, dispatch]
   );
 
   return { resolveIndividualConnection };

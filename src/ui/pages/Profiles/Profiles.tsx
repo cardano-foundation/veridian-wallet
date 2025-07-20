@@ -76,7 +76,9 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const identifiersData = Object.values(identifiersDataCache);
 
   // TODO: remove this after core API exists
-  const currentProfile = identifiersData.find((p) => p.id === defaultProfileId);
+  const currentProfileId = identifiersData.find(
+    (p) => p.id === defaultProfileId
+  );
 
   const filteredIdentifiersData = identifiersData.filter(
     (p) => p.id !== defaultProfileId
@@ -152,7 +154,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           <div className="profiles-selected-profile">
             <ProfileItem
               id={defaultProfileId}
-              displayName={currentProfile?.displayName}
+              displayName={currentProfileId?.displayName}
             />
             <OptionButton
               icon={personCircleOutline}

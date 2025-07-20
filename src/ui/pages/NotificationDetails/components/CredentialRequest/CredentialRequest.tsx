@@ -26,7 +26,7 @@ const CredentialRequest = ({
   const dispatch = useAppDispatch();
   const identifiersData = useAppSelector(getIdentifiersCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
-  const currentProfile = useAppSelector(getCurrentProfileId);
+  const currentProfileId = useAppSelector(getCurrentProfileId);
   const [requestStage, setRequestStage] = useState(0);
   const [credentialRequest, setCredentialRequest] =
     useState<CredentialsMatchingApply | null>();
@@ -55,7 +55,7 @@ const CredentialRequest = ({
       if (!memberConnection) {
         return {
           aid: member,
-          name: currentProfile,
+          name: currentProfileId,
           joined: linkedGroup.linkedRequest.accepted,
         };
       }
@@ -71,7 +71,7 @@ const CredentialRequest = ({
       ...linkedGroup,
       memberInfos,
     });
-  }, [multisignConnectionsCache, notificationDetails.id, currentProfile]);
+  }, [multisignConnectionsCache, notificationDetails.id, currentProfileId]);
 
   const getCrendetialRequest = useCallback(async () => {
     try {

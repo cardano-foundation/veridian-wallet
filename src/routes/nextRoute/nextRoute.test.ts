@@ -142,7 +142,7 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
-          currentProfile: "Account1",
+          currentProfileId: "Account1",
           authentication: {
             loggedIn: false,
             time: 0,
@@ -177,7 +177,7 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
-          currentProfile: "Account1",
+          currentProfileId: "Account1",
           authentication: {
             loggedIn: false,
             time: 0,
@@ -213,7 +213,7 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
-          currentProfile: "Account1",
+          currentProfileId: "Account1",
           authentication: {
             loggedIn: false,
             time: 0,
