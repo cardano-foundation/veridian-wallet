@@ -6,10 +6,10 @@ import {
 } from "./migrations.types";
 import { DATA_V001 } from "./v0.0.1-init_sql";
 import { DATA_V1201 } from "./v1.2.0.1-connections-per-account";
-import { MIGRATION_V1_2_0_3 } from "./v1.2.0.3-group-scoped-username";
+import { MIGRATION_V1203 } from "./v1.2.0.3-group-scoped-username";
 
 type Migration = SqlMigration | TsMigration | CloudMigration | HybridMigration;
-const MIGRATIONS: Migration[] = [DATA_V001, DATA_V1201, MIGRATION_V1_2_0_3];
+const MIGRATIONS: Migration[] = [DATA_V001, DATA_V1201, MIGRATION_V1203];
 const CURRENT_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;
 
 export { MIGRATIONS, CURRENT_VERSION };

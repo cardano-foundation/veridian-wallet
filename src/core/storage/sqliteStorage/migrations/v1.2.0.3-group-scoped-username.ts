@@ -4,16 +4,19 @@ import { formatToV1_2_0_3, parseHabName } from "../../../utils/habName";
 
 const migrationVersion = "1.2.0.3";
 
-export const MIGRATION_V1_2_0_3: HybridMigration = {
+export const MIGRATION_V1203: HybridMigration = {
   version: migrationVersion,
   type: MigrationType.HYBRID,
   localMigrationStatements: async (session: SQLiteDBConnection) => {
     // eslint-disable-next-line no-console
     console.log(`Starting local migration for v${migrationVersion}...`);
     const statements = [];
+
     const queryResult = await session.query(
-      "SELECT id, displayName, groupMetadata FROM identifierMetadata;"
+      "SELECT * FROM items WHERE category = ?",
+      ["IdentifierMetadataRecord"]
     );
+
     const identifiers = queryResult.values || [];
     // eslint-disable-next-line no-console
     console.log(`Found ${identifiers.length} identifiers to process locally.`);
@@ -24,26 +27,17 @@ export const MIGRATION_V1_2_0_3: HybridMigration = {
         `[v${migrationVersion}] Processing local identifier ID: ${identifier.id}`
       );
 
-      let groupMetadata = {};
-      if (identifier.groupMetadata) {
-        try {
-          // Safely parse existing metadata
-          groupMetadata = JSON.parse(identifier.groupMetadata);
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.error(
-            `Failed to parse groupMetadata for id ${identifier.id}. Using empty object.`,
-            e
-          );
-        }
-      }
+      const recordValue = JSON.parse(identifier.value);
+      const groupMetadata = recordValue.groupMetadata || {};
+
+      recordValue.groupMetadata = { ...groupMetadata, userName: "" };
 
       statements.push({
-        statement:
-          "UPDATE identifierMetadata SET groupMetadata = ? WHERE id = ?;",
+        statement: "UPDATE items SET value = ? WHERE id = ? AND category = ?;",
         values: [
-          JSON.stringify({ ...groupMetadata, userName: "" }),
+          JSON.stringify(recordValue),
           identifier.id,
+          "IdentifierMetadataRecord",
         ],
       });
     }
