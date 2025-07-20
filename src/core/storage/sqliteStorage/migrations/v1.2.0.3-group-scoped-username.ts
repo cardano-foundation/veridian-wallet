@@ -27,10 +27,13 @@ export const MIGRATION_V1203: HybridMigration = {
         `[v${migrationVersion}] Processing local identifier ID: ${identifier.id}`
       );
 
-      const recordValue = JSON.parse(identifier.value);
+      let recordValue = JSON.parse(identifier.value);
       const groupMetadata = recordValue.groupMetadata || {};
 
-      recordValue.groupMetadata = { ...groupMetadata, userName: "" };
+      recordValue = {
+        ...recordValue,
+        groupMetadata: { ...groupMetadata, userName: "" },
+      };
 
       statements.push({
         statement: "UPDATE items SET value = ? WHERE id = ? AND category = ?;",
