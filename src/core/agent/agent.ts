@@ -611,6 +611,44 @@ class Agent {
     await SecureStorage.wipe();
     this.markAgentStatus(false);
   }
+
+  @OnlineOnly
+  async getAccountDetails(id: string): Promise<any> {
+    const identifier = await this.identifiers.getIdentifier(id);
+    const credentials = await this.credentials.getCredentials(true);
+    const connections = await this.connections.getConnections();
+    const peerConnections =
+      await this.peerConnectionMetadataStorage.createPeerConnectionMetadataRecord(
+        ""
+      );
+
+    const accountDetails = {
+      ...identifier,
+      credentials: [],
+      connections: [],
+      peerConnections: [],
+    };
+
+    for (const credential of credentials) {
+      if (credential.identifierId === id) {
+        accountDetails.credentials.push(credential);
+      }
+    }
+
+    for (const connection of connections) {
+      if (connection.id === id) {
+        accountDetails.connections.push(connection);
+      }
+    }
+
+    for (const peerConnection of peerConnections) {
+      if (peerConnection.identifierId === id) {
+        accountDetails.peerConnections.push(peerConnection);
+      }
+    }
+
+    return accountDetails;
+  }
 }
 
 export { Agent };

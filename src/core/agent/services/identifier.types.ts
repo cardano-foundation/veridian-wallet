@@ -28,6 +28,23 @@ interface IdentifierShortDetails {
   groupMemberPre?: string;
 }
 
+export interface AccountDetails extends IdentifierShortDetails {
+  s: string;
+  dt: string;
+  kt: string | string[];
+  k: string[];
+  nt: string | string[];
+  n: string[];
+  bt: string;
+  b: string[];
+  di?: string;
+  members?: string[];
+  credentials: any[];
+  connections: any[];
+  notifications: any[];
+  peerConnections: any[];
+}
+
 interface IdentifierDetails extends IdentifierShortDetails {
   s: string;
   dt: string;
@@ -93,6 +110,7 @@ export type {
   MultiSigIcpRequestDetails,
   CreateIdentifierInputs,
   CreateIdentifierResult,
+  AccountDetails,
 };
 
 export { IdentifierType };
