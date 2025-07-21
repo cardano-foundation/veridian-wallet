@@ -9,6 +9,33 @@ export const DATA_V1200: TsMigration = {
       "Running migration v1.2.0.0: Peer Connection Account Migration"
     );
 
+    function insertItemTags(itemRecord: any) {
+      const statements: { statement: string; values?: unknown[] }[] = [];
+      const statement =
+        "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
+      const tags = itemRecord.tags;
+      if (!tags) {
+        return statements;
+      }
+      // eslint-disable-next-line no-console
+      console.log(`    - Inserting tags for ${itemRecord.id}:`, tags);
+      for (const key of Object.keys(tags)) {
+        if (tags[key] === undefined || tags[key] === null) continue;
+        if (typeof tags[key] === "boolean") {
+          statements.push({
+            statement: statement,
+            values: [itemRecord.id, key, tags[key] ? "1" : "0", "boolean"],
+          });
+        } else if (typeof tags[key] === "string") {
+          statements.push({
+            statement: statement,
+            values: [itemRecord.id, key, tags[key], "string"],
+          });
+        }
+      }
+      return statements;
+    }
+
     // Get all identifiers from local database
     const identifierResult = await session.query(
       "SELECT * FROM items WHERE category = ? AND value NOT LIKE '%\"isDeleted\":true%' AND value NOT LIKE '%\"pendingDeletion\":true%'",
@@ -96,6 +123,7 @@ export const DATA_V1200: TsMigration = {
             JSON.stringify(newRecordValue),
           ],
         });
+        statements.push(...insertItemTags(newRecordValue));
       } else {
         // eslint-disable-next-line no-console
         console.log(
