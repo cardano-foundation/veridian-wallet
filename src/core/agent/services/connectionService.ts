@@ -29,6 +29,7 @@ import {
 } from "../agent.types";
 import {
   BasicStorage,
+  ConnectionPairRecord,
   ConnectionPairStorage,
   ConnectionRecord,
   ConnectionStorage,
@@ -118,7 +119,10 @@ class ConnectionService extends AgentService {
     this.props.eventEmitter.on(
       EventTypes.ConnectionRemoved,
       (data: ConnectionRemovedEvent) =>
-        this.deleteConnectionById(data.payload.connectionId)
+        this.deleteConnectionByIdAndIdentifier(
+          data.payload.connectionId,
+          data.payload.identifier
+        )
     );
   }
 
@@ -380,20 +384,6 @@ class ConnectionService extends AgentService {
   }
 
   @OnlineOnly
-  async deleteConnectionById(id: string): Promise<void> {
-    await this.props.signifyClient
-      .contacts()
-      .delete(id)
-      .catch((error) => {
-        const status = error.message.split(" - ")[1];
-        if (!/404/gi.test(status)) {
-          throw error;
-        }
-      });
-    await this.connectionStorage.deleteById(id);
-  }
-
-  @OnlineOnly
   async deleteConnectionByIdAndIdentifier(
     contactId: string,
     identifier: string
@@ -404,6 +394,54 @@ class ConnectionService extends AgentService {
     });
 
     if (connectionPair.length > 0) {
+      // delete the connection createdAt,note,history from cloud
+      const connection = await this.props.signifyClient
+        .contacts()
+        .get(contactId)
+        .catch((error) => {
+          const status = error.message.split(" - ")[1];
+          if (/404/gi.test(status)) {
+            throw new Error(`${Agent.MISSING_DATA_ON_KERIA}: ${contactId}`, {
+              cause: error,
+            });
+          } else {
+            throw error;
+          }
+        });
+
+      const sharedIdentifier = connection.sharedIdentifier;
+
+      const keysToDelete: Array<string> = [];
+      keysToDelete.push(`${sharedIdentifier}:createdAt`);
+      Object.keys(connection).forEach((key) => {
+        if (
+          key.startsWith(
+            `${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}`
+          ) &&
+          connection[key]
+        ) {
+          keysToDelete.push(key);
+        } else if (
+          key.startsWith(
+            `${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}`
+          ) ||
+          key.startsWith(
+            `${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_REVOKE}`
+          )
+        ) {
+          keysToDelete.push(key);
+        }
+      });
+
+      const contactUpdates: Record<string, unknown> = {};
+      for (const keyToDelete of keysToDelete) {
+        contactUpdates[keyToDelete] = null;
+      }
+
+      await this.props.signifyClient
+        .contacts()
+        .update(contactId, contactUpdates);
+
       await this.connectionPairStorage.deleteById(connectionPair[0].id);
     }
 
@@ -428,27 +466,33 @@ class ConnectionService extends AgentService {
     }
   }
 
-  async markConnectionPendingDelete(id: string): Promise<void> {
-    const connectionProps = await this.connectionStorage.findById(id);
-    if (!connectionProps) return;
+  async markConnectionPendingDelete(
+    connectionId: string,
+    identifier: string
+  ): Promise<void> {
+    const connectionPairProps = await this.connectionPairStorage.findById(
+      `${identifier}:${connectionId}`
+    );
+    if (!connectionPairProps) return;
 
-    connectionProps.pendingDeletion = true;
-    await this.connectionStorage.update(connectionProps);
+    connectionPairProps.pendingDeletion = true;
+    await this.connectionPairStorage.update(connectionPairProps);
 
     this.props.eventEmitter.emit<ConnectionRemovedEvent>({
       type: EventTypes.ConnectionRemoved,
       payload: {
-        connectionId: id,
+        connectionId,
+        identifier,
       },
     });
   }
 
-  async getConnectionsPendingDeletion(): Promise<string[]> {
-    const connections = await this.connectionStorage.findAllByQuery({
+  async getConnectionsPendingDeletion(): Promise<ConnectionPairRecord[]> {
+    const connectionPairs = await this.connectionPairStorage.findAllByQuery({
       pendingDeletion: true,
     });
 
-    return connections.map((connection) => connection.id);
+    return connectionPairs;
   }
 
   async getConnectionsPending(): Promise<ConnectionRecord[]> {
@@ -555,7 +599,7 @@ class ConnectionService extends AgentService {
 
     if (!metadata.groupId) {
       await this.connectionPairStorage.save({
-        id: randomSalt(),
+        id: `${metadata.sharedIdentifier}:${connectionId}`,
         contactId: connectionId,
         identifier: metadata.sharedIdentifier as string,
         creationStatus: metadata.creationStatus as CreationStatus,
@@ -673,10 +717,13 @@ class ConnectionService extends AgentService {
     return { op: operation, alias };
   }
 
-  async removeConnectionsPendingDeletion(): Promise<string[]> {
+  async removeConnectionsPendingDeletion(): Promise<ConnectionPairRecord[]> {
     const pendingDeletions = await this.getConnectionsPendingDeletion();
-    for (const id of pendingDeletions) {
-      await this.deleteConnectionById(id);
+    for (const connectionPair of pendingDeletions) {
+      await this.deleteConnectionByIdAndIdentifier(
+        connectionPair.contactId,
+        connectionPair.identifier
+      );
     }
 
     return pendingDeletions;
