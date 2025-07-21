@@ -31,7 +31,9 @@ const InputAttribute = ({
           <AppInput
             key={attribute}
             fullWidth
-            label={`${inputLabelText.at(0)?.toUpperCase()}${inputLabelText.slice(1)}`}
+            label={`${inputLabelText
+              .at(0)
+              ?.toUpperCase()}${inputLabelText.slice(1)}`}
             type={type}
             optional={!required}
             value={inputValue}

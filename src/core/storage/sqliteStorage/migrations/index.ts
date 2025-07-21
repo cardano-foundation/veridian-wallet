@@ -1,4 +1,9 @@
-import { SqlMigration, TsMigration, CloudMigration, HybridMigration } from "./migrations.types";
+import {
+  SqlMigration,
+  TsMigration,
+  CloudMigration,
+  HybridMigration,
+} from "./migrations.types";
 import { DATA_V001 } from "./v0.0.1-init_sql";
 import { DATA_V1201 } from "./v1.2.0.1-connections-per-account";
 
