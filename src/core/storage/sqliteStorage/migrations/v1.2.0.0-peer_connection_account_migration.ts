@@ -81,6 +81,7 @@ export const DATA_V1200: TsMigration = {
           url: peerConnectionData.url,
           iconB64: peerConnectionData.iconB64,
           createdAt: peerConnectionData.createdAt,
+          tags: peerConnectionData.tags,
         };
 
         // eslint-disable-next-line no-console
