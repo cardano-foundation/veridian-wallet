@@ -591,10 +591,8 @@ class IdentifierService extends AgentService {
           displayName: parsed.displayName,
           theme,
           groupMetadata: {
-            groupId: parsed.groupMetadata.groupId,
+            ...parsed.groupMetadata,
             groupCreated: false,
-            groupInitiator: parsed.groupMetadata.groupInitiator,
-            userName: parsed.groupMetadata.userName,
           },
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
@@ -657,10 +655,8 @@ class IdentifierService extends AgentService {
       // Mark as created
       await this.identifierStorage.updateIdentifierMetadata(groupMemberPre, {
         groupMetadata: {
-          groupId: mhabParsed.groupMetadata.groupId,
+          ...mhabParsed.groupMetadata,
           groupCreated: true,
-          groupInitiator: mhabParsed.groupMetadata.groupInitiator,
-          userName: mhabParsed.groupMetadata.userName,
         },
       });
 
