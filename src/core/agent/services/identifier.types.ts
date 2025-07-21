@@ -5,6 +5,8 @@ import {
   JSONObject,
 } from "../agent.types";
 import { IdentifierMetadataRecord } from "../records";
+import { CredentialShortDetails } from "./credentialService.types";
+import { PeerConnectionDetails } from "../../cardano/walletConnect/peerConnection.types";
 
 interface GroupMetadata {
   groupId: string;
@@ -28,21 +30,11 @@ interface IdentifierShortDetails {
   groupMemberPre?: string;
 }
 
-export interface AccountDetails extends IdentifierShortDetails {
-  s: string;
-  dt: string;
-  kt: string | string[];
-  k: string[];
-  nt: string | string[];
-  n: string[];
-  bt: string;
-  b: string[];
-  di?: string;
-  members?: string[];
-  credentials: any[];
-  connections: any[];
-  notifications: any[];
-  peerConnections: any[];
+export interface AccountDetails {
+  identifier: IdentifierShortDetails;
+  connections: ConnectionShortDetails[];
+  credentials: CredentialShortDetails[];
+  peerConnections: PeerConnectionDetails[];
 }
 
 interface IdentifierDetails extends IdentifierShortDetails {
@@ -110,7 +102,6 @@ export type {
   MultiSigIcpRequestDetails,
   CreateIdentifierInputs,
   CreateIdentifierResult,
-  AccountDetails,
 };
 
 export { IdentifierType };

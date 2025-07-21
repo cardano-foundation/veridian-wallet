@@ -1,4 +1,4 @@
-import { PeerConnection } from "../../cardano/walletConnect/peerConnection.types";
+import { PeerConnectionDetails } from "../../cardano/walletConnect/peerConnection.types";
 import { StorageService } from "../../storage/storage.types";
 import {
   PeerConnectionMetadataRecord,
@@ -14,7 +14,7 @@ class PeerConnectionStorage {
     this.storageService = storageService;
   }
 
-  async getPeerConnection(id: string): Promise<PeerConnection> {
+  async getPeerConnection(id: string): Promise<PeerConnectionDetails> {
     const metadata = await this.getPeerConnectionMetadata(id);
     return {
       id: metadata.id,
@@ -41,7 +41,7 @@ class PeerConnectionStorage {
     return metadata;
   }
 
-  async getAllPeerConnectionMetadata(): Promise<PeerConnection[]> {
+  async getAllPeerConnectionMetadata(): Promise<PeerConnectionDetails[]> {
     const records = await this.storageService.getAll(
       PeerConnectionMetadataRecord
     );

@@ -51,7 +51,7 @@ interface PeerConnectionError {
   info: string;
 }
 
-interface PeerConnection {
+interface PeerConnectionDetails {
   id: string;
   name?: string;
   url?: string;
@@ -77,5 +77,5 @@ export type {
   PeerDisconnectedEvent,
   PeerConnectionBrokenEvent,
   PeerConnectionError,
-  PeerConnection,
+  PeerConnectionDetails,
 };

@@ -20,6 +20,7 @@ import {
   BranAndMnemonic,
   AgentUrls,
   MiscRecordId,
+  ConnectionShortDetails,
 } from "./agent.types";
 import { CoreEventEmitter } from "./event";
 import {
@@ -47,6 +48,9 @@ import { OperationPendingRecord } from "./records/operationPendingRecord";
 import { EventTypes, KeriaStatusChangedEvent } from "./event.types";
 import { isNetworkError, OnlineOnly, randomSalt } from "./services/utils";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
+import { CredentialShortDetails } from "./services/credentialService.types";
+import { AccountDetails } from "./services/identifier.types";
+import { PeerConnectionDetails } from "../cardano/walletConnect/peerConnection.types";
 
 const walletId = "idw";
 class Agent {
@@ -613,21 +617,24 @@ class Agent {
   }
 
   @OnlineOnly
-  async getAccountDetails(id: string): Promise<any> {
-    const identifier = await this.identifiers.getIdentifier(id);
-    const credentials = await this.credentials.getCredentials(true);
-    const connections = await this.connections.getConnections();
-    const peerConnections =
-      await this.peerConnectionMetadataStorage.createPeerConnectionMetadataRecord(
-        ""
-      );
+  async getAccountDetails(id: string): Promise<AccountDetails> {
+    if (!id) {
+      throw new Error("Identifier ID is required to fetch account details.");
+    }
 
-    const accountDetails = {
-      ...identifier,
+    const identifier = await this.identifiers.getIdentifier(id);
+
+    const accountDetails: AccountDetails = {
+      identifier,
       credentials: [],
       connections: [],
       peerConnections: [],
     };
+
+    const credentials = await this.credentials.getCredentials(true);
+    const connections = await this.connections.getConnections();
+    const peerConnections =
+      await this.peerConnectionMetadataStorage.getAllPeerConnectionMetadata();
 
     for (const credential of credentials) {
       if (credential.identifierId === id) {
@@ -642,7 +649,7 @@ class Agent {
     }
 
     for (const peerConnection of peerConnections) {
-      if (peerConnection.identifierId === id) {
+      if (peerConnection.selectedAid === id) {
         accountDetails.peerConnections.push(peerConnection);
       }
     }
