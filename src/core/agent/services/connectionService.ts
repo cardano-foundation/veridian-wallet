@@ -218,6 +218,7 @@ class ConnectionService extends AgentService {
           status: ConnectionStatus.PENDING,
           url,
           label: alias,
+          identifier: sharedIdentifier,
         },
       });
     }
@@ -387,6 +388,38 @@ class ConnectionService extends AgentService {
     await this.connectionStorage.deleteById(id);
   }
 
+  @OnlineOnly
+  async deleteConnectionByIdAndIdentifier(contactId: string, identifier: string): Promise<void> {
+    const connectionPair = await this.connectionPairStorage.findAllByQuery({
+      contactId,
+      identifier,
+    });
+
+    if(connectionPair.length > 0) {
+      await this.connectionPairStorage.deleteById(connectionPair[0].id);
+    }
+
+    // The contact record should only be deleted if this is the last connection record pair being deleted
+    // The KERIA contact in the cloud should be deleted if this is the last connection record pair being deleted
+    const connectionPairs = await this.connectionPairStorage.findAllByQuery({
+      contactId,
+    });
+
+    if(connectionPairs.length === 0) {
+      await this.contactStorage.deleteById(contactId);
+
+      await this.props.signifyClient
+      .contacts()
+      .delete(contactId)
+      .catch((error) => {
+        const status = error.message.split(" - ")[1];
+        if (!/404/gi.test(status)) {
+          throw error;
+        }
+      });
+    }
+  }
+
   async markConnectionPendingDelete(id: string): Promise<void> {
     const connectionProps = await this.connectionStorage.findById(id);
     if (!connectionProps) return;
@@ -499,15 +532,29 @@ class ConnectionService extends AgentService {
     connectionId: string,
     metadata: Record<string, unknown> // @TODO - foconnor: Proper typing here.
   ): Promise<void> {
-    await this.connectionStorage.save({
-      id: connectionId,
-      alias: metadata.alias as string,
-      oobi: metadata.oobi as string,
-      groupId: metadata.groupId as string,
-      creationStatus: metadata.creationStatus as CreationStatus,
-      createdAt: new Date(metadata.createdAtUTC as string),
-      sharedIdentifier: metadata.sharedIdentifier as string,
-    });
+    const createdAt = new Date(metadata.createdAtUTC as string);
+    const contact = await this.contactStorage.findById(connectionId);
+
+    if(!contact) {
+      await this.contactStorage.save({
+        id: connectionId,
+        alias: metadata.alias as string,
+        oobi: metadata.oobi as string,
+        groupId: metadata.groupId as string,
+        createdAt,
+      });
+    }
+
+    if(!metadata.groupId) {
+      await this.connectionPairStorage.save({
+        id: randomSalt(),
+        contactId: connectionId,
+        identifier: metadata.sharedIdentifier as string,
+        creationStatus: metadata.creationStatus as CreationStatus,
+        pendingDeletion: false,
+        createdAt,
+      });
+    }
   }
 
   private async getConnectionMetadataById(
@@ -544,7 +591,8 @@ class ConnectionService extends AgentService {
   @OnlineOnly
   async resolveOobi(
     url: string,
-    waitForCompletion = true
+    waitForCompletion = true,
+    identifier?: string
   ): Promise<{
     op: Operation & { response: State };
     alias: string;
@@ -593,7 +641,7 @@ class ConnectionService extends AgentService {
             await this.props.signifyClient.contacts().update(connectionId, {
               alias,
               groupCreationId,
-              createdAt,
+              [`${identifier}:createdAt`]: createdAt,
               oobi: url,
             });
           } else {
@@ -603,6 +651,12 @@ class ConnectionService extends AgentService {
       }
     } else {
       operation = await this.props.signifyClient.oobis().resolve(strippedUrl);
+
+      // When an OOBI is resolved, we should always share the identifier of the connection record pair via /introduce
+      if(identifier) {
+        await this.shareIdentifier(operation.response.i, identifier);
+      }
+
       await this.operationPendingStorage.save({
         id: operation.name,
         recordType: OperationPendingRecordType.Oobi,
