@@ -122,8 +122,6 @@ export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
         );
       }
 
-      // TODO:
-      // await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       if (individualFirstCreate) {
         await Agent.agent.basicStorage
           .deleteById(MiscRecordId.INDIVIDUAL_FIRST_CREATE)
