@@ -48,22 +48,23 @@ export const DATA_V1201: HybridMigration = {
 
     function instertItemTags(itemRecord: any) {
       const statements = [];
-      const statement = "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
+      const statement =
+        "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
       const tags = itemRecord.tags;
-      console.log('tags', tags);
+      console.log("tags", tags);
       for (const key of Object.keys(tags)) {
-        if(tags[key] === undefined || tags[key] === null) continue;
-       if(typeof tags[key] === 'boolean') {
-        statements.push({
-          statement: statement,
-          values: [itemRecord.id, key, tags[key] ? '1' : '0', 'boolean']
-        });
-       } else if(typeof tags[key] === 'string') {
-        statements.push({
-          statement: statement,
-          values: [itemRecord.id, key, tags[key], 'string']
-        });
-       }
+        if (tags[key] === undefined || tags[key] === null) continue;
+        if (typeof tags[key] === "boolean") {
+          statements.push({
+            statement: statement,
+            values: [itemRecord.id, key, tags[key] ? "1" : "0", "boolean"],
+          });
+        } else if (typeof tags[key] === "string") {
+          statements.push({
+            statement: statement,
+            values: [itemRecord.id, key, tags[key], "string"],
+          });
+        }
       }
       return statements;
     }
@@ -79,14 +80,14 @@ export const DATA_V1201: HybridMigration = {
         tags: {
           groupId: connectionData.groupId,
         },
-        type: 'ContactRecord',
+        type: "ContactRecord",
       };
-      console.log('contactRecord', contactRecord);
+      console.log("contactRecord", contactRecord);
 
-       // we need to delete the connection with this id, because it will be replaced by the new connection in items table
-       statements.push({
+      // we need to delete the connection with this id, because it will be replaced by the new connection in items table
+      statements.push({
         statement: "DELETE FROM items WHERE id = ?",
-        values: [connection.id]
+        values: [connection.id],
       });
 
       const connectionPairsToInsert: any[] = [];
@@ -107,7 +108,7 @@ export const DATA_V1201: HybridMigration = {
               creationStatus: connectionData.creationStatus,
               pendingDeletion: connectionData.pendingDeletion,
             },
-            type: 'ConnectionPairRecord',
+            type: "ConnectionPairRecord",
           });
         }
       } else {
@@ -129,7 +130,7 @@ export const DATA_V1201: HybridMigration = {
               creationStatus: connectionData.creationStatus,
               pendingDeletion: connectionData.pendingDeletion,
             },
-            type: 'ConnectionPairRecord',
+            type: "ConnectionPairRecord",
           });
         }
       }

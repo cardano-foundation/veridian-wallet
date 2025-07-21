@@ -233,9 +233,11 @@ class ConnectionService extends AgentService {
       pendingDeletion: false,
     });
 
-    for(const connectionPair of connectionPairs) {
-      const contact = await this.contactStorage.findById(connectionPair.contactId);
-      
+    for (const connectionPair of connectionPairs) {
+      const contact = await this.contactStorage.findById(
+        connectionPair.contactId
+      );
+
       connections.push({
         id: connectionPair.contactId,
         alias: contact?.alias,
@@ -243,7 +245,7 @@ class ConnectionService extends AgentService {
         oobi: contact?.oobi,
         groupId: contact?.groupId,
         creationStatus: connectionPair.creationStatus,
-        pendingDeletion: connectionPair.pendingDeletion
+        pendingDeletion: connectionPair.pendingDeletion,
       });
     }
 
@@ -279,9 +281,7 @@ class ConnectionService extends AgentService {
     return connectionsDetails;
   }
 
-  private getConnectionShortDetails(
-    record: any
-  ): ConnectionShortDetails {
+  private getConnectionShortDetails(record: any): ConnectionShortDetails {
     let status = ConnectionStatus.PENDING;
     if (record.creationStatus === CreationStatus.COMPLETE) {
       status = ConnectionStatus.CONFIRMED;
@@ -297,7 +297,10 @@ class ConnectionService extends AgentService {
       oobi: record.oobi,
     };
 
-    const groupId = record instanceof ConnectionRecord ? record.getTags().groupId : record.groupId;
+    const groupId =
+      record instanceof ConnectionRecord
+        ? record.getTags().groupId
+        : record.groupId;
     if (groupId) {
       connection.groupId = groupId as string;
     }
@@ -391,13 +394,16 @@ class ConnectionService extends AgentService {
   }
 
   @OnlineOnly
-  async deleteConnectionByIdAndIdentifier(contactId: string, identifier: string): Promise<void> {
+  async deleteConnectionByIdAndIdentifier(
+    contactId: string,
+    identifier: string
+  ): Promise<void> {
     const connectionPair = await this.connectionPairStorage.findAllByQuery({
       contactId,
       identifier,
     });
 
-    if(connectionPair.length > 0) {
+    if (connectionPair.length > 0) {
       await this.connectionPairStorage.deleteById(connectionPair[0].id);
     }
 
@@ -407,18 +413,18 @@ class ConnectionService extends AgentService {
       contactId,
     });
 
-    if(connectionPairs.length === 0) {
+    if (connectionPairs.length === 0) {
       await this.contactStorage.deleteById(contactId);
 
       await this.props.signifyClient
-      .contacts()
-      .delete(contactId)
-      .catch((error) => {
-        const status = error.message.split(" - ")[1];
-        if (!/404/gi.test(status)) {
-          throw error;
-        }
-      });
+        .contacts()
+        .delete(contactId)
+        .catch((error) => {
+          const status = error.message.split(" - ")[1];
+          if (!/404/gi.test(status)) {
+            throw error;
+          }
+        });
     }
   }
 
@@ -537,7 +543,7 @@ class ConnectionService extends AgentService {
     const createdAt = new Date(metadata.createdAtUTC as string);
     const contact = await this.contactStorage.findById(connectionId);
 
-    if(!contact) {
+    if (!contact) {
       await this.contactStorage.save({
         id: connectionId,
         alias: metadata.alias as string,
@@ -547,7 +553,7 @@ class ConnectionService extends AgentService {
       });
     }
 
-    if(!metadata.groupId) {
+    if (!metadata.groupId) {
       await this.connectionPairStorage.save({
         id: randomSalt(),
         contactId: connectionId,
@@ -655,7 +661,7 @@ class ConnectionService extends AgentService {
       operation = await this.props.signifyClient.oobis().resolve(strippedUrl);
 
       // When an OOBI is resolved, we should always share the identifier of the connection record pair via /introduce
-      if(identifier) {
+      if (identifier) {
         await this.shareIdentifier(operation.response.i, identifier);
       }
 
