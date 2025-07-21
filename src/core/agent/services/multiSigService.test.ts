@@ -393,7 +393,7 @@ describe("Creation of multi-sig", () => {
     );
 
     expectAllWitnessIntroductions();
-    expect(identifierCreateIcpDataMock).toBeCalledWith("0:testUser", {
+    expect(identifierCreateIcpDataMock).toBeCalledWith("0:Identifier 2", {
       algo: "group",
       mhab: getMemberIdentifierResponse,
       isith: 2,
