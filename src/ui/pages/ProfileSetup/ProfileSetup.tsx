@@ -114,7 +114,7 @@ export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
       if (isGroup) {
         await Agent.agent.basicStorage.createOrUpdateBasicRecord(
           new BasicRecord({
-            id: MiscRecordId.CURRENT_PROFILE,
+            id: MiscRecordId.CURRENT_PROFILE_ID,
             content: {
               userName,
             },
@@ -133,7 +133,7 @@ export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
       // Set as default if it's the first identifier
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
-          id: MiscRecordId.CURRENT_PROFILE,
+          id: MiscRecordId.CURRENT_PROFILE_ID,
           content: { defaultProfile: identifier },
         })
       );

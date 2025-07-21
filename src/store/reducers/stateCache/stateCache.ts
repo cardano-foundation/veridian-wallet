@@ -192,9 +192,6 @@ const stateCacheSlice = createSlice({
     setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
       state.isSetupProfile = action.payload;
     },
-    setDefaultProfile: (state, action: PayloadAction<string>) => {
-      state.authentication.defaultProfile = action.payload;
-    },
   },
 });
 
@@ -225,7 +222,6 @@ const {
   clearStateCache,
   showGlobalLoading,
   setIsSetupProfile,
-  setDefaultProfile,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -316,5 +312,4 @@ export {
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
-  setDefaultProfile,
 };

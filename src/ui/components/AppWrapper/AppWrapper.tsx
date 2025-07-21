@@ -346,7 +346,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
         await Agent.agent.keriaNotifications.getNotifications();
 
       const currentProfileId = await Agent.agent.basicStorage.findById(
-        MiscRecordId.CURRENT_PROFILE
+        MiscRecordId.CURRENT_PROFILE_ID
       );
 
       const currentProfileName = storedIdentifiers.find(
