@@ -8,7 +8,6 @@ describe("habName", () => {
         name: "01:1-groupId123:MyGroup",
         expected: {
           displayName: "MyGroup",
-          isGroupMember: true,
           theme: "01",
           groupMetadata: {
             groupInitiator: true,
@@ -21,7 +20,6 @@ describe("habName", () => {
         name: "01:0-groupId456:AnotherGroup",
         expected: {
           displayName: "AnotherGroup",
-          isGroupMember: true,
           theme: "01",
           groupMetadata: {
             groupInitiator: false,
@@ -34,7 +32,6 @@ describe("habName", () => {
         name: "01:1-gr@up!d:MyGroup",
         expected: {
           displayName: "MyGroup",
-          isGroupMember: true,
           theme: "01",
           groupMetadata: {
             groupInitiator: true,
@@ -47,7 +44,6 @@ describe("habName", () => {
         name: "01:1-group-with-hyphens:MyGroup",
         expected: {
           displayName: "MyGroup",
-          isGroupMember: true,
           theme: "01",
           groupMetadata: {
             groupInitiator: true,
@@ -60,7 +56,6 @@ describe("habName", () => {
         name: "01:1-group-id-extra:DisplayName", // Invalid groupPart for old format
         expected: {
           displayName: "DisplayName",
-          isGroupMember: true,
           theme: "01",
           groupMetadata: {
             groupInitiator: true,
@@ -81,7 +76,6 @@ describe("habName", () => {
         expected: {
           version: "1.2.0.3",
           displayName: "MyNewGroup",
-          isGroupMember: true,
           theme: "XX",
           groupMetadata: {
             groupInitiator: true,
@@ -95,7 +89,6 @@ describe("habName", () => {
         expected: {
           version: "1.2.0.3",
           displayName: "Group Name",
-          isGroupMember: true,
           theme: "XX",
           groupMetadata: {
             groupInitiator: true,
@@ -109,7 +102,6 @@ describe("habName", () => {
         expected: {
           version: "1.2.0.3",
           displayName: "MyNewGroup",
-          isGroupMember: true,
           theme: "XX",
           groupMetadata: {
             groupInitiator: true,
@@ -123,7 +115,6 @@ describe("habName", () => {
         expected: {
           version: "1.2.0.3",
           displayName: "MyNewWallet",
-          isGroupMember: false,
           theme: "XX",
         },
       },
@@ -178,7 +169,6 @@ describe("habName", () => {
       {
         parts: {
           displayName: "FormattedWallet",
-          isGroupMember: false,
           theme: "XX",
         },
         expected: "1.2.0.3:XX:FormattedWallet", // Non-group member format
@@ -186,7 +176,6 @@ describe("habName", () => {
       {
         parts: {
           displayName: "FormattedGroup",
-          isGroupMember: true,
           theme: "XX",
           groupMetadata: {
             groupId: "groupXYZ",
@@ -199,7 +188,6 @@ describe("habName", () => {
       {
         parts: {
           displayName: "",
-          isGroupMember: false,
           theme: "XX",
         },
         expected: "1.2.0.3:XX:",
@@ -207,7 +195,6 @@ describe("habName", () => {
       {
         parts: {
           displayName: "Group !@#$%^&*()",
-          isGroupMember: false,
           theme: "XX",
         },
         expected: "1.2.0.3:XX:Group !@#$%^&*()",
@@ -215,7 +202,6 @@ describe("habName", () => {
       {
         parts: {
           displayName: "Group 🚀",
-          isGroupMember: false,
           theme: "XX",
         },
         expected: "1.2.0.3:XX:Group 🚀",
@@ -223,7 +209,6 @@ describe("habName", () => {
       {
         parts: {
           displayName: "Display:Name:With:Colons",
-          isGroupMember: false,
           theme: "XX",
         },
         expected: "1.2.0.3:XX:Display:Name:With:Colons",

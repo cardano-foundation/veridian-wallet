@@ -95,10 +95,23 @@ export const MIGRATION_V1203: HybridMigration = {
         console.log(
           `[v${migrationVersion}] Updating cloud identifier: ${currentName} (${identifier.prefix})`
         );
+
+        if (
+          !parts.groupMetadata?.groupInitiator ||
+          !parts.groupMetadata?.groupId
+        ) {
+          // eslint-disable-next-line no-console
+          console.error(
+            "Invalid identifier name format: Expected groupInitiator and groupId to be present in groupMetadata."
+          );
+          continue;
+        }
+
         const newName = formatToV1_2_0_3({
           ...parts,
           groupMetadata: {
-            ...parts.groupMetadata,
+            groupInitiator: parts.groupMetadata?.groupInitiator,
+            groupId: parts.groupMetadata?.groupId,
             userName: parts.groupMetadata?.userName || "",
           },
         });

@@ -2,11 +2,10 @@ export interface HabNameParts {
   version?: string;
   displayName: string;
   groupMetadata?: {
-    groupInitiator?: boolean;
-    groupId?: string;
-    userName?: string;
+    groupInitiator: boolean;
+    groupId: string;
+    userName: string;
   };
-  isGroupMember?: boolean;
   theme?: string;
 }
 
@@ -31,7 +30,6 @@ export function parseHabName(name: string): HabNameParts {
         version,
         theme,
         displayName,
-        isGroupMember: false,
       };
     }
 
@@ -61,14 +59,13 @@ export function parseHabName(name: string): HabNameParts {
     if (!groupId || groupId.trim() === "") {
       throw new Error("Invalid new format name: groupId cannot be empty.");
     }
-    if (!userName || userName.trim() === "") {
-      throw new Error("Invalid new format name: userName cannot be empty.");
+    if (!userName) {
+      throw new Error("Invalid new format name: userName cannot be null.");
     }
 
     return {
       version,
       theme,
-      isGroupMember: true,
       displayName,
       groupMetadata: {
         groupInitiator: groupInitiatorStr === "1",
@@ -96,7 +93,6 @@ export function parseHabName(name: string): HabNameParts {
     return {
       theme,
       displayName,
-      isGroupMember: false,
     };
   }
 
@@ -120,7 +116,6 @@ export function parseHabName(name: string): HabNameParts {
 
   return {
     theme,
-    isGroupMember: true,
     displayName,
     groupMetadata: {
       groupInitiator: groupInitiatorStr === "1",
@@ -135,7 +130,10 @@ export function formatToV1_2_0_3(parts: HabNameParts): string {
   const themePart = parts.theme || ""; // Ensure theme is not undefined
   const displayNamePart = parts.displayName || ""; // Ensure display name is not undefined
 
-  if (parts.isGroupMember && parts.groupMetadata) {
+  if (
+    parts.groupMetadata?.groupId?.length &&
+    parts.groupMetadata?.groupInitiator !== undefined
+  ) {
     const groupInitiatorStr = parts.groupMetadata.groupInitiator ? "1" : "0";
     const groupIdPart = parts.groupMetadata.groupId || "";
     const userNamePart = parts.groupMetadata.userName || "";

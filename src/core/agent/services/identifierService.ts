@@ -195,8 +195,7 @@ class IdentifierService extends AgentService {
       let metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">;
 
       if (
-        parsed.isGroupMember &&
-        parsed.groupMetadata?.groupId &&
+        parsed.groupMetadata?.groupId.length &&
         parsed.groupMetadata?.userName !== undefined &&
         parsed.groupMetadata?.groupInitiator !== undefined
       ) {
@@ -591,8 +590,7 @@ class IdentifierService extends AgentService {
         .get(identifier.prefix)) as HabState;
 
       if (
-        parsed.isGroupMember &&
-        parsed.groupMetadata?.groupId &&
+        parsed.groupMetadata?.groupId?.length &&
         parsed.groupMetadata?.userName !== undefined &&
         parsed.groupMetadata?.groupInitiator !== undefined
       ) {
@@ -659,8 +657,7 @@ class IdentifierService extends AgentService {
       const mhabParsed = parseHabName(identifier.group.mhab.name);
 
       if (
-        !mhabParsed.isGroupMember ||
-        !mhabParsed.groupMetadata?.groupId ||
+        !mhabParsed.groupMetadata?.groupId?.length ||
         mhabParsed.groupMetadata?.userName === undefined ||
         mhabParsed.groupMetadata?.groupInitiator === undefined
       ) {
