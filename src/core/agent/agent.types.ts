@@ -56,6 +56,7 @@ interface ConnectionShortDetails {
   logo?: string;
   oobi?: string;
   groupId?: string;
+  sharedIdentifier?: string;
 }
 
 type ConnectionNoteDetails = {

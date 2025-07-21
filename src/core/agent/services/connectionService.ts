@@ -270,6 +270,7 @@ class ConnectionService extends AgentService {
       createdAtUTC: record.createdAt.toISOString(),
       status,
       oobi: record.oobi,
+      sharedIdentifier: record.sharedIdentifier,
     };
     const groupId = record.getTag(OobiQueryParams.GROUP_ID);
     if (groupId) {

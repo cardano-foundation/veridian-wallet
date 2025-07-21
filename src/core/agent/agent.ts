@@ -634,7 +634,7 @@ class Agent {
     const credentials = await this.credentials.getCredentials(true);
     const connections = await this.connections.getConnections();
     const peerConnections =
-      await this.peerConnectionMetadataStorage.getAllPeerConnectionMetadata();
+      await this.peerConnectionStorage.getAllPeerConnectionMetadata();
 
     for (const credential of credentials) {
       if (credential.identifierId === id) {
@@ -643,7 +643,7 @@ class Agent {
     }
 
     for (const connection of connections) {
-      if (connection.id === id) {
+      if (connection.sharedIdentifier === id) {
         accountDetails.connections.push(connection);
       }
     }

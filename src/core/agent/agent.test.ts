@@ -2,6 +2,7 @@ const stopPollingMock = jest.fn();
 const getAllIdentifiersMock = jest.fn();
 const getAllCredentialsMock = jest.fn();
 const getAllConnectionsMock = jest.fn();
+const getPeerConnectionsMock = jest.fn();
 const getAllNotificationsMock = jest.fn();
 const updateIdentifierMock = jest.fn();
 const deleteCredentialMock = jest.fn().mockResolvedValue(undefined);
@@ -41,14 +42,6 @@ jest.mock("../cardano/walletConnect/peerConnection", () => ({
   },
 }));
 
-const signifyClient = jest.mocked({
-  connect: jest.fn(),
-  boot: jest.fn(),
-  identifiers: () => ({
-    update: updateIdentifierMock,
-  }),
-});
-
 const eventEmitter = new CoreEventEmitter();
 eventEmitter.emit = jest.fn().mockImplementation(() => Promise.resolve());
 jest.mock("bip39", () => ({
@@ -72,15 +65,18 @@ const mockConnectionService = {
   removeConnectionsPendingDeletion: jest.fn(),
   resolvePendingConnections: jest.fn(),
   syncKeriaContacts: jest.fn(),
+  getConnections: jest.fn(),
 };
 const mockIdentifierService = {
   processIdentifiersPendingCreation: jest.fn(),
   removeIdentifiersPendingDeletion: jest.fn(),
   syncKeriaIdentifiers: jest.fn(),
+  getIdentifier: jest.fn(),
 };
 const mockCredentialService = {
   syncKeriaCredentials: jest.fn(),
   removeCredentialsPendingDeletion: jest.fn(),
+  getCredentials: jest.fn(),
 };
 const mockMultiSigService = {
   processGroupsPendingCreation: jest.fn(),
@@ -99,6 +95,9 @@ const mockConnectionStorage = {
 };
 const mockNotificationStorage = {
   getAll: getAllNotificationsMock,
+};
+const mockPeerConnectionStorage = {
+  getAllPeerConnectionMetadata: getPeerConnectionsMock,
 };
 
 const mockEntropy = "00000000000000000000000000000000";
@@ -446,10 +445,14 @@ describe("Agent setup and wiping", () => {
       signifyClient: mockSignifyClient,
     };
     (agent as any).keriaNotificationService = mockKeriaNotificationService;
+    (agent as any).credentialService = mockCredentialService;
+    (agent as any).connectionService = mockConnectionService;
+    (agent as any).identifierService = mockIdentifierService;
     (agent as any).identifierStorage = mockIdentifierStorage;
     (agent as any).credentialStorage = mockCredentialStorage;
     (agent as any).connectionStorage = mockConnectionStorage;
     (agent as any).notificationStorage = mockNotificationStorage;
+    (agent as any).peerConnectionStorage = mockPeerConnectionStorage;
 
     mockAgentUrls = {
       url: "http://127.0.0.1:3901",
@@ -501,5 +504,53 @@ describe("Agent setup and wiping", () => {
     expect(stopPollingMock).toBeCalled();
     expect(wipeSessionMock).toBeCalledWith("idw");
     expect(SecureStorage.wipe).toBeCalled();
+  });
+
+  test("should throw an error if identifier ID is not provided", async () => {
+    await expect(agent.getAccountDetails("")).rejects.toThrow(
+      "Identifier ID is required to fetch account details."
+    );
+  });
+  test("should return correct account details with matching credentials, connections, and peer connections", async () => {
+    const identifierId = "EABC123";
+    const otherIdentifierId = "EDEF456";
+    const mockIdentifier = {
+      id: identifierId,
+      displayName: "My Account",
+    };
+
+    // Assuming credential objects have an 'identifierId' property to link them to an identifier
+    const mockCredentials = [
+      { id: "cred-1", identifierId: identifierId, claims: {} },
+      { id: "cred-2", identifierId: otherIdentifierId, claims: {} },
+      { id: "cred-3", identifierId: identifierId, claims: {} },
+    ];
+    // Assuming connection objects have an 'identifierId' property which is the identifier's ID
+    const mockConnections = [
+      { id: "conn-1", identifierId: identifierId, alias: "Connection 1" },
+      { id: "conn-2", identifierId: otherIdentifierId, alias: "Connection 2" },
+    ];
+    const mockPeerConnections = [
+      { dAppAddress: identifierId, metadata: "some-data" },
+      { dAppAddress: otherIdentifierId, metadata: "other-data" },
+    ];
+
+    mockIdentifierService.getIdentifier.mockResolvedValue(mockIdentifier);
+    mockCredentialService.getCredentials.mockResolvedValue(mockCredentials);
+    mockConnectionService.getConnections.mockResolvedValue(mockConnections);
+    getPeerConnectionsMock.mockResolvedValue(mockPeerConnections);
+
+    const accountDetails = await agent.getAccountDetails(identifierId);
+
+    expect(accountDetails.identifier).toEqual(mockIdentifier);
+    expect(accountDetails.credentials).toHaveLength(2);
+    expect(accountDetails.credentials).toEqual([
+      mockCredentials[0],
+      mockCredentials[2],
+    ]);
+    expect(accountDetails.connections).toHaveLength(1);
+    expect(accountDetails.connections).toEqual([mockConnections[0]]);
+    expect(accountDetails.peerConnections).toHaveLength(1);
+    expect(accountDetails.peerConnections[0]).toEqual(mockPeerConnections[0]);
   });
 });
