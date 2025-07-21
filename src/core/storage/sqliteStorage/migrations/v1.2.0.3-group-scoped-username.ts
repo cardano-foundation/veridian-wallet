@@ -98,12 +98,7 @@ export const MIGRATION_V1203: HybridMigration = {
 
         const newName = formatToV1_2_0_3({
           ...parts,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          groupMetadata: {
-            ...parts.groupMetadata,
-            userName: parts.groupMetadata?.userName || "",
-          },
+          groupMetadata: parts.groupMetadata,
         });
         await signifyClient
           .identifiers()
