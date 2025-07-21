@@ -19,7 +19,7 @@
     "active": true,
     "notes": "REDS attacks on @capacitor/assets and the Appium server when e2e testing do not impact the wallet."
   },
-  "1106462": {
+  "1106485": {
     "active": true,
     "notes": "Appium server responses when e2e testing is unlikely to impact the wallet."
   }

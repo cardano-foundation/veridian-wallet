@@ -1,8 +1,5 @@
 import { StorageService } from "../../storage/storage.types";
-import {
-  ContactRecord,
-  ContactRecordStorageProps,
-} from "./contactRecord";
+import { ContactRecord, ContactRecordStorageProps } from "./contactRecord";
 
 export class ContactStorage {
   private storageService: StorageService<ContactRecord>;
@@ -39,4 +36,4 @@ export class ContactStorage {
   getAll(): Promise<ContactRecord[]> {
     return this.storageService.getAll(ContactRecord);
   }
-} 
+}

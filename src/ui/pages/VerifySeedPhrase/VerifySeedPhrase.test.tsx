@@ -452,7 +452,7 @@ describe("Verify Seed Phrase Page", () => {
 
     await waitFor(() => {
       const seedNumberElements = matchingSeedPhraseContainer.querySelectorAll(
-        "span[data-testid*=\"word-index-number\"]"
+        'span[data-testid*="word-index-number"]'
       );
       expect(seedNumberElements.length).toBe(MNEMONIC_WORDS);
     });
@@ -474,7 +474,7 @@ describe("Verify Seed Phrase Page", () => {
 
     await waitFor(() => {
       const seedNumberElements = originalSeedPhraseContainer.querySelectorAll(
-        "span[data-testid*=\"word-index-number\"]"
+        'span[data-testid*="word-index-number"]'
       );
       expect(seedNumberElements.length).toBe(0);
     });

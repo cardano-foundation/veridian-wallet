@@ -346,8 +346,10 @@ class ConnectionService extends AgentService {
           `${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_REVOKE}`
         )
       ) {
-        const historyItem = JSON.parse(connection[key] as string);
-        if (full || !skippedHistoryTypes.includes(historyItem.type)) {
+        const historyItem: ConnectionHistoryItem = JSON.parse(
+          connection[key] as string
+        );
+        if (full || !skippedHistoryTypes.includes(historyItem.historyType)) {
           historyItems.push(historyItem);
         }
       }

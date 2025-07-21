@@ -69,11 +69,11 @@ const CredentialRequestInformation = ({
 
   const missingProposedCred = proposedCredId
     ? !(
-      credsCache.some((credential) => credential.id === proposedCredId) ||
+        credsCache.some((credential) => credential.id === proposedCredId) ||
         archivedCredsCache.some(
           (credential) => credential.id === proposedCredId
         )
-    )
+      )
     : false;
 
   const getCred = useCallback(async () => {

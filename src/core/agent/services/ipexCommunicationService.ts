@@ -353,15 +353,15 @@ class IpexCommunicationService extends AgentService {
       agreeNoteRecord.hidden = true;
     }
 
-    await this.operationPendingStorage.save({
-      id: op.name,
-      recordType: OperationPendingRecordType.ExchangePresentCredential,
-    });
-
     await this.createLinkedIpexMessageRecord(
       agreeExn,
       ConnectionHistoryType.IPEX_AGREE_COMPLETE
     );
+
+    await this.operationPendingStorage.save({
+      id: op.name,
+      recordType: OperationPendingRecordType.ExchangePresentCredential,
+    });
 
     await this.notificationStorage.update(agreeNoteRecord);
   }
@@ -393,13 +393,13 @@ class IpexCommunicationService extends AgentService {
       "-a-i": exchange.exn.rp,
       ...(Object.keys(attributes).length > 0
         ? {
-          ...Object.fromEntries(
-            Object.entries(attributes).map(([key, value]) => [
-              "-a-" + key,
-              value,
-            ])
-          ),
-        }
+            ...Object.fromEntries(
+              Object.entries(attributes).map(([key, value]) => [
+                "-a-" + key,
+                value,
+              ])
+            ),
+          }
         : {}),
     };
 
@@ -1196,7 +1196,7 @@ class IpexCommunicationService extends AgentService {
     const indexerOobiResult = await (
       await fetch(`${agentBase}/indexer/${prefix}`)
     ).text();
-    const schemaBase = indexerOobiResult.split("\"url\":\"")[1].split("\"")[0];
+    const schemaBase = indexerOobiResult.split('"url":"')[1].split('"')[0];
 
     return `${schemaBase}/oobi/${said}`;
   }

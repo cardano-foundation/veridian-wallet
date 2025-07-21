@@ -46,4 +46,4 @@ class ConnectionPairRecord extends BaseRecord {
 }
 
 export type { ConnectionPairRecordStorageProps };
-export { ConnectionPairRecord }; 
+export { ConnectionPairRecord };
