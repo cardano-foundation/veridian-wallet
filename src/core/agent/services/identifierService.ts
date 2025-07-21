@@ -603,8 +603,9 @@ class IdentifierService extends AgentService {
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
           sxlt: identifierDetail.salty?.sxlt,
-          isDeleted:
-            parsed.theme === IdentifierService.DELETED_IDENTIFIER_THEME,
+          isDeleted: identifier.name.startsWith(
+            IdentifierService.DELETED_IDENTIFIER_THEME
+          ),
         });
         continue;
       }
@@ -616,7 +617,9 @@ class IdentifierService extends AgentService {
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
         sxlt: identifierDetail.salty?.sxlt,
-        isDeleted: parsed.theme === IdentifierService.DELETED_IDENTIFIER_THEME,
+        isDeleted: identifier.name.startsWith(
+          IdentifierService.DELETED_IDENTIFIER_THEME
+        ),
       });
     }
 
@@ -672,7 +675,9 @@ class IdentifierService extends AgentService {
         groupMemberPre,
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
-        isDeleted: parsed.theme === IdentifierService.DELETED_IDENTIFIER_THEME,
+        isDeleted: identifier.name.startsWith(
+          IdentifierService.DELETED_IDENTIFIER_THEME
+        ),
       });
     }
   }
