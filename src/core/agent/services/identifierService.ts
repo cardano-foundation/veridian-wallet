@@ -194,19 +194,15 @@ class IdentifierService extends AgentService {
       const parsed = parseHabName(queued);
       let metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">;
 
-      if (
-        parsed.groupMetadata?.groupId.length &&
-        parsed.groupMetadata?.userName !== undefined &&
-        parsed.groupMetadata?.groupInitiator !== undefined
-      ) {
+      if (parsed.groupMetadata) {
         metadata = {
           theme: parsed.theme ? parseInt(parsed.theme, 10) : 0,
           displayName: parsed.displayName,
           groupMetadata: {
-            groupId: parsed.groupMetadata?.groupId,
+            groupId: parsed.groupMetadata.groupId,
             groupCreated: false,
-            groupInitiator: parsed.groupMetadata?.groupInitiator,
-            userName: parsed.groupMetadata?.userName,
+            groupInitiator: parsed.groupMetadata.groupInitiator,
+            userName: parsed.groupMetadata.userName,
           },
         };
       } else {
@@ -595,10 +591,10 @@ class IdentifierService extends AgentService {
           displayName: parsed.displayName,
           theme,
           groupMetadata: {
-            groupId: parsed.groupMetadata?.groupId,
+            groupId: parsed.groupMetadata.groupId,
             groupCreated: false,
-            groupInitiator: parsed.groupMetadata?.groupInitiator,
-            userName: parsed.groupMetadata?.userName,
+            groupInitiator: parsed.groupMetadata.groupInitiator,
+            userName: parsed.groupMetadata.userName,
           },
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
@@ -661,10 +657,10 @@ class IdentifierService extends AgentService {
       // Mark as created
       await this.identifierStorage.updateIdentifierMetadata(groupMemberPre, {
         groupMetadata: {
-          groupId: mhabParsed.groupMetadata?.groupId,
+          groupId: mhabParsed.groupMetadata.groupId,
           groupCreated: true,
-          groupInitiator: mhabParsed.groupMetadata?.groupInitiator,
-          userName: mhabParsed.groupMetadata?.userName,
+          groupInitiator: mhabParsed.groupMetadata.groupInitiator,
+          userName: mhabParsed.groupMetadata.userName,
         },
       });
 
