@@ -153,7 +153,19 @@ export const DATA_V1201: HybridMigration = {
       "Starting cloud KERIA migration: Converting connections to account-based model"
     );
 
-    let identifiers = (await signifyClient.identifiers().list()).aids;
+    let identifiers: any[] = [];
+    let returned = -1;
+    let iteration = 0;
+
+    while (returned !== 0) {
+      const result = await signifyClient
+        .identifiers()
+        .list(iteration * (24 + 1), 24 + iteration * (24 + 1));
+      identifiers.push(...result.aids);
+
+      returned = result.aids.length;
+      iteration += 1;
+    }
 
     identifiers = identifiers.filter(
       (identifier: any) => !identifier.name.startsWith("XX")
