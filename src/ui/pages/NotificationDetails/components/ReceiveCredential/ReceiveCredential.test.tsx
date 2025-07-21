@@ -326,6 +326,7 @@ describe("Receive credential", () => {
           time: Date.now(),
           passcodeIsSet: true,
         },
+        profileHistories: [],
         isOnline: true,
       },
       credsCache: {
@@ -375,13 +376,13 @@ describe("Receive credential", () => {
     fireEvent.click(getByTestId("related-identifier-detail"));
 
     await waitFor(() => {
-      expect(getByTestId("identifier-detail-page")).toBeVisible();
+      expect(getByTestId("profile-details-page")).toBeVisible();
     });
 
     fireEvent.click(getByTestId("back-button"));
 
     await waitFor(() => {
-      expect(queryByTestId("identifier-detail-page")).toBeNull();
+      expect(queryByTestId("profile-details-page")).toBeNull();
     });
   }, 10000);
 

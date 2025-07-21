@@ -16,7 +16,7 @@ import { identifierFix } from "../../../__fixtures__/identifierFix";
 import { OperationType, ToastMsgType } from "../../../globals/types";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../utils/passcodeFiller";
-import { IdentifierColor } from "../../CreateIdentifier/components/IdentifierColorSelector";
+import { IdentifierColor } from "../../EditProfile/components/IdentifierColorSelector";
 import { TabsRoutePath } from "../../navigation/TabsMenu";
 import { Stage } from "../CreateGroupIdentifier.types";
 import { SetupConnections } from "./SetupConnections";

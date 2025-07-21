@@ -47,6 +47,7 @@ const initialState = {
       passcodeIsSet: true,
       defaultProfile: "",
     },
+    profileHistories: [],
   },
   identifiersCache: {
     identifiers: filteredIdentifierMapFix,

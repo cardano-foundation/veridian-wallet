@@ -68,6 +68,7 @@ interface StateCacheProps {
   forceInitApp?: number;
   showLoading?: boolean;
   isSetupProfile?: boolean;
+  profileHistories: string[];
 }
 
 enum InitializationPhase {

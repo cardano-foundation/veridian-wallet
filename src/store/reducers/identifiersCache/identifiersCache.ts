@@ -105,9 +105,6 @@ export const {
 const getIdentifiersCache = (state: RootState) =>
   state.identifiersCache?.identifiers;
 
-const getDefaultProfile = (state: RootState) =>
-  Object.values(state.identifiersCache?.identifiers).at(0);
-
 const getMultiSigGroupCache = (state: RootState) =>
   state.identifiersCache?.multiSigGroup;
 
@@ -121,7 +118,6 @@ const getIndividualFirstCreateSetting = (state: RootState) =>
   state.identifiersCache.individualFirstCreate;
 
 export {
-  getDefaultProfile,
   getIdentifiersCache,
   getIndividualFirstCreateSetting,
   getMultiSigGroupCache,

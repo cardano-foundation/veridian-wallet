@@ -24,7 +24,7 @@ import {
 } from "../../CardDetails";
 import { CardTheme } from "../../CardTheme";
 import { FallbackIcon } from "../../FallbackIcon";
-import { ProfileDetailModal } from "../../ProfileDetailModal";
+import { ProfileDetailsModal } from "../../ProfileDetailsModal";
 import { ListHeader } from "../../ListHeader";
 import { ReadMore } from "../../ReadMore";
 import {
@@ -58,7 +58,7 @@ const RelatedIdentifier = ({ identifierId }: IssuedIdentifierProps) => {
           />
         </CardBlock>
       )}
-      <ProfileDetailModal
+      <ProfileDetailsModal
         isOpen={openIdentifierDetail}
         setIsOpen={setOpenIdentifierDetail}
         profileId={identifierId}

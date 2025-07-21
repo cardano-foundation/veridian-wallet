@@ -19,7 +19,9 @@ const List = ({ data, title, bottomText, fullText, mask }: ListProps) => {
             <CardDetailsItem
               key={index}
               info={item.title}
-              startSlot={<FallbackIcon src={item.image} />}
+              startSlot={
+                item.avatar ? item.avatar : <FallbackIcon src={item.image} />
+              }
               className="member"
               testId={`group-member-${item.title}`}
               mask={mask}
@@ -28,7 +30,7 @@ const List = ({ data, title, bottomText, fullText, mask }: ListProps) => {
                 item.isCurrentUser && (
                   <div className="user-label">
                     <IonIcon icon={star} />
-                    <span>{i18n.t("profiledetails.detailmodal.you")}</span>
+                    <span>{i18n.t("profiledetails.detailsmodal.you")}</span>
                   </div>
                 )
               }

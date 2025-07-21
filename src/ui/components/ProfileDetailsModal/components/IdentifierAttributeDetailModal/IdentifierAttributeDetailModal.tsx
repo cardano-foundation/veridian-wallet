@@ -2,7 +2,7 @@ import { IonModal } from "@ionic/react";
 import { i18n } from "../../../../../i18n";
 import { useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
-import { getAuthentication } from "../../../../../store/reducers/stateCache";
+import { MemberAvatar } from "../../../Avatar";
 import { InfoCard } from "../../../InfoCard";
 import { ScrollablePageLayout } from "../../../layout/ScrollablePageLayout";
 import { PageHeader } from "../../../PageHeader";
@@ -23,7 +23,6 @@ const IdentifierAttributeDetailModal = ({
   data,
   setViewType,
 }: IdentifierAttributeDetailModalProps) => {
-  const userName = useAppSelector(getAuthentication)?.userName;
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
 
   const handleClose = () => {
@@ -38,12 +37,20 @@ const IdentifierAttributeDetailModal = ({
 
       if (!memberConnection?.label) {
         currentUserIndex = index;
-        name = userName;
+        name = data.displayName;
       }
+
+      const rank = index >= 0 ? index % 5 : 0;
 
       return {
         title: name,
         isCurrentUser: !memberConnection?.label,
+        avatar: (
+          <MemberAvatar
+            firstLetter={name.at(0)?.toLocaleUpperCase() || ""}
+            rank={rank}
+          />
+        ),
       };
     });
 
@@ -66,10 +73,10 @@ const IdentifierAttributeDetailModal = ({
         return (
           <List
             bottomText={`${i18n.t(
-              `profiledetails.detailmodal.${view}.bottomtext`,
+              `profiledetails.detailsmodal.${view}.bottomtext`,
               { members: members?.length || 0 }
             )}`}
-            title={`${i18n.t(`profiledetails.detailmodal.${view}.title`)}`}
+            title={`${i18n.t(`profiledetails.detailsmodal.${view}.title`)}`}
             data={members || []}
             mask
           />
@@ -96,10 +103,10 @@ const IdentifierAttributeDetailModal = ({
           pageId={view}
           header={
             <PageHeader
-              title={`${i18n.t(`profiledetails.detailmodal.${view}.title`)}`}
+              title={`${i18n.t(`profiledetails.detailsmodal.${view}.title`)}`}
               closeButton
               closeButtonLabel={`${i18n.t(
-                "profiledetails.detailmodal.button.done"
+                "profiledetails.detailsmodal.button.done"
               )}`}
               closeButtonAction={handleClose}
             />
@@ -107,13 +114,13 @@ const IdentifierAttributeDetailModal = ({
         >
           <div className="attribute-description">
             <h3>
-              {i18n.t(`profiledetails.detailmodal.${view}.propexplain.title`)}
+              {i18n.t(`profiledetails.detailsmodal.${view}.propexplain.title`)}
             </h3>
           </div>
           <InfoCard
             className="attribute-description-content"
             content={i18n.t(
-              `profiledetails.detailmodal.${view}.propexplain.content`
+              `profiledetails.detailsmodal.${view}.propexplain.content`
             )}
           />
           {renderContent()}

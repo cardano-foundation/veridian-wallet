@@ -37,7 +37,7 @@ import {
   MultisigMember,
 } from "../../../../components/CredentialDetailModule/components";
 import { FallbackIcon } from "../../../../components/FallbackIcon";
-import { ProfileDetailModal } from "../../../../components/ProfileDetailModal";
+import { ProfileDetailsModal } from "../../../../components/ProfileDetailsModal";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
@@ -552,10 +552,10 @@ const ReceiveCredential = ({
         viewOnly
       />
       {credDetail && (
-        <ProfileDetailModal
+        <ProfileDetailsModal
           isOpen={openIdentifierDetail}
           setIsOpen={setOpenIdentifierDetail}
-          pageId="identifier-detail"
+          pageId="profile-details"
           profileId={credDetail.identifierId}
         />
       )}

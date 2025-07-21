@@ -58,6 +58,7 @@ describe("getBackRoute", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        profileHistories: [],
       },
       identifiersCache: {
         identifiers: {},
@@ -181,6 +182,7 @@ describe("getPreviousRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
+        profileHistories: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,

@@ -2,7 +2,24 @@ import { IonButton } from "@ionic/react";
 import { useAppSelector } from "../../../store/hooks";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import "./Avatar.scss";
-import { AvatarProps } from "./Avatar.types";
+import { AvatarProps, MemberAvatarProps } from "./Avatar.types";
+
+const MemberAvatar = ({
+  firstLetter,
+  handleClick,
+  rank,
+}: MemberAvatarProps) => {
+  return (
+    <IonButton
+      shape="round"
+      className={"avatar-button" + " rank-" + rank}
+      data-testid="avatar-button"
+      onClick={handleClick}
+    >
+      <span>{firstLetter}</span>
+    </IonButton>
+  );
+};
 
 const Avatar = ({ id, handleAvatarClick }: AvatarProps) => {
   const identifiersDataCache = useAppSelector(getIdentifiersCache) || {};
@@ -22,15 +39,12 @@ const Avatar = ({ id, handleAvatarClick }: AvatarProps) => {
   const { firstLetter, rank } = getAvatarContent(id);
 
   return (
-    <IonButton
-      shape="round"
-      className={"avatar-button" + " rank-" + rank}
-      data-testid="avatar-button"
-      onClick={handleAvatarClick}
-    >
-      <span>{firstLetter}</span>
-    </IonButton>
+    <MemberAvatar
+      firstLetter={firstLetter}
+      rank={rank}
+      handleClick={handleAvatarClick}
+    />
   );
 };
 
-export { Avatar };
+export { Avatar, MemberAvatar };

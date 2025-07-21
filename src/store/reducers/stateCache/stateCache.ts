@@ -17,6 +17,7 @@ const initialState: StateCacheProps = {
   recoveryCompleteNoInterruption: false,
   isOnline: false,
   routes: [],
+  profileHistories: [],
   authentication: {
     loggedIn: false,
     userName: "",
@@ -187,11 +188,14 @@ const stateCacheSlice = createSlice({
         forceInitApp: (state.forceInitApp || 0) + 1,
       };
     },
+    setDefaultProfile: (state, action: PayloadAction<string>) => {
+      state.authentication.defaultProfile = action.payload;
+    },
     setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
       state.isSetupProfile = action.payload;
     },
-    setDefaultProfile: (state, action: PayloadAction<string>) => {
-      state.authentication.defaultProfile = action.payload;
+    setProfileHistories: (state, action: PayloadAction<string[]>) => {
+      state.profileHistories = action.payload;
     },
   },
 });
@@ -223,6 +227,7 @@ const {
   showGlobalLoading,
   setIsSetupProfile,
   setDefaultProfile,
+  setProfileHistories,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -255,6 +260,10 @@ const getForceInitApp = (state: RootState) => state.stateCache.forceInitApp;
 const getGlobalLoading = (state: RootState) => state.stateCache.showLoading;
 const getShowSetupProfilePage = (state: RootState) =>
   state.stateCache.isSetupProfile;
+const getDefaultProfile = (state: RootState) =>
+  state.stateCache.authentication.defaultProfile;
+const getProfileHistories = (state: RootState) =>
+  state.stateCache.profileHistories;
 
 export type {
   AuthenticationCacheProps,
@@ -270,12 +279,14 @@ export {
   getCameraDirection,
   getCurrentOperation,
   getCurrentRoute,
+  getDefaultProfile,
   getFirstAppLaunch,
   getForceInitApp,
   getGlobalLoading,
   getInitializationPhase,
   getIsOnline,
   getLoginAttempt,
+  getProfileHistories,
   getQueueIncomingRequest,
   getRecoveryCompleteNoInterruption,
   getRoutes,
@@ -296,18 +307,19 @@ export {
   setCameraDirection,
   setCurrentOperation,
   setCurrentRoute,
+  setDefaultProfile,
   setFirstAppLaunchComplete,
   setInitializationPhase,
   setIsOnline,
+  setIsSetupProfile,
   setLoginAttempt,
   setPauseQueueIncomingRequest,
+  setProfileHistories,
   setQueueIncomingRequest,
   setRecoveryCompleteNoInterruption,
-  setIsSetupProfile,
   setToastMsg,
   showGenericError,
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
-  setDefaultProfile,
 };

@@ -1,5 +1,11 @@
 .cloud-error {
   .responsive-page-content {
-    justify-content: space-between;
+    .info-card {
+      margin-top: 1.5rem;
+    }
+
+    .page-footer {
+      padding: 0;
+    }
   }
 }

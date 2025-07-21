@@ -15,25 +15,23 @@ import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
 import { createThemeValue, getTheme } from "../../utils/theme";
-import { IdentifierColorSelector } from "../CreateIdentifier/components/IdentifierColorSelector";
-import { IdentifierThemeSelector } from "../CreateIdentifier/components/IdentifierThemeSelector";
 import { CustomInput } from "../CustomInput";
 import { ErrorMessage } from "../ErrorMessage";
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import { PageFooter } from "../PageFooter";
 import { PageHeader } from "../PageHeader";
-import "./EditIdentifier.scss";
-import { EditIdentifierProps } from "./EditIdentifier.types";
+import "./EditProfile.scss";
+import { EditProfileProps } from "./EditProfile.types";
 
 const IDENTIFIER_NOT_EXIST = "Identifier not existed. id: ";
 const DUPLICATE_NAME = "Identifier name is a duplicate";
 
-const EditIdentifier = ({
+const EditProfile = ({
   modalIsOpen,
   setModalIsOpen,
   cardData,
   setCardData,
-}: EditIdentifierProps) => {
+}: EditProfileProps) => {
   const pageId = "edit-identifier";
   const dispatch = useAppDispatch();
   const identifiersData = useAppSelector(getIdentifiersCache);
@@ -192,25 +190,6 @@ const EditIdentifier = ({
             />
           ) : null}
         </div>
-        <span className="theme-input-title">{`${i18n.t(
-          "profiledetails.options.inner.color"
-        )}`}</span>
-        <div className="card-theme">
-          <IdentifierColorSelector
-            value={newSelectedColor}
-            onColorChange={setNewSelectedColor}
-          />
-        </div>
-        <span className="theme-input-title">{`${i18n.t(
-          "profiledetails.options.inner.theme"
-        )}`}</span>
-        <div className="card-theme">
-          <IdentifierThemeSelector
-            color={newSelectedColor}
-            selectedTheme={newSelectedTheme}
-            setSelectedTheme={setNewSelectedTheme}
-          />
-        </div>
       </ScrollablePageLayout>
       {isLoading && (
         <div
@@ -224,4 +203,4 @@ const EditIdentifier = ({
   );
 };
 
-export { EditIdentifier };
+export { EditProfile };

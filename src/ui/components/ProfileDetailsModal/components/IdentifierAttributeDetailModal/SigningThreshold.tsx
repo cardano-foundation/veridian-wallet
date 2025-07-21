@@ -3,18 +3,18 @@ import { CardBlock, CardDetailsItem } from "../../../CardDetails";
 import { ListHeader } from "../../../ListHeader";
 import { SigningThresholdProps } from "./IdentifierAttributeDetailModal.types";
 
-const RotationThreshold = ({ data }: SigningThresholdProps) => {
+export const SigningThreshold = ({ data }: SigningThresholdProps) => {
   return (
     <>
       <ListHeader
         title={i18n.t(
-          "profiledetails.detailmodal.rotationthreshold.threshold.title"
+          "profiledetails.detailsmodal.signingthreshold.threshold.title"
         )}
       />
-      <CardBlock testId="threshhold-block">
+      <CardBlock testId="signing-threshold-block">
         <CardDetailsItem
           info={i18n.t(
-            "profiledetails.detailmodal.rotationthreshold.threshold.text",
+            "profiledetails.detailsmodal.signingthreshold.threshold.text",
             {
               members: data.members?.length || 0,
               threshold: data.kt,
@@ -25,5 +25,3 @@ const RotationThreshold = ({ data }: SigningThresholdProps) => {
     </>
   );
 };
-
-export { RotationThreshold };

@@ -10,7 +10,7 @@ import { identifierFix } from "../../__fixtures__/identifierFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
-import { EditIdentifier } from "./EditIdentifier";
+import { EditProfile } from "./EditProfile";
 
 const updateMock = jest.fn();
 
@@ -75,7 +75,7 @@ jest.mock("../CustomInput", () => ({
   },
 }));
 
-describe("Edit identifier", () => {
+describe("Edit profile", () => {
   const dispatchMock = jest.fn();
   let mockedStore: Store<unknown, AnyAction>;
   beforeEach(() => {
@@ -110,7 +110,7 @@ describe("Edit identifier", () => {
     const setCardData = jest.fn();
     const { unmount } = render(
       <Provider store={mockedStore}>
-        <EditIdentifier
+        <EditProfile
           modalIsOpen={true}
           setModalIsOpen={setIdentifierOptionsIsOpen}
           setCardData={setCardData}
@@ -136,7 +136,7 @@ describe("Edit identifier", () => {
 
     const { getByTestId } = render(
       <Provider store={mockedStore}>
-        <EditIdentifier
+        <EditProfile
           modalIsOpen={true}
           setModalIsOpen={setIdentifierOptionsIsOpen}
           setCardData={setCardData}
@@ -149,14 +149,10 @@ describe("Edit identifier", () => {
 
     expect(getByTestId("edit-name-input")).toBeVisible();
 
-    act(() => {
-      fireEvent.click(getByTestId("identifier-theme-selector-item-1"));
-    });
-
     await waitFor(() => {
       expect(
         getByTestId("primary-button-edit-identifier").getAttribute("disabled")
-      ).toBe("false");
+      ).toBe("");
     });
 
     act(() => {
@@ -171,7 +167,7 @@ describe("Edit identifier", () => {
   test("Display error when display name invalid", async () => {
     const { getByTestId, getByText } = render(
       <Provider store={mockedStore}>
-        <EditIdentifier
+        <EditProfile
           modalIsOpen={true}
           setModalIsOpen={jest.fn()}
           setCardData={jest.fn()}

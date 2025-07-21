@@ -1,6 +1,6 @@
 import { IdentifierDetails } from "../../../../core/agent/services/identifier.types";
 
-interface IdentifierContentProps {
+interface ProfileContentProps {
   oobi: string;
   cardData: IdentifierDetails;
   onRotateKey: () => void;
@@ -12,4 +12,4 @@ interface ProfileInformationProps {
   text: string;
 }
 
-export type { IdentifierContentProps, ProfileInformationProps };
+export type { ProfileContentProps, ProfileInformationProps };

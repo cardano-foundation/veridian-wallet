@@ -1,4 +1,12 @@
-.identifier-details-module {
+.cloud-error {
+  ion-title {
+    h2 {
+      text-align: left;
+    }
+  }
+}
+
+.profile-details-module {
   .page-header {
     .back-button {
       background: var(--ion-color-neutral-100) !important;
@@ -99,6 +107,59 @@
         }
       }
 
+      &.group-members {
+        .card-details-info-block-line {
+          align-items: center;
+          .card-details-info-block-line-start-icon {
+            height: auto;
+
+            ion-button.avatar-button {
+              width: 1.5rem;
+              min-height: auto;
+              margin-bottom: 0.125rem;
+
+              span {
+                font-size: 1rem;
+                line-height: 1rem;
+              }
+
+              &::part(native) {
+                width: 1.5rem;
+                height: 1.5rem;
+              }
+            }
+
+            @media screen and (min-width: 250px) and (max-width: 370px) {
+              width: auto;
+            }
+          }
+        }
+
+        .user-label {
+          padding: 0.25rem 0.5rem;
+          background: var(--ion-color-card-theme-one);
+          border-radius: 0.25rem;
+          display: flex;
+          align-items: center;
+          margin-left: 0.5rem;
+          color: var(--ion-color-neutral-100);
+
+          &.hidden {
+            visibility: hidden;
+          }
+
+          ion-icon {
+            margin-right: 0.25rem;
+          }
+
+          span {
+            font-weight: 400;
+            font-size: 0.75rem;
+            line-height: 1rem;
+          }
+        }
+      }
+
       &.flat-border-top {
         margin-top: 0.25rem;
       }
@@ -150,7 +211,7 @@
     padding: 0;
   }
 
-  .identifier-details-split-section {
+  .profile-details-split-section {
     margin: 0;
     display: flex;
     justify-content: space-between;
@@ -221,7 +282,7 @@
   }
 
   @media screen and (min-width: 250px) and (max-width: 370px) {
-    .identifier-details-split-section {
+    .profile-details-split-section {
       flex-direction: column;
 
       .card-block {

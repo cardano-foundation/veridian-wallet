@@ -3,4 +3,10 @@ interface AvatarProps {
   handleAvatarClick?: () => void;
 }
 
-export type { AvatarProps };
+interface MemberAvatarProps {
+  rank: number;
+  firstLetter: string;
+  handleClick?: () => void;
+}
+
+export type { AvatarProps, MemberAvatarProps };

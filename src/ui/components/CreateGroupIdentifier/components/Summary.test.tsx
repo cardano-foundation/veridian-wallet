@@ -7,7 +7,7 @@ import { store } from "../../../../store";
 import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { connectionsFix } from "../../../__fixtures__/connectionsFix";
 import { ToastMsgType } from "../../../globals/types";
-import { IdentifierColor } from "../../CreateIdentifier/components/IdentifierColorSelector";
+import { IdentifierColor } from "../../EditProfile/components/IdentifierColorSelector";
 import { Stage } from "../CreateGroupIdentifier.types";
 import { Summary } from "./Summary";
 import { makeTestStore } from "../../../utils/makeTestStore";

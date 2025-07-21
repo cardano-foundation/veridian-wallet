@@ -2,15 +2,27 @@ const verifySecretMock = jest.fn().mockResolvedValue(true);
 
 import { Clipboard } from "@capacitor/clipboard";
 import { ionFireEvent } from "@ionic/react-test-utils";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  getDefaultNormalizer,
+  render,
+  waitFor,
+} from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
-import { CreationStatus } from "../../../core/agent/agent.types";
+import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
 import { ConfigurationService } from "../../../core/configuration";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
-import { setToastMsg } from "../../../store/reducers/stateCache";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import {
+  setDefaultProfile,
+  setProfileHistories,
+  setToastMsg,
+} from "../../../store/reducers/stateCache";
+import {
+  filteredIdentifierFix,
+  filteredIdentifierMapFix,
+} from "../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { ToastMsgType } from "../../globals/types";
 import {
@@ -19,9 +31,10 @@ import {
   getUTCOffset,
 } from "../../utils/formatters";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { passcodeFiller } from "../../utils/passcodeFiller";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { AccordionKey } from "./components/IdentifierAttributeDetailModal/IdentifierAttributeDetailModal.types";
-import { ProfileDetailModal } from "./ProfileDetailModal";
+import { ProfileDetailsModal } from "./ProfileDetailsModal";
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -80,7 +93,9 @@ jest.mock("../../../core/agent/agent", () => ({
       basicStorage: {
         findById: jest.fn(),
         save: jest.fn(),
-        createOrUpdateBasicRecord: () => createOrUpdateMock(),
+        createOrUpdateBasicRecord: (param: unknown) =>
+          createOrUpdateMock(param),
+        deleteById: jest.fn(),
       },
       auth: {
         verifySecret: verifySecretMock,
@@ -141,7 +156,7 @@ describe("Individual Identifier details page", () => {
     Clipboard.write = jest.fn();
     const { getByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -178,7 +193,7 @@ describe("Individual Identifier details page", () => {
     Clipboard.write = jest.fn();
     const { getByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -218,7 +233,7 @@ describe("Individual Identifier details page", () => {
   test("It opens the sharing modal", async () => {
     const { getByTestId, queryByTestId } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -249,7 +264,7 @@ describe("Individual Identifier details page", () => {
   test("It opens the edit modal", async () => {
     const { getByTestId, getByText } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -279,7 +294,7 @@ describe("Individual Identifier details page", () => {
 
     const { getByText, unmount, findByText, queryByText } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -327,7 +342,7 @@ describe("Individual Identifier details page", () => {
   test("It shows the warning when I click on the big delete button", async () => {
     const { getByTestId, queryByText, findByText, unmount } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -375,7 +390,7 @@ describe("Individual Identifier details page", () => {
 
     const { getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -395,7 +410,7 @@ describe("Individual Identifier details page", () => {
   test("Hide loading after retrieved indetifier data", async () => {
     const { queryByTestId } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -447,7 +462,7 @@ describe("Individual Identifier details page", () => {
 
     const { queryByTestId, getByTestId, getByText } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -544,7 +559,7 @@ describe("Individual Identifier details page", () => {
 
     const { getByTestId, unmount, queryByTestId } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -696,9 +711,9 @@ describe("Group Identifier details page", () => {
       dispatch: dispatchMock,
     };
 
-    const { getByTestId, getAllByText, getByText } = render(
+    const { getByTestId, getAllByText } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -707,9 +722,13 @@ describe("Group Identifier details page", () => {
         />
       </Provider>
     );
-    await waitFor(() =>
-      expect(getByText(identifierFix[2].displayName)).toBeInTheDocument()
-    );
+
+    await waitFor(() => {
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      getAllByText(identifierFix[2].displayName).forEach((item) => {
+        expect(item).toBeVisible();
+      });
+    });
 
     // Render Group members
     expect(getByTestId("group-member-0-text-value").innerHTML).toBe("Member 0");
@@ -737,9 +756,9 @@ describe("Group Identifier details page", () => {
   });
 
   test("Open group member", async () => {
-    const { getByText, getByTestId } = render(
+    const { getByText, getByTestId, getAllByText } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -749,9 +768,12 @@ describe("Group Identifier details page", () => {
       </Provider>
     );
 
-    await waitFor(() =>
-      expect(getByText(identifierFix[2].displayName)).toBeInTheDocument()
-    );
+    await waitFor(() => {
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      getAllByText(identifierFix[2].displayName).forEach((item) => {
+        expect(item).toBeVisible();
+      });
+    });
 
     // Render Group members
     expect(getByTestId("group-member-0-text-value").innerHTML).toBe("Member 0");
@@ -763,13 +785,13 @@ describe("Group Identifier details page", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.groupmember.propexplain
+          EN_TRANSLATIONS.profiledetails.detailsmodal.groupmember.propexplain
             .title
         )
       ).toBeVisible();
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.groupmember.propexplain
+          EN_TRANSLATIONS.profiledetails.detailsmodal.groupmember.propexplain
             .content
         )
       ).toBeVisible();
@@ -777,9 +799,9 @@ describe("Group Identifier details page", () => {
   });
 
   test("Open signing threshold", async () => {
-    const { getByText, getByTestId } = render(
+    const { getByText, getAllByText } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -788,10 +810,12 @@ describe("Group Identifier details page", () => {
         />
       </Provider>
     );
-
-    await waitFor(() =>
-      expect(getByText(identifierFix[2].displayName)).toBeInTheDocument()
-    );
+    await waitFor(() => {
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      getAllByText(identifierFix[2].displayName).forEach((item) => {
+        expect(item).toBeVisible();
+      });
+    });
 
     fireEvent.click(
       getByText(EN_TRANSLATIONS.profiledetails.group.signingkeysthreshold.title)
@@ -800,13 +824,13 @@ describe("Group Identifier details page", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.signingthreshold
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold
             .propexplain.title
         )
       ).toBeVisible();
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.signingthreshold
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold
             .propexplain.content
         )
       ).toBeVisible();
@@ -814,9 +838,9 @@ describe("Group Identifier details page", () => {
   });
 
   test("Open advanced detail", async () => {
-    const { getByText, getByTestId } = render(
+    const { getByText, getByTestId, getAllByText } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -826,9 +850,12 @@ describe("Group Identifier details page", () => {
       </Provider>
     );
 
-    await waitFor(() =>
-      expect(getByText(identifierFix[2].displayName)).toBeInTheDocument()
-    );
+    await waitFor(() => {
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      getAllByText(identifierFix[2].displayName).forEach((item) => {
+        expect(item).toBeVisible();
+      });
+    });
 
     fireEvent.click(
       getByText(EN_TRANSLATIONS.profiledetails.identifierdetail.showadvanced)
@@ -863,7 +890,7 @@ describe("Group Identifier details page", () => {
 
     expect(
       getByText(
-        EN_TRANSLATIONS.profiledetails.detailmodal.advanceddetail.viewkey.replace(
+        EN_TRANSLATIONS.profiledetails.detailsmodal.advanceddetail.viewkey.replace(
           "{{keys}}",
           "1"
         )
@@ -871,7 +898,7 @@ describe("Group Identifier details page", () => {
     ).toBeInTheDocument();
     expect(
       getByText(
-        EN_TRANSLATIONS.profiledetails.detailmodal.advanceddetail.viewrotationkey.replace(
+        EN_TRANSLATIONS.profiledetails.detailsmodal.advanceddetail.viewrotationkey.replace(
           "{{keys}}",
           "1"
         )
@@ -885,7 +912,7 @@ describe("Group Identifier details page", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.advanceddetail.hidekey.replace(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.advanceddetail.hidekey.replace(
             "{{keys}}",
             "1"
           )
@@ -900,7 +927,7 @@ describe("Group Identifier details page", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.advanceddetail.hiderotationkey.replace(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.advanceddetail.hiderotationkey.replace(
             "{{keys}}",
             "1"
           )
@@ -910,9 +937,9 @@ describe("Group Identifier details page", () => {
   });
 
   test("Open rotation threshold", async () => {
-    const { getByText, getByTestId } = render(
+    const { getByText, getAllByText } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -922,26 +949,29 @@ describe("Group Identifier details page", () => {
       </Provider>
     );
 
-    await waitFor(() =>
-      expect(getByText(identifierFix[2].displayName)).toBeInTheDocument()
-    );
+    await waitFor(() => {
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      getAllByText(identifierFix[2].displayName).forEach((item) => {
+        expect(item).toBeVisible();
+      });
+    });
 
     fireEvent.click(
       getByText(
-        EN_TRANSLATIONS.profiledetails.detailmodal.rotationthreshold.title
+        EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold.title
       )
     );
 
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.rotationthreshold
+          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
             .propexplain.title
         )
       ).toBeVisible();
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.rotationthreshold
+          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
             .propexplain.content
         )
       ).toBeVisible();
@@ -949,9 +979,9 @@ describe("Group Identifier details page", () => {
   });
 
   test("Open group member from rotation threshold", async () => {
-    const { getByText, getByTestId } = render(
+    const { getByText, getAllByText } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -961,26 +991,29 @@ describe("Group Identifier details page", () => {
       </Provider>
     );
 
-    await waitFor(() =>
-      expect(getByText(identifierFix[2].displayName)).toBeInTheDocument()
-    );
+    await waitFor(() => {
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      getAllByText(identifierFix[2].displayName).forEach((item) => {
+        expect(item).toBeVisible();
+      });
+    });
 
     fireEvent.click(
       getByText(
-        EN_TRANSLATIONS.profiledetails.detailmodal.rotationthreshold.title
+        EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold.title
       )
     );
 
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.rotationthreshold
+          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
             .propexplain.title
         )
       ).toBeVisible();
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailmodal.rotationthreshold
+          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
             .propexplain.content
         )
       ).toBeVisible();
@@ -1024,7 +1057,7 @@ describe("Group Identifier details page", () => {
 
     const { queryByTestId } = render(
       <Provider store={storeMockedAidKeri}>
-        <ProfileDetailModal
+        <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
           onClose={jest.fn()}
           pageId={pageId}
@@ -1043,5 +1076,371 @@ describe("Group Identifier details page", () => {
     await waitFor(() =>
       expect(queryByTestId("signing-key-0-action-icon")).toBe(null)
     );
+  });
+});
+
+describe("Checking the Identifier Details Page when information is missing from the cloud", () => {
+  beforeEach(() => {
+    getIndentifier.mockImplementation(() => {
+      throw new Error(`${Agent.MISSING_DATA_ON_KERIA}: id`);
+    });
+    verifySecretMock.mockResolvedValue(true);
+  });
+
+  test("Identifier exists in the database but not on Signify", async () => {
+    const initialStateKeri = {
+      stateCache: {
+        routes: [TabsRoutePath.CREDENTIALS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+        },
+        isOnline: true,
+        profileHistories: [],
+      },
+      seedPhraseCache: {
+        seedPhrase:
+          "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
+        bran: "bran",
+      },
+      identifiersCache: {
+        identifiers: filteredIdentifierFix,
+        favourites: [],
+      },
+      connectionsCache: {
+        multisigConnections: {},
+      },
+      biometricsCache: {
+        enabled: false,
+      },
+    };
+
+    const storeMockedAidKeri = {
+      ...makeTestStore(initialStateKeri),
+      dispatch: dispatchMock,
+    };
+
+    const { getByTestId, getByText, unmount, queryByText } = render(
+      <Provider store={storeMockedAidKeri}>
+        <ProfileDetailsModal
+          profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
+          onClose={jest.fn()}
+          pageId={pageId}
+          isOpen
+          setIsOpen={jest.fn}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(
+        getByTestId("identifier-card-details-cloud-error-page")
+      ).toBeVisible();
+
+      expect(
+        getByText(EN_TRANSLATIONS.profiledetails.clouderror, {
+          normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+        })
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("delete-button-identifier-card-details"));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.profiledetails.delete.alert.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByTestId("alert-confirm-identifier-delete-details-confirm-button")
+    );
+    fireEvent.click(
+      getByTestId("alert-confirm-identifier-delete-details-cancel-button")
+    );
+
+    await waitFor(() => {
+      expect(
+        queryByText(EN_TRANSLATIONS.profiledetails.delete.alert.title)
+      ).toBeNull();
+    });
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
+    });
+
+    await passcodeFiller(getByText, getByTestId, "193212");
+
+    await waitFor(() => {
+      expect(deleteStaleLocalIdentifierMock).toBeCalled();
+    });
+
+    unmount();
+  });
+});
+
+describe("Set default profile when delete profile", () => {
+  test("Set recent profile as default profile", async () => {
+    const initialStateKeri = {
+      stateCache: {
+        routes: [TabsRoutePath.CREDENTIALS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+          defaultProfile: filteredIdentifierFix[0].id,
+        },
+        isOnline: true,
+        profileHistories: [
+          filteredIdentifierFix[0].id,
+          filteredIdentifierFix[2].id,
+          filteredIdentifierFix[1].id,
+        ],
+      },
+      identifiersCache: {
+        identifiers: filteredIdentifierMapFix,
+      },
+    };
+
+    const storeMockedAidKeri = {
+      ...makeTestStore(initialStateKeri),
+      dispatch: dispatchMock,
+    };
+
+    const { findByText, getByText, queryByText, getByTestId } = render(
+      <Provider store={storeMockedAidKeri}>
+        <ProfileDetailsModal
+          profileId={filteredIdentifierFix[0].id}
+          onClose={jest.fn()}
+          pageId={pageId}
+          isOpen
+          setIsOpen={jest.fn}
+        />
+      </Provider>
+    );
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.profiledetails.delete.button)
+      ).toBeInTheDocument()
+    );
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.profiledetails.delete.button));
+
+    const alertTitle = await findByText(
+      EN_TRANSLATIONS.profiledetails.delete.alert.title
+    );
+
+    await waitFor(() => {
+      expect(alertTitle).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(EN_TRANSLATIONS.profiledetails.delete.alert.confirm)
+    );
+
+    await waitFor(() => {
+      expect(
+        queryByText(EN_TRANSLATIONS.profiledetails.delete.alert.title)
+      ).toBeNull();
+    });
+
+    const verifyTitle = await findByText(EN_TRANSLATIONS.verifypasscode.title);
+
+    await waitFor(() => {
+      expect(verifyTitle).toBeVisible();
+    });
+
+    await passcodeFiller(getByText, getByTestId, "997887");
+
+    await waitFor(() => {
+      expect(createOrUpdateMock).toBeCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.DEFAULT_PROFILE,
+          content: { defaultProfile: filteredIdentifierFix[1].id },
+        })
+      );
+
+      expect(dispatchMock).toBeCalledWith(
+        setDefaultProfile(filteredIdentifierFix[1].id)
+      );
+
+      expect(dispatchMock).toBeCalledWith(
+        setProfileHistories([
+          filteredIdentifierFix[0].id,
+          filteredIdentifierFix[2].id,
+        ])
+      );
+    });
+  });
+
+  test("Set default profile is first profile in the alphabet", async () => {
+    const initialStateKeri = {
+      stateCache: {
+        routes: [TabsRoutePath.CREDENTIALS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+          defaultProfile: filteredIdentifierFix[0].id,
+        },
+        isOnline: true,
+        profileHistories: [],
+      },
+      identifiersCache: {
+        identifiers: filteredIdentifierMapFix,
+      },
+    };
+
+    const storeMockedAidKeri = {
+      ...makeTestStore(initialStateKeri),
+      dispatch: dispatchMock,
+    };
+
+    const { findByText, getByText, queryByText, getByTestId } = render(
+      <Provider store={storeMockedAidKeri}>
+        <ProfileDetailsModal
+          profileId={filteredIdentifierFix[0].id}
+          onClose={jest.fn()}
+          pageId={pageId}
+          isOpen
+          setIsOpen={jest.fn}
+        />
+      </Provider>
+    );
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.profiledetails.delete.button)
+      ).toBeInTheDocument()
+    );
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.profiledetails.delete.button));
+
+    const alertTitle = await findByText(
+      EN_TRANSLATIONS.profiledetails.delete.alert.title
+    );
+
+    await waitFor(() => {
+      expect(alertTitle).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(EN_TRANSLATIONS.profiledetails.delete.alert.confirm)
+    );
+
+    await waitFor(() => {
+      expect(
+        queryByText(EN_TRANSLATIONS.profiledetails.delete.alert.title)
+      ).toBeNull();
+    });
+
+    const verifyTitle = await findByText(EN_TRANSLATIONS.verifypasscode.title);
+
+    await waitFor(() => {
+      expect(verifyTitle).toBeVisible();
+    });
+
+    await passcodeFiller(getByText, getByTestId, "997887");
+
+    await waitFor(() => {
+      expect(createOrUpdateMock).toBeCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.DEFAULT_PROFILE,
+          content: { defaultProfile: filteredIdentifierFix[3].id },
+        })
+      );
+
+      expect(dispatchMock).toBeCalledWith(
+        setDefaultProfile(filteredIdentifierFix[3].id)
+      );
+
+      expect(dispatchMock).toBeCalledWith(setProfileHistories([]));
+    });
+  });
+
+  test("Clear default profile cache and remove profile histories when no matching profile", async () => {
+    const initialStateKeri = {
+      stateCache: {
+        routes: [TabsRoutePath.CREDENTIALS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+          defaultProfile: filteredIdentifierFix[0].id,
+        },
+        isOnline: true,
+        profileHistories: [],
+      },
+      identifiersCache: {
+        identifiers: {
+          [filteredIdentifierFix[0].id]: filteredIdentifierFix[0],
+        },
+      },
+    };
+
+    const storeMockedAidKeri = {
+      ...makeTestStore(initialStateKeri),
+      dispatch: dispatchMock,
+    };
+
+    const { findByText, getByText, queryByText, getByTestId } = render(
+      <Provider store={storeMockedAidKeri}>
+        <ProfileDetailsModal
+          profileId={filteredIdentifierFix[0].id}
+          onClose={jest.fn()}
+          pageId={pageId}
+          isOpen
+          setIsOpen={jest.fn}
+        />
+      </Provider>
+    );
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.profiledetails.delete.button)
+      ).toBeInTheDocument()
+    );
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.profiledetails.delete.button));
+
+    const alertTitle = await findByText(
+      EN_TRANSLATIONS.profiledetails.delete.alert.title
+    );
+
+    await waitFor(() => {
+      expect(alertTitle).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(EN_TRANSLATIONS.profiledetails.delete.alert.confirm)
+    );
+
+    await waitFor(() => {
+      expect(
+        queryByText(EN_TRANSLATIONS.profiledetails.delete.alert.title)
+      ).toBeNull();
+    });
+
+    const verifyTitle = await findByText(EN_TRANSLATIONS.verifypasscode.title);
+
+    await waitFor(() => {
+      expect(verifyTitle).toBeVisible();
+    });
+
+    await passcodeFiller(getByText, getByTestId, "997887");
+
+    await waitFor(() => {
+      expect(Agent.agent.basicStorage.deleteById).toBeCalledWith(
+        MiscRecordId.DEFAULT_PROFILE
+      );
+      expect(dispatchMock).toBeCalledWith(setDefaultProfile(""));
+      expect(Agent.agent.basicStorage.deleteById).toBeCalledWith(
+        MiscRecordId.PROFILE_HISTORIES
+      );
+      expect(dispatchMock).toBeCalledWith(setProfileHistories([]));
+    });
   });
 });
