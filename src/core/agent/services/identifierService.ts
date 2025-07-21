@@ -589,11 +589,7 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
-      if (
-        parsed.groupMetadata?.groupId?.length &&
-        parsed.groupMetadata?.userName !== undefined &&
-        parsed.groupMetadata?.groupInitiator !== undefined
-      ) {
+      if (parsed.groupMetadata) {
         await this.identifierStorage.createIdentifierMetadataRecord({
           id: identifier.prefix,
           displayName: parsed.displayName,
@@ -656,11 +652,7 @@ class IdentifierService extends AgentService {
 
       const mhabParsed = parseHabName(identifier.group.mhab.name);
 
-      if (
-        !mhabParsed.groupMetadata?.groupId?.length ||
-        mhabParsed.groupMetadata?.userName === undefined ||
-        mhabParsed.groupMetadata?.groupInitiator === undefined
-      ) {
+      if (!mhabParsed.groupMetadata) {
         throw new Error(IdentifierService.INVALID_QUEUED_DISPLAY_NAMES_FORMAT);
       }
       // Mark as created
