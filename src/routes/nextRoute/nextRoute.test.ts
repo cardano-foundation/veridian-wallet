@@ -1,21 +1,21 @@
-import {
-  getNextGenerateSeedPhraseRoute,
-  getNextOnboardingRoute,
-  getNextSetPasscodeRoute,
-  getNextRoute,
-  updateStoreAfterSetPasscodeRoute,
-  getNextVerifySeedPhraseRoute,
-  getNextCreateSSIAgentRoute,
-} from "./nextRoute";
+import { CreationStatus } from "../../core/agent/agent.types";
 import { RootState } from "../../store";
-import { RoutePath } from "../index";
 import { setAuthentication } from "../../store/reducers/stateCache";
-import { DataProps } from "./nextRoute.types";
+import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { OperationType } from "../../ui/globals/types";
 import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
-import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
+import { RoutePath } from "../index";
 import { TabsRoutePath } from "../paths";
-import { CreationStatus } from "../../core/agent/agent.types";
+import {
+  getNextCreateSSIAgentRoute,
+  getNextGenerateSeedPhraseRoute,
+  getNextOnboardingRoute,
+  getNextRoute,
+  getNextSetPasscodeRoute,
+  getNextVerifySeedPhraseRoute,
+  updateStoreAfterSetPasscodeRoute,
+} from "./nextRoute";
+import { DataProps } from "./nextRoute.types";
 
 describe("NextRoute", () => {
   let localStorageMock: any;
@@ -70,6 +70,7 @@ describe("NextRoute", () => {
           queues: [],
           isPaused: false,
         },
+        profileHistories: [],
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -348,6 +349,7 @@ describe("getNextRoute", () => {
         archivedCredentials: [],
         notifications: [],
       },
+      profileHistories: [],
     },
     seedPhraseCache: {
       seedPhrase: "",

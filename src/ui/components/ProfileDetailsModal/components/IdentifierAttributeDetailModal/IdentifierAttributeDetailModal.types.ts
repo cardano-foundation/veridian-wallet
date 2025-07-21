@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { IdentifierDetails } from "../../../../../core/agent/services/identifier.types";
 
 enum DetailView {
@@ -46,12 +47,13 @@ interface ListItem {
   image?: string;
   title: string;
   isCurrentUser?: boolean;
+  avatar?: ReactNode;
 }
 
 interface ListProps {
   title: string;
   data: ListItem[];
-  bottomText: string;
+  bottomText?: string;
   fullText?: boolean;
   mask?: boolean;
 }

@@ -59,6 +59,7 @@ import {
   setIsOnline,
   setIsSetupProfile,
   setPauseQueueIncomingRequest,
+  setProfileHistories,
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert
@@ -603,6 +604,16 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const finishSetupBiometrics = await Agent.agent.basicStorage.findById(
         MiscRecordId.BIOMETRICS_SETUP
       );
+
+      const profileHistories = await Agent.agent.basicStorage.findById(
+        MiscRecordId.PROFILE_HISTORIES
+      );
+
+      if (profileHistories) {
+        dispatch(
+          setProfileHistories(profileHistories.content.value as string[])
+        );
+      }
 
       dispatch(
         setAuthentication({

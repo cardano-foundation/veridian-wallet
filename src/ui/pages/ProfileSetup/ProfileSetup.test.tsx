@@ -110,6 +110,7 @@ describe("Profile setup", () => {
           },
           firstAppLaunch: true,
         },
+        profileHistories: [],
       },
       connectionsCache: {
         connections: connectionsFix,
@@ -580,6 +581,7 @@ describe("Profile setup: use as modal", () => {
         },
         firstAppLaunch: false,
       },
+      profileHistories: [],
     },
     connectionsCache: {
       connections: connectionsFix,

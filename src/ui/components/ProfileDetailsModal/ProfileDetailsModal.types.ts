@@ -1,6 +1,6 @@
 import { HardwareBackButtonConfig } from "../PageHeader/PageHeader.types";
 
-interface ProfileDetailModalProps {
+interface ProfileDetailsModalProps {
   pageId: string;
   profileId: string;
   onClose?: (animation?: boolean) => void;
@@ -9,9 +9,9 @@ interface ProfileDetailModalProps {
 }
 
 interface IdentifierDetailModalProps
-  extends Omit<ProfileDetailModalProps, "navAnimation"> {
+  extends Omit<ProfileDetailsModalProps, "navAnimation"> {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
 }
 
-export type { IdentifierDetailModalProps, ProfileDetailModalProps };
+export type { IdentifierDetailModalProps, ProfileDetailsModalProps };

@@ -7,7 +7,7 @@ import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { store } from "../../../../store";
 import { connectionsFix } from "../../../__fixtures__/connectionsFix";
 import { SetupThreshold } from "./SetupThreshold";
-import { IdentifierColor } from "../../CreateIdentifier/components/IdentifierColorSelector";
+import { IdentifierColor } from "../../EditProfile/components/IdentifierColorSelector";
 import { Stage } from "../CreateGroupIdentifier.types";
 import { CreationStatus } from "../../../../core/agent/agent.types";
 import { makeTestStore } from "../../../utils/makeTestStore";

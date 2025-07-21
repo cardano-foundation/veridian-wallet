@@ -4,11 +4,17 @@ import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
 import "./CloudError.scss";
 import { CloudErrorProps } from "./CloudError.types";
 
-const CloudError = ({ pageId, header, children }: CloudErrorProps) => {
+const CloudError = ({
+  pageId,
+  header,
+  children,
+  content,
+  type = "error",
+}: CloudErrorProps) => {
   const getMessage = (pageId: string) => {
+    if (content) return content;
+
     switch (pageId) {
-      case "identifier-card-details":
-        return i18n.t("profiledetails.clouderror");
       case "credential-card-details":
         return i18n.t("tabs.credentials.details.clouderror");
       case "connection-details":
@@ -23,9 +29,12 @@ const CloudError = ({ pageId, header, children }: CloudErrorProps) => {
       pageId={`${pageId}-cloud-error`}
       header={header}
       activeStatus={true}
-      customClass={"cloud-error"}
+      customClass="cloud-error"
     >
-      <InfoCard content={getMessage(pageId)} />
+      <InfoCard
+        danger={type === "error"}
+        content={getMessage(pageId)}
+      />
       {children}
     </ResponsivePageLayout>
   );
