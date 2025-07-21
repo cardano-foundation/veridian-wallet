@@ -151,7 +151,7 @@ class MultiSigService extends AgentService {
           threshold,
         }
       );
-    await this.inceptGroup(mHab, states, inceptionData, groupName);
+    await this.inceptGroup(mHab, states, inceptionData);
 
     // Share witness OOBIs with other group members
     await this.shareWitnessOobis(mHab, groupConnections);
@@ -293,8 +293,7 @@ class MultiSigService extends AgentService {
   private async inceptGroup(
     mHab: HabState,
     states: State[],
-    inceptionData: CreateIdentifierBody,
-    name?: string
+    inceptionData: CreateIdentifierBody
   ): Promise<void> {
     try {
       await this.props.signifyClient
@@ -332,7 +331,6 @@ class MultiSigService extends AgentService {
         gid: serder.pre,
         smids: smids,
         rmids: smids,
-        name,
       },
       embeds,
       recp
@@ -504,7 +502,7 @@ class MultiSigService extends AgentService {
         exn.e.icp.bt,
         exn.e.icp.b
       );
-    await this.inceptGroup(mHab, states, inceptionData, groupName);
+    await this.inceptGroup(mHab, states, inceptionData);
 
     const multisigId = inceptionData.icp.i;
     const creationStatus = CreationStatus.PENDING;
@@ -553,7 +551,7 @@ class MultiSigService extends AgentService {
             groupId: multisigId,
             groupInitiator: false,
             groupCreated: true,
-            userName: mHabRecord.groupMetadata!.userName,
+            userName: mHabRecord.groupMetadata.userName,
           },
         },
       },
