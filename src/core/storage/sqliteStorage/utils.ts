@@ -40,26 +40,26 @@ function resolveTagsFromDb(tagDb: string): Record<string, unknown> | null {
   tagsParseArrays.forEach((tag: string) => {
     const tagParse = tag.split("|");
     switch (tagParse[0]) {
-    case TagDataType.ARRAY: {
-      if (tags[tagParse[1]]) {
-        (tags[tagParse[1]] as Array<string>).push(tagParse[2]);
-      } else {
-        tags[tagParse[1]] = [tagParse[2]];
+      case TagDataType.ARRAY: {
+        if (tags[tagParse[1]]) {
+          (tags[tagParse[1]] as Array<string>).push(tagParse[2]);
+        } else {
+          tags[tagParse[1]] = [tagParse[2]];
+        }
+        break;
       }
-      break;
-    }
-    case TagDataType.STRING: {
-      tags[tagParse[1]] = tagParse[2];
-      break;
-    }
-    case TagDataType.BOOLEAN: {
-      tags[tagParse[1]] = tagParse[2] === "1" ? true : false;
-      break;
-    }
-    default:
-      throw new Error(
-        `Expected tag type to be in enum TagDataType, found ${tagParse[0]}`
-      );
+      case TagDataType.STRING: {
+        tags[tagParse[1]] = tagParse[2];
+        break;
+      }
+      case TagDataType.BOOLEAN: {
+        tags[tagParse[1]] = tagParse[2] === "1" ? true : false;
+        break;
+      }
+      default:
+        throw new Error(
+          `Expected tag type to be in enum TagDataType, found ${tagParse[0]}`
+        );
     }
   });
   return tags;

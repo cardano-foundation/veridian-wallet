@@ -52,8 +52,8 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const back = [SetupProfileStep.SetupProfile].includes(step)
     ? i18n.t("setupprofile.button.back")
     : isModal
-      ? i18n.t("setupprofile.button.cancel")
-      : undefined;
+    ? i18n.t("setupprofile.button.cancel")
+    : undefined;
 
   const getButtonText = () => {
     switch (step) {

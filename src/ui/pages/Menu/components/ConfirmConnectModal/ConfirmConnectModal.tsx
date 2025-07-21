@@ -57,8 +57,8 @@ const ConfirmConnectModal = ({
     isConnecting
       ? "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.connectingbtn"
       : isConnectModal
-        ? "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.connectbtn"
-        : "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.disconnectbtn"
+      ? "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.connectbtn"
+      : "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.disconnectbtn"
   );
 
   const meerkatId = connectionData?.id

@@ -210,8 +210,8 @@ const CreateIdentifier = ({
           identifierData.selectedAidType === 1 || multiSigGroup
             ? ToastMsgType.MULTI_SIGN_IDENTIFIER_CREATED
             : identifierData.selectedAidType === 2
-              ? ToastMsgType.DELEGATED_IDENTIFIER_CREATED
-              : ToastMsgType.IDENTIFIER_CREATED
+            ? ToastMsgType.DELEGATED_IDENTIFIER_CREATED
+            : ToastMsgType.IDENTIFIER_CREATED
         )
       );
     } catch (e) {

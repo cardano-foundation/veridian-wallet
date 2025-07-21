@@ -13,7 +13,7 @@ interface AppTableHeader<T extends AppTableBaseData> {
 }
 
 interface EnhancedTableHeaderProps<
-  T extends AppTableBaseData = AppTableBaseData,
+  T extends AppTableBaseData = AppTableBaseData
 > {
   onRequestSort: (property: keyof T) => void;
   order: "asc" | "desc";

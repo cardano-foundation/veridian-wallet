@@ -27,8 +27,8 @@ const IdentifierSelectorModal = ({
     const result = identifiers
       ? identifiers
       : Object.values(identifierCache)
-        .filter((item) => item.creationStatus === CreationStatus.COMPLETE)
-        .filter((item) => !item.groupMetadata?.groupId);
+          .filter((item) => item.creationStatus === CreationStatus.COMPLETE)
+          .filter((item) => !item.groupMetadata?.groupId);
 
     return result.map(
       (identifier): CardItem<IdentifierShortDetails> => ({

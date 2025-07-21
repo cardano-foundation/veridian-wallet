@@ -247,10 +247,10 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
             {!confirmPasswordFocus &&
               !!confirmPasswordValue.length &&
               createPasswordValueNotMatching && (
-              <ErrorMessage
-                message={`${i18n.t("createpassword.error.hasNoMatch")}`}
-              />
-            )}
+                <ErrorMessage
+                  message={`${i18n.t("createpassword.error.hasNoMatch")}`}
+                />
+              )}
             <CustomInput
               dataTestId="create-hint-input"
               title={`${i18n.t("createpassword.input.third.title")}`}

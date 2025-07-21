@@ -62,27 +62,27 @@ class AuthService extends AgentService {
     let lockDuration = 0;
 
     switch (attempts) {
-    case 5:
-      lockDuration = AuthService.MIN_LOCK_TIME;
-      break;
-    case 6:
-      lockDuration = 5 * AuthService.MIN_LOCK_TIME;
-      break;
-    case 7:
-      lockDuration = 10 * AuthService.MIN_LOCK_TIME;
-      break;
-    case 8:
-      lockDuration = 15 * AuthService.MIN_LOCK_TIME;
-      break;
-    case 9:
-      lockDuration = 60 * AuthService.MIN_LOCK_TIME;
-      break;
-    case 10:
-      lockDuration = 4 * 60 * AuthService.MIN_LOCK_TIME;
-      break;
-    default:
-      lockDuration = 8 * 60 * AuthService.MIN_LOCK_TIME;
-      break;
+      case 5:
+        lockDuration = AuthService.MIN_LOCK_TIME;
+        break;
+      case 6:
+        lockDuration = 5 * AuthService.MIN_LOCK_TIME;
+        break;
+      case 7:
+        lockDuration = 10 * AuthService.MIN_LOCK_TIME;
+        break;
+      case 8:
+        lockDuration = 15 * AuthService.MIN_LOCK_TIME;
+        break;
+      case 9:
+        lockDuration = 60 * AuthService.MIN_LOCK_TIME;
+        break;
+      case 10:
+        lockDuration = 4 * 60 * AuthService.MIN_LOCK_TIME;
+        break;
+      default:
+        lockDuration = 8 * 60 * AuthService.MIN_LOCK_TIME;
+        break;
     }
 
     if (attempts >= 5) {
