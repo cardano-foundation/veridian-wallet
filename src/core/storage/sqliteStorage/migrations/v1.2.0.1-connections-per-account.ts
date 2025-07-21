@@ -46,7 +46,7 @@ export const DATA_V1201: HybridMigration = {
       };
     }
 
-    function instertItemTags(itemRecord: any) {
+    function insertItemTags(itemRecord: any) {
       const statements = [];
       const statement =
         "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
@@ -82,7 +82,6 @@ export const DATA_V1201: HybridMigration = {
         },
         type: "ContactRecord",
       };
-      console.log("contactRecord", contactRecord);
 
       // we need to delete the connection with this id, because it will be replaced by the new connection in items table
       statements.push({
@@ -96,7 +95,7 @@ export const DATA_V1201: HybridMigration = {
         // No sharedIdentifier: create pair for every non-deleted identifier
         for (const identifier of identifiers) {
           connectionPairsToInsert.push({
-            id: randomSalt(),
+            id: `${identifier.id}:${connectionData.id}`,
             contactId: contactRecord.id,
             createdAt: connectionData.createdAt,
             identifier: identifier.id,
@@ -118,7 +117,7 @@ export const DATA_V1201: HybridMigration = {
         });
         if (identifier) {
           connectionPairsToInsert.push({
-            id: randomSalt(),
+            id: `${identifier.id}:${connectionData.id}`,
             contactId: contactRecord.id,
             identifier: identifier.id,
             createdAt: connectionData.createdAt,
@@ -138,10 +137,10 @@ export const DATA_V1201: HybridMigration = {
       // Only insert the contact if there is at least one pair
       if (connectionPairsToInsert.length > 0) {
         statements.push(insertItem(contactRecord));
-        statements.push(...instertItemTags(contactRecord));
+        statements.push(...insertItemTags(contactRecord));
         for (const connectionPair of connectionPairsToInsert) {
           statements.push(insertItem(connectionPair));
-          statements.push(...instertItemTags(connectionPair));
+          statements.push(...insertItemTags(connectionPair));
         }
       }
     }
