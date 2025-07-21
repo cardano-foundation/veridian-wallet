@@ -60,11 +60,11 @@ const SearchConnectionContent = ({
       >
         <IonIcon icon={search} />
         <h3>
-          {i18n.t("connections.page.search.noresult.title", {
+          {i18n.t("tabs.connections.tab.search.noresult.title", {
             keyword,
           })}
         </h3>
-        <p>{i18n.t("connections.page.search.noresult.text")}</p>
+        <p>{i18n.t("tabs.connections.tab.search.noresult.text")}</p>
       </div>
     );
   }
@@ -75,7 +75,7 @@ const SearchConnectionContent = ({
       className="search-connection-content"
     >
       <SearchConnectionList
-        title={`${i18n.t("connections.page.search.connections")}`}
+        title={`${i18n.t("tabs.connections.tab.search.connections")}`}
         connections={connections}
         onItemClick={onItemClick}
         testId="connection-search"

@@ -202,6 +202,10 @@ class Agent {
     return this.authService;
   }
 
+  get client() {
+    return this.agentServicesProps.signifyClient;
+  }
+
   private constructor() {
     this.storageSession = Capacitor.isNativePlatform()
       ? new SqliteSession()
@@ -317,6 +321,11 @@ class Agent {
     await this.connections.syncKeriaContacts();
     await this.identifiers.syncKeriaIdentifiers();
     await this.credentials.syncKeriaCredentials();
+
+    // Validate and run any missed cloud migrations after recovery
+    if (this.storageSession instanceof SqliteSession) {
+      await this.storageSession.validateCloudMigrationsOnRecovery();
+    }
 
     await this.basicStorage.createOrUpdateBasicRecord(
       new BasicRecord({

@@ -49,11 +49,9 @@ import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {
   getAuthentication,
   getCurrentOperation,
-  getShowConnections,
   getToastMsgs,
   setCurrentOperation,
   setToastMsg,
-  showConnections,
 } from "../../../store/reducers/stateCache";
 import {
   setPendingConnection,
@@ -92,7 +90,6 @@ const Scanner = forwardRef(
     const dispatch = useAppDispatch();
     const multiSigGroupCache = useAppSelector(getMultiSigGroupCache);
     const connections = useAppSelector(getConnectionsCache);
-    const isShowConnectionsModal = useAppSelector(getShowConnections);
     const currentOperation = useAppSelector(getCurrentOperation);
     const scanGroupId = useAppSelector(getScanGroupId);
     const currentToastMsgs = useAppSelector(getToastMsgs);
@@ -194,8 +191,7 @@ const Scanner = forwardRef(
     useEffect(() => {
       const onLoad = async () => {
         if (
-          (routePath === TabsRoutePath.SCAN &&
-            (isShowConnectionsModal || createIdentifierModalIsOpen)) ||
+          (routePath === TabsRoutePath.SCAN && createIdentifierModalIsOpen) ||
           !loggedIn ||
           openIdentifierSelector
         ) {
@@ -242,7 +238,6 @@ const Scanner = forwardRef(
     }, [
       currentOperation,
       routePath,
-      isShowConnectionsModal,
       createIdentifierModalIsOpen,
       currentToastMsgs,
       loggedIn,
@@ -429,7 +424,6 @@ const Scanner = forwardRef(
         return;
       } else {
         dispatch(setOpenConnectionId(urlId));
-        dispatch(showConnections(true));
       }
 
       handleReset?.();

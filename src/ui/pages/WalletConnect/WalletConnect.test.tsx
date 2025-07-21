@@ -1,7 +1,6 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { identifierFix } from "../../__fixtures__/identifierFix";
@@ -10,6 +9,7 @@ import { WalletConnect } from "./WalletConnect";
 import { WalletConnectStageOne } from "./WalletConnectStageOne";
 import { WalletConnectStageTwo } from "./WalletConnectStageTwo";
 import { CreationStatus } from "../../../core/agent/agent.types";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -88,10 +88,9 @@ describe("Wallet Connect Stage One", () => {
     },
   };
 
-  const mockStore = configureStore();
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -208,7 +207,7 @@ describe("Wallet Connect Stage One", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initialState),
+      ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
 
@@ -261,8 +260,6 @@ describe("Wallet Connect Stage One", () => {
 });
 
 describe("Wallet Connect Stage Two", () => {
-  const mockStore = configureStore();
-
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.IDENTIFIERS],
@@ -283,7 +280,7 @@ describe("Wallet Connect Stage Two", () => {
 
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 
@@ -361,8 +358,6 @@ describe("Wallet Connect Stage Two", () => {
 });
 
 describe("Wallet Connect Request", () => {
-  const mockStore = configureStore();
-
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.IDENTIFIERS],
@@ -384,7 +379,7 @@ describe("Wallet Connect Request", () => {
 
   const dispatchMock = jest.fn();
   const storeMocked = {
-    ...mockStore(initialState),
+    ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
 

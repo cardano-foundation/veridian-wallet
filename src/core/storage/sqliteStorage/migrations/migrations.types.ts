@@ -1,8 +1,11 @@
 import { SQLiteDBConnection } from "@capacitor-community/sqlite";
+import { SignifyClient } from "signify-ts";
 
 enum MigrationType {
   SQL,
   TS,
+  CLOUD,
+  HYBRID,
 }
 
 type BaseMigration = {
@@ -24,6 +27,22 @@ type TsMigration = BaseMigration & {
   >;
 };
 
+type CloudMigration = BaseMigration & {
+  type: MigrationType.CLOUD;
+  cloudMigrationStatements: (signifyClient: SignifyClient) => Promise<void>;
+};
+
+type HybridMigration = BaseMigration & {
+  type: MigrationType.HYBRID;
+  localMigrationStatements: (session: SQLiteDBConnection) => Promise<
+    {
+      statement: string;
+      values?: unknown[];
+    }[]
+  >;
+  cloudMigrationStatements: (signifyClient: SignifyClient) => Promise<void>;
+};
+
 export { MigrationType };
 
-export type { SqlMigration, TsMigration };
+export type { SqlMigration, TsMigration, CloudMigration, HybridMigration };

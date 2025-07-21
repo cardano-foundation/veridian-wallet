@@ -12,6 +12,7 @@ import { Agent } from "../agent";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { EventTypes } from "../event.types";
 import {
+  ConnectionHistoryItem,
   ConnectionHistoryType,
   KeriaContactKeyPrefix,
 } from "./connectionService.types";
@@ -1139,12 +1140,11 @@ describe("Connection service of agent", () => {
       message: "message",
     };
 
-    const mockHistoryItems = [
+    const mockHistoryItems: ConnectionHistoryItem[] = [
       {
         id: "ipex1",
         credentialType: "lei",
         historyType: ConnectionHistoryType.IPEX_AGREE_COMPLETE,
-        type: ConnectionHistoryType.IPEX_AGREE_COMPLETE,
         dt: "2025-02-25T10:00:00.000Z",
         connectionId: "connectionId",
       },
@@ -1152,7 +1152,6 @@ describe("Connection service of agent", () => {
         id: "cred1",
         credentialType: "lei",
         historyType: ConnectionHistoryType.CREDENTIAL_ISSUANCE,
-        type: ConnectionHistoryType.CREDENTIAL_ISSUANCE,
         dt: "2025-02-25T09:00:00.000Z",
         connectionId: "connectionId",
       },
@@ -1218,6 +1217,7 @@ describe("Connection service of agent", () => {
     basicStorage.findExpectedById.mockResolvedValue({
       content: { userName: "Alice" },
     });
+    identifierStorage.getIdentifierMetadata.mockResolvedValue(individualRecord);
     getOobiMock.mockImplementation((name: string) => {
       return {
         oobis: [`${oobiPrefix}${name}`],
@@ -1247,6 +1247,7 @@ describe("Connection service of agent", () => {
     basicStorage.findExpectedById.mockResolvedValue({
       content: { userName: "Alice" },
     });
+    identifierStorage.getIdentifierMetadata.mockResolvedValue(individualRecord);
     getOobiMock.mockImplementation((name: string) => {
       return {
         oobis: [`${oobiPrefix}${name}`],

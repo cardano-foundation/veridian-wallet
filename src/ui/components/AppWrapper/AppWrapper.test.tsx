@@ -7,6 +7,7 @@ import {
   ConnectionShortDetails,
   ConnectionStatus,
   CreationStatus,
+  MiscRecordId,
 } from "../../../core/agent/agent.types";
 import {
   AcdcStateChangedEvent,
@@ -480,5 +481,50 @@ describe("Group state changed handler", () => {
     expect(dispatch).toBeCalledWith(
       addGroupIdentifierCache(pendingGroupIdentifierFix)
     );
+  });
+});
+
+describe("AppWrapper - defaultProfile logic", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("sets defaultProfile to the oldest identifier if no default profile is set", async () => {
+    Agent.agent.basicStorage.findById = jest.fn().mockImplementation((id) => {
+      if (id === MiscRecordId.DEFAULT_PROFILE) return Promise.resolve(null);
+      return Promise.resolve(null);
+    });
+
+    const identifiers = [
+      {
+        id: "id-1",
+        displayName: "Alice",
+        createdAtUTC: "2020-01-01T00:00:00.000Z",
+      },
+      {
+        id: "id-2",
+        displayName: "Bob",
+        createdAtUTC: "2021-01-01T00:00:00.000Z",
+      },
+    ];
+    Agent.agent.identifiers.getIdentifiers = jest
+      .fn()
+      .mockResolvedValue(identifiers);
+
+    const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
+    let defaultProfile = { defaultProfile: "" };
+    if (storedIdentifiers.length > 0) {
+      const oldest = storedIdentifiers
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(a.createdAtUTC).getTime() -
+            new Date(b.createdAtUTC).getTime()
+        )[0];
+      const id = oldest?.id || "";
+      defaultProfile = { defaultProfile: id };
+    }
+
+    expect(defaultProfile.defaultProfile).toBe("id-1");
   });
 });

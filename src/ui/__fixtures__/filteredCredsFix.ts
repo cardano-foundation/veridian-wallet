@@ -31,7 +31,7 @@ const filteredCredsFix: CredentialShortDetails[] = [
     issuanceDate: "2010-01-01T19:23:24Z",
     credentialType: "University Credential 2",
     status: CredentialStatus.CONFIRMED,
-    schema: "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqbo",
+    schema: "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt",
     identifierType: IdentifierType.Individual,
     identifierId: memberIdentifierRecord.id,
     connectionId: "ebfeb1ebc6f1c276ef71212ec20",

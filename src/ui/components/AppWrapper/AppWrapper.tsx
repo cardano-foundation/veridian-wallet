@@ -55,9 +55,9 @@ import {
   setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
+  setIsSetupProfile,
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
-  setShowWelcomePage,
   setToastMsg,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
@@ -92,6 +92,7 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
+import { BasicRecord } from "../../../core/agent/records";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -377,7 +378,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let userName: { userName: string } = { userName: "" };
+      let defaultProfile = "";
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -474,11 +475,36 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const appUserNameRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.USER_NAME
+      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
+        MiscRecordId.DEFAULT_PROFILE
       );
-      if (appUserNameRecord) {
-        userName = appUserNameRecord.content as { userName: string };
+
+      if (appDefaultProfileRecord) {
+        defaultProfile = (
+          appDefaultProfileRecord.content as { defaultProfile: string }
+        ).defaultProfile;
+      } else {
+        const storedIdentifiers =
+          await Agent.agent.identifiers.getIdentifiers();
+        if (storedIdentifiers.length > 0) {
+          // If we have no default profile set, we will set the oldest identifier as default.
+          const oldest = storedIdentifiers
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(a.createdAtUTC).getTime() -
+                new Date(b.createdAtUTC).getTime()
+            )[0];
+          const id = oldest?.id || "";
+          defaultProfile = id;
+
+          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+            new BasicRecord({
+              id: MiscRecordId.DEFAULT_PROFILE,
+              content: { defaultProfile: id },
+            })
+          );
+        }
       }
 
       const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
@@ -516,11 +542,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
       }
 
       const firstInstall = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_FIRST_INSTALL
+        MiscRecordId.IS_SETUP_PROFILE
       );
 
       if (firstInstall) {
-        dispatch(setShowWelcomePage(firstInstall.content.value as boolean));
+        dispatch(setIsSetupProfile(firstInstall.content.value as boolean));
       }
 
       const passwordSkipped = await Agent.agent.basicStorage.findById(
@@ -548,7 +574,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(
         setAuthentication({
           ...authentication,
-          userName: userName.userName as string,
+          defaultProfile,
           passcodeIsSet,
           seedPhraseIsSet,
           passwordIsSet,

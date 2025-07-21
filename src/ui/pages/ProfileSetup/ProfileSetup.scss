@@ -1,0 +1,30 @@
+.profile-setup {
+  &.profiletype {
+    padding: 0;
+    --padding: 1.25rem;
+
+    &.md {
+      padding-bottom: calc(var(--ion-safe-area-bottom) + 1.25rem);
+    }
+
+    ion-header {
+      padding: var(--padding);
+      padding-bottom: 0;
+    }
+
+    .page-footer {
+      padding: var(--padding);
+      padding-top: 0;
+    }
+
+    @media screen and (min-width: 250px) and (max-width: 370px) {
+      --padding: 0.9rem;
+    }
+  }
+
+  .spinner-container {
+    margin-top: 0 !important;
+    background: rgba(var(--ion-color-neutral-700-rgb), 0.2);
+    backdrop-filter: blur(0.25rem);
+  }
+}

@@ -1,8 +1,6 @@
 import { IonModal, isPlatform } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
-import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
 import { OobiQueryParams } from "../../../core/agent/services/connectionService.types";
 import { StorageMessage } from "../../../core/storage/storage.types";
 import { i18n } from "../../../i18n";
@@ -13,27 +11,18 @@ import {
   setMissingAliasConnection,
   setOpenConnectionId,
 } from "../../../store/reducers/connectionsCache";
-import {
-  getAuthentication,
-  getCurrentRoute,
-  setAuthentication,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
 import { CustomInput } from "../CustomInput";
 import { ErrorMessage } from "../ErrorMessage";
-import { TabsRoutePath } from "../navigation/TabsMenu";
 import { PageFooter } from "../PageFooter";
 import "./InputRequest.scss";
 
 const InputRequest = () => {
   const dispatch = useAppDispatch();
   const connections = useAppSelector(getConnectionsCache);
-  const authentication = useAppSelector(getAuthentication);
   const missingAliasConnection = useAppSelector(getMissingAliasConnection);
-  const currentRoute = useAppSelector(getCurrentRoute);
   const missingAliasUrl = missingAliasConnection?.url;
 
   const componentId = "input-request";
@@ -44,12 +33,7 @@ const InputRequest = () => {
     ? nameChecker.getError(inputValue)
     : undefined;
 
-  const showModal =
-    (authentication.loggedIn &&
-      (authentication.userName === undefined ||
-        authentication.userName?.length === 0) &&
-      currentRoute?.path?.includes(TabsRoutePath.ROOT)) ||
-    !!missingAliasUrl;
+  const showModal = !!missingAliasUrl;
 
   useEffect(() => {
     if (!showModal) {
@@ -97,37 +81,6 @@ const InputRequest = () => {
     }
   };
 
-  const setUserName = () => {
-    Agent.agent.basicStorage
-      .createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.USER_NAME,
-          content: {
-            userName: inputValue,
-          },
-        })
-      )
-      .then(() => {
-        dispatch(
-          setAuthentication({
-            ...authentication,
-            userName: inputValue,
-          })
-        );
-
-        setInputValue("");
-        dispatch(setToastMsg(ToastMsgType.USERNAME_CREATION_SUCCESS));
-      })
-      .catch((error) => {
-        showError(
-          "Unable to create user name",
-          error,
-          dispatch,
-          ToastMsgType.USERNAME_CREATION_ERROR
-        );
-      });
-  };
-
   const handleConfirm = () => {
     if (errorMessage) return;
 
@@ -140,8 +93,6 @@ const InputRequest = () => {
       setInputValue("");
       return;
     }
-
-    setUserName();
   };
 
   const title = missingAliasUrl

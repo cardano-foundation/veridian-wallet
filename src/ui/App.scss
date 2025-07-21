@@ -52,7 +52,8 @@ body {
     display: none;
   }
 
-  &.scanner-active {
+  &.scanner-active,
+  &.scan-active {
     background-color: transparent;
 
     > div:last-child {
@@ -301,6 +302,10 @@ ion-segment {
       --color-checked: var(--ion-color-neutral-100);
       &::part(indicator-background) {
         background: var(--ion-color-primary-700);
+      }
+
+      &.md {
+        --color-checked: var(--ion-color-primary-700);
       }
     }
   }

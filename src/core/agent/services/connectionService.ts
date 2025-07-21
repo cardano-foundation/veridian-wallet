@@ -312,8 +312,10 @@ class ConnectionService extends AgentService {
         key.startsWith(KeriaContactKeyPrefix.HISTORY_IPEX) ||
         key.startsWith(KeriaContactKeyPrefix.HISTORY_REVOKE)
       ) {
-        const historyItem = JSON.parse(connection[key] as string);
-        if (full || !skippedHistoryTypes.includes(historyItem.type)) {
+        const historyItem: ConnectionHistoryItem = JSON.parse(
+          connection[key] as string
+        );
+        if (full || !skippedHistoryTypes.includes(historyItem.historyType)) {
           historyItems.push(historyItem);
         }
       }
@@ -599,8 +601,8 @@ class ConnectionService extends AgentService {
     identifier: string
   ): Promise<void> {
     const userName = (
-      await this.basicStorage.findExpectedById(MiscRecordId.USER_NAME)
-    ).content.userName as string;
+      await this.identifierStorage.getIdentifierMetadata(identifier)
+    ).displayName;
 
     const connectionRecord = await this.getConnectionMetadataById(connectionId);
     const externalId = new URL(connectionRecord.oobi).searchParams.get(

@@ -1,11 +1,5 @@
-import {
-  IonButton,
-  IonIcon,
-  IonLabel,
-  useIonViewWillEnter,
-} from "@ionic/react";
+import { IonButton, IonLabel, useIonViewWillEnter } from "@ionic/react";
 import { t } from "i18next";
-import { peopleOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -30,11 +24,13 @@ import {
   setCredsCache,
 } from "../../../store/reducers/credsCache";
 import {
+  getAuthentication,
   setCurrentRoute,
   setToastMsg,
-  showConnections,
 } from "../../../store/reducers/stateCache";
 import { ArchivedCredentials } from "../../components/ArchivedCredentials";
+import { Avatar } from "../../components/Avatar";
+import { AvatarProps } from "../../components/Avatar/Avatar.types";
 import { CardSlider } from "../../components/CardSlider";
 import { CardsPlaceholder } from "../../components/CardsPlaceholder";
 import { FilterChip } from "../../components/FilterChip/FilterChip";
@@ -54,31 +50,9 @@ import { combineClassNames } from "../../utils/style";
 import { StartAnimationSource } from "../Identifiers/Identifiers.types";
 import "./Credentials.scss";
 import { CredentialsFilters } from "./Credentials.types";
+import { Profiles } from "../Profiles";
 
 const CLEAR_STATE_DELAY = 1000;
-
-const AdditionalButtons = ({
-  handleConnections,
-}: {
-  handleConnections: () => void;
-}) => {
-  return (
-    <>
-      <IonButton
-        shape="round"
-        className="connections-button"
-        data-testid="connections-button"
-        onClick={handleConnections}
-      >
-        <IonIcon
-          slot="icon-only"
-          icon={peopleOutline}
-          color="primary"
-        />
-      </IonButton>
-    </>
-  );
-};
 
 const Credentials = () => {
   const pageId = "credentials-tab";
@@ -92,6 +66,7 @@ const Credentials = () => {
   const [showPlaceholder, setShowPlaceholder] = useState(true);
   const [navAnimation, setNavAnimation] =
     useState<StartAnimationSource>("none");
+  const [openProfiles, setOpenProfiles] = useState(false);
   const favouriteContainerElement = useRef<HTMLDivElement>(null);
   const [deletedPendingItem, setDeletePendingItem] =
     useState<CredentialShortDetails | null>(null);
@@ -103,7 +78,7 @@ const Credentials = () => {
     CredentialShortDetails[]
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
-
+  const authData = useAppSelector(getAuthentication);
   const revokedCreds = credsCache.filter(
     (item) => item.status === CredentialStatus.REVOKED
   );
@@ -160,10 +135,6 @@ const Credentials = () => {
   }, [confirmedCreds, credsCache, pendingCreds.length]);
 
   useOnlineStatusEffect(fetchArchivedCreds);
-
-  const handleConnections = () => {
-    dispatch(showConnections(true));
-  };
 
   useIonViewWillEnter(() => {
     dispatch(setCurrentRoute({ path: TabsRoutePath.CREDENTIALS }));
@@ -279,6 +250,23 @@ const Credentials = () => {
       });
   };
 
+  const handleAvatarClick = () => {
+    setOpenProfiles(true);
+  };
+
+  const AdditionalButtons = ({
+    handleAvatarClick,
+  }: {
+    handleAvatarClick: AvatarProps["handleAvatarClick"];
+  }) => {
+    return (
+      <Avatar
+        id={authData.defaultProfile}
+        handleAvatarClick={handleAvatarClick}
+      />
+    );
+  };
+
   return (
     <>
       <TabLayout
@@ -287,7 +275,7 @@ const Credentials = () => {
         customClass={tabClasses}
         title={`${i18n.t("tabs.credentials.tab.title")}`}
         additionalButtons={
-          <AdditionalButtons handleConnections={handleConnections} />
+          <AdditionalButtons handleAvatarClick={handleAvatarClick} />
         }
         placeholder={
           showPlaceholder && (
@@ -377,6 +365,10 @@ const Credentials = () => {
           </>
         )}
       </TabLayout>
+      <Profiles
+        isOpen={openProfiles}
+        setIsOpen={setOpenProfiles}
+      />
       <RemovePendingAlert
         pageId={pageId}
         openFirstCheck={openDeletePendingAlert}

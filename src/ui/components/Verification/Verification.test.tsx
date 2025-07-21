@@ -1,9 +1,9 @@
 import { BiometryErrorType } from "@aparajita/capacitor-biometric-auth";
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import EngTrans from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { Verification } from "./Verification";
 
 jest.mock("../../../core/agent/agent", () => ({
@@ -40,7 +40,6 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: () => useBiometricInfoMock(),
 }));
 
-const mockStore = configureStore();
 const dispatchMock = jest.fn();
 
 const initState = {
@@ -61,7 +60,7 @@ const initState = {
 };
 
 const storeMocked = {
-  ...mockStore(initState),
+  ...makeTestStore(initState),
   dispatch: dispatchMock,
 };
 
@@ -125,7 +124,7 @@ describe("Verification", () => {
     };
 
     const storeMocked = {
-      ...mockStore(initState),
+      ...makeTestStore(initState),
       dispatch: dispatchMock,
     };
 

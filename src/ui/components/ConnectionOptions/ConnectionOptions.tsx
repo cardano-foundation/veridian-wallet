@@ -18,7 +18,7 @@ const ConnectionOptions = ({
   const options: OptionItem[] = [
     {
       icon: pencilOutline,
-      label: i18n.t("connections.details.options.labels.manage"),
+      label: i18n.t("tabs.connections.details.options.labels.manage"),
       onClick: () => {
         setOptionsIsOpen(false);
         handleEdit(true);
@@ -30,7 +30,7 @@ const ConnectionOptions = ({
   if (!restrictedOptions) {
     options.push({
       icon: trashOutline,
-      label: i18n.t("connections.details.options.labels.delete"),
+      label: i18n.t("tabs.connections.details.options.labels.delete"),
       onClick: () => {
         handleDelete();
         dispatch(setCurrentOperation(OperationType.DELETE_CONNECTION));
@@ -45,7 +45,7 @@ const ConnectionOptions = ({
       componentId="connection-options-modal"
       onDismiss={() => setOptionsIsOpen(false)}
       header={{
-        title: `${i18n.t("connections.details.options.title")}`,
+        title: `${i18n.t("tabs.connections.details.options.title")}`,
       }}
       items={options}
     />

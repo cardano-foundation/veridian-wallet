@@ -16,6 +16,7 @@ interface CurrentRouteCacheProps {
 interface AuthenticationCacheProps {
   loggedIn: boolean;
   userName: string;
+  defaultProfile: string;
   time: number;
   passcodeIsSet: boolean;
   seedPhraseIsSet: boolean;
@@ -63,11 +64,10 @@ interface StateCacheProps {
   cameraDirection?: LensFacing;
   showGenericError?: boolean;
   showNoWitnessAlert?: boolean;
-  showConnections: boolean;
   toastMsgs: ToastStackItem[];
   forceInitApp?: number;
   showLoading?: boolean;
-  showWelcomePage?: boolean;
+  isSetupProfile?: boolean;
 }
 
 enum InitializationPhase {
