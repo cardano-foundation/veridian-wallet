@@ -165,6 +165,7 @@ describe("Notifications cache", () => {
           archivedCredentials: [],
           notifications: [],
         },
+        profileHistories: [],
       },
       seedPhraseCache: {
         seedPhrase: "",

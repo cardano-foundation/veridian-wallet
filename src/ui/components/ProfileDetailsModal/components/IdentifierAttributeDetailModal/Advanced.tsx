@@ -52,7 +52,7 @@ const Advanced = ({ data, currentUserIndex }: AdvancedProps) => {
   return (
     <>
       <ListHeader
-        title={i18n.t("profiledetails.detailmodal.advanceddetail.title")}
+        title={i18n.t("profiledetails.detailsmodal.advanceddetail.title")}
       />
       {isMultisig && (
         <>
@@ -73,7 +73,7 @@ const Advanced = ({ data, currentUserIndex }: AdvancedProps) => {
               >
                 <span>
                   {i18n.t(
-                    `profiledetails.detailmodal.advanceddetail.${
+                    `profiledetails.detailsmodal.advanceddetail.${
                       !isShowSigningList ? "viewkey" : "hidekey"
                     }`,
                     {
@@ -99,7 +99,7 @@ const Advanced = ({ data, currentUserIndex }: AdvancedProps) => {
                         })}
                       >
                         <IonIcon icon={star} />
-                        <span>{i18n.t("profiledetails.detailmodal.you")}</span>
+                        <span>{i18n.t("profiledetails.detailsmodal.you")}</span>
                       </div>
                     }
                   />
@@ -116,7 +116,7 @@ const Advanced = ({ data, currentUserIndex }: AdvancedProps) => {
               >
                 <span>
                   {i18n.t(
-                    `profiledetails.detailmodal.advanceddetail.${
+                    `profiledetails.detailsmodal.advanceddetail.${
                       !isShowRotationKey ? "viewrotationkey" : "hiderotationkey"
                     }`,
                     {

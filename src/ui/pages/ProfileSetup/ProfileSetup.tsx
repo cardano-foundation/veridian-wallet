@@ -1,22 +1,19 @@
 import { useState } from "react";
-import { useAppDispatch , useAppSelector } from "../../../store/hooks";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
 import { IdentifierService } from "../../../core/agent/services";
 import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
   getStateCache,
-  showNoWitnessAlert,
-  updateCurrentProfile,
+  showNoWitnessAlert
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
@@ -25,6 +22,7 @@ import { PageHeader } from "../../components/PageHeader";
 import { Spinner } from "../../components/Spinner";
 import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
 import { useAppIonRouter } from "../../hooks";
+import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
 import { SetupProfile } from "./components/SetupProfile";
@@ -38,6 +36,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
   const dispatch = useAppDispatch();
+  const { updateDefaultProfile, defaultProfile } = useProfile();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
   const [userName, setUserName] = useState("");
@@ -49,7 +48,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const title = i18n.t(`setupprofile.${step}.title`);
   const back = [SetupProfileStep.SetupProfile].includes(step)
     ? i18n.t("setupprofile.button.back")
-    : isModal
+    : isModal && defaultProfile
       ? i18n.t("setupprofile.button.cancel")
       : undefined;
 
@@ -95,13 +94,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           .then(() => dispatch(setIndividualFirstCreate(false)));
       }
 
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
-          content: { defaultProfile: identifier },
-        })
-      );
-      dispatch(updateCurrentProfile(identifier));
+      await updateDefaultProfile(identifier);
 
       if (isModal) {
         onClose();

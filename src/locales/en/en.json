@@ -586,7 +586,7 @@
       }
     },
     "rotatekeys": {
-      "message": "After rotating your keys, you may experience some delays when using this identifier for a short period.",
+      "message": "After rotating your keys, you may experience some delays when using this profile for a short period.",
       "signingkey": "List of signing keys",
       "description": "Rotating your signing keys boosts security by reducing the risk of key compromise.",
       "done": "Done"
@@ -598,13 +598,11 @@
       "share": "Share",
       "inner": {
         "label": "Display name",
-        "theme": "Edit theme",
-        "confirm": "Confirm changes",
-        "color": "Choose card colour"
+        "confirm": "Confirm"
       }
     },
-    "clouderror": "We couldn’t locate this identifier in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this identifier, tap “Delete identifier” to remove.",
-    "detailmodal": {
+    "clouderror": "We couldn’t locate this profile in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this profile, tap “Delete profile” to remove it.",
+    "detailsmodal": {
       "you": "You",
       "button": {
         "done": "Done"
@@ -613,7 +611,7 @@
         "title": "Advanced details",
         "propexplain": {
           "title": "About advanced details",
-          "content": "Provides additional details on this identifier for users interested in more technical insights."
+          "content": "Provides additional details on this profile for users interested in more technical insights."
         },
         "viewkey": "Show {{keys}} singing keys",
         "hidekey": "Hide {{keys}} singing keys",
@@ -624,7 +622,7 @@
         "title": "Signing threshold",
         "propexplain": {
           "title": "About signing threshold",
-          "content": "Minimum number of signing keys required to approve a transaction or event within the identifier."
+          "content": "Minimum number of signing keys required to approve a transaction or event within the profile."
         },
         "threshold": {
           "title": "Threshold",
@@ -635,10 +633,10 @@
         "title": "Rotation threshold",
         "propexplain": {
           "title": "About rotation threshold",
-          "content": "The minimum number of new keys required to rotate and replace old signing keys."
+          "content": "Provides additional details on this profile for users interested in more technical insights."
         },
         "threshold": {
-          "title": "Rotation threshold",
+          "title": "Threshold",
           "text": "{{threshold}} out of {{members}}"
         }
       },
@@ -646,7 +644,7 @@
         "title": "Group members",
         "propexplain": {
           "title": "About group members",
-          "content": "Displays the list of individuals or entities that jointly control this group identifier."
+          "content": "Displays the list of individuals or entities that jointly control this group profile."
         },
         "bottomtext": "{{members}} group members"
       }

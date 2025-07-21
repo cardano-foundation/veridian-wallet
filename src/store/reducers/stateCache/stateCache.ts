@@ -6,9 +6,19 @@ import {
   ThunkAction,
 } from "@reduxjs/toolkit";
 import { Salter } from "signify-ts";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
 import { OperationType, ToastMsgType } from "../../../ui/globals/types";
 import { RootState } from "../../index";
+import {
+  getConnectionsCache,
+  getMultisigConnectionsCache,
+} from "../connectionsCache";
+import { getCredsArchivedCache } from "../credsArchivedCache";
+import { getCredsCache } from "../credsCache";
+import { getIdentifiersCache } from "../identifiersCache";
+import { getNotificationsCache } from "../notificationsCache";
+import { getWalletConnectionsCache } from "../walletConnectionsCache";
 import {
   AuthenticationCacheProps,
   CurrentRouteCacheProps,
@@ -16,16 +26,6 @@ import {
   InitializationPhase,
   StateCacheProps,
 } from "./stateCache.types";
-import { CreationStatus } from "../../../core/agent/agent.types";
-import { getIdentifiersCache } from "../identifiersCache";
-import { getCredsCache } from "../credsCache";
-import { getCredsArchivedCache } from "../credsArchivedCache";
-import { getWalletConnectionsCache } from "../walletConnectionsCache";
-import {
-  getConnectionsCache,
-  getMultisigConnectionsCache,
-} from "../connectionsCache";
-import { getNotificationsCache } from "../notificationsCache";
 import { filterProfileData } from "./utils";
 
 const initialState: StateCacheProps = {
@@ -49,6 +49,7 @@ const initialState: StateCacheProps = {
     archivedCredentials: [],
     notifications: [],
   },
+  profileHistories: [],
   authentication: {
     loggedIn: false,
     userName: "",
@@ -227,6 +228,9 @@ const stateCacheSlice = createSlice({
     ) => {
       state.currentProfile = action.payload;
     },
+    setProfileHistories: (state, action: PayloadAction<string[]>) => {
+      state.profileHistories = action.payload;
+    },
   },
 });
 
@@ -257,59 +261,60 @@ const {
   showGlobalLoading,
   setIsSetupProfile,
   setCurrentProfile,
+  setProfileHistories,
 } = stateCacheSlice.actions;
 
 const updateCurrentProfile =
   (profileId: string): ThunkAction<void, RootState, unknown, AnyAction> =>
-  async (dispatch, getState) => {
-    const state = getState();
-    const identifiers = getIdentifiersCache(state);
+    async (dispatch, getState) => {
+      const state = getState();
+      const identifiers = getIdentifiersCache(state);
 
-    if (!identifiers || !identifiers[profileId]) {
-      throw new Error(`Profile with id ${profileId} not found.`);
-    }
+      if (!identifiers || !identifiers[profileId]) {
+        throw new Error(`Profile with id ${profileId} not found.`);
+      }
 
-    const profileData = identifiers[profileId];
-    const allCreds = getCredsCache(state);
-    const allArchivedCreds = getCredsArchivedCache(state);
-    const allPeerConnections = getWalletConnectionsCache(state);
-    const allConnections = getConnectionsCache(state);
-    const allMultisigConnections = getMultisigConnectionsCache(state);
-    const allNotifications = getNotificationsCache(state);
+      const profileData = identifiers[profileId];
+      const allCreds = getCredsCache(state);
+      const allArchivedCreds = getCredsArchivedCache(state);
+      const allPeerConnections = getWalletConnectionsCache(state);
+      const allConnections = getConnectionsCache(state);
+      const allMultisigConnections = getMultisigConnectionsCache(state);
+      const allNotifications = getNotificationsCache(state);
 
-    const {
-      profileIdentifier,
-      profileCredentials,
-      profileArchivedCredentials,
-      profilePeerConnections,
-      profileNotifications,
-    } = filterProfileData(
-      identifiers,
-      allCreds,
-      allArchivedCreds,
-      allPeerConnections,
-      allNotifications,
-      profileId
-    );
+      const {
+        profileIdentifier,
+        profileCredentials,
+        profileArchivedCredentials,
+        profilePeerConnections,
+        profileNotifications,
+      } = filterProfileData(
+        identifiers,
+        allCreds,
+        allArchivedCreds,
+        allPeerConnections,
+        allNotifications,
+        profileId
+      );
 
-    const newProfile: StateCacheProps["currentProfile"] = {
-      identity: {
-        id: profileIdentifier.id,
-        displayName: profileData.displayName,
-        createdAtUTC: profileIdentifier.createdAtUTC,
-        theme: profileIdentifier.theme,
-        creationStatus: profileIdentifier.creationStatus,
-      },
-      // TODO: add filtering for connections once we have connections per account merged
-      connections: Object.values(allConnections),
-      multisigConnections: Object.values(allMultisigConnections),
-      peerConnections: profilePeerConnections,
-      credentials: profileCredentials,
-      archivedCredentials: profileArchivedCredentials,
-      notifications: profileNotifications,
+      const newProfile: StateCacheProps["currentProfile"] = {
+        identity: {
+          id: profileIdentifier.id,
+          displayName: profileData.displayName,
+          createdAtUTC: profileIdentifier.createdAtUTC,
+          theme: profileIdentifier.theme,
+          creationStatus: profileIdentifier.creationStatus,
+        },
+        // TODO: add filtering for connections once we have connections per account merged
+        connections: Object.values(allConnections),
+        multisigConnections: Object.values(allMultisigConnections),
+        peerConnections: profilePeerConnections,
+        credentials: profileCredentials,
+        archivedCredentials: profileArchivedCredentials,
+        notifications: profileNotifications,
+      };
+      dispatch(setCurrentProfile(newProfile));
     };
-    dispatch(setCurrentProfile(newProfile));
-  };
 
 const getStateCache = (state: RootState) => state.stateCache;
 const getInitializationPhase = (state: RootState) =>
@@ -342,11 +347,13 @@ const getGlobalLoading = (state: RootState) => state.stateCache.showLoading;
 const getShowSetupProfilePage = (state: RootState) =>
   state.stateCache.isSetupProfile;
 const getCurrentProfile = (state: RootState) => state.stateCache.currentProfile;
+const getProfileHistories = (state: RootState) =>
+  state.stateCache.profileHistories;
 
 export type {
   AuthenticationCacheProps,
   CurrentRouteCacheProps,
-  StateCacheProps,
+  StateCacheProps
 };
 
 export {
@@ -355,14 +362,14 @@ export {
   enqueueIncomingRequest,
   getAuthentication,
   getCameraDirection,
-  getCurrentOperation,
-  getCurrentRoute,
+  getCurrentOperation, getCurrentProfile, getCurrentRoute,
   getFirstAppLaunch,
   getForceInitApp,
   getGlobalLoading,
   getInitializationPhase,
   getIsOnline,
   getLoginAttempt,
+  getProfileHistories,
   getQueueIncomingRequest,
   getRecoveryCompleteNoInterruption,
   getRoutes,
@@ -371,32 +378,29 @@ export {
   getShowSetupProfilePage,
   getStateCache,
   getToastMgs,
-  getToastMsgs,
-  getCurrentProfile,
-  initialState,
+  getToastMsgs, initialState,
   login,
   logout,
   removeCurrentRoute,
   removeRoute,
   removeToastMessage,
-  resetAllRoutes,
-  setCurrentProfile,
-  setAuthentication,
+  resetAllRoutes, setAuthentication,
   setCameraDirection,
-  setCurrentOperation,
-  setCurrentRoute,
+  setCurrentOperation, setCurrentProfile, setCurrentRoute,
   setFirstAppLaunchComplete,
   setInitializationPhase,
   setIsOnline,
+  setIsSetupProfile,
   setLoginAttempt,
   setPauseQueueIncomingRequest,
+  setProfileHistories,
   setQueueIncomingRequest,
   setRecoveryCompleteNoInterruption,
-  setIsSetupProfile,
   setToastMsg,
   showGenericError,
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
-  updateCurrentProfile,
+  updateCurrentProfile
 };
+

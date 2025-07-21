@@ -1,21 +1,20 @@
 import { mockIonicReact } from "@ionic/react-test-utils";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
+import { Agent } from "../../../core/agent/agent";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
+import {
+  setToastMsg
+} from "../../../store/reducers/stateCache";
 import {
   filteredIdentifierFix,
   filteredIdentifierMapFix,
 } from "../../__fixtures__/filteredIdentifierFix";
+import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Profiles } from "./Profiles";
-import { Agent } from "../../../core/agent/agent";
-import {
-  setToastMsg,
-  updateCurrentProfile,
-} from "../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../globals/types";
-import { CreationStatus } from "../../../core/agent/agent.types";
 
 jest.mock("../../../store/reducers/stateCache", () => ({
   ...jest.requireActual("../../../store/reducers/stateCache"),
@@ -64,6 +63,7 @@ const initialState = {
       credentials: [],
       archivedCredentials: [],
     },
+    profileHistories: [],
   },
   identifiersCache: {
     identifiers: filteredIdentifierMapFix,

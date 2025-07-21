@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
@@ -12,9 +12,8 @@ import {
   setToastMsg,
 } from "../../../../../store/reducers/stateCache";
 import {
-  setConnectedWallet,
   setPendingConnection,
-  setWalletConnectionsCache,
+  setWalletConnectionsCache
 } from "../../../../../store/reducers/walletConnectionsCache";
 import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
@@ -264,165 +263,6 @@ describe("Wallet connect: empty history", () => {
       expect(dispatchMock).toBeCalledWith(
         setCurrentOperation(OperationType.SCAN_WALLET_CONNECTION)
       );
-    });
-  });
-
-  test("Connect wallet modal: alert identifier missing when create new connect", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.CREDENTIALS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: true,
-        },
-        toastMsgs: [],
-      },
-      walletConnectionsCache: {
-        walletConnections: [],
-      },
-      identifiersCache: {
-        identifiers: {},
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const { getByText, queryByText, getByTestId } = render(
-      <MemoryRouter>
-        <Provider store={storeMocked}>
-          <ConnectWallet />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectbtn)
-      ).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectbtn)
-      );
-    });
-
-    await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .missingidentifieralert.message
-        )
-      ).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("alert-create-keri-cancel-button"));
-    });
-
-    await waitFor(() => {
-      expect(
-        queryByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .missingidentifieralert.message
-        )
-      ).toBe(null);
-    });
-  });
-
-  test("Connect wallet modal: alert identifier missing when create new connect if we only have multi-sig or group identifiers", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.CREDENTIALS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: true,
-        },
-        toastMsgs: [],
-      },
-      walletConnectionsCache: {
-        walletConnections: [],
-      },
-      identifiersCache: {
-        identifiers: {
-          EFn1HAaIyISfu_pwLA8DFgeKxr0pLzBccb4eXHSPVQ6L: {
-            displayName: "ms",
-            id: "EFn1HAaIyISfu_pwLA8DFgeKxr0pLzBccb4eXHSPVQ6L",
-            createdAtUTC: "2024-07-25T13:33:20.323Z",
-            theme: 0,
-            creationStatus: CreationStatus.COMPLETE,
-            groupMemberPre: "EBze49sDYvxxtq5eFbX2TKbK7g4SPS7DJVdoTRIyybxN",
-          },
-          EFn1HAaIyISfu_pwLA8DFgeKxr0pLzBccb4eXHSPVQ61: {
-            displayName: "ms",
-            id: "EFn1HAaIyISfu_pwLA8DFgeKxr0pLzBccb4eXHSPVQ6L",
-            createdAtUTC: "2024-07-25T13:33:20.323Z",
-            theme: 0,
-            creationStatus: CreationStatus.COMPLETE,
-            groupMetadata: {},
-          },
-        },
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const { getByText, getAllByText, queryByText, getAllByTestId } = render(
-      <MemoryRouter>
-        <Provider store={storeMocked}>
-          <ConnectWallet />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectbtn)
-      ).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectbtn)
-      );
-    });
-
-    await waitFor(() => {
-      expect(
-        getAllByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .missingidentifieralert.message
-        )[0]
-      ).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(getAllByTestId("alert-create-keri-cancel-button")[0]);
-    });
-
-    await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .missingidentifieralert.message
-        )
-      ).toBeVisible();
     });
   });
 });
@@ -702,73 +542,6 @@ describe("Wallet connect", () => {
       expect(PeerConnection.peerConnection.disconnectDApp).toBeCalledWith(
         walletConnectionsFix[1].meerkatId
       );
-    });
-  });
-
-  test("Wallet connect modal: alert identifier missing", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.CREDENTIALS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: true,
-        },
-        toastMsgs: [],
-      },
-      walletConnectionsCache: {
-        walletConnections: [...walletConnectionsFix],
-        connectedWallet: null,
-      },
-      identifiersCache: {
-        identifiers: {},
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const { getByTestId, findAllByText, queryByTestId } = render(
-      <MemoryRouter>
-        <Provider store={storeMocked}>
-          <ConnectWallet />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    fireEvent.click(
-      getByTestId(`card-item-${walletConnectionsFix[0].meerkatId}`)
-    );
-
-    await waitFor(() => {
-      expect(getByTestId("confirm-connect-btn")).toBeVisible();
-      expect(queryByTestId("create-identifier-modal")).toBeNull();
-    });
-
-    fireEvent.click(getByTestId("confirm-connect-btn"));
-
-    const alertMessages = await findAllByText(
-      EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-        .missingidentifieralert.message,
-      {},
-      { timeout: 3000 }
-    );
-    expect(alertMessages[0]).toBeVisible();
-
-    const alertContainer = getByTestId("alert-create-keri");
-    const confirmButton = within(alertContainer).getByTestId(
-      "alert-create-keri-confirm-button"
-    );
-    fireEvent.click(confirmButton);
-
-    await waitFor(() => {
-      expect(getByTestId("create-identifier-modal")).toBeVisible();
     });
   });
 

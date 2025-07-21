@@ -73,6 +73,7 @@ describe("getBackRoute", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        profileHistories: [],
       },
       identifiersCache: {
         identifiers: {},
@@ -211,6 +212,7 @@ describe("getPreviousRoute", () => {
           archivedCredentials: [],
           notifications: [],
         },
+        profileHistories: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
