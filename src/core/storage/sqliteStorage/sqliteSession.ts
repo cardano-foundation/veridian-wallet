@@ -126,6 +126,7 @@ class SqliteSession {
    * Should be called when KERIA connection is established after recovery
    */
   async validateCloudMigrationsOnRecovery(): Promise<void> {
+    // eslint-disable-next-line no-console
     console.log("Validating cloud migrations after recovery...");
 
     const currentLocalVersion = await this.getCurrentVersionDatabase();
@@ -144,15 +145,18 @@ class SqliteSession {
     );
 
     if (missedCloudMigrations.length == 0) {
+      // eslint-disable-next-line no-console
       console.log("No missed cloud migrations found");
       return;
     }
 
+    // eslint-disable-next-line no-console
     console.log(
       `Found ${missedCloudMigrations.length} missed cloud migrations to run`
     );
 
     for (const migration of missedCloudMigrations) {
+      // eslint-disable-next-line no-console
       console.log(`Running missed cloud migration: ${migration.version}`);
       await this.performCloudMigration(
         migration as CloudMigration | HybridMigration,
@@ -218,6 +222,7 @@ class SqliteSession {
       const action = isRecoveryValidation
         ? "recovery validation"
         : "initial migration";
+      // eslint-disable-next-line no-console
       console.log(
         `Skipping cloud migration ${migration.version} during ${action} - KERIA not configured`
       );
@@ -225,9 +230,11 @@ class SqliteSession {
       await this.temporaryKeriaConnection();
 
       const action = isRecoveryValidation ? "recovery validation" : "migration";
+      // eslint-disable-next-line no-console
       console.log(`Starting cloud ${action} ${migration.version}`);
       const signifyClient = Agent.agent.client;
       await migration.cloudMigrationStatements(signifyClient);
+      // eslint-disable-next-line no-console
       console.log(`Completed cloud ${action} ${migration.version}`);
 
       // Mark cloud migration as complete
