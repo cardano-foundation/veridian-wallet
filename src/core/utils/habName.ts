@@ -130,10 +130,7 @@ export function formatToV1_2_0_3(parts: HabNameParts): string {
   const themePart = parts.theme || ""; // Ensure theme is not undefined
   const displayNamePart = parts.displayName || ""; // Ensure display name is not undefined
 
-  if (
-    parts.groupMetadata?.groupId?.length &&
-    parts.groupMetadata?.groupInitiator !== undefined
-  ) {
+  if (parts.groupMetadata) {
     const groupInitiatorStr = parts.groupMetadata.groupInitiator ? "1" : "0";
     const groupIdPart = parts.groupMetadata.groupId || "";
     const userNamePart = parts.groupMetadata.userName || "";

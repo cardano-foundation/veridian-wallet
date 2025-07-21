@@ -43,6 +43,7 @@ import { ConnectionService } from "./connectionService";
 import { IdentifierService } from "./identifierService";
 import { StorageMessage } from "../../storage/storage.types";
 import { RpyRoute } from "./connectionService.types";
+import { CURRENT_VERSION } from "../../storage/sqliteStorage/migrations";
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
   static readonly CANNOT_GET_KEYSTATE_OF_IDENTIFIER =
@@ -137,7 +138,7 @@ class MultiSigService extends AgentService {
     );
     const states = [mHab["state"], ...connectionStates];
 
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
+    const groupName = `${CURRENT_VERSION}:${mHabRecord.theme}:${mHabRecord.displayName}`;
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
@@ -475,7 +476,7 @@ class MultiSigService extends AgentService {
       .identifiers()
       .get(mHabRecord.id);
 
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
+    const groupName = `${CURRENT_VERSION}:${mHabRecord.theme}:${mHabRecord.displayName}`;
 
     // @TODO - foconnor: We should error here if smids no longer matches once we have multi-sig rotation.
     const states = await Promise.all(
