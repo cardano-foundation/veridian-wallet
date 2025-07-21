@@ -6,7 +6,7 @@ export interface HabNameParts {
     groupId: string;
     userName: string;
   };
-  theme?: string;
+  theme: string;
 }
 
 // Old format: theme:groupInitiator-groupId:displayName or  theme:displayName
