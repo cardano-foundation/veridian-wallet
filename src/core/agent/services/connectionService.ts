@@ -312,8 +312,10 @@ class ConnectionService extends AgentService {
         key.startsWith(KeriaContactKeyPrefix.HISTORY_IPEX) ||
         key.startsWith(KeriaContactKeyPrefix.HISTORY_REVOKE)
       ) {
-        const historyItem = JSON.parse(connection[key] as string);
-        if (full || !skippedHistoryTypes.includes(historyItem.type)) {
+        const historyItem: ConnectionHistoryItem = JSON.parse(
+          connection[key] as string
+        );
+        if (full || !skippedHistoryTypes.includes(historyItem.historyType)) {
           historyItems.push(historyItem);
         }
       }

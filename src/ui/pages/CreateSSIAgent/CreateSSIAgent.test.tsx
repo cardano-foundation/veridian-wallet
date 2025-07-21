@@ -51,7 +51,10 @@ import {
   setCurrentOperation,
   setIsOnline,
 } from "../../../store/reducers/stateCache";
-import { filteredIdentifierMapFix } from "../../__fixtures__/filteredIdentifierFix";
+import {
+  filteredIdentifierFix,
+  filteredIdentifierMapFix,
+} from "../../__fixtures__/filteredIdentifierFix";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import {
   ONBOARDING_DOCUMENTATION_LINK,
@@ -938,6 +941,16 @@ describe("SSI agent page: recovery mode", () => {
 
     act(() => {
       store.dispatch(setIsOnline(true));
+    });
+
+    jest.spyOn(global.Date, "now").mockImplementationOnce(() => 1);
+    await waitFor(() => {
+      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.DEFAULT_PROFILE,
+          content: { defaultProfile: filteredIdentifierFix[0].id },
+        })
+      );
     });
 
     await waitFor(() => {
