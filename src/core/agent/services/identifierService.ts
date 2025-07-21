@@ -233,7 +233,7 @@ class IdentifierService extends AgentService {
     let name: string;
     if (metadata.groupMetadata) {
       const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
-      const userNamePart = metadata.groupMetadata.userName || "";
+      const userNamePart = metadata.groupMetadata.userName;
       name = `${CURRENT_VERSION}:${metadata.theme}:${initiatorFlag}-${metadata.groupMetadata.groupId}-${userNamePart}:${metadata.displayName}`;
     } else {
       name = `${CURRENT_VERSION}:${metadata.theme}:${metadata.displayName}`;
