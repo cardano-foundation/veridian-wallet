@@ -947,7 +947,7 @@ describe("SSI agent page: recovery mode", () => {
     await waitFor(() => {
       expect(createOrUpdateBasicRecordMock).toBeCalledWith(
         expect.objectContaining({
-          id: MiscRecordId.DEFAULT_PROFILE,
+          id: MiscRecordId.CURRENT_PROFILE_ID,
           content: { defaultProfile: filteredIdentifierFix[0].id },
         })
       );
