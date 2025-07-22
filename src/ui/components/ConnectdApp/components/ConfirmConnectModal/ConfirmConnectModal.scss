@@ -1,0 +1,141 @@
+.confirm-connect-modal {
+  .add-connection-modal-content {
+    align-items: center;
+  }
+
+  &.responsive-modal .responsive-modal-content {
+    & > * {
+      margin-bottom: 0;
+    }
+
+    .wallet-connect-logo {
+      border-radius: 50%;
+      width: 2.75rem;
+      height: 2.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .wallet-connect-fallback-logo {
+      background-color: var(--ion-color-neutral-800);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      ion-icon {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .confirm-modal-name-title {
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .confirm-modal-name {
+      margin: 0 0 1.25rem;
+      font-size: 0.875rem;
+      line-height: 1rem;
+      font-weight: 400;
+      text-align: center;
+    }
+
+    .confirm-modal-id {
+      margin: 0 0 1.5rem;
+      padding: 1rem 1.5rem;
+      background-color: var(--ion-color-neutral-100);
+      border-radius: 1.875rem;
+
+      display: flex;
+      align-items: center;
+
+      & > span {
+        font-weight: 500;
+        color: var(--ion-color-neutral-700);
+      }
+
+      & > ion-icon {
+        margin-left: 0.625rem;
+        width: 1.375rem;
+        height: 1.375rem;
+      }
+    }
+
+    .pending-chip {
+      margin: 1.25rem 0 1.5rem;
+      border-radius: 0.25rem;
+      color: var(--ion-color-neutral-700);
+      background: var(--ion-color-neutral-300);
+
+      & > span {
+        font-size: 0.75rem;
+        font-weight: 400;
+      }
+    }
+
+    .confirm-connect-submit {
+      width: 100%;
+      --border-radius: 2rem;
+      margin-bottom: 2rem;
+
+      &.md {
+        --box-shadow: none;
+      }
+    }
+  }
+
+  .buttons-last-slot {
+    min-width: fit-content !important;
+
+    .action-button {
+      background: var(--ion-color-danger) !important;
+
+      & > ion-icon {
+        --ion-color-base: var(--ion-color-neutral-100) !important;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .buttons-last-slot {
+      .action-button {
+        & > ion-icon {
+          width: 1.15rem;
+          height: 1.15rem;
+        }
+      }
+    }
+
+    & .page-header.md {
+      ion-toolbar {
+        max-height: none !important;
+      }
+    }
+
+    &.responsive-modal .responsive-modal-content {
+      .confirm-modal-id {
+        padding: 0.875rem 1.5rem;
+
+        & > span {
+          font-size: 0.875rem;
+        }
+      }
+
+      .wallet-connect-fallback-logo {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+
+      .confirm-modal-name-title {
+        font-size: 0.875rem;
+      }
+
+      .confirm-connect-submit {
+        margin-bottom: 1.5rem;
+      }
+    }
+  }
+}

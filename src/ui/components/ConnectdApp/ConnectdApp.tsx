@@ -1,16 +1,22 @@
-import { IonCheckbox, IonChip, IonIcon, IonItemOption } from "@ionic/react";
-import { hourglassOutline } from "ionicons/icons";
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { Agent } from "../../../../../core/agent/agent";
-import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
-import { i18n } from "../../../../../i18n";
-import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
+import {
+  IonButton,
+  IonCheckbox,
+  IonChip,
+  IonIcon,
+  IonItemOption,
+} from "@ionic/react";
+import { addOutline, arrowBackOutline, hourglassOutline } from "ionicons/icons";
+import { useEffect, useState } from "react";
+import { Agent } from "../../../core/agent/agent";
+import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
+import { i18n } from "../../../i18n";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getCurrentOperation,
   getToastMsgs,
   setCurrentOperation,
   setToastMsg,
-} from "../../../../../store/reducers/stateCache";
+} from "../../../store/reducers/stateCache";
 import {
   ConnectionData,
   getConnectedWallet,
@@ -19,26 +25,29 @@ import {
   setConnectedWallet,
   setPendingConnection,
   setWalletConnectionsCache,
-} from "../../../../../store/reducers/walletConnectionsCache";
-import { Alert } from "../../../../components/Alert";
-import { CardList } from "../../../../components/CardList";
-import { CardsPlaceholder } from "../../../../components/CardsPlaceholder";
-import { ANIMATION_DURATION } from "../../../../components/SideSlider/SideSlider.types";
-import { Verification } from "../../../../components/Verification";
-import { OperationType, ToastMsgType } from "../../../../globals/types";
-import { showError } from "../../../../utils/error";
-import { ConfirmConnectModal } from "../ConfirmConnectModal";
-import "./ConnectWallet.scss";
-import { ActionInfo, ActionType, ConnectdApp } from "./ConnectWallet.types";
+} from "../../../store/reducers/walletConnectionsCache";
+import { Alert } from "../../components/Alert";
+import { CardList } from "../../components/CardList";
+import { CardsPlaceholder } from "../../components/CardsPlaceholder";
+import { ANIMATION_DURATION } from "../../components/SideSlider/SideSlider.types";
+import { Verification } from "../../components/Verification";
+import { OperationType, ToastMsgType } from "../../globals/types";
+import { showError } from "../../utils/error";
+import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
+import { PageHeader } from "../PageHeader";
+import { SideSlider } from "../SideSlider";
+import { ConfirmConnectModal } from "./components/ConfirmConnectModal";
+import "./ConnectdApp.scss";
+import { ActionInfo, ActionType, ConnectdAppProps } from "./ConnectdApp.types";
 
-const ConnectWallet = forwardRef<ConnectdApp, object>((props, ref) => {
+const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
   const dispatch = useAppDispatch();
   const toastMsgs = useAppSelector(getToastMsgs);
   const pendingConnection = useAppSelector(getPendingConnection);
   const connections = useAppSelector(getWalletConnectionsCache);
   const connectedWallet = useAppSelector(getConnectedWallet);
   const currentOperation = useAppSelector(getCurrentOperation);
-  const pageId = "connect-wallet-placeholder";
+  const pageId = "wallet-connect";
   const [actionInfo, setActionInfo] = useState<ActionInfo>({
     type: ActionType.None,
   });
@@ -60,10 +69,6 @@ const ConnectWallet = forwardRef<ConnectdApp, object>((props, ref) => {
       data: connection,
     };
   });
-
-  useImperativeHandle(ref, () => ({
-    openConnectWallet: handleScanQR,
-  }));
 
   const handleOpenVerify = () => {
     setVerifyIsOpen(true);
@@ -219,63 +224,95 @@ const ConnectWallet = forwardRef<ConnectdApp, object>((props, ref) => {
 
   return (
     <>
-      <div className="connect-wallet-container">
-        {connections.length > 0 ? (
-          <>
-            <h2 className="connect-wallet-title">
-              {i18n.t("connectdapp.connectionhistory.title")}
-            </h2>
-            <CardList
-              data={displayConnection}
-              onCardClick={handleOpenConfirmConnectModal}
-              onRenderCardAction={(data) => {
-                return (
-                  <IonItemOption
-                    color="danger"
-                    data-testid={`delete-connections-${data.id}`}
-                    onClick={() => {
-                      handleOpenDeleteAlert(data);
-                    }}
-                  >
-                    {i18n.t("connectdapp.connectionhistory.action.delete")}
-                  </IonItemOption>
-                );
-              }}
-              onRenderEndSlot={(data) => {
-                if (data.id === pendingConnection?.id) {
-                  return (
-                    <IonChip className="connection-pending">
-                      <IonIcon
-                        icon={hourglassOutline}
-                        color="primary"
-                      ></IonIcon>
-                    </IonChip>
-                  );
-                }
-
-                if (data.id !== connectedWallet?.id) return null;
-
-                return (
-                  <IonCheckbox
-                    checked={true}
-                    aria-label=""
-                    className="checkbox"
-                    data-testid="connected-wallet-check-mark"
+      <SideSlider
+        renderAsModal
+        isOpen={isOpen}
+      >
+        <ScrollablePageLayout
+          pageId={pageId}
+          activeStatus={isOpen}
+          header={
+            <PageHeader
+              closeButton
+              closeButtonAction={() => setIsOpen(false)}
+              closeButtonIcon={arrowBackOutline}
+              title={`${i18n.t("connectdapp.tabheader")}`}
+              additionalButtons={
+                <IonButton
+                  shape="round"
+                  className="connect-wallet-button"
+                  data-testid="menu-add-connection-button"
+                  onClick={handleScanQR}
+                >
+                  <IonIcon
+                    slot="icon-only"
+                    icon={addOutline}
+                    color="primary"
                   />
-                );
-              }}
+                </IonButton>
+              }
             />
-          </>
-        ) : (
-          <div className="placeholder-container">
-            <CardsPlaceholder
-              buttonLabel={`${i18n.t("connectdapp.connectbtn")}`}
-              buttonAction={handleScanQR}
-              testId={pageId}
-            />
+          }
+        >
+          <div className="connect-wallet-container">
+            {connections.length > 0 ? (
+              <>
+                <h2 className="connect-wallet-title">
+                  {i18n.t("connectdapp.connectionhistory.title")}
+                </h2>
+                <CardList
+                  data={displayConnection}
+                  onCardClick={handleOpenConfirmConnectModal}
+                  onRenderCardAction={(data) => {
+                    return (
+                      <IonItemOption
+                        color="danger"
+                        data-testid={`delete-connections-${data.id}`}
+                        onClick={() => {
+                          handleOpenDeleteAlert(data);
+                        }}
+                      >
+                        {i18n.t("connectdapp.connectionhistory.action.delete")}
+                      </IonItemOption>
+                    );
+                  }}
+                  onRenderEndSlot={(data) => {
+                    if (data.id === pendingConnection?.id) {
+                      return (
+                        <IonChip className="connection-pending">
+                          <IonIcon
+                            icon={hourglassOutline}
+                            color="primary"
+                          ></IonIcon>
+                        </IonChip>
+                      );
+                    }
+
+                    if (data.id !== connectedWallet?.id) return null;
+
+                    return (
+                      <IonCheckbox
+                        checked={true}
+                        aria-label=""
+                        className="checkbox"
+                        data-testid="connected-wallet-check-mark"
+                      />
+                    );
+                  }}
+                />
+              </>
+            ) : (
+              <div className="placeholder-container">
+                <CardsPlaceholder
+                  buttonLabel={`${i18n.t("connectdapp.connectbtn")}`}
+                  buttonAction={handleScanQR}
+                  testId={pageId}
+                />
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </ScrollablePageLayout>
+      </SideSlider>
       <ConfirmConnectModal
         isConnectModal={actionInfo.data?.id !== connectedWallet?.id}
         openModal={openConfirmConnectModal}
@@ -321,6 +358,6 @@ const ConnectWallet = forwardRef<ConnectdApp, object>((props, ref) => {
       />
     </>
   );
-});
+};
 
-export { ConnectWallet };
+export { ConnectdApp };

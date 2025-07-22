@@ -85,10 +85,7 @@ describe("Side Page: wallet connect", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stageone
-            .title
-        )
+        getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
       ).toBeInTheDocument();
     });
 

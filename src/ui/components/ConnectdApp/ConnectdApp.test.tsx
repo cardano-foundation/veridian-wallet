@@ -2,22 +2,21 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-
-import { CreationStatus } from "../../../../../core/agent/agent.types";
-import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
-import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
-import { TabsRoutePath } from "../../../../../routes/paths";
+import { CreationStatus } from "../../../core/agent/agent.types";
+import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
+import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import {
   setCurrentOperation,
   setToastMsg,
-} from "../../../../../store/reducers/stateCache";
-import { setPendingConnection } from "../../../../../store/reducers/walletConnectionsCache";
-import { identifierFix } from "../../../../__fixtures__/identifierFix";
-import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
-import { OperationType, ToastMsgType } from "../../../../globals/types";
-import { makeTestStore } from "../../../../utils/makeTestStore";
-import { passcodeFiller } from "../../../../utils/passcodeFiller";
-import { ConnectWallet } from "./ConnectWallet";
+} from "../../../store/reducers/stateCache";
+import { setPendingConnection } from "../../../store/reducers/walletConnectionsCache";
+import { identifierFix } from "../../__fixtures__/identifierFix";
+import { walletConnectionsFix } from "../../__fixtures__/walletConnectionsFix";
+import { OperationType, ToastMsgType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
+import { passcodeFiller } from "../../utils/passcodeFiller";
+import { TabsRoutePath } from "../navigation/TabsMenu";
+import { ConnectdApp } from "./ConnectdApp";
 
 jest.mock("../../../../../core/configuration", () => ({
   ...jest.requireActual("../../../../../core/configuration"),
@@ -122,7 +121,10 @@ describe("Wallet connect: empty history", () => {
 
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
@@ -163,7 +165,10 @@ describe("Wallet connect: empty history", () => {
     const { getByText, queryByText, getByTestId } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
-          <ConnectWallet />
+          <ConnectdApp
+            isOpen
+            setIsOpen={jest.fn}
+          />
         </Provider>
       </MemoryRouter>
     );
@@ -228,7 +233,10 @@ describe("Wallet connect: empty history", () => {
     const { getByText } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
-          <ConnectWallet />
+          <ConnectdApp
+            isOpen
+            setIsOpen={jest.fn}
+          />
         </Provider>
       </MemoryRouter>
     );
@@ -253,7 +261,10 @@ describe("Wallet connect", () => {
   test("Wallet connect render", async () => {
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
@@ -276,7 +287,10 @@ describe("Wallet connect", () => {
   test("Confirm connect modal render", async () => {
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
@@ -299,7 +313,10 @@ describe("Wallet connect", () => {
   test("Delete wallet connections", async () => {
     const { getByText, getByTestId, queryByText, findByText } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
@@ -382,7 +399,10 @@ describe("Wallet connect", () => {
 
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
@@ -423,7 +443,10 @@ describe("Wallet connect", () => {
   test("Connect wallet", async () => {
     const { getByText, getByTestId, queryByText, getAllByText } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
@@ -553,7 +576,10 @@ describe("Wallet connect", () => {
     const { getByTestId, rerender } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
-          <ConnectWallet />
+          <ConnectdApp
+            isOpen
+            setIsOpen={jest.fn}
+          />
         </Provider>
       </MemoryRouter>
     );
@@ -626,7 +652,10 @@ describe("Wallet connect", () => {
     rerender(
       <MemoryRouter>
         <Provider store={updateStoreMocked}>
-          <ConnectWallet />
+          <ConnectdApp
+            isOpen
+            setIsOpen={jest.fn}
+          />
         </Provider>
       </MemoryRouter>
     );

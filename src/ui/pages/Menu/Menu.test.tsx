@@ -91,9 +91,7 @@ describe("Menu Tab", () => {
     expect(
       getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connections.title)
     ).toBeInTheDocument();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.title)
-    ).toBeInTheDocument();
+    expect(getByText(EN_TRANSLATIONS.connectdapp.title)).toBeInTheDocument();
   });
 
   test("Open Profile sub-menu", async () => {
@@ -128,9 +126,7 @@ describe("Menu Tab", () => {
     );
 
     expect(getByTestId("menu-tab")).toBeInTheDocument();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.title)
-    ).toBeInTheDocument();
+    expect(getByText(EN_TRANSLATIONS.connectdapp.title)).toBeInTheDocument();
     const connectButton = getByTestId(
       `menu-input-item-${SubMenuKey.ConnectWallet}`
     );
@@ -140,9 +136,7 @@ describe("Menu Tab", () => {
     });
 
     await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.tabheader)
-      ).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.connectdapp.tabheader)).toBeVisible();
     });
   });
 });

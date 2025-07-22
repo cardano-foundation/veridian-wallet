@@ -73,7 +73,7 @@ const Menu = () => {
       label: `${i18n.t("tabs.menu.tab.items.connectwallet.title")}`,
       subLabel: `${i18n.t("tabs.menu.tab.items.connectwallet.sublabel")}`,
       hidden: ConfigurationService.env.features.cut.includes(
-        OptionalFeature.ConnectWallet
+        OptionalFeature.ConnectdApp
       ),
     },
   ];

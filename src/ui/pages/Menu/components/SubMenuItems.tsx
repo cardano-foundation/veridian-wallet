@@ -3,7 +3,7 @@ import { addOutline } from "ionicons/icons";
 import { useMemo, useRef, useState } from "react";
 import { i18n } from "../../../../i18n";
 import { SubMenuData, SubMenuKey } from "../Menu.types";
-import { ConnectWallet, ConnectWalletOptionRef } from "./ConnectWallet";
+import { ConnectWallet, ConnectdApp } from "./ConnectWallet";
 import { Profile } from "./Profile";
 import { ProfileOptionRef } from "./Profile/Profile.types";
 
@@ -23,7 +23,7 @@ const emptySubMenu = {
 
 const SubMenuItems = () => {
   const profileRef = useRef<ProfileOptionRef>(null);
-  const connectWalletRef = useRef<ConnectWalletOptionRef>(null);
+  const connectWalletRef = useRef<ConnectdApp>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const toggleEditProfile = () => {

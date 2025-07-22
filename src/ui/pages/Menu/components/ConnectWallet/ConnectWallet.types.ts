@@ -1,6 +1,6 @@
 import { ConnectionData } from "../../../../../store/reducers/walletConnectionsCache";
 
-interface ConnectWalletOptionRef {
+interface ConnectdApp {
   openConnectWallet: () => void;
 }
 
@@ -18,4 +18,4 @@ enum ActionType {
 
 export { ActionType };
 
-export type { ConnectWalletOptionRef, ActionInfo, ConnectionData };
+export type { ConnectdApp, ActionInfo, ConnectionData };
