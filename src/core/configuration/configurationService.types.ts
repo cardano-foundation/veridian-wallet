@@ -4,7 +4,7 @@ interface KeriaConfig {
 }
 
 enum OptionalFeature {
-  ConnectWallet = "CONNECT_WALLET",
+  ConnectdApp = "CONNECT_WALLET",
 }
 
 enum IndividualOnlyMode {

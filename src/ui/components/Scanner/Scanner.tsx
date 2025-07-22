@@ -293,7 +293,7 @@ const Scanner = forwardRef(
           })
         );
         dispatch(showConnectWallet(true));
-        handleReset && handleReset(TabsRoutePath.MENU);
+        handleReset?.();
       } else {
         dispatch(setToastMsg(ToastMsgType.PEER_ID_ERROR));
       }
@@ -803,9 +803,7 @@ const Scanner = forwardRef(
               currentOperation === OperationType.MULTI_SIG_RECEIVER_SCAN
                 ? `${i18n.t("createidentifier.scan.pasteoobi")}`
                 : currentOperation === OperationType.SCAN_WALLET_CONNECTION
-                  ? i18n.t(
-                    "tabs.menu.tab.items.connectwallet.inputpidmodal.header"
-                  )
+                  ? i18n.t("connectdapp.inputpidmodal.header")
                   : `${i18n.t("createidentifier.scan.pastecontents")}`
             }`,
             actionButton: true,

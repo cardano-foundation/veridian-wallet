@@ -76,9 +76,9 @@ describe("Confirm connect modal", () => {
     expect(getByText(walletConnectionsFix[0].url || "")).toBeVisible();
 
     const ellipsisLink =
-      (walletConnectionsFix[0].meerkatId as string).substring(0, 5) +
+      (walletConnectionsFix[0].id as string).substring(0, 5) +
       "..." +
-      (walletConnectionsFix[0].meerkatId as string).slice(-5);
+      (walletConnectionsFix[0].id as string).slice(-5);
 
     expect(getByText(ellipsisLink)).toBeVisible();
 
@@ -128,8 +128,8 @@ describe("Confirm connect modal", () => {
     expect(getByTestId("wallet-connection-fallback-logo")).toBeVisible();
     expect(
       getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-          .confirmconnect.disconnectbtn
+        EN_TRANSLATIONS.connectdapp.connectionhistory.confirmconnect
+          .disconnectbtn
       )
     ).toBeVisible();
   });
@@ -154,8 +154,8 @@ describe("Confirm connect modal", () => {
     expect(getByTestId("wallet-connection-fallback-logo")).toBeVisible();
     expect(
       getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-          .confirmconnect.disconnectbtn
+        EN_TRANSLATIONS.connectdapp.connectionhistory.confirmconnect
+          .disconnectbtn
       )
     ).toBeVisible();
 

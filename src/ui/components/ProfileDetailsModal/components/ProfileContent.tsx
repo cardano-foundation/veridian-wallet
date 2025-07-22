@@ -31,6 +31,7 @@ import {
   ProfileContentProps,
   ProfileInformationProps,
 } from "./ProfileContent.types";
+import { ConnectdApp } from "../../ConnectdApp";
 
 const DISPLAY_MEMBERS = 3;
 
@@ -56,6 +57,7 @@ const ProfileContent = ({
   const [viewType, setViewType] = useState(DetailView.AdvancedDetail);
   const [shareIsOpen, setShareIsOpen] = useState(false);
   const [editorOptionsIsOpen, setEditorIsOpen] = useState(false);
+  const [connectdApp, setConnectdApp] = useState(false);
 
   const openShareModal = () => {
     if (!cardData) return;
@@ -91,7 +93,7 @@ const ProfileContent = ({
 
   const openGroupMember = () => openPropDetailModal(DetailView.GroupMember);
   const showDapp = () => {
-    // TODO: Show dapp modal
+    setConnectdApp(true);
   };
 
   return (
@@ -334,6 +336,10 @@ const ProfileContent = ({
         setModalIsOpen={setEditorIsOpen}
         setCardData={setCardData}
         cardData={cardData}
+      />
+      <ConnectdApp
+        isOpen={connectdApp}
+        setIsOpen={setConnectdApp}
       />
     </>
   );
