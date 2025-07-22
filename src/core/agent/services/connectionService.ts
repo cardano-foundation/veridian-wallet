@@ -413,24 +413,22 @@ class ConnectionService extends AgentService {
           }
         });
 
-      const sharedIdentifier = connection.sharedIdentifier;
-
       const keysToDelete: Array<string> = [];
-      keysToDelete.push(`${sharedIdentifier}:createdAt`);
+      keysToDelete.push(`${identifier}:createdAt`);
       Object.keys(connection).forEach((key) => {
         if (
           key.startsWith(
-            `${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}`
+            `${identifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}`
           ) &&
           connection[key]
         ) {
           keysToDelete.push(key);
         } else if (
           key.startsWith(
-            `${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}`
+            `${identifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}`
           ) ||
           key.startsWith(
-            `${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_REVOKE}`
+            `${identifier}:${KeriaContactKeyPrefix.HISTORY_REVOKE}`
           )
         ) {
           keysToDelete.push(key);
@@ -509,7 +507,9 @@ class ConnectionService extends AgentService {
         this.contactStorage.findById(connectionPair.contactId)
       )
     );
-    return contacts.filter((contact): contact is ContactRecord => contact !== null);
+    return contacts.filter(
+      (contact): contact is ContactRecord => contact !== null
+    );
   }
 
   async deleteStaleLocalConnectionById(id: string): Promise<void> {
@@ -651,7 +651,7 @@ class ConnectionService extends AgentService {
   @OnlineOnly
   async resolveOobi(
     url: string,
-    waitForCompletion: { wait: true } | { wait: false, identifier?: string }
+    waitForCompletion: { wait: true } | { wait: false; identifier?: string }
   ): Promise<{
     op: Operation & { response: State };
     alias: string;
