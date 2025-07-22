@@ -537,7 +537,7 @@ class MultiSigService extends AgentService {
       payload: {
         group: {
           id: multisigId,
-          theme: 0,
+          theme: mHabRecord.theme,
           displayName: mHabRecord.displayName,
           creationStatus,
           groupMemberPre: mHabRecord.id,
