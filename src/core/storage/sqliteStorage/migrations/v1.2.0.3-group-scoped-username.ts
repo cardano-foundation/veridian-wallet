@@ -71,11 +71,11 @@ export const MIGRATION_V1203: HybridMigration = {
           "IdentifierMetadataRecord",
         ],
       });
-      statements.push(...insertItemTags(recordValue));
       statements.push({
         statement: "DELETE FROM items_tags WHERE item_id = ?",
         values: [identifier.id],
       });
+      statements.push(...insertItemTags(recordValue));
     }
     // eslint-disable-next-line no-console
     console.log(
