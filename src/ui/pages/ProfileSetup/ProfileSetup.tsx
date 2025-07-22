@@ -32,14 +32,10 @@ import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
-import { SetupProfileStep } from "./ProfileSetup.types";
+import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
 import { BasicRecord } from "../../../core/agent/records";
 
-export interface ProfileSetupProps {
-  onComplete?: () => void;
-}
-
-export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
+export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
@@ -50,6 +46,7 @@ export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
   const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
+  const isModal = !!onClose;
 
   const title = i18n.t(`setupprofile.${step}.title`);
   const back = [
@@ -80,7 +77,10 @@ export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
 
     if (step === SetupProfileStep.SetupProfile) {
       setStep(SetupProfileStep.SetupGroup);
+      return;
     }
+
+    onClose?.(true);
   };
 
   const createIdentifier = async () => {
@@ -128,7 +128,6 @@ export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
           .then(() => dispatch(setIndividualFirstCreate(false)));
       }
 
-      // Set as default if it's the first identifier
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
           id: MiscRecordId.CURRENT_PROFILE_ID,
@@ -137,6 +136,13 @@ export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
       );
       dispatch(setCurrentProfileId(identifier));
 
+      if (isModal) {
+        onClose();
+        navToCredentials();
+        return;
+      }
+
+      await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       setStep(SetupProfileStep.FinishSetup);
     } catch (e) {
       const errorMessage = (e as Error).message;
@@ -189,11 +195,7 @@ export const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
     }
 
     if (step === SetupProfileStep.FinishSetup) {
-      if (onComplete) {
-        onComplete();
-      } else {
-        navToCredentials();
-      }
+      navToCredentials();
       return;
     }
 

@@ -41,6 +41,7 @@ const IdentifierAttributeDetailModal = ({
 
       if (!memberConnection?.label) {
         currentUserIndex = index;
+        // TODO: use name instead id after backend implements account data API
         name = currentProfileId;
       }
 

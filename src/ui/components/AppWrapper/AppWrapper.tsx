@@ -349,13 +349,13 @@ const AppWrapper = (props: { children: ReactNode }) => {
         MiscRecordId.CURRENT_PROFILE_ID
       );
 
-      const currentProfileName = storedIdentifiers.find(
+      const currentProfile = storedIdentifiers.find(
         (identifier) => identifier.id === currentProfileId?.content?.id
       );
 
       dispatch(
         setCurrentProfileId(
-          currentProfileName?.id || storedIdentifiers[0]?.id || ""
+          currentProfile?.id || storedIdentifiers[0]?.id || ""
         )
       );
       dispatch(setIdentifiersCache(storedIdentifiers));

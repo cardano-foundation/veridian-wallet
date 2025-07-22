@@ -198,7 +198,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         isOpen={openSetupProfile}
         renderAsModal
       >
-        <ProfileSetup onComplete={handleCloseSetupProfile} />
+        <ProfileSetup onClose={handleCloseSetupProfile} />
       </SideSlider>
     </>
   );
