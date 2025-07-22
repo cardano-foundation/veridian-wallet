@@ -69,10 +69,10 @@ describe("habName", () => {
       expect(result).toEqual(expect.objectContaining(expected));
     });
 
-    // Tests for new format names (1.2.0.3:theme:groupInitiator-groupId-userName:displayName)
+    // Tests for new format names (1.2.0.3:theme:groupInitiator:groupId:userName:displayName)
     test.each([
       {
-        name: "1.2.0.3:XX:1-groupId789-user123:MyNewGroup",
+        name: "1.2.0.3:XX:1:groupId789:user123:MyNewGroup",
         expected: {
           version: "1.2.0.3",
           displayName: "MyNewGroup",
@@ -85,7 +85,7 @@ describe("habName", () => {
         },
       },
       {
-        name: "1.2.0.3:XX:1-gr@up!d-us$er%name:Group Name",
+        name: "1.2.0.3:XX:1:gr@up!d:us$er%name:Group Name",
         expected: {
           version: "1.2.0.3",
           displayName: "Group Name",
@@ -98,7 +98,7 @@ describe("habName", () => {
         },
       },
       {
-        name: "1.2.0.3:XX:1-group-with-hyphens-user123:MyNewGroup",
+        name: "1.2.0.3:XX:1:group-with-hyphens:user123:MyNewGroup",
         expected: {
           version: "1.2.0.3",
           displayName: "MyNewGroup",
@@ -136,9 +136,9 @@ describe("habName", () => {
           "Invalid old format name: Expected 2 or 3 parts separated by colons (theme:groupPart:displayName or theme:displayName)",
       },
       {
-        name: "1.2.0.3:MyNewWallet", // Missing theme, groupPart, displayName for new format
+        name: "1.2.0.3:XX:1:groupId789:user123", // Invalid number of parts for new format (5 parts)
         errorMessage:
-          "Invalid new format name: Expected 3 or 4 parts separated by colons (version:theme:groupPart:displayName or version:theme:displayName)",
+          "Invalid new format name: Expected 3 or 6 parts separated by colons (version:theme:displayName or version:theme:groupInitiator:groupId:userName:displayName).",
       },
       {
         name: "03:1-group-id:", // Missing display name for old format
@@ -153,7 +153,7 @@ describe("habName", () => {
         errorMessage: "Invalid old format name: groupId cannot be empty.",
       },
       {
-        name: "1.2.0.3:XX:1--user123:MyGroup", // Empty groupId for new format
+        name: "1.2.0.3:XX:1::user123:MyGroup", // Empty groupId for new format
         errorMessage: "Invalid new format name: groupId cannot be empty.",
       },
     ])(
@@ -183,7 +183,7 @@ describe("habName", () => {
             userName: "formattedUser",
           },
         },
-        expected: "1.2.0.3:XX:1-groupXYZ-formattedUser:FormattedGroup",
+        expected: "1.2.0.3:XX:1:groupXYZ:formattedUser:FormattedGroup",
       },
       {
         parts: {

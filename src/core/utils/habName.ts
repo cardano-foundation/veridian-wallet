@@ -10,46 +10,32 @@ export interface HabNameParts {
 }
 
 // Old format: theme:groupInitiator-groupId:displayName or  theme:displayName
-// New format: version:theme:groupInitiator-groupId-userName:displayName or version:theme:displayName
+// New format: version:theme:groupInitiator:groupId:userName:displayName or version:theme:displayName
 export function parseHabName(name: string): HabNameParts {
   const parts = name.split(":");
 
   if (name.startsWith("1.2.0.3:")) {
-    if (parts.length < 3 || parts.length > 4) {
+    if (parts.length !== 3 && parts.length !== 6) {
       throw new Error(
-        "Invalid new format name: Expected 3 or 4 parts separated by colons (version:theme:groupPart:displayName or version:theme:displayName)."
+        "Invalid new format name: Expected 3 or 6 parts separated by colons (version:theme:displayName or version:theme:groupInitiator:groupId:userName:displayName)."
       );
     }
 
     const version = parts[0];
     const theme = parts[1];
-    const displayName = parts.length === 3 ? parts[2] : parts[3];
 
     if (parts.length === 3) {
       return {
         version,
         theme,
-        displayName,
+        displayName: parts[2],
       };
     }
 
-    const groupPart = parts[2];
-    const firstHyphenIndex = groupPart.indexOf("-");
-    const lastHyphenIndex = groupPart.lastIndexOf("-");
-
-    if (
-      firstHyphenIndex === -1 ||
-      lastHyphenIndex === -1 ||
-      firstHyphenIndex === lastHyphenIndex
-    ) {
-      throw new Error(
-        "Invalid new format name: Invalid group part format (expected groupInitiator-groupId-userName)"
-      );
-    }
-
-    const groupInitiatorStr = groupPart.substring(0, firstHyphenIndex);
-    const groupId = groupPart.substring(firstHyphenIndex + 1, lastHyphenIndex);
-    const userName = groupPart.substring(lastHyphenIndex + 1);
+    const groupInitiatorStr = parts[2];
+    const groupId = parts[3];
+    const userName = parts[4];
+    const displayName = parts[5];
 
     if (groupInitiatorStr !== "1" && groupInitiatorStr !== "0") {
       throw new Error(
@@ -134,7 +120,7 @@ export function formatToV1_2_0_3(parts: HabNameParts): string {
     const groupInitiatorStr = parts.groupMetadata.groupInitiator ? "1" : "0";
     const groupIdPart = parts.groupMetadata.groupId || "";
     const userNamePart = parts.groupMetadata.userName || "";
-    return `${version}:${themePart}:${groupInitiatorStr}-${groupIdPart}-${userNamePart}:${displayNamePart}`;
+    return `${version}:${themePart}:${groupInitiatorStr}:${groupIdPart}:${userNamePart}:${displayNamePart}`;
   } else {
     return `${version}:${themePart}:${displayNamePart}`;
   }
