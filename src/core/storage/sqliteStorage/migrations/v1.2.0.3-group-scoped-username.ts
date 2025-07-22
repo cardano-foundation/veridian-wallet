@@ -12,6 +12,7 @@ export const MIGRATION_V1203: HybridMigration = {
     console.log(`Starting local migration for v${migrationVersion}...`);
     const statements = [];
 
+    // TODO: @jimcase - refactor this to use a common function for inserting tags
     function insertItemTags(itemRecord: any) {
       const statements: { statement: string; values?: unknown[] }[] = [];
       const statement =
