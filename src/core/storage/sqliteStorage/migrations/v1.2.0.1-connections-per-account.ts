@@ -1,6 +1,6 @@
 import { MigrationType, HybridMigration } from "./migrations.types";
 import { SignifyClient } from "signify-ts";
-import { ConnectionHistoryType } from "../../../agent/services/connectionService.types";
+import { randomSalt } from "../../../agent/services/utils";
 
 export const DATA_V1201: HybridMigration = {
   type: MigrationType.HYBRID,
@@ -38,12 +38,35 @@ export const DATA_V1201: HybridMigration = {
     const connections = connectionResult.values;
     const statements: { statement: string; values?: unknown[] }[] = [];
 
-    function insertRecord(record: any) {
+    function insertItem(record: any) {
       return {
         statement:
           "INSERT INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
         values: [record.id, record.type, record.id, JSON.stringify(record)],
       };
+    }
+
+    function insertItemTags(itemRecord: any) {
+      const statements = [];
+      const statement =
+        "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
+      const tags = itemRecord.tags;
+      console.log("tags", tags);
+      for (const key of Object.keys(tags)) {
+        if (tags[key] === undefined || tags[key] === null) continue;
+        if (typeof tags[key] === "boolean") {
+          statements.push({
+            statement: statement,
+            values: [itemRecord.id, key, tags[key] ? "1" : "0", "boolean"],
+          });
+        } else if (typeof tags[key] === "string") {
+          statements.push({
+            statement: statement,
+            values: [itemRecord.id, key, tags[key], "string"],
+          });
+        }
+      }
+      return statements;
     }
 
     for (const connection of connections || []) {
@@ -54,9 +77,17 @@ export const DATA_V1201: HybridMigration = {
         alias: connectionData.alias,
         oobi: connectionData.oobi,
         groupId: connectionData.groupId,
-        tags: connectionData.tags,
+        tags: {
+          groupId: connectionData.groupId,
+        },
         type: "ContactRecord",
       };
+
+      // we need to delete the connection with this id, because it will be replaced by the new connection in items table
+      statements.push({
+        statement: "DELETE FROM items WHERE id = ?",
+        values: [connection.id],
+      });
 
       const connectionPairsToInsert: any[] = [];
 
@@ -64,10 +95,18 @@ export const DATA_V1201: HybridMigration = {
         // No sharedIdentifier: create pair for every non-deleted identifier
         for (const identifier of identifiers) {
           connectionPairsToInsert.push({
+            id: `${identifier.id}:${connectionData.id}`,
             contactId: contactRecord.id,
+            createdAt: connectionData.createdAt,
             identifier: identifier.id,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
+            tags: {
+              identifier: identifier.id,
+              contactId: contactRecord.id,
+              creationStatus: connectionData.creationStatus,
+              pendingDeletion: connectionData.pendingDeletion,
+            },
             type: "ConnectionPairRecord",
           });
         }
@@ -76,19 +115,20 @@ export const DATA_V1201: HybridMigration = {
         const identifier = identifiers.find((identifier: any) => {
           return identifier.id === connectionData.sharedIdentifier;
         });
-        if (!identifier) {
-          // Identifier does not exist or is deleted/pending deletion: delete connection
-          statements.push({
-            statement: "DELETE FROM items WHERE id = ?",
-            values: [connection.id],
-          });
-          continue;
-        } else {
+        if (identifier) {
           connectionPairsToInsert.push({
+            id: `${identifier.id}:${connectionData.id}`,
             contactId: contactRecord.id,
             identifier: identifier.id,
+            createdAt: connectionData.createdAt,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
+            tags: {
+              identifier: identifier.id,
+              contactId: contactRecord.id,
+              creationStatus: connectionData.creationStatus,
+              pendingDeletion: connectionData.pendingDeletion,
+            },
             type: "ConnectionPairRecord",
           });
         }
@@ -96,12 +136,15 @@ export const DATA_V1201: HybridMigration = {
 
       // Only insert the contact if there is at least one pair
       if (connectionPairsToInsert.length > 0) {
-        statements.push(insertRecord(contactRecord));
+        statements.push(insertItem(contactRecord));
+        statements.push(...insertItemTags(contactRecord));
         for (const connectionPair of connectionPairsToInsert) {
-          statements.push(insertRecord(connectionPair));
+          statements.push(insertItem(connectionPair));
+          statements.push(...insertItemTags(connectionPair));
         }
       }
     }
+
     return statements;
   },
 
@@ -110,7 +153,19 @@ export const DATA_V1201: HybridMigration = {
       "Starting cloud KERIA migration: Converting connections to account-based model"
     );
 
-    let identifiers = (await signifyClient.identifiers().list()).aids;
+    let identifiers: any[] = [];
+    let returned = -1;
+    let iteration = 0;
+
+    while (returned !== 0) {
+      const result = await signifyClient
+        .identifiers()
+        .list(iteration * (24 + 1), 24 + iteration * (24 + 1));
+      identifiers.push(...result.aids);
+
+      returned = result.aids.length;
+      iteration += 1;
+    }
 
     identifiers = identifiers.filter(
       (identifier: any) => !identifier.name.startsWith("XX")
@@ -201,6 +256,8 @@ export const DATA_V1201: HybridMigration = {
 
           contactUpdates[`${sharedIdentifierPrefix}:createdAt`] =
             contact["createdAt"];
+
+          keysToDelete.push(sharedIdentifierPrefix as string);
           keysToDelete.push("createdAt");
         } else {
           // delete contact if sharedIdentifier soft deleted
