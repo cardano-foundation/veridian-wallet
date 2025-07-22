@@ -13,9 +13,8 @@ import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
-  getStateCache,
-  setAuthentication,
+  getCurrentProfileId,
+  setCurrentProfileId,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
@@ -72,13 +71,17 @@ const OptionButton = ({ icon, text, action }: OptionButtonProps) => {
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
-  const authentication = useAppSelector(getAuthentication);
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const defaultProfile = stateCache.authentication.defaultProfile;
+  const defaultProfileId = useAppSelector(getCurrentProfileId);
   const identifiersData = Object.values(identifiersDataCache);
+
+  // TODO: remove this after core API exists
+  const currentProfileId = identifiersData.find(
+    (p) => p.id === defaultProfileId
+  );
+
   const filteredIdentifiersData = identifiersData.filter(
-    (item) => item.id !== defaultProfile
+    (p) => p.id !== defaultProfileId
   );
   const [openSetting, setOpenSetting] = useState(false);
 
@@ -103,16 +106,11 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     try {
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
+          id: MiscRecordId.CURRENT_PROFILE_ID,
           content: { defaultProfile: id },
         })
       );
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: id,
-        })
-      );
+      dispatch(setCurrentProfileId(id));
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
     } catch (e) {
@@ -155,8 +153,8 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         >
           <div className="profiles-selected-profile">
             <ProfileItem
-              id={defaultProfile}
-              displayName={identifiersDataCache[defaultProfile]?.displayName}
+              id={defaultProfileId}
+              displayName={currentProfileId?.displayName}
             />
             <OptionButton
               icon={personCircleOutline}

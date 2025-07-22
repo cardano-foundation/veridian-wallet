@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { Salter } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
 import { IdentifierService } from "../../../core/agent/services";
 import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
@@ -15,9 +14,8 @@ import {
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
   getStateCache,
-  setAuthentication,
+  setCurrentProfileId,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
@@ -35,12 +33,12 @@ import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
 import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
+import { BasicRecord } from "../../../core/agent/records";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
-  const authentication = useAppSelector(getAuthentication);
   const dispatch = useDispatch();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
@@ -48,7 +46,6 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
-
   const isModal = !!onClose;
 
   const title = i18n.t(`setupprofile.${step}.title`);
@@ -57,9 +54,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     SetupProfileStep.SetupGroup,
   ].includes(step)
     ? i18n.t("setupprofile.button.back")
-    : isModal
-      ? i18n.t("setupprofile.button.cancel")
-      : undefined;
+    : undefined;
 
   const getButtonText = () => {
     switch (step) {
@@ -84,7 +79,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       setStep(SetupProfileStep.SetupGroup);
       return;
     }
-  
+
     onClose?.(true);
   };
 
@@ -95,7 +90,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
     const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
-      displayName: isGroup ? groupName : userName,
+      displayName: userName,
       theme: 0,
     };
 
@@ -104,13 +99,13 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         groupId: new Salter({}).qb64,
         groupInitiator: true,
         groupCreated: false,
+        userName: groupName,
       };
       metadata.groupMetadata = groupMetadata;
     }
 
     try {
       setLoading(true);
-
       // Create the identifier
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
@@ -119,7 +114,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       if (isGroup) {
         await Agent.agent.basicStorage.createOrUpdateBasicRecord(
           new BasicRecord({
-            id: MiscRecordId.USER_NAME,
+            id: MiscRecordId.CURRENT_PROFILE_ID,
             content: {
               userName,
             },
@@ -135,17 +130,11 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
+          id: MiscRecordId.CURRENT_PROFILE_ID,
           content: { defaultProfile: identifier },
         })
       );
-      // Set as default if it's the first identifier
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: identifier,
-        })
-      );
+      dispatch(setCurrentProfileId(identifier));
 
       if (isModal) {
         onClose();

@@ -30,9 +30,9 @@ describe("NextRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [],
+        currentProfileId: "Account1",
         authentication: {
           loggedIn: false,
-          userName: "",
           time: 0,
           passcodeIsSet: false,
           seedPhraseIsSet: false,
@@ -47,7 +47,6 @@ describe("NextRoute", () => {
           },
           firstAppLaunch: false,
           finishSetupBiometrics: false,
-          defaultProfile: "",
         },
         toastMsgs: [],
         currentOperation: OperationType.IDLE,
@@ -143,9 +142,9 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
+          currentProfileId: "Account1",
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,
@@ -178,9 +177,9 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
+          currentProfileId: "Account1",
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,
@@ -214,9 +213,9 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
+          currentProfileId: "Account1",
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: true,
@@ -300,9 +299,9 @@ describe("getNextRoute", () => {
       initializationPhase: InitializationPhase.PHASE_TWO,
       recoveryCompleteNoInterruption: false,
       routes: [],
+      currentProfileId: "Account1",
       authentication: {
         loggedIn: false,
-        userName: "",
         time: 0,
         passcodeIsSet: true,
         seedPhraseIsSet: false,
@@ -317,7 +316,6 @@ describe("getNextRoute", () => {
         },
         firstAppLaunch: false,
         finishSetupBiometrics: false,
-        defaultProfile: "",
       },
       toastMsgs: [],
       currentOperation: OperationType.IDLE,

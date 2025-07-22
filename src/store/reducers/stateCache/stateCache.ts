@@ -17,10 +17,9 @@ const initialState: StateCacheProps = {
   recoveryCompleteNoInterruption: false,
   isOnline: false,
   routes: [],
+  currentProfileId: "",
   authentication: {
     loggedIn: false,
-    userName: "",
-    defaultProfile: "",
     time: 0,
     passcodeIsSet: false,
     seedPhraseIsSet: false,
@@ -60,6 +59,9 @@ const stateCacheSlice = createSlice({
     },
     setRecoveryCompleteNoInterruption: (state) => {
       state.recoveryCompleteNoInterruption = true;
+    },
+    setCurrentProfileId: (state, action: PayloadAction<string>) => {
+      state.currentProfileId = action.payload;
     },
     setCurrentRoute: (state, action: PayloadAction<CurrentRouteCacheProps>) => {
       const filteredRoutes = state.routes.filter(
@@ -190,9 +192,6 @@ const stateCacheSlice = createSlice({
     setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
       state.isSetupProfile = action.payload;
     },
-    setDefaultProfile: (state, action: PayloadAction<string>) => {
-      state.authentication.defaultProfile = action.payload;
-    },
   },
 });
 
@@ -200,6 +199,7 @@ const {
   setInitializationPhase,
   setRecoveryCompleteNoInterruption,
   setCurrentRoute,
+  setCurrentProfileId,
   removeCurrentRoute,
   removeRoute,
   resetAllRoutes,
@@ -222,7 +222,6 @@ const {
   clearStateCache,
   showGlobalLoading,
   setIsSetupProfile,
-  setDefaultProfile,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -233,6 +232,8 @@ const getRecoveryCompleteNoInterruption = (state: RootState) =>
 const getRoutes = (state: RootState) => state.stateCache.routes;
 const getCurrentRoute = (state: RootState) =>
   state.stateCache.routes.length ? state.stateCache.routes[0] : undefined;
+const getCurrentProfileId = (state: RootState) =>
+  state.stateCache.currentProfileId;
 const getAuthentication = (state: RootState) => state.stateCache.authentication;
 const getCurrentOperation = (state: RootState) =>
   state.stateCache.currentOperation;
@@ -270,6 +271,7 @@ export {
   getCameraDirection,
   getCurrentOperation,
   getCurrentRoute,
+  getCurrentProfileId,
   getFirstAppLaunch,
   getForceInitApp,
   getGlobalLoading,
@@ -295,6 +297,7 @@ export {
   setAuthentication,
   setCameraDirection,
   setCurrentOperation,
+  setCurrentProfileId,
   setCurrentRoute,
   setFirstAppLaunchComplete,
   setInitializationPhase,
@@ -309,5 +312,4 @@ export {
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
-  setDefaultProfile,
 };

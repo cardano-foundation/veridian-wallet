@@ -413,7 +413,6 @@ describe("SSI agent page", () => {
           passwordIsSet: true,
           passwordIsSkipped: true,
           loggedIn: false,
-          userName: "",
           time: 0,
           ssiAgentIsSet: false,
           ssiAgentUrl: "",
@@ -539,7 +538,6 @@ describe("SSI agent page", () => {
           passwordIsSet: true,
           passwordIsSkipped: true,
           loggedIn: false,
-          userName: "",
           time: 0,
           ssiAgentIsSet: false,
           ssiAgentUrl: "",
@@ -636,7 +634,6 @@ describe("SSI agent page", () => {
           passwordIsSet: true,
           passwordIsSkipped: true,
           loggedIn: false,
-          userName: "",
           time: 0,
           ssiAgentIsSet: false,
           ssiAgentUrl: "",
@@ -809,7 +806,6 @@ describe("SSI agent page: recovery mode", () => {
           passwordIsSet: true,
           passwordIsSkipped: true,
           loggedIn: false,
-          userName: "",
           time: 0,
           ssiAgentIsSet: false,
           ssiAgentUrl: "",
@@ -951,7 +947,7 @@ describe("SSI agent page: recovery mode", () => {
     await waitFor(() => {
       expect(createOrUpdateBasicRecordMock).toBeCalledWith(
         expect.objectContaining({
-          id: MiscRecordId.DEFAULT_PROFILE,
+          id: MiscRecordId.CURRENT_PROFILE_ID,
           content: { defaultProfile: filteredIdentifierFix[0].id },
         })
       );
@@ -1017,7 +1013,6 @@ describe("SSI agent page: show error", () => {
           passwordIsSet: true,
           passwordIsSkipped: true,
           loggedIn: false,
-          userName: "",
           time: 0,
           ssiAgentIsSet: false,
           ssiAgentUrl: "",
@@ -1076,7 +1071,6 @@ describe("SSI agent page: show error", () => {
           passwordIsSet: true,
           passwordIsSkipped: true,
           loggedIn: false,
-          userName: "",
           time: 0,
           ssiAgentIsSet: false,
           ssiAgentUrl: "",
@@ -1135,7 +1129,6 @@ describe("SSI agent page: show error", () => {
           passwordIsSet: true,
           passwordIsSkipped: true,
           loggedIn: false,
-          userName: "",
           time: 0,
           ssiAgentIsSet: false,
           ssiAgentUrl: "",
@@ -1194,7 +1187,6 @@ describe("SSI agent page: show error", () => {
           passwordIsSet: true,
           passwordIsSkipped: true,
           loggedIn: false,
-          userName: "",
           time: 0,
           ssiAgentIsSet: false,
           ssiAgentUrl: "",

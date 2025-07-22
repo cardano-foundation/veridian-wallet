@@ -1,10 +1,11 @@
-import { BaseRecord } from "../../storage/storage.types";
+import { BaseRecord, Tags } from "../../storage/storage.types";
 import { CreationStatus } from "../agent.types";
 
 interface GroupMetadata {
   groupId: string;
   groupInitiator: boolean;
   groupCreated: boolean;
+  userName: string;
 }
 
 interface IdentifierMetadataRecordProps {
@@ -18,6 +19,7 @@ interface IdentifierMetadataRecordProps {
   groupMetadata?: GroupMetadata;
   pendingDeletion?: boolean;
   sxlt?: string;
+  tags?: Tags;
 }
 
 class IdentifierMetadataRecord extends BaseRecord {
@@ -47,6 +49,7 @@ class IdentifierMetadataRecord extends BaseRecord {
       this.groupMemberPre = props.groupMemberPre;
       this.pendingDeletion = props.pendingDeletion ?? false;
       this.sxlt = props.sxlt;
+      this._tags = props.tags ?? {};
     }
   }
 

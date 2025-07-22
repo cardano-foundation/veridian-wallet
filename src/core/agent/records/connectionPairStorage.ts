@@ -48,7 +48,10 @@ export class ConnectionPairStorage {
     return this.findAllByQuery({ identifier });
   }
 
-  findByContactAndIdentifier(contactId: string, identifier: string): Promise<ConnectionPairRecord[]> {
+  findByContactAndIdentifier(
+    contactId: string,
+    identifier: string
+  ): Promise<ConnectionPairRecord[]> {
     return this.findAllByQuery({ contactId, identifier });
   }
-} 
+}

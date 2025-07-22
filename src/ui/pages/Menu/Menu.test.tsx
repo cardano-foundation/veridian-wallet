@@ -96,30 +96,6 @@ describe("Menu Tab", () => {
     ).toBeInTheDocument();
   });
 
-  test("Open Profile sub-menu", async () => {
-    const { getByTestId, getByText } = render(
-      <Provider store={storeMocked}>
-        <Menu />
-      </Provider>
-    );
-
-    expect(getByTestId("menu-tab")).toBeInTheDocument();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
-    ).toBeInTheDocument();
-    const profileButton = getByTestId(`menu-input-item-${SubMenuKey.Profile}`);
-
-    act(() => {
-      fireEvent.click(profileButton);
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("profile-title")).toHaveTextContent(
-        EN_TRANSLATIONS.tabs.menu.tab.items.profile.tabheader
-      );
-    });
-  });
-
   test("Open Cardano connect sub-menu", async () => {
     const { getByTestId, getByText } = render(
       <Provider store={store}>

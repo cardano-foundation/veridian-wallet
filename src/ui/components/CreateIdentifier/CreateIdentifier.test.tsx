@@ -4,6 +4,7 @@ import { ionFireEvent, mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
+import { ready } from "signify-ts";
 import {
   ConnectionDetails,
   CreationStatus,
@@ -105,6 +106,10 @@ jest.mock("../CustomInput", () => ({
 }));
 
 describe("Create Identifier modal", () => {
+  beforeAll(async () => {
+    await ready();
+  });
+
   beforeEach(() => {
     mockGetMultisigConnection.mockImplementation((): any =>
       Promise.resolve([] as ConnectionDetails[])

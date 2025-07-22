@@ -9,6 +9,7 @@ import {
   dequeueIncomingRequest,
   enqueueIncomingRequest,
   getAuthentication,
+  getCurrentProfileId,
   getCurrentOperation,
   getCurrentRoute,
   getStateCache,
@@ -24,6 +25,7 @@ import {
   showGenericError,
   StateCacheProps,
   stateCacheSlice,
+  setCurrentProfileId,
 } from "./stateCache";
 import {
   IncomingRequestProps,
@@ -91,7 +93,6 @@ describe("State Cache", () => {
   test("should set the authentication cache", () => {
     const authentication: AuthenticationCacheProps = {
       loggedIn: false,
-      userName: "",
       time: 0,
       passcodeIsSet: false,
       seedPhraseIsSet: false,
@@ -105,7 +106,6 @@ describe("State Cache", () => {
         lockedUntil: Date.now(),
       },
       firstAppLaunch: false,
-      defaultProfile: "",
     };
     const action = setAuthentication(authentication);
     const nextState = stateCacheSlice.reducer(initialState, action);
@@ -130,6 +130,27 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialState, action);
     expect(nextState.authentication.loggedIn).toEqual(true);
     expect(nextState).not.toBe(initialState);
+  });
+
+  test("should handle setCurrentProfileIdId action", () => {
+    const newAccount = "Account2";
+    const nextState = stateCacheSlice.reducer(
+      initialState,
+      setCurrentProfileId(newAccount)
+    );
+    expect(nextState.currentProfileId).toEqual(newAccount);
+  });
+
+  test("getCurrentProfileId should select the current account from state", () => {
+    const mockState: Partial<RootState> = {
+      stateCache: {
+        ...initialState,
+        currentProfileId: "TestAccount123",
+      },
+    };
+
+    const selectedAccount = getCurrentProfileId(mockState as RootState);
+    expect(selectedAccount).toEqual("TestAccount123");
   });
 
   test("should set the currentOperation cache", () => {
@@ -209,35 +230,5 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialStateMock, action);
     expect(nextState.queueIncomingRequest.queues.length).toEqual(1);
     expect(nextState.queueIncomingRequest.isProcessing).toEqual(true);
-  });
-
-  test("should set defaultProfile in authentication cache", () => {
-    const authentication: AuthenticationCacheProps = {
-      loggedIn: true,
-      userName: "testuser",
-      time: Date.now(),
-      passcodeIsSet: true,
-      seedPhraseIsSet: true,
-      passwordIsSet: true,
-      passwordIsSkipped: false,
-      ssiAgentIsSet: true,
-      ssiAgentUrl: "",
-      recoveryWalletProgress: false,
-      loginAttempt: {
-        attempts: 0,
-        lockedUntil: Date.now(),
-      },
-      firstAppLaunch: false,
-      defaultProfile: "profile-123",
-    };
-    const action = setAuthentication(authentication);
-    const nextState = stateCacheSlice.reducer(initialState, action);
-
-    expect(nextState.authentication.defaultProfile).toEqual("profile-123");
-    expect(nextState.authentication).toEqual(authentication);
-
-    const rootState = { stateCache: nextState } as RootState;
-    expect(getAuthentication(rootState).defaultProfile).toEqual("profile-123");
-    expect(getStateCache(rootState)).toEqual(nextState);
   });
 });

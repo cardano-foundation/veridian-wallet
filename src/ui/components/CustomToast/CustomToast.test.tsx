@@ -11,9 +11,9 @@ describe("Custom toast", () => {
   const initialState = {
     stateCache: {
       routes: ["/"],
+      currentProfileId: "Account1",
       authentication: {
         loggedIn: true,
-        userName: "Test",
         time: Date.now(),
         passcodeIsSet: true,
       },
@@ -49,30 +49,10 @@ describe("Custom toast", () => {
     );
   });
 
-  test("It renders message with user name successfully", async () => {
-    const toastMsg = {
-      id: "1",
-      message: ToastMsgType.USERNAME_CREATION_SUCCESS,
-    };
-
-    const { getByTestId } = render(
-      <Provider store={storeMocked}>
-        <CustomToast
-          toastMsg={toastMsg}
-          index={0}
-        />
-      </Provider>
-    );
-    expect(getByTestId("confirmation-toast-1")).toHaveAttribute(
-      "message",
-      "Welcome, Test!"
-    );
-  });
-
   test("It renders error message successfully", async () => {
     const toastMsg = {
       id: "1",
-      message: ToastMsgType.USERNAME_CREATION_ERROR,
+      message: ToastMsgType.UNKNOWN_ERROR,
     };
 
     const { getByTestId } = render(
@@ -82,10 +62,6 @@ describe("Custom toast", () => {
           index={0}
         />
       </Provider>
-    );
-    expect(getByTestId("confirmation-toast-1")).toHaveAttribute(
-      "message",
-      EN_TRANSLATIONS.toast.usernamecreationerror
     );
     expect(getByTestId("confirmation-toast-1")).toHaveAttribute(
       "color",
@@ -99,9 +75,9 @@ describe("Toast stack", () => {
   const initialState = {
     stateCache: {
       routes: ["/"],
+      currentProfileId: "Account1",
       authentication: {
         loggedIn: true,
-        userName: "Test",
         time: Date.now(),
         passcodeIsSet: true,
       },

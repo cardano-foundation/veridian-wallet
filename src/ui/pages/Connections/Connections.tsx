@@ -17,6 +17,7 @@ import {
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
+  getCurrentProfileId,
   getStateCache,
   setCurrentOperation,
   setCurrentRoute,
@@ -43,7 +44,6 @@ import { Profiles } from "../Profiles";
 const Connections = () => {
   const pageId = "connections-tab";
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
   const identifiers = useAppSelector(getIdentifiersCache);
   const connectionsCache = useAppSelector(getConnectionsCache);
   const openDetailId = useAppSelector(getOpenConnectionId);
@@ -53,7 +53,7 @@ const Connections = () => {
   const [mappedConnections, setMappedConnections] = useState<
     MappedConnections[]
   >([]);
-  const [openShareDefaultProfile, setOpenShareDefaultProfile] = useState(false);
+  const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [deletePendingItem, setDeletePendingItem] =
     useState<ConnectionShortDetails | null>(null);
@@ -61,9 +61,8 @@ const Connections = () => {
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
-  const auth = useAppSelector(getAuthentication);
-  const defaultProfile = stateCache.authentication.defaultProfile;
-  const identifier = identifiers[defaultProfile];
+  const currentProfileName = useAppSelector(getCurrentProfileId);
+  const identifier = identifiers[currentProfileName];
 
   const showPlaceholder = Object.keys(connectionsCache).length === 0;
 
@@ -123,10 +122,10 @@ const Connections = () => {
 
   const fetchOobi = useCallback(async () => {
     try {
-      if (!auth.defaultProfile) return;
+      if (!currentProfileName) return;
 
       const oobiValue = await Agent.agent.connections.getOobi(
-        `${auth.defaultProfile}`,
+        `${currentProfileName}`,
         identifier?.displayName || ""
       );
       if (oobiValue) {
@@ -135,7 +134,7 @@ const Connections = () => {
     } catch (e) {
       showError("Unable to fetch connection oobi", e, dispatch);
     }
-  }, [auth.defaultProfile, identifier?.displayName, dispatch]);
+  }, [currentProfileName, identifier?.displayName, dispatch]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -180,7 +179,7 @@ const Connections = () => {
   };
 
   const handleConnectModal = () => {
-    setOpenShareDefaultProfile(true);
+    setOpenShareCurrentProfile(true);
   };
 
   const handleAvatarClick = () => {
@@ -203,7 +202,7 @@ const Connections = () => {
           />
         </IonButton>
         <Avatar
-          id={auth.defaultProfile}
+          id={currentProfileName}
           handleAvatarClick={handleAvatarClick}
         />
       </>
@@ -262,8 +261,8 @@ const Connections = () => {
         />
       </TabLayout>
       <ShareProfile
-        isOpen={openShareDefaultProfile}
-        setIsOpen={setOpenShareDefaultProfile}
+        isOpen={openShareCurrentProfile}
+        setIsOpen={setOpenShareCurrentProfile}
         oobi={oobi}
       />
       <Profiles

@@ -8,8 +8,8 @@ import { Agent } from "../../../../../core/agent/agent";
 import { BasicRecord } from "../../../../../core/agent/records";
 import { MiscRecordId } from "../../../../../core/agent/agent.types";
 import {
-  getAuthentication,
-  setAuthentication,
+  getCurrentProfileId,
+  setCurrentProfileId,
 } from "../../../../../store/reducers/stateCache";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { showError } from "../../../../utils/error";
@@ -19,36 +19,31 @@ import { ErrorMessage } from "../../../../components/ErrorMessage";
 const Profile = forwardRef<ProfileOptionRef, ProfileProps>(
   ({ isEditing }, ref) => {
     const dispatch = useAppDispatch();
-    const authentication = useAppSelector(getAuthentication);
-    const [userName, setUserName] = useState(authentication.userName);
+    const currentProfileName = useAppSelector(getCurrentProfileId);
+    const [userName, setUserName] = useState(currentProfileName);
 
     const errorMessage = nameChecker.getError(userName);
 
     useEffect(() => {
-      setUserName(authentication.userName);
-    }, [authentication.userName]);
+      setUserName(currentProfileName);
+    }, [currentProfileName]);
 
     const saveChanges = () => {
       if (errorMessage) return;
 
       userName.length &&
-        userName !== authentication.userName &&
+        userName !== currentProfileName &&
         Agent.agent.basicStorage
           .createOrUpdateBasicRecord(
             new BasicRecord({
-              id: MiscRecordId.USER_NAME,
+              id: MiscRecordId.CURRENT_PROFILE_ID,
               content: {
                 userName,
               },
             })
           )
           .then(() => {
-            dispatch(
-              setAuthentication({
-                ...authentication,
-                userName,
-              })
-            );
+            dispatch(setCurrentProfileId(userName));
           })
           .catch((error) => {
             showError("Unable to update user name: ", error, dispatch);
