@@ -213,7 +213,9 @@ const RequestPresentationModal = ({
         const data: SelectListData[] = connections.map((connection) => ({
           id: connection.id,
           text: connection.alias,
-          subText: `${connection.id.substring(0, 4)}...${connection.id.slice(-4)}`,
+          subText: `${connection.id.substring(0, 4)}...${connection.id.slice(
+            -4
+          )}`,
         }));
 
         return (

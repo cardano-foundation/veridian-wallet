@@ -38,7 +38,9 @@ const EnhancedTableToolbar: React.FC<EnhancedTableToolbarProps> = (props) => {
   return (
     <>
       <Toolbar
-        className={`connection-table-toolbar${numSelected == 0 ? " hidden" : ""}`}
+        className={`connection-table-toolbar${
+          numSelected == 0 ? " hidden" : ""
+        }`}
       >
         <div className="table-left">
           <IconButton>

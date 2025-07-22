@@ -29,8 +29,8 @@ function calcInitStage(credentialTypeId?: string, connectionId?: string) {
   return credentialTypeId && connectionId
     ? IssueCredentialStage.InputAttribute
     : credentialTypeId
-      ? IssueCredentialStage.SelectConnection
-      : IssueCredentialStage.SelectCredentialType;
+    ? IssueCredentialStage.SelectConnection
+    : IssueCredentialStage.SelectCredentialType;
 }
 
 export { getBackStage, getNextStage, calcInitStage };

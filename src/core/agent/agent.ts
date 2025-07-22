@@ -32,10 +32,10 @@ import {
   CredentialStorage,
   IdentifierMetadataRecord,
   IdentifierStorage,
-  PeerConnectionMetadataRecord,
-  PeerConnectionStorage,
   NotificationRecord,
   NotificationStorage,
+  PeerConnectionPairRecord,
+  PeerConnectionPairStorage,
 } from "./records";
 import { KeyStoreKeys, SecureStorage } from "../storage";
 import { SqliteSession } from "../storage/sqliteStorage/sqliteSession";
@@ -83,9 +83,9 @@ class Agent {
   private credentialStorage!: CredentialStorage;
   private connectionStorage!: ConnectionStorage;
   private notificationStorage!: NotificationStorage;
-  private peerConnectionStorage!: PeerConnectionStorage;
-  private operationPendingStorage!: OperationPendingStorage;
 
+  private operationPendingStorage!: OperationPendingStorage;
+  private peerConnectionPairStorage!: PeerConnectionPairStorage;
   private identifierService!: IdentifierService;
   private multiSigService!: MultiSigService;
   private ipexCommunicationService!: IpexCommunicationService;
@@ -166,8 +166,8 @@ class Agent {
     return this.credentialService;
   }
 
-  get peerConnectionMetadataStorage() {
-    return this.peerConnectionStorage;
+  get peerConnectionPair() {
+    return this.peerConnectionPairStorage;
   }
 
   get basicStorage() {
@@ -457,12 +457,13 @@ class Agent {
     this.notificationStorage = new NotificationStorage(
       this.getStorageService<NotificationRecord>(this.storageSession)
     );
-    this.peerConnectionStorage = new PeerConnectionStorage(
-      this.getStorageService<PeerConnectionMetadataRecord>(this.storageSession)
-    );
+
     this.operationPendingStorage = new OperationPendingStorage(
       this.getStorageService<OperationPendingRecord>(this.storageSession),
       this.agentServicesProps.eventEmitter
+    );
+    this.peerConnectionPairStorage = new PeerConnectionPairStorage(
+      this.getStorageService<PeerConnectionPairRecord>(this.storageSession)
     );
     this.connections.onConnectionRemoved();
     this.connections.onConnectionAdded();

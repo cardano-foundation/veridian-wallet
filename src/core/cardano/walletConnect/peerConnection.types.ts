@@ -41,7 +41,6 @@ interface PeerDisconnectedEvent extends BaseEventEmitter {
     dAppAddress: string;
   };
 }
-
 interface PeerConnectionBrokenEvent extends BaseEventEmitter {
   type: typeof PeerConnectionEventTypes.PeerConnectionBroken;
 }
@@ -51,12 +50,12 @@ interface PeerConnectionError {
   info: string;
 }
 
-interface PeerConnectionDetails {
-  id: string;
+interface PeerConnection {
+  meerkatId: string;
+  selectedAid: string;
   name?: string;
   url?: string;
   iconB64?: string;
-  selectedAid?: string;
   createdAt?: string;
 }
 
@@ -77,5 +76,5 @@ export type {
   PeerDisconnectedEvent,
   PeerConnectionBrokenEvent,
   PeerConnectionError,
-  PeerConnectionDetails,
+  PeerConnection,
 };
