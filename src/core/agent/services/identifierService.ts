@@ -580,8 +580,8 @@ class IdentifierService extends AgentService {
       const theme = parsed.theme.startsWith(
         IdentifierService.DELETED_IDENTIFIER_THEME
       )
-        ? parseInt(parsed.theme, 10)
-        : 0;
+        ? 0
+        : parseInt(parsed.theme, 10);
 
       const identifierDetail = (await this.props.signifyClient
         .identifiers()
@@ -633,8 +633,8 @@ class IdentifierService extends AgentService {
       const theme = parsed.theme.startsWith(
         IdentifierService.DELETED_IDENTIFIER_THEME
       )
-        ? parseInt(parsed.theme, 10)
-        : 0;
+        ? 0
+        : parseInt(parsed.theme, 10);
 
       const groupMemberPre = identifier.group.mhab.prefix;
 
