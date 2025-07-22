@@ -1,0 +1,191 @@
+x-keria-common: &keria-common
+  restart: unless-stopped
+  image: ${KERIA_IMAGE:-cardanofoundation/cf-idw-keria:main}
+  environment:
+    - KERI_AGENT_CORS=${KERI_AGENT_CORS:-true}
+    - KERIA_PASSCODE=${KERIA_PASSCODE:-CHANGEME}
+    - ALLOW_INTRODUCTIONS=${ALLOW_INTRODUCTIONS:-true}
+    - REMOTE_SIGNING=${REMOTE_SIGNING:-true}
+  volumes:
+    - keria-data:/usr/local/var/keri
+    - keria-config:/keria/scripts/keri/cf
+  entrypoint: keria start --config-file backer-oobis --config-dir ./scripts --loglevel INFO
+
+services:
+  keria-init:
+    profiles: [keria-init]
+    image: "rcmorano/alpine-bash-jq-curl"
+    environment:
+      - KERIA_PASSCODE=${KERIA_PASSCODE:-DLDRW3f108LaQB2qscJOd}
+      - KERIA_CURLS=${KERIA_CURLS:-http://keria-prod:3902}
+      - KERIA_IURLS=${KERIA_IURLS:-http://witness:5642/oobi/dummy1 http://witness:5643/oobi/dummy2}
+    volumes:
+      - keria-config:/config
+    configs:
+      - source: keria-init_sh
+        target: /keria-init.sh
+      - source: backer-oobis_json_tpl
+        target: /configmap/backer-oobis.json.tpl
+    entrypoint: ["bash", "/keria-init.sh"]
+
+  keria-local:
+    profiles: [keria-local,local]
+    <<: *keria-common
+    ports:
+      - 3904:3901
+      - 3905:3902
+      - 3906:3903
+
+  keria:
+    profiles: [keria,production]
+    <<: *keria-common
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.keria.rule=Host(`${KERIA_HOST:-keria}`)"
+      - "traefik.http.routers.keria.entrypoints=websecure"
+      - "traefik.http.routers.keria.tls.certresolver=myresolver"
+      - "traefik.http.routers.keria.service=keria"
+      - "traefik.http.services.keria.loadbalancer.server.port=3901"
+      - "traefik.http.routers.keria-http.rule=Host(`${KERIA_HOST:-keria}`)"
+      - "traefik.http.routers.keria-http.entrypoints=web"
+      - "traefik.http.routers.keria-http.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.keria-ext.rule=Host(`${KERIA_EXT_HOST:-keria-ext}`)"
+      - "traefik.http.routers.keria-ext.entrypoints=websecure"
+      - "traefik.http.routers.keria-ext.tls.certresolver=myresolver"
+      - "traefik.http.routers.keria-ext.service=keria-ext"
+      - "traefik.http.services.keria-ext.loadbalancer.server.port=3902"
+      - "traefik.http.routers.keria-ext-http.rule=Host(`${KERIA_EXT_HOST:-keria-ext}`)"
+      - "traefik.http.routers.keria-ext-http.entrypoints=web"
+      - "traefik.http.routers.keria-ext-http.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.keria-boot.rule=Host(`${KERIA_BOOT_HOST:-keria-boot}`)"
+      - "traefik.http.routers.keria-boot.entrypoints=websecure"
+      - "traefik.http.routers.keria-boot.tls.certresolver=myresolver"
+      - "traefik.http.routers.keria-boot.service=keria-boot"
+      - "traefik.http.services.keria-boot.loadbalancer.server.port=3903"
+      - "traefik.http.routers.keria-boot-http.rule=Host(`${KERIA_BOOT_HOST:-keria-boot}`)"
+      - "traefik.http.routers.keria-boot-http.entrypoints=web"
+      - "traefik.http.routers.keria-boot-http.middlewares=redirect-to-https"
+
+  witness-init:
+    extends:
+      file: docker-compose.keri-witnesses.yaml
+      service: witness-init
+
+  witness-0:
+    extends:
+      file: docker-compose.keri-witnesses.yaml
+      service: witness-0
+
+  witness-1:
+    extends:
+      file: docker-compose.keri-witnesses.yaml
+      service: witness-1
+
+  witness-2:
+    extends:
+      file: docker-compose.keri-witnesses.yaml
+      service: witness-2
+
+  witness-3:
+    extends:
+      file: docker-compose.keri-witnesses.yaml
+      service: witness-3
+
+  witness-4:
+    extends:
+      file: docker-compose.keri-witnesses.yaml
+      service: witness-4
+
+  witness-5:
+    extends:
+      file: docker-compose.keri-witnesses.yaml
+      service: witness-5
+
+  cred-issuance:
+    profiles: [cred-issuance,production,local]
+    image: ${CRED_IMAGE:-cardanofoundation/cf-cred-issuance:main}
+    restart: unless-stopped
+    environment:
+      - OOBI_ENDPOINT=${CRED_OOBI_ENDPOINT:-http://cred-issuance:3001}
+      - KERIA_ENDPOINT=${CRED_KERIA_ENDPOINT:-http://keria:3901}
+      - KERIA_BOOT_ENDPOINT=${CRED_KERIA_BOOT_ENDPOINT:-http://keria:3903}
+    volumes:
+      - issuer-server-data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.credentials.rule=Host(`${CRED_HOST:-cred-issuance}`)"
+      - "traefik.http.routers.credentials.entrypoints=websecure"
+      - "traefik.http.routers.credentials.tls.certresolver=myresolver"
+      - "traefik.http.services.credentials.loadbalancer.server.port=3001"
+      - "traefik.http.routers.credentials-http.rule=Host(`${CRED_HOST:-cred-issuance}`)"
+      - "traefik.http.routers.credentials-http.entrypoints=web"
+      - "traefik.http.routers.credentials-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+  cred-issuance-ui:
+    profiles: [cred-issuance,production,local]
+    image: ${CRED_UI_IMAGE:-cardanofoundation/cf-cred-issuance-ui:main}
+    restart: unless-stopped
+    environment:
+      - VITE_SERVER_URL=${CRED_UI_SERVER_URL:-http://localhost:3001}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.credentials-ui.rule=Host(`${CRED_UI_HOST:-cred-issuance-ui}`)"
+      - "traefik.http.routers.credentials-ui.entrypoints=websecure"
+      - "traefik.http.routers.credentials-ui.tls.certresolver=myresolver"
+      - "traefik.http.services.credentials-ui.loadbalancer.server.port=80"
+      - "traefik.http.routers.credentials-ui-http.rule=Host(`${CRED_UI_HOST:-cred-issuance-ui}`)"
+      - "traefik.http.routers.credentials-ui-http.entrypoints=web"
+      - "traefik.http.routers.credentials-ui-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+  traefik:
+    profiles: [traefik,production]
+    image: "traefik:v3.3.5"
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      - "--accesslog.filepath=/dev/stdout"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_ADMIN_EMAIL:-acme@example.com}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "443:443"
+      - "80:80"
+      #- "8080:8080"
+    volumes:
+      - "/var/lib/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+volumes:
+  keria-data:
+  keria-config:
+  issuer-server-data:
+
+configs:
+  backer-oobis_json_tpl:
+    content: |
+      {
+        "dt": "2022-01-20T12:57:59.823350+00:00",
+        "keria": {
+          "dt": "2022-01-20T12:57:59.823350+00:00",
+          "curls": $${KERIA_RENDERED_CURLS}
+        },
+        "iurls": $${KERIA_RENDERED_IURLS}
+      }
+
+  keria-init_sh:
+    content: |
+      #!/bin/sh
+      set -xe
+      export KERIA_RENDERED_CURLS=$$(for keria_curl in $${KERIA_CURLS}; do echo $$keria_curl; done | jq -cRn '[inputs]')
+      export KERIA_RENDERED_IURLS=$$(for keria_iurl in $${KERIA_IURLS}; do echo $$keria_iurl; done | jq -cRn '[inputs]')
+      envsubst < /configmap/backer-oobis.json.tpl > /config/backer-oobis.json
