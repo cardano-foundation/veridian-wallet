@@ -18,8 +18,8 @@ import { passcodeFiller } from "../../utils/passcodeFiller";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { ConnectdApp } from "./ConnectdApp";
 
-jest.mock("../../../../../core/configuration", () => ({
-  ...jest.requireActual("../../../../../core/configuration"),
+jest.mock("../../../core/configuration", () => ({
+  ...jest.requireActual("../../../core/configuration"),
   ConfigurationService: {
     env: {
       features: {
@@ -29,7 +29,7 @@ jest.mock("../../../../../core/configuration", () => ({
   },
 }));
 
-jest.mock("../../../../../core/agent/agent", () => ({
+jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       peerConnectionMetadataStorage: {
@@ -43,7 +43,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
   },
 }));
 
-jest.mock("../../../../../core/cardano/walletConnect/peerConnection", () => ({
+jest.mock("../../../core/cardano/walletConnect/peerConnection", () => ({
   PeerConnection: {
     peerConnection: {
       disconnectDApp: jest.fn(),

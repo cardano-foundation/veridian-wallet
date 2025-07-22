@@ -442,6 +442,7 @@ describe("Individual Identifier details page", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         currentProfile: {
           identity: filteredIdentifierFix[0],
@@ -599,6 +600,7 @@ describe("Group Identifier details page", () => {
         passcodeIsSet: true,
         passwordIsSet: false,
       },
+      toastMsgs: [],
       isOnline: true,
       currentProfile: {
         identity: filteredIdentifierFix[0],
@@ -683,6 +685,7 @@ describe("Group Identifier details page", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         currentProfile: {
           identity: filteredIdentifierFix[0],
@@ -708,6 +711,7 @@ describe("Group Identifier details page", () => {
             groupMemberPre: "ELUXM-ajSu0o1qyFvss-3QQfkj3DOke9aHNwt72Byi9x",
           },
         },
+        toastMsgs: [],
         favourites: [],
       },
       connectionsCache: {
@@ -1059,6 +1063,7 @@ describe("Group Identifier details page", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         currentProfile: {
           identity: filteredIdentifierFix[0],
@@ -1134,6 +1139,7 @@ describe("Checking the Identifier Details Page when information is missing from 
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         profileHistories: [],
         currentProfile: {
@@ -1237,6 +1243,7 @@ describe("Set default profile when delete profile", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         profileHistories: [
           filteredIdentifierFix[0].id,
@@ -1336,6 +1343,7 @@ describe("Set default profile when delete profile", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         profileHistories: [],
         currentProfile: {
@@ -1424,6 +1432,7 @@ describe("Set default profile when delete profile", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         profileHistories: [],
         currentProfile: {
