@@ -22,6 +22,7 @@ do
     echo "KERIA_RENDERED_CURLS: ${KERIA_RENDERED_CURLS}"
     
     export WITNESS_NAME="wit${WITNESS_COUNTER}"
+    export DT=$(date -u +"%Y-%m-%dT%H:%M:%S.000000+00:00")
     envsubst < /configmap/witness.json.tpl > ${KERI_SCRIPT_DIR}/keri/cf/${WITNESS_NAME}.json
     
     echo "Generated config file contents:"
