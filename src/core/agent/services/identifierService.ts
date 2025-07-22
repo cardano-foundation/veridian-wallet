@@ -577,11 +577,11 @@ class IdentifierService extends AgentService {
       }
 
       const parsed = parseHabName(identifier.name);
-      const theme =
-        parsed.theme &&
-        parsed.theme !== IdentifierService.DELETED_IDENTIFIER_THEME
-          ? parseInt(parsed.theme, 10)
-          : 0;
+      const theme = parsed.theme.startsWith(
+        IdentifierService.DELETED_IDENTIFIER_THEME
+      )
+        ? parseInt(parsed.theme, 10)
+        : 0;
 
       const identifierDetail = (await this.props.signifyClient
         .identifiers()
@@ -630,11 +630,11 @@ class IdentifierService extends AgentService {
         ? identifier.group.mhab.name
         : identifier.name;
       const parsed = parseHabName(nameToParse);
-      const theme =
-        parsed.theme &&
-        parsed.theme !== IdentifierService.DELETED_IDENTIFIER_THEME
-          ? parseInt(parsed.theme, 10)
-          : 0;
+      const theme = parsed.theme.startsWith(
+        IdentifierService.DELETED_IDENTIFIER_THEME
+      )
+        ? parseInt(parsed.theme, 10)
+        : 0;
 
       const groupMemberPre = identifier.group.mhab.prefix;
 
