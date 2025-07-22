@@ -359,7 +359,9 @@ describe("Creation of multi-sig", () => {
       new BasicRecord({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [{ ...queuedIdentifier, name: "0:different identifier" }],
+          queued: [
+            { ...queuedIdentifier, name: "1.2.0.3:0:different identifier" },
+          ],
         },
       })
     );
@@ -368,7 +370,7 @@ describe("Creation of multi-sig", () => {
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            { ...queuedIdentifier, name: "0:different identifier" },
+            { ...queuedIdentifier, name: "1.2.0.3:0:different identifier" },
             { ...queuedIdentifier, name: "1.2.0.3:0:Identifier 2" },
           ],
         },
@@ -417,7 +419,7 @@ describe("Creation of multi-sig", () => {
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            { ...queuedIdentifier, name: "0:different identifier" },
+            { ...queuedIdentifier, name: "1.2.0.3:0:different identifier" },
             {
               ...queuedIdentifier,
               name: "1.2.0.3:0:Identifier 2",
@@ -496,7 +498,9 @@ describe("Creation of multi-sig", () => {
       expect.objectContaining({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [{ ...queuedIdentifier, name: "0:different identifier" }],
+          queued: [
+            { ...queuedIdentifier, name: "1.2.0.3:0:different identifier" },
+          ],
         },
       })
     );
@@ -855,7 +859,7 @@ describe("Creation of multi-sig", () => {
       new BasicRecord({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [{ ...queuedJoin, name: "0:different identifier" }],
+          queued: [{ ...queuedJoin, name: "1.2.0.3:0:different identifier" }],
         },
       })
     );
@@ -864,7 +868,7 @@ describe("Creation of multi-sig", () => {
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            { ...queuedJoin, name: "0:different identifier" },
+            { ...queuedJoin, name: "1.2.0.3:0:different identifier" },
             { ...queuedJoin, name: "1.2.0.3:0:Identifier 2" },
           ],
         },
@@ -978,7 +982,7 @@ describe("Creation of multi-sig", () => {
       expect.objectContaining({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [{ ...queuedJoin, name: "0:different identifier" }],
+          queued: [{ ...queuedJoin, name: "1.2.0.3:0:different identifier" }],
         },
       })
     );
