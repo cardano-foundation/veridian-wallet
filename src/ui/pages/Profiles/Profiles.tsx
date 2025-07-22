@@ -1,13 +1,14 @@
-import { IonButton, IonIcon, IonModal } from "@ionic/react";
+import { IonButton, IonChip, IonIcon, IonModal } from "@ionic/react";
 import {
   addCircleOutline,
+  hourglassOutline,
   peopleCircleOutline,
   personCircleOutline,
   settingsOutline,
 } from "ionicons/icons";
 import { useState } from "react";
 import { Agent } from "../../../core/agent/agent";
-import { MiscRecordId } from "../../../core/agent/agent.types";
+import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -33,7 +34,9 @@ import {
   ProfilesProps,
 } from "./Profiles.types";
 
-const ProfileItem = ({ id, displayName, onClick }: ProfileItemsProps) => {
+const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
+  if (!identifier) return null;
+  const { id, displayName, creationStatus } = identifier;
   return (
     <div
       className="profiles-list-item"
@@ -43,18 +46,30 @@ const ProfileItem = ({ id, displayName, onClick }: ProfileItemsProps) => {
       <div className="profiles-list-item-avatar">
         <Avatar id={id} />
       </div>
-      <div className="profiles-list-item-name">{displayName}</div>
+      <span className="profiles-list-item-inner">
+        <div className="profiles-list-item-name">{displayName}</div>
+        {creationStatus === CreationStatus.PENDING && (
+          <IonChip data-testid={`profiles-list-item-${id}-status`}>
+            <IonIcon
+              icon={hourglassOutline}
+              color="primary"
+            />
+            <span>{CreationStatus.PENDING.toLowerCase()}</span>
+          </IonChip>
+        )}
+      </span>
     </div>
   );
 };
 
-const OptionButton = ({ icon, text, action }: OptionButtonProps) => {
+const OptionButton = ({ icon, text, action, disabled }: OptionButtonProps) => {
   return (
     <IonButton
       expand="block"
       className="profiles-options-button"
       data-testid={`profiles-option-button-${text.toLowerCase()}`}
       onClick={action}
+      disabled={disabled}
     >
       {icon && (
         <IonIcon
@@ -81,19 +96,12 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     (item) => item.id !== defaultProfile
   );
   const [openSetting, setOpenSetting] = useState(false);
-
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
 
-  const handleClose = () => {
-    setIsOpen(false);
-  };
-  const handleOpenSettings = () => {
-    setOpenSetting(true);
-  };
-
-  const handleAddProfile = () => {
-    setOpenSetupProfile(true);
-  };
+  const handleClose = () => setIsOpen(false);
+  const handleOpenSettings = () => setOpenSetting(true);
+  const handleAddProfile = () => setOpenSetupProfile(true);
+  const handleCloseSetupProfile = () => setOpenSetupProfile(false);
 
   const handleJoinGroup = () => {
     // TODO: Implement the logic to join a group
@@ -125,8 +133,6 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     }
   };
 
-  const handleCloseSetupProfile = () => setOpenSetupProfile(false);
-
   return (
     <>
       <IonModal
@@ -154,25 +160,25 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           }
         >
           <div className="profiles-selected-profile">
-            <ProfileItem
-              id={defaultProfile}
-              displayName={identifiersDataCache[defaultProfile]?.displayName}
-            />
+            <ProfileItem identifier={identifiersDataCache[defaultProfile]} />
             <OptionButton
               icon={personCircleOutline}
               text={`${i18n.t("profiles.options.manage")}`}
               action={handleOpenSettings}
+              disabled={
+                identifiersDataCache[defaultProfile]?.creationStatus ===
+                CreationStatus.PENDING
+              }
             />
           </div>
           <div className="profiles-list">
             {filteredIdentifiersData.map((identifier) => (
               <ProfileItem
                 key={identifier.id}
-                id={identifier.id}
+                identifier={identifier}
                 onClick={async () => {
                   handleSelectProfile(identifier.id);
                 }}
-                displayName={identifiersDataCache[identifier.id]?.displayName}
               />
             ))}
           </div>
