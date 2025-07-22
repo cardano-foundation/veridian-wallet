@@ -731,11 +731,9 @@ const AppWrapper = (props: { children: ReactNode }) => {
         isOpen={isAlertPeerBrokenOpen}
         setIsOpen={setIsAlertPeerBrokenOpen}
         dataTestId="alert-confirm-connection-broken"
-        headerText={i18n.t(
-          "tabs.menu.tab.items.connectwallet.connectionbrokenalert.message"
-        )}
+        headerText={i18n.t("connectdapp.connectionbrokenalert.message")}
         confirmButtonText={`${i18n.t(
-          "tabs.menu.tab.items.connectwallet.connectionbrokenalert.confirm"
+          "connectdapp.connectionbrokenalert.confirm"
         )}`}
         actionConfirm={() => dispatch(setCurrentOperation(OperationType.IDLE))}
         actionDismiss={() => dispatch(setCurrentOperation(OperationType.IDLE))}

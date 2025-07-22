@@ -1,15 +1,13 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import { CreationStatus } from "../../../core/agent/agent.types";
-import EN_TRANSLATIONS from "../../../locales/en/en.json";
-import { TabsRoutePath } from "../../../routes/paths";
-import { identifierFix } from "../../__fixtures__/identifierFix";
-import { walletConnectionsFix } from "../../__fixtures__/walletConnectionsFix";
-import { makeTestStore } from "../../utils/makeTestStore";
+import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
+import { TabsRoutePath } from "../../../../../routes/paths";
+import { identifierFix } from "../../../../__fixtures__/identifierFix";
+import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 import { WalletConnect } from "./WalletConnect";
 import { WalletConnectStageOne } from "./WalletConnectStageOne";
-import { WalletConnectStageTwo } from "./WalletConnectStageTwo";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -21,36 +19,6 @@ jest.mock("../../../core/configuration", () => ({
     },
   },
 }));
-
-const identifierCache = [
-  {
-    displayName: "mutil sign",
-    id: "testid_00",
-    createdAtUTC: "2024-07-02T02:59:06.013Z",
-    theme: 0,
-    creationStatus: CreationStatus.COMPLETE,
-    groupMemberPre: "EHNPqg5RyNVWfpwUYDK135xuUMFGK1GXZoDVqGc0DPsy",
-  },
-  {
-    displayName: "mutil sign 1",
-    id: "testid_0",
-    createdAtUTC: "2024-07-02T02:59:06.013Z",
-    theme: 0,
-    creationStatus: CreationStatus.COMPLETE,
-    groupMetadata: {
-      groupId: "test",
-      groupInitiator: true,
-      groupCreated: true,
-    },
-  },
-  {
-    displayName: "mutil sign 2",
-    id: "testid_1",
-    createdAtUTC: "2024-07-02T02:59:06.013Z",
-    theme: 0,
-    creationStatus: CreationStatus.COMPLETE,
-  },
-];
 
 jest.mock("../../../core/cardano/walletConnect/peerConnection", () => ({
   PeerConnection: {
@@ -94,7 +62,6 @@ describe("Wallet Connect Stage One", () => {
     dispatch: dispatchMock,
   };
 
-  const handleAccept = jest.fn();
   const handleCancel = jest.fn();
 
   test("Renders content ", async () => {
@@ -102,23 +69,18 @@ describe("Wallet Connect Stage One", () => {
       <Provider store={storeMocked}>
         <WalletConnectStageOne
           isOpen={true}
-          onAccept={handleAccept}
+          pendingDAppMeerkat={"pending-meerkat"}
           onClose={handleCancel}
         />
       </Provider>
     );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stageone.title
-      )
+      getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
     ).toBeVisible();
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stageone
-          .message
-      )
+      getByText(EN_TRANSLATIONS.connectdapp.request.stageone.message)
     ).toBeVisible();
 
     expect(getByText(EN_TRANSLATIONS.request.button.accept)).toBeVisible();
@@ -131,7 +93,7 @@ describe("Wallet Connect Stage One", () => {
       <Provider store={storeMocked}>
         <WalletConnectStageOne
           isOpen={true}
-          onAccept={handleAccept}
+          pendingDAppMeerkat={"pending-meerkat"}
           onClose={handleCancel}
         />
       </Provider>
@@ -142,7 +104,7 @@ describe("Wallet Connect Stage One", () => {
     });
 
     await waitFor(() => {
-      expect(handleAccept).toBeCalled();
+      expect(handleCancel).toBeCalled();
     });
   });
 
@@ -151,7 +113,7 @@ describe("Wallet Connect Stage One", () => {
       <Provider store={storeMocked}>
         <WalletConnectStageOne
           isOpen={true}
-          onAccept={handleAccept}
+          pendingDAppMeerkat={"pending-meerkat"}
           onClose={handleCancel}
         />
       </Provider>
@@ -164,8 +126,7 @@ describe("Wallet Connect Stage One", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stageone
-            .alert.titleconfirm
+          EN_TRANSLATIONS.connectdapp.request.stageone.alert.titleconfirm
         )
       ).toBeVisible();
     });
@@ -175,112 +136,13 @@ describe("Wallet Connect Stage One", () => {
     await waitFor(() => {
       expect(
         queryByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stageone
-            .alert.titleconfirm
+          EN_TRANSLATIONS.connectdapp.request.stageone.alert.titleconfirm
         )
       ).toBeNull();
     });
 
     await waitFor(() => {
       expect(handleCancel).toBeCalled();
-    });
-  });
-});
-
-describe("Wallet Connect Stage Two", () => {
-  const initialState = {
-    stateCache: {
-      routes: [TabsRoutePath.CREDENTIALS],
-      authentication: {
-        loggedIn: true,
-        time: Date.now(),
-        passcodeIsSet: true,
-        passwordIsSet: false,
-      },
-    },
-    walletConnectionsCache: {
-      walletConnections: [],
-    },
-    identifiersCache: {
-      identifiers: identifierCache,
-    },
-  };
-
-  const dispatchMock = jest.fn();
-  const storeMocked = {
-    ...makeTestStore(initialState),
-    dispatch: dispatchMock,
-  };
-
-  const handleCancel = jest.fn();
-  const handleChangeStage = jest.fn();
-
-  test("Renders content ", async () => {
-    const { getByText, getByTestId } = render(
-      <Provider store={storeMocked}>
-        <WalletConnectStageTwo
-          isOpen={true}
-          pendingDAppMeerkat={"pending-meerkat"}
-          onClose={handleCancel}
-          onBackClick={handleChangeStage}
-        />
-      </Provider>
-    );
-
-    expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stagetwo.title
-      )
-    ).toBeVisible();
-
-    expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stagetwo
-          .message
-      )
-    ).toBeVisible();
-
-    expect(getByTestId(`card-item-${identifierCache[2].id}`)).toBeVisible();
-
-    expect(getByTestId("primary-button")).toBeVisible();
-
-    expect(getByTestId("primary-button")).toBeDisabled();
-  });
-
-  test("Click to confirm button", async () => {
-    const { getByTestId } = render(
-      <Provider store={storeMocked}>
-        <WalletConnectStageTwo
-          isOpen={true}
-          pendingDAppMeerkat={"pending-meerkat"}
-          onClose={handleCancel}
-          onBackClick={handleChangeStage}
-        />
-      </Provider>
-    );
-
-    expect(
-      getByTestId("identifier-select-" + identifierCache[2].id)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(
-        getByTestId("identifier-select-" + identifierCache[2].id)
-      );
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("primary-button").getAttribute("disabled")).toBe(
-        "false"
-      );
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button"));
-    });
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalled();
     });
   });
 });
@@ -322,30 +184,11 @@ describe("Wallet Connect Request", () => {
     );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stageone.title
-      )
+      getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
     ).toBeVisible();
 
     act(() => {
       fireEvent.click(getByTestId("primary-button-connect-wallet-stage-one"));
-    });
-
-    await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stagetwo
-            .title
-        )
-      ).toBeVisible();
-    });
-
-    expect(
-      getByTestId("identifier-select-" + identifierFix[0].id)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("identifier-select-" + identifierFix[0].id));
     });
 
     await waitFor(() => {
@@ -374,9 +217,7 @@ describe("Wallet Connect Request", () => {
     );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stageone.title
-      )
+      getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
     ).toBeVisible();
 
     act(() => {

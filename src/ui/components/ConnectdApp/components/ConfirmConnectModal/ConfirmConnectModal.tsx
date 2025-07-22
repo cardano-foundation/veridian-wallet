@@ -48,24 +48,21 @@ const ConfirmConnectModal = ({
   );
 
   const isConnecting =
-    !!pendingConnection &&
-    pendingConnection.meerkatId === connectionData?.meerkatId;
+    !!pendingConnection && pendingConnection.id === connectionData?.id;
   const dAppName = !connectionData?.name
-    ? ellipsisText(connectionData?.meerkatId || "", 25)
+    ? ellipsisText(connectionData?.id || "", 25)
     : connectionData?.name;
 
   const buttonTitle = i18n.t(
     isConnecting
-      ? "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.connectingbtn"
+      ? "connectdapp.connectionhistory.confirmconnect.connectingbtn"
       : isConnectModal
-      ? "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.connectbtn"
-      : "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.disconnectbtn"
+        ? "connectdapp.connectionhistory.confirmconnect.connectbtn"
+        : "connectdapp.connectionhistory.confirmconnect.disconnectbtn"
   );
 
-  const meerkatId = connectionData?.meerkatId
-    ? connectionData.meerkatId.substring(0, 5) +
-      "..." +
-      connectionData.meerkatId.slice(-5)
+  const meerkatId = connectionData?.id
+    ? connectionData.id.substring(0, 5) + "..." + connectionData.id.slice(-5)
     : "";
 
   const deleteConnection = () => {
@@ -95,7 +92,7 @@ const ConfirmConnectModal = ({
         closeButton: true,
         closeButtonAction: closeModal,
         closeButtonLabel: `${i18n.t(
-          "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.done"
+          "connectdapp.connectionhistory.confirmconnect.done"
         )}`,
         actionButton: true,
         actionButtonIcon: trashOutline,
@@ -120,8 +117,8 @@ const ConfirmConnectModal = ({
       {!isConnecting && connectionData?.name && (
         <div
           onClick={() => {
-            if (!connectionData?.meerkatId) return;
-            writeToClipboard(connectionData.meerkatId as string);
+            if (!connectionData?.id) return;
+            writeToClipboard(connectionData.id as string);
             dispatch(setToastMsg(ToastMsgType.COPIED_TO_CLIPBOARD));
           }}
           className="confirm-modal-id"
@@ -139,9 +136,7 @@ const ConfirmConnectModal = ({
             color="primary"
           ></IonIcon>
           <span>
-            {i18n.t(
-              "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.pending"
-            )}
+            {i18n.t("connectdapp.connectionhistory.confirmconnect.pending")}
           </span>
         </IonChip>
       )}
