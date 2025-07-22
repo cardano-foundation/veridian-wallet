@@ -1,5 +1,5 @@
 {
-  "$id": "EEfRCS-0uUj8wHVtWBTcMD6uDzzcHfoq1NcM0Zlo9Dth",
+  "$id": "EL9oOWU_7zQn_rD--Xsgi3giCWnFDaNvFMUGTOZx1ARO",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Foundation Employee",
   "description": "This is a credential issued for a Foundation Employee.",
@@ -38,7 +38,7 @@
           "type": "string"
         },
         {
-          "$id": "EPUvZStSdA18ZfRjO4iCPMF7XRsvq28G7SxOXny1TcF8",
+          "$id": "EBYi_g86fmAt8n7W0I4D2sRVI7fIo1NIwtH_fITN7DaW",
           "description": "Attributes block",
           "type": "object",
           "properties": {
@@ -58,13 +58,23 @@
             "email": {
               "description": "Internal email of the employee",
               "type": "string"
+            },
+            "firstName": {
+              "description": "First name of the employee",
+              "type": "string"
+            },
+            "lastName": {
+              "description": "Last name of the employee",
+              "type": "string"
             }
           },
           "additionalProperties": false,
           "required": [
             "i",
             "dt",
-            "email"
+            "email",
+            "firstName",
+            "lastName"
           ]
         }
       ]
