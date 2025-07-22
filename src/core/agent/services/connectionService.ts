@@ -33,6 +33,7 @@ import {
   ConnectionPairStorage,
   ConnectionRecord,
   ConnectionStorage,
+  ContactRecord,
   ContactStorage,
   CredentialStorage,
   IdentifierStorage,
@@ -109,7 +110,10 @@ class ConnectionService extends AgentService {
           event.payload.url &&
           event.payload.status === ConnectionStatus.PENDING
         ) {
-          this.resolveOobi(event.payload.url, event.payload.isMultiSigInvite);
+          this.resolveOobi(event.payload.url, {
+            wait: false,
+            identifier: event.payload.identifier,
+          });
         }
       }
     );
@@ -172,7 +176,7 @@ class ConnectionService extends AgentService {
     };
 
     if (multiSigInvite) {
-      const oobiResult = (await this.resolveOobi(url, multiSigInvite)) as {
+      const oobiResult = (await this.resolveOobi(url, { wait: true })) as {
         op: Operation & { response: State };
         connection: Contact;
         alias: string;
@@ -495,13 +499,17 @@ class ConnectionService extends AgentService {
     return connectionPairs;
   }
 
-  async getConnectionsPending(): Promise<ConnectionRecord[]> {
-    const connections = await this.connectionStorage.findAllByQuery({
+  async getConnectionsPending(): Promise<ContactRecord[]> {
+    const connectionPairs = await this.connectionPairStorage.findAllByQuery({
       creationStatus: CreationStatus.PENDING,
-      groupId: undefined,
     });
 
-    return connections;
+    const contacts = await Promise.all(
+      connectionPairs.map((connectionPair) =>
+        this.contactStorage.findById(connectionPair.contactId)
+      )
+    );
+    return contacts.filter((contact): contact is ContactRecord => contact !== null);
   }
 
   async deleteStaleLocalConnectionById(id: string): Promise<void> {
@@ -643,8 +651,7 @@ class ConnectionService extends AgentService {
   @OnlineOnly
   async resolveOobi(
     url: string,
-    waitForCompletion = true,
-    identifier?: string
+    waitForCompletion: { wait: true } | { wait: false, identifier?: string }
   ): Promise<{
     op: Operation & { response: State };
     alias: string;
@@ -663,7 +670,7 @@ class ConnectionService extends AgentService {
     const strippedUrl = urlObj.toString();
 
     let operation: Operation & { response: State };
-    if (waitForCompletion) {
+    if (waitForCompletion.wait) {
       operation = (await waitAndGetDoneOp(
         this.props.signifyClient,
         await this.props.signifyClient.oobis().resolve(strippedUrl),
@@ -691,9 +698,10 @@ class ConnectionService extends AgentService {
             /404/gi.test(error.message.split(" - ")[1])
           ) {
             await this.props.signifyClient.contacts().update(connectionId, {
+              version: "1.2.0.1",
               alias,
               groupCreationId,
-              [`${identifier}:createdAt`]: createdAt,
+              createdAt,
               oobi: url,
             });
           } else {
@@ -703,11 +711,6 @@ class ConnectionService extends AgentService {
       }
     } else {
       operation = await this.props.signifyClient.oobis().resolve(strippedUrl);
-
-      // When an OOBI is resolved, we should always share the identifier of the connection record pair via /introduce
-      if (identifier) {
-        await this.shareIdentifier(operation.response.i, identifier);
-      }
 
       await this.operationPendingStorage.save({
         id: operation.name,
@@ -732,7 +735,7 @@ class ConnectionService extends AgentService {
   async resolvePendingConnections(): Promise<void> {
     const pendingConnections = await this.getConnectionsPending();
     for (const pendingConnection of pendingConnections) {
-      await this.resolveOobi(pendingConnection.oobi);
+      await this.resolveOobi(pendingConnection.oobi, { wait: true });
     }
   }
 
