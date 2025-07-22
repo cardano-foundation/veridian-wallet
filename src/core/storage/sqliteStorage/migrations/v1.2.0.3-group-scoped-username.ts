@@ -12,6 +12,33 @@ export const MIGRATION_V1203: HybridMigration = {
     console.log(`Starting local migration for v${migrationVersion}...`);
     const statements = [];
 
+    function insertItemTags(itemRecord: any) {
+      const statements: { statement: string; values?: unknown[] }[] = [];
+      const statement =
+        "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
+      const tags = itemRecord.tags;
+      if (!tags) {
+        return statements;
+      }
+      // eslint-disable-next-line no-console
+      console.log(`    - Inserting tags for ${itemRecord.id}:`, tags);
+      for (const key of Object.keys(tags)) {
+        if (tags[key] === undefined || tags[key] === null) continue;
+        if (typeof tags[key] === "boolean") {
+          statements.push({
+            statement: statement,
+            values: [itemRecord.id, key, tags[key] ? "1" : "0", "boolean"],
+          });
+        } else if (typeof tags[key] === "string") {
+          statements.push({
+            statement: statement,
+            values: [itemRecord.id, key, tags[key], "string"],
+          });
+        }
+      }
+      return statements;
+    }
+
     const queryResult = await session.query(
       "SELECT * FROM items WHERE category = ?",
       ["IdentifierMetadataRecord"]
@@ -42,6 +69,11 @@ export const MIGRATION_V1203: HybridMigration = {
           identifier.id,
           "IdentifierMetadataRecord",
         ],
+      });
+      statements.push(...insertItemTags(recordValue));
+      statements.push({
+        statement: "DELETE FROM items_tags WHERE item_id = ?",
+        values: [identifier.id],
       });
     }
     // eslint-disable-next-line no-console
