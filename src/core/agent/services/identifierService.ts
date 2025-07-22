@@ -196,7 +196,7 @@ class IdentifierService extends AgentService {
 
       if (parsed.groupMetadata) {
         metadata = {
-          theme: parsed.theme ? parseInt(parsed.theme, 10) : 0,
+          theme: parseInt(parsed.theme, 10),
           displayName: parsed.displayName,
           groupMetadata: {
             groupId: parsed.groupMetadata.groupId,
@@ -207,7 +207,7 @@ class IdentifierService extends AgentService {
         };
       } else {
         metadata = {
-          theme: parsed.theme ? parseInt(parsed.theme, 10) : 0,
+          theme: parseInt(parsed.theme, 10),
           displayName: parsed.displayName,
         };
       }
