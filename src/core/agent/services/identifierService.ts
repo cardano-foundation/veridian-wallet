@@ -40,7 +40,7 @@ import {
 } from "../event.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { OobiQueryParams } from "./connectionService.types";
-import { CURRENT_VERSION } from "../../storage/sqliteStorage/migrations";
+import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/migrations";
 
 const UI_THEMES = [
   0, 1, 2, 3, 10, 11, 12, 13, 20, 21, 22, 23, 30, 31, 32, 33, 40, 41, 42, 43,
@@ -230,9 +230,9 @@ class IdentifierService extends AgentService {
     if (metadata.groupMetadata) {
       const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
       const userNamePart = metadata.groupMetadata.userName;
-      name = `${CURRENT_VERSION}:${metadata.theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${userNamePart}:${metadata.displayName}`;
+      name = `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${userNamePart}:${metadata.displayName}`;
     } else {
-      name = `${CURRENT_VERSION}:${metadata.theme}:${metadata.displayName}`;
+      name = `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${metadata.displayName}`;
     }
 
     // For distributed reliability, store name so we can re-try on start-up

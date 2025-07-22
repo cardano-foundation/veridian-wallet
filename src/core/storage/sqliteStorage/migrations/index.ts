@@ -12,4 +12,6 @@ type Migration = SqlMigration | TsMigration | CloudMigration | HybridMigration;
 const MIGRATIONS: Migration[] = [DATA_V001, DATA_V1201, MIGRATION_V1203];
 const CURRENT_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;
 
-export { MIGRATIONS, CURRENT_VERSION };
+const LATEST_IDENTIFIER_VERSION = "1.2.0.3";
+
+export { MIGRATIONS, CURRENT_VERSION, LATEST_IDENTIFIER_VERSION };
