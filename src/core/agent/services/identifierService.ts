@@ -62,6 +62,8 @@ class IdentifierService extends AgentService {
     "Misconfigured KERIA agent for this wallet type";
   static readonly INVALID_QUEUED_DISPLAY_NAMES_FORMAT =
     "Queued display names has invalid format";
+  static readonly IDENTIFIER_GROUP_METADATA_MISSING =
+    "Group metadata data in identifier  does not exist";
   static readonly CANNOT_FIND_EXISTING_IDENTIFIER_BY_SEARCH =
     "Identifier name taken on KERIA, but cannot be found when iterating over identifier list";
   static readonly DELETED_IDENTIFIER_THEME = "XX";
@@ -655,8 +657,9 @@ class IdentifierService extends AgentService {
       const mhabParsed = parseHabName(identifier.group.mhab.name);
 
       if (!mhabParsed.groupMetadata) {
-        throw new Error(IdentifierService.INVALID_QUEUED_DISPLAY_NAMES_FORMAT);
+        throw new Error(IdentifierService.IDENTIFIER_GROUP_METADATA_MISSING);
       }
+
       // Mark as created
       await this.identifierStorage.updateIdentifierMetadata(groupMemberPre, {
         groupMetadata: {
