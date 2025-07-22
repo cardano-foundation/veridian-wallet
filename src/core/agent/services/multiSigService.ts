@@ -201,12 +201,6 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: memberPrefix,
           createdAtUTC: multisigDetail.icp_dt,
-          groupMetadata: {
-            groupId: multisigId,
-            groupInitiator: true,
-            groupCreated: true,
-            userName: mHabRecord.groupMetadata.userName,
-          },
         },
       },
     });
