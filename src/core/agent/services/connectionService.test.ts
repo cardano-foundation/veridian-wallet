@@ -1233,7 +1233,7 @@ describe("Connection service of agent", () => {
     expect(submitRpyMock.mock.calls[0][0]).toBe("connectionId");
     const rpyIms: string = submitRpyMock.mock.calls[0][1];
     expect(rpyIms.includes("/introduce"));
-    expect(rpyIms.includes("\"http://oobi.com/oobi/ourIdentifier?name=Alice\""));
+    expect(rpyIms.includes('"http://oobi.com/oobi/ourIdentifier?name=Alice"'));
   });
 
   test("Shared identifier OOBIs carry over the external ID hint", async () => {
@@ -1265,7 +1265,7 @@ describe("Connection service of agent", () => {
     expect(rpyIms.includes("/introduce"));
     expect(
       rpyIms.includes(
-        "\"http://oobi.com/oobi/ourIdentifier?name=Alice&externalId=test123\""
+        '"http://oobi.com/oobi/ourIdentifier?name=Alice&externalId=test123"'
       )
     );
   });

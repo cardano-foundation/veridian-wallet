@@ -135,8 +135,8 @@ const IdentifierDetailModule = ({
       const filterId = cardData
         ? cardData.id
         : cloudError
-          ? identifierDetailId
-          : undefined;
+        ? identifierDetailId
+        : undefined;
 
       await deleteIdentifier();
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));

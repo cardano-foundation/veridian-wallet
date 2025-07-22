@@ -39,4 +39,4 @@ class ContactRecord extends BaseRecord {
 }
 
 export type { ContactRecordStorageProps };
-export { ContactRecord }; 
+export { ContactRecord };

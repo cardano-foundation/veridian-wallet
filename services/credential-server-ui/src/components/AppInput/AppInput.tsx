@@ -68,8 +68,8 @@ const AppInput = ({
           typeof value === "number"
             ? value
             : value === ""
-              ? null
-              : Number(value)
+            ? null
+            : Number(value)
         }
         onChange={onChange as ((value: number | null) => void) | undefined}
         min={min}
