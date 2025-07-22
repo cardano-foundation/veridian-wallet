@@ -46,11 +46,11 @@ services:
     <<: *witness-common
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.witness0.rule=Host(`witness-0.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness0.rule=Host(`witness-0.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness0.entrypoints=websecure"
       - "traefik.http.routers.witness0.tls.certresolver=myresolver"
       - "traefik.http.services.witness0.loadbalancer.server.port=5642"
-      - "traefik.http.routers.witness0-http.rule=Host(`witness-0.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness0-http.rule=Host(`witness-0.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness0-http.entrypoints=web"
       - "traefik.http.routers.witness0-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -60,11 +60,11 @@ services:
     <<: *witness-common
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.witness1.rule=Host(`witness-1.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness1.rule=Host(`witness-1.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness1.entrypoints=websecure"
       - "traefik.http.routers.witness1.tls.certresolver=myresolver"
       - "traefik.http.services.witness1.loadbalancer.server.port=5643"
-      - "traefik.http.routers.witness1-http.rule=Host(`witness-1.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness1-http.rule=Host(`witness-1.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness1-http.entrypoints=web"
       - "traefik.http.routers.witness1-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -74,11 +74,11 @@ services:
     <<: *witness-common
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.witness2.rule=Host(`witness-2.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness2.rule=Host(`witness-2.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness2.entrypoints=websecure"
       - "traefik.http.routers.witness2.tls.certresolver=myresolver"
       - "traefik.http.services.witness2.loadbalancer.server.port=5644"
-      - "traefik.http.routers.witness2-http.rule=Host(`witness-2.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness2-http.rule=Host(`witness-2.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness2-http.entrypoints=web"
       - "traefik.http.routers.witness2-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -88,11 +88,11 @@ services:
     <<: *witness-common
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.witness3.rule=Host(`witness-3.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness3.rule=Host(`witness-3.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness3.entrypoints=websecure"
       - "traefik.http.routers.witness3.tls.certresolver=myresolver"
       - "traefik.http.services.witness3.loadbalancer.server.port=5645"
-      - "traefik.http.routers.witness3-http.rule=Host(`witness-3.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness3-http.rule=Host(`witness-3.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness3-http.entrypoints=web"
       - "traefik.http.routers.witness3-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -102,11 +102,11 @@ services:
     <<: *witness-common
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.witness4.rule=Host(`witness-4.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness4.rule=Host(`witness-4.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness4.entrypoints=websecure"
       - "traefik.http.routers.witness4.tls.certresolver=myresolver"
       - "traefik.http.services.witness4.loadbalancer.server.port=5646"
-      - "traefik.http.routers.witness4-http.rule=Host(`witness-4.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness4-http.rule=Host(`witness-4.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness4-http.entrypoints=web"
       - "traefik.http.routers.witness4-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -116,11 +116,11 @@ services:
     <<: *witness-common
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.witness5.rule=Host(`witness-5.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness5.rule=Host(`witness-5.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness5.entrypoints=websecure"
       - "traefik.http.routers.witness5.tls.certresolver=myresolver"
       - "traefik.http.services.witness5.loadbalancer.server.port=5647"
-      - "traefik.http.routers.witness5-http.rule=Host(`witness-5.${PUBLIC_DOMAIN}`)"
+      - "traefik.http.routers.witness5-http.rule=Host(`witness-5.${PUBLIC_DOMAIN:-example.com}`)"
       - "traefik.http.routers.witness5-http.entrypoints=web"
       - "traefik.http.routers.witness5-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"

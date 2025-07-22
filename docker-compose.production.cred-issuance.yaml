@@ -32,7 +32,7 @@ services:
     image: ${CRED_UI_IMAGE:-cardanofoundation/cf-cred-issuance-ui:main}
     restart: unless-stopped
     environment:
-      - VITE_SERVER_URL=${CRED_UI_SERVER_URL:-http://localhost:3001}
+      - VITE_SERVER_URL=${CRED_UI_SERVER_URL:-http://localhost:3002}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.credentials-ui.rule=Host(`${CRED_UI_HOST:-cred-issuance-ui}`)"

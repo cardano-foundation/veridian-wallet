@@ -24,7 +24,7 @@ services:
     image: "rcmorano/alpine-bash-jq-curl"
     environment:
       - KERIA_PASSCODE=${KERIA_PASSCODE:-DLDRW3f108LaQB2qscJOd}
-      - KERIA_CURLS=${KERIA_CURLS:-http://keria-prod:3902}
+      - KERIA_CURLS=${KERIA_CURLS:-http://keria:3902}
       - KERIA_IURLS=${KERIA_IURLS:-http://witness:5642/oobi/dummy1 http://witness:5643/oobi/dummy2}
     volumes:
       - keria-config:/config
