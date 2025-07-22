@@ -32,6 +32,7 @@ const setBackgroundColorMock = jest.fn();
 jest.mock("../core/agent/agent", () => ({
   Agent: {
     agent: {
+      devPreload: jest.fn(),
       start: jest.fn(),
       setupLocalDependencies: () => mockInitDatabase(),
       markAgentStatus: jest.fn(),
@@ -91,9 +92,10 @@ jest.mock("../core/agent/agent", () => ({
         onRemoveNotification: jest.fn(),
       },
       onKeriaStatusStateChanged: jest.fn(),
-      peerConnectionMetadataStorage: {
-        getAllPeerConnectionMetadata: jest.fn(),
-        getPeerConnectionMetadata: jest.fn(),
+      peerConnectionAccounts: {
+        getAll: jest.fn(),
+        findById: jest.fn(),
+        getAllPeerConnectionAccount: jest.fn().mockResolvedValue([]),
       },
       basicStorage: {
         findById: jest.fn(),
