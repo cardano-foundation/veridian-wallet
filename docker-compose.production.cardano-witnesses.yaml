@@ -1,0 +1,172 @@
+name: veridian-prod
+
+x-cardano-backer: &witness-common
+  profiles: [witness,production,local]
+  restart: unless-stopped
+  image: ghcr.io/cardano-foundation/cardano-backer:${CARDANO_BACKER_IMAGE_TAG:-main}
+  environment:
+    - PYTHONUNBUFFERED=1
+    - BACKER_LOG_LEVEL=${BACKER_LOG_LEVEL:-INFO}
+    - INITIAL_HTTP_PORT=5642
+    - INITIAL_TCP_PORT=5632
+    - KERI_VAR_DIR=/usr/local/var/keri
+    - KERI_SCRIPT_DIR=/usr/local/var/keri/scripts
+    - NETWORK=${CARDANO_NETWORK:-preprod}
+    - OGMIOS_HOST=${OGMIOS_HOST:-ogmios}
+    - OGMIOS_PORT=${OGMIOS_PORT:-1337}
+    - START_SLOT_NUMBER=${START_SLOT_NUMBER:-92593696}
+    - START_BLOCK_HEADER_HASH=${START_BLOCK_HEADER_HASH:-345893332931ff4b75b1c2daf7c1e283e4f63da14aca78936489f80e85e2e2cc}
+    - WALLET_ADDRESS_CBORHEX=${WALLET_ADDRESS_CBORHEX:-null}
+    - LOG_LEVEL=DEBUG
+  entrypoint: ["bash", "-c", "export WITNESS_NO=$$(hostname | awk -F- '{print $$NF}'); exec backer start --loglevel $${LOG_LEVEL} --name wit$${WITNESS_NO} --alias wit$${WITNESS_NO} -H $$(( INITIAL_HTTP_PORT + WITNESS_NO )) --base ./store"]
+  volumes:
+    - witnesses-config:/usr/local/var/keri
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "1024k"
+      max-file: "200"
+
+services:
+  cardano-node:
+    profiles: [cardano]
+    restart: unless-stopped
+    image: ghcr.io/blinklabs-io/cardano-node:${CARDANO_NODE_IMAGE_TAG:-10.4.1-3}
+    environment:
+      - NETWORK=${CARDANO_NETWORK:-preprod}
+      - RESTORE_SNAPSHOT=${CARDANO_NODE_MITHRIL_RESTORE:-true}
+    volumes:
+      - node-db:/data
+      - node-ipc:/ipc
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024k"
+        max-file: "200"
+
+  ogmios:
+    profiles: [cardano]
+    restart: unless-stopped
+    image: cardanosolutions/ogmios:${CARDANO_OGMIOS_IMAGE_TAG:-v6.13.0}
+    command: [
+      "--host", "0.0.0.0",
+      "--node-socket", "/ipc/node.socket",
+      "--node-config", "/config/${CARDANO_NETWORK:-preprod}/cardano-node/config.json"
+    ]
+    environment:
+      - NETWORK=${NETWORK:-preprod}
+    volumes:
+      - node-ipc:/ipc
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024k"
+        max-file: "200"
+
+  witness-init:
+    profiles: [witness-init]
+    restart: no
+    image: ghcr.io/cardano-foundation/cardano-backer:${CARDANO_BACKER_IMAGE_TAG:-main}
+    environment:
+      - KERI_VAR_DIR=/usr/local/var/keri
+      - KERI_SCRIPT_DIR=/usr/local/var/keri/scripts
+      - KERIA_CURLS_PROTO=${KERIA_CURLS_PROTO:-https}
+      - KERIA_CURLS_EXTERNAL_HOST_TLD=${PUBLIC_DOMAIN:-example.com}
+      - WITNESS_COUNT=${WITNESS_COUNT:-6}
+      - DEPLOYMENT_MODE=${DEPLOYMENT_MODE:-cloud}
+      - BASE_HTTP_PORT=5642
+    volumes:
+      - witnesses-config:/usr/local/var/keri
+      - $PWD/docker-assets/keri-witness/witness-init.sh:/configmap/witness-init.sh:ro
+      - $PWD/docker-assets/keri-witness/witness.json.tpl:/configmap/witness.json.tpl:ro
+      - $PWD/docker-assets/keri-witness/wil-witness-sample.json:/configmap/wil-witness-sample.json:ro
+    entrypoint: ["bash", "-c", "bash /configmap/witness-init.sh"]
+
+  witness-0:
+    hostname: witness-0
+    <<: *witness-common
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.witness0.rule=Host(`witness-0.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness0.entrypoints=websecure"
+      - "traefik.http.routers.witness0.tls.certresolver=myresolver"
+      - "traefik.http.services.witness0.loadbalancer.server.port=5642"
+      - "traefik.http.routers.witness0-http.rule=Host(`witness-0.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness0-http.entrypoints=web"
+      - "traefik.http.routers.witness0-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+  witness-1:
+    hostname: witness-1
+    <<: *witness-common
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.witness1.rule=Host(`witness-1.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness1.entrypoints=websecure"
+      - "traefik.http.routers.witness1.tls.certresolver=myresolver"
+      - "traefik.http.services.witness1.loadbalancer.server.port=5643"
+      - "traefik.http.routers.witness1-http.rule=Host(`witness-1.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness1-http.entrypoints=web"
+      - "traefik.http.routers.witness1-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+  witness-2:
+    hostname: witness-2
+    <<: *witness-common
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.witness2.rule=Host(`witness-2.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness2.entrypoints=websecure"
+      - "traefik.http.routers.witness2.tls.certresolver=myresolver"
+      - "traefik.http.services.witness2.loadbalancer.server.port=5644"
+      - "traefik.http.routers.witness2-http.rule=Host(`witness-2.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness2-http.entrypoints=web"
+      - "traefik.http.routers.witness2-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+  witness-3:
+    hostname: witness-3
+    <<: *witness-common
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.witness3.rule=Host(`witness-3.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness3.entrypoints=websecure"
+      - "traefik.http.routers.witness3.tls.certresolver=myresolver"
+      - "traefik.http.services.witness3.loadbalancer.server.port=5645"
+      - "traefik.http.routers.witness3-http.rule=Host(`witness-3.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness3-http.entrypoints=web"
+      - "traefik.http.routers.witness3-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+  witness-4:
+    hostname: witness-4
+    <<: *witness-common
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.witness4.rule=Host(`witness-4.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness4.entrypoints=websecure"
+      - "traefik.http.routers.witness4.tls.certresolver=myresolver"
+      - "traefik.http.services.witness4.loadbalancer.server.port=5646"
+      - "traefik.http.routers.witness4-http.rule=Host(`witness-4.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness4-http.entrypoints=web"
+      - "traefik.http.routers.witness4-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+  witness-5:
+    hostname: witness-5
+    <<: *witness-common
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.witness5.rule=Host(`witness-5.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness5.entrypoints=websecure"
+      - "traefik.http.routers.witness5.tls.certresolver=myresolver"
+      - "traefik.http.services.witness5.loadbalancer.server.port=5647"
+      - "traefik.http.routers.witness5-http.rule=Host(`witness-5.${PUBLIC_DOMAIN:-example.com}`)"
+      - "traefik.http.routers.witness5-http.entrypoints=web"
+      - "traefik.http.routers.witness5-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+volumes:
+  witnesses-config:
+  node-db:
+  node-ipc:

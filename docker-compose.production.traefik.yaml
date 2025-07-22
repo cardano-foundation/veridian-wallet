@@ -1,0 +1,108 @@
+name: veridian-prod
+
+# There is no need to use an anchor, but having it here makes the witness type init more evident
+x-witness-type: &witness-type
+  file: docker-compose.production.${WITNESS_TYPE}-witnesses.yaml
+
+services:
+
+  traefik:
+    profiles: [traefik,production]
+    image: "traefik:v3.3.5"
+    container_name: "traefik"
+    command:
+      - "--log.level=${TRAEFIK_LOG_LEVEL:-DEBUG}"
+      - "--accesslog.filepath=/dev/stdout"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_ADMIN_EMAIL:-acme@example.com}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "443:443"
+      - "80:80"
+      #- "8080:8080"
+    volumes:
+      - "/var/lib/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  keria-init:
+    extends:
+      file: docker-compose.production.keria.yaml
+      service: keria-init
+
+  keria-local:
+    extends:
+      file: docker-compose.production.keria.yaml
+      service: keria-local
+
+  keria:
+    extends:
+      file: docker-compose.production.keria.yaml
+      service: keria
+
+  witness-init:
+    extends:
+      <<: *witness-type
+      service: witness-init
+
+  witness-0:
+    extends:
+      <<: *witness-type
+      service: witness-0
+
+  witness-1:
+    extends:
+      <<: *witness-type
+      service: witness-1
+
+  witness-2:
+    extends:
+      <<: *witness-type
+      service: witness-2
+
+  witness-3:
+    extends:
+      <<: *witness-type
+      service: witness-3
+
+  witness-4:
+    extends:
+      <<: *witness-type
+      service: witness-4
+
+  witness-5:
+    extends:
+      <<: *witness-type
+      service: witness-5
+
+  cardano-node:
+    extends:
+      file: docker-compose.production.cardano-witnesses.yaml
+      service: cardano-node
+
+  ogmios:
+    extends:
+      file: docker-compose.production.cardano-witnesses.yaml
+      service: ogmios
+
+  cred-issuance:
+    extends:
+      file: docker-compose.production.cred-issuance.yaml
+      service: cred-issuance
+
+  cred-issuance-ui:
+    extends:
+      file: docker-compose.production.cred-issuance.yaml
+      service: cred-issuance-ui
+
+volumes:
+  keria-data:
+  keria-config:
+  issuer-server-data:
+  witnesses-config:
+  node-db:
+  node-ipc:
