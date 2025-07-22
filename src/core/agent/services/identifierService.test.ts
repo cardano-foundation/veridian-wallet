@@ -1516,7 +1516,7 @@ describe("Single sig service of agent", () => {
             prefix: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
             group: {
               mhab: {
-                name: "1.2.0.3:XX:1:group1:user1:test1",
+                name: "1.2.0.3:0:1:group1:user1:test1",
                 prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
                 sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
               },
@@ -1588,17 +1588,6 @@ describe("Single sig service of agent", () => {
       sxlt: "1AAHOxnWacQOKjjcVD3Fl1PNyd9MDOkWAjpIfStG297qrCx9E2W5D8St0SdJ1E8N8yeaN0Gy4kLhH6PVHQwlupAGNRKvodlX-UKo",
       isDeleted: true,
     });
-    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenCalledWith(
-      "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
-      {
-        groupMetadata: {
-          groupId: "group1",
-          groupCreated: true,
-          groupInitiator: true,
-          userName: "user1",
-        },
-      }
-    );
     expect(
       identifierStorage.createIdentifierMetadataRecord
     ).toHaveBeenCalledWith({
@@ -1610,6 +1599,17 @@ describe("Single sig service of agent", () => {
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
       isDeleted: true,
     });
+    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenCalledWith(
+      "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
+      {
+        groupMetadata: {
+          groupId: "group1",
+          groupCreated: true,
+          groupInitiator: true,
+          userName: "user1",
+        },
+      }
+    );
     expect(operationPendingStorage.save).not.toBeCalled();
     expect(eventEmitter.emit).not.toBeCalled();
   });

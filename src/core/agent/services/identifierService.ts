@@ -622,7 +622,12 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
-      const parsed = parseHabName(identifier.name);
+      const nameToParse = identifier.name.startsWith(
+        IdentifierService.DELETED_IDENTIFIER_THEME
+      )
+        ? identifier.group.mhab.name
+        : identifier.name;
+      const parsed = parseHabName(nameToParse);
       const theme =
         parsed.theme &&
         parsed.theme !== IdentifierService.DELETED_IDENTIFIER_THEME
