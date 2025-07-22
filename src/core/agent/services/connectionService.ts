@@ -619,12 +619,12 @@ class ConnectionService extends AgentService {
 
   private async getConnectionMetadataById(
     connectionId: string
-  ): Promise<ConnectionRecord> {
-    const connection = await this.connectionStorage.findById(connectionId);
-    if (!connection) {
+  ): Promise<ContactRecord> {
+    const contact = await this.contactStorage.findById(connectionId);
+    if (!contact) {
       throw new Error(ConnectionService.CONNECTION_METADATA_RECORD_NOT_FOUND);
     }
-    return connection;
+    return contact;
   }
 
   async syncKeriaContacts(): Promise<void> {
@@ -747,8 +747,8 @@ class ConnectionService extends AgentService {
       await this.identifierStorage.getIdentifierMetadata(identifier)
     ).displayName;
 
-    const connectionRecord = await this.getConnectionMetadataById(connectionId);
-    const externalId = new URL(connectionRecord.oobi).searchParams.get(
+    const contact = await this.getConnectionMetadataById(connectionId);
+    const externalId = new URL(contact.oobi).searchParams.get(
       OobiQueryParams.EXTERNAL_ID
     );
     const oobi = await this.getOobi(
