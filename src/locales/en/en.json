@@ -1047,26 +1047,6 @@
         }
       }
     },
-    "menu": {
-      "tab": {
-        "header": "Menu",
-        "items": {
-          "profile": {
-            "title": "Profile",
-            "tabheader": "Profile",
-            "tabedit": "Edit profile",
-            "actionedit": "Edit",
-            "actionconfirm": "Confirm",
-            "actioncancel": "Cancel",
-            "name": "Name"
-          },
-          "connections": {
-            "title": "Connections",
-            "tabheader": "Connections"
-          }
-        }
-      }
-    },
     "connections": {
       "tab": {
         "title": "Connections",
