@@ -558,6 +558,14 @@ describe("Single sig service of agent", () => {
         done: false,
       }),
     });
+    const pendingIdentifiersRecordWithQueued = new BasicRecord({
+      id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
+      content: {
+        queued: [
+          "1.2.0.3:0:1:DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:testUser:displayName",
+        ],
+      },
+    });
     basicStorage.findById = jest
       .fn()
       .mockResolvedValueOnce(
@@ -568,16 +576,7 @@ describe("Single sig service of agent", () => {
           },
         })
       )
-      .mockResolvedValueOnce(
-        new BasicRecord({
-          id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
-          content: {
-            queued: [
-              "1.2.0.3:0:1-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
-            ],
-          },
-        })
-      );
+      .mockResolvedValueOnce(pendingIdentifiersRecordWithQueued);
     getIdentifierMock.mockResolvedValue(identifierStateKeria);
     saveOperationPendingMock.mockResolvedValueOnce({
       id: "op123",
@@ -600,13 +599,13 @@ describe("Single sig service of agent", () => {
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            "1.2.0.3:0:1-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
+            "1.2.0.3:0:1:DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:testUser:displayName",
           ],
         },
       })
     );
     expect(createIdentifierMock).toBeCalledWith(
-      "1.2.0.3:0:1-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
+      "1.2.0.3:0:1:DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:testUser:displayName",
       {
         toad: 4,
         wits: witnessEids.slice(0, 6),
@@ -664,6 +663,14 @@ describe("Single sig service of agent", () => {
         done: false,
       }),
     });
+    const pendingIdentifiersRecordWithQueued = new BasicRecord({
+      id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
+      content: {
+        queued: [
+          "1.2.0.3:0:0:DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:testUser:displayName",
+        ],
+      },
+    });
     basicStorage.findById = jest
       .fn()
       .mockResolvedValueOnce(
@@ -674,16 +681,7 @@ describe("Single sig service of agent", () => {
           },
         })
       )
-      .mockResolvedValueOnce(
-        new BasicRecord({
-          id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
-          content: {
-            queued: [
-              "1.2.0.3:0:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
-            ],
-          },
-        })
-      );
+      .mockResolvedValueOnce(pendingIdentifiersRecordWithQueued);
     getIdentifierMock.mockResolvedValue(identifierStateKeria);
     saveOperationPendingMock.mockResolvedValueOnce({
       id: "op123",
@@ -706,13 +704,13 @@ describe("Single sig service of agent", () => {
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            "1.2.0.3:0:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
+            "1.2.0.3:0:0:DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:testUser:displayName",
           ],
         },
       })
     );
     expect(createIdentifierMock).toBeCalledWith(
-      "1.2.0.3:0:0-DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd-testUser:displayName",
+      "1.2.0.3:0:0:DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd:testUser:displayName",
       {
         toad: 4,
         wits: witnessEids.slice(0, 6),
@@ -1318,7 +1316,7 @@ describe("Single sig service of agent", () => {
       .mockReturnValueOnce({
         aids: [
           {
-            name: "1.2.0.3:0:1-group1-user1:test1", // Correct format
+            name: "1.2.0.3:0:1:group1:user1:test1", // Correct format
             prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
             sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
           },
@@ -1327,7 +1325,7 @@ describe("Single sig service of agent", () => {
             prefix: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
             group: {
               mhab: {
-                name: "1.2.0.3:0:1-group1-user1:test1",
+                name: "1.2.0.3:0:1:group1:user1:test1",
                 prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
                 sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
               },
@@ -1339,7 +1337,7 @@ describe("Single sig service of agent", () => {
             sxlt: "1AAHOxnWacQOKjjcVD3Fl1PNyd9MDOkWAjpIfStG297qrCx9E2W5D8St0SdJ1E8N8yeaN0Gy4kLhH6PVHQwlupAGNRKvodlX-UKo",
           },
           {
-            name: "1.2.0.3:0:0-group3-user3:test3",
+            name: "1.2.0.3:0:0:group3:user3:test3",
             prefix: "ED_5C2-UOA8N3iRrV7o75fIMOnJfoSmYAe829YCiGaVB",
             sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE3TT",
           },
@@ -1348,7 +1346,7 @@ describe("Single sig service of agent", () => {
             prefix: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJljTz8",
             group: {
               mhab: {
-                name: "1.2.0.3:0:0-group3-user3:test3",
+                name: "1.2.0.3:0:0:group3:user3:test3",
                 prefix: "ED_5C2-UOA8N3iRrV7o75fIMOnJfoSmYAe829YCiGaVB",
                 sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE3TT",
               },
@@ -1509,23 +1507,23 @@ describe("Single sig service of agent", () => {
       .mockReturnValueOnce({
         aids: [
           {
-            name: "1.2.0.3:XX:1-group1-user1:test1",
+            name: "XX:randomSalt1",
             prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
             sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
           },
           {
-            name: "1.2.0.3:XX:test1",
+            name: "XX:randomSalt2",
             prefix: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
             group: {
               mhab: {
-                name: "1.2.0.3:XX:1-group1-user1:test1",
+                name: "1.2.0.3:XX:1:group1:user1:test1",
                 prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
                 sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
               },
             },
           },
           {
-            name: "1.2.0.3:XX:test2",
+            name: "XX:randomSalt3",
             prefix: "EJ9oenRW3_SNc0JkETnOegspNGaDCypBfTU1kJiL2AMs",
             sxlt: "1AAHOxnWacQOKjjcVD3Fl1PNyd9MDOkWAjpIfStG297qrCx9E2W5D8St0SdJ1E8N8yeaN0Gy4kLhH6PVHQwlupAGNRKvodlX-UKo",
           },
@@ -1572,14 +1570,8 @@ describe("Single sig service of agent", () => {
       identifierStorage.createIdentifierMetadataRecord
     ).toHaveBeenCalledWith({
       id: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
-      displayName: "test1",
+      displayName: "randomSalt1",
       theme: 0,
-      groupMetadata: {
-        groupId: "group1",
-        groupCreated: false,
-        groupInitiator: true,
-        userName: "user1",
-      },
       creationStatus: CreationStatus.COMPLETE,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
       sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
@@ -1589,7 +1581,7 @@ describe("Single sig service of agent", () => {
       identifierStorage.createIdentifierMetadataRecord
     ).toHaveBeenCalledWith({
       id: "EJ9oenRW3_SNc0JkETnOegspNGaDCypBfTU1kJiL2AMs",
-      displayName: "test2",
+      displayName: "randomSalt3",
       theme: 0,
       creationStatus: CreationStatus.COMPLETE,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -1628,7 +1620,7 @@ describe("Single sig service of agent", () => {
       .mockReturnValueOnce({
         aids: [
           {
-            name: "1.2.0.3:0:1-group1-user1:test1",
+            name: "1.2.0.3:0:1:group1:user1:test1",
             prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
             sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
           },
@@ -1637,7 +1629,7 @@ describe("Single sig service of agent", () => {
             prefix: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
             group: {
               mhab: {
-                name: "1.2.0.3:0:1-group1-user1:test1",
+                name: "1.2.0.3:0:1:group1:user1:test1",
                 prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
                 sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
               },
@@ -1770,7 +1762,7 @@ describe("Single sig service of agent", () => {
       .mockReturnValueOnce({
         aids: [
           {
-            name: "1.2.0.3:0:1-group1-user1:test1",
+            name: "1.2.0.3:0:1:group1:user1:test1",
             prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
             sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
           },
@@ -1779,7 +1771,7 @@ describe("Single sig service of agent", () => {
             prefix: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
             group: {
               mhab: {
-                name: "1.2.0.3:0:1-group1-user1:test1",
+                name: "1.2.0.3:0:1:group1:user1:test1",
                 prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
                 sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
               },
@@ -2037,9 +2029,9 @@ describe("Single sig service of agent", () => {
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            "1.2.0.3:0:1-ED4KeyyTKFj72B008OTGgDCrFo6y7B2B73kfyzu5Inx-memberOne:memberOne",
-            "1.2.0.3:0:1-ED4KeyyTKFj-memberOne:memberOne",
-            "1.2.0.3:0:0-ED4KeyyTKFj-memberTwo:memberTwo",
+            "1.2.0.3:0:1:ED4KeyyTKFj72B008OTGgDCrFo6y7B2B73kfyzu5Inx:memberOne:memberOne",
+            "1.2.0.3:0:1:ED4KeyyTKFj:memberOne:memberOne",
+            "1.2.0.3:0:0:ED4KeyyTKFj:memberTwo:memberTwo",
           ],
         },
       })
