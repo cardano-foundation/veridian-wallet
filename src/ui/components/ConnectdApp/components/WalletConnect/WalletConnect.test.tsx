@@ -9,8 +9,8 @@ import { makeTestStore } from "../../../../utils/makeTestStore";
 import { WalletConnect } from "./WalletConnect";
 import { WalletConnectStageOne } from "./WalletConnectStageOne";
 
-jest.mock("../../../core/configuration", () => ({
-  ...jest.requireActual("../../../core/configuration"),
+jest.mock("../../../../../core/configuration", () => ({
+  ...jest.requireActual("../../../../../core/configuration"),
   ConfigurationService: {
     env: {
       features: {
@@ -20,11 +20,22 @@ jest.mock("../../../core/configuration", () => ({
   },
 }));
 
-jest.mock("../../../core/cardano/walletConnect/peerConnection", () => ({
+jest.mock("../../../../../core/cardano/walletConnect/peerConnection", () => ({
   PeerConnection: {
     peerConnection: {
       start: jest.fn(),
       connectWithDApp: jest.fn(),
+    },
+  },
+}));
+
+jest.mock("../../../../../core/agent/agent", () => ({
+  Agent: {
+    agent: {
+      peerConnectionMetadataStorage: {
+        getPeerConnectionMetadata: jest.fn(),
+        getAllPeerConnectionMetadata: jest.fn(),
+      },
     },
   },
 }));
@@ -36,10 +47,10 @@ jest.mock("@ionic/react", () => ({
   ),
 }));
 
-describe("Wallet Connect Stage One", () => {
+describe("Wallet Connect Request", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.MENU],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -52,7 +63,7 @@ describe("Wallet Connect Stage One", () => {
       pendingConnection: walletConnectionsFix[0],
     },
     identifiersCache: {
-      identifiers: identifierFix,
+      identifiers: [...identifierFix],
     },
   };
 
@@ -61,6 +72,31 @@ describe("Wallet Connect Stage One", () => {
     ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
+
+  // const initialState = {
+  //   stateCache: {
+  //     routes: [TabsRoutePath.CREDENTIALS],
+  //     authentication: {
+  //       loggedIn: true,
+  //       time: Date.now(),
+  //       passcodeIsSet: true,
+  //       passwordIsSet: false,
+  //     },
+  //   },
+  //   walletConnectionsCache: {
+  //     walletConnections: [],
+  //     pendingConnection: walletConnectionsFix[0],
+  //   },
+  //   identifiersCache: {
+  //     identifiers: identifierFix,
+  //   },
+  // };
+
+  // const dispatchMock = jest.fn();
+  // const storeMocked = {
+  //   ...makeTestStore(initialState),
+  //   dispatch: dispatchMock,
+  // };
 
   const handleCancel = jest.fn();
 
@@ -145,68 +181,8 @@ describe("Wallet Connect Stage One", () => {
       expect(handleCancel).toBeCalled();
     });
   });
-});
 
-describe("Wallet Connect Request", () => {
-  const initialState = {
-    stateCache: {
-      routes: [TabsRoutePath.CREDENTIALS],
-      authentication: {
-        loggedIn: true,
-        time: Date.now(),
-        passcodeIsSet: true,
-        passwordIsSet: false,
-      },
-    },
-    walletConnectionsCache: {
-      walletConnections: [],
-      pendingConnection: walletConnectionsFix[0],
-    },
-    identifiersCache: {
-      identifiers: [...identifierFix],
-    },
-  };
-
-  const dispatchMock = jest.fn();
-  const storeMocked = {
-    ...makeTestStore(initialState),
-    dispatch: dispatchMock,
-  };
-
-  test("Renders content ", async () => {
-    const { getByTestId, getByText } = render(
-      <Provider store={storeMocked}>
-        <WalletConnect
-          open={true}
-          setOpenPage={jest.fn()}
-        />
-      </Provider>
-    );
-
-    expect(
-      getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-connect-wallet-stage-one"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("primary-button").getAttribute("disabled")).toBe(
-        "false"
-      );
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button"));
-    });
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalled();
-    });
-  });
-
-  test("Renders close in stage one ", async () => {
+  test("Close modal", async () => {
     const { getByTestId, getByText, queryByTestId } = render(
       <Provider store={storeMocked}>
         <WalletConnect

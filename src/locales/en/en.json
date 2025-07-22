@@ -1047,17 +1047,6 @@
         }
       }
     },
-    "menu": {
-      "tab": {
-        "header": "Menu",
-        "items": {
-          "connections": {
-            "title": "Connections",
-            "tabheader": "Connections"
-          }
-        }
-      }
-    },
     "connections": {
       "tab": {
         "title": "Connections",
