@@ -1,5 +1,13 @@
 name: Build and publish docker artifacts
 
+###############################################################################
+# WARNING:
+# This workflow uses pull_request_target to allow building images from forks,
+# this means that secrets are exposed and we should never run anything code
+# outside a sandbox (ie, docker containers) to prevent potential malicious code
+# leaking the github actions secrets.
+###############################################################################
+
 on:
   push:
     branches: [ main ]
