@@ -1,6 +1,5 @@
 import { MigrationType, HybridMigration } from "./migrations.types";
 import { SignifyClient } from "signify-ts";
-import { randomSalt } from "../../../agent/services/utils";
 
 export const DATA_V1201: HybridMigration = {
   type: MigrationType.HYBRID,
@@ -257,7 +256,7 @@ export const DATA_V1201: HybridMigration = {
           contactUpdates[`${sharedIdentifierPrefix}:createdAt`] =
             contact["createdAt"];
 
-          keysToDelete.push(sharedIdentifierPrefix as string);
+          keysToDelete.push("sharedIdentifier");
           keysToDelete.push("createdAt");
         } else {
           // delete contact if sharedIdentifier soft deleted
