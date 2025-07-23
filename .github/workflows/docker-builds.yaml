@@ -5,13 +5,6 @@ on:
     branches: [ main ]
     tags:
       - '[0-9]+.[0-9]+.[0-9]+*'
-  pull_request:
-    types: [ opened, synchronize ]
-    paths:
-    - 'Earthfile'
-    - '.github/workflows/docker-builds.yaml'
-    - 'services/credential-server-ui/**'
-    - 'services/credential-server/**'
   pull_request_target:
     types: [ opened, synchronize ]
     paths:
