@@ -114,7 +114,15 @@ jobs:
           
           if [ ${{github.event_name}} == "pull_request" ]
           then
-            git checkout ${BRANCH_NAME}
+
+            if [ "$IS_PR_FROM_FORK" == "true" ]; then
+              echo "External PR detected: fetching branch from $PR_HEAD_REPO"
+              git fetch https://github.com/${PR_HEAD_REPO}.git "$PR_HEAD_REF"
+              git checkout FETCH_HEAD
+            else
+              echo "Internal PR: checking out branch $PR_HEAD_REF"
+            	git checkout ${BRANCH_NAME}
+            fi
 
             # set earthly docker image targets based on changed paths
             set +e
