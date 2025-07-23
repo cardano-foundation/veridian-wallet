@@ -73,31 +73,6 @@ describe("Wallet Connect Request", () => {
     dispatch: dispatchMock,
   };
 
-  // const initialState = {
-  //   stateCache: {
-  //     routes: [TabsRoutePath.CREDENTIALS],
-  //     authentication: {
-  //       loggedIn: true,
-  //       time: Date.now(),
-  //       passcodeIsSet: true,
-  //       passwordIsSet: false,
-  //     },
-  //   },
-  //   walletConnectionsCache: {
-  //     walletConnections: [],
-  //     pendingConnection: walletConnectionsFix[0],
-  //   },
-  //   identifiersCache: {
-  //     identifiers: identifierFix,
-  //   },
-  // };
-
-  // const dispatchMock = jest.fn();
-  // const storeMocked = {
-  //   ...makeTestStore(initialState),
-  //   dispatch: dispatchMock,
-  // };
-
   const handleCancel = jest.fn();
 
   test("Renders content ", async () => {
