@@ -117,7 +117,7 @@ const agentServicesProps = {
 
 const connections = jest.mocked({
   getMultisigLinkedContacts: jest.fn(),
-  deleteConnectionById: jest.fn(),
+  deleteConnectionByIdAndIdentifier: jest.fn(),
 });
 
 const basicStorage = jest.mocked({
@@ -1097,11 +1097,8 @@ describe("Single sig service of agent", () => {
     });
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([
       {
-        id: "EHxEwa9UAcThqxuxbq56BYMq7YPWYxA63A1nau2AZ-1A",
-        connectionDate: nowISO,
-        label: "",
-        logo: "logoUrl",
-        status: ConnectionStatus.PENDING,
+        contactId: "EHxEwa9UAcThqxuxbq56BYMq7YPWYxA63A1nau2AZ-1A",
+        identifier: "test-identifier",
       },
     ]);
     PeerConnection.peerConnection.getConnectingIdentifier = jest
@@ -1113,8 +1110,9 @@ describe("Single sig service of agent", () => {
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
-    expect(connections.deleteConnectionById).toBeCalledWith(
-      "EHxEwa9UAcThqxuxbq56BYMq7YPWYxA63A1nau2AZ-1A"
+    expect(connections.deleteConnectionByIdAndIdentifier).toBeCalledWith(
+      "EHxEwa9UAcThqxuxbq56BYMq7YPWYxA63A1nau2AZ-1A",
+      "test-identifier"
     );
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -1154,11 +1152,8 @@ describe("Single sig service of agent", () => {
       .mockReturnValueOnce(localMember);
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([
       {
-        id: "group-id",
-        connectionDate: nowISO,
-        label: "",
-        logo: "logoUrl",
-        status: ConnectionStatus.CONFIRMED,
+        contactId: "group-id",
+        identifier: "test-identifier",
       },
     ]);
     identifierStorage.updateIdentifierMetadata = jest.fn();
@@ -1175,7 +1170,7 @@ describe("Single sig service of agent", () => {
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
-    expect(connections.deleteConnectionById).toBeCalledWith("group-id");
+    expect(connections.deleteConnectionByIdAndIdentifier).toBeCalledWith("group-id", "test-identifier");
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       "manageAid",
       {

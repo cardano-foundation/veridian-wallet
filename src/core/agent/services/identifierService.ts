@@ -479,7 +479,10 @@ class IdentifierService extends AgentService {
       groupId
     );
     for (const connection of connections) {
-      await this.connections.deleteConnectionById(connection.id);
+      await this.connections.deleteConnectionByIdAndIdentifier(
+        connection.contactId as string,
+        connection.identifier as string
+      );
     }
   }
 
