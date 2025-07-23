@@ -169,6 +169,9 @@ jobs:
 
             if [ "$IS_PR_FROM_FORK" == "true" ]; then
               git checkout ${GIT_SHORT_COMMIT}
+              git config --global user.email "github-actions[bot]@users.noreply.github.com"
+              git config --global user.name "github-actions[bot]"
+              git checkout ${GIT_SHORT_COMMIT}
               git merge --no-ff --no-commit FETCH_HEAD
             else
               git checkout ${GIT_SHORT_COMMIT}
