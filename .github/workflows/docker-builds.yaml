@@ -1,11 +1,19 @@
 name: Build and publish docker artifacts
 
+###############################################################################
+# WARNING:
+# This workflow uses pull_request_target to allow building images from forks,
+# this means that secrets are exposed and we should never run anything (ie tests)
+# outside a sandbox (ie, docker containers) to prevent potential malicious code
+# leaking the github actions secrets.
+###############################################################################
+
 on:
   push:
     branches: [ main ]
     tags:
       - '[0-9]+.[0-9]+.[0-9]+*'
-  pull_request:
+  pull_request_target:
     types: [ opened, synchronize ]
     paths:
     - 'Earthfile'
@@ -112,7 +120,7 @@ jobs:
             echo "DOCKER_IMAGES_TARGETS_$(echo ${{ matrix.platform }} | sed 's|/|_|g')=${DOCKER_IMAGES_TARGETS}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
           fi
           
-          if [ ${{github.event_name}} == "pull_request" ]
+          if [ "$TRIGGERING_REF" == "pr" ]
           then
 
             if [ "$IS_PR_FROM_FORK" == "true" ]; then
@@ -166,7 +174,7 @@ jobs:
         run: |
           set -x
           # For PR builds, we skip any earthly build if there are no changes on any known target-related file, for branch builds, we just build everything
-          if [ ${{github.event_name}} == "pull_request" ]
+          if [ "$TRIGGERING_REF" == "pr" ]
           then
             if [ ! -z "${DOCKER_IMAGES_TARGETS}" ]
             then
@@ -272,7 +280,7 @@ jobs:
               --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
           else
-              if [ "${{github.event_name}}" == "pull_request" ]
+              if [ "$TRIGGERING_REF" == "pr" ]
               then
                 echo "[+] No changes on any known target-related file, skipping earthly build..."
                 exit 0
