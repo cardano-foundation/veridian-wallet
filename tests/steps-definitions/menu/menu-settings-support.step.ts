@@ -25,7 +25,7 @@ When(/^user click privacy policy button$/, async function() {
 });
 
 When(/^user click Done button$/, async function() {
-  await MenuSettingsSupportScreen.doneButton.click()
+  await MenuSettingsSupportScreen.doneButton[1].click()
 });
 
 Then(/^user see term and privacy screen$/, async function() {

@@ -13,11 +13,11 @@ export class MenuSettingsSupportScreen {
   }
 
   get backButton() {
-    return $("[data-testid='close-button']");
+    return $("[data-testid='back-button']");
   }
 
   get doneButton() {
-    return $("[data-testid='close-button-label']");
+    return $$("[data-testid='close-button-label']");
   }
 
   get componentsText() {
