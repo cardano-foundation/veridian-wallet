@@ -22,7 +22,7 @@ describe("Connection Options modal", () => {
     jest.resetAllMocks();
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),

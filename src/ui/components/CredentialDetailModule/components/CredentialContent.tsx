@@ -24,7 +24,7 @@ import {
 } from "../../CardDetails";
 import { CardTheme } from "../../CardTheme";
 import { FallbackIcon } from "../../FallbackIcon";
-import { IdentifierDetailModal } from "../../IdentifierDetailModule";
+import { ProfileDetailsModal } from "../../ProfileDetailsModal";
 import { ListHeader } from "../../ListHeader";
 import { ReadMore } from "../../ReadMore";
 import {
@@ -58,10 +58,10 @@ const RelatedIdentifier = ({ identifierId }: IssuedIdentifierProps) => {
           />
         </CardBlock>
       )}
-      <IdentifierDetailModal
+      <ProfileDetailsModal
         isOpen={openIdentifierDetail}
         setIsOpen={setOpenIdentifierDetail}
-        identifierDetailId={identifierId}
+        profileId={identifierId}
         pageId="credential-related-identifier"
       />
     </>

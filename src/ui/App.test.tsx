@@ -189,7 +189,7 @@ jest.mock("@capacitor-community/privacy-screen", () => ({
 const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
-    routes: [TabsRoutePath.IDENTIFIERS],
+    routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
       loggedIn: true,
       userName: "",
@@ -561,7 +561,7 @@ describe("Witness availability", () => {
 
     render(
       <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+        <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
           <App />
         </MemoryRouter>
       </Provider>
@@ -656,7 +656,7 @@ describe("Witness availability", () => {
 
     render(
       <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+        <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
           <App />
         </MemoryRouter>
       </Provider>
@@ -916,7 +916,7 @@ describe("System threat alert", () => {
 
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+        <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
           <App />
         </MemoryRouter>
       </Provider>

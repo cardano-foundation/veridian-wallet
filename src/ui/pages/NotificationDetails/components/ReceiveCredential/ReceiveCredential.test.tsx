@@ -326,6 +326,7 @@ describe("Receive credential", () => {
           time: Date.now(),
           passcodeIsSet: true,
         },
+        profileHistories: [],
         isOnline: true,
       },
       credsCache: {
@@ -375,32 +376,13 @@ describe("Receive credential", () => {
     fireEvent.click(getByTestId("related-identifier-detail"));
 
     await waitFor(() => {
-      expect(getByTestId("identifier-detail-modal")).toBeVisible();
+      expect(getByTestId("profile-details-page")).toBeVisible();
     });
 
-    await waitFor(() =>
-      expect(
-        getByTestId("identifier-card-template-default-index-0")
-      ).toBeInTheDocument()
-    );
-    expect(
-      queryByTestId("delete-button-identifier-detail")
-    ).not.toBeInTheDocument();
-
-    act(() => {
-      fireEvent.click(getByTestId("identifier-options-button"));
-    });
+    fireEvent.click(getByTestId("back-button"));
 
     await waitFor(() => {
-      expect(getByTestId("share-identifier-option")).toBeInTheDocument();
-    });
-
-    expect(queryByTestId("delete-identifier-option")).not.toBeInTheDocument();
-
-    fireEvent.click(getByText(EN_TRANSLATIONS.tabs.identifiers.details.done));
-
-    await waitFor(() => {
-      expect(queryByTestId("identifier-detail-modal")).toBeNull();
+      expect(queryByTestId("profile-details-page")).toBeNull();
     });
   }, 10000);
 

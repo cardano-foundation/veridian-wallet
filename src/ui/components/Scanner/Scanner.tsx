@@ -63,7 +63,6 @@ import { combineClassNames } from "../../utils/style";
 import { isValidConnectionUrl, isValidHttpUrl } from "../../utils/urlChecker";
 import { Alert } from "../Alert";
 import { CreateGroupIdentifier } from "../CreateGroupIdentifier";
-import { CreateIdentifier } from "../CreateIdentifier";
 import { CustomInput } from "../CustomInput";
 import { IdentifierSelectorModal } from "../IdentifierSelectorModal";
 import { TabsRoutePath } from "../navigation/TabsMenu";
@@ -333,7 +332,7 @@ const Scanner = forwardRef(
     ) => {
       await updateConnections(groupId);
       handleReset?.(
-        TabsRoutePath.IDENTIFIERS,
+        TabsRoutePath.CREDENTIALS,
         OperationType.OPEN_MULTISIG_IDENTIFIER
       );
     };
@@ -420,7 +419,7 @@ const Scanner = forwardRef(
         }
 
         dispatch(setOpenMultiSigId(urlId));
-        handleReset?.(TabsRoutePath.IDENTIFIERS);
+        handleReset?.(TabsRoutePath.CREDENTIALS);
         return;
       } else {
         dispatch(setOpenConnectionId(urlId));
@@ -784,12 +783,6 @@ const Scanner = forwardRef(
             </div>
           )}
         </IonGrid>
-        <CreateIdentifier
-          modalIsOpen={createIdentifierModalIsOpen}
-          setModalIsOpen={setCreateIdentifierModalIsOpen}
-          onClose={openGroupIdentifierSetup}
-          groupId={groupId}
-        />
         <CreateGroupIdentifier
           modalIsOpen={groupIdentifierOpen}
           setModalIsOpen={setGroupIdentifierOpen}

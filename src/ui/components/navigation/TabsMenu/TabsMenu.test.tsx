@@ -46,14 +46,14 @@ describe("Tab menu", () => {
 
   test("Render", async () => {
     const history = createMemoryHistory();
-    history.push(TabsRoutePath.IDENTIFIERS);
+    history.push(TabsRoutePath.CREDENTIALS);
 
     const { getByTestId, getByText } = render(
       <IonReactMemoryRouter history={history}>
         <Provider store={storeMocked}>
           <TabsMenu
             tab={() => <></>}
-            path={TabsRoutePath.IDENTIFIERS}
+            path={TabsRoutePath.CREDENTIALS}
           />
         </Provider>
       </IonReactMemoryRouter>

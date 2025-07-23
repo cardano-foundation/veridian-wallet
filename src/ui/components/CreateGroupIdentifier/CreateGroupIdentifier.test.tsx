@@ -36,7 +36,7 @@ jest.mock("../../../core/agent/agent", () => ({
 describe("Create Identifier modal", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),
