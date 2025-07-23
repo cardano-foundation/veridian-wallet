@@ -62,7 +62,7 @@ jobs:
           platforms: arm64
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@feat/add-external-pr-check-for-gha-baseline
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -115,13 +115,7 @@ jobs:
           if [ ${{github.event_name}} == "pull_request" ]
           then
 
-            # Fetch PR metadata
-            PR_HEAD_REPO="${{ github.event.pull_request.head.repo.full_name }}"
-            PR_HEAD_REF="${{ github.event.pull_request.head.ref }}"
-            PR_HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-            PR_BASE_REPO="${{ github.repository }}"
-            
-            if [ "$PR_HEAD_REPO" != "$PR_BASE_REPO" ]; then
+            if [ "$IS_PR_FROM_FORK" == "true" ]; then
               echo "External PR detected: fetching branch from $PR_HEAD_REPO"
               git fetch https://github.com/${PR_HEAD_REPO}.git "$PR_HEAD_REF"
               git checkout FETCH_HEAD
