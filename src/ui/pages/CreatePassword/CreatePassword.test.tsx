@@ -300,7 +300,7 @@ describe("Create Password Page", () => {
   describe("Renders Create Password page when manage password", () => {
     const initialStateWithPassword = {
       stateCache: {
-        routes: [{ path: TabsRoutePath.MENU }],
+        routes: [{ path: TabsRoutePath.CREDENTIALS }],
         authentication: {
           loggedIn: true,
           time: Date.now(),

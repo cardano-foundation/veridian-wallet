@@ -326,6 +326,7 @@ describe("Receive credential", () => {
           time: Date.now(),
           passcodeIsSet: true,
         },
+        toastMsgs: [],
         profileHistories: [],
         isOnline: true,
       },

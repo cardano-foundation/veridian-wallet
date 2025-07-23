@@ -185,6 +185,7 @@ describe("Creds content", () => {
           passwordIsSet: false,
           passwordIsSkipped: true,
         },
+        toastMsgs: [],
       },
       credsCache: { creds: credsFixAcdc, favourites: [] },
       credsArchivedCache: { creds: credsFixAcdc },

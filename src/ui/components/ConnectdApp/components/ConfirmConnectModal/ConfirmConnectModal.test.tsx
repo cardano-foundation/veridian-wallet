@@ -128,8 +128,8 @@ describe("Confirm connect modal", () => {
     expect(getByTestId("wallet-connection-fallback-logo")).toBeVisible();
     expect(
       getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-          .confirmconnect.disconnectbtn
+        EN_TRANSLATIONS.connectdapp.connectionhistory.confirmconnect
+          .disconnectbtn
       )
     ).toBeVisible();
   });
@@ -154,8 +154,8 @@ describe("Confirm connect modal", () => {
     expect(getByTestId("wallet-connection-fallback-logo")).toBeVisible();
     expect(
       getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-          .confirmconnect.disconnectbtn
+        EN_TRANSLATIONS.connectdapp.connectionhistory.confirmconnect
+          .disconnectbtn
       )
     ).toBeVisible();
 

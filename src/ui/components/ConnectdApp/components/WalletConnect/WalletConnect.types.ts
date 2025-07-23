@@ -1,8 +1,8 @@
 interface WalletConnectStageOneProps {
   isOpen: boolean;
   onClose: () => void;
-  onAccept: () => void;
   className?: string;
+  pendingDAppMeerkat: string;
 }
 
 interface WalletConnectStageTwoProps {
