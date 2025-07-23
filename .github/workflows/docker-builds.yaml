@@ -167,7 +167,12 @@ jobs:
               echo "DOCKER_IMAGES_TARGETS_$(echo ${{ matrix.platform }} | sed 's|/|_|g')=${STRIPPED_DOCKER_IMAGES_TARGETS}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
             fi
 
-            git checkout ${GIT_SHORT_COMMIT}
+            if [ "$IS_PR_FROM_FORK" == "true" ]; then
+              git checkout ${GIT_SHORT_COMMIT}
+              git merge --no-ff --no-commit FETCH_HEAD
+            else
+              git checkout ${GIT_SHORT_COMMIT}
+            fi
           fi
 
       - name: 🌍 earthly (docker build and push)
