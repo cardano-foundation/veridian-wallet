@@ -66,8 +66,7 @@ const CardSlider = ({
   const [swiper, setSwiper] = useState<SwiperClass | undefined>(undefined);
   const [activeIndex, setActiveIndex] = useState(0);
   const [pickedCardIndex, setPickedCardIndex] = useState<number | null>(null);
-  const credFavouriteIndex = useAppSelector(getCredentialFavouriteIndex);
-  const favouriteIndex = credFavouriteIndex;
+  const favouriteIndex = useAppSelector(getCredentialFavouriteIndex);
 
   const handleShowCardDetails = async (index: number) => {
     setPickedCardIndex(index);

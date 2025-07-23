@@ -50,7 +50,6 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
-const path = TabsRoutePath.CREDENTIALS + "/" + identifierFix[0].id;
 const getIndentifier = jest.fn(() => identifierFix[0]);
 
 jest.mock("react-router-dom", () => ({
@@ -58,7 +57,6 @@ jest.mock("react-router-dom", () => ({
   useParams: () => ({
     id: identifierFix[0].id,
   }),
-  useRouteMatch: () => ({ url: path }),
 }));
 
 const deleteStaleLocalIdentifierMock = jest.fn();
