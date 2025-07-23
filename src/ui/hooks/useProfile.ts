@@ -77,11 +77,11 @@ export const useProfile = () => {
       return true;
     }
 
-    const identifies = Object.values(identifierMap)
+    const identifiers = Object.values(identifierMap)
       .sort((prev, next) => prev.displayName.localeCompare(next.displayName))
       .filter((item) => item.id !== defaultProfile.identity.id);
-    if (identifies.length > 0) {
-      await updateDefaultProfile(identifies[0].id, []);
+    if (identifiers.length > 0) {
+      await updateDefaultProfile(identifiers[0].id, []);
       return true;
     }
 
