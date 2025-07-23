@@ -117,8 +117,9 @@ const ConnectionDetails = ({
             connectionShortDetails.id
           );
         } else {
-          await Agent.agent.connections.markConnectionPendingDelete(
-            connectionShortDetails.id
+          await Agent.agent.connections.markContactPendingDelete(
+            connectionShortDetails.id,
+            connectionShortDetails.identifier as string
           );
         }
         dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
