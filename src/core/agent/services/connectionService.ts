@@ -56,6 +56,7 @@ import {
   OobiQueryParams,
   RpyRoute,
 } from "./connectionService.types";
+import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/migrations";
 
 class ConnectionService extends AgentService {
   protected readonly connectionStorage!: ConnectionStorage;
@@ -95,6 +96,8 @@ class ConnectionService extends AgentService {
     "Failed to resolve OOBI, operation not completing...";
   static readonly CANNOT_GET_OOBI = "No OOBI available from KERIA";
   static readonly OOBI_INVALID = "OOBI URL is invalid";
+  static readonly MISSING_SHARED_IDENTIFIER =
+    "Shared identifier is required for non-multi-sig invites";
 
   onConnectionStateChanged(
     callback: (event: ConnectionStateChangedEvent) => void
@@ -215,6 +218,10 @@ class ConnectionService extends AgentService {
     await this.createConnectionMetadata(connectionId, connectionMetadata);
 
     if (!multiSigInvite) {
+      if (!sharedIdentifier) {
+        throw new Error(ConnectionService.MISSING_SHARED_IDENTIFIER);
+      }
+
       this.props.eventEmitter.emit<ConnectionStateChangedEvent>({
         type: EventTypes.ConnectionStateChanged,
         payload: {
@@ -223,7 +230,7 @@ class ConnectionService extends AgentService {
           status: ConnectionStatus.PENDING,
           url,
           label: alias,
-          identifier: sharedIdentifier as string,
+          identifier: sharedIdentifier,
         },
       });
     }
@@ -446,7 +453,7 @@ class ConnectionService extends AgentService {
         await this.props.signifyClient
           .contacts()
           .update(contactId, contactUpdates);
-  
+
         await this.connectionPairStorage.deleteById(connectionPair.id);
       }
     }
@@ -679,7 +686,7 @@ class ConnectionService extends AgentService {
             /404/gi.test(error.message.split(" - ")[1])
           ) {
             await this.props.signifyClient.contacts().update(connectionId, {
-              version: "1.2.0.1",
+              version: LATEST_CONTACT_VERSION,
               alias,
               createdAt,
               oobi: url,
