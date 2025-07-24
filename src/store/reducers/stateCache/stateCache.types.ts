@@ -22,7 +22,6 @@ interface CurrentRouteCacheProps {
 interface AuthenticationCacheProps {
   loggedIn: boolean;
   userName: string;
-  defaultProfile: string;
   time: number;
   passcodeIsSet: boolean;
   seedPhraseIsSet: boolean;

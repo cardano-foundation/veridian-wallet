@@ -49,7 +49,6 @@ const initialState: StateCacheProps = {
   authentication: {
     loggedIn: false,
     userName: "",
-    defaultProfile: "",
     time: 0,
     passcodeIsSet: false,
     seedPhraseIsSet: false,
@@ -219,9 +218,6 @@ const stateCacheSlice = createSlice({
     setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
       state.isSetupProfile = action.payload;
     },
-    setDefaultProfile: (state, action: PayloadAction<string>) => {
-      state.authentication.defaultProfile = action.payload;
-    },
     setCurrentProfile: (
       state,
       action: PayloadAction<StateCacheProps["currentProfile"]>
@@ -257,7 +253,6 @@ const {
   clearStateCache,
   showGlobalLoading,
   setIsSetupProfile,
-  setDefaultProfile,
   setCurrentProfile,
 } = stateCacheSlice.actions;
 
@@ -335,6 +330,7 @@ const getForceInitApp = (state: RootState) => state.stateCache.forceInitApp;
 const getGlobalLoading = (state: RootState) => state.stateCache.showLoading;
 const getShowSetupProfilePage = (state: RootState) =>
   state.stateCache.isSetupProfile;
+const getCurrentProfile = (state: RootState) => state.stateCache.currentProfile;
 
 export type {
   AuthenticationCacheProps,
@@ -365,6 +361,7 @@ export {
   getStateCache,
   getToastMgs,
   getToastMsgs,
+  getCurrentProfile,
   initialState,
   login,
   logout,
@@ -390,6 +387,5 @@ export {
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
-  setDefaultProfile,
   updateCurrentProfile,
 };

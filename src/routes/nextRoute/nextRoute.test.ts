@@ -48,7 +48,6 @@ describe("NextRoute", () => {
           },
           firstAppLaunch: false,
           finishSetupBiometrics: false,
-          defaultProfile: "",
         },
         currentProfile: {
           identity: {
@@ -332,7 +331,6 @@ describe("getNextRoute", () => {
         },
         firstAppLaunch: false,
         finishSetupBiometrics: false,
-        defaultProfile: "",
       },
       toastMsgs: [],
       currentOperation: OperationType.IDLE,

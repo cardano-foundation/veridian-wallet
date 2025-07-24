@@ -18,6 +18,7 @@ import {
   getStateCache,
   setAuthentication,
   setToastMsg,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
@@ -88,9 +89,8 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
   const stateCache = useAppSelector(getStateCache);
-  const authentication = useAppSelector(getAuthentication);
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const defaultProfile = stateCache.authentication.defaultProfile;
+  const defaultProfile = stateCache.currentProfile.identity.id;
   const identifiersData = Object.values(identifiersDataCache);
   const filteredIdentifiersData = identifiersData.filter(
     (item) => item.id !== defaultProfile
@@ -115,12 +115,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           content: { defaultProfile: id },
         })
       );
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: id,
-        })
-      );
+      dispatch(updateCurrentProfile(id));
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
     } catch (e) {

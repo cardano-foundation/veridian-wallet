@@ -140,7 +140,6 @@ describe("Notifications cache", () => {
             lockedUntil: Date.now(),
           },
           firstAppLaunch: false,
-          defaultProfile: "",
         },
         currentOperation: OperationType.IDLE,
         queueIncomingRequest: {
