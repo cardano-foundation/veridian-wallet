@@ -480,7 +480,7 @@ class IdentifierService extends AgentService {
     );
     for (const connection of connections) {
       await this.connections.deleteMultisigConnectionById(
-        connection.contactId as string
+        connection.id
       );
     }
   }
