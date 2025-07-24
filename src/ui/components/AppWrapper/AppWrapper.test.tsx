@@ -164,6 +164,7 @@ const connectionStateChangedEvent: ConnectionStateChangedEvent = {
   type: EventTypes.ConnectionStateChanged,
   payload: {
     status: ConnectionStatus.PENDING,
+    identifier: "identifier",
   },
 };
 
@@ -252,6 +253,7 @@ describe("Connection state changed handler", () => {
       payload: {
         status: ConnectionStatus.CONFIRMED,
         connectionId: "connectionId",
+        identifier: "identifier",
       },
     };
     await connectionStateChangedHandler(

@@ -119,8 +119,7 @@ class IpexCommunicationService extends AgentService {
       await this.connections.getConnectionById(grantExn.exn.i)
     ).serviceEndpoints[0];
           await this.connections.resolveOobi(
-        await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid),
-        { wait: true }
+        await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
       );
 
     const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {})
@@ -467,8 +466,7 @@ class IpexCommunicationService extends AgentService {
   ): Promise<SubmitIPEXResult> {
     for (const schemaSaid of schemaSaids) {
       await this.connections.resolveOobi(
-        await this.getSchemaUrl(issuerOobi, issuerAid, schemaSaid),
-        { wait: true }
+        await this.getSchemaUrl(issuerOobi, issuerAid, schemaSaid)
       );
     }
 
@@ -533,8 +531,7 @@ class IpexCommunicationService extends AgentService {
         connection.serviceEndpoints[0],
         connectionId,
         schemaSaid
-      ),
-      { wait: true }
+      )
     );
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
 
@@ -962,8 +959,7 @@ class IpexCommunicationService extends AgentService {
             await this.connections.getConnectionById(exchange.exn.i)
           ).serviceEndpoints[0];
           await this.connections.resolveOobi(
-            await this.getSchemaUrl(issuerOobi, exchange.exn.i, schemaSaid),
-            { wait: true }
+            await this.getSchemaUrl(issuerOobi, exchange.exn.i, schemaSaid)
           );
           return await this.props.signifyClient.schemas().get(schemaSaid);
         } else {
@@ -1008,8 +1004,7 @@ class IpexCommunicationService extends AgentService {
       schemaSaids.map(
         async (schemaSaid) =>
           await this.connections.resolveOobi(
-            await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid),
-            { wait: true }
+            await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
           )
       )
     );

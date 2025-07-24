@@ -110,10 +110,7 @@ class ConnectionService extends AgentService {
           event.payload.url &&
           event.payload.status === ConnectionStatus.PENDING
         ) {
-          this.resolveOobi(event.payload.url, {
-            wait: false,
-            identifier: event.payload.identifier,
-          });
+          this.resolveOobi(event.payload.url);
         }
       }
     );
@@ -176,7 +173,7 @@ class ConnectionService extends AgentService {
     };
 
     if (multiSigInvite) {
-      const oobiResult = (await this.resolveOobi(url, { wait: true })) as {
+      const oobiResult = (await this.resolveOobi(url)) as {
         op: Operation & { response: State };
         connection: Contact;
         alias: string;
@@ -636,7 +633,7 @@ class ConnectionService extends AgentService {
   @OnlineOnly
   async resolveOobi(
     url: string,
-    waitForCompletion: { wait: true } | { wait: false; identifier: string }
+    waitForCompletion = true
   ): Promise<{
     op: Operation & { response: State };
     alias: string;
@@ -655,7 +652,7 @@ class ConnectionService extends AgentService {
     const strippedUrl = urlObj.toString();
 
     let operation: Operation & { response: State };
-    if (waitForCompletion.wait) {
+    if (waitForCompletion) {
       operation = (await waitAndGetDoneOp(
         this.props.signifyClient,
         await this.props.signifyClient.oobis().resolve(strippedUrl),
@@ -685,7 +682,6 @@ class ConnectionService extends AgentService {
             await this.props.signifyClient.contacts().update(connectionId, {
               version: "1.2.0.1",
               alias,
-              groupCreationId,
               createdAt,
               oobi: url,
             });
@@ -720,7 +716,7 @@ class ConnectionService extends AgentService {
   async resolvePendingConnections(): Promise<void> {
     const pendingConnections = await this.getConnectionsPending();
     for (const pendingConnection of pendingConnections) {
-        await this.resolveOobi(pendingConnection.oobi, { wait: true });
+      await this.resolveOobi(pendingConnection.oobi);
     }
   }
 
