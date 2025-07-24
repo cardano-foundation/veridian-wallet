@@ -13,6 +13,7 @@ import {
 import { IdentifiersFilters } from "../../../ui/pages/Identifiers/Identifiers.types";
 import { CredentialsFilters } from "../../../ui/pages/Credentials/Credentials.types";
 import { InitializationPhase } from "../stateCache/stateCache.types";
+import { CreationStatus } from "../../../core/agent/agent.types";
 
 const notification: KeriaNotification = {
   id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmG",
@@ -148,6 +149,20 @@ describe("Notifications cache", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        currentProfile: {
+          identity: {
+            id: "",
+            displayName: "",
+            createdAtUTC: "",
+            theme: 0,
+            creationStatus: CreationStatus.PENDING,
+          },
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
       },
       seedPhraseCache: {
         seedPhrase: "",

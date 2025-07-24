@@ -25,7 +25,6 @@ import {
   getConnectionsCache,
   getMultisigConnectionsCache,
 } from "../connectionsCache";
-import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection.types";
 
 const initialState: StateCacheProps = {
   initializationPhase: InitializationPhase.PHASE_ZERO,
