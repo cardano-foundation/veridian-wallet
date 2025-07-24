@@ -1,5 +1,13 @@
 name: Build and publish docker artifacts
 
+###############################################################################
+# WARNING:
+# This workflow uses pull_request_target to allow building images from forks,
+# this means that secrets are exposed and we should never run anything (ie tests)
+# outside a sandbox (ie, docker containers) to prevent potential malicious code
+# leaking the github actions secrets.
+###############################################################################
+
 on:
   push:
     branches:
@@ -7,7 +15,7 @@ on:
       - 'release/**'
     tags:
       - '[0-9]+.[0-9]+.[0-9]+*'
-  pull_request:
+  pull_request_target:
     types: [ opened, synchronize ]
     paths:
     - 'Earthfile'
@@ -114,9 +122,17 @@ jobs:
             echo "DOCKER_IMAGES_TARGETS_$(echo ${{ matrix.platform }} | sed 's|/|_|g')=${DOCKER_IMAGES_TARGETS}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
           fi
           
-          if [ ${{github.event_name}} == "pull_request" ]
+          if [ "$TRIGGERING_REF" == "pr" ]
           then
-            git checkout ${BRANCH_NAME}
+
+            if [ "$IS_PR_FROM_FORK" == "true" ]; then
+              echo "External PR detected: fetching branch from $PR_HEAD_REPO"
+              git fetch https://github.com/${PR_HEAD_REPO}.git "$PR_HEAD_REF"
+              git checkout FETCH_HEAD
+            else
+              echo "Internal PR: checking out branch $PR_HEAD_REF"
+            	git checkout ${BRANCH_NAME}
+            fi
 
             # set earthly docker image targets based on changed paths
             set +e
@@ -153,14 +169,22 @@ jobs:
               echo "DOCKER_IMAGES_TARGETS_$(echo ${{ matrix.platform }} | sed 's|/|_|g')=${STRIPPED_DOCKER_IMAGES_TARGETS}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
             fi
 
-            git checkout ${GIT_SHORT_COMMIT}
+            if [ "$IS_PR_FROM_FORK" == "true" ]; then
+              git checkout ${GIT_SHORT_COMMIT}
+              git config --global user.email "github-actions[bot]@users.noreply.github.com"
+              git config --global user.name "github-actions[bot]"
+              git checkout ${GIT_SHORT_COMMIT}
+              git merge --no-ff --no-commit FETCH_HEAD
+            else
+              git checkout ${GIT_SHORT_COMMIT}
+            fi
           fi
 
       - name: 🌍 earthly (docker build and push)
         run: |
           set -x
           # For PR builds, we skip any earthly build if there are no changes on any known target-related file, for branch builds, we just build everything
-          if [ ${{github.event_name}} == "pull_request" ]
+          if [ "$TRIGGERING_REF" == "pr" ]
           then
             if [ ! -z "${DOCKER_IMAGES_TARGETS}" ]
             then
@@ -168,7 +192,7 @@ jobs:
               +docker-publish \
               --PUSH=true \
               --TARGET_PLATFORM="${{ matrix.platform }}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}" \
               --DOCKER_IMAGES_LABELS="${DOCKER_METADATA_OUTPUT_LABELS_COMMA_SEPARATED}" \
               --DOCKER_IMAGES_TARGETS="${DOCKER_IMAGES_TARGETS}"
@@ -187,7 +211,7 @@ jobs:
               "${DOCKER_IMAGES_TARGETS_ARG}" \
               --PUSH=true \
               --TARGET_PLATFORM="${{ matrix.platform }}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_LABELS="${DOCKER_METADATA_OUTPUT_LABELS_COMMA_SEPARATED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
             else
@@ -196,7 +220,7 @@ jobs:
               ${FORCE_BUILD} \
               --PUSH=true \
               --TARGET_PLATFORM="${{ matrix.platform }}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_LABELS="${DOCKER_METADATA_OUTPUT_LABELS_COMMA_SEPARATED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
             fi
@@ -263,10 +287,10 @@ jobs:
               --PUSH=true \
               --PLATFORMS="${PLATFORMS}" \
               --DOCKER_IMAGES_TARGETS="${DOCKER_IMAGES_TARGETS}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
           else
-              if [ "${{github.event_name}}" == "pull_request" ]
+              if [ "$TRIGGERING_REF" == "pr" ]
               then
                 echo "[+] No changes on any known target-related file, skipping earthly build..."
                 exit 0
@@ -275,7 +299,7 @@ jobs:
               +docker-manifests-merge \
               --PUSH=true \
               --PLATFORMS="${PLATFORMS}" \
-              --DOCKER_REGISTRIES="${{ secrets.DOCKER_REGISTRIES }}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
           fi
 
