@@ -701,6 +701,7 @@ class ConnectionService extends AgentService {
             await this.props.signifyClient.contacts().update(connectionId, {
               version: LATEST_CONTACT_VERSION,
               alias,
+              groupId: groupCreationId,
               createdAt,
               oobi: url,
             });
