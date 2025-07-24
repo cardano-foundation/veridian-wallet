@@ -485,14 +485,14 @@ class ConnectionService extends AgentService {
     return connectionPairs;
   }
 
-  async getConnectionsPending(): Promise<(ContactRecord | null)[]> {
+  async getConnectionsPending(): Promise<ContactRecord[]> {
     const connectionPairs = await this.connectionPairStorage.findAllByQuery({
       creationStatus: CreationStatus.PENDING,
     });
 
     return await Promise.all(
       connectionPairs.map((connectionPair) =>
-        this.contactStorage.findById(connectionPair.contactId)
+        this.contactStorage.findExpectedById(connectionPair.contactId)
       )
     );
   }
@@ -720,9 +720,7 @@ class ConnectionService extends AgentService {
   async resolvePendingConnections(): Promise<void> {
     const pendingConnections = await this.getConnectionsPending();
     for (const pendingConnection of pendingConnections) {
-      if (pendingConnection) {
         await this.resolveOobi(pendingConnection.oobi, { wait: true });
-      }
     }
   }
 
