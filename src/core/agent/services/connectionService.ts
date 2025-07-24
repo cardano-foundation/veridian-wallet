@@ -283,12 +283,9 @@ class ConnectionService extends AgentService {
     groupId: string
   ): Promise<ConnectionShortDetails[]> {
     const connectionsDetails: ConnectionShortDetails[] = [];
-    const associatedContacts = await this.connectionStorage.findAllByQuery({
-      groupId,
-      pendingDeletion: false,
-    });
-    for (const connection of associatedContacts) {
-      connectionsDetails.push(this.getConnectionShortDetails(connection));
+    const associatedContacts = await this.contactStorage.findAllByQuery({ groupId });
+    for (const contact of associatedContacts) {
+      connectionsDetails.push(this.getConnectionShortDetails(contact));
     }
     return connectionsDetails;
   }
@@ -307,6 +304,7 @@ class ConnectionService extends AgentService {
       createdAtUTC: record.createdAt.toISOString(),
       status,
       oobi: record.oobi,
+      contactId: record.id,
     };
 
     const groupId =
@@ -389,6 +387,21 @@ class ConnectionService extends AgentService {
           };
         }),
     };
+  }
+
+  @OnlineOnly
+  async deleteMultisigConnectionById(contactId: string): Promise<void> {
+    await this.props.signifyClient
+    .contacts()
+    .delete(contactId)
+    .catch((error) => {
+      const status = error.message.split(" - ")[1];
+      if (!/404/gi.test(status)) {
+        throw error;
+      }
+      // Idempotent - ignore 404 errors if already deleted
+    });
+    await this.contactStorage.deleteById(contactId);
   }
 
   @OnlineOnly
