@@ -439,19 +439,13 @@ class ConnectionService extends AgentService {
           }
         });
 
-      const keysToDelete: Array<string> = [];
-
       if (connection) {
+        const contactUpdates: Record<string, unknown> = {};
         Object.keys(connection).forEach((key) => {
           if (key.startsWith(`${identifier}:`)) {
-            keysToDelete.push(key);
+            contactUpdates[key] = null;
           }
         });
-
-        const contactUpdates: Record<string, unknown> = {};
-        for (const keyToDelete of keysToDelete) {
-          contactUpdates[keyToDelete] = null;
-        }
   
         await this.props.signifyClient
           .contacts()
