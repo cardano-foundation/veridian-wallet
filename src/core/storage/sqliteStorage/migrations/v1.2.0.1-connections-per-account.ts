@@ -90,26 +90,7 @@ export const DATA_V1201: HybridMigration = {
 
       const connectionPairsToInsert: any[] = [];
 
-      if (!connectionData.sharedIdentifier) {
-        // No sharedIdentifier: create pair for every non-deleted identifier
-        for (const identifier of identifiers) {
-          connectionPairsToInsert.push({
-            id: `${identifier.id}:${connectionData.id}`,
-            contactId: contactRecord.id,
-            createdAt: connectionData.createdAt,
-            identifier: identifier.id,
-            creationStatus: connectionData.creationStatus,
-            pendingDeletion: connectionData.pendingDeletion,
-            tags: {
-              identifier: identifier.id,
-              contactId: contactRecord.id,
-              creationStatus: connectionData.creationStatus,
-              pendingDeletion: connectionData.pendingDeletion,
-            },
-            type: "ConnectionPairRecord",
-          });
-        }
-      } else {
+      if (connectionData.sharedIdentifier) {
         // Has sharedIdentifier: only create pair if identifier exists and is not deleted/pending
         const identifier = identifiers.find((identifier: any) => {
           return identifier.id === connectionData.sharedIdentifier;
@@ -133,14 +114,11 @@ export const DATA_V1201: HybridMigration = {
         }
       }
 
-      // Only insert the contact if there is at least one pair
-      if (connectionPairsToInsert.length > 0) {
-        statements.push(insertItem(contactRecord));
-        statements.push(...insertItemTags(contactRecord));
-        for (const connectionPair of connectionPairsToInsert) {
-          statements.push(insertItem(connectionPair));
-          statements.push(...insertItemTags(connectionPair));
-        }
+      statements.push(insertItem(contactRecord));
+      statements.push(...insertItemTags(contactRecord));
+      for (const connectionPair of connectionPairsToInsert) {
+        statements.push(insertItem(connectionPair));
+        statements.push(...insertItemTags(connectionPair));
       }
     }
 
