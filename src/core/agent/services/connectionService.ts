@@ -390,12 +390,11 @@ class ConnectionService extends AgentService {
     identifier: string
   ): Promise<void> {
     // Check if the connection pair exists
-    const connectionPair = await this.connectionPairStorage.findAllByQuery({
-      contactId,
-      identifier,
-    });
+    const connectionPair = await this.connectionPairStorage.findById(
+      `${identifier}:${contactId}`
+    );
 
-    if (connectionPair.length === 0) {
+    if (!connectionPair) {
       return; // Nothing to delete
     }
 
@@ -422,7 +421,7 @@ class ConnectionService extends AgentService {
 
       // Delete the contact locally
       await this.contactStorage.deleteById(contactId);
-      await this.connectionPairStorage.deleteById(connectionPair[0].id);
+      await this.connectionPairStorage.deleteById(connectionPair.id);
     } else {
       // If this is not the last (more accounts with this connection):
       // Update KERIA contact to remove fields
@@ -448,7 +447,7 @@ class ConnectionService extends AgentService {
           .contacts()
           .update(contactId, contactUpdates);
   
-        await this.connectionPairStorage.deleteById(connectionPair[0].id);
+        await this.connectionPairStorage.deleteById(connectionPair.id);
       }
     }
   }
