@@ -21,6 +21,11 @@ import { getIdentifiersCache } from "../identifiersCache";
 import { getCredsCache } from "../credsCache";
 import { getCredsArchivedCache } from "../credsArchivedCache";
 import { getWalletConnectionsCache } from "../walletConnectionsCache";
+import {
+  getConnectionsCache,
+  getMultisigConnectionsCache,
+} from "../connectionsCache";
+import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection.types";
 
 const initialState: StateCacheProps = {
   initializationPhase: InitializationPhase.PHASE_ZERO,
@@ -262,14 +267,17 @@ const updateCurrentProfile =
     async (dispatch, getState) => {
       const state = getState();
       const identifiers = getIdentifiersCache(state);
+
       if (!identifiers || !identifiers[profileId]) {
-        return;
+        throw new Error(`Profile with id ${profileId} not found.`);
       }
 
       const profileData = identifiers[profileId];
       const allCreds = getCredsCache(state);
       const allArchivedCreds = getCredsArchivedCache(state);
       const allPeerConnections = getWalletConnectionsCache(state);
+      const allConnections = getConnectionsCache(state);
+      const allMultisigConnections = getMultisigConnectionsCache(state);
 
       const profileCreds = allCreds.filter(
         (cred) => cred.identifierId === profileId
@@ -277,11 +285,10 @@ const updateCurrentProfile =
       const profileArchivedCreds = allArchivedCreds.filter(
         (cred) => cred.identifierId === profileId
       );
-      const peerConnections = allPeerConnections.filter(
+      const profilePeerConnections = allPeerConnections.filter(
         (conn) => conn.selectedAid === profileId
       );
 
-      // Construct the new profile state
       const newProfile: StateCacheProps["currentProfile"] = {
         identity: {
           id: profileData.id,
@@ -290,14 +297,12 @@ const updateCurrentProfile =
           theme: profileData.theme,
           creationStatus: profileData.creationStatus,
         },
-        // Reset other parts of the profile to avoid stale data
-        connections: [],
-        multisigConnections: [],
-        peerConnections: peerConnections,
+        connections: Object.values(allConnections),
+        multisigConnections: Object.values(allMultisigConnections),
+        peerConnections: profilePeerConnections,
         credentials: profileCreds,
         archivedCredentials: profileArchivedCreds,
       };
-
       dispatch(setCurrentProfile(newProfile));
     };
 
