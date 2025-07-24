@@ -96,8 +96,8 @@ class ConnectionService extends AgentService {
     "Failed to resolve OOBI, operation not completing...";
   static readonly CANNOT_GET_OOBI = "No OOBI available from KERIA";
   static readonly OOBI_INVALID = "OOBI URL is invalid";
-  static readonly MISSING_SHARED_IDENTIFIER =
-    "Shared identifier is required for non-multi-sig invites";
+  static readonly NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER =
+    "Cannot set up normal connection without specifying a controlling identifier to complete the connection identifier is required for non-multi-sig invites";
 
   onConnectionStateChanged(
     callback: (event: ConnectionStateChangedEvent) => void
@@ -219,7 +219,7 @@ class ConnectionService extends AgentService {
 
     if (!multiSigInvite) {
       if (!sharedIdentifier) {
-        throw new Error(ConnectionService.MISSING_SHARED_IDENTIFIER);
+        throw new Error(ConnectionService.NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER);
       }
 
       this.props.eventEmitter.emit<ConnectionStateChangedEvent>({
