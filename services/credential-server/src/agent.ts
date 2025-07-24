@@ -16,6 +16,8 @@ class Agent {
     "EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb";
   static readonly LE_SCHEMA_SAID =
     "ENPXp1vQzRF6JwIuS-mp2U8Uf1MoADoP_GqQ62VsDZWY";
+  static readonly F_EMPLOYEE_DEMO_SCHEMA_SAID =
+    "EL9oOWU_7zQn_rD--Xsgi3giCWnFDaNvFMUGTOZx1ARO";
 
   private static instance: Agent;
 
