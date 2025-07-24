@@ -18,6 +18,9 @@ import {
 } from "./stateCache.types";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import { getIdentifiersCache } from "../identifiersCache";
+import { getCredsCache } from "../credsCache";
+import { getCredsArchivedCache } from "../credsArchivedCache";
+import { getWalletConnectionsCache } from "../walletConnectionsCache";
 
 const initialState: StateCacheProps = {
   initializationPhase: InitializationPhase.PHASE_ZERO,
@@ -257,20 +260,42 @@ const {
 const updateCurrentProfile =
   (profileId: string): ThunkAction<void, RootState, unknown, AnyAction> =>
     async (dispatch, getState) => {
-      const identifiers = getIdentifiersCache(getState());
+      const state = getState();
+      const identifiers = getIdentifiersCache(state);
       if (!identifiers || !identifiers[profileId]) {
         return;
       }
 
+      const profileData = identifiers[profileId];
+      const allCreds = getCredsCache(state);
+      const allArchivedCreds = getCredsArchivedCache(state);
+      const allPeerConnections = getWalletConnectionsCache(state);
+
+      const profileCreds = allCreds.filter(
+        (cred) => cred.identifierId === profileId
+      );
+      const profileArchivedCreds = allArchivedCreds.filter(
+        (cred) => cred.identifierId === profileId
+      );
+      const peerConnections = allPeerConnections.filter(
+        (conn) => conn.selectedAid === profileId
+      );
+
       // Construct the new profile state
       const newProfile: StateCacheProps["currentProfile"] = {
-        identity: identifiers[profileId],
+        identity: {
+          id: profileData.id,
+          displayName: profileData.displayName,
+          createdAtUTC: profileData.createdAtUTC,
+          theme: profileData.theme,
+          creationStatus: profileData.creationStatus,
+        },
         // Reset other parts of the profile to avoid stale data
         connections: [],
         multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
+        peerConnections: peerConnections,
+        credentials: profileCreds,
+        archivedCredentials: profileArchivedCreds,
       };
 
       dispatch(setCurrentProfile(newProfile));

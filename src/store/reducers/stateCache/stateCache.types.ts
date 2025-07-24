@@ -63,7 +63,7 @@ interface CurrentProfileProps {
   identity: IdentifierShortDetails;
   connections: ConnectionShortDetails[];
   multisigConnections: ConnectionShortDetails[];
-  peerConnections: PeerConnection[];
+  peerConnections: ConnectionData[];
   credentials: CredentialShortDetails[];
   archivedCredentials: CredentialShortDetails[];
 }
