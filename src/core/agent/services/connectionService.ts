@@ -462,7 +462,7 @@ class ConnectionService extends AgentService {
     }
   }
 
-  async markContactPendingDelete(
+  async markConnectionPendingDelete(
     contactId: string,
     identifier: string
   ): Promise<void> {
