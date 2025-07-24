@@ -33,7 +33,7 @@ jest.mock("../../../core/agent/agent", () => ({
         getCredentialDetailsById: jest.fn(),
         deleteCredential: () => deleteIdentifierMock(),
         archiveCredential: () => archiveIdentifierMock(),
-        getCredentials: jest.fn(),
+        getCredentials: jest.fn(() => Promise.resolve([])),
         markCredentialPendingDeletion: () =>
           markCredentialPendingDeletionMock(),
       },
@@ -65,6 +65,14 @@ const initialStateEmpty = {
       passcodeIsSet: true,
     },
     isOnline: true,
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
+    },
   },
   seedPhraseCache: {},
   credsCache: {
@@ -102,6 +110,14 @@ const initialStateFull = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
   },
   seedPhraseCache: {},
@@ -150,6 +166,14 @@ const archivedAndRevokedState = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
   },
   seedPhraseCache: {},
@@ -210,17 +234,19 @@ describe("Creds Tab", () => {
   });
 
   test("Renders favourites in Creds", () => {
-    const { getByText } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
-        <Provider store={mockedStore}>
-          <Credentials />
-        </Provider>
-      </MemoryRouter>
-    );
+    act(() => {
+      const { getByText } = render(
+        <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
+          <Provider store={mockedStore}>
+            <Credentials />
+          </Provider>
+        </MemoryRouter>
+      );
 
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.credentials.tab.favourites)
-    ).toBeInTheDocument();
+      expect(
+        getByText(EN_TRANSLATIONS.tabs.credentials.tab.favourites)
+      ).toBeInTheDocument();
+    });
   });
 
   test("Renders Creds Tab", () => {
@@ -432,6 +458,14 @@ describe("Creds Tab", () => {
           loggedIn: true,
           time: Date.now(),
           passcodeIsSet: true,
+        },
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
         },
       },
       credsCache: {

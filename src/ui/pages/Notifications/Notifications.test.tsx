@@ -85,6 +85,14 @@ const initialState = {
       passcodeIsSet: true,
       defaultProfile: filteredIdentifierFix[0].id,
     },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
+    },
   },
   identifiersCache: {
     identifiers: filteredIdentifierMapFix,
@@ -108,6 +116,14 @@ const fullState = {
       time: Date.now(),
       passcodeIsSet: true,
       defaultProfile: filteredIdentifierFix[0].id,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: Object.values(connectionsForNotifications),
+      multisigConnections: Object.values(connectionsForNotifications),
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
   },
   identifiersCache: {
@@ -137,6 +153,14 @@ const filterTestData = {
       passcodeIsSet: true,
       defaultProfile: filteredIdentifierFix[0].id,
     },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: Object.values(connectionsForNotifications),
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
+    },
   },
   connectionsCache: {
     connections: connectionsForNotifications,
@@ -160,6 +184,14 @@ const emptyConnection = {
       time: Date.now(),
       passcodeIsSet: true,
       defaultProfile: filteredIdentifierFix[0].id,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
   },
   connectionsCache: {

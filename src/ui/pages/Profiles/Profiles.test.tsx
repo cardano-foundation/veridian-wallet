@@ -48,6 +48,14 @@ const initialState = {
       passcodeIsSet: true,
       defaultProfile: "",
     },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
+    },
   },
   identifiersCache: {
     identifiers: filteredIdentifierMapFix,

@@ -134,6 +134,14 @@ describe("Share Profile", () => {
         passwordIsSet: false,
         defaultProfile: filteredIdentifierFix[0].id,
       },
+      currentProfile: {
+        identity: filteredIdentifierFix[0],
+        connections: [],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+      },
     },
   };
 
