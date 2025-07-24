@@ -305,15 +305,9 @@ class ConnectionService extends AgentService {
       status,
       oobi: record.oobi,
       contactId: record.id,
+      groupId: record.groupId,
     };
-
-    const groupId =
-      record instanceof ConnectionRecord
-        ? record.getTags().groupId
-        : record.groupId;
-    if (groupId) {
-      connection.groupId = groupId as string;
-    }
+    
     return connection;
   }
 
