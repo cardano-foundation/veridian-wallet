@@ -1,5 +1,10 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  AnyAction,
+  createSlice,
+  PayloadAction,
+  ThunkAction,
+} from "@reduxjs/toolkit";
 import { Salter } from "signify-ts";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
 import { OperationType, ToastMsgType } from "../../../ui/globals/types";
@@ -11,12 +16,29 @@ import {
   InitializationPhase,
   StateCacheProps,
 } from "./stateCache.types";
+import { CreationStatus } from "../../../core/agent/agent.types";
+import { getIdentifiersCache } from "../identifiersCache";
 
 const initialState: StateCacheProps = {
   initializationPhase: InitializationPhase.PHASE_ZERO,
   recoveryCompleteNoInterruption: false,
   isOnline: false,
   routes: [],
+  currentProfile: {
+    identity: {
+      id: "",
+      displayName: "",
+      createdAtUTC: "",
+      theme: 0,
+      // TODO: default status ??
+      creationStatus: CreationStatus.PENDING,
+    },
+    connections: [],
+    multisigConnections: [],
+    peerConnections: [],
+    credentials: [],
+    archivedCredentials: [],
+  },
   authentication: {
     loggedIn: false,
     userName: "",
@@ -193,6 +215,12 @@ const stateCacheSlice = createSlice({
     setDefaultProfile: (state, action: PayloadAction<string>) => {
       state.authentication.defaultProfile = action.payload;
     },
+    setCurrentProfile: (
+      state,
+      action: PayloadAction<StateCacheProps["currentProfile"]>
+    ) => {
+      state.currentProfile = action.payload;
+    },
   },
 });
 
@@ -223,7 +251,30 @@ const {
   showGlobalLoading,
   setIsSetupProfile,
   setDefaultProfile,
+  setCurrentProfile,
 } = stateCacheSlice.actions;
+
+const updateCurrentProfile =
+  (profileId: string): ThunkAction<void, RootState, unknown, AnyAction> =>
+    async (dispatch, getState) => {
+      const identifiers = getIdentifiersCache(getState());
+      if (!identifiers || !identifiers[profileId]) {
+        return;
+      }
+
+      // Construct the new profile state
+      const newProfile: StateCacheProps["currentProfile"] = {
+        identity: identifiers[profileId],
+        // Reset other parts of the profile to avoid stale data
+        connections: [],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+      };
+
+      dispatch(setCurrentProfile(newProfile));
+    };
 
 const getStateCache = (state: RootState) => state.stateCache;
 const getInitializationPhase = (state: RootState) =>
@@ -310,4 +361,5 @@ export {
   showNoWitnessAlert,
   stateCacheSlice,
   setDefaultProfile,
+  updateCurrentProfile,
 };
