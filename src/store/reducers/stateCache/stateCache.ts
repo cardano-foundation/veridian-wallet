@@ -373,6 +373,7 @@ export {
   removeRoute,
   removeToastMessage,
   resetAllRoutes,
+  setCurrentProfile,
   setAuthentication,
   setCameraDirection,
   setCurrentOperation,
