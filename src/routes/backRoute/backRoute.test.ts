@@ -1,3 +1,4 @@
+import { CreationStatus } from "../../core/agent/agent.types";
 import { RootState } from "../../store";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { OperationType } from "../../ui/globals/types";
@@ -34,6 +35,20 @@ describe("getBackRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
+        currentProfile: {
+          identity: {
+            id: "",
+            displayName: "",
+            createdAtUTC: "",
+            theme: 0,
+            creationStatus: CreationStatus.PENDING,
+          },
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
@@ -50,7 +65,6 @@ describe("getBackRoute", () => {
             lockedUntil: Date.now(),
           },
           firstAppLaunch: false,
-          defaultProfile: "",
         },
         currentOperation: OperationType.IDLE,
         queueIncomingRequest: {
@@ -188,6 +202,20 @@ describe("getPreviousRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
+        currentProfile: {
+          identity: {
+            id: "",
+            displayName: "",
+            createdAtUTC: "",
+            theme: 0,
+            creationStatus: CreationStatus.PENDING,
+          },
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
@@ -204,7 +232,6 @@ describe("getPreviousRoute", () => {
             lockedUntil: Date.now(),
           },
           firstAppLaunch: false,
-          defaultProfile: "",
         },
         currentOperation: OperationType.IDLE,
         queueIncomingRequest: {

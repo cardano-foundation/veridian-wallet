@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch , useAppSelector } from "../../../store/hooks";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -8,7 +8,6 @@ import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
-import { useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
   setIndividualFirstCreate,
@@ -16,8 +15,8 @@ import {
 import {
   getAuthentication,
   getStateCache,
-  setAuthentication,
   showNoWitnessAlert,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
@@ -38,8 +37,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
-  const authentication = useAppSelector(getAuthentication);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
   const [userName, setUserName] = useState("");
@@ -52,8 +50,8 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const back = [SetupProfileStep.SetupProfile].includes(step)
     ? i18n.t("setupprofile.button.back")
     : isModal
-    ? i18n.t("setupprofile.button.cancel")
-    : undefined;
+      ? i18n.t("setupprofile.button.cancel")
+      : undefined;
 
   const getButtonText = () => {
     switch (step) {
@@ -103,12 +101,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           content: { defaultProfile: identifier },
         })
       );
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: identifier,
-        })
-      );
+      dispatch(updateCurrentProfile(identifier));
 
       if (isModal) {
         onClose();

@@ -108,7 +108,6 @@ const initialState = {
         lockedUntil: 0,
       },
       firstAppLaunch: false,
-      defaultProfile: "",
     },
   },
   walletConnectionsCache: {
@@ -207,7 +206,6 @@ describe("Profile page", () => {
             lockedUntil: 0,
           },
           firstAppLaunch: false,
-          defaultProfile: "",
         })
       );
     });

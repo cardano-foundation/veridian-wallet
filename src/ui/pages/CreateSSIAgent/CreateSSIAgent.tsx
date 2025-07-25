@@ -37,9 +37,9 @@ import {
 import {
   getStateCache,
   setCurrentOperation,
-  setDefaultProfile,
   setIsSetupProfile,
   setRecoveryCompleteNoInterruption,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { CustomInput } from "../../components/CustomInput";
@@ -227,7 +227,7 @@ const CreateSSIAgent = () => {
                 })
               )
               .then(() => {
-                dispatch(setDefaultProfile(oldestIdentifier.id));
+                dispatch(updateCurrentProfile(oldestIdentifier.id));
               })
               .catch((e) => {
                 showError("Cannot set default profile", e);
