@@ -10,9 +10,17 @@ import {
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Profiles } from "./Profiles";
 import { Agent } from "../../../core/agent/agent";
-import { setToastMsg } from "../../../store/reducers/stateCache";
+import {
+  setToastMsg,
+  updateCurrentProfile,
+} from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
 import { CreationStatus } from "../../../core/agent/agent.types";
+
+jest.mock("../../../store/reducers/stateCache", () => ({
+  ...jest.requireActual("../../../store/reducers/stateCache"),
+  updateCurrentProfile: jest.fn(),
+}));
 mockIonicReact();
 
 jest.mock("../../../core/configuration", () => ({
@@ -159,9 +167,9 @@ describe("Profiles", () => {
       </Provider>
     );
 
-    jest
-      .spyOn(Agent.agent.basicStorage, "createOrUpdateBasicRecord")
-      .mockRejectedValue(new Error("error"));
+    (
+      Agent.agent.basicStorage.createOrUpdateBasicRecord as jest.Mock
+    ).mockRejectedValue(new Error("error"));
 
     await waitFor(() => {
       expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeInTheDocument();

@@ -172,7 +172,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
                 key={identifier.id}
                 identifier={identifier}
                 onClick={async () => {
-                  handleSelectProfile(identifier.id);
+                  await handleSelectProfile(identifier.id);
                 }}
               />
             ))}
