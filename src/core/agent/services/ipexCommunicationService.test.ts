@@ -2572,8 +2572,7 @@ describe("IPEX communication service of agent", () => {
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
     expect(connections.resolveOobi).toBeCalledWith(
-      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
-      true
+      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu"
     );
   });
 

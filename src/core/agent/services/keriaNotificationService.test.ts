@@ -3246,10 +3246,10 @@ describe("Long running operation tracker", () => {
       pendingDeletion: false,
     });
     expect(contactsUpdateMock).toBeCalledWith("id", {
+      version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      createdAt: operationMock.response.dt,
+      "null:createdAt": operationMock.response.dt,
       oobi: "http://oobi.com/",
-      sharedIdentifier: null,
     });
     expect(eventEmitter.emit).toHaveBeenNthCalledWith(1, {
       type: EventTypes.ConnectionStateChanged,
@@ -3320,10 +3320,10 @@ describe("Long running operation tracker", () => {
       pendingDeletion: false,
     });
     expect(contactsUpdateMock).toBeCalledWith("id", {
+      version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      createdAt: operationMock.response.dt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9:createdAt": operationMock.response.dt,
       oobi: "http://oobi.com/",
-      sharedIdentifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
     });
     expect(eventEmitter.emit).toHaveBeenNthCalledWith(1, {
       type: EventTypes.ConnectionStateChanged,
