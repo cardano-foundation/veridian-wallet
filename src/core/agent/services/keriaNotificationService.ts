@@ -49,6 +49,7 @@ import { NotificationAttempts } from "../records/notificationRecord.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { IdentifierService } from "./identifierService";
 import { ConnectionService } from "./connectionService";
+import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/migrations";
 
 class KeriaNotificationService extends AgentService {
   static readonly NOTIFICATION_NOT_FOUND = "Notification record not found";
@@ -1257,10 +1258,12 @@ class KeriaNotificationService extends AgentService {
               await this.props.signifyClient
                 .contacts()
                 .update((operation.response as State).i, {
+                  version: LATEST_CONTACT_VERSION,
                   alias: contact.alias,
-                  createdAt: new Date((operation.response as State).dt),
+                  [`${connectionPairRecord.identifier}:createdAt`]: new Date(
+                    (operation.response as State).dt
+                  ),
                   oobi: contact.oobi,
-                  sharedIdentifier: connectionPairRecord.identifier,
                 });
             }
 

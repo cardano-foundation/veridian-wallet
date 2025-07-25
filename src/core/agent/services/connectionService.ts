@@ -113,7 +113,7 @@ class ConnectionService extends AgentService {
           event.payload.url &&
           event.payload.status === ConnectionStatus.PENDING
         ) {
-          this.resolveOobi(event.payload.url);
+          this.resolveOobi(event.payload.url, false);
         }
       }
     );
@@ -730,7 +730,7 @@ class ConnectionService extends AgentService {
   async resolvePendingConnections(): Promise<void> {
     const pendingConnections = await this.getConnectionsPending();
     for (const pendingConnection of pendingConnections) {
-      await this.resolveOobi(pendingConnection.oobi);
+      await this.resolveOobi(pendingConnection.oobi, false);
     }
   }
 
