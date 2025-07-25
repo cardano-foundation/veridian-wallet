@@ -233,20 +233,22 @@ describe("Creds Tab", () => {
     };
   });
 
-  test("Renders favourites in Creds", () => {
-    act(() => {
-      const { getByText } = render(
-        <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
-          <Provider store={mockedStore}>
-            <Credentials />
-          </Provider>
-        </MemoryRouter>
-      );
+  it("Renders favourites in Creds", () => {
+    const storeMocked = {
+      ...makeTestStore(initialStateFull),
+      dispatch: dispatchMock,
+    };
+    const { getByText } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
+        <Provider store={storeMocked}>
+          <Credentials />
+        </Provider>
+      </MemoryRouter>
+    );
 
-      expect(
-        getByText(EN_TRANSLATIONS.tabs.credentials.tab.favourites)
-      ).toBeInTheDocument();
-    });
+    expect(
+      getByText(EN_TRANSLATIONS.tabs.credentials.tab.favourites)
+    ).toBeInTheDocument();
   });
 
   test("Renders Creds Tab", () => {
