@@ -93,6 +93,7 @@ describe("Profiles", () => {
 
   afterEach(() => {
     cleanup();
+    jest.clearAllMocks();
   });
 
   test("Render profile", async () => {
@@ -131,6 +132,9 @@ describe("Profiles", () => {
 
   test("switch profile success", async () => {
     const setIsOpenMock = jest.fn();
+    (
+      Agent.agent.basicStorage.createOrUpdateBasicRecord as jest.Mock
+    ).mockResolvedValue(undefined);
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <Profiles
@@ -145,7 +149,7 @@ describe("Profiles", () => {
     });
 
     fireEvent.click(
-      getByTestId(`profiles-list-item-${filteredIdentifierFix[0].id}`)
+      getByTestId(`profiles-list-item-${filteredIdentifierFix[1].id}`)
     );
 
     await waitFor(() => {
@@ -176,7 +180,7 @@ describe("Profiles", () => {
     });
 
     fireEvent.click(
-      getByTestId(`profiles-list-item-${filteredIdentifierFix[0].id}`)
+      getByTestId(`profiles-list-item-${filteredIdentifierFix[1].id}`)
     );
 
     await waitFor(() => {

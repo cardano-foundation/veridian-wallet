@@ -38,6 +38,7 @@ import {
 const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
   if (!identifier) return null;
   const { id, displayName, creationStatus } = identifier;
+
   return (
     <div
       className="profiles-list-item"
@@ -98,10 +99,21 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const [openSetting, setOpenSetting] = useState(false);
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
 
-  const handleClose = () => setIsOpen(false);
-  const handleOpenSettings = () => setOpenSetting(true);
-  const handleAddProfile = () => setOpenSetupProfile(true);
-  const handleCloseSetupProfile = () => setOpenSetupProfile(false);
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleOpenSettings = () => {
+    setOpenSetting(true);
+  };
+
+  const handleAddProfile = () => {
+    setOpenSetupProfile(true);
+  };
+
+  const handleCloseSetupProfile = () => {
+    setOpenSetupProfile(false);
+  };
 
   const handleJoinGroup = () => {
     // TODO: Implement the logic to join a group
@@ -171,8 +183,8 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
               <ProfileItem
                 key={identifier.id}
                 identifier={identifier}
-                onClick={async () => {
-                  await handleSelectProfile(identifier.id);
+                onClick={() => {
+                  handleSelectProfile(identifier.id);
                 }}
               />
             ))}
