@@ -64,6 +64,7 @@ describe("Notifications cache", () => {
         connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
         read: false,
         groupReplied: false,
+        receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
       },
     ]);
   });
