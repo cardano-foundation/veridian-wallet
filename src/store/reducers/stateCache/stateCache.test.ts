@@ -269,6 +269,7 @@ describe("State Cache", () => {
         peerConnections: [],
         credentials: [],
         archivedCredentials: [],
+        notifications: [],
       };
       const action =
         stateCacheSlice.actions.setCurrentProfile(newProfilePayload);
@@ -430,6 +431,7 @@ describe("State Cache", () => {
           peerConnections: [mockPeerConnection],
           credentials: [mockCredential],
           archivedCredentials: [mockArchivedCredential],
+          notifications: [],
         })
       );
     });
@@ -602,6 +604,7 @@ describe("State Cache", () => {
           peerConnections: [mockPeerConnection],
           credentials: [mockCredential],
           archivedCredentials: [mockArchivedCredential],
+          notifications: [],
         })
       );
     });

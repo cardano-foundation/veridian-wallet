@@ -26,6 +26,7 @@ const notification: KeriaNotification = {
   connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
   read: true,
   groupReplied: false,
+  receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
 };
 
 describe("Notifications cache", () => {
@@ -108,6 +109,7 @@ describe("Notifications cache", () => {
         connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
         read: true,
         groupReplied: false,
+        receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
       },
     ];
     const newState = notificationsCacheSlice.reducer(
@@ -161,6 +163,7 @@ describe("Notifications cache", () => {
           peerConnections: [],
           credentials: [],
           archivedCredentials: [],
+          notifications: [],
         },
       },
       seedPhraseCache: {
@@ -221,6 +224,7 @@ describe("Notifications cache", () => {
             connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
             read: true,
             groupReplied: false,
+            receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
           },
         ],
       },

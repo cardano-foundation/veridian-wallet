@@ -25,6 +25,7 @@ import {
   getConnectionsCache,
   getMultisigConnectionsCache,
 } from "../connectionsCache";
+import { getNotificationsCache } from "../notificationsCache";
 
 const initialState: StateCacheProps = {
   initializationPhase: InitializationPhase.PHASE_ZERO,
@@ -45,6 +46,7 @@ const initialState: StateCacheProps = {
     peerConnections: [],
     credentials: [],
     archivedCredentials: [],
+    notifications: [],
   },
   authentication: {
     loggedIn: false,
@@ -272,6 +274,7 @@ const updateCurrentProfile =
       const allPeerConnections = getWalletConnectionsCache(state);
       const allConnections = getConnectionsCache(state);
       const allMultisigConnections = getMultisigConnectionsCache(state);
+      const allNotifications = getNotificationsCache(state);
 
       const profileCreds = allCreds.filter(
         (cred) => cred.identifierId === profileId
@@ -281,6 +284,10 @@ const updateCurrentProfile =
       );
       const profilePeerConnections = allPeerConnections.filter(
         (conn) => conn.selectedAid === profileId
+      );
+
+      const profileNotifications = allNotifications.filter(
+        (noti) => noti.receivingPre === profileId
       );
 
       const newProfile: StateCacheProps["currentProfile"] = {
@@ -296,6 +303,7 @@ const updateCurrentProfile =
         peerConnections: profilePeerConnections,
         credentials: profileCreds,
         archivedCredentials: profileArchivedCreds,
+        notifications: profileNotifications,
       };
       dispatch(setCurrentProfile(newProfile));
     };

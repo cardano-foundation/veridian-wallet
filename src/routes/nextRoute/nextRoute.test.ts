@@ -62,6 +62,7 @@ describe("NextRoute", () => {
           peerConnections: [],
           credentials: [],
           archivedCredentials: [],
+          notifications: [],
         },
         toastMsgs: [],
         currentOperation: OperationType.IDLE,
@@ -352,6 +353,7 @@ describe("getNextRoute", () => {
         peerConnections: [],
         credentials: [],
         archivedCredentials: [],
+        notifications: [],
       },
     },
     seedPhraseCache: {

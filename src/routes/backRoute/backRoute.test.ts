@@ -48,6 +48,7 @@ describe("getBackRoute", () => {
           peerConnections: [],
           credentials: [],
           archivedCredentials: [],
+          notifications: [],
         },
         authentication: {
           passcodeIsSet: true,
@@ -215,6 +216,7 @@ describe("getPreviousRoute", () => {
           peerConnections: [],
           credentials: [],
           archivedCredentials: [],
+          notifications: [],
         },
         authentication: {
           passcodeIsSet: true,

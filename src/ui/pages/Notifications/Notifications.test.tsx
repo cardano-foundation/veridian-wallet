@@ -504,6 +504,7 @@ describe("Notifications Tab", () => {
       groupReplied: false,
       groupInitiator: false,
       groupInitiatorPre: "",
+      receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
     };
 
     const mockOnClick = jest.fn();

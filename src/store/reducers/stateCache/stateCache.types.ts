@@ -9,6 +9,7 @@ import { ConnectionData } from "../walletConnectionsCache";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { ConnectionShortDetails } from "../../../core/agent/agent.types";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
+import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 
 interface PayloadData<T = any> {
   [key: string]: T;
@@ -65,6 +66,7 @@ interface CurrentProfileProps {
   peerConnections: ConnectionData[];
   credentials: CredentialShortDetails[];
   archivedCredentials: CredentialShortDetails[];
+  notifications: KeriaNotification[];
 }
 
 interface StateCacheProps {
