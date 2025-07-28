@@ -137,11 +137,11 @@ export const DATA_V1201: HybridMigration = {
           });
         }
       }
+      
+      statements.push(insertItem(contactRecord));
+      statements.push(...insertItemTags(contactRecord));
 
-      // Only insert the contact if there is at least one pair
       if (connectionPairsToInsert.length > 0) {
-        statements.push(insertItem(contactRecord));
-        statements.push(...insertItemTags(contactRecord));
         for (const connectionPair of connectionPairsToInsert) {
           statements.push(insertItem(connectionPair));
           statements.push(...insertItemTags(connectionPair));
