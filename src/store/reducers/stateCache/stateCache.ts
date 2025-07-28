@@ -26,6 +26,7 @@ import {
   getMultisigConnectionsCache,
 } from "../connectionsCache";
 import { getNotificationsCache } from "../notificationsCache";
+import { filterProfileData } from "./utils";
 
 const initialState: StateCacheProps = {
   initializationPhase: InitializationPhase.PHASE_ZERO,
@@ -276,33 +277,34 @@ const updateCurrentProfile =
       const allMultisigConnections = getMultisigConnectionsCache(state);
       const allNotifications = getNotificationsCache(state);
 
-      const profileCreds = allCreds.filter(
-        (cred) => cred.identifierId === profileId
-      );
-      const profileArchivedCreds = allArchivedCreds.filter(
-        (cred) => cred.identifierId === profileId
-      );
-      const profilePeerConnections = allPeerConnections.filter(
-        (conn) => conn.selectedAid === profileId
-      );
-
-      const profileNotifications = allNotifications.filter(
-        (noti) => noti.receivingPre === profileId
+      const {
+        profileIdentifier,
+        profileCredentials,
+        profileArchivedCredentials,
+        profilePeerConnections,
+        profileNotifications,
+      } = filterProfileData(
+        identifiers,
+        allCreds,
+        allArchivedCreds,
+        allPeerConnections,
+        allNotifications,
+        profileId
       );
 
       const newProfile: StateCacheProps["currentProfile"] = {
         identity: {
-          id: profileData.id,
+          id: profileIdentifier.id,
           displayName: profileData.displayName,
-          createdAtUTC: profileData.createdAtUTC,
-          theme: profileData.theme,
-          creationStatus: profileData.creationStatus,
+          createdAtUTC: profileIdentifier.createdAtUTC,
+          theme: profileIdentifier.theme,
+          creationStatus: profileIdentifier.creationStatus,
         },
         connections: Object.values(allConnections),
         multisigConnections: Object.values(allMultisigConnections),
         peerConnections: profilePeerConnections,
-        credentials: profileCreds,
-        archivedCredentials: profileArchivedCreds,
+        credentials: profileCredentials,
+        archivedCredentials: profileArchivedCredentials,
         notifications: profileNotifications,
       };
       dispatch(setCurrentProfile(newProfile));

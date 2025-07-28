@@ -53,6 +53,7 @@ import {
   setAuthentication,
   setCameraDirection,
   setCurrentOperation,
+  setCurrentProfile,
   setInitializationPhase,
   setIsOnline,
   setIsSetupProfile,
@@ -60,6 +61,7 @@ import {
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import {
   IncomingRequestType,
@@ -93,6 +95,8 @@ import {
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
 import { BasicRecord } from "../../../core/agent/records";
+import { filterProfileData } from "../../../store/reducers/stateCache/utils";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -350,8 +354,8 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadDatabase = async () => {
     try {
-      const connectionsDetails = await Agent.agent.connections.getConnections();
-      const multisigConnectionsDetails =
+      const allConnections = await Agent.agent.connections.getConnections();
+      const allMultisigConnections =
         await Agent.agent.connections.getMultisigConnections();
       const credsCache = await Agent.agent.credentials.getCredentials();
       const credsArchivedCache = await Agent.agent.credentials.getCredentials(
@@ -364,13 +368,90 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();
 
+      // TODO: load current profile after load database
+      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
+        MiscRecordId.DEFAULT_PROFILE
+      );
+
+      let currentProfileAid = "";
+      if (appDefaultProfileRecord) {
+        currentProfileAid = (
+          appDefaultProfileRecord.content as { defaultProfile: string }
+        ).defaultProfile;
+      } else {
+        const storedIdentifiers =
+          await Agent.agent.identifiers.getIdentifiers();
+        if (storedIdentifiers.length > 0) {
+          // If we have no default profile set, we will set the oldest identifier as default.
+          const oldest = storedIdentifiers
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(a.createdAtUTC).getTime() -
+                new Date(b.createdAtUTC).getTime()
+            )[0];
+          const id = oldest?.id || "";
+          currentProfileAid = id;
+
+          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+            new BasicRecord({
+              id: MiscRecordId.DEFAULT_PROFILE,
+              content: { defaultProfile: id },
+            })
+          );
+        }
+      }
+
+      const identifiersDict = storedIdentifiers.reduce(
+        (acc: Record<string, IdentifierShortDetails>, identifier) => {
+          acc[identifier.id] = identifier;
+          return acc;
+        },
+        {}
+      );
+
+      const {
+        profileIdentifier,
+        profileCredentials,
+        profileArchivedCredentials,
+        profilePeerConnections,
+        profileNotifications,
+      } = filterProfileData(
+        identifiersDict,
+        credsCache,
+        credsArchivedCache,
+        storedPeerConnections,
+        notifications,
+        currentProfileAid
+      );
+
+      dispatch(
+        setCurrentProfile({
+          identity: {
+            id: profileIdentifier.id,
+            displayName: profileIdentifier.displayName,
+            createdAtUTC: profileIdentifier.createdAtUTC,
+            theme: profileIdentifier.theme,
+            creationStatus: profileIdentifier.creationStatus,
+          },
+          connections: Object.values(allConnections),
+          multisigConnections: Object.values(allMultisigConnections),
+          peerConnections: profilePeerConnections,
+          credentials: profileCredentials,
+          archivedCredentials: profileArchivedCredentials,
+          notifications: profileNotifications,
+        })
+      );
+
       dispatch(setIdentifiersCache(storedIdentifiers));
       dispatch(setCredsCache(credsCache));
       dispatch(setCredsArchivedCache(credsArchivedCache));
-      dispatch(setConnectionsCache(connectionsDetails));
-      dispatch(setMultisigConnectionsCache(multisigConnectionsDetails));
+      dispatch(setConnectionsCache(allConnections));
+      dispatch(setMultisigConnectionsCache(allMultisigConnections));
       dispatch(setWalletConnectionsCache(storedPeerConnections));
       dispatch(setNotificationsCache(notifications));
+
+      // TODO: set current profile data
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
     }
@@ -378,7 +459,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let defaultProfile = "";
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -473,38 +553,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
         dispatch(
           setEnableBiometricsCache(appBiometrics.content.enabled as boolean)
         );
-      }
-
-      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.DEFAULT_PROFILE
-      );
-
-      if (appDefaultProfileRecord) {
-        defaultProfile = (
-          appDefaultProfileRecord.content as { defaultProfile: string }
-        ).defaultProfile;
-      } else {
-        const storedIdentifiers =
-          await Agent.agent.identifiers.getIdentifiers();
-        if (storedIdentifiers.length > 0) {
-          // If we have no default profile set, we will set the oldest identifier as default.
-          const oldest = storedIdentifiers
-            .slice()
-            .sort(
-              (a, b) =>
-                new Date(a.createdAtUTC).getTime() -
-                new Date(b.createdAtUTC).getTime()
-            )[0];
-          const id = oldest?.id || "";
-          defaultProfile = id;
-
-          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.DEFAULT_PROFILE,
-              content: { defaultProfile: id },
-            })
-          );
-        }
       }
 
       const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
