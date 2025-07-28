@@ -3220,7 +3220,9 @@ describe("Long running operation tracker", () => {
       identifier: null,
       pendingDeletion: false,
     };
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([connectionPairMock]);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
+      connectionPairMock,
+    ]);
     const contactMock = {
       id: "id",
       alias: "CF Credential Issuance",
@@ -3291,7 +3293,9 @@ describe("Long running operation tracker", () => {
       identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       pendingDeletion: false,
     };
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([connectionPairMock]);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
+      connectionPairMock,
+    ]);
     const contactMock = {
       id: "id",
       alias: "CF Credential Issuance",
@@ -3322,7 +3326,8 @@ describe("Long running operation tracker", () => {
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9:createdAt": operationMock.response.dt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9:createdAt":
+        operationMock.response.dt,
       oobi: "http://oobi.com/",
     });
     expect(eventEmitter.emit).toHaveBeenNthCalledWith(1, {
@@ -3366,7 +3371,9 @@ describe("Long running operation tracker", () => {
       identifier: null,
       pendingDeletion: false,
     };
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([connectionPairMock]);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
+      connectionPairMock,
+    ]);
     const operationRecord = {
       type: "OperationPendingRecord",
       id: "oobi.AOCUvGbpidkplC7gAoJOxLgXX1P2j4xlWMbzk3gM8JzA",
@@ -3423,7 +3430,9 @@ describe("Long running operation tracker", () => {
       identifier: null,
       pendingDeletion: false,
     };
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([connectionPairMock]);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
+      connectionPairMock,
+    ]);
     const operationRecord = {
       type: "OperationPendingRecord",
       id: "oobi.AOCUvGbpidkplC7gAoJOxLgXX1P2j4xlWMbzk3gM8JzA",
@@ -4301,7 +4310,9 @@ describe("Handling of failed long running operations", () => {
       identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       pendingDeletion: false,
     };
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([connectionPairMock]);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
+      connectionPairMock,
+    ]);
 
     await keriaNotificationService.processOperation(operationRecord);
 
@@ -4357,7 +4368,9 @@ describe("Handling of failed long running operations", () => {
       identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       pendingDeletion: false,
     };
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([connectionPairMock]);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
+      connectionPairMock,
+    ]);
 
     await keriaNotificationService.processOperation(operationRecord);
 

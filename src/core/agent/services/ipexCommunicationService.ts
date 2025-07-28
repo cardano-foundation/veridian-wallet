@@ -118,9 +118,9 @@ class IpexCommunicationService extends AgentService {
     const issuerOobi = (
       await this.connections.getConnectionById(grantExn.exn.i)
     ).serviceEndpoints[0];
-          await this.connections.resolveOobi(
-        await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
-      );
+    await this.connections.resolveOobi(
+      await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
+    );
 
     const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {})
       .map(

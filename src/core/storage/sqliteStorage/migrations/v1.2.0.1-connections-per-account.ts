@@ -92,9 +92,7 @@ export const DATA_V1201: HybridMigration = {
 
       if (!connectionData.sharedIdentifier) {
         if (!connectionData.groupId) {
-          console.log(
-            "No groupId found for connection, skipping migration"
-          );
+          console.log("No groupId found for connection, skipping migration");
           continue;
         }
 

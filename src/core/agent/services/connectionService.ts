@@ -219,7 +219,9 @@ class ConnectionService extends AgentService {
 
     if (!multiSigInvite) {
       if (!sharedIdentifier) {
-        throw new Error(ConnectionService.NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER);
+        throw new Error(
+          ConnectionService.NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER
+        );
       }
 
       this.props.eventEmitter.emit<ConnectionStateChangedEvent>({
@@ -283,7 +285,9 @@ class ConnectionService extends AgentService {
     groupId: string
   ): Promise<ConnectionShortDetails[]> {
     const connectionsDetails: ConnectionShortDetails[] = [];
-    const associatedContacts = await this.contactStorage.findAllByQuery({ groupId });
+    const associatedContacts = await this.contactStorage.findAllByQuery({
+      groupId,
+    });
     for (const contact of associatedContacts) {
       connectionsDetails.push(this.getConnectionShortDetails(contact));
     }
@@ -386,15 +390,15 @@ class ConnectionService extends AgentService {
   @OnlineOnly
   async deleteMultisigConnectionById(contactId: string): Promise<void> {
     await this.props.signifyClient
-    .contacts()
-    .delete(contactId)
-    .catch((error) => {
-      const status = error.message.split(" - ")[1];
-      if (!/404/gi.test(status)) {
-        throw error;
-      }
-      // Idempotent - ignore 404 errors if already deleted
-    });
+      .contacts()
+      .delete(contactId)
+      .catch((error) => {
+        const status = error.message.split(" - ")[1];
+        if (!/404/gi.test(status)) {
+          throw error;
+        }
+        // Idempotent - ignore 404 errors if already deleted
+      });
     await this.contactStorage.deleteById(contactId);
   }
 
@@ -456,7 +460,7 @@ class ConnectionService extends AgentService {
             contactUpdates[key] = null;
           }
         });
-  
+
         await this.props.signifyClient
           .contacts()
           .update(contactId, contactUpdates);
