@@ -434,6 +434,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
             theme: profileIdentifier.theme,
             creationStatus: profileIdentifier.creationStatus,
           },
+          // TODO: add filtering for connections once we have connections per account merged
           connections: Object.values(allConnections),
           multisigConnections: Object.values(allMultisigConnections),
           peerConnections: profilePeerConnections,
