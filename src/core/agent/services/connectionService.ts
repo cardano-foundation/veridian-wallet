@@ -166,13 +166,14 @@ class ConnectionService extends AgentService {
       sharedIdentifier,
     };
 
-    const connection = {
+    const connection: ConnectionShortDetails = {
       id: connectionId,
       createdAtUTC: connectionDate,
       oobi: url,
       status: ConnectionStatus.PENDING,
       label: alias,
-      groupId,
+      contactId: connectionId,
+      ...(groupId ? { groupId } : { identifier: sharedIdentifier ?? '' }),
     };
 
     if (multiSigInvite) {
@@ -260,6 +261,7 @@ class ConnectionService extends AgentService {
         groupId: contact?.groupId,
         creationStatus: connectionPair.creationStatus,
         pendingDeletion: connectionPair.pendingDeletion,
+        identifier: connectionPair.identifier, // Include identifier from connection pair
       });
     }
 
@@ -302,17 +304,15 @@ class ConnectionService extends AgentService {
       status = ConnectionStatus.FAILED;
     }
 
-    const connection: ConnectionShortDetails = {
+    return {
       id: record.id,
       label: record.alias,
       createdAtUTC: record.createdAt.toISOString(),
       status,
       oobi: record.oobi,
       contactId: record.id,
-      groupId: record.groupId,
+      ...(record.groupId ? { groupId: record.groupId } : { identifier: record.identifier }),
     };
-
-    return connection;
   }
 
   @OnlineOnly
@@ -366,9 +366,11 @@ class ConnectionService extends AgentService {
       }
     });
 
-    return {
+    // Determine if this is a multisig connection based on groupCreationId
+    const baseDetails = {
       label: connection.alias,
       id: connection.id,
+      contactId: connection.id,
       status: ConnectionStatus.CONFIRMED,
       createdAtUTC: connection[`${sharedIdentifier}:createdAt`] as string,
       serviceEndpoints: [connection.oobi],
@@ -385,6 +387,20 @@ class ConnectionService extends AgentService {
           };
         }),
     };
+
+    // Return appropriate type based on whether this is a multisig connection
+    if (connection.groupCreationId) {
+      return {
+        ...baseDetails,
+        groupId: connection.groupCreationId as string,
+        identifier: sharedIdentifier as string,
+      };
+    } else {
+      return {
+        ...baseDetails,
+        identifier: sharedIdentifier as string,
+      };
+    }
   }
 
   @OnlineOnly

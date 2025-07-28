@@ -170,6 +170,8 @@ const connectionStateChangedEvent: ConnectionStateChangedEvent = {
 
 const connectionShortDetails: ConnectionShortDetails = {
   id: "id",
+  contactId: "id",
+  identifier: "some-identifier",
   label: "idw",
   logo: "png",
   status: ConnectionStatus.PENDING,

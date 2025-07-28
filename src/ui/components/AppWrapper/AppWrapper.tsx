@@ -103,6 +103,8 @@ const connectionStateChangedHandler = async (
     dispatch(
       updateOrAddConnectionCache({
         id: event.payload.connectionId || "",
+        contactId: event.payload.connectionId || "",
+        identifier: event.payload.identifier || "",
         label: event.payload.label || "",
         status: event.payload.status,
         createdAtUTC: new Date().toString(),

@@ -16,6 +16,8 @@ import {
   ConnectionDetails as ConnectionData,
   ConnectionHistoryItem,
   ConnectionNoteDetails,
+  isRegularConnectionDetails,
+  isMultisigConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { RoutePath } from "../../../routes";
 import { useAppDispatch } from "../../../store/hooks";
@@ -40,6 +42,7 @@ import ConnectionDetailsHeader from "./components/ConnectionDetailsHeader";
 import { ConnectionHistoryEvent } from "./components/ConnectionHistoryEvent";
 import { ConnectionNotes } from "./components/ConnectionNotes";
 import { EditConnectionsModal } from "./components/EditConnectionsModal";
+import { RegularConnectionDetails } from "../../../core/agent/agent.types";
 
 const ConnectionDetails = ({
   connectionShortDetails,
@@ -117,10 +120,12 @@ const ConnectionDetails = ({
             connectionShortDetails.id
           );
         } else {
-          await Agent.agent.connections.markConnectionPendingDelete(
-            connectionShortDetails.id,
-            connectionShortDetails.identifier as string
-          );
+          if (isRegularConnectionDetails(connectionShortDetails)) {
+            await Agent.agent.connections.markConnectionPendingDelete(
+              connectionShortDetails.id,
+              connectionShortDetails.identifier
+            );
+          }
         }
         dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
         dispatch(removeConnectionCache(connectionShortDetails.id));

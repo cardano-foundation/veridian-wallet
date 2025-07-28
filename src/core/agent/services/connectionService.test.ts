@@ -215,6 +215,7 @@ describe("Connection service of agent", () => {
       connection: {
         groupId,
         id: "id",
+        contactId: "id",
         label: alias,
         oobi: oobi,
         status: ConnectionStatus.CONFIRMED,
@@ -249,7 +250,6 @@ describe("Connection service of agent", () => {
       alias,
       oobi,
       groupId,
-      creationStatus: CreationStatus.PENDING,
       createdAt: expect.any(Date),
     });
   });
@@ -1267,6 +1267,8 @@ describe("Connection service of agent", () => {
 
     expect(await connectionService.getConnectionById("id")).toEqual({
       id: "id",
+      contactId: "id",
+      identifier: "test-shared-identifier",
       label: "alias",
       serviceEndpoints: ["oobi"],
       status: ConnectionStatus.CONFIRMED,
@@ -1423,6 +1425,8 @@ describe("Connection service of agent", () => {
 
     expect(result).toEqual({
       id: "test-id",
+      contactId: "test-id",
+      identifier: "test-shared-identifier",
       label: "alias",
       serviceEndpoints: ["http://test.oobi"],
       status: ConnectionStatus.CONFIRMED,
@@ -1503,6 +1507,8 @@ describe("Connection service of agent", () => {
 
     expect(result).toEqual({
       id: "test-id",
+      contactId: "test-id",
+      identifier: "test-shared-identifier",
       label: "alias",
       serviceEndpoints: ["http://test.oobi"],
       status: ConnectionStatus.CONFIRMED,

@@ -117,6 +117,8 @@ describe("ConnectionDetails Page", () => {
       (): Promise<MockConnectionDetails> =>
         Promise.resolve({
           id: "ebfeb1ebc6f1c276ef71212ec20",
+          contactId: "ebfeb1ebc6f1c276ef71212ec20",
+          identifier: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
           label: "Cambridge University",
           createdAtUTC: "2017-08-14T19:23:24Z",
           logo: ".png",
@@ -401,6 +403,8 @@ describe("ConnectionDetails Page", () => {
 
 interface MockConnectionDetails {
   id: string;
+  contactId: string;
+  identifier: string;
   label: string;
   createdAtUTC: string;
   logo: string;
@@ -416,6 +420,8 @@ describe("Checking the Connection Details Page when no notes are available", () 
       (): Promise<MockConnectionDetails> =>
         Promise.resolve({
           id: "ebfeb1ebc6f1c276ef71212ec20",
+          contactId: "ebfeb1ebc6f1c276ef71212ec20",
+          identifier: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
           label: "Cambridge University",
           createdAtUTC: "2017-08-14T19:23:24Z",
           logo: ".png",
@@ -470,6 +476,8 @@ describe("Checking the Connection Details Page when notes are available", () => 
       (): Promise<MockConnectionDetails> =>
         Promise.resolve({
           id: "ebfeb1ebc6f1c276ef71212ec20",
+          contactId: "ebfeb1ebc6f1c276ef71212ec20",
+          identifier: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
           label: "Cambridge University",
           createdAtUTC: "2017-08-14T19:23:24Z",
           logo: ".png",

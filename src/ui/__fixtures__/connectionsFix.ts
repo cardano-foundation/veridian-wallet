@@ -8,6 +8,8 @@ import CardanoLogo from "../assets/images/CardanoLogo.jpg";
 const connectionsFix: ConnectionDetails[] = [
   {
     id: "ebfeb1ebc6f1c276ef71212ec20",
+    contactId: "ebfeb1ebc6f1c276ef71212ec20",
+    identifier: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
     label: "Cambridge University",
     createdAtUTC: "2017-01-14T19:23:24Z",
     logo: CardanoLogo,
@@ -33,6 +35,8 @@ const connectionsFix: ConnectionDetails[] = [
   },
   {
     id: "ebfeb1ebc6f1c276ef71212ec21",
+    contactId: "ebfeb1ebc6f1c276ef71212ec21",
+    identifier: "ENGnzDMWk8PlFbOoYCauLs1rDuQbvsIStxNzkjZPikSo",
     label: "Passport Office",
     createdAtUTC: "2017-01-16T08:21:54Z",
     logo: CardanoLogo,
@@ -58,6 +62,8 @@ const connectionsFix: ConnectionDetails[] = [
   },
   {
     id: "ebfeb1ebc6f1c276ef71212ec22",
+    contactId: "ebfeb1ebc6f1c276ef71212ec22",
+    identifier: "EKwzermyJ6VhunFWpo7fscyCILxFG7zZIM9JwSSABbZ5",
     label: "Cardano Foundation",
     createdAtUTC: "2017-01-13T10:15:11Z",
     logo: CardanoLogo,
@@ -68,6 +74,8 @@ const connectionsFix: ConnectionDetails[] = [
   },
   {
     id: "ebfeb1ebc6f1c276ef71212ec23",
+    contactId: "ebfeb1ebc6f1c276ef71212ec23",
+    identifier: "EBvcao4Ub-Q7Wwkm0zJzwigvPTrthP4uH5mQ4efRv9aU",
     label: "John Smith",
     createdAtUTC: "2024-02-13T11:39:20Z",
     logo: CardanoLogo,
@@ -78,6 +86,8 @@ const connectionsFix: ConnectionDetails[] = [
   },
   {
     id: "ebfeb1ebc6f1c276ef71212ec24",
+    contactId: "ebfeb1ebc6f1c276ef71212ec24",
+    identifier: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
     label: "Starling Bank",
     createdAtUTC: "2016-01-10T19:23:24Z",
     logo: CardanoLogo,
@@ -88,6 +98,8 @@ const connectionsFix: ConnectionDetails[] = [
   },
   {
     id: "ebfeb1ebc6f1c276ef71212ec25",
+    contactId: "ebfeb1ebc6f1c276ef71212ec25",
+    identifier: "EHgDxeR8ZbNnNjQ2v4xdwgYTg9wKkVs_eLQf8U1nU9gQ",
     label: "Friends' Bank",
     createdAtUTC: "2018-01-14T19:23:24Z",
     logo: CardanoLogo,
@@ -99,6 +111,8 @@ const connectionsFix: ConnectionDetails[] = [
   {
     label: "The Pentagon",
     id: "EBvcao4Ub-Q7Wwkm0zJzwigvPTrthP4uH5mQ4efRv9aU",
+    contactId: "EBvcao4Ub-Q7Wwkm0zJzwigvPTrthP4uH5mQ4efRv9aU",
+    identifier: "EXs9OWpOtqrJ9jVhK0_QYL4LdQ1a3VIrJn9d8sQ5RZeg",
     status: ConnectionStatus.CONFIRMED,
     createdAtUTC: "2024-08-07T15:30:42.952Z",
     serviceEndpoints: [],
