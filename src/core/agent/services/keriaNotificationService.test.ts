@@ -3217,7 +3217,7 @@ describe("Long running operation tracker", () => {
     const connectionPairMock = {
       contactId: "id",
       creationStatus: CreationStatus.PENDING,
-      identifier: null,
+      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       pendingDeletion: false,
     };
     connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
@@ -3240,17 +3240,21 @@ describe("Long running operation tracker", () => {
 
     await keriaNotificationService.processOperation(operationRecord);
 
-    expect(connectionService.shareIdentifier).not.toBeCalled();
+    expect(connectionService.shareIdentifier).toBeCalledWith(
+      "id",
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9"
+    );
+    
     expect(connectionPairStorage.update).toBeCalledWith({
       contactId: "id",
       creationStatus: CreationStatus.COMPLETE,
-      identifier: null,
+      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       pendingDeletion: false,
     });
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "null:createdAt": operationMock.response.dt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9:createdAt": operationMock.response.dt,
       oobi: "http://oobi.com/",
     });
     expect(eventEmitter.emit).toHaveBeenNthCalledWith(1, {
@@ -3258,7 +3262,7 @@ describe("Long running operation tracker", () => {
       payload: {
         connectionId: "id",
         status: ConnectionStatus.CONFIRMED,
-        identifier: null,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       },
     });
     expect(eventEmitter.emit).toHaveBeenNthCalledWith(2, {
@@ -3368,7 +3372,7 @@ describe("Long running operation tracker", () => {
     const connectionPairMock = {
       contactId: "id",
       creationStatus: CreationStatus.PENDING,
-      identifier: null,
+      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       pendingDeletion: false,
     };
     connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
@@ -3393,7 +3397,7 @@ describe("Long running operation tracker", () => {
     expect(connectionPairStorage.update).toHaveBeenCalledWith({
       contactId: "id",
       creationStatus: CreationStatus.COMPLETE,
-      identifier: null,
+      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       pendingDeletion: false,
     });
     expect(contactsUpdateMock).toBeCalledTimes(0);
@@ -3427,7 +3431,7 @@ describe("Long running operation tracker", () => {
     const connectionPairMock = {
       contactId: "id",
       creationStatus: CreationStatus.PENDING,
-      identifier: null,
+      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       pendingDeletion: false,
     };
     connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
@@ -3456,7 +3460,7 @@ describe("Long running operation tracker", () => {
     expect(connectionPairStorage.update).toHaveBeenCalledWith({
       contactId: "id",
       creationStatus: CreationStatus.COMPLETE,
-      identifier: null,
+      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
       pendingDeletion: false,
     });
     expect(contactsUpdateMock).toBeCalledTimes(0);
