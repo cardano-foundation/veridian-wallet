@@ -18,6 +18,7 @@ import {
   getStateCache,
   setAuthentication,
   setToastMsg,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
@@ -37,6 +38,7 @@ import {
 const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
   if (!identifier) return null;
   const { id, displayName, creationStatus } = identifier;
+
   return (
     <div
       className="profiles-list-item"
@@ -88,9 +90,8 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
   const stateCache = useAppSelector(getStateCache);
-  const authentication = useAppSelector(getAuthentication);
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const defaultProfile = stateCache.authentication.defaultProfile;
+  const defaultProfile = stateCache.currentProfile.identity.id;
   const identifiersData = Object.values(identifiersDataCache);
   const filteredIdentifiersData = identifiersData.filter(
     (item) => item.id !== defaultProfile
@@ -98,10 +99,21 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const [openSetting, setOpenSetting] = useState(false);
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
 
-  const handleClose = () => setIsOpen(false);
-  const handleOpenSettings = () => setOpenSetting(true);
-  const handleAddProfile = () => setOpenSetupProfile(true);
-  const handleCloseSetupProfile = () => setOpenSetupProfile(false);
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleOpenSettings = () => {
+    setOpenSetting(true);
+  };
+
+  const handleAddProfile = () => {
+    setOpenSetupProfile(true);
+  };
+
+  const handleCloseSetupProfile = () => {
+    setOpenSetupProfile(false);
+  };
 
   const handleJoinGroup = () => {
     // TODO: Implement the logic to join a group
@@ -115,12 +127,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           content: { defaultProfile: id },
         })
       );
-      dispatch(
-        setAuthentication({
-          ...authentication,
-          defaultProfile: id,
-        })
-      );
+      dispatch(updateCurrentProfile(id));
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
     } catch (e) {
@@ -176,7 +183,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
               <ProfileItem
                 key={identifier.id}
                 identifier={identifier}
-                onClick={async () => {
+                onClick={() => {
                   handleSelectProfile(identifier.id);
                 }}
               />

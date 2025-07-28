@@ -30,6 +30,7 @@ interface KeriaNotification {
   connectionId: string;
   read: boolean;
   groupReplied: boolean;
+  receivingPre: string;
   groupInitiatorPre?: string;
   groupInitiator?: boolean;
 }
