@@ -50,7 +50,7 @@ export const DATA_V1201: HybridMigration = {
       const statement =
         "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
       const tags = itemRecord.tags;
-      console.log("tags", tags);
+
       for (const key of Object.keys(tags)) {
         if (tags[key] === undefined || tags[key] === null) continue;
         if (typeof tags[key] === "boolean") {
@@ -138,7 +138,7 @@ export const DATA_V1201: HybridMigration = {
         }
       }
 
-      if (connectionPairsToInsert.length > 0 && !connectionData.groupId) {
+      if (connectionPairsToInsert.length > 0 || !connectionData.groupId) {
         statements.push(insertItem(contactRecord));
         statements.push(...insertItemTags(contactRecord));
 
