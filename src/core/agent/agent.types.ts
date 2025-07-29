@@ -139,7 +139,6 @@ interface RegularConnectionDetailsFull extends ConnectionShortDetailsBase, Conne
 
 interface MultisigConnectionDetailsFull extends ConnectionShortDetailsBase, ConnectionDetailsExtras {
   groupId: string;
-  identifier?: string;
 }
 
 type ConnectionDetails = RegularConnectionDetailsFull | MultisigConnectionDetailsFull;
