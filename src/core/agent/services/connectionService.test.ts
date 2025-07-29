@@ -336,6 +336,17 @@ describe("Connection service of agent", () => {
     }
   });
 
+  test("Should throw error when creating normal connection without shared identifier", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
+    const normalConnectionUrl = "https://localhost/oobi/1234/agent?name=alias";
+    
+    await expect(
+      connectionService.connectByOobiUrl(normalConnectionUrl)
+    ).rejects.toThrowError(
+      new Error(ConnectionService.NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER)
+    );
+  });
+
   test("Can mark an identifier to share when creating a connection", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const url = "https://localhost/oobi/1234/agent?name=alias";
