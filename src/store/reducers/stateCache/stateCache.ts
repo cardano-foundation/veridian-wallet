@@ -270,6 +270,27 @@ const updateCurrentProfile =
       const state = getState();
       const identifiers = getIdentifiersCache(state);
 
+      if (!profileId) {
+        dispatch(
+          setCurrentProfile({
+            identity: {
+              id: "",
+              displayName: "",
+              createdAtUTC: "",
+              theme: 0,
+              creationStatus: CreationStatus.PENDING,
+            },
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [],
+          })
+        );
+        return;
+      }
+
       if (!identifiers || !identifiers[profileId]) {
         throw new Error(`Profile with id ${profileId} not found.`);
       }
@@ -353,7 +374,7 @@ const getProfileHistories = (state: RootState) =>
 export type {
   AuthenticationCacheProps,
   CurrentRouteCacheProps,
-  StateCacheProps
+  StateCacheProps,
 };
 
 export {
@@ -362,7 +383,9 @@ export {
   enqueueIncomingRequest,
   getAuthentication,
   getCameraDirection,
-  getCurrentOperation, getCurrentProfile, getCurrentRoute,
+  getCurrentOperation,
+  getCurrentProfile,
+  getCurrentRoute,
   getFirstAppLaunch,
   getForceInitApp,
   getGlobalLoading,
@@ -378,15 +401,19 @@ export {
   getShowSetupProfilePage,
   getStateCache,
   getToastMgs,
-  getToastMsgs, initialState,
+  getToastMsgs,
+  initialState,
   login,
   logout,
   removeCurrentRoute,
   removeRoute,
   removeToastMessage,
-  resetAllRoutes, setAuthentication,
+  resetAllRoutes,
+  setAuthentication,
   setCameraDirection,
-  setCurrentOperation, setCurrentProfile, setCurrentRoute,
+  setCurrentOperation,
+  setCurrentProfile,
+  setCurrentRoute,
   setFirstAppLaunchComplete,
   setInitializationPhase,
   setIsOnline,
@@ -401,6 +428,5 @@ export {
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
-  updateCurrentProfile
+  updateCurrentProfile,
 };
-

@@ -109,6 +109,10 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     setOpenSetupProfile(false);
   };
 
+  const handleOpenProfile = () => {
+    setOpenProfileDetail(true);
+  };
+
   const handleJoinGroup = () => {
     // TODO: Implement the logic to join a group
   };
@@ -165,7 +169,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
             <OptionButton
               icon={personCircleOutline}
               text={`${i18n.t("profiles.options.manage")}`}
-              action={handleOpenSettings}
+              action={handleOpenProfile}
               disabled={
                 defaultProfile.identity?.creationStatus ===
                 CreationStatus.PENDING

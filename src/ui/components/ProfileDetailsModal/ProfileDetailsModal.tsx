@@ -123,7 +123,7 @@ const ProfileDetailsModule = ({
       await deleteIdentifier();
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
       dispatch(removeIdentifierCache(filterId || ""));
-      if (defaultProfile === filterId) {
+      if (defaultProfile.identity.id === filterId) {
         await setRecentProfileAsDefault();
       }
     } catch (e) {
@@ -173,7 +173,7 @@ const ProfileDetailsModule = ({
           header={
             <PageHeader
               title={defaultName}
-              additionalButtons={<Avatar id={defaultProfile} />}
+              additionalButtons={<Avatar id={defaultProfile.identity.id} />}
             />
           }
           content={`${i18n.t("profiledetails.clouderror")}`}
