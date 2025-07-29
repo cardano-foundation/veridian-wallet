@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor, within } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
@@ -11,7 +11,11 @@ import {
   setCurrentOperation,
   setToastMsg,
 } from "../../../../../store/reducers/stateCache";
-import { setPendingConnection } from "../../../../../store/reducers/walletConnectionsCache";
+import {
+  setConnectedWallet,
+  setPendingConnection,
+  setWalletConnectionsCache,
+} from "../../../../../store/reducers/walletConnectionsCache";
 import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 import { OperationType, ToastMsgType } from "../../../../globals/types";
@@ -33,9 +37,12 @@ jest.mock("../../../../../core/configuration", () => ({
 jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
-      peerConnectionMetadataStorage: {
-        getAllPeerConnectionMetadata: jest.fn(),
-        deletePeerConnectionMetadataRecord: jest.fn(),
+      peerConnectionAccounts: {
+        getAll: jest.fn().mockResolvedValue(walletConnectionsFix),
+        deleteById: jest.fn().mockResolvedValue(true),
+      },
+      peerConnectionPair: {
+        deletePeerConnectionPairRecord: jest.fn().mockResolvedValue(true),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
@@ -47,7 +54,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
 jest.mock("../../../../../core/cardano/walletConnect/peerConnection", () => ({
   PeerConnection: {
     peerConnection: {
-      disconnectDApp: jest.fn(),
+      disconnectDApp: jest.fn().mockResolvedValue(true),
     },
   },
 }));
@@ -421,6 +428,10 @@ describe("Wallet connect: empty history", () => {
 });
 
 describe("Wallet connect", () => {
+  afterEach(() => {
+    dispatchMock.mockClear();
+  });
+
   test("Wallet connect render", async () => {
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
@@ -491,7 +502,7 @@ describe("Wallet connect", () => {
 
     act(() => {
       fireEvent.click(
-        getByTestId(`delete-connections-${walletConnectionsFix[0].id}`)
+        getByTestId(`delete-connections-${walletConnectionsFix[0].meerkatId}`)
       );
     });
 
@@ -527,7 +538,7 @@ describe("Wallet connect", () => {
     passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(
+      expect(dispatchMock).toHaveBeenCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
     });
@@ -579,7 +590,7 @@ describe("Wallet connect", () => {
     });
 
     fireEvent.click(
-      getByTestId(`delete-connections-${walletConnectionsFix[0].id}`)
+      getByTestId(`delete-connections-${walletConnectionsFix[0].meerkatId}`)
     );
 
     await waitFor(() => {
@@ -600,10 +611,18 @@ describe("Wallet connect", () => {
     passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(
+      expect(dispatchMock).toHaveBeenCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
-      expect(dispatchMock).toBeCalledWith(setPendingConnection(null));
+      expect(dispatchMock).toHaveBeenCalledWith(setPendingConnection(null));
+      expect(dispatchMock).toHaveBeenCalledWith(
+        setWalletConnectionsCache(
+          walletConnectionsFix.filter(
+            (connection) =>
+              connection.meerkatId !== walletConnectionsFix[0].meerkatId
+          )
+        )
+      );
     });
   });
 
@@ -622,7 +641,9 @@ describe("Wallet connect", () => {
     ).toBeVisible();
 
     act(() => {
-      fireEvent.click(getByTestId(`card-item-${walletConnectionsFix[0].id}`));
+      fireEvent.click(
+        getByTestId(`card-item-${walletConnectionsFix[0].meerkatId}`)
+      );
     });
 
     await waitFor(() => {
@@ -665,7 +686,9 @@ describe("Wallet connect", () => {
     });
 
     act(() => {
-      fireEvent.click(getByTestId(`card-item-${walletConnectionsFix[1].id}`));
+      fireEvent.click(
+        getByTestId(`card-item-${walletConnectionsFix[1].meerkatId}`)
+      );
     });
 
     await waitFor(() => {
@@ -677,7 +700,7 @@ describe("Wallet connect", () => {
     });
     await waitFor(() => {
       expect(PeerConnection.peerConnection.disconnectDApp).toBeCalledWith(
-        walletConnectionsFix[1].id
+        walletConnectionsFix[1].meerkatId
       );
     });
   });
@@ -719,7 +742,9 @@ describe("Wallet connect", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(getByTestId(`card-item-${walletConnectionsFix[0].id}`));
+    fireEvent.click(
+      getByTestId(`card-item-${walletConnectionsFix[0].meerkatId}`)
+    );
 
     await waitFor(() => {
       expect(getByTestId("confirm-connect-btn")).toBeVisible();
@@ -736,7 +761,11 @@ describe("Wallet connect", () => {
     );
     expect(alertMessages[0]).toBeVisible();
 
-    fireEvent.click(getByTestId("alert-create-keri-confirm-button"));
+    const alertContainer = getByTestId("alert-create-keri");
+    const confirmButton = within(alertContainer).getByTestId(
+      "alert-create-keri-confirm-button"
+    );
+    fireEvent.click(confirmButton);
 
     await waitFor(() => {
       expect(getByTestId("create-identifier-modal")).toBeVisible();

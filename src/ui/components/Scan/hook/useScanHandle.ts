@@ -12,7 +12,7 @@ import {
   setMissingAliasConnection,
   setOpenConnectionId,
 } from "../../../../store/reducers/connectionsCache";
-import { getAuthentication } from "../../../../store/reducers/stateCache";
+import { getCurrentProfile } from "../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../globals/types";
 import { showError } from "../../../utils/error";
 import { isValidConnectionUrl } from "../../../utils/urlChecker";
@@ -24,7 +24,7 @@ enum ErrorMessage {
 
 const useScanHandle = () => {
   const dispatch = useAppDispatch();
-  const defaultIdentifier = useAppSelector(getAuthentication).defaultProfile;
+  const defaultIdentifier = useAppSelector(getCurrentProfile).identity.id;
   const connections = useAppSelector(getConnectionsCache);
 
   const resolveIndividualConnection = useCallback(

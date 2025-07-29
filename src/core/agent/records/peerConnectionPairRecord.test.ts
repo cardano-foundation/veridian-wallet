@@ -1,10 +1,10 @@
 import {
-  PeerConnectionMetadataRecord,
-  PeerConnectionMetadataRecordProps,
-} from "./peerConnectionMetadataRecord";
+  PeerConnectionPairRecord,
+  PeerConnectionPairRecordProps,
+} from "./peerConnectionPairRecord";
 
-const mockData: PeerConnectionMetadataRecordProps = {
-  id: "id",
+const mockData: PeerConnectionPairRecordProps = {
+  id: "id:aid",
   name: "name",
   url: "url",
   iconB64: "icon",
@@ -14,13 +14,13 @@ const mockData: PeerConnectionMetadataRecordProps = {
 describe("Peer Connection Record", () => {
   test("should fill the record based on supplied props", () => {
     const createdAt = new Date();
-    const settingsRecord = new PeerConnectionMetadataRecord({
+    const settingsRecord = new PeerConnectionPairRecord({
       ...mockData,
       createdAt: createdAt,
     });
     settingsRecord.getTags();
-    expect(settingsRecord.type).toBe(PeerConnectionMetadataRecord.type);
-    expect(settingsRecord.id).toBe(mockData.id);
+    expect(settingsRecord.type).toBe(PeerConnectionPairRecord.type);
+    expect(settingsRecord.id).toBe("id:aid");
     expect(settingsRecord.name).toBe(mockData.name);
     expect(settingsRecord.url).toBe(mockData.url);
     expect(settingsRecord.selectedAid).toBe(mockData.selectedAid);

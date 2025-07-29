@@ -33,7 +33,7 @@ jest.mock("../../../core/agent/agent", () => ({
         getCredentialDetailsById: jest.fn(),
         deleteCredential: () => deleteIdentifierMock(),
         archiveCredential: () => archiveIdentifierMock(),
-        getCredentials: jest.fn(),
+        getCredentials: jest.fn(() => Promise.resolve([])),
         markCredentialPendingDeletion: () =>
           markCredentialPendingDeletionMock(),
       },
@@ -65,6 +65,14 @@ const initialStateEmpty = {
       passcodeIsSet: true,
     },
     isOnline: true,
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
+    },
   },
   seedPhraseCache: {},
   credsCache: {
@@ -102,6 +110,14 @@ const initialStateFull = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
   },
   seedPhraseCache: {},
@@ -150,6 +166,14 @@ const archivedAndRevokedState = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
   },
   seedPhraseCache: {},
@@ -209,10 +233,14 @@ describe("Creds Tab", () => {
     };
   });
 
-  test("Renders favourites in Creds", () => {
+  it("Renders favourites in Creds", () => {
+    const storeMocked = {
+      ...makeTestStore(initialStateFull),
+      dispatch: dispatchMock,
+    };
     const { getByText } = render(
       <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
-        <Provider store={mockedStore}>
+        <Provider store={storeMocked}>
           <Credentials />
         </Provider>
       </MemoryRouter>
@@ -432,6 +460,14 @@ describe("Creds Tab", () => {
           loggedIn: true,
           time: Date.now(),
           passcodeIsSet: true,
+        },
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
         },
       },
       credsCache: {

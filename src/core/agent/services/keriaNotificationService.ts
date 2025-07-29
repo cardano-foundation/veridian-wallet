@@ -629,6 +629,7 @@ class KeriaNotificationService extends AgentService {
                 read: false,
                 connectionId: exchange.exn.i,
                 groupReplied: false,
+                receivingPre: notificationRecord.receivingPre,
               },
             },
           });
@@ -765,6 +766,7 @@ class KeriaNotificationService extends AgentService {
               connectionId: notificationRecord.connectionId,
               read: notificationRecord.read,
               groupReplied: true,
+              receivingPre: notificationRecord.receivingPre,
             },
           },
         });
@@ -837,6 +839,7 @@ class KeriaNotificationService extends AgentService {
               groupReplied: notificationRecord.groupReplied,
               groupInitiatorPre: notificationRecord.groupInitiatorPre,
               groupInitiator: notificationRecord.groupInitiator,
+              receivingPre: notificationRecord.receivingPre,
             },
           },
         });
@@ -960,6 +963,7 @@ class KeriaNotificationService extends AgentService {
       connectionId: result.connectionId,
       read: result.read,
       groupReplied: result.linkedRequest.current !== undefined,
+      receivingPre: result.receivingPre,
     };
   }
 
@@ -1004,6 +1008,7 @@ class KeriaNotificationService extends AgentService {
       connectionId: notification.connectionId,
       read: notification.read,
       groupReplied: false,
+      receivingPre: notification.receivingPre,
     };
   }
 
@@ -1047,6 +1052,7 @@ class KeriaNotificationService extends AgentService {
         groupReplied: notification.linkedRequest.current !== undefined,
         groupInitiator: notification.groupInitiator,
         groupInitiatorPre: notification.groupInitiatorPre,
+        receivingPre: notification.receivingPre,
       };
     });
   }
@@ -1400,6 +1406,7 @@ class KeriaNotificationService extends AgentService {
                     groupReplied: notification.groupReplied,
                     groupInitiatorPre: notification.groupInitiatorPre,
                     groupInitiator: notification.groupInitiator,
+                    receivingPre: notification.receivingPre,
                   },
                 },
               });

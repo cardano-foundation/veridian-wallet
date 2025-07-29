@@ -50,7 +50,7 @@ const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
     if (
       incomingRequest.type === IncomingRequestType.PEER_CONNECT_SIGN &&
       (!connectedWallet ||
-        connectedWallet.id !== incomingRequest.peerConnection?.id)
+        connectedWallet.meerkatId !== incomingRequest.peerConnection?.meerkatId)
     ) {
       handleReset();
     }

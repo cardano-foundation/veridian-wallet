@@ -44,6 +44,7 @@ import { IncomingRequestType } from "../../../store/reducers/stateCache/stateCac
 import {
   ConnectionData,
   setConnectedWallet,
+  setPendingConnection,
   setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
 import { ToastMsgType } from "../../globals/types";
@@ -67,82 +68,96 @@ import {
   pendingGroupIdentifierFix,
 } from "../../__fixtures__/filteredIdentifierFix";
 
-jest.mock("../../../core/agent/agent", () => ({
-  Agent: {
-    agent: {
-      start: jest.fn(),
-      setupLocalDependencies: jest.fn(),
-      auth: {
-        getLoginAttempts: jest.fn(() =>
-          Promise.resolve({
-            attempts: 0,
-            lockedUntil: Date.now(),
-          })
-        ),
-      },
-      identifiers: {
-        getIdentifiers: jest.fn().mockResolvedValue([]),
-        syncKeriaIdentifiers: jest.fn(),
-        onIdentifierAdded: jest.fn(),
-        getAvailableWitnesses: jest.fn(),
-      },
-      multiSigs: {
-        getMultisigIcpDetails: jest.fn().mockResolvedValue({}),
-        onGroupAdded: jest.fn(),
-      },
-      connections: {
-        getConnections: jest.fn().mockResolvedValue([]),
-        getMultisigConnections: jest.fn().mockResolvedValue([]),
-        onConnectionStateChanged: jest.fn(),
-        getConnectionShortDetails: jest.fn(),
-        isConnectionRequestSent: jest.fn(),
-        isConnectionResponseReceived: jest.fn(),
-        isConnectionRequestReceived: jest.fn(),
-        isConnectionResponseSent: jest.fn(),
-        isConnectionConnected: jest.fn(),
-        getConnectionShortDetailById: getConnectionShortDetailByIdMock,
-        getUnhandledConnections: jest.fn(),
-        syncKeriaContacts: jest.fn(),
-      },
-      credentials: {
-        getCredentials: jest.fn().mockResolvedValue([]),
-        onCredentialStateChanged: jest.fn(),
-        isCredentialOfferReceived: jest.fn(),
-        isCredentialRequestSent: jest.fn(),
-        createMetadata: jest.fn(),
-        isCredentialDone: jest.fn(),
-        updateMetadataCompleted: jest.fn(),
-        onAcdcStateChanged: jest.fn(),
-        syncKeriaCredentials: jest.fn(),
-      },
-      messages: {
-        onBasicMessageStateChanged: jest.fn(),
-        pickupMessagesFromMediator: jest.fn(),
-      },
-      keriaNotifications: {
-        pollNotifications: jest.fn(),
-        pollLongOperations: jest.fn(),
-        getNotifications: jest.fn(),
-        onNewNotification: jest.fn(),
-        onLongOperationSuccess: jest.fn(),
-        onLongOperationFailure: jest.fn(),
-        onRemoveNotification: jest.fn(),
-        stopPolling: jest.fn(),
-      },
-      getKeriaOnlineStatus: jest.fn(),
-      onKeriaStatusStateChanged: jest.fn(),
-      peerConnectionMetadataStorage: {
-        getAllPeerConnectionMetadata: jest.fn(),
-        getPeerConnectionMetadata: jest.fn(),
-        getPeerConnection: jest.fn(),
-      },
-      basicStorage: {
-        findById: jest.fn(),
-        save: jest.fn(),
+jest.mock("../../../core/agent/agent", () => {
+  const mockPeerConnectionPairRecordPlainObject = {
+    id: "dApp-address:identifier",
+    peerConnectionId: "dApp-address",
+    accountId: "identifier",
+    creationStatus: "complete",
+    pendingDeletion: false,
+    name: "dApp-name",
+    url: "http://localhost:3000",
+    iconB64: "icon",
+    createdAt: new Date().toISOString(), // Directly provide ISO string
+  };
+
+  return {
+    Agent: {
+      agent: {
+        devPreload: jest.fn(),
+        start: jest.fn(),
+        setupLocalDependencies: jest.fn(),
+        auth: {
+          getLoginAttempts: jest.fn(() =>
+            Promise.resolve({
+              attempts: 0,
+              lockedUntil: Date.now(),
+            })
+          ),
+        },
+        identifiers: {
+          getIdentifiers: jest.fn().mockResolvedValue([]),
+          syncKeriaIdentifiers: jest.fn(),
+          onIdentifierAdded: jest.fn(),
+          getAvailableWitnesses: jest.fn(),
+        },
+        multiSigs: {
+          getMultisigIcpDetails: jest.fn().mockResolvedValue({}),
+          onGroupAdded: jest.fn(),
+        },
+        connections: {
+          getConnections: jest.fn().mockResolvedValue([]),
+          getMultisigConnections: jest.fn().mockResolvedValue([]),
+          onConnectionStateChanged: jest.fn(),
+          getConnectionShortDetails: jest.fn(),
+          isConnectionRequestSent: jest.fn(),
+          isConnectionResponseReceived: jest.fn(),
+          isConnectionRequestReceived: jest.fn(),
+          isConnectionResponseSent: jest.fn(),
+          isConnectionConnected: jest.fn(),
+          getConnectionShortDetailById: getConnectionShortDetailByIdMock,
+          getUnhandledConnections: jest.fn(),
+          syncKeriaContacts: jest.fn(),
+        },
+        credentials: {
+          getCredentials: jest.fn().mockResolvedValue([]),
+          onCredentialStateChanged: jest.fn(),
+          isCredentialOfferReceived: jest.fn(),
+          isCredentialRequestSent: jest.fn(),
+          createMetadata: jest.fn(),
+          isCredentialDone: jest.fn(),
+          updateMetadataCompleted: jest.fn(),
+          onAcdcStateChanged: jest.fn(),
+          syncKeriaCredentials: jest.fn(),
+        },
+        messages: {
+          onBasicMessageStateChanged: jest.fn(),
+          pickupMessagesFromMediator: jest.fn(),
+        },
+        keriaNotifications: {
+          pollNotifications: jest.fn(),
+          pollLongOperations: jest.fn(),
+          getNotifications: jest.fn(),
+          onNewNotification: jest.fn(),
+          onLongOperationSuccess: jest.fn(),
+          onLongOperationFailure: jest.fn(),
+          onRemoveNotification: jest.fn(),
+          stopPolling: jest.fn(),
+        },
+        getKeriaOnlineStatus: jest.fn(),
+        onKeriaStatusStateChanged: jest.fn(),
+        peerConnectionPair: {
+          getPeerConnection: jest.fn(),
+          getAllPeerConnectionAccount: jest.fn(),
+        },
+        basicStorage: {
+          findById: jest.fn(),
+          save: jest.fn(),
+        },
       },
     },
-  },
-}));
+  };
+});
 
 describe("App Wrapper", () => {
   test("renders children components", async () => {
@@ -209,12 +224,23 @@ const peerConnectionBrokenEvent: PeerConnectionBrokenEvent = {
   payload: {},
 };
 
-const peerConnection: ConnectionData = {
-  id: "dApp-address",
-  name: "dApp-name",
-  iconB64: "icon",
+import { PeerConnectionPairRecord } from "../../../core/agent/records";
+
+const mockPeerConnectionPairRecordInstance = new PeerConnectionPairRecord({
+  id: "dApp-address:identifier",
   selectedAid: "identifier",
+  name: "dApp-name",
   url: "http://localhost:3000",
+  iconB64: "icon",
+  createdAt: new Date(),
+});
+
+const peerConnection: ConnectionData = {
+  meerkatId: mockPeerConnectionPairRecordInstance.id,
+  name: mockPeerConnectionPairRecordInstance.name,
+  url: mockPeerConnectionPairRecordInstance.url,
+  createdAt: mockPeerConnectionPairRecordInstance.createdAt?.toISOString(),
+  iconB64: mockPeerConnectionPairRecordInstance.iconB64,
 };
 
 const identifierAddedEvent: IdentifierAddedEvent = {
@@ -318,18 +344,32 @@ describe("Credential state changed handler", () => {
 });
 
 describe("Peer connection states changed handler", () => {
+  beforeEach(() => {
+    dispatch.mockClear();
+  });
+
   test("handle peer connected event", async () => {
-    Agent.agent.peerConnectionMetadataStorage.getPeerConnectionMetadata = jest
+    Agent.agent.peerConnectionPair.getPeerConnection = jest
       .fn()
-      .mockResolvedValue(peerConnection);
-    Agent.agent.peerConnectionMetadataStorage.getAllPeerConnectionMetadata =
-      jest.fn().mockResolvedValue([peerConnection]);
+      .mockResolvedValue(mockPeerConnectionPairRecordInstance);
+    Agent.agent.peerConnectionPair.getAllPeerConnectionAccount = jest
+      .fn()
+      .mockResolvedValue([mockPeerConnectionPairRecordInstance]);
     await peerConnectedChangeHandler(peerConnectedEvent, dispatch);
     await waitFor(() => {
-      expect(dispatch).toBeCalledWith(setConnectedWallet(peerConnection));
+      expect(dispatch).toBeCalledWith(setPendingConnection(null));
     });
     expect(dispatch).toBeCalledWith(
-      setWalletConnectionsCache([peerConnection])
+      setWalletConnectionsCache(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: mockPeerConnectionPairRecordInstance.id,
+            name: "dApp-name",
+            url: "http://localhost:3000",
+            iconB64: "icon",
+          }),
+        ])
+      )
     );
     expect(dispatch).toBeCalledWith(
       setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS)
@@ -339,7 +379,7 @@ describe("Peer connection states changed handler", () => {
   test("handle peer disconnected event", async () => {
     await peerDisconnectedChangeHandler(
       peerDisconnectedEvent,
-      peerConnection.id,
+      peerConnection.meerkatId,
       dispatch
     );
     expect(dispatch).toBeCalledWith(setConnectedWallet(null));
@@ -349,16 +389,23 @@ describe("Peer connection states changed handler", () => {
   });
 
   test("handle peer sign request event", async () => {
-    Agent.agent.peerConnectionMetadataStorage.getPeerConnection = jest
+    Agent.agent.peerConnectionPair.getPeerConnection = jest
       .fn()
       .mockResolvedValue(peerConnection);
     await peerConnectRequestSignChangeHandler(peerSignRequestEvent, dispatch);
     expect(dispatch).toBeCalledWith(
-      setQueueIncomingRequest({
-        signTransaction: peerSignRequestEvent,
-        peerConnection: peerConnection,
-        type: IncomingRequestType.PEER_CONNECT_SIGN,
-      })
+      setQueueIncomingRequest(
+        expect.objectContaining({
+          type: IncomingRequestType.PEER_CONNECT_SIGN,
+          peerConnection: expect.objectContaining({
+            meerkatId: peerConnection.meerkatId,
+            name: peerConnection.name,
+            url: peerConnection.url,
+            iconB64: peerConnection.iconB64,
+          }),
+          signTransaction: peerSignRequestEvent,
+        })
+      )
     );
   });
 
@@ -408,7 +455,7 @@ describe("KERIA operation state changed handler", () => {
     const connectionMock = {
       id: "id",
       creationStatus: CreationStatus.PENDING,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       alias: "CF Credential Issuance",
       oobi: "http://oobi.com/",
     };

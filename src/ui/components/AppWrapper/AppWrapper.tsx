@@ -53,6 +53,7 @@ import {
   setAuthentication,
   setCameraDirection,
   setCurrentOperation,
+  setCurrentProfile,
   setInitializationPhase,
   setIsOnline,
   setIsSetupProfile,
@@ -60,6 +61,7 @@ import {
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import {
   IncomingRequestType,
@@ -71,6 +73,7 @@ import {
   setIdentifierViewTypeCache,
 } from "../../../store/reducers/viewTypeCache";
 import {
+  ConnectionData,
   getConnectedWallet,
   setConnectedWallet,
   setPendingConnection,
@@ -92,6 +95,8 @@ import {
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
 import { BasicRecord } from "../../../core/agent/records";
+import { filterProfileData } from "../../../store/reducers/stateCache/utils";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -144,17 +149,29 @@ const peerConnectRequestSignChangeHandler = async (
 ) => {
   const connectedDAppAddress =
     PeerConnection.peerConnection.getConnectedDAppAddress();
-  const peerConnection =
-    await Agent.agent.peerConnectionMetadataStorage.getPeerConnection(
-      connectedDAppAddress
+  const peerConnectionRecord =
+    await Agent.agent.peerConnectionPair.getPeerConnection(
+      `${connectedDAppAddress}:${event.payload.identifier}`
     );
-  dispatch(
-    setQueueIncomingRequest({
-      signTransaction: event,
-      peerConnection,
-      type: IncomingRequestType.PEER_CONNECT_SIGN,
-    })
-  );
+
+  if (peerConnectionRecord) {
+    const peerConnection: ConnectionData = {
+      meerkatId: peerConnectionRecord.meerkatId,
+      name: peerConnectionRecord.name,
+      url: peerConnectionRecord.url,
+      createdAt: peerConnectionRecord.createdAt,
+      iconB64: peerConnectionRecord.iconB64,
+      selectedAid: peerConnectionRecord.selectedAid,
+    };
+
+    dispatch(
+      setQueueIncomingRequest({
+        signTransaction: event,
+        peerConnection,
+        type: IncomingRequestType.PEER_CONNECT_SIGN,
+      })
+    );
+  }
 };
 
 const peerConnectedChangeHandler = async (
@@ -162,10 +179,13 @@ const peerConnectedChangeHandler = async (
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
   const existingConnections =
-    await Agent.agent.peerConnectionMetadataStorage.getAllPeerConnectionMetadata();
+    await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
+
   dispatch(setWalletConnectionsCache(existingConnections));
+  const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
   const connectedWallet = existingConnections.find(
-    (connection) => connection.id === event.payload.dAppAddress
+    (connection) =>
+      `${connection.meerkatId}:${connection.selectedAid}` === newConnectionId
   );
   if (connectedWallet) {
     dispatch(setConnectedWallet(connectedWallet));
@@ -176,10 +196,15 @@ const peerConnectedChangeHandler = async (
 
 const peerDisconnectedChangeHandler = async (
   event: PeerDisconnectedEvent,
-  connectedMeerKat: string | null,
+  connectedWalletId: string | null,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  if (connectedMeerKat === event.payload.dAppAddress) {
+  // The connectedWalletId is a composite key (dAppAddress:accountId),
+  // while the event only provides the dAppAddress.
+  if (
+    connectedWalletId &&
+    connectedWalletId.includes(event.payload.dAppAddress)
+  ) {
     dispatch(setConnectedWallet(null));
     dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
   }
@@ -272,12 +297,12 @@ const AppWrapper = (props: { children: ReactNode }) => {
   }, [authentication.loggedIn, initializationPhase]);
 
   useEffect(() => {
-    if (!connectedWallet?.id) {
+    if (!connectedWallet?.meerkatId) {
       return;
     }
 
     const eventHandler = async (event: PeerDisconnectedEvent) => {
-      peerDisconnectedChangeHandler(event, connectedWallet.id, dispatch);
+      peerDisconnectedChangeHandler(event, connectedWallet.meerkatId, dispatch);
     };
 
     PeerConnection.peerConnection.onPeerDisconnectedStateChanged(eventHandler);
@@ -287,7 +312,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
         eventHandler
       );
     };
-  }, [connectedWallet?.id, dispatch]);
+  }, [connectedWallet?.meerkatId, dispatch]);
 
   useEffect(() => {
     if (recoveryCompleteNoInterruption) {
@@ -331,27 +356,105 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadDatabase = async () => {
     try {
-      const connectionsDetails = await Agent.agent.connections.getConnections();
-      const multisigConnectionsDetails =
+      const allConnections = await Agent.agent.connections.getConnections();
+      const allMultisigConnections =
         await Agent.agent.connections.getMultisigConnections();
-
       const credsCache = await Agent.agent.credentials.getCredentials();
       const credsArchivedCache = await Agent.agent.credentials.getCredentials(
         true
       );
       const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
       const storedPeerConnections =
-        await Agent.agent.peerConnectionMetadataStorage.getAllPeerConnectionMetadata();
+        await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
+
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();
+
+      // TODO: load current profile after load database
+      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
+        MiscRecordId.DEFAULT_PROFILE
+      );
+
+      let currentProfileAid = "";
+      if (appDefaultProfileRecord) {
+        currentProfileAid = (
+          appDefaultProfileRecord.content as { defaultProfile: string }
+        ).defaultProfile;
+      } else {
+        const storedIdentifiers =
+          await Agent.agent.identifiers.getIdentifiers();
+        if (storedIdentifiers.length > 0) {
+          // If we have no default profile set, we will set the oldest identifier as default.
+          const oldest = storedIdentifiers
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(a.createdAtUTC).getTime() -
+                new Date(b.createdAtUTC).getTime()
+            )[0];
+          const id = oldest?.id || "";
+          currentProfileAid = id;
+
+          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+            new BasicRecord({
+              id: MiscRecordId.DEFAULT_PROFILE,
+              content: { defaultProfile: id },
+            })
+          );
+        }
+      }
+
+      const identifiersDict = storedIdentifiers.reduce(
+        (acc: Record<string, IdentifierShortDetails>, identifier) => {
+          acc[identifier.id] = identifier;
+          return acc;
+        },
+        {}
+      );
+
+      const {
+        profileIdentifier,
+        profileCredentials,
+        profileArchivedCredentials,
+        profilePeerConnections,
+        profileNotifications,
+      } = filterProfileData(
+        identifiersDict,
+        credsCache,
+        credsArchivedCache,
+        storedPeerConnections,
+        notifications,
+        currentProfileAid
+      );
+
+      dispatch(
+        setCurrentProfile({
+          identity: {
+            id: profileIdentifier.id,
+            displayName: profileIdentifier.displayName,
+            createdAtUTC: profileIdentifier.createdAtUTC,
+            theme: profileIdentifier.theme,
+            creationStatus: profileIdentifier.creationStatus,
+          },
+          // TODO: add filtering for connections once we have connections per account merged
+          connections: Object.values(allConnections),
+          multisigConnections: Object.values(allMultisigConnections),
+          peerConnections: profilePeerConnections,
+          credentials: profileCredentials,
+          archivedCredentials: profileArchivedCredentials,
+          notifications: profileNotifications,
+        })
+      );
 
       dispatch(setIdentifiersCache(storedIdentifiers));
       dispatch(setCredsCache(credsCache));
       dispatch(setCredsArchivedCache(credsArchivedCache));
-      dispatch(setConnectionsCache(connectionsDetails));
-      dispatch(setMultisigConnectionsCache(multisigConnectionsDetails));
+      dispatch(setConnectionsCache(allConnections));
+      dispatch(setMultisigConnectionsCache(allMultisigConnections));
       dispatch(setWalletConnectionsCache(storedPeerConnections));
       dispatch(setNotificationsCache(notifications));
+
+      // TODO: set current profile data
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
     }
@@ -359,7 +462,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let defaultProfile = "";
       let identifiersSelectedFilter: IdentifiersFilters =
         IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
@@ -456,38 +558,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.DEFAULT_PROFILE
-      );
-
-      if (appDefaultProfileRecord) {
-        defaultProfile = (
-          appDefaultProfileRecord.content as { defaultProfile: string }
-        ).defaultProfile;
-      } else {
-        const storedIdentifiers =
-          await Agent.agent.identifiers.getIdentifiers();
-        if (storedIdentifiers.length > 0) {
-          // If we have no default profile set, we will set the oldest identifier as default.
-          const oldest = storedIdentifiers
-            .slice()
-            .sort(
-              (a, b) =>
-                new Date(a.createdAtUTC).getTime() -
-                new Date(b.createdAtUTC).getTime()
-            )[0];
-          const id = oldest?.id || "";
-          defaultProfile = id;
-
-          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.DEFAULT_PROFILE,
-              content: { defaultProfile: id },
-            })
-          );
-        }
-      }
-
       const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX
       );
@@ -555,7 +625,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(
         setAuthentication({
           ...authentication,
-          defaultProfile,
           passcodeIsSet,
           seedPhraseIsSet,
           passwordIsSet,

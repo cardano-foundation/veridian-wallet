@@ -16,6 +16,7 @@ import { IdentifiersFilters } from "../../ui/pages/Identifiers/Identifiers.types
 import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { TabsRoutePath } from "../paths";
+import { CreationStatus } from "../../core/agent/agent.types";
 
 describe("NextRoute", () => {
   let localStorageMock: any;
@@ -47,7 +48,21 @@ describe("NextRoute", () => {
           },
           firstAppLaunch: false,
           finishSetupBiometrics: false,
-          defaultProfile: "",
+        },
+        currentProfile: {
+          identity: {
+            id: "",
+            displayName: "",
+            createdAtUTC: "",
+            theme: 0,
+            creationStatus: CreationStatus.PENDING,
+          },
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+          notifications: [],
         },
         toastMsgs: [],
         currentOperation: OperationType.IDLE,
@@ -317,7 +332,6 @@ describe("getNextRoute", () => {
         },
         firstAppLaunch: false,
         finishSetupBiometrics: false,
-        defaultProfile: "",
       },
       toastMsgs: [],
       currentOperation: OperationType.IDLE,
@@ -325,6 +339,21 @@ describe("getNextRoute", () => {
         isProcessing: false,
         queues: [],
         isPaused: false,
+      },
+      currentProfile: {
+        identity: {
+          id: "",
+          displayName: "",
+          createdAtUTC: "",
+          theme: 0,
+          creationStatus: CreationStatus.PENDING,
+        },
+        connections: [],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+        notifications: [],
       },
     },
     seedPhraseCache: {
