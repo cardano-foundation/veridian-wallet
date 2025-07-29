@@ -4409,6 +4409,303 @@ describe("Handling of failed long running operations", () => {
     );
   });
 
+  test("Should handle failed oobi operations with multiple connection pairs all meeting criteria", async () => {
+    operationsGetMock.mockResolvedValue({
+      done: true,
+      error: { code: 400 },
+      metadata: {
+        oobi: "http://keria.com/oobi/EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      },
+    });
+    const operationRecord = {
+      type: "OperationPendingRecord",
+      id: "AOCUvGbpidkplC7gA",
+      createdAt: new Date("2024-08-01T10:36:17.814Z"),
+      recordType: "oobi",
+      updatedAt: new Date("2024-08-01T10:36:17.814Z"),
+    } as OperationPendingRecord;
+
+    // Multiple connection pairs, all with identifiers and not pending deletion
+    const connectionPairMocks = [
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
+        pendingDeletion: false,
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EKuLLzTOFE8EjBBDcUM2IWpNF7OclCme_bE76yKE3hzU",
+        pendingDeletion: false,
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EAnotherIdentifierForTesting123456789012345678",
+        pendingDeletion: false,
+      },
+    ];
+
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(connectionPairMocks);
+
+    await keriaNotificationService.processOperation(operationRecord);
+
+    expect(connectionPairStorage.findAllByQuery).toBeCalledWith({
+      contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      creationStatus: CreationStatus.PENDING,
+    });
+
+    // All three connection pairs should be updated to FAILED
+    expect(connectionPairStorage.update).toBeCalledTimes(3);
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(1,
+      expect.objectContaining({
+        creationStatus: CreationStatus.FAILED,
+      })
+    );
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(2,
+      expect.objectContaining({
+        creationStatus: CreationStatus.FAILED,
+      })
+    );
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(3,
+      expect.objectContaining({
+        creationStatus: CreationStatus.FAILED,
+      })
+    );
+
+    expect(eventEmitter.emit).toHaveBeenCalledWith({
+      type: EventTypes.OperationFailed,
+      payload: {
+        opType: operationRecord.recordType,
+        oid: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      },
+    });
+    expect(operationPendingStorage.deleteById).toBeCalledWith("AOCUvGbpidkplC7gA");
+  });
+
+  test("Should handle failed oobi operations with multiple connection pairs, some without identifiers", async () => {
+    operationsGetMock.mockResolvedValue({
+      done: true,
+      error: { code: 400 },
+      metadata: {
+        oobi: "http://keria.com/oobi/EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      },
+    });
+    const operationRecord = {
+      type: "OperationPendingRecord",
+      id: "AOCUvGbpidkplC7gA",
+      createdAt: new Date("2024-08-01T10:36:17.814Z"),
+      recordType: "oobi",
+      updatedAt: new Date("2024-08-01T10:36:17.814Z"),
+    } as OperationPendingRecord;
+
+    // Mix of connection pairs - some with identifiers, some without
+    const connectionPairMocks = [
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
+        pendingDeletion: false,
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: null, // No identifier
+        pendingDeletion: false,
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EAnotherIdentifierForTesting123456789012345678",
+        pendingDeletion: false,
+      },
+    ];
+
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(connectionPairMocks);
+
+    await keriaNotificationService.processOperation(operationRecord);
+
+    expect(connectionPairStorage.findAllByQuery).toBeCalledWith({
+      contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      creationStatus: CreationStatus.PENDING,
+    });
+
+    // Only 2 connection pairs should be updated (those with identifiers)
+    expect(connectionPairStorage.update).toBeCalledTimes(2);
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(1,
+      expect.objectContaining({
+        creationStatus: CreationStatus.FAILED,
+      })
+    );
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(2,
+      expect.objectContaining({
+        creationStatus: CreationStatus.FAILED,
+      })
+    );
+
+    expect(eventEmitter.emit).toHaveBeenCalledWith({
+      type: EventTypes.OperationFailed,
+      payload: {
+        opType: operationRecord.recordType,
+        oid: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      },
+    });
+    expect(operationPendingStorage.deleteById).toBeCalledWith("AOCUvGbpidkplC7gA");
+  });
+
+  test("Should handle failed oobi operations with multiple connection pairs, some pending deletion", async () => {
+    operationsGetMock.mockResolvedValue({
+      done: true,
+      error: { code: 400 },
+      metadata: {
+        oobi: "http://keria.com/oobi/EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      },
+    });
+    const operationRecord = {
+      type: "OperationPendingRecord",
+      id: "AOCUvGbpidkplC7gA",
+      createdAt: new Date("2024-08-01T10:36:17.814Z"),
+      recordType: "oobi",
+      updatedAt: new Date("2024-08-01T10:36:17.814Z"),
+    } as OperationPendingRecord;
+
+    // Mix of connection pairs - some pending deletion, some not
+    const connectionPairMocks = [
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
+        pendingDeletion: false,
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EKuLLzTOFE8EjBBDcUM2IWpNF7OclCme_bE76yKE3hzU",
+        pendingDeletion: true, // Pending deletion
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EAnotherIdentifierForTesting123456789012345678",
+        pendingDeletion: false,
+      },
+    ];
+
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(connectionPairMocks);
+
+    await keriaNotificationService.processOperation(operationRecord);
+
+    expect(connectionPairStorage.findAllByQuery).toBeCalledWith({
+      contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      creationStatus: CreationStatus.PENDING,
+    });
+
+    // Only 2 connection pairs should be updated (those not pending deletion)
+    expect(connectionPairStorage.update).toBeCalledTimes(2);
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(1,
+      expect.objectContaining({
+        creationStatus: CreationStatus.FAILED,
+      })
+    );
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(2,
+      expect.objectContaining({
+        creationStatus: CreationStatus.FAILED,
+      })
+    );
+
+    expect(eventEmitter.emit).toHaveBeenCalledWith({
+      type: EventTypes.OperationFailed,
+      payload: {
+        opType: operationRecord.recordType,
+        oid: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      },
+    });
+    expect(operationPendingStorage.deleteById).toBeCalledWith("AOCUvGbpidkplC7gA");
+  });
+
+  test("Should handle failed oobi operations with multiple connection pairs, mixed conditions", async () => {
+    operationsGetMock.mockResolvedValue({
+      done: true,
+      error: { code: 400 },
+      metadata: {
+        oobi: "http://keria.com/oobi/EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      },
+    });
+    const operationRecord = {
+      type: "OperationPendingRecord",
+      id: "AOCUvGbpidkplC7gA",
+      createdAt: new Date("2024-08-01T10:36:17.814Z"),
+      recordType: "oobi",
+      updatedAt: new Date("2024-08-01T10:36:17.814Z"),
+    } as OperationPendingRecord;
+
+    // Complex mix of connection pairs with various conditions
+    const connectionPairMocks = [
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
+        pendingDeletion: false, // Should be updated
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: null, // No identifier - should not be updated
+        pendingDeletion: false,
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EKuLLzTOFE8EjBBDcUM2IWpNF7OclCme_bE76yKE3hzU",
+        pendingDeletion: true, // Pending deletion - should not be updated
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: "EAnotherIdentifierForTesting123456789012345678",
+        pendingDeletion: false, // Should be updated
+      },
+      {
+        contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+        creationStatus: CreationStatus.PENDING,
+        identifier: undefined, // Undefined identifier - should not be updated
+        pendingDeletion: false,
+      },
+    ];
+
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(connectionPairMocks);
+
+    await keriaNotificationService.processOperation(operationRecord);
+
+    expect(connectionPairStorage.findAllByQuery).toBeCalledWith({
+      contactId: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      creationStatus: CreationStatus.PENDING,
+    });
+
+    // Only 2 connection pairs should be updated (those with identifiers and not pending deletion)
+    expect(connectionPairStorage.update).toBeCalledTimes(2);
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(1,
+      expect.objectContaining({
+        creationStatus: CreationStatus.FAILED,
+      })
+    );
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(2,
+      expect.objectContaining({
+        creationStatus: CreationStatus.FAILED,
+      })
+    );
+
+    expect(eventEmitter.emit).toHaveBeenCalledWith({
+      type: EventTypes.OperationFailed,
+      payload: {
+        opType: operationRecord.recordType,
+        oid: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
+      },
+    });
+    expect(operationPendingStorage.deleteById).toBeCalledWith("AOCUvGbpidkplC7gA");
+  });
+
   test("Should handle all other failed operation types as a failure", async () => {
     operationsGetMock.mockResolvedValue({
       done: true,
