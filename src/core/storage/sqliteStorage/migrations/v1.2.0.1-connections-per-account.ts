@@ -138,7 +138,7 @@ export const DATA_V1201: HybridMigration = {
         }
       }
 
-      if (connectionPairsToInsert.length > 0 || !connectionData.groupId) {
+      if (connectionPairsToInsert.length > 0 || connectionData.groupId) {
         statements.push(insertItem(contactRecord));
         statements.push(...insertItemTags(contactRecord));
 
