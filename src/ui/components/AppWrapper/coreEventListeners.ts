@@ -1,3 +1,5 @@
+import { Agent } from "../../../core/agent/agent";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import {
   EventTypes,
   GroupCreatedEvent,
@@ -6,12 +8,13 @@ import {
   NotificationRemovedEvent,
 } from "../../../core/agent/event.types";
 import { OperationPendingRecordType } from "../../../core/agent/records/operationPendingRecord.type";
-import { CreationStatus } from "../../../core/agent/agent.types";
 import { useAppDispatch } from "../../../store/hooks";
+import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
 import {
+  addGroupIdentifierCache,
   updateCreationStatus,
   updateOrAddIdentifiersCache,
-  addGroupIdentifierCache,
+  updateProfileStatus,
 } from "../../../store/reducers/identifiersCache";
 import {
   addNotification,
@@ -19,8 +22,6 @@ import {
 } from "../../../store/reducers/notificationsCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
-import { Agent } from "../../../core/agent/agent";
-import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
 
 const notificationStateChanged = (
   event: NotificationRemovedEvent | NotificationAddedEvent,
@@ -46,7 +47,7 @@ const operationCompleteHandler = async (
     case OperationPendingRecordType.Witness:
     case OperationPendingRecordType.Group:
       dispatch(
-        updateCreationStatus({
+        updateProfileStatus({
           id: oid,
           creationStatus: CreationStatus.COMPLETE,
         })
@@ -95,9 +96,9 @@ const groupCreatedHandler = async (
 };
 
 export {
+  groupCreatedHandler,
+  identifierAddedHandler,
   notificationStateChanged,
   operationCompleteHandler,
   operationFailureHandler,
-  identifierAddedHandler,
-  groupCreatedHandler,
 };

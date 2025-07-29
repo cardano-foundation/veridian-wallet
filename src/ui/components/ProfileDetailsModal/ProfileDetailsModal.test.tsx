@@ -15,9 +15,9 @@ import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
 import { ConfigurationService } from "../../../core/configuration";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import {
-  setDefaultProfile,
   setProfileHistories,
   setToastMsg,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import {
   filteredIdentifierFix,
@@ -1262,7 +1262,7 @@ describe("Set default profile when delete profile", () => {
       );
 
       expect(dispatchMock).toBeCalledWith(
-        setDefaultProfile(filteredIdentifierFix[1].id)
+        updateCurrentProfile(filteredIdentifierFix[1].id)
       );
 
       expect(dispatchMock).toBeCalledWith(
@@ -1352,7 +1352,7 @@ describe("Set default profile when delete profile", () => {
       );
 
       expect(dispatchMock).toBeCalledWith(
-        setDefaultProfile(filteredIdentifierFix[3].id)
+        updateCurrentProfile(filteredIdentifierFix[3].id)
       );
 
       expect(dispatchMock).toBeCalledWith(setProfileHistories([]));
@@ -1434,7 +1434,7 @@ describe("Set default profile when delete profile", () => {
       expect(Agent.agent.basicStorage.deleteById).toBeCalledWith(
         MiscRecordId.DEFAULT_PROFILE
       );
-      expect(dispatchMock).toBeCalledWith(setDefaultProfile(""));
+      expect(dispatchMock).toBeCalledWith(updateCurrentProfile(""));
       expect(Agent.agent.basicStorage.deleteById).toBeCalledWith(
         MiscRecordId.PROFILE_HISTORIES
       );

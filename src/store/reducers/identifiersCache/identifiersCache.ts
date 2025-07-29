@@ -1,6 +1,12 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  AnyAction,
+  createSlice,
+  PayloadAction,
+  ThunkAction,
+} from "@reduxjs/toolkit";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { RootState } from "../../index";
+import { updateCurrentProfile } from "../stateCache";
 import { IdentifierCacheState, MultiSigGroup } from "./identifiersCache.types";
 
 const initialState: IdentifierCacheState = {
@@ -102,6 +108,20 @@ export const {
   setIndividualFirstCreate,
 } = identifiersCacheSlice.actions;
 
+const updateProfileStatus =
+  (
+    data: Pick<IdentifierShortDetails, "id" | "creationStatus">
+  ): ThunkAction<void, RootState, unknown, AnyAction> =>
+    async (dispatch, getState) => {
+      dispatch(updateCreationStatus(data));
+
+      const state = getState();
+
+      if (state.stateCache.currentProfile.identity.id === data.id) {
+        dispatch(updateCurrentProfile(data.id));
+      }
+    };
+
 const getIdentifiersCache = (state: RootState) =>
   state.identifiersCache?.identifiers;
 
@@ -123,4 +143,5 @@ export {
   getMultiSigGroupCache,
   getOpenMultiSig,
   getScanGroupId,
+  updateProfileStatus,
 };

@@ -63,13 +63,18 @@ export const useProfile = () => {
     while (
       recentProfile &&
       !identifierMap[recentProfile] &&
+      recentProfile !== defaultProfile.identity.id &&
       tmpProfileHistories.length > 0
     ) {
       recentProfile = tmpProfileHistories.pop();
     }
 
     // Has recent profile (identifier) and it exist on current identifiers
-    if (recentProfile && identifierMap[recentProfile]) {
+    if (
+      recentProfile &&
+      identifierMap[recentProfile] &&
+      recentProfile !== defaultProfile.identity.id
+    ) {
       await updateDefaultProfile(
         recentProfile,
         tmpProfileHistories.filter((item) => identifierMap[item])

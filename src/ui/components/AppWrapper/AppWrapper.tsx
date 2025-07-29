@@ -61,7 +61,7 @@ import {
   setProfileHistories,
   setQueueIncomingRequest,
   setToastMsg,
-  showNoWitnessAlert
+  showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import {
   IncomingRequestType,
@@ -421,24 +421,26 @@ const AppWrapper = (props: { children: ReactNode }) => {
         currentProfileAid
       );
 
-      dispatch(
-        setCurrentProfile({
-          identity: {
-            id: profileIdentifier.id,
-            displayName: profileIdentifier.displayName,
-            createdAtUTC: profileIdentifier.createdAtUTC,
-            theme: profileIdentifier.theme,
-            creationStatus: profileIdentifier.creationStatus,
-          },
-          // TODO: add filtering for connections once we have connections per account merged
-          connections: Object.values(allConnections),
-          multisigConnections: Object.values(allMultisigConnections),
-          peerConnections: profilePeerConnections,
-          credentials: profileCredentials,
-          archivedCredentials: profileArchivedCredentials,
-          notifications: profileNotifications,
-        })
-      );
+      if (profileIdentifier) {
+        dispatch(
+          setCurrentProfile({
+            identity: {
+              id: profileIdentifier.id,
+              displayName: profileIdentifier.displayName,
+              createdAtUTC: profileIdentifier.createdAtUTC,
+              theme: profileIdentifier.theme,
+              creationStatus: profileIdentifier.creationStatus,
+            },
+            // TODO: add filtering for connections once we have connections per account merged
+            connections: Object.values(allConnections),
+            multisigConnections: Object.values(allMultisigConnections),
+            peerConnections: profilePeerConnections,
+            credentials: profileCredentials,
+            archivedCredentials: profileArchivedCredentials,
+            notifications: profileNotifications,
+          })
+        );
+      }
 
       dispatch(setIdentifiersCache(storedIdentifiers));
       dispatch(setCredsCache(credsCache));
@@ -771,6 +773,5 @@ export {
   peerConnectRequestSignChangeHandler,
   peerConnectedChangeHandler,
   peerConnectionBrokenChangeHandler,
-  peerDisconnectedChangeHandler
+  peerDisconnectedChangeHandler,
 };
-
