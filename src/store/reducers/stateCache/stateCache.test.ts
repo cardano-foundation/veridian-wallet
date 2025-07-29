@@ -323,6 +323,8 @@ describe("State Cache", () => {
       label: "Connection 1",
       createdAtUTC: "2023-01-01T00:00:00Z",
       status: ConnectionStatus.CONFIRMED,
+      contactId: "conn-id-1",
+      identifier: "identifier-id-1",
     };
 
     const mockMultisigConnection = {
@@ -330,6 +332,7 @@ describe("State Cache", () => {
       label: "Multisig Connection 1",
       createdAtUTC: "2023-01-01T00:00:00Z",
       status: ConnectionStatus.CONFIRMED,
+      contactId: "multisig-conn-id-1",
       groupId: "group-id-1",
     };
 

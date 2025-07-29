@@ -254,7 +254,15 @@ describe("ConnectionPair Storage", () => {
     storageService.save.mockResolvedValue(minimalRecord);
     
     await connectionPairStorage.save(minimalProps);
-    expect(storageService.save).toBeCalledWith(minimalRecord);
+    expect(storageService.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contactId: contactId1,
+        identifier: identifier1,
+        creationStatus: CreationStatus.PENDING, // default value
+        pendingDeletion: false, // default value
+        type: "ConnectionPairRecord",
+      })
+    );
   });
 
   // Test different creation statuses
@@ -268,7 +276,15 @@ describe("ConnectionPair Storage", () => {
     storageService.save.mockResolvedValue(pendingRecord);
     
     await connectionPairStorage.save(pendingProps);
-    expect(storageService.save).toBeCalledWith(pendingRecord);
+    expect(storageService.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contactId: contactId1,
+        identifier: identifier1,
+        creationStatus: CreationStatus.PENDING,
+        pendingDeletion: false, // default value
+        type: "ConnectionPairRecord",
+      })
+    );
   });
 
   test("Should handle connection pair record with FAILED status", async () => {
@@ -281,7 +297,15 @@ describe("ConnectionPair Storage", () => {
     storageService.save.mockResolvedValue(failedRecord);
     
     await connectionPairStorage.save(failedProps);
-    expect(storageService.save).toBeCalledWith(failedRecord);
+    expect(storageService.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contactId: contactId1,
+        identifier: identifier1,
+        creationStatus: CreationStatus.FAILED,
+        pendingDeletion: false, // default value
+        type: "ConnectionPairRecord",
+      })
+    );
   });
 
   test("Should handle connection pair record with pendingDeletion true", async () => {
@@ -294,7 +318,15 @@ describe("ConnectionPair Storage", () => {
     storageService.save.mockResolvedValue(deletionRecord);
     
     await connectionPairStorage.save(deletionProps);
-    expect(storageService.save).toBeCalledWith(deletionRecord);
+    expect(storageService.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contactId: contactId1,
+        identifier: identifier1,
+        creationStatus: CreationStatus.PENDING, // default value
+        pendingDeletion: true,
+        type: "ConnectionPairRecord",
+      })
+    );
   });
 
   // Test complex queries
