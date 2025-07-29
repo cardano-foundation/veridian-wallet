@@ -387,7 +387,7 @@ describe("Connection service of agent", () => {
       },
     ]);
 
-    contactStorage.findById = jest.fn().mockResolvedValue({
+    contactStorage.findExpectedById = jest.fn().mockResolvedValue({
       id: contacts[0].id,
       alias: "keri",
       oobi: "oobi",
@@ -401,7 +401,7 @@ describe("Connection service of agent", () => {
         status: ConnectionStatus.CONFIRMED,
         createdAtUTC: expect.any(String),
         contactId: contacts[0].id,
-        groupId: undefined,
+        identifier: undefined,
       },
       {
         id: contacts[0].id,
@@ -410,7 +410,7 @@ describe("Connection service of agent", () => {
         status: ConnectionStatus.PENDING,
         createdAtUTC: expect.any(String),
         contactId: contacts[0].id,
-        groupId: undefined,
+        identifier: undefined,
       },
     ]);
     expect(connectionPairStorage.findAllByQuery).toHaveBeenCalledWith({
