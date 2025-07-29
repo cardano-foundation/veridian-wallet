@@ -249,7 +249,7 @@ class ConnectionService extends AgentService {
     });
 
     for (const connectionPair of connectionPairs) {
-      const contact = await this.contactStorage.findById(
+      const contact = await this.contactStorage.findExpectedById(
         connectionPair.contactId
       );
 
