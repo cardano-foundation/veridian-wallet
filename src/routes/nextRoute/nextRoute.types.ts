@@ -1,3 +1,4 @@
+import { IdentifierShortDetails } from "../../core/agent/services/identifier.types";
 import { SeedPhraseCacheProps } from "../../store/reducers/seedPhraseCache";
 import { StateCacheProps } from "../../store/reducers/stateCache";
 import { RoutePath, TabsRoutePath } from "../paths";
@@ -11,6 +12,7 @@ interface PayloadProps {
 interface StoreState {
   stateCache: StateCacheProps;
   seedPhraseCache?: SeedPhraseCacheProps;
+  identifiers?: Record<string, IdentifierShortDetails>;
 }
 
 interface NextRoute {

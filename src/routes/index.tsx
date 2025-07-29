@@ -2,6 +2,7 @@ import { IonRouterOutlet } from "@ionic/react";
 import { useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { getIdentifiersCache } from "../store/reducers/identifiersCache";
 import {
   getRoutes,
   getStateCache,
@@ -17,6 +18,7 @@ import { Onboarding } from "../ui/pages/Onboarding";
 import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
 import { SetPasscode } from "../ui/pages/SetPasscode";
 import { SetupBiometrics } from "../ui/pages/SetupBiometrics/SetupBiometrics";
+import { SetupGroupProfile } from "../ui/pages/SetupGroupProfile";
 import { VerifyRecoverySeedPhrase } from "../ui/pages/VerifyRecoverySeedPhrase";
 import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
@@ -24,11 +26,12 @@ import { RoutePath, TabsRoutePath } from "./paths";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
+  const identifiers = useAppSelector(getIdentifiersCache);
   const dispatch = useAppDispatch();
   const routes = useAppSelector(getRoutes);
 
   const { nextPath } = getNextRoute(RoutePath.ROOT, {
-    store: { stateCache },
+    store: { stateCache, identifiers },
   });
 
   useEffect(() => {
@@ -75,6 +78,11 @@ const Routes = () => {
       <Route
         path={RoutePath.SSI_AGENT}
         component={CreateSSIAgent}
+        exact
+      />
+      <Route
+        path={RoutePath.GROUP_PROFILE_SETUP}
+        component={SetupGroupProfile}
         exact
       />
       {tabsRoutes.map((tab, index: number) => {

@@ -41,6 +41,23 @@ const getNextRootRoute = (data: DataProps) => {
       : TabsRoutePath.CREDENTIALS;
   }
 
+  if (
+    data.store.identifiers &&
+    data.store.stateCache.currentProfile.identity.id
+  ) {
+    const defaultProfile =
+      data.store.identifiers[
+        data.store.stateCache.currentProfile.identity.id
+      ];
+
+    path = defaultProfile.groupMetadata
+      ? RoutePath.GROUP_PROFILE_SETUP.replace(
+        ":id",
+        data.store.stateCache.currentProfile.identity.id
+      )
+      : path;
+  }
+
   return { pathname: path };
 };
 

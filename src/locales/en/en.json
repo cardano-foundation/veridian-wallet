@@ -1196,7 +1196,7 @@
     "copykey": "Copy connection URL",
     "more": "More share options"
   },
-  "createidentifier": {
+  "setupgroupprofile": {
     "cancel": "Cancel",
     "back": "Back",
     "done": "Done",
@@ -1204,23 +1204,22 @@
       "title": "Add an identifier",
       "confirmbutton": "Create identifier"
     },
-    "share": {
-      "title": "Share identifier",
-      "subtitle": "You've scanned",
-      "copybutton": "Copy connection URL",
+    "setupmembers": {
+      "subtitle": "Connected members",
+      "share": "Share",
+      "alert": "Ensure all members are mutually connected before initiating the group. This means everyone must scan each other's QR codes (or use connection URLs).",
       "notes": {
-        "top": "Before proceeding, please make sure that everyone you want to include as a signer scans this QR code.",
-        "middle": "After everyone has scanned your QR code, please be sure to scan everyone else's QR code as well.",
-        "bottom": "To continue with the initiation of the group identifier you must have scanned at least one other QR code."
+        "bottom": "To continue with the initiation of the group profile you must have scanned at least one other QR code."
       },
-      "scanbutton": "Scan QR codes",
       "initiatebutton": "Initiate group",
-      "scanalert": {
-        "text": "Have all the individuals you want to include as members scanned your QR code?",
-        "confirm": "Confirm and scan",
-        "cancel": "Cancel"
+      "delete": {
+        "button": "Delete Profile",
+        "alert": {
+          "title": "Are you sure you want to delete this profile?",
+          "confirm": "Yes, I'm sure",
+          "cancel": "Cancel"
+        }
       },
-      "delete": "Delete identifier",
       "pending": {
         "top": "Still loading.",
         "bottom": "Check back later or contact support if it persists."
@@ -1352,7 +1351,7 @@
     "setupbiometricsuccess": "Biometrics setup successfully",
     "rotatekeysuccess": "Individual keys rotated successfully",
     "rotatekeyerror": "Unable to rotate keys",
-    "newmultisignmember": "New member added to group",
+    "newmultisignmember": "New member added",
     "multisignidentifiercreated": "Identifier added to “For groups“",
     "delegatedidentifiercreated": "Identifier added to “For delegates“",
     "passcodeupdated": "Passcode updated successfully",
