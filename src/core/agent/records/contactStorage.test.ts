@@ -1,8 +1,9 @@
-import { Query, StorageMessage, StorageService } from "../../storage/storage.types";
 import {
-  ContactRecord,
-  ContactRecordStorageProps,
-} from "./contactRecord";
+  Query,
+  StorageMessage,
+  StorageService,
+} from "../../storage/storage.types";
+import { ContactRecord, ContactRecordStorageProps } from "./contactRecord";
 import { ContactStorage } from "./contactStorage";
 
 // Mock the randomSalt function
@@ -78,7 +79,10 @@ describe("Contact Storage", () => {
     storageService.findById.mockResolvedValue(contactRecordA);
     const result = await contactStorage.findById(contactRecordA.id);
     expect(result).toEqual(contactRecordA);
-    expect(storageService.findById).toBeCalledWith(contactRecordA.id, ContactRecord);
+    expect(storageService.findById).toBeCalledWith(
+      contactRecordA.id,
+      ContactRecord
+    );
   });
 
   test("Should find all contact records by query", async () => {
@@ -104,7 +108,10 @@ describe("Contact Storage", () => {
     storageService.findById.mockResolvedValue(contactRecordA);
     const result = await contactStorage.findExpectedById(contactRecordA.id);
     expect(result).toEqual(contactRecordA);
-    expect(storageService.findById).toBeCalledWith(contactRecordA.id, ContactRecord);
+    expect(storageService.findById).toBeCalledWith(
+      contactRecordA.id,
+      ContactRecord
+    );
   });
 
   test("Should throw error when expected contact record not found", async () => {
@@ -130,7 +137,9 @@ describe("Contact Storage", () => {
   });
 
   test("Should handle deleting by ID error", async () => {
-    storageService.deleteById.mockRejectedValue(new Error("Deleting by ID error"));
+    storageService.deleteById.mockRejectedValue(
+      new Error("Deleting by ID error")
+    );
     await expect(contactStorage.deleteById(contactRecordA.id)).rejects.toThrow(
       "Deleting by ID error"
     );
@@ -145,9 +154,9 @@ describe("Contact Storage", () => {
 
   test("Should handle finding error", async () => {
     storageService.findById.mockRejectedValue(new Error("Finding error"));
-    await expect(
-      contactStorage.findById(contactRecordA.id)
-    ).rejects.toThrow("Finding error");
+    await expect(contactStorage.findById(contactRecordA.id)).rejects.toThrow(
+      "Finding error"
+    );
   });
 
   test("Should handle findExpectedById error", async () => {
@@ -195,7 +204,7 @@ describe("Contact Storage", () => {
     };
     const minimalRecord = new ContactRecord(minimalProps);
     storageService.save.mockResolvedValue(minimalRecord);
-    
+
     await contactStorage.save(minimalProps);
     expect(storageService.save).toBeCalledWith(minimalRecord);
   });
@@ -206,9 +215,9 @@ describe("Contact Storage", () => {
     };
     const records = [contactRecordA];
     storageService.findAllByQuery.mockResolvedValue(records);
-    
+
     const result = await contactStorage.findAllByQuery(query);
     expect(result).toEqual(records);
     expect(storageService.findAllByQuery).toBeCalledWith(query, ContactRecord);
   });
-}); 
+});

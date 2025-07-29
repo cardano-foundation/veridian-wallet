@@ -2,7 +2,10 @@ import { IonCard, IonIcon, IonItem, IonLabel } from "@ionic/react";
 import { pencilOutline } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { Agent } from "../../../../core/agent/agent";
-import { ConnectionShortDetails, MultisigConnectionDetails } from "../../../../core/agent/agent.types";
+import {
+  ConnectionShortDetails,
+  MultisigConnectionDetails,
+} from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
 import { useAppDispatch } from "../../../../store/hooks";
 import { setToastMsg } from "../../../../store/reducers/stateCache";

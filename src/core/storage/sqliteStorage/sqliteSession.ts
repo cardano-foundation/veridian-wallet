@@ -127,7 +127,7 @@ class SqliteSession {
    */
   async validateCloudMigrationsOnRecovery(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log('Validating cloud migrations after recovery...');
+    console.log("Validating cloud migrations after recovery...");
 
     const currentLocalVersion = await this.getCurrentVersionDatabase();
     const cloudMigrationStatus = await this.getCloudMigrationStatus();
@@ -146,13 +146,15 @@ class SqliteSession {
 
     if (missedCloudMigrations.length == 0) {
       // eslint-disable-next-line no-console
-      console.log('No missed cloud migrations found');
+      console.log("No missed cloud migrations found");
       return;
     }
-        
+
     // eslint-disable-next-line no-console
-    console.log(`Found ${missedCloudMigrations.length} missed cloud migrations to run`);
-    
+    console.log(
+      `Found ${missedCloudMigrations.length} missed cloud migrations to run`
+    );
+
     for (const migration of missedCloudMigrations) {
       // eslint-disable-next-line no-console
       console.log(`Running missed cloud migration: ${migration.version}`);
@@ -209,7 +211,7 @@ class SqliteSession {
       }
     }
   }
-  
+
   private async performCloudMigration(
     migration: CloudMigration | HybridMigration,
     isRecoveryValidation: boolean = false

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppDispatch , useAppSelector } from "../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -50,8 +50,8 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const back = [SetupProfileStep.SetupProfile].includes(step)
     ? i18n.t("setupprofile.button.back")
     : isModal
-      ? i18n.t("setupprofile.button.cancel")
-      : undefined;
+    ? i18n.t("setupprofile.button.cancel")
+    : undefined;
 
   const getButtonText = () => {
     switch (step) {

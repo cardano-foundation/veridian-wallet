@@ -42,7 +42,9 @@ const connectionPairRecordProps: ConnectionPairRecordStorageProps = {
   tags: { category: "test" },
 };
 
-const connectionPairRecordA = new ConnectionPairRecord(connectionPairRecordProps);
+const connectionPairRecordA = new ConnectionPairRecord(
+  connectionPairRecordProps
+);
 
 const connectionPairRecordB = new ConnectionPairRecord({
   ...connectionPairRecordProps,
@@ -83,9 +85,14 @@ describe("ConnectionPair Storage", () => {
 
   test("Should find connection pair record by ID", async () => {
     storageService.findById.mockResolvedValue(connectionPairRecordA);
-    const result = await connectionPairStorage.findById(connectionPairRecordA.id);
+    const result = await connectionPairStorage.findById(
+      connectionPairRecordA.id
+    );
     expect(result).toEqual(connectionPairRecordA);
-    expect(storageService.findById).toBeCalledWith(connectionPairRecordA.id, ConnectionPairRecord);
+    expect(storageService.findById).toBeCalledWith(
+      connectionPairRecordA.id,
+      ConnectionPairRecord
+    );
   });
 
   test("Should find all connection pair records by query", async () => {
@@ -96,7 +103,10 @@ describe("ConnectionPair Storage", () => {
     storageService.findAllByQuery.mockResolvedValue(records);
     const result = await connectionPairStorage.findAllByQuery(query);
     expect(result).toEqual(records);
-    expect(storageService.findAllByQuery).toBeCalledWith(query, ConnectionPairRecord);
+    expect(storageService.findAllByQuery).toBeCalledWith(
+      query,
+      ConnectionPairRecord
+    );
   });
 
   test("Should get all connection pair records", async () => {
@@ -113,7 +123,10 @@ describe("ConnectionPair Storage", () => {
     storageService.findAllByQuery.mockResolvedValue(records);
     const result = await connectionPairStorage.findByContactId(contactId1);
     expect(result).toEqual(records);
-    expect(storageService.findAllByQuery).toBeCalledWith({ contactId: contactId1 }, ConnectionPairRecord);
+    expect(storageService.findAllByQuery).toBeCalledWith(
+      { contactId: contactId1 },
+      ConnectionPairRecord
+    );
   });
 
   test("Should find connection pair records by identifier", async () => {
@@ -121,13 +134,19 @@ describe("ConnectionPair Storage", () => {
     storageService.findAllByQuery.mockResolvedValue(records);
     const result = await connectionPairStorage.findByIdentifier(identifier1);
     expect(result).toEqual(records);
-    expect(storageService.findAllByQuery).toBeCalledWith({ identifier: identifier1 }, ConnectionPairRecord);
+    expect(storageService.findAllByQuery).toBeCalledWith(
+      { identifier: identifier1 },
+      ConnectionPairRecord
+    );
   });
 
   test("Should find connection pair records by contact and identifier", async () => {
     const records = [connectionPairRecordA];
     storageService.findAllByQuery.mockResolvedValue(records);
-    const result = await connectionPairStorage.findByContactAndIdentifier(contactId1, identifier1);
+    const result = await connectionPairStorage.findByContactAndIdentifier(
+      contactId1,
+      identifier1
+    );
     expect(result).toEqual(records);
     expect(storageService.findAllByQuery).toBeCalledWith(
       { contactId: contactId1, identifier: identifier1 },
@@ -138,30 +157,32 @@ describe("ConnectionPair Storage", () => {
   // Error handling tests
   test("Should handle saving error", async () => {
     storageService.save.mockRejectedValue(new Error("Saving error"));
-    await expect(connectionPairStorage.save(connectionPairRecordProps)).rejects.toThrow(
-      "Saving error"
-    );
+    await expect(
+      connectionPairStorage.save(connectionPairRecordProps)
+    ).rejects.toThrow("Saving error");
   });
 
   test("Should handle deleting error", async () => {
     storageService.delete.mockRejectedValue(new Error("Deleting error"));
-    await expect(connectionPairStorage.delete(connectionPairRecordA)).rejects.toThrow(
-      "Deleting error"
-    );
+    await expect(
+      connectionPairStorage.delete(connectionPairRecordA)
+    ).rejects.toThrow("Deleting error");
   });
 
   test("Should handle deleting by ID error", async () => {
-    storageService.deleteById.mockRejectedValue(new Error("Deleting by ID error"));
-    await expect(connectionPairStorage.deleteById(connectionPairRecordA.id)).rejects.toThrow(
-      "Deleting by ID error"
+    storageService.deleteById.mockRejectedValue(
+      new Error("Deleting by ID error")
     );
+    await expect(
+      connectionPairStorage.deleteById(connectionPairRecordA.id)
+    ).rejects.toThrow("Deleting by ID error");
   });
 
   test("Should handle updating error", async () => {
     storageService.update.mockRejectedValue(new Error("Updating error"));
-    await expect(connectionPairStorage.update(connectionPairRecordA)).rejects.toThrow(
-      "Updating error"
-    );
+    await expect(
+      connectionPairStorage.update(connectionPairRecordA)
+    ).rejects.toThrow("Updating error");
   });
 
   test("Should handle finding error", async () => {
@@ -180,25 +201,33 @@ describe("ConnectionPair Storage", () => {
 
   test("Should handle getAll error", async () => {
     storageService.getAll.mockRejectedValue(new Error("Get all error"));
-    await expect(connectionPairStorage.getAll()).rejects.toThrow("Get all error");
+    await expect(connectionPairStorage.getAll()).rejects.toThrow(
+      "Get all error"
+    );
   });
 
   test("Should handle findByContactId error", async () => {
-    storageService.findAllByQuery.mockRejectedValue(new Error("Find by contact error"));
-    await expect(connectionPairStorage.findByContactId(contactId1)).rejects.toThrow(
-      "Find by contact error"
+    storageService.findAllByQuery.mockRejectedValue(
+      new Error("Find by contact error")
     );
+    await expect(
+      connectionPairStorage.findByContactId(contactId1)
+    ).rejects.toThrow("Find by contact error");
   });
 
   test("Should handle findByIdentifier error", async () => {
-    storageService.findAllByQuery.mockRejectedValue(new Error("Find by identifier error"));
-    await expect(connectionPairStorage.findByIdentifier(identifier1)).rejects.toThrow(
-      "Find by identifier error"
+    storageService.findAllByQuery.mockRejectedValue(
+      new Error("Find by identifier error")
     );
+    await expect(
+      connectionPairStorage.findByIdentifier(identifier1)
+    ).rejects.toThrow("Find by identifier error");
   });
 
   test("Should handle findByContactAndIdentifier error", async () => {
-    storageService.findAllByQuery.mockRejectedValue(new Error("Find by contact and identifier error"));
+    storageService.findAllByQuery.mockRejectedValue(
+      new Error("Find by contact and identifier error")
+    );
     await expect(
       connectionPairStorage.findByContactAndIdentifier(contactId1, identifier1)
     ).rejects.toThrow("Find by contact and identifier error");
@@ -225,13 +254,17 @@ describe("ConnectionPair Storage", () => {
 
   test("Should handle empty result for findByContactId", async () => {
     storageService.findAllByQuery.mockResolvedValue([]);
-    const result = await connectionPairStorage.findByContactId("nonexistentContact");
+    const result = await connectionPairStorage.findByContactId(
+      "nonexistentContact"
+    );
     expect(result).toEqual([]);
   });
 
   test("Should handle empty result for findByIdentifier", async () => {
     storageService.findAllByQuery.mockResolvedValue([]);
-    const result = await connectionPairStorage.findByIdentifier("nonexistentIdentifier");
+    const result = await connectionPairStorage.findByIdentifier(
+      "nonexistentIdentifier"
+    );
     expect(result).toEqual([]);
   });
 
@@ -252,7 +285,7 @@ describe("ConnectionPair Storage", () => {
     };
     const minimalRecord = new ConnectionPairRecord(minimalProps);
     storageService.save.mockResolvedValue(minimalRecord);
-    
+
     await connectionPairStorage.save(minimalProps);
     expect(storageService.save).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -274,7 +307,7 @@ describe("ConnectionPair Storage", () => {
     };
     const pendingRecord = new ConnectionPairRecord(pendingProps);
     storageService.save.mockResolvedValue(pendingRecord);
-    
+
     await connectionPairStorage.save(pendingProps);
     expect(storageService.save).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -295,7 +328,7 @@ describe("ConnectionPair Storage", () => {
     };
     const failedRecord = new ConnectionPairRecord(failedProps);
     storageService.save.mockResolvedValue(failedRecord);
-    
+
     await connectionPairStorage.save(failedProps);
     expect(storageService.save).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -316,7 +349,7 @@ describe("ConnectionPair Storage", () => {
     };
     const deletionRecord = new ConnectionPairRecord(deletionProps);
     storageService.save.mockResolvedValue(deletionRecord);
-    
+
     await connectionPairStorage.save(deletionProps);
     expect(storageService.save).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -338,9 +371,12 @@ describe("ConnectionPair Storage", () => {
     };
     const records = [connectionPairRecordA];
     storageService.findAllByQuery.mockResolvedValue(records);
-    
+
     const result = await connectionPairStorage.findAllByQuery(complexQuery);
     expect(result).toEqual(records);
-    expect(storageService.findAllByQuery).toBeCalledWith(complexQuery, ConnectionPairRecord);
+    expect(storageService.findAllByQuery).toBeCalledWith(
+      complexQuery,
+      ConnectionPairRecord
+    );
   });
-}); 
+});

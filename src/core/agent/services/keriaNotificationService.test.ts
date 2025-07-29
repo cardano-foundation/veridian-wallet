@@ -3244,7 +3244,7 @@ describe("Long running operation tracker", () => {
       "id",
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9"
     );
-    
+
     expect(connectionPairStorage.update).toBeCalledWith({
       contactId: "id",
       creationStatus: CreationStatus.COMPLETE,
@@ -3254,7 +3254,8 @@ describe("Long running operation tracker", () => {
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9:createdAt": operationMock.response.dt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9:createdAt":
+        operationMock.response.dt,
       oobi: "http://oobi.com/",
     });
     expect(eventEmitter.emit).toHaveBeenNthCalledWith(1, {
@@ -4447,7 +4448,9 @@ describe("Handling of failed long running operations", () => {
       },
     ];
 
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(connectionPairMocks);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(
+      connectionPairMocks
+    );
 
     await keriaNotificationService.processOperation(operationRecord);
 
@@ -4458,17 +4461,20 @@ describe("Handling of failed long running operations", () => {
 
     // All three connection pairs should be updated to FAILED
     expect(connectionPairStorage.update).toBeCalledTimes(3);
-    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(1,
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(
+      1,
       expect.objectContaining({
         creationStatus: CreationStatus.FAILED,
       })
     );
-    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(2,
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(
+      2,
       expect.objectContaining({
         creationStatus: CreationStatus.FAILED,
       })
     );
-    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(3,
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(
+      3,
       expect.objectContaining({
         creationStatus: CreationStatus.FAILED,
       })
@@ -4481,7 +4487,9 @@ describe("Handling of failed long running operations", () => {
         oid: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
       },
     });
-    expect(operationPendingStorage.deleteById).toBeCalledWith("AOCUvGbpidkplC7gA");
+    expect(operationPendingStorage.deleteById).toBeCalledWith(
+      "AOCUvGbpidkplC7gA"
+    );
   });
 
   test("Should handle failed oobi operations with multiple connection pairs, some without identifiers", async () => {
@@ -4522,7 +4530,9 @@ describe("Handling of failed long running operations", () => {
       },
     ];
 
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(connectionPairMocks);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(
+      connectionPairMocks
+    );
 
     await keriaNotificationService.processOperation(operationRecord);
 
@@ -4533,12 +4543,14 @@ describe("Handling of failed long running operations", () => {
 
     // Only 2 connection pairs should be updated (those with identifiers)
     expect(connectionPairStorage.update).toBeCalledTimes(2);
-    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(1,
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(
+      1,
       expect.objectContaining({
         creationStatus: CreationStatus.FAILED,
       })
     );
-    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(2,
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(
+      2,
       expect.objectContaining({
         creationStatus: CreationStatus.FAILED,
       })
@@ -4551,7 +4563,9 @@ describe("Handling of failed long running operations", () => {
         oid: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
       },
     });
-    expect(operationPendingStorage.deleteById).toBeCalledWith("AOCUvGbpidkplC7gA");
+    expect(operationPendingStorage.deleteById).toBeCalledWith(
+      "AOCUvGbpidkplC7gA"
+    );
   });
 
   test("Should handle failed oobi operations with multiple connection pairs, some pending deletion", async () => {
@@ -4592,7 +4606,9 @@ describe("Handling of failed long running operations", () => {
       },
     ];
 
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(connectionPairMocks);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(
+      connectionPairMocks
+    );
 
     await keriaNotificationService.processOperation(operationRecord);
 
@@ -4603,12 +4619,14 @@ describe("Handling of failed long running operations", () => {
 
     // Only 2 connection pairs should be updated (those not pending deletion)
     expect(connectionPairStorage.update).toBeCalledTimes(2);
-    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(1,
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(
+      1,
       expect.objectContaining({
         creationStatus: CreationStatus.FAILED,
       })
     );
-    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(2,
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(
+      2,
       expect.objectContaining({
         creationStatus: CreationStatus.FAILED,
       })
@@ -4621,7 +4639,9 @@ describe("Handling of failed long running operations", () => {
         oid: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
       },
     });
-    expect(operationPendingStorage.deleteById).toBeCalledWith("AOCUvGbpidkplC7gA");
+    expect(operationPendingStorage.deleteById).toBeCalledWith(
+      "AOCUvGbpidkplC7gA"
+    );
   });
 
   test("Should handle failed oobi operations with multiple connection pairs, mixed conditions", async () => {
@@ -4674,7 +4694,9 @@ describe("Handling of failed long running operations", () => {
       },
     ];
 
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(connectionPairMocks);
+    connectionPairStorage.findAllByQuery.mockResolvedValueOnce(
+      connectionPairMocks
+    );
 
     await keriaNotificationService.processOperation(operationRecord);
 
@@ -4685,12 +4707,14 @@ describe("Handling of failed long running operations", () => {
 
     // Only 2 connection pairs should be updated (those with identifiers and not pending deletion)
     expect(connectionPairStorage.update).toBeCalledTimes(2);
-    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(1,
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(
+      1,
       expect.objectContaining({
         creationStatus: CreationStatus.FAILED,
       })
     );
-    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(2,
+    expect(connectionPairStorage.update).toHaveBeenNthCalledWith(
+      2,
       expect.objectContaining({
         creationStatus: CreationStatus.FAILED,
       })
@@ -4703,7 +4727,9 @@ describe("Handling of failed long running operations", () => {
         oid: "EMoQKrOjmuOGgoqBuPB5goSZiEqjYNN5hb9sAt1HHVrU",
       },
     });
-    expect(operationPendingStorage.deleteById).toBeCalledWith("AOCUvGbpidkplC7gA");
+    expect(operationPendingStorage.deleteById).toBeCalledWith(
+      "AOCUvGbpidkplC7gA"
+    );
   });
 
   test("Should handle all other failed operation types as a failure", async () => {

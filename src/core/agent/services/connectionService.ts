@@ -173,7 +173,7 @@ class ConnectionService extends AgentService {
       status: ConnectionStatus.PENDING,
       label: alias,
       contactId: connectionId,
-      ...(groupId ? { groupId } : { identifier: sharedIdentifier ?? '' }),
+      ...(groupId ? { groupId } : { identifier: sharedIdentifier ?? "" }),
     };
 
     if (multiSigInvite) {
@@ -311,7 +311,9 @@ class ConnectionService extends AgentService {
       status,
       oobi: record.oobi,
       contactId: record.id,
-      ...(record.groupId ? { groupId: record.groupId } : { identifier: record.identifier }),
+      ...(record.groupId
+        ? { groupId: record.groupId }
+        : { identifier: record.identifier }),
     };
   }
 
