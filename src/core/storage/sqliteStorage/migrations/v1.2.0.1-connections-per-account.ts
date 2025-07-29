@@ -137,11 +137,11 @@ export const DATA_V1201: HybridMigration = {
           });
         }
       }
-      
-      statements.push(insertItem(contactRecord));
-      statements.push(...insertItemTags(contactRecord));
 
-      if (connectionPairsToInsert.length > 0) {
+      if (connectionPairsToInsert.length > 0 && !connectionData.groupId) {
+        statements.push(insertItem(contactRecord));
+        statements.push(...insertItemTags(contactRecord));
+
         for (const connectionPair of connectionPairsToInsert) {
           statements.push(insertItem(connectionPair));
           statements.push(...insertItemTags(connectionPair));
