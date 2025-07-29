@@ -378,12 +378,14 @@ describe("Connection service of agent", () => {
         createdAt: now,
         creationStatus: CreationStatus.COMPLETE,
         pendingDeletion: false,
+        identifier: "test-identifier-1",
       },
       {
         contactId: contacts[0].id,
         createdAt: now,
         creationStatus: CreationStatus.PENDING,
         pendingDeletion: false,
+        identifier: "test-identifier-2",
       },
     ]);
 
@@ -401,7 +403,7 @@ describe("Connection service of agent", () => {
         status: ConnectionStatus.CONFIRMED,
         createdAtUTC: expect.any(String),
         contactId: contacts[0].id,
-        identifier: undefined,
+        identifier: "test-identifier-1",
       },
       {
         id: contacts[0].id,
@@ -410,7 +412,7 @@ describe("Connection service of agent", () => {
         status: ConnectionStatus.PENDING,
         createdAtUTC: expect.any(String),
         contactId: contacts[0].id,
-        identifier: undefined,
+        identifier: "test-identifier-2",
       },
     ]);
     expect(connectionPairStorage.findAllByQuery).toHaveBeenCalledWith({
