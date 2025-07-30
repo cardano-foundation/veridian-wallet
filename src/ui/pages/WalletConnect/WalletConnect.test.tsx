@@ -1,15 +1,15 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { walletConnectionsFix } from "../../__fixtures__/walletConnectionsFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { WalletConnect } from "./WalletConnect";
 import { WalletConnectStageOne } from "./WalletConnectStageOne";
 import { WalletConnectStageTwo } from "./WalletConnectStageTwo";
-import { CreationStatus } from "../../../core/agent/agent.types";
-import { makeTestStore } from "../../utils/makeTestStore";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -185,84 +185,12 @@ describe("Wallet Connect Stage One", () => {
       expect(handleCancel).toBeCalled();
     });
   });
-
-  test("Renders show missing identifier alert", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-      },
-      walletConnectionsCache: {
-        walletConnections: [],
-        pendingConnection: walletConnectionsFix[0],
-      },
-      identifiersCache: {
-        identifiers: {},
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const { getByTestId, getByText, findByText, queryByText } = render(
-      <Provider store={storeMocked}>
-        <WalletConnectStageOne
-          isOpen={true}
-          onAccept={handleAccept}
-          onClose={handleCancel}
-        />
-      </Provider>
-    );
-
-    expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.request.stageone.title
-      )
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-connect-wallet-stage-one"));
-    });
-
-    const missingIdenTitle = await findByText(
-      EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-        .missingidentifieralert.message
-    );
-
-    await waitFor(() => {
-      expect(missingIdenTitle).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("missing-identifier-alert-confirm-button"));
-
-    await waitFor(() => {
-      expect(
-        queryByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .missingidentifieralert.message
-        )
-      ).toBeNull();
-    });
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.createidentifier.add.title)
-      ).toBeVisible();
-    });
-  });
 });
 
 describe("Wallet Connect Stage Two", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -360,7 +288,7 @@ describe("Wallet Connect Stage Two", () => {
 describe("Wallet Connect Request", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),

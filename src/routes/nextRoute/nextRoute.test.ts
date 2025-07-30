@@ -1,22 +1,21 @@
+import { CreationStatus } from "../../core/agent/agent.types";
+import { RootState } from "../../store";
+import { setAuthentication } from "../../store/reducers/stateCache";
+import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
+import { OperationType } from "../../ui/globals/types";
+import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
+import { RoutePath } from "../index";
+import { TabsRoutePath } from "../paths";
 import {
+  getNextCreateSSIAgentRoute,
   getNextGenerateSeedPhraseRoute,
   getNextOnboardingRoute,
-  getNextSetPasscodeRoute,
   getNextRoute,
-  updateStoreAfterSetPasscodeRoute,
+  getNextSetPasscodeRoute,
   getNextVerifySeedPhraseRoute,
-  getNextCreateSSIAgentRoute,
+  updateStoreAfterSetPasscodeRoute,
 } from "./nextRoute";
-import { RootState } from "../../store";
-import { RoutePath } from "../index";
-import { setAuthentication } from "../../store/reducers/stateCache";
 import { DataProps } from "./nextRoute.types";
-import { OperationType } from "../../ui/globals/types";
-import { IdentifiersFilters } from "../../ui/pages/Identifiers/Identifiers.types";
-import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
-import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
-import { TabsRoutePath } from "../paths";
-import { CreationStatus } from "../../core/agent/agent.types";
 
 describe("NextRoute", () => {
   let localStorageMock: any;
@@ -71,6 +70,7 @@ describe("NextRoute", () => {
           queues: [],
           isPaused: false,
         },
+        profileHistories: [],
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -78,12 +78,10 @@ describe("NextRoute", () => {
       },
       identifiersCache: {
         identifiers: {},
-        favourites: [],
         multiSigGroup: {
           groupId: "",
           connections: [],
         },
-        filters: IdentifiersFilters.All,
       },
       credsCache: {
         creds: [],
@@ -101,10 +99,6 @@ describe("NextRoute", () => {
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
@@ -355,6 +349,7 @@ describe("getNextRoute", () => {
         archivedCredentials: [],
         notifications: [],
       },
+      profileHistories: [],
     },
     seedPhraseCache: {
       seedPhrase: "",
@@ -362,12 +357,10 @@ describe("getNextRoute", () => {
     },
     identifiersCache: {
       identifiers: {},
-      favourites: [],
       multiSigGroup: {
         groupId: "",
         connections: [],
       },
-      filters: IdentifiersFilters.All,
     },
     credsCache: { creds: [], favourites: [], filters: CredentialsFilters.All },
     credsArchivedCache: { creds: [] },
@@ -381,10 +374,6 @@ describe("getNextRoute", () => {
       pendingConnection: null,
     },
     viewTypeCache: {
-      identifier: {
-        viewType: null,
-        favouriteIndex: 0,
-      },
       credential: {
         viewType: null,
         favouriteIndex: 0,

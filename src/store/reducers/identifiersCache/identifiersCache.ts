@@ -1,19 +1,18 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  AnyAction,
+  createSlice,
+  PayloadAction,
+  ThunkAction,
+} from "@reduxjs/toolkit";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { RootState } from "../../index";
-import {
-  FavouriteIdentifier,
-  IdentifierCacheState,
-  MultiSigGroup,
-} from "./identifiersCache.types";
-import { IdentifiersFilters } from "../../../ui/pages/Identifiers/Identifiers.types";
+import { updateCurrentProfile } from "../stateCache";
+import { IdentifierCacheState, MultiSigGroup } from "./identifiersCache.types";
 
 const initialState: IdentifierCacheState = {
   identifiers: {},
-  favourites: [],
   multiSigGroup: undefined,
   openMultiSigId: undefined,
-  filters: IdentifiersFilters.All,
 };
 const identifiersCacheSlice = createSlice({
   name: "identifiersCache",
@@ -75,24 +74,6 @@ const identifiersCacheSlice = createSlice({
     removeIdentifierCache: (state, action: PayloadAction<string>) => {
       delete state.identifiers[action.payload];
     },
-    setFavouritesIdentifiersCache: (
-      state,
-      action: PayloadAction<FavouriteIdentifier[]>
-    ) => {
-      state.favourites = action.payload;
-    },
-    addFavouriteIdentifierCache: (
-      state,
-      action: PayloadAction<FavouriteIdentifier>
-    ) => {
-      if (state.favourites.some((fav) => fav.id === action.payload.id)) return;
-      state.favourites = [action.payload, ...state.favourites];
-    },
-    removeFavouriteIdentifierCache: (state, action: PayloadAction<string>) => {
-      state.favourites = state.favourites.filter(
-        (fav) => fav.id !== action.payload
-      );
-    },
     setMultiSigGroupCache: (
       state,
       action: PayloadAction<MultiSigGroup | undefined>
@@ -105,12 +86,6 @@ const identifiersCacheSlice = createSlice({
     setScanGroupId: (state, action: PayloadAction<string | undefined>) => {
       state.scanGroupId = action.payload;
     },
-    setIdentifiersFilters: (
-      state,
-      action: PayloadAction<IdentifiersFilters>
-    ) => {
-      state.filters = action.payload;
-    },
     setIndividualFirstCreate: (state, action: PayloadAction<boolean>) => {
       state.individualFirstCreate = action.payload;
     },
@@ -122,29 +97,33 @@ export { identifiersCacheSlice, initialState };
 
 export const {
   setIdentifiersCache,
-  setFavouritesIdentifiersCache,
   updateOrAddIdentifiersCache,
   updateCreationStatus,
-  addFavouriteIdentifierCache,
-  removeFavouriteIdentifierCache,
   setMultiSigGroupCache,
   setOpenMultiSigId,
   setScanGroupId,
-  setIdentifiersFilters,
   removeIdentifierCache,
   addGroupIdentifierCache,
   clearIdentifierCache,
   setIndividualFirstCreate,
 } = identifiersCacheSlice.actions;
 
+const updateProfileStatus =
+  (
+    data: Pick<IdentifierShortDetails, "id" | "creationStatus">
+  ): ThunkAction<void, RootState, unknown, AnyAction> =>
+    async (dispatch, getState) => {
+      dispatch(updateCreationStatus(data));
+
+      const state = getState();
+
+      if (state.stateCache.currentProfile.identity.id === data.id) {
+        dispatch(updateCurrentProfile(data.id));
+      }
+    };
+
 const getIdentifiersCache = (state: RootState) =>
   state.identifiersCache?.identifiers;
-
-const getDefaultProfile = (state: RootState) =>
-  Object.values(state.identifiersCache?.identifiers).at(0);
-
-const getFavouritesIdentifiersCache = (state: RootState) =>
-  state.identifiersCache.favourites;
 
 const getMultiSigGroupCache = (state: RootState) =>
   state.identifiersCache?.multiSigGroup;
@@ -155,19 +134,14 @@ const getOpenMultiSig = (state: RootState) =>
 const getScanGroupId = (state: RootState) =>
   state.identifiersCache?.scanGroupId;
 
-const getIdentifiersFilters = (state: RootState) =>
-  state.identifiersCache.filters;
-
 const getIndividualFirstCreateSetting = (state: RootState) =>
   state.identifiersCache.individualFirstCreate;
 
 export {
-  getFavouritesIdentifiersCache,
   getIdentifiersCache,
+  getIndividualFirstCreateSetting,
   getMultiSigGroupCache,
   getOpenMultiSig,
   getScanGroupId,
-  getIdentifiersFilters,
-  getIndividualFirstCreateSetting,
-  getDefaultProfile,
+  updateProfileStatus,
 };

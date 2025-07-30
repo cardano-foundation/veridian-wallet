@@ -6,7 +6,7 @@ import { setMultiSigGroupCache } from "../../../store/reducers/identifiersCache"
 import { MultiSigGroup } from "../../../store/reducers/identifiersCache/identifiersCache.types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
-import { IdentifierColor } from "../CreateIdentifier/components/IdentifierColorSelector";
+import { IdentifierColor } from "../EditProfile/components/IdentifierColorSelector";
 import { Spinner } from "../Spinner";
 import "./CreateGroupIdentifier.scss";
 import {

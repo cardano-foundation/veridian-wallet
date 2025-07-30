@@ -11,8 +11,10 @@ import {
   AcdcStateChangedEvent,
   ConnectionStateChangedEvent,
 } from "../../../core/agent/event.types";
+import { BasicRecord } from "../../../core/agent/records";
 import { IdentifierService } from "../../../core/agent/services";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
 import {
   PeerConnectSigningEvent,
@@ -36,13 +38,11 @@ import {
   setFavouritesCredsCache,
   updateOrAddCredsCache,
 } from "../../../store/reducers/credsCache";
+import { FavouriteCredential } from "../../../store/reducers/credsCache/credCache.types";
 import {
-  setFavouritesIdentifiersCache,
   setIdentifiersCache,
-  setIdentifiersFilters,
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
-import { FavouriteIdentifier } from "../../../store/reducers/identifiersCache/identifiersCache.types";
 import { setNotificationsCache } from "../../../store/reducers/notificationsCache";
 import {
   getAuthentication,
@@ -58,19 +58,19 @@ import {
   setIsOnline,
   setIsSetupProfile,
   setPauseQueueIncomingRequest,
+  setProfileHistories,
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert,
-  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import {
   IncomingRequestType,
   InitializationPhase,
 } from "../../../store/reducers/stateCache/stateCache.types";
+import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
+  setCredentialFavouriteIndex,
   setCredentialViewTypeCache,
-  setIdentifierFavouriteIndex,
-  setIdentifierViewTypeCache,
 } from "../../../store/reducers/viewTypeCache";
 import {
   ConnectionData,
@@ -80,8 +80,8 @@ import {
   setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
 import { OperationType, ToastMsgType } from "../../globals/types";
+import { useProfile } from "../../hooks/useProfile";
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
-import { IdentifiersFilters } from "../../pages/Identifiers/Identifiers.types";
 import { showError } from "../../utils/error";
 import { Alert } from "../Alert";
 import { CardListViewType } from "../SwitchCardView";
@@ -94,9 +94,6 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
-import { BasicRecord } from "../../../core/agent/records";
-import { filterProfileData } from "../../../store/reducers/stateCache/utils";
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -227,6 +224,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
   );
   const forceInitApp = useAppSelector(getForceInitApp);
   const [isAlertPeerBrokenOpen, setIsAlertPeerBrokenOpen] = useState(false);
+  const { getRecentDefaultProfile, updateProfileHistories } = useProfile();
   useActivityTimer();
 
   const setOnlineStatus = useCallback(
@@ -373,33 +371,16 @@ const AppWrapper = (props: { children: ReactNode }) => {
         MiscRecordId.DEFAULT_PROFILE
       );
 
-      let currentProfileAid = "";
-      if (appDefaultProfileRecord) {
-        currentProfileAid = (
-          appDefaultProfileRecord.content as { defaultProfile: string }
-        ).defaultProfile;
-      } else {
-        const storedIdentifiers =
-          await Agent.agent.identifiers.getIdentifiers();
-        if (storedIdentifiers.length > 0) {
-          // If we have no default profile set, we will set the oldest identifier as default.
-          const oldest = storedIdentifiers
-            .slice()
-            .sort(
-              (a, b) =>
-                new Date(a.createdAtUTC).getTime() -
-                new Date(b.createdAtUTC).getTime()
-            )[0];
-          const id = oldest?.id || "";
-          currentProfileAid = id;
+      const profileHistoriesRecord = await Agent.agent.basicStorage.findById(
+        MiscRecordId.PROFILE_HISTORIES
+      );
 
-          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.DEFAULT_PROFILE,
-              content: { defaultProfile: id },
-            })
-          );
-        }
+      const profileHistories = profileHistoriesRecord
+        ? (profileHistoriesRecord.content.value as string[])
+        : [];
+
+      if (profileHistories) {
+        dispatch(setProfileHistories(profileHistories));
       }
 
       const identifiersDict = storedIdentifiers.reduce(
@@ -410,39 +391,77 @@ const AppWrapper = (props: { children: ReactNode }) => {
         {}
       );
 
-      const {
-        profileIdentifier,
-        profileCredentials,
-        profileArchivedCredentials,
-        profilePeerConnections,
-        profileNotifications,
-      } = filterProfileData(
-        identifiersDict,
-        credsCache,
-        credsArchivedCache,
-        storedPeerConnections,
-        notifications,
-        currentProfileAid
-      );
+      let currentProfileAid = "";
+      if (appDefaultProfileRecord) {
+        currentProfileAid = (
+          appDefaultProfileRecord.content as { defaultProfile: string }
+        ).defaultProfile;
+      } else {
+        const { recentProfile, newProfileHistories } = getRecentDefaultProfile(
+          profileHistories,
+          identifiersDict,
+          ""
+        );
 
-      dispatch(
-        setCurrentProfile({
-          identity: {
-            id: profileIdentifier.id,
-            displayName: profileIdentifier.displayName,
-            createdAtUTC: profileIdentifier.createdAtUTC,
-            theme: profileIdentifier.theme,
-            creationStatus: profileIdentifier.creationStatus,
-          },
-          // TODO: add filtering for connections once we have connections per account merged
-          connections: Object.values(allConnections),
-          multisigConnections: Object.values(allMultisigConnections),
-          peerConnections: profilePeerConnections,
-          credentials: profileCredentials,
-          archivedCredentials: profileArchivedCredentials,
-          notifications: profileNotifications,
-        })
-      );
+        if (recentProfile) {
+          currentProfileAid = recentProfile;
+          updateProfileHistories(newProfileHistories);
+        } else {
+          if (storedIdentifiers.length > 0) {
+            // If we have no default profile set, we will set the oldest identifier as default.
+            const oldest = storedIdentifiers
+              .slice()
+              .sort((prev, next) =>
+                prev.displayName.localeCompare(next.displayName)
+              )[0];
+
+            currentProfileAid = oldest?.id || "";
+
+            await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+              new BasicRecord({
+                id: MiscRecordId.DEFAULT_PROFILE,
+                content: { defaultProfile: currentProfileAid },
+              })
+            );
+          }
+        }
+      }
+
+      if (currentProfileAid) {
+        const {
+          profileIdentifier,
+          profileCredentials,
+          profileArchivedCredentials,
+          profilePeerConnections,
+          profileNotifications,
+        } = filterProfileData(
+          identifiersDict,
+          credsCache,
+          credsArchivedCache,
+          storedPeerConnections,
+          notifications,
+          currentProfileAid
+        );
+
+        dispatch(
+          setCurrentProfile({
+            identity: {
+              id: profileIdentifier.id,
+              displayName: profileIdentifier.displayName,
+              createdAtUTC: profileIdentifier.createdAtUTC,
+              theme: profileIdentifier.theme,
+              creationStatus: profileIdentifier.creationStatus,
+            },
+            // TODO: add filtering for connections once we have connections per account merged
+            connections: Object.values(allConnections),
+            multisigConnections: Object.values(allMultisigConnections),
+            peerConnections: profilePeerConnections,
+            credentials: profileCredentials,
+            archivedCredentials: profileArchivedCredentials,
+            notifications: profileNotifications,
+          })
+        );
+      }
 
       dispatch(setIdentifiersCache(storedIdentifiers));
       dispatch(setCredsCache(credsCache));
@@ -460,8 +479,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let identifiersSelectedFilter: IdentifiersFilters =
-        IdentifiersFilters.All;
       let credentialsSelectedFilter: CredentialsFilters =
         CredentialsFilters.All;
       const passcodeIsSet = await SecureStorage.keyExists(
@@ -482,46 +499,15 @@ const AppWrapper = (props: { children: ReactNode }) => {
         MiscRecordId.APP_RECOVERY_WALLET
       );
 
-      const identifiersFavourites = await Agent.agent.basicStorage.findById(
-        MiscRecordId.IDENTIFIERS_FAVOURITES
-      );
-      if (identifiersFavourites)
-        dispatch(
-          setFavouritesIdentifiersCache(
-            identifiersFavourites.content.favourites as FavouriteIdentifier[]
-          )
-        );
-
       const credsFavourites = await Agent.agent.basicStorage.findById(
         MiscRecordId.CREDS_FAVOURITES
       );
       if (credsFavourites) {
         dispatch(
           setFavouritesCredsCache(
-            credsFavourites.content.favourites as FavouriteIdentifier[]
+            credsFavourites.content.favourites as FavouriteCredential[]
           )
         );
-      }
-      const indentifierViewType = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_IDENTIFIER_VIEW_TYPE
-      );
-      if (indentifierViewType) {
-        dispatch(
-          setIdentifierViewTypeCache(
-            indentifierViewType.content.viewType as CardListViewType
-          )
-        );
-      }
-
-      const indentifiersFilters = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_IDENTIFIER_SELECTED_FILTER
-      );
-      if (indentifiersFilters) {
-        identifiersSelectedFilter = indentifiersFilters.content
-          .filter as IdentifiersFilters;
-      }
-      if (identifiersSelectedFilter) {
-        dispatch(setIdentifiersFilters(identifiersSelectedFilter));
       }
 
       const credViewType = await Agent.agent.basicStorage.findById(
@@ -556,25 +542,13 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const identifierFavouriteIndex = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_IDENTIFIER_FAVOURITE_INDEX
-      );
-
-      if (identifierFavouriteIndex) {
-        dispatch(
-          setIdentifierFavouriteIndex(
-            Number(identifierFavouriteIndex.content.favouriteIndex)
-          )
-        );
-      }
-
       const credFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_CRED_FAVOURITE_INDEX
       );
 
       if (credFavouriteIndex) {
         dispatch(
-          setIdentifierFavouriteIndex(
+          setCredentialFavouriteIndex(
             Number(credFavouriteIndex.content.favouriteIndex)
           )
         );

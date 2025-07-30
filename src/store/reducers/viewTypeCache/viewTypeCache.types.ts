@@ -6,7 +6,6 @@ interface ViewType {
 }
 
 interface ViewTypeCacheProps {
-  identifier: ViewType;
   credential: ViewType;
 }
 export type { ViewTypeCacheProps };

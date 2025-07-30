@@ -1,19 +1,18 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 import { OperationType } from "../../../ui/globals/types";
+import { CredentialsFilters } from "../../../ui/pages/Credentials/Credentials.types";
 import { RootState } from "../../index";
+import { InitializationPhase } from "../stateCache/stateCache.types";
 import {
+  clearNotifications,
   deleteNotificationById,
   getNotificationsCache,
+  markNotificationAsRead,
   notificationsCacheSlice,
   setNotificationsCache,
-  markNotificationAsRead,
-  clearNotifications,
 } from "./notificationsCache";
-import { IdentifiersFilters } from "../../../ui/pages/Identifiers/Identifiers.types";
-import { CredentialsFilters } from "../../../ui/pages/Credentials/Credentials.types";
-import { InitializationPhase } from "../stateCache/stateCache.types";
-import { CreationStatus } from "../../../core/agent/agent.types";
 
 const notification: KeriaNotification = {
   id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmG",
@@ -166,6 +165,7 @@ describe("Notifications cache", () => {
           archivedCredentials: [],
           notifications: [],
         },
+        profileHistories: [],
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -173,12 +173,10 @@ describe("Notifications cache", () => {
       },
       identifiersCache: {
         identifiers: {},
-        favourites: [],
         multiSigGroup: {
           groupId: "",
           connections: [],
         },
-        filters: IdentifiersFilters.All,
       },
       credsCache: {
         creds: [],
@@ -196,10 +194,6 @@ describe("Notifications cache", () => {
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,

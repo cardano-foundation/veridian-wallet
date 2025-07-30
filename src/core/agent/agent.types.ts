@@ -21,19 +21,15 @@ enum MiscRecordId {
   APP_ALREADY_INIT = "app-already-init",
   APP_STATE_FLAGS = "app-state-flags",
   APP_LANGUAGE = "app-language",
-  IDENTIFIERS_FAVOURITES = "identifiers-favourites",
   CREDS_FAVOURITES = "creds-favourites",
   USER_NAME = "user-name",
   DEFAULT_PROFILE = "default-profile",
   APP_BIOMETRY = "app-biometry",
   KERIA_NOTIFICATION_MARKER = "keria-notification-marker",
-  APP_IDENTIFIER_VIEW_TYPE = "app-identifier-view-type",
   APP_CRED_VIEW_TYPE = "app-cred-view-type",
-  APP_IDENTIFIER_SELECTED_FILTER = "app-identifier-selected-filter",
   APP_CRED_SELECTED_FILTER = "app-cred-selected-filter",
   KERIA_CONNECT_URL = "keria-connect-url",
   KERIA_BOOT_URL = "keria-boot-url",
-  APP_IDENTIFIER_FAVOURITE_INDEX = "identifier-favourite-index",
   APP_CRED_FAVOURITE_INDEX = "cred-favourite-index",
   APP_PASSWORD_SKIPPED = "app-password-skipped",
   APP_RECOVERY_WALLET = "recovery-wallet",
@@ -46,6 +42,7 @@ enum MiscRecordId {
   IS_SETUP_PROFILE = "is-setup-profile",
   INDIVIDUAL_FIRST_CREATE = "individual-first-create",
   BIOMETRICS_SETUP = "biometrics-setup",
+  PROFILE_HISTORIES = "profile-histories",
 }
 
 interface ConnectionShortDetails {
@@ -167,21 +164,21 @@ export const OOBI_AGENT_ONLY_RE =
 export const DOOBI_RE = /^\/oobi\/(?<said>[^/]+)$/i;
 export const WOOBI_RE = /^\/\.well-known\/keri\/oobi\/(?<cid>[^/]+)$/;
 
-export { ConnectionStatus, MiscRecordId, OobiType, CreationStatus };
+export { ConnectionStatus, CreationStatus, MiscRecordId, OobiType };
 
 export type {
-  ConnectionShortDetails,
-  ConnectionDetails,
-  ConnectionNoteDetails,
-  ConnectionNoteProps,
-  ConnectionHistoryItem,
-  OobiScan,
   AgentServicesProps,
   AgentUrls,
-  BranAndMnemonic,
-  ExnMessage,
-  NotificationRpy,
   AuthorizationRequestExn,
-  JSONValue,
+  BranAndMnemonic,
+  ConnectionDetails,
+  ConnectionHistoryItem,
+  ConnectionNoteDetails,
+  ConnectionNoteProps,
+  ConnectionShortDetails,
+  ExnMessage,
   JSONObject,
+  JSONValue,
+  NotificationRpy,
+  OobiScan,
 };
