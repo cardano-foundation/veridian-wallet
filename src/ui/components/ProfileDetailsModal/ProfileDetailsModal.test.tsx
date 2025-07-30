@@ -121,6 +121,7 @@ const initialStateKeri = {
       credentials: [],
       archivedCredentials: [],
     },
+    toastMsgs: [],
     isOnline: true,
   },
   seedPhraseCache: {
@@ -147,7 +148,7 @@ const storeMockedAidKeri = {
 
 const pageId = "identifier-card-details";
 
-describe("Individual Identifier details page", () => {
+describe("Individual profile details page", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
   });
@@ -157,7 +158,7 @@ describe("Individual Identifier details page", () => {
     verifySecretMock.mockResolvedValue(true);
   });
 
-  test("It renders Identifier Details", async () => {
+  test("It renders profile Details", async () => {
     Clipboard.write = jest.fn();
     const { getByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
@@ -442,6 +443,7 @@ describe("Individual Identifier details page", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         currentProfile: {
           identity: filteredIdentifierFix[0],
@@ -589,7 +591,7 @@ describe("Individual Identifier details page", () => {
   });
 });
 
-describe("Group Identifier details page", () => {
+describe("Group profile details page", () => {
   const initialStateKeri = {
     stateCache: {
       routes: [TabsRoutePath.CREDENTIALS],
@@ -599,6 +601,7 @@ describe("Group Identifier details page", () => {
         passcodeIsSet: true,
         passwordIsSet: false,
       },
+      toastMsgs: [],
       isOnline: true,
       currentProfile: {
         identity: filteredIdentifierFix[0],
@@ -671,7 +674,7 @@ describe("Group Identifier details page", () => {
     });
   });
 
-  test("It renders Identifier Details", async () => {
+  test("It renders profile Details", async () => {
     Clipboard.write = jest.fn();
 
     const initialStateKeri = {
@@ -683,6 +686,7 @@ describe("Group Identifier details page", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         currentProfile: {
           identity: filteredIdentifierFix[0],
@@ -708,6 +712,7 @@ describe("Group Identifier details page", () => {
             groupMemberPre: "ELUXM-ajSu0o1qyFvss-3QQfkj3DOke9aHNwt72Byi9x",
           },
         },
+        toastMsgs: [],
         favourites: [],
       },
       connectionsCache: {
@@ -1059,6 +1064,7 @@ describe("Group Identifier details page", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         currentProfile: {
           identity: filteredIdentifierFix[0],
@@ -1116,7 +1122,7 @@ describe("Group Identifier details page", () => {
   });
 });
 
-describe("Checking the Identifier Details Page when information is missing from the cloud", () => {
+describe("Checking the profile details page when information is missing from the cloud", () => {
   beforeEach(() => {
     getIndentifier.mockImplementation(() => {
       throw new Error(`${Agent.MISSING_DATA_ON_KERIA}: id`);
@@ -1124,7 +1130,7 @@ describe("Checking the Identifier Details Page when information is missing from 
     verifySecretMock.mockResolvedValue(true);
   });
 
-  test("Identifier exists in the database but not on Signify", async () => {
+  test("profile exists in the database but not on Signify", async () => {
     const initialStateKeri = {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],
@@ -1134,6 +1140,7 @@ describe("Checking the Identifier Details Page when information is missing from 
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         profileHistories: [],
         currentProfile: {
@@ -1237,6 +1244,7 @@ describe("Set default profile when delete profile", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         profileHistories: [
           filteredIdentifierFix[0].id,
@@ -1336,6 +1344,7 @@ describe("Set default profile when delete profile", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         profileHistories: [],
         currentProfile: {
@@ -1424,6 +1433,7 @@ describe("Set default profile when delete profile", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
+        toastMsgs: [],
         isOnline: true,
         profileHistories: [],
         currentProfile: {

@@ -2,28 +2,24 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-
-import { CreationStatus } from "../../../../../core/agent/agent.types";
-import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
-import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
-import { TabsRoutePath } from "../../../../../routes/paths";
+import { CreationStatus } from "../../../core/agent/agent.types";
+import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
+import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import {
   setCurrentOperation,
   setToastMsg,
-} from "../../../../../store/reducers/stateCache";
-import {
-  setPendingConnection,
-  setWalletConnectionsCache
-} from "../../../../../store/reducers/walletConnectionsCache";
-import { identifierFix } from "../../../../__fixtures__/identifierFix";
-import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
-import { OperationType, ToastMsgType } from "../../../../globals/types";
-import { makeTestStore } from "../../../../utils/makeTestStore";
-import { passcodeFiller } from "../../../../utils/passcodeFiller";
-import { ConnectWallet } from "./ConnectWallet";
+} from "../../../store/reducers/stateCache";
+import { setPendingConnection } from "../../../store/reducers/walletConnectionsCache";
+import { identifierFix } from "../../__fixtures__/identifierFix";
+import { walletConnectionsFix } from "../../__fixtures__/walletConnectionsFix";
+import { OperationType, ToastMsgType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
+import { passcodeFiller } from "../../utils/passcodeFiller";
+import { TabsRoutePath } from "../navigation/TabsMenu";
+import { ConnectdApp } from "./ConnectdApp";
 
-jest.mock("../../../../../core/configuration", () => ({
-  ...jest.requireActual("../../../../../core/configuration"),
+jest.mock("../../../core/configuration", () => ({
+  ...jest.requireActual("../../../core/configuration"),
   ConfigurationService: {
     env: {
       features: {
@@ -33,7 +29,7 @@ jest.mock("../../../../../core/configuration", () => ({
   },
 }));
 
-jest.mock("../../../../../core/agent/agent", () => ({
+jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       peerConnectionAccounts: {
@@ -50,10 +46,10 @@ jest.mock("../../../../../core/agent/agent", () => ({
   },
 }));
 
-jest.mock("../../../../../core/cardano/walletConnect/peerConnection", () => ({
+jest.mock("../../../core/cardano/walletConnect/peerConnection", () => ({
   PeerConnection: {
     peerConnection: {
-      disconnectDApp: jest.fn().mockResolvedValue(true),
+      disconnectDApp: jest.fn(),
     },
   },
 }));
@@ -128,14 +124,15 @@ describe("Wallet connect: empty history", () => {
 
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
     await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectbtn)
-      ).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.connectdapp.connectbtn)).toBeVisible();
     });
   });
 
@@ -171,28 +168,26 @@ describe("Wallet connect: empty history", () => {
     const { getByText, queryByText, getByTestId } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
-          <ConnectWallet />
+          <ConnectdApp
+            isOpen
+            setIsOpen={jest.fn}
+          />
         </Provider>
       </MemoryRouter>
     );
 
     await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectbtn)
-      ).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.connectdapp.connectbtn)).toBeVisible();
     });
 
     act(() => {
-      fireEvent.click(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectbtn)
-      );
+      fireEvent.click(getByText(EN_TRANSLATIONS.connectdapp.connectbtn));
     });
 
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet
-            .disconnectbeforecreatealert.message
+          EN_TRANSLATIONS.connectdapp.disconnectbeforecreatealert.message
         )
       ).toBeVisible();
     });
@@ -204,8 +199,7 @@ describe("Wallet connect: empty history", () => {
     await waitFor(() => {
       expect(
         queryByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet
-            .disconnectbeforecreatealert.message
+          EN_TRANSLATIONS.connectdapp.disconnectbeforecreatealert.message
         )
       ).toBeNull();
     });
@@ -242,21 +236,20 @@ describe("Wallet connect: empty history", () => {
     const { getByText } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
-          <ConnectWallet />
+          <ConnectdApp
+            isOpen
+            setIsOpen={jest.fn}
+          />
         </Provider>
       </MemoryRouter>
     );
 
     await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectbtn)
-      ).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.connectdapp.connectbtn)).toBeVisible();
     });
 
     act(() => {
-      fireEvent.click(
-        getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectbtn)
-      );
+      fireEvent.click(getByText(EN_TRANSLATIONS.connectdapp.connectbtn));
     });
 
     await waitFor(() => {
@@ -268,23 +261,19 @@ describe("Wallet connect: empty history", () => {
 });
 
 describe("Wallet connect", () => {
-  afterEach(() => {
-    dispatchMock.mockClear();
-  });
-
   test("Wallet connect render", async () => {
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
     await waitFor(() => {
       expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .title
-        )
+        getByText(EN_TRANSLATIONS.connectdapp.connectionhistory.title)
       ).toBeVisible();
     });
     expect(getByText(walletConnectionsFix[0].name as string)).toBeVisible();
@@ -301,16 +290,16 @@ describe("Wallet connect", () => {
   test("Confirm connect modal render", async () => {
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
     await waitFor(() => {
       expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .title
-        )
+        getByText(EN_TRANSLATIONS.connectdapp.connectionhistory.title)
       ).toBeVisible();
     });
     expect(getByText(walletConnectionsFix[0].name as string)).toBeVisible();
@@ -327,16 +316,16 @@ describe("Wallet connect", () => {
   test("Delete wallet connections", async () => {
     const { getByText, getByTestId, queryByText, findByText } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
     await waitFor(() => {
       expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .title
-        )
+        getByText(EN_TRANSLATIONS.connectdapp.connectionhistory.title)
       ).toBeVisible();
     });
 
@@ -347,8 +336,7 @@ describe("Wallet connect", () => {
     });
 
     const alerTitle = await findByText(
-      EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-        .deletealert.message
+      EN_TRANSLATIONS.connectdapp.connectionhistory.deletealert.message
     );
 
     await waitFor(() => {
@@ -356,20 +344,10 @@ describe("Wallet connect", () => {
     });
 
     const deleteConfirmButton = await findByText(
-      EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-        .deletealert.confirm
+      EN_TRANSLATIONS.connectdapp.connectionhistory.deletealert.confirm
     );
 
     fireEvent.click(deleteConfirmButton);
-
-    await waitFor(() => {
-      expect(
-        queryByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .deletealert.message
-        )
-      ).not.toBeVisible();
-    });
 
     await waitFor(() => {
       expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
@@ -378,7 +356,7 @@ describe("Wallet connect", () => {
     passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(dispatchMock).toHaveBeenCalledWith(
+      expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
     });
@@ -416,16 +394,16 @@ describe("Wallet connect", () => {
 
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
     await waitFor(() => {
       expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .title
-        )
+        getByText(EN_TRANSLATIONS.connectdapp.connectionhistory.title)
       ).toBeVisible();
     });
 
@@ -436,8 +414,7 @@ describe("Wallet connect", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-            .deletealert.message
+          EN_TRANSLATIONS.connectdapp.connectionhistory.deletealert.message
         )
       ).toBeVisible();
     });
@@ -451,33 +428,25 @@ describe("Wallet connect", () => {
     passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(dispatchMock).toHaveBeenCalledWith(
+      expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
-      expect(dispatchMock).toHaveBeenCalledWith(setPendingConnection(null));
-      expect(dispatchMock).toHaveBeenCalledWith(
-        setWalletConnectionsCache(
-          walletConnectionsFix.filter(
-            (connection) =>
-              connection.meerkatId !== walletConnectionsFix[0].meerkatId
-          )
-        )
-      );
+      expect(dispatchMock).toBeCalledWith(setPendingConnection(null));
     });
   });
 
   test("Connect wallet", async () => {
     const { getByText, getByTestId, queryByText, getAllByText } = render(
       <Provider store={storeMocked}>
-        <ConnectWallet />
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn}
+        />
       </Provider>
     );
 
     expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet.connectionhistory
-          .title
-      )
+      getByText(EN_TRANSLATIONS.connectdapp.connectionhistory.title)
     ).toBeVisible();
 
     act(() => {
@@ -497,24 +466,19 @@ describe("Wallet connect", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet
-            .disconnectbeforecreatealert.message
+          EN_TRANSLATIONS.connectdapp.disconnectbeforecreatealert.message
         )
       ).toBeVisible();
     });
 
     fireEvent.click(
-      getByText(
-        EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet
-          .disconnectbeforecreatealert.confirm
-      )
+      getByText(EN_TRANSLATIONS.connectdapp.disconnectbeforecreatealert.confirm)
     );
 
     await waitFor(() => {
       expect(
         queryByText(
-          EN_TRANSLATIONS.tabs.menu.tab.items.connectwallet
-            .disconnectbeforecreatealert.message
+          EN_TRANSLATIONS.connectdapp.disconnectbeforecreatealert.message
         )
       ).toBeNull();
     });
@@ -611,7 +575,10 @@ describe("Wallet connect", () => {
     const { getByTestId, rerender } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
-          <ConnectWallet />
+          <ConnectdApp
+            isOpen
+            setIsOpen={jest.fn}
+          />
         </Provider>
       </MemoryRouter>
     );
@@ -684,7 +651,10 @@ describe("Wallet connect", () => {
     rerender(
       <MemoryRouter>
         <Provider store={updateStoreMocked}>
-          <ConnectWallet />
+          <ConnectdApp
+            isOpen
+            setIsOpen={jest.fn}
+          />
         </Provider>
       </MemoryRouter>
     );

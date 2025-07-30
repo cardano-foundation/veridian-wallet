@@ -56,10 +56,10 @@ const ConfirmConnectModal = ({
 
   const buttonTitle = i18n.t(
     isConnecting
-      ? "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.connectingbtn"
+      ? "connectdapp.connectionhistory.confirmconnect.connectingbtn"
       : isConnectModal
-      ? "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.connectbtn"
-      : "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.disconnectbtn"
+        ? "connectdapp.connectionhistory.confirmconnect.connectbtn"
+        : "connectdapp.connectionhistory.confirmconnect.disconnectbtn"
   );
 
   const meerkatId = connectionData?.meerkatId
@@ -95,7 +95,7 @@ const ConfirmConnectModal = ({
         closeButton: true,
         closeButtonAction: closeModal,
         closeButtonLabel: `${i18n.t(
-          "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.done"
+          "connectdapp.connectionhistory.confirmconnect.done"
         )}`,
         actionButton: true,
         actionButtonIcon: trashOutline,
@@ -139,9 +139,7 @@ const ConfirmConnectModal = ({
             color="primary"
           ></IonIcon>
           <span>
-            {i18n.t(
-              "tabs.menu.tab.items.connectwallet.connectionhistory.confirmconnect.pending"
-            )}
+            {i18n.t("connectdapp.connectionhistory.confirmconnect.pending")}
           </span>
         </IonChip>
       )}
