@@ -44,6 +44,7 @@ jest.mock("../../../core/agent/agent", () => ({
         getShortenUrl: jest.fn(),
         deleteStaleLocalConnectionById: () => deleteConnectionByIdMock(),
         getConnectionShortDetailById: jest.fn(() => Promise.resolve([])),
+        getOobi: jest.fn(() => Promise.resolve("mock-oobi")),
       },
       auth: {
         verifySecret: verifySecretMock,
@@ -91,6 +92,14 @@ const initialStateFull = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
   },
   viewTypeCache: {
@@ -149,6 +158,14 @@ describe("Connections tab", () => {
             loggedIn: true,
             time: Date.now(),
             passcodeIsSet: true,
+          },
+          currentProfile: {
+            identity: filteredIdentifierFix[0],
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
           },
         },
         viewTypeCache: {
@@ -214,6 +231,14 @@ describe("Connections tab", () => {
           time: Date.now(),
           passcodeIsSet: true,
         },
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
       },
       seedPhraseCache: {},
       credsCache: {
@@ -229,7 +254,7 @@ describe("Connections tab", () => {
         connections: [],
       },
       identifiersCache: {
-        identifiers: filteredIdentifierFix,
+        identifiers: filteredIdentifierMapFix,
       },
       biometricsCache: {
         enabled: false,

@@ -149,6 +149,7 @@ class SqliteSession {
       console.log("No missed cloud migrations found");
       return;
     }
+
     // eslint-disable-next-line no-console
     console.log(
       `Found ${missedCloudMigrations.length} missed cloud migrations to run`

@@ -1,5 +1,10 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  AnyAction,
+  createSlice,
+  PayloadAction,
+  ThunkAction,
+} from "@reduxjs/toolkit";
 import { Salter } from "signify-ts";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
 import { OperationType, ToastMsgType } from "../../../ui/globals/types";
@@ -11,15 +16,42 @@ import {
   InitializationPhase,
   StateCacheProps,
 } from "./stateCache.types";
+import { CreationStatus } from "../../../core/agent/agent.types";
+import { getIdentifiersCache } from "../identifiersCache";
+import { getCredsCache } from "../credsCache";
+import { getCredsArchivedCache } from "../credsArchivedCache";
+import { getWalletConnectionsCache } from "../walletConnectionsCache";
+import {
+  getConnectionsCache,
+  getMultisigConnectionsCache,
+} from "../connectionsCache";
+import { getNotificationsCache } from "../notificationsCache";
+import { filterProfileData } from "./utils";
 
 const initialState: StateCacheProps = {
   initializationPhase: InitializationPhase.PHASE_ZERO,
   recoveryCompleteNoInterruption: false,
   isOnline: false,
   routes: [],
-  currentProfileId: "",
+  currentProfile: {
+    identity: {
+      id: "",
+      displayName: "",
+      createdAtUTC: "",
+      theme: 0,
+      // TODO: default status ??
+      creationStatus: CreationStatus.PENDING,
+    },
+    connections: [],
+    multisigConnections: [],
+    peerConnections: [],
+    credentials: [],
+    archivedCredentials: [],
+    notifications: [],
+  },
   authentication: {
     loggedIn: false,
+    userName: "",
     time: 0,
     passcodeIsSet: false,
     seedPhraseIsSet: false,
@@ -59,9 +91,6 @@ const stateCacheSlice = createSlice({
     },
     setRecoveryCompleteNoInterruption: (state) => {
       state.recoveryCompleteNoInterruption = true;
-    },
-    setCurrentProfileId: (state, action: PayloadAction<string>) => {
-      state.currentProfileId = action.payload;
     },
     setCurrentRoute: (state, action: PayloadAction<CurrentRouteCacheProps>) => {
       const filteredRoutes = state.routes.filter(
@@ -192,6 +221,12 @@ const stateCacheSlice = createSlice({
     setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
       state.isSetupProfile = action.payload;
     },
+    setCurrentProfile: (
+      state,
+      action: PayloadAction<StateCacheProps["currentProfile"]>
+    ) => {
+      state.currentProfile = action.payload;
+    },
   },
 });
 
@@ -199,7 +234,6 @@ const {
   setInitializationPhase,
   setRecoveryCompleteNoInterruption,
   setCurrentRoute,
-  setCurrentProfileId,
   removeCurrentRoute,
   removeRoute,
   resetAllRoutes,
@@ -222,7 +256,60 @@ const {
   clearStateCache,
   showGlobalLoading,
   setIsSetupProfile,
+  setCurrentProfile,
 } = stateCacheSlice.actions;
+
+const updateCurrentProfile =
+  (profileId: string): ThunkAction<void, RootState, unknown, AnyAction> =>
+    async (dispatch, getState) => {
+      const state = getState();
+      const identifiers = getIdentifiersCache(state);
+
+      if (!identifiers || !identifiers[profileId]) {
+        throw new Error(`Profile with id ${profileId} not found.`);
+      }
+
+      const profileData = identifiers[profileId];
+      const allCreds = getCredsCache(state);
+      const allArchivedCreds = getCredsArchivedCache(state);
+      const allPeerConnections = getWalletConnectionsCache(state);
+      const allConnections = getConnectionsCache(state);
+      const allMultisigConnections = getMultisigConnectionsCache(state);
+      const allNotifications = getNotificationsCache(state);
+
+      const {
+        profileIdentifier,
+        profileCredentials,
+        profileArchivedCredentials,
+        profilePeerConnections,
+        profileNotifications,
+      } = filterProfileData(
+        identifiers,
+        allCreds,
+        allArchivedCreds,
+        allPeerConnections,
+        allNotifications,
+        profileId
+      );
+
+      const newProfile: StateCacheProps["currentProfile"] = {
+        identity: {
+          id: profileIdentifier.id,
+          displayName: profileData.displayName,
+          createdAtUTC: profileIdentifier.createdAtUTC,
+          theme: profileIdentifier.theme,
+          creationStatus: profileIdentifier.creationStatus,
+        },
+        // TODO: add filtering for connections once we have connections per account merged
+        connections: Object.values(allConnections),
+        multisigConnections: Object.values(allMultisigConnections),
+        peerConnections: profilePeerConnections,
+        credentials: profileCredentials,
+        archivedCredentials: profileArchivedCredentials,
+        notifications: profileNotifications,
+      };
+      dispatch(setCurrentProfile(newProfile));
+    };
 
 const getStateCache = (state: RootState) => state.stateCache;
 const getInitializationPhase = (state: RootState) =>
@@ -232,8 +319,6 @@ const getRecoveryCompleteNoInterruption = (state: RootState) =>
 const getRoutes = (state: RootState) => state.stateCache.routes;
 const getCurrentRoute = (state: RootState) =>
   state.stateCache.routes.length ? state.stateCache.routes[0] : undefined;
-const getCurrentProfileId = (state: RootState) =>
-  state.stateCache.currentProfileId;
 const getAuthentication = (state: RootState) => state.stateCache.authentication;
 const getCurrentOperation = (state: RootState) =>
   state.stateCache.currentOperation;
@@ -256,6 +341,7 @@ const getForceInitApp = (state: RootState) => state.stateCache.forceInitApp;
 const getGlobalLoading = (state: RootState) => state.stateCache.showLoading;
 const getShowSetupProfilePage = (state: RootState) =>
   state.stateCache.isSetupProfile;
+const getCurrentProfile = (state: RootState) => state.stateCache.currentProfile;
 
 export type {
   AuthenticationCacheProps,
@@ -271,7 +357,6 @@ export {
   getCameraDirection,
   getCurrentOperation,
   getCurrentRoute,
-  getCurrentProfileId,
   getFirstAppLaunch,
   getForceInitApp,
   getGlobalLoading,
@@ -287,6 +372,7 @@ export {
   getStateCache,
   getToastMgs,
   getToastMsgs,
+  getCurrentProfile,
   initialState,
   login,
   logout,
@@ -294,10 +380,10 @@ export {
   removeRoute,
   removeToastMessage,
   resetAllRoutes,
+  setCurrentProfile,
   setAuthentication,
   setCameraDirection,
   setCurrentOperation,
-  setCurrentProfileId,
   setCurrentRoute,
   setFirstAppLaunchComplete,
   setInitializationPhase,
@@ -312,4 +398,5 @@ export {
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
+  updateCurrentProfile,
 };

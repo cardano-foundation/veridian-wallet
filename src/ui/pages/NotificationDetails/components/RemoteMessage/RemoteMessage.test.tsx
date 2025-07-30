@@ -61,6 +61,7 @@ describe("RemoteMessage", () => {
       connectionId: "connection-456",
       read: false,
       groupReplied: false,
+      receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
     };
 
     render(
@@ -108,6 +109,7 @@ describe("RemoteMessage", () => {
       connectionId: "connection-456",
       read: false,
       groupReplied: false,
+      receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
     };
 
     const { queryByTestId } = render(

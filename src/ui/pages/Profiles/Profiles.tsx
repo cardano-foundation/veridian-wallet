@@ -1,21 +1,24 @@
-import { IonButton, IonIcon, IonModal } from "@ionic/react";
+import { IonButton, IonChip, IonIcon, IonModal } from "@ionic/react";
 import {
   addCircleOutline,
+  hourglassOutline,
   peopleCircleOutline,
   personCircleOutline,
   settingsOutline,
 } from "ionicons/icons";
 import { useState } from "react";
 import { Agent } from "../../../core/agent/agent";
-import { MiscRecordId } from "../../../core/agent/agent.types";
+import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getCurrentProfileId,
-  setCurrentProfileId,
+  getAuthentication,
+  getStateCache,
+  setAuthentication,
   setToastMsg,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
@@ -32,7 +35,10 @@ import {
   ProfilesProps,
 } from "./Profiles.types";
 
-const ProfileItem = ({ id, displayName, onClick }: ProfileItemsProps) => {
+const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
+  if (!identifier) return null;
+  const { id, displayName, creationStatus } = identifier;
+
   return (
     <div
       className="profiles-list-item"
@@ -42,18 +48,30 @@ const ProfileItem = ({ id, displayName, onClick }: ProfileItemsProps) => {
       <div className="profiles-list-item-avatar">
         <Avatar id={id} />
       </div>
-      <div className="profiles-list-item-name">{displayName}</div>
+      <span className="profiles-list-item-inner">
+        <div className="profiles-list-item-name">{displayName}</div>
+        {creationStatus === CreationStatus.PENDING && (
+          <IonChip data-testid={`profiles-list-item-${id}-status`}>
+            <IonIcon
+              icon={hourglassOutline}
+              color="primary"
+            />
+            <span>{CreationStatus.PENDING.toLowerCase()}</span>
+          </IonChip>
+        )}
+      </span>
     </div>
   );
 };
 
-const OptionButton = ({ icon, text, action }: OptionButtonProps) => {
+const OptionButton = ({ icon, text, action, disabled }: OptionButtonProps) => {
   return (
     <IonButton
       expand="block"
       className="profiles-options-button"
       data-testid={`profiles-option-button-${text.toLowerCase()}`}
       onClick={action}
+      disabled={disabled}
     >
       {icon && (
         <IonIcon
@@ -71,31 +89,30 @@ const OptionButton = ({ icon, text, action }: OptionButtonProps) => {
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
+  const stateCache = useAppSelector(getStateCache);
   const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const defaultProfileId = useAppSelector(getCurrentProfileId);
+  const defaultProfile = stateCache.currentProfile.identity.id;
   const identifiersData = Object.values(identifiersDataCache);
-
-  // TODO: remove this after core API exists
-  const currentProfileId = identifiersData.find(
-    (p) => p.id === defaultProfileId
-  );
-
   const filteredIdentifiersData = identifiersData.filter(
-    (p) => p.id !== defaultProfileId
+    (item) => item.id !== defaultProfile
   );
   const [openSetting, setOpenSetting] = useState(false);
-
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
 
   const handleClose = () => {
     setIsOpen(false);
   };
+
   const handleOpenSettings = () => {
     setOpenSetting(true);
   };
 
   const handleAddProfile = () => {
     setOpenSetupProfile(true);
+  };
+
+  const handleCloseSetupProfile = () => {
+    setOpenSetupProfile(false);
   };
 
   const handleJoinGroup = () => {
@@ -106,11 +123,11 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     try {
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
-          id: MiscRecordId.CURRENT_PROFILE_ID,
+          id: MiscRecordId.DEFAULT_PROFILE,
           content: { defaultProfile: id },
         })
       );
-      dispatch(setCurrentProfileId(id));
+      dispatch(updateCurrentProfile(id));
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
     } catch (e) {
@@ -122,8 +139,6 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       );
     }
   };
-
-  const handleCloseSetupProfile = () => setOpenSetupProfile(false);
 
   return (
     <>
@@ -152,25 +167,25 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           }
         >
           <div className="profiles-selected-profile">
-            <ProfileItem
-              id={defaultProfileId}
-              displayName={currentProfileId?.displayName}
-            />
+            <ProfileItem identifier={identifiersDataCache[defaultProfile]} />
             <OptionButton
               icon={personCircleOutline}
               text={`${i18n.t("profiles.options.manage")}`}
               action={handleOpenSettings}
+              disabled={
+                identifiersDataCache[defaultProfile]?.creationStatus ===
+                CreationStatus.PENDING
+              }
             />
           </div>
           <div className="profiles-list">
             {filteredIdentifiersData.map((identifier) => (
               <ProfileItem
                 key={identifier.id}
-                id={identifier.id}
-                onClick={async () => {
+                identifier={identifier}
+                onClick={() => {
                   handleSelectProfile(identifier.id);
                 }}
-                displayName={identifiersDataCache[identifier.id]?.displayName}
               />
             ))}
           </div>

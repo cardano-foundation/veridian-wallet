@@ -27,10 +27,7 @@ import {
   getNotificationsCache,
   setNotificationsCache,
 } from "../../../../../store/reducers/notificationsCache";
-import {
-  getAuthentication,
-  getCurrentProfileId,
-} from "../../../../../store/reducers/stateCache";
+import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert, Alert as AlertDecline } from "../../../../components/Alert";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
 import { CardTheme } from "../../../../components/CardTheme";
@@ -69,7 +66,7 @@ const ReceiveCredential = ({
   const dispatch = useAppDispatch();
   const notificationsCache = useAppSelector(getNotificationsCache);
   const [notifications, setNotifications] = useState(notificationsCache);
-  const currentProfileId = useAppSelector(getCurrentProfileId);
+  const userName = useAppSelector(getAuthentication)?.userName;
   const connectionsCache = useAppSelector(getConnectionsCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
@@ -283,7 +280,7 @@ const ReceiveCredential = ({
     let name = memberConnection?.label || member;
 
     if (!memberConnection?.label) {
-      name = currentProfileId;
+      name = userName;
     }
 
     return {

@@ -1,10 +1,10 @@
 import { Capacitor } from "@capacitor/core";
 import { IonInput, IonLabel, setupIonicReact } from "@ionic/react";
+import { ready } from "signify-ts";
 import { ionFireEvent, mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import { ready } from "signify-ts";
 import {
   ConnectionDetails,
   CreationStatus,

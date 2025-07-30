@@ -13,6 +13,7 @@ import {
 import { IdentifiersFilters } from "../../../ui/pages/Identifiers/Identifiers.types";
 import { CredentialsFilters } from "../../../ui/pages/Credentials/Credentials.types";
 import { InitializationPhase } from "../stateCache/stateCache.types";
+import { CreationStatus } from "../../../core/agent/agent.types";
 
 const notification: KeriaNotification = {
   id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmG",
@@ -25,6 +26,7 @@ const notification: KeriaNotification = {
   connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
   read: true,
   groupReplied: false,
+  receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
 };
 
 describe("Notifications cache", () => {
@@ -62,6 +64,7 @@ describe("Notifications cache", () => {
         connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
         read: false,
         groupReplied: false,
+        receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
       },
     ]);
   });
@@ -107,6 +110,7 @@ describe("Notifications cache", () => {
         connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
         read: true,
         groupReplied: false,
+        receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
       },
     ];
     const newState = notificationsCacheSlice.reducer(
@@ -123,9 +127,9 @@ describe("Notifications cache", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [],
-        currentProfileId: "Account1",
         authentication: {
           loggedIn: false,
+          userName: "",
           time: 0,
           passcodeIsSet: false,
           seedPhraseIsSet: false,
@@ -147,6 +151,21 @@ describe("Notifications cache", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        currentProfile: {
+          identity: {
+            id: "",
+            displayName: "",
+            createdAtUTC: "",
+            theme: 0,
+            creationStatus: CreationStatus.PENDING,
+          },
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+          notifications: [],
+        },
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -206,6 +225,7 @@ describe("Notifications cache", () => {
             connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
             read: true,
             groupReplied: false,
+            receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
           },
         ],
       },

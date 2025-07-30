@@ -20,7 +20,9 @@ const InputAttribute = ({
           <AppInput
             key={attribute}
             fullWidth
-            label={`${inputLabelText.at(0)?.toUpperCase()}${inputLabelText.slice(1)}`}
+            label={`${inputLabelText
+              .at(0)
+              ?.toUpperCase()}${inputLabelText.slice(1)}`}
             optional={attributeOptional}
             value={value[attribute] || ""}
             onChange={(e) => setValue(attribute, e.target.value)}

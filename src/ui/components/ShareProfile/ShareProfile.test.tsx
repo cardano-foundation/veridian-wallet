@@ -13,8 +13,6 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import {
-  getCurrentProfileId,
-  logout,
   setToastMsg,
   showGenericError,
 } from "../../../store/reducers/stateCache";
@@ -134,6 +132,14 @@ describe("Share Profile", () => {
         time: Date.now(),
         passcodeIsSet: true,
         passwordIsSet: false,
+      },
+      currentProfile: {
+        identity: filteredIdentifierFix[0],
+        connections: [],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
       },
     },
   };

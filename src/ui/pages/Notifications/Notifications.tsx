@@ -15,7 +15,8 @@ import {
   markNotificationAsRead,
 } from "../../../store/reducers/notificationsCache";
 import {
-  getCurrentProfileId,
+  getAuthentication,
+  getCurrentProfile,
   setCurrentRoute,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
@@ -62,7 +63,7 @@ const Notifications = () => {
     openUnknownPresentConnectionAlert,
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
-  const currentProfileName = useAppSelector(getCurrentProfileId);
+  const currentProfile = useAppSelector(getCurrentProfile);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
@@ -200,7 +201,7 @@ const Notifications = () => {
   }) => {
     return (
       <Avatar
-        id={currentProfileName}
+        id={currentProfile.identity.id}
         handleAvatarClick={handleAvatarClick}
       />
     );

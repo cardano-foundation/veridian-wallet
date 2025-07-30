@@ -1,3 +1,5 @@
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
+
 interface AvatarProfilesProps {
   defaultProfile: string;
 }
@@ -9,12 +11,12 @@ interface ProfilesProps {
 interface OptionButtonProps {
   icon: string;
   text: string;
+  disabled?: boolean;
   action: () => void;
 }
 
 interface ProfileItemsProps {
-  id: string;
-  displayName?: string;
+  identifier: IdentifierShortDetails;
   onClick?: () => void;
 }
 

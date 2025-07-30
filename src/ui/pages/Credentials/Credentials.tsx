@@ -25,7 +25,7 @@ import {
 } from "../../../store/reducers/credsCache";
 import {
   getAuthentication,
-  getCurrentProfileId,
+  getCurrentProfile,
   setCurrentRoute,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
@@ -79,7 +79,7 @@ const Credentials = () => {
     CredentialShortDetails[]
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
-  const currentProfileId = useAppSelector(getCurrentProfileId);
+  const currentProfile = useAppSelector(getCurrentProfile);
   const revokedCreds = credsCache.filter(
     (item) => item.status === CredentialStatus.REVOKED
   );
@@ -262,7 +262,7 @@ const Credentials = () => {
   }) => {
     return (
       <Avatar
-        id={currentProfileId}
+        id={currentProfile.identity.id}
         handleAvatarClick={handleAvatarClick}
       />
     );

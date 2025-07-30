@@ -7,8 +7,17 @@ import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix"
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Profiles } from "./Profiles";
 import { Agent } from "../../../core/agent/agent";
-import { setToastMsg } from "../../../store/reducers/stateCache";
+import {
+  setToastMsg,
+  updateCurrentProfile,
+} from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
+import { CreationStatus } from "../../../core/agent/agent.types";
+
+jest.mock("../../../store/reducers/stateCache", () => ({
+  ...jest.requireActual("../../../store/reducers/stateCache"),
+  updateCurrentProfile: jest.fn(),
+}));
 mockIonicReact();
 
 jest.mock("../../../core/configuration", () => ({
@@ -44,6 +53,14 @@ const initialState = {
       time: Date.now(),
       passcodeIsSet: true,
     },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
+    },
   },
   identifiersCache: {
     identifiers: filteredIdentifierFix,
@@ -73,6 +90,7 @@ describe("Profiles", () => {
 
   afterEach(() => {
     cleanup();
+    jest.clearAllMocks();
   });
 
   test("Render profile", async () => {
@@ -111,6 +129,9 @@ describe("Profiles", () => {
 
   test("switch profile success", async () => {
     const setIsOpenMock = jest.fn();
+    (
+      Agent.agent.basicStorage.createOrUpdateBasicRecord as jest.Mock
+    ).mockResolvedValue(undefined);
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <Profiles
@@ -147,9 +168,9 @@ describe("Profiles", () => {
       </Provider>
     );
 
-    jest
-      .spyOn(Agent.agent.basicStorage, "createOrUpdateBasicRecord")
-      .mockRejectedValue(new Error("error"));
+    (
+      Agent.agent.basicStorage.createOrUpdateBasicRecord as jest.Mock
+    ).mockRejectedValue(new Error("error"));
 
     await waitFor(() => {
       expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeInTheDocument();
@@ -165,5 +186,34 @@ describe("Profiles", () => {
         setToastMsg(ToastMsgType.UNABLE_TO_SWITCH_PROFILE)
       );
     });
+  });
+
+  test("shows IonChip for identifier with creationStatus PENDING", async () => {
+    const setIsOpenMock = jest.fn();
+    const pendingIdentifier = filteredIdentifierFix.find(
+      (idObj) => idObj.creationStatus === CreationStatus.PENDING
+    );
+    if (!pendingIdentifier) {
+      throw new Error(
+        "No identifier with creationStatus PENDING found in fixture"
+      );
+    }
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <Profiles
+          isOpen
+          setIsOpen={setIsOpenMock}
+        />
+      </Provider>
+    );
+
+    const chip = await waitFor(() =>
+      getByTestId(`profiles-list-item-${pendingIdentifier.id}-status`)
+    );
+    expect(chip).toBeVisible();
+    expect(chip.textContent?.toLowerCase()).toContain(
+      CreationStatus.PENDING.toLowerCase()
+    );
   });
 });

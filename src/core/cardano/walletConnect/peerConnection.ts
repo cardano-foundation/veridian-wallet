@@ -14,7 +14,7 @@ import {
   PeerDisconnectedEvent,
 } from "./peerConnection.types";
 import { Agent } from "../../agent/agent";
-import { PeerConnectionStorage } from "../../agent/records";
+import { PeerConnectionPairStorage } from "../../agent/records";
 
 class PeerConnection {
   static readonly PEER_CONNECTION_START_PENDING =
@@ -107,15 +107,16 @@ class PeerConnection {
           ) {
             iconB64 = icon;
           }
-          await Agent.agent.peerConnectionMetadataStorage.updatePeerConnectionMetadata(
-            address,
+          const peerConnectionId = `${address}:${selectedAid}`;
+          await Agent.agent.peerConnectionPair.updatePeerConnectionAccount(
+            peerConnectionId,
             {
               name,
-              selectedAid,
               url,
-              iconB64: iconB64,
+              iconB64,
             }
           );
+
           this.eventEmitter.emit<PeerConnectedEvent>({
             type: PeerConnectionEventTypes.PeerConnected,
             payload: {
@@ -147,36 +148,34 @@ class PeerConnection {
     );
   }
 
-  async connectWithDApp(dAppIdentifier: string) {
+  async connectWithDApp(peerConnectionId: string) {
     if (this.identityWalletConnect === undefined) {
       throw new Error(PeerConnection.PEER_CONNECTION_START_PENDING);
     }
-    const existingPeerConnection =
-      await Agent.agent.peerConnectionMetadataStorage
-        .getPeerConnectionMetadata(dAppIdentifier)
-        .catch((error) => {
-          if (
-            error.message ===
-            PeerConnectionStorage.PEER_CONNECTION_METADATA_RECORD_MISSING
-          ) {
-            return undefined;
-          } else {
-            throw error;
-          }
-        });
-    if (!existingPeerConnection) {
-      const connectingIdentifier =
-        await this.identityWalletConnect.getKeriIdentifier();
-      await Agent.agent.peerConnectionMetadataStorage.createPeerConnectionMetadataRecord(
-        {
-          id: dAppIdentifier,
-          selectedAid: connectingIdentifier.id,
-          iconB64: ICON_BASE64,
+
+    const [dAppIdentifier, connectingIdentifier] = peerConnectionId.split(":");
+
+    const existingPeerConnection = await Agent.agent.peerConnectionPair
+      .getPeerConnection(`${dAppIdentifier}:${connectingIdentifier}`)
+      .catch((error) => {
+        if (
+          error.message ===
+          PeerConnectionPairStorage.PEER_CONNECTION_ACCOUNT_RECORD_MISSING
+        ) {
+          return undefined;
+        } else {
+          throw error;
         }
-      );
+      });
+
+    if (!existingPeerConnection) {
+      await Agent.agent.peerConnectionPair.createPeerConnectionPairRecord({
+        id: `${dAppIdentifier}:${connectingIdentifier}`,
+        selectedAid: connectingIdentifier,
+        iconB64: ICON_BASE64,
+      });
     }
     const seed = this.identityWalletConnect.connect(dAppIdentifier);
-
     SecureStorage.set(KeyStoreKeys.MEERKAT_SEED, seed);
   }
 

@@ -16,6 +16,7 @@ import { IdentifiersFilters } from "../../ui/pages/Identifiers/Identifiers.types
 import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { TabsRoutePath } from "../paths";
+import { CreationStatus } from "../../core/agent/agent.types";
 
 describe("NextRoute", () => {
   let localStorageMock: any;
@@ -30,9 +31,9 @@ describe("NextRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [],
-        currentProfileId: "Account1",
         authentication: {
           loggedIn: false,
+          userName: "",
           time: 0,
           passcodeIsSet: false,
           seedPhraseIsSet: false,
@@ -47,6 +48,21 @@ describe("NextRoute", () => {
           },
           firstAppLaunch: false,
           finishSetupBiometrics: false,
+        },
+        currentProfile: {
+          identity: {
+            id: "",
+            displayName: "",
+            createdAtUTC: "",
+            theme: 0,
+            creationStatus: CreationStatus.PENDING,
+          },
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+          notifications: [],
         },
         toastMsgs: [],
         currentOperation: OperationType.IDLE,
@@ -142,9 +158,9 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
-          currentProfileId: "Account1",
           authentication: {
             loggedIn: false,
+            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,
@@ -177,9 +193,9 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
-          currentProfileId: "Account1",
           authentication: {
             loggedIn: false,
+            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,
@@ -213,9 +229,9 @@ describe("NextRoute", () => {
         stateCache: {
           initializationPhase: InitializationPhase.PHASE_TWO,
           routes: [],
-          currentProfileId: "Account1",
           authentication: {
             loggedIn: false,
+            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: true,
@@ -299,9 +315,9 @@ describe("getNextRoute", () => {
       initializationPhase: InitializationPhase.PHASE_TWO,
       recoveryCompleteNoInterruption: false,
       routes: [],
-      currentProfileId: "Account1",
       authentication: {
         loggedIn: false,
+        userName: "",
         time: 0,
         passcodeIsSet: true,
         seedPhraseIsSet: false,
@@ -323,6 +339,21 @@ describe("getNextRoute", () => {
         isProcessing: false,
         queues: [],
         isPaused: false,
+      },
+      currentProfile: {
+        identity: {
+          id: "",
+          displayName: "",
+          createdAtUTC: "",
+          theme: 0,
+          creationStatus: CreationStatus.PENDING,
+        },
+        connections: [],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+        notifications: [],
       },
     },
     seedPhraseCache: {

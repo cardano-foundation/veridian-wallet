@@ -17,7 +17,7 @@ import {
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
   getAuthentication,
-  getCurrentProfileId,
+  getCurrentProfile,
   getStateCache,
   setCurrentOperation,
   setCurrentRoute,
@@ -61,8 +61,9 @@ const Connections = () => {
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
-  const currentProfileName = useAppSelector(getCurrentProfileId);
-  const identifier = identifiers[currentProfileName];
+  const auth = useAppSelector(getAuthentication);
+  const currentProfile = useAppSelector(getCurrentProfile);
+  const identifier = identifiers[currentProfile.identity.id];
 
   const showPlaceholder = Object.keys(connectionsCache).length === 0;
 
@@ -122,10 +123,10 @@ const Connections = () => {
 
   const fetchOobi = useCallback(async () => {
     try {
-      if (!currentProfileName) return;
+      if (!currentProfile.identity.id) return;
 
       const oobiValue = await Agent.agent.connections.getOobi(
-        `${currentProfileName}`,
+        `${currentProfile.identity.id}`,
         identifier?.displayName || ""
       );
       if (oobiValue) {
@@ -134,7 +135,7 @@ const Connections = () => {
     } catch (e) {
       showError("Unable to fetch connection oobi", e, dispatch);
     }
-  }, [currentProfileName, identifier?.displayName, dispatch]);
+  }, [currentProfile.identity.id, identifier?.displayName, dispatch]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -202,7 +203,7 @@ const Connections = () => {
           />
         </IonButton>
         <Avatar
-          id={currentProfileName}
+          id={currentProfile.identity.id}
           handleAvatarClick={handleAvatarClick}
         />
       </>

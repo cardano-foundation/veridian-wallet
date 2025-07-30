@@ -37,9 +37,9 @@ import {
 import {
   getStateCache,
   setCurrentOperation,
-  setCurrentProfileId,
   setIsSetupProfile,
   setRecoveryCompleteNoInterruption,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { CustomInput } from "../../components/CustomInput";
@@ -222,12 +222,12 @@ const CreateSSIAgent = () => {
             Agent.agent.basicStorage
               .createOrUpdateBasicRecord(
                 new BasicRecord({
-                  id: MiscRecordId.CURRENT_PROFILE_ID,
+                  id: MiscRecordId.DEFAULT_PROFILE,
                   content: { defaultProfile: oldestIdentifier.id },
                 })
               )
               .then(() => {
-                dispatch(setCurrentProfileId(oldestIdentifier.id));
+                dispatch(updateCurrentProfile(oldestIdentifier.id));
               })
               .catch((e) => {
                 showError("Cannot set default profile", e);

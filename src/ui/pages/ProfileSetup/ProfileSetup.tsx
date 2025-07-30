@@ -1,22 +1,22 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { Salter } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
+import { BasicRecord } from "../../../core/agent/records";
 import { IdentifierService } from "../../../core/agent/services";
 import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
-import { useAppSelector } from "../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
 import {
   getStateCache,
-  setCurrentProfileId,
   showNoWitnessAlert,
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
@@ -33,19 +33,19 @@ import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
 import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
-import { BasicRecord } from "../../../core/agent/records";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
   const [userName, setUserName] = useState("");
   const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
+
   const isModal = !!onClose;
 
   const title = i18n.t(`setupprofile.${step}.title`);
@@ -54,7 +54,9 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     SetupProfileStep.SetupGroup,
   ].includes(step)
     ? i18n.t("setupprofile.button.back")
-    : undefined;
+    : isModal
+      ? i18n.t("setupprofile.button.cancel")
+      : undefined;
 
   const getButtonText = () => {
     switch (step) {
@@ -90,7 +92,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
     const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
-      displayName: userName,
+      displayName: isGroup ? groupName : userName,
       theme: 0,
     };
 
@@ -106,6 +108,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
     try {
       setLoading(true);
+
       // Create the identifier
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
@@ -114,7 +117,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       if (isGroup) {
         await Agent.agent.basicStorage.createOrUpdateBasicRecord(
           new BasicRecord({
-            id: MiscRecordId.CURRENT_PROFILE_ID,
+            id: MiscRecordId.USER_NAME,
             content: {
               userName,
             },
@@ -130,11 +133,11 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
-          id: MiscRecordId.CURRENT_PROFILE_ID,
+          id: MiscRecordId.DEFAULT_PROFILE,
           content: { defaultProfile: identifier },
         })
       );
-      dispatch(setCurrentProfileId(identifier));
+      dispatch(updateCurrentProfile(identifier));
 
       if (isModal) {
         onClose();

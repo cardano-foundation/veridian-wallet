@@ -9,10 +9,7 @@ import { i18n } from "../../../../i18n";
 import { useAppSelector } from "../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../store/reducers/connectionsCache";
 import { getIdentifiersCache } from "../../../../store/reducers/identifiersCache";
-import {
-  getAuthentication,
-  getCurrentProfileId,
-} from "../../../../store/reducers/stateCache";
+import { getAuthentication } from "../../../../store/reducers/stateCache";
 import { CardDetailsContent } from "../../../components/CardDetails";
 import {
   CardBlock,
@@ -37,7 +34,7 @@ const IdentifierContent = ({
   onRotateKey,
 }: IdentifierContentProps) => {
   const identifiersData = useAppSelector(getIdentifiersCache);
-  const currentProfileId = useAppSelector(getCurrentProfileId);
+  const userName = useAppSelector(getAuthentication)?.userName;
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const memberCount = cardData.members?.length || 0;
   const [openDetailModal, setOpenDetailModal] = useState(false);
@@ -57,7 +54,7 @@ const IdentifierContent = ({
       let name = memberConnection?.label || member;
 
       if (!memberConnection?.label) {
-        name = currentProfileId;
+        name = userName;
       }
 
       return name;

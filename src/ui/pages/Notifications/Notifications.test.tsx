@@ -85,6 +85,14 @@ const initialState = {
       passcodeIsSet: true,
       defaultProfile: filteredIdentifierFix[0].id,
     },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
+    },
   },
   identifiersCache: {
     identifiers: filteredIdentifierMapFix,
@@ -108,6 +116,14 @@ const fullState = {
       time: Date.now(),
       passcodeIsSet: true,
       defaultProfile: filteredIdentifierFix[0].id,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: Object.values(connectionsForNotifications),
+      multisigConnections: Object.values(connectionsForNotifications),
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
   },
   identifiersCache: {
@@ -137,6 +153,14 @@ const filterTestData = {
       passcodeIsSet: true,
       defaultProfile: filteredIdentifierFix[0].id,
     },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: Object.values(connectionsForNotifications),
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
+    },
   },
   connectionsCache: {
     connections: connectionsForNotifications,
@@ -160,6 +184,14 @@ const emptyConnection = {
       time: Date.now(),
       passcodeIsSet: true,
       defaultProfile: filteredIdentifierFix[0].id,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
   },
   connectionsCache: {
@@ -334,7 +366,7 @@ describe("Notifications Tab", () => {
     const history = createMemoryHistory();
     history.push(TabsRoutePath.NOTIFICATIONS);
 
-    const { getByTestId, findByText } = render(
+    const { getByTestId, findByTestId, findAllByTestId } = render(
       <IonReactMemoryRouter history={history}>
         <Provider store={filterStore}>
           <Notifications />
@@ -354,10 +386,12 @@ describe("Notifications Tab", () => {
       );
     });
 
-    const unknownIssuerText = await findByText(
+    const alerts = await findAllByTestId("alert-unknown-issuer");
+    expect(alerts[0]).toBeInTheDocument();
+    expect(alerts[0]).toHaveAttribute(
+      "header",
       EN_TRANSLATIONS.tabs.notifications.tab.unknownissuer.text
     );
-    expect(unknownIssuerText).toBeInTheDocument();
   });
 
   test("Cannot open notification from unknown presentation connection", async () => {
@@ -470,6 +504,7 @@ describe("Notifications Tab", () => {
       groupReplied: false,
       groupInitiator: false,
       groupInitiatorPre: "",
+      receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
     };
 
     const mockOnClick = jest.fn();
