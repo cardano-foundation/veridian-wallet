@@ -2,6 +2,7 @@ const getConnectionShortDetailByIdMock = jest.fn();
 
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
+import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
@@ -28,7 +29,7 @@ import {
   PeerConnectionEventTypes,
   PeerDisconnectedEvent,
 } from "../../../core/cardano/walletConnect/peerConnection.types";
-import { store } from "../../../store";
+import { RootState, store } from "../../../store";
 import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
 import { updateOrAddCredsCache } from "../../../store/reducers/credsCache";
 import {
@@ -419,17 +420,35 @@ describe("Peer connection states changed handler", () => {
 
 describe("KERIA operation state changed handler", () => {
   test("handles completed witness operation", async () => {
+    const storeDispatch = jest.fn();
+    const getStateMock = jest.fn(() => ({
+      stateCache: {
+        currentProfile: {
+          identity: {
+            id: "test",
+          },
+        },
+      },
+    }));
+
+    dispatch.mockImplementation(
+      (func: ThunkAction<void, any, unknown, AnyAction>) => {
+        if (typeof func === "function") func(storeDispatch, getStateMock, {});
+      }
+    );
+
     const id = "id";
     await operationCompleteHandler(
       { opType: OperationPendingRecordType.Witness, oid: id },
       dispatch
     );
-    expect(dispatch).toBeCalledWith(
+    expect(storeDispatch).toBeCalledWith(
       updateCreationStatus({ id: id, creationStatus: CreationStatus.COMPLETE })
     );
     expect(dispatch).toBeCalledWith(
       setToastMsg(ToastMsgType.IDENTIFIER_UPDATED)
     );
+    dispatch.mockClear();
   });
 
   test("handles failed witness operation", async () => {

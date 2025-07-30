@@ -81,6 +81,7 @@ import {
   setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
 import { OperationType, ToastMsgType } from "../../globals/types";
+import { useProfile } from "../../hooks/useProfile";
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
 import { showError } from "../../utils/error";
 import { Alert } from "../Alert";
@@ -224,6 +225,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
   );
   const forceInitApp = useAppSelector(getForceInitApp);
   const [isAlertPeerBrokenOpen, setIsAlertPeerBrokenOpen] = useState(false);
+  const { getRecentDefaultProfile, updateProfileHistories } = useProfile();
   useActivityTimer();
 
   const setOnlineStatus = useCallback(
@@ -370,33 +372,16 @@ const AppWrapper = (props: { children: ReactNode }) => {
         MiscRecordId.DEFAULT_PROFILE
       );
 
-      let currentProfileAid = "";
-      if (appDefaultProfileRecord) {
-        currentProfileAid = (
-          appDefaultProfileRecord.content as { defaultProfile: string }
-        ).defaultProfile;
-      } else {
-        const storedIdentifiers =
-          await Agent.agent.identifiers.getIdentifiers();
-        if (storedIdentifiers.length > 0) {
-          // If we have no default profile set, we will set the oldest identifier as default.
-          const oldest = storedIdentifiers
-            .slice()
-            .sort(
-              (a, b) =>
-                new Date(a.createdAtUTC).getTime() -
-                new Date(b.createdAtUTC).getTime()
-            )[0];
-          const id = oldest?.id || "";
-          currentProfileAid = id;
+      const profileHistoriesRecord = await Agent.agent.basicStorage.findById(
+        MiscRecordId.PROFILE_HISTORIES
+      );
 
-          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.DEFAULT_PROFILE,
-              content: { defaultProfile: id },
-            })
-          );
-        }
+      const profileHistories = profileHistoriesRecord
+        ? (profileHistoriesRecord.content.value as string[])
+        : [];
+
+      if (profileHistories) {
+        dispatch(setProfileHistories(profileHistories));
       }
 
       const identifiersDict = storedIdentifiers.reduce(
@@ -407,22 +392,58 @@ const AppWrapper = (props: { children: ReactNode }) => {
         {}
       );
 
-      const {
-        profileIdentifier,
-        profileCredentials,
-        profileArchivedCredentials,
-        profilePeerConnections,
-        profileNotifications,
-      } = filterProfileData(
-        identifiersDict,
-        credsCache,
-        credsArchivedCache,
-        storedPeerConnections,
-        notifications,
-        currentProfileAid
-      );
+      let currentProfileAid = "";
+      if (appDefaultProfileRecord) {
+        currentProfileAid = (
+          appDefaultProfileRecord.content as { defaultProfile: string }
+        ).defaultProfile;
+      } else {
+        const { recentProfile, newProfileHistories } = getRecentDefaultProfile(
+          profileHistories,
+          identifiersDict,
+          ""
+        );
 
-      if (profileIdentifier) {
+        if (recentProfile) {
+          currentProfileAid = recentProfile;
+          updateProfileHistories(newProfileHistories);
+        } else {
+          if (storedIdentifiers.length > 0) {
+            // If we have no default profile set, we will set the oldest identifier as default.
+            const oldest = storedIdentifiers
+              .slice()
+              .sort((prev, next) =>
+                prev.displayName.localeCompare(next.displayName)
+              )[0];
+
+            currentProfileAid = oldest?.id || "";
+
+            await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+              new BasicRecord({
+                id: MiscRecordId.DEFAULT_PROFILE,
+                content: { defaultProfile: currentProfileAid },
+              })
+            );
+          }
+        }
+      }
+
+      if (currentProfileAid) {
+        const {
+          profileIdentifier,
+          profileCredentials,
+          profileArchivedCredentials,
+          profilePeerConnections,
+          profileNotifications,
+        } = filterProfileData(
+          identifiersDict,
+          credsCache,
+          credsArchivedCache,
+          storedPeerConnections,
+          notifications,
+          currentProfileAid
+        );
+
         dispatch(
           setCurrentProfile({
             identity: {
@@ -459,7 +480,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let defaultProfile = "";
       let credentialsSelectedFilter: CredentialsFilters =
         CredentialsFilters.All;
       const passcodeIsSet = await SecureStorage.keyExists(
@@ -523,38 +543,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
-      const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.DEFAULT_PROFILE
-      );
-
-      if (appDefaultProfileRecord) {
-        defaultProfile = (
-          appDefaultProfileRecord.content as { defaultProfile: string }
-        ).defaultProfile;
-      } else {
-        const storedIdentifiers =
-          await Agent.agent.identifiers.getIdentifiers();
-        if (storedIdentifiers.length > 0) {
-          // If we have no default profile set, we will set the oldest identifier as default.
-          const oldest = storedIdentifiers
-            .slice()
-            .sort(
-              (a, b) =>
-                new Date(a.createdAtUTC).getTime() -
-                new Date(b.createdAtUTC).getTime()
-            )[0];
-          const id = oldest?.id || "";
-          defaultProfile = id;
-
-          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.DEFAULT_PROFILE,
-              content: { defaultProfile: id },
-            })
-          );
-        }
-      }
-
       const credFavouriteIndex = await Agent.agent.basicStorage.findById(
         MiscRecordId.APP_CRED_FAVOURITE_INDEX
       );
@@ -606,16 +594,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const finishSetupBiometrics = await Agent.agent.basicStorage.findById(
         MiscRecordId.BIOMETRICS_SETUP
       );
-
-      const profileHistories = await Agent.agent.basicStorage.findById(
-        MiscRecordId.PROFILE_HISTORIES
-      );
-
-      if (profileHistories) {
-        dispatch(
-          setProfileHistories(profileHistories.content.value as string[])
-        );
-      }
 
       dispatch(
         setAuthentication({
