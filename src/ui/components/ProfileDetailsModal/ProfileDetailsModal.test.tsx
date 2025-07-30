@@ -17,7 +17,6 @@ import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import {
   setProfileHistories,
   setToastMsg,
-  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import {
   filteredIdentifierFix,
@@ -113,6 +112,14 @@ const initialStateKeri = {
       passcodeIsSet: true,
       passwordIsSet: true,
       firstAppLaunch: false,
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0],
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
     isOnline: true,
   },
@@ -436,6 +443,14 @@ describe("Individual Identifier details page", () => {
           passwordIsSet: false,
         },
         isOnline: true,
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -585,6 +600,14 @@ describe("Group Identifier details page", () => {
         passwordIsSet: false,
       },
       isOnline: true,
+      currentProfile: {
+        identity: filteredIdentifierFix[0],
+        connections: [],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+      },
     },
     seedPhraseCache: {
       seedPhrase: "",
@@ -661,6 +684,14 @@ describe("Group Identifier details page", () => {
           passwordIsSet: false,
         },
         isOnline: true,
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -1029,6 +1060,14 @@ describe("Group Identifier details page", () => {
           passwordIsSet: false,
         },
         isOnline: true,
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -1097,6 +1136,14 @@ describe("Checking the Identifier Details Page when information is missing from 
         },
         isOnline: true,
         profileHistories: [],
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
       },
       seedPhraseCache: {
         seedPhrase:
@@ -1189,7 +1236,6 @@ describe("Set default profile when delete profile", () => {
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: false,
-          defaultProfile: filteredIdentifierFix[0].id,
         },
         isOnline: true,
         profileHistories: [
@@ -1197,6 +1243,14 @@ describe("Set default profile when delete profile", () => {
           filteredIdentifierFix[2].id,
           filteredIdentifierFix[1].id,
         ],
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
       },
       identifiersCache: {
         identifiers: filteredIdentifierMapFix,
@@ -1260,11 +1314,9 @@ describe("Set default profile when delete profile", () => {
           content: { defaultProfile: filteredIdentifierFix[1].id },
         })
       );
+    });
 
-      expect(dispatchMock).toBeCalledWith(
-        updateCurrentProfile(filteredIdentifierFix[1].id)
-      );
-
+    await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
         setProfileHistories([
           filteredIdentifierFix[0].id,
@@ -1283,10 +1335,17 @@ describe("Set default profile when delete profile", () => {
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: false,
-          defaultProfile: filteredIdentifierFix[0].id,
         },
         isOnline: true,
         profileHistories: [],
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
       },
       identifiersCache: {
         identifiers: filteredIdentifierMapFix,
@@ -1351,10 +1410,6 @@ describe("Set default profile when delete profile", () => {
         })
       );
 
-      expect(dispatchMock).toBeCalledWith(
-        updateCurrentProfile(filteredIdentifierFix[3].id)
-      );
-
       expect(dispatchMock).toBeCalledWith(setProfileHistories([]));
     });
   });
@@ -1368,10 +1423,17 @@ describe("Set default profile when delete profile", () => {
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: false,
-          defaultProfile: filteredIdentifierFix[0].id,
         },
         isOnline: true,
         profileHistories: [],
+        currentProfile: {
+          identity: filteredIdentifierFix[0],
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
       },
       identifiersCache: {
         identifiers: {
@@ -1434,7 +1496,6 @@ describe("Set default profile when delete profile", () => {
       expect(Agent.agent.basicStorage.deleteById).toBeCalledWith(
         MiscRecordId.DEFAULT_PROFILE
       );
-      expect(dispatchMock).toBeCalledWith(updateCurrentProfile(""));
       expect(Agent.agent.basicStorage.deleteById).toBeCalledWith(
         MiscRecordId.PROFILE_HISTORIES
       );
