@@ -59,9 +59,9 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
 
   const displayConnection = connections.map((connection) => {
-    const dAppName = connection.name ? connection.name : connection.id;
+    const dAppName = connection.name ? connection.name : connection.meerkatId;
     return {
-      id: connection.id,
+      id: connection.meerkatId,
       title: dAppName,
       url: connection.url,
       subtitle: connection.url,
@@ -110,20 +110,24 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
         type: ActionType.None,
       });
       if (connectedWallet) {
-        PeerConnection.peerConnection.disconnectDApp(connectedWallet?.id);
+        PeerConnection.peerConnection.disconnectDApp(
+          connectedWallet?.meerkatId
+        );
         dispatch(setConnectedWallet(null));
       }
-      await Agent.agent.peerConnectionMetadataStorage.deletePeerConnectionMetadataRecord(
-        data.id
+      await Agent.agent.peerConnectionPair.deletePeerConnectionPairRecord(
+        `${data.meerkatId}:${data.selectedAid}`
       );
 
       dispatch(
         setWalletConnectionsCache(
-          connections.filter((connection) => connection.id !== data.id)
+          connections.filter(
+            (connection) => connection.meerkatId !== data.meerkatId
+          )
         )
       );
 
-      if (data.id === pendingConnection?.id) {
+      if (data.meerkatId === pendingConnection?.meerkatId) {
         dispatch(setPendingConnection(null));
       }
 
@@ -135,12 +139,13 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
 
   const disconnectWallet = () => {
     if (!connectedWallet) return;
-    PeerConnection.peerConnection.disconnectDApp(connectedWallet?.id);
+    PeerConnection.peerConnection.disconnectDApp(connectedWallet?.meerkatId);
   };
 
   const toggleConnected = () => {
     if (!actionInfo.data) return;
-    const isConnectedItem = actionInfo.data.id === connectedWallet?.id;
+    const isConnectedItem =
+      actionInfo.data.meerkatId === connectedWallet?.meerkatId;
     if (isConnectedItem) {
       disconnectWallet();
       return;
@@ -267,7 +272,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
                     return (
                       <IonItemOption
                         color="danger"
-                        data-testid={`delete-connections-${data.id}`}
+                        data-testid={`delete-connections-${data.meerkatId}`}
                         onClick={() => {
                           handleOpenDeleteAlert(data);
                         }}
@@ -277,7 +282,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
                     );
                   }}
                   onRenderEndSlot={(data) => {
-                    if (data.id === pendingConnection?.id) {
+                    if (data.meerkatId === pendingConnection?.meerkatId) {
                       return (
                         <IonChip className="connection-pending">
                           <IonIcon
@@ -288,7 +293,8 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
                       );
                     }
 
-                    if (data.id !== connectedWallet?.id) return null;
+                    if (data.meerkatId !== connectedWallet?.meerkatId)
+                      return null;
 
                     return (
                       <IonCheckbox
@@ -314,7 +320,9 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
         </ScrollablePageLayout>
       </SideSlider>
       <ConfirmConnectModal
-        isConnectModal={actionInfo.data?.id !== connectedWallet?.id}
+        isConnectModal={
+          actionInfo.data?.meerkatId !== connectedWallet?.meerkatId
+        }
         openModal={openConfirmConnectModal}
         closeModal={() => setOpenConfirmConnectModal(false)}
         onConfirm={toggleConnected}

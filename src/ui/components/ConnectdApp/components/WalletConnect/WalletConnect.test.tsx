@@ -3,11 +3,12 @@ import { act } from "react";
 import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
+import { filteredIdentifierFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 import { WalletConnect } from "./WalletConnect";
-import { WalletConnectStageOne } from "./WalletConnectStageOne";
+import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
 
 jest.mock("../../../../../core/configuration", () => ({
   ...jest.requireActual("../../../../../core/configuration"),
@@ -29,17 +30,6 @@ jest.mock("../../../../../core/cardano/walletConnect/peerConnection", () => ({
   },
 }));
 
-jest.mock("../../../../../core/agent/agent", () => ({
-  Agent: {
-    agent: {
-      peerConnectionMetadataStorage: {
-        getPeerConnectionMetadata: jest.fn(),
-        getAllPeerConnectionMetadata: jest.fn(),
-      },
-    },
-  },
-}));
-
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
   IonModal: ({ children, isOpen }: any) => (
@@ -56,6 +46,14 @@ describe("Wallet Connect Request", () => {
         time: Date.now(),
         passcodeIsSet: true,
         passwordIsSet: false,
+      },
+      currentProfile: {
+        identity: filteredIdentifierFix[0],
+        connections: [],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
       },
     },
     walletConnectionsCache: {
@@ -78,10 +76,9 @@ describe("Wallet Connect Request", () => {
   test("Renders content ", async () => {
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <WalletConnectStageOne
-          isOpen={true}
-          pendingDAppMeerkat={"pending-meerkat"}
-          onClose={handleCancel}
+        <WalletConnect
+          open
+          setOpenPage={jest.fn()}
         />
       </Provider>
     );
@@ -100,12 +97,12 @@ describe("Wallet Connect Request", () => {
   });
 
   test("Click to acccept button", async () => {
+    const setOpenPage = jest.fn();
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <WalletConnectStageOne
-          isOpen={true}
-          pendingDAppMeerkat={"pending-meerkat"}
-          onClose={handleCancel}
+        <WalletConnect
+          open
+          setOpenPage={setOpenPage}
         />
       </Provider>
     );
@@ -115,17 +112,22 @@ describe("Wallet Connect Request", () => {
     });
 
     await waitFor(() => {
-      expect(handleCancel).toBeCalled();
+      expect(PeerConnection.peerConnection.start).toBeCalled();
+      expect(PeerConnection.peerConnection.connectWithDApp).toBeCalled();
+    });
+
+    await waitFor(() => {
+      expect(setOpenPage).toBeCalled();
     });
   });
 
   test("Click to decline button", async () => {
+    const setOpenPage = jest.fn();
     const { getByText, queryByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <WalletConnectStageOne
-          isOpen={true}
-          pendingDAppMeerkat={"pending-meerkat"}
-          onClose={handleCancel}
+        <WalletConnect
+          open
+          setOpenPage={setOpenPage}
         />
       </Provider>
     );
@@ -153,7 +155,7 @@ describe("Wallet Connect Request", () => {
     });
 
     await waitFor(() => {
-      expect(handleCancel).toBeCalled();
+      expect(setOpenPage).toBeCalled();
     });
   });
 

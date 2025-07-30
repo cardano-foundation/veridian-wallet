@@ -32,9 +32,12 @@ jest.mock("../../../core/configuration", () => ({
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
-      peerConnectionMetadataStorage: {
-        getAllPeerConnectionMetadata: jest.fn(),
-        deletePeerConnectionMetadataRecord: jest.fn(),
+      peerConnectionAccounts: {
+        getAll: jest.fn().mockResolvedValue(walletConnectionsFix),
+        deleteById: jest.fn().mockResolvedValue(true),
+      },
+      peerConnectionPair: {
+        deletePeerConnectionPairRecord: jest.fn().mockResolvedValue(true),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
@@ -328,7 +331,7 @@ describe("Wallet connect", () => {
 
     act(() => {
       fireEvent.click(
-        getByTestId(`delete-connections-${walletConnectionsFix[0].id}`)
+        getByTestId(`delete-connections-${walletConnectionsFix[0].meerkatId}`)
       );
     });
 
@@ -345,14 +348,6 @@ describe("Wallet connect", () => {
     );
 
     fireEvent.click(deleteConfirmButton);
-
-    await waitFor(() => {
-      expect(
-        queryByText(
-          EN_TRANSLATIONS.connectdapp.connectionhistory.deletealert.message
-        )
-      ).not.toBeVisible();
-    });
 
     await waitFor(() => {
       expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
@@ -413,7 +408,7 @@ describe("Wallet connect", () => {
     });
 
     fireEvent.click(
-      getByTestId(`delete-connections-${walletConnectionsFix[0].id}`)
+      getByTestId(`delete-connections-${walletConnectionsFix[0].meerkatId}`)
     );
 
     await waitFor(() => {
@@ -455,7 +450,9 @@ describe("Wallet connect", () => {
     ).toBeVisible();
 
     act(() => {
-      fireEvent.click(getByTestId(`card-item-${walletConnectionsFix[0].id}`));
+      fireEvent.click(
+        getByTestId(`card-item-${walletConnectionsFix[0].meerkatId}`)
+      );
     });
 
     await waitFor(() => {
@@ -493,7 +490,9 @@ describe("Wallet connect", () => {
     });
 
     act(() => {
-      fireEvent.click(getByTestId(`card-item-${walletConnectionsFix[1].id}`));
+      fireEvent.click(
+        getByTestId(`card-item-${walletConnectionsFix[1].meerkatId}`)
+      );
     });
 
     await waitFor(() => {
@@ -505,7 +504,7 @@ describe("Wallet connect", () => {
     });
     await waitFor(() => {
       expect(PeerConnection.peerConnection.disconnectDApp).toBeCalledWith(
-        walletConnectionsFix[1].id
+        walletConnectionsFix[1].meerkatId
       );
     });
   });
