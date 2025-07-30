@@ -121,6 +121,7 @@ const initialStateKeri = {
       credentials: [],
       archivedCredentials: [],
     },
+    toastMsgs: [],
     isOnline: true,
   },
   seedPhraseCache: {
@@ -147,7 +148,7 @@ const storeMockedAidKeri = {
 
 const pageId = "identifier-card-details";
 
-describe("Individual Identifier details page", () => {
+describe("Individual profile details page", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
   });
@@ -157,7 +158,7 @@ describe("Individual Identifier details page", () => {
     verifySecretMock.mockResolvedValue(true);
   });
 
-  test("It renders Identifier Details", async () => {
+  test("It renders profile Details", async () => {
     Clipboard.write = jest.fn();
     const { getByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
@@ -590,7 +591,7 @@ describe("Individual Identifier details page", () => {
   });
 });
 
-describe("Group Identifier details page", () => {
+describe("Group profile details page", () => {
   const initialStateKeri = {
     stateCache: {
       routes: [TabsRoutePath.CREDENTIALS],
@@ -673,7 +674,7 @@ describe("Group Identifier details page", () => {
     });
   });
 
-  test("It renders Identifier Details", async () => {
+  test("It renders profile Details", async () => {
     Clipboard.write = jest.fn();
 
     const initialStateKeri = {
@@ -1121,7 +1122,7 @@ describe("Group Identifier details page", () => {
   });
 });
 
-describe("Checking the Identifier Details Page when information is missing from the cloud", () => {
+describe("Checking the profile details page when information is missing from the cloud", () => {
   beforeEach(() => {
     getIndentifier.mockImplementation(() => {
       throw new Error(`${Agent.MISSING_DATA_ON_KERIA}: id`);
@@ -1129,7 +1130,7 @@ describe("Checking the Identifier Details Page when information is missing from 
     verifySecretMock.mockResolvedValue(true);
   });
 
-  test("Identifier exists in the database but not on Signify", async () => {
+  test("profile exists in the database but not on Signify", async () => {
     const initialStateKeri = {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],

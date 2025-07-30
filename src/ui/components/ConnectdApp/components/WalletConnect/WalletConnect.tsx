@@ -5,7 +5,7 @@ import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerCo
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
-  getDefaultProfile,
+  getCurrentProfile,
   setCurrentOperation,
 } from "../../../../../store/reducers/stateCache";
 import {
@@ -29,7 +29,7 @@ import "./WalletConnect.scss";
 const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
   const pendingConnection = useAppSelector(getPendingConnection);
   const dispatch = useAppDispatch();
-  const defaultProfile = useAppSelector(getDefaultProfile);
+  const defaultProfile = useAppSelector(getCurrentProfile);
   const [openDeclineAlert, setOpenDeclineAlert] = useState(false);
   const [startingMeerkat, setStartingMeerkat] = useState<boolean>(false);
   const existingConnections = useAppSelector(getWalletConnectionsCache);
@@ -54,22 +54,26 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
   };
 
   const handleAccept = async () => {
+    const pendingDAppMeerkat = pendingConnection.meerkatId;
+    const peerConnectionId = `${pendingDAppMeerkat}:${defaultProfile.identity.id}`;
+
     try {
       if (!startingMeerkat) {
-        const pendingDAppMeerkat = pendingConnection.id;
         setStartingMeerkat(true);
-        await PeerConnection.peerConnection.start(defaultProfile);
-        await PeerConnection.peerConnection.connectWithDApp(pendingDAppMeerkat);
+        await PeerConnection.peerConnection.start(defaultProfile.identity.id);
+        await PeerConnection.peerConnection.connectWithDApp(peerConnectionId);
         const existingConnection = existingConnections.find(
-          (connection) => connection.id === pendingDAppMeerkat
+          (connection) =>
+            `${connection.meerkatId}:${connection.selectedAid}` ===
+            peerConnectionId
         );
         if (existingConnection) {
           const updatedConnections = [];
           for (const connection of existingConnections) {
-            if (connection.id === existingConnection.id) {
+            if (connection.meerkatId === existingConnection.meerkatId) {
               updatedConnections.push({
                 ...existingConnection,
-                selectedAid: defaultProfile,
+                selectedAid: defaultProfile.identity.id,
               });
             } else {
               updatedConnections.push(connection);
@@ -80,7 +84,10 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
           dispatch(
             setWalletConnectionsCache([
               ...existingConnections,
-              { id: pendingDAppMeerkat, selectedAid: defaultProfile },
+              {
+                meerkatId: pendingDAppMeerkat,
+                selectedAid: defaultProfile.identity.id,
+              },
             ])
           );
         }
