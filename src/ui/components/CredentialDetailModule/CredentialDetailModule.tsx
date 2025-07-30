@@ -5,6 +5,7 @@ import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
   MiscRecordId,
+  isRegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -419,7 +420,9 @@ const CredentialDetailModule = ({
   const resetOperation = () =>
     dispatch(setCurrentOperation(OperationType.IDLE));
 
-  return openConnectionlModal && connectionShortDetails ? (
+  return openConnectionlModal &&
+    connectionShortDetails &&
+    isRegularConnectionDetails(connectionShortDetails) ? (
     <ConnectionDetails
       connectionShortDetails={connectionShortDetails}
       handleCloseConnectionModal={() => setOpenConnectionlModal(false)}

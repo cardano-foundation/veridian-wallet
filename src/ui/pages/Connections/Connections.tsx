@@ -4,6 +4,7 @@ import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
   ConnectionStatus,
+  isRegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
@@ -164,9 +165,17 @@ const Connections = () => {
 
     try {
       setDeletePendingItem(null);
-      await Agent.agent.connections.deleteStaleLocalConnectionById(
-        deletePendingItem.id
-      );
+      if (isRegularConnectionDetails(deletePendingItem)) {
+        await Agent.agent.connections.deleteStaleLocalConnectionById(
+          deletePendingItem.id,
+          deletePendingItem.identifier
+        );
+      } else {
+        // For multisig connections, we don't need an identifier
+        await Agent.agent.connections.deleteStaleLocalConnectionById(
+          deletePendingItem.id
+        );
+      }
       dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
       dispatch(removeConnectionCache(deletePendingItem.id));
     } catch (error) {
@@ -219,7 +228,8 @@ const Connections = () => {
     setConnectionShortDetails(undefined);
   };
 
-  return connectionShortDetails ? (
+  return connectionShortDetails &&
+    isRegularConnectionDetails(connectionShortDetails) ? (
     <ConnectionDetails
       connectionShortDetails={connectionShortDetails}
       handleCloseConnectionModal={handleCloseConnectionModal}
