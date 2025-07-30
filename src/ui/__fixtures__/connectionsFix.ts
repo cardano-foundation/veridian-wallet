@@ -1,11 +1,12 @@
 import {
   ConnectionDetails,
   ConnectionStatus,
+  RegularConnectionDetailsFull,
 } from "../../core/agent/agent.types";
 import { ConnectionHistoryType } from "../../core/agent/services/connectionService.types";
 import CardanoLogo from "../assets/images/CardanoLogo.jpg";
 
-const connectionsFix: ConnectionDetails[] = [
+const connectionsFix: RegularConnectionDetailsFull[] = [
   {
     id: "ebfeb1ebc6f1c276ef71212ec20",
     contactId: "ebfeb1ebc6f1c276ef71212ec20",

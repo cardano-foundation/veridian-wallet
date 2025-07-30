@@ -25,14 +25,11 @@ import {
   OOBI_RE,
   OobiScan,
   WOOBI_RE,
-  MiscRecordId,
 } from "../agent.types";
 import {
   BasicStorage,
   ConnectionPairRecord,
   ConnectionPairStorage,
-  ConnectionRecord,
-  ConnectionStorage,
   ContactRecord,
   ContactStorage,
   CredentialStorage,
@@ -51,6 +48,7 @@ import {
 import {
   ConnectionHistoryItem,
   ConnectionHistoryType,
+  ContactDetailsRecord,
   HumanReadableMessage,
   KeriaContactKeyPrefix,
   OobiQueryParams,
@@ -59,7 +57,6 @@ import {
 import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/migrations";
 
 class ConnectionService extends AgentService {
-  protected readonly connectionStorage!: ConnectionStorage;
   protected readonly connectionPairStorage!: ConnectionPairStorage;
   protected readonly contactStorage!: ContactStorage;
   protected readonly credentialStorage: CredentialStorage;
@@ -69,7 +66,6 @@ class ConnectionService extends AgentService {
 
   constructor(
     agentServiceProps: AgentServicesProps,
-    connectionStorage: ConnectionStorage,
     credentialStorage: CredentialStorage,
     operationPendingStorage: OperationPendingStorage,
     identifierStorage: IdentifierStorage,
@@ -78,7 +74,6 @@ class ConnectionService extends AgentService {
     contactStorage: ContactStorage
   ) {
     super(agentServiceProps);
-    this.connectionStorage = connectionStorage;
     this.credentialStorage = credentialStorage;
     this.operationPendingStorage = operationPendingStorage;
     this.identifierStorage = identifierStorage;
@@ -241,17 +236,24 @@ class ConnectionService extends AgentService {
     return { type: OobiType.NORMAL, connection };
   }
 
-  async getConnections(): Promise<ConnectionShortDetails[]> {
+  async getConnections(identifier?: string): Promise<ConnectionShortDetails[]> {
     const connections: any[] = [];
 
     const connectionPairs = await this.connectionPairStorage.findAllByQuery({
       pendingDeletion: false,
+      ...(identifier ? { identifier } : {}),
     });
 
+    const contactRecordMap = new Map<string, ContactRecord>();
+
     for (const connectionPair of connectionPairs) {
-      const contact = await this.contactStorage.findExpectedById(
-        connectionPair.contactId
-      );
+      if (!contactRecordMap.has(connectionPair.contactId)) {
+        contactRecordMap.set(
+          connectionPair.contactId,
+          await this.contactStorage.findExpectedById(connectionPair.contactId)
+        );
+      }
+      const contact = contactRecordMap.get(connectionPair.contactId);
 
       connections.push({
         id: connectionPair.contactId,
@@ -271,11 +273,10 @@ class ConnectionService extends AgentService {
   }
 
   async getMultisigConnections(): Promise<ConnectionShortDetails[]> {
-    const multisigConnections = await this.connectionStorage.findAllByQuery({
+    const multisigConnections = await this.contactStorage.findAllByQuery({
       $not: {
         groupId: undefined,
       },
-      pendingDeletion: false,
     });
 
     return multisigConnections.map((connection) =>
@@ -296,7 +297,9 @@ class ConnectionService extends AgentService {
     return connectionsDetails;
   }
 
-  private getConnectionShortDetails(record: any): ConnectionShortDetails {
+  private getConnectionShortDetails(
+    record: ContactDetailsRecord
+  ): ConnectionShortDetails {
     let status = ConnectionStatus.PENDING;
     if (record.creationStatus === CreationStatus.COMPLETE) {
       status = ConnectionStatus.CONFIRMED;
@@ -313,14 +316,15 @@ class ConnectionService extends AgentService {
       contactId: record.id,
       ...(record.groupId
         ? { groupId: record.groupId }
-        : { identifier: record.identifier }),
+        : { identifier: record.identifier ?? "" }),
     };
   }
 
   @OnlineOnly
   async getConnectionById(
     id: string,
-    full = false
+    full = false,
+    identifier?: string
   ): Promise<ConnectionDetails> {
     const connection = await this.props.signifyClient
       .contacts()
@@ -336,71 +340,68 @@ class ConnectionService extends AgentService {
         }
       });
 
-    const sharedIdentifier = connection.sharedIdentifier;
-
-    const notes: Array<ConnectionNoteDetails> = [];
-    const historyItems: Array<ConnectionHistoryItem> = [];
-
-    const skippedHistoryTypes = [ConnectionHistoryType.IPEX_AGREE_COMPLETE];
-
-    Object.keys(connection).forEach((key) => {
-      if (
-        key.startsWith(
-          `${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}`
-        ) &&
-        connection[key]
-      ) {
-        notes.push(JSON.parse(connection[key] as string));
-      } else if (
-        key.startsWith(
-          `${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}`
-        ) ||
-        key.startsWith(
-          `${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_REVOKE}`
-        )
-      ) {
-        const historyItem: ConnectionHistoryItem = JSON.parse(
-          connection[key] as string
-        );
-        if (full || !skippedHistoryTypes.includes(historyItem.historyType)) {
-          historyItems.push(historyItem);
-        }
-      }
-    });
-
-    // Determine if this is a multisig connection based on groupCreationId
-    const baseDetails = {
+    const baseConnectionDetails = {
       label: connection.alias,
       id: connection.id,
       contactId: connection.id,
       status: ConnectionStatus.CONFIRMED,
-      createdAtUTC: connection[`${sharedIdentifier}:createdAt`] as string,
       serviceEndpoints: [connection.oobi],
-      notes,
-      historyItems: historyItems
-        .sort((a, b) => new Date(b.dt).getTime() - new Date(a.dt).getTime())
-        .map((messageRecord) => {
-          const { historyType, dt, credentialType, id } = messageRecord;
-          return {
-            id,
-            type: historyType,
-            timestamp: dt,
-            credentialType,
-          };
-        }),
     };
 
-    // Return appropriate type based on whether this is a multisig connection
-    if (connection.groupCreationId) {
+    if (identifier) {
+      const createdAt = connection[`${identifier}:createdAt`] as string;
+
+      const notes: Array<ConnectionNoteDetails> = [];
+      const historyItems: Array<ConnectionHistoryItem> = [];
+      const skippedHistoryTypes = [ConnectionHistoryType.IPEX_AGREE_COMPLETE];
+
+      Object.keys(connection).forEach((key) => {
+        if (
+          key.startsWith(
+            `${identifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}`
+          ) &&
+          connection[key]
+        ) {
+          notes.push(JSON.parse(connection[key] as string));
+        } else if (
+          key.startsWith(
+            `${identifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}`
+          ) ||
+          key.startsWith(
+            `${identifier}:${KeriaContactKeyPrefix.HISTORY_REVOKE}`
+          )
+        ) {
+          const historyItem: ConnectionHistoryItem = JSON.parse(
+            connection[key] as string
+          );
+          if (full || !skippedHistoryTypes.includes(historyItem.historyType)) {
+            historyItems.push(historyItem);
+          }
+        }
+      });
+
       return {
-        ...baseDetails,
-        groupId: connection.groupCreationId as string,
-        identifier: sharedIdentifier as string,
+        ...baseConnectionDetails,
+        createdAtUTC: createdAt,
+        identifier,
+        notes,
+        historyItems: historyItems
+          .sort((a, b) => new Date(b.dt).getTime() - new Date(a.dt).getTime())
+          .map((messageRecord) => {
+            const { historyType, dt, credentialType, id } = messageRecord;
+            return {
+              id,
+              type: historyType,
+              timestamp: dt,
+              credentialType,
+            };
+          }),
       };
     } else {
       return {
-        ...baseDetails,
-        identifier: sharedIdentifier as string,
+        ...baseConnectionDetails,
+        createdAtUTC: connection.createdAt as string,
+        groupId: connection.groupCreationId as string,
       };
     }
   }
@@ -530,7 +531,7 @@ class ConnectionService extends AgentService {
   }
 
   async deleteStaleLocalConnectionById(id: string): Promise<void> {
-    await this.connectionStorage.deleteById(id);
+    await this.contactStorage.deleteById(id);
   }
 
   async getConnectionShortDetailById(
@@ -542,34 +543,38 @@ class ConnectionService extends AgentService {
 
   async createConnectionNote(
     connectionId: string,
-    note: ConnectionNoteProps
+    note: ConnectionNoteProps,
+    identifier: string
   ): Promise<void> {
     const id = randomSalt();
     await this.props.signifyClient.contacts().update(connectionId, {
-      [`${KeriaContactKeyPrefix.CONNECTION_NOTE}${id}`]: JSON.stringify({
-        ...note,
-        id: `${KeriaContactKeyPrefix.CONNECTION_NOTE}${id}`,
-        timestamp: new Date().toISOString(),
-      }),
+      [`${identifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}${id}`]:
+        JSON.stringify({
+          ...note,
+          id: `${KeriaContactKeyPrefix.CONNECTION_NOTE}${id}`,
+          timestamp: new Date().toISOString(),
+        }),
     });
   }
 
   async updateConnectionNoteById(
     connectionId: string,
     connectionNoteId: string,
-    note: ConnectionNoteProps
+    note: ConnectionNoteProps,
+    identifier: string
   ): Promise<void> {
     await this.props.signifyClient.contacts().update(connectionId, {
-      [connectionNoteId]: JSON.stringify(note),
+      [`${identifier}:${connectionNoteId}`]: JSON.stringify(note),
     });
   }
 
   async deleteConnectionNoteById(
     connectionId: string,
-    connectionNoteId: string
+    connectionNoteId: string,
+    identifier: string
   ): Promise<Contact> {
     return this.props.signifyClient.contacts().update(connectionId, {
-      [connectionNoteId]: null,
+      [`${identifier}:${connectionNoteId}`]: null,
     });
   }
 
@@ -646,11 +651,11 @@ class ConnectionService extends AgentService {
 
   async syncKeriaContacts(): Promise<void> {
     const cloudContacts = await this.props.signifyClient.contacts().list();
-    const localContacts = await this.connectionStorage.getAll();
+    const localContacts = await this.contactStorage.getAll();
 
     const unSyncedData = cloudContacts.filter(
       (contact: Contact) =>
-        !localContacts.find((item: ConnectionRecord) => contact.id == item.id)
+        !localContacts.find((item: ContactRecord) => contact.id == item.id)
     );
 
     for (const contact of unSyncedData) {

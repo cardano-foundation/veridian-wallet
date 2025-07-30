@@ -52,7 +52,8 @@ export const EditConnectionsContainer = ({
             update = true;
             return Agent.agent.connections.createConnectionNote(
               connectionDetails.id,
-              note
+              note,
+              connectionDetails.identifier
             );
           })
       );
@@ -67,7 +68,8 @@ export const EditConnectionsContainer = ({
             update = true;
             return Agent.agent.connections.deleteConnectionNoteById(
               connectionDetails.id,
-              note.id
+              note.id,
+              connectionDetails.identifier
             );
           }
 
@@ -79,7 +81,8 @@ export const EditConnectionsContainer = ({
             return Agent.agent.connections.updateConnectionNoteById(
               connectionDetails.id,
               noteFind.id,
-              noteFind
+              noteFind,
+              connectionDetails.identifier
             );
           }
         })

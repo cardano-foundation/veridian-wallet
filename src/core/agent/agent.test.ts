@@ -94,7 +94,7 @@ const mockIdentifierStorage = {
 const mockCredentialStorage = {
   getAllCredentialMetadata: getAllCredentialsMock,
 };
-const mockConnectionStorage = {
+const mockContactStorage = {
   getAll: getAllConnectionsMock,
 };
 const mockNotificationStorage = {
@@ -448,7 +448,7 @@ describe("Agent setup and wiping", () => {
     (agent as any).keriaNotificationService = mockKeriaNotificationService;
     (agent as any).identifierStorage = mockIdentifierStorage;
     (agent as any).credentialStorage = mockCredentialStorage;
-    (agent as any).connectionStorage = mockConnectionStorage;
+    (agent as any).contactStorage = mockContactStorage;
     (agent as any).notificationStorage = mockNotificationStorage;
 
     mockAgentUrls = {

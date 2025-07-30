@@ -77,8 +77,8 @@ const ConnectionDetails = ({
       );
 
       setConnectionDetails(connectionDetails);
-      setNotes(connectionDetails.notes);
-      setConnectionHistory(connectionDetails.historyItems);
+      setNotes(connectionDetails.notes || []);
+      setConnectionHistory(connectionDetails.historyItems || []);
     } catch (error) {
       if (
         error instanceof Error &&
@@ -326,7 +326,7 @@ const ConnectionDetails = ({
           />
         </ScrollablePageLayout>
       )}
-      {connectionDetails && (
+      {connectionDetails && isRegularConnectionDetails(connectionDetails) && (
         <EditConnectionsModal
           notes={notes}
           setNotes={setNotes}

@@ -25,8 +25,6 @@ import { CoreEventEmitter } from "./event";
 import {
   BasicRecord,
   BasicStorage,
-  ConnectionRecord,
-  ConnectionStorage,
   CredentialMetadataRecord,
   CredentialStorage,
   IdentifierMetadataRecord,
@@ -81,7 +79,6 @@ class Agent {
   private basicStorageService!: BasicStorage;
   private identifierStorage!: IdentifierStorage;
   private credentialStorage!: CredentialStorage;
-  private connectionStorage!: ConnectionStorage;
   private notificationStorage!: NotificationStorage;
 
   private operationPendingStorage!: OperationPendingStorage;
@@ -146,7 +143,6 @@ class Agent {
     if (!this.connectionService) {
       this.connectionService = new ConnectionService(
         this.agentServicesProps,
-        this.connectionStorage,
         this.credentialStorage,
         this.operationPendingStorage,
         this.identifierStorage,
@@ -456,9 +452,6 @@ class Agent {
     this.credentialStorage = new CredentialStorage(
       this.getStorageService<CredentialMetadataRecord>(this.storageSession)
     );
-    this.connectionStorage = new ConnectionStorage(
-      this.getStorageService<ConnectionRecord>(this.storageSession)
-    );
     this.notificationStorage = new NotificationStorage(
       this.getStorageService<NotificationRecord>(this.storageSession)
     );
@@ -595,7 +588,7 @@ class Agent {
         });
     }
 
-    const connections = await this.connectionStorage.getAll();
+    const connections = await this.contactStorage.getAll();
     for (const connection of connections) {
       await this.agentServicesProps.signifyClient
         .contacts()
