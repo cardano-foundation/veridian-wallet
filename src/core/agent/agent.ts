@@ -433,11 +433,11 @@ class Agent {
   }
 
   async setupLocalDependencies(): Promise<void> {
-    await this.storageSession.open(walletId);
     this.agentServicesProps = {
       signifyClient: this.signifyClient,
       eventEmitter: new CoreEventEmitter(),
     };
+    await this.storageSession.open(walletId);
     this.basicStorageService = new BasicStorage(
       this.getStorageService<BasicRecord>(this.storageSession)
     );
