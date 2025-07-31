@@ -16,6 +16,7 @@ import { AlphabeticList } from "../AlphabeticList";
 
 import { SearchConnectionContent } from "../SearchConnectionContent";
 import "./ConnectionsBody.scss";
+import { RegularConnectionDetails } from "../../../../../core/agent/agent.types";
 import { ConnectionsBodyProps } from "./ConnectionsBody.types";
 
 const ALPHABET_LIST_MAX_HEIGHT = 432;
@@ -108,8 +109,10 @@ const ConnectionsBody = ({
                       </IonItemDivider>
                       <AlphabeticList
                         items={Array.from(alphabeticGroup.value)}
-                        handleShowConnectionDetails={
-                          handleShowConnectionDetails
+                        handleShowConnectionDetails={(item) =>
+                          handleShowConnectionDetails(
+                            item as RegularConnectionDetails
+                          )
                         }
                       />
                     </IonItemGroup>
@@ -119,7 +122,11 @@ const ConnectionsBody = ({
                 <SearchConnectionContent
                   keyword={search}
                   mappedConnections={mappedConnections}
-                  onItemClick={handleShowConnectionDetails}
+                  onItemClick={(item) =>
+                    handleShowConnectionDetails(
+                      item as RegularConnectionDetails
+                    )
+                  }
                 />
               )}
             </IonCol>

@@ -1,4 +1,7 @@
-import { ConnectionShortDetails, RegularConnectionDetails } from "../../../../../core/agent/agent.types";
+import {
+  ConnectionShortDetails,
+  RegularConnectionDetails,
+} from "../../../../../core/agent/agent.types";
 import { MappedConnections } from "../../Connections.types";
 
 interface ConnectionsBodyProps {
@@ -13,13 +16,13 @@ interface SearchConnectionListProps {
   title: string;
   testId: string;
   connections: ConnectionShortDetails[];
-  onItemClick: (item: ConnectionShortDetails) => void;
+  onItemClick: (item: RegularConnectionDetails) => void;
 }
 
 interface SearchConnectionContentProps {
   keyword: string;
   mappedConnections: MappedConnections[];
-  onItemClick: (item: ConnectionShortDetails) => void;
+  onItemClick: (item: RegularConnectionDetails) => void;
 }
 
 export type {
