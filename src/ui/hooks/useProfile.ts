@@ -5,11 +5,11 @@ import { BasicRecord } from "../../core/agent/records";
 import { IdentifierShortDetails } from "../../core/agent/services/identifier.types";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { getIdentifiersCache } from "../../store/reducers/identifiersCache";
+import { updateCurrentProfile } from "../../store/reducers/profileCache";
 import {
   getCurrentProfile,
   getProfileHistories,
   setProfileHistories,
-  updateCurrentProfile,
 } from "../../store/reducers/stateCache";
 
 export const useProfile = () => {

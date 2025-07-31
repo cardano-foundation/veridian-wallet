@@ -15,10 +15,7 @@ import { i18n } from "../../../../../../i18n";
 import { useAppSelector } from "../../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../../store/reducers/connectionsCache";
 import { getCredsCache } from "../../../../../../store/reducers/credsCache";
-import {
-  getNotificationsCache,
-  setNotificationsCache,
-} from "../../../../../../store/reducers/notificationsCache";
+import { deleteNotificationById } from "../../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../../store/reducers/stateCache";
 import { CardItem, CardList } from "../../../../../components/CardList";
 import { BackReason } from "../../../../../components/CredentialDetailModule/CredentialDetailModule.types";
@@ -53,7 +50,6 @@ const ChooseCredential = ({
 }: ChooseCredentialProps) => {
   const credsCache = useAppSelector(getCredsCache);
   const connections = useAppSelector(getConnectionsCache);
-  const notifications = useAppSelector(getNotificationsCache);
   const dispatch = useDispatch();
   const [selectedCred, setSelectedCred] = useState<RequestCredential | null>(
     null
@@ -130,13 +126,6 @@ const ChooseCredential = ({
     setViewCredDetail(null);
   };
 
-  const handleNotificationUpdate = async () => {
-    const updatedNotifications = notifications.filter(
-      (notification) => notification.id !== notificationDetails.id
-    );
-    dispatch(setNotificationsCache(updatedNotifications));
-  };
-
   const handleRequestCredential = async () => {
     try {
       if (!selectedCred) {
@@ -151,7 +140,7 @@ const ChooseCredential = ({
       );
 
       if (!linkedGroup) {
-        handleNotificationUpdate();
+        dispatch(deleteNotificationById(notificationDetails.id));
       }
 
       dispatch(

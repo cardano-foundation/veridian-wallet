@@ -29,6 +29,10 @@ describe("getBackRoute", () => {
         bootUrl: "",
         connectUrl: "",
       },
+      profilesCache: {
+        profiles: {},
+        recentProfiles: [],
+      },
       stateCache: {
         isOnline: true,
         initializationPhase: InitializationPhase.PHASE_TWO,
@@ -105,9 +109,6 @@ describe("getBackRoute", () => {
       },
       biometricsCache: {
         enabled: false,
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
   });
@@ -192,6 +193,10 @@ describe("getPreviousRoute", () => {
         bootUrl: "",
         connectUrl: "",
       },
+      profilesCache: {
+        profiles: {},
+        recentProfiles: [],
+      },
       stateCache: {
         isOnline: true,
         initializationPhase: InitializationPhase.PHASE_TWO,
@@ -268,9 +273,6 @@ describe("getPreviousRoute", () => {
       },
       biometricsCache: {
         enabled: false,
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
   });

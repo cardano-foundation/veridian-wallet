@@ -26,7 +26,10 @@ import {
   getIdentifiersCache,
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
-import { addNotification } from "../../../store/reducers/notificationsCache";
+import {
+  addNotification,
+  updateCurrentProfile,
+} from "../../../store/reducers/profileCache";
 import { getSeedPhraseCache } from "../../../store/reducers/seedPhraseCache";
 import {
   clearSSIAgent,
@@ -39,7 +42,6 @@ import {
   setCurrentOperation,
   setIsSetupProfile,
   setRecoveryCompleteNoInterruption,
-  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { CustomInput } from "../../components/CustomInput";

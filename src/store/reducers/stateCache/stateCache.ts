@@ -1,24 +1,10 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
-import {
-  AnyAction,
-  createSlice,
-  PayloadAction,
-  ThunkAction,
-} from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Salter } from "signify-ts";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
 import { OperationType, ToastMsgType } from "../../../ui/globals/types";
 import { RootState } from "../../index";
-import {
-  getConnectionsCache,
-  getMultisigConnectionsCache,
-} from "../connectionsCache";
-import { getCredsArchivedCache } from "../credsArchivedCache";
-import { getCredsCache } from "../credsCache";
-import { getIdentifiersCache } from "../identifiersCache";
-import { getNotificationsCache } from "../notificationsCache";
-import { getWalletConnectionsCache } from "../walletConnectionsCache";
 import {
   AuthenticationCacheProps,
   CurrentRouteCacheProps,
@@ -26,7 +12,6 @@ import {
   InitializationPhase,
   StateCacheProps,
 } from "./stateCache.types";
-import { filterProfileData } from "./utils";
 
 const initialState: StateCacheProps = {
   initializationPhase: InitializationPhase.PHASE_ZERO,
@@ -264,79 +249,6 @@ const {
   setProfileHistories,
 } = stateCacheSlice.actions;
 
-const updateCurrentProfile =
-  (profileId: string): ThunkAction<void, RootState, unknown, AnyAction> =>
-    async (dispatch, getState) => {
-      const state = getState();
-      const identifiers = getIdentifiersCache(state);
-
-      if (!profileId) {
-        dispatch(
-          setCurrentProfile({
-            identity: {
-              id: "",
-              displayName: "",
-              createdAtUTC: "",
-              theme: 0,
-              creationStatus: CreationStatus.PENDING,
-            },
-            connections: [],
-            multisigConnections: [],
-            peerConnections: [],
-            credentials: [],
-            archivedCredentials: [],
-            notifications: [],
-          })
-        );
-        return;
-      }
-
-      if (!identifiers || !identifiers[profileId]) {
-        throw new Error(`Profile with id ${profileId} not found.`);
-      }
-
-      const profileData = identifiers[profileId];
-      const allCreds = getCredsCache(state);
-      const allArchivedCreds = getCredsArchivedCache(state);
-      const allPeerConnections = getWalletConnectionsCache(state);
-      const allConnections = getConnectionsCache(state);
-      const allMultisigConnections = getMultisigConnectionsCache(state);
-      const allNotifications = getNotificationsCache(state);
-
-      const {
-        profileIdentifier,
-        profileCredentials,
-        profileArchivedCredentials,
-        profilePeerConnections,
-        profileNotifications,
-      } = filterProfileData(
-        identifiers,
-        allCreds,
-        allArchivedCreds,
-        allPeerConnections,
-        allNotifications,
-        profileId
-      );
-
-      const newProfile: StateCacheProps["currentProfile"] = {
-        identity: {
-          id: profileIdentifier.id,
-          displayName: profileData.displayName,
-          createdAtUTC: profileIdentifier.createdAtUTC,
-          theme: profileIdentifier.theme,
-          creationStatus: profileIdentifier.creationStatus,
-        },
-        // TODO: add filtering for connections once we have connections per account merged
-        connections: Object.values(allConnections),
-        multisigConnections: Object.values(allMultisigConnections),
-        peerConnections: profilePeerConnections,
-        credentials: profileCredentials,
-        archivedCredentials: profileArchivedCredentials,
-        notifications: profileNotifications,
-      };
-      dispatch(setCurrentProfile(newProfile));
-    };
-
 const getStateCache = (state: RootState) => state.stateCache;
 const getInitializationPhase = (state: RootState) =>
   state.stateCache.initializationPhase;
@@ -428,5 +340,4 @@ export {
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
-  updateCurrentProfile,
 };

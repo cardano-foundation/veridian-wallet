@@ -43,7 +43,7 @@ import {
   setIdentifiersCache,
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
-import { setNotificationsCache } from "../../../store/reducers/notificationsCache";
+import { Profile, setProfiles } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   getForceInitApp,
@@ -463,13 +463,52 @@ const AppWrapper = (props: { children: ReactNode }) => {
         );
       }
 
+      const profiles = storedIdentifiers.reduce(
+        (acc: Record<string, Profile>, identifier) => {
+          const {
+            profileIdentifier,
+            profileCredentials,
+            profileArchivedCredentials,
+            profilePeerConnections,
+            profileNotifications,
+          } = filterProfileData(
+            identifiersDict,
+            credsCache,
+            credsArchivedCache,
+            storedPeerConnections,
+            notifications,
+            currentProfileAid
+          );
+
+          acc[identifier.id] = {
+            identity: {
+              id: profileIdentifier.id,
+              displayName: profileIdentifier.displayName,
+              createdAtUTC: profileIdentifier.createdAtUTC,
+              theme: profileIdentifier.theme,
+              creationStatus: profileIdentifier.creationStatus,
+            },
+            // TODO: add filtering for connections once we have connections per account merged
+            connections: Object.values(allConnections),
+            multisigConnections: Object.values(allMultisigConnections),
+            peerConnections: profilePeerConnections,
+            credentials: profileCredentials,
+            archivedCredentials: profileArchivedCredentials,
+            notifications: profileNotifications,
+          };
+
+          return acc;
+        },
+        {}
+      );
+
+      dispatch(setProfiles(profiles));
       dispatch(setIdentifiersCache(storedIdentifiers));
       dispatch(setCredsCache(credsCache));
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(setConnectionsCache(allConnections));
       dispatch(setMultisigConnectionsCache(allMultisigConnections));
       dispatch(setWalletConnectionsCache(storedPeerConnections));
-      dispatch(setNotificationsCache(notifications));
 
       // TODO: set current profile data
     } catch (e) {

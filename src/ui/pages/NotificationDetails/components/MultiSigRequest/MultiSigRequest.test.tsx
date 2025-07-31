@@ -14,11 +14,11 @@ import {
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { MultiSigRequest } from "./MultiSigRequest";
 import { filteredIdentifierFix } from "../../../../__fixtures__/filteredIdentifierFix";
-import { setNotificationsCache } from "../../../../../store/reducers/notificationsCache";
 import { MultiSigService } from "../../../../../core/agent/services/multiSigService";
 import { KeyStoreKeys } from "../../../../../core/storage";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { makeTestStore } from "../../../../utils/makeTestStore";
+import { setNotificationsCache } from "../../../../../store/reducers/profileCache";
 
 mockIonicReact();
 

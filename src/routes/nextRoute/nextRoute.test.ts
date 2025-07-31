@@ -76,6 +76,10 @@ describe("NextRoute", () => {
         seedPhrase: "",
         bran: "",
       },
+      profilesCache: {
+        profiles: {},
+        recentProfiles: [],
+      },
       identifiersCache: {
         identifiers: {},
         multiSigGroup: {
@@ -110,9 +114,6 @@ describe("NextRoute", () => {
       ssiAgentCache: {
         bootUrl: "",
         connectUrl: "",
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
     data = {
@@ -351,6 +352,10 @@ describe("getNextRoute", () => {
       },
       profileHistories: [],
     },
+    profilesCache: {
+      profiles: {},
+      recentProfiles: [],
+    },
     seedPhraseCache: {
       seedPhrase: "",
       bran: "",
@@ -385,9 +390,6 @@ describe("getNextRoute", () => {
     ssiAgentCache: {
       bootUrl: "",
       connectUrl: "",
-    },
-    notificationsCache: {
-      notifications: [],
     },
   };
   const state = {};

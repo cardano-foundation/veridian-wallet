@@ -4,7 +4,6 @@ import { connectionsCacheSlice } from "../../store/reducers/connectionsCache";
 import { credsArchivedCacheSlice } from "../../store/reducers/credsArchivedCache";
 import { credsCacheSlice } from "../../store/reducers/credsCache";
 import { identifiersCacheSlice } from "../../store/reducers/identifiersCache";
-import { notificationsCacheSlice } from "../../store/reducers/notificationsCache";
 import { seedPhraseCacheSlice } from "../../store/reducers/seedPhraseCache";
 import { ssiAgentSlice } from "../../store/reducers/ssiAgent";
 import { stateCacheSlice } from "../../store/reducers/stateCache";
@@ -24,7 +23,6 @@ export function makeTestStore(preloadedState?: any) {
       viewTypeCache: viewTypeCacheSlice.reducer,
       biometricsCache: biometricsCacheSlice.reducer,
       ssiAgentCache: ssiAgentSlice.reducer,
-      notificationsCache: notificationsCacheSlice.reducer,
     },
     preloadedState,
   });

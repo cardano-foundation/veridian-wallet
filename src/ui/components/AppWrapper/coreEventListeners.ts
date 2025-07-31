@@ -19,7 +19,7 @@ import {
 import {
   addNotification,
   deleteNotificationById,
-} from "../../../store/reducers/notificationsCache";
+} from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
 

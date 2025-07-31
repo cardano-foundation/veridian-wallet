@@ -22,11 +22,7 @@ import {
   getMultisigConnectionsCache,
 } from "../../../../../store/reducers/connectionsCache";
 import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
-import {
-  deleteNotificationById,
-  getNotificationsCache,
-  setNotificationsCache,
-} from "../../../../../store/reducers/notificationsCache";
+import { deleteNotificationById } from "../../../../../store/reducers/profileCache";
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert, Alert as AlertDecline } from "../../../../components/Alert";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
@@ -37,11 +33,11 @@ import {
   MultisigMember,
 } from "../../../../components/CredentialDetailModule/components";
 import { FallbackIcon } from "../../../../components/FallbackIcon";
-import { ProfileDetailsModal } from "../../../../components/ProfileDetailsModal";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
+import { ProfileDetailsModal } from "../../../../components/ProfileDetailsModal";
 import { Spinner } from "../../../../components/Spinner";
 import { Verification } from "../../../../components/Verification";
 import { BackEventPriorityType } from "../../../../globals/types";
@@ -64,8 +60,6 @@ const ReceiveCredential = ({
   handleBack,
 }: NotificationDetailsProps) => {
   const dispatch = useAppDispatch();
-  const notificationsCache = useAppSelector(getNotificationsCache);
-  const [notifications, setNotifications] = useState(notificationsCache);
   const userName = useAppSelector(getAuthentication)?.userName;
   const connectionsCache = useAppSelector(getConnectionsCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
@@ -118,11 +112,7 @@ const ReceiveCredential = ({
   );
 
   const handleNotificationUpdate = async () => {
-    const updatedNotifications = notifications.filter(
-      (notification) => notification.id !== notificationDetails.id
-    );
-    setNotifications(updatedNotifications);
-    dispatch(setNotificationsCache(updatedNotifications));
+    dispatch(deleteNotificationById(notificationDetails.id));
   };
 
   const getMultiSigMemberStatus = useCallback(async () => {
@@ -308,12 +298,12 @@ const ReceiveCredential = ({
   const primaryButtonText = isRevoked
     ? undefined
     : `${i18n.t(
-        displayInitiatorNotAcceptedAlert
-          ? "tabs.notifications.details.buttons.ok"
-          : maxThreshold
+      displayInitiatorNotAcceptedAlert
+        ? "tabs.notifications.details.buttons.ok"
+        : maxThreshold
           ? "tabs.notifications.details.buttons.addcred"
           : "tabs.notifications.details.buttons.accept"
-      )}`;
+    )}`;
 
   const declineButtonText =
     maxThreshold || isRevoked || displayInitiatorNotAcceptedAlert

@@ -23,10 +23,6 @@ import {
   setCredsCache,
 } from "../../../store/reducers/credsCache";
 import {
-  getNotificationsCache,
-  setNotificationsCache,
-} from "../../../store/reducers/notificationsCache";
-import {
   getAuthentication,
   setCurrentOperation,
   setToastMsg,
@@ -53,6 +49,10 @@ import {
   CredentialDetailModuleProps,
 } from "./CredentialDetailModule.types";
 import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
+import {
+  getNotificationsCache,
+  setNotificationsCache,
+} from "../../../store/reducers/profileCache";
 
 const CredentialDetailModule = ({
   pageId,

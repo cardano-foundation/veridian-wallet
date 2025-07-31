@@ -1,8 +1,8 @@
-import { ThunkDispatch } from "redux-thunk";
-import { AnyAction } from "redux";
 import { ThunkAction } from "@reduxjs/toolkit";
-import { RootState } from "./index";
+import { AnyAction } from "redux";
+import { ThunkDispatch } from "redux-thunk";
 import { DataProps } from "../routes/nextRoute/nextRoute.types";
+import { RootState } from "./index";
 import { clearBiometricsCache } from "./reducers/biometricsCache";
 import { clearConnectionsCache } from "./reducers/connectionsCache";
 import { clearCredArchivedCache } from "./reducers/credsArchivedCache";
@@ -12,7 +12,6 @@ import { clearSeedPhraseCache } from "./reducers/seedPhraseCache";
 import { clearSSIAgent } from "./reducers/ssiAgent";
 import { clearStateCache } from "./reducers/stateCache";
 import { clearViewTypeCache } from "./reducers/viewTypeCache";
-import { clearNotifications } from "./reducers/notificationsCache";
 import { clearWalletConnection } from "./reducers/walletConnectionsCache";
 
 const updateReduxState = (
@@ -43,8 +42,7 @@ const CLEAR_STORE_ACTIONS = [
   clearSSIAgent,
   clearStateCache,
   clearViewTypeCache,
-  clearNotifications,
   clearWalletConnection,
 ];
 
-export { updateReduxState, CLEAR_STORE_ACTIONS };
+export { CLEAR_STORE_ACTIONS, updateReduxState };
