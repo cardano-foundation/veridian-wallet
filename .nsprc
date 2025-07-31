@@ -19,7 +19,7 @@
     "active": true,
     "notes": "REDS attacks on @capacitor/assets and the Appium server when e2e testing do not impact the wallet."
   },
-  "1106485": {
+  "1106812": {
     "active": true,
     "notes": "On-headers is vulnerable to http response header on Appium server do not impact the wallet."
   },
