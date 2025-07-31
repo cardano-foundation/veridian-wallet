@@ -696,7 +696,9 @@ class ConnectionService extends AgentService {
           alias: contact.alias,
           oobi: contact.oobi,
           groupId: contact.groupCreationId as string | undefined,
-          createdAt: new Date(contact.createdAt as string),
+          createdAt: contact.groupCreationId
+            ? new Date(contact.createdAt as string)
+            : new Date(),
         });
       }
 
