@@ -1151,7 +1151,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       grantExn.exn.i,
-      true
+      true,
+      exchange.exn.rp
     );
     expect(markNotificationMock).toHaveBeenCalledWith(notif.i);
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1195,7 +1196,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       grantExn.exn.i,
-      true
+      true,
+      grantExn.exn.rp
     );
     expect(markNotificationMock).not.toHaveBeenCalled();
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1304,7 +1306,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       applyExn.exn.i,
-      true
+      true,
+      applyExn.exn.rp
     );
     expect(markNotificationMock).toHaveBeenCalledWith(notif.i);
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1349,7 +1352,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       applyExn.exn.i,
-      true
+      true,
+      applyExn.exn.rp
     );
     expect(markNotificationMock).not.toHaveBeenCalled();
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1464,7 +1468,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       agreeExn.exn.i,
-      true
+      true,
+      agreeExn.exn.rp
     );
     expect(markNotificationMock).toHaveBeenCalledWith(notif.i);
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1509,7 +1514,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       agreeExn.exn.i,
-      true
+      true,
+      agreeExn.exn.rp
     );
     expect(markNotificationMock).not.toHaveBeenCalled();
     expect(notificationStorage.save).not.toHaveBeenCalled();
