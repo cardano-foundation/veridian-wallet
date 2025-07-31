@@ -131,8 +131,8 @@ type ConnectionNoteProps = Pick<ConnectionNoteDetails, "title" | "message">;
 
 interface ConnectionDetailsExtras {
   serviceEndpoints: string[];
-  notes?: ConnectionNoteDetails[];
-  historyItems?: ConnectionHistoryItem[];
+  notes: ConnectionNoteDetails[];
+  historyItems: ConnectionHistoryItem[];
 }
 
 interface RegularConnectionDetailsFull

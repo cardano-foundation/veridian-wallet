@@ -244,6 +244,7 @@ const connectionService = jest.mocked({
     serviceEndpoints: [
       "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
     ],
+    notes: [],
     historyItems: [],
   }),
   shareIdentifier: jest.fn(),
@@ -1131,6 +1132,7 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: grantExn.exn.i,
+      notes: [],
       historyItems: [
         { id: grantExn.exn.d, type: ConnectionHistoryType.CREDENTIAL_ISSUANCE },
       ],
@@ -1174,7 +1176,9 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: grantExn.exn.i,
+      notes: [],
       historyItems: [],
+      serviceEndpoints: [],
     });
 
     identifierStorage.getIdentifierMetadata.mockRejectedValueOnce(
@@ -1277,6 +1281,7 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: applyExn.exn.i,
+      notes: [],
       historyItems: [
         {
           id: applyExn.exn.d,
@@ -1324,7 +1329,9 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: applyExn.exn.i,
+      notes: [],
       historyItems: [],
+      serviceEndpoints: [],
     });
 
     identifierStorage.getIdentifierMetadata.mockRejectedValueOnce(
@@ -1434,6 +1441,7 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: exchange.exn.i,
+      notes: [],
       historyItems: [
         {
           id: agreeExn.exn.d,
@@ -1481,7 +1489,9 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: agreeExn.exn.i,
+      notes: [],
       historyItems: [],
+      serviceEndpoints: [],
     });
 
     identifierStorage.getIdentifierMetadata.mockRejectedValueOnce(
@@ -1574,6 +1584,7 @@ describe("Signify notification service of agent", () => {
     credentialStorage.getCredentialMetadata.mockResolvedValue(null);
     connectionService.getConnectionById.mockResolvedValueOnce({
       id: multisigExnAdmitForIssuance.exn.i,
+      notes: [],
       historyItems: [],
       serviceEndpoints: [
         "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
@@ -2259,6 +2270,7 @@ describe("Group IPEX presentation", () => {
 
     connectionService.getConnectionById.mockResolvedValueOnce({
       id: multisigExnOfferForPresenting.exn.i,
+      notes: [],
       historyItems: [],
       serviceEndpoints: [
         "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
@@ -2336,6 +2348,7 @@ describe("Group IPEX presentation", () => {
 
     connectionService.getConnectionById.mockResolvedValueOnce({
       id: multisigExnGrant.exn.i,
+      notes: [],
       historyItems: [],
       serviceEndpoints: [
         "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",

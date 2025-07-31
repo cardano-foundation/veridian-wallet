@@ -728,10 +728,9 @@ class KeriaNotificationService extends AgentService {
               grantExn.exn.i,
               true
             );
-          const historyExists =
-            connectionInCloud.historyItems?.some(
-              (item) => item.id === grantExn.exn.d
-            ) ?? false;
+          const historyExists = connectionInCloud.historyItems.some(
+            (item) => item.id === grantExn.exn.d
+          );
           if (historyExists) {
             await this.markNotification(notif.i);
             return false;
@@ -791,10 +790,9 @@ class KeriaNotificationService extends AgentService {
               applyExn.exn.i,
               true
             );
-          const historyExists =
-            connectionInCloud.historyItems?.some(
-              (item) => item.id === applyExn.exn.d
-            ) ?? false;
+          const historyExists = connectionInCloud.historyItems.some(
+            (item) => item.id === applyExn.exn.d
+          );
           if (historyExists) {
             await this.markNotification(notif.i);
             return false;
@@ -865,10 +863,9 @@ class KeriaNotificationService extends AgentService {
               agreeExn.exn.i,
               true
             );
-          const historyExists =
-            connectionInCloud.historyItems?.some(
-              (item) => item.id === agreeExn.exn.d
-            ) ?? false;
+          const historyExists = connectionInCloud.historyItems.some(
+            (item) => item.id === agreeExn.exn.d
+          );
           if (historyExists) {
             await this.markNotification(notif.i);
             return false;

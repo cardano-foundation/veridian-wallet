@@ -402,6 +402,8 @@ class ConnectionService extends AgentService {
         ...baseConnectionDetails,
         createdAtUTC: connection.createdAt as string,
         groupId: connection.groupCreationId as string,
+        notes: [],
+        historyItems: [],
       };
     }
   }

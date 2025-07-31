@@ -290,6 +290,8 @@ const connections = jest.mocked({
     serviceEndpoints: [
       "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
     ],
+    notes: [],
+    historyItems: [],
   }),
 });
 
