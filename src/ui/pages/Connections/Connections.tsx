@@ -165,17 +165,14 @@ const Connections = () => {
 
     try {
       setDeletePendingItem(null);
-      if (isRegularConnectionDetails(deletePendingItem)) {
-        await Agent.agent.connections.deleteStaleLocalConnectionById(
-          deletePendingItem.id,
-          deletePendingItem.identifier
-        );
-      } else {
-        // For multisig connections, we don't need an identifier
-        await Agent.agent.connections.deleteStaleLocalConnectionById(
-          deletePendingItem.id
-        );
-      }
+      const connectionIdentifier = isRegularConnectionDetails(deletePendingItem)
+        ? deletePendingItem.identifier
+        : identifier.id; // Use current user's identifier for multisig connections
+
+      await Agent.agent.connections.deleteStaleLocalConnectionById(
+        deletePendingItem.id,
+        connectionIdentifier
+      );
       dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
       dispatch(removeConnectionCache(deletePendingItem.id));
     } catch (error) {

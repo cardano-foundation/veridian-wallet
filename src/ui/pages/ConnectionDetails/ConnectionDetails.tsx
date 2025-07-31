@@ -20,11 +20,12 @@ import {
   isMultisigConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { RoutePath } from "../../../routes";
-import { useAppDispatch } from "../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { removeConnectionCache } from "../../../store/reducers/connectionsCache";
 import {
   setCurrentOperation,
   setToastMsg,
+  getCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { Alert as AlertDeleteConnection } from "../../components/Alert";
 import { CardDetailsBlock } from "../../components/CardDetails";
@@ -51,6 +52,7 @@ const ConnectionDetails = ({
 }: ConnectionDetailsProps) => {
   const pageId = "connection-details";
   const dispatch = useAppDispatch();
+  const currentProfile = useAppSelector(getCurrentProfile);
   const [connectionDetails, setConnectionDetails] = useState<ConnectionData>();
   const [connectionHistory, setConnectionHistory] = useState<
     ConnectionHistoryItem[]
@@ -117,9 +119,15 @@ const ConnectionDetails = ({
     async function deleteConnection() {
       try {
         if (cloudError) {
+          const connectionIdentifier = isRegularConnectionDetails(
+            connectionShortDetails
+          )
+            ? connectionShortDetails.identifier
+            : currentProfile.identity.id; // Use current user's identifier for multisig connections
+
           await Agent.agent.connections.deleteStaleLocalConnectionById(
             connectionShortDetails.id,
-            connectionShortDetails.identifier
+            connectionIdentifier
           );
         } else {
           if (isRegularConnectionDetails(connectionShortDetails)) {

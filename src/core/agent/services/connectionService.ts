@@ -534,13 +534,18 @@ class ConnectionService extends AgentService {
 
   async deleteStaleLocalConnectionById(
     id: string,
-    identifier?: string
+    identifier: string
   ): Promise<void> {
-    if (identifier) {
-      // For regular connections, delete the connection pair
-      await this.connectionPairStorage.deleteById(`${identifier}:${id}`);
-    } else {
-      // For multisig connections, delete the contact directly
+    // Delete the connection pair
+    await this.connectionPairStorage.deleteById(`${identifier}:${id}`);
+
+    // Check if this was the last pair for this contact
+    const remainingPairs = await this.connectionPairStorage.findAllByQuery({
+      contactId: id,
+    });
+
+    // If no remaining pairs, delete the contact
+    if (remainingPairs.length === 0) {
       await this.contactStorage.deleteById(id);
     }
   }

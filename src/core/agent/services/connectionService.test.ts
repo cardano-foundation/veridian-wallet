@@ -1179,19 +1179,68 @@ describe("Connection service of agent", () => {
   test("Can delete stale local connection with identifier", async () => {
     const connectionId = "connection-id";
     const identifier = "test-identifier";
+
+    // Mock that remaining pairs exist, so contact should NOT be deleted
+    connectionPairStorage.findAllByQuery.mockResolvedValue([
+      { id: "other-pair", contactId: connectionId },
+    ]);
+
     await connectionService.deleteStaleLocalConnectionById(
       connectionId,
       identifier
     );
+
     expect(connectionPairStorage.deleteById).toBeCalledWith(
       `${identifier}:${connectionId}`
     );
+    expect(connectionPairStorage.findAllByQuery).toBeCalledWith({
+      contactId: connectionId,
+    });
+    expect(contactStorage.deleteById).not.toBeCalled();
   });
 
-  test("Can delete stale local connection without identifier (multisig)", async () => {
+  test("Can delete stale local connection and contact if last pair", async () => {
     const connectionId = "connection-id";
-    await connectionService.deleteStaleLocalConnectionById(connectionId);
+    const identifier = "test-identifier";
+
+    // Mock no remaining pairs, so contact should be deleted
+    connectionPairStorage.findAllByQuery.mockResolvedValue([]);
+
+    await connectionService.deleteStaleLocalConnectionById(
+      connectionId,
+      identifier
+    );
+
+    expect(connectionPairStorage.deleteById).toBeCalledWith(
+      `${identifier}:${connectionId}`
+    );
+    expect(connectionPairStorage.findAllByQuery).toBeCalledWith({
+      contactId: connectionId,
+    });
     expect(contactStorage.deleteById).toBeCalledWith(connectionId);
+  });
+
+  test("Can delete stale local connection but preserve contact if other pairs exist", async () => {
+    const connectionId = "connection-id";
+    const identifier = "test-identifier";
+
+    // Mock remaining pairs exist, so contact should NOT be deleted
+    connectionPairStorage.findAllByQuery.mockResolvedValue([
+      { id: "other-pair", contactId: connectionId },
+    ]);
+
+    await connectionService.deleteStaleLocalConnectionById(
+      connectionId,
+      identifier
+    );
+
+    expect(connectionPairStorage.deleteById).toBeCalledWith(
+      `${identifier}:${connectionId}`
+    );
+    expect(connectionPairStorage.findAllByQuery).toBeCalledWith({
+      contactId: connectionId,
+    });
+    expect(contactStorage.deleteById).not.toBeCalled();
   });
 
   test("connection exists in the database but not on Signify", async () => {
