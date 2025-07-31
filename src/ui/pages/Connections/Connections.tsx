@@ -58,7 +58,7 @@ const Connections = () => {
   const [openShareDefaultProfile, setOpenShareDefaultProfile] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [deletePendingItem, setDeletePendingItem] =
-    useState<ConnectionShortDetails | null>(null);
+    useState<RegularConnectionDetails | null>(null);
   const [openDeletePendingAlert, setOpenDeletePendingAlert] = useState(false);
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
@@ -142,7 +142,7 @@ const Connections = () => {
 
   useOnlineStatusEffect(fetchOobi);
 
-  const handleShowConnectionDetails = (item: ConnectionShortDetails) => {
+  const handleShowConnectionDetails = (item: RegularConnectionDetails) => {
     if (
       item.status === ConnectionStatus.PENDING ||
       item.status === ConnectionStatus.FAILED
@@ -153,7 +153,7 @@ const Connections = () => {
     }
 
     // Only show details for regular connections
-    setConnectionShortDetails(item as RegularConnectionDetails);
+    setConnectionShortDetails(item);
   };
 
   const deletePendingCheckProps = {
@@ -167,15 +167,10 @@ const Connections = () => {
 
     try {
       setDeletePendingItem(null);
-      // For regular connections use their identifier, for multisig use current user's identifier
-      const connectionIdentifier =
-        "identifier" in deletePendingItem
-          ? deletePendingItem.identifier
-          : identifier.id;
 
       await Agent.agent.connections.deleteStaleLocalConnectionById(
         deletePendingItem.id,
-        connectionIdentifier
+        deletePendingItem.identifier!
       );
       dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
       dispatch(removeConnectionCache(deletePendingItem.id));
