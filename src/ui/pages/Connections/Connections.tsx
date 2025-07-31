@@ -44,7 +44,6 @@ import { Profiles } from "../Profiles";
 const Connections = () => {
   const pageId = "connections-tab";
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
   const identifiers = useAppSelector(getIdentifiersCache);
   const connectionsCache = useAppSelector(getConnectionsCache);
   const openDetailId = useAppSelector(getOpenConnectionId);
@@ -54,7 +53,7 @@ const Connections = () => {
   const [mappedConnections, setMappedConnections] = useState<
     MappedConnections[]
   >([]);
-  const [openShareDefaultProfile, setOpenShareDefaultProfile] = useState(false);
+  const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [deletePendingItem, setDeletePendingItem] =
     useState<ConnectionShortDetails | null>(null);
@@ -181,7 +180,7 @@ const Connections = () => {
   };
 
   const handleConnectModal = () => {
-    setOpenShareDefaultProfile(true);
+    setOpenShareCurrentProfile(true);
   };
 
   const handleAvatarClick = () => {
@@ -263,8 +262,8 @@ const Connections = () => {
         />
       </TabLayout>
       <ShareProfile
-        isOpen={openShareDefaultProfile}
-        setIsOpen={setOpenShareDefaultProfile}
+        isOpen={openShareCurrentProfile}
+        setIsOpen={setOpenShareCurrentProfile}
         oobi={oobi}
       />
       <Profiles

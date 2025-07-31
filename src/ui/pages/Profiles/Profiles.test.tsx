@@ -3,10 +3,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import {
-  filteredIdentifierFix,
-  filteredIdentifierMapFix,
-} from "../../__fixtures__/filteredIdentifierFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Profiles } from "./Profiles";
 import { Agent } from "../../../core/agent/agent";
@@ -50,11 +47,11 @@ const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
+    currentProfileId: filteredIdentifierFix[0].id,
     authentication: {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
     },
     currentProfile: {
       identity: filteredIdentifierFix[0],
@@ -66,7 +63,7 @@ const initialState = {
     },
   },
   identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
+    identifiers: filteredIdentifierFix,
   },
   connectionsCache: {
     connections: {},

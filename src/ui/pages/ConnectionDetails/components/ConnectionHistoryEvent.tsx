@@ -31,13 +31,13 @@ const ConnectionHistoryEvent = ({
       <div className="connection-details-logo">
         {historyItem.type ===
         ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT ? (
-          <FallbackIcon
-            src={connectionDetails?.logo}
-            alt="connection-logo"
-          />
-        ) : (
-          <CardTheme />
-        )}
+            <FallbackIcon
+              src={connectionDetails?.logo}
+              alt="connection-logo"
+            />
+          ) : (
+            <CardTheme />
+          )}
       </div>
       <p className="connection-details-history-event-info">
         <span className="connection-details-history-text">

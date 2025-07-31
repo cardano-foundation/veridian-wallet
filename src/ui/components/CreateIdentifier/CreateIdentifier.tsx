@@ -157,12 +157,14 @@ const CreateIdentifier = ({
         groupId: multiSigGroup.groupId,
         groupInitiator: false,
         groupCreated: false,
+        userName: "", // TODO: Set userName if needed
       };
     } else if (identifierData.selectedAidType == 1) {
       groupMetadata = {
         groupId: new Salter({}).qb64,
         groupInitiator: true,
         groupCreated: false,
+        userName: "", // TODO: Set userName if needed
       };
     }
     metadata.groupMetadata = groupMetadata;
@@ -210,8 +212,8 @@ const CreateIdentifier = ({
           identifierData.selectedAidType === 1 || multiSigGroup
             ? ToastMsgType.MULTI_SIGN_IDENTIFIER_CREATED
             : identifierData.selectedAidType === 2
-            ? ToastMsgType.DELEGATED_IDENTIFIER_CREATED
-            : ToastMsgType.IDENTIFIER_CREATED
+              ? ToastMsgType.DELEGATED_IDENTIFIER_CREATED
+              : ToastMsgType.IDENTIFIER_CREATED
         )
       );
     } catch (e) {

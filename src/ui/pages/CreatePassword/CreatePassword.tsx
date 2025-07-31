@@ -107,10 +107,10 @@ const CreatePassword = ({
             title={
               !isOnboarding
                 ? `${i18n.t(
-                    userAction?.current === "change"
-                      ? "createpassword.change"
-                      : "createpassword.title"
-                  )}`
+                  userAction?.current === "change"
+                    ? "createpassword.change"
+                    : "createpassword.title"
+                )}`
                 : undefined
             }
             actionButton={isShowProgresBar}

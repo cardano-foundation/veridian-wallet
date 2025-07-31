@@ -16,7 +16,7 @@ import {
 import {
   getStateCache,
   showNoWitnessAlert,
-  updateCurrentProfile
+  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
@@ -81,7 +81,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       setStep(SetupProfileStep.SetupGroup);
       return;
     }
-  
+
     onClose?.(true);
   };
 
@@ -101,6 +101,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         groupId: new Salter({}).qb64,
         groupInitiator: true,
         groupCreated: false,
+        userName: groupName,
       };
       metadata.groupMetadata = groupMetadata;
     }

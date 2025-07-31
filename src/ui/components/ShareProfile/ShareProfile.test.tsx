@@ -13,7 +13,6 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import {
-  logout,
   setToastMsg,
   showGenericError,
 } from "../../../store/reducers/stateCache";
@@ -127,12 +126,12 @@ describe("Share Profile", () => {
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.CONNECTIONS],
+      currentProfileId: filteredIdentifierFix[0].id,
       authentication: {
         loggedIn: true,
         time: Date.now(),
         passcodeIsSet: true,
         passwordIsSet: false,
-        defaultProfile: filteredIdentifierFix[0].id,
       },
       currentProfile: {
         identity: filteredIdentifierFix[0],
@@ -242,7 +241,7 @@ describe("Share Profile", () => {
     await waitFor(() => {
       expect(connectByOobiUrlMock).toBeCalledWith(
         barcodes[0].rawValue,
-        initialState.stateCache.authentication.defaultProfile
+        initialState.stateCache.currentProfileId
       );
     });
   });
@@ -301,7 +300,7 @@ describe("Share Profile", () => {
       expect(dispatchMock).toBeCalledWith(
         setMissingAliasConnection({
           url: "http://keria:3902/oobi/EKDTSzuyUb7ICP1rFzrFGXc1AwC4yFtTkzIHbbjoJDO6/agent/EJqSoWGc6xyYisiaFKsuut159p",
-          identifier: initialState.stateCache.authentication.defaultProfile,
+          identifier: initialState.stateCache.currentProfileId,
         })
       );
     });

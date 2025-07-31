@@ -71,12 +71,12 @@ describe("Create group identifier - Setup Connection", () => {
   const initialState = {
     stateCache: {
       routes: [TabsRoutePath.IDENTIFIERS],
+      currentProfileId: "Account1",
       authentication: {
         loggedIn: true,
         time: Date.now(),
         passcodeIsSet: true,
         passwordIsSet: false,
-        userName: "Duke",
       },
       isOnline: true,
       queueIncomingRequest: {
@@ -117,6 +117,7 @@ describe("Create group identifier - Setup Connection", () => {
         groupId: "a2c1ac9e-fbaf-4cfd-83fb-7008d9661898",
         groupInitiator: true,
         groupCreated: true,
+        userName: "",
       },
     },
     color: IdentifierColor.One,
@@ -158,7 +159,7 @@ describe("Create group identifier - Setup Connection", () => {
     await waitFor(() => {
       expect(getOobiMock).toBeCalledWith(
         stage1State.newIdentifier.id,
-        initialState.stateCache.authentication.userName,
+        stage1State.newIdentifier.displayName,
         stage1State.newIdentifier.groupMetadata.groupId
       );
     });
@@ -203,6 +204,7 @@ describe("Create group identifier - Setup Connection", () => {
           groupId: "a2c1ac9e-fbaf-4cfd-83fb-7008d9661898",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       color: IdentifierColor.One,
@@ -391,6 +393,7 @@ describe("Create group identifier - Setup Connection", () => {
           groupId: "a2c1ac9e-fbaf-4cfd-83fb-7008d9661898",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       color: IdentifierColor.One,
@@ -525,12 +528,12 @@ describe("Create group identifier - Setup Connection", () => {
     const baseState = {
       stateCache: {
         routes: [TabsRoutePath.IDENTIFIERS],
+        currentProfileId: "Account1",
         authentication: {
           loggedIn: true,
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: false,
-          userName: "Duke",
         },
         queueIncomingRequest: {
           isProcessing: false,
