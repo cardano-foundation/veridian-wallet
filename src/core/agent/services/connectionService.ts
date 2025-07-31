@@ -316,7 +316,7 @@ class ConnectionService extends AgentService {
       contactId: record.id,
       ...(record.groupId
         ? { groupId: record.groupId }
-        : { identifier: record.identifier ?? "" }),
+        : { identifier: record.identifier! }),
     };
   }
 
