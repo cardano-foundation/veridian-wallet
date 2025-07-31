@@ -116,7 +116,11 @@ class IpexCommunicationService extends AgentService {
 
     const schemaSaid = grantExn.exn.e.acdc.s;
     const issuerOobi = (
-      await this.connections.getConnectionById(grantExn.exn.i)
+      await this.connections.getConnectionById(
+        grantExn.exn.i,
+        false,
+        grantExn.exn.rp
+      )
     ).serviceEndpoints[0];
     await this.connections.resolveOobi(
       await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
@@ -493,9 +497,13 @@ class IpexCommunicationService extends AgentService {
       historyType === ConnectionHistoryType.CREDENTIAL_PRESENTED
         ? message.exn.rp
         : message.exn.i;
+    const identifier =
+      historyType === ConnectionHistoryType.CREDENTIAL_PRESENTED
+        ? message.exn.i
+        : message.exn.rp;
 
     const connection = await this.connections
-      .getConnectionById(connectionId)
+      .getConnectionById(connectionId, false, identifier)
       .catch((error) => {
         if (
           error instanceof Error &&
@@ -956,7 +964,11 @@ class IpexCommunicationService extends AgentService {
         const status = error.message.split(" - ")[1];
         if (/404/gi.test(status)) {
           const issuerOobi = (
-            await this.connections.getConnectionById(exchange.exn.i)
+            await this.connections.getConnectionById(
+              exchange.exn.i,
+              false,
+              exchange.exn.rp
+            )
           ).serviceEndpoints[0];
           await this.connections.resolveOobi(
             await this.getSchemaUrl(issuerOobi, exchange.exn.i, schemaSaid)
@@ -998,7 +1010,11 @@ class IpexCommunicationService extends AgentService {
     let mend: string;
 
     const issuerOobi = (
-      await this.connections.getConnectionById(grantExn.exn.i)
+      await this.connections.getConnectionById(
+        grantExn.exn.i,
+        false,
+        grantExn.exn.rp
+      )
     ).serviceEndpoints[0];
     await Promise.all(
       schemaSaids.map(

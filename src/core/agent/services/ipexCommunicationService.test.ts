@@ -2623,4 +2623,187 @@ describe("IPEX communication service of agent", () => {
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
   });
+
+  describe("getConnectionById parameter verification tests", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test("grantAcdcFromAgree calls getConnectionById with correct parameters", async () => {
+      Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+
+      // Setup mocks
+      notificationStorage.findById.mockResolvedValue({
+        id: "test-note-id",
+        a: { d: "test-exchange-id" },
+        linkedRequest: { accepted: false },
+      });
+
+      getExchangeMock.mockResolvedValue(grantForIssuanceExnMessage);
+      identifierStorage.getIdentifierMetadata.mockResolvedValue(
+        groupIdentifierMetadataRecord
+      );
+      schemaGetMock.mockResolvedValue(QVISchema);
+      credentialStorage.getCredentialMetadata.mockResolvedValue(
+        credentialRecord
+      );
+      connections.resolveOobi.mockResolvedValue(undefined);
+      ipexGrantMock.mockResolvedValue([
+        { ked: { d: "grant-said" } },
+        "sigs",
+        "gend",
+      ]);
+
+      await ipexCommunicationService.grantAcdcFromAgree("test-note-id");
+
+      // Verify getConnectionById is called with correct parameters: (id, false, identifier)
+      expect(connections.getConnectionById).toHaveBeenCalledWith(
+        grantForIssuanceExnMessage.exn.i,
+        false,
+        grantForIssuanceExnMessage.exn.rp
+      );
+    });
+
+    test("createLinkedIpexMessageRecord calls getConnectionById with correct parameters for CREDENTIAL_PRESENTED", async () => {
+      schemaGetMock.mockResolvedValue(QVISchema);
+      connections.resolveOobi.mockResolvedValue(undefined);
+
+      await ipexCommunicationService.createLinkedIpexMessageRecord(
+        grantForIssuanceExnMessage,
+        ConnectionHistoryType.CREDENTIAL_PRESENTED
+      );
+
+      // For CREDENTIAL_PRESENTED: connectionId = exn.rp, identifier = exn.i
+      expect(connections.getConnectionById).toHaveBeenCalledWith(
+        grantForIssuanceExnMessage.exn.rp,
+        false,
+        grantForIssuanceExnMessage.exn.i
+      );
+    });
+
+    test("createLinkedIpexMessageRecord calls getConnectionById with correct parameters for CREDENTIAL_REQUEST_PRESENT", async () => {
+      schemaGetMock.mockResolvedValue(QVISchema);
+      connections.resolveOobi.mockResolvedValue(undefined);
+
+      await ipexCommunicationService.createLinkedIpexMessageRecord(
+        applyForPresentingExnMessage,
+        ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT
+      );
+
+      // For CREDENTIAL_REQUEST_PRESENT: connectionId = exn.i, identifier = exn.rp
+      expect(connections.getConnectionById).toHaveBeenCalledWith(
+        applyForPresentingExnMessage.exn.i,
+        false,
+        applyForPresentingExnMessage.exn.rp
+      );
+    });
+
+    test("createLinkedIpexMessageRecord calls getConnectionById with correct parameters for CREDENTIAL_ISSUANCE", async () => {
+      schemaGetMock.mockResolvedValue(QVISchema);
+      connections.resolveOobi.mockResolvedValue(undefined);
+
+      await ipexCommunicationService.createLinkedIpexMessageRecord(
+        grantForIssuanceExnMessage,
+        ConnectionHistoryType.CREDENTIAL_ISSUANCE
+      );
+
+      // For CREDENTIAL_ISSUANCE: connectionId = exn.i, identifier = exn.rp
+      expect(connections.getConnectionById).toHaveBeenCalledWith(
+        grantForIssuanceExnMessage.exn.i,
+        false,
+        grantForIssuanceExnMessage.exn.rp
+      );
+    });
+
+    test("joinMultisigAdmit calls getConnectionById with correct parameters", async () => {
+      Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+
+      // Setup mocks
+      notificationStorage.findById.mockResolvedValue({
+        id: "test-note-id",
+        a: { d: "test-exchange-id" },
+        linkedRequest: { accepted: false },
+      });
+
+      getExchangeMock.mockResolvedValue(multisigExnGrant);
+      identifierStorage.getIdentifierMetadata.mockResolvedValue(
+        groupIdentifierMetadataRecord
+      );
+      schemaGetMock.mockResolvedValue(QVISchema);
+      connections.resolveOobi.mockResolvedValue(undefined);
+      ipexAdmitMock.mockResolvedValue([
+        { ked: { d: "admit-said" } },
+        "sigs",
+        "aend",
+      ]);
+
+      await ipexCommunicationService.joinMultisigAdmit("test-note-id");
+
+      // Verify getConnectionById is called with correct parameters: (id, false, identifier)
+      expect(connections.getConnectionById).toHaveBeenCalledWith(
+        multisigExnGrant.exn.i,
+        false,
+        multisigExnGrant.exn.rp
+      );
+    });
+
+    test("schema resolution error handling calls getConnectionById with correct parameters", async () => {
+      // Mock schema get to throw 404 error first, then succeed
+      schemaGetMock
+        .mockRejectedValueOnce(new Error("404 - Schema not found"))
+        .mockResolvedValueOnce(QVISchema);
+
+      connections.resolveOobi.mockResolvedValue(undefined);
+
+      await ipexCommunicationService.createLinkedIpexMessageRecord(
+        grantForIssuanceExnMessage,
+        ConnectionHistoryType.CREDENTIAL_ISSUANCE
+      );
+
+      // Should be called twice: once in main flow, once in error handling
+      expect(connections.getConnectionById).toHaveBeenCalledTimes(2);
+
+      // Verify the call in the error handler has correct parameters
+      expect(connections.getConnectionById).toHaveBeenNthCalledWith(
+        2,
+        grantForIssuanceExnMessage.exn.i,
+        false,
+        grantForIssuanceExnMessage.exn.rp
+      );
+    });
+
+    test("getConnectionById receives connection history when identifier is provided", async () => {
+      // Setup a mock that returns different data based on whether identifier is provided
+      const mockConnectionWithHistory = {
+        serviceEndpoints: ["http://test.oobi"],
+        notes: [{ id: "note1", title: "Test Note", message: "Test message" }],
+        historyItems: [
+          {
+            id: "hist1",
+            type: ConnectionHistoryType.CREDENTIAL_ISSUANCE,
+            timestamp: "2024-01-01T00:00:00Z",
+            credentialType: "Test Credential",
+          },
+        ],
+      };
+
+      connections.getConnectionById.mockResolvedValueOnce(
+        mockConnectionWithHistory
+      );
+      schemaGetMock.mockResolvedValue(QVISchema);
+      connections.resolveOobi.mockResolvedValue(undefined);
+
+      await ipexCommunicationService.createLinkedIpexMessageRecord(
+        grantForIssuanceExnMessage,
+        ConnectionHistoryType.CREDENTIAL_ISSUANCE
+      );
+
+      // Verify that when identifier is provided, we get connection history
+      expect(connections.getConnectionById).toHaveBeenCalledWith(
+        grantForIssuanceExnMessage.exn.i,
+        false,
+        grantForIssuanceExnMessage.exn.rp
+      );
+    });
+  });
 });
