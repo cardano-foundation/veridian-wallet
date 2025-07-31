@@ -38,13 +38,12 @@ import {
   updateOrAddMultisigConnectionCache,
 } from "../../../store/reducers/connectionsCache";
 import {
-  getIdentifiersCache,
-  getMultiSigGroupCache,
+  getProfileGroupCache,
+  getProfiles,
   getScanGroupId,
-  setMultiSigGroupCache,
-  setOpenMultiSigId,
-} from "../../../store/reducers/identifiersCache";
-import { MultiSigGroup } from "../../../store/reducers/identifiersCache/identifiersCache.types";
+  MultiSigGroup,
+  setGroupProfileCache,
+} from "../../../store/reducers/profileCache";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {
   getAuthentication,
@@ -87,13 +86,13 @@ const Scanner = forwardRef(
     const componentId = "scanner";
     const platforms = getPlatforms();
     const dispatch = useAppDispatch();
-    const multiSigGroupCache = useAppSelector(getMultiSigGroupCache);
+    const multiSigGroupCache = useAppSelector(getProfileGroupCache);
     const connections = useAppSelector(getConnectionsCache);
     const currentOperation = useAppSelector(getCurrentOperation);
     const scanGroupId = useAppSelector(getScanGroupId);
     const currentToastMsgs = useAppSelector(getToastMsgs);
     const loggedIn = useAppSelector(getAuthentication).loggedIn;
-    const identifiers = useAppSelector(getIdentifiersCache);
+    const profiles = useAppSelector(getProfiles);
     const [createIdentifierModalIsOpen, setCreateIdentifierModalIsOpen] =
       useState(false);
     const [pasteModalIsOpen, setPasteModalIsOpen] = useState(false);
@@ -120,17 +119,17 @@ const Scanner = forwardRef(
     const scanByTab = routePath === TabsRoutePath.SCAN;
 
     const getCreatedIdentifiers = async () => {
-      const identifierList = Object.values(identifiers);
+      const profileList = Object.values(profiles);
       const checkOobiResponse = await Promise.allSettled(
-        identifierList.map((identifier) =>
-          Agent.agent.connections.getOobi(identifier.id)
+        profileList.map((identifier) =>
+          Agent.agent.connections.getOobi(identifier.identity.id)
         )
       );
 
       const result: IdentifierShortDetails[] = [];
       checkOobiResponse.forEach((response, index) => {
         if (response.status === "fulfilled" && response.value) {
-          result.push(identifierList[index]);
+          result.push(profileList[index].identity);
         }
       });
 
@@ -311,7 +310,7 @@ const Scanner = forwardRef(
         connections,
       };
 
-      dispatch(setMultiSigGroupCache(newMultiSigGroup));
+      dispatch(setGroupProfileCache(newMultiSigGroup));
     };
 
     const handleSSIScan = (content: string) => {
@@ -371,15 +370,15 @@ const Scanner = forwardRef(
 
     const handleAfterScanMultisig = (groupId: string | null) => {
       if (!groupId) return;
-      const identifier = Object.values(identifiers).find(
-        (identifier) => identifier.groupMetadata?.groupId === groupId
+      const profile = Object.values(profiles).find(
+        (profile) => profile.identity.groupMetadata?.groupId === groupId
       );
 
-      if (!identifier) {
+      if (!profile) {
         throw new Error(ErrorMessage.GROUP_ID_NOT_MATCH);
       }
 
-      openGroupIdentifierSetup(identifier);
+      openGroupIdentifierSetup(profile.identity);
     };
 
     const handleDuplicateConnectionError = async (
@@ -418,7 +417,6 @@ const Scanner = forwardRef(
           return;
         }
 
-        dispatch(setOpenMultiSigId(urlId));
         handleReset?.(TabsRoutePath.CREDENTIALS);
         return;
       } else {

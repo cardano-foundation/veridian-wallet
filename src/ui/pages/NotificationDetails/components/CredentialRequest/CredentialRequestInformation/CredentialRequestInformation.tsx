@@ -6,9 +6,9 @@ import { NotificationRoute } from "../../../../../../core/agent/services/keriaNo
 import { i18n } from "../../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../../store/reducers/connectionsCache";
-import { getCredsArchivedCache } from "../../../../../../store/reducers/credsArchivedCache";
 import {
   deleteNotificationById,
+  getCredsArchivedCache,
   getCredsCache,
 } from "../../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../../store/reducers/stateCache";

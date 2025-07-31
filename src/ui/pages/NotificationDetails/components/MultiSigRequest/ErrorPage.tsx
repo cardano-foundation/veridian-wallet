@@ -6,7 +6,6 @@ import { IdentifierShortDetails } from "../../../../../core/agent/services/ident
 import { i18n } from "../../../../../i18n";
 import { useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
-import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
 import { CreateGroupIdentifier } from "../../../../components/CreateGroupIdentifier";
 import { InfoCard } from "../../../../components/InfoCard";
@@ -16,6 +15,7 @@ import { PageHeader } from "../../../../components/PageHeader";
 import { SUPPORT_EMAIL } from "../../../../globals/constants";
 import "./ErrorPage.scss";
 import { ErrorPageProps } from "./ErrorPage.types";
+import { getProfiles } from "../../../../../store/reducers/profileCache";
 
 const ErrorPage = ({
   pageId,
@@ -24,7 +24,7 @@ const ErrorPage = ({
   notificationDetails,
   onFinishSetup,
 }: ErrorPageProps) => {
-  const identifierCache = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
   const connectionsCache = useAppSelector(getMultisigConnectionsCache);
   const [resumeMultiSig, setResumeMultiSig] =
     useState<IdentifierShortDetails | null>(null);
@@ -36,12 +36,12 @@ const ErrorPage = ({
     const multiSignGroupId =
       connectionsCache[notificationDetails.connectionId].groupId;
 
-    const identifier = Object.values(identifierCache).find(
-      (item) => item.groupMetadata?.groupId === multiSignGroupId
+    const identifier = Object.values(profiles).find(
+      (item) => item.identity.groupMetadata?.groupId === multiSignGroupId
     );
 
     if (identifier) {
-      setResumeMultiSig(identifier);
+      setResumeMultiSig(identifier.identity);
       setCreateIdentifierModalIsOpen(true);
     }
   };

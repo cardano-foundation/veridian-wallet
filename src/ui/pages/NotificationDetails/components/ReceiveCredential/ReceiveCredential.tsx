@@ -21,8 +21,10 @@ import {
   getConnectionsCache,
   getMultisigConnectionsCache,
 } from "../../../../../store/reducers/connectionsCache";
-import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
-import { deleteNotificationById } from "../../../../../store/reducers/profileCache";
+import {
+  deleteNotificationById,
+  getProfiles,
+} from "../../../../../store/reducers/profileCache";
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert, Alert as AlertDecline } from "../../../../components/Alert";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
@@ -80,7 +82,7 @@ const ReceiveCredential = ({
       },
     });
   const [isLoading, setIsLoading] = useState(false);
-  const identifiersData = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
 
   const isMultisig = credDetail?.identifierType === IdentifierType.Group;
   const [isRevoked, setIsRevoked] = useState(false);
@@ -96,9 +98,10 @@ const ReceiveCredential = ({
       (multisigMemberStatus.linkedRequest.accepted ? 1 : 0) >=
       Number(multisigMemberStatus.threshold);
 
-  const identifier = identifiersData[credDetail?.identifierId || ""];
+  const profile = profiles[credDetail?.identifierId || ""];
   const groupInitiatorAid = multisigMemberStatus.members[0] || "";
-  const isGroupInitiator = identifier?.groupMemberPre === groupInitiatorAid;
+  const isGroupInitiator =
+    profile?.identity.groupMemberPre === groupInitiatorAid;
   const displayInitiatorNotAcceptedAlert =
     isMultisig &&
     !isRevoked &&
@@ -138,11 +141,11 @@ const ReceiveCredential = ({
           notificationDetails.a.d as string
         );
 
-      const identifier = identifiersData[credential.identifierId];
+      const profile = profiles[credential.identifierId];
 
       // @TODO: identifierType is not needed to render the component so this could be optimised. If it's needed, it should be fetched in the core for simplicity.
       const identifierType =
-        identifier?.groupMetadata || identifier?.groupMemberPre
+        profile?.identity.groupMetadata || profile?.identity.groupMemberPre
           ? IdentifierType.Group
           : IdentifierType.Individual;
 
@@ -167,12 +170,7 @@ const ReceiveCredential = ({
     } finally {
       setIsLoading(false);
     }
-  }, [
-    dispatch,
-    getMultiSigMemberStatus,
-    identifiersData,
-    notificationDetails.a.d,
-  ]);
+  }, [dispatch, getMultiSigMemberStatus, profiles, notificationDetails.a.d]);
 
   useOnlineStatusEffect(getAcdc);
 
@@ -250,7 +248,7 @@ const ReceiveCredential = ({
 
       if (
         multisigMemberStatus.linkedRequest.accepted &&
-        identifier?.groupMemberPre === member
+        profile?.identity.groupMemberPre === member
       ) {
         return MemberAcceptStatus.Accepted;
       }
@@ -260,7 +258,7 @@ const ReceiveCredential = ({
     [
       multisigMemberStatus.othersJoined,
       multisigMemberStatus.linkedRequest,
-      identifier,
+      profile,
     ]
   );
 
@@ -310,7 +308,7 @@ const ReceiveCredential = ({
       ? undefined
       : `${i18n.t("tabs.notifications.details.buttons.decline")}`;
 
-  const theme = getTheme(identifier?.theme || 0);
+  const theme = getTheme(profile?.identity.theme || 0);
 
   const closeDeclineAlert = () => setAlertDeclineIsOpen(false);
 
@@ -463,7 +461,7 @@ const ReceiveCredential = ({
               ))}
             </CardDetailsBlock>
           )}
-          {identifier && (
+          {profile && (
             <CardDetailsBlock
               className="related-identifiers"
               title={i18n.t(
@@ -486,7 +484,7 @@ const ReceiveCredential = ({
                   slot="start"
                   className="identifier-name"
                 >
-                  {identifier.displayName}
+                  {profile.identity.displayName}
                 </IonText>
                 <IonIcon
                   slot="end"

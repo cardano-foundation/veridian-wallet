@@ -43,7 +43,7 @@ jest.mock("../credsArchivedCache", () => ({
   getCredsArchivedCache: jest.fn(),
 }));
 jest.mock("../walletConnectionsCache", () => ({
-  getWalletConnectionsCache: jest.fn(),
+  getPeerConnections: jest.fn(),
 }));
 jest.mock("../connectionsCache", () => ({
   getConnectionsCache: jest.fn(),

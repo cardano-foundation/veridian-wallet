@@ -15,10 +15,10 @@ import { NotificationRoute } from "../../../core/agent/services/keriaNotificatio
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
-import { setCredsArchivedCache } from "../../../store/reducers/credsArchivedCache";
 import {
   getCredsCache,
   getNotificationsCache,
+  setCredsArchivedCache,
   setCredsCache,
   setNotificationsCache,
 } from "../../../store/reducers/profileCache";

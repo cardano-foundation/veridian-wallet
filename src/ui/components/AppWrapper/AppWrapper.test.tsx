@@ -32,20 +32,13 @@ import {
 import { store } from "../../../store";
 import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
 import {
-  addGroupIdentifierCache,
-  updateCreationStatus,
-  updateOrAddIdentifiersCache,
-} from "../../../store/reducers/identifiersCache";
-import {
   setQueueIncomingRequest,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { IncomingRequestType } from "../../../store/reducers/stateCache/stateCache.types";
 import {
-  ConnectionData,
   setConnectedWallet,
   setPendingConnection,
-  setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
 import {
   pendingGroupIdentifierFix,
@@ -222,7 +215,13 @@ const peerConnectionBrokenEvent: PeerConnectionBrokenEvent = {
 };
 
 import { PeerConnectionPairRecord } from "../../../core/agent/records";
-import { updateOrAddCredsCache } from "../../../store/reducers/profileCache";
+import {
+  ConnectionData,
+  addGroupProfile,
+  setPeerConnections,
+  updateOrAddCredsCache,
+  updateProfileCreationStatus,
+} from "../../../store/reducers/profileCache";
 
 const mockPeerConnectionPairRecordInstance = new PeerConnectionPairRecord({
   id: "dApp-address:identifier",
@@ -357,7 +356,7 @@ describe("Peer connection states changed handler", () => {
       expect(dispatch).toBeCalledWith(setPendingConnection(null));
     });
     expect(dispatch).toBeCalledWith(
-      setWalletConnectionsCache(
+      setPeerConnections(
         expect.arrayContaining([
           expect.objectContaining({
             id: mockPeerConnectionPairRecordInstance.id,
@@ -420,30 +419,16 @@ describe("Peer connection states changed handler", () => {
 
 describe("KERIA operation state changed handler", () => {
   test("handles completed witness operation", async () => {
-    const storeDispatch = jest.fn();
-    const getStateMock = jest.fn(() => ({
-      stateCache: {
-        currentProfile: {
-          identity: {
-            id: "test",
-          },
-        },
-      },
-    }));
-
-    dispatch.mockImplementation(
-      (func: ThunkAction<void, any, unknown, AnyAction>) => {
-        if (typeof func === "function") func(storeDispatch, getStateMock, {});
-      }
-    );
-
     const id = "id";
     await operationCompleteHandler(
       { opType: OperationPendingRecordType.Witness, oid: id },
       dispatch
     );
-    expect(storeDispatch).toBeCalledWith(
-      updateCreationStatus({ id: id, creationStatus: CreationStatus.COMPLETE })
+    expect(dispatch).toBeCalledWith(
+      updateProfileCreationStatus({
+        id: id,
+        creationStatus: CreationStatus.COMPLETE,
+      })
     );
     expect(dispatch).toBeCalledWith(
       setToastMsg(ToastMsgType.IDENTIFIER_UPDATED)
@@ -458,7 +443,10 @@ describe("KERIA operation state changed handler", () => {
       dispatch
     );
     expect(dispatch).toBeCalledWith(
-      updateCreationStatus({ id: id, creationStatus: CreationStatus.FAILED })
+      updateProfileCreationStatus({
+        id: id,
+        creationStatus: CreationStatus.FAILED,
+      })
     );
     expect(dispatch).toBeCalledWith(
       setToastMsg(ToastMsgType.IDENTIFIER_UPDATED)
@@ -489,7 +477,7 @@ describe("Identifier state changed handler", () => {
   test("handles identifier added event", async () => {
     await identifierAddedHandler(identifierAddedEvent, dispatch);
     expect(dispatch).toBeCalledWith(
-      updateOrAddIdentifiersCache(pendingIdentifierFix)
+      updateProfileCreationStatus(pendingIdentifierFix)
     );
   });
 });
@@ -497,9 +485,7 @@ describe("Identifier state changed handler", () => {
 describe("Group state changed handler", () => {
   test("handles group created event", async () => {
     await groupCreatedHandler(groupCreatedEvent, dispatch);
-    expect(dispatch).toBeCalledWith(
-      addGroupIdentifierCache(pendingGroupIdentifierFix)
-    );
+    expect(dispatch).toBeCalledWith(addGroupProfile(pendingGroupIdentifierFix));
   });
 });
 

@@ -5,10 +5,10 @@ import { ConnectionShortDetails } from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import {
-  getMultiSigGroupCache,
-  removeIdentifierCache,
+  getProfileGroupCache,
+  removeProfile,
   setScanGroupId,
-} from "../../../../store/reducers/identifiersCache";
+} from "../../../../store/reducers/profileCache";
 import {
   getCurrentOperation,
   getStateCache,
@@ -41,7 +41,7 @@ const SetupConnections = ({
   const dispatch = useAppDispatch();
   const stateCache = useAppSelector(getStateCache);
   const currentOperation = useAppSelector(getCurrentOperation);
-  const multiSigGroupCache = useAppSelector(getMultiSigGroupCache);
+  const multiSigGroupCache = useAppSelector(getProfileGroupCache);
   const userName = stateCache.authentication.userName;
   const [oobi, setOobi] = useState("");
   const identifierId = resumeMultiSig?.id || state.newIdentifier.id;
@@ -58,15 +58,6 @@ const SetupConnections = ({
     ConnectionShortDetails[]
   >([]);
 
-  useEffect(() => {
-    if (isModalOpen) {
-      dispatch(setScanGroupId(groupId));
-    } else {
-      dispatch(setScanGroupId(undefined));
-    }
-    fetchOobi();
-  }, [isModalOpen, groupId, dispatch]);
-
   const fetchOobi = useCallback(async () => {
     try {
       const oobiValue = await Agent.agent.connections.getOobi(
@@ -80,7 +71,16 @@ const SetupConnections = ({
     } catch (e) {
       showError("Unable to fetch Oobi", e, dispatch);
     }
-  }, [groupId, userName, dispatch]);
+  }, [identifierId, userName, groupId, dispatch]);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      dispatch(setScanGroupId(groupId));
+    } else {
+      dispatch(setScanGroupId(undefined));
+    }
+    fetchOobi();
+  }, [isModalOpen, groupId, dispatch, fetchOobi]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -152,7 +152,7 @@ const SetupConnections = ({
       await Agent.agent.identifiers.markIdentifierPendingDelete(identifierId);
 
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
-      dispatch(removeIdentifierCache(identifierId));
+      dispatch(removeProfile(identifierId));
       handleDone();
     } catch (e) {
       showError(

@@ -31,13 +31,13 @@ import {
   setMultisigConnectionsCache,
   updateOrAddConnectionCache,
 } from "../../../store/reducers/connectionsCache";
-import { setCredsArchivedCache } from "../../../store/reducers/credsArchivedCache";
 import {
-  setIdentifiersCache,
-  setIndividualFirstCreate,
-} from "../../../store/reducers/identifiersCache";
-import {
+  ConnectionData,
   Profile,
+  setCredsArchivedCache,
+  setCurrentProfile,
+  setIndividualFirstCreate,
+  setPeerConnections,
   setProfiles,
   updateOrAddCredsCache,
 } from "../../../store/reducers/profileCache";
@@ -50,7 +50,6 @@ import {
   setAuthentication,
   setCameraDirection,
   setCurrentOperation,
-  setCurrentProfile,
   setInitializationPhase,
   setIsOnline,
   setIsSetupProfile,
@@ -73,11 +72,9 @@ import {
 } from "../../../store/reducers/viewTypeCache";
 import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
 import {
-  ConnectionData,
   getConnectedWallet,
   setConnectedWallet,
   setPendingConnection,
-  setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { useProfile } from "../../hooks/useProfile";
@@ -176,7 +173,7 @@ const peerConnectedChangeHandler = async (
   const existingConnections =
     await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
 
-  dispatch(setWalletConnectionsCache(existingConnections));
+  dispatch(setPeerConnections(existingConnections));
   const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
   const connectedWallet = existingConnections.find(
     (connection) =>
@@ -391,78 +388,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
         {}
       );
 
-      let currentProfileAid = "";
-      if (appDefaultProfileRecord) {
-        currentProfileAid = (
-          appDefaultProfileRecord.content as { defaultProfile: string }
-        ).defaultProfile;
-      } else {
-        const { recentProfile, newProfileHistories } = getRecentDefaultProfile(
-          profileHistories,
-          identifiersDict,
-          ""
-        );
-
-        if (recentProfile) {
-          currentProfileAid = recentProfile;
-          updateProfileHistories(newProfileHistories);
-        } else {
-          if (storedIdentifiers.length > 0) {
-            // If we have no default profile set, we will set the oldest identifier as default.
-            const oldest = storedIdentifiers
-              .slice()
-              .sort((prev, next) =>
-                prev.displayName.localeCompare(next.displayName)
-              )[0];
-
-            currentProfileAid = oldest?.id || "";
-
-            await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-              new BasicRecord({
-                id: MiscRecordId.DEFAULT_PROFILE,
-                content: { defaultProfile: currentProfileAid },
-              })
-            );
-          }
-        }
-      }
-
-      if (currentProfileAid) {
-        const {
-          profileIdentifier,
-          profileCredentials,
-          profileArchivedCredentials,
-          profilePeerConnections,
-          profileNotifications,
-        } = filterProfileData(
-          identifiersDict,
-          credsCache,
-          credsArchivedCache,
-          storedPeerConnections,
-          notifications,
-          currentProfileAid
-        );
-
-        dispatch(
-          setCurrentProfile({
-            identity: {
-              id: profileIdentifier.id,
-              displayName: profileIdentifier.displayName,
-              createdAtUTC: profileIdentifier.createdAtUTC,
-              theme: profileIdentifier.theme,
-              creationStatus: profileIdentifier.creationStatus,
-            },
-            // TODO: add filtering for connections once we have connections per account merged
-            connections: Object.values(allConnections),
-            multisigConnections: Object.values(allMultisigConnections),
-            peerConnections: profilePeerConnections,
-            credentials: profileCredentials,
-            archivedCredentials: profileArchivedCredentials,
-            notifications: profileNotifications,
-          })
-        );
-      }
-
       const profiles = storedIdentifiers.reduce(
         (acc: Record<string, Profile>, identifier) => {
           const {
@@ -502,12 +427,47 @@ const AppWrapper = (props: { children: ReactNode }) => {
         {}
       );
 
+      let currentProfileAid = "";
+      if (appDefaultProfileRecord) {
+        currentProfileAid = (
+          appDefaultProfileRecord.content as { defaultProfile: string }
+        ).defaultProfile;
+      } else {
+        const { recentProfile, newProfileHistories } = getRecentDefaultProfile(
+          profileHistories,
+          profiles,
+          ""
+        );
+
+        if (recentProfile) {
+          currentProfileAid = recentProfile;
+          updateProfileHistories(newProfileHistories);
+        } else {
+          if (storedIdentifiers.length > 0) {
+            // If we have no default profile set, we will set the oldest identifier as default.
+            const oldest = storedIdentifiers
+              .slice()
+              .sort((prev, next) =>
+                prev.displayName.localeCompare(next.displayName)
+              )[0];
+
+            currentProfileAid = oldest?.id || "";
+
+            await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+              new BasicRecord({
+                id: MiscRecordId.DEFAULT_PROFILE,
+                content: { defaultProfile: currentProfileAid },
+              })
+            );
+          }
+        }
+      }
+
       dispatch(setProfiles(profiles));
-      dispatch(setIdentifiersCache(storedIdentifiers));
+      dispatch(setCurrentProfile(currentProfileAid));
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(setConnectionsCache(allConnections));
       dispatch(setMultisigConnectionsCache(allMultisigConnections));
-      dispatch(setWalletConnectionsCache(storedPeerConnections));
 
       // TODO: set current profile data
     } catch (e) {

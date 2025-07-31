@@ -1,15 +1,12 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
-import { LoginAttempts } from "../../../core/agent/services/auth.types";
-import {
-  PeerConnection,
-  PeerConnectSigningEvent,
-} from "../../../core/cardano/walletConnect/peerConnection.types";
-import { OperationType, ToastMsgType } from "../../../ui/globals/types";
-import { ConnectionData } from "../walletConnectionsCache";
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { ConnectionShortDetails } from "../../../core/agent/agent.types";
+import { LoginAttempts } from "../../../core/agent/services/auth.types";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
+import { PeerConnectSigningEvent } from "../../../core/cardano/walletConnect/peerConnection.types";
+import { OperationType, ToastMsgType } from "../../../ui/globals/types";
+import { ConnectionData } from "../profileCache";
 
 interface PayloadData<T = any> {
   [key: string]: T;

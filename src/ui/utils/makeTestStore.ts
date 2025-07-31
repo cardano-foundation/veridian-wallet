@@ -1,8 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { biometricsCacheSlice } from "../../store/reducers/biometricsCache";
 import { connectionsCacheSlice } from "../../store/reducers/connectionsCache";
-import { credsArchivedCacheSlice } from "../../store/reducers/credsArchivedCache";
-import { identifiersCacheSlice } from "../../store/reducers/identifiersCache";
 import { seedPhraseCacheSlice } from "../../store/reducers/seedPhraseCache";
 import { ssiAgentSlice } from "../../store/reducers/ssiAgent";
 import { stateCacheSlice } from "../../store/reducers/stateCache";
@@ -14,8 +12,6 @@ export function makeTestStore(preloadedState?: any) {
     reducer: {
       stateCache: stateCacheSlice.reducer,
       seedPhraseCache: seedPhraseCacheSlice.reducer,
-      identifiersCache: identifiersCacheSlice.reducer,
-      credsArchivedCache: credsArchivedCacheSlice.reducer,
       connectionsCache: connectionsCacheSlice.reducer,
       walletConnectionsCache: walletConnectionsCacheSlice.reducer,
       viewTypeCache: viewTypeCacheSlice.reducer,

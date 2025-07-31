@@ -1,9 +1,12 @@
 import { IonModal } from "@ionic/react";
 import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import { useAppDispatch } from "../../../store/hooks";
-import { setMultiSigGroupCache } from "../../../store/reducers/identifiersCache";
-import { MultiSigGroup } from "../../../store/reducers/identifiersCache/identifiersCache.types";
+import {
+  MultiSigGroup,
+  setGroupProfileCache,
+} from "../../../store/reducers/profileCache";
 import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { IdentifierColor } from "../EditProfile/components/IdentifierColorSelector";
@@ -17,7 +20,6 @@ import { GroupMembers } from "./components/GroupMembers";
 import { SetupConnections } from "./components/SetupConnections";
 import { SetupThreshold } from "./components/SetupThreshold";
 import { Summary } from "./components/Summary";
-import { CreationStatus } from "../../../core/agent/agent.types";
 
 const stages = [SetupConnections, GroupMembers, SetupThreshold, Summary];
 
@@ -77,7 +79,7 @@ const CreateGroupIdentifier = ({
         connections,
       };
       setMultiSigGroup(multiSigGroup);
-      dispatch(setMultiSigGroupCache(multiSigGroup));
+      dispatch(setGroupProfileCache(multiSigGroup));
     } catch (e) {
       showError("Unable to update multisig", e, dispatch);
     }
@@ -91,7 +93,7 @@ const CreateGroupIdentifier = ({
     setState(initialState);
     setResumeMultiSig && setResumeMultiSig(null);
     setMultiSigGroup && setMultiSigGroup(undefined);
-    dispatch(setMultiSigGroupCache(undefined));
+    dispatch(setGroupProfileCache(undefined));
   };
 
   const CurrentStage = stages[state.identifierCreationStage];

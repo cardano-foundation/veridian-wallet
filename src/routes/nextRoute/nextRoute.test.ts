@@ -79,21 +79,13 @@ describe("NextRoute", () => {
       profilesCache: {
         profiles: {},
         recentProfiles: [],
+        multiSigGroup: undefined,
       },
-      identifiersCache: {
-        identifiers: {},
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
@@ -352,25 +344,17 @@ describe("getNextRoute", () => {
     profilesCache: {
       profiles: {},
       recentProfiles: [],
+      multiSigGroup: undefined,
     },
     seedPhraseCache: {
       seedPhrase: "",
       bran: "",
     },
-    identifiersCache: {
-      identifiers: {},
-      multiSigGroup: {
-        groupId: "",
-        connections: [],
-      },
-    },
-    credsArchivedCache: { creds: [] },
     connectionsCache: {
       connections: {},
       multisigConnections: {},
     },
     walletConnectionsCache: {
-      walletConnections: [],
       connectedWallet: null,
       pendingConnection: null,
     },

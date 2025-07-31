@@ -10,10 +10,10 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
   setIndividualFirstCreate,
-} from "../../../store/reducers/identifiersCache";
+} from "../../../store/reducers/profileCache";
 import {
   getStateCache,
-  showNoWitnessAlert
+  showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";

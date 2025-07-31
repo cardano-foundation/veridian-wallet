@@ -14,10 +14,8 @@ import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getCredsArchivedCache,
-  setCredsArchivedCache,
-} from "../../../store/reducers/credsArchivedCache";
-import {
   getCredsCache,
+  setCredsArchivedCache,
   setCredsCache,
 } from "../../../store/reducers/profileCache";
 import {

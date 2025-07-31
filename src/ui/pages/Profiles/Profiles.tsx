@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
+import { getProfiles } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
@@ -83,12 +83,14 @@ const OptionButton = ({ icon, text, action, disabled }: OptionButtonProps) => {
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
-  const identifiersDataCache = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
   const { updateDefaultProfile, defaultProfile } = useProfile();
-  const identifiersData = Object.values(identifiersDataCache);
-  const filteredIdentifiersData = identifiersData
-    .filter((item) => item.id !== defaultProfile.identity.id)
-    .sort((prev, next) => prev.displayName.localeCompare(next.displayName));
+  const profileList = Object.values(profiles);
+  const filteredProfiles = profileList
+    .filter((item) => item.identity.id !== defaultProfile?.identity.id)
+    .sort((prev, next) =>
+      prev.identity.displayName.localeCompare(next.identity.displayName)
+    );
   const [openSetting, setOpenSetting] = useState(false);
   const [openProfileDetail, setOpenProfileDetail] = useState(false);
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
@@ -133,10 +135,10 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   useEffect(() => {
-    if (!defaultProfile || identifiersData.length === 0) {
+    if (!defaultProfile || profileList.length === 0) {
       setOpenSetupProfile(true);
     }
-  }, [defaultProfile, identifiersData.length]);
+  }, [defaultProfile, profileList.length]);
 
   return (
     <>
@@ -165,24 +167,24 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           }
         >
           <div className="profiles-selected-profile">
-            <ProfileItem identifier={defaultProfile.identity} />
+            <ProfileItem identifier={defaultProfile?.identity} />
             <OptionButton
               icon={personCircleOutline}
               text={`${i18n.t("profiles.options.manage")}`}
               action={handleOpenProfile}
               disabled={
-                defaultProfile.identity?.creationStatus ===
+                defaultProfile?.identity?.creationStatus ===
                 CreationStatus.PENDING
               }
             />
           </div>
           <div className="profiles-list">
-            {filteredIdentifiersData.map((identifier) => (
+            {filteredProfiles.map((identifier) => (
               <ProfileItem
-                key={identifier.id}
-                identifier={identifier}
+                key={identifier.identity.id}
+                identifier={identifier.identity}
                 onClick={() => {
-                  handleSelectProfile(identifier.id);
+                  handleSelectProfile(identifier.identity.id);
                 }}
               />
             ))}
@@ -222,7 +224,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         pageId="profile-details"
         isOpen={openProfileDetail}
         setIsOpen={setOpenProfileDetail}
-        profileId={defaultProfile.identity.id}
+        profileId={defaultProfile?.identity.id || ""}
       />
     </>
   );

@@ -4,11 +4,11 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import EN_TRANSLATION from "../../../locales/en/en.json";
-import { setMultiSigGroupCache } from "../../../store/reducers/identifiersCache";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CreateGroupIdentifier } from "./CreateGroupIdentifier";
+import { setGroupProfileCache } from "../../../store/reducers/profileCache";
 
 setupIonicReact();
 mockIonicReact();
@@ -99,7 +99,7 @@ describe("Create Identifier modal", () => {
     await waitFor(() => {
       expect(mockGetMultisigConnection).toBeCalledWith("mockId");
       expect(dispatchMock).toBeCalledWith(
-        setMultiSigGroupCache({
+        setGroupProfileCache({
           groupId: "mockId",
           connections: [],
         })

@@ -32,6 +32,7 @@ describe("getBackRoute", () => {
       profilesCache: {
         profiles: {},
         recentProfiles: [],
+        multiSigGroup: undefined,
       },
       stateCache: {
         isOnline: true,
@@ -79,20 +80,11 @@ describe("getBackRoute", () => {
         toastMsgs: [],
         profileHistories: [],
       },
-      identifiersCache: {
-        identifiers: {},
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
@@ -193,6 +185,7 @@ describe("getPreviousRoute", () => {
       profilesCache: {
         profiles: {},
         recentProfiles: [],
+        multiSigGroup: undefined,
       },
       stateCache: {
         isOnline: true,
@@ -240,20 +233,11 @@ describe("getPreviousRoute", () => {
         },
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },

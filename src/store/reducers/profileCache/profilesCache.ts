@@ -1,12 +1,19 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 import { RootState } from "../../index";
-import { Profile, ProfileCache } from "./profilesCache.types";
+import {
+  ConnectionData,
+  MultiSigGroup,
+  Profile,
+  ProfileCache,
+} from "./profilesCache.types";
 
 const initialState: ProfileCache = {
   profiles: {},
   recentProfiles: [],
+  multiSigGroup: undefined,
 };
 
 export const profilesCacheSlice = createSlice({
@@ -15,6 +22,9 @@ export const profilesCacheSlice = createSlice({
   reducers: {
     setProfiles: (state, action: PayloadAction<Record<string, Profile>>) => {
       state.profiles = action.payload;
+    },
+    setCurrentProfile: (state, action: PayloadAction<string>) => {
+      state.defaultProfile = action.payload;
     },
     clearProfiles: (state) => {
       state.profiles = {};
@@ -27,6 +37,73 @@ export const profilesCacheSlice = createSlice({
     },
     updateRecentProfiles: (state, action: PayloadAction<string[]>) => {
       state.recentProfiles = action.payload;
+    },
+    setScanGroupId: (state, action: PayloadAction<string | undefined>) => {
+      state.scanGroupId = action.payload;
+    },
+    addOrUpdateProfileIdentity: (
+      state,
+      action: PayloadAction<IdentifierShortDetails>
+    ) => {
+      const existedProfile = state.profiles[action.payload.id];
+      if (existedProfile) {
+        existedProfile.identity = action.payload;
+      } else {
+        state.profiles[action.payload.id] = {
+          identity: action.payload,
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+          notifications: [],
+        };
+      }
+    },
+    addGroupProfile: (state, action: PayloadAction<IdentifierShortDetails>) => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      delete state.profiles[action.payload.groupMemberPre!];
+      // In case it was already added, we want to avoid inserting a "PENDING" one that could be complete already
+      if (!state.profiles[action.payload.id]) {
+        state.profiles = {
+          ...state.profiles,
+          [action.payload.id]: {
+            identity: action.payload,
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [],
+          },
+        };
+      }
+    },
+    updateProfileCreationStatus: (
+      state,
+      action: PayloadAction<
+        Pick<IdentifierShortDetails, "id" | "creationStatus">
+      >
+    ) => {
+      const profile = state.profiles[action.payload.id];
+
+      if (profile) {
+        profile.identity.creationStatus = action.payload.creationStatus;
+
+        state.profiles = {
+          ...state.profiles,
+          [action.payload.id]: profile,
+        };
+      }
+    },
+    removeProfile: (state, action: PayloadAction<string>) => {
+      delete state.profiles[action.payload];
+    },
+    setGroupProfileCache: (
+      state,
+      action: PayloadAction<MultiSigGroup | undefined>
+    ) => {
+      state.multiSigGroup = action.payload;
     },
     setNotificationsCache: (
       state,
@@ -97,6 +174,26 @@ export const profilesCacheSlice = createSlice({
       );
       targetProfile.credentials = [...creds, action.payload];
     },
+    setCredsArchivedCache: (
+      state,
+      action: PayloadAction<CredentialShortDetails[]>
+    ) => {
+      if (!state.defaultProfile) return;
+      const defaultProfile = state.profiles[state.defaultProfile];
+      if (!defaultProfile) return;
+
+      defaultProfile.archivedCredentials = action.payload;
+    },
+    setPeerConnections: (state, action: PayloadAction<ConnectionData[]>) => {
+      if (!state.defaultProfile) return;
+      const defaultProfile = state.profiles[state.defaultProfile];
+      if (!defaultProfile) return;
+
+      defaultProfile.peerConnections = action.payload;
+    },
+    setIndividualFirstCreate: (state, action: PayloadAction<boolean>) => {
+      state.individualFirstCreate = action.payload;
+    },
   },
 });
 
@@ -111,6 +208,16 @@ export const {
   addNotification,
   setCredsCache,
   updateOrAddCredsCache,
+  setPeerConnections,
+  setCredsArchivedCache,
+  addOrUpdateProfileIdentity,
+  addGroupProfile,
+  updateProfileCreationStatus,
+  removeProfile,
+  setGroupProfileCache,
+  setIndividualFirstCreate,
+  setCurrentProfile,
+  setScanGroupId,
 } = profilesCacheSlice.actions;
 
 const getProfiles = (state: RootState) => state.profilesCache.profiles;
@@ -127,10 +234,29 @@ const getNotificationsCache = (state: RootState) =>
 const getCredsCache = (state: RootState) =>
   getCurrentProfile(state)?.credentials || [];
 
+const getPeerConnections = (state: RootState) =>
+  getCurrentProfile(state)?.peerConnections || [];
+
+const getCredsArchivedCache = (state: RootState) =>
+  getCurrentProfile(state)?.archivedCredentials || [];
+
+const getProfileGroupCache = (state: RootState) =>
+  state.profilesCache.multiSigGroup;
+
+const getIndividualFirstCreateSetting = (state: RootState) =>
+  state.profilesCache.individualFirstCreate;
+
+const getScanGroupId = (state: RootState) => state.profilesCache?.scanGroupId;
+
 export {
+  getCredsArchivedCache,
   getCredsCache,
   getCurrentProfile,
+  getIndividualFirstCreateSetting,
+  getProfileGroupCache,
   getNotificationsCache,
+  getPeerConnections,
   getProfiles,
   getRecentProfiles,
+  getScanGroupId,
 };

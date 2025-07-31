@@ -4,13 +4,15 @@ import { Profile, ProfileCache } from "../../store/reducers/profileCache";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { OperationType } from "../globals/types";
 import { CredentialsFilters } from "../pages/Credentials/Credentials.types";
-import { filteredCredsFix } from "./filteredCredsFix";
+import { filteredArchivedCredsFix, filteredCredsFix } from "./filteredCredsFix";
 import { filteredIdentifierFix } from "./filteredIdentifierFix";
 import { notificationsFix } from "./notificationsFix";
+import { walletConnectionsFix } from "./walletConnectionsFix";
 
 export const profileInitFixData: ProfileCache = {
   profiles: {},
   recentProfiles: [],
+  multiSigGroup: undefined,
 };
 
 export const defaultProfileIdentifierFix = filteredIdentifierFix[0];
@@ -21,11 +23,15 @@ export const profilesCachesFix = filteredIdentifierFix.reduce(
       identity: identifier,
       connections: [],
       multisigConnections: [],
-      peerConnections: [],
+      peerConnections: walletConnectionsFix.filter(
+        (item) => item.selectedAid === identifier.id
+      ),
       credentials: filteredCredsFix.filter(
         (item) => item.identifierId === identifier.id
       ),
-      archivedCredentials: [],
+      archivedCredentials: filteredArchivedCredsFix.filter(
+        (item) => item.identifierId === identifier.id
+      ),
       notifications: notificationsFix.filter(
         (item) => item.receivingPre === identifier.id
       ),
@@ -46,6 +52,7 @@ export const profileCacheFixData: ProfileCache = {
   },
   defaultProfile: filteredIdentifierFix[0].id,
   recentProfiles: [...recentProfilesDataFix],
+  multiSigGroup: undefined,
 };
 
 export const defaultProfileDataFix =
@@ -102,20 +109,11 @@ export const storeStateFixData: RootState = {
     seedPhrase: "",
     bran: "",
   },
-  identifiersCache: {
-    identifiers: {},
-    multiSigGroup: {
-      groupId: "",
-      connections: [],
-    },
-  },
-  credsArchivedCache: { creds: [] },
   connectionsCache: {
     connections: {},
     multisigConnections: {},
   },
   walletConnectionsCache: {
-    walletConnections: [],
     connectedWallet: null,
     pendingConnection: null,
   },

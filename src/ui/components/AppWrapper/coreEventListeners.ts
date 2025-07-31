@@ -11,14 +11,11 @@ import { OperationPendingRecordType } from "../../../core/agent/records/operatio
 import { useAppDispatch } from "../../../store/hooks";
 import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
 import {
-  addGroupIdentifierCache,
-  updateCreationStatus,
-  updateOrAddIdentifiersCache,
-  updateProfileStatus,
-} from "../../../store/reducers/identifiersCache";
-import {
+  addGroupProfile,
   addNotification,
+  addOrUpdateProfileIdentity,
   deleteNotificationById,
+  updateProfileCreationStatus,
 } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
@@ -47,7 +44,7 @@ const operationCompleteHandler = async (
     case OperationPendingRecordType.Witness:
     case OperationPendingRecordType.Group:
       dispatch(
-        updateProfileStatus({
+        updateProfileCreationStatus({
           id: oid,
           creationStatus: CreationStatus.COMPLETE,
         })
@@ -64,7 +61,10 @@ const operationFailureHandler = async (
   switch (opType) {
     case OperationPendingRecordType.Witness: {
       dispatch(
-        updateCreationStatus({ id: oid, creationStatus: CreationStatus.FAILED })
+        updateProfileCreationStatus({
+          id: oid,
+          creationStatus: CreationStatus.FAILED,
+        })
       );
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_UPDATED));
       break;
@@ -85,14 +85,14 @@ const identifierAddedHandler = async (
   event: IdentifierAddedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  dispatch(updateOrAddIdentifiersCache(event.payload.identifier));
+  dispatch(addOrUpdateProfileIdentity(event.payload.identifier));
 };
 
 const groupCreatedHandler = async (
   event: GroupCreatedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  dispatch(addGroupIdentifierCache(event.payload.group));
+  dispatch(addGroupProfile(event.payload.group));
 };
 
 export {

@@ -10,10 +10,8 @@ import {
 } from "../../../../../store/reducers/stateCache";
 import {
   getPendingConnection,
-  getWalletConnectionsCache,
   setIsConnecting,
   setPendingConnection,
-  setWalletConnectionsCache,
 } from "../../../../../store/reducers/walletConnectionsCache";
 import { OperationType, ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
@@ -25,6 +23,10 @@ import { PageHeader } from "../../../PageHeader";
 import { SidePageContentProps } from "../../../SidePage/SidePage.types";
 import { ANIMATION_DURATION } from "../../../SideSlider/SideSlider.types";
 import "./WalletConnect.scss";
+import {
+  getPeerConnections,
+  setPeerConnections,
+} from "../../../../../store/reducers/profileCache";
 
 const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
   const pendingConnection = useAppSelector(getPendingConnection);
@@ -32,7 +34,7 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
   const defaultProfile = useAppSelector(getCurrentProfile);
   const [openDeclineAlert, setOpenDeclineAlert] = useState(false);
   const [startingMeerkat, setStartingMeerkat] = useState<boolean>(false);
-  const existingConnections = useAppSelector(getWalletConnectionsCache);
+  const existingConnections = useAppSelector(getPeerConnections);
 
   const classes = combineClassNames({
     show: !!pendingConnection,
@@ -79,10 +81,10 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
               updatedConnections.push(connection);
             }
           }
-          dispatch(setWalletConnectionsCache(updatedConnections));
+          dispatch(setPeerConnections(updatedConnections));
         } else {
           dispatch(
-            setWalletConnectionsCache([
+            setPeerConnections([
               ...existingConnections,
               {
                 meerkatId: pendingDAppMeerkat,
