@@ -16,8 +16,8 @@ import {
   ConnectionDetails as ConnectionData,
   ConnectionHistoryItem,
   ConnectionNoteDetails,
-  isRegularConnectionDetails,
-  isMultisigConnectionDetails,
+  RegularConnectionDetails,
+  RegularConnectionDetailsFull,
 } from "../../../core/agent/agent.types";
 import { RoutePath } from "../../../routes";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -43,7 +43,6 @@ import ConnectionDetailsHeader from "./components/ConnectionDetailsHeader";
 import { ConnectionHistoryEvent } from "./components/ConnectionHistoryEvent";
 import { ConnectionNotes } from "./components/ConnectionNotes";
 import { EditConnectionsModal } from "./components/EditConnectionsModal";
-import { RegularConnectionDetails } from "../../../core/agent/agent.types";
 
 const ConnectionDetails = ({
   connectionShortDetails,
@@ -53,7 +52,8 @@ const ConnectionDetails = ({
   const pageId = "connection-details";
   const dispatch = useAppDispatch();
   const currentProfile = useAppSelector(getCurrentProfile);
-  const [connectionDetails, setConnectionDetails] = useState<ConnectionData>();
+  const [connectionDetails, setConnectionDetails] =
+    useState<RegularConnectionDetailsFull>();
   const [connectionHistory, setConnectionHistory] = useState<
     ConnectionHistoryItem[]
   >([]);
@@ -79,7 +79,8 @@ const ConnectionDetails = ({
         connectionShortDetails.identifier
       );
 
-      setConnectionDetails(connectionDetails);
+      // Since this component only handles regular connections, cast to RegularConnectionDetailsFull
+      setConnectionDetails(connectionDetails as RegularConnectionDetailsFull);
       setNotes(connectionDetails.notes);
       setConnectionHistory(connectionDetails.historyItems);
     } catch (error) {
@@ -119,23 +120,15 @@ const ConnectionDetails = ({
     async function deleteConnection() {
       try {
         if (cloudError) {
-          const connectionIdentifier = isRegularConnectionDetails(
-            connectionShortDetails
-          )
-            ? connectionShortDetails.identifier
-            : currentProfile.identity.id; // Use current user's identifier for multisig connections
-
           await Agent.agent.connections.deleteStaleLocalConnectionById(
             connectionShortDetails.id,
-            connectionIdentifier
+            connectionShortDetails.identifier
           );
         } else {
-          if (isRegularConnectionDetails(connectionShortDetails)) {
-            await Agent.agent.connections.markConnectionPendingDelete(
-              connectionShortDetails.id,
-              connectionShortDetails.identifier
-            );
-          }
+          await Agent.agent.connections.markConnectionPendingDelete(
+            connectionShortDetails.id,
+            connectionShortDetails.identifier
+          );
         }
         dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
         dispatch(removeConnectionCache(connectionShortDetails.id));
@@ -336,7 +329,7 @@ const ConnectionDetails = ({
           />
         </ScrollablePageLayout>
       )}
-      {connectionDetails && isRegularConnectionDetails(connectionDetails) && (
+      {connectionDetails && (
         <EditConnectionsModal
           notes={notes}
           setNotes={setNotes}

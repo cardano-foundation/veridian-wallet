@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
+  RegularConnectionDetails,
   MiscRecordId,
-  isRegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -89,7 +89,7 @@ const CredentialDetailModule = ({
   const isFavourite = favouritesCredsCache?.some((fav) => fav.id === id);
   const [cloudError, setCloudError] = useState(false);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
-    ConnectionShortDetails | undefined
+    RegularConnectionDetails | undefined
   >(undefined);
 
   const isInactiveCred = (isArchived || isRevoked || cloudError) && !viewOnly;
@@ -109,7 +109,8 @@ const CredentialDetailModule = ({
         await Agent.agent.connections.getConnectionShortDetailById(
           connectionId
         );
-      setConnectionShortDetails(shortDetails);
+      // Credentials are only associated with regular connections
+      setConnectionShortDetails(shortDetails as RegularConnectionDetails);
     } catch (error) {
       showError("Unable to load connection", error);
     }
@@ -420,9 +421,7 @@ const CredentialDetailModule = ({
   const resetOperation = () =>
     dispatch(setCurrentOperation(OperationType.IDLE));
 
-  return openConnectionlModal &&
-    connectionShortDetails &&
-    isRegularConnectionDetails(connectionShortDetails) ? (
+  return openConnectionlModal && connectionShortDetails ? (
     <ConnectionDetails
       connectionShortDetails={connectionShortDetails}
       handleCloseConnectionModal={() => setOpenConnectionlModal(false)}

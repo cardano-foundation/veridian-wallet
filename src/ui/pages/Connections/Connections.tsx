@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
+  RegularConnectionDetails,
   ConnectionStatus,
-  isRegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
@@ -50,7 +50,7 @@ const Connections = () => {
   const connectionsCache = useAppSelector(getConnectionsCache);
   const openDetailId = useAppSelector(getOpenConnectionId);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
-    ConnectionShortDetails | undefined
+    RegularConnectionDetails | undefined
   >(undefined);
   const [mappedConnections, setMappedConnections] = useState<
     MappedConnections[]
@@ -120,7 +120,8 @@ const Connections = () => {
   const getConnectionShortDetails = async (connectionId: string) => {
     const shortDetails =
       await Agent.agent.connections.getConnectionShortDetailById(connectionId);
-    setConnectionShortDetails(shortDetails);
+    // Connections page only shows details for regular connections
+    setConnectionShortDetails(shortDetails as RegularConnectionDetails);
   };
 
   const fetchOobi = useCallback(async () => {
@@ -151,7 +152,8 @@ const Connections = () => {
       return;
     }
 
-    setConnectionShortDetails(item);
+    // Only show details for regular connections
+    setConnectionShortDetails(item as RegularConnectionDetails);
   };
 
   const deletePendingCheckProps = {
@@ -165,9 +167,11 @@ const Connections = () => {
 
     try {
       setDeletePendingItem(null);
-      const connectionIdentifier = isRegularConnectionDetails(deletePendingItem)
-        ? deletePendingItem.identifier
-        : identifier.id; // Use current user's identifier for multisig connections
+      // For regular connections use their identifier, for multisig use current user's identifier
+      const connectionIdentifier =
+        "identifier" in deletePendingItem
+          ? deletePendingItem.identifier
+          : identifier.id;
 
       await Agent.agent.connections.deleteStaleLocalConnectionById(
         deletePendingItem.id,
@@ -225,8 +229,7 @@ const Connections = () => {
     setConnectionShortDetails(undefined);
   };
 
-  return connectionShortDetails &&
-    isRegularConnectionDetails(connectionShortDetails) ? (
+  return connectionShortDetails ? (
     <ConnectionDetails
       connectionShortDetails={connectionShortDetails}
       handleCloseConnectionModal={handleCloseConnectionModal}
