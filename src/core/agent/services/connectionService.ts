@@ -530,14 +530,24 @@ class ConnectionService extends AgentService {
     );
   }
 
-  async deleteStaleLocalConnectionById(id: string): Promise<void> {
-    await this.contactStorage.deleteById(id);
+  async deleteStaleLocalConnectionById(
+    id: string,
+    identifier?: string
+  ): Promise<void> {
+    if (identifier) {
+      // For regular connections, delete the connection pair
+      await this.connectionPairStorage.deleteById(`${identifier}:${id}`);
+    } else {
+      // For multisig connections, delete the contact directly
+      await this.contactStorage.deleteById(id);
+    }
   }
 
   async getConnectionShortDetailById(
-    id: string
+    id: string,
+    identifier?: string
   ): Promise<ConnectionShortDetails> {
-    const metadata = await this.getContactMetadataById(id);
+    const metadata = await this.getContactMetadataById(id, identifier);
     return this.getConnectionShortDetails(metadata);
   }
 
@@ -640,12 +650,35 @@ class ConnectionService extends AgentService {
   }
 
   private async getContactMetadataById(
-    contactId: string
-  ): Promise<ContactRecord> {
+    contactId: string,
+    identifier?: string
+  ): Promise<ContactDetailsRecord> {
     const contact = await this.contactStorage.findById(contactId);
     if (!contact) {
       throw new Error(ConnectionService.CONTACT_METADATA_RECORD_NOT_FOUND);
     }
+
+    if (identifier) {
+      const connectionPair = await this.connectionPairStorage.findById(
+        `${identifier}:${contactId}`
+      );
+
+      if (!connectionPair) {
+        throw new Error(ConnectionService.CONTACT_METADATA_RECORD_NOT_FOUND);
+      }
+
+      return {
+        id: contactId,
+        alias: contact.alias,
+        createdAt: connectionPair.createdAt,
+        oobi: contact.oobi,
+        groupId: contact.groupId,
+        creationStatus: connectionPair.creationStatus,
+        pendingDeletion: connectionPair.pendingDeletion,
+        identifier,
+      };
+    }
+
     return contact;
   }
 

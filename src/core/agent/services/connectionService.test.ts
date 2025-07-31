@@ -803,7 +803,7 @@ describe("Connection service of agent", () => {
     expect(KeriOobi).toEqual(`${oobiPrefix}${id}?name=alias&groupId=123`);
   });
 
-  test("can get connection short details by id", async () => {
+  test("can get connection short details by id without identifier", async () => {
     contactStorage.findById = jest.fn().mockResolvedValue({
       id: contacts[0].id,
       createdAt: now,
@@ -821,28 +821,81 @@ describe("Connection service of agent", () => {
     expect(contactStorage.findById).toBeCalledWith(contacts[0].id);
   });
 
-  test("can get failed connection short details by id", async () => {
+  test("can get connection short details by id with identifier", async () => {
+    const identifier = "test-identifier";
     contactStorage.findById = jest.fn().mockResolvedValue({
       id: contacts[0].id,
-      createdAt: now,
       alias: "keri",
-      creationStatus: CreationStatus.COMPLETE,
+      oobi: "test-oobi",
+      // No groupId for regular connections
     });
+    connectionPairStorage.findById = jest.fn().mockResolvedValue({
+      contactId: contacts[0].id,
+      identifier,
+      createdAt: now,
+      creationStatus: CreationStatus.COMPLETE,
+      pendingDeletion: false,
+    });
+
     expect(
-      await connectionService.getConnectionShortDetailById(contacts[0].id)
+      await connectionService.getConnectionShortDetailById(
+        contacts[0].id,
+        identifier
+      )
     ).toMatchObject({
       id: contacts[0].id,
       createdAtUTC: nowISO,
       label: "keri",
       status: ConnectionStatus.CONFIRMED,
+      identifier,
+    });
+    expect(contactStorage.findById).toBeCalledWith(contacts[0].id);
+    expect(connectionPairStorage.findById).toBeCalledWith(
+      `${identifier}:${contacts[0].id}`
+    );
+  });
+
+  test("can get connection short details by id without identifier (multisig)", async () => {
+    const groupId = "test-group";
+    contactStorage.findById = jest.fn().mockResolvedValue({
+      id: contacts[0].id,
+      alias: "multisig-contact",
+      oobi: "test-multisig-oobi",
+      groupId,
+      createdAt: now,
+      creationStatus: CreationStatus.COMPLETE,
+    });
+
+    expect(
+      await connectionService.getConnectionShortDetailById(contacts[0].id)
+    ).toMatchObject({
+      id: contacts[0].id,
+      createdAtUTC: nowISO,
+      label: "multisig-contact",
+      status: ConnectionStatus.CONFIRMED,
+      groupId,
     });
     expect(contactStorage.findById).toBeCalledWith(contacts[0].id);
   });
 
-  test("cannot get connection short details if it does not exist", async () => {
-    connectionStorage.findById = jest.fn().mockResolvedValue(null);
+  test("cannot get connection short details if contact does not exist", async () => {
+    contactStorage.findById = jest.fn().mockResolvedValue(null);
     await expect(
       connectionService.getConnectionShortDetailById(contacts[0].id)
+    ).rejects.toThrowError(ConnectionService.CONTACT_METADATA_RECORD_NOT_FOUND);
+  });
+
+  test("cannot get connection short details if connection pair does not exist", async () => {
+    const identifier = "test-identifier";
+    contactStorage.findById = jest.fn().mockResolvedValue({
+      id: contacts[0].id,
+      alias: "keri",
+      oobi: "test-oobi",
+    });
+    connectionPairStorage.findById = jest.fn().mockResolvedValue(null);
+
+    await expect(
+      connectionService.getConnectionShortDetailById(contacts[0].id, identifier)
     ).rejects.toThrowError(ConnectionService.CONTACT_METADATA_RECORD_NOT_FOUND);
   });
 
@@ -1157,7 +1210,19 @@ describe("Connection service of agent", () => {
     await connectionService.resolveOobi(`${oobiPrefix}${failUuid}`, false);
   });
 
-  test("Can delete stale local connection", async () => {
+  test("Can delete stale local connection with identifier", async () => {
+    const connectionId = "connection-id";
+    const identifier = "test-identifier";
+    await connectionService.deleteStaleLocalConnectionById(
+      connectionId,
+      identifier
+    );
+    expect(connectionPairStorage.deleteById).toBeCalledWith(
+      `${identifier}:${connectionId}`
+    );
+  });
+
+  test("Can delete stale local connection without identifier (multisig)", async () => {
     const connectionId = "connection-id";
     await connectionService.deleteStaleLocalConnectionById(connectionId);
     expect(contactStorage.deleteById).toBeCalledWith(connectionId);

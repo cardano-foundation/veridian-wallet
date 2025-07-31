@@ -70,10 +70,11 @@ const ConnectionDetails = ({
 
   const getDetails = useCallback(async () => {
     if (!connectionShortDetails?.id) return;
-
     try {
       const connectionDetails = await Agent.agent.connections.getConnectionById(
-        connectionShortDetails.id
+        connectionShortDetails.id,
+        false,
+        connectionShortDetails.identifier
       );
 
       setConnectionDetails(connectionDetails);
@@ -117,7 +118,8 @@ const ConnectionDetails = ({
       try {
         if (cloudError) {
           await Agent.agent.connections.deleteStaleLocalConnectionById(
-            connectionShortDetails.id
+            connectionShortDetails.id,
+            connectionShortDetails.identifier
           );
         } else {
           if (isRegularConnectionDetails(connectionShortDetails)) {

@@ -42,7 +42,8 @@ jest.mock("../../../core/agent/agent", () => ({
         getConnectionHistoryById: jest.fn(),
         createMediatorInvitation: jest.fn(),
         getShortenUrl: jest.fn(),
-        deleteStaleLocalConnectionById: () => deleteConnectionByIdMock(),
+        deleteStaleLocalConnectionById: (id: string, identifier: string) =>
+          deleteConnectionByIdMock(id, identifier),
         getConnectionShortDetailById: jest.fn(() => Promise.resolve([])),
         getOobi: jest.fn(() => Promise.resolve("mock-oobi")),
       },
@@ -452,7 +453,10 @@ describe("Connections tab", () => {
     await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(deleteConnectionByIdMock).toBeCalled();
+      expect(deleteConnectionByIdMock).toBeCalledWith(
+        connectionsFix[4].id,
+        connectionsFix[4].identifier
+      );
     });
 
     unmount();
