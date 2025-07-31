@@ -12,7 +12,7 @@ import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
-import { setCredsCache } from "../../../store/reducers/credsCache";
+import { setCredsCache } from "../../../store/reducers/profileCache";
 import {
   setCurrentRoute,
   setToastMsg,

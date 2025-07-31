@@ -6,22 +6,22 @@ import {
   ConnectionShortDetails,
   MiscRecordId,
 } from "../../../core/agent/agent.types";
-import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { BasicRecord } from "../../../core/agent/records";
 import {
   ACDCDetails,
   CredentialStatus,
 } from "../../../core/agent/services/credentialService.types";
+import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { setCredsArchivedCache } from "../../../store/reducers/credsArchivedCache";
 import {
-  addFavouritesCredsCache,
   getCredsCache,
-  getFavouritesCredsCache,
-  removeFavouritesCredsCache,
+  getNotificationsCache,
   setCredsCache,
-} from "../../../store/reducers/credsCache";
+  setNotificationsCache,
+} from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   setCurrentOperation,
@@ -48,11 +48,11 @@ import {
   BackReason,
   CredentialDetailModuleProps,
 } from "./CredentialDetailModule.types";
-import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import {
-  getNotificationsCache,
-  setNotificationsCache,
-} from "../../../store/reducers/profileCache";
+  addFavouritesCredsCache,
+  getFavouritesCredsCache,
+  removeFavouritesCredsCache,
+} from "../../../store/reducers/viewTypeCache";
 
 const CredentialDetailModule = ({
   pageId,

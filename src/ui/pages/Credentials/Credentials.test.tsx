@@ -6,11 +6,9 @@ import { MemoryRouter } from "react-router-dom";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import {
-  setCredentialsFilters,
-  setCredsCache,
-} from "../../../store/reducers/credsCache";
+import { setCredsCache } from "../../../store/reducers/profileCache";
 import { setCurrentRoute } from "../../../store/reducers/stateCache";
+import { setCredentialsFilters } from "../../../store/reducers/viewTypeCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { pendingCredFixs } from "../../__fixtures__/credsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";

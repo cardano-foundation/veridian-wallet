@@ -1,22 +1,20 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { seedPhraseCacheSlice } from "./reducers/seedPhraseCache";
-import { stateCacheSlice } from "./reducers/stateCache";
-import { identifiersCacheSlice } from "./reducers/identifiersCache";
-import { credsCacheSlice } from "./reducers/credsCache";
-import { connectionsCacheSlice } from "./reducers/connectionsCache";
-import { walletConnectionsCacheSlice } from "./reducers/walletConnectionsCache";
-import { viewTypeCacheSlice } from "./reducers/viewTypeCache";
 import { biometricsCacheSlice } from "./reducers/biometricsCache";
+import { connectionsCacheSlice } from "./reducers/connectionsCache";
 import { credsArchivedCacheSlice } from "./reducers/credsArchivedCache";
-import { ssiAgentSlice } from "./reducers/ssiAgent";
+import { identifiersCacheSlice } from "./reducers/identifiersCache";
 import { profilesCacheSlice } from "./reducers/profileCache";
+import { seedPhraseCacheSlice } from "./reducers/seedPhraseCache";
+import { ssiAgentSlice } from "./reducers/ssiAgent";
+import { stateCacheSlice } from "./reducers/stateCache";
+import { viewTypeCacheSlice } from "./reducers/viewTypeCache";
+import { walletConnectionsCacheSlice } from "./reducers/walletConnectionsCache";
 
 const store = configureStore({
   reducer: {
     stateCache: stateCacheSlice.reducer,
     seedPhraseCache: seedPhraseCacheSlice.reducer,
     identifiersCache: identifiersCacheSlice.reducer,
-    credsCache: credsCacheSlice.reducer,
     credsArchivedCache: credsArchivedCacheSlice.reducer,
     connectionsCache: connectionsCacheSlice.reducer,
     walletConnectionsCache: walletConnectionsCacheSlice.reducer,
@@ -39,6 +37,6 @@ const store = configureStore({
 type RootState = ReturnType<typeof store.getState>;
 type AppDispatch = typeof store.dispatch;
 
-export type { RootState, AppDispatch };
+export type { AppDispatch, RootState };
 
 export { store };

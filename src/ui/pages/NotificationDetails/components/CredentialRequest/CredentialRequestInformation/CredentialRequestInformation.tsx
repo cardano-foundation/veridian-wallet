@@ -7,8 +7,10 @@ import { i18n } from "../../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../../store/reducers/connectionsCache";
 import { getCredsArchivedCache } from "../../../../../../store/reducers/credsArchivedCache";
-import { getCredsCache } from "../../../../../../store/reducers/credsCache";
-import { deleteNotificationById } from "../../../../../../store/reducers/profileCache";
+import {
+  deleteNotificationById,
+  getCredsCache,
+} from "../../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../../store/reducers/stateCache";
 import { Alert as AlertDecline } from "../../../../../components/Alert";
 import {

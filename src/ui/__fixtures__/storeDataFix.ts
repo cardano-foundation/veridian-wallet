@@ -4,6 +4,7 @@ import { Profile, ProfileCache } from "../../store/reducers/profileCache";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { OperationType } from "../globals/types";
 import { CredentialsFilters } from "../pages/Credentials/Credentials.types";
+import { filteredCredsFix } from "./filteredCredsFix";
 import { filteredIdentifierFix } from "./filteredIdentifierFix";
 import { notificationsFix } from "./notificationsFix";
 
@@ -21,7 +22,9 @@ export const profilesCachesFix = filteredIdentifierFix.reduce(
       connections: [],
       multisigConnections: [],
       peerConnections: [],
-      credentials: [],
+      credentials: filteredCredsFix.filter(
+        (item) => item.identifierId === identifier.id
+      ),
       archivedCredentials: [],
       notifications: notificationsFix.filter(
         (item) => item.receivingPre === identifier.id
@@ -106,11 +109,6 @@ export const storeStateFixData: RootState = {
       connections: [],
     },
   },
-  credsCache: {
-    creds: [],
-    favourites: [],
-    filters: CredentialsFilters.All,
-  },
   credsArchivedCache: { creds: [] },
   connectionsCache: {
     connections: {},
@@ -125,6 +123,8 @@ export const storeStateFixData: RootState = {
     credential: {
       viewType: null,
       favouriteIndex: 0,
+      favourites: [],
+      filters: CredentialsFilters.All,
     },
   },
   biometricsCache: {

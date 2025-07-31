@@ -1,4 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { filteredCredsFix } from "../../../ui/__fixtures__/filteredCredsFix";
 import { notificationsFix } from "../../../ui/__fixtures__/notificationsFix";
 import {
   defaultProfileDataFix,
@@ -11,14 +12,17 @@ import {
 import {
   addNotification,
   deleteNotificationById,
+  getCredsCache,
   getCurrentProfile,
   getNotificationsCache,
   getRecentProfiles,
   markNotificationAsRead,
   profilesCacheSlice,
-  updateCurrentProfile,
+  setCredsCache,
   setNotificationsCache,
   setProfiles,
+  updateCurrentProfile,
+  updateOrAddCredsCache,
   updateRecentProfiles,
 } from "./profilesCache";
 import { ProfileCache } from "./profilesCache.types";
@@ -114,16 +118,46 @@ describe("Profile cache", () => {
   });
 
   it("should add notification", () => {
-    const action = addNotification(notificationsFix[2]);
+    const newNoti = {
+      ...notificationsFix[2],
+      receivingPre: defaultProfileIdentifierFix.id,
+    };
+    const action = addNotification(newNoti);
 
     const nextState = profilesCacheSlice.reducer(profileCacheFixData, action);
 
     const defaultProfile = nextState.profiles[defaultProfileIdentifierFix.id];
 
     expect(
-      defaultProfile.notifications.some(
-        (item) => item.id === notificationsFix[2].id
-      )
+      defaultProfile.notifications.some((item) => item.id === newNoti.id)
+    ).toEqual(true);
+  });
+
+  it("should get cred cache", () => {
+    const data = getCredsCache(storeStateFixData);
+    expect(data).toEqual(defaultProfileDataFix.credentials);
+  });
+
+  it("should set cred cache", () => {
+    const action = setCredsCache(filteredCredsFix);
+
+    const nextState = profilesCacheSlice.reducer(profileCacheFixData, action);
+
+    const defaultProfile = nextState.profiles[defaultProfileIdentifierFix.id];
+
+    expect(defaultProfile.credentials).toEqual(filteredCredsFix);
+  });
+
+  it("should add or update cred cache", () => {
+    const newCred = {
+      ...filteredCredsFix[1],
+      identifierId: defaultProfileIdentifierFix.id,
+    };
+    const action = updateOrAddCredsCache(newCred);
+    const nextState = profilesCacheSlice.reducer(profileCacheFixData, action);
+    const defaultProfile = nextState.profiles[defaultProfileIdentifierFix.id];
+    expect(
+      defaultProfile.credentials.some((item) => item.id === newCred.id)
     ).toEqual(true);
   });
 });

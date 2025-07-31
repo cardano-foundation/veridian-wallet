@@ -13,7 +13,7 @@ const notificationsFix: KeriaNotification[] = [
     connectionId: "EJNd_YCOZA_g5fT8BnvY6KWgSMbIP9selgebbVNu8gNw",
     read: false,
     groupReplied: false,
-    receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
+    receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
   },
   {
     id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmG",

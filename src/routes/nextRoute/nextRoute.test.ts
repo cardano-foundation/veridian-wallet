@@ -87,11 +87,6 @@ describe("NextRoute", () => {
           connections: [],
         },
       },
-      credsCache: {
-        creds: [],
-        favourites: [],
-        filters: CredentialsFilters.All,
-      },
       credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
@@ -106,6 +101,8 @@ describe("NextRoute", () => {
         credential: {
           viewType: null,
           favouriteIndex: 0,
+          favourites: [],
+          filters: CredentialsFilters.All,
         },
       },
       biometricsCache: {
@@ -367,7 +364,6 @@ describe("getNextRoute", () => {
         connections: [],
       },
     },
-    credsCache: { creds: [], favourites: [], filters: CredentialsFilters.All },
     credsArchivedCache: { creds: [] },
     connectionsCache: {
       connections: {},
@@ -382,6 +378,8 @@ describe("getNextRoute", () => {
       credential: {
         viewType: null,
         favouriteIndex: 0,
+        favourites: [],
+        filters: CredentialsFilters.All,
       },
     },
     biometricsCache: {

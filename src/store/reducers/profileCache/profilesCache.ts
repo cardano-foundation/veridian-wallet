@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 import { RootState } from "../../index";
 import { Profile, ProfileCache } from "./profilesCache.types";
@@ -77,6 +78,25 @@ export const profilesCacheSlice = createSlice({
         ...targetProfile.notifications,
       ];
     },
+    setCredsCache: (state, action: PayloadAction<CredentialShortDetails[]>) => {
+      if (!state.defaultProfile) return;
+      const defaultProfile = state.profiles[state.defaultProfile];
+      if (!defaultProfile) return;
+
+      defaultProfile.credentials = action.payload;
+    },
+    updateOrAddCredsCache: (
+      state,
+      action: PayloadAction<CredentialShortDetails>
+    ) => {
+      const targetProfile = state.profiles[action.payload.identifierId];
+      if (!targetProfile) return;
+
+      const creds = targetProfile.credentials.filter(
+        (cred) => cred.id !== action.payload.id
+      );
+      targetProfile.credentials = [...creds, action.payload];
+    },
   },
 });
 
@@ -89,6 +109,8 @@ export const {
   deleteNotificationById,
   markNotificationAsRead,
   addNotification,
+  setCredsCache,
+  updateOrAddCredsCache,
 } = profilesCacheSlice.actions;
 
 const getProfiles = (state: RootState) => state.profilesCache.profiles;
@@ -102,7 +124,11 @@ const getRecentProfiles = (state: RootState) =>
 const getNotificationsCache = (state: RootState) =>
   getCurrentProfile(state)?.notifications || [];
 
+const getCredsCache = (state: RootState) =>
+  getCurrentProfile(state)?.credentials || [];
+
 export {
+  getCredsCache,
   getCurrentProfile,
   getNotificationsCache,
   getProfiles,

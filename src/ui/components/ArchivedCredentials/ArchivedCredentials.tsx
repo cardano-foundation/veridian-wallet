@@ -22,10 +22,8 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { setCredsArchivedCache } from "../../../store/reducers/credsArchivedCache";
 import {
   getCredsCache,
-  setCredsCache,
-} from "../../../store/reducers/credsCache";
-import {
   getNotificationsCache,
+  setCredsCache,
   setNotificationsCache,
 } from "../../../store/reducers/profileCache";
 import {

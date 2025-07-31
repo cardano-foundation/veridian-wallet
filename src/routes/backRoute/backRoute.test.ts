@@ -86,11 +86,6 @@ describe("getBackRoute", () => {
           connections: [],
         },
       },
-      credsCache: {
-        creds: [],
-        favourites: [],
-        filters: CredentialsFilters.All,
-      },
       credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
@@ -105,6 +100,8 @@ describe("getBackRoute", () => {
         credential: {
           viewType: null,
           favouriteIndex: 0,
+          favourites: [],
+          filters: CredentialsFilters.All,
         },
       },
       biometricsCache: {
@@ -250,11 +247,6 @@ describe("getPreviousRoute", () => {
           connections: [],
         },
       },
-      credsCache: {
-        creds: [],
-        favourites: [],
-        filters: CredentialsFilters.All,
-      },
       credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
@@ -269,6 +261,8 @@ describe("getPreviousRoute", () => {
         credential: {
           viewType: null,
           favouriteIndex: 0,
+          favourites: [],
+          filters: CredentialsFilters.All,
         },
       },
       biometricsCache: {

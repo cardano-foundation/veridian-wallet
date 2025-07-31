@@ -6,13 +6,14 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
+import { initiatorConnectionShortDetails } from "../../../core/__fixtures__/agent/multiSigFixtures";
 import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import {
   addFavouritesCredsCache,
   removeFavouritesCredsCache,
-} from "../../../store/reducers/credsCache";
-import { setToastMsg } from "../../../store/reducers/stateCache";
+} from "../../../store/reducers/viewTypeCache";
 import {
   connectionsFix,
   connectionsMapFix,
@@ -20,11 +21,10 @@ import {
 import { credsFixAcdc, revokedCredFixs } from "../../__fixtures__/credsFix";
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
 import { ToastMsgType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CredentialDetailModule } from "./CredentialDetailModule";
-import { initiatorConnectionShortDetails } from "../../../core/__fixtures__/agent/multiSigFixtures";
-import { makeTestStore } from "../../utils/makeTestStore";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
 

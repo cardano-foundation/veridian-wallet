@@ -1,8 +1,8 @@
 const getConnectionShortDetailByIdMock = jest.fn();
 
+import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
@@ -29,9 +29,8 @@ import {
   PeerConnectionEventTypes,
   PeerDisconnectedEvent,
 } from "../../../core/cardano/walletConnect/peerConnection.types";
-import { RootState, store } from "../../../store";
+import { store } from "../../../store";
 import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
-import { updateOrAddCredsCache } from "../../../store/reducers/credsCache";
 import {
   addGroupIdentifierCache,
   updateCreationStatus,
@@ -48,6 +47,10 @@ import {
   setPendingConnection,
   setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
+import {
+  pendingGroupIdentifierFix,
+  pendingIdentifierFix,
+} from "../../__fixtures__/filteredIdentifierFix";
 import { ToastMsgType } from "../../globals/types";
 import {
   AppWrapper,
@@ -64,10 +67,6 @@ import {
   operationCompleteHandler,
   operationFailureHandler,
 } from "./coreEventListeners";
-import {
-  pendingIdentifierFix,
-  pendingGroupIdentifierFix,
-} from "../../__fixtures__/filteredIdentifierFix";
 
 jest.mock("../../../core/agent/agent", () => {
   const mockPeerConnectionPairRecordPlainObject = {
@@ -223,6 +222,7 @@ const peerConnectionBrokenEvent: PeerConnectionBrokenEvent = {
 };
 
 import { PeerConnectionPairRecord } from "../../../core/agent/records";
+import { updateOrAddCredsCache } from "../../../store/reducers/profileCache";
 
 const mockPeerConnectionPairRecordInstance = new PeerConnectionPairRecord({
   id: "dApp-address:identifier",

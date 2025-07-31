@@ -17,9 +17,9 @@ import { CredentialStatus } from "../../../core/agent/services/credentialService
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
 import {
-  PeerConnectSigningEvent,
   PeerConnectedEvent,
   PeerConnectionBrokenEvent,
+  PeerConnectSigningEvent,
   PeerDisconnectedEvent,
 } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
@@ -33,17 +33,14 @@ import {
 } from "../../../store/reducers/connectionsCache";
 import { setCredsArchivedCache } from "../../../store/reducers/credsArchivedCache";
 import {
-  setCredentialsFilters,
-  setCredsCache,
-  setFavouritesCredsCache,
-  updateOrAddCredsCache,
-} from "../../../store/reducers/credsCache";
-import { FavouriteCredential } from "../../../store/reducers/credsCache/credCache.types";
-import {
   setIdentifiersCache,
   setIndividualFirstCreate,
 } from "../../../store/reducers/identifiersCache";
-import { Profile, setProfiles } from "../../../store/reducers/profileCache";
+import {
+  Profile,
+  setProfiles,
+  updateOrAddCredsCache,
+} from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   getForceInitApp,
@@ -70,8 +67,11 @@ import {
 import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
   setCredentialFavouriteIndex,
+  setCredentialsFilters,
   setCredentialViewTypeCache,
+  setFavouritesCredsCache,
 } from "../../../store/reducers/viewTypeCache";
+import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
 import {
   ConnectionData,
   getConnectedWallet,
@@ -504,7 +504,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
       dispatch(setProfiles(profiles));
       dispatch(setIdentifiersCache(storedIdentifiers));
-      dispatch(setCredsCache(credsCache));
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(setConnectionsCache(allConnections));
       dispatch(setMultisigConnectionsCache(allMultisigConnections));
@@ -782,11 +781,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
 };
 
 export {
-  AppWrapper,
   acdcChangeHandler,
+  AppWrapper,
   connectionStateChangedHandler,
-  peerConnectRequestSignChangeHandler,
   peerConnectedChangeHandler,
   peerConnectionBrokenChangeHandler,
+  peerConnectRequestSignChangeHandler,
   peerDisconnectedChangeHandler,
 };

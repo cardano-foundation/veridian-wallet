@@ -14,8 +14,10 @@ import { CredentialStatus } from "../../../../../../core/agent/services/credenti
 import { i18n } from "../../../../../../i18n";
 import { useAppSelector } from "../../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../../store/reducers/connectionsCache";
-import { getCredsCache } from "../../../../../../store/reducers/credsCache";
-import { deleteNotificationById } from "../../../../../../store/reducers/profileCache";
+import {
+  deleteNotificationById,
+  getCredsCache,
+} from "../../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../../store/reducers/stateCache";
 import { CardItem, CardList } from "../../../../../components/CardList";
 import { BackReason } from "../../../../../components/CredentialDetailModule/CredentialDetailModule.types";

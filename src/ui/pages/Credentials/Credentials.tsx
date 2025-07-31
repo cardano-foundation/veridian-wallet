@@ -17,18 +17,19 @@ import {
   setCredsArchivedCache,
 } from "../../../store/reducers/credsArchivedCache";
 import {
-  getCredentialsFilters,
   getCredsCache,
-  getFavouritesCredsCache,
-  setCredentialsFilters,
   setCredsCache,
-} from "../../../store/reducers/credsCache";
+} from "../../../store/reducers/profileCache";
 import {
-  getAuthentication,
   getCurrentProfile,
   setCurrentRoute,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
+import {
+  getCredentialsFilters,
+  getFavouritesCredsCache,
+  setCredentialsFilters,
+} from "../../../store/reducers/viewTypeCache";
 import { ArchivedCredentials } from "../../components/ArchivedCredentials";
 import { Avatar } from "../../components/Avatar";
 import { AvatarProps } from "../../components/Avatar/Avatar.types";

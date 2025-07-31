@@ -1,15 +1,8 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import {
-  ConnectionStatus,
-  CreationStatus,
-} from "../../../core/agent/agent.types";
-import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
-import { IdentifierType } from "../../../core/agent/services/identifier.types";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import { PeerConnectionEventTypes } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { RoutePath } from "../../../routes";
-import { CardListViewType } from "../../../ui/components/SwitchCardView/SwitchCardView.types";
 import { OperationType } from "../../../ui/globals/types";
-import { CredentialsFilters } from "../../../ui/pages/Credentials/Credentials.types";
 import { RootState } from "../../index";
 import {
   AuthenticationCacheProps,
@@ -56,16 +49,6 @@ jest.mock("../connectionsCache", () => ({
   getConnectionsCache: jest.fn(),
   getMultisigConnectionsCache: jest.fn(),
 }));
-
-// Import the mocked selectors
-import {
-  getConnectionsCache,
-  getMultisigConnectionsCache,
-} from "../connectionsCache";
-import { getCredsArchivedCache } from "../credsArchivedCache";
-import { getCredsCache } from "../credsCache";
-import { getIdentifiersCache } from "../identifiersCache";
-import { getWalletConnectionsCache } from "../walletConnectionsCache";
 
 // Mock the setCurrentProfile action to spy on its calls
 const mockSetCurrentProfile = jest.spyOn(

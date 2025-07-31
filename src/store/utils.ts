@@ -6,7 +6,6 @@ import { RootState } from "./index";
 import { clearBiometricsCache } from "./reducers/biometricsCache";
 import { clearConnectionsCache } from "./reducers/connectionsCache";
 import { clearCredArchivedCache } from "./reducers/credsArchivedCache";
-import { clearCredCache } from "./reducers/credsCache";
 import { clearIdentifierCache } from "./reducers/identifiersCache";
 import { clearSeedPhraseCache } from "./reducers/seedPhraseCache";
 import { clearSSIAgent } from "./reducers/ssiAgent";
@@ -35,7 +34,6 @@ const updateReduxState = (
 const CLEAR_STORE_ACTIONS = [
   clearIdentifierCache,
   clearCredArchivedCache,
-  clearCredCache,
   clearConnectionsCache,
   clearBiometricsCache,
   clearSeedPhraseCache,
