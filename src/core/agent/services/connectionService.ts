@@ -324,21 +324,21 @@ class ConnectionService extends AgentService {
     };
   }
 
-  async getConnectionById(id: string, full?: boolean): Promise<MultisigConnectionDetailsFull>;
-  async getConnectionById(id: string, full: boolean, identifier: string): Promise<RegularConnectionDetailsFull>;
+  async getConnectionById(contactId: string): Promise<MultisigConnectionDetailsFull>;
+  async getConnectionById(contactId: string, full: boolean, identifier: string): Promise<RegularConnectionDetailsFull>;
   @OnlineOnly
   async getConnectionById(
-    id: string,
+    contactId: string,
     full = false,
     identifier?: string
   ): Promise<ConnectionDetails> {
     const connection = await this.props.signifyClient
       .contacts()
-      .get(id)
+      .get(contactId)
       .catch((error) => {
         const status = error.message.split(" - ")[1];
         if (/404/gi.test(status)) {
-          throw new Error(`${Agent.MISSING_DATA_ON_KERIA}: ${id}`, {
+          throw new Error(`${Agent.MISSING_DATA_ON_KERIA}: ${contactId}`, {
             cause: error,
           });
         } else {

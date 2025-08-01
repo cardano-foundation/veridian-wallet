@@ -1104,7 +1104,7 @@ describe("Connection service of agent", () => {
 
   test("Should throw error when KERIA is offline", async () => {
     await expect(
-      connectionService.getConnectionById("id", false)
+      connectionService.getConnectionById("id")
     ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
     await expect(
       connectionService.deleteConnectionByIdAndIdentifier("id", "identifier")
