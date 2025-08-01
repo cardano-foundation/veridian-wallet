@@ -1,4 +1,4 @@
-import { ConnectionData } from "../../../store/reducers/walletConnectionsCache";
+import { ConnectionData } from "../../../store/reducers/profileCache";
 
 interface ConnectdAppProps {
   isOpen: boolean;

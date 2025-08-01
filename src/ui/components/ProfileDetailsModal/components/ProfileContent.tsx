@@ -12,7 +12,7 @@ import { useCallback, useState } from "react";
 import { i18n } from "../../../../i18n";
 import { useAppSelector } from "../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../store/reducers/connectionsCache";
-import { getIdentifiersCache } from "../../../../store/reducers/identifiersCache";
+import { getProfiles } from "../../../../store/reducers/profileCache";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -22,6 +22,7 @@ import { Avatar, MemberAvatar } from "../../Avatar";
 import { CardDetailsContent } from "../../CardDetails";
 import { CardBlock, FlatBorderType } from "../../CardDetails/CardDetailsBlock";
 import { CardDetailsItem } from "../../CardDetails/CardDetailsItem";
+import { ConnectdApp } from "../../ConnectdApp";
 import { EditProfile } from "../../EditProfile";
 import { ListHeader } from "../../ListHeader";
 import { ShareConnection } from "../../ShareConnection";
@@ -31,7 +32,6 @@ import {
   ProfileContentProps,
   ProfileInformationProps,
 } from "./ProfileContent.types";
-import { ConnectdApp } from "../../ConnectdApp";
 
 const DISPLAY_MEMBERS = 3;
 
@@ -50,7 +50,7 @@ const ProfileContent = ({
   oobi,
   setCardData,
 }: ProfileContentProps) => {
-  const identifiersData = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const memberCount = cardData.members?.length || 0;
   const [openDetailModal, setOpenDetailModal] = useState(false);
@@ -70,7 +70,7 @@ const ProfileContent = ({
   }, []);
 
   const isMultiSig =
-    cardData.groupMemberPre || identifiersData[cardData.id]?.groupMemberPre;
+    cardData.groupMemberPre || profiles[cardData.id]?.identity.groupMemberPre;
 
   const members = cardData.members
     ?.map((member, index) => {

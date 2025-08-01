@@ -2,20 +2,20 @@ import { useCallback } from "react";
 import { Agent } from "../../core/agent/agent";
 import { MiscRecordId } from "../../core/agent/agent.types";
 import { BasicRecord } from "../../core/agent/records";
-import { IdentifierShortDetails } from "../../core/agent/services/identifier.types";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { getIdentifiersCache } from "../../store/reducers/identifiersCache";
 import {
   getCurrentProfile,
-  getProfileHistories,
-  setProfileHistories,
+  getProfiles,
+  getRecentProfiles,
+  Profile,
   updateCurrentProfile,
-} from "../../store/reducers/stateCache";
+  updateRecentProfiles,
+} from "../../store/reducers/profileCache";
 
 export const useProfile = () => {
   const defaultProfile = useAppSelector(getCurrentProfile);
-  const profileHistories = useAppSelector(getProfileHistories);
-  const identifierMap = useAppSelector(getIdentifiersCache);
+  const profileHistories = useAppSelector(getRecentProfiles);
+  const profiles = useAppSelector(getProfiles);
   const dispatch = useAppDispatch();
 
   const updateProfileHistories = useCallback(
@@ -27,7 +27,7 @@ export const useProfile = () => {
         })
       );
 
-      dispatch(setProfileHistories(newProfilesHistory));
+      dispatch(updateRecentProfiles(newProfilesHistory));
     },
     [dispatch]
   );
@@ -45,7 +45,7 @@ export const useProfile = () => {
 
       const newHistoriesProfile =
         newProfilesHistory ||
-        [...profileHistories, defaultProfile?.identity.id].filter(
+        [...profileHistories, defaultProfile?.identity.id || ""].filter(
           (item) => !!item
         );
 
@@ -66,14 +66,14 @@ export const useProfile = () => {
 
     await Agent.agent.basicStorage.deleteById(MiscRecordId.PROFILE_HISTORIES);
 
-    dispatch(setProfileHistories([]));
+    dispatch(updateRecentProfiles([]));
   }, [dispatch]);
 
   const getRecentDefaultProfile = useCallback(
     (
       profiles: string[],
-      identifierMap: Record<string, IdentifierShortDetails>,
-      currentProfileId: string
+      identifierMap: Record<string, Profile>,
+      currentProfileId?: string
     ) => {
       const tmpProfileHistories = [...profiles];
       let recentProfile = tmpProfileHistories.pop();
@@ -103,24 +103,26 @@ export const useProfile = () => {
     const { recentProfile, newProfileHistories: tmpProfileHistories } =
       getRecentDefaultProfile(
         profileHistories,
-        identifierMap,
-        defaultProfile.identity.id
+        profiles,
+        defaultProfile?.identity.id
       );
 
     // Has recent profile (identifier) and it exist on current identifiers
-    if (recentProfile && recentProfile !== defaultProfile.identity.id) {
+    if (recentProfile && recentProfile !== defaultProfile?.identity.id) {
       await updateDefaultProfile(
         recentProfile,
-        tmpProfileHistories.filter((item) => identifierMap[item])
+        tmpProfileHistories.filter((item) => profiles[item])
       );
       return true;
     }
 
-    const identifiers = Object.values(identifierMap)
-      .sort((prev, next) => prev.displayName.localeCompare(next.displayName))
-      .filter((item) => item.id !== defaultProfile.identity.id);
+    const identifiers = Object.values(profiles)
+      .sort((prev, next) =>
+        prev.identity.displayName.localeCompare(next.identity.displayName)
+      )
+      .filter((item) => item.identity.id !== defaultProfile?.identity.id);
     if (identifiers.length > 0) {
-      await updateDefaultProfile(identifiers[0].id, []);
+      await updateDefaultProfile(identifiers[0].identity.id, []);
       return true;
     }
 
@@ -130,7 +132,7 @@ export const useProfile = () => {
     clearDefaultProfile,
     defaultProfile?.identity?.id,
     getRecentDefaultProfile,
-    identifierMap,
+    profiles,
     profileHistories,
     updateDefaultProfile,
   ]);

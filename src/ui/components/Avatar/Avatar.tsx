@@ -1,8 +1,8 @@
 import { IonButton } from "@ionic/react";
 import { useAppSelector } from "../../../store/hooks";
-import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import "./Avatar.scss";
 import { AvatarProps, MemberAvatarProps } from "./Avatar.types";
+import { getProfiles } from "../../../store/reducers/profileCache";
 
 const MemberAvatar = ({
   firstLetter,
@@ -22,16 +22,18 @@ const MemberAvatar = ({
 };
 
 const Avatar = ({ id, handleAvatarClick }: AvatarProps) => {
-  const identifiersDataCache = useAppSelector(getIdentifiersCache) || {};
+  const profiles = useAppSelector(getProfiles) || {};
   const getAvatarContent = (id: string) => {
-    const cache = identifiersDataCache;
+    const cache = profiles;
     const entries = Object.entries(cache).sort(
       ([, a], [, b]) =>
-        new Date(a.createdAtUTC).getTime() - new Date(b.createdAtUTC).getTime()
+        new Date(a.identity.createdAtUTC).getTime() -
+        new Date(b.identity.createdAtUTC).getTime()
     );
     const index = entries.findIndex(([key]) => key === id);
     const item = cache[id];
-    const firstLetter = item?.displayName?.charAt(0).toUpperCase() || "";
+    const firstLetter =
+      item?.identity.displayName?.charAt(0).toUpperCase() || "";
     const rank = index >= 0 ? index % 5 : 0; // ranks cycle from 0 to 4
     return { firstLetter, rank };
   };

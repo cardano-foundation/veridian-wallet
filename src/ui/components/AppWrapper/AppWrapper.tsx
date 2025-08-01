@@ -18,9 +18,9 @@ import { CredentialStatus } from "../../../core/agent/services/credentialService
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
 import {
-  PeerConnectSigningEvent,
   PeerConnectedEvent,
   PeerConnectionBrokenEvent,
+  PeerConnectSigningEvent,
   PeerDisconnectedEvent,
 } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
@@ -32,19 +32,18 @@ import {
   setMultisigConnectionsCache,
   updateOrAddConnectionCache,
 } from "../../../store/reducers/connectionsCache";
-import { setCredsArchivedCache } from "../../../store/reducers/credsArchivedCache";
 import {
-  setCredentialsFilters,
-  setCredsCache,
-  setFavouritesCredsCache,
-  updateOrAddCredsCache,
-} from "../../../store/reducers/credsCache";
-import { FavouriteCredential } from "../../../store/reducers/credsCache/credCache.types";
-import {
-  setIdentifiersCache,
+  ConnectionData,
+  Profile,
+  setCredsArchivedCache,
+  setCurrentProfile,
   setIndividualFirstCreate,
-} from "../../../store/reducers/identifiersCache";
-import { setNotificationsCache } from "../../../store/reducers/notificationsCache";
+  setPeerConnections,
+  setProfiles,
+  updateOrAddCredsCache,
+  updatePeerConnectionsFromCore,
+  updateRecentProfiles,
+} from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   getForceInitApp,
@@ -54,12 +53,10 @@ import {
   setAuthentication,
   setCameraDirection,
   setCurrentOperation,
-  setCurrentProfile,
   setInitializationPhase,
   setIsOnline,
   setIsSetupProfile,
   setPauseQueueIncomingRequest,
-  setProfileHistories,
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert,
@@ -71,14 +68,15 @@ import {
 import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
   setCredentialFavouriteIndex,
+  setCredentialsFilters,
   setCredentialViewTypeCache,
+  setFavouritesCredsCache,
 } from "../../../store/reducers/viewTypeCache";
+import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
 import {
-  ConnectionData,
   getConnectedWallet,
   setConnectedWallet,
   setPendingConnection,
-  setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { useProfile } from "../../hooks/useProfile";
@@ -177,7 +175,7 @@ const peerConnectedChangeHandler = async (
   const existingConnections =
     await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
 
-  dispatch(setWalletConnectionsCache(existingConnections));
+  dispatch(updatePeerConnectionsFromCore(existingConnections));
   const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
   const connectedWallet = existingConnections.find(
     (connection) =>
@@ -381,12 +379,51 @@ const AppWrapper = (props: { children: ReactNode }) => {
         : [];
 
       if (profileHistories) {
-        dispatch(setProfileHistories(profileHistories));
+        dispatch(updateRecentProfiles(profileHistories));
       }
 
       const identifiersDict = storedIdentifiers.reduce(
         (acc: Record<string, IdentifierShortDetails>, identifier) => {
           acc[identifier.id] = identifier;
+          return acc;
+        },
+        {}
+      );
+
+      const profiles = storedIdentifiers.reduce(
+        (acc: Record<string, Profile>, identifier) => {
+          const {
+            profileIdentifier,
+            profileCredentials,
+            profileArchivedCredentials,
+            profilePeerConnections,
+            profileNotifications,
+          } = filterProfileData(
+            identifiersDict,
+            credsCache,
+            credsArchivedCache,
+            storedPeerConnections,
+            notifications,
+            identifier.id
+          );
+
+          acc[identifier.id] = {
+            identity: {
+              id: profileIdentifier.id,
+              displayName: profileIdentifier.displayName,
+              createdAtUTC: profileIdentifier.createdAtUTC,
+              theme: profileIdentifier.theme,
+              creationStatus: profileIdentifier.creationStatus,
+            },
+            // TODO: add filtering for connections once we have connections per account merged
+            connections: Object.values(allConnections),
+            multisigConnections: Object.values(allMultisigConnections),
+            peerConnections: profilePeerConnections,
+            credentials: profileCredentials,
+            archivedCredentials: profileArchivedCredentials,
+            notifications: profileNotifications,
+          };
+
           return acc;
         },
         {}
@@ -400,7 +437,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       } else {
         const { recentProfile, newProfileHistories } = getRecentDefaultProfile(
           profileHistories,
-          identifiersDict,
+          profiles,
           ""
         );
 
@@ -428,49 +465,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
         }
       }
 
-      if (currentProfileAid) {
-        const {
-          profileIdentifier,
-          profileCredentials,
-          profileArchivedCredentials,
-          profilePeerConnections,
-          profileNotifications,
-        } = filterProfileData(
-          identifiersDict,
-          credsCache,
-          credsArchivedCache,
-          storedPeerConnections,
-          notifications,
-          currentProfileAid
-        );
-
-        dispatch(
-          setCurrentProfile({
-            identity: {
-              id: profileIdentifier.id,
-              displayName: profileIdentifier.displayName,
-              createdAtUTC: profileIdentifier.createdAtUTC,
-              theme: profileIdentifier.theme,
-              creationStatus: profileIdentifier.creationStatus,
-            },
-            // TODO: add filtering for connections once we have connections per account merged
-            connections: Object.values(allConnections),
-            multisigConnections: Object.values(allMultisigConnections),
-            peerConnections: profilePeerConnections,
-            credentials: profileCredentials,
-            archivedCredentials: profileArchivedCredentials,
-            notifications: profileNotifications,
-          })
-        );
-      }
-
-      dispatch(setIdentifiersCache(storedIdentifiers));
-      dispatch(setCredsCache(credsCache));
+      dispatch(setProfiles(profiles));
+      dispatch(setCurrentProfile(currentProfileAid));
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(setConnectionsCache(allConnections));
       dispatch(setMultisigConnectionsCache(allMultisigConnections));
-      dispatch(setWalletConnectionsCache(storedPeerConnections));
-      dispatch(setNotificationsCache(notifications));
 
       // TODO: set current profile data
     } catch (e) {
@@ -744,11 +743,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
 };
 
 export {
-  AppWrapper,
   acdcChangeHandler,
+  AppWrapper,
   connectionStateChangedHandler,
-  peerConnectRequestSignChangeHandler,
   peerConnectedChangeHandler,
   peerConnectionBrokenChangeHandler,
+  peerConnectRequestSignChangeHandler,
   peerDisconnectedChangeHandler,
 };

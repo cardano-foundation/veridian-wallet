@@ -6,7 +6,7 @@ import { IdentifierDetails as IdentifierDetailsCore } from "../../../core/agent/
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
-import { removeIdentifierCache } from "../../../store/reducers/identifiersCache";
+import { removeProfile } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   getStateCache,
@@ -70,7 +70,7 @@ const ProfileDetailsModule = ({
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${profile.id}`,
-        userName
+        profile.displayName
       );
       if (oobiValue) {
         setOobi(oobiValue);
@@ -117,13 +117,13 @@ const ProfileDetailsModule = ({
       const filterId = profile
         ? profile.id
         : cloudError
-          ? profileId
-          : undefined;
+        ? profileId
+        : undefined;
 
       await deleteIdentifier();
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
-      dispatch(removeIdentifierCache(filterId || ""));
-      if (defaultProfile.identity.id === filterId) {
+      dispatch(removeProfile(filterId || ""));
+      if (defaultProfile?.identity.id === filterId) {
         await setRecentProfileAsDefault();
       }
     } catch (e) {
@@ -173,7 +173,9 @@ const ProfileDetailsModule = ({
           header={
             <PageHeader
               title={defaultName}
-              additionalButtons={<Avatar id={defaultProfile.identity.id} />}
+              additionalButtons={
+                <Avatar id={defaultProfile?.identity.id || ""} />
+              }
             />
           }
           content={`${i18n.t("profiledetails.clouderror")}`}

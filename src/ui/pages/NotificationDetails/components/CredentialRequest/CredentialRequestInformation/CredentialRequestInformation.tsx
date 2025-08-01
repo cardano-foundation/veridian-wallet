@@ -6,12 +6,11 @@ import { NotificationRoute } from "../../../../../../core/agent/services/keriaNo
 import { i18n } from "../../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../../store/reducers/connectionsCache";
-import { getCredsArchivedCache } from "../../../../../../store/reducers/credsArchivedCache";
-import { getCredsCache } from "../../../../../../store/reducers/credsCache";
 import {
-  getNotificationsCache,
-  setNotificationsCache,
-} from "../../../../../../store/reducers/notificationsCache";
+  deleteNotificationById,
+  getCredsArchivedCache,
+  getCredsCache,
+} from "../../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../../store/reducers/stateCache";
 import { Alert as AlertDecline } from "../../../../../components/Alert";
 import {
@@ -47,11 +46,9 @@ const CredentialRequestInformation = ({
   onReloadData,
 }: CredentialRequestProps) => {
   const dispatch = useAppDispatch();
-  const notificationsCache = useAppSelector(getNotificationsCache);
   const connectionsCache = useAppSelector(getConnectionsCache);
   const credsCache = useAppSelector(getCredsCache);
   const archivedCredsCache = useAppSelector(getCredsArchivedCache);
-  const [notifications, setNotifications] = useState(notificationsCache);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
   const [viewCredId, setViewCredId] = useState<string>();
   const [proposedCredId, setProposedCredId] = useState<string>("");
@@ -91,14 +88,6 @@ const CredentialRequestInformation = ({
 
   useOnlineStatusEffect(getCred);
 
-  const handleNotificationUpdate = async () => {
-    const updatedNotifications = notifications.filter(
-      (notification) => notification.id !== notificationDetails.id
-    );
-    setNotifications(updatedNotifications);
-    dispatch(setNotificationsCache(updatedNotifications));
-  };
-
   const handleDecline = async () => {
     const isRejectGroupRequest =
       isGroup &&
@@ -117,7 +106,7 @@ const CredentialRequestInformation = ({
         dispatch(setToastMsg(ToastMsgType.PROPOSAL_CRED_REJECT));
       }
 
-      handleNotificationUpdate();
+      dispatch(deleteNotificationById(notificationDetails.id));
       onBack();
     } catch (e) {
       const toastMessage = isRejectGroupRequest

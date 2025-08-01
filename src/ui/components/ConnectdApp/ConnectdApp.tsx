@@ -18,13 +18,10 @@ import {
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import {
-  ConnectionData,
   getConnectedWallet,
   getPendingConnection,
-  getWalletConnectionsCache,
   setConnectedWallet,
   setPendingConnection,
-  setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
 import { Alert } from "../../components/Alert";
 import { CardList } from "../../components/CardList";
@@ -38,13 +35,22 @@ import { PageHeader } from "../PageHeader";
 import { SideSlider } from "../SideSlider";
 import { ConfirmConnectModal } from "./components/ConfirmConnectModal";
 import "./ConnectdApp.scss";
-import { ActionInfo, ActionType, ConnectdAppProps } from "./ConnectdApp.types";
+import {
+  ActionInfo,
+  ActionType,
+  ConnectdAppProps,
+  ConnectionData,
+} from "./ConnectdApp.types";
+import {
+  getPeerConnections,
+  setPeerConnections,
+} from "../../../store/reducers/profileCache";
 
 const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
   const dispatch = useAppDispatch();
   const toastMsgs = useAppSelector(getToastMsgs);
   const pendingConnection = useAppSelector(getPendingConnection);
-  const connections = useAppSelector(getWalletConnectionsCache);
+  const connections = useAppSelector(getPeerConnections);
   const connectedWallet = useAppSelector(getConnectedWallet);
   const currentOperation = useAppSelector(getCurrentOperation);
   const pageId = "wallet-connect";
@@ -120,7 +126,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
       );
 
       dispatch(
-        setWalletConnectionsCache(
+        setPeerConnections(
           connections.filter(
             (connection) => connection.meerkatId !== data.meerkatId
           )

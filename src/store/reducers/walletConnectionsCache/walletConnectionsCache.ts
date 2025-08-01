@@ -1,27 +1,19 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../index";
-import {
-  ConnectionData,
-  WalletConnectState,
-} from "./walletConnectionsCache.types";
+import { ConnectionData } from "../profileCache";
+import { WalletConnectState } from "./walletConnectionsCache.types";
 
 const initialState: WalletConnectState = {
-  walletConnections: [],
   connectedWallet: null,
   pendingConnection: null,
   isConnecting: false,
   showConnectWallet: false,
 };
+
 const walletConnectionsCacheSlice = createSlice({
   name: "walletConnectionsCache",
   initialState,
   reducers: {
-    setWalletConnectionsCache: (
-      state,
-      action: PayloadAction<ConnectionData[]>
-    ) => {
-      state.walletConnections = action.payload;
-    },
     setConnectedWallet: (
       state,
       action: PayloadAction<ConnectionData | null>
@@ -51,16 +43,12 @@ const walletConnectionsCacheSlice = createSlice({
 export { initialState, walletConnectionsCacheSlice };
 
 export const {
-  setWalletConnectionsCache,
   setConnectedWallet,
   setPendingConnection,
   setIsConnecting,
   showConnectWallet,
   clearWalletConnection,
 } = walletConnectionsCacheSlice.actions;
-
-const getWalletConnectionsCache = (state: RootState) =>
-  state.walletConnectionsCache.walletConnections;
 
 const getConnectedWallet = (state: RootState) =>
   state.walletConnectionsCache?.connectedWallet;
@@ -75,9 +63,8 @@ const getShowConnectWallet = (state: RootState) =>
   state.walletConnectionsCache.showConnectWallet;
 
 export {
-  getWalletConnectionsCache,
   getConnectedWallet,
-  getPendingConnection,
   getIsConnecting,
+  getPendingConnection,
   getShowConnectWallet,
 };

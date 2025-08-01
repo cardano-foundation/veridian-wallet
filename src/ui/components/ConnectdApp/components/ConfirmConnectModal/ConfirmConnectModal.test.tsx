@@ -35,9 +35,6 @@ const initialState = {
     },
     toastMsgs: [],
   },
-  identifiersCache: {
-    identifiers: [...identifierFix],
-  },
   walletConnectionsCache: {
     pendingConnection: null,
   },
@@ -178,9 +175,6 @@ describe("Confirm connect modal", () => {
           passcodeIsSet: true,
           passwordIsSet: true,
         },
-      },
-      identifiersCache: {
-        identifiers: [...identifierFix],
       },
       walletConnectionsCache: {
         pendingConnection: walletConnectionsFix[0],

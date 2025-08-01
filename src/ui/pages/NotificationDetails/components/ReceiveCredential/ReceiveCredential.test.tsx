@@ -21,6 +21,7 @@ import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { ReceiveCredential } from "./ReceiveCredential";
 import { makeTestStore } from "../../../../utils/makeTestStore";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 
 jest.useFakeTimers();
 
@@ -87,18 +88,10 @@ const initialState = {
       passcodeIsSet: true,
     },
   },
-  credsCache: {
-    creds: [],
-  },
   connectionsCache: {
     connections: connectionsForNotifications,
   },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -268,18 +261,10 @@ describe("Receive credential", () => {
           passcodeIsSet: true,
         },
       },
-      credsCache: {
-        creds: [],
-      },
       connectionsCache: {
         connections: [],
       },
-      notificationsCache: {
-        notifications: notificationsFix,
-      },
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
-      },
+      profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
       },
@@ -330,18 +315,10 @@ describe("Receive credential", () => {
         profileHistories: [],
         isOnline: true,
       },
-      credsCache: {
-        creds: [],
-      },
       connectionsCache: {
         connections: connectionsForNotifications,
       },
-      notificationsCache: {
-        notifications: notificationsFix,
-      },
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
-      },
+      profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
       },
@@ -440,9 +417,6 @@ describe("Credential request: Multisig", () => {
       },
       isOnline: true,
     },
-    credsCache: {
-      creds: [],
-    },
     connectionsCache: {
       connections: connectionsForNotifications,
       multisigConnections: {
@@ -454,12 +428,7 @@ describe("Credential request: Multisig", () => {
         },
       },
     },
-    notificationsCache: {
-      notifications: notificationsFix,
-    },
-    identifiersCache: {
-      identifiers: filteredIdentifierMapFix,
-    },
+    profilesCache: profileCacheFixData,
     biometricsCache: {
       enabled: false,
     },

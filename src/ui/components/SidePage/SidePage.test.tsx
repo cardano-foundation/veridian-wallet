@@ -9,6 +9,7 @@ import { identifierFix } from "../../__fixtures__/identifierFix";
 import { signTransactionFix } from "../../__fixtures__/signTransactionFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { SidePage } from "./SidePage";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -58,9 +59,7 @@ describe("Side Page: wallet connect", () => {
       },
       isOnline: true,
     },
-    identifiersCache: {
-      identifiers: [...identifierFix],
-    },
+    profilesCache: profileCacheFixData,
     walletConnectionsCache: {
       pendingConnection: "pending-meerkat",
       walletConnections: [],
@@ -122,9 +121,7 @@ describe("Side Page: incoming request", () => {
         isPaused: false,
       },
     },
-    identifiersCache: {
-      identifiers: [...identifierFix],
-    },
+    profilesCache: profileCacheFixData,
     walletConnectionsCache: {},
     biometricsCache: {
       enabled: false,

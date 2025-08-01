@@ -23,10 +23,11 @@ import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getIdentifiersCache,
+  addNotification,
+  getProfiles,
   setIndividualFirstCreate,
-} from "../../../store/reducers/identifiersCache";
-import { addNotification } from "../../../store/reducers/notificationsCache";
+  updateCurrentProfile,
+} from "../../../store/reducers/profileCache";
 import { getSeedPhraseCache } from "../../../store/reducers/seedPhraseCache";
 import {
   clearSSIAgent,
@@ -39,7 +40,6 @@ import {
   setCurrentOperation,
   setIsSetupProfile,
   setRecoveryCompleteNoInterruption,
-  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { CustomInput } from "../../components/CustomInput";
@@ -83,7 +83,7 @@ const CreateSSIAgent = () => {
   const ssiAgent = useAppSelector(getSSIAgent);
   const seedPhraseCache = useAppSelector(getSeedPhraseCache);
   const stateCache = useAppSelector(getStateCache);
-  const identifiers = useAppSelector(getIdentifiersCache);
+  const identifiers = useAppSelector(getProfiles);
 
   const ionRouter = useAppIonRouter();
   const dispatch = useAppDispatch();
@@ -210,24 +210,25 @@ const CreateSSIAgent = () => {
             })
           );
         } else {
-          const oldestIdentifier = Object.values(identifiers).reduce(
+          const oldestProfile = Object.values(identifiers).reduce(
             (prev, curr) => {
-              return new Date(curr.createdAtUTC) < new Date(prev.createdAtUTC)
+              return new Date(curr.identity.createdAtUTC) <
+                new Date(prev.identity.createdAtUTC)
                 ? curr
                 : prev;
             }
           );
 
-          if (oldestIdentifier) {
+          if (oldestProfile) {
             Agent.agent.basicStorage
               .createOrUpdateBasicRecord(
                 new BasicRecord({
                   id: MiscRecordId.DEFAULT_PROFILE,
-                  content: { defaultProfile: oldestIdentifier.id },
+                  content: { defaultProfile: oldestProfile.identity.id },
                 })
               )
               .then(() => {
-                dispatch(updateCurrentProfile(oldestIdentifier.id));
+                dispatch(updateCurrentProfile(oldestProfile.identity.id));
               })
               .catch((e) => {
                 showError("Cannot set default profile", e);

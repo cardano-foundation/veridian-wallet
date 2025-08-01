@@ -6,12 +6,12 @@ import { Provider } from "react-redux";
 import { KeriaNotification } from "../../../../core/agent/services/keriaNotificationService.types";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../routes/paths";
+import { NotificationOptionsModal } from "./NotificationOptionsModal";
+import { makeTestStore } from "../../../utils/makeTestStore";
 import {
   deleteNotificationById,
   markNotificationAsRead,
-} from "../../../../store/reducers/notificationsCache";
-import { NotificationOptionsModal } from "./NotificationOptionsModal";
-import { makeTestStore } from "../../../utils/makeTestStore";
+} from "../../../../store/reducers/profileCache";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),

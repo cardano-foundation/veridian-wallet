@@ -1,4 +1,4 @@
-import { ConnectionData } from "../../../../../store/reducers/walletConnectionsCache";
+import { ConnectionData } from "../../ConnectdApp.types";
 
 interface ConfirmConnectModalProps {
   openModal: boolean;

@@ -9,6 +9,7 @@ import {
   setToastMsg
 } from "../../../store/reducers/stateCache";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Profiles } from "./Profiles";
@@ -68,9 +69,7 @@ const initialState = {
   connectionsCache: {
     connections: {},
   },
-  notificationsCache: {
-    notifications: [],
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },

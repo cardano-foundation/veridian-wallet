@@ -480,11 +480,6 @@ describe("Settings page", () => {
           passwordIsSkipped: true,
         },
       },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
-      identifiersCache: {
-        identifiers: [],
-      },
       connectionsCache: {
         multisigConnections: {},
       },

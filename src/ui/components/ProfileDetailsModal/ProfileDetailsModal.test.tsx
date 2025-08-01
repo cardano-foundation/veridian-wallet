@@ -11,18 +11,17 @@ import {
 import { act } from "react";
 import { Provider } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
-import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
+import { MiscRecordId } from "../../../core/agent/agent.types";
 import { ConfigurationService } from "../../../core/configuration";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
-import {
-  setProfileHistories,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
+import { updateRecentProfiles } from "../../../store/reducers/profileCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import {
   filteredIdentifierFix,
   filteredIdentifierMapFix,
 } from "../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../__fixtures__/identifierFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { ToastMsgType } from "../../globals/types";
 import {
   formatShortDate,
@@ -113,14 +112,6 @@ const initialStateKeri = {
       passwordIsSet: true,
       firstAppLaunch: false,
     },
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: [],
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
-    },
     toastMsgs: [],
     isOnline: true,
   },
@@ -129,10 +120,7 @@ const initialStateKeri = {
       "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
     bran: "bran",
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierFix,
-    favourites: [],
-  },
+  profilesCache: profileCacheFixData,
   connectionsCache: {
     multisigConnections: {},
   },
@@ -171,6 +159,11 @@ describe("Individual profile details page", () => {
         />
       </Provider>
     );
+
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
     await waitFor(() =>
       expect(
         getByText(filteredIdentifierFix[0].displayName)
@@ -208,6 +201,10 @@ describe("Individual profile details page", () => {
         />
       </Provider>
     );
+
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
     // Render card template
     await waitFor(() =>
       expect(
@@ -249,6 +246,9 @@ describe("Individual profile details page", () => {
       </Provider>
     );
 
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
     await waitFor(() => {
       expect(getByTestId("share-button")).toBeInTheDocument();
       expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
@@ -280,6 +280,10 @@ describe("Individual profile details page", () => {
       </Provider>
     );
 
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
     await waitFor(() =>
       expect(getByTestId("identifier-id")).toBeInTheDocument()
     );
@@ -298,7 +302,7 @@ describe("Individual profile details page", () => {
   test("It asks to verify the password when users try to delete the identifier using the button in the modal", async () => {
     verifySecretMock.mockResolvedValue(false);
 
-    const { getByText, unmount, findByText, queryByText } = render(
+    const { getByText, unmount, findByText, queryByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
@@ -309,6 +313,10 @@ describe("Individual profile details page", () => {
         />
       </Provider>
     );
+
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
 
     await waitFor(() =>
       expect(
@@ -358,6 +366,10 @@ describe("Individual profile details page", () => {
       </Provider>
     );
 
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
     await waitFor(() =>
       expect(
         getByTestId("delete-button-identifier-card-details")
@@ -406,6 +418,10 @@ describe("Individual profile details page", () => {
       </Provider>
     );
 
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
     await waitFor(() =>
       expect(
         getByTestId("identifier-card-detail-spinner-container")
@@ -414,7 +430,7 @@ describe("Individual profile details page", () => {
   });
 
   test("Hide loading after retrieved indetifier data", async () => {
-    const { queryByTestId } = render(
+    const { queryByTestId, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
@@ -425,6 +441,10 @@ describe("Individual profile details page", () => {
         />
       </Provider>
     );
+
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
 
     await waitFor(() =>
       expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
@@ -445,26 +465,15 @@ describe("Individual profile details page", () => {
         },
         toastMsgs: [],
         isOnline: true,
-        currentProfile: {
-          identity: filteredIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-        },
       },
       seedPhraseCache: {
         seedPhrase: "",
         bran: "bran",
       },
-      identifiersCache: {
-        identifiers: filteredIdentifierFix,
-        favourites: [],
-      },
       connectionsCache: {
         multisigConnections: {},
       },
+      profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
       },
@@ -486,6 +495,10 @@ describe("Individual profile details page", () => {
         />
       </Provider>
     );
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
     await waitFor(() => {
       expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
         null
@@ -584,6 +597,15 @@ describe("Individual profile details page", () => {
         />
       </Provider>
     );
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
+    await waitFor(() => {
+      expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
+        null
+      );
+    });
 
     expect(
       queryByTestId("delete-button-identifier-card-details")
@@ -603,32 +625,12 @@ describe("Group profile details page", () => {
       },
       toastMsgs: [],
       isOnline: true,
-      currentProfile: {
-        identity: filteredIdentifierFix[0],
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
-      },
     },
     seedPhraseCache: {
       seedPhrase: "",
       bran: "bran",
     },
-    identifiersCache: {
-      identifiers: {
-        EJexLqpflqJr3HQhMNECkgFL_D5Z3xAMbSmlHyPhqYut: {
-          displayName: "GG",
-          id: "EJexLqpflqJr3HQhMNECkgFL_D5Z3xAMbSmlHyPhqYut",
-          createdAtUTC: "2024-10-14T13:11:52.963Z",
-          theme: 20,
-          creationStatus: CreationStatus.COMPLETE,
-          groupMemberPre: "ELUXM-ajSu0o1qyFvss-3QQfkj3DOke9aHNwt72Byi9x",
-        },
-      },
-      favourites: [],
-    },
+    profilesCache: profileCacheFixData,
     connectionsCache: {
       multisigConnections: {
         "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu": {
@@ -688,33 +690,12 @@ describe("Group profile details page", () => {
         },
         toastMsgs: [],
         isOnline: true,
-        currentProfile: {
-          identity: filteredIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-        },
       },
       seedPhraseCache: {
         seedPhrase: "",
         bran: "bran",
       },
-      identifiersCache: {
-        identifiers: {
-          EJexLqpflqJr3HQhMNECkgFL_D5Z3xAMbSmlHyPhqYut: {
-            displayName: "GG",
-            id: "EJexLqpflqJr3HQhMNECkgFL_D5Z3xAMbSmlHyPhqYut",
-            createdAtUTC: "2024-10-14T13:11:52.963Z",
-            theme: 20,
-            creationStatus: CreationStatus.COMPLETE,
-            groupMemberPre: "ELUXM-ajSu0o1qyFvss-3QQfkj3DOke9aHNwt72Byi9x",
-          },
-        },
-        toastMsgs: [],
-        favourites: [],
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         multisigConnections: {
           "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu": {
@@ -756,6 +737,9 @@ describe("Group profile details page", () => {
         />
       </Provider>
     );
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
 
     await waitFor(() => {
       expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
@@ -802,6 +786,10 @@ describe("Group profile details page", () => {
       </Provider>
     );
 
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
     await waitFor(() => {
       expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
       getAllByText(identifierFix[2].displayName).forEach((item) => {
@@ -833,7 +821,7 @@ describe("Group profile details page", () => {
   });
 
   test("Open signing threshold", async () => {
-    const { getByText, getAllByText } = render(
+    const { getByText, getAllByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
@@ -844,6 +832,10 @@ describe("Group profile details page", () => {
         />
       </Provider>
     );
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
     await waitFor(() => {
       expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
       getAllByText(identifierFix[2].displayName).forEach((item) => {
@@ -883,6 +875,10 @@ describe("Group profile details page", () => {
         />
       </Provider>
     );
+
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
 
     await waitFor(() => {
       expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
@@ -971,7 +967,7 @@ describe("Group profile details page", () => {
   });
 
   test("Open rotation threshold", async () => {
-    const { getByText, getAllByText } = render(
+    const { getByText, getAllByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
@@ -982,6 +978,10 @@ describe("Group profile details page", () => {
         />
       </Provider>
     );
+
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
 
     await waitFor(() => {
       expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
@@ -1013,7 +1013,7 @@ describe("Group profile details page", () => {
   });
 
   test("Open group member from rotation threshold", async () => {
-    const { getByText, getAllByText } = render(
+    const { getByText, getAllByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
@@ -1024,6 +1024,10 @@ describe("Group profile details page", () => {
         />
       </Provider>
     );
+
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
 
     await waitFor(() => {
       expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
@@ -1066,25 +1070,12 @@ describe("Group profile details page", () => {
         },
         toastMsgs: [],
         isOnline: true,
-        currentProfile: {
-          identity: filteredIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-        },
       },
       seedPhraseCache: {
         seedPhrase: "",
         bran: "bran",
       },
-      identifiersCache: {
-        identifiers: {
-          [filteredIdentifierFix[2].id]: filteredIdentifierFix[2],
-        },
-        favourites: [],
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         multisigConnections: {},
       },
@@ -1098,7 +1089,7 @@ describe("Group profile details page", () => {
       dispatch: dispatchMock,
     };
 
-    const { queryByTestId } = render(
+    const { queryByTestId, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
@@ -1109,6 +1100,10 @@ describe("Group profile details page", () => {
         />
       </Provider>
     );
+
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
 
     await waitFor(() =>
       expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
@@ -1142,25 +1137,13 @@ describe("Checking the profile details page when information is missing from the
         },
         toastMsgs: [],
         isOnline: true,
-        profileHistories: [],
-        currentProfile: {
-          identity: filteredIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-        },
       },
       seedPhraseCache: {
         seedPhrase:
           "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
         bran: "bran",
       },
-      identifiersCache: {
-        identifiers: filteredIdentifierFix,
-        favourites: [],
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         multisigConnections: {},
       },
@@ -1185,7 +1168,6 @@ describe("Checking the profile details page when information is missing from the
         />
       </Provider>
     );
-
     await waitFor(() => {
       expect(
         getByTestId("identifier-card-details-cloud-error-page")
@@ -1246,22 +1228,14 @@ describe("Set default profile when delete profile", () => {
         },
         toastMsgs: [],
         isOnline: true,
-        profileHistories: [
+      },
+      profilesCache: {
+        ...profileCacheFixData,
+        recentProfiles: [
           filteredIdentifierFix[0].id,
           filteredIdentifierFix[2].id,
           filteredIdentifierFix[1].id,
         ],
-        currentProfile: {
-          identity: filteredIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-        },
-      },
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
       },
     };
 
@@ -1281,6 +1255,7 @@ describe("Set default profile when delete profile", () => {
         />
       </Provider>
     );
+
     await waitFor(() =>
       expect(
         getByText(EN_TRANSLATIONS.profiledetails.delete.button)
@@ -1326,7 +1301,7 @@ describe("Set default profile when delete profile", () => {
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
-        setProfileHistories([
+        updateRecentProfiles([
           filteredIdentifierFix[0].id,
           filteredIdentifierFix[2].id,
         ])
@@ -1346,18 +1321,10 @@ describe("Set default profile when delete profile", () => {
         },
         toastMsgs: [],
         isOnline: true,
-        profileHistories: [],
-        currentProfile: {
-          identity: filteredIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-        },
       },
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
+      profilesCache: {
+        ...profileCacheFixData,
+        recentProfiles: [],
       },
     };
 
@@ -1419,7 +1386,7 @@ describe("Set default profile when delete profile", () => {
         })
       );
 
-      expect(dispatchMock).toBeCalledWith(setProfileHistories([]));
+      expect(dispatchMock).toBeCalledWith(updateRecentProfiles([]));
     });
   });
 
@@ -1436,19 +1403,20 @@ describe("Set default profile when delete profile", () => {
         toastMsgs: [],
         isOnline: true,
         profileHistories: [],
-        currentProfile: {
-          identity: filteredIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-        },
       },
-      identifiersCache: {
-        identifiers: {
-          [filteredIdentifierFix[0].id]: filteredIdentifierFix[0],
+      profilesCache: {
+        profiles: {
+          [filteredIdentifierFix[0].id]: {
+            identity: filteredIdentifierFix[0],
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+          },
         },
+        defaultProfile: filteredIdentifierFix[0].id,
+        recentProfiles: [],
       },
     };
 
@@ -1509,7 +1477,7 @@ describe("Set default profile when delete profile", () => {
       expect(Agent.agent.basicStorage.deleteById).toBeCalledWith(
         MiscRecordId.PROFILE_HISTORIES
       );
-      expect(dispatchMock).toBeCalledWith(setProfileHistories([]));
+      expect(dispatchMock).toBeCalledWith(updateRecentProfiles([]));
     });
   });
 });

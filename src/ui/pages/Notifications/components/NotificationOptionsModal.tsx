@@ -6,17 +6,17 @@ import {
 } from "ionicons/icons";
 import { useState } from "react";
 import { Agent } from "../../../../core/agent/agent";
+import { NotificationRoute } from "../../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../../i18n";
 import { useAppDispatch } from "../../../../store/hooks";
 import {
   deleteNotificationById,
   markNotificationAsRead,
-} from "../../../../store/reducers/notificationsCache";
+} from "../../../../store/reducers/profileCache";
 import { Alert } from "../../../components/Alert";
 import { OptionItem, OptionModal } from "../../../components/OptionsModal";
-import { NotificationOptionModalProps } from "./NotificationOptionsModal.types";
-import { NotificationRoute } from "../../../../core/agent/services/keriaNotificationService.types";
 import { showError } from "../../../utils/error";
+import { NotificationOptionModalProps } from "./NotificationOptionsModal.types";
 
 const NotificationOptionsModal = ({
   optionsIsOpen,

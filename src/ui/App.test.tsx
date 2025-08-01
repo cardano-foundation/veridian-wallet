@@ -209,26 +209,15 @@ const initialState = {
       isPaused: false,
     },
   },
-  seedPhraseCache: {
-    seedPhrase: "",
-    bran: "",
+  profilesCache: {
+    profiles: {},
+    defaultProfile: undefined,
   },
-  identifiersCache: {
-    identifiers: {},
-    favourites: [],
-    multiSigGroup: {
-      groupId: "",
-      connections: [],
-    },
-  },
-  credsCache: { creds: [], favourites: [] },
-  credsArchivedCache: { creds: [] },
   connectionsCache: {
     connections: {},
     multisigConnections: {},
   },
   walletConnectionsCache: {
-    walletConnections: [],
     connectedWallet: null,
     pendingConnection: null,
   },
@@ -248,9 +237,6 @@ const initialState = {
   ssiAgentCache: {
     bootUrl: "",
     connectUrl: "",
-  },
-  notificationsCache: {
-    notifications: [],
   },
 };
 
@@ -514,30 +500,15 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-      identifiersCache: {
-        identifiers: [],
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
@@ -549,9 +520,6 @@ describe("Witness availability", () => {
       ssiAgentCache: {
         bootUrl: "",
         connectUrl: "",
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
 
@@ -609,30 +577,15 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-      identifiersCache: {
-        identifiers: [],
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
@@ -644,9 +597,6 @@ describe("Witness availability", () => {
       ssiAgentCache: {
         bootUrl: "",
         connectUrl: "",
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
 
@@ -866,30 +816,15 @@ describe("System threat alert", () => {
         seedPhrase: "",
         bran: "",
       },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
@@ -901,9 +836,6 @@ describe("System threat alert", () => {
       ssiAgentCache: {
         bootUrl: "",
         connectUrl: "",
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
 

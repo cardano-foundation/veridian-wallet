@@ -5,10 +5,6 @@ import { useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  getIdentifiersCache,
-  updateOrAddIdentifiersCache,
-} from "../../../store/reducers/identifiersCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { DISPLAY_NAME_LENGTH } from "../../globals/constants";
 import { ToastMsgType } from "../../globals/types";
@@ -22,6 +18,10 @@ import { PageFooter } from "../PageFooter";
 import { PageHeader } from "../PageHeader";
 import "./EditProfile.scss";
 import { EditProfileProps } from "./EditProfile.types";
+import {
+  addOrUpdateProfileIdentity,
+  getProfiles,
+} from "../../../store/reducers/profileCache";
 
 const IDENTIFIER_NOT_EXIST = "Identifier not existed. id: ";
 const DUPLICATE_NAME = "Identifier name is a duplicate";
@@ -34,7 +34,7 @@ const EditProfile = ({
 }: EditProfileProps) => {
   const pageId = "edit-identifier";
   const dispatch = useAppDispatch();
-  const identifiersData = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
   const [isLoading, setLoading] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState(cardData.displayName);
   const [newSelectedTheme, setNewSelectedTheme] = useState(0);
@@ -87,15 +87,15 @@ const EditProfile = ({
     try {
       if (
         newDisplayName.trim() !== cardData.displayName.trim() &&
-        Object.values(identifiersData).some(
-          (item) => item.displayName === newDisplayName
+        Object.values(profiles).some(
+          (item) => item.identity.displayName === newDisplayName
         )
       ) {
         throw new Error(DUPLICATE_NAME);
       }
 
       setLoading(true);
-      const currentIdentifier = identifiersData[cardData.id];
+      const currentIdentifier = profiles[cardData.id];
 
       if (!currentIdentifier) {
         throw new Error(`${IDENTIFIER_NOT_EXIST} ${cardData.id}`);
@@ -103,7 +103,7 @@ const EditProfile = ({
 
       const theme = Number(`${newSelectedColor}${newSelectedTheme}`);
       const updatedIdentifier = {
-        ...currentIdentifier,
+        ...currentIdentifier.identity,
         displayName: newDisplayName,
         theme,
       };
@@ -117,7 +117,7 @@ const EditProfile = ({
         theme,
       });
       handleCancel();
-      dispatch(updateOrAddIdentifiersCache(updatedIdentifier));
+      dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_UPDATED));
     } catch (e) {
       if ((e as Error).message === DUPLICATE_NAME) {
