@@ -1,8 +1,6 @@
 import { IonIcon } from "@ionic/react";
 import { search } from "ionicons/icons";
-import {
-  RegularConnectionDetails,
-} from "../../../../../core/agent/agent.types";
+import { RegularConnectionDetails } from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
 import { CardItem, CardList } from "../../../../components/CardList";
 import { ListHeader } from "../../../../components/ListHeader";

@@ -109,7 +109,7 @@ const ConnectionsBody = ({
                       <AlphabeticList
                         items={Array.from(alphabeticGroup.value)}
                         handleShowConnectionDetails={(item) => {
-                            handleShowConnectionDetails(item);
+                          handleShowConnectionDetails(item);
                         }}
                       />
                     </IonItemGroup>
@@ -120,7 +120,7 @@ const ConnectionsBody = ({
                   keyword={search}
                   mappedConnections={mappedConnections}
                   onItemClick={(item) => {
-                      handleShowConnectionDetails(item);
+                    handleShowConnectionDetails(item);
                   }}
                 />
               )}

@@ -324,8 +324,14 @@ class ConnectionService extends AgentService {
     };
   }
 
-  async getConnectionById(contactId: string): Promise<MultisigConnectionDetailsFull>;
-  async getConnectionById(contactId: string, full: boolean, identifier: string): Promise<RegularConnectionDetailsFull>;
+  async getConnectionById(
+    contactId: string
+  ): Promise<MultisigConnectionDetailsFull>;
+  async getConnectionById(
+    contactId: string,
+    full: boolean,
+    identifier: string
+  ): Promise<RegularConnectionDetailsFull>;
   @OnlineOnly
   async getConnectionById(
     contactId: string,
@@ -556,8 +562,13 @@ class ConnectionService extends AgentService {
     }
   }
 
-  async getConnectionShortDetailById(id: string): Promise<MultisigConnectionDetails>;
-  async getConnectionShortDetailById(id: string, identifier: string): Promise<RegularConnectionDetails>;
+  async getConnectionShortDetailById(
+    id: string
+  ): Promise<MultisigConnectionDetails>;
+  async getConnectionShortDetailById(
+    id: string,
+    identifier: string
+  ): Promise<RegularConnectionDetails>;
   async getConnectionShortDetailById(
     id: string,
     identifier?: string

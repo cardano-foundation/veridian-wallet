@@ -78,7 +78,7 @@ const ConnectionDetails = ({
         false,
         connectionShortDetails.identifier
       );
-      
+
       setConnectionDetails(connectionDetails);
       setNotes(connectionDetails.notes);
       setConnectionHistory(connectionDetails.historyItems);

@@ -24,9 +24,7 @@ const AlphabeticList = ({
 
   return (
     <CardList
-      onCardClick={(connection) =>
-        handleShowConnectionDetails(connection)
-      }
+      onCardClick={(connection) => handleShowConnectionDetails(connection)}
       data={displayConnection}
       onRenderEndSlot={(data) =>
         data.status === ConnectionStatus.PENDING ||

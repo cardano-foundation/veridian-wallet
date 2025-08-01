@@ -80,7 +80,7 @@ const Connections = () => {
       dispatch(setOpenConnectionId(undefined));
       if (
         !connection ||
-        !('identifier' in connection) ||
+        !("identifier" in connection) ||
         connection.status === ConnectionStatus.PENDING ||
         connection.status === ConnectionStatus.FAILED
       ) {
@@ -118,9 +118,15 @@ const Connections = () => {
     }
   }, [connectionsCache]);
 
-  const getConnectionShortDetails = async (connectionId: string, identifier: string) => {
+  const getConnectionShortDetails = async (
+    connectionId: string,
+    identifier: string
+  ) => {
     const shortDetails =
-      await Agent.agent.connections.getConnectionShortDetailById(connectionId, identifier);
+      await Agent.agent.connections.getConnectionShortDetailById(
+        connectionId,
+        identifier
+      );
     setConnectionShortDetails(shortDetails);
   };
 

@@ -103,18 +103,21 @@ const CredentialDetailModule = ({
     }
   }, [dispatch]);
 
-  const getConnection = useCallback(async (connectionId: string, identifier: string) => {
-    try {
-      const shortDetails =
-        await Agent.agent.connections.getConnectionShortDetailById(
-          connectionId,
-          identifier
-        );
-      setConnectionShortDetails(shortDetails);
-    } catch (error) {
-      showError("Unable to load connection", error);
-    }
-  }, []);
+  const getConnection = useCallback(
+    async (connectionId: string, identifier: string) => {
+      try {
+        const shortDetails =
+          await Agent.agent.connections.getConnectionShortDetailById(
+            connectionId,
+            identifier
+          );
+        setConnectionShortDetails(shortDetails);
+      } catch (error) {
+        showError("Unable to load connection", error);
+      }
+    },
+    []
+  );
 
   const getCredDetails = useCallback(async () => {
     if (credDetail) {
