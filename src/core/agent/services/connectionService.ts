@@ -709,23 +709,48 @@ class ConnectionService extends AgentService {
   }
 
   async syncKeriaContacts(): Promise<void> {
+    const localIdentifiers = await this.identifierStorage.getAllIdentifiers();
+    const localAIDs = localIdentifiers.map((id) => id.id);
     const cloudContacts = await this.props.signifyClient.contacts().list();
-    const localContacts = await this.contactStorage.getAll();
 
-    const unSyncedData = cloudContacts.filter(
-      (contact: Contact) =>
-        !localContacts.find((item: ContactRecord) => contact.id == item.id)
-    );
+    for (const contact of cloudContacts) {
+      const contactExists = await this.contactStorage.findById(contact.id);
 
-    for (const contact of unSyncedData) {
-      await this.createConnectionMetadata(contact.id, {
-        alias: contact.alias,
-        oobi: contact.oobi,
-        groupId: contact.groupCreationId,
-        createdAtUTC: contact.createdAt,
-        sharedIdentifier: contact.sharedIdentifier ?? "",
-        creationStatus: CreationStatus.COMPLETE,
-      });
+      if (!contactExists) {
+        await this.contactStorage.save({
+          id: contact.id,
+          alias: contact.alias,
+          oobi: contact.oobi,
+          groupId: contact.groupCreationId as string | undefined,
+          createdAt: contact.groupCreationId
+            ? new Date(contact.createdAt as string)
+            : new Date(),
+        });
+      }
+
+      for (const key of Object.keys(contact)) {
+        const keyParts = key.split(":");
+        if (keyParts.length === 2 && keyParts[1] === "createdAt") {
+          const aid = keyParts[0];
+          if (localAIDs.includes(aid)) {
+            const pairId = `${aid}:${contact.id}`;
+            const pairExists = await this.connectionPairStorage.findById(
+              pairId
+            );
+
+            if (!pairExists) {
+              await this.connectionPairStorage.save({
+                id: pairId,
+                contactId: contact.id,
+                identifier: aid,
+                creationStatus: CreationStatus.COMPLETE,
+                pendingDeletion: false,
+                createdAt: new Date(contact[key] as string),
+              });
+            }
+          }
+        }
+      }
     }
   }
 

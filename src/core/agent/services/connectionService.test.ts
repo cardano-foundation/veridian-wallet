@@ -159,6 +159,7 @@ const credentialStorage = jest.mocked({
 const identifierStorage = jest.mocked({
   getIdentifierMetadata: jest.fn(),
   getIdentifierMetadataByGroupId: jest.fn(),
+  getAllIdentifiers: jest.fn(),
 });
 
 const basicStorage = jest.mocked({
@@ -914,60 +915,98 @@ describe("Connection service of agent", () => {
     expect(KeriOobi).toEqual(oobiPrefix + id);
   });
 
-  test("Should call createIdentifierMetadataRecord when there are un-synced KERI contacts", async () => {
+  test("Should sync unsynced KERI contacts and their connection pairs", async () => {
     const DATE = new Date();
-    contactListMock.mockReturnValue([
+    const localIdentifier = {
+      id: "EP48HXCPvtzGu0c90gG9fkOYiSoi6U5Am-XaqcoNHTBl",
+    };
+    const cloudContacts = [
       {
         id: "EBaDnyriYK_FAruigHO42avVN40fOlVSUxpxXJ1fNxFR",
         alias: "MyFirstContact",
-        oobi: "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org:3902/oobi/EBaDnyriYK_FAruigHO42avVN40fOlVSUxpxXJ1fNxFR/agent/EP48HXCPvtzGu0c90gG9fkOYiSoi6U5Am-XaqcoNHTBl",
+        oobi: "http://oobi.com/1",
         groupCreationId: "group-id",
         createdAt: DATE.toISOString(),
-        challenges: [],
-        wellKnowns: [],
-        sharedIdentifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
+        "EP48HXCPvtzGu0c90gG9fkOYiSoi6U5Am-XaqcoNHTBl:createdAt":
+          DATE.toISOString(),
       },
       {
         id: "ECTcHGs3EhJEdVTW10vm5pkiDlOXlR8bPBj9-8LSpZ3W",
         alias: "MySecondContact",
-        oobi: "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org:3902/oobi/ECTcHGs3EhJEdVTW10vm5pkiDlOXlR8bPBj9-8LSpZ3W/agent/EJMV0RgikXM7jyvXB9oOyKSZzo_AsYrEgP15Ly0dwzEL",
+        oobi: "http://oobi.com/2",
         createdAt: DATE.toISOString(),
-        challenges: [],
-        wellKnowns: [],
       },
-      {
-        id: "EA67QQC6C6OG4Pok44UHKegNS0YoQm3yxeZwJEbbdCXX",
-        alias: "ExistingContact",
-        oobi: "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org:3902/oobi/EA67QQC6C6OG4Pok44UHKegNS0YoQm3yxeZwJEbbdCXX/agent/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_zH",
-        createdAt: DATE.toISOString(),
-        challenges: [],
-        wellKnowns: [],
-      },
-    ]);
+    ];
 
-    eventEmitter.emit = jest.fn();
-    contactStorage.getAll = jest
+    identifierStorage.getAllIdentifiers = jest
       .fn()
-      .mockReturnValue([
-        { id: "EA67QQC6C6OG4Pok44UHKegNS0YoQm3yxeZwJEbbdCXX" },
-      ]);
+      .mockResolvedValue([localIdentifier]);
+    contactListMock.mockReturnValue(cloudContacts);
+    contactStorage.findById = jest.fn().mockResolvedValue(null);
+    connectionPairStorage.findById = jest.fn().mockResolvedValue(null);
 
     await connectionService.syncKeriaContacts();
 
     expect(contactStorage.save).toBeCalledTimes(2);
-    expect(contactStorage.save).toBeCalledWith({
+    expect(contactStorage.save).toHaveBeenCalledWith({
       id: "EBaDnyriYK_FAruigHO42avVN40fOlVSUxpxXJ1fNxFR",
       alias: "MyFirstContact",
       createdAt: DATE,
-      oobi: "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org:3902/oobi/EBaDnyriYK_FAruigHO42avVN40fOlVSUxpxXJ1fNxFR/agent/EP48HXCPvtzGu0c90gG9fkOYiSoi6U5Am-XaqcoNHTBl",
+      oobi: "http://oobi.com/1",
       groupId: "group-id",
     });
-    expect(contactStorage.save).toHaveBeenNthCalledWith(2, {
-      id: "ECTcHGs3EhJEdVTW10vm5pkiDlOXlR8bPBj9-8LSpZ3W",
-      alias: "MySecondContact",
+
+    expect(connectionPairStorage.save).toBeCalledTimes(1);
+    expect(connectionPairStorage.save).toHaveBeenCalledWith({
+      id: `${localIdentifier.id}:${cloudContacts[0].id}`,
+      contactId: cloudContacts[0].id,
+      identifier: localIdentifier.id,
+      creationStatus: CreationStatus.COMPLETE,
+      pendingDeletion: false,
       createdAt: DATE,
-      oobi: "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org:3902/oobi/ECTcHGs3EhJEdVTW10vm5pkiDlOXlR8bPBj9-8LSpZ3W/agent/EJMV0RgikXM7jyvXB9oOyKSZzo_AsYrEgP15Ly0dwzEL",
+    });
+  });
+
+  test("should restore connection pairs from cloud contact data during recovery", async () => {
+    const localIdentifier = { id: "Eabc123" };
+    const anotherLocalIdentifier = { id: "Fdef456" };
+    identifierStorage.getAllIdentifiers = jest
+      .fn()
+      .mockResolvedValue([localIdentifier, anotherLocalIdentifier]);
+
+    const cloudContact = {
+      id: "Dcontact1",
+      alias: "Test Contact",
+      oobi: "http://oobi.com/Dcontact1",
+      createdAt: "2025-01-01T00:00:00.000Z",
+      "Eabc123:createdAt": "2025-01-02T00:00:00.000Z",
+      "Xyz789:createdAt": "2025-01-03T00:00:00.000Z", // This one should be ignored
+    };
+    contactListMock.mockReturnValue([cloudContact]);
+    contactStorage.findById = jest.fn().mockResolvedValue(null);
+    connectionPairStorage.findById = jest.fn().mockResolvedValue(null);
+
+    await connectionService.syncKeriaContacts();
+
+    // Verify that the main contact record was saved
+    expect(contactStorage.save).toHaveBeenCalledTimes(1);
+    expect(contactStorage.save).toHaveBeenCalledWith({
+      id: "Dcontact1",
+      alias: "Test Contact",
+      oobi: "http://oobi.com/Dcontact1",
       groupId: undefined,
+      createdAt: expect.any(Date),
+    });
+
+    // Verify that the connection pair for the matching identifier was created
+    expect(connectionPairStorage.save).toHaveBeenCalledTimes(1);
+    expect(connectionPairStorage.save).toHaveBeenCalledWith({
+      id: "Eabc123:Dcontact1",
+      contactId: "Dcontact1",
+      identifier: "Eabc123",
+      creationStatus: CreationStatus.COMPLETE,
+      pendingDeletion: false,
+      createdAt: expect.any(Date),
     });
   });
 
@@ -1958,7 +1997,7 @@ describe("Connection service of agent", () => {
     expect(submitRpyMock.mock.calls[0][0]).toBe("connectionId");
     const rpyIms: string = submitRpyMock.mock.calls[0][1];
     expect(rpyIms.includes("/introduce"));
-    expect(rpyIms.includes('"http://oobi.com/oobi/ourIdentifier?name=Alice"'));
+    expect(rpyIms.includes("\"http://oobi.com/oobi/ourIdentifier?name=Alice\""));
   });
 
   test("Shared identifier OOBIs carry over the external ID hint", async () => {
@@ -1990,7 +2029,7 @@ describe("Connection service of agent", () => {
     expect(rpyIms.includes("/introduce"));
     expect(
       rpyIms.includes(
-        '"http://oobi.com/oobi/ourIdentifier?name=Alice&externalId=test123"'
+        "\"http://oobi.com/oobi/ourIdentifier?name=Alice&externalId=test123\""
       )
     );
   });
