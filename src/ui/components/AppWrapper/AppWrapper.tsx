@@ -40,6 +40,7 @@ import {
   setPeerConnections,
   setProfiles,
   updateOrAddCredsCache,
+  updatePeerConnectionsFromCore,
   updateRecentProfiles,
 } from "../../../store/reducers/profileCache";
 import {
@@ -173,7 +174,7 @@ const peerConnectedChangeHandler = async (
   const existingConnections =
     await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
 
-  dispatch(setPeerConnections(existingConnections));
+  dispatch(updatePeerConnectionsFromCore(existingConnections));
   const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
   const connectedWallet = existingConnections.find(
     (connection) =>

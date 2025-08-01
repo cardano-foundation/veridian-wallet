@@ -198,6 +198,30 @@ export const profilesCacheSlice = createSlice({
 
       defaultProfile.peerConnections = action.payload;
     },
+    updatePeerConnectionsFromCore: (
+      state,
+      action: PayloadAction<ConnectionData[]>
+    ) => {
+      const updateData: Record<string, ConnectionData[]> =
+        action.payload.reduce((result, item) => {
+          if (!item.selectedAid) return result;
+          let currentArr = result[item.selectedAid];
+
+          if (currentArr) {
+            currentArr.push(item);
+          } else {
+            currentArr = [item];
+          }
+
+          result[item.selectedAid] = currentArr;
+          return result;
+        }, {} as Record<string, ConnectionData[]>);
+
+      Object.keys(updateData).forEach((key) => {
+        if (!state.profiles[key]) return;
+        state.profiles[key].peerConnections = updateData[key];
+      });
+    },
     setIndividualFirstCreate: (state, action: PayloadAction<boolean>) => {
       state.individualFirstCreate = action.payload;
     },
@@ -225,6 +249,7 @@ export const {
   setIndividualFirstCreate,
   setCurrentProfile,
   setScanGroupId,
+  updatePeerConnectionsFromCore,
 } = profilesCacheSlice.actions;
 
 const getProfiles = (state: RootState) => state.profilesCache.profiles;

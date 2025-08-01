@@ -220,6 +220,7 @@ import {
   addOrUpdateProfileIdentity,
   setPeerConnections,
   updateOrAddCredsCache,
+  updatePeerConnectionsFromCore,
   updateProfileCreationStatus,
 } from "../../../store/reducers/profileCache";
 
@@ -356,7 +357,7 @@ describe("Peer connection states changed handler", () => {
       expect(dispatch).toBeCalledWith(setPendingConnection(null));
     });
     expect(dispatch).toBeCalledWith(
-      setPeerConnections(
+      updatePeerConnectionsFromCore(
         expect.arrayContaining([
           expect.objectContaining({
             id: mockPeerConnectionPairRecordInstance.id,
