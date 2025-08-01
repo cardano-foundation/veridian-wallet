@@ -80,12 +80,13 @@ const Connections = () => {
       dispatch(setOpenConnectionId(undefined));
       if (
         !connection ||
+        !('identifier' in connection) ||
         connection.status === ConnectionStatus.PENDING ||
         connection.status === ConnectionStatus.FAILED
       ) {
         return;
       } else {
-        await getConnectionShortDetails(openDetailId);
+        await getConnectionShortDetails(openDetailId, connection.identifier);
       }
     };
 
@@ -117,11 +118,10 @@ const Connections = () => {
     }
   }, [connectionsCache]);
 
-  const getConnectionShortDetails = async (connectionId: string) => {
+  const getConnectionShortDetails = async (connectionId: string, identifier: string) => {
     const shortDetails =
-      await Agent.agent.connections.getConnectionShortDetailById(connectionId);
-    // Connections page only shows details for regular connections
-    setConnectionShortDetails(shortDetails as RegularConnectionDetails);
+      await Agent.agent.connections.getConnectionShortDetailById(connectionId, identifier);
+    setConnectionShortDetails(shortDetails);
   };
 
   const fetchOobi = useCallback(async () => {

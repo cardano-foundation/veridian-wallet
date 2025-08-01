@@ -20,10 +20,14 @@ import {
   ConnectionStatus,
   CreationStatus,
   DOOBI_RE,
+  MultisigConnectionDetails,
+  MultisigConnectionDetailsFull,
   OobiType,
   OOBI_AGENT_ONLY_RE,
   OOBI_RE,
   OobiScan,
+  RegularConnectionDetails,
+  RegularConnectionDetailsFull,
   WOOBI_RE,
 } from "../agent.types";
 import {
@@ -320,6 +324,8 @@ class ConnectionService extends AgentService {
     };
   }
 
+  async getConnectionById(id: string, full?: boolean): Promise<MultisigConnectionDetailsFull>;
+  async getConnectionById(id: string, full: boolean, identifier: string): Promise<RegularConnectionDetailsFull>;
   @OnlineOnly
   async getConnectionById(
     id: string,
@@ -550,10 +556,12 @@ class ConnectionService extends AgentService {
     }
   }
 
+  async getConnectionShortDetailById(id: string): Promise<MultisigConnectionDetails>;
+  async getConnectionShortDetailById(id: string, identifier: string): Promise<RegularConnectionDetails>;
   async getConnectionShortDetailById(
     id: string,
     identifier?: string
-  ): Promise<ConnectionShortDetails> {
+  ): Promise<MultisigConnectionDetails | RegularConnectionDetails> {
     const metadata = await this.getContactMetadataById(id, identifier);
     return this.getConnectionShortDetails(metadata);
   }

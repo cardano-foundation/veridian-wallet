@@ -103,14 +103,14 @@ const CredentialDetailModule = ({
     }
   }, [dispatch]);
 
-  const getConnection = useCallback(async (connectionId: string) => {
+  const getConnection = useCallback(async (connectionId: string, identifier: string) => {
     try {
       const shortDetails =
         await Agent.agent.connections.getConnectionShortDetailById(
-          connectionId
+          connectionId,
+          identifier
         );
-      // Credentials are only associated with regular connections
-      setConnectionShortDetails(shortDetails as RegularConnectionDetails);
+      setConnectionShortDetails(shortDetails);
     } catch (error) {
       showError("Unable to load connection", error);
     }
@@ -119,7 +119,7 @@ const CredentialDetailModule = ({
   const getCredDetails = useCallback(async () => {
     if (credDetail) {
       setCardData(credDetail);
-      getConnection(credDetail.i);
+      getConnection(credDetail.i, credDetail.identifierId);
       return;
     }
 
@@ -129,7 +129,7 @@ const CredentialDetailModule = ({
       const cardDetails =
         await Agent.agent.credentials.getCredentialDetailsById(id);
       setCardData(cardDetails);
-      getConnection(cardDetails.i);
+      getConnection(cardDetails.i, cardDetails.identifierId);
     } catch (error) {
       setCloudError(true);
       showError("Unable to get credential detail", error);

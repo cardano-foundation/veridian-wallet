@@ -15,7 +15,7 @@ interface ConnectionsBodyProps {
 interface SearchConnectionListProps {
   title: string;
   testId: string;
-  connections: ConnectionShortDetails[];
+  connections: RegularConnectionDetails[];
   onItemClick: (item: RegularConnectionDetails) => void;
 }
 

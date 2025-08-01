@@ -1,7 +1,6 @@
 import { IonChip, IonIcon } from "@ionic/react";
 import { hourglassOutline } from "ionicons/icons";
 import {
-  ConnectionShortDetails,
   RegularConnectionDetails,
   ConnectionStatus,
 } from "../../../../core/agent/agent.types";
@@ -12,7 +11,7 @@ const AlphabeticList = ({
   items,
   handleShowConnectionDetails,
 }: {
-  items: ConnectionShortDetails[];
+  items: RegularConnectionDetails[];
   handleShowConnectionDetails: (item: RegularConnectionDetails) => void;
 }) => {
   const displayConnection = items.map((connection) => ({
@@ -26,7 +25,7 @@ const AlphabeticList = ({
   return (
     <CardList
       onCardClick={(connection) =>
-        handleShowConnectionDetails(connection as RegularConnectionDetails)
+        handleShowConnectionDetails(connection)
       }
       data={displayConnection}
       onRenderEndSlot={(data) =>

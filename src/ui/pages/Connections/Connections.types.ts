@@ -1,4 +1,4 @@
-import { ConnectionShortDetails } from "../../../core/agent/agent.types";
+import { ConnectionShortDetails, RegularConnectionDetails } from "../../../core/agent/agent.types";
 
 interface ConnectionsOptionRef {
   handleConnectModalButton: () => void;
@@ -12,7 +12,7 @@ interface ConnectionItemProps {
 
 interface MappedConnections {
   key: string;
-  value: ConnectionShortDetails[];
+  value: RegularConnectionDetails[];
 }
 
 interface ConnectionRequestData {

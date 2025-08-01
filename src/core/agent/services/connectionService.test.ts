@@ -802,11 +802,13 @@ describe("Connection service of agent", () => {
     expect(KeriOobi).toEqual(`${oobiPrefix}${id}?name=alias&groupId=123`);
   });
 
-  test("can get connection short details by id without identifier", async () => {
+  test("can get connection short details by id", async () => {
     contactStorage.findById = jest.fn().mockResolvedValue({
       id: contacts[0].id,
-      createdAt: now,
       alias: "keri",
+      oobi: "test-oobi",
+      groupId: "test-group",
+      createdAt: now,
       creationStatus: CreationStatus.COMPLETE,
     });
     expect(
@@ -816,6 +818,7 @@ describe("Connection service of agent", () => {
       createdAtUTC: nowISO,
       label: "keri",
       status: ConnectionStatus.CONFIRMED,
+      groupId: "test-group",
     });
     expect(contactStorage.findById).toBeCalledWith(contacts[0].id);
   });
@@ -1101,7 +1104,7 @@ describe("Connection service of agent", () => {
 
   test("Should throw error when KERIA is offline", async () => {
     await expect(
-      connectionService.getConnectionById("id")
+      connectionService.getConnectionById("id", false)
     ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
     await expect(
       connectionService.deleteConnectionByIdAndIdentifier("id", "identifier")

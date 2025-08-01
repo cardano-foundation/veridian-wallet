@@ -78,9 +78,8 @@ const ConnectionDetails = ({
         false,
         connectionShortDetails.identifier
       );
-
-      // Since this component only handles regular connections, cast to RegularConnectionDetailsFull
-      setConnectionDetails(connectionDetails as RegularConnectionDetailsFull);
+      
+      setConnectionDetails(connectionDetails);
       setNotes(connectionDetails.notes);
       setConnectionHistory(connectionDetails.historyItems);
     } catch (error) {

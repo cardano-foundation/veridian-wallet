@@ -1,7 +1,6 @@
 import { IonIcon } from "@ionic/react";
 import { search } from "ionicons/icons";
 import {
-  ConnectionShortDetails,
   RegularConnectionDetails,
 } from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
@@ -20,7 +19,7 @@ const SearchConnectionList = ({
   title,
 }: SearchConnectionListProps) => {
   const cardListData = connections.map(
-    (connection): CardItem<ConnectionShortDetails> => {
+    (connection): CardItem<RegularConnectionDetails> => {
       return {
         id: connection.id,
         title: connection.label,
@@ -37,7 +36,7 @@ const SearchConnectionList = ({
         className="connections-card-list"
         data={cardListData}
         lines="none"
-        onCardClick={(item) => onItemClick(item as RegularConnectionDetails)}
+        onCardClick={(item) => onItemClick(item)}
         testId={`${testId}-list`}
       />
     </div>
@@ -80,7 +79,7 @@ const SearchConnectionContent = ({
       <SearchConnectionList
         title={`${i18n.t("tabs.connections.tab.search.connections")}`}
         connections={connections}
-        onItemClick={(item) => onItemClick(item as RegularConnectionDetails)}
+        onItemClick={(item) => onItemClick(item)}
         testId="connection-search"
       />
     </div>
