@@ -6,12 +6,13 @@ import EN_TRANSLATIONS from "../../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../../routes/paths";
 import { connectionsForNotifications } from "../../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../../__fixtures__/credRequestFix";
+import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
 import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
+import { profileCacheFixData } from "../../../../../__fixtures__/storeDataFix";
+import { makeTestStore } from "../../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
-import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
-import { filteredIdentifierMapFix } from "../../../../../__fixtures__/filteredIdentifierFix";
-import { makeTestStore } from "../../../../../utils/makeTestStore";
+import { filteredCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -63,24 +64,16 @@ const initialState = {
   connectionsCache: {
     connections: connectionsForNotifications,
   },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
-  credsCache: {
-    creds: [{ ...credsFixAcdc[0], id: "cred-id" }],
-  },
-  credsArchivedCache: {
-    creds: [],
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
   },
 };
 
 describe("Credential request information", () => {
+  beforeEach(() => {
+    getOfferedCredentialSaid.mockImplementation(() => "cred-id");
+  });
   test("Render and decline", async () => {
     const storeMocked = {
       ...makeTestStore(initialState),
@@ -488,9 +481,6 @@ describe("Credential request information: multisig", () => {
     const storeMocked = {
       ...makeTestStore({
         ...initialState,
-        credsCache: {
-          creds: [],
-        },
       }),
       dispatch: dispatchMock,
     };
@@ -602,9 +592,6 @@ describe("Credential request information: multisig", () => {
     const storeMocked = {
       ...makeTestStore({
         ...initialState,
-        credsCache: {
-          creds: [],
-        },
       }),
       dispatch: dispatchMock,
     };
@@ -775,6 +762,7 @@ describe("Credential request information: multisig", () => {
   });
 
   test("Member open request and accepts proposal from initiator", async () => {
+    getOfferedCredentialSaid.mockImplementation(() => filteredCredsFix[0].id);
     const linkedGroup = {
       linkedRequest: {
         accepted: false,
@@ -938,12 +926,6 @@ describe("Credential request information: multisig", () => {
     const storeMocked = {
       ...makeTestStore({
         ...initialState,
-        credsCache: {
-          creds: [],
-        },
-        credsArchivedCache: {
-          creds: [{ ...credsFixAcdc[0], id: "cred-id" }],
-        },
       }),
       dispatch: dispatchMock,
     };
@@ -1369,6 +1351,7 @@ describe("Credential request information: multisig", () => {
   });
 
   test("Member opens request before accepting but proposed credential is missing, before threshold is met", async () => {
+    getOfferedCredentialSaid.mockImplementation(() => "cred-id");
     const linkedGroup = {
       linkedRequest: {
         accepted: false,
@@ -1400,9 +1383,6 @@ describe("Credential request information: multisig", () => {
     const storeMocked = {
       ...makeTestStore({
         ...initialState,
-        credsCache: {
-          creds: credsFixAcdc,
-        },
       }),
       dispatch: dispatchMock,
     };
@@ -1484,6 +1464,7 @@ describe("Credential request information: multisig", () => {
   });
 
   test("Member opens request before accepting but proposed credential is missing, after threshold met", async () => {
+    getOfferedCredentialSaid.mockImplementation(() => "cred-id");
     const linkedGroup = {
       linkedRequest: {
         accepted: false,
@@ -1515,9 +1496,6 @@ describe("Credential request information: multisig", () => {
     const storeMocked = {
       ...makeTestStore({
         ...initialState,
-        credsCache: {
-          creds: credsFixAcdc,
-        },
       }),
       dispatch: dispatchMock,
     };
@@ -1599,6 +1577,7 @@ describe("Credential request information: multisig", () => {
   });
 
   test("Member opens request after accepting but proposed credential is missing, before threshold is met", async () => {
+    getOfferedCredentialSaid.mockImplementation(() => "cred-id");
     const linkedGroup = {
       linkedRequest: {
         accepted: true,
@@ -1630,9 +1609,6 @@ describe("Credential request information: multisig", () => {
     const storeMocked = {
       ...makeTestStore({
         ...initialState,
-        credsCache: {
-          creds: credsFixAcdc,
-        },
       }),
       dispatch: dispatchMock,
     };
@@ -1714,6 +1690,7 @@ describe("Credential request information: multisig", () => {
   });
 
   test("Member opens request after accepting but proposed credential is missing, after threshold is met", async () => {
+    getOfferedCredentialSaid.mockImplementation(() => "cred-id");
     const linkedGroup = {
       linkedRequest: {
         accepted: true,
@@ -1745,9 +1722,6 @@ describe("Credential request information: multisig", () => {
     const storeMocked = {
       ...makeTestStore({
         ...initialState,
-        credsCache: {
-          creds: credsFixAcdc,
-        },
       }),
       dispatch: dispatchMock,
     };
@@ -1829,6 +1803,7 @@ describe("Credential request information: multisig", () => {
   });
 
   test("Open proposed cred", async () => {
+    getOfferedCredentialSaid.mockImplementation(() => filteredCredsFix[0].id);
     const linkedGroup = {
       linkedRequest: {
         accepted: true,
@@ -1860,9 +1835,6 @@ describe("Credential request information: multisig", () => {
     const storeMocked = {
       ...makeTestStore({
         ...initialState,
-        credsCache: {
-          creds: [{ ...credsFixAcdc[0], id: "cred-id" }],
-        },
       }),
       dispatch: dispatchMock,
     };

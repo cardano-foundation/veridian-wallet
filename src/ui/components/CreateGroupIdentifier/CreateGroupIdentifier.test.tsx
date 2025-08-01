@@ -9,6 +9,7 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CreateGroupIdentifier } from "./CreateGroupIdentifier";
 import { setGroupProfileCache } from "../../../store/reducers/profileCache";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 setupIonicReact();
 mockIonicReact();
@@ -50,9 +51,7 @@ describe("Create Identifier modal", () => {
       },
       isOnline: true,
     },
-    identifiersCache: {
-      identifiers: {},
-    },
+    profilesCache: profileCacheFixData,
     biometricsCache: {
       enabled: false,
     },

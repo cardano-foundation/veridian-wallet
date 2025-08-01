@@ -15,7 +15,6 @@ import {
   setOpenConnectionId,
 } from "../../../store/reducers/connectionsCache";
 import {
-  getCurrentProfile,
   setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
@@ -37,6 +36,7 @@ import { ConnectionsBody } from "./components/ConnectionsBody";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
+import { getCurrentProfile } from "../../../store/reducers/profileCache";
 
 const Connections = () => {
   const pageId = "connections-tab";
@@ -201,7 +201,7 @@ const Connections = () => {
           />
         </IonButton>
         <Avatar
-          id={currentProfile?.identity.id}
+          id={currentProfile?.identity.id || ""}
           handleAvatarClick={handleAvatarClick}
         />
       </>

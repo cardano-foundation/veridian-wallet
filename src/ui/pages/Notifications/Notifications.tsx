@@ -11,13 +11,11 @@ import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
+  getCurrentProfile,
   getNotificationsCache,
   markNotificationAsRead,
 } from "../../../store/reducers/profileCache";
-import {
-  getCurrentProfile,
-  setCurrentRoute,
-} from "../../../store/reducers/stateCache";
+import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
 import { Avatar } from "../../components/Avatar";
 import { AvatarProps } from "../../components/Avatar/Avatar.types";
@@ -198,7 +196,7 @@ const Notifications = () => {
   }) => {
     return (
       <Avatar
-        id={currentProfile.identity.id}
+        id={currentProfile?.identity.id || ""}
         handleAvatarClick={handleAvatarClick}
       />
     );

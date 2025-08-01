@@ -23,6 +23,8 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { Scanner } from "./Scanner";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -171,14 +173,7 @@ describe("Scanner", () => {
       currentOperation: OperationType.SCAN_WALLET_CONNECTION,
       toastMsgs: [],
     },
-    identifiersCache: {
-      identifiers: {},
-      favourites: [],
-      multiSigGroup: {
-        groupId: "",
-        connections: [],
-      },
-    },
+    profilesCache: profileCacheFixData,
     connectionsCache: {
       connections: {},
       multisigConnections: {},
@@ -350,10 +345,7 @@ describe("Scanner", () => {
         currentOperation: OperationType.MULTI_SIG_INITIATOR_SCAN,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
-        scanGroupId: "mock",
-      },
+      profilesCache: { profileCacheFixData, scanGroupId: "mock" },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
@@ -422,8 +414,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.MULTI_SIG_INITIATOR_SCAN,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
         scanGroupId: "72e2f089cef6",
         multiSigGroup: {
           connections: [connectionsFix[0]],
@@ -479,9 +471,12 @@ describe("Scanner", () => {
         currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
         scanGroupId: "72e2f089cef6",
+        multiSigGroup: {
+          connections: [connectionsFix[0]],
+        },
       },
       connectionsCache: {
         connections: {},
@@ -569,8 +564,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -608,9 +603,7 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_SSI_BOOT_URL,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         connections: {},
         multisigConnections: {},
@@ -678,8 +671,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_SSI_CONNECT_URL,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -748,10 +741,22 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {
-          [identifierFix[0].id]: identifierFix[0],
+
+      profilesCache: {
+        profiles: {
+          [filteredIdentifierFix[0].id]: {
+            identity: filteredIdentifierFix[0],
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [],
+          },
         },
+        defaultProfile: filteredIdentifierFix[0].id,
+        recentProfiles: [],
+        multiSigGroup: undefined,
       },
       connectionsCache: {
         connections: {},
@@ -831,8 +836,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -905,8 +910,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -977,8 +982,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -1037,8 +1042,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -1083,11 +1088,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {
-          [identifierFix[0].id]: identifierFix[0],
-          [identifierFix[1].id]: identifierFix[1],
-        },
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -1177,10 +1179,21 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {
-          [identifierFix[0].id]: identifierFix[0],
+      profilesCache: {
+        profiles: {
+          [filteredIdentifierFix[0].id]: {
+            identity: filteredIdentifierFix[0],
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [],
+          },
         },
+        defaultProfile: filteredIdentifierFix[0].id,
+        recentProfiles: [],
+        multiSigGroup: undefined,
       },
       connectionsCache: {
         connections: {},

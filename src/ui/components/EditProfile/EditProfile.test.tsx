@@ -11,6 +11,7 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { EditProfile } from "./EditProfile";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 const updateMock = jest.fn();
 
@@ -93,9 +94,7 @@ describe("Edit profile", () => {
           passwordIsSet: true,
         },
       },
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
-      },
+      profilesCache: profileCacheFixData,
     };
     mockedStore = {
       ...makeTestStore(initialState),

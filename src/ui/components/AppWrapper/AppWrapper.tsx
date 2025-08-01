@@ -40,6 +40,7 @@ import {
   setPeerConnections,
   setProfiles,
   updateOrAddCredsCache,
+  updateRecentProfiles,
 } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
@@ -54,7 +55,6 @@ import {
   setIsOnline,
   setIsSetupProfile,
   setPauseQueueIncomingRequest,
-  setProfileHistories,
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert,
@@ -377,7 +377,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
         : [];
 
       if (profileHistories) {
-        dispatch(setProfileHistories(profileHistories));
+        dispatch(updateRecentProfiles(profileHistories));
       }
 
       const identifiersDict = storedIdentifiers.reduce(
@@ -402,7 +402,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
             credsArchivedCache,
             storedPeerConnections,
             notifications,
-            currentProfileAid
+            identifier.id
           );
 
           acc[identifier.id] = {

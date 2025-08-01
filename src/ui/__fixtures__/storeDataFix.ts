@@ -1,4 +1,3 @@
-import { CreationStatus } from "../../core/agent/agent.types";
 import { RootState } from "../../store";
 import { Profile, ProfileCache } from "../../store/reducers/profileCache";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
@@ -88,22 +87,6 @@ export const storeStateFixData: RootState = {
       isPaused: false,
     },
     toastMsgs: [],
-    currentProfile: {
-      identity: {
-        id: "",
-        displayName: "",
-        createdAtUTC: "",
-        theme: 0,
-        creationStatus: CreationStatus.PENDING,
-      },
-      connections: [],
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
-      notifications: [],
-    },
-    profileHistories: [],
   },
   seedPhraseCache: {
     seedPhrase: "",

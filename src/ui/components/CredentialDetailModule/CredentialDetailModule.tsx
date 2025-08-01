@@ -16,6 +16,7 @@ import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import {
+  getCredsArchivedCache,
   getCredsCache,
   getNotificationsCache,
   setCredsArchivedCache,
@@ -27,6 +28,11 @@ import {
   setCurrentOperation,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
+import {
+  addFavouritesCredsCache,
+  getFavouritesCredsCache,
+  removeFavouritesCredsCache,
+} from "../../../store/reducers/viewTypeCache";
 import "../../components/CardDetails/CardDetails.scss";
 import { MAX_FAVOURITES } from "../../globals/constants";
 import { OperationType, ToastMsgType } from "../../globals/types";
@@ -48,11 +54,6 @@ import {
   BackReason,
   CredentialDetailModuleProps,
 } from "./CredentialDetailModule.types";
-import {
-  addFavouritesCredsCache,
-  getFavouritesCredsCache,
-  removeFavouritesCredsCache,
-} from "../../../store/reducers/viewTypeCache";
 
 const CredentialDetailModule = ({
   pageId,
@@ -70,6 +71,7 @@ const CredentialDetailModule = ({
   const setSelected = isLightMode ? props.setSelected : undefined;
   const dispatch = useAppDispatch();
   const credsCache = useAppSelector(getCredsCache);
+  const archivedCred = useAppSelector(getCredsArchivedCache);
   const biometrics = useAppSelector(getBiometricsCache);
   const favouritesCredsCache = useAppSelector(getFavouritesCredsCache);
   const passwordAuthentication =
@@ -83,7 +85,7 @@ const CredentialDetailModule = ({
   const [cardData, setCardData] = useState<ACDCDetails>();
   const [hidden, setHidden] = useState(false);
   const [openConnectionlModal, setOpenConnectionlModal] = useState(false);
-  const isArchived = credsCache.filter((item) => item.id === id).length === 0;
+  const isArchived = archivedCred.some((item) => item.id === id);
   const isRevoked = cardData?.status === CredentialStatus.REVOKED;
   const isFavourite = favouritesCredsCache?.some((fav) => fav.id === id);
   const [cloudError, setCloudError] = useState(false);

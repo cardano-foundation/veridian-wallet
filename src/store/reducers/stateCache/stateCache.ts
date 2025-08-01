@@ -1,7 +1,6 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Salter } from "signify-ts";
-import { CreationStatus } from "../../../core/agent/agent.types";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
 import { OperationType, ToastMsgType } from "../../../ui/globals/types";
 import { RootState } from "../../index";
@@ -18,23 +17,6 @@ const initialState: StateCacheProps = {
   recoveryCompleteNoInterruption: false,
   isOnline: false,
   routes: [],
-  currentProfile: {
-    identity: {
-      id: "",
-      displayName: "",
-      createdAtUTC: "",
-      theme: 0,
-      // TODO: default status ??
-      creationStatus: CreationStatus.PENDING,
-    },
-    connections: [],
-    multisigConnections: [],
-    peerConnections: [],
-    credentials: [],
-    archivedCredentials: [],
-    notifications: [],
-  },
-  profileHistories: [],
   authentication: {
     loggedIn: false,
     userName: "",
@@ -207,15 +189,6 @@ const stateCacheSlice = createSlice({
     setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
       state.isSetupProfile = action.payload;
     },
-    setCurrentProfile: (
-      state,
-      action: PayloadAction<StateCacheProps["currentProfile"]>
-    ) => {
-      state.currentProfile = action.payload;
-    },
-    setProfileHistories: (state, action: PayloadAction<string[]>) => {
-      state.profileHistories = action.payload;
-    },
   },
 });
 
@@ -245,8 +218,6 @@ const {
   clearStateCache,
   showGlobalLoading,
   setIsSetupProfile,
-  setCurrentProfile,
-  setProfileHistories,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -279,9 +250,6 @@ const getForceInitApp = (state: RootState) => state.stateCache.forceInitApp;
 const getGlobalLoading = (state: RootState) => state.stateCache.showLoading;
 const getShowSetupProfilePage = (state: RootState) =>
   state.stateCache.isSetupProfile;
-const getCurrentProfile = (state: RootState) => state.stateCache.currentProfile;
-const getProfileHistories = (state: RootState) =>
-  state.stateCache.profileHistories;
 
 export type {
   AuthenticationCacheProps,
@@ -296,7 +264,6 @@ export {
   getAuthentication,
   getCameraDirection,
   getCurrentOperation,
-  getCurrentProfile,
   getCurrentRoute,
   getFirstAppLaunch,
   getForceInitApp,
@@ -304,7 +271,6 @@ export {
   getInitializationPhase,
   getIsOnline,
   getLoginAttempt,
-  getProfileHistories,
   getQueueIncomingRequest,
   getRecoveryCompleteNoInterruption,
   getRoutes,
@@ -324,7 +290,6 @@ export {
   setAuthentication,
   setCameraDirection,
   setCurrentOperation,
-  setCurrentProfile,
   setCurrentRoute,
   setFirstAppLaunchComplete,
   setInitializationPhase,
@@ -332,7 +297,6 @@ export {
   setIsSetupProfile,
   setLoginAttempt,
   setPauseQueueIncomingRequest,
-  setProfileHistories,
   setQueueIncomingRequest,
   setRecoveryCompleteNoInterruption,
   setToastMsg,

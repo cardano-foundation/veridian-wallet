@@ -70,7 +70,7 @@ const ProfileDetailsModule = ({
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${profile.id}`,
-        userName
+        profile.displayName
       );
       if (oobiValue) {
         setOobi(oobiValue);
@@ -117,8 +117,8 @@ const ProfileDetailsModule = ({
       const filterId = profile
         ? profile.id
         : cloudError
-          ? profileId
-          : undefined;
+        ? profileId
+        : undefined;
 
       await deleteIdentifier();
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));

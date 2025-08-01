@@ -14,7 +14,7 @@ import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { ProfileSetup } from "./ProfileSetup";
@@ -99,15 +99,11 @@ describe("Individual setup", () => {
         },
         firstAppLaunch: true,
       },
-      profileHistories: [],
     },
     connectionsCache: {
       connections: connectionsFix,
     },
-    identifiersCache: {
-      identifiers: filteredIdentifierFix,
-      favourites: [],
-    },
+    profilesCache: profileCacheFixData,
   });
 
   const dispatchMock = jest.fn();
@@ -358,10 +354,7 @@ describe("Profile setup: use as modal", () => {
     connectionsCache: {
       connections: connectionsFix,
     },
-    identifiersCache: {
-      identifiers: filteredIdentifierFix,
-      favourites: [],
-    },
+    profilesCache: profileCacheFixData,
   });
 
   const dispatchMock = jest.fn();

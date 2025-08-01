@@ -4,10 +4,7 @@ import { useState } from "react";
 import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
-import {
-  getCurrentProfile,
-  setCurrentOperation,
-} from "../../../../../store/reducers/stateCache";
+import { setCurrentOperation } from "../../../../../store/reducers/stateCache";
 import {
   getPendingConnection,
   setIsConnecting,
@@ -24,6 +21,7 @@ import { SidePageContentProps } from "../../../SidePage/SidePage.types";
 import { ANIMATION_DURATION } from "../../../SideSlider/SideSlider.types";
 import "./WalletConnect.scss";
 import {
+  getCurrentProfile,
   getPeerConnections,
   setPeerConnections,
 } from "../../../../../store/reducers/profileCache";
@@ -56,6 +54,7 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
   };
 
   const handleAccept = async () => {
+    if (!defaultProfile) return;
     const pendingDAppMeerkat = pendingConnection.meerkatId;
     const peerConnectionId = `${pendingDAppMeerkat}:${defaultProfile.identity.id}`;
 

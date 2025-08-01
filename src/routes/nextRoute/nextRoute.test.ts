@@ -48,21 +48,6 @@ describe("NextRoute", () => {
           firstAppLaunch: false,
           finishSetupBiometrics: false,
         },
-        currentProfile: {
-          identity: {
-            id: "",
-            displayName: "",
-            createdAtUTC: "",
-            theme: 0,
-            creationStatus: CreationStatus.PENDING,
-          },
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        },
         toastMsgs: [],
         currentOperation: OperationType.IDLE,
         queueIncomingRequest: {
@@ -70,7 +55,6 @@ describe("NextRoute", () => {
           queues: [],
           isPaused: false,
         },
-        profileHistories: [],
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -324,22 +308,6 @@ describe("getNextRoute", () => {
         queues: [],
         isPaused: false,
       },
-      currentProfile: {
-        identity: {
-          id: "",
-          displayName: "",
-          createdAtUTC: "",
-          theme: 0,
-          creationStatus: CreationStatus.PENDING,
-        },
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
-        notifications: [],
-      },
-      profileHistories: [],
     },
     profilesCache: {
       profiles: {},

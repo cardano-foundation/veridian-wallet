@@ -18,7 +18,11 @@ import { MultiSigService } from "../../../../../core/agent/services/multiSigServ
 import { KeyStoreKeys } from "../../../../../core/storage";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { makeTestStore } from "../../../../utils/makeTestStore";
-import { setNotificationsCache } from "../../../../../store/reducers/profileCache";
+import {
+  deleteNotificationById,
+  setNotificationsCache,
+} from "../../../../../store/reducers/profileCache";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 
 mockIonicReact();
 
@@ -81,15 +85,10 @@ const initialState = {
   connectionsCache: {
     connections: connectionsForNotifications,
   },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
   biometricsCache: {
     enabled: false,
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierFix,
-  },
+  profilesCache: profileCacheFixData,
 };
 
 describe("Multisign request", () => {
@@ -191,12 +190,10 @@ describe("Multisign request", () => {
       );
     });
 
-    const newNotification = notificationsFix.filter(
-      (notification) => notification.id !== notificationsFix[3].id
-    );
-
     expect(backMock).toBeCalled();
-    expect(dispatchMock).lastCalledWith(setNotificationsCache(newNotification));
+    expect(dispatchMock).lastCalledWith(
+      deleteNotificationById(notificationsFix[3].id)
+    );
   });
 
   test("Show error page", async () => {

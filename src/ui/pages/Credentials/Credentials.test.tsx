@@ -3,7 +3,6 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { setCredsCache } from "../../../store/reducers/profileCache";
@@ -11,11 +10,12 @@ import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { setCredentialsFilters } from "../../../store/reducers/viewTypeCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { pendingCredFixs } from "../../__fixtures__/credsFix";
-import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
 import {
-  filteredIdentifierFix,
-  filteredIdentifierMapFix,
-} from "../../__fixtures__/filteredIdentifierFix";
+  filteredCredsFix,
+  pendingCredFix,
+} from "../../__fixtures__/filteredCredsFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Credentials } from "./Credentials";
@@ -57,33 +57,19 @@ const initialStateEmpty = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
-      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
     },
     isOnline: true,
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: [],
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
-    },
   },
   seedPhraseCache: {},
-  credsCache: {
-    creds: [],
-  },
-  credsArchivedCache: {
-    creds: filteredCredsFix,
-  },
   connectionsCache: {
     connections: [],
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    defaultProfile: filteredIdentifierFix[2].id,
   },
   viewTypeCache: {
     identifier: {
@@ -119,36 +105,24 @@ const initialStateFull = {
     },
   },
   seedPhraseCache: {},
-  credsCache: {
-    creds: filteredCredsFix,
-    favourites: [
-      {
-        id: filteredCredsFix[0].id,
-        time: 1,
-      },
-      {
-        id: filteredCredsFix[1].id,
-        time: 2,
-      },
-    ],
-  },
-  credsArchivedCache: {
-    creds: filteredCredsFix,
-  },
   connectionsCache: {
     connections: connectionsFix,
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
-  },
+  profilesCache: profileCacheFixData,
   viewTypeCache: {
-    identifier: {
-      viewType: null,
-      favouriteIndex: 0,
-    },
     credential: {
       viewType: null,
       favouriteIndex: 0,
+      favourites: [
+        {
+          id: filteredCredsFix[0].id,
+          time: 1,
+        },
+        {
+          id: filteredCredsFix[1].id,
+          time: 2,
+        },
+      ],
     },
   },
   biometricsCache: {
@@ -165,51 +139,22 @@ const archivedAndRevokedState = {
       time: Date.now(),
       passcodeIsSet: true,
     },
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: [],
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
-    },
   },
   seedPhraseCache: {},
-  credsCache: {
-    creds: [
-      filteredCredsFix[0],
-      {
-        ...filteredCredsFix[1],
-        status: CredentialStatus.REVOKED,
-      },
-    ],
-    favourites: [
-      {
-        id: filteredCredsFix[0].id,
-        time: 1,
-      },
-    ],
-  },
-  credsArchivedCache: {
-    creds: filteredCredsFix,
-  },
+  profilesCache: profileCacheFixData,
   connectionsCache: {
     connections: connectionsFix,
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
-  },
-  notificationsCache: {
-    notifications: [],
-  },
   viewTypeCache: {
-    identifier: {
-      viewType: null,
-      favouriteIndex: 0,
-    },
     credential: {
       viewType: null,
       favouriteIndex: 0,
+      favourites: [
+        {
+          id: filteredCredsFix[0].id,
+          time: 1,
+        },
+      ],
     },
   },
   biometricsCache: {
@@ -231,12 +176,12 @@ describe("Creds Tab", () => {
     };
   });
 
-  it("Renders favourites in Creds", () => {
+  it("Renders favourites in Creds", async () => {
     const storeMocked = {
       ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
-    const { getByText } = render(
+    const { getByText, getByTestId } = render(
       <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
         <Provider store={storeMocked}>
           <Credentials />
@@ -247,9 +192,15 @@ describe("Creds Tab", () => {
     expect(
       getByText(EN_TRANSLATIONS.tabs.credentials.tab.favourites)
     ).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("visible")
+      ).toBeTruthy();
+    });
   });
 
-  test("Renders Creds Tab", () => {
+  test("Renders Creds Tab", async () => {
     const storeMocked = {
       ...makeTestStore(initialStateEmpty),
       dispatch: dispatchMock,
@@ -264,6 +215,11 @@ describe("Creds Tab", () => {
 
     expect(getByTestId("credentials-tab")).toBeInTheDocument();
     expect(getByText("Credentials")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("hidden")
+      ).toBeTruthy();
+    });
   });
 
   test("Open profile", async () => {
@@ -279,6 +235,12 @@ describe("Creds Tab", () => {
       </MemoryRouter>
     );
     await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("hidden")
+      ).toBeTruthy();
+    });
+
+    await waitFor(() => {
       expect(getByTestId("avatar-button")).toBeVisible();
     });
 
@@ -289,7 +251,7 @@ describe("Creds Tab", () => {
     });
   });
 
-  test("Renders Creds Card placeholder", () => {
+  test("Renders Creds Card placeholder", async () => {
     const storeMocked = {
       ...makeTestStore(initialStateEmpty),
       dispatch: dispatchMock,
@@ -301,6 +263,11 @@ describe("Creds Tab", () => {
         </Provider>
       </MemoryRouter>
     );
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("hidden")
+      ).toBeTruthy();
+    });
 
     expect(
       getByTestId("credentials-tab-cards-placeholder")
@@ -310,7 +277,7 @@ describe("Creds Tab", () => {
     ).toBeInTheDocument();
   });
 
-  test("Renders Creds Card", () => {
+  test("Renders Creds Card", async () => {
     const storeMocked = {
       ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
@@ -322,11 +289,16 @@ describe("Creds Tab", () => {
         </Provider>
       </MemoryRouter>
     );
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("visible")
+      ).toBeTruthy();
+    });
 
     expect(getByTestId("keri-card-template-favs-index-0")).toBeInTheDocument();
   });
 
-  test("Renders Creds Filters", () => {
+  test("Renders Creds Filters", async () => {
     const storeMocked = {
       ...makeTestStore(initialStateFull),
     };
@@ -337,6 +309,11 @@ describe("Creds Tab", () => {
         </Provider>
       </MemoryRouter>
     );
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("visible")
+      ).toBeTruthy();
+    });
 
     const allFilterBtn = getByTestId("all-filter-btn");
     const individualFilterBtn = getByTestId("individual-filter-btn");
@@ -364,6 +341,11 @@ describe("Creds Tab", () => {
         </Provider>
       </MemoryRouter>
     );
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("hidden")
+      ).toBeTruthy();
+    });
 
     const allFilterBtn = getByTestId("all-filter-btn");
     const individualFilterBtn = getByTestId("individual-filter-btn");
@@ -412,6 +394,11 @@ describe("Creds Tab", () => {
         </Provider>
       </MemoryRouter>
     );
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("visible")
+      ).toBeTruthy();
+    });
 
     const allFilterBtn = getByTestId("all-filter-btn");
     const individualFilterBtn = getByTestId("individual-filter-btn");
@@ -454,31 +441,15 @@ describe("Creds Tab", () => {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
-          defaultProfile: filteredIdentifierFix[0].id,
           loggedIn: true,
           time: Date.now(),
           passcodeIsSet: true,
         },
-        currentProfile: {
-          identity: filteredIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-        },
-      },
-      credsCache: {
-        creds: pendingCredFixs,
-        favourites: [],
       },
       seedPhraseCache: {},
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
-      },
-
-      credsArchivedCache: {
-        creds: [],
+      profilesCache: {
+        ...profileCacheFixData,
+        defaultProfile: filteredIdentifierFix[1].id,
       },
       viewTypeCache: {
         identifier: {
@@ -512,11 +483,17 @@ describe("Creds Tab", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId(`card-item-${pendingCredFixs[0].id}`)).toBeVisible();
+      expect(
+        getByTestId("archive-button-container").classList.contains("hidden")
+      ).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(getByTestId(`card-item-${pendingCredFix.id}`)).toBeVisible();
     });
 
     act(() => {
-      fireEvent.click(getByTestId(`card-item-${pendingCredFixs[0].id}`));
+      fireEvent.click(getByTestId(`card-item-${pendingCredFix.id}`));
     });
 
     await waitFor(() => {
@@ -577,6 +554,11 @@ describe("Creds Tab", () => {
         </Provider>
       </MemoryRouter>
     );
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("visible")
+      ).toBeTruthy();
+    });
 
     expect(getByTestId("cred-archived-revoked-button")).toBeVisible();
   });
@@ -593,6 +575,11 @@ describe("Creds Tab", () => {
         </Provider>
       </MemoryRouter>
     );
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("visible")
+      ).toBeTruthy();
+    });
 
     act(() => {
       fireEvent.click(getByTestId("keri-card-template-allcreds-index-0"));
@@ -629,6 +616,11 @@ describe("Creds Tab", () => {
         </Provider>
       </MemoryRouter>
     );
+    await waitFor(() => {
+      expect(
+        getByTestId("archive-button-container").classList.contains("visible")
+      ).toBeTruthy();
+    });
 
     act(() => {
       fireEvent.click(getByTestId("cred-archived-revoked-button"));

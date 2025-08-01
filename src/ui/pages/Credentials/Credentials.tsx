@@ -15,11 +15,11 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getCredsArchivedCache,
   getCredsCache,
+  getCurrentProfile,
   setCredsArchivedCache,
   setCredsCache,
 } from "../../../store/reducers/profileCache";
 import {
-  getCurrentProfile,
   setCurrentRoute,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
@@ -169,6 +169,7 @@ const Credentials = () => {
   const ArchivedCredentialsButton = () => {
     return (
       <div
+        data-testid="archive-button-container"
         className={`archived-credentials-button-container${
           archivedCreds?.length > 0 || revokedCreds.length > 0
             ? " visible"
@@ -260,7 +261,7 @@ const Credentials = () => {
   }) => {
     return (
       <Avatar
-        id={currentProfile.identity.id}
+        id={currentProfile?.identity.id || ""}
         handleAvatarClick={handleAvatarClick}
       />
     );
@@ -312,8 +313,8 @@ const Credentials = () => {
                   selectedFilter === CredentialsFilters.All
                     ? confirmedCreds
                     : selectedFilter === CredentialsFilters.Individual
-                      ? individualCredentials
-                      : groupCredentials
+                    ? individualCredentials
+                    : groupCredentials
                 }
                 onShowCardDetails={() => handleShowNavAnimation("cards")}
                 title={`${i18n.t("tabs.credentials.tab.allcreds")}`}

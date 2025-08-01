@@ -1,4 +1,3 @@
-import { CreationStatus } from "../../core/agent/agent.types";
 import { RootState } from "../../store";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { OperationType } from "../../ui/globals/types";
@@ -39,21 +38,6 @@ describe("getBackRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
-        currentProfile: {
-          identity: {
-            id: "",
-            displayName: "",
-            createdAtUTC: "",
-            theme: 0,
-            creationStatus: CreationStatus.PENDING,
-          },
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        },
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
@@ -78,7 +62,6 @@ describe("getBackRoute", () => {
           isPaused: false,
         },
         toastMsgs: [],
-        profileHistories: [],
       },
       connectionsCache: {
         connections: {},
@@ -192,22 +175,6 @@ describe("getPreviousRoute", () => {
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
-        currentProfile: {
-          identity: {
-            id: "",
-            displayName: "",
-            createdAtUTC: "",
-            theme: 0,
-            creationStatus: CreationStatus.PENDING,
-          },
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        },
-        profileHistories: [],
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,

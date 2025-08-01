@@ -16,6 +16,7 @@ import {
 } from "../../../utils/formatters";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { CredentialContent } from "./CredentialContent";
+import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -67,11 +68,7 @@ describe("Creds content", () => {
           passwordIsSkipped: true,
         },
       },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
-      identifiersCache: {
-        identifiers: [],
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         multisigConnections: {},
       },
@@ -187,11 +184,7 @@ describe("Creds content", () => {
         },
         toastMsgs: [],
       },
-      credsCache: { creds: credsFixAcdc, favourites: [] },
-      credsArchivedCache: { creds: credsFixAcdc },
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         multisigConnections: {
           [connectionDetailsFix.id]: connectionDetailsFix,

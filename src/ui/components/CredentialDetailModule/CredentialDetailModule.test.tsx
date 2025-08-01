@@ -25,6 +25,12 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CredentialDetailModule } from "./CredentialDetailModule";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
+import {
+  filteredArchivedCredsFix,
+  revokedCredsFix,
+} from "../../__fixtures__/filteredCredsFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
 
@@ -102,16 +108,9 @@ const initialStateNoPasswordCurrent = {
       "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
     bran: "bran",
   },
-  credsCache: { creds: credsFixAcdc, favourites: [] },
-  credsArchivedCache: { creds: credsFixAcdc },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
-  },
-  notificationsCache: {
-    notificationDetailCache: null,
-  },
-  identifiersCache: {
-    identifiers: {},
   },
   connectionsCache: {
     connections: connectionsMapFix,
@@ -135,16 +134,9 @@ const initialStateNoPasswordArchived = {
       "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
     bran: "bran",
   },
-  credsCache: { creds: [] },
-  credsArchivedCache: { creds: [] },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
-  },
-  notificationsCache: {
-    notificationDetailCache: null,
-  },
-  identifiersCache: {
-    identifiers: {},
   },
   connectionsCache: {
     connections: connectionsMapFix,
@@ -339,20 +331,16 @@ describe("Cred Detail Module - current not archived credential", () => {
           "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
         bran: "bran",
       },
-      credsCache: {
-        creds: credsFixAcdc,
-        favourites: [
-          {
-            id: credsFixAcdc[0].id,
-            time: mockNow,
-          },
-        ],
-      },
-      notificationsCache: {
-        notificationDetailCache: null,
-      },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: profileCacheFixData,
+      viewTypeCache: {
+        credential: {
+          favourites: [
+            {
+              id: credsFixAcdc[0].id,
+              time: mockNow,
+            },
+          ],
+        },
       },
       connectionsCache: {
         connections: connectionsMapFix,
@@ -416,19 +404,15 @@ describe("Cred Detail Module - current not archived credential", () => {
           "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
         bran: "bran",
       },
-      credsCache: {
-        creds: credsFixAcdc,
-        favourites: new Array(5).map((_, index) => ({
-          id: index,
-          time: mockNow,
-        })),
+      viewTypeCache: {
+        credential: {
+          favourites: new Array(5).map((_, index) => ({
+            id: index,
+            time: mockNow,
+          })),
+        },
       },
-      identifiersCache: {
-        identifiers: {},
-      },
-      notificationsCache: {
-        notificationDetailCache: null,
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         connections: connectionsMapFix,
       },
@@ -571,7 +555,10 @@ describe("Cred Detail Module - archived", () => {
   beforeAll(() => {
     jest
       .spyOn(Agent.agent.credentials, "getCredentialDetailsById")
-      .mockResolvedValue(credsFixAcdc[0]);
+      .mockResolvedValue({
+        ...credsFixAcdc[0],
+        id: filteredArchivedCredsFix[0].id,
+      });
   });
   beforeEach(() => {
     storeMocked = {
@@ -580,50 +567,12 @@ describe("Cred Detail Module - archived", () => {
     };
   });
 
-  test("It shows the restore alert", async () => {
-    const { queryByText, getByText, queryAllByTestId } = render(
-      <Provider store={storeMocked}>
-        <CredentialDetailModule
-          pageId="credential-card-details"
-          id={credsFixAcdc[0].id}
-          onClose={jest.fn()}
-        />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(
-        queryByText(EN_TRANSLATIONS.tabs.credentials.details.restore)
-      ).toBeVisible();
-    });
-
-    const restoreButton = getByText(
-      EN_TRANSLATIONS.tabs.credentials.details.restore
-    );
-
-    act(() => {
-      fireEvent.click(restoreButton);
-    });
-
-    await waitFor(() => {
-      expect(queryAllByTestId("alert-restore")[0]).toBeInTheDocument();
-    });
-
-    await waitFor(() => {
-      expect(
-        queryByText(
-          EN_TRANSLATIONS.tabs.credentials.details.alert.restore.title
-        )
-      ).toBeVisible();
-    });
-  });
-
   test("Restore func", async () => {
     const { queryByText, getByText, queryAllByTestId, getByTestId } = render(
       <Provider store={storeMocked}>
         <CredentialDetailModule
           pageId="credential-card-details"
-          id={credsFixAcdc[0].id}
+          id={filteredArchivedCredsFix[0].id}
           onClose={jest.fn()}
         />
       </Provider>
@@ -671,7 +620,7 @@ describe("Cred Detail Module - archived", () => {
       <Provider store={storeMocked}>
         <CredentialDetailModule
           pageId="credential-card-details"
-          id={credsFixAcdc[0].id}
+          id={filteredArchivedCredsFix[0].id}
           onClose={jest.fn()}
         />
       </Provider>
@@ -730,20 +679,8 @@ describe("Cred Detail Module - light mode", () => {
         "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
       bran: "bran",
     },
-    credsCache: { creds: credsFixAcdc },
-    credsArchivedCache: { creds: [] },
     biometricsCache: {
       enabled: false,
-    },
-    identifiersCache: {
-      identifiers: {},
-    },
-    notificationsCache: {
-      notificationDetailCache: {
-        notificationId: "test-id",
-        viewCred: "test-cred",
-        step: 0,
-      },
     },
     connectionsCache: {
       connections: connectionsMapFix,
@@ -803,29 +740,9 @@ describe("Cred detail - revoked", () => {
         "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
       bran: "bran",
     },
-    identifiersCache: {
-      identifiers: {},
-    },
-    credsCache: { creds: credsFixAcdc },
-    credsArchivedCache: { creds: [] },
+    profilesCache: profileCacheFixData,
     biometricsCache: {
       enabled: false,
-    },
-    notificationsCache: {
-      notificationDetailCache: {
-        notificationId: "test-id",
-        viewCred: "test-cred",
-        step: 0,
-      },
-      notifications: [
-        {
-          ...notificationsFix[0],
-          a: {
-            ...notificationsFix[0].a,
-            credentialId: credsFixAcdc[0].id,
-          },
-        },
-      ],
     },
     connectionsCache: {
       connections: connectionsMapFix,
@@ -835,7 +752,10 @@ describe("Cred detail - revoked", () => {
   beforeAll(() => {
     jest
       .spyOn(Agent.agent.credentials, "getCredentialDetailsById")
-      .mockResolvedValue(revokedCredFixs[0]);
+      .mockResolvedValue({
+        ...revokedCredFixs[0],
+        id: revokedCredsFix[0].id,
+      });
   });
 
   beforeEach(() => {
@@ -850,7 +770,7 @@ describe("Cred detail - revoked", () => {
       <Provider store={storeMocked}>
         <CredentialDetailModule
           pageId="credential-card-details"
-          id={credsFixAcdc[0].id}
+          id={revokedCredsFix[0].id}
           onClose={jest.fn()}
         />
       </Provider>
@@ -871,7 +791,7 @@ describe("Cred detail - revoked", () => {
       <Provider store={storeMocked}>
         <CredentialDetailModule
           pageId="credential-card-details"
-          id={credsFixAcdc[0].id}
+          id={revokedCredsFix[0].id}
           onClose={jest.fn()}
         />
       </Provider>
@@ -934,20 +854,9 @@ describe("Cred detail - view only", () => {
         "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
       bran: "bran",
     },
-    credsCache: { creds: credsFixAcdc },
-    credsArchivedCache: { creds: [] },
+    profilesCache: profileCacheFixData,
     biometricsCache: {
       enabled: false,
-    },
-    identifiersCache: {
-      identifiers: {},
-    },
-    notificationsCache: {
-      notificationDetailCache: {
-        notificationId: "test-id",
-        viewCred: "test-cred",
-        step: 0,
-      },
     },
     connectionsCache: {
       connections: connectionsMapFix,

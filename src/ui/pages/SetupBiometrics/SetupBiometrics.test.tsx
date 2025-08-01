@@ -98,9 +98,6 @@ const initialState = {
     },
     isOnline: true,
   },
-  identifiersCache: {
-    identifiers: {},
-  },
 };
 
 const dispatchMock = jest.fn();

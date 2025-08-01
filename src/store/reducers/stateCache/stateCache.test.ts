@@ -33,28 +33,10 @@ import {
 } from "./stateCache.types";
 
 // Mock the selectors
-jest.mock("../identifiersCache", () => ({
-  getIdentifiersCache: jest.fn(),
-}));
-jest.mock("../credsCache", () => ({
-  getCredsCache: jest.fn(),
-}));
-jest.mock("../credsArchivedCache", () => ({
-  getCredsArchivedCache: jest.fn(),
-}));
-jest.mock("../walletConnectionsCache", () => ({
-  getPeerConnections: jest.fn(),
-}));
 jest.mock("../connectionsCache", () => ({
   getConnectionsCache: jest.fn(),
   getMultisigConnectionsCache: jest.fn(),
 }));
-
-// Mock the setCurrentProfile action to spy on its calls
-const mockSetCurrentProfile = jest.spyOn(
-  stateCacheSlice.actions,
-  "setCurrentProfile"
-);
 
 const signingRequest: PeerConnectSigningEventRequest = {
   type: IncomingRequestType.PEER_CONNECT_SIGN,
@@ -233,31 +215,5 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialStateMock, action);
     expect(nextState.queueIncomingRequest.queues.length).toEqual(1);
     expect(nextState.queueIncomingRequest.isProcessing).toEqual(true);
-  });
-
-  describe("setCurrentProfile", () => {
-    test("should set the currentProfile with the provided payload", () => {
-      const newProfilePayload = {
-        identity: {
-          id: "new-profile-id",
-          displayName: "New Profile",
-          createdAtUTC: "2024-01-01T00:00:00Z",
-          theme: 2,
-          creationStatus: CreationStatus.COMPLETE,
-        },
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
-        notifications: [],
-      };
-      const action =
-        stateCacheSlice.actions.setCurrentProfile(newProfilePayload);
-      const nextState = stateCacheSlice.reducer(initialState, action);
-
-      expect(nextState.currentProfile).toEqual(newProfilePayload);
-      expect(nextState).not.toBe(initialState);
-    });
   });
 });

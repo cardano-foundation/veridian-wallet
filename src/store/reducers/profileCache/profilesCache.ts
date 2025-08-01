@@ -10,6 +10,13 @@ import {
   ProfileCache,
 } from "./profilesCache.types";
 
+const DefaultArrayValue = {
+  Notifications: [] as KeriaNotification[],
+  PeerConn: [] as ConnectionData[],
+  ArchivedCreds: [] as CredentialShortDetails[],
+  Credentials: [] as CredentialShortDetails[],
+};
+
 const initialState: ProfileCache = {
   profiles: {},
   recentProfiles: [],
@@ -229,16 +236,17 @@ const getRecentProfiles = (state: RootState) =>
   state.profilesCache.recentProfiles;
 
 const getNotificationsCache = (state: RootState) =>
-  getCurrentProfile(state)?.notifications || [];
+  getCurrentProfile(state)?.notifications || DefaultArrayValue.Notifications;
 
 const getCredsCache = (state: RootState) =>
-  getCurrentProfile(state)?.credentials || [];
+  getCurrentProfile(state)?.credentials || DefaultArrayValue.Credentials;
 
 const getPeerConnections = (state: RootState) =>
-  getCurrentProfile(state)?.peerConnections || [];
+  getCurrentProfile(state)?.peerConnections || DefaultArrayValue.PeerConn;
 
 const getCredsArchivedCache = (state: RootState) =>
-  getCurrentProfile(state)?.archivedCredentials || [];
+  getCurrentProfile(state)?.archivedCredentials ||
+  DefaultArrayValue.ArchivedCreds;
 
 const getProfileGroupCache = (state: RootState) =>
   state.profilesCache.multiSigGroup;

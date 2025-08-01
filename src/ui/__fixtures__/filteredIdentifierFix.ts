@@ -1,6 +1,60 @@
 import { IdentifierShortDetails } from "../../core/agent/services/identifier.types";
 import { CreationStatus } from "../../core/agent/agent.types";
 
+const failedMultisignIdentifierFix: IdentifierShortDetails[] = [
+  {
+    id: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inc",
+    displayName: "Professional ID",
+    createdAtUTC: "2023-01-01T19:23:24Z",
+    theme: 0,
+    creationStatus: CreationStatus.FAILED,
+    groupMetadata: {
+      groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
+      groupCreated: false,
+      groupInitiator: false,
+    },
+  },
+];
+
+const multisignIdentifierFix: IdentifierShortDetails[] = [
+  {
+    id: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inu",
+    displayName: "Professional ID",
+    createdAtUTC: "2023-01-01T19:23:24Z",
+    theme: 0,
+    creationStatus: CreationStatus.COMPLETE,
+    groupMetadata: {
+      groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
+      groupCreated: false,
+      groupInitiator: false,
+    },
+  },
+];
+
+const pendingMemberIdentifierFix: IdentifierShortDetails[] = [
+  {
+    id: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
+    displayName: "Professional ID",
+    createdAtUTC: "2023-01-01T19:23:24Z",
+    theme: 0,
+    creationStatus: CreationStatus.PENDING,
+    groupMetadata: {
+      groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
+      groupCreated: false,
+      groupInitiator: false,
+    },
+  },
+];
+
+const pendingGroupIdentifierFix: IdentifierShortDetails = {
+  id: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPyi",
+  displayName: "Test MS",
+  createdAtUTC: "2024-03-07T11:54:56.886Z",
+  theme: 0,
+  creationStatus: CreationStatus.PENDING,
+  groupMemberPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
+};
+
 const filteredIdentifierFix: IdentifierShortDetails[] = [
   {
     id: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
@@ -39,6 +93,9 @@ const filteredIdentifierFix: IdentifierShortDetails[] = [
     theme: 0,
     creationStatus: CreationStatus.COMPLETE,
   },
+  failedMultisignIdentifierFix[0],
+  multisignIdentifierFix[0],
+  pendingGroupIdentifierFix,
 ];
 
 const filteredIdentifierMapFix = filteredIdentifierFix.reduce(
@@ -61,60 +118,6 @@ const failedFilteredIdentifierMapFix = filteredIdentifierFix.reduce(
   },
   {} as Record<string, IdentifierShortDetails>
 );
-
-const multisignIdentifierFix: IdentifierShortDetails[] = [
-  {
-    id: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
-    displayName: "Professional ID",
-    createdAtUTC: "2023-01-01T19:23:24Z",
-    theme: 0,
-    creationStatus: CreationStatus.COMPLETE,
-    groupMetadata: {
-      groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
-      groupCreated: false,
-      groupInitiator: false,
-    },
-  },
-];
-
-const failedMultisignIdentifierFix: IdentifierShortDetails[] = [
-  {
-    id: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
-    displayName: "Professional ID",
-    createdAtUTC: "2023-01-01T19:23:24Z",
-    theme: 0,
-    creationStatus: CreationStatus.FAILED,
-    groupMetadata: {
-      groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
-      groupCreated: false,
-      groupInitiator: false,
-    },
-  },
-];
-
-const pendingMemberIdentifierFix: IdentifierShortDetails[] = [
-  {
-    id: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
-    displayName: "Professional ID",
-    createdAtUTC: "2023-01-01T19:23:24Z",
-    theme: 0,
-    creationStatus: CreationStatus.PENDING,
-    groupMetadata: {
-      groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
-      groupCreated: false,
-      groupInitiator: false,
-    },
-  },
-];
-
-const pendingGroupIdentifierFix: IdentifierShortDetails = {
-  id: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPyi",
-  displayName: "Test MS",
-  createdAtUTC: "2024-03-07T11:54:56.886Z",
-  theme: 0,
-  creationStatus: CreationStatus.PENDING,
-  groupMemberPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
-};
 
 const pendingIdentifierFix: IdentifierShortDetails = {
   id: "EB3VkeAMhhPh2GZnDYs68N8-jJ1xrB6ptX5JxPuPFpZ7",

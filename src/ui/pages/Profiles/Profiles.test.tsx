@@ -5,9 +5,7 @@ import { Agent } from "../../../core/agent/agent";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import {
-  setToastMsg
-} from "../../../store/reducers/stateCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import {
   filteredIdentifierFix,
   filteredIdentifierMapFix,
@@ -15,6 +13,7 @@ import {
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Profiles } from "./Profiles";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 jest.mock("../../../store/reducers/stateCache", () => ({
   ...jest.requireActual("../../../store/reducers/stateCache"),
@@ -55,25 +54,11 @@ const initialState = {
       passcodeIsSet: true,
       defaultProfile: "",
     },
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: [],
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
-    },
-    profileHistories: [],
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
   },
   connectionsCache: {
     connections: {},
   },
-  notificationsCache: {
-    notifications: [],
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },

@@ -17,6 +17,7 @@ import {
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { CredentialRequest } from "./CredentialRequest";
 import { makeTestStore } from "../../../../utils/makeTestStore";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 
 jest.mock("@ionic/react", () => {
   const actual = jest.requireActual("@ionic/react");
@@ -66,14 +67,7 @@ const initialState = {
   connectionsCache: {
     connections: connectionsForNotifications,
   },
-  credsCache: { creds: credsFixAcdc, favourites: [] },
-  credsArchivedCache: { creds: [] },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierFix,
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -191,20 +185,24 @@ describe("Credential request: Multisig", () => {
       },
       isOnline: true,
     },
-    credsCache: { creds: credsFixAcdc, favourites: [] },
-    credsArchivedCache: { creds: [] },
-    notificationsCache: {
-      notifications: notificationsFix,
-    },
-    identifiersCache: {
-      identifiers: {
+    profilesCache: {
+      ...profileCacheFixData,
+      profiles: {
         id: {
-          ...multisignIdentifierFix[0],
-          groupMemberPre: "member-1",
-          id: "id",
+          identity: {
+            ...multisignIdentifierFix[0],
+            groupMemberPre: "member-1",
+            id: "id",
+          },
+          connections: [],
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+          notifications: [],
         },
       },
-      favourites: [],
+      defaultProfile: "id",
     },
     connectionsCache: {
       connections: connectionsForNotifications,

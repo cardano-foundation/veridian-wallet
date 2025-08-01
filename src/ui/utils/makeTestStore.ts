@@ -6,6 +6,7 @@ import { ssiAgentSlice } from "../../store/reducers/ssiAgent";
 import { stateCacheSlice } from "../../store/reducers/stateCache";
 import { viewTypeCacheSlice } from "../../store/reducers/viewTypeCache";
 import { walletConnectionsCacheSlice } from "../../store/reducers/walletConnectionsCache";
+import { profilesCacheSlice } from "../../store/reducers/profileCache";
 
 export function makeTestStore(preloadedState?: any) {
   return configureStore({
@@ -17,6 +18,7 @@ export function makeTestStore(preloadedState?: any) {
       viewTypeCache: viewTypeCacheSlice.reducer,
       biometricsCache: biometricsCacheSlice.reducer,
       ssiAgentCache: ssiAgentSlice.reducer,
+      profilesCache: profilesCacheSlice.reducer,
     },
     preloadedState,
   });

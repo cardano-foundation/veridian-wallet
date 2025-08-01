@@ -51,7 +51,7 @@ const RelatedIdentifier = ({ identifierId }: IssuedIdentifierProps) => {
           testId="related-identifier-section"
         >
           <CardDetailsItem
-            info={profile?.identity.id || ""}
+            info={profile?.identity.displayName || ""}
             className="related-identifier"
             testId="related-identifier-name"
             startSlot={<CardTheme {...getTheme(profile.identity.theme || 0)} />}

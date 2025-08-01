@@ -6,17 +6,15 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   getCurrentProfile,
   getProfiles,
+  getRecentProfiles,
   Profile,
   updateCurrentProfile,
+  updateRecentProfiles,
 } from "../../store/reducers/profileCache";
-import {
-  getProfileHistories,
-  setProfileHistories,
-} from "../../store/reducers/stateCache";
 
 export const useProfile = () => {
   const defaultProfile = useAppSelector(getCurrentProfile);
-  const profileHistories = useAppSelector(getProfileHistories);
+  const profileHistories = useAppSelector(getRecentProfiles);
   const profiles = useAppSelector(getProfiles);
   const dispatch = useAppDispatch();
 
@@ -29,7 +27,7 @@ export const useProfile = () => {
         })
       );
 
-      dispatch(setProfileHistories(newProfilesHistory));
+      dispatch(updateRecentProfiles(newProfilesHistory));
     },
     [dispatch]
   );
@@ -68,7 +66,7 @@ export const useProfile = () => {
 
     await Agent.agent.basicStorage.deleteById(MiscRecordId.PROFILE_HISTORIES);
 
-    dispatch(setProfileHistories([]));
+    dispatch(updateRecentProfiles([]));
   }, [dispatch]);
 
   const getRecentDefaultProfile = useCallback(

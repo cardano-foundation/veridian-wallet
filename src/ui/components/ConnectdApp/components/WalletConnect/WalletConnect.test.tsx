@@ -1,14 +1,13 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
+import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
-import { TabsRoutePath } from "../../../../../routes/paths";
-import { filteredIdentifierFix } from "../../../../__fixtures__/filteredIdentifierFix";
-import { identifierFix } from "../../../../__fixtures__/identifierFix";
-import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
+import { RootState } from "../../../../../store";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 import { WalletConnect } from "./WalletConnect";
-import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
+import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 
 jest.mock("../../../../../core/configuration", () => ({
   ...jest.requireActual("../../../../../core/configuration"),
@@ -38,30 +37,11 @@ jest.mock("@ionic/react", () => ({
 }));
 
 describe("Wallet Connect Request", () => {
-  const initialState = {
-    stateCache: {
-      routes: [TabsRoutePath.CREDENTIALS],
-      authentication: {
-        loggedIn: true,
-        time: Date.now(),
-        passcodeIsSet: true,
-        passwordIsSet: false,
-      },
-      currentProfile: {
-        identity: filteredIdentifierFix[0],
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
-      },
-    },
+  const initialState: Partial<RootState> = {
+    profilesCache: profileCacheFixData,
     walletConnectionsCache: {
-      walletConnections: [],
-      pendingConnection: walletConnectionsFix[0],
-    },
-    identifiersCache: {
-      identifiers: [...identifierFix],
+      connectedWallet: null,
+      pendingConnection: walletConnectionsFix[4],
     },
   };
 
@@ -70,8 +50,6 @@ describe("Wallet Connect Request", () => {
     ...makeTestStore(initialState),
     dispatch: dispatchMock,
   };
-
-  const handleCancel = jest.fn();
 
   test("Renders content ", async () => {
     const { getByText } = render(

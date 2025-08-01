@@ -15,6 +15,7 @@ import { CredentialDetails } from "../../pages/CredentialDetails";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { VerifyPasscode } from "./VerifyPasscode";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
 
@@ -65,17 +66,10 @@ const initialStateNoPassword = {
       "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
     bran: "bran",
   },
-  credsCache: { creds: credsFixAcdc },
-  credsArchivedCache: { creds: credsFixAcdc },
   biometricsCache: {
     enabled: false,
   },
-  notificationsCache: {
-    notificationDetailCache: null,
-  },
-  identifiersCache: {
-    identifiers: {},
-  },
+  profilesCache: profileCacheFixData,
   connectionsCache: {
     connections: connectionsMapFix,
   },

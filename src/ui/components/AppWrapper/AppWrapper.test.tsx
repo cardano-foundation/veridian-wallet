@@ -1,6 +1,5 @@
 const getConnectionShortDetailByIdMock = jest.fn();
 
-import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
@@ -218,6 +217,7 @@ import { PeerConnectionPairRecord } from "../../../core/agent/records";
 import {
   ConnectionData,
   addGroupProfile,
+  addOrUpdateProfileIdentity,
   setPeerConnections,
   updateOrAddCredsCache,
   updateProfileCreationStatus,
@@ -477,7 +477,7 @@ describe("Identifier state changed handler", () => {
   test("handles identifier added event", async () => {
     await identifierAddedHandler(identifierAddedEvent, dispatch);
     expect(dispatch).toBeCalledWith(
-      updateProfileCreationStatus(pendingIdentifierFix)
+      addOrUpdateProfileIdentity(pendingIdentifierFix)
     );
   });
 });
