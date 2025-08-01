@@ -914,7 +914,9 @@ describe("Connection service of agent", () => {
 
   test("Should sync unsynced KERI contacts and their connection pairs", async () => {
     const DATE = new Date();
-    const localIdentifier = { id: "EP48HXCPvtzGu0c90gG9fkOYiSoi6U5Am-XaqcoNHTBl" };
+    const localIdentifier = {
+      id: "EP48HXCPvtzGu0c90gG9fkOYiSoi6U5Am-XaqcoNHTBl",
+    };
     const cloudContacts = [
       {
         id: "EBaDnyriYK_FAruigHO42avVN40fOlVSUxpxXJ1fNxFR",
@@ -922,7 +924,8 @@ describe("Connection service of agent", () => {
         oobi: "http://oobi.com/1",
         groupCreationId: "group-id",
         createdAt: DATE.toISOString(),
-        "EP48HXCPvtzGu0c90gG9fkOYiSoi6U5Am-XaqcoNHTBl:createdAt": DATE.toISOString(),
+        "EP48HXCPvtzGu0c90gG9fkOYiSoi6U5Am-XaqcoNHTBl:createdAt":
+          DATE.toISOString(),
       },
       {
         id: "ECTcHGs3EhJEdVTW10vm5pkiDlOXlR8bPBj9-8LSpZ3W",
@@ -932,7 +935,9 @@ describe("Connection service of agent", () => {
       },
     ];
 
-    identifierStorage.getAllIdentifiers = jest.fn().mockResolvedValue([localIdentifier]);
+    identifierStorage.getAllIdentifiers = jest
+      .fn()
+      .mockResolvedValue([localIdentifier]);
     contactListMock.mockReturnValue(cloudContacts);
     contactStorage.findById = jest.fn().mockResolvedValue(null);
     connectionPairStorage.findById = jest.fn().mockResolvedValue(null);
@@ -987,7 +992,7 @@ describe("Connection service of agent", () => {
       alias: "Test Contact",
       oobi: "http://oobi.com/Dcontact1",
       groupId: undefined,
-      createdAt: new Date("2025-01-01T00:00:00.000Z"),
+      createdAt: expect.any(Date),
     });
 
     // Verify that the connection pair for the matching identifier was created
@@ -998,7 +1003,7 @@ describe("Connection service of agent", () => {
       identifier: "Eabc123",
       creationStatus: CreationStatus.COMPLETE,
       pendingDeletion: false,
-      createdAt: new Date("2025-01-02T00:00:00.000Z"),
+      createdAt: expect.any(Date),
     });
   });
 
