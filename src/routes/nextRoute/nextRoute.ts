@@ -43,7 +43,8 @@ const getNextRootRoute = (data: DataProps) => {
 
   if (
     data.store.identifiers &&
-    data.store.stateCache.currentProfile.identity.id
+    data.store.stateCache.currentProfile.identity.id &&
+    data.store.stateCache.routes[0]?.path !== RoutePath.PROFILE_SETUP
   ) {
     const defaultProfile =
       data.store.identifiers[data.store.stateCache.currentProfile.identity.id];
