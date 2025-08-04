@@ -1,5 +1,6 @@
 import { MigrationType, HybridMigration } from "./migrations.types";
 import { SignifyClient } from "signify-ts";
+import { createInsertItemTagsStatements, createInsertItemStatement } from "./migrationUtils";
 
 export const DATA_V1201: HybridMigration = {
   type: MigrationType.HYBRID,
@@ -36,37 +37,6 @@ export const DATA_V1201: HybridMigration = {
     );
     const connections = connectionResult.values;
     const statements: { statement: string; values?: unknown[] }[] = [];
-
-    function insertItem(record: any) {
-      return {
-        statement:
-          "INSERT INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
-        values: [record.id, record.type, record.id, JSON.stringify(record)],
-      };
-    }
-
-    function insertItemTags(itemRecord: any) {
-      const statements = [];
-      const statement =
-        "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
-      const tags = itemRecord.tags;
-
-      for (const key of Object.keys(tags)) {
-        if (tags[key] === undefined || tags[key] === null) continue;
-        if (typeof tags[key] === "boolean") {
-          statements.push({
-            statement: statement,
-            values: [itemRecord.id, key, tags[key] ? "1" : "0", "boolean"],
-          });
-        } else if (typeof tags[key] === "string") {
-          statements.push({
-            statement: statement,
-            values: [itemRecord.id, key, tags[key], "string"],
-          });
-        }
-      }
-      return statements;
-    }
 
     for (const connection of connections || []) {
       const connectionData = JSON.parse(connection.value);
@@ -139,12 +109,12 @@ export const DATA_V1201: HybridMigration = {
       }
 
       if (connectionPairsToInsert.length > 0 || connectionData.groupId) {
-        statements.push(insertItem(contactRecord));
-        statements.push(...insertItemTags(contactRecord));
+        statements.push(createInsertItemStatement(contactRecord));
+        statements.push(...createInsertItemTagsStatements(contactRecord));
 
         for (const connectionPair of connectionPairsToInsert) {
-          statements.push(insertItem(connectionPair));
-          statements.push(...insertItemTags(connectionPair));
+          statements.push(createInsertItemStatement(connectionPair));
+          statements.push(...createInsertItemTagsStatements(connectionPair));
         }
       }
     }

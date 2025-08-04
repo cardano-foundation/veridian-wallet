@@ -5,13 +5,8 @@ import {
 } from "@capacitor-community/sqlite";
 import { Capacitor } from "@capacitor/core";
 import { randomPasscode } from "signify-ts";
-import { versionCompare } from "./utils";
-import { MIGRATIONS } from "./migrations";
-import {
-  MigrationType,
-  CloudMigration,
-  HybridMigration,
-} from "./migrations/migrations.types";
+import { LocalMigrationManager } from "./migrations/localMigrationManager";
+import { CloudMigrationManager } from "./migrations/cloudMigrationManager";
 import { KeyStoreKeys, SecureStorage } from "../secureStorage";
 import { BasicStorage } from "../../agent/records/basicStorage";
 import { SqliteStorage } from "./sqliteStorage";
@@ -28,6 +23,8 @@ class SqliteSession {
   static readonly BASE_VERSION = "0.0.0";
   private sessionInstance?: SQLiteDBConnection;
   private basicStorageService!: BasicStorage;
+  private localMigrationManager?: LocalMigrationManager;
+  private cloudMigrationManager?: CloudMigrationManager;
 
   get session() {
     return this.sessionInstance;
@@ -132,113 +129,54 @@ class SqliteSession {
     const currentLocalVersion = await this.getCurrentVersionDatabase();
     const cloudMigrationStatus = await this.getCloudMigrationStatus();
 
-    const orderedMigrations = MIGRATIONS.sort((a, b) =>
-      versionCompare(a.version, b.version)
-    );
-
-    const missedCloudMigrations = orderedMigrations.filter(
-      (migration) =>
-        (migration.type === MigrationType.CLOUD ||
-          migration.type === MigrationType.HYBRID) &&
-        versionCompare(migration.version, currentLocalVersion) <= 0 && // Migration version is at or before current local version
-        !cloudMigrationStatus[migration.version] // But cloud migration wasn't completed
-    );
-
-    if (missedCloudMigrations.length == 0) {
-      // eslint-disable-next-line no-console
-      console.log("No missed cloud migrations found");
-      return;
+    if (!this.cloudMigrationManager) {
+      await this.initializeCloudMigrationManager();
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
-      `Found ${missedCloudMigrations.length} missed cloud migrations to run`
+    await this.cloudMigrationManager!.validateCloudMigrationsOnRecovery(
+      currentLocalVersion,
+      cloudMigrationStatus
     );
-
-    for (const migration of missedCloudMigrations) {
-      // eslint-disable-next-line no-console
-      console.log(`Running missed cloud migration: ${migration.version}`);
-      await this.performCloudMigration(
-        migration as CloudMigration | HybridMigration,
-        true
-      );
-    }
   }
 
   private async migrateDb(): Promise<void> {
     const currentVersion = await this.getCurrentVersionDatabase();
 
-    const orderedMigrations = MIGRATIONS.sort((a, b) =>
-      versionCompare(a.version, b.version)
-    );
-
-    for (const migration of orderedMigrations) {
-      if (versionCompare(migration.version, currentVersion) !== 1) {
-        continue;
-      }
-
-      const migrationStatements = [];
-
-      if (migration.type === MigrationType.SQL) {
-        for (const sqlStatement of migration.sql) {
-          migrationStatements.push({ statement: sqlStatement });
-        }
-      } else if (migration.type === MigrationType.TS) {
-        const statements = await migration.migrationStatements(this.session!);
-        migrationStatements.push(...statements);
-      } else if (migration.type === MigrationType.CLOUD) {
-        // Handle cloud migrations
-        await this.performCloudMigration(migration);
-      } else if (migration.type === MigrationType.HYBRID) {
-        const statements = await migration.localMigrationStatements(
-          this.session!
-        );
-        migrationStatements.push(...statements);
-        await this.performCloudMigration(migration, false);
-      }
-
-      // Update version for all migration types
-      migrationStatements.push({
-        statement: SqliteSession.INSERT_KV_SQL,
-        values: [
-          SqliteSession.VERSION_DATABASE_KEY,
-          JSON.stringify(migration.version),
-        ],
-      });
-
-      if (migrationStatements.length > 0) {
-        await this.session!.executeTransaction(migrationStatements);
-      }
-    }
+    await this.executeCloudMigrations(currentVersion);
+    await this.executeLocalMigrations(currentVersion);
   }
 
-  private async performCloudMigration(
-    migration: CloudMigration | HybridMigration,
-    isRecoveryValidation: boolean = false
-  ): Promise<void> {
+  private async executeLocalMigrations(currentVersion: string): Promise<void> {
+    if (!this.localMigrationManager) {
+      this.localMigrationManager = new LocalMigrationManager(this.session!);
+    }
+
+    await this.localMigrationManager.executeLocalMigrations(currentVersion);
+  }
+
+  private async executeCloudMigrations(currentVersion: string): Promise<void> {
     const isKeriaConfigured = await this.isKeriaConfigured();
     if (!isKeriaConfigured) {
-      const action = isRecoveryValidation
-        ? "recovery validation"
-        : "initial migration";
       // eslint-disable-next-line no-console
-      console.log(
-        `Skipping cloud migration ${migration.version} during ${action} - KERIA not configured`
-      );
-    } else {
-      await this.temporaryKeriaConnection();
-
-      const action = isRecoveryValidation ? "recovery validation" : "migration";
-      // eslint-disable-next-line no-console
-      console.log(`Starting cloud ${action} ${migration.version}`);
-      const signifyClient = Agent.agent.client;
-      await migration.cloudMigrationStatements(signifyClient);
-      // eslint-disable-next-line no-console
-      console.log(`Completed cloud ${action} ${migration.version}`);
-
-      // Mark cloud migration as complete
-      await this.markCloudMigrationComplete(migration.version);
+      console.log("Skipping cloud migrations - KERIA not configured");
+      return;
     }
+
+    await this.initializeCloudMigrationManager();
+    const cloudMigrationStatus = await this.getCloudMigrationStatus();
+
+    await this.cloudMigrationManager!.executeCloudMigrations(
+      currentVersion,
+      cloudMigrationStatus
+    );
+  }
+
+  private async initializeCloudMigrationManager(): Promise<void> {
+    await this.temporaryKeriaConnection();
+    this.cloudMigrationManager = new CloudMigrationManager(
+      Agent.agent.client,
+      this.markCloudMigrationComplete.bind(this)
+    );
   }
 
   private async isKeriaConfigured(): Promise<boolean> {

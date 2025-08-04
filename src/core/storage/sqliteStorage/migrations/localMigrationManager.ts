@@ -1,0 +1,81 @@
+import { SQLiteDBConnection } from "@capacitor-community/sqlite";
+import { versionCompare } from "../utils";
+import { LocalMigration, CombinedMigration, MigrationType } from "./migrations.types";
+import { LOCAL_MIGRATIONS, COMBINED_MIGRATIONS } from "./index";
+
+export class LocalMigrationManager {
+  constructor(private session: SQLiteDBConnection) {}
+
+  /**
+   * Executes all pending local migrations
+   * @param currentVersion The current database version
+   * @returns Promise<void>
+   */
+  async executeLocalMigrations(currentVersion: string): Promise<void> {
+    // eslint-disable-next-line no-console
+    console.log("Starting local migration execution...");
+
+    const allLocalMigrations = [
+      ...LOCAL_MIGRATIONS,
+      ...COMBINED_MIGRATIONS.map(migration => ({
+        version: migration.version,
+        type: migration.type,
+        localMigrationStatements: migration.localMigrationStatements,
+      }))
+    ];
+
+    const orderedMigrations = allLocalMigrations.sort((a, b) =>
+      versionCompare(a.version, b.version)
+    );
+
+    for (const migration of orderedMigrations) {
+      if (versionCompare(migration.version, currentVersion) !== 1) {
+        continue;
+      }
+
+      // eslint-disable-next-line no-console
+      console.log(`Executing local migration: ${migration.version}`);
+
+      const migrationStatements = await this.executeLocalMigration(migration);
+
+      // Update version after successful migration
+      migrationStatements.push({
+        statement: "INSERT OR REPLACE INTO kv (key,value) VALUES (?,?)",
+        values: ["VERSION_DATABASE_KEY", JSON.stringify(migration.version)],
+      });
+
+      if (migrationStatements.length > 0) {
+        await this.session.executeTransaction(migrationStatements);
+      }
+
+      // eslint-disable-next-line no-console
+      console.log(`Completed local migration: ${migration.version}`);
+    }
+  }
+
+  private async executeLocalMigration(
+    migration: LocalMigration | { version: string; type: MigrationType; localMigrationStatements: any }
+  ): Promise<{ statement: string; values?: unknown[] }[]> {
+    const migrationStatements: { statement: string; values?: unknown[] }[] = [];
+
+    if (migration.type === MigrationType.SQL) {
+      // Handle SQL migrations
+      const sqlMigration = migration as any;
+      for (const sqlStatement of sqlMigration.sql) {
+        migrationStatements.push({ statement: sqlStatement });
+      }
+    } else if (migration.type === MigrationType.TS) {
+      // Handle TypeScript migrations
+      const tsMigration = migration as any;
+      const statements = await tsMigration.migrationStatements(this.session);
+      migrationStatements.push(...statements);
+    } else if (migration.type === MigrationType.HYBRID) {
+      // Handle hybrid migrations (local part only)
+      const hybridMigration = migration as any;
+      const statements = await hybridMigration.localMigrationStatements(this.session);
+      migrationStatements.push(...statements);
+    }
+
+    return migrationStatements;
+  }
+} 

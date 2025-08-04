@@ -12,6 +12,7 @@ type BaseMigration = {
   version: string;
 };
 
+// Local-only migrations (SQLite database)
 type SqlMigration = BaseMigration & {
   type: MigrationType.SQL;
   sql: string[];
@@ -27,11 +28,13 @@ type TsMigration = BaseMigration & {
   >;
 };
 
+// Cloud-only migrations (KERIA storage)
 type CloudMigration = BaseMigration & {
   type: MigrationType.CLOUD;
   cloudMigrationStatements: (signifyClient: SignifyClient) => Promise<void>;
 };
 
+// Hybrid migrations (both local and cloud)
 type HybridMigration = BaseMigration & {
   type: MigrationType.HYBRID;
   localMigrationStatements: (session: SQLiteDBConnection) => Promise<
@@ -43,6 +46,19 @@ type HybridMigration = BaseMigration & {
   cloudMigrationStatements: (signifyClient: SignifyClient) => Promise<void>;
 };
 
+// Type aliases for better organization
+type LocalMigration = SqlMigration | TsMigration;
+type CloudOnlyMigration = CloudMigration;
+type CombinedMigration = HybridMigration;
+
 export { MigrationType };
 
-export type { SqlMigration, TsMigration, CloudMigration, HybridMigration };
+export type { 
+  SqlMigration, 
+  TsMigration, 
+  CloudMigration, 
+  HybridMigration,
+  LocalMigration,
+  CloudOnlyMigration,
+  CombinedMigration
+};
