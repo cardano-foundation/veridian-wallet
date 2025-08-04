@@ -360,7 +360,11 @@ class IdentifierService extends AgentService {
       identifier
     );
     if (metadata.groupMetadata) {
-      await this.deleteGroupLinkedConnections(metadata.groupMetadata.groupId);
+      await this.connections.deleteAllConnectionsForGroup(
+        metadata.groupMetadata.groupId
+      );
+    } else {
+      await this.connections.deleteAllConnectionsForIdentifier(identifier);
     }
 
     if (metadata.groupMemberPre) {
@@ -381,7 +385,7 @@ class IdentifierService extends AgentService {
         }:${localMember.displayName}`,
       });
 
-      await this.deleteGroupLinkedConnections(
+      await this.connections.deleteAllConnectionsForGroup(
         localMember.groupMetadata!.groupId
       );
 
@@ -472,15 +476,6 @@ class IdentifierService extends AgentService {
         id,
       },
     });
-  }
-
-  private async deleteGroupLinkedConnections(groupId: string): Promise<void> {
-    const connections = await this.connections.getMultisigLinkedContacts(
-      groupId
-    );
-    for (const connection of connections) {
-      await this.connections.deleteMultisigConnectionById(connection.id);
-    }
   }
 
   async deleteStaleLocalIdentifier(identifier: string): Promise<void> {
