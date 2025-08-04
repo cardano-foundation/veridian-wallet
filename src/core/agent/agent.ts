@@ -620,59 +620,6 @@ class Agent {
     await SecureStorage.wipe();
     this.markAgentStatus(false);
   }
-
-  @OnlineOnly
-  async deleteIdentifierAccount(identifierId: string): Promise<void> {
-    const metadata = await this.identifierStorage.getIdentifierMetadata(
-      identifierId
-    );
-    if (!metadata) {
-      console.warn(
-        `Attempted to delete a non-existent identifier: ${identifierId}`
-      );
-      return;
-    }
-
-    if (metadata.groupMetadata?.groupId) {
-      await this.connections.deleteAllConnectionsForGroup(
-        metadata.groupMetadata.groupId
-      );
-    } else {
-      await this.connections.deleteAllConnectionsForIdentifier(identifierId);
-    }
-
-    const notifications = await this.notificationStorage.findAllByQuery({
-      receivingPre: identifierId,
-    });
-    for (const notification of notifications) {
-      if (!/^\/local/.test(notification.route)) {
-        await this.signifyClient
-          .notifications()
-          .mark(notification.id)
-          .catch((error) => {
-            const status = (error as Error).message.split(" - ")[1];
-            if (!/404/gi.test(status)) {
-              throw error;
-            }
-          });
-      }
-    }
-
-    const allPeerConnections =
-      await this.peerConnectionPair.getAllPeerConnectionAccount();
-    for (const connection of allPeerConnections) {
-      if (connection.selectedAid === identifierId) {
-        PeerConnection.peerConnection.disconnectDApp(
-          connection.meerkatId,
-          true
-        );
-      }
-    }
-
-    // TODO:
-    await this.identifierService.deleteIdentifier(identifierId);
-    await this.identifiers.removeIdentifiersPendingDeletion();
-  }
 }
 
 export { Agent };

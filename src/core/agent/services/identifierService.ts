@@ -359,8 +359,13 @@ class IdentifierService extends AgentService {
     const metadata = await this.identifierStorage.getIdentifierMetadata(
       identifier
     );
+    if (!metadata) {
+      return;
+    }
     if (metadata.groupMetadata) {
       await this.deleteGroupLinkedConnections(metadata.groupMetadata.groupId);
+    } else {
+      await this.connections.deleteAllConnectionsForIdentifier(identifier);
     }
 
     if (metadata.groupMemberPre) {
