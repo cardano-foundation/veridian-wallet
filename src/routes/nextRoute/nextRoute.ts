@@ -46,9 +46,7 @@ const getNextRootRoute = (data: DataProps) => {
     data.store.stateCache.currentProfile.identity.id
   ) {
     const defaultProfile =
-      data.store.identifiers[
-        data.store.stateCache.currentProfile.identity.id
-      ];
+      data.store.identifiers[data.store.stateCache.currentProfile.identity.id];
 
     path = defaultProfile.groupMetadata
       ? RoutePath.GROUP_PROFILE_SETUP.replace(

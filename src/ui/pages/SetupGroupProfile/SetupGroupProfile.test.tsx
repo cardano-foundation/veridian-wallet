@@ -129,7 +129,14 @@ describe("Setup Connections", () => {
         time: Date.now(),
         passcodeIsSet: true,
         passwordIsSet: false,
-        defaultProfile: filteredIdentifierFix[0].id,
+      },
+      currentProfile: {
+        identity: filteredIdentifierFix[0],
+        connections: [],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
       },
     },
   };
@@ -231,7 +238,7 @@ describe("Setup Connections", () => {
     await waitFor(() => {
       expect(connectByOobiUrlMock).toBeCalledWith(
         barcodes[0].rawValue,
-        initialState.stateCache.authentication.defaultProfile
+        initialState.stateCache.currentProfile.identity.id
       );
     });
   });
@@ -290,7 +297,7 @@ describe("Setup Connections", () => {
       expect(dispatchMock).toBeCalledWith(
         setMissingAliasConnection({
           url: "http://keria:3902/oobi/EKDTSzuyUb7ICP1rFzrFGXc1AwC4yFtTkzIHbbjoJDO6/agent/EJqSoWGc6xyYisiaFKsuut159p",
-          identifier: initialState.stateCache.authentication.defaultProfile,
+          identifier: initialState.stateCache.currentProfile.identity.id,
         })
       );
     });

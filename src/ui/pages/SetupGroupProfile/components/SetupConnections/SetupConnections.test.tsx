@@ -78,6 +78,7 @@ const initiatorGroupProfile = {
     groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
     groupCreated: false,
     groupInitiator: true,
+    userName: "",
   },
 };
 jest.mock("react-router-dom", () => ({
@@ -177,7 +178,14 @@ describe("Setup Connection", () => {
         passcodeIsSet: true,
         passwordIsSet: false,
         userName: "Duke",
-        defaultProfile: "",
+      },
+      currentProfile: {
+        identity: initiatorGroupProfile.id,
+        connections: [],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
       },
       isOnline: true,
     },
@@ -259,7 +267,7 @@ describe("Setup Connection", () => {
     await waitFor(() => {
       expect(getOobiMock).toBeCalledWith(
         stage1State.newIdentifier.id,
-        initiatorGroupProfile.displayName,
+        initiatorGroupProfile.groupMetadata.userName,
         initiatorGroupProfile.groupMetadata?.groupId
       );
     });
@@ -292,13 +300,13 @@ describe("Setup Connection", () => {
     });
   });
 
-  test("Render setup connection tab and open profiles modal", async () => {
+  test("Share", async () => {
     const history = createMemoryHistory();
     history.push(
       RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
     );
 
-    const { getByText, getByTestId } = render(
+    const { getByText } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter history={history}>
           <SetupConnections
@@ -320,7 +328,7 @@ describe("Setup Connection", () => {
     expect(shareFnc).toBeCalled();
   });
 
-  test("Render setup connection tab and open profiles modal", async () => {
+  test("Delete group profile", async () => {
     const history = createMemoryHistory();
     history.push(
       RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
@@ -340,7 +348,7 @@ describe("Setup Connection", () => {
     await waitFor(() => {
       expect(getOobiMock).toBeCalledWith(
         stage1State.newIdentifier.id,
-        initiatorGroupProfile.displayName,
+        initiatorGroupProfile.groupMetadata.userName,
         initiatorGroupProfile.groupMetadata?.groupId
       );
     });
@@ -411,7 +419,7 @@ describe("Setup Connection", () => {
     await waitFor(() => {
       expect(getOobiMock).toBeCalledWith(
         stage1State.newIdentifier.id,
-        initiatorGroupProfile.displayName,
+        initiatorGroupProfile.groupMetadata.userName,
         initiatorGroupProfile.groupMetadata?.groupId
       );
     });
@@ -485,7 +493,7 @@ describe("Setup Connection", () => {
     await waitFor(() => {
       expect(getOobiMock).toBeCalledWith(
         stage1State.newIdentifier.id,
-        initiatorGroupProfile.displayName,
+        initiatorGroupProfile.groupMetadata.userName,
         initiatorGroupProfile.groupMetadata?.groupId
       );
     });
@@ -547,7 +555,7 @@ describe("Setup Connection", () => {
     await waitFor(() => {
       expect(getOobiMock).toBeCalledWith(
         stage1State.newIdentifier.id,
-        initiatorGroupProfile.displayName,
+        initiatorGroupProfile.groupMetadata.userName,
         initiatorGroupProfile.groupMetadata?.groupId
       );
     });
@@ -589,7 +597,7 @@ describe("Setup Connection", () => {
     await waitFor(() => {
       expect(getOobiMock).toBeCalledWith(
         stage1State.newIdentifier.id,
-        initiatorGroupProfile.displayName,
+        initiatorGroupProfile.groupMetadata.userName,
         initiatorGroupProfile.groupMetadata?.groupId
       );
     });
