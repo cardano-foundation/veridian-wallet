@@ -247,7 +247,9 @@ const Connections = () => {
               buttonAction={handleConnectModal}
               testId={pageId}
               buttonIcon={ScanIconWhite}
-            />
+            >
+              <div className="placeholder-spacer" />
+            </CardsPlaceholder>
           )
         }
       >

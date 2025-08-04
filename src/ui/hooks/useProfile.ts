@@ -45,9 +45,12 @@ export const useProfile = () => {
 
       const newHistoriesProfile =
         newProfilesHistory ||
-        [...profileHistories, defaultProfile?.identity.id || ""].filter(
-          (item) => !!item
-        );
+        [
+          ...[...profileHistories].filter(
+            (item) => item !== defaultProfile?.identity.id || ""
+          ),
+          defaultProfile?.identity.id || "",
+        ].filter((item) => !!item);
 
       updateProfileHistories(newHistoriesProfile);
     },

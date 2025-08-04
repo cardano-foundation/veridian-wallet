@@ -117,15 +117,15 @@ const ProfileDetailsModule = ({
       const filterId = profile
         ? profile.id
         : cloudError
-        ? profileId
-        : undefined;
+          ? profileId
+          : undefined;
 
       await deleteIdentifier();
-      dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
-      dispatch(removeProfile(filterId || ""));
       if (defaultProfile?.identity.id === filterId) {
         await setRecentProfileAsDefault();
       }
+      dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
+      dispatch(removeProfile(filterId || ""));
     } catch (e) {
       showError(
         "Unable to delete identifier",
