@@ -16,9 +16,7 @@ import {
 } from "../../../store/reducers/connectionsCache";
 import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
   getCurrentProfile,
-  getStateCache,
   setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
@@ -35,11 +33,11 @@ import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { ConnectionDetails } from "../ConnectionDetails";
+import { Profiles } from "../Profiles";
 import { ConnectionsBody } from "./components/ConnectionsBody";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
-import { Profiles } from "../Profiles";
 
 const Connections = () => {
   const pageId = "connections-tab";
@@ -61,7 +59,6 @@ const Connections = () => {
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
-  const auth = useAppSelector(getAuthentication);
   const currentProfile = useAppSelector(getCurrentProfile);
   const identifier = identifiers[currentProfile.identity.id];
 

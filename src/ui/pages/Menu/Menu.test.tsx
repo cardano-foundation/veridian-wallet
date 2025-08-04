@@ -86,9 +86,6 @@ describe("Menu Tab", () => {
     expect(getByTestId("menu-tab")).toBeInTheDocument();
     expect(getByText(EN_TRANSLATIONS.tabs.menu.tab.header)).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.menu.tab.items.profile.title)
-    ).toBeInTheDocument();
-    expect(
       getByText(EN_TRANSLATIONS.tabs.menu.tab.items.connections.title)
     ).toBeInTheDocument();
     expect(

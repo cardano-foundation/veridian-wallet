@@ -480,7 +480,7 @@ describe("Profile setup", () => {
             groupId: "",
             groupInitiator: true,
             groupCreated: false,
-            userName: "groupName",
+            userName: "testUser",
           },
         });
       });
