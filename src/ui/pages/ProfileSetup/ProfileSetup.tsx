@@ -101,7 +101,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         groupId: new Salter({}).qb64,
         groupInitiator: true,
         groupCreated: false,
-        userName: groupName,
+        userName: userName,
       };
       metadata.groupMetadata = groupMetadata;
     }
@@ -113,17 +113,6 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
       );
-
-      if (isGroup) {
-        await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-          new BasicRecord({
-            id: MiscRecordId.USER_NAME,
-            content: {
-              userName,
-            },
-          })
-        );
-      }
 
       if (individualFirstCreate) {
         await Agent.agent.basicStorage

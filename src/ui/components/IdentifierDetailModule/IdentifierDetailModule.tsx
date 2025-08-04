@@ -83,7 +83,10 @@ const IdentifierDetailModule = ({
     try {
       if (!cardData?.id) return;
 
-      const oobiValue = await Agent.agent.connections.getOobi(`${cardData.id}`);
+      const oobiValue = await Agent.agent.connections.getOobi(
+        `${cardData.id}`,
+        displayName
+      );
       if (oobiValue) {
         setOobi(oobiValue);
       }

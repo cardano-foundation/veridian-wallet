@@ -159,7 +159,7 @@ describe("Create group identifier - Setup Connection", () => {
     await waitFor(() => {
       expect(getOobiMock).toBeCalledWith(
         stage1State.newIdentifier.id,
-        stage1State.newIdentifier.displayName,
+        stage1State.newIdentifier.groupMetadata.userName,
         stage1State.newIdentifier.groupMetadata.groupId
       );
     });
