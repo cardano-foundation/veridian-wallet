@@ -1,6 +1,9 @@
 import { MigrationType, HybridMigration } from "./migrations.types";
 import { SignifyClient } from "signify-ts";
-import { createInsertItemTagsStatements, createInsertItemStatement } from "./migrationUtils";
+import {
+  createInsertItemTagsStatements,
+  createInsertItemStatement,
+} from "./migrationUtils";
 
 export const DATA_V1201: HybridMigration = {
   type: MigrationType.HYBRID,

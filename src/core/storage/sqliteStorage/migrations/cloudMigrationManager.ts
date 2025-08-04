@@ -24,10 +24,10 @@ export class CloudMigrationManager {
 
     const allCloudMigrations = [
       ...CLOUD_ONLY_MIGRATIONS,
-      ...COMBINED_MIGRATIONS.map(migration => ({
+      ...COMBINED_MIGRATIONS.map((migration) => ({
         version: migration.version,
         cloudMigrationStatements: migration.cloudMigrationStatements,
-      }))
+      })),
     ];
 
     const orderedMigrations = allCloudMigrations.sort((a, b) =>
@@ -42,7 +42,9 @@ export class CloudMigrationManager {
       // Skip if cloud migration is already completed
       if (cloudMigrationStatus[migration.version]) {
         // eslint-disable-next-line no-console
-        console.log(`Cloud migration ${migration.version} already completed, skipping`);
+        console.log(
+          `Cloud migration ${migration.version} already completed, skipping`
+        );
         continue;
       }
 
@@ -51,17 +53,20 @@ export class CloudMigrationManager {
 
       try {
         await this.executeCloudMigration(migration);
-        
+
         // Mark migration as complete if callback is provided
         if (this.markMigrationComplete) {
           await this.markMigrationComplete(migration.version);
         }
-        
+
         // eslint-disable-next-line no-console
         console.log(`Completed cloud migration: ${migration.version}`);
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error(`Failed to execute cloud migration ${migration.version}:`, error);
+        console.error(
+          `Failed to execute cloud migration ${migration.version}:`,
+          error
+        );
         throw error;
       }
     }
@@ -80,10 +85,10 @@ export class CloudMigrationManager {
 
     const allCloudMigrations = [
       ...CLOUD_ONLY_MIGRATIONS,
-      ...COMBINED_MIGRATIONS.map(migration => ({
+      ...COMBINED_MIGRATIONS.map((migration) => ({
         version: migration.version,
         cloudMigrationStatements: migration.cloudMigrationStatements,
-      }))
+      })),
     ];
 
     const orderedMigrations = allCloudMigrations.sort((a, b) =>
@@ -111,7 +116,7 @@ export class CloudMigrationManager {
       // eslint-disable-next-line no-console
       console.log(`Running missed cloud migration: ${migration.version}`);
       await this.executeCloudMigration(migration, true);
-      
+
       // Mark migration as complete if callback is provided
       if (this.markMigrationComplete) {
         await this.markMigrationComplete(migration.version);
@@ -120,16 +125,18 @@ export class CloudMigrationManager {
   }
 
   private async executeCloudMigration(
-    migration: CloudOnlyMigration | { version: string; cloudMigrationStatements: any },
+    migration:
+      | CloudOnlyMigration
+      | { version: string; cloudMigrationStatements: any },
     isRecoveryValidation: boolean = false
   ): Promise<void> {
     const action = isRecoveryValidation ? "recovery validation" : "migration";
     // eslint-disable-next-line no-console
     console.log(`Starting cloud ${action} ${migration.version}`);
-    
+
     await migration.cloudMigrationStatements(this.signifyClient);
-    
+
     // eslint-disable-next-line no-console
     console.log(`Completed cloud ${action} ${migration.version}`);
   }
-} 
+}

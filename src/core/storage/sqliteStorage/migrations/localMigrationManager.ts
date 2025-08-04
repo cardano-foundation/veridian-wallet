@@ -1,6 +1,10 @@
 import { SQLiteDBConnection } from "@capacitor-community/sqlite";
 import { versionCompare } from "../utils";
-import { LocalMigration, CombinedMigration, MigrationType } from "./migrations.types";
+import {
+  LocalMigration,
+  CombinedMigration,
+  MigrationType,
+} from "./migrations.types";
 import { LOCAL_MIGRATIONS, COMBINED_MIGRATIONS } from "./index";
 
 export class LocalMigrationManager {
@@ -17,11 +21,11 @@ export class LocalMigrationManager {
 
     const allLocalMigrations = [
       ...LOCAL_MIGRATIONS,
-      ...COMBINED_MIGRATIONS.map(migration => ({
+      ...COMBINED_MIGRATIONS.map((migration) => ({
         version: migration.version,
         type: migration.type,
         localMigrationStatements: migration.localMigrationStatements,
-      }))
+      })),
     ];
 
     const orderedMigrations = allLocalMigrations.sort((a, b) =>
@@ -54,7 +58,9 @@ export class LocalMigrationManager {
   }
 
   private async executeLocalMigration(
-    migration: LocalMigration | { version: string; type: MigrationType; localMigrationStatements: any }
+    migration:
+      | LocalMigration
+      | { version: string; type: MigrationType; localMigrationStatements: any }
   ): Promise<{ statement: string; values?: unknown[] }[]> {
     const migrationStatements: { statement: string; values?: unknown[] }[] = [];
 
@@ -72,10 +78,12 @@ export class LocalMigrationManager {
     } else if (migration.type === MigrationType.HYBRID) {
       // Handle hybrid migrations (local part only)
       const hybridMigration = migration as any;
-      const statements = await hybridMigration.localMigrationStatements(this.session);
+      const statements = await hybridMigration.localMigrationStatements(
+        this.session
+      );
       migrationStatements.push(...statements);
     }
 
     return migrationStatements;
   }
-} 
+}

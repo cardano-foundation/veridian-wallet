@@ -53,12 +53,12 @@ type CombinedMigration = HybridMigration;
 
 export { MigrationType };
 
-export type { 
-  SqlMigration, 
-  TsMigration, 
-  CloudMigration, 
+export type {
+  SqlMigration,
+  TsMigration,
+  CloudMigration,
   HybridMigration,
   LocalMigration,
   CloudOnlyMigration,
-  CombinedMigration
+  CombinedMigration,
 };

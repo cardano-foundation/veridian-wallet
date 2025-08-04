@@ -1,5 +1,8 @@
 import { MigrationType, TsMigration } from "./migrations.types";
-import { createInsertItemTagsStatements, createInsertItemStatement } from "./migrationUtils";
+import {
+  createInsertItemTagsStatements,
+  createInsertItemStatement,
+} from "./migrationUtils";
 
 export const DATA_V1200: TsMigration = {
   type: MigrationType.TS,
