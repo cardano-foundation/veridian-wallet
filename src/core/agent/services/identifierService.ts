@@ -31,6 +31,7 @@ import { OperationPendingRecordType } from "../records/operationPendingRecord.ty
 import { Agent } from "../agent";
 import { PeerConnection } from "../../cardano/walletConnect/peerConnection";
 import { ConnectionService } from "./connectionService";
+import { CredentialService } from "./credentialService";
 import {
   EventTypes,
   IdentifierAddedEvent,
@@ -39,7 +40,6 @@ import {
 } from "../event.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { OobiQueryParams } from "./connectionService.types";
-import type { KeriaNotification } from "./keriaNotificationService.types";
 
 const UI_THEMES = [
   0, 1, 2, 3, 10, 11, 12, 13, 20, 21, 22, 23, 30, 31, 32, 33, 40, 41, 42, 43,
@@ -70,6 +70,7 @@ class IdentifierService extends AgentService {
   protected readonly basicStorage: BasicStorage;
   protected readonly notificationStorage: NotificationStorage;
   protected readonly connections: ConnectionService;
+  protected readonly credentials: CredentialService;
 
   constructor(
     agentServiceProps: AgentServicesProps,
@@ -77,7 +78,8 @@ class IdentifierService extends AgentService {
     operationPendingStorage: OperationPendingStorage,
     basicStorage: BasicStorage,
     notificationStorage: NotificationStorage,
-    connections: ConnectionService
+    connections: ConnectionService,
+    credentials: CredentialService
   ) {
     super(agentServiceProps);
     this.identifierStorage = identifierStorage;
@@ -85,6 +87,7 @@ class IdentifierService extends AgentService {
     this.basicStorage = basicStorage;
     this.notificationStorage = notificationStorage;
     this.connections = connections;
+    this.credentials = credentials;
   }
 
   onIdentifierRemoved() {
@@ -366,6 +369,8 @@ class IdentifierService extends AgentService {
     } else {
       await this.connections.deleteAllConnectionsForIdentifier(identifier);
     }
+
+    await this.credentials.deleteAllCredentialsForIdentifier(identifier);
 
     if (metadata.groupMemberPre) {
       const localMember = await this.identifierStorage.getIdentifierMetadata(
