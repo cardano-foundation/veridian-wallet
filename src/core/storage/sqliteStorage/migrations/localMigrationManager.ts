@@ -2,7 +2,6 @@ import { SQLiteDBConnection } from "@capacitor-community/sqlite";
 import { versionCompare } from "../utils";
 import {
   LocalMigration,
-  CombinedMigration,
   MigrationType,
 } from "./migrations.types";
 import { LOCAL_MIGRATIONS, COMBINED_MIGRATIONS } from "./index";
