@@ -32,11 +32,27 @@ export class LocalMigrationManager {
       versionCompare(a.version, b.version)
     );
 
-    for (const migration of orderedMigrations) {
-      if (versionCompare(migration.version, currentVersion) !== 1) {
-        continue;
-      }
+    // Filter migrations that need to be executed
+    const pendingMigrations = orderedMigrations.filter(
+      (migration) => versionCompare(migration.version, currentVersion) === 1
+    );
 
+    if (pendingMigrations.length === 0) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `No local migrations needed. Current version: ${currentVersion}`
+      );
+      return;
+    }
+
+    const targetVersion =
+      pendingMigrations[pendingMigrations.length - 1].version;
+    // eslint-disable-next-line no-console
+    console.log(
+      `Starting local migration from version ${currentVersion} to ${targetVersion}...`
+    );
+
+    for (const migration of pendingMigrations) {
       // eslint-disable-next-line no-console
       console.log(`Executing local migration: ${migration.version}`);
 
@@ -55,6 +71,11 @@ export class LocalMigrationManager {
       // eslint-disable-next-line no-console
       console.log(`Completed local migration: ${migration.version}`);
     }
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `Local migration completed. Updated from version ${currentVersion} to ${targetVersion}`
+    );
   }
 
   private async executeLocalMigration(

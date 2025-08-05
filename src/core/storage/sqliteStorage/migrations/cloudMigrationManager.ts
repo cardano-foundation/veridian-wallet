@@ -1,6 +1,6 @@
 import { SignifyClient } from "signify-ts";
 import { versionCompare } from "../utils";
-import { CloudOnlyMigration, CombinedMigration } from "./migrations.types";
+import { CloudOnlyMigration } from "./migrations.types";
 import { CLOUD_ONLY_MIGRATIONS, COMBINED_MIGRATIONS } from "./index";
 
 export class CloudMigrationManager {
@@ -34,20 +34,30 @@ export class CloudMigrationManager {
       versionCompare(a.version, b.version)
     );
 
-    for (const migration of orderedMigrations) {
-      if (versionCompare(migration.version, currentVersion) !== 1) {
-        continue;
-      }
+    // Filter migrations that need to be executed
+    const pendingMigrations = orderedMigrations.filter((migration) => {
+      const needsMigration =
+        versionCompare(migration.version, currentVersion) === 1;
+      const notCompleted = !cloudMigrationStatus[migration.version];
+      return needsMigration && notCompleted;
+    });
 
-      // Skip if cloud migration is already completed
-      if (cloudMigrationStatus[migration.version]) {
-        // eslint-disable-next-line no-console
-        console.log(
-          `Cloud migration ${migration.version} already completed, skipping`
-        );
-        continue;
-      }
+    if (pendingMigrations.length === 0) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `No cloud migrations needed. Current version: ${currentVersion}`
+      );
+      return;
+    }
 
+    const targetVersion =
+      pendingMigrations[pendingMigrations.length - 1].version;
+    // eslint-disable-next-line no-console
+    console.log(
+      `Starting cloud migration from version ${currentVersion} to ${targetVersion}...`
+    );
+
+    for (const migration of pendingMigrations) {
       // eslint-disable-next-line no-console
       console.log(`Executing cloud migration: ${migration.version}`);
 
@@ -70,6 +80,11 @@ export class CloudMigrationManager {
         throw error;
       }
     }
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `Cloud migration completed. Updated from version ${currentVersion} to ${targetVersion}`
+    );
   }
 
   /**
@@ -107,9 +122,11 @@ export class CloudMigrationManager {
       return;
     }
 
+    const targetVersion =
+      missedCloudMigrations[missedCloudMigrations.length - 1].version;
     // eslint-disable-next-line no-console
     console.log(
-      `Found ${missedCloudMigrations.length} missed cloud migrations to run`
+      `Found ${missedCloudMigrations.length} missed cloud migrations to run (from version ${currentVersion} to ${targetVersion})`
     );
 
     for (const migration of missedCloudMigrations) {
@@ -122,13 +139,18 @@ export class CloudMigrationManager {
         await this.markMigrationComplete(migration.version);
       }
     }
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `Recovery cloud migration completed. Updated from version ${currentVersion} to ${targetVersion}`
+    );
   }
 
   private async executeCloudMigration(
     migration:
       | CloudOnlyMigration
       | { version: string; cloudMigrationStatements: any },
-    isRecoveryValidation: boolean = false
+    isRecoveryValidation = false
   ): Promise<void> {
     const action = isRecoveryValidation ? "recovery validation" : "migration";
     // eslint-disable-next-line no-console
