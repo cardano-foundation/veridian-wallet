@@ -1103,11 +1103,6 @@ describe("Single sig service of agent", () => {
       ...keriMetadataRecord,
       creationStatus: CreationStatus.PENDING,
     });
-    connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([
-      {
-        id: "EHxEwa9UAcThqxuxbq56BYMq7YPWYxA63A1nau2AZ-1A",
-      },
-    ]);
     PeerConnection.peerConnection.getConnectingIdentifier = jest
       .fn()
       .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
@@ -1117,9 +1112,7 @@ describe("Single sig service of agent", () => {
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
-    expect(connections.deleteMultisigConnectionById).toBeCalledWith(
-      "EHxEwa9UAcThqxuxbq56BYMq7YPWYxA63A1nau2AZ-1A"
-    );
+    expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
       findNotificationsResult[0].id
