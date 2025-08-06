@@ -86,11 +86,6 @@ class ConnectionService extends AgentService {
     this.contactStorage = contactStorage;
   }
 
-  static readonly CONNECTION_NOTE_RECORD_NOT_FOUND =
-    "Connection note record not found";
-  static readonly CONTACT_METADATA_RECORD_NOT_FOUND =
-    "Contact metadata record not found";
-  static readonly DEFAULT_ROLE = "agent";
   static readonly FAILED_TO_RESOLVE_OOBI =
     "Failed to resolve OOBI, operation not completing...";
   static readonly CANNOT_GET_OOBI = "No OOBI available from KERIA";
