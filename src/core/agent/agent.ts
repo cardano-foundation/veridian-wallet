@@ -365,17 +365,17 @@ class Agent {
     Agent.isOnline = online;
 
     if (online) {
+      // Execute cloud migrations when we come online
+      if (this.storageSession instanceof SqliteSession) {
+        this.storageSession.executeCloudMigrationsOnConnection();
+      }
+
       this.connections.removeConnectionsPendingDeletion();
       this.connections.resolvePendingConnections();
       this.identifiers.removeIdentifiersPendingDeletion();
       this.identifiers.processIdentifiersPendingCreation();
       this.credentials.removeCredentialsPendingDeletion();
       this.multiSigs.processGroupsPendingCreation();
-
-      // Execute cloud migrations when we come online
-      if (this.storageSession instanceof SqliteSession) {
-        this.storageSession.executeCloudMigrationsOnConnection();
-      }
     }
 
     this.agentServicesProps.eventEmitter.emit<KeriaStatusChangedEvent>({
