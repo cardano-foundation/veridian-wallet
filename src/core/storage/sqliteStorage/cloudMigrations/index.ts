@@ -6,4 +6,6 @@ const CLOUD_MIGRATIONS: CloudMigration[] = [
   CLOUD_V1201, // Convert connections to account-based model
 ];
 
-export { CLOUD_MIGRATIONS };
+const LATEST_CONTACT_VERSION = "1.2.0.1";
+
+export { CLOUD_MIGRATIONS, LATEST_CONTACT_VERSION };

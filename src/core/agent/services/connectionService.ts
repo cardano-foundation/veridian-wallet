@@ -58,7 +58,7 @@ import {
   OobiQueryParams,
   RpyRoute,
 } from "./connectionService.types";
-import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/migrations";
+import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
 class ConnectionService extends AgentService {
   protected readonly connectionPairStorage!: ConnectionPairStorage;
