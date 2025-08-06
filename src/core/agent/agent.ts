@@ -376,6 +376,11 @@ class Agent {
       this.identifiers.processIdentifiersPendingCreation();
       this.credentials.removeCredentialsPendingDeletion();
       this.multiSigs.processGroupsPendingCreation();
+
+      // Execute cloud migrations when we come online
+      if (this.storageSession instanceof SqliteSession) {
+        this.storageSession.executeCloudMigrationsOnConnection();
+      }
     }
 
     this.agentServicesProps.eventEmitter.emit<KeriaStatusChangedEvent>({

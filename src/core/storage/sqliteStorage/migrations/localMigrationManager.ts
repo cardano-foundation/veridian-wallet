@@ -1,10 +1,7 @@
 import { SQLiteDBConnection } from "@capacitor-community/sqlite";
 import { versionCompare } from "../utils";
-import {
-  LocalMigration,
-  MigrationType,
-} from "./migrations.types";
-import { LOCAL_MIGRATIONS, COMBINED_MIGRATIONS } from "./index";
+import { LocalMigration, MigrationType } from "./migrations.types";
+import { LOCAL_MIGRATIONS } from "./index";
 
 export class LocalMigrationManager {
   constructor(private session: SQLiteDBConnection) {}
@@ -18,16 +15,7 @@ export class LocalMigrationManager {
     // eslint-disable-next-line no-console
     console.log("Starting local migration execution...");
 
-    const allLocalMigrations = [
-      ...LOCAL_MIGRATIONS,
-      ...COMBINED_MIGRATIONS.map((migration) => ({
-        version: migration.version,
-        type: migration.type,
-        localMigrationStatements: migration.localMigrationStatements,
-      })),
-    ];
-
-    const orderedMigrations = allLocalMigrations.sort((a, b) =>
+    const orderedMigrations = LOCAL_MIGRATIONS.sort((a, b) =>
       versionCompare(a.version, b.version)
     );
 
@@ -78,9 +66,7 @@ export class LocalMigrationManager {
   }
 
   private async executeLocalMigration(
-    migration:
-      | LocalMigration
-      | { version: string; type: MigrationType; localMigrationStatements: any }
+    migration: LocalMigration
   ): Promise<{ statement: string; values?: unknown[] }[]> {
     const migrationStatements: { statement: string; values?: unknown[] }[] = [];
 
@@ -94,13 +80,6 @@ export class LocalMigrationManager {
       // Handle TypeScript migrations
       const tsMigration = migration as any;
       const statements = await tsMigration.migrationStatements(this.session);
-      migrationStatements.push(...statements);
-    } else if (migration.type === MigrationType.HYBRID) {
-      // Handle hybrid migrations (local part only)
-      const hybridMigration = migration as any;
-      const statements = await hybridMigration.localMigrationStatements(
-        this.session
-      );
       migrationStatements.push(...statements);
     }
 

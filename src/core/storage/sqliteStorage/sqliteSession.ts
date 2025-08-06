@@ -6,7 +6,7 @@ import {
 import { Capacitor } from "@capacitor/core";
 import { randomPasscode } from "signify-ts";
 import { LocalMigrationManager } from "./migrations/localMigrationManager";
-import { CloudMigrationManager } from "./migrations/cloudMigrationManager";
+import { CloudMigrationManager } from "./cloudMigrations/cloudMigrationManager";
 import { KeyStoreKeys, SecureStorage } from "../secureStorage";
 import { BasicStorage } from "../../agent/records/basicStorage";
 import { SqliteStorage } from "./sqliteStorage";
@@ -16,7 +16,7 @@ import { MiscRecordId } from "../../agent/agent.types";
 
 class SqliteSession {
   static readonly VERSION_DATABASE_KEY = "VERSION_DATABASE_KEY";
-  static readonly CLOUD_MIGRATION_STATUS_KEY = "CLOUD_MIGRATION_STATUS_KEY";
+  static readonly CLOUD_VERSION_KEY = "CLOUD_VERSION_KEY";
   static readonly GET_KV_SQL = "SELECT * FROM kv where key = ?";
   static readonly INSERT_KV_SQL =
     "INSERT OR REPLACE INTO kv (key,value) VALUES (?,?)";
@@ -24,7 +24,6 @@ class SqliteSession {
   private sessionInstance?: SQLiteDBConnection;
   private basicStorageService!: BasicStorage;
   private localMigrationManager?: LocalMigrationManager;
-  private cloudMigrationManager?: CloudMigrationManager;
 
   get session() {
     return this.sessionInstance;
@@ -59,19 +58,17 @@ class SqliteSession {
     }
   }
 
-  private async getCloudMigrationStatus(): Promise<Record<string, boolean>> {
+  private async getCloudVersion(): Promise<string> {
     try {
-      const status = await this.getKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY);
-      return status ?? {};
+      const cloudVersion = await this.getKv(SqliteSession.CLOUD_VERSION_KEY);
+      return cloudVersion ?? SqliteSession.BASE_VERSION;
     } catch (error) {
-      return {};
+      return SqliteSession.BASE_VERSION;
     }
   }
 
-  private async markCloudMigrationComplete(version: string): Promise<void> {
-    const status = await this.getCloudMigrationStatus();
-    status[version] = true;
-    await this.setKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY, status);
+  private async setCloudVersion(version: string): Promise<void> {
+    await this.setKv(SqliteSession.CLOUD_VERSION_KEY, version);
   }
 
   async open(storageName: string): Promise<void> {
@@ -119,30 +116,32 @@ class SqliteSession {
   }
 
   /**
-   * Validates and runs any missed cloud migrations after recovery
-   * Should be called when KERIA connection is established after recovery
+   * Executes cloud migrations when connecting to KERIA
+   * Should be called on normal startup or recovery when KERIA connection is established
    */
-  async validateCloudMigrationsOnRecovery(): Promise<void> {
-    // eslint-disable-next-line no-console
-    console.log("Validating cloud migrations after recovery...");
-
-    const currentLocalVersion = await this.getCurrentVersionDatabase();
-    const cloudMigrationStatus = await this.getCloudMigrationStatus();
-
-    if (!this.cloudMigrationManager) {
-      await this.initializeCloudMigrationManager();
+  async executeCloudMigrationsOnConnection(): Promise<void> {
+    const isKeriaConfigured = await this.isKeriaConfigured();
+    if (!isKeriaConfigured) {
+      // eslint-disable-next-line no-console
+      console.log("Skipping cloud migrations - KERIA not configured");
+      return;
     }
 
-    await this.cloudMigrationManager!.validateCloudMigrationsOnRecovery(
-      currentLocalVersion,
-      cloudMigrationStatus
+    if (!Agent.isOnline) {
+      await this.temporaryKeriaConnection();
+    }
+
+    const cloudMigrationManager = new CloudMigrationManager(
+      Agent.agent.client,
+      this.getCloudVersion.bind(this),
+      this.setCloudVersion.bind(this)
     );
+
+    await cloudMigrationManager.executeCloudMigrations();
   }
 
   private async migrateDb(): Promise<void> {
     const currentVersion = await this.getCurrentVersionDatabase();
-
-    await this.executeCloudMigrations(currentVersion);
     await this.executeLocalMigrations(currentVersion);
   }
 
@@ -152,31 +151,6 @@ class SqliteSession {
     }
 
     await this.localMigrationManager.executeLocalMigrations(currentVersion);
-  }
-
-  private async executeCloudMigrations(currentVersion: string): Promise<void> {
-    const isKeriaConfigured = await this.isKeriaConfigured();
-    if (!isKeriaConfigured) {
-      // eslint-disable-next-line no-console
-      console.log("Skipping cloud migrations - KERIA not configured");
-      return;
-    }
-
-    await this.initializeCloudMigrationManager();
-    const cloudMigrationStatus = await this.getCloudMigrationStatus();
-
-    await this.cloudMigrationManager!.executeCloudMigrations(
-      currentVersion,
-      cloudMigrationStatus
-    );
-  }
-
-  private async initializeCloudMigrationManager(): Promise<void> {
-    await this.temporaryKeriaConnection();
-    this.cloudMigrationManager = new CloudMigrationManager(
-      Agent.agent.client,
-      this.markCloudMigrationComplete.bind(this)
-    );
   }
 
   private async isKeriaConfigured(): Promise<boolean> {
