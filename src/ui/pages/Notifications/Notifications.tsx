@@ -53,6 +53,7 @@ const Notifications = () => {
   const [selectedItem, setSelectedItem] = useState<KeriaNotification | null>(
     null
   );
+
   const [isOpenCredModal, setIsOpenCredModal] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [viewCred, setViewCred] = useState("");

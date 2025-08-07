@@ -39,10 +39,8 @@ const SetupConnections = ({
 }: IdentifierStageProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
   const currentOperation = useAppSelector(getCurrentOperation);
   const multiSigGroupCache = useAppSelector(getMultiSigGroupCache);
-  const userName = stateCache.authentication.userName;
   const [oobi, setOobi] = useState("");
   const identifierId = resumeMultiSig?.id || state.newIdentifier.id;
   const groupId =
@@ -71,7 +69,7 @@ const SetupConnections = ({
     try {
       const oobiValue = await Agent.agent.connections.getOobi(
         identifierId,
-        userName,
+        state.newIdentifier.groupMetadata?.userName,
         groupId
       );
       if (oobiValue) {
@@ -80,7 +78,7 @@ const SetupConnections = ({
     } catch (e) {
       showError("Unable to fetch Oobi", e, dispatch);
     }
-  }, [groupId, userName, dispatch]);
+  }, [groupId, dispatch]);
 
   useOnlineStatusEffect(fetchOobi);
 

@@ -106,6 +106,10 @@ jest.mock("../CustomInput", () => ({
 }));
 
 describe("Create Identifier modal", () => {
+  beforeAll(async () => {
+    await ready();
+  });
+
   beforeEach(() => {
     mockGetMultisigConnection.mockImplementation((): any =>
       Promise.resolve([] as ConnectionDetails[])

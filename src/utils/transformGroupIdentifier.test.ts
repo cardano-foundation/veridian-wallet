@@ -36,6 +36,7 @@ describe("transformGroupIdentifier", () => {
           groupId: "test",
           groupInitiator: true,
           groupCreated: false,
+          userName: "",
         },
         groupMemberPre: "ELUXM-ajSu0o1qyFvss-3QQfkj3DOke9aHNwt72Byi9y",
       },

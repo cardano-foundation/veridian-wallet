@@ -312,7 +312,9 @@ describe("Connection service of agent", () => {
   test("Can mark an identifier to share when creating a connection", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const url = "https://localhost/oobi/1234/agent?name=alias";
-    identifierStorage.getIdentifierMetadata.mockResolvedValue(individualRecord);
+    identifierStorage.getIdentifierMetadata.mockResolvedValue({
+      displayName: "TestUser",
+    });
 
     await connectionService.connectByOobiUrl(url, individualRecord.id);
 
@@ -1214,8 +1216,8 @@ describe("Connection service of agent", () => {
       alias: "alias",
       oobi: "http://test.oobi",
     });
-    basicStorage.findExpectedById.mockResolvedValue({
-      content: { userName: "Alice" },
+    identifierStorage.getIdentifierMetadata.mockResolvedValue({
+      displayName: "Alice",
     });
     identifierStorage.getIdentifierMetadata.mockResolvedValue(individualRecord);
     getOobiMock.mockImplementation((name: string) => {
@@ -1233,7 +1235,7 @@ describe("Connection service of agent", () => {
     expect(submitRpyMock.mock.calls[0][0]).toBe("connectionId");
     const rpyIms: string = submitRpyMock.mock.calls[0][1];
     expect(rpyIms.includes("/introduce"));
-    expect(rpyIms.includes('"http://oobi.com/oobi/ourIdentifier?name=Alice"'));
+    expect(rpyIms.includes("\"http://oobi.com/oobi/ourIdentifier?name=Alice\""));
   });
 
   test("Shared identifier OOBIs carry over the external ID hint", async () => {
@@ -1244,8 +1246,8 @@ describe("Connection service of agent", () => {
       alias: "alias",
       oobi: "http://test.oobi?name=Bob&externalId=test123&randomQueryParam=random",
     });
-    basicStorage.findExpectedById.mockResolvedValue({
-      content: { userName: "Alice" },
+    identifierStorage.getIdentifierMetadata.mockResolvedValue({
+      displayName: "Alice",
     });
     identifierStorage.getIdentifierMetadata.mockResolvedValue(individualRecord);
     getOobiMock.mockImplementation((name: string) => {
@@ -1265,7 +1267,7 @@ describe("Connection service of agent", () => {
     expect(rpyIms.includes("/introduce"));
     expect(
       rpyIms.includes(
-        '"http://oobi.com/oobi/ourIdentifier?name=Alice&externalId=test123"'
+        "\"http://oobi.com/oobi/ourIdentifier?name=Alice&externalId=test123\""
       )
     );
   });

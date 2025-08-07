@@ -23,7 +23,6 @@ enum MiscRecordId {
   APP_LANGUAGE = "app-language",
   IDENTIFIERS_FAVOURITES = "identifiers-favourites",
   CREDS_FAVOURITES = "creds-favourites",
-  USER_NAME = "user-name",
   DEFAULT_PROFILE = "default-profile",
   APP_BIOMETRY = "app-biometry",
   KERIA_NOTIFICATION_MARKER = "keria-notification-marker",

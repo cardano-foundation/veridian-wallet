@@ -1013,15 +1013,6 @@
       "tab": {
         "header": "Menu",
         "items": {
-          "profile": {
-            "title": "Profile",
-            "tabheader": "Profile",
-            "tabedit": "Edit profile",
-            "actionedit": "Edit",
-            "actionconfirm": "Confirm",
-            "actioncancel": "Cancel",
-            "name": "Name"
-          },
           "connections": {
             "title": "Connections",
             "tabheader": "Connections"
@@ -1389,8 +1380,6 @@
     "notesupdated": "Notes updated successfully",
     "noteremoved": "Note removed successfully",
     "maxfavouritesreached": "Maximum of 5 favourites reached",
-    "usernamecreationsuccess": "Welcome, {{username}}!",
-    "usernamecreationerror": "Unable to set name. Please try again.",
     "walletconnectiondeleted": "Delete successfully",
     "connectwalletsuccess": "Connected successfully",
     "disconnectwallet": "Disconnected successfully",
@@ -1532,6 +1521,16 @@
       "form": {
         "input": "Username",
         "placeholder": "e.g. JohnSmith25"
+      }
+    },
+    "groupsetup": {
+      "title": "Group setup",
+      "description": "Create a group name for other members to join your group, or join an existing group",
+      "form": {
+        "input": "Group name",
+        "placeholder": "e.g. Company Name",
+        "or": "or",
+        "joingroup": "Join existing group"
       }
     },
     "finishsetup": {

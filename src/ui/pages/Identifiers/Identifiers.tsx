@@ -273,8 +273,8 @@ const Identifiers = () => {
       deletedPendingItem?.creationStatus === CreationStatus.FAILED
         ? "tabs.identifiers.deletepending.witnesserror"
         : deletedPendingItem?.groupMetadata?.groupId
-        ? "tabs.identifiers.deletepending.mutilsigdescription"
-        : "tabs.identifiers.deletepending.description"
+          ? "tabs.identifiers.deletepending.mutilsigdescription"
+          : "tabs.identifiers.deletepending.description"
     ),
     button: i18n.t("tabs.identifiers.deletepending.button"),
   };
@@ -360,8 +360,8 @@ const Identifiers = () => {
                   selectedFilter === IdentifiersFilters.All
                     ? allIdentifiers
                     : selectedFilter === IdentifiersFilters.Individual
-                    ? individualIdentifiers
-                    : groupIdentifiers
+                      ? individualIdentifiers
+                      : groupIdentifiers
                 }
                 onShowCardDetails={() => handleShowNavAnimation("cards")}
                 title={`${i18n.t("tabs.identifiers.tab.allidentifiers")}`}

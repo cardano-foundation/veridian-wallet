@@ -1,11 +1,8 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { addOutline } from "ionicons/icons";
-import { useMemo, useRef, useState } from "react";
-import { i18n } from "../../../../i18n";
+import { useMemo, useRef } from "react";
 import { SubMenuData, SubMenuKey } from "../Menu.types";
 import { ConnectWallet, ConnectWalletOptionRef } from "./ConnectWallet";
-import { Profile } from "./Profile";
-import { ProfileOptionRef } from "./Profile/Profile.types";
 
 const emptySubMenu = {
   Component: () => <></>,
@@ -22,50 +19,9 @@ const emptySubMenu = {
 };
 
 const SubMenuItems = () => {
-  const profileRef = useRef<ProfileOptionRef>(null);
   const connectWalletRef = useRef<ConnectWalletOptionRef>(null);
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-
-  const toggleEditProfile = () => {
-    setIsEditingProfile((prev) => {
-      const newState = !prev;
-      return newState;
-    });
-  };
-
-  const saveChanges = () => {
-    profileRef.current?.saveChanges();
-    toggleEditProfile();
-  };
 
   const menuMapData: [SubMenuKey, SubMenuData][] = [
-    [
-      SubMenuKey.Profile,
-      {
-        Component: () => (
-          <Profile
-            ref={profileRef}
-            isEditing={isEditingProfile}
-          />
-        ),
-        closeButtonLabel: isEditingProfile
-          ? `${i18n.t("tabs.menu.tab.items.profile.actioncancel")}`
-          : undefined,
-        closeButtonAction: isEditingProfile ? toggleEditProfile : undefined,
-        title: isEditingProfile
-          ? "tabs.menu.tab.items.profile.tabedit"
-          : "tabs.menu.tab.items.profile.tabheader",
-        pageId: isEditingProfile ? "edit-profile" : "view-profile",
-        additionalButtons: <></>,
-        nestedMenu: false,
-        actionButton: true,
-        actionButtonAction: isEditingProfile ? saveChanges : toggleEditProfile,
-        actionButtonLabel: isEditingProfile
-          ? `${i18n.t("tabs.menu.tab.items.profile.actionconfirm")}`
-          : `${i18n.t("tabs.menu.tab.items.profile.actionedit")}`,
-        renderAsModal: false,
-      },
-    ],
     [
       SubMenuKey.ConnectWallet,
       {
@@ -94,7 +50,7 @@ const SubMenuItems = () => {
 
   const subMenuMapData: [SubMenuKey, SubMenuData][] = [...menuMapData];
 
-  return useMemo(() => new Map(subMenuMapData), [isEditingProfile]);
+  return useMemo(() => new Map(subMenuMapData), []);
 };
 
 export { emptySubMenu, SubMenuItems };
