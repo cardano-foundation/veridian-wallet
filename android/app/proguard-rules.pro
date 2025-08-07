@@ -42,6 +42,12 @@
 -keep class io.evva.capacitor.securestorage.** { *; }
 -dontwarn io.evva.capacitor.securestorage.**
 
+# Rules for capacitor-freerasp to fix R8 minification errors
+-keep class com.aheaditec.freerasp.** { *; }
+-dontwarn com.aheaditec.freerasp.**
+-keep class java.lang.invoke.StringConcatFactory { *; }
+-dontwarn java.lang.invoke.StringConcatFactory
+
 # Suppress warnings from common libraries
 -dontwarn com.google.**
 -dontwarn org.chromium.**
