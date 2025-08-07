@@ -344,6 +344,11 @@ class Agent {
       bootUrl: "",
     });
 
+    // Validate and run any missed cloud migrations after recovery
+    if (this.storageSession instanceof SqliteSession) {
+      await this.storageSession.validateCloudMigrationsOnRecovery();
+    }
+
     await this.syncWithKeria();
   }
 
@@ -351,11 +356,6 @@ class Agent {
     await this.connections.syncKeriaContacts();
     await this.identifiers.syncKeriaIdentifiers();
     await this.credentials.syncKeriaCredentials();
-
-    // Validate and run any missed cloud migrations after recovery
-    if (this.storageSession instanceof SqliteSession) {
-      await this.storageSession.validateCloudMigrationsOnRecovery();
-    }
 
     await this.basicStorage.createOrUpdateBasicRecord(
       new BasicRecord({
@@ -494,11 +494,11 @@ class Agent {
   }
 
   async setupLocalDependencies(): Promise<void> {
-    await this.storageSession.open(walletId);
     this.agentServicesProps = {
       signifyClient: this.signifyClient,
       eventEmitter: new CoreEventEmitter(),
     };
+    await this.storageSession.open(walletId);
     this.basicStorageService = new BasicStorage(
       this.getStorageService<BasicRecord>(this.storageSession)
     );
@@ -562,10 +562,13 @@ class Agent {
   private getStorageService<T extends BaseRecord>(
     instance: IonicSession | SqliteSession
   ) {
-    if (instance instanceof IonicSession) {
-      return new IonicStorage<T>(instance.session!);
+    if (!instance.session) {
+      throw new Error("Storage session not initialized");
     }
-    return new SqliteStorage<T>(instance.session!);
+    if (instance instanceof IonicSession) {
+      return new IonicStorage<T>(instance.session);
+    }
+    return new SqliteStorage<T>(instance.session);
   }
 
   getBranAndMnemonic(): BranAndMnemonic {

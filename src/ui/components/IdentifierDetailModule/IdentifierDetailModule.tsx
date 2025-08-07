@@ -62,7 +62,6 @@ const IdentifierDetailModule = ({
 }: IdentifierDetailModuleProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
   const biometrics = useAppSelector(getBiometricsCache);
   const favouritesIdentifiersData = useAppSelector(
     getFavouritesIdentifiersCache
@@ -75,7 +74,7 @@ const IdentifierDetailModule = ({
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
   const [cardData, setCardData] = useState<IdentifierDetailsCore | undefined>();
-  const userName = stateCache.authentication.userName;
+  const displayName = cardData?.displayName;
   const [oobi, setOobi] = useState("");
   const [cloudError, setCloudError] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -86,7 +85,7 @@ const IdentifierDetailModule = ({
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${cardData.id}`,
-        userName
+        displayName
       );
       if (oobiValue) {
         setOobi(oobiValue);
@@ -94,7 +93,7 @@ const IdentifierDetailModule = ({
     } catch (e) {
       showError("Unable to fetch oobi", e, dispatch);
     }
-  }, [cardData?.id, userName, dispatch]);
+  }, [cardData?.id, displayName, dispatch]);
 
   const isFavourite = favouritesIdentifiersData?.some(
     (fav) => fav.id === identifierDetailId
@@ -135,8 +134,8 @@ const IdentifierDetailModule = ({
       const filterId = cardData
         ? cardData.id
         : cloudError
-        ? identifierDetailId
-        : undefined;
+          ? identifierDetailId
+          : undefined;
 
       await deleteIdentifier();
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));

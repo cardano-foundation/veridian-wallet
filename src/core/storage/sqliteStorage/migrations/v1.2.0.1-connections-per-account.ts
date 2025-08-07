@@ -1,5 +1,5 @@
-import { MigrationType, HybridMigration } from "./migrations.types";
 import { SignifyClient } from "signify-ts";
+import { MigrationType, HybridMigration } from "./migrations.types";
 import { ConnectionHistoryType } from "../../../agent/services/connectionService.types";
 
 export const DATA_V1201: HybridMigration = {
@@ -20,6 +20,7 @@ export const DATA_V1201: HybridMigration = {
       );
 
     if (!identifiers || identifiers.length === 0) {
+      // eslint-disable-next-line no-console
       console.log(
         "No identifiers found in local database, deleting all connections"
       );
@@ -106,6 +107,7 @@ export const DATA_V1201: HybridMigration = {
   },
 
   cloudMigrationStatements: async (signifyClient: SignifyClient) => {
+    // eslint-disable-next-line no-console
     console.log(
       "Starting cloud KERIA migration: Converting connections to account-based model"
     );
@@ -126,6 +128,7 @@ export const DATA_V1201: HybridMigration = {
 
     for (const contact of contacts) {
       if (contact["version"] === "1.2.0") {
+        // eslint-disable-next-line no-console
         console.log(
           `Contact ${contact.id} is already migrated from v1.2.0, skipping migration`
         );
@@ -244,6 +247,7 @@ export const DATA_V1201: HybridMigration = {
       await signifyClient.contacts().update(contact.id, contactUpdates);
     }
 
+    // eslint-disable-next-line no-console
     console.log(
       `Cloud migration completed: ${contacts.length} connections migrated to account-based model`
     );

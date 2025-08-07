@@ -49,8 +49,8 @@ class SecureStorage {
   static isErrorKeyNotFound(errorMessage?: string): boolean {
     return errorMessage
       ? SecureStorage.KEY_NOT_FOUND_ERRORS.some((err) =>
-          errorMessage.includes(err)
-        )
+        errorMessage.includes(err)
+      )
       : false;
   }
 
