@@ -38,6 +38,7 @@
     "@capacitor/share": "^7.0.0",
     "@capacitor/splash-screen": "^7.0.0",
     "@capacitor/status-bar": "^7.0.0",
+    "@capgo/capacitor-native-biometric": "^7.1.13",
     "@evva/capacitor-secure-storage-plugin": "^3.1.0",
     "@fabianbormann/cardano-peer-connect": "^1.2.18",
     "@ionic/react": "^8.6.0",
