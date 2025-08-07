@@ -39,7 +39,7 @@ export class MenuSettingsSupportScreen {
   async navigateToAnotherWebview() {
     const contexts = await driver.getContexts();
     log.info(`Contexts: ${contexts}`);
-    // Chỉ switch nếu context tồn tại
+    // Only switch if context exists
     if (contexts.includes("WEBVIEW_org.cardanofoundation.idw")) {
       await driver.switchContext("WEBVIEW_org.cardanofoundation.idw");
     } else {
