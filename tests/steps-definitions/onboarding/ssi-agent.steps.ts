@@ -62,7 +62,7 @@ When(/^user tap Validate button on SSI Agent Details screen$/, async function() 
 });
 
 Then(/^user can see Welcome modal$/, async function() {
-  // Chờ trang Profile Setup xuất hiện (không dùng wait cứng)
+  
   const profileTypeTitle = $("p.title");
   await profileTypeTitle.waitForDisplayed({ timeout: 10000 });
   await expect(profileTypeTitle).toHaveText("Which type of profile do you want to create?");
