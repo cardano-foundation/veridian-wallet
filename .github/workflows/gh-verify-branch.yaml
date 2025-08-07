@@ -44,3 +44,32 @@ jobs:
 
     - name: 🔨 Build project
       run: npm run build
+
+    - name: Mobile Dependency Security Check
+      run: |
+        echo "🔍 Checking mobile dependencies for security issues..."
+        
+        # Check for known vulnerable mobile dependencies
+        npm audit --audit-level=moderate --production || {
+          echo "⚠️ Security vulnerabilities found in mobile dependencies"
+          echo "Please review and update the following packages:"
+          npm audit --audit-level=moderate --production --json | jq -r '.advisories | to_entries[] | select(.value.severity == "moderate" or .value.severity == "high" or .value.severity == "critical") | .value.module_name // empty' | sort | uniq
+          exit 1
+        }
+        
+        # Check for outdated Capacitor and mobile-specific dependencies
+        echo "📱 Checking for outdated mobile dependencies..."
+        npx npm-check-updates --target minor --reject "@capacitor/*,@aparajita/*,@evva/*,capacitor-*" --format group || {
+          echo "ℹ️ Some mobile dependencies may have updates available"
+        }
+        
+        # Check for sensitive files in mobile directories
+        echo "🔍 Checking for sensitive files in mobile directories..."
+        if find . -name "google-services.json" -o -name "GoogleService-Info.plist" -o -name "*.keystore" -o -name "*.jks" | grep -q .; then
+          echo "⚠️ Found sensitive files in repository"
+          find . -name "google-services.json" -o -name "GoogleService-Info.plist" -o -name "*.keystore" -o -name "*.jks"
+        else
+          echo "✅ No sensitive files found"
+        fi
+        
+        echo "✅ Mobile dependency security check completed"

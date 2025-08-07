@@ -1,0 +1,208 @@
+name: Mobile Dependency Audit
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  ios-dependency-audit:
+    runs-on: macos-latest
+    name: iOS Dependency Audit
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 1
+
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+        bundler-cache: true
+
+    - name: Install CocoaPods and Audit Tools
+      run: |
+        gem install cocoapods
+        gem install cocoapods-audit
+
+    - name: Install iOS Dependencies
+      run: |
+        cd ios/App
+        pod install
+
+    - name: Check iOS Dependencies for Vulnerabilities
+      run: |
+        cd ios/App
+        echo "🔍 Checking iOS dependencies for security vulnerabilities..."
+        
+        # Run cocoapods-audit for vulnerability scanning
+        if command -v pod-audit &> /dev/null; then
+          echo "Running cocoapods-audit..."
+          pod-audit || {
+            echo "⚠️ iOS dependency vulnerabilities found by cocoapods-audit"
+            exit 1
+          }
+        else
+          echo "⚠️ cocoapods-audit not available, using basic checks"
+        fi
+        
+        # Check for outdated dependencies
+        if pod outdated --silent; then
+          echo "⚠️ Some iOS dependencies may be outdated. Consider updating."
+        else
+          echo "✅ iOS dependencies appear to be up to date"
+        fi
+        
+        # Check for known vulnerable dependencies
+        if grep -q "GoogleMLKit\|MLKitBarcodeScanning" Podfile; then
+          echo "⚠️ MLKit dependencies detected - monitor for security updates"
+        fi
+        
+        # Check for specific vulnerable iOS libraries
+        echo "Checking for known vulnerable iOS libraries..."
+        VULNERABLE_LIBS=("AFNetworking" "SDWebImage" "Realm" "CocoaLumberjack")
+        for lib in "${VULNERABLE_LIBS[@]}"; do
+          if grep -q "$lib" Podfile; then
+            echo "⚠️ Found potentially vulnerable library: $lib"
+          fi
+        done
+        
+        echo "✅ iOS dependency vulnerability check completed"
+
+  android-dependency-audit:
+    runs-on: ubuntu-latest
+    name: Android Dependency Audit
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 1
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: --no-daemon
+
+    - name: Download Gradle Dependencies
+      run: |
+        cd android
+        ./gradlew dependencies --no-daemon
+
+    - name: Install Dependency Check
+      run: |
+        wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0-release/dependency-check-8.4.0-release.zip
+        unzip dependency-check-8.4.0-release.zip
+        echo "$PWD/dependency-check/bin" >> $GITHUB_PATH
+
+    - name: Audit Android Dependencies
+      run: |
+        cd android
+        echo "🔍 Running OWASP Dependency Check for Android..."
+        dependency-check/bin/dependency-check.sh \
+          --scan . \
+          --format "JSON" \
+          --out "dependency-check-report.json" \
+          --failOnCVSS 7 || {
+          echo "⚠️ Android dependency vulnerabilities found. Please review and update dependencies."
+          cat dependency-check-report.json
+          exit 1
+        }
+
+    - name: Check Android Dependencies for Known Vulnerabilities
+      run: |
+        cd android
+        echo "🔍 Checking Android dependencies for known vulnerabilities..."
+        
+        # Check for vulnerable AndroidX versions
+        if grep -q "androidx.appcompat.*1\.[0-5]\." app/build.gradle; then
+          echo "⚠️ Outdated AndroidX AppCompat detected"
+          exit 1
+        fi
+        
+        # Check for vulnerable support library versions
+        if grep -q "com.android.support" app/build.gradle; then
+          echo "⚠️ Android Support Library detected - consider migrating to AndroidX"
+        fi
+        
+        # Check for known vulnerable libraries
+        VULNERABLE_ANDROID_LIBS=("okhttp" "retrofit" "glide" "picasso")
+        for lib in "${VULNERABLE_ANDROID_LIBS[@]}"; do
+          if grep -q "$lib" app/build.gradle; then
+            echo "⚠️ Found potentially vulnerable Android library: $lib"
+          fi
+        done
+        
+        echo "✅ Android dependency vulnerability check completed"
+
+  mobile-security-scan:
+    runs-on: ubuntu-latest
+    name: Mobile Security Scan
+    needs: [ios-dependency-audit, android-dependency-audit]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 1
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Run Mobile Security Scan
+      run: |
+        # Additional mobile-specific security checks
+        echo "🔍 Running mobile security scan..."
+        
+        # Check for known vulnerable Capacitor plugins
+        npm audit --audit-level=moderate || {
+          echo "⚠️ NPM audit found vulnerabilities in Capacitor dependencies"
+          exit 1
+        }
+        
+        # Check for outdated mobile dependencies
+        npx npm-check-updates --target minor --reject "@capacitor/*,@aparajita/*,@evva/*,capacitor-*" || {
+          echo "ℹ️ Some mobile dependencies may have updates available"
+        }
+        
+        # Check for sensitive files in mobile directories
+        echo "🔍 Checking for sensitive files in mobile directories..."
+        if find . -name "google-services.json" -o -name "GoogleService-Info.plist" -o -name "*.keystore" -o -name "*.jks" | grep -q .; then
+          echo "⚠️ Found sensitive files in repository"
+          find . -name "google-services.json" -o -name "GoogleService-Info.plist" -o -name "*.keystore" -o -name "*.jks"
+        else
+          echo "✅ No sensitive files found"
+        fi
+        
+        # Check Capacitor configuration for security issues
+        if [ -f "capacitor.config.ts" ]; then
+          echo "🔍 Checking Capacitor configuration for security issues..."
+          if grep -q "allowNavigation" capacitor.config.ts; then
+            echo "⚠️ Found allowNavigation in Capacitor config - review for security implications"
+          fi
+          if grep -q "server" capacitor.config.ts; then
+            echo "⚠️ Found server configuration in Capacitor config - review for security implications"
+          fi
+        fi
+        
+        echo "✅ Mobile security scan completed successfully" 

@@ -1,0 +1,121 @@
+# Mobile Security Configuration
+# This file configures mobile dependency scanning for iOS and Android
+
+mobile_dependencies:
+  # Capacitor core packages
+  capacitor_core:
+    - "@capacitor/core"
+    - "@capacitor/android"
+    - "@capacitor/ios"
+    - "@capacitor/app"
+    - "@capacitor/device"
+    - "@capacitor/keyboard"
+    - "@capacitor/status-bar"
+    - "@capacitor/splash-screen"
+    - "@capacitor/browser"
+    - "@capacitor/clipboard"
+    - "@capacitor/share"
+    - "@capacitor/screen-orientation"
+
+  # Security-focused plugins
+  security_plugins:
+    - "@aparajita/capacitor-biometric-auth"
+    - "@evva/capacitor-secure-storage-plugin"
+    - "capacitor-freerasp"
+    - "capacitor-native-settings"
+    - "capacitor-plugin-safe-area"
+
+  # Community plugins
+  community_plugins:
+    - "@capacitor-community/privacy-screen"
+    - "@capacitor-community/sqlite"
+    - "@capacitor-community/tap-jacking"
+    - "@capacitor-mlkit/barcode-scanning"
+
+# Vulnerability severity levels
+severity_levels:
+  critical: 9.0
+  high: 7.0
+  moderate: 4.0
+  low: 0.0
+
+# Scanning configuration
+scanning:
+  # iOS specific settings
+  ios:
+    tools:
+      - "cocoapods-audit"
+      - "npm-audit"
+    fail_on_severity: "moderate"
+    check_podfile: true
+    check_podfile_lock: true
+
+  # Android specific settings
+  android:
+    tools:
+      - "dependency-check"
+      - "npm-audit"
+    fail_on_severity: "moderate"
+    check_gradle_files: true
+    check_build_gradle: true
+
+  # General mobile settings
+  general:
+    tools:
+      - "npm-audit"
+      - "npm-check-updates"
+    fail_on_severity: "moderate"
+    check_capacitor_config: true
+    check_sensitive_files: true
+
+# Excluded vulnerabilities (known false positives or accepted risks)
+excluded_vulnerabilities:
+  # NSP IDs for known false positives
+  nsp_ids:
+    - "1100267"  # ReDOS vulnerability for email inputs in Appium drivers
+    - "1101851"  # SSRF attacks not relevant to our usage
+    - "1103618"  # SSRF attacks on Appium server
+    - "1105443"  # REDS attacks on @capacitor/assets
+    - "1105444"  # REDS attacks on @capacitor/assets
+    - "1106812"  # http response header vulnerability
+    - "1106507"  # Math.random() vulnerability in form-data
+
+# Mobile-specific security checks
+security_checks:
+  # Check for sensitive files that shouldn't be committed
+  sensitive_files:
+    - "google-services.json"
+    - "GoogleService-Info.plist"
+    - "*.keystore"
+    - "*.jks"
+    - "*.p12"
+    - "*.mobileprovision"
+
+  # Check for security-related configurations
+  configuration_checks:
+    - "capacitor.config.ts"
+    - "ios/App/Info.plist"
+    - "android/app/src/main/AndroidManifest.xml"
+
+# Reporting configuration
+reporting:
+  formats:
+    - "json"
+    - "html"
+    - "console"
+  output_directory: "security-reports"
+  include_recommendations: true
+  include_remediation_steps: true
+
+# CI/CD integration
+ci_cd:
+  # GitHub Actions specific settings
+  github_actions:
+    fail_on_vulnerabilities: true
+    create_issue_on_failure: false
+    comment_on_pr: true
+    
+  # Earthly specific settings
+  earthly:
+    fail_on_vulnerabilities: true
+    cache_results: true 

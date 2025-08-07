@@ -26,6 +26,34 @@ all:
     BUILD +$image_target --PUSH=$PUSH
   END
 
+mobile-security-audit:
+  LOCALLY
+  RUN echo "🔍 Starting mobile dependency security audit..."
+  
+  # Install Node.js dependencies
+  RUN npm ci
+  
+  # Run mobile dependency audit
+  RUN npm run audit:mobile || {
+    echo "⚠️ Mobile dependency vulnerabilities found"
+    exit 1
+  }
+  
+  # Additional mobile security checks
+  RUN echo "📱 Checking mobile-specific security configurations..."
+  
+  # Check Capacitor configuration
+  IF [ -f "capacitor.config.ts" ]
+    RUN echo "✅ Capacitor configuration found"
+  END
+  
+  # Check for sensitive files
+  RUN find . -name "google-services.json" -o -name "GoogleService-Info.plist" -o -name "*.keystore" -o -name "*.jks" | head -5 || {
+    echo "ℹ️ No sensitive files found in repository"
+  }
+  
+  RUN echo "✅ Mobile security audit completed"
+
 docker-publish:
   BUILD +all --PUSH=$PUSH
 

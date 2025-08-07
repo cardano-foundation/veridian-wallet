@@ -18,7 +18,8 @@
     "wdio:ios:15promax": "npx wdio tests/config/wdio.sim.ios.iphone15ProMax.config.ts",
     "wdio:ios:16promax": "npx wdio tests/config/wdio.sim.ios.iphone16ProMax.config.ts",
     "prepare": "husky install",
-    "audit": "better-npm-audit audit"
+    "audit": "better-npm-audit audit",
+    "audit:mobile": "./scripts/mobile-dependency-audit.sh"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^8.0.2",
@@ -99,6 +100,7 @@
     "appium-xcuitest-driver": "^9.2.2",
     "babel-jest": "^29.5.0",
     "better-npm-audit": "^3.11.0",
+    "npm-check-updates": "^18.0.0",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
