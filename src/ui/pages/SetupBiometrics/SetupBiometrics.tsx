@@ -130,7 +130,14 @@ const SetupBiometrics = () => {
     <>
       <ResponsivePageLayout
         pageId={pageId}
-        header={<PageHeader currentPath={RoutePath.SETUP_BIOMETRICS} />}
+        header={
+          <PageHeader
+            currentPath={RoutePath.SETUP_BIOMETRICS}
+            progressBar={true}
+            progressBarValue={0.25}
+            progressBarBuffer={1}
+          />
+        }
       >
         <div className="page-info">
           <IonIcon icon={fingerPrintOutline} />

@@ -22,7 +22,9 @@ import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import "./CreatePassword.scss";
 import { CreatePasswordProps } from "./CreatePassword.types";
-import { SetupPassword } from "./components";
+import { PageFooter } from "../../components/PageFooter";
+import { IonIcon } from "@ionic/react";
+import { lockClosedOutline } from "ionicons/icons";
 
 const CreatePassword = ({
   handleClear,
@@ -37,6 +39,7 @@ const CreatePassword = ({
   const [alertCancelIsOpen, setAlertCancelIsOpen] = useState(false);
   const isOnboarding = stateCache.routes[0]?.path === RoutePath.CREATE_PASSWORD;
   const [step, setStep] = useState(isOnboarding ? 0 : 1);
+  const [validated, setValidated] = useState(false);
 
   const handleContinue = async (skipped: boolean) => {
     if (skipped) {
@@ -88,8 +91,6 @@ const CreatePassword = ({
     setAlertCancelIsOpen(true);
   };
 
-  const isShowProgresBar = step !== 0 && isOnboarding;
-
   return (
     <>
       <ScrollablePageLayout
@@ -98,8 +99,8 @@ const CreatePassword = ({
         header={
           <PageHeader
             currentPath={isOnboarding ? RoutePath.CREATE_PASSWORD : undefined}
-            progressBar={isShowProgresBar}
-            progressBarValue={0.4}
+            progressBar={isOnboarding}
+            progressBarValue={0.5}
             progressBarBuffer={1}
             closeButton={!isOnboarding}
             closeButtonAction={handleClear}
@@ -113,17 +114,41 @@ const CreatePassword = ({
                 )}`
                 : undefined
             }
-            actionButton={isShowProgresBar}
+            actionButton={isOnboarding}
             actionButtonLabel={`${i18n.t("createpassword.button.skip")}`}
             actionButtonAction={handleSkip}
           />
         }
+        footer={
+          step === 0 ? (
+            <PageFooter
+              primaryButtonText={`${i18n.t(
+                "createpassword.setuppassword.button.enable"
+              )}`}
+              primaryButtonAction={handleSetupPassword}
+              tertiaryButtonText={`${i18n.t(
+                "createpassword.setuppassword.button.skip"
+              )}`}
+              tertiaryButtonAction={handleSkip}
+            />
+          ) : (
+            <PageFooter
+              pageId={pageId}
+              primaryButtonText={`${i18n.t("createpassword.button.continue")}`}
+              primaryButtonAction={() => handleContinue(false)}
+              primaryButtonDisabled={!validated}
+            />
+          )
+        }
       >
         {step === 0 ? (
-          <SetupPassword
-            onSetupPasswordClick={handleSetupPassword}
-            onSkipClick={handleSkip}
-          />
+          <div className="setup-password">
+            <div className="page-info">
+              <IonIcon icon={lockClosedOutline} />
+              <h1>{i18n.t("createpassword.setuppassword.title")}</h1>
+              <p>{i18n.t("createpassword.setuppassword.description")}</p>
+            </div>
+          </div>
         ) : (
           <PasswordModule
             ref={passwordModuleRef}
