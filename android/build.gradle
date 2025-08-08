@@ -14,8 +14,8 @@ buildscript {
         classpath 'com.android.tools.build:gradle:8.7.2'
         classpath 'com.google.gms:google-services:4.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // OWASP Dependency-Check Gradle plugin
-        classpath 'org.owasp:dependency-check-gradle:9.1.0'
+        // CycloneDX SBOM plugin (no API key required)
+        classpath 'org.cyclonedx:cyclonedx-gradle-plugin:1.10.0'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -23,16 +23,13 @@ buildscript {
 
 apply from: "variables.gradle"
 
-// Apply OWASP Dependency-Check plugin at root so it can scan all subprojects
-apply plugin: 'org.owasp.dependencycheck'
+// Apply CycloneDX plugin to generate SBOM for alternative scanners
+apply plugin: 'org.cyclonedx.bom'
 
-dependencyCheck {
-    failBuildOnCVSS = 7.0
-    analyzers {
-        assemblyEnabled = false
-    }
-    formats = ["HTML", "JSON"]
-    outputDirectory = file("${buildDir}/reports/dependency-check")
+// CycloneDX configuration (JSON SBOM)
+cyclonedx {
+    outputFormat = 'json'
+    skipConfigs = ["testCompileClasspath", "testRuntimeClasspath"]
 }
 
 allprojects {

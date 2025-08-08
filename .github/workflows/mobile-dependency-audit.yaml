@@ -122,18 +122,25 @@ jobs:
       working-directory: android
       run: ./gradlew dependencies --no-daemon
 
-    - name: OWASP Dependency-Check (Gradle)
+    - name: Generate CycloneDX SBOM (Gradle)
       working-directory: android
-      run: ./gradlew --no-daemon dependencyCheckAnalyze
+      run: ./gradlew --no-daemon cyclonedxBom
 
-    - name: Upload Dependency-Check reports
+    - name: Scan SBOM with Trivy (no API key)
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        scan-type: sbom
+        input: android/build/reports/bom.json
+        severity: HIGH,CRITICAL
+        exit-code: '1'
+        ignore-unfixed: true
+
+    - name: Upload SBOM
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: android-dependency-check-reports
-        path: |
-          android/**/build/reports/dependency-check*
-          android/**/build/reports/dependency-check/**
+        name: android-sbom
+        path: android/build/reports/bom.json
 
     - name: Check Android Dependencies for Known Vulnerabilities
       run: |
