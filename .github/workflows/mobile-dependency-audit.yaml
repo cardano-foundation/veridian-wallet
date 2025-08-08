@@ -23,8 +23,8 @@ on:
       - 'mobile-security-config.yaml'
 
 jobs:
-  mobile-security-audit:
-    name: Mobile Security Audit
+  setup-android:
+    name: Setup Android Environment
     runs-on: ubuntu-latest
     
     steps:
@@ -43,15 +43,108 @@ jobs:
       - name: Build project
         run: npm run build
         
-      - name: Sync Capacitor platforms
-        run: |
-          npx --yes cap sync ios
-          npx --yes cap sync android
+      - name: Sync Android platform
+        run: npx --yes cap sync android
+        
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
           
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          build-root-directory: android
+          
+      - name: Make gradlew executable
+        working-directory: android
+        run: chmod +x gradlew
+        
+      - name: Generate CycloneDX SBOM
+        working-directory: android
+        run: ./gradlew --no-daemon cyclonedxBom
+        
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-artifacts
+          path: android/build/reports/
+          retention-days: 30
+
+  setup-ios:
+    name: Setup iOS Environment
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci || npm install --no-audit --no-fund
+        
+      - name: Build project
+        run: npm run build
+        
+      - name: Sync iOS platform
+        run: npx --yes cap sync ios
+        
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          
+      - name: Install CocoaPods
+        run: gem install cocoapods
+        
       - name: Install iOS dependencies
         run: |
           cd ios/App
           pod install --repo-update
+          
+      - name: Upload iOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-artifacts
+          path: ios/App/Podfile.lock
+          retention-days: 30
+
+  mobile-security-audit:
+    name: Mobile Security Audit
+    runs-on: ubuntu-latest
+    needs: [setup-android, setup-ios]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci || npm install --no-audit --no-fund
+        
+      - name: Download Android artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-build-artifacts
+          path: android/build/reports/
+          
+      - name: Download iOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-build-artifacts
+          path: ios/App/
           
       - name: Run mobile dependency audit
         run: |
@@ -74,14 +167,4 @@ jobs:
             find ios -name "GoogleService-Info.plist" -o -name "*.p12" -o -name "*.mobileprovision"
           fi
           
-          echo "✅ Sensitive file check completed"
-          
-      - name: Upload audit artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: mobile-security-audit-results
-          path: |
-            android/build/reports/
-            ios/App/Podfile.lock
-          retention-days: 30 
+          echo "✅ Sensitive file check completed" 
