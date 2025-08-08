@@ -29,7 +29,7 @@ jobs:
     - name: Install CocoaPods and Audit Tools
       run: |
         gem install cocoapods
-        gem install cocoapods-audit
+        # cocoapods-audit is not available, using basic checks only
 
     - name: Install iOS Dependencies
       run: |
@@ -41,16 +41,8 @@ jobs:
         cd ios/App
         echo "🔍 Checking iOS dependencies for security vulnerabilities..."
         
-        # Run cocoapods-audit for vulnerability scanning
-        if command -v pod-audit &> /dev/null; then
-          echo "Running cocoapods-audit..."
-          pod-audit || {
-            echo "⚠️ iOS dependency vulnerabilities found by cocoapods-audit"
-            exit 1
-          }
-        else
-          echo "⚠️ cocoapods-audit not available, using basic checks"
-        fi
+        # Basic iOS dependency checks (cocoapods-audit not available)
+        echo "Running basic iOS dependency checks..."
         
         # Check for outdated dependencies
         if pod outdated --silent; then
