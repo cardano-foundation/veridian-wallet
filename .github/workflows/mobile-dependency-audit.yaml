@@ -95,32 +95,35 @@ jobs:
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: --no-daemon
+        build-root-directory: android
+
+    - name: Make gradlew executable
+      working-directory: android
+      run: chmod +x gradlew
 
     - name: Download Gradle Dependencies
-      run: |
-        cd android
-        ./gradlew dependencies --no-daemon
+      working-directory: android
+      run: ./gradlew dependencies --no-daemon
 
     - name: Install Dependency Check
       run: |
-        wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0-release/dependency-check-8.4.0-release.zip
-        unzip dependency-check-8.4.0-release.zip
+        wget -q https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0-release/dependency-check-8.4.0-release.zip
+        unzip -q dependency-check-8.4.0-release.zip
         echo "$PWD/dependency-check/bin" >> $GITHUB_PATH
 
     - name: Audit Android Dependencies
       run: |
-        cd android
         echo "🔍 Running OWASP Dependency Check for Android..."
         dependency-check/bin/dependency-check.sh \
-          --scan . \
+          --project "Android" \
+          --scan android \
           --format "JSON" \
           --out "dependency-check-report.json" \
           --failOnCVSS 7 || {
-          echo "⚠️ Android dependency vulnerabilities found. Please review and update dependencies."
-          cat dependency-check-report.json
-          exit 1
-        }
+            echo "⚠️ Android dependency vulnerabilities found. Please review and update dependencies."
+            cat dependency-check-report.json | head -n 200 || true
+            exit 1
+          }
 
     - name: Check Android Dependencies for Known Vulnerabilities
       run: |
