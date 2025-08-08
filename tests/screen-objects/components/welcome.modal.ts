@@ -12,7 +12,7 @@ export class WelcomeModal extends BaseModal {
   }
 
   get titleText() {
-    return $(".input-request-wrapper >h3");
+    return $(".input-request-wrapper h3");
   }
 
   async loads() {

@@ -14,7 +14,7 @@
     "prettier": "npx prettier --write './src/**/*.{ts,tsx,scss}' 'services/{credential-server,credential-server-ui}/src/**/*.{ts,tsx,scss}'",
     "eslint": "eslint 'src/**/*.{ts,tsx}'",
     "test": "jest",
-    "wdio:android:s24ultra": "npx wdio tests/config/wdio.emu.android.galaxyS24Ultra.config.ts",
+    "wdio:android:s24ultra": "export APP_PATH=\"$(pwd)/android/app/build/outputs/apk/debug/app-debug.apk\" && npx wdio tests/config/wdio.emu.android.galaxyS24Ultra.config.ts",
     "wdio:ios:15promax": "npx wdio tests/config/wdio.sim.ios.iphone15ProMax.config.ts",
     "wdio:ios:16promax": "npx wdio tests/config/wdio.sim.ios.iphone16ProMax.config.ts",
     "prepare": "husky install",
