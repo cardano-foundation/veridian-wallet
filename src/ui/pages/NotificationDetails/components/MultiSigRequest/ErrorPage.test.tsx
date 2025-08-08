@@ -14,6 +14,7 @@ import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { ErrorPage } from "./ErrorPage";
 import { CreationStatus } from "../../../../../core/agent/agent.types";
 import { makeTestStore } from "../../../../utils/makeTestStore";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 
 mockIonicReact();
 
@@ -58,14 +59,8 @@ const initialState = {
   connectionsCache: {
     multisigConnections: connectionsForNotifications,
   },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
-  identifiersCache: {
-    identifiers: multisignIdentifierFix,
-  },
-  biometricsCache: {
-    enabled: false,
+  profilesCache: {
+    ...profileCacheFixData,
   },
 };
 

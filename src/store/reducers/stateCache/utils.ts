@@ -1,7 +1,7 @@
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
-import { ConnectionData } from "../walletConnectionsCache";
+import { ConnectionData } from "../profileCache";
 
 const filterProfileData = (
   identifiers: Record<string, IdentifierShortDetails>,

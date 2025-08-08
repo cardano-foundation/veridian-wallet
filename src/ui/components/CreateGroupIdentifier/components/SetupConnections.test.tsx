@@ -16,10 +16,11 @@ import { identifierFix } from "../../../__fixtures__/identifierFix";
 import { OperationType, ToastMsgType } from "../../../globals/types";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../utils/passcodeFiller";
-import { IdentifierColor } from "../../CreateIdentifier/components/IdentifierColorSelector";
+import { IdentifierColor } from "../../EditProfile/components/IdentifierColorSelector";
 import { TabsRoutePath } from "../../navigation/TabsMenu";
 import { Stage } from "../CreateGroupIdentifier.types";
 import { SetupConnections } from "./SetupConnections";
+import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 
 setupIonicReact();
 mockIonicReact();
@@ -70,8 +71,7 @@ jest.mock("react-router-dom", () => ({
 describe("Create group identifier - Setup Connection", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
-      currentProfileId: "Account1",
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -85,9 +85,8 @@ describe("Create group identifier - Setup Connection", () => {
         isPaused: false,
       },
     },
-    identifiersCache: {
-      identifiers: {},
-      favourites: [],
+    profilesCache: {
+      ...profileCacheFixData,
       multiSigGroup: {
         groupId: "b75838e5-98cb-46cf-9233-8bf3beca4cd3",
         connections: [connectionsFix[3]],
@@ -348,7 +347,7 @@ describe("Create group identifier - Setup Connection", () => {
   describe("Resume Create Identifier", () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -361,9 +360,8 @@ describe("Create group identifier - Setup Connection", () => {
           isPaused: false,
         },
       },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
+      profilesCache: {
+        ...profileCacheFixData,
         multiSigGroup: {
           groupId: "b75838e5-98cb-46cf-9233-8bf3beca4cd3",
           connections: [connectionsFix[3]],
@@ -469,15 +467,13 @@ describe("Create group identifier - Setup Connection", () => {
 
       await waitFor(() => {
         expect(
-          getByText(EN_TRANSLATIONS.tabs.identifiers.details.delete.alert.title)
+          getByText(EN_TRANSLATIONS.profiledetails.delete.alert.title)
         ).toBeInTheDocument();
       });
 
       act(() => {
         fireEvent.click(
-          getByText(
-            EN_TRANSLATIONS.tabs.identifiers.details.delete.alert.confirm
-          )
+          getByText(EN_TRANSLATIONS.profiledetails.delete.alert.confirm)
         );
       });
 
@@ -527,8 +523,7 @@ describe("Create group identifier - Setup Connection", () => {
   describe("Create group identifier - Setup Connection", () => {
     const baseState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
-        currentProfileId: "Account1",
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -542,9 +537,8 @@ describe("Create group identifier - Setup Connection", () => {
         },
         isOnline: true,
       },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
+      profilesCache: {
+        ...profileCacheFixData,
         multiSigGroup: {
           groupId: "b75838e5-98cb-46cf-9233-8bf3beca4cd3",
           connections: [],
@@ -562,10 +556,13 @@ describe("Create group identifier - Setup Connection", () => {
 
       const pendingState = {
         ...baseState,
-        identifiersCache: {
-          ...baseState.identifiersCache,
-          identifiers: {
-            [identifierId]: transformedIdentifier[identifierId], // Ensure the key matches the transformed identifier
+        profilesCache: {
+          ...baseState.profilesCache,
+          profiles: {
+            ...baseState.profilesCache.profiles,
+            [identifierId]: {
+              identity: transformedIdentifier[identifierId],
+            },
           },
         },
       };
@@ -606,10 +603,13 @@ describe("Create group identifier - Setup Connection", () => {
 
       const completeState = {
         ...baseState,
-        identifiersCache: {
-          ...baseState.identifiersCache,
-          identifiers: {
-            [identifierId]: transformedIdentifier[identifierId], // Ensure the key matches the transformed identifier
+        profilesCache: {
+          ...baseState.profilesCache,
+          profiles: {
+            ...baseState.profilesCache.profiles,
+            [identifierId]: {
+              identity: transformedIdentifier[identifierId],
+            },
           },
         },
       };

@@ -38,13 +38,12 @@ import {
   updateOrAddMultisigConnectionCache,
 } from "../../../store/reducers/connectionsCache";
 import {
-  getIdentifiersCache,
-  getMultiSigGroupCache,
+  getProfileGroupCache,
+  getProfiles,
   getScanGroupId,
-  setMultiSigGroupCache,
-  setOpenMultiSigId,
-} from "../../../store/reducers/identifiersCache";
-import { MultiSigGroup } from "../../../store/reducers/identifiersCache/identifiersCache.types";
+  MultiSigGroup,
+  setGroupProfileCache,
+} from "../../../store/reducers/profileCache";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {
   getAuthentication,
@@ -63,7 +62,6 @@ import { combineClassNames } from "../../utils/style";
 import { isValidConnectionUrl, isValidHttpUrl } from "../../utils/urlChecker";
 import { Alert } from "../Alert";
 import { CreateGroupIdentifier } from "../CreateGroupIdentifier";
-import { CreateIdentifier } from "../CreateIdentifier";
 import { CustomInput } from "../CustomInput";
 import { IdentifierSelectorModal } from "../IdentifierSelectorModal";
 import { TabsRoutePath } from "../navigation/TabsMenu";
@@ -88,13 +86,13 @@ const Scanner = forwardRef(
     const componentId = "scanner";
     const platforms = getPlatforms();
     const dispatch = useAppDispatch();
-    const multiSigGroupCache = useAppSelector(getMultiSigGroupCache);
+    const multiSigGroupCache = useAppSelector(getProfileGroupCache);
     const connections = useAppSelector(getConnectionsCache);
     const currentOperation = useAppSelector(getCurrentOperation);
     const scanGroupId = useAppSelector(getScanGroupId);
     const currentToastMsgs = useAppSelector(getToastMsgs);
     const loggedIn = useAppSelector(getAuthentication).loggedIn;
-    const identifiers = useAppSelector(getIdentifiersCache);
+    const profiles = useAppSelector(getProfiles);
     const [createIdentifierModalIsOpen, setCreateIdentifierModalIsOpen] =
       useState(false);
     const [pasteModalIsOpen, setPasteModalIsOpen] = useState(false);
@@ -121,17 +119,17 @@ const Scanner = forwardRef(
     const scanByTab = routePath === TabsRoutePath.SCAN;
 
     const getCreatedIdentifiers = async () => {
-      const identifierList = Object.values(identifiers);
+      const profileList = Object.values(profiles);
       const checkOobiResponse = await Promise.allSettled(
-        identifierList.map((identifier) =>
-          Agent.agent.connections.getOobi(identifier.id)
+        profileList.map((identifier) =>
+          Agent.agent.connections.getOobi(identifier.identity.id)
         )
       );
 
       const result: IdentifierShortDetails[] = [];
       checkOobiResponse.forEach((response, index) => {
         if (response.status === "fulfilled" && response.value) {
-          result.push(identifierList[index]);
+          result.push(profileList[index].identity);
         }
       });
 
@@ -294,7 +292,7 @@ const Scanner = forwardRef(
           })
         );
         dispatch(showConnectWallet(true));
-        handleReset && handleReset(TabsRoutePath.MENU);
+        handleReset?.();
       } else {
         dispatch(setToastMsg(ToastMsgType.PEER_ID_ERROR));
       }
@@ -312,7 +310,7 @@ const Scanner = forwardRef(
         connections,
       };
 
-      dispatch(setMultiSigGroupCache(newMultiSigGroup));
+      dispatch(setGroupProfileCache(newMultiSigGroup));
     };
 
     const handleSSIScan = (content: string) => {
@@ -333,7 +331,7 @@ const Scanner = forwardRef(
     ) => {
       await updateConnections(groupId);
       handleReset?.(
-        TabsRoutePath.IDENTIFIERS,
+        TabsRoutePath.CREDENTIALS,
         OperationType.OPEN_MULTISIG_IDENTIFIER
       );
     };
@@ -372,15 +370,15 @@ const Scanner = forwardRef(
 
     const handleAfterScanMultisig = (groupId: string | null) => {
       if (!groupId) return;
-      const identifier = Object.values(identifiers).find(
-        (identifier) => identifier.groupMetadata?.groupId === groupId
+      const profile = Object.values(profiles).find(
+        (profile) => profile.identity.groupMetadata?.groupId === groupId
       );
 
-      if (!identifier) {
+      if (!profile) {
         throw new Error(ErrorMessage.GROUP_ID_NOT_MATCH);
       }
 
-      openGroupIdentifierSetup(identifier);
+      openGroupIdentifierSetup(profile.identity);
     };
 
     const handleDuplicateConnectionError = async (
@@ -419,8 +417,7 @@ const Scanner = forwardRef(
           return;
         }
 
-        dispatch(setOpenMultiSigId(urlId));
-        handleReset?.(TabsRoutePath.IDENTIFIERS);
+        handleReset?.(TabsRoutePath.CREDENTIALS);
         return;
       } else {
         dispatch(setOpenConnectionId(urlId));
@@ -784,12 +781,6 @@ const Scanner = forwardRef(
             </div>
           )}
         </IonGrid>
-        <CreateIdentifier
-          modalIsOpen={createIdentifierModalIsOpen}
-          setModalIsOpen={setCreateIdentifierModalIsOpen}
-          onClose={openGroupIdentifierSetup}
-          groupId={groupId}
-        />
         <CreateGroupIdentifier
           modalIsOpen={groupIdentifierOpen}
           setModalIsOpen={setGroupIdentifierOpen}
@@ -810,9 +801,7 @@ const Scanner = forwardRef(
               currentOperation === OperationType.MULTI_SIG_RECEIVER_SCAN
                 ? `${i18n.t("createidentifier.scan.pasteoobi")}`
                 : currentOperation === OperationType.SCAN_WALLET_CONNECTION
-                  ? i18n.t(
-                    "tabs.menu.tab.items.connectwallet.inputpidmodal.header"
-                  )
+                  ? i18n.t("connectdapp.inputpidmodal.header")
                   : `${i18n.t("createidentifier.scan.pastecontents")}`
             }`,
             actionButton: true,

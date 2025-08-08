@@ -1,0 +1,23 @@
+.rotate-keys-modal {
+  .description {
+    text-align: center;
+    margin: 0 2.375rem 1.5rem;
+  }
+
+  .signing-key {
+    position: relative;
+  }
+
+  .spinner-container {
+    background: rgba(var(--ion-color-neutral-700-rgb), 0.2);
+    z-index: 100;
+  }
+
+  .rotate-key-footer {
+    padding: 0.5rem 0 2rem;
+
+    ion-icon {
+      margin-right: 0.625rem;
+    }
+  }
+}

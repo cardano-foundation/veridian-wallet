@@ -5,7 +5,6 @@ import { QRCode } from "react-qrcode-logo";
 import { CreationStatus } from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { getIdentifiersCache } from "../../../../store/reducers/identifiersCache";
 import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../globals/types";
 import { writeToClipboard } from "../../../utils/clipboard";
@@ -16,6 +15,7 @@ import { Spinner } from "../../Spinner";
 import { SpinnerConverage } from "../../Spinner/Spinner.type";
 import { ScrollablePageLayout } from "../../layout/ScrollablePageLayout";
 import { IdentifierStage1BodyProps } from "../CreateGroupIdentifier.types";
+import { getProfiles } from "../../../../store/reducers/profileCache";
 
 const SetupConnectionBodyResume = ({
   componentId,
@@ -29,14 +29,15 @@ const SetupConnectionBodyResume = ({
   handleDelete,
 }: IdentifierStage1BodyProps) => {
   const dispatch = useAppDispatch();
-  const identifiers = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
   const [isPending, setIsPending] = useState(true);
 
   useEffect(() => {
-    identifiers &&
-      identifiers[identifierId]?.creationStatus === CreationStatus.COMPLETE &&
+    profiles &&
+      profiles[identifierId]?.identity.creationStatus ===
+        CreationStatus.COMPLETE &&
       setIsPending(false);
-  }, [identifierId, identifiers]);
+  }, [identifierId, profiles]);
 
   const copyToClipboard = () => {
     writeToClipboard(oobi);

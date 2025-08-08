@@ -7,7 +7,6 @@ import { useState } from "react";
 import { JSONObject } from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
 import { useAppSelector } from "../../../../store/hooks";
-import { getIdentifiersCache } from "../../../../store/reducers/identifiersCache";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -24,7 +23,7 @@ import {
 } from "../../CardDetails";
 import { CardTheme } from "../../CardTheme";
 import { FallbackIcon } from "../../FallbackIcon";
-import { IdentifierDetailModal } from "../../IdentifierDetailModule";
+import { ProfileDetailsModal } from "../../ProfileDetailsModal";
 import { ListHeader } from "../../ListHeader";
 import { ReadMore } from "../../ReadMore";
 import {
@@ -34,34 +33,35 @@ import {
 } from "./CredentialContent.types";
 import { MultisigMember } from "./MultisigMember";
 import { MemberAcceptStatus } from "./MultisigMember.types";
+import { getProfiles } from "../../../../store/reducers/profileCache";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
 
 const RelatedIdentifier = ({ identifierId }: IssuedIdentifierProps) => {
-  const identifiers = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
   const [openIdentifierDetail, setOpenIdentifierDetail] = useState(false);
-  const identifier = identifiers[identifierId];
+  const profile = profiles[identifierId];
 
   return (
     <>
-      {identifier && (
+      {profile && (
         <CardBlock
           title={i18n.t("tabs.credentials.details.relatedidentifier")}
           onClick={() => setOpenIdentifierDetail(true)}
           testId="related-identifier-section"
         >
           <CardDetailsItem
-            info={identifier?.displayName || ""}
+            info={profile?.identity.displayName || ""}
             className="related-identifier"
             testId="related-identifier-name"
-            startSlot={<CardTheme {...getTheme(identifier.theme || 0)} />}
+            startSlot={<CardTheme {...getTheme(profile.identity.theme || 0)} />}
           />
         </CardBlock>
       )}
-      <IdentifierDetailModal
+      <ProfileDetailsModal
         isOpen={openIdentifierDetail}
         setIsOpen={setOpenIdentifierDetail}
-        identifierDetailId={identifierId}
+        profileId={identifierId}
         pageId="credential-related-identifier"
       />
     </>

@@ -23,17 +23,8 @@ const initialState = {
       passcodeIsSet: true,
     },
   },
-  credsCache: {
-    creds: [],
-  },
   connectionsCache: {
     connections: connectionsForNotifications,
-  },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
   },
 };
 

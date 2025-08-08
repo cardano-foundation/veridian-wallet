@@ -30,23 +30,19 @@ import {
 } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { store } from "../../../store";
 import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
-import { updateOrAddCredsCache } from "../../../store/reducers/credsCache";
-import {
-  addGroupIdentifierCache,
-  updateCreationStatus,
-  updateOrAddIdentifiersCache,
-} from "../../../store/reducers/identifiersCache";
 import {
   setQueueIncomingRequest,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { IncomingRequestType } from "../../../store/reducers/stateCache/stateCache.types";
 import {
-  ConnectionData,
   setConnectedWallet,
   setPendingConnection,
-  setWalletConnectionsCache,
 } from "../../../store/reducers/walletConnectionsCache";
+import {
+  pendingGroupIdentifierFix,
+  pendingIdentifierFix,
+} from "../../__fixtures__/filteredIdentifierFix";
 import { ToastMsgType } from "../../globals/types";
 import {
   AppWrapper,
@@ -63,10 +59,6 @@ import {
   operationCompleteHandler,
   operationFailureHandler,
 } from "./coreEventListeners";
-import {
-  pendingIdentifierFix,
-  pendingGroupIdentifierFix,
-} from "../../__fixtures__/filteredIdentifierFix";
 
 jest.mock("../../../core/agent/agent", () => {
   const mockPeerConnectionPairRecordPlainObject = {
@@ -222,6 +214,15 @@ const peerConnectionBrokenEvent: PeerConnectionBrokenEvent = {
 };
 
 import { PeerConnectionPairRecord } from "../../../core/agent/records";
+import {
+  ConnectionData,
+  addGroupProfile,
+  addOrUpdateProfileIdentity,
+  setPeerConnections,
+  updateOrAddCredsCache,
+  updatePeerConnectionsFromCore,
+  updateProfileCreationStatus,
+} from "../../../store/reducers/profileCache";
 
 const mockPeerConnectionPairRecordInstance = new PeerConnectionPairRecord({
   id: "dApp-address:identifier",
@@ -356,7 +357,7 @@ describe("Peer connection states changed handler", () => {
       expect(dispatch).toBeCalledWith(setPendingConnection(null));
     });
     expect(dispatch).toBeCalledWith(
-      setWalletConnectionsCache(
+      updatePeerConnectionsFromCore(
         expect.arrayContaining([
           expect.objectContaining({
             id: mockPeerConnectionPairRecordInstance.id,
@@ -425,11 +426,15 @@ describe("KERIA operation state changed handler", () => {
       dispatch
     );
     expect(dispatch).toBeCalledWith(
-      updateCreationStatus({ id: id, creationStatus: CreationStatus.COMPLETE })
+      updateProfileCreationStatus({
+        id: id,
+        creationStatus: CreationStatus.COMPLETE,
+      })
     );
     expect(dispatch).toBeCalledWith(
       setToastMsg(ToastMsgType.IDENTIFIER_UPDATED)
     );
+    dispatch.mockClear();
   });
 
   test("handles failed witness operation", async () => {
@@ -439,7 +444,10 @@ describe("KERIA operation state changed handler", () => {
       dispatch
     );
     expect(dispatch).toBeCalledWith(
-      updateCreationStatus({ id: id, creationStatus: CreationStatus.FAILED })
+      updateProfileCreationStatus({
+        id: id,
+        creationStatus: CreationStatus.FAILED,
+      })
     );
     expect(dispatch).toBeCalledWith(
       setToastMsg(ToastMsgType.IDENTIFIER_UPDATED)
@@ -470,7 +478,7 @@ describe("Identifier state changed handler", () => {
   test("handles identifier added event", async () => {
     await identifierAddedHandler(identifierAddedEvent, dispatch);
     expect(dispatch).toBeCalledWith(
-      updateOrAddIdentifiersCache(pendingIdentifierFix)
+      addOrUpdateProfileIdentity(pendingIdentifierFix)
     );
   });
 });
@@ -478,9 +486,7 @@ describe("Identifier state changed handler", () => {
 describe("Group state changed handler", () => {
   test("handles group created event", async () => {
     await groupCreatedHandler(groupCreatedEvent, dispatch);
-    expect(dispatch).toBeCalledWith(
-      addGroupIdentifierCache(pendingGroupIdentifierFix)
-    );
+    expect(dispatch).toBeCalledWith(addGroupProfile(pendingGroupIdentifierFix));
   });
 });
 

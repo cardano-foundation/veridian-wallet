@@ -10,10 +10,7 @@ import { act } from "react";
 import { Provider } from "react-redux";
 import { OobiType } from "../../../core/agent/agent.types";
 import EN_Translation from "../../../locales/en/en.json";
-import {
-  setMultiSigGroupCache,
-  setOpenMultiSigId,
-} from "../../../store/reducers/identifiersCache";
+import { setGroupProfileCache } from "../../../store/reducers/profileCache";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {
   setCurrentOperation,
@@ -26,6 +23,8 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { Scanner } from "./Scanner";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -174,14 +173,7 @@ describe("Scanner", () => {
       currentOperation: OperationType.SCAN_WALLET_CONNECTION,
       toastMsgs: [],
     },
-    identifiersCache: {
-      identifiers: {},
-      favourites: [],
-      multiSigGroup: {
-        groupId: "",
-        connections: [],
-      },
-    },
+    profilesCache: profileCacheFixData,
     connectionsCache: {
       connections: {},
       multisigConnections: {},
@@ -353,10 +345,7 @@ describe("Scanner", () => {
         currentOperation: OperationType.MULTI_SIG_INITIATOR_SCAN,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
-        scanGroupId: "mock",
-      },
+      profilesCache: { profileCacheFixData, scanGroupId: "mock" },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
@@ -425,8 +414,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.MULTI_SIG_INITIATOR_SCAN,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
         scanGroupId: "72e2f089cef6",
         multiSigGroup: {
           connections: [connectionsFix[0]],
@@ -482,9 +471,12 @@ describe("Scanner", () => {
         currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
         scanGroupId: "72e2f089cef6",
+        multiSigGroup: {
+          connections: [connectionsFix[0]],
+        },
       },
       connectionsCache: {
         connections: {},
@@ -551,7 +543,7 @@ describe("Scanner", () => {
       expect(handleReset).toBeCalled();
       expect(getMultisigLinkedContactsMock).toBeCalledWith("72e2f089cef6");
       expect(dispatchMock).toBeCalledWith(
-        setMultiSigGroupCache({
+        setGroupProfileCache({
           groupId: "72e2f089cef6",
           connections: [connectionsFix[0]],
         })
@@ -572,8 +564,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -611,9 +603,7 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_SSI_BOOT_URL,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         connections: {},
         multisigConnections: {},
@@ -681,8 +671,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_SSI_CONNECT_URL,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -751,10 +741,22 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {
-          [identifierFix[0].id]: identifierFix[0],
+
+      profilesCache: {
+        profiles: {
+          [filteredIdentifierFix[0].id]: {
+            identity: filteredIdentifierFix[0],
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [],
+          },
         },
+        defaultProfile: filteredIdentifierFix[0].id,
+        recentProfiles: [],
+        multiSigGroup: undefined,
       },
       connectionsCache: {
         connections: {},
@@ -821,79 +823,6 @@ describe("Scanner", () => {
     });
   });
 
-  test("Duplicate multisig connection error handle", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.SCAN],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        currentOperation: OperationType.SCAN_CONNECTION,
-        toastMsgs: [],
-      },
-      identifiersCache: {
-        identifiers: {},
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const handleReset = jest.fn();
-
-    connectByOobiUrlMock.mockImplementation(() => {
-      throw new Error("Record already exists with id connectionId");
-    });
-
-    addListener.mockImplementation(
-      (
-        eventName: string,
-        listenerFunc: (result: BarcodesScannedEvent) => void
-      ) => {
-        setTimeout(() => {
-          listenerFunc({
-            barcodes: [
-              {
-                displayValue:
-                  "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org/oobi/string1/agent/string2?groupId=72e2f089cef6",
-                format: BarcodeFormat.QrCode,
-                rawValue:
-                  "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org/oobi/string1/agent/string2?groupId=72e2f089cef6",
-                valueType: BarcodeValueType.Url,
-              },
-            ],
-          });
-        }, 100);
-
-        return {
-          remove: jest.fn(),
-        };
-      }
-    );
-
-    render(
-      <Provider store={storeMocked}>
-        <Scanner
-          setIsValueCaptured={setIsValueCaptured}
-          handleReset={handleReset}
-        />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(setOpenMultiSigId("72e2f089cef6"));
-    });
-  });
-
   test("Invalid connection url handle", async () => {
     const initialState = {
       stateCache: {
@@ -907,8 +836,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -981,8 +910,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -1053,8 +982,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -1113,8 +1042,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -1146,87 +1075,6 @@ describe("Scanner", () => {
     });
   });
 
-  test("Show create identifier alert", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.SCAN],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        currentOperation: OperationType.SCAN_CONNECTION,
-        toastMsgs: [],
-      },
-      identifiersCache: {
-        identifiers: {
-          // [identifierFix[0].id]: identifierFix[0]
-        },
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    addListener.mockImplementation(
-      (
-        eventName: string,
-        listenerFunc: (result: BarcodesScannedEvent) => void
-      ) => {
-        setTimeout(() => {
-          listenerFunc({
-            barcodes: [
-              {
-                displayValue:
-                  "http://keria:3902/oobi/EL0xzJRb4Mf/agent/foicaqnwqklena?name=domain",
-                format: BarcodeFormat.QrCode,
-                rawValue:
-                  "http://keria:3902/oobi/EL0xzJRb4Mf/agent/foicaqnwqklena?name=domain",
-                valueType: BarcodeValueType.Url,
-              },
-            ],
-          });
-        }, 100);
-
-        return {
-          remove: jest.fn(),
-        };
-      }
-    );
-
-    const { getByText } = render(
-      <Provider store={storeMocked}>
-        <Scanner routePath={TabsRoutePath.SCAN} />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_Translation.tabs.scan.tab.missingidentifier.title)
-      ).toBeVisible();
-    });
-
-    fireEvent.click(
-      getByText(EN_Translation.tabs.scan.tab.missingidentifier.create)
-    );
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_Translation.createidentifier.add.title)
-      ).toBeVisible();
-      expect(
-        getByText(EN_Translation.createidentifier.aidtype.title)
-      ).toBeVisible();
-    });
-  });
-
   test("Show choose identifier modal", async () => {
     const initialState = {
       stateCache: {
@@ -1240,11 +1088,8 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {
-          [identifierFix[0].id]: identifierFix[0],
-          [identifierFix[1].id]: identifierFix[1],
-        },
+      profilesCache: {
+        ...profileCacheFixData,
       },
       connectionsCache: {
         connections: {},
@@ -1334,10 +1179,21 @@ describe("Scanner", () => {
         currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {
-          [identifierFix[0].id]: identifierFix[0],
+      profilesCache: {
+        profiles: {
+          [filteredIdentifierFix[0].id]: {
+            identity: filteredIdentifierFix[0],
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [],
+          },
         },
+        defaultProfile: filteredIdentifierFix[0].id,
+        recentProfiles: [],
+        multiSigGroup: undefined,
       },
       connectionsCache: {
         connections: {},

@@ -4,11 +4,12 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import EN_TRANSLATION from "../../../locales/en/en.json";
-import { setMultiSigGroupCache } from "../../../store/reducers/identifiersCache";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CreateGroupIdentifier } from "./CreateGroupIdentifier";
+import { setGroupProfileCache } from "../../../store/reducers/profileCache";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 setupIonicReact();
 mockIonicReact();
@@ -36,7 +37,7 @@ jest.mock("../../../core/agent/agent", () => ({
 describe("Create Identifier modal", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -50,9 +51,7 @@ describe("Create Identifier modal", () => {
       },
       isOnline: true,
     },
-    identifiersCache: {
-      identifiers: {},
-    },
+    profilesCache: profileCacheFixData,
     biometricsCache: {
       enabled: false,
     },
@@ -99,7 +98,7 @@ describe("Create Identifier modal", () => {
     await waitFor(() => {
       expect(mockGetMultisigConnection).toBeCalledWith("mockId");
       expect(dispatchMock).toBeCalledWith(
-        setMultiSigGroupCache({
+        setGroupProfileCache({
           groupId: "mockId",
           connections: [],
         })

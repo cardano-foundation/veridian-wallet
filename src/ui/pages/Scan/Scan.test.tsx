@@ -10,6 +10,8 @@ import { TabsRoutePath } from "../../../routes/paths";
 import { OperationType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Scan } from "./Scan";
+import { RootState } from "../../../store";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -134,14 +136,7 @@ describe("Scan Tab", () => {
         currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
-        scanGroupId: "72e2f089cef6",
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
+      profilesCache: profileCacheFixData,
     };
 
     const storeMocked = {
@@ -164,10 +159,10 @@ describe("Scan Tab", () => {
     expect(getByTestId("scan-tab")).toBeInTheDocument();
   });
 
-  test("Nav to identifier after scan duplicate multisig", async () => {
+  test("Nav to credentials after scan duplicate multisig", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.SCAN, TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.SCAN, TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -177,17 +172,8 @@ describe("Scan Tab", () => {
         currentOperation: OperationType.IDLE,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
+      profilesCache: {
+        ...profileCacheFixData,
       },
     };
 
@@ -210,7 +196,7 @@ describe("Scan Tab", () => {
 
     await waitFor(() => {
       expect(historyPushMock).toBeCalledWith({
-        pathname: TabsRoutePath.IDENTIFIERS,
+        pathname: TabsRoutePath.CREDENTIALS,
       });
     });
   });

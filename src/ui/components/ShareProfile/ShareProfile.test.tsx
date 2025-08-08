@@ -6,25 +6,24 @@ import {
 import { IonInput } from "@ionic/react";
 import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import { act } from "react";
 import { Provider } from "react-redux";
 import EN_Translation from "../../../locales/en/en.json";
-import { makeTestStore } from "../../utils/makeTestStore";
-import { CustomInputProps } from "../CustomInput/CustomInput.types";
-import { TabsRoutePath } from "../navigation/TabsMenu";
-import {
-  setToastMsg,
-  showGenericError,
-} from "../../../store/reducers/stateCache";
-import { ShareProfile } from "./ShareProfile";
-import { identifierFix } from "../../__fixtures__/identifierFix";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
-import { ToastMsgType } from "../../globals/types";
 import {
   setMissingAliasConnection,
   setOpenConnectionId,
 } from "../../../store/reducers/connectionsCache";
+import {
+  setToastMsg,
+  showGenericError,
+} from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
+import { ToastMsgType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
+import { CustomInputProps } from "../CustomInput/CustomInput.types";
+import { TabsRoutePath } from "../navigation/TabsMenu";
+import { ShareProfile } from "./ShareProfile";
 
 const connectByOobiUrlMock = jest.fn();
 jest.mock("../../../core/agent/agent", () => ({
@@ -142,6 +141,7 @@ describe("Share Profile", () => {
         archivedCredentials: [],
       },
     },
+    profilesCache: profileCacheFixData,
   };
 
   beforeEach(() => {
@@ -241,7 +241,7 @@ describe("Share Profile", () => {
     await waitFor(() => {
       expect(connectByOobiUrlMock).toBeCalledWith(
         barcodes[0].rawValue,
-        initialState.stateCache.currentProfileId
+        initialState.profilesCache.defaultProfile
       );
     });
   });
@@ -300,7 +300,7 @@ describe("Share Profile", () => {
       expect(dispatchMock).toBeCalledWith(
         setMissingAliasConnection({
           url: "http://keria:3902/oobi/EKDTSzuyUb7ICP1rFzrFGXc1AwC4yFtTkzIHbbjoJDO6/agent/EJqSoWGc6xyYisiaFKsuut159p",
-          identifier: initialState.stateCache.currentProfileId,
+          identifier: initialState.profilesCache.defaultProfile,
         })
       );
     });

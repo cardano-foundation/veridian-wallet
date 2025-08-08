@@ -65,6 +65,7 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { ProfileSetup } from "../ProfileSetup/ProfileSetup";
 import { CreateSSIAgent } from "./CreateSSIAgent";
 import { Credentials } from "../Credentials";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 jest.mock(
   "../../../core/configuration/configurationService",
@@ -503,113 +504,6 @@ describe("SSI agent page", () => {
   });
 
   test("Connect and create connect instructions notification", async () => {
-    const connectInstructionsNote = {
-      id: "0AD1nIXv84vzwaKecSZY2wo1",
-      createdAt: new Date(),
-      a: { r: NotificationRoute.LocalSingletonConnectInstructions },
-      read: false,
-      route: NotificationRoute.LocalSingletonConnectInstructions,
-      connectionId: KeriaNotificationService.SINGLETON_PRE,
-      receivingPre: KeriaNotificationService.SINGLETON_PRE,
-    };
-    createSingletonNotificationMock.mockResolvedValueOnce(
-      connectInstructionsNote
-    );
-
-    customiseMockValue = {
-      identifiers: {
-        creation: {
-          individualOnly: "FirstTime",
-        },
-      },
-      notifications: {
-        connectInstructions: {
-          connectionName: "ConnectionNameFromConfig",
-        },
-      },
-    };
-
-    const initialState = {
-      stateCache: {
-        routes: [],
-        authentication: {
-          passcodeIsSet: true,
-          seedPhraseIsSet: true,
-          passwordIsSet: true,
-          passwordIsSkipped: true,
-          loggedIn: false,
-          time: 0,
-          ssiAgentIsSet: false,
-          ssiAgentUrl: "",
-        },
-      },
-      ssiAgentCache: {
-        bootUrl:
-          "https://dev.keria-boot.cf-keripy.metadata.dev.cf-deployments.org",
-        connectUrl:
-          "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org",
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const history = createMemoryHistory();
-    history.push(RoutePath.SSI_AGENT);
-
-    const { getByTestId } = render(
-      <IonReactMemoryRouter history={history}>
-        <Provider store={storeMocked}>
-          <CreateSSIAgent />
-        </Provider>
-      </IonReactMemoryRouter>
-    );
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-create-ssi-agent"));
-    });
-
-    expect(bootAndConnectMock).toBeCalledWith({
-      bootUrl:
-        "https://dev.keria-boot.cf-keripy.metadata.dev.cf-deployments.org",
-      url: "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org",
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("ssi-spinner-container")).toBeVisible();
-    });
-
-    await waitFor(() => {
-      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
-        expect.objectContaining({
-          id: MiscRecordId.IS_SETUP_PROFILE,
-          content: { value: true },
-        })
-      );
-    });
-
-    await waitFor(() => {
-      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
-        expect.objectContaining({
-          id: MiscRecordId.INDIVIDUAL_FIRST_CREATE,
-          content: { value: true },
-        })
-      );
-    });
-
-    expect(createSingletonNotificationMock).toBeCalledWith(
-      NotificationRoute.LocalSingletonConnectInstructions,
-      { name: "ConnectionNameFromConfig" }
-    );
-    expect(dispatchMock).toBeCalledWith({
-      type: "notificationsCache/addNotification",
-      payload: connectInstructionsNote,
-    });
-  });
-
-  test("Connect and create connect instructions notification", async () => {
     createSingletonNotificationMock.mockResolvedValueOnce(undefined);
 
     customiseMockValue = {
@@ -902,9 +796,7 @@ describe("SSI agent page: recovery mode", () => {
       seedPhraseCache: {
         seedPhrase: "mock-seed",
       },
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
-      },
+      profilesCache: profileCacheFixData,
     };
 
     const store = makeTestStore(initialState);

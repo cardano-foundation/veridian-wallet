@@ -5,13 +5,12 @@ import { ConnectionShortDetails } from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import {
-  getMultiSigGroupCache,
-  removeIdentifierCache,
+  getProfileGroupCache,
+  removeProfile,
   setScanGroupId,
-} from "../../../../store/reducers/identifiersCache";
+} from "../../../../store/reducers/profileCache";
 import {
   getCurrentOperation,
-  getStateCache,
   setCurrentOperation,
   setToastMsg,
 } from "../../../../store/reducers/stateCache";
@@ -34,13 +33,12 @@ const SetupConnections = ({
   resumeMultiSig,
   multiSigGroup,
   preventRedirect,
-  isModalOpen,
   openAfterCreate,
 }: IdentifierStageProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
   const currentOperation = useAppSelector(getCurrentOperation);
-  const multiSigGroupCache = useAppSelector(getMultiSigGroupCache);
+  const multiSigGroupCache = useAppSelector(getProfileGroupCache);
   const [oobi, setOobi] = useState("");
   const identifierId = resumeMultiSig?.id || state.newIdentifier.id;
   const groupId =
@@ -56,15 +54,6 @@ const SetupConnections = ({
     ConnectionShortDetails[]
   >([]);
 
-  useEffect(() => {
-    if (isModalOpen) {
-      dispatch(setScanGroupId(groupId));
-    } else {
-      dispatch(setScanGroupId(undefined));
-    }
-    fetchOobi();
-  }, [isModalOpen, groupId, dispatch]);
-
   const fetchOobi = useCallback(async () => {
     try {
       const oobiValue = await Agent.agent.connections.getOobi(
@@ -78,7 +67,12 @@ const SetupConnections = ({
     } catch (e) {
       showError("Unable to fetch Oobi", e, dispatch);
     }
-  }, [groupId, dispatch]);
+  }, [
+    identifierId,
+    state.newIdentifier.groupMetadata?.userName,
+    groupId,
+    dispatch,
+  ]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -100,7 +94,7 @@ const SetupConnections = ({
     dispatch(setScanGroupId(undefined));
     if (multiSigGroup?.groupId && !preventRedirect) {
       history.push({
-        pathname: TabsRoutePath.IDENTIFIERS,
+        pathname: TabsRoutePath.CREDENTIALS,
       });
     }
   };
@@ -150,7 +144,7 @@ const SetupConnections = ({
       await Agent.agent.identifiers.markIdentifierPendingDelete(identifierId);
 
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
-      dispatch(removeIdentifierCache(identifierId));
+      dispatch(removeProfile(identifierId));
       handleDone();
     } catch (e) {
       showError(
@@ -211,13 +205,9 @@ const SetupConnections = ({
         isOpen={alertDeleteOpen}
         setIsOpen={setAlertDeleteOpen}
         dataTestId="alert-confirm-identifier-delete-details"
-        headerText={i18n.t("tabs.identifiers.details.delete.alert.title")}
-        confirmButtonText={`${i18n.t(
-          "tabs.identifiers.details.delete.alert.confirm"
-        )}`}
-        cancelButtonText={`${i18n.t(
-          "tabs.identifiers.details.delete.alert.cancel"
-        )}`}
+        headerText={i18n.t("profiledetails.delete.alert.title")}
+        confirmButtonText={`${i18n.t("profiledetails.delete.alert.confirm")}`}
+        cancelButtonText={`${i18n.t("profiledetails.delete.alert.cancel")}`}
         actionConfirm={() => handleAuthentication()}
         actionCancel={() => setAlertDeleteOpen(false)}
         actionDismiss={() => setAlertDeleteOpen(false)}

@@ -526,156 +526,194 @@
       }
     }
   },
+  "profiledetails": {
+    "done": "Done",
+    "identifierdetail": {
+      "title": "Profile details",
+      "showadvanced": "Show advanced details",
+      "dapp": "dApps",
+      "information": {
+        "credentials": "Credentials",
+        "connections": "Connections",
+        "dapps": "dApps"
+      },
+      "identifierid": {
+        "title": "Identifier ID"
+      },
+      "created": {
+        "title": "Created"
+      },
+      "signingkey": {
+        "title": "Signing key",
+        "rotate": "Rotate key",
+        "multisigtitle": "Show {{singingKeys}} singing keys"
+      }
+    },
+    "keyrotation": {
+      "title": "Key rotation",
+      "rotatesigningkey": {
+        "title": "Rotation threshold",
+        "outof": "out of {{threshold}}"
+      },
+      "sequencenumber": {
+        "title": "Sequence number",
+        "lastrotate": "Last key event"
+      },
+      "nextkeyslist": {
+        "title": "Rotation key digest",
+        "showkey": "Show {{rotationKeys}} rotation key digests"
+      }
+    },
+    "group": {
+      "title": "Group information",
+      "groupmembers": {
+        "title": "Group members"
+      },
+      "signingkeysthreshold": {
+        "title": "Signing threshold",
+        "outof": "out of {{threshold}}"
+      },
+      "button": {
+        "viewmore": "View {{remainMembers}} more"
+      }
+    },
+    "delete": {
+      "button": "Delete profile",
+      "alert": {
+        "title": "Are you sure you want to delete this profile?",
+        "confirm": "Yes, I'm sure",
+        "cancel": "Cancel"
+      }
+    },
+    "rotatekeys": {
+      "message": "After rotating your keys, you may experience some delays when using this profile for a short period.",
+      "signingkey": "List of signing keys",
+      "description": "Rotating your signing keys boosts security by reducing the risk of key compromise.",
+      "done": "Done"
+    },
+    "options": {
+      "cancel": "Cancel",
+      "edit": "Edit profile",
+      "rotatekeys": "Rotate keys",
+      "share": "Share",
+      "inner": {
+        "label": "Display name",
+        "confirm": "Confirm"
+      }
+    },
+    "clouderror": "We couldn’t locate this profile in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this profile, tap “Delete profile” to remove it.",
+    "detailsmodal": {
+      "you": "You",
+      "button": {
+        "done": "Done"
+      },
+      "advanceddetail": {
+        "title": "Advanced details",
+        "propexplain": {
+          "title": "About advanced details",
+          "content": "Provides additional details on this profile for users interested in more technical insights."
+        },
+        "viewkey": "Show {{keys}} singing keys",
+        "hidekey": "Hide {{keys}} singing keys",
+        "viewrotationkey": "Show {{keys}} rotation key digests",
+        "hiderotationkey": "Hide {{keys}} rotation key digests"
+      },
+      "signingthreshold": {
+        "title": "Signing threshold",
+        "propexplain": {
+          "title": "About signing threshold",
+          "content": "Minimum number of signing keys required to approve a transaction or event within the profile."
+        },
+        "threshold": {
+          "title": "Threshold",
+          "text": "{{threshold}} out of {{members}}"
+        }
+      },
+      "rotationthreshold": {
+        "title": "Rotation threshold",
+        "propexplain": {
+          "title": "About rotation threshold",
+          "content": "Provides additional details on this profile for users interested in more technical insights."
+        },
+        "threshold": {
+          "title": "Threshold",
+          "text": "{{threshold}} out of {{members}}"
+        }
+      },
+      "groupmember": {
+        "title": "Group members",
+        "propexplain": {
+          "title": "About group members",
+          "content": "Displays the list of individuals or entities that jointly control this group profile."
+        },
+        "bottomtext": "{{members}} group members"
+      }
+    }
+  },
+  "connectdapp": {
+    "title": "Cardano connect",
+    "sublabel": "CIP-45",
+    "tabheader": "Cardano Connect",
+    "connectbtn": "Connect with Cardano",
+    "disconnectbeforecreatealert": {
+      "message": "You are currently connected. To connect with a new wallet, you will be disconnected from your current selection. Would you like to disconnect and continue?",
+      "confirm": "Continue",
+      "cancel": "Cancel"
+    },
+    "connectionbrokenalert": {
+      "message": "Your connection has been disconnected as you have deleted the chosen identifier paired with this connection. Please choose a new identifier to re-establish this connection.",
+      "confirm": "Ok"
+    },
+    "inputpidmodal": {
+      "header": "Paste Meerkat ID",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "scanQR": "Scan QR code"
+    },
+    "connectionhistory": {
+      "title": "Connection History",
+      "action": {
+        "delete": "Delete"
+      },
+      "deletealert": {
+        "message": "Are you sure you want to delete this connection?",
+        "confirm": "Yes, I’m sure",
+        "cancel": "Cancel"
+      },
+      "missingidentifieralert": {
+        "message": "To connect with Cardano, you need to create an individual identifier. Would you like to create one now?",
+        "confirm": "Create identifier",
+        "cancel": "Cancel"
+      },
+      "confirmconnect": {
+        "done": "Done",
+        "connectbtn": "Connect",
+        "disconnectbtn": "Disconnect",
+        "connectingbtn": "Connecting...",
+        "pending": "Pending"
+      }
+    },
+    "request": {
+      "stageone": {
+        "title": "Connect Cardano",
+        "message": "Would you like to establish a CIP-45 Connection?",
+        "alert": {
+          "titleconfirm": "Are you sure you want to decline this connection?",
+          "confirm": "Decline",
+          "cancel": "Cancel"
+        }
+      },
+      "button": {
+        "back": "Back",
+        "accept": "Accept",
+        "decline": "Decline"
+      }
+    }
+  },
   "tabs": {
     "identifiers": {
-      "tab": {
-        "title": "Identifiers",
-        "create": "Add an identifier",
-        "favourites": "Favourites",
-        "allidentifiers": "All identifiers",
-        "filters": {
-          "all": "All",
-          "individual": "Individual",
-          "group": "Group",
-          "placeholder": "You haven’t created any {{ type }} identifiers yet."
-        },
-        "pendingidentifiers": "Pending identifiers",
-        "multisigidentifiers": "For groups"
-      },
-      "deletepending": {
-        "title": "Identifier options",
-        "description": "Your identifier is pending and may still complete. If you no longer require this identifier, tap “Delete identifier” to remove it.",
-        "mutilsigdescription": "This multi-sig is pending. It will complete once it meets the required member threshold. To remove it from your pending list, tap “Delete identifier”.",
-        "witnesserror": "There was an issue creating this identifier. Please contact your cloud provider for more information. To remove it from your pending list, tap “Delete Identifier”.",
-        "button": "Delete identifier",
-        "secondchecktitle": "Are you sure you want to delete this identifier?"
-      },
       "layout": {
         "created": "CREATED"
-      },
-      "details": {
-        "done": "Done",
-        "identifierdetail": {
-          "title": "Identifier details",
-          "showadvanced": "Show advanced details",
-          "identifierid": {
-            "title": "Identifier ID"
-          },
-          "created": {
-            "title": "Created"
-          },
-          "signingkey": {
-            "title": "Signing key",
-            "rotate": "Rotate key",
-            "multisigtitle": "Show {{singingKeys}} singing keys"
-          }
-        },
-        "keyrotation": {
-          "title": "Key rotation",
-          "rotatesigningkey": {
-            "title": "Rotation threshold",
-            "outof": "out of {{threshold}}"
-          },
-          "sequencenumber": {
-            "title": "Sequence number",
-            "lastrotate": "Last key event"
-          },
-          "nextkeyslist": {
-            "title": "Rotation key digest",
-            "showkey": "Show {{rotationKeys}} rotation key digests"
-          }
-        },
-        "group": {
-          "title": "Group information",
-          "groupmembers": {
-            "title": "Group members"
-          },
-          "signingkeysthreshold": {
-            "title": "Signing threshold",
-            "outof": "out of {{threshold}}"
-          },
-          "button": {
-            "viewmore": "View {{remainMembers}} more"
-          }
-        },
-        "delete": {
-          "button": "Delete identifier",
-          "alert": {
-            "title": "Are you sure you want to delete this identifier?",
-            "confirm": "Yes, I'm sure",
-            "cancel": "Cancel"
-          }
-        },
-        "rotatekeys": {
-          "message": "After rotating your keys, you may experience some delays when using this identifier for a short period.",
-          "signingkey": "List of signing keys",
-          "description": "Rotating your signing keys boosts security by reducing the risk of key compromise.",
-          "done": "Done"
-        },
-        "options": {
-          "title": "Identifier options",
-          "cancel": "Cancel",
-          "view": "View JSON",
-          "edit": "Edit identifier",
-          "share": "Share identifier",
-          "delete": "Delete identifier",
-          "rotatekeys": "Rotate keys",
-          "inner": {
-            "label": "Display name",
-            "theme": "Edit theme",
-            "confirm": "Confirm changes",
-            "color": "Choose card colour"
-          }
-        },
-        "clouderror": "We couldn’t locate this identifier in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this identifier, tap “Delete identifier” to remove.",
-        "detailmodal": {
-          "you": "You",
-          "button": {
-            "done": "Done"
-          },
-          "advanceddetail": {
-            "title": "Advanced details",
-            "propexplain": {
-              "title": "About advanced details",
-              "content": "Provides additional details on this identifier for users interested in more technical insights."
-            },
-            "proptitle": "Advanced details",
-            "viewkey": "Show {{keys}} singing keys",
-            "hidekey": "Hide {{keys}} singing keys",
-            "viewrotationkey": "Show {{keys}} rotation key digests",
-            "hiderotationkey": "Hide {{keys}} rotation key digests"
-          },
-          "signingthreshold": {
-            "title": "Signing threshold",
-            "propexplain": {
-              "title": "About signing threshold",
-              "content": "Minimum number of signing keys required to approve a transaction or event within the identifier."
-            },
-            "threshold": {
-              "title": "Threshold",
-              "text": "{{threshold}} out of {{members}}"
-            }
-          },
-          "rotationthreshold": {
-            "title": "Rotation threshold",
-            "propexplain": {
-              "title": "About rotation threshold",
-              "content": "The minimum number of new keys required to rotate and replace old signing keys."
-            },
-            "threshold": {
-              "title": "Rotation threshold",
-              "text": "{{threshold}} out of {{members}}"
-            }
-          },
-          "groupmember": {
-            "title": "Group members",
-            "propexplain": {
-              "title": "About group members",
-              "content": "Displays the list of individuals or entities that jointly control this group identifier."
-            },
-            "bottomtext": "{{members}} group members"
-          }
-        }
       }
     },
     "credentials": {
@@ -1005,82 +1043,6 @@
           },
           "button": {
             "label": "Scan now"
-          }
-        }
-      }
-    },
-    "menu": {
-      "tab": {
-        "header": "Menu",
-        "items": {
-          "connections": {
-            "title": "Connections",
-            "tabheader": "Connections"
-          },
-          "connectwallet": {
-            "title": "Cardano connect",
-            "sublabel": "CIP-45",
-            "tabheader": "Cardano Connect",
-            "connectbtn": "Connect with Cardano",
-            "disconnectbeforecreatealert": {
-              "message": "You are currently connected. To connect with a new wallet, you will be disconnected from your current selection. Would you like to disconnect and continue?",
-              "confirm": "Continue",
-              "cancel": "Cancel"
-            },
-            "connectionbrokenalert": {
-              "message": "Your connection has been disconnected as you have deleted the chosen identifier paired with this connection. Please choose a new identifier to re-establish this connection.",
-              "confirm": "Ok"
-            },
-            "inputpidmodal": {
-              "header": "Paste Meerkat ID",
-              "cancel": "Cancel",
-              "confirm": "Confirm",
-              "scanQR": "Scan QR code"
-            },
-            "connectionhistory": {
-              "title": "Connection History",
-              "action": {
-                "delete": "Delete"
-              },
-              "deletealert": {
-                "message": "Are you sure you want to delete this connection?",
-                "confirm": "Yes, I’m sure",
-                "cancel": "Cancel"
-              },
-              "missingidentifieralert": {
-                "message": "To connect with Cardano, you need to create an individual identifier. Would you like to create one now?",
-                "confirm": "Create identifier",
-                "cancel": "Cancel"
-              },
-              "confirmconnect": {
-                "done": "Done",
-                "connectbtn": "Connect",
-                "disconnectbtn": "Disconnect",
-                "connectingbtn": "Connecting...",
-                "pending": "Pending"
-              }
-            },
-            "request": {
-              "stageone": {
-                "title": "Connect Cardano",
-                "message": "Would you like to establish a CIP-45 Connection?",
-                "alert": {
-                  "titleconfirm": "Are you sure you want to decline this connection?",
-                  "confirm": "Decline",
-                  "cancel": "Cancel"
-                }
-              },
-              "stagetwo": {
-                "title": "Choose identifier",
-                "message": "Which individual identifier would you like to make the connection with?",
-                "confirm": "Confirm"
-              },
-              "button": {
-                "back": "Back",
-                "accept": "Accept",
-                "decline": "Decline"
-              }
-            }
           }
         }
       }
