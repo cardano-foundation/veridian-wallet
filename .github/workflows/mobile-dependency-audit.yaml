@@ -151,6 +151,14 @@ jobs:
           chmod +x scripts/mobile-dependency-audit.sh
           ./scripts/mobile-dependency-audit.sh
           
+      - name: Generate HTML report
+        run: |
+          if [ -f "mobile-security-audit-report.html" ]; then
+            echo "✅ HTML report generated successfully"
+          else
+            echo "⚠️ HTML report not generated - this is normal if no issues found"
+          fi
+          
       - name: Check for sensitive files in mobile directories
         run: |
           echo "🔍 Checking for sensitive files in mobile directories..."
@@ -168,3 +176,13 @@ jobs:
           fi
           
           echo "✅ Sensitive file check completed" 
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-security-audit-results
+          path: |
+            android/build/reports/
+            ios/App/Podfile.lock
+            mobile-security-audit-report.html
+          retention-days: 30 

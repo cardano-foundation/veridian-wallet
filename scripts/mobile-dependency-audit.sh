@@ -254,4 +254,95 @@ echo "  2. Monitor security advisories for mobile dependencies"
 echo "  3. Consider using dependency scanning tools in CI/CD"
 echo "  4. Review and update .nsprc for mobile-specific vulnerabilities"
 echo "  5. Install cocoapods-audit for enhanced iOS vulnerability scanning"
-echo "  6. Consider using OWASP Dependency Check for Android in local development" 
+echo "  6. Consider using OWASP Dependency Check for Android in local development"
+
+# Generate HTML report if Node.js is available
+if command -v node &> /dev/null; then
+    print_status "Generating HTML report..."
+    
+    # Capture the entire audit output for the report generator
+    {
+        echo "=== MOBILE DEPENDENCY AUDIT OUTPUT ==="
+        echo "NPM dependencies: $vuln_count vulnerabilities"
+        
+        # Capture full npm audit output
+        if [ "$vuln_count" != "0" ] && [ "$vuln_count" != "unknown" ]; then
+            echo "NPM vulnerabilities found: $vuln_count"
+            echo ""
+            echo "# npm audit report"
+            npm audit --audit-level=moderate --production 2>/dev/null || echo "npm audit failed"
+        fi
+        
+        # Capture npm-check-updates output
+        echo ""
+        echo "=== OUTDATED PACKAGES ==="
+        npx npm-check-updates --target minor --reject "@capacitor/*,@aparajita/*,@evva/*,capacitor-*" --format group 2>/dev/null || echo "npm-check-updates failed"
+        
+        # Capture iOS issues
+        if [ -d "ios" ] && [ -f "ios/App/Podfile" ]; then
+            echo ""
+            echo "=== IOS DEPENDENCIES ==="
+            cd ios/App
+            if pod outdated --silent 2>/dev/null; then
+                echo "Some iOS dependencies may be outdated"
+            fi
+            cd ../..
+        fi
+        
+        # Capture Android issues
+        if [ -d "android" ] && [ -f "android/app/build.gradle" ]; then
+            echo ""
+            echo "=== ANDROID DEPENDENCIES ==="
+            if grep -q "debuggable.*true" android/app/build.gradle; then
+                echo "Found debuggable=true in build.gradle - security risk"
+            fi
+            if grep -q "allowBackup.*true" android/app/build.gradle; then
+                echo "Found allowBackup=true in build.gradle - review for security implications"
+            fi
+        fi
+        
+        # Capture sensitive files
+        echo ""
+        echo "=== SENSITIVE FILES ==="
+        SENSITIVE_FILES=("google-services.json" "GoogleService-Info.plist" "*.keystore" "*.jks" "*.p12" "*.mobileprovision")
+        for pattern in "${SENSITIVE_FILES[@]}"; do
+            if find . -name "$pattern" -type f | grep -q .; then
+                echo "Found sensitive files matching pattern: $pattern"
+            fi
+        done
+        
+        # Capture Capacitor config issues
+        echo ""
+        echo "=== CAPACITOR CONFIG ==="
+        if [ -f "capacitor.config.ts" ]; then
+            if grep -q "allowNavigation" capacitor.config.ts; then
+                echo "Found allowNavigation in Capacitor config - review for security implications"
+            fi
+            if grep -q "server" capacitor.config.ts; then
+                echo "Found server configuration in Capacitor config - review for security implications"
+            fi
+            if grep -q "cleartext.*true" capacitor.config.ts; then
+                echo "Found cleartext=true in Capacitor config - security risk"
+            fi
+        fi
+    } > audit-output.txt
+    
+    # Generate HTML report
+    if [ -f "scripts/generate-audit-report.js" ]; then
+        if node scripts/generate-audit-report.js 2>/dev/null; then
+            print_success "HTML report generated: mobile-security-audit-report.html"
+        else
+            print_warning "Could not generate HTML report (script execution failed)"
+            # Show the error for debugging
+            node scripts/generate-audit-report.js 2>&1 | head -5
+        fi
+    else
+        print_warning "Could not generate HTML report (scripts/generate-audit-report.js not found)"
+    fi
+    
+    # Clean up temporary file after a delay to ensure it's processed
+    sleep 1
+    rm -f audit-output.txt
+else
+    print_warning "Node.js not available - skipping HTML report generation"
+fi 
