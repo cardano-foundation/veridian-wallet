@@ -1,0 +1,404 @@
+name: Enhanced Mobile Security Audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'ios/**'
+      - 'android/**'
+      - 'capacitor.config.ts'
+      - 'mobile-security-config.yaml'
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'ios/**'
+      - 'android/**'
+      - 'capacitor.config.ts'
+      - 'mobile-security-config.yaml'
+
+env:
+  SECURITY_SCAN_TIMEOUT: 1800  # 30 minutes
+  MAX_VULNERABILITIES: 10
+  FAIL_ON_CRITICAL: true
+  FAIL_ON_HIGH: true
+
+jobs:
+  # Job 1: Setup and Build
+  setup-and-build:
+    name: Setup and Build
+    runs-on: ubuntu-latest
+    outputs:
+      build-artifacts: ${{ steps.build.outputs.artifacts }}
+      dependencies-hash: ${{ steps.deps.outputs.hash }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for security analysis
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        id: deps
+        run: |
+          npm ci || npm install --no-audit --no-fund
+          echo "hash=$(md5sum package-lock.json | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+          
+      - name: Build project
+        id: build
+        run: |
+          npm run build
+          echo "artifacts=build/" >> $GITHUB_OUTPUT
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+          retention-days: 7
+
+  # Job 2: NPM Security Audit (Parallel)
+  npm-security-audit:
+    name: NPM Security Audit
+    runs-on: ubuntu-latest
+    needs: setup-and-build
+    outputs:
+      vulnerabilities: ${{ steps.audit.outputs.vulnerabilities }}
+      outdated-packages: ${{ steps.outdated.outputs.count }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+          
+      - name: Install dependencies
+        run: npm ci || npm install --no-audit --no-fund
+        
+      - name: Run NPM security audit
+        id: audit
+        run: |
+          # Run audit and capture results
+          npm audit --audit-level=moderate --production --json > audit-results.json || echo '{"vulnerabilities": {}}' > audit-results.json
+          
+          # Parse vulnerability count
+          VULN_COUNT=$(jq '.metadata.vulnerabilities.total // 0' audit-results.json)
+          echo "vulnerabilities=$VULN_COUNT" >> $GITHUB_OUTPUT
+          
+          # Check if we should fail
+          if [ "$VULN_COUNT" -gt "${{ env.MAX_VULNERABILITIES }}" ]; then
+            echo "❌ Too many vulnerabilities found: $VULN_COUNT"
+            exit 1
+          fi
+          
+      - name: Check for outdated packages
+        id: outdated
+        run: |
+          # Check for outdated packages
+          OUTDATED_COUNT=$(npx npm-check-updates --target minor --reject "@capacitor/*,@aparajita/*,@evva/*,capacitor-*" --format group 2>/dev/null | grep -c "→" || echo "0")
+          echo "count=$OUTDATED_COUNT" >> $GITHUB_OUTPUT
+          
+      - name: Upload audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-results
+          path: audit-results.json
+          retention-days: 30
+
+  # Job 3: iOS Security Audit (macOS)
+  ios-security-audit:
+    name: iOS Security Audit
+    runs-on: macos-latest
+    needs: setup-and-build
+    outputs:
+      vulnerabilities: ${{ steps.ios-audit.outputs.vulnerabilities }}
+      outdated-deps: ${{ steps.outdated.outputs.count }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+          
+      - name: Install dependencies
+        run: npm ci || npm install --no-audit --no-fund
+        
+      - name: Sync iOS platform
+        run: npx --yes cap sync ios
+        
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          
+      - name: Install CocoaPods
+        run: gem install cocoapods
+        
+      - name: Install iOS dependencies
+        run: |
+          cd ios/App
+          pod install --repo-update
+          
+      - name: Run iOS security audit
+        id: ios-audit
+        run: |
+          cd ios/App
+          
+          # Check for outdated dependencies
+          OUTDATED=$(pod outdated --silent 2>/dev/null | wc -l || echo "0")
+          
+          # Check for known vulnerable libraries
+          VULNERABLE_LIBS=("AFNetworking" "SDWebImage" "Realm" "CocoaLumberjack" "GoogleMLKit" "MLKitBarcodeScanning")
+          VULN_COUNT=0
+          
+          for lib in "${VULNERABLE_LIBS[@]}"; do
+            if grep -q "$lib" Podfile; then
+              VULN_COUNT=$((VULN_COUNT + 1))
+            fi
+          done
+          
+          echo "vulnerabilities=$VULN_COUNT" >> $GITHUB_OUTPUT
+          echo "outdated=$OUTDATED" >> $GITHUB_OUTPUT
+          
+          # Fail if critical vulnerabilities found
+          if [ "$VULN_COUNT" -gt 0 ] && [ "${{ env.FAIL_ON_CRITICAL }}" = "true" ]; then
+            echo "❌ Critical iOS vulnerabilities found"
+            exit 1
+          fi
+          
+      - name: Upload iOS audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-audit-results
+          path: ios/App/Podfile.lock
+          retention-days: 30
+
+  # Job 4: Android Security Audit (Ubuntu)
+  android-security-audit:
+    name: Android Security Audit
+    runs-on: ubuntu-latest
+    needs: setup-and-build
+    outputs:
+      vulnerabilities: ${{ steps.android-audit.outputs.vulnerabilities }}
+      build-issues: ${{ steps.build-check.outputs.issues }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+          
+      - name: Install dependencies
+        run: npm ci || npm install --no-audit --no-fund
+        
+      - name: Sync Android platform
+        run: npx --yes cap sync android
+        
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          build-root-directory: android
+          
+      - name: Make gradlew executable
+        working-directory: android
+        run: chmod +x gradlew
+        
+      - name: Run Android security audit
+        id: android-audit
+        run: |
+          cd android
+          
+          # Generate SBOM for vulnerability scanning
+          ./gradlew --no-daemon cyclonedxBom || echo "SBOM generation failed"
+          
+          # Check for known vulnerable libraries
+          VULNERABLE_LIBS=("okhttp" "retrofit" "glide" "picasso" "volley" "universal-image-loader")
+          VULN_COUNT=0
+          
+          for lib in "${VULNERABLE_LIBS[@]}"; do
+            if grep -q "$lib" app/build.gradle; then
+              VULN_COUNT=$((VULN_COUNT + 1))
+            fi
+          done
+          
+          # Check for security issues in build.gradle
+          if grep -q "debuggable.*true" app/build.gradle; then
+            VULN_COUNT=$((VULN_COUNT + 1))
+          fi
+          
+          if grep -q "allowBackup.*true" app/build.gradle; then
+            VULN_COUNT=$((VULN_COUNT + 1))
+          fi
+          
+          echo "vulnerabilities=$VULN_COUNT" >> $GITHUB_OUTPUT
+          
+          # Fail if critical vulnerabilities found
+          if [ "$VULN_COUNT" -gt 0 ] && [ "${{ env.FAIL_ON_CRITICAL }}" = "true" ]; then
+            echo "❌ Critical Android vulnerabilities found"
+            exit 1
+          fi
+          
+      - name: Check build configuration
+        id: build-check
+        run: |
+          cd android
+          
+          # Check for security issues
+          ISSUES=0
+          
+          if grep -q "debuggable.*true" app/build.gradle; then
+            ISSUES=$((ISSUES + 1))
+          fi
+          
+          if grep -q "allowBackup.*true" app/build.gradle; then
+            ISSUES=$((ISSUES + 1))
+          fi
+          
+          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+          
+      - name: Upload Android audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-audit-results
+          path: android/build/reports/
+          retention-days: 30
+
+  # Job 5: Security Report Generation
+  security-report:
+    name: Generate Security Report
+    runs-on: ubuntu-latest
+    needs: [npm-security-audit, ios-security-audit, android-security-audit]
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci || npm install --no-audit --no-fund
+        
+      - name: Download all audit results
+        uses: actions/download-artifact@v4
+        with:
+          path: audit-results/
+          
+      - name: Generate comprehensive security report
+        run: |
+          # Run the enhanced audit script
+          chmod +x scripts/mobile-dependency-audit.sh
+          ./scripts/mobile-dependency-audit.sh
+          
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: |
+            mobile-security-audit-report.html
+            audit-results/
+          retention-days: 90
+
+  # Job 6: Security Notifications
+  security-notifications:
+    name: Security Notifications
+    runs-on: ubuntu-latest
+    needs: [npm-security-audit, ios-security-audit, android-security-audit, security-report]
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download security report
+        uses: actions/download-artifact@v4
+        with:
+          name: security-report
+          path: security-report/
+          
+      - name: Generate security summary
+        run: |
+          echo "## 🔒 Mobile Security Audit Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Vulnerability Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **NPM Vulnerabilities**: ${{ needs.npm-security-audit.outputs.vulnerabilities }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **iOS Vulnerabilities**: ${{ needs.ios-security-audit.outputs.vulnerabilities }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Android Vulnerabilities**: ${{ needs.android-security-audit.outputs.vulnerabilities }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Recommendations" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review the detailed HTML report" >> $GITHUB_STEP_SUMMARY
+          echo "2. Address critical vulnerabilities immediately" >> $GITHUB_STEP_SUMMARY
+          echo "3. Update outdated dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "4. Schedule regular security reviews" >> $GITHUB_STEP_SUMMARY
+          
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'security-report/mobile-security-audit-report.html';
+            
+            if (fs.existsSync(reportPath)) {
+              const reportContent = fs.readFileSync(reportPath, 'utf8');
+              const summary = reportContent.match(/<title>(.*?)<\/title>/)?.[1] || 'Security Report Generated';
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## 🔒 Mobile Security Audit Complete\n\n${summary}\n\n📊 **Vulnerabilities Found**:\n- NPM: ${{ needs.npm-security-audit.outputs.vulnerabilities }}\n- iOS: ${{ needs.ios-security-audit.outputs.vulnerabilities }}\n- Android: ${{ needs.android-security-audit.outputs.vulnerabilities }}\n\n📋 **Next Steps**:\n1. Review the detailed security report\n2. Address any critical vulnerabilities\n3. Update outdated dependencies\n\n🔍 **Detailed Report**: Available in workflow artifacts`
+              });
+            }
