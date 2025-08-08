@@ -339,8 +339,8 @@ jobs:
       - name: Generate comprehensive security report
         run: |
           # Run the security report generator script
-          chmod +x scripts/generate-security-report.sh
-          ./scripts/generate-security-report.sh
+          chmod +x scripts/audit-cicd.sh
+          ./scripts/audit-cicd.sh
           
       - name: Upload security report
         uses: actions/upload-artifact@v4

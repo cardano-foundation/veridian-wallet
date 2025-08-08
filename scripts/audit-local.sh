@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# Mobile Dependency Audit Script
-# This script performs comprehensive security audits for iOS and Android dependencies
+# Mobile Dependency Security Audit - Local Development
+# This script provides fast, simple security checks for local development
 
 set -e
-
-echo "🔍 Starting Mobile Dependency Security Audit..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -14,21 +12,43 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Function to print colored output
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+# Helper functions
+print_info() {
+    echo -e "${BLUE}ℹ️  $1${NC}"
 }
 
 print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+    echo -e "${GREEN}✅ $1${NC}"
 }
 
 print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+    echo -e "${YELLOW}⚠️  $1${NC}"
 }
 
 print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+    echo -e "${RED}❌ $1${NC}"
+}
+
+print_status() {
+    echo -e "${BLUE}📋 $1${NC}"
+}
+
+# Load configuration if available
+load_config() {
+    if [ -f "mobile-security-config.yaml" ]; then
+        print_info "Loading security configuration..."
+        # Basic YAML parsing for key values
+        MAX_CRITICAL=$(grep "max_critical:" mobile-security-config.yaml | awk '{print $2}' || echo "0")
+        MAX_HIGH=$(grep "max_high:" mobile-security-config.yaml | awk '{print $2}' || echo "5")
+        MAX_MEDIUM=$(grep "max_medium:" mobile-security-config.yaml | awk '{print $2}' || echo "10")
+        MAX_LOW=$(grep "max_low:" mobile-security-config.yaml | awk '{print $2}' || echo "20")
+    else
+        print_warning "No mobile-security-config.yaml found, using defaults"
+        MAX_CRITICAL=0
+        MAX_HIGH=5
+        MAX_MEDIUM=10
+        MAX_LOW=20
+    fi
 }
 
 # Check if we're in the right directory

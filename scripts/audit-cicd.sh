@@ -43,8 +43,8 @@ SENSITIVE_COUNT=0
 print_info "Generating comprehensive HTML security report..."
 
 # Check if Node.js script is available
-if [ ! -f "scripts/generate-audit-report.js" ]; then
-    print_error "HTML report generator not found: scripts/generate-audit-report.js"
+if [ ! -f "scripts/report-html.js" ]; then
+    print_error "HTML report generator not found: scripts/report-html.js"
     print_error "This script is only available in CI/CD environments"
     print_error "For local development, use: npm run audit:mobile"
     exit 1
@@ -139,7 +139,7 @@ print_info "Preparing data for HTML report..."
 
 # Generate HTML report
 print_info "Generating HTML report..."
-if node scripts/generate-audit-report.js 2>/dev/null; then
+if node scripts/report-html.js 2>/dev/null; then
     print_success "HTML report generated successfully"
     
     # Verify the report was created
