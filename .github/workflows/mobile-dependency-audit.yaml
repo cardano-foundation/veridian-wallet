@@ -1,231 +1,87 @@
-name: Mobile Dependency Audit
+name: Mobile Dependency Security Audit
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
   push:
-    branches:
-      - main
-      - develop
+    branches: [ main ]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'ios/**'
+      - 'android/**'
+      - 'capacitor.config.ts'
+      - 'mobile-security-config.yaml'
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'ios/**'
+      - 'android/**'
+      - 'capacitor.config.ts'
+      - 'mobile-security-config.yaml'
 
 jobs:
-  ios-dependency-audit:
-    runs-on: macos-latest
-    name: iOS Dependency Audit
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        fetch-depth: 1
-
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
-
-    - name: Install CocoaPods and Audit Tools
-      run: |
-        gem install cocoapods
-        # cocoapods-audit is not available, using basic checks only
-
-    - name: Setup iOS Environment
-      run: |
-        # Install dependencies first
-        npm ci || npm install --no-audit --no-fund
-        
-        # Build web assets for Capacitor
-        npm run build
-        
-        # Ensure Capacitor iOS files are generated
-        npx --yes cap sync ios
-        
-    - name: Install iOS Dependencies
-      run: |
-        cd ios/App
-        pod install --repo-update
-
-    - name: Check iOS Dependencies for Vulnerabilities
-      run: |
-        cd ios/App
-        echo "🔍 Checking iOS dependencies for security vulnerabilities..."
-        
-        # Basic iOS dependency checks (cocoapods-audit not available)
-        echo "Running basic iOS dependency checks..."
-        
-        # Check for outdated dependencies
-        if pod outdated --silent; then
-          echo "⚠️ Some iOS dependencies may be outdated. Consider updating."
-        else
-          echo "✅ iOS dependencies appear to be up to date"
-        fi
-        
-        # Check for known vulnerable dependencies
-        if grep -q "GoogleMLKit\|MLKitBarcodeScanning" Podfile; then
-          echo "⚠️ MLKit dependencies detected - monitor for security updates"
-        fi
-        
-        # Check for specific vulnerable iOS libraries
-        echo "Checking for known vulnerable iOS libraries..."
-        VULNERABLE_LIBS=("AFNetworking" "SDWebImage" "Realm" "CocoaLumberjack")
-        for lib in "${VULNERABLE_LIBS[@]}"; do
-          if grep -q "$lib" Podfile; then
-            echo "⚠️ Found potentially vulnerable library: $lib"
-          fi
-        done
-        
-        echo "✅ iOS dependency vulnerability check completed"
-
-  android-dependency-audit:
+  mobile-security-audit:
+    name: Mobile Security Audit
     runs-on: ubuntu-latest
-    name: Android Dependency Audit
     
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        fetch-depth: 1
-
-    - name: Setup Node (for Capacitor CLI)
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-
-    - name: Install Node dependencies
-      run: |
-        # Prefer clean install, but fall back to regular install if lockfile is out of sync
-        npm ci || npm install --no-audit --no-fund
-
-    - name: Build web assets
-      run: npm run build
-
-    - name: Generate Android project artifacts (Capacitor sync)
-      run: npx --yes cap sync android
-
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        build-root-directory: android
-
-    - name: Make gradlew executable
-      working-directory: android
-      run: chmod +x gradlew
-
-    - name: Download Gradle Dependencies
-      working-directory: android
-      run: ./gradlew dependencies --no-daemon
-
-    - name: Generate CycloneDX SBOM (Gradle)
-      working-directory: android
-      run: ./gradlew --no-daemon cyclonedxBom
-
-    - name: Scan SBOM with Trivy (no API key)
-      uses: aquasecurity/trivy-action@0.28.0
-      with:
-        scan-type: sbom
-        input: android/build/reports/bom.json
-        severity: HIGH,CRITICAL
-        exit-code: '1'
-        ignore-unfixed: true
-
-    - name: Upload SBOM
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: android-sbom
-        path: android/build/reports/bom.json
-
-    - name: Check Android Dependencies for Known Vulnerabilities
-      run: |
-        cd android
-        echo "🔍 Checking Android dependencies for known vulnerabilities..."
+      - name: Checkout code
+        uses: actions/checkout@v4
         
-        # Check for vulnerable AndroidX versions
-        if grep -q "androidx.appcompat.*1\.[0-5]\." app/build.gradle; then
-          echo "⚠️ Outdated AndroidX AppCompat detected"
-          exit 1
-        fi
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci || npm install --no-audit --no-fund
         
-        # Check for vulnerable support library versions
-        if grep -q "com.android.support" app/build.gradle; then
-          echo "⚠️ Android Support Library detected - consider migrating to AndroidX"
-        fi
+      - name: Build project
+        run: npm run build
         
-        # Check for known vulnerable libraries
-        VULNERABLE_ANDROID_LIBS=("okhttp" "retrofit" "glide" "picasso")
-        for lib in "${VULNERABLE_ANDROID_LIBS[@]}"; do
-          if grep -q "$lib" app/build.gradle; then
-            echo "⚠️ Found potentially vulnerable Android library: $lib"
+      - name: Sync Capacitor platforms
+        run: |
+          npx --yes cap sync ios
+          npx --yes cap sync android
+          
+      - name: Install iOS dependencies
+        run: |
+          cd ios/App
+          pod install --repo-update
+          
+      - name: Run mobile dependency audit
+        run: |
+          chmod +x scripts/mobile-dependency-audit.sh
+          ./scripts/mobile-dependency-audit.sh
+          
+      - name: Check for sensitive files in mobile directories
+        run: |
+          echo "🔍 Checking for sensitive files in mobile directories..."
+          
+          # Check for sensitive Android files
+          if find android -name "google-services.json" -o -name "*.keystore" -o -name "*.jks" | grep -q .; then
+            echo "⚠️ Found sensitive Android files:"
+            find android -name "google-services.json" -o -name "*.keystore" -o -name "*.jks"
           fi
-        done
-        
-        echo "✅ Android dependency vulnerability check completed"
-
-  mobile-security-scan:
-    runs-on: ubuntu-latest
-    name: Mobile Security Scan
-    needs: [ios-dependency-audit, android-dependency-audit]
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        fetch-depth: 1
-
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Run Mobile Security Scan
-      run: |
-        # Additional mobile-specific security checks
-        echo "🔍 Running mobile security scan..."
-        
-        # Check for known vulnerable Capacitor plugins
-        npm audit --audit-level=moderate || {
-          echo "⚠️ NPM audit found vulnerabilities in Capacitor dependencies"
-          exit 1
-        }
-        
-        # Check for outdated mobile dependencies
-        npx npm-check-updates --target minor --reject "@capacitor/*,@aparajita/*,@evva/*,capacitor-*" || {
-          echo "ℹ️ Some mobile dependencies may have updates available"
-        }
-        
-        # Check for sensitive files in mobile directories
-        echo "🔍 Checking for sensitive files in mobile directories..."
-        if find . -name "google-services.json" -o -name "GoogleService-Info.plist" -o -name "*.keystore" -o -name "*.jks" | grep -q .; then
-          echo "⚠️ Found sensitive files in repository"
-          find . -name "google-services.json" -o -name "GoogleService-Info.plist" -o -name "*.keystore" -o -name "*.jks"
-        else
-          echo "✅ No sensitive files found"
-        fi
-        
-        # Check Capacitor configuration for security issues
-        if [ -f "capacitor.config.ts" ]; then
-          echo "🔍 Checking Capacitor configuration for security issues..."
-          if grep -q "allowNavigation" capacitor.config.ts; then
-            echo "⚠️ Found allowNavigation in Capacitor config - review for security implications"
+          
+          # Check for sensitive iOS files
+          if find ios -name "GoogleService-Info.plist" -o -name "*.p12" -o -name "*.mobileprovision" | grep -q .; then
+            echo "⚠️ Found sensitive iOS files:"
+            find ios -name "GoogleService-Info.plist" -o -name "*.p12" -o -name "*.mobileprovision"
           fi
-          if grep -q "server" capacitor.config.ts; then
-            echo "⚠️ Found server configuration in Capacitor config - review for security implications"
-          fi
-        fi
-        
-        echo "✅ Mobile security scan completed successfully" 
+          
+          echo "✅ Sensitive file check completed"
+          
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-security-audit-results
+          path: |
+            android/build/reports/
+            ios/App/Podfile.lock
+          retention-days: 30 
