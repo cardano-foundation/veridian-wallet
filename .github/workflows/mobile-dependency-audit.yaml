@@ -31,10 +31,15 @@ jobs:
         gem install cocoapods
         # cocoapods-audit is not available, using basic checks only
 
+    - name: Setup iOS Environment
+      run: |
+        # Ensure Capacitor iOS files are generated
+        npx --yes cap sync ios
+        
     - name: Install iOS Dependencies
       run: |
         cd ios/App
-        pod install
+        pod install --repo-update
 
     - name: Check iOS Dependencies for Vulnerabilities
       run: |
