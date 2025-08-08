@@ -36,6 +36,9 @@ jobs:
         # Install dependencies first
         npm ci || npm install --no-audit --no-fund
         
+        # Build web assets for Capacitor
+        npm run build
+        
         # Ensure Capacitor iOS files are generated
         npx --yes cap sync ios
         
