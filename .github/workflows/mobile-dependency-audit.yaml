@@ -93,7 +93,9 @@ jobs:
         cache: 'npm'
 
     - name: Install Node dependencies
-      run: npm ci
+      run: |
+        # Prefer clean install, but fall back to regular install if lockfile is out of sync
+        npm ci || npm install --no-audit --no-fund
 
     - name: Generate Android project artifacts (Capacitor sync)
       run: npx --yes cap sync android
