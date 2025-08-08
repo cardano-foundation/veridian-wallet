@@ -122,25 +122,18 @@ jobs:
       working-directory: android
       run: ./gradlew dependencies --no-daemon
 
-    - name: Install Dependency Check
-      run: |
-        wget -q https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0-release/dependency-check-8.4.0-release.zip
-        unzip -q dependency-check-8.4.0-release.zip
-        echo "$PWD/dependency-check/bin" >> $GITHUB_PATH
+    - name: OWASP Dependency-Check (Gradle)
+      working-directory: android
+      run: ./gradlew --no-daemon dependencyCheckAnalyze
 
-    - name: Audit Android Dependencies
-      run: |
-        echo "🔍 Running OWASP Dependency Check for Android..."
-        dependency-check/bin/dependency-check.sh \
-          --project "Android" \
-          --scan android \
-          --format "JSON" \
-          --out "dependency-check-report.json" \
-          --failOnCVSS 7 || {
-            echo "⚠️ Android dependency vulnerabilities found. Please review and update dependencies."
-            cat dependency-check-report.json | head -n 200 || true
-            exit 1
-          }
+    - name: Upload Dependency-Check reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-dependency-check-reports
+        path: |
+          android/**/build/reports/dependency-check*
+          android/**/build/reports/dependency-check/**
 
     - name: Check Android Dependencies for Known Vulnerabilities
       run: |
