@@ -97,6 +97,9 @@ jobs:
         # Prefer clean install, but fall back to regular install if lockfile is out of sync
         npm ci || npm install --no-audit --no-fund
 
+    - name: Build web assets
+      run: npm run build
+
     - name: Generate Android project artifacts (Capacitor sync)
       run: npx --yes cap sync android
 
