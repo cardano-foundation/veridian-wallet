@@ -16,7 +16,7 @@ import { Alert } from "../../components/Alert";
 import { PageHeader } from "../../components/PageHeader";
 import { PasswordModule } from "../../components/PasswordModule";
 import { PasswordModuleRef } from "../../components/PasswordModule/PasswordModule.types";
-import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
+import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
@@ -93,7 +93,7 @@ const CreatePassword = ({
 
   return (
     <>
-      <ScrollablePageLayout
+      <ResponsivePageLayout
         pageId={pageId}
         customClass={isOnboarding ? "has-header-skip" : undefined}
         header={
@@ -108,37 +108,16 @@ const CreatePassword = ({
             title={
               !isOnboarding
                 ? `${i18n.t(
-                  userAction?.current === "change"
-                    ? "createpassword.change"
-                    : "createpassword.title"
-                )}`
+                    userAction?.current === "change"
+                      ? "createpassword.change"
+                      : "createpassword.title"
+                  )}`
                 : undefined
             }
             actionButton={isOnboarding}
             actionButtonLabel={`${i18n.t("createpassword.button.skip")}`}
             actionButtonAction={handleSkip}
           />
-        }
-        footer={
-          step === 0 ? (
-            <PageFooter
-              primaryButtonText={`${i18n.t(
-                "createpassword.setuppassword.button.enable"
-              )}`}
-              primaryButtonAction={handleSetupPassword}
-              tertiaryButtonText={`${i18n.t(
-                "createpassword.setuppassword.button.skip"
-              )}`}
-              tertiaryButtonAction={handleSkip}
-            />
-          ) : (
-            <PageFooter
-              pageId={pageId}
-              primaryButtonText={`${i18n.t("createpassword.button.continue")}`}
-              primaryButtonAction={() => handleContinue(false)}
-              primaryButtonDisabled={!validated}
-            />
-          )
         }
       >
         {step === 0 ? (
@@ -160,7 +139,26 @@ const CreatePassword = ({
             onCreateSuccess={handleContinue}
           />
         )}
-      </ScrollablePageLayout>
+        {step === 0 ? (
+          <PageFooter
+            primaryButtonText={`${i18n.t(
+              "createpassword.setuppassword.button.enable"
+            )}`}
+            primaryButtonAction={handleSetupPassword}
+            tertiaryButtonText={`${i18n.t(
+              "createpassword.setuppassword.button.skip"
+            )}`}
+            tertiaryButtonAction={handleSkip}
+          />
+        ) : (
+          <PageFooter
+            pageId={pageId}
+            primaryButtonText={`${i18n.t("createpassword.button.continue")}`}
+            primaryButtonAction={() => handleContinue(false)}
+            primaryButtonDisabled={!validated}
+          />
+        )}
+      </ResponsivePageLayout>
       <Alert
         isOpen={alertCancelIsOpen}
         setIsOpen={setAlertCancelIsOpen}
