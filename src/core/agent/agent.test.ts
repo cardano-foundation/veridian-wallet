@@ -42,6 +42,7 @@ jest.mock("../cardano/walletConnect/peerConnection", () => ({
     peerConnection: {
       getConnectedDAppAddress: jest.fn(),
       disconnectDApp: jest.fn(),
+      getConnectingIdentifier: jest.fn(),
     },
   },
 }));
@@ -518,93 +519,146 @@ describe("Agent setup and wiping", () => {
   });
 });
 
-describe("Identifier deletion", () => {
+describe("Agent delete profile", () => {
   let agent: Agent;
 
   beforeEach(() => {
+    jest.resetAllMocks();
     agent = Agent.agent;
     (agent as any).identifierStorage = mockIdentifierStorage;
-    (agent as any).notificationStorage = mockNotificationStorage;
     (agent as any).connectionService = mockConnectionService;
-    (agent as any).identifierService = mockIdentifierService;
+    (agent as any).notificationStorage = mockNotificationStorage;
     (agent as any).agentServicesProps = mockAgentServicesProps;
 
-    jest
-      .spyOn(utils, "deleteNotificationRecordById")
-      .mockResolvedValue(undefined);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  test("should delete group identifier and its associations", async () => {
-    const identifierId = "identifier-id";
-    const metadata = {
-      id: identifierId,
-      groupMetadata: { groupId: "group-id" },
-      groupMemberPre: null,
-    };
-    mockIdentifierStorage.getIdentifierMetadata.mockResolvedValue(
-      metadata as any
-    );
+    mockIdentifierStorage.getIdentifierMetadata.mockResolvedValue({
+      id: "test-id",
+      groupMetadata: { groupId: "test-group-id" },
+      groupMemberPre: "test-group-member-pre",
+    });
     mockConnectionService.deleteAllConnectionsForGroup.mockResolvedValue(
       undefined
-    );
-    mockNotificationStorage.findAllByQuery.mockResolvedValue([]);
-    (
-      PeerConnection.peerConnection.getConnectedDAppAddress as jest.Mock
-    ).mockReturnValue("");
-    mockIdentifierService.deleteIdentifier.mockResolvedValue(undefined);
-
-    await (agent as any).deleteIdentifierAndAssociations(identifierId);
-
-    expect(mockIdentifierStorage.getIdentifierMetadata).toHaveBeenCalledWith(
-      identifierId
-    );
-    expect(
-      mockConnectionService.deleteAllConnectionsForGroup
-    ).toHaveBeenCalledWith(metadata.groupMetadata.groupId);
-    expect(
-      mockConnectionService.deleteAllConnectionsForIdentifier
-    ).not.toHaveBeenCalled();
-    expect(mockIdentifierService.deleteIdentifier).toHaveBeenCalledWith(
-      identifierId
-    );
-  });
-
-  test("should delete single identifier and its associations", async () => {
-    const identifierId = "identifier-id";
-    const metadata = {
-      id: identifierId,
-      groupMetadata: null,
-      groupMemberPre: null,
-    };
-    mockIdentifierStorage.getIdentifierMetadata.mockResolvedValue(
-      metadata as any
     );
     mockConnectionService.deleteAllConnectionsForIdentifier.mockResolvedValue(
       undefined
     );
-    mockNotificationStorage.findAllByQuery.mockResolvedValue([]);
-    (
-      PeerConnection.peerConnection.getConnectedDAppAddress as jest.Mock
-    ).mockReturnValue("");
+    mockNotificationStorage.findAllByQuery.mockResolvedValue([
+      { id: "note1", a: { r: "/some/route" } },
+      { id: "note2", a: { r: "/local/route" } },
+    ]);
+    jest
+      .spyOn(utils, "deleteNotificationRecordById")
+      .mockResolvedValue(undefined);
+    jest
+      .spyOn(PeerConnection.peerConnection, "getConnectedDAppAddress")
+      .mockReturnValue("dapp-address");
+    jest
+      .spyOn(PeerConnection.peerConnection, "getConnectingIdentifier")
+      .mockResolvedValue({ id: "test-id", oobi: "test-oobi" });
+    jest
+      .spyOn(PeerConnection.peerConnection, "disconnectDApp")
+      .mockReturnValue(undefined);
     mockIdentifierService.deleteIdentifier.mockResolvedValue(undefined);
+  });
 
-    await (agent as any).deleteIdentifierAndAssociations(identifierId);
+  test("should orchestrate deletion of identifier and its associated data", async () => {
+    const identifierId = "test-id";
+
+    await (agent as any).deleteProfile(identifierId);
 
     expect(mockIdentifierStorage.getIdentifierMetadata).toHaveBeenCalledWith(
       identifierId
     );
     expect(
-      mockConnectionService.deleteAllConnectionsForIdentifier
-    ).toHaveBeenCalledWith(identifierId);
-    expect(
       mockConnectionService.deleteAllConnectionsForGroup
+    ).toHaveBeenCalledWith("test-group-id");
+    expect(
+      mockConnectionService.deleteAllConnectionsForIdentifier
     ).not.toHaveBeenCalled();
+    expect(mockNotificationStorage.findAllByQuery).toHaveBeenCalledWith({
+      receivingPre: "test-group-member-pre",
+    });
+    expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      "note1",
+      "/some/route"
+    );
+    expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      "note2",
+      "/local/route"
+    ); // Local notifications should not be deleted via signifyClient
+    expect(
+      PeerConnection.peerConnection.getConnectedDAppAddress
+    ).toHaveBeenCalled();
+    expect(
+      PeerConnection.peerConnection.getConnectingIdentifier
+    ).toHaveBeenCalled();
+    expect(PeerConnection.peerConnection.disconnectDApp).toHaveBeenCalledWith(
+      "dapp-address",
+      true
+    );
     expect(mockIdentifierService.deleteIdentifier).toHaveBeenCalledWith(
       identifierId
+    );
+  });
+
+  test("should delete a group identifier and its associated data", async () => {
+    const groupIdentifierId = "group-id";
+    mockIdentifierStorage.getIdentifierMetadata.mockResolvedValueOnce({
+      id: groupIdentifierId,
+      groupMetadata: { groupId: groupIdentifierId },
+      groupMemberPre: undefined,
+    });
+    mockNotificationStorage.findAllByQuery.mockResolvedValueOnce([
+      { id: "group-note1", a: { r: "/some/route" } },
+      { id: "group-note2", a: { r: "/local/route" } },
+    ]);
+
+    // Explicitly mock PeerConnection methods for this test case
+    jest
+      .spyOn(PeerConnection.peerConnection, "getConnectedDAppAddress")
+      .mockReturnValueOnce(""); // Should return empty string
+    jest
+      .spyOn(PeerConnection.peerConnection, "getConnectingIdentifier")
+      .mockResolvedValueOnce({ id: "some-other-id", oobi: "some-other-oobi" }); // Should not be called, but mock it anyway
+
+    await (agent as any).deleteProfile(groupIdentifierId);
+
+    expect(mockIdentifierStorage.getIdentifierMetadata).toHaveBeenCalledWith(
+      groupIdentifierId
+    );
+    expect(
+      mockConnectionService.deleteAllConnectionsForGroup
+    ).toHaveBeenCalledWith(groupIdentifierId);
+    expect(
+      mockConnectionService.deleteAllConnectionsForIdentifier
+    ).not.toHaveBeenCalled();
+    expect(mockNotificationStorage.findAllByQuery).toHaveBeenCalledWith({
+      receivingPre: groupIdentifierId,
+    });
+    expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      "group-note1",
+      "/some/route"
+    );
+    expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      "group-note2",
+      "/local/route"
+    );
+    expect(
+      PeerConnection.peerConnection.getConnectedDAppAddress
+    ).toHaveBeenCalled(); // This call is expected
+    expect(
+      PeerConnection.peerConnection.getConnectingIdentifier
+    ).not.toHaveBeenCalled(); // This call should not happen
+    expect(PeerConnection.peerConnection.disconnectDApp).not.toHaveBeenCalled();
+    expect(mockIdentifierService.deleteIdentifier).toHaveBeenCalledWith(
+      groupIdentifierId
     );
   });
 });
