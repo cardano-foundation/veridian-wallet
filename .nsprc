@@ -26,5 +26,9 @@
   "1106507": {
     "active": true,
     "notes": "form-data uses Math.random() to select a boundary value for multipart form-encoded data. A hacker Can observe values produced by Math.random in the application and control the field of a form-data request on Appium server do not impact the wallet."
+  },
+  "1106849": {
+    "active": true,
+    "notes": "Low severity vulnerability in dev dependency (tmp via external-editor and @wdio/cli). Not exploitable in production, and unlikely in dev environment as it requires control over temporary directory paths."
   }
 }
