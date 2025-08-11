@@ -48,7 +48,11 @@ import { SqliteStorage } from "../storage/sqliteStorage";
 import { BaseRecord } from "../storage/storage.types";
 import { OperationPendingStorage } from "./records/operationPendingStorage";
 import { OperationPendingRecord } from "./records/operationPendingRecord";
-import { EventTypes, KeriaStatusChangedEvent , NotificationRemovedEvent } from "./event.types";
+import {
+  EventTypes,
+  KeriaStatusChangedEvent,
+  NotificationRemovedEvent,
+} from "./event.types";
 import {
   isNetworkError,
   OnlineOnly,
@@ -487,9 +491,7 @@ class Agent {
     this.credentials.onCredentialRemoved();
   }
 
-  private async deleteIdentifierAndRelatedData(
-    identifier: string
-  ): Promise<void> {
+  private async deleteProfile(identifier: string): Promise<void> {
     const metadata = await this.identifierStorage.getIdentifierMetadata(
       identifier
     );
