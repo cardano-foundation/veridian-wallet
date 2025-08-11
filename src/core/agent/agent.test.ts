@@ -2,7 +2,11 @@ const stopPollingMock = jest.fn();
 const getAllIdentifiersMock = jest.fn();
 const getAllCredentialsMock = jest.fn();
 const getAllConnectionsMock = jest.fn();
-const getAllNotificationsMock = jest.fn();
+const mockNotificationStorage = {
+  getAll: jest.fn(),
+  findAllByQuery: jest.fn(),
+};
+mockNotificationStorage.getAll.mockResolvedValue([]);
 const updateIdentifierMock = jest.fn();
 const deleteCredentialMock = jest.fn().mockResolvedValue(undefined);
 const deleteContactMock = jest.fn().mockResolvedValue(undefined);
@@ -18,6 +22,7 @@ import { CoreEventEmitter } from "./event";
 import { EventTypes } from "./event.types";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
 import { IdentifierService } from "./services";
+import * as utils from "./services/utils";
 
 jest.mock("signify-ts", () => ({
   SignifyClient: jest.fn(),
@@ -72,11 +77,14 @@ const mockConnectionService = {
   removeConnectionsPendingDeletion: jest.fn(),
   resolvePendingConnections: jest.fn(),
   syncKeriaContacts: jest.fn(),
+  deleteAllConnectionsForGroup: jest.fn(),
+  deleteAllConnectionsForIdentifier: jest.fn(),
 };
 const mockIdentifierService = {
   processIdentifiersPendingCreation: jest.fn(),
   removeIdentifiersPendingDeletion: jest.fn(),
   syncKeriaIdentifiers: jest.fn(),
+  deleteIdentifier: jest.fn(),
 };
 const mockCredentialService = {
   syncKeriaCredentials: jest.fn(),
@@ -89,16 +97,14 @@ const mockKeriaNotificationService = {
   stopPolling: stopPollingMock,
 };
 const mockIdentifierStorage = {
-  getAllIdentifiers: getAllIdentifiersMock,
+  getAllIdentifiers: jest.fn(),
+  getIdentifierMetadata: jest.fn(),
 };
 const mockCredentialStorage = {
-  getAllCredentialMetadata: getAllCredentialsMock,
+  getAllCredentialMetadata: jest.fn(),
 };
 const mockConnectionStorage = {
-  getAll: getAllConnectionsMock,
-};
-const mockNotificationStorage = {
-  getAll: getAllNotificationsMock,
+  getAll: jest.fn(),
 };
 
 const mockEntropy = "00000000000000000000000000000000";
@@ -451,6 +457,8 @@ describe("Agent setup and wiping", () => {
     (agent as any).connectionStorage = mockConnectionStorage;
     (agent as any).notificationStorage = mockNotificationStorage;
 
+    jest.spyOn(utils, "randomSalt").mockReturnValue("my-salt");
+
     mockAgentUrls = {
       url: "http://127.0.0.1:3901",
       bootUrl: "http://127.0.0.1:3903",
@@ -462,12 +470,18 @@ describe("Agent setup and wiping", () => {
     PeerConnection.peerConnection.getConnectedDAppAddress = jest
       .fn()
       .mockReturnValue("");
-    getAllIdentifiersMock.mockResolvedValue([
+    mockIdentifierStorage.getAllIdentifiers.mockResolvedValue([]);
+    mockCredentialStorage.getAllCredentialMetadata.mockResolvedValue([
+      { id: "credential-id" },
+    ]);
+    mockConnectionStorage.getAll.mockResolvedValue([{ id: "connection-id" }]);
+    mockNotificationStorage.getAll.mockResolvedValue([
+      { id: "note-id", route: "/some/remote/route" },
+    ]);
+
+    mockIdentifierStorage.getAllIdentifiers.mockResolvedValue([
       { id: "identifier", displayName: "my-identifier" },
     ]);
-    getAllCredentialsMock.mockResolvedValue([{ id: "credential-id" }]);
-    getAllConnectionsMock.mockResolvedValue([{ id: "connection-id" }]);
-    getAllNotificationsMock.mockResolvedValue([{ id: "note-id" }]);
 
     await Agent.agent.deleteAccount();
 
@@ -487,10 +501,10 @@ describe("Agent setup and wiping", () => {
     PeerConnection.peerConnection.getConnectedDAppAddress = jest
       .fn()
       .mockReturnValue("meerkat-id");
-    getAllIdentifiersMock.mockResolvedValue([]);
+    mockIdentifierStorage.getAllIdentifiers.mockResolvedValue([]);
     getAllCredentialsMock.mockResolvedValue([]);
     getAllConnectionsMock.mockResolvedValue([]);
-    getAllNotificationsMock.mockResolvedValue([]);
+    mockNotificationStorage.getAll.mockResolvedValue([]);
 
     await agent.deleteAccount();
 
@@ -501,5 +515,96 @@ describe("Agent setup and wiping", () => {
     expect(stopPollingMock).toBeCalled();
     expect(wipeSessionMock).toBeCalledWith("idw");
     expect(SecureStorage.wipe).toBeCalled();
+  });
+});
+
+describe("Identifier deletion", () => {
+  let agent: Agent;
+
+  beforeEach(() => {
+    agent = Agent.agent;
+    (agent as any).identifierStorage = mockIdentifierStorage;
+    (agent as any).notificationStorage = mockNotificationStorage;
+    (agent as any).connectionService = mockConnectionService;
+    (agent as any).identifierService = mockIdentifierService;
+    (agent as any).agentServicesProps = mockAgentServicesProps;
+
+    jest
+      .spyOn(utils, "deleteNotificationRecordById")
+      .mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should delete group identifier and its associations", async () => {
+    const identifierId = "identifier-id";
+    const metadata = {
+      id: identifierId,
+      groupMetadata: { groupId: "group-id" },
+      groupMemberPre: null,
+    };
+    mockIdentifierStorage.getIdentifierMetadata.mockResolvedValue(
+      metadata as any
+    );
+    mockConnectionService.deleteAllConnectionsForGroup.mockResolvedValue(
+      undefined
+    );
+    mockNotificationStorage.findAllByQuery.mockResolvedValue([]);
+    (
+      PeerConnection.peerConnection.getConnectedDAppAddress as jest.Mock
+    ).mockReturnValue("");
+    mockIdentifierService.deleteIdentifier.mockResolvedValue(undefined);
+
+    await (agent as any).deleteIdentifierAndAssociations(identifierId);
+
+    expect(mockIdentifierStorage.getIdentifierMetadata).toHaveBeenCalledWith(
+      identifierId
+    );
+    expect(
+      mockConnectionService.deleteAllConnectionsForGroup
+    ).toHaveBeenCalledWith(metadata.groupMetadata.groupId);
+    expect(
+      mockConnectionService.deleteAllConnectionsForIdentifier
+    ).not.toHaveBeenCalled();
+    expect(mockIdentifierService.deleteIdentifier).toHaveBeenCalledWith(
+      identifierId
+    );
+  });
+
+  test("should delete single identifier and its associations", async () => {
+    const identifierId = "identifier-id";
+    const metadata = {
+      id: identifierId,
+      groupMetadata: null,
+      groupMemberPre: null,
+    };
+    mockIdentifierStorage.getIdentifierMetadata.mockResolvedValue(
+      metadata as any
+    );
+    mockConnectionService.deleteAllConnectionsForIdentifier.mockResolvedValue(
+      undefined
+    );
+    mockNotificationStorage.findAllByQuery.mockResolvedValue([]);
+    (
+      PeerConnection.peerConnection.getConnectedDAppAddress as jest.Mock
+    ).mockReturnValue("");
+    mockIdentifierService.deleteIdentifier.mockResolvedValue(undefined);
+
+    await (agent as any).deleteIdentifierAndAssociations(identifierId);
+
+    expect(mockIdentifierStorage.getIdentifierMetadata).toHaveBeenCalledWith(
+      identifierId
+    );
+    expect(
+      mockConnectionService.deleteAllConnectionsForIdentifier
+    ).toHaveBeenCalledWith(identifierId);
+    expect(
+      mockConnectionService.deleteAllConnectionsForGroup
+    ).not.toHaveBeenCalled();
+    expect(mockIdentifierService.deleteIdentifier).toHaveBeenCalledWith(
+      identifierId
+    );
   });
 });

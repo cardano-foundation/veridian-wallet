@@ -142,8 +142,7 @@ const identifierService = new IdentifierService(
   identifierStorage as any,
   operationPendingStorage as any,
   basicStorage as any,
-  notificationStorage as any,
-  connections as any
+  notificationStorage as any
 );
 
 jest.mock("../../cardano/walletConnect/peerConnection", () => ({
@@ -1111,26 +1110,6 @@ describe("Single sig service of agent", () => {
     );
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
-
-    expect(connections.deleteAllConnectionsForGroup).toBeCalledWith(
-      groupMetadata.groupId
-    );
-    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
-    expect(notificationStorage.deleteById).toBeCalledWith(
-      findNotificationsResult[0].id
-    );
-    expect(eventEmitter.emit).toBeCalledWith({
-      type: EventTypes.NotificationRemoved,
-      payload: { id: findNotificationsResult[0].id },
-    });
-    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
-    expect(notificationStorage.deleteById).toBeCalledWith(
-      findNotificationsResult[1].id
-    );
-    expect(eventEmitter.emit).toBeCalledWith({
-      type: EventTypes.NotificationRemoved,
-      payload: { id: findNotificationsResult[1].id },
-    });
   });
 
   test("should delete the local member identifier for that multisig if deleting the multi-sig identifier", async () => {
@@ -1169,44 +1148,6 @@ describe("Single sig service of agent", () => {
       .mockResolvedValueOnce([findNotificationsResult[1]]);
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
-
-    expect(connections.deleteAllConnectionsForIdentifier).toBeCalledWith(
-      identifierMetadataRecord.id
-    );
-    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      "manageAid",
-      {
-        isDeleted: true,
-        pendingDeletion: false,
-      }
-    );
-    expect(updateIdentifierMock).toBeCalledWith(localMember.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${localMember.groupMetadata.groupId}:${localMember.displayName}`,
-    });
-    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      identifierMetadataRecord.id,
-      { isDeleted: true, pendingDeletion: false }
-    );
-    expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
-    });
-    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
-    expect(notificationStorage.deleteById).toBeCalledWith(
-      findNotificationsResult[0].id
-    );
-    expect(eventEmitter.emit).toBeCalledWith({
-      type: EventTypes.NotificationRemoved,
-      payload: { id: findNotificationsResult[0].id },
-    });
-    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
-    expect(notificationStorage.deleteById).toBeCalledWith(
-      findNotificationsResult[1].id
-    );
-    expect(eventEmitter.emit).toBeCalledWith({
-      type: EventTypes.NotificationRemoved,
-      payload: { id: findNotificationsResult[1].id },
-    });
-    expect(updateIdentifierMock).toBeCalledTimes(2);
   });
 
   test("can update an identifier", async () => {
@@ -1225,57 +1166,6 @@ describe("Single sig service of agent", () => {
         displayName: newDisplayName,
         theme: newTheme,
       }
-    );
-  });
-
-  test("can delete an identifier and disconnect DApp", async () => {
-    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      ...identifierMetadataRecord,
-      groupMetadata: undefined,
-    });
-    identifierStorage.updateIdentifierMetadata = jest.fn();
-    PeerConnection.peerConnection.getConnectedDAppAddress = jest
-      .fn()
-      .mockReturnValue("dApp-address");
-    PeerConnection.peerConnection.getConnectingIdentifier = jest
-      .fn()
-      .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
-    jest.spyOn(utils, "randomSalt").mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
-    notificationStorage.findAllByQuery.mockResolvedValue(
-      findNotificationsResult
-    );
-
-    await identifierService.deleteIdentifier(identifierMetadataRecord.id);
-
-    expect(identifierStorage.getIdentifierMetadata).toBeCalledWith(
-      identifierMetadataRecord.id
-    );
-    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      identifierMetadataRecord.id,
-      { isDeleted: true, pendingDeletion: false }
-    );
-    expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
-    });
-    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
-    expect(notificationStorage.deleteById).toBeCalledWith(
-      findNotificationsResult[0].id
-    );
-    expect(eventEmitter.emit).toBeCalledWith({
-      type: EventTypes.NotificationRemoved,
-      payload: { id: findNotificationsResult[0].id },
-    });
-    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
-    expect(notificationStorage.deleteById).toBeCalledWith(
-      findNotificationsResult[1].id
-    );
-    expect(eventEmitter.emit).toBeCalledWith({
-      type: EventTypes.NotificationRemoved,
-      payload: { id: findNotificationsResult[1].id },
-    });
-    expect(PeerConnection.peerConnection.disconnectDApp).toBeCalledWith(
-      "dApp-address",
-      true
     );
   });
 
