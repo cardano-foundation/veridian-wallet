@@ -116,7 +116,7 @@ export const useProfile = () => {
         recentProfile,
         tmpProfileHistories.filter((item) => profiles[item])
       );
-      return true;
+      return profiles[recentProfile].identity;
     }
 
     const identifiers = Object.values(profiles)
@@ -126,11 +126,11 @@ export const useProfile = () => {
       .filter((item) => item.identity.id !== defaultProfile?.identity.id);
     if (identifiers.length > 0) {
       await updateDefaultProfile(identifiers[0].identity.id, []);
-      return true;
+      return identifiers[0].identity;
     }
 
     await clearDefaultProfile();
-    return false;
+    return null;
   }, [
     clearDefaultProfile,
     defaultProfile?.identity?.id,

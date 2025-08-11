@@ -6,8 +6,6 @@ import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
-import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
-import { MultiSigGroup } from "../../../../../store/reducers/identifiersCache/identifiersCache.types";
 import { Avatar } from "../../../../components/Avatar";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
@@ -24,11 +22,15 @@ import { StageProps } from "../../SetupGroupProfile.types";
 import "./SetupConnections.scss";
 import { Tab } from "./SetupConnections.types";
 import { ShareConnections } from "./ShareConnections";
+import {
+  getProfiles,
+  MultiSigGroup,
+} from "../../../../../store/reducers/profileCache";
 
 const SetupConnections = ({ setState }: StageProps) => {
   const componentId = "setup-group-profile";
   const dispatch = useAppDispatch();
-  const identifiers = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
   const [oobi, setOobi] = useState("");
   const [tab, setTab] = useState<Tab>(Tab.SetupMembers);
   const isScanTab = Tab.Scan === tab;
@@ -38,8 +40,8 @@ const SetupConnections = ({ setState }: StageProps) => {
   const [openProfiles, setOpenProfiles] = useState(false);
   const scanRef = useRef<ScanRef>(null);
   const { id: profileId } = useParams<{ id: string }>();
-  const profile = identifiers[profileId];
-  const groupId = profile.groupMetadata?.groupId;
+  const profile = profiles[profileId]?.identity;
+  const groupId = profile?.groupMetadata?.groupId;
   const groupConnections = useAppSelector(getMultisigConnectionsCache);
   const [multiSigGroup, setMultiSigGroup] = useState<
     MultiSigGroup | undefined

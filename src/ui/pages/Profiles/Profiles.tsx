@@ -1,4 +1,4 @@
-import { IonButton, IonChip, IonIcon, IonModal, useIonRouter } from "@ionic/react";
+import { IonButton, IonChip, IonIcon, IonModal } from "@ionic/react";
 import {
   addCircleOutline,
   hourglassOutline,
@@ -22,6 +22,7 @@ import { ProfileDetailsModal } from "../../components/ProfileDetailsModal";
 import { Settings } from "../../components/Settings";
 import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
+import { useAppIonRouter } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { ProfileSetup } from "../ProfileSetup";
@@ -87,7 +88,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
   const profiles = useAppSelector(getProfiles);
-  const ionHistory = useIonRouter();
+  const ionHistory = useAppIonRouter();
   const { updateDefaultProfile, defaultProfile } = useProfile();
   const profileList = Object.values(profiles);
   const filteredProfiles = profileList
@@ -128,16 +129,11 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       await updateDefaultProfile(profile.id);
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
-      if (
-        !defaultProfile?.identity.groupMetadata &&
+      ionHistory.push(
         profile.groupMetadata
-      ) {
-        ionHistory.push(
-          profile.groupMetadata
-            ? RoutePath.GROUP_PROFILE_SETUP.replace(":id", profile.id)
-            : TabsRoutePath.CREDENTIALS
-        );
-      }
+          ? RoutePath.GROUP_PROFILE_SETUP.replace(":id", profile.id)
+          : TabsRoutePath.CREDENTIALS
+      );
     } catch (e) {
       showError(
         "Unable to switch profile",

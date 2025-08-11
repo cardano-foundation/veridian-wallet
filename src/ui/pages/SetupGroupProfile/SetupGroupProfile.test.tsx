@@ -8,21 +8,21 @@ import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import EN_Translation from "../../../locales/en/en.json";
-import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../../../routes/paths";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
-import { makeTestStore } from "../../utils/makeTestStore";
-import { ShareProfile } from "../../components/ShareProfile";
 import {
   setMissingAliasConnection,
   setOpenConnectionId,
 } from "../../../store/reducers/connectionsCache";
-import { ToastMsgType } from "../../globals/types";
 import {
   setToastMsg,
   showGenericError,
 } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
+import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
+import { ShareProfile } from "../../components/ShareProfile";
+import { ToastMsgType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 
 const connectByOobiUrlMock = jest.fn();
 jest.mock("../../../core/agent/agent", () => ({
@@ -130,14 +130,9 @@ describe("Setup Connections", () => {
         passcodeIsSet: true,
         passwordIsSet: false,
       },
-      currentProfile: {
-        identity: filteredIdentifierFix[0],
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
-      },
+    },
+    profilesCache: {
+      ...profileCacheFixData,
     },
   };
 
@@ -238,7 +233,7 @@ describe("Setup Connections", () => {
     await waitFor(() => {
       expect(connectByOobiUrlMock).toBeCalledWith(
         barcodes[0].rawValue,
-        initialState.stateCache.currentProfile.identity.id
+        profileCacheFixData.defaultProfile
       );
     });
   });
@@ -297,7 +292,7 @@ describe("Setup Connections", () => {
       expect(dispatchMock).toBeCalledWith(
         setMissingAliasConnection({
           url: "http://keria:3902/oobi/EKDTSzuyUb7ICP1rFzrFGXc1AwC4yFtTkzIHbbjoJDO6/agent/EJqSoWGc6xyYisiaFKsuut159p",
-          identifier: initialState.stateCache.currentProfile.identity.id,
+          identifier: profileCacheFixData.defaultProfile,
         })
       );
     });

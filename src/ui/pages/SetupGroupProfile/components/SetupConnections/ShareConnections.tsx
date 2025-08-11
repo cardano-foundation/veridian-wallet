@@ -14,17 +14,19 @@ import { useParams } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import { CreationStatus } from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
-import { TabsRoutePath } from "../../../../../routes/paths";
+import { RoutePath, TabsRoutePath } from "../../../../../routes/paths";
 import { useAppDispatch } from "../../../../../store/hooks";
-import { removeIdentifierCache } from "../../../../../store/reducers/identifiersCache";
+import { removeProfile } from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
 import { Verification } from "../../../../components/Verification";
 import { ToastMsgType } from "../../../../globals/types";
 import { useAppIonRouter } from "../../../../hooks";
+import { useProfile } from "../../../../hooks/useProfile";
 import { showError } from "../../../../utils/error";
 import { SetupConnectionsProps } from "./SetupConnections.types";
 
+const NAV_TIME = 500;
 const SHARE_CANCELLED_ERROR = "Share canceled";
 const ShareConnections = ({ group, oobi, profile }: SetupConnectionsProps) => {
   const dispatch = useAppDispatch();
@@ -32,6 +34,7 @@ const ShareConnections = ({ group, oobi, profile }: SetupConnectionsProps) => {
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [alertDeleteOpen, setAlertDeleteOpen] = useState(false);
   const ionRouter = useAppIonRouter();
+  const { setRecentProfileAsDefault } = useProfile();
 
   const nativeShare = () => {
     Share.share({
@@ -49,10 +52,18 @@ const ShareConnections = ({ group, oobi, profile }: SetupConnectionsProps) => {
       setVerifyIsOpen(false);
 
       await Agent.agent.identifiers.markIdentifierPendingDelete(profileId);
+      const nextCurrentProfile = await setRecentProfileAsDefault();
 
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
-      dispatch(removeIdentifierCache(profileId));
-      ionRouter.push(TabsRoutePath.CREDENTIALS);
+      ionRouter.push(
+        !nextCurrentProfile || !nextCurrentProfile.groupMetadata
+          ? TabsRoutePath.CREDENTIALS
+          : RoutePath.GROUP_PROFILE_SETUP.replace(":id", nextCurrentProfile.id)
+      );
+      // Waiting
+      setTimeout(() => {
+        dispatch(removeProfile(profileId));
+      }, NAV_TIME);
     } catch (e) {
       showError(
         "Unable to delete identifier",

@@ -67,6 +67,9 @@ jest.mock("../../../../../core/agent/agent", () => ({
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
       },
+      basicStorage: {
+        deleteById: jest.fn(),
+      },
     },
   },
 }));
@@ -179,23 +182,16 @@ describe("Setup Connection", () => {
         passwordIsSet: false,
         userName: "Duke",
       },
-      currentProfile: {
-        identity: initiatorGroupProfile.id,
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
-      },
       isOnline: true,
     },
-    identifiersCache: {
-      identifiers: {
+    profilesCache: {
+      profiles: {
         [initiatorGroupProfile.id]: {
-          ...initiatorGroupProfile,
+          identity: initiatorGroupProfile,
         },
       },
-      favourites: [],
+      defaultProfile: initiatorGroupProfile.id,
+      recentProfiles: [],
       multiSigGroup: {
         groupId,
         connections: [connectionsFix[3]],

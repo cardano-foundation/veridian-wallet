@@ -2,7 +2,6 @@ import { IonRouterOutlet } from "@ionic/react";
 import { useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { getIdentifiersCache } from "../store/reducers/identifiersCache";
 import {
   getRoutes,
   getStateCache,
@@ -23,15 +22,16 @@ import { VerifyRecoverySeedPhrase } from "../ui/pages/VerifyRecoverySeedPhrase";
 import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
+import { getCurrentProfile } from "../store/reducers/profileCache";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
-  const identifiers = useAppSelector(getIdentifiersCache);
+  const currentProfile = useAppSelector(getCurrentProfile);
   const dispatch = useAppDispatch();
   const routes = useAppSelector(getRoutes);
 
   const { nextPath } = getNextRoute(RoutePath.ROOT, {
-    store: { stateCache, identifiers },
+    store: { stateCache, currentProfile },
   });
 
   useEffect(() => {

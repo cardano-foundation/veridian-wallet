@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Salter } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -45,6 +45,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
+  const cacheIdentifier = useRef("");
 
   const isModal = !!onClose;
 
@@ -124,11 +125,12 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
       if (isModal) {
         onClose();
-        navToCredentials();
+        navToCredentials(identifier);
         return;
       }
 
       await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
+      cacheIdentifier.current = identifier;
       setStep(SetupProfileStep.FinishSetup);
     } catch (e) {
       const errorMessage = (e as Error).message;
@@ -151,11 +153,13 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
   };
 
-  const navToCredentials = () => {
+  const navToCredentials = (id?: string) => {
     const { nextPath, updateRedux } = getNextRoute(RoutePath.PROFILE_SETUP, {
       store: { stateCache },
       state: {
         isSetupProfile: false,
+        isGroup: profileType === ProfileType.Group,
+        id,
       },
     });
 
@@ -167,6 +171,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       dispatch,
       updateRedux
     );
+
     ionRouter.push(nextPath.pathname);
   };
 
@@ -181,7 +186,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
 
     if (step === SetupProfileStep.FinishSetup) {
-      navToCredentials();
+      navToCredentials(cacheIdentifier.current);
       return;
     }
 
