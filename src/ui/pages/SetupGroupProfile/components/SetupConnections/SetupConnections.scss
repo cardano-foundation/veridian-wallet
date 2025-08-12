@@ -22,7 +22,7 @@
         background-color: rgba(var(--ion-color-warning-800-rgb), 0.1);
         margin: 0.5rem 0 1.5rem 0;
         width: 100%;
-        border-radius: 0 0 0.5rem 0.5rem;
+        border-radius: 0.5rem;
 
         p {
           text-align: left;
@@ -36,6 +36,10 @@
       &.scan-container {
         height: 100vh;
       }
+    }
+
+    .page-footer {
+      padding-bottom: 1.5rem;
     }
 
     &.setup-members {

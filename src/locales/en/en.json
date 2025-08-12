@@ -1213,9 +1213,9 @@
       },
       "initiatebutton": "Initiate group",
       "delete": {
-        "button": "Delete Profile",
+        "button": "Delete group",
         "alert": {
-          "title": "Are you sure you want to delete this profile?",
+          "title": "Are you sure you want to delete this group?",
           "confirm": "Yes, I'm sure",
           "cancel": "Cancel"
         }
