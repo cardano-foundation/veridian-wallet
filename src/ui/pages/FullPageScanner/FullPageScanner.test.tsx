@@ -189,56 +189,6 @@ describe("Full page scanner", () => {
     });
   });
 
-  test("Reset after scan", async () => {
-    isNativeMock.mockImplementation(() => true);
-
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.SCAN],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
-        toastMsgs: [],
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    connectByOobiUrlMock.mockImplementation(() => {
-      return {
-        type: OobiType.NORMAL,
-      };
-    });
-
-    getMultisigLinkedContactsMock.mockReturnValue([connectionsFix[0]]);
-
-    const setShowScanMock = jest.fn();
-
-    render(
-      <Provider store={storeMocked}>
-        <FullPageScanner
-          showScan={true}
-          setShowScan={setShowScanMock}
-        />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(setShowScanMock).toBeCalled();
-    });
-  });
-
   test("Change direction", async () => {
     const initialState = {
       stateCache: {

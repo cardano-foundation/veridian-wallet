@@ -1,20 +1,19 @@
 import { mockIonicReact } from "@ionic/react-test-utils";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 
+import { CreationStatus } from "../../../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import {
   connectionsFix,
   connectionsForNotifications,
 } from "../../../../__fixtures__/connectionsFix";
-import { multisignIdentifierFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
-import { ErrorPage } from "./ErrorPage";
-import { CreationStatus } from "../../../../../core/agent/agent.types";
-import { makeTestStore } from "../../../../utils/makeTestStore";
 import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
+import { makeTestStore } from "../../../../utils/makeTestStore";
+import { ErrorPage } from "./ErrorPage";
 
 mockIonicReact();
 
@@ -142,10 +141,6 @@ describe("Multisign error feedback", () => {
 
     act(() => {
       fireEvent.click(getByTestId("primary-button-feedback"));
-    });
-
-    await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.createidentifier.share.title));
     });
   });
 });

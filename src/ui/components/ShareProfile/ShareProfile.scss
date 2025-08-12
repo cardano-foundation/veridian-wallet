@@ -1,6 +1,8 @@
 body.scan-active {
-  div.app-router {
-    display: none;
+  &.scan-modal {
+    div.app-router {
+      display: none;
+    }
   }
 
   .share-profile-modal {

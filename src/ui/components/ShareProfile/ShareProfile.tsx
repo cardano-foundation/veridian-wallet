@@ -83,6 +83,7 @@ const ShareProfile = ({ isOpen, setIsOpen, oobi }: ShareProfileProps) => {
               onFinishScan={handleScan}
               cameraDirection={cameraDirection}
               onCheckPermissionFinish={setEnableCameraDirection}
+              displayOnModal
             />
           </>
         )}

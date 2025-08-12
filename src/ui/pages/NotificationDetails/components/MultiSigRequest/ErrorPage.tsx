@@ -7,7 +7,6 @@ import { i18n } from "../../../../../i18n";
 import { useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
-import { CreateGroupIdentifier } from "../../../../components/CreateGroupIdentifier";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
@@ -142,13 +141,6 @@ const ErrorPage = ({
           </IonText>
         </div>
       </ScrollablePageLayout>
-      <CreateGroupIdentifier
-        modalIsOpen={createIdentifierModalIsOpen}
-        setModalIsOpen={handleCloseCreateIdentifier}
-        resumeMultiSig={resumeMultiSig}
-        setResumeMultiSig={setResumeMultiSig}
-        preventRedirect
-      />
     </>
   );
 };

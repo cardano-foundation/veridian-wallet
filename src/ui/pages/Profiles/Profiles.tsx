@@ -8,7 +8,10 @@ import {
 } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { CreationStatus } from "../../../core/agent/agent.types";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
+import { RoutePath } from "../../../routes";
+import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getProfiles } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
@@ -19,6 +22,7 @@ import { ProfileDetailsModal } from "../../components/ProfileDetailsModal";
 import { Settings } from "../../components/Settings";
 import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
+import { useAppIonRouter } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { ProfileSetup } from "../ProfileSetup";
@@ -84,6 +88,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
   const profiles = useAppSelector(getProfiles);
+  const ionHistory = useAppIonRouter();
   const { updateDefaultProfile, defaultProfile } = useProfile();
   const profileList = Object.values(profiles);
   const filteredProfiles = profileList
@@ -119,11 +124,16 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     // TODO: Implement the logic to join a group
   };
 
-  const handleSelectProfile = async (id: string) => {
+  const handleSelectProfile = async (profile: IdentifierShortDetails) => {
     try {
-      await updateDefaultProfile(id);
+      await updateDefaultProfile(profile.id);
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
+      ionHistory.push(
+        profile.groupMetadata
+          ? RoutePath.GROUP_PROFILE_SETUP.replace(":id", profile.id)
+          : TabsRoutePath.CREDENTIALS
+      );
     } catch (e) {
       showError(
         "Unable to switch profile",
@@ -184,7 +194,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
                 key={identifier.identity.id}
                 identifier={identifier.identity}
                 onClick={() => {
-                  handleSelectProfile(identifier.identity.id);
+                  handleSelectProfile(identifier.identity);
                 }}
               />
             ))}
