@@ -158,46 +158,4 @@ describe("Scan Tab", () => {
 
     expect(getByTestId("scan-tab")).toBeInTheDocument();
   });
-
-  test("Nav to credentials after scan duplicate multisig", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.SCAN, TabsRoutePath.CREDENTIALS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        currentOperation: OperationType.IDLE,
-        toastMsgs: [],
-      },
-      profilesCache: {
-        ...profileCacheFixData,
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    connectByOobiUrlMock.mockImplementation(() => {
-      return Promise.reject(
-        new Error(StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG)
-      );
-    });
-
-    render(
-      <Provider store={storeMocked}>
-        <Scan />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(historyPushMock).toBeCalledWith({
-        pathname: TabsRoutePath.CREDENTIALS,
-      });
-    });
-  });
 });

@@ -20,6 +20,7 @@ import {
 } from "./globals/constants";
 import { OperationType } from "./globals/types";
 import { makeTestStore } from "./utils/makeTestStore";
+import { filteredIdentifierFix } from "./__fixtures__/filteredIdentifierFix";
 
 jest.mock("capacitor-freerasp", () => ({
   startFreeRASP: jest.fn(),
@@ -200,6 +201,14 @@ const initialState = {
         attempts: 0,
         lockedUntil: Date.now(),
       },
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0].id,
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
     toastMsgs: [],
     currentOperation: OperationType.IDLE,

@@ -2,7 +2,6 @@ import { TapJacking } from "@capacitor-community/tap-jacking";
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { Device } from "@capacitor/device";
 import { ReactNode, useCallback, useEffect, useState } from "react";
-import { current } from "@reduxjs/toolkit";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
@@ -38,7 +37,6 @@ import {
   setCredsArchivedCache,
   setCurrentProfile,
   setIndividualFirstCreate,
-  setPeerConnections,
   setProfiles,
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
@@ -408,13 +406,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
           );
 
           acc[identifier.id] = {
-            identity: {
-              id: profileIdentifier.id,
-              displayName: profileIdentifier.displayName,
-              createdAtUTC: profileIdentifier.createdAtUTC,
-              theme: profileIdentifier.theme,
-              creationStatus: profileIdentifier.creationStatus,
-            },
+            identity: profileIdentifier,
             // TODO: add filtering for connections once we have connections per account merged
             connections: Object.values(allConnections),
             multisigConnections: Object.values(allMultisigConnections),

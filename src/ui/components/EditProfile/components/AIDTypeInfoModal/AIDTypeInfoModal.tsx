@@ -22,23 +22,23 @@ const IADTypeInfoModal = ({ isOpen, setOpen }: IADTypeInfoModalProps) => {
         header={
           <PageHeader
             closeButton={true}
-            title={`${i18n.t("createidentifier.aidinfo.title")}`}
+            title={`${i18n.t("setupgroupprofile.aidinfo.title")}`}
             closeButtonAction={handleClose}
             closeButtonLabel={`${i18n.t(
-              "createidentifier.aidinfo.button.done"
+              "setupgroupprofile.aidinfo.button.done"
             )}`}
           />
         }
       >
         <p className="paragraph-top">
-          {i18n.t("createidentifier.aidinfo.text")}
+          {i18n.t("setupgroupprofile.aidinfo.text")}
         </p>
-        <h2>{i18n.t("createidentifier.aidinfo.individual.label")}</h2>
-        <p>{i18n.t("createidentifier.aidinfo.individual.text")}</p>
-        <h2>{i18n.t("createidentifier.aidinfo.group.label")}</h2>
-        <p>{i18n.t("createidentifier.aidinfo.group.text")}</p>
-        <h2>{i18n.t("createidentifier.aidinfo.delegated.label")}</h2>
-        <p>{i18n.t("createidentifier.aidinfo.delegated.text")}</p>
+        <h2>{i18n.t("setupgroupprofile.aidinfo.individual.label")}</h2>
+        <p>{i18n.t("setupgroupprofile.aidinfo.individual.text")}</p>
+        <h2>{i18n.t("setupgroupprofile.aidinfo.group.label")}</h2>
+        <p>{i18n.t("setupgroupprofile.aidinfo.group.text")}</p>
+        <h2>{i18n.t("setupgroupprofile.aidinfo.delegated.label")}</h2>
+        <p>{i18n.t("setupgroupprofile.aidinfo.delegated.text")}</p>
       </ScrollablePageLayout>
     </IonModal>
   );
