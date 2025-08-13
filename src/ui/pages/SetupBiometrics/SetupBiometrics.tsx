@@ -38,22 +38,20 @@ const SetupBiometrics = () => {
   const stateCache = useAppSelector(getStateCache);
   const [showCancelBiometricsAlert, setShowCancelBiometricsAlert] =
     useState(false);
-
   const setupBiometricsConfirmtext = i18n.t("biometry.setupbiometryconfirm");
   const cancelBiometricsHeaderText = i18n.t("biometry.cancelbiometryheader");
   const cancelBiometricsConfirmText = setupBiometricsConfirmtext;
-
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
   const { handleBiometricAuth } = useBiometricAuth();
-
+  console.log(stateCache);
   const navToNextStep = async () => {
     await Agent.agent.basicStorage
-      .save({
-        id: MiscRecordId.BIOMETRICS_SETUP,
-        content: {
-          value: true,
-        },
-      })
+      .createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.BIOMETRICS_SETUP,
+          content: { value: true },
+        })
+      )
       .then(() => {
         const data: DataProps = {
           store: {
