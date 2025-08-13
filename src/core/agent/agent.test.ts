@@ -735,4 +735,24 @@ describe("Agent setup and wiping", () => {
     expect(wipeSessionMock).toBeCalledWith("idw");
     expect(SecureStorage.wipe).toBeCalled();
   });
+
+  test("can wipe local database to start fresh", async () => {
+    // Set up the agent with storage session mock and markAgentStatus mock
+    (agent as any).storageSession = { wipe: wipeSessionMock };
+    (agent as any).markAgentStatus = jest.fn();
+
+    await agent.wipeLocalDatabase();
+
+    // Verify background services are stopped
+    expect(stopPollingMock).toBeCalled();
+
+    // Verify storage session is wiped
+    expect(wipeSessionMock).toBeCalledWith("idw");
+
+    // Verify secure storage is wiped
+    expect(SecureStorage.wipe).toBeCalled();
+
+    // Verify agent status is marked as offline
+    expect((agent as any).markAgentStatus).toBeCalledWith(false);
+  });
 });
