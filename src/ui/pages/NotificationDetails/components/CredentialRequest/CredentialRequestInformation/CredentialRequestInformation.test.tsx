@@ -13,6 +13,8 @@ import { makeTestStore } from "../../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
 import { filteredCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
+import { OperationType } from "../../../../../globals/types";
+import { InitializationPhase } from "../../../../../../store/reducers/stateCache/stateCache.types";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -54,12 +56,34 @@ const dispatchMock = jest.fn();
 
 const initialState = {
   stateCache: {
-    routes: [TabsRoutePath.NOTIFICATIONS],
+    routes: [{ path: TabsRoutePath.NOTIFICATIONS }],
     authentication: {
       loggedIn: true,
+      userName: "",
       time: Date.now(),
       passcodeIsSet: true,
+      seedPhraseIsSet: true,
+      passwordIsSet: false,
+      passwordIsSkipped: false,
+      ssiAgentIsSet: false,
+      ssiAgentUrl: "",
+      recoveryWalletProgress: false,
+      loginAttempt: {
+        attempts: 0,
+        lockedUntil: Date.now(),
+      },
+      firstAppLaunch: false,
     },
+    initializationPhase: InitializationPhase.PHASE_ONE,
+    recoveryCompleteNoInterruption: false,
+    isOnline: true,
+    currentOperation: OperationType.IDLE,
+    queueIncomingRequest: {
+      isPaused: false,
+      isProcessing: false,
+      queues: [],
+    },
+    toastMsgs: [],
   },
   connectionsCache: {
     connections: connectionsForNotifications,
