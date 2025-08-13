@@ -18,7 +18,10 @@ import { getCurrentProfile } from "../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../globals/types";
 import { showError } from "../../../utils/error";
-import { isValidConnectionUrl, isValidHttpUrl } from "../../../utils/urlChecker";
+import {
+  isValidConnectionUrl,
+  isValidHttpUrl,
+} from "../../../utils/urlChecker";
 
 enum ErrorMessage {
   INVALID_CONNECTION_URL = "Invalid connection url",

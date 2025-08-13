@@ -16,13 +16,15 @@ import { Alert } from "../../components/Alert";
 import { PageHeader } from "../../components/PageHeader";
 import { PasswordModule } from "../../components/PasswordModule";
 import { PasswordModuleRef } from "../../components/PasswordModule/PasswordModule.types";
-import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
+import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import "./CreatePassword.scss";
 import { CreatePasswordProps } from "./CreatePassword.types";
-import { SetupPassword } from "./components";
+import { PageFooter } from "../../components/PageFooter";
+import { IonIcon } from "@ionic/react";
+import { lockClosedOutline } from "ionicons/icons";
 
 const CreatePassword = ({
   handleClear,
@@ -37,6 +39,7 @@ const CreatePassword = ({
   const [alertCancelIsOpen, setAlertCancelIsOpen] = useState(false);
   const isOnboarding = stateCache.routes[0]?.path === RoutePath.CREATE_PASSWORD;
   const [step, setStep] = useState(isOnboarding ? 0 : 1);
+  const [validated, setValidated] = useState(false);
 
   const handleContinue = async (skipped: boolean) => {
     if (skipped) {
@@ -88,18 +91,16 @@ const CreatePassword = ({
     setAlertCancelIsOpen(true);
   };
 
-  const isShowProgresBar = step !== 0 && isOnboarding;
-
   return (
     <>
-      <ScrollablePageLayout
+      <ResponsivePageLayout
         pageId={pageId}
         customClass={isOnboarding ? "has-header-skip" : undefined}
         header={
           <PageHeader
             currentPath={isOnboarding ? RoutePath.CREATE_PASSWORD : undefined}
-            progressBar={isShowProgresBar}
-            progressBarValue={0.4}
+            progressBar={isOnboarding}
+            progressBarValue={0.5}
             progressBarBuffer={1}
             closeButton={!isOnboarding}
             closeButtonAction={handleClear}
@@ -107,23 +108,26 @@ const CreatePassword = ({
             title={
               !isOnboarding
                 ? `${i18n.t(
-                  userAction?.current === "change"
-                    ? "createpassword.change"
-                    : "createpassword.title"
-                )}`
+                    userAction?.current === "change"
+                      ? "createpassword.change"
+                      : "createpassword.title"
+                  )}`
                 : undefined
             }
-            actionButton={isShowProgresBar}
+            actionButton={isOnboarding}
             actionButtonLabel={`${i18n.t("createpassword.button.skip")}`}
             actionButtonAction={handleSkip}
           />
         }
       >
         {step === 0 ? (
-          <SetupPassword
-            onSetupPasswordClick={handleSetupPassword}
-            onSkipClick={handleSkip}
-          />
+          <div className="setup-password">
+            <div className="page-info">
+              <IonIcon icon={lockClosedOutline} />
+              <h1>{i18n.t("createpassword.setuppassword.title")}</h1>
+              <p>{i18n.t("createpassword.setuppassword.description")}</p>
+            </div>
+          </div>
         ) : (
           <PasswordModule
             ref={passwordModuleRef}
@@ -135,7 +139,26 @@ const CreatePassword = ({
             onCreateSuccess={handleContinue}
           />
         )}
-      </ScrollablePageLayout>
+        {step === 0 ? (
+          <PageFooter
+            primaryButtonText={`${i18n.t(
+              "createpassword.setuppassword.button.enable"
+            )}`}
+            primaryButtonAction={handleSetupPassword}
+            tertiaryButtonText={`${i18n.t(
+              "createpassword.setuppassword.button.skip"
+            )}`}
+            tertiaryButtonAction={handleSkip}
+          />
+        ) : (
+          <PageFooter
+            pageId={pageId}
+            primaryButtonText={`${i18n.t("createpassword.button.continue")}`}
+            primaryButtonAction={() => handleContinue(false)}
+            primaryButtonDisabled={!validated}
+          />
+        )}
+      </ResponsivePageLayout>
       <Alert
         isOpen={alertCancelIsOpen}
         setIsOpen={setAlertCancelIsOpen}

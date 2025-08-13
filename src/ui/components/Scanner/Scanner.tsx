@@ -22,12 +22,10 @@ import {
 } from "react";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  getConnectionsCache
-} from "../../../store/reducers/connectionsCache";
+import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
   getProfileGroupCache,
-  getProfiles
+  getProfiles,
 } from "../../../store/reducers/profileCache";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {

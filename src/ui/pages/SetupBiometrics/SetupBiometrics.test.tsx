@@ -146,7 +146,7 @@ describe("SetPasscode Page", () => {
   });
 
   test("Click on skip", async () => {
-    const { getByText } = render(
+    const { getByTestId, getByText } = render(
       <IonReactMemoryRouter
         history={history}
         initialEntries={[RoutePath.SETUP_BIOMETRICS]}
@@ -157,7 +157,13 @@ describe("SetPasscode Page", () => {
       </IonReactMemoryRouter>
     );
 
-    fireEvent.click(getByText(EN_TRANSLATIONS.setupbiometrics.button.skip));
+    fireEvent.click(getByTestId("action-button"));
+
+    await waitFor(() => {
+      expect(getByTestId("alert-cancel-biometry")).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("alert-cancel-biometry-confirm-button"));
 
     await waitFor(() => {
       expect(saveItem).toBeCalled();

@@ -118,8 +118,8 @@ const SetupBiometrics = () => {
     }
   };
 
-  const skip = () => {
-    navToNextStep();
+  const handleSkip = () => {
+    setShowCancelBiometricsAlert(true);
   };
 
   const handleCancelBiometrics = () => {
@@ -130,7 +130,18 @@ const SetupBiometrics = () => {
     <>
       <ResponsivePageLayout
         pageId={pageId}
-        header={<PageHeader currentPath={RoutePath.SETUP_BIOMETRICS} />}
+        customClass={"has-header-skip"}
+        header={
+          <PageHeader
+            currentPath={RoutePath.SETUP_BIOMETRICS}
+            progressBar={true}
+            progressBarValue={0.25}
+            progressBarBuffer={1}
+            actionButton={true}
+            actionButtonLabel={`${i18n.t("createpassword.button.skip")}`}
+            actionButtonAction={handleSkip}
+          />
+        }
       >
         <div className="page-info">
           <IonIcon icon={fingerPrintOutline} />
@@ -141,7 +152,7 @@ const SetupBiometrics = () => {
           primaryButtonText={`${i18n.t("setupbiometrics.button.enable")}`}
           primaryButtonAction={processBiometrics}
           tertiaryButtonText={`${i18n.t("setupbiometrics.button.skip")}`}
-          tertiaryButtonAction={skip}
+          tertiaryButtonAction={handleSkip}
         />
       </ResponsivePageLayout>
       <Alert
