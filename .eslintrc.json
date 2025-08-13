@@ -15,7 +15,8 @@
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react-hooks/recommended",
-    "plugin:import/warnings"
+    "plugin:import/warnings",
+    "prettier"
   ],
   "overrides": [
     {
@@ -39,8 +40,7 @@
     "no-console": "error",
     "no-unused-vars": "off",
     "no-undef": "error",
-    "indent": ["warn", 2, { "SwitchCase": 1 }],
-    "quotes": ["warn", "double"],
+    "react/display-name": "off",
     "import/order": [
       "warn",
       {
@@ -50,8 +50,7 @@
           ["parent", "sibling", "index"]
         ]
       }
-    ],
-    "react/display-name": "off"
+    ]
   },
   "settings": {
     "react": {
