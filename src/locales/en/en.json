@@ -1209,7 +1209,7 @@
       "share": "Share",
       "alert": "Ensure all members are mutually connected before initiating the group. This means everyone must scan each other's QR codes (or use connection URLs).",
       "notes": {
-        "bottom": "To continue with the initiation of the group profile you must have scanned at least one other QR code."
+        "bottom": "To continue with the initiation of the group profile you must have scanned at least one other member."
       },
       "initiatebutton": "Initiate group",
       "delete": {

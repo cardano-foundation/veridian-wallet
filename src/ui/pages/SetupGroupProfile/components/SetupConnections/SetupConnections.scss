@@ -213,6 +213,8 @@
     }
 
     .share-button {
+      width: 12.5rem;
+
       &:not(.button-disabled) {
         --background: transparent;
         --border-color: var(--ion-color-primary-700);
