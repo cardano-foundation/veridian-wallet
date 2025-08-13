@@ -1,4 +1,4 @@
-import { StorageService } from "../../storage/storage.types";
+import { StorageService, Query } from "../../storage/storage.types";
 import { ContactRecord, ContactRecordStorageProps } from "./contactRecord";
 
 export class ContactStorage {
@@ -29,7 +29,7 @@ export class ContactStorage {
     return this.storageService.findById(id, ContactRecord);
   }
 
-  findAllByQuery(query: any): Promise<ContactRecord[]> {
+  findAllByQuery(query: Query<ContactRecord>): Promise<ContactRecord[]> {
     return this.storageService.findAllByQuery(query, ContactRecord);
   }
 

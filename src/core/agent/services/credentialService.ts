@@ -195,7 +195,24 @@ class CredentialService extends AgentService {
   }
 
   async syncKeriaCredentials(): Promise<void> {
-    const cloudCredentials: any[] = [];
+    interface KeriaCredential {
+      sad: {
+        d: string;
+        a: {
+          i: string;
+          dt: string;
+          [key: string]: unknown;
+        };
+        i: string;
+        ri: string;
+      };
+      schema: {
+        title: string;
+        $id: string;
+      };
+    }
+
+    const cloudCredentials: KeriaCredential[] = [];
     let returned = -1;
     let iteration = 0;
 
@@ -214,7 +231,7 @@ class CredentialService extends AgentService {
       await this.credentialStorage.getAllCredentialMetadata();
 
     const unSyncedData = cloudCredentials.filter(
-      (credential: any) =>
+      (credential: KeriaCredential) =>
         !localCredentials.find((item) => credential.sad.d === item.id)
     );
 

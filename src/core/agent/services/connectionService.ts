@@ -21,11 +21,9 @@ import {
   CreationStatus,
   DOOBI_RE,
   OobiType,
-  OOBI_AGENT_ONLY_RE,
   OOBI_RE,
   OobiScan,
   WOOBI_RE,
-  MiscRecordId,
 } from "../agent.types";
 import {
   BasicStorage,
@@ -123,18 +121,19 @@ class ConnectionService extends AgentService {
       await this.identifierStorage.getIdentifierMetadata(sharedIdentifier); // Error if missing
     }
 
-    if (
-      !new URL(url).pathname.match(OOBI_AGENT_ONLY_RE) &&
-      !new URL(url).pathname.match(WOOBI_RE)
-    ) {
+    if (!url.includes("/oobi/")) {
       throw new Error(ConnectionService.OOBI_INVALID);
     }
 
     const multiSigInvite = url.includes(OobiQueryParams.GROUP_ID);
-    const connectionId = new URL(url).pathname
-      .split("/oobi/")
-      .pop()!
-      .split("/")[0];
+    const pathname = new URL(url).pathname;
+    const oobiPath = pathname.split("/oobi/").pop();
+    
+    if (!oobiPath) {
+      throw new Error(ConnectionService.OOBI_INVALID);
+    }
+    
+    const connectionId = oobiPath.split("/")[0];
 
     const alias =
       new URL(url).searchParams.get(OobiQueryParams.NAME) ?? randomSalt();
