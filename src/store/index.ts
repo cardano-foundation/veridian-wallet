@@ -8,7 +8,6 @@ import { stateCacheSlice } from "./reducers/stateCache";
 import { viewTypeCacheSlice } from "./reducers/viewTypeCache";
 import { walletConnectionsCacheSlice } from "./reducers/walletConnectionsCache";
 
-// Export the root reducer for testing
 export const rootReducer = combineReducers({
   stateCache: stateCacheSlice.reducer,
   seedPhraseCache: seedPhraseCacheSlice.reducer,

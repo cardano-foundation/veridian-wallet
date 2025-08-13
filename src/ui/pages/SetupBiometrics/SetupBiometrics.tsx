@@ -43,7 +43,7 @@ const SetupBiometrics = () => {
   const cancelBiometricsConfirmText = setupBiometricsConfirmtext;
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
   const { handleBiometricAuth } = useBiometricAuth();
-  console.log(stateCache);
+
   const navToNextStep = async () => {
     await Agent.agent.basicStorage
       .createOrUpdateBasicRecord(
