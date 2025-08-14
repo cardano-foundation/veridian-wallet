@@ -760,7 +760,7 @@ class IpexCommunicationService extends AgentService {
       credentialData,
       {
         grantExn: multiSigExn.exn.e.exn as unknown as IpexGrantMultiSigExn,
-        atc: multiSigExn.pathed.exn!,
+        atc: multiSigExn.pathed.exn || "",
       }
     );
 
@@ -804,7 +804,10 @@ class IpexCommunicationService extends AgentService {
     if (offerExnToJoin) {
       const [, ked] = Saider.saidify(offerExnToJoin);
       const offer = new Serder(ked);
-      const keeper = this.props.signifyClient.manager!.get(gHab);
+      if (!this.props.signifyClient.manager) {
+        throw new Error("Signify client manager not initialized");
+      }
+      const keeper = this.props.signifyClient.manager.get(gHab);
       const sigs = await keeper.sign(b(new Serder(offerExnToJoin).raw));
 
       const mstateNew = gHab["state"];
@@ -913,7 +916,10 @@ class IpexCommunicationService extends AgentService {
       const { grantExn, atc } = grantToJoin;
       const [, ked] = Saider.saidify(grantExn);
       const grant = new Serder(ked);
-      const keeper = this.props.signifyClient.manager!.get(gHab);
+      if (!this.props.signifyClient.manager) {
+        throw new Error("Signify client manager not initialized");
+      }
+      const keeper = this.props.signifyClient.manager.get(gHab);
       const sigs = await keeper.sign(b(new Serder(grantExn).raw));
       const mstateNew = gHab["state"];
       const seal = [
@@ -1077,7 +1083,10 @@ class IpexCommunicationService extends AgentService {
     if (admitExnToJoin) {
       const [, ked] = Saider.saidify(admitExnToJoin);
       const admit = new Serder(ked);
-      const keeper = this.props.signifyClient.manager!.get(gHab);
+      if (!this.props.signifyClient.manager) {
+        throw new Error("Signify client manager not initialized");
+      }
+      const keeper = this.props.signifyClient.manager.get(gHab);
       const sigs = await keeper.sign(b(new Serder(admitExnToJoin).raw));
 
       const mstateNew = gHab["state"];
