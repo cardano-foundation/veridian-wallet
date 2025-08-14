@@ -53,6 +53,7 @@ import {
   setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
+  setIsPendingJoinGroup,
   setIsSetupProfile,
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
@@ -585,6 +586,16 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const finishSetupBiometrics = await Agent.agent.basicStorage.findById(
         MiscRecordId.BIOMETRICS_SETUP
       );
+
+      const pendingJoinGroup = await Agent.agent.basicStorage.findById(
+        MiscRecordId.PENDING_JOIN_GROUP
+      );
+
+      if (pendingJoinGroup) {
+        dispatch(
+          setIsPendingJoinGroup(pendingJoinGroup.content.value as boolean)
+        );
+      }
 
       dispatch(
         setAuthentication({

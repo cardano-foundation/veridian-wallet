@@ -1,4 +1,16 @@
 .profile-setup {
+  &.responsive-page-layout.scan {
+    background-color: transparent !important;
+
+    .responsive-page-content .profile-scanner {
+      margin: 0;
+    }
+
+    .close-button-label h4 {
+      color: var(--ion-color-neutral-200);
+    }
+  }
+
   &.profiletype {
     padding: 0;
     --padding: 1.25rem;

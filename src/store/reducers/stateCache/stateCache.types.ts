@@ -67,6 +67,7 @@ interface StateCacheProps {
   forceInitApp?: number;
   showLoading?: boolean;
   isSetupProfile?: boolean;
+  isPendingJoinGroup?: boolean;
 }
 
 enum InitializationPhase {

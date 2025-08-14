@@ -189,6 +189,9 @@ const stateCacheSlice = createSlice({
     setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
       state.isSetupProfile = action.payload;
     },
+    setIsPendingJoinGroup: (state, action: PayloadAction<boolean>) => {
+      state.isPendingJoinGroup = action.payload;
+    },
   },
 });
 
@@ -218,6 +221,7 @@ const {
   clearStateCache,
   showGlobalLoading,
   setIsSetupProfile,
+  setIsPendingJoinGroup,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -294,6 +298,7 @@ export {
   setFirstAppLaunchComplete,
   setInitializationPhase,
   setIsOnline,
+  setIsPendingJoinGroup,
   setIsSetupProfile,
   setLoginAttempt,
   setPauseQueueIncomingRequest,

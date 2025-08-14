@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Salter } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -26,12 +26,18 @@ import { useAppIonRouter } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
-import { SetupGroup } from "./components/SetupGroup";
+import { GroupSetup } from "./components/GroupSetup";
 import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
 import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
+import { Scan } from "../../components/Scan";
+import { ScanRef } from "../../components/Scan/Scan.types";
+import { useScanHandle } from "../../components/Scan/hook/useScanHandle";
+import { useCameraDirection } from "../../components/Scan/hook/useCameraDirection";
+import { repeatOutline } from "ionicons/icons";
+import { BasicRecord } from "../../../core/agent/records";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
@@ -44,20 +50,28 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const [userName, setUserName] = useState("");
   const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
+  const [isScanOpen, setIsScanOpen] = useState(false);
   const ionRouter = useAppIonRouter();
   const cacheIdentifier = useRef("");
+  const scanRef = useRef<ScanRef>(null);
+  const { resolveGroupConnection } = useScanHandle();
+  const { cameraDirection, changeCameraDirection, supportMultiCamera } =
+    useCameraDirection();
+  const [enableCameraDirection, setEnableCameraDirection] = useState(false);
 
   const isModal = !!onClose;
 
   const title = i18n.t(`setupprofile.${step}.title`);
-  const back = [
-    SetupProfileStep.SetupProfile,
-    SetupProfileStep.SetupGroup,
-  ].includes(step)
+  const back = stateCache.isPendingJoinGroup
+    ? undefined // Disable back button if pending join group
+    : [
+        SetupProfileStep.SetupProfile,
+        SetupProfileStep.GroupSetupStart,
+      ].includes(step)
     ? i18n.t("setupprofile.button.back")
     : isModal && defaultProfile
-      ? i18n.t("setupprofile.button.cancel")
-      : undefined;
+    ? i18n.t("setupprofile.button.cancel")
+    : undefined;
 
   const getButtonText = () => {
     switch (step) {
@@ -70,7 +84,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
   const handleBack = () => {
     if (
-      step === SetupProfileStep.SetupGroup ||
+      step === SetupProfileStep.GroupSetupStart ||
       (step === SetupProfileStep.SetupProfile &&
         profileType !== ProfileType.Group)
     ) {
@@ -79,7 +93,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
 
     if (step === SetupProfileStep.SetupProfile) {
-      setStep(SetupProfileStep.SetupGroup);
+      setStep(SetupProfileStep.GroupSetupStart);
       return;
     }
 
@@ -110,7 +124,6 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     try {
       setLoading(true);
 
-      // Create the identifier
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
       );
@@ -176,7 +189,11 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   };
 
   const handleOpenScan = () => {
-    // TODO: implement on next ticket
+    setIsScanOpen(true);
+  };
+
+  const handleCloseScan = () => {
+    setIsScanOpen(false);
   };
 
   const handleChangeStep = () => {
@@ -194,10 +211,52 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       profileType === ProfileType.Group &&
       step === SetupProfileStep.SetupType
     ) {
-      setStep(SetupProfileStep.SetupGroup);
+      setStep(SetupProfileStep.GroupSetupStart);
       return;
     }
 
+    setStep(SetupProfileStep.SetupProfile);
+  };
+
+  const handleScanFinish = async (content: string) => {
+    try {
+      const url = new URL(content);
+      const scanGroupId = url.searchParams.get("groupId");
+
+      if (!scanGroupId) {
+        throw new Error("Group ID not found in the scanned QR code.");
+      }
+
+      const isInitiator = false;
+
+      await resolveGroupConnection(
+        content,
+        scanGroupId,
+        isInitiator,
+        () => handleCloseScan(),
+        undefined,
+        (id: string) => console.warn(`Duplicate group ID detected: ${id}`)
+      );
+
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.PENDING_JOIN_GROUP,
+          content: {
+            value: true,
+          },
+        })
+      );
+
+      setStep(SetupProfileStep.GroupSetupConfirm);
+    } catch (error) {
+      console.error("Failed to resolve group connection:", error);
+      showError("Unable to process the scanned QR code", error, dispatch);
+    } finally {
+      handleCloseScan();
+    }
+  };
+
+  const handleConfirmJoinGroup = () => {
     setStep(SetupProfileStep.SetupProfile);
   };
 
@@ -210,12 +269,22 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
             onChangeUserName={setUserName}
           />
         );
-      case SetupProfileStep.SetupGroup:
+      case SetupProfileStep.GroupSetupStart:
         return (
-          <SetupGroup
+          <GroupSetup
             groupName={groupName}
             onChangeGroupName={setGroupName}
-            onClickJoinGroupButton={handleOpenScan}
+            onClickEvent={handleOpenScan}
+            setupProfileStep={step}
+          />
+        );
+      case SetupProfileStep.GroupSetupConfirm:
+        return (
+          <GroupSetup
+            groupName={groupName}
+            onChangeGroupName={setGroupName}
+            onClickEvent={handleConfirmJoinGroup}
+            setupProfileStep={step}
           />
         );
       case SetupProfileStep.FinishSetup:
@@ -231,36 +300,69 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
   };
 
+  useEffect(() => {
+    if (stateCache.isPendingJoinGroup) {
+      setStep(SetupProfileStep.GroupSetupConfirm);
+    }
+  }, [stateCache.isPendingJoinGroup]);
+
   return (
-    <ResponsivePageLayout
-      pageId={pageId}
-      customClass={step}
-      header={
-        step !== SetupProfileStep.FinishSetup ? (
-          <PageHeader
-            closeButton={!!back}
-            closeButtonLabel={back}
-            closeButtonAction={handleBack}
-            title={title}
+    <>
+      {isScanOpen ? (
+        <ResponsivePageLayout
+          pageId={pageId}
+          customClass={"scan"}
+          header={
+            <PageHeader
+              closeButton={!!back}
+              closeButtonLabel={back}
+              closeButtonAction={handleCloseScan}
+              actionButton={supportMultiCamera}
+              actionButtonIcon={repeatOutline}
+              actionButtonAction={changeCameraDirection}
+              actionButtonDisabled={!enableCameraDirection}
+            />
+          }
+        >
+          <Scan
+            ref={scanRef}
+            onFinishScan={handleScanFinish}
+            cameraDirection={cameraDirection}
+            onCheckPermissionFinish={setEnableCameraDirection}
           />
-        ) : undefined
-      }
-    >
-      {renderContent()}
-      <PageFooter
-        primaryButtonText={getButtonText()}
-        primaryButtonAction={handleChangeStep}
-        primaryButtonDisabled={
-          (SetupProfileStep.SetupGroup === step && !groupName) ||
-          (SetupProfileStep.SetupProfile === step && !userName) ||
-          isLoading
-        }
-        pageId={pageId}
-      />
-      <Spinner
-        show={isLoading}
-        coverage={SpinnerConverage.Screen}
-      />
-    </ResponsivePageLayout>
+        </ResponsivePageLayout>
+      ) : (
+        <ResponsivePageLayout
+          pageId={pageId}
+          customClass={step}
+          header={
+            step !== SetupProfileStep.FinishSetup ? (
+              <PageHeader
+                closeButton={!!back}
+                closeButtonLabel={back}
+                closeButtonAction={handleBack}
+                title={!isScanOpen ? title : undefined}
+              />
+            ) : undefined
+          }
+        >
+          {renderContent()}
+          <PageFooter
+            primaryButtonText={getButtonText()}
+            primaryButtonAction={handleChangeStep}
+            primaryButtonDisabled={
+              (SetupProfileStep.GroupSetupStart === step && !groupName) ||
+              (SetupProfileStep.SetupProfile === step && !userName) ||
+              isLoading
+            }
+            pageId={pageId}
+          />
+          <Spinner
+            show={isLoading}
+            coverage={SpinnerConverage.Screen}
+          />
+        </ResponsivePageLayout>
+      )}
+    </>
   );
 };

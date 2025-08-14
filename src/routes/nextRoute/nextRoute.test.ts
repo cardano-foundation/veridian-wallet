@@ -10,6 +10,7 @@ import {
   getNextCreateSSIAgentRoute,
   getNextGenerateSeedPhraseRoute,
   getNextOnboardingRoute,
+  getNextRootRoute,
   getNextRoute,
   getNextSetPasscodeRoute,
   getNextVerifySeedPhraseRoute,
@@ -386,5 +387,37 @@ describe("getNextRoute", () => {
     expect(result).toEqual({
       pathname: RoutePath.SETUP_BIOMETRICS,
     });
+  });
+
+  test("should redirect to PROFILE_SETUP when isPendingJoinGroup is true", () => {
+    const mockData = {
+      store: {
+        stateCache: {
+          isPendingJoinGroup: true,
+          authentication: {},
+        },
+      },
+    };
+
+    const result = getNextRootRoute(mockData as any);
+
+    expect(result.pathname).toEqual(RoutePath.PROFILE_SETUP);
+  });
+
+  test("should follow existing logic when isPendingJoinGroup is false", () => {
+    const mockData = {
+      store: {
+        stateCache: {
+          isPendingJoinGroup: false,
+          authentication: {
+            passcodeIsSet: true,
+          },
+        },
+      },
+    };
+
+    const result = getNextRootRoute(mockData as any);
+
+    expect(result.pathname).toEqual(RoutePath.SETUP_BIOMETRICS);
   });
 });

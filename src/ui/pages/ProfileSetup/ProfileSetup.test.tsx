@@ -393,20 +393,20 @@ describe("Profile setup", () => {
 
       await waitFor(() => {
         expect(
-          getByText(EN_TRANSLATIONS.setupprofile.groupsetup.title)
+          getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.title)
         ).toBeVisible();
       });
 
       expect(
-        getByText(EN_TRANSLATIONS.setupprofile.groupsetup.form.input)
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.form.input)
       ).toBeVisible();
 
       expect(
-        getByText(EN_TRANSLATIONS.setupprofile.groupsetup.description)
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.description)
       ).toBeVisible();
 
       expect(
-        getByText(EN_TRANSLATIONS.setupprofile.groupsetup.form.joingroup)
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.form.joingroup)
       ).toBeVisible();
     });
 
@@ -429,7 +429,7 @@ describe("Profile setup", () => {
 
       await waitFor(() => {
         expect(
-          getByText(EN_TRANSLATIONS.setupprofile.groupsetup.title)
+          getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.title)
         ).toBeVisible();
       });
 

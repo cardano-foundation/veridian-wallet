@@ -1484,7 +1484,7 @@
         "placeholder": "e.g. JohnSmith25"
       }
     },
-    "groupsetup": {
+    "groupsetupstart": {
       "title": "Group setup",
       "description": "Create a group name for other members to join your group, or join an existing group",
       "form": {
@@ -1493,6 +1493,9 @@
         "or": "or",
         "joingroup": "Join existing group"
       }
+    },
+    "groupsetupconfirm": {
+      "title": "Group setup"
     },
     "finishsetup": {
       "greeting": "Welcome, {{name}}",
