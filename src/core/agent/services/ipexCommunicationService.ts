@@ -8,8 +8,9 @@ import {
   Serder,
   Siger,
 } from "signify-ts";
-import { ExnMessage, type AgentServicesProps } from "../agent.types";
-import { type KeriaNotification } from "./keriaNotificationService.types";
+import type { ExnMessage, AgentServicesProps } from "../agent.types";
+import type { KeriaNotification } from "./keriaNotificationService.types";
+import type { IpexGrantMultiSigExn } from "./multiSig.types";
 import { ExchangeRoute } from "./keriaNotificationService.types";
 import {
   CredentialStorage,
@@ -20,7 +21,7 @@ import {
   NotificationRecord,
   CredentialMetadataRecord,
 } from "../records";
-import { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
+import type { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
 import { AgentService } from "./agentService";
 import { getCredentialShortDetails, OnlineOnly } from "./utils";
 import { CredentialStatus, ACDCDetails } from "./credentialService.types";
@@ -203,7 +204,7 @@ class IpexCommunicationService extends AgentService {
   }
 
   @OnlineOnly
-  async offerAcdcFromApply(notificationId: string, acdc: any): Promise<void> {
+  async offerAcdcFromApply(notificationId: string, acdc: CredentialMetadataRecordProps): Promise<void> {
     const applyNoteRecord = await this.notificationStorage.findById(
       notificationId
     );
@@ -406,9 +407,26 @@ class IpexCommunicationService extends AgentService {
     const filtered = await this.props.signifyClient.credentials().list({
       filter,
     });
+    interface KeriaCredential {
+      sad: {
+        d: string;
+        a: {
+          i: string;
+          dt: string;
+          [key: string]: unknown;
+        };
+        i: string;
+        ri: string;
+      };
+      schema: {
+        title: string;
+        $id: string;
+      };
+    }
+
     const localFiltered =
       await this.credentialStorage.getCredentialMetadatasById(
-        filtered.map((cred: any) => cred.sad.d),
+        filtered.map((cred: KeriaCredential) => cred.sad.d),
         {
           $and: [{ pendingDeletion: false }, { isArchived: false }],
         }
@@ -420,7 +438,10 @@ class IpexCommunicationService extends AgentService {
         description: schema.description,
       },
       credentials: localFiltered.map((cr) => {
-        const credKeri = filtered.find((cred: any) => cred.sad.d === cr.id);
+        const credKeri = filtered.find((cred: KeriaCredential) => cred.sad.d === cr.id);
+        if (!credKeri) {
+          throw new Error("Credential not found in filtered results");
+        }
         return {
           connectionId: cr.connectionId,
           acdc: credKeri.sad,
@@ -515,6 +536,9 @@ class IpexCommunicationService extends AgentService {
 
     let schemaSaid;
     if (message.exn.r === ExchangeRoute.IpexGrant) {
+      if (!message.exn.e.acdc) {
+        throw new Error("ACDC data missing from IpexGrant message");
+      }
       schemaSaid = message.exn.e.acdc.s;
     } else if (message.exn.r === ExchangeRoute.IpexApply) {
       schemaSaid = message.exn.a.s;
@@ -525,6 +549,9 @@ class IpexCommunicationService extends AgentService {
       const previousExchange = await this.props.signifyClient
         .exchanges()
         .get(message.exn.p);
+      if (!previousExchange.exn.e.acdc) {
+        throw new Error("ACDC data missing from previous exchange");
+      }
       schemaSaid = previousExchange.exn.e.acdc.s;
     }
 
@@ -543,6 +570,9 @@ class IpexCommunicationService extends AgentService {
     switch (historyType) {
       case ConnectionHistoryType.CREDENTIAL_REVOKED:
         prefix = KeriaContactKeyPrefix.HISTORY_REVOKE;
+        if (!message.exn.e.acdc) {
+          throw new Error("ACDC data missing from credential revoked message");
+        }
         key = message.exn.e.acdc.d;
         break;
       case ConnectionHistoryType.CREDENTIAL_ISSUANCE:
@@ -710,14 +740,26 @@ class IpexCommunicationService extends AgentService {
       throw new Error(IpexCommunicationService.NO_CURRENT_IPEX_MSG_TO_JOIN);
     }
 
-    const grantExn = multiSigExn.exn.e.exn;
+    const grantExn = multiSigExn.exn.e.exn as {
+      i: string;
+      p: string;
+      e: { acdc: { i: string; d: string; s: string } };
+    };
+    
+    // Create the credential structure expected by submitMultisigGrant
+    const credentialData = {
+      sad: { d: grantExn.e.acdc.d },
+      iss: { d: grantExn.e.acdc.i },
+      anc: { d: grantExn.e.acdc.s },
+    };
+    
     const { op } = await this.submitMultisigGrant(
-      multiSigExn.exn.e.exn.i,
+      grantExn.i,
       grantExn.e.acdc.i,
       grantExn.p,
-      grantExn.e.acdc,
+      credentialData,
       {
-        grantExn,
+        grantExn: multiSigExn.exn.e.exn as unknown as IpexGrantMultiSigExn,
         atc: multiSigExn.pathed.exn!,
       }
     );
@@ -737,9 +779,9 @@ class IpexCommunicationService extends AgentService {
   private async submitMultisigOffer(
     multisigId: string,
     notificationSaid: string,
-    acdcDetail: any,
+    acdcDetail: CredentialMetadataRecordProps,
     discloseePrefix: string,
-    offerExnToJoin?: any
+    offerExnToJoin?: { ked: unknown }
   ): Promise<SubmitIPEXResult> {
     let exn: Serder;
     let sigsMes: string[];
@@ -753,9 +795,9 @@ class IpexCommunicationService extends AgentService {
       .identifiers()
       .get(ourIdentifier.id);
 
-    const recp = multisigMembers
-      .filter((signing: any) => signing.aid !== ourIdentifier.id)
-      .map((member: any) => member.aid);
+    const recp = multisigMembers.signing
+      .filter((signing) => signing.aid !== ourIdentifier.id)
+      .map((member) => member.aid);
 
     const [, acdc] = Saider.saidify(acdcDetail);
 
@@ -842,7 +884,14 @@ class IpexCommunicationService extends AgentService {
     multisigId: string,
     discloseePrefix: string,
     agreeSaid: string,
-    acdcDetail: any,
+    acdcDetail: {
+      sad: { d: string };
+      iss: { d: string };
+      anc: { d: string };
+      atc?: string;
+      ancatc?: string;
+      issAtc?: string;
+    },
     grantToJoin?: GrantToJoinMultisigExnPayload
   ): Promise<SubmitIPEXResult> {
     let exn: Serder;
@@ -856,9 +905,9 @@ class IpexCommunicationService extends AgentService {
       .identifiers()
       .get(ourIdentifier.id);
 
-    const recp = multisigMembers
-      .filter((signing: any) => signing.aid !== ourIdentifier.id)
-      .map((member: any) => member.aid);
+    const recp = multisigMembers.signing
+      .filter((signing) => signing.aid !== ourIdentifier.id)
+      .map((member) => member.aid);
 
     if (grantToJoin) {
       const { grantExn, atc } = grantToJoin;
@@ -995,7 +1044,7 @@ class IpexCommunicationService extends AgentService {
     multisigId: string,
     grantExn: ExnMessage,
     schemaSaids: string[],
-    admitExnToJoin?: any
+    admitExnToJoin?: { ked: unknown }
   ): Promise<SubmitIPEXResult> {
     let exn: Serder;
     let sigsMes: string[];
@@ -1021,9 +1070,9 @@ class IpexCommunicationService extends AgentService {
       .identifiers()
       .get(ourIdentifier.id);
 
-    const recp: string[] = multisigMembers
-      .filter((signing: any) => signing.aid !== ourIdentifier.id)
-      .map((member: any) => member.aid);
+    const recp: string[] = multisigMembers.signing
+      .filter((signing) => signing.aid !== ourIdentifier.id)
+      .map((member) => member.aid);
 
     if (admitExnToJoin) {
       const [, ked] = Saider.saidify(admitExnToJoin);
@@ -1041,7 +1090,7 @@ class IpexCommunicationService extends AgentService {
         },
       ];
 
-      const sigers = sigs.map((sig: any) => new Siger({ qb64: sig }));
+      const sigers = sigs.map((sig: string) => new Siger({ qb64: sig }));
       const ims = d(messagize(admit, sigers, seal));
       const atc = ims.substring(admit.size);
       const gembeds = {
@@ -1117,7 +1166,7 @@ class IpexCommunicationService extends AgentService {
     const members = await this.props.signifyClient
       .identifiers()
       .members(recipientPrefix);
-    const memberAids = members.signing.map((member: any) => member.aid);
+    const memberAids = members.signing.map((member: { aid: string }) => member.aid);
 
     const othersJoined: string[] = [];
     if (grantNoteRecord.linkedRequest.current) {
@@ -1155,7 +1204,7 @@ class IpexCommunicationService extends AgentService {
     const members = await this.props.signifyClient
       .identifiers()
       .members(recipientPrefix);
-    const memberAids = members.signing.map((member: any) => member.aid);
+    const memberAids = members.signing.map((member: { aid: string }) => member.aid);
 
     const othersJoined: string[] = [];
     if (applyNoteRecord.linkedRequest.current) {

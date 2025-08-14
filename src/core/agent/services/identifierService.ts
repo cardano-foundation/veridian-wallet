@@ -157,7 +157,7 @@ class IdentifierService extends AgentService {
     if (hab.group) {
       members = (
         await this.props.signifyClient.identifiers().members(identifier)
-      ).signing.map((member: any) => member.aid);
+      ).signing.map((member: { aid: string }) => member.aid);
     }
 
     return {
@@ -295,9 +295,12 @@ class IdentifierService extends AgentService {
       .identifiers()
       .get(identifier)) as HabState;
 
+    if (!this.props.signifyClient.agent) {
+      throw new Error("Agent not initialized");
+    }
     const addRoleOperation = await this.props.signifyClient
       .identifiers()
-      .addEndRole(identifier, "agent", this.props.signifyClient.agent!.pre);
+      .addEndRole(identifier, "agent", this.props.signifyClient.agent.pre);
     await addRoleOperation.op();
 
     const creationStatus = CreationStatus.PENDING;
@@ -385,8 +388,11 @@ class IdentifierService extends AgentService {
         }:${localMember.displayName}`,
       });
 
+      if (!localMember.groupMetadata) {
+        throw new Error("Group metadata missing for local member");
+      }
       await this.deleteGroupLinkedConnections(
-        localMember.groupMetadata!.groupId
+        localMember.groupMetadata.groupId
       );
 
       for (const notification of await this.notificationStorage.findAllByQuery({
@@ -529,7 +535,16 @@ class IdentifierService extends AgentService {
   }
 
   async syncKeriaIdentifiers(): Promise<void> {
-    const cloudIdentifiers: any[] = [];
+    const cloudIdentifiers: Array<{ 
+      prefix: string; 
+      name: string; 
+      group?: { 
+        mhab: { 
+          name: string; 
+          prefix: string 
+        } 
+      } 
+    }> = [];
     let returned = -1;
     let iteration = 0;
 
@@ -624,6 +639,9 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
+      if (!identifier.group) {
+        throw new Error("Group identifier missing group data");
+      }
       const nameToParse = identifier.name.startsWith(
         IdentifierService.DELETED_IDENTIFIER_THEME
       )
