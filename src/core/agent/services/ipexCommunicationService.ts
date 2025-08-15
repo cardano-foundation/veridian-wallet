@@ -740,7 +740,7 @@ class IpexCommunicationService extends AgentService {
       throw new Error(IpexCommunicationService.NO_CURRENT_IPEX_MSG_TO_JOIN);
     }
 
-    const grantExn = multiSigExn.exn.e.exn as {
+    const grantExn = (multiSigExn.exn.e.exn as unknown) as {
       i: string;
       p: string;
       e: { acdc: { i: string; d: string; s: string } };
