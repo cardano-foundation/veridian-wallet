@@ -243,7 +243,26 @@ const multisigExnOfferForPresenting = {
       d: "EE8_Xc0ZUh_sUJLtmBpVSEr-RFS2mRUIpFyL-pmvtPvx",
     },
   },
-  pathed: {},
+  pathed: {
+    exn: {
+      v: "KERI10JSON000178_",
+      t: "exn",
+      d: "EKa94ERqArLOvNf9AmItMJtsoGKZPVb3e_pEo_1D37qt",
+      i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+      rp: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
+      p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
+      dt: "2024-08-28T06:39:51.416000+00:00",
+      r: ExchangeRoute.IpexGrant,
+      q: {},
+      a: {
+        i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
+        m: "",
+      },
+      e: {
+        acdc: { d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT" },
+      },
+    },
+  },
 };
 
 const multisigExnAdmitForIssuance = {
@@ -407,16 +426,43 @@ const multisigParticipantsProps = {
       userName: "IdentifierName2",
     },
   },
-  multisigMembers: [
-    {
-      aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
-      ends: [],
-    },
-    {
-      aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
-      ends: [],
-    },
-  ],
+  multisigMembers: {
+    signing: [
+      {
+        aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
+        ends: {
+          agent: {
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8": {
+              http: "http://keria:3902/",
+            },
+          },
+          witness: {
+            "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha": {
+              http: "http://witness-demo:5642/",
+              tcp: "tcp://witness-demo:5632/",
+            },
+          },
+        },
+      },
+      {
+        aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
+        ends: {
+          agent: {
+            "EBkResDyD-lZslJAZLe2gOCIlGLTd4Wts7Wy0EgDBi4d": {
+              http: "http://keria:3902/",
+            },
+          },
+          witness: {
+            "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha": {
+              http: "http://witness-demo:5642/",
+              tcp: "tcp://witness-demo:5632/",
+            },
+          },
+        },
+      },
+    ],
+    rotation: [],
+  },
 };
 
 const ipexGrantSerder = {

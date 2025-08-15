@@ -439,9 +439,6 @@ class IpexCommunicationService extends AgentService {
       },
       credentials: localFiltered.map((cr) => {
         const credKeri = filtered.find((cred: KeriaCredential) => cred.sad.d === cr.id);
-        if (!credKeri) {
-          throw new Error("Credential not found in filtered results");
-        }
         return {
           connectionId: cr.connectionId,
           acdc: credKeri.sad,
@@ -535,10 +532,7 @@ class IpexCommunicationService extends AgentService {
     }
 
     let schemaSaid;
-    if (message.exn.r === ExchangeRoute.IpexGrant) {
-      if (!message.exn.e.acdc) {
-        throw new Error("ACDC data missing from IpexGrant message");
-      }
+    if (message.exn.r === ExchangeRoute.IpexGrant && message.exn.e.acdc) {
       schemaSaid = message.exn.e.acdc.s;
     } else if (message.exn.r === ExchangeRoute.IpexApply) {
       schemaSaid = message.exn.a.s;
@@ -549,9 +543,6 @@ class IpexCommunicationService extends AgentService {
       const previousExchange = await this.props.signifyClient
         .exchanges()
         .get(message.exn.p);
-      if (!previousExchange.exn.e.acdc) {
-        throw new Error("ACDC data missing from previous exchange");
-      }
       schemaSaid = previousExchange.exn.e.acdc.s;
     }
 
@@ -570,10 +561,7 @@ class IpexCommunicationService extends AgentService {
     switch (historyType) {
       case ConnectionHistoryType.CREDENTIAL_REVOKED:
         prefix = KeriaContactKeyPrefix.HISTORY_REVOKE;
-        if (!message.exn.e.acdc) {
-          throw new Error("ACDC data missing from credential revoked message");
-        }
-        key = message.exn.e.acdc.d;
+        key = message.exn.e.acdc?.d;
         break;
       case ConnectionHistoryType.CREDENTIAL_ISSUANCE:
       case ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT:
@@ -753,10 +741,6 @@ class IpexCommunicationService extends AgentService {
       anc: { d: grantExn.e.acdc.s },
     };
     
-    if (!multiSigExn.pathed.exn) {
-      throw new Error("Multisig exchange attachment (atc) is required but missing");
-    }
-
     const { op } = await this.submitMultisigGrant(
       grantExn.i,
       grantExn.e.acdc.i,
@@ -764,7 +748,7 @@ class IpexCommunicationService extends AgentService {
       credentialData,
       {
         grantExn: multiSigExn.exn.e.exn as unknown as IpexGrantMultiSigExn,
-        atc: multiSigExn.pathed.exn,
+        atc: multiSigExn.pathed.exn as string,
       }
     );
 
