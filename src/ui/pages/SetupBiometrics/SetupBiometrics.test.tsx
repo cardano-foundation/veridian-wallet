@@ -6,7 +6,6 @@ import { IonReactMemoryRouter } from "@ionic/react-router";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
-
 import { AuthService } from "../../../core/agent/services";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes/paths";
@@ -15,6 +14,7 @@ import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { SetupBiometrics } from "./SetupBiometrics";
+import { Agent } from "../../../core/agent/agent";
 
 jest.mock("../../utils/passcodeChecker", () => ({
   isRepeat: () => false,
@@ -30,7 +30,7 @@ jest.mock("../../../core/agent/agent", () => ({
         findById: jest.fn(),
         save: () => saveItem(),
         update: jest.fn(),
-        createOrUpdateBasicRecord: jest.fn(),
+        createOrUpdateBasicRecord: jest.fn(() => Promise.resolve()),
       },
       auth: {
         verifySecret: verifySecretMock,
@@ -146,7 +146,7 @@ describe("SetPasscode Page", () => {
   });
 
   test("Click on skip", async () => {
-    const { getByTestId, getByText } = render(
+    const { getByTestId } = render(
       <IonReactMemoryRouter
         history={history}
         initialEntries={[RoutePath.SETUP_BIOMETRICS]}
@@ -166,7 +166,7 @@ describe("SetPasscode Page", () => {
     fireEvent.click(getByTestId("alert-cancel-biometry-confirm-button"));
 
     await waitFor(() => {
-      expect(saveItem).toBeCalled();
+      expect(Agent.agent.basicStorage.createOrUpdateBasicRecord).toBeCalled();
     });
 
     expect(dispatchMock).toBeCalled();
@@ -197,7 +197,7 @@ describe("SetPasscode Page", () => {
     );
 
     await waitFor(() => {
-      expect(saveItem).toBeCalled();
+      expect(Agent.agent.basicStorage.createOrUpdateBasicRecord).toBeCalled();
     });
 
     expect(dispatchMock).toBeCalled();
