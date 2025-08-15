@@ -94,6 +94,7 @@ interface StorageRecord {
   category: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<T = BaseRecord> = new (...args: any[]) => T;
 
 interface BaseRecordConstructor<T> extends Constructor<T> {

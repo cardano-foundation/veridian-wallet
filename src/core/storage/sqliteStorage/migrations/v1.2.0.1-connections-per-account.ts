@@ -1,6 +1,5 @@
 import { SignifyClient } from "signify-ts";
 import { MigrationType, HybridMigration } from "./migrations.types";
-import { ConnectionHistoryType } from "../../../agent/services/connectionService.types";
 
 export const DATA_V1201: HybridMigration = {
   type: MigrationType.HYBRID,
@@ -13,9 +12,9 @@ export const DATA_V1201: HybridMigration = {
 
     let identifiers = identifierResult.values;
     identifiers = identifiers
-      ?.map((identifier: any) => JSON.parse(identifier.value))
+      ?.map((identifier: { value: string }) => JSON.parse(identifier.value))
       .filter(
-        (identifier: any) =>
+        (identifier: { isDeleted?: boolean; pendingDeletion?: boolean }) =>
           !identifier.isDeleted && !identifier.pendingDeletion
       );
 
@@ -39,11 +38,12 @@ export const DATA_V1201: HybridMigration = {
     const connections = connectionResult.values;
     const statements: { statement: string; values?: unknown[] }[] = [];
 
-    function insertRecord(record: any) {
+    function insertRecord(record: { id: string; type: string } | { contactId: string; identifier: string; creationStatus: unknown; pendingDeletion: unknown; type: string }) {
+      const recordId = 'id' in record ? record.id : `${record.contactId}:${record.identifier}`;
       return {
         statement:
           "INSERT INTO items (id, category, name, value) VALUES (?, ?, ?, ?)",
-        values: [record.id, record.type, record.id, JSON.stringify(record)],
+        values: [recordId, record.type, recordId, JSON.stringify(record)],
       };
     }
 
@@ -59,7 +59,13 @@ export const DATA_V1201: HybridMigration = {
         type: "ContactRecord",
       };
 
-      const connectionPairsToInsert: any[] = [];
+      const connectionPairsToInsert: Array<{
+        contactId: string;
+        identifier: string;
+        creationStatus: unknown;
+        pendingDeletion: unknown;
+        type: string;
+      }> = [];
 
       if (!connectionData.sharedIdentifier) {
         // No sharedIdentifier: create pair for every non-deleted identifier
@@ -74,7 +80,7 @@ export const DATA_V1201: HybridMigration = {
         }
       } else {
         // Has sharedIdentifier: only create pair if identifier exists and is not deleted/pending
-        const identifier = identifiers.find((identifier: any) => {
+        const identifier = identifiers.find((identifier: { id: string }) => {
           return identifier.id === connectionData.sharedIdentifier;
         });
         if (!identifier) {
@@ -115,7 +121,7 @@ export const DATA_V1201: HybridMigration = {
     let identifiers = (await signifyClient.identifiers().list()).aids;
 
     identifiers = identifiers.filter(
-      (identifier: any) => !identifier.name.startsWith("XX")
+      (identifier: { name: string }) => !identifier.name.startsWith("XX")
     );
 
     const contacts = await signifyClient.contacts().list();
@@ -142,9 +148,9 @@ export const DATA_V1201: HybridMigration = {
       const historyItems: Array<{
         key: string;
         identifier: string;
-        data: any;
+        data: string;
       }> = [];
-      const noteItems: Array<{ key: string; data: any }> = [];
+      const noteItems: Array<{ key: string; data: unknown }> = [];
 
       for (const key of Object.keys(contact)) {
         if (
@@ -183,7 +189,7 @@ export const DATA_V1201: HybridMigration = {
 
       if (sharedIdentifierPrefix) {
         const sharedIdentifier = identifiers.find(
-          (id: any) => id.prefix === sharedIdentifierPrefix
+          (id: { prefix: string }) => id.prefix === sharedIdentifierPrefix
         );
 
         if (sharedIdentifier) {
@@ -214,7 +220,7 @@ export const DATA_V1201: HybridMigration = {
         // associate history items to the correct identifier
         for (const historyItem of historyItems) {
           const identifier = identifiers.find(
-            (id: any) => id.prefix === historyItem.identifier
+            (id: { prefix: string }) => id.prefix === historyItem.identifier
           );
           if (identifier) {
             contactUpdates[`${identifier.prefix}:${historyItem.key}`] =
@@ -225,10 +231,10 @@ export const DATA_V1201: HybridMigration = {
 
         // associate createdAt and all notes for every non-deleted identifier
         for (const prefix of identifiers) {
-          contactUpdates[`${prefix}:createdAt`] = contact["createdAt"];
+          contactUpdates[`${prefix.prefix}:createdAt`] = contact["createdAt"];
 
           for (const noteItem of noteItems) {
-            const newPrefixedNote = `${prefix}:${noteItem.key}`;
+            const newPrefixedNote = `${prefix.prefix}:${noteItem.key}`;
             contactUpdates[newPrefixedNote] = noteItem.data;
           }
         }
