@@ -338,7 +338,10 @@ class MultiSigService extends AgentService {
     groupConnections: ConnectionShortDetails[]
   ): Promise<void> {
     const { witnesses } = await this.identifiers.getAvailableWitnesses();
-    const keeper = this.props.signifyClient.manager!.get(mHab);
+    if (!this.props.signifyClient.manager) {
+      throw new Error("Signify client manager not initialized");
+    }
+    const keeper = this.props.signifyClient.manager.get(mHab);
 
     for (const witness of witnesses) {
       const rpyData = {
@@ -633,11 +636,11 @@ class MultiSigService extends AgentService {
       .identifiers()
       .get(ourIdentifier.id as string);
 
-    const recp = multisigMembers
-      .filter((signing: any) => signing.aid !== ourIdentifier.id)
-      .map((member: any) => member.aid);
+    const recp = multisigMembers.signing
+      .filter((signing) => signing.aid !== ourIdentifier.id)
+      .map((member) => member.aid);
 
-    for (const member of multisigMembers) {
+    for (const member of multisigMembers.signing) {
       const eid = Object.keys(member.ends.agent)[0]; //agent of member
       const endRoleRes = await this.props.signifyClient
         .identifiers()
@@ -707,9 +710,9 @@ class MultiSigService extends AgentService {
 
     const { ourIdentifier, multisigMembers } =
       await this.getMultisigParticipants(multisigId);
-    const recp = multisigMembers
-      .filter((signing: any) => signing.aid !== ourIdentifier.id)
-      .map((member: any) => member.aid);
+    const recp = multisigMembers.signing
+      .filter((signing) => signing.aid !== ourIdentifier.id)
+      .map((member) => member.aid);
     const mHab = await this.props.signifyClient
       .identifiers()
       .get(ourIdentifier.id as string);
@@ -736,8 +739,11 @@ class MultiSigService extends AgentService {
     for (const queued of pendingGroupsRecord.content
       .queued as QueuedGroupCreation[]) {
       if (queued.initiator) {
+        if (!queued.data.group) {
+          throw new Error("Group data missing for initiator");
+        }
         await this.createGroup(
-          queued.data.group!.mhab.prefix,
+          queued.data.group.mhab.prefix,
           queued.groupConnections,
           queued.threshold,
           true
