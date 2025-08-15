@@ -56,6 +56,7 @@ describe("NextRoute", () => {
           queues: [],
           isPaused: false,
         },
+        pendingJoinGroupMetadata: null,
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -309,6 +310,7 @@ describe("getNextRoute", () => {
         queues: [],
         isPaused: false,
       },
+      pendingJoinGroupMetadata: null,
     },
     profilesCache: {
       profiles: {},

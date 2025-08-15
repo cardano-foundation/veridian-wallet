@@ -14,6 +14,8 @@ import {
 } from "../../../store/reducers/profileCache";
 import {
   getStateCache,
+  setPendingJoinGroupMetadata,
+  setToastMsg,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
@@ -24,7 +26,6 @@ import { Spinner } from "../../components/Spinner";
 import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
 import { useAppIonRouter } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
-import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
 import { GroupSetup } from "./components/GroupSetup";
 import { SetupProfile } from "./components/SetupProfile";
@@ -38,6 +39,8 @@ import { useScanHandle } from "../../components/Scan/hook/useScanHandle";
 import { useCameraDirection } from "../../components/Scan/hook/useCameraDirection";
 import { repeatOutline } from "ionicons/icons";
 import { BasicRecord } from "../../../core/agent/records";
+import { ToastMsgType } from "../../globals/types";
+import { PendingJoinGroupMetadata } from "../../../store/reducers/stateCache/stateCache.types";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
@@ -62,7 +65,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const isModal = !!onClose;
 
   const title = i18n.t(`setupprofile.${step}.title`);
-  const back = stateCache.isPendingJoinGroup
+  const back = stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
     ? undefined // Disable back button if pending join group
     : [
         SetupProfileStep.SetupProfile,
@@ -105,13 +108,18 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const createIdentifier = async () => {
     const error = nameChecker.getError(userName);
 
-    if (error) return;
+    if (error) {
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
+      return;
+    }
 
     const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
       displayName: isGroup ? groupName : userName,
       theme: 0,
     };
+
+    let groupId = null;
 
     if (isGroup) {
       const groupMetadata = {
@@ -121,6 +129,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         userName: userName,
       };
       metadata.groupMetadata = groupMetadata;
+      groupId = groupMetadata.groupId; // Store groupId for later navigation
     }
 
     try {
@@ -139,14 +148,31 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       await updateDefaultProfile(identifier);
 
       if (isModal) {
-        onClose();
+        onClose?.();
         navToCredentials(identifier);
         return;
       }
 
       await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       cacheIdentifier.current = identifier;
+
       setStep(SetupProfileStep.FinishSetup);
+
+      if (groupId) {
+        dispatch(
+          setPendingJoinGroupMetadata({
+            isPendingJoinGroup: true,
+            groupId,
+            groupName,
+          })
+        );
+      }
+
+      // Clear pendingJoinGroupMetadata after navigating to FinishSetup
+      dispatch(setPendingJoinGroupMetadata(null));
+      await Agent.agent.basicStorage.deleteById(
+        MiscRecordId.PENDING_JOIN_GROUP_METADATA
+      );
     } catch (e) {
       const errorMessage = (e as Error).message;
 
@@ -162,7 +188,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         return;
       }
 
-      showError("Unable to create identifier", e, dispatch);
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
     } finally {
       setLoading(false);
     }
@@ -205,6 +231,22 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
 
     if (step === SetupProfileStep.FinishSetup) {
+      if (stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup) {
+        const { groupId, groupName } = stateCache.pendingJoinGroupMetadata;
+
+        dispatch(setPendingJoinGroupMetadata(null));
+        Agent.agent.basicStorage.deleteById(
+          MiscRecordId.PENDING_JOIN_GROUP_METADATA
+        );
+
+        ionRouter.push(
+          `/group-profile-setup/${groupId}?groupName=${encodeURIComponent(
+            groupName
+          )}`
+        );
+        return;
+      }
+
       navToCredentials(cacheIdentifier.current);
       return;
     }
@@ -224,9 +266,18 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     try {
       const url = new URL(content);
       const scanGroupId = url.searchParams.get("groupId");
+      const scannedGroupName = url.searchParams.get("groupName");
 
       if (!scanGroupId) {
-        throw new Error("Group ID not found in the scanned QR code.");
+        handleCloseScan();
+        dispatch(setToastMsg(ToastMsgType.GROUP_ID_NOT_FOUND_ERROR));
+        return;
+      }
+
+      if (!scannedGroupName) {
+        handleCloseScan();
+        dispatch(setToastMsg(ToastMsgType.GROUP_NAME_NOT_FOUND_ERROR));
+        return;
       }
 
       const isInitiator = false;
@@ -237,28 +288,47 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         isInitiator,
         () => handleCloseScan(),
         undefined,
-        (id: string) => console.warn(`Duplicate group ID detected: ${id}`)
+        (id: string) =>
+          dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR))
       );
 
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.PENDING_JOIN_GROUP,
-          content: {
-            value: true,
-          },
+      // Update Redux state with all metadata
+      dispatch(
+        setPendingJoinGroupMetadata({
+          isPendingJoinGroup: true,
+          groupId: scanGroupId,
+          groupName: scannedGroupName,
         })
       );
 
+      // Update local state
+      setGroupName(scannedGroupName);
       setStep(SetupProfileStep.GroupSetupConfirm);
+
+      // Update persistent storage
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.PENDING_JOIN_GROUP_METADATA,
+          content: {
+            isPendingJoinGroup: true,
+            groupId: scanGroupId,
+            groupName: scannedGroupName,
+          },
+        })
+      );
     } catch (error) {
-      console.error("Failed to resolve group connection:", error);
-      showError("Unable to process the scanned QR code", error, dispatch);
-    } finally {
       handleCloseScan();
+      dispatch(setToastMsg(ToastMsgType.SCANNER_ERROR));
     }
   };
 
   const handleConfirmJoinGroup = () => {
+    // Clear pendingJoinGroupMetadata to prevent useEffect from triggering again
+    dispatch(setPendingJoinGroupMetadata(null));
+    Agent.agent.basicStorage.deleteById(
+      MiscRecordId.PENDING_JOIN_GROUP_METADATA
+    );
+
     setStep(SetupProfileStep.SetupProfile);
   };
 
@@ -303,10 +373,20 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   };
 
   useEffect(() => {
-    if (stateCache.isPendingJoinGroup) {
+    if (
+      stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup &&
+      step === SetupProfileStep.SetupType // Only restore if on the initial step
+    ) {
+      const { groupName } = stateCache.pendingJoinGroupMetadata;
+
+      if (groupName) {
+        setGroupName(groupName);
+      }
+
+      setProfileType(ProfileType.Group);
       setStep(SetupProfileStep.GroupSetupConfirm);
     }
-  }, [stateCache.isPendingJoinGroup]);
+  }, [stateCache.pendingJoinGroupMetadata, step]);
 
   return (
     <>

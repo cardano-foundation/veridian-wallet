@@ -16,7 +16,6 @@ import { useScanHandle } from "../../../../components/Scan/hook/useScanHandle";
 import { ScanRef } from "../../../../components/Scan/Scan.types";
 import { useCameraDirection } from "../../../../components/Scanner/hook/useCameraDirection";
 import { useOnlineStatusEffect } from "../../../../hooks";
-import { showError } from "../../../../utils/error";
 import { Profiles } from "../../../Profiles";
 import { StageProps } from "../../SetupGroupProfile.types";
 import "./SetupConnections.scss";
@@ -26,8 +25,18 @@ import {
   getProfiles,
   MultiSigGroup,
 } from "../../../../../store/reducers/profileCache";
+import { GroupMetadata } from "../../../../../core/agent/services/identifier.types";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
+import { ToastMsgType } from "../../../../globals/types";
 
-const SetupConnections = ({ setState }: StageProps) => {
+const SetupConnections = ({
+  setState,
+  groupMetadata, // Optional prop for joiners
+  groupName, // Passed separately from SetupGroupProfile
+}: StageProps & {
+  groupMetadata?: GroupMetadata;
+  groupName?: string | null;
+}) => {
   const componentId = "setup-group-profile";
   const dispatch = useAppDispatch();
   const profiles = useAppSelector(getProfiles);
@@ -41,7 +50,11 @@ const SetupConnections = ({ setState }: StageProps) => {
   const scanRef = useRef<ScanRef>(null);
   const { id: profileId } = useParams<{ id: string }>();
   const profile = profiles[profileId]?.identity;
-  const groupId = profile?.groupMetadata?.groupId;
+
+  // Determine groupId and userName based on the flow
+  const groupId = groupMetadata?.groupId || profile?.groupMetadata?.groupId;
+  const userName = groupMetadata?.userName || profile?.groupMetadata?.userName;
+
   const groupConnections = useAppSelector(getMultisigConnectionsCache);
   const [multiSigGroup, setMultiSigGroup] = useState<
     MultiSigGroup | undefined
@@ -54,8 +67,9 @@ const SetupConnections = ({ setState }: StageProps) => {
   };
 
   const updateMultiSigGroup = useCallback(async () => {
+    if (!groupId) return; // Skip if groupId is missing
+
     try {
-      if (!groupId) return;
       const multiSigGroup: MultiSigGroup = {
         groupId,
         connections: Object.values(groupConnections).filter(
@@ -64,28 +78,28 @@ const SetupConnections = ({ setState }: StageProps) => {
       };
       setMultiSigGroup(multiSigGroup);
     } catch (e) {
-      showError("Unable to update multisig", e, dispatch);
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
     }
   }, [dispatch, groupConnections, groupId]);
 
   useOnlineStatusEffect(updateMultiSigGroup);
 
   const fetchOobi = useCallback(async () => {
-    if (!groupId) return;
+    if (!groupId || !userName) return; // Skip if groupId or userName is missing
 
     try {
       const oobiValue = await Agent.agent.connections.getOobi(
         profileId,
-        profile.groupMetadata?.userName,
+        userName,
         groupId
       );
       if (oobiValue) {
         setOobi(oobiValue);
       }
     } catch (e) {
-      showError("Unable to fetch Oobi", e, dispatch);
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
     }
-  }, [dispatch, groupId, profile.groupMetadata?.userName, profileId]);
+  }, [dispatch, groupId, userName, profileId]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -100,7 +114,7 @@ const SetupConnections = ({ setState }: StageProps) => {
       await resolveGroupConnection(
         content,
         groupId,
-        !!profile.groupMetadata?.groupInitiator,
+        !!profile?.groupMetadata?.groupInitiator,
         handleClose,
         scanRef.current?.registerScanHandler,
         handleClose
@@ -109,7 +123,7 @@ const SetupConnections = ({ setState }: StageProps) => {
     [
       groupId,
       handleClose,
-      profile.groupMetadata?.groupInitiator,
+      profile?.groupMetadata?.groupInitiator,
       resolveGroupConnection,
     ]
   );
@@ -132,7 +146,11 @@ const SetupConnections = ({ setState }: StageProps) => {
         customClass={tab}
         header={
           <PageHeader
-            title={tab === Tab.SetupMembers ? profile?.displayName : undefined}
+            title={
+              tab === Tab.SetupMembers
+                ? groupName || profile?.displayName // Use groupName if available
+                : undefined
+            }
             actionButton={isScanTab && supportMultiCamera}
             actionButtonIcon={isScanTab ? repeatOutline : undefined}
             actionButtonAction={isScanTab ? changeCameraDirection : undefined}

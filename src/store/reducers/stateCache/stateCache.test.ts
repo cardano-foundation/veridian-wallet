@@ -21,7 +21,7 @@ import {
   setIsOnline,
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
-  setIsPendingJoinGroup,
+  setPendingJoinGroupMetadata,
   showGenericError,
   StateCacheProps,
   stateCacheSlice,
@@ -217,13 +217,25 @@ describe("State Cache", () => {
     expect(nextState.queueIncomingRequest.isProcessing).toEqual(true);
   });
 
-  test("should set isPendingJoinGroup", () => {
-    const action = setIsPendingJoinGroup(true);
+  test("should set pendingJoinGroupMetadata", () => {
+    const action = setPendingJoinGroupMetadata({
+      isPendingJoinGroup: true,
+      groupId: "test-group-id",
+      groupName: "Test Group",
+    });
     const nextState = stateCacheSlice.reducer(initialState, action);
 
-    expect(nextState.isPendingJoinGroup).toEqual(true);
+    expect(nextState.pendingJoinGroupMetadata).toEqual({
+      isPendingJoinGroup: true,
+      groupId: "test-group-id",
+      groupName: "Test Group",
+    });
 
     const rootState = { stateCache: nextState } as RootState;
-    expect(getStateCache(rootState).isPendingJoinGroup).toEqual(true);
+    expect(getStateCache(rootState).pendingJoinGroupMetadata).toEqual({
+      isPendingJoinGroup: true,
+      groupId: "test-group-id",
+      groupName: "Test Group",
+    });
   });
 });

@@ -98,6 +98,7 @@ export type {
 
 export { IdentifierType };
 export type {
+  GroupMetadata,
   QueuedIdentifierCreation,
   QueuedGroupProps,
   QueuedGroupCreation,

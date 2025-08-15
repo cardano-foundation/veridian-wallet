@@ -53,9 +53,9 @@ import {
   setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
-  setIsPendingJoinGroup,
   setIsSetupProfile,
   setPauseQueueIncomingRequest,
+  setPendingJoinGroupMetadata,
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert,
@@ -63,6 +63,7 @@ import {
 import {
   IncomingRequestType,
   InitializationPhase,
+  PendingJoinGroupMetadata,
 } from "../../../store/reducers/stateCache/stateCache.types";
 import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
@@ -587,14 +588,37 @@ const AppWrapper = (props: { children: ReactNode }) => {
         MiscRecordId.BIOMETRICS_SETUP
       );
 
-      const pendingJoinGroup = await Agent.agent.basicStorage.findById(
-        MiscRecordId.PENDING_JOIN_GROUP
+      const pendingJoinGroupMetadata = await Agent.agent.basicStorage.findById(
+        MiscRecordId.PENDING_JOIN_GROUP_METADATA
       );
 
-      if (pendingJoinGroup) {
-        dispatch(
-          setIsPendingJoinGroup(pendingJoinGroup.content.value as boolean)
+      const isPendingJoinGroupMetadata = (
+        data: unknown
+      ): data is PendingJoinGroupMetadata => {
+        return (
+          typeof data === "object" &&
+          data !== null &&
+          typeof (data as Record<string, unknown>).isPendingJoinGroup ===
+            "boolean" &&
+          typeof (data as Record<string, unknown>).groupId === "string" &&
+          typeof (data as Record<string, unknown>).groupName === "string"
         );
+      };
+
+      if (pendingJoinGroupMetadata) {
+        const content = pendingJoinGroupMetadata.content;
+
+        if (isPendingJoinGroupMetadata(content)) {
+          dispatch(
+            setPendingJoinGroupMetadata({
+              isPendingJoinGroup: content.isPendingJoinGroup,
+              groupId: content.groupId,
+              groupName: content.groupName,
+            })
+          );
+        } else {
+          console.error("Invalid PendingJoinGroupMetadata structure:", content);
+        }
       }
 
       dispatch(

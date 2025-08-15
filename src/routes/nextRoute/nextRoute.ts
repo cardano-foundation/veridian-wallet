@@ -53,7 +53,7 @@ const getNextRootRoute = (data: DataProps) => {
       : path;
   }
 
-  if (data.store.stateCache.isPendingJoinGroup) {
+  if (data.store.stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup) {
     path = RoutePath.PROFILE_SETUP;
   }
 

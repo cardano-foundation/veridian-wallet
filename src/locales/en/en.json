@@ -1379,7 +1379,11 @@
     "deleteaccountsuccess": "Account deleted successfully",
     "remotesignsuccess": "Signed successfully",
     "profileswitched": "Profile switched",
-    "unabletoswitchprofile": "Unable to switch profile"
+    "unabletoswitchprofile": "Unable to switch profile",
+    "groupidnotfounderror": "Group ID not found",
+    "groupnamenotfounderror": "Group name not found",
+    "duplicategroupiderror": "Group already exists",
+    "groupmetadatanotfounderror": "Group metadata is missing. Please try again."
   },
   "request": {
     "sign": {

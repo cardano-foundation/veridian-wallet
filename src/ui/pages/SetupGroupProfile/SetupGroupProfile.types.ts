@@ -1,6 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
 import { ConnectionShortDetails } from "../../../core/agent/agent.types";
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
+import {
+  GroupMetadata,
+  IdentifierShortDetails,
+} from "../../../core/agent/services/identifier.types";
 
 enum Stage {
   SetupConnection,
@@ -12,6 +15,8 @@ enum Stage {
 interface StageProps {
   setState: Dispatch<SetStateAction<GroupInfomation>>;
   state: GroupInfomation;
+  groupName: string | null;
+  groupMetadata?: GroupMetadata;
 }
 
 interface GroupInfomation {
@@ -22,6 +27,7 @@ interface GroupInfomation {
   selectedConnections: ConnectionShortDetails[];
   newIdentifier: IdentifierShortDetails;
   ourIdentifier: string;
+  groupMetadata?: GroupMetadata;
 }
 
 enum Tab {
