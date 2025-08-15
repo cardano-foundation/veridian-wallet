@@ -1495,7 +1495,9 @@
       }
     },
     "groupsetupconfirm": {
-      "title": "Group setup"
+      "title": "Group setup",
+      "description": "Joined group",
+      "button": "Next: setup profile"
     },
     "finishsetup": {
       "greeting": "Welcome, {{name}}",

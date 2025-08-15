@@ -8,6 +8,7 @@ import "./GroupSetup.scss";
 import { SetupGroupProps } from "./GroupSetup.types";
 import { peopleCircleOutline } from "ionicons/icons";
 import { SetupProfileStep } from "../../ProfileSetup.types";
+import { MemberAvatar } from "../../../../components/Avatar";
 
 const GroupSetup = ({
   groupName,
@@ -58,7 +59,14 @@ const GroupSetup = ({
           </IonButton>
         </>
       ) : (
-        <>TODO: Placeholder for SetupProfileStep.GroupSetupConfirm</>
+        <>
+          <MemberAvatar
+            firstLetter={groupName.charAt(0)}
+            rank={0}
+          />
+          {groupName}
+          {i18n.t("setupprofile.groupsetupconfirm.description")}
+        </>
       )}
     </IonContent>
   );

@@ -75,6 +75,8 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
   const getButtonText = () => {
     switch (step) {
+      case SetupProfileStep.GroupSetupConfirm:
+        return i18n.t("setupprofile.groupsetupconfirm.button");
       case SetupProfileStep.FinishSetup:
         return i18n.t("setupprofile.button.started");
       default:
