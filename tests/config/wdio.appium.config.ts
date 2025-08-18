@@ -38,6 +38,7 @@ export const config = {
         "appium:app": process.env.APP_PATH,
         "appium:newCommandTimeout": 260,
         "appium:webviewConnectTimeout": 80 * 1000, // 80 seconds
+        "appium:adbExecTimeout": 60 * 1000, // 60 seconds - increase from default 20 seconds
       },
     ]
   },

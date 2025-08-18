@@ -33,10 +33,44 @@ export class WelcomeBackScreen {
   }
 
   async checkLoginUnavailableScreen(title :string, content :string) {
-    expect(this.loginUnavailableTitle).toBeDisplayed();
-    expect(this.loginUnavailableTitle).toHaveText(title);
-    expect(this.loginUnavailableContent).toBeDisplayed();
-    expect(this.loginUnavailableContent).toHaveText(content);
+    // Wait for the login unavailable alert to appear with increased timeout
+    await this.loginUnavailableTitle.waitForDisplayed({ 
+      timeout: 15000, 
+      timeoutMsg: 'Login unavailable title not displayed within 15 seconds' 
+    });
+    
+    // Wait for the alert content to appear
+    await this.loginUnavailableContent.waitForDisplayed({ 
+      timeout: 10000, 
+      timeoutMsg: 'Login unavailable content not displayed within 10 seconds' 
+    });
+    
+    // Get text content and verify in a single step to avoid session issues
+    let titleText: string;
+    let contentText: string;
+    
+    try {
+      titleText = await this.loginUnavailableTitle.getText();
+      contentText = await this.loginUnavailableContent.getText();
+      
+      // Verify the text content matches expected values
+      if (titleText !== title) {
+        throw new Error(`Expected title "${title}" but got "${titleText}"`);
+      }
+      
+      if (contentText !== content) {
+        throw new Error(`Expected content "${content}" but got "${contentText}"`);
+      }
+      
+      // If we reach here, all validations passed
+      console.log(`✅ Login unavailable screen validation PASSED:`);
+      console.log(`   Title: "${titleText}"`);
+      console.log(`   Content: "${contentText}"`);
+      
+    } catch (error) {
+      console.error('❌ Login unavailable screen validation FAILED:', error.message);
+      throw error;
+    }
   }
 
   async clickOnForgottenPasscodeButton() {

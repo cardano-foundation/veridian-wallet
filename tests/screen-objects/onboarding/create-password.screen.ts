@@ -57,6 +57,9 @@ export class CreatePasswordScreen {
   get setUpLaterButton() {
     return $("[data-testid='tertiary-button']");
   }
+  get yesSkipButton() {
+    return $("span=Yes, skip"); 
+  }
 
   async loads() {
     await expect(this.screenTitle).toBeDisplayed();

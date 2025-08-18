@@ -19,9 +19,11 @@ Given(/^user had already setup a identity$/, async function () {
     );
     if (await BiometricScreen.biometricTitleText.isExisting()) {
       await BiometricScreen.setUpLaterButton.click();
+      await BiometricScreen.okButton.click();
     }
     if (await CreatePasswordScreen.pageInforTitle.isExisting()) {
       await CreatePasswordScreen.setUpLaterButton.click();
+     // await CreatePasswordScreen.yesSkipButton.click();
     }
     await AlertModal.clickConfirmButtonOf(CreatePasswordScreen.alertModal);
     await delay(62000);
@@ -44,6 +46,10 @@ When(
     if (attempts <= maximumAttempts) {
       for (let i = 0; i < attempts; i++) {
         await PasscodeScreen.createAndEnterRandomPasscode();
+      }
+      // If exactly 5 attempts, add a small delay to allow lockout screen to appear
+      if (attempts === maximumAttempts) {
+        await delay(2000); // Wait 2 seconds for lockout screen to show
       }
     } else {
       for (let i = 0; i < maximumAttempts; i++) {

@@ -25,6 +25,9 @@ export class BiometricScreen {
   get setUpLaterButton() {
     return $("[data-testid='tertiary-button']");
   }
+  get cancelBiometricButton() {
+    return $("[data-testid='alert-cancel-biometry-confirm-button']");
+  }
 
   async loads() {
     await expect(this.biometricTitleText).toBeDisplayed();
