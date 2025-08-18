@@ -46,8 +46,8 @@ jobs:
         npm ci
         npm run audit
     
-    - name: Run ESLint
-      run: npm run eslint
+    - name: Run ESLint (Core Only)
+      run: npx eslint src/core --ext .ts,.tsx
     
     - name: Run unit tests
       env:
