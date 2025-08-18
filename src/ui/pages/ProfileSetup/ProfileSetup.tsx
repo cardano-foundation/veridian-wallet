@@ -40,7 +40,6 @@ import { useCameraDirection } from "../../components/Scan/hook/useCameraDirectio
 import { repeatOutline } from "ionicons/icons";
 import { BasicRecord } from "../../../core/agent/records";
 import { ToastMsgType } from "../../globals/types";
-import { PendingJoinGroupMetadata } from "../../../store/reducers/stateCache/stateCache.types";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
@@ -68,13 +67,13 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const back = stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
     ? undefined // Disable back button if pending join group
     : [
-        SetupProfileStep.SetupProfile,
-        SetupProfileStep.GroupSetupStart,
-      ].includes(step)
-    ? i18n.t("setupprofile.button.back")
-    : isModal && defaultProfile
-    ? i18n.t("setupprofile.button.cancel")
-    : undefined;
+      SetupProfileStep.SetupProfile,
+      SetupProfileStep.GroupSetupStart,
+    ].includes(step)
+      ? i18n.t("setupprofile.button.back")
+      : isModal && defaultProfile
+        ? i18n.t("setupprofile.button.cancel")
+        : undefined;
 
   const getButtonText = () => {
     switch (step) {
@@ -123,10 +122,16 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
     if (isGroup) {
       const groupMetadata = {
-        groupId: new Salter({}).qb64,
-        groupInitiator: true,
+        groupId:
+          stateCache.pendingJoinGroupMetadata?.groupId || new Salter({}).qb64, // Use existing groupId if joining
+        groupInitiator: stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
+          ? false // Ensure joiner is not the initiator
+          : true,
         groupCreated: false,
         userName: userName,
+        initiatorName: stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
+          ? stateCache.pendingJoinGroupMetadata?.initiatorName || undefined
+          : userName, // Set initiatorName to userName for the initiator
       };
       metadata.groupMetadata = groupMetadata;
       groupId = groupMetadata.groupId; // Store groupId for later navigation
@@ -164,6 +169,8 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
             isPendingJoinGroup: true,
             groupId,
             groupName,
+            initiatorName:
+              stateCache.pendingJoinGroupMetadata?.initiatorName || null,
           })
         );
       }
@@ -267,6 +274,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       const url = new URL(content);
       const scanGroupId = url.searchParams.get("groupId");
       const scannedGroupName = url.searchParams.get("groupName");
+      const groupInitiator = url.searchParams.get("name");
 
       if (!scanGroupId) {
         handleCloseScan();
@@ -280,7 +288,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         return;
       }
 
-      const isInitiator = false;
+      const isInitiator = false; // Ensure joiner is not the initiator
 
       await resolveGroupConnection(
         content,
@@ -292,12 +300,13 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR))
       );
 
-      // Update Redux state with all metadata
+      // Update Redux state with all metadata, including initiatorName
       dispatch(
         setPendingJoinGroupMetadata({
           isPendingJoinGroup: true,
           groupId: scanGroupId,
           groupName: scannedGroupName,
+          initiatorName: groupInitiator,
         })
       );
 
@@ -313,6 +322,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
             isPendingJoinGroup: true,
             groupId: scanGroupId,
             groupName: scannedGroupName,
+            initiatorName: groupInitiator,
           },
         })
       );

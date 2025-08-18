@@ -9,6 +9,7 @@ import {
   CurrentRouteCacheProps,
   IncomingRequestProps,
   InitializationPhase,
+  PendingJoinGroupMetadata,
   StateCacheProps,
 } from "./stateCache.types";
 
@@ -192,11 +193,7 @@ const stateCacheSlice = createSlice({
     },
     setPendingJoinGroupMetadata: (
       state,
-      action: PayloadAction<{
-        isPendingJoinGroup: boolean;
-        groupId: string;
-        groupName: string;
-      } | null>
+      action: PayloadAction<PendingJoinGroupMetadata | null>
     ) => {
       state.pendingJoinGroupMetadata = action.payload;
     },

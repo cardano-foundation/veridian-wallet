@@ -56,6 +56,7 @@ interface PendingJoinGroupMetadata {
   isPendingJoinGroup: boolean;
   groupId: string;
   groupName: string;
+  initiatorName: string | null;
 }
 
 interface StateCacheProps {

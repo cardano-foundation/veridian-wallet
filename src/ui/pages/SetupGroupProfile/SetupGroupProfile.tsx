@@ -23,9 +23,10 @@ const initialState: GroupInfomation = {
   },
   groupMetadata: {
     groupId: "",
-    groupInitiator: false,
+    groupInitiator: false, // Default to false for joiners
     groupCreated: false,
     userName: "",
+    initiatorName: "",
   },
 };
 
@@ -41,7 +42,14 @@ const SetupGroupProfile = () => {
       state={state}
       setState={setState}
       groupName={groupName}
-      groupMetadata={state.groupMetadata}
+      groupMetadata={{
+        ...state.groupMetadata,
+        groupId: state.groupMetadata?.groupId ?? "",
+        groupInitiator: state.groupMetadata?.groupInitiator ?? false,
+        groupCreated: state.groupMetadata?.groupCreated ?? false,
+        userName: state.groupMetadata?.userName ?? "",
+        initiatorName: state.groupMetadata?.initiatorName ?? "",
+      }}
     />
   );
 };

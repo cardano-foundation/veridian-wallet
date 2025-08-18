@@ -59,6 +59,7 @@ const GroupSetup = ({
           </IonButton>
         </>
       ) : (
+        // TODO: Update UI for joiner
         <>
           <MemberAvatar
             firstLetter={groupName.charAt(0)}

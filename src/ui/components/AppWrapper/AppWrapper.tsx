@@ -614,10 +614,9 @@ const AppWrapper = (props: { children: ReactNode }) => {
               isPendingJoinGroup: content.isPendingJoinGroup,
               groupId: content.groupId,
               groupName: content.groupName,
+              initiatorName: content.initiatorName || null,
             })
           );
-        } else {
-          console.error("Invalid PendingJoinGroupMetadata structure:", content);
         }
       }
 

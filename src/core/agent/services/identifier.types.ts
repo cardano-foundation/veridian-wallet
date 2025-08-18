@@ -11,6 +11,7 @@ interface GroupMetadata {
   groupInitiator: boolean;
   groupCreated: boolean;
   userName: string;
+  initiatorName?: string;
 }
 
 interface CreateIdentifierInputs {

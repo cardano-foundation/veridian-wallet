@@ -222,6 +222,7 @@ describe("State Cache", () => {
       isPendingJoinGroup: true,
       groupId: "test-group-id",
       groupName: "Test Group",
+      initiatorName: "Frank",
     });
     const nextState = stateCacheSlice.reducer(initialState, action);
 
@@ -229,6 +230,7 @@ describe("State Cache", () => {
       isPendingJoinGroup: true,
       groupId: "test-group-id",
       groupName: "Test Group",
+      initiatorName: "Frank",
     });
 
     const rootState = { stateCache: nextState } as RootState;
@@ -236,6 +238,7 @@ describe("State Cache", () => {
       isPendingJoinGroup: true,
       groupId: "test-group-id",
       groupName: "Test Group",
+      initiatorName: "Frank",
     });
   });
 });
