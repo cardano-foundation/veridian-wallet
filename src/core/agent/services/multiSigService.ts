@@ -594,10 +594,9 @@ class MultiSigService extends AgentService {
     const members = await this.props.signifyClient
       .identifiers()
       .members(multisigId);
-    const multisigMembers = members.signing;
 
     let ourIdentifier;
-    for (const member of multisigMembers) {
+    for (const member of members.signing) {
       const identifier = await this.identifierStorage
         .getIdentifierMetadata(member.aid)
         .catch((error) => {
@@ -623,7 +622,10 @@ class MultiSigService extends AgentService {
 
     return {
       ourIdentifier,
-      multisigMembers,
+      multisigMembers: {
+        signing: members.signing,
+        rotation: members.rotation || [],
+      },
     };
   }
 

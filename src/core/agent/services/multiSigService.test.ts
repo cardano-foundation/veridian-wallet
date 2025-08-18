@@ -1438,7 +1438,7 @@ describe("Creation of multi-sig", () => {
     await multiSigService.processGroupsPendingCreation();
 
     expect(multiSigService.createGroup).toHaveBeenCalledWith(
-      queuedIdentifier.data.group!.mhab.prefix,
+      queuedIdentifier.data.group?.mhab.prefix,
       queuedIdentifier.groupConnections,
       2,
       true
