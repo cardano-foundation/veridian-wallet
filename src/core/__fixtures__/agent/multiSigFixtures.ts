@@ -381,7 +381,10 @@ const multisigExnIpexGrantSerder = {
     dt: "2024-08-09T10:27:01.653000+00:00",
     r: "/multisig/exn",
     q: {},
-    a: { gid: "EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY" },
+    a: { 
+      gid: "EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY",
+      smids: ["EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY"],
+    },
     e: {
       exn: {
         v: "KERI10JSON00051e_",
@@ -392,7 +395,12 @@ const multisigExnIpexGrantSerder = {
         dt: "2024-08-09T10:27:00.155000+00:00",
         r: "/ipex/grant",
         q: {},
-        a: { m: "", i: "ENDDYy0SVuFOI3rEnB3HbNFB_BFjhl4fQbZSeDZHGQf9" },
+        a: { 
+          m: "", 
+          i: "ENDDYy0SVuFOI3rEnB3HbNFB_BFjhl4fQbZSeDZHGQf9",
+          smids: ["ENDDYy0SVuFOI3rEnB3HbNFB_BFjhl4fQbZSeDZHGQf9"],
+          gid: "ENDDYy0SVuFOI3rEnB3HbNFB_BFjhl4fQbZSeDZHGQf9",
+        },
         e: {
           acdc: {
             v: "ACDC10JSON000197_",
