@@ -437,6 +437,7 @@ class ConnectionService extends AgentService {
     id: string,
     alias?: string,
     groupId?: string,
+    groupName?: string,
     externalId?: string
   ): Promise<string> {
     const result = await this.props.signifyClient.oobis().get(id);
@@ -455,11 +456,18 @@ class ConnectionService extends AgentService {
         oobi.pathname = pathName.substring(0, agentIndex);
       }
     }
-    if (alias !== undefined) oobi.searchParams.set(OobiQueryParams.NAME, alias);
-    if (groupId !== undefined)
+    if (alias !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.NAME, alias);
+    }
+    if (groupId !== undefined) {
       oobi.searchParams.set(OobiQueryParams.GROUP_ID, groupId);
-    if (externalId !== undefined)
+    }
+    if (groupName !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.GROUP_NAME, groupName);
+    }
+    if (externalId !== undefined) {
       oobi.searchParams.set(OobiQueryParams.EXTERNAL_ID, externalId);
+    }
 
     return oobi.toString();
   }
