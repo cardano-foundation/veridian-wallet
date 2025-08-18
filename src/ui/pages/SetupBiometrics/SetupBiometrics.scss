@@ -1,4 +1,6 @@
-.set-biometrics {
+.set-biometrics.responsive-page-layout {
+  padding-top: 0;
+
   .responsive-page-content {
     justify-content: space-between;
 
@@ -27,6 +29,14 @@
   .page-header {
     ion-toolbar {
       --background: transparent;
+
+      .buttons-first-slot.md {
+        min-width: auto;
+      }
+
+      ion-buttons.has-progressbar .action-button-label {
+        --padding-start: 1.5rem;
+      }
     }
   }
 

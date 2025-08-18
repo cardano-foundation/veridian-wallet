@@ -21,12 +21,10 @@ import {
   getConnectionsCache,
   getMultisigConnectionsCache,
 } from "../../../../../store/reducers/connectionsCache";
-import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
 import {
   deleteNotificationById,
-  getNotificationsCache,
-  setNotificationsCache,
-} from "../../../../../store/reducers/notificationsCache";
+  getProfiles,
+} from "../../../../../store/reducers/profileCache";
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert, Alert as AlertDecline } from "../../../../components/Alert";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
@@ -37,11 +35,11 @@ import {
   MultisigMember,
 } from "../../../../components/CredentialDetailModule/components";
 import { FallbackIcon } from "../../../../components/FallbackIcon";
-import { IdentifierDetailModal } from "../../../../components/IdentifierDetailModule";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
+import { ProfileDetailsModal } from "../../../../components/ProfileDetailsModal";
 import { Spinner } from "../../../../components/Spinner";
 import { Verification } from "../../../../components/Verification";
 import { BackEventPriorityType } from "../../../../globals/types";
@@ -64,8 +62,6 @@ const ReceiveCredential = ({
   handleBack,
 }: NotificationDetailsProps) => {
   const dispatch = useAppDispatch();
-  const notificationsCache = useAppSelector(getNotificationsCache);
-  const [notifications, setNotifications] = useState(notificationsCache);
   const userName = useAppSelector(getAuthentication)?.userName;
   const connectionsCache = useAppSelector(getConnectionsCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
@@ -86,7 +82,7 @@ const ReceiveCredential = ({
       },
     });
   const [isLoading, setIsLoading] = useState(false);
-  const identifiersData = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
 
   const isMultisig = credDetail?.identifierType === IdentifierType.Group;
   const [isRevoked, setIsRevoked] = useState(false);
@@ -102,9 +98,10 @@ const ReceiveCredential = ({
       (multisigMemberStatus.linkedRequest.accepted ? 1 : 0) >=
       Number(multisigMemberStatus.threshold);
 
-  const identifier = identifiersData[credDetail?.identifierId || ""];
+  const profile = profiles[credDetail?.identifierId || ""];
   const groupInitiatorAid = multisigMemberStatus.members[0] || "";
-  const isGroupInitiator = identifier?.groupMemberPre === groupInitiatorAid;
+  const isGroupInitiator =
+    profile?.identity.groupMemberPre === groupInitiatorAid;
   const displayInitiatorNotAcceptedAlert =
     isMultisig &&
     !isRevoked &&
@@ -118,11 +115,7 @@ const ReceiveCredential = ({
   );
 
   const handleNotificationUpdate = async () => {
-    const updatedNotifications = notifications.filter(
-      (notification) => notification.id !== notificationDetails.id
-    );
-    setNotifications(updatedNotifications);
-    dispatch(setNotificationsCache(updatedNotifications));
+    dispatch(deleteNotificationById(notificationDetails.id));
   };
 
   const getMultiSigMemberStatus = useCallback(async () => {
@@ -148,11 +141,11 @@ const ReceiveCredential = ({
           notificationDetails.a.d as string
         );
 
-      const identifier = identifiersData[credential.identifierId];
+      const profile = profiles[credential.identifierId];
 
       // @TODO: identifierType is not needed to render the component so this could be optimised. If it's needed, it should be fetched in the core for simplicity.
       const identifierType =
-        identifier?.groupMetadata || identifier?.groupMemberPre
+        profile?.identity.groupMetadata || profile?.identity.groupMemberPre
           ? IdentifierType.Group
           : IdentifierType.Individual;
 
@@ -177,12 +170,7 @@ const ReceiveCredential = ({
     } finally {
       setIsLoading(false);
     }
-  }, [
-    dispatch,
-    getMultiSigMemberStatus,
-    identifiersData,
-    notificationDetails.a.d,
-  ]);
+  }, [dispatch, getMultiSigMemberStatus, profiles, notificationDetails.a.d]);
 
   useOnlineStatusEffect(getAcdc);
 
@@ -260,7 +248,7 @@ const ReceiveCredential = ({
 
       if (
         multisigMemberStatus.linkedRequest.accepted &&
-        identifier?.groupMemberPre === member
+        profile?.identity.groupMemberPre === member
       ) {
         return MemberAcceptStatus.Accepted;
       }
@@ -270,7 +258,7 @@ const ReceiveCredential = ({
     [
       multisigMemberStatus.othersJoined,
       multisigMemberStatus.linkedRequest,
-      identifier,
+      profile,
     ]
   );
 
@@ -320,7 +308,7 @@ const ReceiveCredential = ({
       ? undefined
       : `${i18n.t("tabs.notifications.details.buttons.decline")}`;
 
-  const theme = getTheme(identifier?.theme || 0);
+  const theme = getTheme(profile?.identity.theme || 0);
 
   const closeDeclineAlert = () => setAlertDeclineIsOpen(false);
 
@@ -473,7 +461,7 @@ const ReceiveCredential = ({
               ))}
             </CardDetailsBlock>
           )}
-          {identifier && (
+          {profile && (
             <CardDetailsBlock
               className="related-identifiers"
               title={i18n.t(
@@ -496,7 +484,7 @@ const ReceiveCredential = ({
                   slot="start"
                   className="identifier-name"
                 >
-                  {identifier.displayName}
+                  {profile.identity.displayName}
                 </IonText>
                 <IonIcon
                   slot="end"
@@ -552,11 +540,11 @@ const ReceiveCredential = ({
         viewOnly
       />
       {credDetail && (
-        <IdentifierDetailModal
+        <ProfileDetailsModal
           isOpen={openIdentifierDetail}
           setIsOpen={setOpenIdentifierDetail}
-          pageId="identifier-detail"
-          identifierDetailId={credDetail.identifierId}
+          pageId="profile-details"
+          profileId={credDetail.identifierId}
         />
       )}
     </>

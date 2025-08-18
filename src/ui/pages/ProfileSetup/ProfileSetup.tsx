@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Salter } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
 import { IdentifierService } from "../../../core/agent/services";
 import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
@@ -12,11 +11,10 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
   setIndividualFirstCreate,
-} from "../../../store/reducers/identifiersCache";
+} from "../../../store/reducers/profileCache";
 import {
   getStateCache,
   showNoWitnessAlert,
-  updateCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
@@ -25,6 +23,7 @@ import { PageHeader } from "../../components/PageHeader";
 import { Spinner } from "../../components/Spinner";
 import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
 import { useAppIonRouter } from "../../hooks";
+import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
 import { SetupGroup } from "./components/SetupGroup";
@@ -39,12 +38,14 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
   const dispatch = useAppDispatch();
+  const { updateDefaultProfile, defaultProfile } = useProfile();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
   const [userName, setUserName] = useState("");
   const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
   const ionRouter = useAppIonRouter();
+  const cacheIdentifier = useRef("");
 
   const isModal = !!onClose;
 
@@ -54,7 +55,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     SetupProfileStep.SetupGroup,
   ].includes(step)
     ? i18n.t("setupprofile.button.back")
-    : isModal
+    : isModal && defaultProfile
       ? i18n.t("setupprofile.button.cancel")
       : undefined;
 
@@ -120,21 +121,16 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           .then(() => dispatch(setIndividualFirstCreate(false)));
       }
 
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
-          content: { defaultProfile: identifier },
-        })
-      );
-      dispatch(updateCurrentProfile(identifier));
+      await updateDefaultProfile(identifier);
 
       if (isModal) {
         onClose();
-        navToCredentials();
+        navToCredentials(identifier);
         return;
       }
 
       await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
+      cacheIdentifier.current = identifier;
       setStep(SetupProfileStep.FinishSetup);
     } catch (e) {
       const errorMessage = (e as Error).message;
@@ -157,11 +153,13 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
   };
 
-  const navToCredentials = () => {
+  const navToCredentials = (id?: string) => {
     const { nextPath, updateRedux } = getNextRoute(RoutePath.PROFILE_SETUP, {
       store: { stateCache },
       state: {
         isSetupProfile: false,
+        isGroup: profileType === ProfileType.Group,
+        id,
       },
     });
 
@@ -173,6 +171,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       dispatch,
       updateRedux
     );
+
     ionRouter.push(nextPath.pathname);
   };
 
@@ -187,7 +186,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
 
     if (step === SetupProfileStep.FinishSetup) {
-      navToCredentials();
+      navToCredentials(cacheIdentifier.current);
       return;
     }
 

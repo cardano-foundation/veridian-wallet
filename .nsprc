@@ -27,8 +27,8 @@
     "active": true,
     "notes": "form-data uses Math.random() to select a boundary value for multipart form-encoded data. A hacker Can observe values produced by Math.random in the application and control the field of a form-data request on Appium server do not impact the wallet."
   },
-  "1106845": {
+  "1106849": {
     "active": true,
-    "notes": "This kind of attack is relevant to wallet itself."
+    "notes": "tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter"
   }
 }

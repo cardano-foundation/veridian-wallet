@@ -52,9 +52,6 @@ const initialState = {
   connectionsCache: {
     connections: connectionsForNotifications,
   },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
 };
 
 describe("Earlier notifications", () => {

@@ -14,9 +14,7 @@ import {
   removeConnectionCache,
   setOpenConnectionId,
 } from "../../../store/reducers/connectionsCache";
-import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getCurrentProfile,
   setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
@@ -38,11 +36,11 @@ import { ConnectionsBody } from "./components/ConnectionsBody";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
+import { getCurrentProfile } from "../../../store/reducers/profileCache";
 
 const Connections = () => {
   const pageId = "connections-tab";
   const dispatch = useAppDispatch();
-  const identifiers = useAppSelector(getIdentifiersCache);
   const connectionsCache = useAppSelector(getConnectionsCache);
   const openDetailId = useAppSelector(getOpenConnectionId);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
@@ -60,7 +58,6 @@ const Connections = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
   const currentProfile = useAppSelector(getCurrentProfile);
-  const identifier = identifiers[currentProfile.identity.id];
 
   const showPlaceholder = Object.keys(connectionsCache).length === 0;
 
@@ -120,11 +117,11 @@ const Connections = () => {
 
   const fetchOobi = useCallback(async () => {
     try {
-      if (!currentProfile.identity.id) return;
+      if (!currentProfile?.identity.id) return;
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${currentProfile.identity.id}`,
-        identifier?.displayName || ""
+        currentProfile?.identity.displayName || ""
       );
       if (oobiValue) {
         setOobi(oobiValue);
@@ -132,7 +129,11 @@ const Connections = () => {
     } catch (e) {
       showError("Unable to fetch connection oobi", e, dispatch);
     }
-  }, [currentProfile.identity.id, identifier?.displayName, dispatch]);
+  }, [
+    currentProfile?.identity.id,
+    currentProfile?.identity.displayName,
+    dispatch,
+  ]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -200,7 +201,7 @@ const Connections = () => {
           />
         </IonButton>
         <Avatar
-          id={currentProfile.identity.id}
+          id={currentProfile?.identity.id || ""}
           handleAvatarClick={handleAvatarClick}
         />
       </>
@@ -246,7 +247,9 @@ const Connections = () => {
               buttonAction={handleConnectModal}
               testId={pageId}
               buttonIcon={ScanIconWhite}
-            />
+            >
+              <div className="placeholder-spacer" />
+            </CardsPlaceholder>
           )
         }
       >
