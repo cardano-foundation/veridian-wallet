@@ -80,8 +80,8 @@ interface ExnMessageA {
   i?: string;
   s?: string;
   a?: Record<string, unknown>;
-  smids?: string[];
-  gid?: string;
+  smids: string[];
+  gid: string;
   t?: string;
   st?: string;
   c?: string[];
@@ -99,11 +99,11 @@ interface ExnMessageA {
 
 // Define types for the 'e' property in ExnMessage
 interface ExnMessageE {
-  acdc?: {
+  acdc: {
     d: string;
     i: string;
     s: string;
-    ri?: string;
+    ri: string;
     a: {
       d: string;
       i: string;
@@ -120,10 +120,10 @@ interface ExnMessageE {
     dt: string;
   };
   d?: string;
-  icp?: {
+  icp: {
     i: string;
   };
-  exn?: {
+  exn: {
     r: string;
     p: string;
   };

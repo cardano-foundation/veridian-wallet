@@ -456,9 +456,6 @@ class KeriaNotificationService extends AgentService {
   ): Promise<{ deleted: true } | { deleted: false; receivingPre: string }> {
     // rp field not being properly utilised yet (open issue on Signify/KERIA), so will be potentially incorrect for groups > 2 members
     if (notif.a.r === NotificationRoute.MultiSigIcp) {
-      if (!exn.exn.a.smids) {
-        return { deleted: true };
-      }
       for (const smid of exn.exn.a.smids) {
         try {
           const hab = await this.props.signifyClient.identifiers().get(smid);
@@ -478,12 +475,8 @@ class KeriaNotificationService extends AgentService {
       }
     } else {
       const receivingPre = exn.exn.r.startsWith("/multisig")
-        ? exn.exn.a.gid
-        : exn.exn.rp;
-      
-      if (!receivingPre) {
-        return { deleted: true };
-      }
+        ? exn.exn.a.gid as string
+        : exn.exn.rp as string;
       
       const hab = await this.props.signifyClient
         .identifiers()
@@ -511,9 +504,6 @@ class KeriaNotificationService extends AgentService {
     exchange: ExnMessage
   ): Promise<boolean> {
     // Only consider issuances for now
-    if (!exchange.exn.e.acdc) {
-      return false;
-    }
 
     const ourIdentifier = await this.identifierStorage
       .getIdentifierMetadata(exchange.exn.e.acdc.a.i)
@@ -534,10 +524,6 @@ class KeriaNotificationService extends AgentService {
     const existingCredential =
       await this.credentialStorage.getCredentialMetadata(exchange.exn.e.acdc.d);
     
-    if (!exchange.exn.e.acdc.ri) {
-      return false;
-    }
-
     const telStatus = (
       await this.props.signifyClient
         .credentials()
@@ -704,10 +690,6 @@ class KeriaNotificationService extends AgentService {
     exchange: ExnMessage
   ): Promise<boolean> {
     // Otherwise group initiator gets notification
-    if (!exchange.exn.e.icp) {
-      return false;
-    }
-    
     try {
       await this.props.signifyClient.identifiers().get(exchange.exn.e.icp.i);
     } catch (error) {
@@ -728,9 +710,6 @@ class KeriaNotificationService extends AgentService {
     exchange: ExnMessage
   ): Promise<false> {
     const exnData = exchange.exn.e?.exn;
-    if (!exnData || typeof exnData !== 'object' || !('r' in exnData) || !('p' in exnData)) {
-      return false;
-    }
     
     switch (exnData.r) {
       case ExchangeRoute.IpexAdmit: {
@@ -831,16 +810,8 @@ class KeriaNotificationService extends AgentService {
         notificationRecord.createdAt = new Date(notif.dt);
         notificationRecord.read = false;
 
-        if (!exchange.exn.a.gid) {
-          return false;
-        }
-
         const { ourIdentifier, multisigMembers } =
           await this.multiSigs.getMultisigParticipants(exchange.exn.a.gid);
-
-        if (!multisigMembers.signing || multisigMembers.signing.length === 0) {
-          return false;
-        }
 
         notificationRecord.groupReplied = true;
         notificationRecord.groupInitiatorPre = multisigMembers.signing[0].aid;
@@ -878,7 +849,7 @@ class KeriaNotificationService extends AgentService {
       case ExchangeRoute.IpexGrant: {
         const agreeExn = await this.props.signifyClient
           .exchanges()
-          .get(exnData.p as string);
+          .get(exnData.p);
 
         const agreeNotificationRecords =
           await this.notificationStorage.findAllByQuery({
@@ -1388,10 +1359,6 @@ class KeriaNotificationService extends AgentService {
                 await this.multiSigs.getMultisigParticipants(
                   applyExchange.exn.rp
                 );
-
-              if (!multisigMembers.signing || multisigMembers.signing.length === 0) {
-                continue;
-              }
 
               notification.groupReplied = true;
               notification.groupInitiatorPre = multisigMembers.signing[0].aid;

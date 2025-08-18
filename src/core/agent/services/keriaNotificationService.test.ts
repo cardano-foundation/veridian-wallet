@@ -1366,7 +1366,10 @@ describe("Signify notification service of agent", () => {
     );
     multiSigs.getMultisigParticipants.mockResolvedValue({
       ourIdentifier: { id: "our-id" },
-      multisigMembers: [{ aid: "member-aid" }],
+      multisigMembers: {
+        signing: [{ aid: "member-aid" }],
+        rotation: [],
+      },
     });
 
     await keriaNotificationService.processNotification(notif);
@@ -2148,16 +2151,19 @@ describe("Group IPEX presentation", () => {
           userName: "",
         },
       },
-      multisigMembers: [
-        {
-          aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
-          ends: [],
-        },
-        {
-          aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
-          ends: [],
-        },
-      ],
+      multisigMembers: {
+        signing: [
+          {
+            aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
+            ends: [],
+          },
+          {
+            aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
+            ends: [],
+          },
+        ],
+        rotation: [],
+      },
     });
 
     notificationStorage.findAllByQuery = jest.fn().mockResolvedValue([
@@ -3881,16 +3887,19 @@ describe("Long running operation tracker", () => {
           userName: "",
         },
       },
-      multisigMembers: [
-        {
-          aid: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
-          ends: [],
-        },
-        {
-          aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
-          ends: [],
-        },
-      ],
+      multisigMembers: {
+        signing: [
+          {
+            aid: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+            ends: [],
+          },
+          {
+            aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
+            ends: [],
+          },
+        ],
+        rotation: [],
+      },
     });
 
     await keriaNotificationService.processOperation(operationRecord);
