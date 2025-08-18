@@ -68,7 +68,8 @@ export class WelcomeBackScreen {
       console.log(`   Content: "${contentText}"`);
       
     } catch (error) {
-      console.error('❌ Login unavailable screen validation FAILED:', error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('❌ Login unavailable screen validation FAILED:', errorMessage);
       throw error;
     }
   }
