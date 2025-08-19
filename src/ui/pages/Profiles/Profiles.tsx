@@ -6,26 +6,24 @@ import {
   personCircleOutline,
   settingsOutline,
 } from "ionicons/icons";
-import { useState } from "react";
-import { Agent } from "../../../core/agent/agent";
-import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
+import { useEffect, useState } from "react";
+import { CreationStatus } from "../../../core/agent/agent.types";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
+import { RoutePath } from "../../../routes";
+import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
-import {
-  getAuthentication,
-  getStateCache,
-  setAuthentication,
-  setToastMsg,
-  updateCurrentProfile,
-} from "../../../store/reducers/stateCache";
+import { getProfiles } from "../../../store/reducers/profileCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
-import { Settings } from "../../components/Setting";
+import { ProfileDetailsModal } from "../../components/ProfileDetailsModal";
+import { Settings } from "../../components/Settings";
 import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
+import { useAppIonRouter } from "../../hooks";
+import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { ProfileSetup } from "../ProfileSetup";
 import "./Profiles.scss";
@@ -89,14 +87,17 @@ const OptionButton = ({ icon, text, action, disabled }: OptionButtonProps) => {
 const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
-  const identifiersDataCache = useAppSelector(getIdentifiersCache);
-  const defaultProfile = stateCache.currentProfile.identity.id;
-  const identifiersData = Object.values(identifiersDataCache);
-  const filteredIdentifiersData = identifiersData.filter(
-    (item) => item.id !== defaultProfile
-  );
+  const profiles = useAppSelector(getProfiles);
+  const ionHistory = useAppIonRouter();
+  const { updateDefaultProfile, defaultProfile } = useProfile();
+  const profileList = Object.values(profiles);
+  const filteredProfiles = profileList
+    .filter((item) => item.identity.id !== defaultProfile?.identity.id)
+    .sort((prev, next) =>
+      prev.identity.displayName.localeCompare(next.identity.displayName)
+    );
   const [openSetting, setOpenSetting] = useState(false);
+  const [openProfileDetail, setOpenProfileDetail] = useState(false);
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
 
   const handleClose = () => {
@@ -115,21 +116,24 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     setOpenSetupProfile(false);
   };
 
+  const handleOpenProfile = () => {
+    setOpenProfileDetail(true);
+  };
+
   const handleJoinGroup = () => {
     // TODO: Implement the logic to join a group
   };
 
-  const handleSelectProfile = async (id: string) => {
+  const handleSelectProfile = async (profile: IdentifierShortDetails) => {
     try {
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
-          content: { defaultProfile: id },
-        })
-      );
-      dispatch(updateCurrentProfile(id));
+      await updateDefaultProfile(profile.id);
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
+      ionHistory.push(
+        profile.groupMetadata
+          ? RoutePath.GROUP_PROFILE_SETUP.replace(":id", profile.id)
+          : TabsRoutePath.CREDENTIALS
+      );
     } catch (e) {
       showError(
         "Unable to switch profile",
@@ -139,6 +143,12 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       );
     }
   };
+
+  useEffect(() => {
+    if (!defaultProfile || profileList.length === 0) {
+      setOpenSetupProfile(true);
+    }
+  }, [defaultProfile, profileList.length]);
 
   return (
     <>
@@ -167,24 +177,24 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           }
         >
           <div className="profiles-selected-profile">
-            <ProfileItem identifier={identifiersDataCache[defaultProfile]} />
+            <ProfileItem identifier={defaultProfile?.identity} />
             <OptionButton
               icon={personCircleOutline}
               text={`${i18n.t("profiles.options.manage")}`}
-              action={handleOpenSettings}
+              action={handleOpenProfile}
               disabled={
-                identifiersDataCache[defaultProfile]?.creationStatus ===
+                defaultProfile?.identity?.creationStatus ===
                 CreationStatus.PENDING
               }
             />
           </div>
           <div className="profiles-list">
-            {filteredIdentifiersData.map((identifier) => (
+            {filteredProfiles.map((identifier) => (
               <ProfileItem
-                key={identifier.id}
-                identifier={identifier}
+                key={identifier.identity.id}
+                identifier={identifier.identity}
                 onClick={() => {
-                  handleSelectProfile(identifier.id);
+                  handleSelectProfile(identifier.identity);
                 }}
               />
             ))}
@@ -220,6 +230,12 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
           }}
         />
       </SideSlider>
+      <ProfileDetailsModal
+        pageId="profile-details"
+        isOpen={openProfileDetail}
+        setIsOpen={setOpenProfileDetail}
+        profileId={defaultProfile?.identity.id || ""}
+      />
     </>
   );
 };

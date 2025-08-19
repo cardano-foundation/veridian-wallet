@@ -12,6 +12,7 @@ interface PasswordModuleProps {
   title?: string;
   description?: string;
   onCreateSuccess: (skipped: boolean) => void;
+  onValidationChange?: (validated: boolean) => void;
 }
 
 interface PasswordModuleRef {

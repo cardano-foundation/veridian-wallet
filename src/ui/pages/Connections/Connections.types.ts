@@ -37,9 +37,15 @@ interface ConnectionRequestData {
   id: string;
 }
 
+interface ConnectionsComponentProps {
+  showConnections: boolean;
+  setShowConnections: (value: boolean) => void;
+}
+
 export type {
   ConnectionItemProps,
   ConnectionRequestData,
   ConnectionsOptionRef,
   MappedConnections,
+  ConnectionsComponentProps,
 };

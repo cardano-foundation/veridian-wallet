@@ -40,6 +40,7 @@ enum RpyRoute {
 enum OobiQueryParams {
   NAME = "name",
   GROUP_ID = "groupId",
+  GROUP_NAME = "groupName",
   ROLE = "role",
   EXTERNAL_ID = "externalId",
 }

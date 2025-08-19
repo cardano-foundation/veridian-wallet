@@ -38,22 +38,20 @@ const SetupBiometrics = () => {
   const stateCache = useAppSelector(getStateCache);
   const [showCancelBiometricsAlert, setShowCancelBiometricsAlert] =
     useState(false);
-
   const setupBiometricsConfirmtext = i18n.t("biometry.setupbiometryconfirm");
   const cancelBiometricsHeaderText = i18n.t("biometry.cancelbiometryheader");
   const cancelBiometricsConfirmText = setupBiometricsConfirmtext;
-
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
   const { handleBiometricAuth } = useBiometricAuth();
 
   const navToNextStep = async () => {
     await Agent.agent.basicStorage
-      .save({
-        id: MiscRecordId.BIOMETRICS_SETUP,
-        content: {
-          value: true,
-        },
-      })
+      .createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.BIOMETRICS_SETUP,
+          content: { value: true },
+        })
+      )
       .then(() => {
         const data: DataProps = {
           store: {
@@ -118,8 +116,8 @@ const SetupBiometrics = () => {
     }
   };
 
-  const skip = () => {
-    navToNextStep();
+  const handleSkip = () => {
+    setShowCancelBiometricsAlert(true);
   };
 
   const handleCancelBiometrics = () => {
@@ -130,7 +128,18 @@ const SetupBiometrics = () => {
     <>
       <ResponsivePageLayout
         pageId={pageId}
-        header={<PageHeader currentPath={RoutePath.SETUP_BIOMETRICS} />}
+        customClass={"has-header-skip"}
+        header={
+          <PageHeader
+            currentPath={RoutePath.SETUP_BIOMETRICS}
+            progressBar={true}
+            progressBarValue={0.25}
+            progressBarBuffer={1}
+            actionButton={true}
+            actionButtonLabel={`${i18n.t("createpassword.button.skip")}`}
+            actionButtonAction={handleSkip}
+          />
+        }
       >
         <div className="page-info">
           <IonIcon icon={fingerPrintOutline} />
@@ -141,7 +150,7 @@ const SetupBiometrics = () => {
           primaryButtonText={`${i18n.t("setupbiometrics.button.enable")}`}
           primaryButtonAction={processBiometrics}
           tertiaryButtonText={`${i18n.t("setupbiometrics.button.skip")}`}
-          tertiaryButtonAction={skip}
+          tertiaryButtonAction={handleSkip}
         />
       </ResponsivePageLayout>
       <Alert

@@ -20,7 +20,7 @@ import { useLocation } from "react-router-dom";
 import { i18n } from "../../../../i18n";
 import { TabsRoutePath } from "../../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { getNotificationsCache } from "../../../../store/reducers/notificationsCache";
+import { getNotificationsCache } from "../../../../store/reducers/profileCache";
 import { setCurrentRoute } from "../../../../store/reducers/stateCache";
 import { Connections } from "../../../pages/Connections";
 import { Credentials } from "../../../pages/Credentials";

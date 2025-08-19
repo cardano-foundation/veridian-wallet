@@ -15,19 +15,17 @@ import {
   useState,
 } from "react";
 import { Agent } from "../../../core/agent/agent";
-import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
+import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { setCredsArchivedCache } from "../../../store/reducers/credsArchivedCache";
 import {
   getCredsCache,
-  setCredsCache,
-} from "../../../store/reducers/credsCache";
-import {
   getNotificationsCache,
+  setCredsArchivedCache,
+  setCredsCache,
   setNotificationsCache,
-} from "../../../store/reducers/notificationsCache";
+} from "../../../store/reducers/profileCache";
 import {
   setCurrentOperation,
   setToastMsg,
@@ -37,6 +35,7 @@ import {
   Alert as AlertRestore,
 } from "../../components/Alert";
 import { OperationType, ToastMsgType } from "../../globals/types";
+import { showError } from "../../utils/error";
 import { CredentialDetailModal } from "../CredentialDetailModule";
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import { ListHeader } from "../ListHeader";
@@ -48,7 +47,6 @@ import {
   ArchivedCredentialsProps,
 } from "./ArchivedCredentials.types";
 import { CredentialItem } from "./CredentialItem";
-import { showError } from "../../utils/error";
 
 const ArchivedCredentialsContainer = forwardRef<
   ArchivedCredentialsContainerRef,
@@ -417,8 +415,8 @@ const ArchivedCredentialsContainer = forwardRef<
                 {selectedCredentials.length === 1
                   ? i18n.t("tabs.credentials.archived.oneselected")
                   : t("tabs.credentials.archived.manyselected", {
-                      amount: selectedCredentials.length,
-                    })}
+                    amount: selectedCredentials.length,
+                  })}
               </div>
               <IonButtons slot="end">
                 <IonButton

@@ -65,6 +65,8 @@ class Agent {
     "Agent has not been booted for a given Signify passcode";
   static readonly MISSING_BRAN_SECURE_STORAGE = "Bran not in secure storage";
   static readonly INVALID_MNEMONIC = "Seed phrase is invalid";
+  static readonly CONNECT_URL_DISCOVERY_FAILED = "Cannot discover connect URL";
+  static readonly CONNECT_URL_NOT_FOUND = "Connect URL not found in response";
   static readonly MISSING_DATA_ON_KERIA =
     "Attempted to fetch data by ID on KERIA, but was not found. May indicate stale data records in the local database.";
   static readonly BUFFER_ALLOC_SIZE = 3;
@@ -243,8 +245,36 @@ class Agent {
     }
   }
 
-  async bootAndConnect(agentUrls: AgentUrls): Promise<void> {
+  /**
+   * Boot and connect to KERIA with automatic connect URL discovery.
+   * This overload takes only a boot URL and discovers the connect URL automatically.
+   *
+   * @param bootUrl The boot URL to use for creating the agent
+   * @returns Promise that resolves when boot and connect are complete
+   */
+  async bootAndConnect(bootUrl: string): Promise<void>;
+  /**
+   * Boot and connect to KERIA with explicit URLs.
+   * This overload takes both boot and connect URLs explicitly.
+   *
+   * @param agentUrls Object containing both boot and connect URLs
+   * @returns Promise that resolves when boot and connect are complete
+   */
+  async bootAndConnect(agentUrls: AgentUrls): Promise<void>;
+  async bootAndConnect(bootUrlOrAgentUrls: string | AgentUrls): Promise<void> {
     if (!Agent.isOnline) {
+      let agentUrls: AgentUrls;
+
+      if (typeof bootUrlOrAgentUrls === "string") {
+        // Auto-discover connect URL from boot URL
+        const bootUrl = bootUrlOrAgentUrls;
+        const connectUrl = await this.discoverConnectUrl(bootUrl);
+        agentUrls = { bootUrl, url: connectUrl };
+      } else {
+        // Use provided AgentUrls
+        agentUrls = bootUrlOrAgentUrls;
+      }
+
       await signifyReady();
       const bran = await this.getBran();
       this.signifyClient = new SignifyClient(
@@ -319,6 +349,11 @@ class Agent {
       bootUrl: "",
     });
 
+    // Validate and run any missed cloud migrations after recovery
+    if (this.storageSession instanceof SqliteSession) {
+      await this.storageSession.validateCloudMigrationsOnRecovery();
+    }
+
     await this.syncWithKeria();
   }
 
@@ -326,11 +361,6 @@ class Agent {
     await this.identifiers.syncKeriaIdentifiers();
     await this.connections.syncKeriaContacts();
     await this.credentials.syncKeriaCredentials();
-
-    // Validate and run any missed cloud migrations after recovery
-    if (this.storageSession instanceof SqliteSession) {
-      await this.storageSession.validateCloudMigrationsOnRecovery();
-    }
 
     await this.basicStorage.createOrUpdateBasicRecord(
       new BasicRecord({
@@ -422,6 +452,37 @@ class Agent {
     );
   }
 
+  /**
+   * Discovers the connect URL from the boot URL by calling the /connect endpoint
+   * on the same domain as the boot URL.
+   *
+   * @param bootUrl The boot URL to derive the connect URL from
+   * @returns Promise resolving to the connect URL
+   * @throws Error if the connect URL cannot be discovered
+   */
+  async discoverConnectUrl(bootUrl: string): Promise<string> {
+    const url = new URL(bootUrl);
+    const connectEndpoint = `${url.protocol}//${url.host}/connect`;
+
+    const response = await fetch(connectEndpoint, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `${Agent.CONNECT_URL_DISCOVERY_FAILED} (${response.status})`
+      );
+    }
+
+    const data = await response.json();
+    if (!data.connectUrl) {
+      throw new Error(Agent.CONNECT_URL_NOT_FOUND);
+    }
+
+    return data.connectUrl;
+  }
+
   private async saveAgentUrls(agentUrls: AgentUrls): Promise<void> {
     await this.basicStorageService.save({
       id: MiscRecordId.KERIA_CONNECT_URL,
@@ -509,10 +570,13 @@ class Agent {
   private getStorageService<T extends BaseRecord>(
     instance: IonicSession | SqliteSession
   ) {
-    if (instance instanceof IonicSession) {
-      return new IonicStorage<T>(instance.session!);
+    if (!instance.session) {
+      throw new Error("Storage session not initialized");
     }
-    return new SqliteStorage<T>(instance.session!);
+    if (instance instanceof IonicSession) {
+      return new IonicStorage<T>(instance.session);
+    }
+    return new SqliteStorage<T>(instance.session);
   }
 
   getBranAndMnemonic(): BranAndMnemonic {
@@ -620,6 +684,23 @@ class Agent {
     await SecureStorage.wipe();
     this.markAgentStatus(false);
   }
+
+    /**
+   * Wipe local database and secure storage to start fresh.
+   */
+    async wipeLocalDatabase(): Promise<void> {
+      // Stop background services
+      this.keriaNotificationService.stopPolling();
+  
+      // Wipe the storage session (this deletes the database file)
+      await this.storageSession.wipe(walletId);
+  
+      // Wipe secure storage
+      await SecureStorage.wipe();
+  
+      // Mark agent as offline
+      this.markAgentStatus(false);
+    }
 }
 
 export { Agent };

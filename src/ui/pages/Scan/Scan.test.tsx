@@ -10,6 +10,8 @@ import { TabsRoutePath } from "../../../routes/paths";
 import { OperationType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Scan } from "./Scan";
+import { RootState } from "../../../store";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -134,14 +136,7 @@ describe("Scan Tab", () => {
         currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
         toastMsgs: [],
       },
-      identifiersCache: {
-        identifiers: {},
-        scanGroupId: "72e2f089cef6",
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
+      profilesCache: profileCacheFixData,
     };
 
     const storeMocked = {
@@ -162,56 +157,5 @@ describe("Scan Tab", () => {
     });
 
     expect(getByTestId("scan-tab")).toBeInTheDocument();
-  });
-
-  test("Nav to identifier after scan duplicate multisig", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.SCAN, TabsRoutePath.IDENTIFIERS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        currentOperation: OperationType.IDLE,
-        toastMsgs: [],
-      },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    connectByOobiUrlMock.mockImplementation(() => {
-      return Promise.reject(
-        new Error(StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG)
-      );
-    });
-
-    render(
-      <Provider store={storeMocked}>
-        <Scan />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(historyPushMock).toBeCalledWith({
-        pathname: TabsRoutePath.IDENTIFIERS,
-      });
-    });
   });
 });

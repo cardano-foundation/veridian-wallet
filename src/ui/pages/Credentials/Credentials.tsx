@@ -14,21 +14,20 @@ import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getCredsArchivedCache,
-  setCredsArchivedCache,
-} from "../../../store/reducers/credsArchivedCache";
-import {
-  getCredentialsFilters,
   getCredsCache,
-  getFavouritesCredsCache,
-  setCredentialsFilters,
-  setCredsCache,
-} from "../../../store/reducers/credsCache";
-import {
-  getAuthentication,
   getCurrentProfile,
+  setCredsArchivedCache,
+  setCredsCache,
+} from "../../../store/reducers/profileCache";
+import {
   setCurrentRoute,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
+import {
+  getCredentialsFilters,
+  getFavouritesCredsCache,
+  setCredentialsFilters,
+} from "../../../store/reducers/viewTypeCache";
 import { ArchivedCredentials } from "../../components/ArchivedCredentials";
 import { Avatar } from "../../components/Avatar";
 import { AvatarProps } from "../../components/Avatar/Avatar.types";
@@ -48,10 +47,9 @@ import { CardType, ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
-import { StartAnimationSource } from "../Identifiers/Identifiers.types";
-import "./Credentials.scss";
-import { CredentialsFilters } from "./Credentials.types";
 import { Profiles } from "../Profiles";
+import "./Credentials.scss";
+import { CredentialsFilters, StartAnimationSource } from "./Credentials.types";
 
 const CLEAR_STATE_DELAY = 1000;
 
@@ -171,6 +169,7 @@ const Credentials = () => {
   const ArchivedCredentialsButton = () => {
     return (
       <div
+        data-testid="archive-button-container"
         className={`archived-credentials-button-container${
           archivedCreds?.length > 0 || revokedCreds.length > 0
             ? " visible"
@@ -262,7 +261,7 @@ const Credentials = () => {
   }) => {
     return (
       <Avatar
-        id={currentProfile.identity.id}
+        id={currentProfile?.identity.id || ""}
         handleAvatarClick={handleAvatarClick}
       />
     );

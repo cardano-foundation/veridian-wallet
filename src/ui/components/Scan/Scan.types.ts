@@ -6,6 +6,7 @@ interface ScanProps {
   onFinishScan: (value: string) => Promise<void>;
   componentId?: string;
   customTranslateKey?: string;
+  displayOnModal?: boolean;
 }
 
 interface ScanRef {

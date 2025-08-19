@@ -1,21 +1,18 @@
 import { mockIonicReact } from "@ionic/react-test-utils";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
+import { Agent } from "../../../core/agent/agent";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import {
-  filteredIdentifierFix,
-  filteredIdentifierMapFix,
-} from "../../__fixtures__/filteredIdentifierFix";
+  setToastMsg
+} from "../../../store/reducers/stateCache";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
+import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Profiles } from "./Profiles";
-import { Agent } from "../../../core/agent/agent";
-import {
-  setToastMsg,
-  updateCurrentProfile,
-} from "../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../globals/types";
-import { CreationStatus } from "../../../core/agent/agent.types";
 
 jest.mock("../../../store/reducers/stateCache", () => ({
   ...jest.requireActual("../../../store/reducers/stateCache"),
@@ -50,11 +47,11 @@ const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
     routes: [TabsRoutePath.NOTIFICATIONS],
+    currentProfileId: filteredIdentifierFix[0].id,
     authentication: {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: "",
     },
     currentProfile: {
       identity: filteredIdentifierFix[0],
@@ -64,16 +61,15 @@ const initialState = {
       credentials: [],
       archivedCredentials: [],
     },
+    profileHistories: [],
   },
   identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
+    identifiers: filteredIdentifierFix,
   },
   connectionsCache: {
     connections: {},
   },
-  notificationsCache: {
-    notifications: [],
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },

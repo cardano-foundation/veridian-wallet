@@ -11,6 +11,7 @@ enum RoutePath {
   VERIFY_RECOVERY_SEED_PHRASE = "/verifyrecoveryseedphrase",
   SETUP_BIOMETRICS = "/setup-biometrics",
   PROFILE_SETUP = "/profile-setup",
+  GROUP_PROFILE_SETUP = "/group-profile-setup/:id",
 }
 
 enum TabsRoutePath {
@@ -21,7 +22,6 @@ enum TabsRoutePath {
   CONNECTIONS_DETAILS = "/tabs/connections/:id",
   CREDENTIAL_DETAILS = "/tabs/credentials/:id",
   NOTIFICATION_DETAILS = "/tabs/notifications/:id",
-  IDENTIFIERS = "/tabs/identifiers",
   SCAN = "/tabs/scan",
   MENU = "/tabs/menu",
   IDENTIFIER_DETAILS = "/tabs/identifiers/:id",
@@ -33,4 +33,4 @@ const PublicRoutes = [
   RoutePath.SET_PASSCODE,
 ];
 
-export { RoutePath, TabsRoutePath, PublicRoutes };
+export { PublicRoutes, RoutePath, TabsRoutePath };

@@ -60,7 +60,7 @@ const requestData = {
 
 const initialState = {
   stateCache: {
-    routes: [TabsRoutePath.IDENTIFIERS],
+    routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
       loggedIn: true,
       time: Date.now(),
@@ -109,7 +109,7 @@ describe("Sign request", () => {
   test("Display fallback image when provider logo is empty: BALLOT_TRANSACTION_REQUEST", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -219,7 +219,7 @@ describe("Sign request", () => {
   test("Render JSON object", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -265,7 +265,7 @@ describe("Sign request", () => {
   test("Incoming request is empty", async () => {
     const initialState = {
       stateCache: {
-        routes: [TabsRoutePath.IDENTIFIERS],
+        routes: [TabsRoutePath.CREDENTIALS],
         authentication: {
           loggedIn: true,
           time: Date.now(),

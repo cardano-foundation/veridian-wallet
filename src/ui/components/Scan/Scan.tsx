@@ -39,6 +39,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       cameraDirection = LensFacing.Back,
       onFinishScan,
       customTranslateKey,
+      displayOnModal,
     }: ScanProps,
     ref
   ) => {
@@ -48,6 +49,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const [pastedValue, setPastedValue] = useState("");
     const [scanning, setScanning] = useState(false);
     const [permission, setPermisson] = useState(false);
+    const permissionRef = useRef(false);
     const [scanUnavailable, setScanUnavailable] = useState(false);
     const isHandlingQR = useRef(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -59,8 +61,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const stopScan = useCallback(async () => {
       if (!Capacitor.isNativePlatform()) return;
 
-      const permission = await checkPermission();
-      if (permission) {
+      if (permissionRef.current) {
         await BarcodeScanner.stopScan();
         await BarcodeScanner.removeAllListeners();
       }
@@ -68,6 +69,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       isHandlingQR.current = false;
       setScanning(false);
       document?.querySelector("body")?.classList.remove("scan-active");
+      document?.querySelector("body")?.classList.remove("scan-modal");
     }, []);
 
     const handleScanValue = useCallback(
@@ -103,6 +105,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       if (Capacitor.isNativePlatform()) {
         const allowed = await checkPermission();
         setPermisson(!!allowed);
+        permissionRef.current = !!allowed;
         onCheckPermissionFinish?.(!!allowed);
         await registerScanHandler();
 
@@ -123,6 +126,9 @@ const Scan = forwardRef<ScanRef, ScanProps>(
         document?.querySelector("body")?.classList.add("scan-active");
         setScanning(true);
         document?.querySelector("body")?.classList.add("scan-active");
+        if (displayOnModal) {
+          document?.querySelector("body")?.classList.add("scan-modal");
+        }
         document
           ?.querySelector("body.scan-active > div:last-child")
           ?.classList.remove("hide");
@@ -130,6 +136,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     }, [
       onCheckPermissionFinish,
       registerScanHandler,
+      displayOnModal,
       cameraDirection,
       stopScan,
     ]);
