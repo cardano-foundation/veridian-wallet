@@ -578,6 +578,7 @@ class ConnectionService extends AgentService {
     id: string,
     alias?: string,
     groupId?: string,
+    groupName?: string,
     externalId?: string
   ): Promise<string> {
     const result = await this.props.signifyClient.oobis().get(id);
@@ -596,11 +597,18 @@ class ConnectionService extends AgentService {
         oobi.pathname = pathName.substring(0, agentIndex);
       }
     }
-    if (alias !== undefined) oobi.searchParams.set(OobiQueryParams.NAME, alias);
-    if (groupId !== undefined)
+    if (alias !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.NAME, alias);
+    }
+    if (groupId !== undefined) {
       oobi.searchParams.set(OobiQueryParams.GROUP_ID, groupId);
-    if (externalId !== undefined)
+    }
+    if (groupName !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.GROUP_NAME, groupName);
+    }
+    if (externalId !== undefined) {
       oobi.searchParams.set(OobiQueryParams.EXTERNAL_ID, externalId);
+    }
 
     return oobi.toString();
   }
@@ -760,17 +768,15 @@ class ConnectionService extends AgentService {
     connectionId: string,
     identifier: string
   ): Promise<void> {
-    const userName = (
-      await this.identifierStorage.getIdentifierMetadata(identifier)
-    ).displayName;
-
     const contact = await this.getContactMetadataById(connectionId);
     const externalId = new URL(contact.oobi).searchParams.get(
       OobiQueryParams.EXTERNAL_ID
     );
+    const identifierMetadata =
+      await this.identifierStorage.getIdentifierMetadata(identifier);
     const oobi = await this.getOobi(
       identifier,
-      userName,
+      identifierMetadata.displayName,
       undefined,
       externalId ?? undefined
     );

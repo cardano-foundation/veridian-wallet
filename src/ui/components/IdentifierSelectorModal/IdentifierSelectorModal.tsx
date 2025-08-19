@@ -4,13 +4,13 @@ import { CreationStatus } from "../../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { useAppSelector } from "../../../store/hooks";
-import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import { CardItem, CardList } from "../CardList";
 import { PageFooter } from "../PageFooter";
 import { PageHeader } from "../PageHeader";
 import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
 import "./IdentifierSelectorModal.scss";
 import { IdentifierSelectorProps } from "./IdentifierSelectorModal.types";
+import { getProfiles } from "../../../store/reducers/profileCache";
 
 const IdentifierSelectorModal = ({
   open,
@@ -18,7 +18,7 @@ const IdentifierSelectorModal = ({
   onSubmit,
   identifiers,
 }: IdentifierSelectorProps) => {
-  const identifierCache = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
 
   const [selectedIdentifier, setSelectedIdentifier] =
     useState<IdentifierShortDetails | null>(null);
@@ -26,9 +26,12 @@ const IdentifierSelectorModal = ({
   const displayIdentifiers = (() => {
     const result = identifiers
       ? identifiers
-      : Object.values(identifierCache)
-          .filter((item) => item.creationStatus === CreationStatus.COMPLETE)
-          .filter((item) => !item.groupMetadata?.groupId);
+      : Object.values(profiles)
+        .filter(
+          (item) => item.identity.creationStatus === CreationStatus.COMPLETE
+        )
+        .filter((item) => !item.identity.groupMetadata?.groupId)
+        .map((item) => item.identity);
 
     return result.map(
       (identifier): CardItem<IdentifierShortDetails> => ({

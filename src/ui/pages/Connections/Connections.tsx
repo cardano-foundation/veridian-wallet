@@ -14,11 +14,7 @@ import {
   removeConnectionCache,
   setOpenConnectionId,
 } from "../../../store/reducers/connectionsCache";
-import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getAuthentication,
-  getCurrentProfile,
-  getStateCache,
   setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
@@ -35,17 +31,16 @@ import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { ConnectionDetails } from "../ConnectionDetails";
+import { Profiles } from "../Profiles";
 import { ConnectionsBody } from "./components/ConnectionsBody";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
-import { Profiles } from "../Profiles";
+import { getCurrentProfile } from "../../../store/reducers/profileCache";
 
 const Connections = () => {
   const pageId = "connections-tab";
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
-  const identifiers = useAppSelector(getIdentifiersCache);
   const connectionsCache = useAppSelector(getConnectionsCache);
   const openDetailId = useAppSelector(getOpenConnectionId);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
@@ -54,7 +49,7 @@ const Connections = () => {
   const [mappedConnections, setMappedConnections] = useState<
     MappedConnections[]
   >([]);
-  const [openShareDefaultProfile, setOpenShareDefaultProfile] = useState(false);
+  const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [deletePendingItem, setDeletePendingItem] =
     useState<ConnectionShortDetails | null>(null);
@@ -62,9 +57,7 @@ const Connections = () => {
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
-  const auth = useAppSelector(getAuthentication);
   const currentProfile = useAppSelector(getCurrentProfile);
-  const identifier = identifiers[currentProfile.identity.id];
 
   const showPlaceholder = Object.keys(connectionsCache).length === 0;
 
@@ -124,11 +117,11 @@ const Connections = () => {
 
   const fetchOobi = useCallback(async () => {
     try {
-      if (!currentProfile.identity.id) return;
+      if (!currentProfile?.identity.id) return;
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${currentProfile.identity.id}`,
-        identifier?.displayName || ""
+        currentProfile?.identity.displayName || ""
       );
       if (oobiValue) {
         setOobi(oobiValue);
@@ -136,7 +129,11 @@ const Connections = () => {
     } catch (e) {
       showError("Unable to fetch connection oobi", e, dispatch);
     }
-  }, [currentProfile.identity.id, identifier?.displayName, dispatch]);
+  }, [
+    currentProfile?.identity.id,
+    currentProfile?.identity.displayName,
+    dispatch,
+  ]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -181,7 +178,7 @@ const Connections = () => {
   };
 
   const handleConnectModal = () => {
-    setOpenShareDefaultProfile(true);
+    setOpenShareCurrentProfile(true);
   };
 
   const handleAvatarClick = () => {
@@ -204,7 +201,7 @@ const Connections = () => {
           />
         </IonButton>
         <Avatar
-          id={currentProfile.identity.id}
+          id={currentProfile?.identity.id || ""}
           handleAvatarClick={handleAvatarClick}
         />
       </>
@@ -250,7 +247,9 @@ const Connections = () => {
               buttonAction={handleConnectModal}
               testId={pageId}
               buttonIcon={ScanIconWhite}
-            />
+            >
+              <div className="placeholder-spacer" />
+            </CardsPlaceholder>
           )
         }
       >
@@ -263,8 +262,8 @@ const Connections = () => {
         />
       </TabLayout>
       <ShareProfile
-        isOpen={openShareDefaultProfile}
-        setIsOpen={setOpenShareDefaultProfile}
+        isOpen={openShareCurrentProfile}
+        setIsOpen={setOpenShareCurrentProfile}
         oobi={oobi}
       />
       <Profiles

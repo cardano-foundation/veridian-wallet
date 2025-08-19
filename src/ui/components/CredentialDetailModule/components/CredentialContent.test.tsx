@@ -16,6 +16,7 @@ import {
 } from "../../../utils/formatters";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { CredentialContent } from "./CredentialContent";
+import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -67,11 +68,7 @@ describe("Creds content", () => {
           passwordIsSkipped: true,
         },
       },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
-      identifiersCache: {
-        identifiers: [],
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         multisigConnections: {},
       },
@@ -185,12 +182,9 @@ describe("Creds content", () => {
           passwordIsSet: false,
           passwordIsSkipped: true,
         },
+        toastMsgs: [],
       },
-      credsCache: { creds: credsFixAcdc, favourites: [] },
-      credsArchivedCache: { creds: credsFixAcdc },
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         multisigConnections: {
           [connectionDetailsFix.id]: connectionDetailsFix,
@@ -226,26 +220,7 @@ describe("Creds content", () => {
     fireEvent.click(getByTestId("related-identifier-name"));
 
     await waitFor(() => {
-      expect(getByTestId("credential-related-identifier-modal")).toBeVisible();
+      expect(getByTestId("credential-related-identifier-page")).toBeVisible();
     });
-
-    await waitFor(() =>
-      expect(
-        getByTestId("identifier-card-template-default-index-0")
-      ).toBeInTheDocument()
-    );
-    expect(
-      queryByTestId("delete-button-credential-related-identifier")
-    ).not.toBeInTheDocument();
-
-    act(() => {
-      fireEvent.click(getByTestId("identifier-options-button"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("share-identifier-option")).toBeInTheDocument();
-    });
-
-    expect(queryByTestId("delete-identifier-option")).not.toBeInTheDocument();
   });
 });

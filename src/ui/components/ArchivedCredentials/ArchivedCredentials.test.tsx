@@ -14,6 +14,8 @@ import { notificationsFix } from "../../__fixtures__/notificationsFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { ArchivedCredentialsContainer } from "./ArchivedCredentials";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
+import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 
 const deleteCredentialsMock = jest.fn((id: string) => Promise.resolve(true));
 const deleteNotificationMock = jest.fn(() => Promise.resolve(true));
@@ -63,13 +65,6 @@ const initialStateEmpty = {
       passcodeIsSet: true,
     },
   },
-  seedPhraseCache: {},
-  credsCache: {
-    creds: [],
-  },
-  notificationsCache: {
-    notifications: [],
-  },
   biometricsCache: {
     enabled: false,
   },
@@ -77,9 +72,7 @@ const initialStateEmpty = {
     connections: {},
     multisigConnections: {},
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
-  },
+  profilesCache: profileCacheFixData,
 };
 
 let mockedStore: Store<unknown, AnyAction>;
@@ -285,31 +278,13 @@ describe("Archived and revoked credentials", () => {
           passcodeIsSet: true,
         },
       },
-      seedPhraseCache: {},
-      credsCache: {
-        creds: revokedCredsFix,
-      },
-      notificationsCache: {
-        notifications: [
-          {
-            ...notificationsFix[0],
-            a: {
-              ...notificationsFix[0].a,
-              credentialId: revokedCredsFix[0].id,
-            },
-          },
-        ],
-      },
+      profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
       },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
-      },
-
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
       },
     };
 
@@ -324,7 +299,9 @@ describe("Archived and revoked credentials", () => {
           <ArchivedCredentialsContainer
             revokedCreds={revokedCredsFix}
             archivedCredentialsIsOpen={true}
-            archivedCreds={filteredCredsFix}
+            archivedCreds={filteredCredsFix.filter(
+              (item) => item.status !== CredentialStatus.REVOKED
+            )}
             setArchivedCredentialsIsOpen={jest.fn()}
           />
         </Provider>
@@ -389,7 +366,9 @@ describe("Archived and revoked credentials", () => {
           <ArchivedCredentialsContainer
             revokedCreds={revokedCredsFix}
             archivedCredentialsIsOpen={true}
-            archivedCreds={filteredCredsFix}
+            archivedCreds={filteredCredsFix.filter(
+              (item) => item.status !== CredentialStatus.REVOKED
+            )}
             setArchivedCredentialsIsOpen={jest.fn()}
           />
         </Provider>

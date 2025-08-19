@@ -19,6 +19,7 @@ import { formatShortDate } from "../../utils/formatters";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Connections } from "./Connections";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 const deleteConnectionByIdMock = jest.fn();
 const getConnectionByIdMock = jest.fn();
@@ -88,18 +89,9 @@ const initialStateFull = {
   stateCache: {
     routes: [TabsRoutePath.CONNECTIONS],
     authentication: {
-      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-    },
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: [],
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
     },
   },
   viewTypeCache: {
@@ -112,22 +104,10 @@ const initialStateFull = {
       favouriteIndex: 0,
     },
   },
-  seedPhraseCache: {},
-  credsCache: {
-    creds: filteredCredsFix,
-    favourites: [
-      {
-        id: filteredCredsFix[0].id,
-        time: 1,
-      },
-    ],
-  },
   connectionsCache: {
     connections: connectionsFix,
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -159,14 +139,6 @@ describe("Connections tab", () => {
             time: Date.now(),
             passcodeIsSet: true,
           },
-          currentProfile: {
-            identity: filteredIdentifierFix[0],
-            connections: [],
-            multisigConnections: [],
-            peerConnections: [],
-            credentials: [],
-            archivedCredentials: [],
-          },
         },
         viewTypeCache: {
           identifier: {
@@ -179,20 +151,9 @@ describe("Connections tab", () => {
           },
         },
         seedPhraseCache: {},
-        credsCache: {
-          creds: filteredCredsFix,
-          favourites: [
-            {
-              id: filteredCredsFix[0].id,
-              time: 1,
-            },
-          ],
-        },
+        profilesCache: profileCacheFixData,
         connectionsCache: {
           connections: [],
-        },
-        identifiersCache: {
-          identifiers: filteredIdentifierMapFix,
         },
         biometricsCache: {
           enabled: false,
@@ -231,30 +192,10 @@ describe("Connections tab", () => {
           time: Date.now(),
           passcodeIsSet: true,
         },
-        currentProfile: {
-          identity: filteredIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-        },
       },
-      seedPhraseCache: {},
-      credsCache: {
-        creds: filteredCredsFix,
-        favourites: [
-          {
-            id: filteredCredsFix[0].id,
-            time: 1,
-          },
-        ],
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         connections: [],
-      },
-      identifiersCache: {
-        identifiers: filteredIdentifierMapFix,
       },
       biometricsCache: {
         enabled: false,

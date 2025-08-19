@@ -1,4 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import { PeerConnectionEventTypes } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { RoutePath } from "../../../routes";
 import { OperationType } from "../../../ui/globals/types";
@@ -24,56 +25,18 @@ import {
   showGenericError,
   StateCacheProps,
   stateCacheSlice,
-  updateCurrentProfile,
 } from "./stateCache";
 import {
   IncomingRequestProps,
   IncomingRequestType,
   PeerConnectSigningEventRequest,
 } from "./stateCache.types";
-import {
-  ConnectionStatus,
-  CreationStatus,
-} from "../../../core/agent/agent.types";
-import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
-import { IdentifierType } from "../../../core/agent/services/identifier.types";
-import { IdentifiersFilters } from "../../../ui/pages/Identifiers/Identifiers.types";
-import { CredentialsFilters } from "../../../ui/pages/Credentials/Credentials.types";
-import { CardListViewType } from "../../../ui/components/SwitchCardView/SwitchCardView.types";
 
 // Mock the selectors
-jest.mock("../identifiersCache", () => ({
-  getIdentifiersCache: jest.fn(),
-}));
-jest.mock("../credsCache", () => ({
-  getCredsCache: jest.fn(),
-}));
-jest.mock("../credsArchivedCache", () => ({
-  getCredsArchivedCache: jest.fn(),
-}));
-jest.mock("../walletConnectionsCache", () => ({
-  getWalletConnectionsCache: jest.fn(),
-}));
 jest.mock("../connectionsCache", () => ({
   getConnectionsCache: jest.fn(),
   getMultisigConnectionsCache: jest.fn(),
 }));
-
-// Import the mocked selectors
-import { getIdentifiersCache } from "../identifiersCache";
-import { getCredsCache } from "../credsCache";
-import { getCredsArchivedCache } from "../credsArchivedCache";
-import { getWalletConnectionsCache } from "../walletConnectionsCache";
-import {
-  getConnectionsCache,
-  getMultisigConnectionsCache,
-} from "../connectionsCache";
-
-// Mock the setCurrentProfile action to spy on its calls
-const mockSetCurrentProfile = jest.spyOn(
-  stateCacheSlice.actions,
-  "setCurrentProfile"
-);
 
 const signingRequest: PeerConnectSigningEventRequest = {
   type: IncomingRequestType.PEER_CONNECT_SIGN,

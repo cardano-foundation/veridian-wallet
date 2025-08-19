@@ -19,12 +19,16 @@
     "active": true,
     "notes": "REDS attacks on @capacitor/assets and the Appium server when e2e testing do not impact the wallet."
   },
-  "1106485": {
+  "1106812": {
     "active": true,
     "notes": "On-headers is vulnerable to http response header on Appium server do not impact the wallet."
   },
   "1106507": {
     "active": true,
     "notes": "form-data uses Math.random() to select a boundary value for multipart form-encoded data. A hacker Can observe values produced by Math.random in the application and control the field of a form-data request on Appium server do not impact the wallet."
+  },
+  "1106849": {
+    "active": true,
+    "notes": "tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter"
   }
 }

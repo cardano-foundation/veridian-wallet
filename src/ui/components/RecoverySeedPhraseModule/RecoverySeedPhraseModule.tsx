@@ -1,6 +1,6 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { wordlists } from "bip39";
-import { closeOutline, addOutline } from "ionicons/icons";
+import { backspaceOutline, addOutline } from "ionicons/icons";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { i18n } from "../../../i18n";
@@ -227,10 +227,10 @@ const RecoverySeedPhraseModule = forwardRef<
     return (
       <>
         <div className="content-container verify-recovery-seed-phrase-module">
-          <div className="page-content">
+          <div>
             {title && (
               <h2
-                className="page-title"
+                className="title"
                 data-testid={`${testId}-title`}
               >
                 {title}
@@ -284,7 +284,7 @@ const RecoverySeedPhraseModule = forwardRef<
               >
                 <IonIcon
                   slot="start"
-                  icon={closeOutline}
+                  icon={backspaceOutline}
                 />
                 {i18n.t("verifyrecoveryseedphrase.button.clear")}
               </IonButton>

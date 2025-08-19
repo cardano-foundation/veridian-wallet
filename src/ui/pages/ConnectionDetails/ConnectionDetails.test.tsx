@@ -90,20 +90,11 @@ const initialStateFull = {
     isOnline: true,
   },
   seedPhraseCache: {},
-  credsCache: {
-    creds: filteredCredsFix,
-  },
-  credsArchivedCache: {
-    creds: filteredCredsFix,
-  },
   connectionsCache: {
     connections: connectionsFix,
   },
   biometricsCache: {
     enabled: false,
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierFix,
   },
 };
 

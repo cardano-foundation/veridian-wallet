@@ -1,6 +1,6 @@
 import { IonIcon } from "@ionic/react";
 import { informationCircleOutline } from "ionicons/icons";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useSelector } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -30,7 +30,10 @@ import { PasswordMeter } from "./components/PasswordMeter";
 import { SymbolModal } from "./components/SymbolModal";
 
 const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
-  ({ title, description, testId, onCreateSuccess }, ref) => {
+  (
+    { title, description, testId, onCreateSuccess, onValidationChange },
+    ref
+  ) => {
     const dispatch = useAppDispatch();
     const stateCache = useSelector(getStateCache);
     const authentication = stateCache.authentication;
@@ -73,6 +76,10 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
     useImperativeHandle(ref, () => ({
       clearState: handleClearState,
     }));
+
+    useEffect(() => {
+      onValidationChange?.(validated);
+    }, [validated, onValidationChange]);
 
     const handleContinue = async (skipped: boolean) => {
       if (!skipped) {
@@ -247,10 +254,10 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
             {!confirmPasswordFocus &&
               !!confirmPasswordValue.length &&
               createPasswordValueNotMatching && (
-                <ErrorMessage
-                  message={`${i18n.t("createpassword.error.hasNoMatch")}`}
-                />
-              )}
+              <ErrorMessage
+                message={`${i18n.t("createpassword.error.hasNoMatch")}`}
+              />
+            )}
             <CustomInput
               dataTestId="create-hint-input"
               title={`${i18n.t("createpassword.input.third.title")}`}
@@ -270,12 +277,6 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
               />
             )}
           </form>
-          <PageFooter
-            pageId={testId}
-            primaryButtonText={`${i18n.t("createpassword.button.continue")}`}
-            primaryButtonAction={() => handleContinue(false)}
-            primaryButtonDisabled={!validated}
-          />
         </div>
         <AlertExisting
           isOpen={alertExistingIsOpen}

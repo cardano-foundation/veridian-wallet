@@ -14,9 +14,10 @@ const memberMetadataRecordProps: IdentifierMetadataRecordProps = {
   createdAt: now,
   theme: 0,
   groupMetadata: {
-    groupId: "group-id",
+    groupId: "groupid",
     groupInitiator: true,
     groupCreated: false,
+    userName: "testUser",
   },
 };
 
@@ -118,6 +119,7 @@ const memberIdentifierRecord = {
     groupId: "08f22dee-8cb0-4d65-8600-a82bbc3f6fd7",
     groupInitiator: true,
     groupCreated: true,
+    userName: "testUser",
   },
   updatedAt: new Date("2024-06-28T03:55:04.260Z"),
 } as IdentifierMetadataRecordProps;
@@ -369,7 +371,7 @@ const mHab = {
 
 const multisigExnIpexGrantSerder = {
   kind: "JSON",
-  raw: '{"v":"KERI10JSON00025f_","t":"exn","d":"EFnDzHLeULKSm_jbQSIN427yWWFr82OBkkxg3iUf2FUW","i":"EGUORQAs0r1mup1OmX1H23PITDV7td-o2XGdMVL6lmmk","p":"","dt":"2024-08-02T03:53:30.133000+00:00","r":"/multisig/exn","q":{},"a":{"gid":"EPIKswKD9AiVxIqU4QLn14qpNuiAfgVGzoK-HVU0znjC"},"e":{"exn":{"v":"KERI10JSON000111_","t":"exn","d":"EMTArfbjevIfB-fbxzsepKO35RWHN2gQxTTU5Lov2Dld","i":"EPIKswKD9AiVxIqU4QLn14qpNuiAfgVGzoK-HVU0znjC","p":"EH-_9IgodejkwXi2Hw--A53rVYcO6bDYnBrbpCId8LOu","dt":"2024-08-02T03:53:29.400000+00:00","r":"/ipex/admit","q":{},"a":{"m":""},"e":{}},"d":"ECxCLDUf8A1y62wf7YkWAcj5RN-KVzNaxRefzgE7oIjq"}}',
+  raw: "{\"v\":\"KERI10JSON00025f_\",\"t\":\"exn\",\"d\":\"EFnDzHLeULKSm_jbQSIN427yWWFr82OBkkxg3iUf2FUW\",\"i\":\"EGUORQAs0r1mup1OmX1H23PITDV7td-o2XGdMVL6lmmk\",\"p\":\"\",\"dt\":\"2024-08-02T03:53:30.133000+00:00\",\"r\":\"/multisig/exn\",\"q\":{},\"a\":{\"gid\":\"EPIKswKD9AiVxIqU4QLn14qpNuiAfgVGzoK-HVU0znjC\"},\"e\":{\"exn\":{\"v\":\"KERI10JSON000111_\",\"t\":\"exn\",\"d\":\"EMTArfbjevIfB-fbxzsepKO35RWHN2gQxTTU5Lov2Dld\",\"i\":\"EPIKswKD9AiVxIqU4QLn14qpNuiAfgVGzoK-HVU0znjC\",\"p\":\"EH-_9IgodejkwXi2Hw--A53rVYcO6bDYnBrbpCId8LOu\",\"dt\":\"2024-08-02T03:53:29.400000+00:00\",\"r\":\"/ipex/admit\",\"q\":{},\"a\":{\"m\":\"\"},\"e\":{}},\"d\":\"ECxCLDUf8A1y62wf7YkWAcj5RN-KVzNaxRefzgE7oIjq\"}}",
   ked: {
     v: "KERI10JSON00066c_",
     t: "exn",
@@ -851,7 +853,7 @@ const linkedContacts = [
 ];
 
 const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
-  name: "0:Identifier 2",
+  name: "1.2.0.3:0:Identifier 2",
   data: inceptionDataFix,
   initiator: true,
   groupConnections: linkedContacts,
@@ -859,7 +861,7 @@ const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
 };
 
 const queuedJoin: QueuedGroupCreation & { initiator: false } = {
-  name: "0:Identifier 2",
+  name: "0:testUser",
   data: inceptionDataFix,
   initiator: false,
   notificationId: "notification-id",
