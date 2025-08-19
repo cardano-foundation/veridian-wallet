@@ -20,6 +20,7 @@ import {
 } from "./globals/constants";
 import { OperationType } from "./globals/types";
 import { makeTestStore } from "./utils/makeTestStore";
+import { filteredIdentifierFix } from "./__fixtures__/filteredIdentifierFix";
 
 jest.mock("capacitor-freerasp", () => ({
   startFreeRASP: jest.fn(),
@@ -92,9 +93,8 @@ jest.mock("../core/agent/agent", () => ({
         onRemoveNotification: jest.fn(),
       },
       onKeriaStatusStateChanged: jest.fn(),
-      peerConnectionAccounts: {
-        getAll: jest.fn(),
-        findById: jest.fn(),
+      peerConnectionPair: {
+        getPeerConnection: jest.fn(),
         getAllPeerConnectionAccount: jest.fn().mockResolvedValue([]),
       },
       basicStorage: {
@@ -191,16 +191,23 @@ jest.mock("@capacitor-community/privacy-screen", () => ({
 const dispatchMock = jest.fn();
 const initialState = {
   stateCache: {
-    routes: [TabsRoutePath.IDENTIFIERS],
+    routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
       loggedIn: true,
-      userName: "",
       time: Date.now(),
       passcodeIsSet: true,
       loginAttempt: {
         attempts: 0,
         lockedUntil: Date.now(),
       },
+    },
+    currentProfile: {
+      identity: filteredIdentifierFix[0].id,
+      connections: [],
+      multisigConnections: [],
+      peerConnections: [],
+      credentials: [],
+      archivedCredentials: [],
     },
     toastMsgs: [],
     currentOperation: OperationType.IDLE,
@@ -210,26 +217,15 @@ const initialState = {
       isPaused: false,
     },
   },
-  seedPhraseCache: {
-    seedPhrase: "",
-    bran: "",
+  profilesCache: {
+    profiles: {},
+    defaultProfile: undefined,
   },
-  identifiersCache: {
-    identifiers: {},
-    favourites: [],
-    multiSigGroup: {
-      groupId: "",
-      connections: [],
-    },
-  },
-  credsCache: { creds: [], favourites: [] },
-  credsArchivedCache: { creds: [] },
   connectionsCache: {
     connections: {},
     multisigConnections: {},
   },
   walletConnectionsCache: {
-    walletConnections: [],
     connectedWallet: null,
     pendingConnection: null,
   },
@@ -249,9 +245,6 @@ const initialState = {
   ssiAgentCache: {
     bootUrl: "",
     connectUrl: "",
-  },
-  notificationsCache: {
-    notifications: [],
   },
 };
 
@@ -350,13 +343,13 @@ describe("App", () => {
         ...initialState.stateCache,
         isOnline: false,
         initializationPhase: InitializationPhase.PHASE_TWO,
+        currentProfileId: "Account1",
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
           passwordIsSet: false,
           passwordIsSkipped: true,
           loggedIn: true,
-          userName: "",
           time: 0,
           ssiAgentIsSet: true,
           ssiAgentUrl: "http://keria.com",
@@ -392,13 +385,13 @@ describe("App", () => {
         ...initialState.stateCache,
         isOnline: false,
         initializationPhase: InitializationPhase.PHASE_ONE,
+        currentProfileId: "Account1",
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
           passwordIsSet: false,
           passwordIsSkipped: true,
           loggedIn: true,
-          userName: "",
           time: 0,
           ssiAgentIsSet: true,
           ssiAgentUrl: "http://keria.com",
@@ -488,9 +481,9 @@ describe("Witness availability", () => {
       stateCache: {
         isOnline: true,
         routes: [{ path: TabsRoutePath.ROOT }],
+        currentProfileId: "Account1",
         authentication: {
           loggedIn: true,
-          userName: "",
           time: Date.now(),
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -515,30 +508,15 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-      identifiersCache: {
-        identifiers: [],
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
@@ -551,9 +529,6 @@ describe("Witness availability", () => {
         bootUrl: "",
         connectUrl: "",
       },
-      notificationsCache: {
-        notifications: [],
-      },
     };
 
     const storeMocked = {
@@ -563,7 +538,7 @@ describe("Witness availability", () => {
 
     render(
       <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+        <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
           <App />
         </MemoryRouter>
       </Provider>
@@ -583,9 +558,9 @@ describe("Witness availability", () => {
       stateCache: {
         isOnline: true,
         routes: [{ path: TabsRoutePath.ROOT }],
+        currentProfileId: "Account1",
         authentication: {
           loggedIn: true,
-          userName: "",
           time: Date.now(),
           passcodeIsSet: true,
           seedPhraseIsSet: true,
@@ -610,30 +585,15 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-      identifiersCache: {
-        identifiers: [],
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
@@ -646,9 +606,6 @@ describe("Witness availability", () => {
         bootUrl: "",
         connectUrl: "",
       },
-      notificationsCache: {
-        notifications: [],
-      },
     };
 
     const storeMocked = {
@@ -658,7 +615,7 @@ describe("Witness availability", () => {
 
     render(
       <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+        <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
           <App />
         </MemoryRouter>
       </Provider>
@@ -867,30 +824,15 @@ describe("System threat alert", () => {
         seedPhrase: "",
         bran: "",
       },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-      },
-      credsCache: { creds: [], favourites: [] },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
@@ -902,9 +844,6 @@ describe("System threat alert", () => {
       ssiAgentCache: {
         bootUrl: "",
         connectUrl: "",
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
 
@@ -918,7 +857,7 @@ describe("System threat alert", () => {
 
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.IDENTIFIERS]}>
+        <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
           <App />
         </MemoryRouter>
       </Provider>

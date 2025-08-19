@@ -290,6 +290,8 @@ const connections = jest.mocked({
     serviceEndpoints: [
       "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
     ],
+    notes: [],
+    historyItems: [],
   }),
 });
 
@@ -587,6 +589,7 @@ describe("Receive group ACDC actions", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       multisigMembers: [
@@ -775,6 +778,7 @@ describe("Receive group ACDC actions", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       multisigMembers: [
@@ -832,6 +836,13 @@ describe("Receive group ACDC actions", () => {
       });
 
     await ipexCommunicationService.joinMultisigAdmit("id");
+
+    // Verify getConnectionById is called with correct parameters
+    expect(connections.getConnectionById).toHaveBeenCalledWith(
+      grantForIssuanceExnMessage.exn.i,
+      false,
+      grantForIssuanceExnMessage.exn.rp
+    );
 
     expect(getManagerMock).toBeCalledWith(gHab);
     expect(ipexSubmitAdmitMock).toBeCalledWith(
@@ -915,6 +926,7 @@ describe("Receive group ACDC actions", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       multisigMembers: [
@@ -1785,6 +1797,13 @@ describe("Grant ACDC individual actions", () => {
     markNotificationMock.mockResolvedValueOnce({ status: "done" });
 
     await ipexCommunicationService.grantAcdcFromAgree("agree-note-id");
+
+    // Verify getConnectionById is called with correct parameters
+    expect(connections.getConnectionById).toHaveBeenCalledWith(
+      agreeForPresentingExnMessage.exn.i,
+      false,
+      agreeForPresentingExnMessage.exn.rp
+    );
 
     expect(ipexGrantMock).toBeCalledWith({
       acdc: new Serder(credentialProps.sad),

@@ -13,6 +13,7 @@ const CardBlock = ({
   flatBorder,
   className,
   copyContent,
+  icon,
 }: CardBlockProps) => {
   const classes = combineClassNames("card-block", className, {
     "flat-border-bot": flatBorder === FlatBorderType.BOT,
@@ -36,6 +37,7 @@ const CardBlock = ({
           copyContent={copyContent}
           info={title}
           copyButton={!!copyContent}
+          icon={icon}
           endSlot={
             !copyContent &&
             onClick && (

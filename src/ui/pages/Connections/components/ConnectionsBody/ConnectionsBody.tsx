@@ -108,9 +108,9 @@ const ConnectionsBody = ({
                       </IonItemDivider>
                       <AlphabeticList
                         items={Array.from(alphabeticGroup.value)}
-                        handleShowConnectionDetails={
-                          handleShowConnectionDetails
-                        }
+                        handleShowConnectionDetails={(item) => {
+                          handleShowConnectionDetails(item);
+                        }}
                       />
                     </IonItemGroup>
                   );
@@ -119,7 +119,9 @@ const ConnectionsBody = ({
                 <SearchConnectionContent
                   keyword={search}
                   mappedConnections={mappedConnections}
-                  onItemClick={handleShowConnectionDetails}
+                  onItemClick={(item) => {
+                    handleShowConnectionDetails(item);
+                  }}
                 />
               )}
             </IonCol>

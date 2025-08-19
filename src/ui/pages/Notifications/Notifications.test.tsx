@@ -19,6 +19,7 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { NotificationFilters } from "./Notification.types";
 import { NotificationItem } from "./NotificationItem";
 import { Notifications } from "./Notifications";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 mockIonicReact();
 
@@ -83,25 +84,14 @@ const initialState = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: filteredIdentifierFix[0].id,
-    },
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: [],
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
     },
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    defaultProfile: filteredIdentifierFix[2].id,
   },
   connectionsCache: {
     connections: {},
-  },
-  notificationsCache: {
-    notifications: [],
   },
   biometricsCache: {
     enabled: false,
@@ -115,30 +105,13 @@ const fullState = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: filteredIdentifierFix[0].id,
     },
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: Object.values(connectionsForNotifications),
-      multisigConnections: Object.values(connectionsForNotifications),
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
-    },
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
   },
   connectionsCache: {
     connections: connectionsForNotifications,
     multisigConnectionsCache: connectionsForNotifications,
   },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
-  credsCache: {
-    creds: [],
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -151,26 +124,12 @@ const filterTestData = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: filteredIdentifierFix[0].id,
-    },
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: Object.values(connectionsForNotifications),
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
     },
   },
   connectionsCache: {
     connections: connectionsForNotifications,
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
-  },
-  notificationsCache: {
-    notifications: [notificationsFix[0], notificationsFix[3]],
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -183,32 +142,14 @@ const emptyConnection = {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
-      defaultProfile: filteredIdentifierFix[0].id,
-    },
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: [],
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
     },
   },
+  profilesCache: profileCacheFixData,
   connectionsCache: {
     connections: {},
   },
-  notificationsCache: {
-    notifications: [
-      notificationsFix[0],
-      notificationsFix[3],
-      notificationsFix[4],
-    ],
-  },
   biometricsCache: {
     enabled: false,
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
   },
 };
 

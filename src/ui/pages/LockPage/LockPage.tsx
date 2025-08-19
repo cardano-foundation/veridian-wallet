@@ -26,6 +26,7 @@ import {
   resetAllRoutes,
   setAuthentication,
   setFirstAppLaunchComplete,
+  setInitializationPhase,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
 import {
@@ -47,6 +48,7 @@ import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
 import { useBiometricAuth } from "../../hooks/useBiometricsHook";
 import { showError } from "../../utils/error";
 import "./LockPage.scss";
+import { InitializationPhase } from "../../../store/reducers/stateCache/stateCache.types";
 
 const LockPageContainer = () => {
   const pageId = "lock-page";
@@ -227,11 +229,12 @@ const LockPageContainer = () => {
           passwordIsSet: false,
           passwordIsSkipped: false,
           loggedIn: false,
+          finishSetupBiometrics: false,
         })
       );
       dispatch(resetAllRoutes());
       dispatch(setEnableBiometricsCache(false));
-
+      dispatch(setInitializationPhase(InitializationPhase.PHASE_TWO));
       router.push(RoutePath.ROOT);
     } catch (e) {
       showError("Failed to clear app: ", e, dispatch);
@@ -306,7 +309,6 @@ const LockPageContainer = () => {
 const LockPage = () => {
   const currentRoute = useAppSelector(getCurrentRoute);
   const authentication = useAppSelector(getAuthentication);
-
   const isPublicPage = PublicRoutes.includes(currentRoute?.path as RoutePath);
 
   if (isPublicPage || authentication.loggedIn) {

@@ -358,7 +358,9 @@ describe("Scan", () => {
       expect(addListener).toBeCalled();
     });
 
-    storeMocked.dispatch(logout());
+    act(() => {
+      storeMocked.dispatch(logout());
+    });
 
     await waitFor(() => {
       expect(stopScan).toBeCalled();

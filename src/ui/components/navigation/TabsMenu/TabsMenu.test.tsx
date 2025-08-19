@@ -8,6 +8,8 @@ import { TabsMenu, TabsRoutePath, tabsRoutes } from "./TabsMenu";
 import { setCurrentRoute } from "../../../../store/reducers/stateCache";
 import { notificationsFix } from "../../../__fixtures__/notificationsFix";
 import { makeTestStore } from "../../../utils/makeTestStore";
+import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
+import { filteredIdentifierFix } from "../../../__fixtures__/filteredIdentifierFix";
 
 describe("Tab menu", () => {
   const dispatchMock = jest.fn();
@@ -34,9 +36,7 @@ describe("Tab menu", () => {
       seedPhrase: "",
       bran: "",
     },
-    notificationsCache: {
-      notifications: [],
-    },
+    profilesCache: profileCacheFixData,
   };
 
   const storeMocked = {
@@ -46,14 +46,14 @@ describe("Tab menu", () => {
 
   test("Render", async () => {
     const history = createMemoryHistory();
-    history.push(TabsRoutePath.IDENTIFIERS);
+    history.push(TabsRoutePath.CREDENTIALS);
 
     const { getByTestId, getByText } = render(
       <IonReactMemoryRouter history={history}>
         <Provider store={storeMocked}>
           <TabsMenu
             tab={() => <></>}
-            path={TabsRoutePath.IDENTIFIERS}
+            path={TabsRoutePath.CREDENTIALS}
           />
         </Provider>
       </IonReactMemoryRouter>
@@ -83,9 +83,7 @@ describe("Tab menu", () => {
         ...initialState.stateCache,
         routes: [TabsRoutePath.NOTIFICATIONS],
       },
-      notificationsCache: {
-        notifications: notificationsFix,
-      },
+      profilesCache: profileCacheFixData,
     };
 
     const storeMocked = {
@@ -109,7 +107,7 @@ describe("Tab menu", () => {
 
     await waitForIonicReact();
 
-    expect(getAllByText(notificationsFix.length).length).toBeGreaterThan(0);
+    expect(getAllByText(7).length).toBeGreaterThan(0);
   });
 
   test("Render 99+ notification", async () => {
@@ -119,8 +117,21 @@ describe("Tab menu", () => {
         ...initialState.stateCache,
         routes: [TabsRoutePath.NOTIFICATIONS],
       },
-      notificationsCache: {
-        notifications: new Array(100).fill(notificationsFix[0]),
+      profilesCache: {
+        profiles: {
+          [filteredIdentifierFix[0].id]: {
+            identity: filteredIdentifierFix[0],
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: new Array(100).fill(notificationsFix[0]),
+          },
+        },
+        defaultProfile: filteredIdentifierFix[0].id,
+        recentProfiles: [],
+        multiSigGroup: undefined,
       },
     };
 

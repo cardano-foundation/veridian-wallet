@@ -16,11 +16,11 @@ import {
   ConnectionDetails as ConnectionData,
   ConnectionHistoryItem,
   ConnectionNoteDetails,
-  isRegularConnectionDetails,
-  isMultisigConnectionDetails,
+  RegularConnectionDetails,
+  RegularConnectionDetailsFull,
 } from "../../../core/agent/agent.types";
 import { RoutePath } from "../../../routes";
-import { useAppDispatch } from "../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { removeConnectionCache } from "../../../store/reducers/connectionsCache";
 import {
   setCurrentOperation,
@@ -42,7 +42,6 @@ import ConnectionDetailsHeader from "./components/ConnectionDetailsHeader";
 import { ConnectionHistoryEvent } from "./components/ConnectionHistoryEvent";
 import { ConnectionNotes } from "./components/ConnectionNotes";
 import { EditConnectionsModal } from "./components/EditConnectionsModal";
-import { RegularConnectionDetails } from "../../../core/agent/agent.types";
 
 const ConnectionDetails = ({
   connectionShortDetails,
@@ -51,7 +50,8 @@ const ConnectionDetails = ({
 }: ConnectionDetailsProps) => {
   const pageId = "connection-details";
   const dispatch = useAppDispatch();
-  const [connectionDetails, setConnectionDetails] = useState<ConnectionData>();
+  const [connectionDetails, setConnectionDetails] =
+    useState<RegularConnectionDetailsFull>();
   const [connectionHistory, setConnectionHistory] = useState<
     ConnectionHistoryItem[]
   >([]);
@@ -70,10 +70,11 @@ const ConnectionDetails = ({
 
   const getDetails = useCallback(async () => {
     if (!connectionShortDetails?.id) return;
-
     try {
       const connectionDetails = await Agent.agent.connections.getConnectionById(
-        connectionShortDetails.id
+        connectionShortDetails.id,
+        false,
+        connectionShortDetails.identifier
       );
 
       setConnectionDetails(connectionDetails);
@@ -117,15 +118,14 @@ const ConnectionDetails = ({
       try {
         if (cloudError) {
           await Agent.agent.connections.deleteStaleLocalConnectionById(
-            connectionShortDetails.id
+            connectionShortDetails.id,
+            connectionShortDetails.identifier
           );
         } else {
-          if (isRegularConnectionDetails(connectionShortDetails)) {
-            await Agent.agent.connections.markConnectionPendingDelete(
-              connectionShortDetails.id,
-              connectionShortDetails.identifier
-            );
-          }
+          await Agent.agent.connections.markConnectionPendingDelete(
+            connectionShortDetails.id,
+            connectionShortDetails.identifier
+          );
         }
         dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
         dispatch(removeConnectionCache(connectionShortDetails.id));
