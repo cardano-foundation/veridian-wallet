@@ -688,7 +688,7 @@ describe("Agent setup and wiping", () => {
     (agent as any).keriaNotificationService = mockKeriaNotificationService;
     (agent as any).identifierStorage = mockIdentifierStorage;
     (agent as any).credentialStorage = mockCredentialStorage;
-    (agent as any).contactStorage = mockContactStorage;
+    (agent as any).contactStorage = mockConnectionStorage;
     (agent as any).notificationStorage = mockNotificationStorage;
 
     jest.spyOn(utils, "randomSalt").mockReturnValue("my-salt");
