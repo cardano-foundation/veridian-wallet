@@ -1,4 +1,4 @@
-import { ExnMessage } from "../agent.types";
+import { CreationStatus, ExnMessage } from "../agent.types";
 
 enum KeriaContactKeyPrefix {
   CONNECTION_NOTE = "note:",
@@ -12,6 +12,17 @@ interface ConnectionHistoryItem {
   historyType: ConnectionHistoryType;
   dt: string;
   connectionId: string;
+}
+
+interface ContactDetailsRecord {
+  id: string;
+  alias: string;
+  createdAt: Date;
+  oobi: string;
+  groupId?: string;
+  creationStatus?: CreationStatus;
+  pendingDeletion?: boolean;
+  identifier?: string;
 }
 
 enum ConnectionHistoryType {
@@ -55,6 +66,7 @@ export {
 
 export type {
   ConnectionHistoryItem,
+  ContactDetailsRecord,
   ExnMessage,
   ExternalLink,
   HumanReadableMessage,
