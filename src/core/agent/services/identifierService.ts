@@ -482,6 +482,15 @@ class IdentifierService extends AgentService {
     });
   }
 
+  private async deleteGroupLinkedConnections(groupId: string): Promise<void> {
+    const connections = await this.connections.getMultisigLinkedContacts(
+      groupId
+    );
+    for (const connection of connections) {
+      await this.connections.deleteMultisigConnectionById(connection.id);
+    }
+  }
+
   async deleteStaleLocalIdentifier(identifier: string): Promise<void> {
     const connectedDApp =
       PeerConnection.peerConnection.getConnectedDAppAddress();
