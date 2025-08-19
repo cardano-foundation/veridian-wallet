@@ -388,6 +388,7 @@ describe("Setup Connection", () => {
       createdAtUTC: "2017-01-14T19:23:24Z",
       status: ConnectionStatus.PENDING,
       groupId,
+      contactId: "conn-id-1",
     };
     connectByOobiUrlMock.mockImplementation(() => {
       return {

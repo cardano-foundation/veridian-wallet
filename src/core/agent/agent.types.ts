@@ -76,6 +76,7 @@ enum MiscRecordId {
   IS_SETUP_PROFILE = "is-setup-profile",
   INDIVIDUAL_FIRST_CREATE = "individual-first-create",
   BIOMETRICS_SETUP = "biometrics-setup",
+  PROFILE_HISTORIES = "profile-histories",
 }
 
 type ConnectionNoteDetails = {

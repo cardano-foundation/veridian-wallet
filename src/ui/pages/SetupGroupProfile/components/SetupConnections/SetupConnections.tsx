@@ -26,6 +26,7 @@ import {
   getProfiles,
   MultiSigGroup,
 } from "../../../../../store/reducers/profileCache";
+import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
 
 const SetupConnections = ({ setState }: StageProps) => {
   const componentId = "setup-group-profile";
@@ -59,7 +60,7 @@ const SetupConnections = ({ setState }: StageProps) => {
       const multiSigGroup: MultiSigGroup = {
         groupId,
         connections: Object.values(groupConnections).filter(
-          (item) => item.groupId === groupId
+          (item) => isMultisigConnectionDetails(item) && item.groupId === groupId
         ),
       };
       setMultiSigGroup(multiSigGroup);

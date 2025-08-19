@@ -260,6 +260,8 @@ describe("Profile cache", () => {
           createdAtUTC: "2017-08-13T19:23:24Z",
           logo: "logo.png",
           status: ConnectionStatus.CONFIRMED,
+          contactId: "conn-id-1",
+          groupId: "group-id",
         },
       ],
     };
