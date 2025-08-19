@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
+  RegularConnectionDetails,
   MiscRecordId,
 } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -90,7 +91,7 @@ const CredentialDetailModule = ({
   const isFavourite = favouritesCredsCache?.some((fav) => fav.id === id);
   const [cloudError, setCloudError] = useState(false);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
-    ConnectionShortDetails | undefined
+    RegularConnectionDetails | undefined
   >(undefined);
 
   const isInactiveCred = (isArchived || isRevoked || cloudError) && !viewOnly;
@@ -104,22 +105,26 @@ const CredentialDetailModule = ({
     }
   }, [dispatch]);
 
-  const getConnection = useCallback(async (connectionId: string) => {
-    try {
-      const shortDetails =
-        await Agent.agent.connections.getConnectionShortDetailById(
-          connectionId
-        );
-      setConnectionShortDetails(shortDetails);
-    } catch (error) {
-      showError("Unable to load connection", error);
-    }
-  }, []);
+  const getConnection = useCallback(
+    async (connectionId: string, identifier: string) => {
+      try {
+        const shortDetails =
+          await Agent.agent.connections.getConnectionShortDetailById(
+            connectionId,
+            identifier
+          );
+        setConnectionShortDetails(shortDetails);
+      } catch (error) {
+        showError("Unable to load connection", error);
+      }
+    },
+    []
+  );
 
   const getCredDetails = useCallback(async () => {
     if (credDetail) {
       setCardData(credDetail);
-      getConnection(credDetail.i);
+      getConnection(credDetail.i, credDetail.identifierId);
       return;
     }
 
@@ -129,7 +134,7 @@ const CredentialDetailModule = ({
       const cardDetails =
         await Agent.agent.credentials.getCredentialDetailsById(id);
       setCardData(cardDetails);
-      getConnection(cardDetails.i);
+      getConnection(cardDetails.i, cardDetails.identifierId);
     } catch (error) {
       setCloudError(true);
       showError("Unable to get credential detail", error);

@@ -1,7 +1,6 @@
 export * from "./credentialMetadataRecord";
 export * from "./identifierMetadataRecord";
 export * from "./basicRecord";
-export * from "./connectionRecord";
 export * from "./contactRecord";
 export * from "./connectionPairRecord";
 export * from "./notificationRecord";
@@ -10,7 +9,6 @@ export * from "./credentialStorage";
 export * from "./identifierStorage";
 export * from "./peerConnectionPairStorage";
 export * from "./basicStorage";
-export * from "./connectionStorage";
 export * from "./contactStorage";
 export * from "./connectionPairStorage";
 export * from "./notificationStorage";
