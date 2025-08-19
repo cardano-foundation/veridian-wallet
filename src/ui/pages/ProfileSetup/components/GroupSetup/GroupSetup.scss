@@ -1,4 +1,14 @@
 .group-setup {
+  .open-scan.secondary-button {
+    height: 2.5rem;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .open-scan.secondary-button {
+      height: 20rem;
+    }
+  }
+
   .error-message {
     text-align: left;
   }

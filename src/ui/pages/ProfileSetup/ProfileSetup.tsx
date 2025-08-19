@@ -147,9 +147,40 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       );
 
       if (individualFirstCreate) {
-        await Agent.agent.basicStorage
-          .deleteById(MiscRecordId.INDIVIDUAL_FIRST_CREATE)
-          .then(() => dispatch(setIndividualFirstCreate(false)));
+        try {
+          await Agent.agent.basicStorage.deleteById(
+            MiscRecordId.INDIVIDUAL_FIRST_CREATE
+          );
+        } catch (cleanupErr) {
+          const msg = (cleanupErr as Error)?.message || "";
+          if (
+            !msg.includes("Record does not exist") &&
+            !msg.toLowerCase().includes("not found")
+          ) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              "Failed to delete INDIVIDUAL_FIRST_CREATE:",
+              cleanupErr
+            );
+          }
+        } finally {
+          dispatch(setIndividualFirstCreate(false));
+        }
+      }
+
+      try {
+        await Agent.agent.basicStorage.deleteById(
+          MiscRecordId.IS_SETUP_PROFILE
+        );
+      } catch (cleanupErr) {
+        const msg = (cleanupErr as Error)?.message || "";
+        if (
+          !msg.includes("Record does not exist") &&
+          !msg.toLowerCase().includes("not found")
+        ) {
+          // eslint-disable-next-line no-console
+          console.warn("Failed to delete IS_SETUP_PROFILE:", cleanupErr);
+        }
       }
 
       await updateDefaultProfile(identifier);
@@ -160,7 +191,6 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         return;
       }
 
-      await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       cacheIdentifier.current = identifier;
 
       setStep(SetupProfileStep.FinishSetup);
@@ -177,12 +207,33 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         );
       }
 
-      // Clear pendingJoinGroupMetadata after navigating to FinishSetup
-      dispatch(setPendingJoinGroupMetadata(null));
-      await Agent.agent.basicStorage.deleteById(
-        MiscRecordId.PENDING_JOIN_GROUP_METADATA
-      );
+      // Only clear pending join metadata for group flows.
+      if (isGroup) {
+        dispatch(setPendingJoinGroupMetadata(null));
+        try {
+          await Agent.agent.basicStorage.deleteById(
+            MiscRecordId.PENDING_JOIN_GROUP_METADATA
+          );
+        } catch (cleanupErr) {
+          const msg = (cleanupErr as Error)?.message || "";
+          if (
+            msg.includes("Record does not exist") ||
+            msg.toLowerCase().includes("not found")
+          ) {
+            // silenced on purpose
+          } else {
+            // eslint-disable-next-line no-console
+            console.warn(
+              "Failed to delete PENDING_JOIN_GROUP_METADATA:",
+              cleanupErr
+            );
+          }
+        }
+      }
     } catch (e) {
+      // log error for easier debugging
+      // eslint-disable-next-line no-console
+      console.error("createIdentifier error:", e);
       const errorMessage = (e as Error).message;
 
       if (
