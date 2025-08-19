@@ -45,7 +45,8 @@ const SetupConnections = ({ setState }: StageProps) => {
   const groupId = profile?.groupMetadata?.groupId;
   const userName = profile?.groupMetadata?.userName;
 
-  const groupConnections = useAppSelector(getMultisigConnectionsCache);
+  // ensure groupConnections is always an object to avoid runtime errors in tests
+  const groupConnections = useAppSelector(getMultisigConnectionsCache) || {};
   const [multiSigGroup, setMultiSigGroup] = useState<
     MultiSigGroup | undefined
   >();
@@ -76,7 +77,7 @@ const SetupConnections = ({ setState }: StageProps) => {
   }, [dispatch, groupConnections, groupId]);
 
   useEffect(() => {
-    if (Object.keys(groupConnections).length > 0) {
+    if (groupConnections && Object.keys(groupConnections).length > 0) {
       updateMultiSigGroup();
     }
   }, [groupConnections, groupId]);

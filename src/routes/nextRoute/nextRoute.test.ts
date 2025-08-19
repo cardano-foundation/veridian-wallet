@@ -396,7 +396,26 @@ describe("getNextRoute", () => {
       store: {
         stateCache: {
           isPendingJoinGroup: true,
-          authentication: {},
+          initializationPhase: InitializationPhase.PHASE_TWO,
+          routes: [],
+          authentication: {
+            loggedIn: false,
+            userName: "",
+            time: 0,
+            passcodeIsSet: true,
+            seedPhraseIsSet: false,
+            passwordIsSet: true,
+            passwordIsSkipped: false,
+            ssiAgentIsSet: true,
+            ssiAgentUrl: "http://keria.com",
+            finishSetupBiometrics: true,
+          },
+          currentOperation: OperationType.IDLE,
+          queueIncomingRequest: {
+            isProcessing: false,
+            queues: [],
+            isPaused: false,
+          },
         },
       },
     };
@@ -411,8 +430,25 @@ describe("getNextRoute", () => {
       store: {
         stateCache: {
           isPendingJoinGroup: false,
+          initializationPhase: InitializationPhase.PHASE_TWO,
+          routes: [],
           authentication: {
+            loggedIn: false,
+            userName: "",
+            time: 0,
             passcodeIsSet: true,
+            seedPhraseIsSet: false,
+            passwordIsSet: true,
+            passwordIsSkipped: false,
+            ssiAgentIsSet: true,
+            ssiAgentUrl: "http://keria.com",
+            finishSetupBiometrics: true,
+          },
+          currentOperation: OperationType.IDLE,
+          queueIncomingRequest: {
+            isProcessing: false,
+            queues: [],
+            isPaused: false,
           },
         },
       },
@@ -420,6 +456,6 @@ describe("getNextRoute", () => {
 
     const result = getNextRootRoute(mockData as any);
 
-    expect(result.pathname).toEqual(RoutePath.SETUP_BIOMETRICS);
+    expect(result.pathname).toEqual(TabsRoutePath.CREDENTIALS);
   });
 });
