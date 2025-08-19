@@ -364,7 +364,11 @@ class IdentifierService extends AgentService {
       identifier
     );
     if (metadata.groupMetadata) {
-      await this.deleteGroupLinkedConnections(metadata.groupMetadata.groupId);
+      await this.connections.deleteAllConnectionsForGroup(
+        metadata.groupMetadata.groupId
+      );
+    } else {
+      await this.connections.deleteAllConnectionsForIdentifier(identifier);
     }
 
     if (metadata.groupMemberPre) {
@@ -385,7 +389,7 @@ class IdentifierService extends AgentService {
         }:${localMember.displayName}`,
       });
 
-      await this.deleteGroupLinkedConnections(
+      await this.connections.deleteAllConnectionsForGroup(
         localMember.groupMetadata!.groupId
       );
 

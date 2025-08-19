@@ -881,6 +881,27 @@ class ConnectionService extends AgentService {
       l: exn.a.l,
     };
   }
+
+  async deleteAllConnectionsForIdentifier(identifierId: string): Promise<void> {
+    const pairsToDelete = await this.connectionPairStorage.findAllByQuery({
+      identifier: identifierId,
+    });
+
+    for (const pair of pairsToDelete) {
+      await this.deleteConnectionByIdAndIdentifier(
+        pair.contactId,
+        pair.identifier
+      );
+    }
+  }
+
+  async deleteAllConnectionsForGroup(groupId: string): Promise<void> {
+    const groupContacts = await this.contactStorage.findAllByQuery({ groupId });
+
+    for (const contact of groupContacts) {
+      await this.deleteMultisigConnectionById(contact.id);
+    }
+  }
 }
 
 export { ConnectionService };

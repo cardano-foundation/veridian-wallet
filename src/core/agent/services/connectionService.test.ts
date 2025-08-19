@@ -2056,6 +2056,54 @@ describe("Connection service of agent", () => {
     );
   });
 
+  test("should delete all connections for a given identifier", async () => {
+    const identifierId = "test-identifier";
+    const connectionPairs = [
+      { contactId: "contact-1", identifier: identifierId },
+      { contactId: "contact-2", identifier: identifierId },
+    ];
+    connectionPairStorage.findAllByQuery.mockResolvedValue(connectionPairs);
+    connectionService.deleteConnectionByIdAndIdentifier = jest.fn();
+
+    await connectionService.deleteAllConnectionsForIdentifier(identifierId);
+
+    expect(connectionPairStorage.findAllByQuery).toHaveBeenCalledWith({
+      identifier: identifierId,
+    });
+    expect(
+      connectionService.deleteConnectionByIdAndIdentifier
+    ).toHaveBeenCalledTimes(2);
+    expect(
+      connectionService.deleteConnectionByIdAndIdentifier
+    ).toHaveBeenCalledWith("contact-1", identifierId);
+    expect(
+      connectionService.deleteConnectionByIdAndIdentifier
+    ).toHaveBeenCalledWith("contact-2", identifierId);
+  });
+
+  test("should delete all connections for a given group", async () => {
+    const groupId = "test-group";
+    const groupContacts = [
+      { id: "contact-1", groupId },
+      { id: "contact-2", groupId },
+    ];
+    contactStorage.findAllByQuery.mockResolvedValue(groupContacts);
+    connectionService.deleteMultisigConnectionById = jest.fn();
+
+    await connectionService.deleteAllConnectionsForGroup(groupId);
+
+    expect(contactStorage.findAllByQuery).toHaveBeenCalledWith({ groupId });
+    expect(
+      connectionService.deleteMultisigConnectionById
+    ).toHaveBeenCalledTimes(2);
+    expect(connectionService.deleteMultisigConnectionById).toHaveBeenCalledWith(
+      "contact-1"
+    );
+    expect(connectionService.deleteMultisigConnectionById).toHaveBeenCalledWith(
+      "contact-2"
+    );
+  });
+
   test("Can get details of a human readable message", async () => {
     getExchangeMock.mockResolvedValue(humanReadableExn);
     expect(
