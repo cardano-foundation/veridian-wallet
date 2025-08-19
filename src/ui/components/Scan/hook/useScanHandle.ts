@@ -15,7 +15,6 @@ import {
   updateOrAddMultisigConnectionCache,
 } from "../../../../store/reducers/connectionsCache";
 import { getCurrentProfile } from "../../../../store/reducers/profileCache";
-import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../globals/types";
 import { showError } from "../../../utils/error";
 import {
@@ -199,7 +198,6 @@ const useScanHandle = () => {
 
       if (invitation.type === OobiType.MULTI_SIG_INITIATOR) {
         dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
-        dispatch(setToastMsg(ToastMsgType.NEW_MULTI_SIGN_MEMBER));
       }
 
       closeScan?.();

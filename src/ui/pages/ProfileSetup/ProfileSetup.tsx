@@ -40,6 +40,8 @@ import { useCameraDirection } from "../../components/Scan/hook/useCameraDirectio
 import { repeatOutline } from "ionicons/icons";
 import { BasicRecord } from "../../../core/agent/records";
 import { ToastMsgType } from "../../globals/types";
+import { getMultisigConnectionsCache } from "../../../store/reducers/connectionsCache";
+import { showError } from "../../utils/error";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
@@ -55,6 +57,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const [isScanOpen, setIsScanOpen] = useState(false);
   const ionRouter = useAppIonRouter();
   const cacheIdentifier = useRef("");
+  const connectionsCache = useAppSelector(getMultisigConnectionsCache);
   const scanRef = useRef<ScanRef>(null);
   const { resolveGroupConnection } = useScanHandle();
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
@@ -67,7 +70,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const back = stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
     ? undefined // Disable back button if pending join group
     : isScanOpen
-      ? i18n.t("setupprofile.button.cancel") // when scanner open, show Cancel
+      ? i18n.t("setupprofile.button.cancel")
       : [
         SetupProfileStep.SetupProfile,
         SetupProfileStep.GroupSetupStart,
@@ -157,11 +160,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
             !msg.includes("Record does not exist") &&
             !msg.toLowerCase().includes("not found")
           ) {
-            // eslint-disable-next-line no-console
-            console.warn(
-              "Failed to delete INDIVIDUAL_FIRST_CREATE:",
-              cleanupErr
-            );
+            showError("Failed to delete INDIVIDUAL_FIRST_CREATE:", cleanupErr);
           }
         } finally {
           dispatch(setIndividualFirstCreate(false));
@@ -178,8 +177,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           !msg.includes("Record does not exist") &&
           !msg.toLowerCase().includes("not found")
         ) {
-          // eslint-disable-next-line no-console
-          console.warn("Failed to delete IS_SETUP_PROFILE:", cleanupErr);
+          showError("Failed to delete IS_SETUP_PROFILE:", cleanupErr);
         }
       }
 
@@ -217,13 +215,10 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         } catch (cleanupErr) {
           const msg = (cleanupErr as Error)?.message || "";
           if (
-            msg.includes("Record does not exist") ||
-            msg.toLowerCase().includes("not found")
+            !msg.includes("Record does not exist") &&
+            !msg.toLowerCase().includes("not found")
           ) {
-            // silenced on purpose
-          } else {
-            // eslint-disable-next-line no-console
-            console.warn(
+            showError(
               "Failed to delete PENDING_JOIN_GROUP_METADATA:",
               cleanupErr
             );
@@ -231,9 +226,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         }
       }
     } catch (e) {
-      // log error for easier debugging
-      // eslint-disable-next-line no-console
-      console.error("createIdentifier error:", e);
+      showError("createIdentifier error:", e);
       const errorMessage = (e as Error).message;
 
       if (
@@ -329,6 +322,19 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       const scannedGroupName = url.searchParams.get("groupName");
       const groupInitiator = url.searchParams.get("name");
 
+      // prevent joining a group already present in connections cache
+      if (
+        scanGroupId &&
+        connectionsCache &&
+        Object.values(connectionsCache).some(
+          (c: any) => String(c.groupId) === String(scanGroupId)
+        )
+      ) {
+        handleCloseScan();
+        dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR));
+        return;
+      }
+
       if (!scanGroupId) {
         handleCloseScan();
         dispatch(setToastMsg(ToastMsgType.GROUP_ID_NOT_FOUND_ERROR));
@@ -385,12 +391,24 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
   };
 
-  const handleConfirmJoinGroup = () => {
-    // Clear pendingJoinGroupMetadata to prevent useEffect from triggering again
+  const handleConfirmJoinGroup = async () => {
+    // Clear pendingJoinGroupMetadata in memory
     dispatch(setPendingJoinGroupMetadata(null));
-    Agent.agent.basicStorage.deleteById(
-      MiscRecordId.PENDING_JOIN_GROUP_METADATA
-    );
+
+    // Remove persisted pending metadata if present. Ignore "not found" errors.
+    try {
+      await Agent.agent.basicStorage.deleteById(
+        MiscRecordId.PENDING_JOIN_GROUP_METADATA
+      );
+    } catch (cleanupErr) {
+      const msg = (cleanupErr as Error)?.message || "";
+      if (
+        !msg.includes("Record does not exist") &&
+        !msg.toLowerCase().includes("not found")
+      ) {
+        showError("Failed to delete PENDING_JOIN_GROUP_METADATA:", cleanupErr);
+      }
+    }
 
     setStep(SetupProfileStep.SetupProfile);
   };
