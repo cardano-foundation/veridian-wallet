@@ -15,6 +15,7 @@ import { SUPPORT_EMAIL } from "../../../../globals/constants";
 import "./ErrorPage.scss";
 import { ErrorPageProps } from "./ErrorPage.types";
 import { getProfiles } from "../../../../../store/reducers/profileCache";
+import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
 
 const ErrorPage = ({
   pageId,
@@ -32,8 +33,10 @@ const ErrorPage = ({
     useState(false);
 
   const actionAccept = () => {
-    const multiSignGroupId =
-      connectionsCache[notificationDetails.connectionId].groupId;
+    const connection = connectionsCache[notificationDetails.connectionId];
+    const multiSignGroupId = isMultisigConnectionDetails(connection)
+      ? connection.groupId
+      : undefined;
 
     const identifier = Object.values(profiles).find(
       (item) => item.identity.groupMetadata?.groupId === multiSignGroupId

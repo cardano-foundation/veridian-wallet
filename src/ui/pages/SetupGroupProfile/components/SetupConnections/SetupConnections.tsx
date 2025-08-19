@@ -27,6 +27,7 @@ import {
 } from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../../globals/types";
+import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
 
 const SetupConnections = ({ setState }: StageProps) => {
   const componentId = "setup-group-profile";
@@ -66,7 +67,8 @@ const SetupConnections = ({ setState }: StageProps) => {
       const multiSigGroup: MultiSigGroup = {
         groupId,
         connections: Object.values(groupConnections).filter(
-          (item) => item.groupId === groupId
+          (item) =>
+            isMultisigConnectionDetails(item) && item.groupId === groupId
         ),
       };
 

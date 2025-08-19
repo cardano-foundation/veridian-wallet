@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
+  RegularConnectionDetails,
   ConnectionStatus,
 } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
@@ -44,7 +45,7 @@ const Connections = () => {
   const connectionsCache = useAppSelector(getConnectionsCache);
   const openDetailId = useAppSelector(getOpenConnectionId);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
-    ConnectionShortDetails | undefined
+    RegularConnectionDetails | undefined
   >(undefined);
   const [mappedConnections, setMappedConnections] = useState<
     MappedConnections[]
@@ -52,7 +53,7 @@ const Connections = () => {
   const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [deletePendingItem, setDeletePendingItem] =
-    useState<ConnectionShortDetails | null>(null);
+    useState<RegularConnectionDetails | null>(null);
   const [openDeletePendingAlert, setOpenDeletePendingAlert] = useState(false);
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
@@ -72,12 +73,13 @@ const Connections = () => {
       dispatch(setOpenConnectionId(undefined));
       if (
         !connection ||
+        !("identifier" in connection) ||
         connection.status === ConnectionStatus.PENDING ||
         connection.status === ConnectionStatus.FAILED
       ) {
         return;
       } else {
-        await getConnectionShortDetails(openDetailId);
+        await getConnectionShortDetails(openDetailId, connection.identifier);
       }
     };
 
@@ -109,9 +111,15 @@ const Connections = () => {
     }
   }, [connectionsCache]);
 
-  const getConnectionShortDetails = async (connectionId: string) => {
+  const getConnectionShortDetails = async (
+    connectionId: string,
+    identifier: string
+  ) => {
     const shortDetails =
-      await Agent.agent.connections.getConnectionShortDetailById(connectionId);
+      await Agent.agent.connections.getConnectionShortDetailById(
+        connectionId,
+        identifier
+      );
     setConnectionShortDetails(shortDetails);
   };
 
@@ -137,7 +145,7 @@ const Connections = () => {
 
   useOnlineStatusEffect(fetchOobi);
 
-  const handleShowConnectionDetails = (item: ConnectionShortDetails) => {
+  const handleShowConnectionDetails = (item: RegularConnectionDetails) => {
     if (
       item.status === ConnectionStatus.PENDING ||
       item.status === ConnectionStatus.FAILED
@@ -147,6 +155,7 @@ const Connections = () => {
       return;
     }
 
+    // Only show details for regular connections
     setConnectionShortDetails(item);
   };
 
@@ -161,8 +170,10 @@ const Connections = () => {
 
     try {
       setDeletePendingItem(null);
+
       await Agent.agent.connections.deleteStaleLocalConnectionById(
-        deletePendingItem.id
+        deletePendingItem.id,
+        deletePendingItem.identifier!
       );
       dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
       dispatch(removeConnectionCache(deletePendingItem.id));

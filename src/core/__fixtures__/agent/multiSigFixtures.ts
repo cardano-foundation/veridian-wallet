@@ -494,6 +494,8 @@ const initiatorConnectionShortDetails = {
   oobi: "http://127.0.0.1:3902/oobi/EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ/agent/EF_dfLFGvUh9kMsV2LIJQtrkuXWG_-wxWzC_XjCWjlkQ",
   status: ConnectionStatus.CONFIRMED,
   createdAtUTC: new Date().toISOString(),
+  contactId: "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ",
+  identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
 };
 
 const notificationMultisigExnRotation = {
@@ -845,6 +847,7 @@ const linkedContacts = [
     oobi: "http://127.0.0.1:3902/oobi/ENsj-3icUgAutHtrUHYnUPnP8RiafT5tOdVIZarFHuyP/agent/EF_dfLFGvUh9kMsV2LIJQtrkuXWG_-wxWzC_XjCWjlkQ",
     status: ConnectionStatus.CONFIRMED,
     createdAtUTC: new Date().toISOString(),
+    contactId: "ENsj-3icUgAutHtrUHYnUPnP8RiafT5tOdVIZarFHuyP",
     groupId: "groupid",
   },
 ];

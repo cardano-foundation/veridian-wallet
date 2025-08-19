@@ -19,6 +19,7 @@ import {
 import { NotificationRoute } from "./keriaNotificationService.types";
 import type {
   ConnectionShortDetails,
+  MultisigConnectionDetails,
   AuthorizationRequestExn,
 } from "../agent.types";
 import {
@@ -101,7 +102,7 @@ class MultiSigService extends AgentService {
   @OnlineOnly
   async createGroup(
     memberPrefix: string,
-    groupConnections: ConnectionShortDetails[],
+    groupConnections: MultisigConnectionDetails[],
     threshold: number,
     backgroundTask = false
   ): Promise<void> {
@@ -738,7 +739,7 @@ class MultiSigService extends AgentService {
       if (queued.initiator) {
         await this.createGroup(
           queued.data.group!.mhab.prefix,
-          queued.groupConnections,
+          queued.groupConnections as MultisigConnectionDetails[],
           queued.threshold,
           true
         );

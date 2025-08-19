@@ -117,7 +117,8 @@ const agentServicesProps = {
 
 const connections = jest.mocked({
   getMultisigLinkedContacts: jest.fn(),
-  deleteConnectionById: jest.fn(),
+  deleteConnectionByIdAndIdentifier: jest.fn(),
+  deleteMultisigConnectionById: jest.fn(),
 });
 
 const basicStorage = jest.mocked({
@@ -1126,10 +1127,6 @@ describe("Single sig service of agent", () => {
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([
       {
         id: "EHxEwa9UAcThqxuxbq56BYMq7YPWYxA63A1nau2AZ-1A",
-        connectionDate: nowISO,
-        label: "",
-        logo: "logoUrl",
-        status: ConnectionStatus.PENDING,
       },
     ]);
     PeerConnection.peerConnection.getConnectingIdentifier = jest
@@ -1141,7 +1138,7 @@ describe("Single sig service of agent", () => {
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
-    expect(connections.deleteConnectionById).toBeCalledWith(
+    expect(connections.deleteMultisigConnectionById).toBeCalledWith(
       "EHxEwa9UAcThqxuxbq56BYMq7YPWYxA63A1nau2AZ-1A"
     );
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
@@ -1183,10 +1180,6 @@ describe("Single sig service of agent", () => {
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([
       {
         id: "group-id",
-        connectionDate: nowISO,
-        label: "",
-        logo: "logoUrl",
-        status: ConnectionStatus.CONFIRMED,
       },
     ]);
     identifierStorage.updateIdentifierMetadata = jest.fn();
@@ -1203,7 +1196,7 @@ describe("Single sig service of agent", () => {
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
-    expect(connections.deleteConnectionById).toBeCalledWith("group-id");
+    expect(connections.deleteMultisigConnectionById).toBeCalledWith("group-id");
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       "manageAid",
       {

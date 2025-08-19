@@ -483,7 +483,7 @@ class IdentifierService extends AgentService {
       groupId
     );
     for (const connection of connections) {
-      await this.connections.deleteConnectionById(connection.id);
+      await this.connections.deleteMultisigConnectionById(connection.id);
     }
   }
 
