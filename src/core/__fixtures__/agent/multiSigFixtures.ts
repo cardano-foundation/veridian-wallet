@@ -848,7 +848,7 @@ const linkedContacts = [
     status: ConnectionStatus.CONFIRMED,
     createdAtUTC: new Date().toISOString(),
     contactId: "ENsj-3icUgAutHtrUHYnUPnP8RiafT5tOdVIZarFHuyP",
-    groupId: "group-id",
+    groupId: "groupid",
   },
 ];
 
