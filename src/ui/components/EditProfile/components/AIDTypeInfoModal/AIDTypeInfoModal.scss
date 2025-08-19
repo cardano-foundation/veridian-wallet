@@ -1,0 +1,32 @@
+.aid-info-modal {
+  & .page-header {
+    ion-toolbar {
+      --background: transparent;
+    }
+  }
+
+  &.scrollable-page-layout .scrollable-page-content {
+    & > p {
+      margin: 0;
+      line-height: 1.325rem;
+      font-weight: 400;
+
+      &.paragraph-top {
+        margin-top: 0.25rem;
+        font-weight: 700;
+      }
+    }
+
+    & > h2 {
+      margin: 1.5rem 0 0.75rem;
+      font-size: 1.5rem;
+    }
+
+    @media screen and (min-width: 250px) and (max-width: 370px) {
+      & > h2 {
+        margin: 0.75rem 0 0.25rem;
+        font-size: 1.25rem;
+      }
+    }
+  }
+}

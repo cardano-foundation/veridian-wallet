@@ -298,6 +298,239 @@ describe("KERIA connectivity", () => {
     expect(mockSignifyClient.boot).not.toHaveBeenCalled();
     expect(mockSignifyClient.connect).not.toHaveBeenCalled();
   });
+
+  test("should discover connect URL and boot successfully with boot URL only", async () => {
+    const mockConnectUrl = "http://127.0.0.1:3901";
+    const mockBootUrl = "http://127.0.0.1:3903/boot/abc123";
+
+    // Mock fetch for connect URL discovery
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: jest.fn().mockResolvedValueOnce({ connectUrl: mockConnectUrl }),
+    });
+
+    (signifyReady as jest.Mock).mockResolvedValueOnce(true);
+    mockSignifyClient.boot.mockResolvedValueOnce({ ok: true });
+    mockSignifyClient.connect.mockResolvedValueOnce(true);
+    SecureStorage.get = jest.fn().mockResolvedValueOnce(mockGetBranValue);
+    mockConnectionService.removeConnectionsPendingDeletion = jest
+      .fn()
+      .mockReturnValue(["id1", "id2"]);
+    mockConnectionService.resolvePendingConnections = jest
+      .fn()
+      .mockReturnValue(undefined);
+    mockIdentifierService.removeIdentifiersPendingDeletion = jest
+      .fn()
+      .mockReturnValue(undefined);
+    mockIdentifierService.processIdentifiersPendingCreation = jest
+      .fn()
+      .mockReturnValue(undefined);
+    mockCredentialService.removeCredentialsPendingDeletion = jest
+      .fn()
+      .mockReturnValue(undefined);
+
+    await agent.bootAndConnect(mockBootUrl);
+
+    expect(fetch).toHaveBeenCalledWith("http://127.0.0.1:3903/connect", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    expect(signifyReady).toHaveBeenCalled();
+    expect(SignifyClient).toHaveBeenCalledWith(
+      mockConnectUrl,
+      mockGetBranValue,
+      Tier.low,
+      mockBootUrl
+    );
+    expect(mockSignifyClient.boot).toHaveBeenCalled();
+    expect(mockSignifyClient.connect).toHaveBeenCalled();
+    expect(Agent.isOnline).toBe(true);
+  });
+
+  test("should throw error when connect URL discovery fails", async () => {
+    const mockBootUrl = "http://127.0.0.1:3903/boot/abc123";
+
+    // Mock fetch to fail
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      statusText: "Not Found",
+    });
+
+    (signifyReady as jest.Mock).mockResolvedValueOnce(true);
+
+    await expect(agent.bootAndConnect(mockBootUrl)).rejects.toThrowError(
+      `${Agent.CONNECT_URL_DISCOVERY_FAILED} (404)`
+    );
+
+    expect(fetch).toHaveBeenCalledWith("http://127.0.0.1:3903/connect", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    expect(mockSignifyClient.boot).not.toHaveBeenCalled();
+    expect(mockSignifyClient.connect).not.toHaveBeenCalled();
+  });
+
+  test("should throw error when connect URL discovery returns invalid response", async () => {
+    const mockBootUrl = "http://127.0.0.1:3903/boot/abc123";
+
+    // Mock fetch with invalid response
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: jest.fn().mockResolvedValueOnce({ invalidField: "value" }),
+    });
+
+    (signifyReady as jest.Mock).mockResolvedValueOnce(true);
+
+    await expect(agent.bootAndConnect(mockBootUrl)).rejects.toThrowError(
+      Agent.CONNECT_URL_NOT_FOUND
+    );
+
+    expect(fetch).toHaveBeenCalledWith("http://127.0.0.1:3903/connect", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    expect(mockSignifyClient.boot).not.toHaveBeenCalled();
+    expect(mockSignifyClient.connect).not.toHaveBeenCalled();
+  });
+
+  test("should throw network error when connect URL discovery fetch fails", async () => {
+    const mockBootUrl = "http://127.0.0.1:3903/boot/abc123";
+
+    // Mock fetch to throw network error
+    global.fetch = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("Failed to fetch"));
+
+    (signifyReady as jest.Mock).mockResolvedValueOnce(true);
+
+    await expect(agent.bootAndConnect(mockBootUrl)).rejects.toThrowError(
+      "Failed to fetch"
+    );
+
+    expect(fetch).toHaveBeenCalledWith("http://127.0.0.1:3903/connect", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    expect(mockSignifyClient.boot).not.toHaveBeenCalled();
+    expect(mockSignifyClient.connect).not.toHaveBeenCalled();
+  });
+});
+
+describe("Connect URL Discovery", () => {
+  let agent: Agent;
+
+  beforeEach(() => {
+    agent = Agent.agent;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should discover connect URL successfully", async () => {
+    const mockBootUrl = "https://boot.keria.com/boot/abc123";
+    const mockConnectUrl = "https://keria.com:3901";
+
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: jest.fn().mockResolvedValueOnce({ connectUrl: mockConnectUrl }),
+    });
+
+    const result = await agent.discoverConnectUrl(mockBootUrl);
+
+    expect(result).toBe(mockConnectUrl);
+    expect(fetch).toHaveBeenCalledWith("https://boot.keria.com/connect", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+  });
+
+  test("should handle different URL formats correctly", async () => {
+    const testCases = [
+      {
+        bootUrl: "http://localhost:9030/agent/uuid123/boot",
+        expectedEndpoint: "http://localhost:9030/connect",
+      },
+      {
+        bootUrl: "https://boot.keria.com/agent/xyz789/boot",
+        expectedEndpoint: "https://boot.keria.com/connect",
+      },
+      {
+        bootUrl: "http://127.0.0.1:3903/boot",
+        expectedEndpoint: "http://127.0.0.1:3903/connect",
+      },
+    ];
+
+    for (const testCase of testCases) {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        json: jest
+          .fn()
+          .mockResolvedValueOnce({ connectUrl: "http://connect.url" }),
+      });
+
+      await agent.discoverConnectUrl(testCase.bootUrl);
+
+      expect(fetch).toHaveBeenCalledWith(testCase.expectedEndpoint, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      jest.clearAllMocks();
+    }
+  });
+
+  test("should throw error when fetch fails", async () => {
+    const mockBootUrl = "https://boot.keria.com/boot/abc123";
+
+    global.fetch = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("Failed to fetch"));
+
+    await expect(agent.discoverConnectUrl(mockBootUrl)).rejects.toThrowError(
+      "Failed to fetch"
+    );
+  });
+
+  test("should throw error when response is not ok", async () => {
+    const mockBootUrl = "https://boot.keria.com/boot/abc123";
+
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: "Internal Server Error",
+    });
+
+    await expect(agent.discoverConnectUrl(mockBootUrl)).rejects.toThrowError(
+      `${Agent.CONNECT_URL_DISCOVERY_FAILED} (500)`
+    );
+  });
+
+  test("should throw error when connectUrl is missing from response", async () => {
+    const mockBootUrl = "https://boot.keria.com/boot/abc123";
+
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: jest.fn().mockResolvedValueOnce({ someOtherField: "value" }),
+    });
+
+    await expect(agent.discoverConnectUrl(mockBootUrl)).rejects.toThrowError(
+      Agent.CONNECT_URL_NOT_FOUND
+    );
+  });
 });
 
 describe("Recovery of DB from cloud sync", () => {
@@ -455,7 +688,7 @@ describe("Agent setup and wiping", () => {
     (agent as any).keriaNotificationService = mockKeriaNotificationService;
     (agent as any).identifierStorage = mockIdentifierStorage;
     (agent as any).credentialStorage = mockCredentialStorage;
-    (agent as any).connectionStorage = mockConnectionStorage;
+    (agent as any).contactStorage = mockContactStorage;
     (agent as any).notificationStorage = mockNotificationStorage;
 
     jest.spyOn(utils, "randomSalt").mockReturnValue("my-salt");
@@ -516,6 +749,162 @@ describe("Agent setup and wiping", () => {
     expect(stopPollingMock).toBeCalled();
     expect(wipeSessionMock).toBeCalledWith("idw");
     expect(SecureStorage.wipe).toBeCalled();
+  });
+
+  test("can wipe local database to start fresh", async () => {
+    (agent as any).storageSession = { wipe: wipeSessionMock };
+    (agent as any).markAgentStatus = jest.fn();
+
+    await agent.wipeLocalDatabase();
+
+    expect(stopPollingMock).toBeCalled();
+    expect(wipeSessionMock).toBeCalledWith("idw");
+    expect(SecureStorage.wipe).toBeCalled();
+    expect((agent as any).markAgentStatus).toBeCalledWith(false);
+  });
+});
+
+describe("Agent delete profile", () => {
+  let agent: Agent;
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+    agent = Agent.agent;
+    (agent as any).identifierStorage = mockIdentifierStorage;
+    (agent as any).connectionService = mockConnectionService;
+    (agent as any).notificationStorage = mockNotificationStorage;
+    (agent as any).agentServicesProps = mockAgentServicesProps;
+
+    mockIdentifierStorage.getIdentifierMetadata.mockResolvedValue({
+      id: "test-id",
+      groupMetadata: { groupId: "test-group-id" },
+      groupMemberPre: "test-group-member-pre",
+    });
+    mockConnectionService.deleteAllConnectionsForGroup.mockResolvedValue(
+      undefined
+    );
+    mockConnectionService.deleteAllConnectionsForIdentifier.mockResolvedValue(
+      undefined
+    );
+    mockNotificationStorage.findAllByQuery.mockResolvedValue([
+      { id: "note1", a: { r: "/some/route" } },
+      { id: "note2", a: { r: "/local/route" } },
+    ]);
+    jest
+      .spyOn(utils, "deleteNotificationRecordById")
+      .mockResolvedValue(undefined);
+    jest
+      .spyOn(PeerConnection.peerConnection, "getConnectedDAppAddress")
+      .mockReturnValue("dapp-address");
+    jest
+      .spyOn(PeerConnection.peerConnection, "getConnectingIdentifier")
+      .mockResolvedValue({ id: "test-id", oobi: "test-oobi" });
+    jest
+      .spyOn(PeerConnection.peerConnection, "disconnectDApp")
+      .mockReturnValue(undefined);
+    mockIdentifierService.deleteIdentifier.mockResolvedValue(undefined);
+  });
+
+  test("should orchestrate deletion of identifier and its associated data", async () => {
+    const identifierId = "test-id";
+
+    await (agent as any).deleteProfile(identifierId);
+
+    expect(mockIdentifierStorage.getIdentifierMetadata).toHaveBeenCalledWith(
+      identifierId
+    );
+    expect(
+      mockConnectionService.deleteAllConnectionsForGroup
+    ).toHaveBeenCalledWith("test-group-id");
+    expect(
+      mockConnectionService.deleteAllConnectionsForIdentifier
+    ).not.toHaveBeenCalled();
+    expect(mockNotificationStorage.findAllByQuery).toHaveBeenCalledWith({
+      receivingPre: "test-group-member-pre",
+    });
+    expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      "note1",
+      "/some/route"
+    );
+    expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      "note2",
+      "/local/route"
+    ); // Local notifications should not be deleted via signifyClient
+    expect(
+      PeerConnection.peerConnection.getConnectedDAppAddress
+    ).toHaveBeenCalled();
+    expect(
+      PeerConnection.peerConnection.getConnectingIdentifier
+    ).toHaveBeenCalled();
+    expect(PeerConnection.peerConnection.disconnectDApp).toHaveBeenCalledWith(
+      "dapp-address",
+      true
+    );
+    expect(mockIdentifierService.deleteIdentifier).toHaveBeenCalledWith(
+      identifierId
+    );
+  });
+
+  test("should delete a group identifier and its associated data", async () => {
+    const groupIdentifierId = "group-id";
+    mockIdentifierStorage.getIdentifierMetadata.mockResolvedValueOnce({
+      id: groupIdentifierId,
+      groupMetadata: { groupId: groupIdentifierId },
+      groupMemberPre: undefined,
+    });
+    mockNotificationStorage.findAllByQuery.mockResolvedValueOnce([
+      { id: "group-note1", a: { r: "/some/route" } },
+      { id: "group-note2", a: { r: "/local/route" } },
+    ]);
+
+    // Explicitly mock PeerConnection methods for this test case
+    jest
+      .spyOn(PeerConnection.peerConnection, "getConnectedDAppAddress")
+      .mockReturnValueOnce(""); // Should return empty string
+    jest
+      .spyOn(PeerConnection.peerConnection, "getConnectingIdentifier")
+      .mockResolvedValueOnce({ id: "some-other-id", oobi: "some-other-oobi" }); // Should not be called, but mock it anyway
+
+    await (agent as any).deleteProfile(groupIdentifierId);
+
+    expect(mockIdentifierStorage.getIdentifierMetadata).toHaveBeenCalledWith(
+      groupIdentifierId
+    );
+    expect(
+      mockConnectionService.deleteAllConnectionsForGroup
+    ).toHaveBeenCalledWith(groupIdentifierId);
+    expect(
+      mockConnectionService.deleteAllConnectionsForIdentifier
+    ).not.toHaveBeenCalled();
+    expect(mockNotificationStorage.findAllByQuery).toHaveBeenCalledWith({
+      receivingPre: groupIdentifierId,
+    });
+    expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      "group-note1",
+      "/some/route"
+    );
+    expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      "group-note2",
+      "/local/route"
+    );
+    expect(
+      PeerConnection.peerConnection.getConnectedDAppAddress
+    ).toHaveBeenCalled(); // This call is expected
+    expect(
+      PeerConnection.peerConnection.getConnectingIdentifier
+    ).not.toHaveBeenCalled(); // This call should not happen
+    expect(PeerConnection.peerConnection.disconnectDApp).not.toHaveBeenCalled();
+    expect(mockIdentifierService.deleteIdentifier).toHaveBeenCalledWith(
+      groupIdentifierId
+    );
   });
 });
 

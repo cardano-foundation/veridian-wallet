@@ -214,7 +214,7 @@ class SqliteSession {
 
   private async performCloudMigration(
     migration: CloudMigration | HybridMigration,
-    isRecoveryValidation: boolean = false
+    isRecoveryValidation = false
   ): Promise<void> {
     const isKeriaConfigured = await this.isKeriaConfigured();
     if (!isKeriaConfigured) {

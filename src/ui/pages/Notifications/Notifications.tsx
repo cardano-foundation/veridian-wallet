@@ -11,14 +11,11 @@ import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
+  getCurrentProfile,
   getNotificationsCache,
   markNotificationAsRead,
-} from "../../../store/reducers/notificationsCache";
-import {
-  getAuthentication,
-  getCurrentProfile,
-  setCurrentRoute,
-} from "../../../store/reducers/stateCache";
+} from "../../../store/reducers/profileCache";
+import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
 import { Avatar } from "../../components/Avatar";
 import { AvatarProps } from "../../components/Avatar/Avatar.types";
@@ -28,14 +25,13 @@ import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types"
 import { TabLayout } from "../../components/layout/TabLayout";
 import { showError } from "../../utils/error";
 import { timeDifference } from "../../utils/formatters";
-import { IdentifiersFilters } from "../Identifiers/Identifiers.types";
+import { Profiles } from "../Profiles";
 import { NotificationFilters } from "./Notification.types";
 import { NotificationItem } from "./NotificationItem";
 import "./Notifications.scss";
 import { EarlierNotification } from "./components";
 import { EarlierNotificationRef } from "./components/EarlierNotification.types";
 import { NotificationOptionsModal } from "./components/NotificationOptionsModal";
-import { Profiles } from "../Profiles";
 
 const Notifications = () => {
   const pageId = "notifications-tab";
@@ -46,13 +42,14 @@ const Notifications = () => {
   const notifications = [...notificationsCache].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
-  const [selectedFilter, setSelectedFilter] = useState<
-    NotificationFilters | IdentifiersFilters
-  >(NotificationFilters.All);
+  const [selectedFilter, setSelectedFilter] = useState<NotificationFilters>(
+    NotificationFilters.All
+  );
   const earlierNotificationRef = useRef<EarlierNotificationRef>(null);
   const [selectedItem, setSelectedItem] = useState<KeriaNotification | null>(
     null
   );
+
   const [isOpenCredModal, setIsOpenCredModal] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [viewCred, setViewCred] = useState("");
@@ -200,7 +197,7 @@ const Notifications = () => {
   }) => {
     return (
       <Avatar
-        id={currentProfile.identity.id}
+        id={currentProfile?.identity.id || ""}
         handleAvatarClick={handleAvatarClick}
       />
     );

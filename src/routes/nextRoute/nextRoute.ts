@@ -41,6 +41,18 @@ const getNextRootRoute = (data: DataProps) => {
       : TabsRoutePath.CREDENTIALS;
   }
 
+  if (
+    data.store.currentProfile &&
+    data.store.stateCache.routes[0]?.path !== RoutePath.PROFILE_SETUP
+  ) {
+    path = data.store.currentProfile.identity.groupMetadata
+      ? RoutePath.GROUP_PROFILE_SETUP.replace(
+        ":id",
+        data.store.currentProfile.identity.id
+      )
+      : path;
+  }
+
   return { pathname: path };
 };
 
@@ -159,7 +171,13 @@ const getNextCreatePasswordRoute = (data: DataProps) => {
   return { pathname: RoutePath.GENERATE_SEED_PHRASE };
 };
 
-const getNextProfileSetupRoute = () => {
+const getNextProfileSetupRoute = (data: DataProps) => {
+  if (data.state?.isGroup) {
+    return {
+      pathname: RoutePath.GROUP_PROFILE_SETUP.replace(":id", data.state?.id),
+    };
+  }
+
   return { pathname: TabsRoutePath.CREDENTIALS };
 };
 
@@ -239,7 +257,7 @@ const nextRoute: Record<string, NextRoute> = {
     updateRedux: [updateStoreAfterCreatePassword],
   },
   [RoutePath.PROFILE_SETUP]: {
-    nextPath: () => getNextProfileSetupRoute(),
+    nextPath: (data: DataProps) => getNextProfileSetupRoute(data),
     updateRedux: [updateStoreAfterSetupProfile],
   },
   [TabsRoutePath.CREDENTIAL_DETAILS]: {

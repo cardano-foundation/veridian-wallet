@@ -29,6 +29,6 @@
   },
   "1106849": {
     "active": true,
-    "notes": "Low severity vulnerability in dev dependency (tmp via external-editor and @wdio/cli). Not exploitable in production, and unlikely in dev environment as it requires control over temporary directory paths."
+    "notes": "tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter"
   }
 }

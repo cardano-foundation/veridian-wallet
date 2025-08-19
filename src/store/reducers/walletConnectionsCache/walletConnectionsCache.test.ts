@@ -6,22 +6,17 @@ import {
   getIsConnecting,
   getPendingConnection,
   getShowConnectWallet,
-  getWalletConnectionsCache,
   setConnectedWallet,
   setIsConnecting,
   setPendingConnection,
-  setWalletConnectionsCache,
   showConnectWallet,
   walletConnectionsCacheSlice,
 } from "./walletConnectionsCache";
-import {
-  ConnectionData,
-  WalletConnectState,
-} from "./walletConnectionsCache.types";
+import { WalletConnectState } from "./walletConnectionsCache.types";
+import { ConnectionData } from "../profileCache";
 
 describe("walletConnectionsCacheSlice", () => {
   const initialState: WalletConnectState = {
-    walletConnections: [],
     connectedWallet: null,
     pendingConnection: null,
     isConnecting: false,
@@ -32,22 +27,6 @@ describe("walletConnectionsCacheSlice", () => {
     expect(
       walletConnectionsCacheSlice.reducer(undefined, {} as PayloadAction)
     ).toEqual(initialState);
-  });
-
-  it("should handle setWalletConnectionsCache", () => {
-    const connections: ConnectionData[] = [
-      {
-        meerkatId: "2",
-        name: "Wallet name #2",
-        selectedAid: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRc",
-        url: "http://localhost:3001/",
-      },
-    ];
-    const newState = walletConnectionsCacheSlice.reducer(
-      initialState,
-      setWalletConnectionsCache(connections)
-    );
-    expect(newState.walletConnections).toEqual(connections);
   });
 
   it("should handle clearWalletConnection", () => {
@@ -62,7 +41,6 @@ describe("walletConnectionsCacheSlice", () => {
     const newState = walletConnectionsCacheSlice.reducer(
       {
         ...initialState,
-        walletConnections: connections,
       },
       clearWalletConnection()
     );
@@ -109,32 +87,6 @@ describe("walletConnectionsCacheSlice", () => {
 });
 
 describe("Get wallet connections cache", () => {
-  it("should return the wallet connetions cache from RootState", () => {
-    const state = {
-      walletConnectionsCache: {
-        walletConnections: [
-          {
-            meerkatId: "1",
-            name: "Wallet name #1",
-            selectedAid: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRd",
-            image: "",
-            url: "http://localhost:3001/",
-          },
-          {
-            meerkatId: "2",
-            name: "Wallet name #2",
-            selectedAid: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRc",
-            url: "http://localhost:3001/",
-          },
-        ],
-      },
-    } as RootState;
-    const connectionCache = getWalletConnectionsCache(state);
-    expect(connectionCache).toEqual(
-      state.walletConnectionsCache.walletConnections
-    );
-  });
-
   it("should return connected wallet from RootState", () => {
     const state = {
       walletConnectionsCache: {

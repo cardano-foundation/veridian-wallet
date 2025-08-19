@@ -36,7 +36,9 @@ interface MultisigConnectionDetails extends ConnectionShortDetailsBase {
   groupId: string;
 }
 
-type ConnectionShortDetails = RegularConnectionDetails | MultisigConnectionDetails;
+type ConnectionShortDetails =
+  | RegularConnectionDetails
+  | MultisigConnectionDetails;
 
 // Type guard functions for runtime checking
 function isRegularConnectionDetails(
@@ -48,7 +50,7 @@ function isRegularConnectionDetails(
 function isMultisigConnectionDetails(
   connection: ConnectionShortDetails
 ): connection is MultisigConnectionDetails {
-  return "groupId" in connection
+  return "groupId" in connection;
 }
 
 enum MiscRecordId {
@@ -56,19 +58,14 @@ enum MiscRecordId {
   APP_ALREADY_INIT = "app-already-init",
   APP_STATE_FLAGS = "app-state-flags",
   APP_LANGUAGE = "app-language",
-  IDENTIFIERS_FAVOURITES = "identifiers-favourites",
   CREDS_FAVOURITES = "creds-favourites",
-  USER_NAME = "user-name",
   DEFAULT_PROFILE = "default-profile",
   APP_BIOMETRY = "app-biometry",
   KERIA_NOTIFICATION_MARKER = "keria-notification-marker",
-  APP_IDENTIFIER_VIEW_TYPE = "app-identifier-view-type",
   APP_CRED_VIEW_TYPE = "app-cred-view-type",
-  APP_IDENTIFIER_SELECTED_FILTER = "app-identifier-selected-filter",
   APP_CRED_SELECTED_FILTER = "app-cred-selected-filter",
   KERIA_CONNECT_URL = "keria-connect-url",
   KERIA_BOOT_URL = "keria-boot-url",
-  APP_IDENTIFIER_FAVOURITE_INDEX = "identifier-favourite-index",
   APP_CRED_FAVOURITE_INDEX = "cred-favourite-index",
   APP_PASSWORD_SKIPPED = "app-password-skipped",
   APP_RECOVERY_WALLET = "recovery-wallet",
@@ -81,6 +78,7 @@ enum MiscRecordId {
   IS_SETUP_PROFILE = "is-setup-profile",
   INDIVIDUAL_FIRST_CREATE = "individual-first-create",
   BIOMETRICS_SETUP = "biometrics-setup",
+  PROFILE_HISTORIES = "profile-histories",
 }
 
 type ConnectionNoteDetails = {
@@ -133,15 +131,21 @@ interface ConnectionDetailsExtras {
   historyItems: ConnectionHistoryItem[];
 }
 
-interface RegularConnectionDetailsFull extends ConnectionShortDetailsBase, ConnectionDetailsExtras {
+interface RegularConnectionDetailsFull
+  extends ConnectionShortDetailsBase,
+    ConnectionDetailsExtras {
   identifier: string;
 }
 
-interface MultisigConnectionDetailsFull extends ConnectionShortDetailsBase, ConnectionDetailsExtras {
+interface MultisigConnectionDetailsFull
+  extends ConnectionShortDetailsBase,
+    ConnectionDetailsExtras {
   groupId: string;
 }
 
-type ConnectionDetails = RegularConnectionDetailsFull | MultisigConnectionDetailsFull;
+type ConnectionDetails =
+  | RegularConnectionDetailsFull
+  | MultisigConnectionDetailsFull;
 
 interface NotificationRpy {
   a: {
@@ -202,33 +206,33 @@ export const OOBI_AGENT_ONLY_RE =
 export const DOOBI_RE = /^\/oobi\/(?<said>[^/]+)$/i;
 export const WOOBI_RE = /^\/\.well-known\/keri\/oobi\/(?<cid>[^/]+)$/;
 
-export { 
-  ConnectionStatus, 
-  MiscRecordId, 
-  OobiType, 
+export {
+  ConnectionStatus,
+  MiscRecordId,
+  OobiType,
   CreationStatus,
   isRegularConnectionDetails,
-  isMultisigConnectionDetails
+  isMultisigConnectionDetails,
 };
 
 export type {
-  ConnectionShortDetails,
+  AgentServicesProps,
+  AgentUrls,
+  AuthorizationRequestExn,
+  BranAndMnemonic,
   ConnectionShortDetailsBase,
   RegularConnectionDetails,
   MultisigConnectionDetails,
   ConnectionDetails,
   RegularConnectionDetailsFull,
   MultisigConnectionDetailsFull,
+  ConnectionHistoryItem,
   ConnectionNoteDetails,
   ConnectionNoteProps,
-  ConnectionHistoryItem,
-  OobiScan,
-  AgentServicesProps,
-  AgentUrls,
-  BranAndMnemonic,
+  ConnectionShortDetails,
   ExnMessage,
-  NotificationRpy,
-  AuthorizationRequestExn,
-  JSONValue,
   JSONObject,
+  JSONValue,
+  NotificationRpy,
+  OobiScan,
 };

@@ -59,8 +59,8 @@ jest.mock("../../../core/agent/agent", () => ({
       connections: {
         getConnectionById: jest.fn(),
         getConnectionHistoryById: jest.fn(),
-        deleteStaleLocalConnectionById: () =>
-          deleteStaleLocalConnectionByIdMock(),
+        deleteStaleLocalConnectionById: (id: string, identifier: string) =>
+          deleteStaleLocalConnectionByIdMock(id, identifier),
         deleteConnectionById: () => deleteConnection(),
         markConnectionPendingDelete: () => markConnectionPendingDeleteMock(),
       },
@@ -90,20 +90,11 @@ const initialStateFull = {
     isOnline: true,
   },
   seedPhraseCache: {},
-  credsCache: {
-    creds: filteredCredsFix,
-  },
-  credsArchivedCache: {
-    creds: filteredCredsFix,
-  },
   connectionsCache: {
     connections: connectionsFix,
   },
   biometricsCache: {
     enabled: false,
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierFix,
   },
 };
 
@@ -760,7 +751,10 @@ describe("Checking the Connection Details Page when connection is missing from t
     await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(deleteStaleLocalConnectionByIdMock).toBeCalled();
+      expect(deleteStaleLocalConnectionByIdMock).toBeCalledWith(
+        connectionsFix[0].id,
+        connectionsFix[0].identifier
+      );
     });
   });
 });

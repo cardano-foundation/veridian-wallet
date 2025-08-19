@@ -726,7 +726,8 @@ class KeriaNotificationService extends AgentService {
           const connectionInCloud =
             await this.connectionService.getConnectionById(
               grantExn.exn.i,
-              true
+              true,
+              grantExn.exn.rp
             );
           const historyExists = connectionInCloud.historyItems.some(
             (item) => item.id === grantExn.exn.d
@@ -788,7 +789,8 @@ class KeriaNotificationService extends AgentService {
           const connectionInCloud =
             await this.connectionService.getConnectionById(
               applyExn.exn.i,
-              true
+              true,
+              applyExn.exn.rp
             );
           const historyExists = connectionInCloud.historyItems.some(
             (item) => item.id === applyExn.exn.d
@@ -861,7 +863,8 @@ class KeriaNotificationService extends AgentService {
           const connectionInCloud =
             await this.connectionService.getConnectionById(
               agreeExn.exn.i,
-              true
+              true,
+              agreeExn.exn.rp
             );
           const historyExists = connectionInCloud.historyItems.some(
             (item) => item.id === agreeExn.exn.d

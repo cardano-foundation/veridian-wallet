@@ -12,24 +12,26 @@ import { CreatePassword } from "../ui/pages/CreatePassword";
 import { CreateSSIAgent } from "../ui/pages/CreateSSIAgent";
 import { CredentialDetails } from "../ui/pages/CredentialDetails";
 import { GenerateSeedPhrase } from "../ui/pages/GenerateSeedPhrase";
-import { IdentifierDetails } from "../ui/pages/IdentifierDetails";
 import { NotificationDetails } from "../ui/pages/NotificationDetails";
 import { Onboarding } from "../ui/pages/Onboarding";
+import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
 import { SetPasscode } from "../ui/pages/SetPasscode";
 import { SetupBiometrics } from "../ui/pages/SetupBiometrics/SetupBiometrics";
+import { SetupGroupProfile } from "../ui/pages/SetupGroupProfile";
 import { VerifyRecoverySeedPhrase } from "../ui/pages/VerifyRecoverySeedPhrase";
 import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
-import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
+import { getCurrentProfile } from "../store/reducers/profileCache";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
+  const currentProfile = useAppSelector(getCurrentProfile);
   const dispatch = useAppDispatch();
   const routes = useAppSelector(getRoutes);
 
   const { nextPath } = getNextRoute(RoutePath.ROOT, {
-    store: { stateCache },
+    store: { stateCache, currentProfile },
   });
 
   useEffect(() => {
@@ -78,6 +80,11 @@ const Routes = () => {
         component={CreateSSIAgent}
         exact
       />
+      <Route
+        path={RoutePath.GROUP_PROFILE_SETUP}
+        component={SetupGroupProfile}
+        exact
+      />
       {tabsRoutes.map((tab, index: number) => {
         return (
           <Route
@@ -93,11 +100,6 @@ const Routes = () => {
           />
         );
       })}
-      <Route
-        path={TabsRoutePath.IDENTIFIER_DETAILS}
-        component={IdentifierDetails}
-        exact
-      />
       <Route
         path={RoutePath.SETUP_BIOMETRICS}
         component={SetupBiometrics}

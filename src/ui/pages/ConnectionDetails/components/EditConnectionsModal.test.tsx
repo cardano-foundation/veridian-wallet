@@ -77,9 +77,6 @@ const initialStateFull = {
     },
   },
   seedPhraseCache: {},
-  credsCache: {
-    creds: filteredCredsFix,
-  },
   connectionsCache: {
     connections: connectionsFix,
   },

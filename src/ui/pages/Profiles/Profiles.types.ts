@@ -16,7 +16,7 @@ interface OptionButtonProps {
 }
 
 interface ProfileItemsProps {
-  identifier: IdentifierShortDetails;
+  identifier?: IdentifierShortDetails;
   onClick?: () => void;
 }
 
