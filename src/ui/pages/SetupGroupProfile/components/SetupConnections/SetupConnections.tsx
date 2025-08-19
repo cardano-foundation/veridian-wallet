@@ -171,7 +171,7 @@ const SetupConnections = ({ setState }: StageProps) => {
               primaryButtonText={`${i18n.t(
                 "setupgroupprofile.setupmembers.actions.initiator.initiatebutton"
               )}`}
-              primaryButtonDisabled={multiSigGroup?.connections.length === 0}
+              primaryButtonDisabled={!multiSigGroup?.connections.length}
             />
           )
         }
