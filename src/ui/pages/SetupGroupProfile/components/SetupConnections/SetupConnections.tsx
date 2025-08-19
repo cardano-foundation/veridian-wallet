@@ -160,12 +160,13 @@ const SetupConnections = ({ setState }: StageProps) => {
           />
         }
         footer={
-          tab === Tab.SetupMembers && (
+          tab === Tab.SetupMembers &&
+          profile?.groupMetadata?.groupInitiator && (
             <PageFooter
               pageId={componentId}
               primaryButtonAction={handleInit}
               primaryButtonText={`${i18n.t(
-                "setupgroupprofile.setupmembers.initiatebutton"
+                "setupgroupprofile.setupmembers.actions.initiator.initiatebutton"
               )}`}
               primaryButtonDisabled={multiSigGroup?.connections.length === 0}
             />
@@ -177,7 +178,11 @@ const SetupConnections = ({ setState }: StageProps) => {
             <InfoCard
               className="alert"
               icon={warningOutline}
-              content={i18n.t("setupgroupprofile.setupmembers.alert")}
+              content={
+                profile?.groupMetadata?.groupInitiator
+                  ? i18n.t("setupgroupprofile.setupmembers.alert.initiator")
+                  : i18n.t("setupgroupprofile.setupmembers.alert.joiner")
+              }
             />
           )}
           <IonSegment
@@ -203,6 +208,7 @@ const SetupConnections = ({ setState }: StageProps) => {
             <ShareConnections
               oobi={oobi}
               group={multiSigGroup}
+              profile={profile}
             />
           ) : (
             <Scan

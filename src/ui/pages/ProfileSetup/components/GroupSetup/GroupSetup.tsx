@@ -25,7 +25,7 @@ const GroupSetup = ({
     <IonContent className="group-setup">
       {setupProfileStep === SetupProfileStep.GroupSetupStart ? (
         <>
-          <p className="title">
+          <p className="subtitle">
             {i18n.t("setupprofile.groupsetupstart.description")}
           </p>
           <CustomInput
@@ -59,15 +59,14 @@ const GroupSetup = ({
           </IonButton>
         </>
       ) : (
-        // TODO: Update UI for joiner
-        <>
+        <div className="join-group-details">
           <MemberAvatar
             firstLetter={groupName.charAt(0)}
             rank={0}
           />
-          {groupName}
-          {i18n.t("setupprofile.groupsetupconfirm.description")}
-        </>
+          <p>{i18n.t("setupprofile.groupsetupconfirm.description")}</p>
+          <h2>{groupName}</h2>
+        </div>
       )}
     </IonContent>
   );

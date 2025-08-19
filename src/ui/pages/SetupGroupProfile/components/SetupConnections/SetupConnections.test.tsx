@@ -270,10 +270,16 @@ describe("Setup Connection", () => {
     });
 
     expect(
-      getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.initiatebutton)
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator
+          .initiatebutton
+      )
     ).toBeVisible();
     expect(
-      getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.delete.button)
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator.delete
+          .button
+      )
     ).toBeVisible();
     expect(
       getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.notes.bottom)
@@ -353,20 +359,25 @@ describe("Setup Connection", () => {
     });
 
     fireEvent.click(
-      getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.delete.button)
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator.delete
+          .button
+      )
     );
 
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.setupgroupprofile.setupmembers.delete.alert.title
+          EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator
+            .delete.alert.title
         )
       ).toBeVisible();
     });
 
     fireEvent.click(
       getByText(
-        EN_TRANSLATIONS.setupgroupprofile.setupmembers.delete.alert.confirm
+        EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator.delete
+          .alert.confirm
       )
     );
 
@@ -443,7 +454,10 @@ describe("Setup Connection", () => {
     });
 
     fireEvent.click(
-      getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.initiatebutton)
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator
+          .initiatebutton
+      )
     );
 
     expect(setState).toBeCalled();

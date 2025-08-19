@@ -174,7 +174,9 @@ describe("Profile setup", () => {
       });
 
       expect(
-        getByText(EN_TRANSLATIONS.setupprofile.profilesetup.description)
+        getByText(
+          EN_TRANSLATIONS.setupprofile.profilesetup.description.individual
+        )
       ).toBeVisible();
 
       expect(

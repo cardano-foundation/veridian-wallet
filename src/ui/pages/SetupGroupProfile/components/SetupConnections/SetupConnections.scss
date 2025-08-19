@@ -93,9 +93,12 @@
         z-index: 99;
 
         ion-segment-button {
-          &.segment-button-checked {
+          &.segment-button-checked,
+          &.segment-button-checked.md {
+            --background-checked: var(--ion-color-neutral-600);
+
             &::part(indicator-background) {
-              background: var(--ion-color-neutral-600);
+              background: var(--ion-color-neutral-700);
             }
           }
 

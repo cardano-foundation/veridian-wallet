@@ -1,9 +1,4 @@
 .group-setup {
-  .title {
-    text-align: center;
-    margin: 0.75rem 0 1.5rem;
-  }
-
   .error-message {
     text-align: left;
   }
@@ -30,10 +25,57 @@
       margin-left: 0.5em;
     }
   }
+}
+
+.groupsetupconfirm .group-setup {
+  transform: translateY(40%);
+
+  .join-group-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .avatar-button {
+      &::part(native) {
+        width: 5rem;
+        height: 5rem;
+      }
+
+      span {
+        font-size: 2.75rem;
+      }
+    }
+
+    p {
+      margin: 2rem 0 0.5rem;
+    }
+
+    h2 {
+      margin: 0.5rem 0;
+    }
+  }
 
   @media screen and (min-width: 250px) and (max-width: 370px) {
-    .title {
-      margin: 0.5rem 0 1rem;
+    .join-group-details {
+      .avatar-button {
+        &::part(native) {
+          width: 4rem;
+          height: 4rem;
+        }
+
+        span {
+          font-size: 2.2rem;
+        }
+      }
+
+      p {
+        margin: 1.6rem 0 0.4rem;
+      }
+
+      h2 {
+        margin: 0.4rem 0;
+      }
     }
   }
 }

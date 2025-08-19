@@ -66,14 +66,16 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const title = i18n.t(`setupprofile.${step}.title`);
   const back = stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
     ? undefined // Disable back button if pending join group
-    : [
-      SetupProfileStep.SetupProfile,
-      SetupProfileStep.GroupSetupStart,
-    ].includes(step)
-      ? i18n.t("setupprofile.button.back")
-      : isModal && defaultProfile
-        ? i18n.t("setupprofile.button.cancel")
-        : undefined;
+    : isScanOpen
+      ? i18n.t("setupprofile.button.cancel") // when scanner open, show Cancel
+      : [
+        SetupProfileStep.SetupProfile,
+        SetupProfileStep.GroupSetupStart,
+      ].includes(step)
+        ? i18n.t("setupprofile.button.back")
+        : isModal && defaultProfile
+          ? i18n.t("setupprofile.button.cancel")
+          : undefined;
 
   const getButtonText = () => {
     switch (step) {
@@ -349,6 +351,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           <SetupProfile
             userName={userName}
             onChangeUserName={setUserName}
+            isGroupProfile={true}
           />
         );
       case SetupProfileStep.GroupSetupStart:
