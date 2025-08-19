@@ -1,7 +1,10 @@
-import { ConnectionShortDetails } from "../../../core/agent/agent.types";
+import {
+  ConnectionShortDetails,
+  RegularConnectionDetails,
+} from "../../../core/agent/agent.types";
 
 interface ConnectionDetailsProps {
-  connectionShortDetails: ConnectionShortDetails;
+  connectionShortDetails: RegularConnectionDetails;
   handleCloseConnectionModal: () => void;
   restrictedOptions?: boolean;
 }

@@ -17,10 +17,10 @@ const LoadingPage = ({
       style={
         type === LoadingType.Splash
           ? {
-              background: `url(${splashImage})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }
+            background: `url(${splashImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }
           : undefined
       }
     >

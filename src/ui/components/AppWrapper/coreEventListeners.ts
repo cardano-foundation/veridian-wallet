@@ -1,3 +1,5 @@
+import { Agent } from "../../../core/agent/agent";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import {
   EventTypes,
   GroupCreatedEvent,
@@ -6,21 +8,17 @@ import {
   NotificationRemovedEvent,
 } from "../../../core/agent/event.types";
 import { OperationPendingRecordType } from "../../../core/agent/records/operationPendingRecord.type";
-import { CreationStatus } from "../../../core/agent/agent.types";
 import { useAppDispatch } from "../../../store/hooks";
+import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
 import {
-  updateCreationStatus,
-  updateOrAddIdentifiersCache,
-  addGroupIdentifierCache,
-} from "../../../store/reducers/identifiersCache";
-import {
+  addGroupProfile,
   addNotification,
+  addOrUpdateProfileIdentity,
   deleteNotificationById,
-} from "../../../store/reducers/notificationsCache";
+  updateProfileCreationStatus,
+} from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
-import { Agent } from "../../../core/agent/agent";
-import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
 
 const notificationStateChanged = (
   event: NotificationRemovedEvent | NotificationAddedEvent,
@@ -46,7 +44,7 @@ const operationCompleteHandler = async (
     case OperationPendingRecordType.Witness:
     case OperationPendingRecordType.Group:
       dispatch(
-        updateCreationStatus({
+        updateProfileCreationStatus({
           id: oid,
           creationStatus: CreationStatus.COMPLETE,
         })
@@ -63,7 +61,10 @@ const operationFailureHandler = async (
   switch (opType) {
     case OperationPendingRecordType.Witness: {
       dispatch(
-        updateCreationStatus({ id: oid, creationStatus: CreationStatus.FAILED })
+        updateProfileCreationStatus({
+          id: oid,
+          creationStatus: CreationStatus.FAILED,
+        })
       );
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_UPDATED));
       break;
@@ -84,20 +85,20 @@ const identifierAddedHandler = async (
   event: IdentifierAddedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  dispatch(updateOrAddIdentifiersCache(event.payload.identifier));
+  dispatch(addOrUpdateProfileIdentity(event.payload.identifier));
 };
 
 const groupCreatedHandler = async (
   event: GroupCreatedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  dispatch(addGroupIdentifierCache(event.payload.group));
+  dispatch(addGroupProfile(event.payload.group));
 };
 
 export {
+  groupCreatedHandler,
+  identifierAddedHandler,
   notificationStateChanged,
   operationCompleteHandler,
   operationFailureHandler,
-  identifierAddedHandler,
-  groupCreatedHandler,
 };

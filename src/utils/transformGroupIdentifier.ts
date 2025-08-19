@@ -19,10 +19,11 @@ export function transformGroupIdentifier(
       creationStatus: input.creationStatus,
       groupMetadata: input.di
         ? {
-            groupId: input.di,
-            groupInitiator: true,
-            groupCreated: false,
-          }
+          groupId: input.di,
+          groupInitiator: true,
+          groupCreated: false,
+          userName: "",
+        }
         : undefined,
       groupMemberPre: input.groupMemberPre,
     },

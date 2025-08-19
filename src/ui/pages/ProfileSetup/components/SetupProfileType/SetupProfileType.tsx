@@ -26,8 +26,6 @@ const SetupProfileType = ({
             className={className}
             onClick={(e) => {
               e.stopPropagation();
-              // TODO: It will be implemented in next ticket
-              if (value === ProfileType.Group) return;
               onChangeProfile(value);
             }}
           >

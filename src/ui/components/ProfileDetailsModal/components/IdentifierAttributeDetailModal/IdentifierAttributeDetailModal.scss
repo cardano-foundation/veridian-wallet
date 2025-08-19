@@ -1,0 +1,210 @@
+.identifier-detail-modal {
+  .page-header {
+    ion-toolbar.ios {
+      padding-left: var(--ion-safe-area-left);
+      padding-right: var(--ion-safe-area-right);
+    }
+  }
+
+  .attribute-description {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.75rem 0;
+
+    h2 {
+      font-weight: 700;
+    }
+
+    p {
+      color: var(--ion-color-primary-700);
+      font-size: 1rem;
+      line-height: 1.375rem;
+    }
+  }
+
+  .accordion-group {
+    --ion-background-color: var(--ion-color-neutral-100);
+    margin-bottom: 0;
+
+    .accordion {
+      border-radius: 1rem;
+      margin-bottom: 0.75rem;
+      padding: 1.25rem 0;
+
+      ion-item {
+        --min-height: auto;
+
+        &.accordion-header {
+          font-weight: 500;
+          --padding-start: 1.25rem;
+          // remove ripple effect
+          --ripple-color: transparent;
+          --background-activated: transparent;
+          --background-activated-opacity: transparent;
+          --background-focused: transparent;
+          --background-focused-opacity: transparent;
+          --background-hover: transparent;
+          --background-hover-opacity: transparent;
+
+          ion-icon {
+            margin: 0 0 0 1rem;
+          }
+        }
+      }
+
+      .list-item {
+        padding: 0 1.25rem;
+      }
+    }
+  }
+
+  .list-item {
+    ion-item {
+      display: flex;
+      align-items: center;
+
+      &::part(native) {
+        margin: 0.75rem 0;
+      }
+
+      &:first-child {
+        margin-top: 0.625rem;
+      }
+    }
+
+    .card-details-info-block-line {
+      align-items: center;
+      .card-details-info-block-line-start-icon {
+        height: auto;
+
+        ion-button.avatar-button {
+          width: 1.5rem;
+          min-height: auto;
+          margin-bottom: 0.125rem;
+
+          span {
+            font-size: 1rem;
+            line-height: 1rem;
+          }
+
+          &::part(native) {
+            width: 1.5rem;
+            height: 1.5rem;
+          }
+        }
+
+        @media screen and (min-width: 250px) and (max-width: 370px) {
+          width: auto;
+        }
+      }
+    }
+
+    .user-label {
+      padding: 0.25rem 0.5rem;
+      background: var(--ion-color-card-theme-one);
+      border-radius: 0.25rem;
+      display: flex;
+      align-items: center;
+      margin-left: 0.5rem;
+      color: var(--ion-color-neutral-100);
+
+      &.hidden {
+        visibility: hidden;
+      }
+
+      ion-icon {
+        margin-right: 0.25rem;
+      }
+
+      span {
+        font-weight: 400;
+        font-size: 0.75rem;
+        line-height: 1rem;
+      }
+    }
+
+    .bottom-text {
+      text-align: center;
+      color: rgba(var(--ion-color-secondary-rgb), 0.5);
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      margin: 0.875rem 0 0;
+    }
+  }
+
+  .rotate-keys-button {
+    width: 100%;
+    --background: transparent;
+    --box-shadow: none;
+    margin: 0;
+    --background-activated: transparent;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    min-height: auto;
+
+    p {
+      margin: 0 0.25rem 0 0;
+    }
+
+    p,
+    ion-icon {
+      color: var(--ion-color-primary-700);
+    }
+  }
+
+  .attribute-description-content {
+    margin-bottom: 1.5rem;
+  }
+
+  .list-header {
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  .card-block {
+    margin-bottom: 0.75rem;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .attribute-description {
+      h2 {
+        font-size: 1rem;
+        line-height: 1.25rem;
+      }
+
+      p {
+        font-size: 0.8rem;
+      }
+    }
+
+    .accordion-group {
+      .accordion {
+        padding: 1rem 0;
+
+        ion-item {
+          &.accordion-header {
+            font-size: 0.8rem;
+          }
+        }
+      }
+    }
+
+    .created {
+      .icon {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      .card-details-info-content {
+        .card-details-info-block-data {
+          font-size: 0.75rem;
+
+          .card-details-info-block-key {
+            font-size: 0.8rem;
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}

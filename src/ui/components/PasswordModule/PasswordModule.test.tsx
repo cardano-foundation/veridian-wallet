@@ -163,12 +163,9 @@ describe("Password Module", () => {
 
     expect(getByText("Password Module")).toBeVisible();
     expect(getByText("Description")).toBeVisible();
-
     expect(getByTestId("create-password-input")).toBeVisible();
     expect(getByTestId("confirm-password-input")).toBeVisible();
     expect(getByTestId("create-hint-input")).toBeVisible();
-
-    expect(getByTestId("primary-button-password-module")).toBeVisible();
   });
 
   test("Validate password", async () => {
@@ -315,133 +312,6 @@ describe("Password Module", () => {
         getByText(TRANSLATIONS.createpassword.error.hintSameAsPassword)
       ).toBeVisible();
     });
-  });
-
-  test("Submit existing password", async () => {
-    verifySecretMock.mockResolvedValueOnce(true);
-    const initialState = {
-      stateCache: {
-        routes: [RoutePath.TABS_MENU],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          seedPhraseIsSet: true,
-          passwordIsSet: true,
-        },
-        currentOperation: OperationType.IDLE,
-      },
-      seedPhraseCache: {
-        seedPhrase: "",
-        bran: "",
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const { getByTestId, queryByText, getByText } = render(
-      <Provider store={storeMocked(initialState)}>
-        <PasswordModule
-          title="Password Module"
-          description="Description"
-          testId="password-module"
-          onCreateSuccess={onCreateSuccesMock}
-        />
-      </Provider>
-    );
-
-    expect(queryByText(TRANSLATIONS.createpassword.button.skip)).toBe(null);
-
-    const input = getByTestId("create-password-input");
-    const confirmInput = getByTestId("confirm-password-input");
-    const hintInput = getByTestId("create-hint-input");
-
-    act(() => {
-      ionFireEvent.ionInput(input, "Passssssss1@");
-      ionFireEvent.ionInput(confirmInput, "Passssssss1@");
-      ionFireEvent.ionInput(hintInput, "hint");
-    });
-
-    expect(
-      queryByText(
-        TRANSLATIONS.settings.sections.security.managepassword.page.alert
-          .existingpassword
-      )
-    ).toBeNull();
-
-    fireEvent.click(getByTestId("primary-button-password-module"));
-
-    await waitFor(() => {
-      expect(
-        getByText(
-          TRANSLATIONS.settings.sections.security.managepassword.page.alert
-            .existingpassword
-        )
-      ).toBeVisible();
-    });
-
-    expect(getByTestId("alert-btn-0")).toBeVisible();
-
-    fireEvent.click(getByTestId("alert-btn-0"));
-
-    await waitFor(() => {
-      expect((input as HTMLInputElement).value).toBe("");
-      expect((confirmInput as HTMLInputElement).value).toBe("");
-      expect((hintInput as HTMLInputElement).value).toBe("");
-    });
-  });
-
-  test("Submit password", async () => {
-    const { getByTestId } = render(
-      <Provider store={storeMocked(initialState)}>
-        <PasswordModule
-          title="Password Module"
-          description="Description"
-          testId="password-module"
-          onCreateSuccess={onCreateSuccesMock}
-        />
-      </Provider>
-    );
-
-    const input = getByTestId("create-password-input");
-    const confirmInput = getByTestId("confirm-password-input");
-    const hintInput = getByTestId("create-hint-input");
-
-    act(() => {
-      ionFireEvent.ionInput(input, "Passssssssss1@");
-      ionFireEvent.ionInput(confirmInput, "Passssssssss1@");
-      ionFireEvent.ionInput(hintInput, "hint");
-    });
-
-    const submitButton = getByTestId("primary-button-password-module");
-
-    const mockDate = new Date(1466424490000);
-    const spy = jest
-      .spyOn(global, "Date")
-      .mockImplementation((() => mockDate) as never);
-
-    act(() => {
-      ionFireEvent.click(submitButton);
-    });
-
-    await waitFor(() => {
-      expect(storeSecretMock).toBeCalledWith(
-        KeyStoreKeys.APP_OP_PASSWORD,
-        "Passssssssss1@"
-      );
-      expect(createOrUpdateBasicRecordMock).toBeCalledWith(
-        new BasicRecord({
-          id: MiscRecordId.OP_PASS_HINT,
-          content: { value: "hint" },
-        })
-      );
-      expect((input as HTMLInputElement).value).toBe("");
-      expect((confirmInput as HTMLInputElement).value).toBe("");
-      expect((hintInput as HTMLInputElement).value).toBe("");
-    });
-
-    spy.mockRestore();
   });
 
   test("Open symbol modal", async () => {

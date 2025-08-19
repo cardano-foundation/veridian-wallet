@@ -93,18 +93,18 @@ const PasscodeModule = ({
                     biometricsCache.enabled &&
                     biometricInfo?.strongBiometryIsAvailable &&
                     biometricInfo?.isAvailable ? (
-                      <IonButton
-                        data-testid="passcode-button-#"
-                        className="passcode-module-number-button"
-                        disabled={hasError}
-                        onClick={() =>
-                          biometricInfo?.strongBiometryIsAvailable &&
+                        <IonButton
+                          data-testid="passcode-button-#"
+                          className="passcode-module-number-button"
+                          disabled={hasError}
+                          onClick={() =>
+                            biometricInfo?.strongBiometryIsAvailable &&
                           handleBiometricButton()
-                        }
-                      >
-                        {getBiometricIcon()}
-                      </IonButton>
-                    ) : null}
+                          }
+                        >
+                          {getBiometricIcon()}
+                        </IonButton>
+                      ) : null}
                   </IonCol>
                 )}
 

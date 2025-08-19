@@ -1,4 +1,4 @@
-import { StorageService } from "../../storage/storage.types";
+import { StorageMessage, StorageService } from "../../storage/storage.types";
 import {
   ConnectionPairRecord,
   ConnectionPairRecordStorageProps,
@@ -30,6 +30,14 @@ export class ConnectionPairStorage {
 
   findById(id: string): Promise<ConnectionPairRecord | null> {
     return this.storageService.findById(id, ConnectionPairRecord);
+  }
+
+  async findExpectedById(id: string): Promise<ConnectionPairRecord> {
+    const record = await this.findById(id);
+    if (!record) {
+      throw new Error(StorageMessage.RECORD_DOES_NOT_EXIST_ERROR_MSG);
+    }
+    return record;
   }
 
   findAllByQuery(query: any): Promise<ConnectionPairRecord[]> {

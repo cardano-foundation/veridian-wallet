@@ -7,7 +7,7 @@ import { IGNORE_ATTRIBUTES } from "../../const";
 import { useSchemaDetail } from "../../hooks/SchemaDetail";
 import { i18n } from "../../i18n";
 import { CredentialService } from "../../services";
-import { CredentialIssueRequest } from "../../services/credential.types";
+import { CredentialRequest } from "../../services/credential.types";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { savePresentationRequest } from "../../store/reducers/connectionsSlice";
 import { PresentationRequestStatus } from "../../store/reducers/connectionsSlice.types";
@@ -111,23 +111,16 @@ const RequestPresentationModal = ({
     if (!selectedCredTemplate || !selectedConnection || !credTemplateType)
       return;
 
-    let objAttributes = {};
-    const attribute: Record<string, string> = {};
+    const attributeData: Record<string, string> = {};
 
     Object.entries(attributes).forEach(([key, value]) => {
-      if (key && value) attribute[key] = value;
+      if (key && value) attributeData[key] = value;
     });
 
-    if (Object.keys(attribute).length) {
-      objAttributes = {
-        attribute,
-      };
-    }
-
-    const data: CredentialIssueRequest = {
+    const data: CredentialRequest = {
       schemaSaid: selectedCredTemplate,
       aid: selectedConnection,
-      ...objAttributes,
+      attributes: attributeData,
     };
 
     try {

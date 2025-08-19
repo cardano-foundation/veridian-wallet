@@ -26,6 +26,7 @@ const grantForIssuanceExnMessage = {
     t: "exn",
     d: "EJ1jbI8vTFCEloTfSsZkBpV0bUJnhGVyak5q-5IFIglL",
     i: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
+    rp: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
     p: "",
     dt: "2024-07-30T04:19:55.801000+00:00",
     r: ExchangeRoute.IpexGrant,

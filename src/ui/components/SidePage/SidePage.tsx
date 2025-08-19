@@ -9,7 +9,7 @@ import {
   getPendingConnection,
 } from "../../../store/reducers/walletConnectionsCache";
 import { IncomingRequest } from "../../pages/IncomingRequest";
-import { WalletConnect } from "../../pages/WalletConnect";
+import { WalletConnect } from "../ConnectdApp/components/WalletConnect";
 import { SideSlider } from "../SideSlider";
 
 const SidePage = () => {

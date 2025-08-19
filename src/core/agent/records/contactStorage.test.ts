@@ -198,9 +198,11 @@ describe("Contact Storage", () => {
   });
 
   test("Should handle contact record without optional fields", async () => {
+    const fixedDate = new Date("2025-01-01T00:00:00.000Z");
     const minimalProps: ContactRecordStorageProps = {
       alias: "minimal-contact",
       oobi: "minimal-oobi",
+      createdAt: fixedDate,
     };
     const minimalRecord = new ContactRecord(minimalProps);
     storageService.save.mockResolvedValue(minimalRecord);

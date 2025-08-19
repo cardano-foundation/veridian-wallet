@@ -244,6 +244,7 @@ const connectionService = jest.mocked({
     serviceEndpoints: [
       "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
     ],
+    notes: [],
     historyItems: [],
   }),
   shareIdentifier: jest.fn(),
@@ -1131,6 +1132,7 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: grantExn.exn.i,
+      notes: [],
       historyItems: [
         { id: grantExn.exn.d, type: ConnectionHistoryType.CREDENTIAL_ISSUANCE },
       ],
@@ -1149,7 +1151,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       grantExn.exn.i,
-      true
+      true,
+      exchange.exn.rp
     );
     expect(markNotificationMock).toHaveBeenCalledWith(notif.i);
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1174,7 +1177,9 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: grantExn.exn.i,
+      notes: [],
       historyItems: [],
+      serviceEndpoints: [],
     });
 
     identifierStorage.getIdentifierMetadata.mockRejectedValueOnce(
@@ -1191,7 +1196,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       grantExn.exn.i,
-      true
+      true,
+      grantExn.exn.rp
     );
     expect(markNotificationMock).not.toHaveBeenCalled();
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1277,6 +1283,7 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: applyExn.exn.i,
+      notes: [],
       historyItems: [
         {
           id: applyExn.exn.d,
@@ -1299,7 +1306,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       applyExn.exn.i,
-      true
+      true,
+      applyExn.exn.rp
     );
     expect(markNotificationMock).toHaveBeenCalledWith(notif.i);
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1324,7 +1332,9 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: applyExn.exn.i,
+      notes: [],
       historyItems: [],
+      serviceEndpoints: [],
     });
 
     identifierStorage.getIdentifierMetadata.mockRejectedValueOnce(
@@ -1342,7 +1352,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       applyExn.exn.i,
-      true
+      true,
+      applyExn.exn.rp
     );
     expect(markNotificationMock).not.toHaveBeenCalled();
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1434,6 +1445,7 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: exchange.exn.i,
+      notes: [],
       historyItems: [
         {
           id: agreeExn.exn.d,
@@ -1456,7 +1468,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       agreeExn.exn.i,
-      true
+      true,
+      agreeExn.exn.rp
     );
     expect(markNotificationMock).toHaveBeenCalledWith(notif.i);
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1481,7 +1494,9 @@ describe("Signify notification service of agent", () => {
 
     connectionService.getConnectionById.mockResolvedValue({
       id: agreeExn.exn.i,
+      notes: [],
       historyItems: [],
+      serviceEndpoints: [],
     });
 
     identifierStorage.getIdentifierMetadata.mockRejectedValueOnce(
@@ -1499,7 +1514,8 @@ describe("Signify notification service of agent", () => {
     });
     expect(connectionService.getConnectionById).toHaveBeenCalledWith(
       agreeExn.exn.i,
-      true
+      true,
+      agreeExn.exn.rp
     );
     expect(markNotificationMock).not.toHaveBeenCalled();
     expect(notificationStorage.save).not.toHaveBeenCalled();
@@ -1574,6 +1590,7 @@ describe("Signify notification service of agent", () => {
     credentialStorage.getCredentialMetadata.mockResolvedValue(null);
     connectionService.getConnectionById.mockResolvedValueOnce({
       id: multisigExnAdmitForIssuance.exn.i,
+      notes: [],
       historyItems: [],
       serviceEndpoints: [
         "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
@@ -2157,6 +2174,7 @@ describe("Group IPEX presentation", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       multisigMembers: [
@@ -2259,6 +2277,7 @@ describe("Group IPEX presentation", () => {
 
     connectionService.getConnectionById.mockResolvedValueOnce({
       id: multisigExnOfferForPresenting.exn.i,
+      notes: [],
       historyItems: [],
       serviceEndpoints: [
         "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
@@ -2336,6 +2355,7 @@ describe("Group IPEX presentation", () => {
 
     connectionService.getConnectionById.mockResolvedValueOnce({
       id: multisigExnGrant.exn.i,
+      notes: [],
       historyItems: [],
       serviceEndpoints: [
         "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
@@ -3925,6 +3945,7 @@ describe("Long running operation tracker", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
+          userName: "",
         },
       },
       multisigMembers: [
@@ -4208,7 +4229,7 @@ describe("Long running operation tracker", () => {
     );
   });
 
-  test('Should retry connection when "Failed to fetch" error occurs when process operation', async () => {
+  test("Should retry connection when \"Failed to fetch\" error occurs when process operation", async () => {
     const operationRecord = {
       type: "OperationPendingRecord",
       id: "exchange.receivecredential.AOCUvGbpidkplC7gAoJOxLgXX1P2j4xlWMbzk3gM8JzA",

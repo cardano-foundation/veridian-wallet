@@ -15,6 +15,7 @@ import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { SetupBiometrics } from "./SetupBiometrics";
+import { Agent } from "../../../core/agent/agent";
 
 jest.mock("../../utils/passcodeChecker", () => ({
   isRepeat: () => false,
@@ -30,7 +31,7 @@ jest.mock("../../../core/agent/agent", () => ({
         findById: jest.fn(),
         save: () => saveItem(),
         update: jest.fn(),
-        createOrUpdateBasicRecord: jest.fn(),
+        createOrUpdateBasicRecord: jest.fn(() => Promise.resolve()),
       },
       auth: {
         verifySecret: verifySecretMock,
@@ -73,13 +74,13 @@ jest.mock("../../hooks/privacyScreenHook", () => ({
 const initialState = {
   stateCache: {
     routes: [RoutePath.SETUP_BIOMETRICS],
+    currentProfileId: "",
     authentication: {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
       passwordIsSet: false,
       finishSetupBiometrics: false,
-      userName: "",
       seedPhraseIsSet: false,
       passwordIsSkipped: false,
       ssiAgentIsSet: false,
@@ -97,9 +98,6 @@ const initialState = {
       isPaused: false,
     },
     isOnline: true,
-  },
-  identifiersCache: {
-    identifiers: {},
   },
 };
 
@@ -149,7 +147,7 @@ describe("SetPasscode Page", () => {
   });
 
   test("Click on skip", async () => {
-    const { getByText } = render(
+    const { getByTestId, getByText } = render(
       <IonReactMemoryRouter
         history={history}
         initialEntries={[RoutePath.SETUP_BIOMETRICS]}
@@ -160,10 +158,16 @@ describe("SetPasscode Page", () => {
       </IonReactMemoryRouter>
     );
 
-    fireEvent.click(getByText(EN_TRANSLATIONS.setupbiometrics.button.skip));
+    fireEvent.click(getByTestId("action-button"));
 
     await waitFor(() => {
-      expect(saveItem).toBeCalled();
+      expect(getByTestId("alert-cancel-biometry")).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("alert-cancel-biometry-confirm-button"));
+
+    await waitFor(() => {
+      expect(Agent.agent.basicStorage.createOrUpdateBasicRecord).toBeCalled();
     });
 
     expect(dispatchMock).toBeCalled();
@@ -194,7 +198,7 @@ describe("SetPasscode Page", () => {
     );
 
     await waitFor(() => {
-      expect(saveItem).toBeCalled();
+      expect(Agent.agent.basicStorage.createOrUpdateBasicRecord).toBeCalled();
     });
 
     expect(dispatchMock).toBeCalled();

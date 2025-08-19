@@ -127,8 +127,8 @@ const SystemCompatibilityAlert: React.FC<SystemCompatibilityAlertProps> = ({
                 isKeyStoreSupported === undefined
                   ? "N/A"
                   : isKeyStoreSupported
-                  ? "Yes"
-                  : "No"
+                    ? "Yes"
+                    : "No"
               }
             />
           </>
@@ -157,8 +157,8 @@ const SystemCompatibilityAlert: React.FC<SystemCompatibilityAlertProps> = ({
                 isKeyStoreSupported === undefined
                   ? "N/A"
                   : isKeyStoreSupported
-                  ? "Yes"
-                  : "No"
+                    ? "Yes"
+                    : "No"
               }
             />
           </>

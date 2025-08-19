@@ -6,7 +6,6 @@ import { CredentialsMatchingApply } from "../../../../../core/agent/services/ipe
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
-import { getIdentifiersCache } from "../../../../../store/reducers/identifiersCache";
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
 import { useOnlineStatusEffect } from "../../../../hooks";
@@ -16,6 +15,7 @@ import { ChooseCredential } from "./ChooseCredential";
 import "./CredentialRequest.scss";
 import { LinkedGroup } from "./CredentialRequest.types";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
+import { getProfiles } from "../../../../../store/reducers/profileCache";
 
 const CredentialRequest = ({
   pageId,
@@ -24,7 +24,7 @@ const CredentialRequest = ({
   handleBack,
 }: NotificationDetailsProps) => {
   const dispatch = useAppDispatch();
-  const identifiersData = useAppSelector(getIdentifiersCache);
+  const profiles = useAppSelector(getProfiles);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const userName = useAppSelector(getAuthentication)?.userName;
   const [requestStage, setRequestStage] = useState(0);
@@ -42,7 +42,7 @@ const CredentialRequest = ({
 
   const userAID = !credentialRequest
     ? null
-    : identifiersData[credentialRequest.identifier]?.groupMemberPre || null;
+    : profiles[credentialRequest.identifier]?.identity.groupMemberPre || null;
 
   const getMultisigInfo = useCallback(async () => {
     const linkedGroup =
@@ -79,10 +79,10 @@ const CredentialRequest = ({
         notificationDetails
       );
 
-      const identifier = identifiersData[request.identifier];
+      const profile = profiles[request.identifier];
 
       const identifierType =
-        identifier?.groupMemberPre || identifier?.groupMetadata
+        profile?.identity.groupMemberPre || profile?.identity.groupMetadata
           ? IdentifierType.Group
           : IdentifierType.Individual;
 
@@ -95,7 +95,7 @@ const CredentialRequest = ({
       handleBack();
       showError("Unable to get credential request detail", e, dispatch);
     }
-  }, [notificationDetails, identifiersData, getMultisigInfo, dispatch]);
+  }, [notificationDetails, profiles, getMultisigInfo, dispatch]);
 
   useOnlineStatusEffect(getCrendetialRequest);
 
