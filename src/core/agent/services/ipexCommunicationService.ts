@@ -24,7 +24,7 @@ import {
 import type { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
 import { AgentService } from "./agentService";
 import { getCredentialShortDetails, OnlineOnly } from "./utils";
-import { CredentialStatus, ACDCDetails } from "./credentialService.types";
+import { CredentialStatus, ACDCDetails, KeriaCredential } from "./credentialService.types";
 import {
   CredentialsMatchingApply,
   LinkedGroupInfo,
@@ -407,22 +407,6 @@ class IpexCommunicationService extends AgentService {
     const filtered = await this.props.signifyClient.credentials().list({
       filter,
     });
-    interface KeriaCredential {
-      sad: {
-        d: string;
-        a: {
-          i: string;
-          dt: string;
-          [key: string]: unknown;
-        };
-        i: string;
-        ri: string;
-      };
-      schema: {
-        title: string;
-        $id: string;
-      };
-    }
 
     const localFiltered =
       await this.credentialStorage.getCredentialMetadatasById(

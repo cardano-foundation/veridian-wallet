@@ -6,6 +6,7 @@ import {
   CredentialShortDetails,
   ACDCDetails,
   CredentialStatus,
+  KeriaCredential,
 } from "./credentialService.types";
 import { CredentialMetadataRecord } from "../records/credentialMetadataRecord";
 import { getCredentialShortDetails, OnlineOnly } from "./utils";
@@ -195,22 +196,6 @@ class CredentialService extends AgentService {
   }
 
   async syncKeriaCredentials(): Promise<void> {
-    interface KeriaCredential {
-      sad: {
-        d: string;
-        a: {
-          i: string;
-          dt: string;
-          [key: string]: unknown;
-        };
-        i: string;
-        ri: string;
-      };
-      schema: {
-        title: string;
-        $id: string;
-      };
-    }
 
     const cloudCredentials: KeriaCredential[] = [];
     let returned = -1;
