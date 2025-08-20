@@ -1,6 +1,7 @@
 import { CreateIdentifierBody } from "signify-ts";
 import {
   ConnectionShortDetails,
+  MultisigConnectionDetails,
   CreationStatus,
   JSONObject,
 } from "../agent.types";
@@ -67,7 +68,7 @@ type QueuedIdentifierCreation = {
 type QueuedGroupProps =
   | {
       initiator: true;
-      groupConnections: ConnectionShortDetails[];
+      groupConnections: MultisigConnectionDetails[];
       threshold: number;
     }
   | {

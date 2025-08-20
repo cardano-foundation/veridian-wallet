@@ -1,5 +1,15 @@
 .generate-seed-phrase {
+  .page-header {
+    ion-toolbar {
+      --background: transparent;
+    }
+  }
+
   .scrollable-page-content {
+    .title {
+      text-align: center;
+    }
+
     .seed-phrase-module {
       ion-chip {
         pointer-events: none;
@@ -38,18 +48,5 @@
         text-wrap: wrap;
       }
     }
-  }
-
-  .page-header {
-    ion-toolbar {
-      --background: transparent;
-    }
-  }
-}
-
-.terms-and-conditions-body {
-  p b {
-    margin-right: 0.35rem;
-    margin-left: 1rem;
   }
 }

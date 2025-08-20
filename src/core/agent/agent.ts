@@ -25,14 +25,16 @@ import { CoreEventEmitter } from "./event";
 import {
   BasicRecord,
   BasicStorage,
-  ConnectionRecord,
-  ConnectionStorage,
   CredentialMetadataRecord,
   CredentialStorage,
   IdentifierMetadataRecord,
   IdentifierStorage,
   NotificationRecord,
   NotificationStorage,
+  ContactStorage,
+  ConnectionPairStorage,
+  ContactRecord,
+  ConnectionPairRecord,
   PeerConnectionPairRecord,
   PeerConnectionPairStorage,
 } from "./records";
@@ -79,10 +81,11 @@ class Agent {
   private basicStorageService!: BasicStorage;
   private identifierStorage!: IdentifierStorage;
   private credentialStorage!: CredentialStorage;
-  private connectionStorage!: ConnectionStorage;
   private notificationStorage!: NotificationStorage;
 
   private operationPendingStorage!: OperationPendingStorage;
+  private connectionPairStorage!: ConnectionPairStorage;
+  private contactStorage!: ContactStorage;
   private peerConnectionPairStorage!: PeerConnectionPairStorage;
   private identifierService!: IdentifierService;
   private multiSigService!: MultiSigService;
@@ -102,7 +105,8 @@ class Agent {
         this.operationPendingStorage,
         this.basicStorage,
         this.notificationStorage,
-        this.connections
+        this.connections,
+        this.credentials
       );
     }
     return this.identifierService;
@@ -142,11 +146,12 @@ class Agent {
     if (!this.connectionService) {
       this.connectionService = new ConnectionService(
         this.agentServicesProps,
-        this.connectionStorage,
         this.credentialStorage,
         this.operationPendingStorage,
         this.identifierStorage,
-        this.basicStorage
+        this.basicStorage,
+        this.connectionPairStorage,
+        this.contactStorage
       );
     }
     return this.connectionService;
@@ -179,7 +184,8 @@ class Agent {
         this.notificationStorage,
         this.identifierStorage,
         this.operationPendingStorage,
-        this.connectionStorage,
+        this.contactStorage,
+        this.connectionPairStorage,
         this.credentialStorage,
         this.basicStorage,
         this.multiSigs,
@@ -353,8 +359,8 @@ class Agent {
   }
 
   async syncWithKeria() {
-    await this.connections.syncKeriaContacts();
     await this.identifiers.syncKeriaIdentifiers();
+    await this.connections.syncKeriaContacts();
     await this.credentials.syncKeriaCredentials();
 
     await this.basicStorage.createOrUpdateBasicRecord(
@@ -508,9 +514,6 @@ class Agent {
     this.credentialStorage = new CredentialStorage(
       this.getStorageService<CredentialMetadataRecord>(this.storageSession)
     );
-    this.connectionStorage = new ConnectionStorage(
-      this.getStorageService<ConnectionRecord>(this.storageSession)
-    );
     this.notificationStorage = new NotificationStorage(
       this.getStorageService<NotificationRecord>(this.storageSession)
     );
@@ -518,6 +521,12 @@ class Agent {
     this.operationPendingStorage = new OperationPendingStorage(
       this.getStorageService<OperationPendingRecord>(this.storageSession),
       this.agentServicesProps.eventEmitter
+    );
+    this.connectionPairStorage = new ConnectionPairStorage(
+      this.getStorageService<ConnectionPairRecord>(this.storageSession)
+    );
+    this.contactStorage = new ContactStorage(
+      this.getStorageService<ContactRecord>(this.storageSession)
     );
     this.peerConnectionPairStorage = new PeerConnectionPairStorage(
       this.getStorageService<PeerConnectionPairRecord>(this.storageSession)
@@ -644,7 +653,7 @@ class Agent {
         });
     }
 
-    const connections = await this.connectionStorage.getAll();
+    const connections = await this.contactStorage.getAll();
     for (const connection of connections) {
       await this.agentServicesProps.signifyClient
         .contacts()
@@ -676,6 +685,23 @@ class Agent {
     await SecureStorage.wipe();
     this.markAgentStatus(false);
   }
+
+    /**
+   * Wipe local database and secure storage to start fresh.
+   */
+    async wipeLocalDatabase(): Promise<void> {
+      // Stop background services
+      this.keriaNotificationService.stopPolling();
+  
+      // Wipe the storage session (this deletes the database file)
+      await this.storageSession.wipe(walletId);
+  
+      // Wipe secure storage
+      await SecureStorage.wipe();
+  
+      // Mark agent as offline
+      this.markAgentStatus(false);
+    }
 }
 
 export { Agent };

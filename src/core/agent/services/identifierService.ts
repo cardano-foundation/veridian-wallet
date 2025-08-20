@@ -32,6 +32,7 @@ import { OperationPendingRecordType } from "../records/operationPendingRecord.ty
 import { Agent } from "../agent";
 import { PeerConnection } from "../../cardano/walletConnect/peerConnection";
 import { ConnectionService } from "./connectionService";
+import { CredentialService } from "./credentialService";
 import {
   EventTypes,
   IdentifierAddedEvent,
@@ -73,6 +74,7 @@ class IdentifierService extends AgentService {
   protected readonly basicStorage: BasicStorage;
   protected readonly notificationStorage: NotificationStorage;
   protected readonly connections: ConnectionService;
+  protected readonly credentials: CredentialService;
 
   constructor(
     agentServiceProps: AgentServicesProps,
@@ -80,7 +82,8 @@ class IdentifierService extends AgentService {
     operationPendingStorage: OperationPendingStorage,
     basicStorage: BasicStorage,
     notificationStorage: NotificationStorage,
-    connections: ConnectionService
+    connections: ConnectionService,
+    credentials: CredentialService
   ) {
     super(agentServiceProps);
     this.identifierStorage = identifierStorage;
@@ -88,6 +91,7 @@ class IdentifierService extends AgentService {
     this.basicStorage = basicStorage;
     this.notificationStorage = notificationStorage;
     this.connections = connections;
+    this.credentials = credentials;
   }
 
   onIdentifierRemoved() {
@@ -367,8 +371,14 @@ class IdentifierService extends AgentService {
       identifier
     );
     if (metadata.groupMetadata) {
-      await this.deleteGroupLinkedConnections(metadata.groupMetadata.groupId);
+      await this.connections.deleteAllConnectionsForGroup(
+        metadata.groupMetadata.groupId
+      );
+    } else {
+      await this.connections.deleteAllConnectionsForIdentifier(identifier);
     }
+
+    await this.credentials.deleteAllCredentialsForIdentifier(identifier);
 
     if (metadata.groupMemberPre) {
       const localMember = await this.identifierStorage.getIdentifierMetadata(
@@ -388,11 +398,8 @@ class IdentifierService extends AgentService {
         }:${localMember.displayName}`,
       });
 
-      if (!localMember.groupMetadata) {
-        throw new Error("Group metadata missing for local member");
-      }
-      await this.deleteGroupLinkedConnections(
-        localMember.groupMetadata.groupId
+      await this.connections.deleteAllConnectionsForGroup(
+        localMember.groupMetadata!.groupId
       );
 
       for (const notification of await this.notificationStorage.findAllByQuery({
@@ -489,7 +496,7 @@ class IdentifierService extends AgentService {
       groupId
     );
     for (const connection of connections) {
-      await this.connections.deleteConnectionById(connection.id);
+      await this.connections.deleteMultisigConnectionById(connection.id);
     }
   }
 

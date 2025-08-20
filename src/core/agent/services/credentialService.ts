@@ -146,6 +146,18 @@ class CredentialService extends AgentService {
     await this.credentialStorage.deleteCredentialMetadata(id);
   }
 
+  async deleteAllCredentialsForIdentifier(identifierId: string): Promise<void> {
+    const credentialsToDelete =
+      await this.credentialStorage.getAllCredentialMetadata(
+        undefined,
+        identifierId
+      );
+
+    for (const credential of credentialsToDelete) {
+      await this.deleteCredential(credential.id);
+    }
+  }
+
   async markCredentialPendingDeletion(id: string): Promise<void> {
     const metadata = await this.getMetadataById(id);
     this.validArchivedCredential(metadata);

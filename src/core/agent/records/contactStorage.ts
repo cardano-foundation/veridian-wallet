@@ -1,4 +1,4 @@
-import { StorageService, Query } from "../../storage/storage.types";
+import { StorageMessage, StorageService, Query } from "../../storage/storage.types";
 import { ContactRecord, ContactRecordStorageProps } from "./contactRecord";
 
 export class ContactStorage {
@@ -29,7 +29,15 @@ export class ContactStorage {
     return this.storageService.findById(id, ContactRecord);
   }
 
-  findAllByQuery(query: Query<ContactRecord>): Promise<ContactRecord[]> {
+  async findExpectedById(id: string): Promise<ContactRecord> {
+    const record = await this.findById(id);
+    if (!record) {
+      throw new Error(StorageMessage.RECORD_DOES_NOT_EXIST_ERROR_MSG);
+    }
+    return record;
+  }
+
+  findAllByQuery(query: any): Promise<ContactRecord[]> {
     return this.storageService.findAllByQuery(query, ContactRecord);
   }
 

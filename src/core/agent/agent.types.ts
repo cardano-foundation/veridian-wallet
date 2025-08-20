@@ -16,6 +16,43 @@ interface ConnectionHistoryItem {
   credentialType?: string;
 }
 
+interface ConnectionShortDetailsBase {
+  id: string;
+  label: string;
+  createdAtUTC: string;
+  status: ConnectionStatus;
+  logo?: string;
+  oobi?: string;
+  contactId: string;
+}
+
+// Regular connection with identifier
+interface RegularConnectionDetails extends ConnectionShortDetailsBase {
+  identifier: string;
+}
+
+// Multisig connection with groupId
+interface MultisigConnectionDetails extends ConnectionShortDetailsBase {
+  groupId: string;
+}
+
+type ConnectionShortDetails =
+  | RegularConnectionDetails
+  | MultisigConnectionDetails;
+
+// Type guard functions for runtime checking
+function isRegularConnectionDetails(
+  connection: ConnectionShortDetails
+): connection is RegularConnectionDetails {
+  return "identifier" in connection && !("groupId" in connection);
+}
+
+function isMultisigConnectionDetails(
+  connection: ConnectionShortDetails
+): connection is MultisigConnectionDetails {
+  return "groupId" in connection;
+}
+
 enum MiscRecordId {
   OP_PASS_HINT = "op-password-hint",
   APP_ALREADY_INIT = "app-already-init",
@@ -42,16 +79,6 @@ enum MiscRecordId {
   INDIVIDUAL_FIRST_CREATE = "individual-first-create",
   BIOMETRICS_SETUP = "biometrics-setup",
   PROFILE_HISTORIES = "profile-histories",
-}
-
-interface ConnectionShortDetails {
-  id: string;
-  label: string;
-  createdAtUTC: string;
-  status: ConnectionStatus;
-  logo?: string;
-  oobi?: string;
-  groupId?: string;
 }
 
 type ConnectionNoteDetails = {
@@ -154,11 +181,27 @@ type ExnMessage = {
 
 type ConnectionNoteProps = Pick<ConnectionNoteDetails, "title" | "message">;
 
-interface ConnectionDetails extends ConnectionShortDetails {
+interface ConnectionDetailsExtras {
   serviceEndpoints: string[];
   notes: ConnectionNoteDetails[];
   historyItems: ConnectionHistoryItem[];
 }
+
+interface RegularConnectionDetailsFull
+  extends ConnectionShortDetailsBase,
+    ConnectionDetailsExtras {
+  identifier: string;
+}
+
+interface MultisigConnectionDetailsFull
+  extends ConnectionShortDetailsBase,
+    ConnectionDetailsExtras {
+  groupId: string;
+}
+
+type ConnectionDetails =
+  | RegularConnectionDetailsFull
+  | MultisigConnectionDetailsFull;
 
 interface NotificationRpy {
   a: {
@@ -219,14 +262,26 @@ export const OOBI_AGENT_ONLY_RE =
 export const DOOBI_RE = /^\/oobi\/(?<said>[^/]+)$/i;
 export const WOOBI_RE = /^\/\.well-known\/keri\/oobi\/(?<cid>[^/]+)$/;
 
-export { ConnectionStatus, CreationStatus, MiscRecordId, OobiType };
+export {
+  ConnectionStatus,
+  MiscRecordId,
+  OobiType,
+  CreationStatus,
+  isRegularConnectionDetails,
+  isMultisigConnectionDetails,
+};
 
 export type {
   AgentServicesProps,
   AgentUrls,
   AuthorizationRequestExn,
   BranAndMnemonic,
+  ConnectionShortDetailsBase,
+  RegularConnectionDetails,
+  MultisigConnectionDetails,
   ConnectionDetails,
+  RegularConnectionDetailsFull,
+  MultisigConnectionDetailsFull,
   ConnectionHistoryItem,
   ConnectionNoteDetails,
   ConnectionNoteProps,

@@ -67,13 +67,15 @@ interface ConnectionStateChangedEvent extends BaseEventEmitter {
     status: ConnectionStatus;
     url?: string;
     label?: string;
+    identifier: string;
   };
 }
 
 interface ConnectionRemovedEvent extends BaseEventEmitter {
   type: typeof EventTypes.ConnectionRemoved;
   payload: {
-    connectionId: string;
+    contactId: string;
+    identifier: string;
   };
 }
 

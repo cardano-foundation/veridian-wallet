@@ -203,8 +203,7 @@ class SqliteSession {
           this.sessionInstance
         );
         migrationStatements.push(...statements);
-
-        await this.performCloudMigration(migration, true);
+        await this.performCloudMigration(migration, false);
       }
 
       // Update version for all migration types
