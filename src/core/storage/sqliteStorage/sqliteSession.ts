@@ -190,7 +190,9 @@ class SqliteSession {
         if (!this.sessionInstance) {
           throw new Error("SQLite session not available for migration");
         }
-        const statements = await migration.migrationStatements(this.sessionInstance);
+        const statements = await migration.migrationStatements(
+          this.sessionInstance
+        );
         migrationStatements.push(...statements);
       } else if (migration.type === MigrationType.CLOUD) {
         // Handle cloud migrations

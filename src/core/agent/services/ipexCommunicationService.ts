@@ -24,7 +24,11 @@ import {
 import type { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
 import { AgentService } from "./agentService";
 import { getCredentialShortDetails, OnlineOnly } from "./utils";
-import { CredentialStatus, ACDCDetails, KeriaCredential } from "./credentialService.types";
+import {
+  CredentialStatus,
+  ACDCDetails,
+  KeriaCredential,
+} from "./credentialService.types";
 import {
   CredentialsMatchingApply,
   LinkedGroupInfo,
@@ -207,7 +211,10 @@ class IpexCommunicationService extends AgentService {
   }
 
   @OnlineOnly
-  async offerAcdcFromApply(notificationId: string, acdc: CredentialMetadataRecordProps): Promise<void> {
+  async offerAcdcFromApply(
+    notificationId: string,
+    acdc: CredentialMetadataRecordProps
+  ): Promise<void> {
     const applyNoteRecord = await this.notificationStorage.findById(
       notificationId
     );
@@ -397,13 +404,13 @@ class IpexCommunicationService extends AgentService {
       "-a-i": exchange.exn.rp,
       ...(Object.keys(attributes).length > 0
         ? {
-          ...Object.fromEntries(
-            Object.entries(attributes).map(([key, value]) => [
-              "-a-" + key,
-              value,
-            ])
-          ),
-        }
+            ...Object.fromEntries(
+              Object.entries(attributes).map(([key, value]) => [
+                "-a-" + key,
+                value,
+              ])
+            ),
+          }
         : {}),
     };
 
@@ -425,7 +432,9 @@ class IpexCommunicationService extends AgentService {
         description: schema.description,
       },
       credentials: localFiltered.map((cr) => {
-        const credKeri = filtered.find((cred: KeriaCredential) => cred.sad.d === cr.id);
+        const credKeri = filtered.find(
+          (cred: KeriaCredential) => cred.sad.d === cr.id
+        );
         return {
           connectionId: cr.connectionId,
           acdc: credKeri.sad,
@@ -717,19 +726,19 @@ class IpexCommunicationService extends AgentService {
       throw new Error(IpexCommunicationService.NO_CURRENT_IPEX_MSG_TO_JOIN);
     }
 
-    const grantExn = (multiSigExn.exn.e.exn as unknown) as {
+    const grantExn = multiSigExn.exn.e.exn as unknown as {
       i: string;
       p: string;
       e: { acdc: { i: string; d: string; s: string } };
     };
-    
+
     // Create the credential structure expected by submitMultisigGrant
     const credentialData = {
       sad: { d: grantExn.e.acdc.d },
       iss: { d: grantExn.e.acdc.i },
       anc: { d: grantExn.e.acdc.s },
     };
-    
+
     const { op } = await this.submitMultisigGrant(
       grantExn.i,
       grantExn.e.acdc.i,
@@ -1158,7 +1167,9 @@ class IpexCommunicationService extends AgentService {
     const members = await this.props.signifyClient
       .identifiers()
       .members(recipientPrefix);
-    const memberAids = members.signing.map((member: { aid: string }) => member.aid);
+    const memberAids = members.signing.map(
+      (member: { aid: string }) => member.aid
+    );
 
     const othersJoined: string[] = [];
     if (grantNoteRecord.linkedRequest.current) {
@@ -1196,7 +1207,9 @@ class IpexCommunicationService extends AgentService {
     const members = await this.props.signifyClient
       .identifiers()
       .members(recipientPrefix);
-    const memberAids = members.signing.map((member: { aid: string }) => member.aid);
+    const memberAids = members.signing.map(
+      (member: { aid: string }) => member.aid
+    );
 
     const othersJoined: string[] = [];
     if (applyNoteRecord.linkedRequest.current) {
@@ -1237,7 +1250,7 @@ class IpexCommunicationService extends AgentService {
     const indexerOobiResult = await (
       await fetch(`${agentBase}/indexer/${prefix}`)
     ).text();
-    const schemaBase = indexerOobiResult.split("\"url\":\"")[1].split("\"")[0];
+    const schemaBase = indexerOobiResult.split('"url":"')[1].split('"')[0];
 
     return `${schemaBase}/oobi/${said}`;
   }

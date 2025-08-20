@@ -1145,9 +1145,7 @@ describe("Single sig service of agent", () => {
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
-    expect(connections.deleteAllConnectionsForGroup).toBeCalledWith(
-      "group-id"
-    );
+    expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
       findNotificationsResult[0].id

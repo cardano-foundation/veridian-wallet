@@ -45,7 +45,10 @@ export const DATA_V1201: HybridMigration = {
       };
     }
 
-    function insertItemTags(itemRecord: { id: string; tags?: Record<string, unknown> }) {
+    function insertItemTags(itemRecord: {
+      id: string;
+      tags?: Record<string, unknown>;
+    }) {
       const statements: { statement: string; values: unknown[] }[] = [];
       const statement =
         "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
@@ -94,6 +97,7 @@ export const DATA_V1201: HybridMigration = {
 
       if (!connectionData.sharedIdentifier) {
         if (!connectionData.groupId) {
+          // eslint-disable-next-line no-console
           console.log("No groupId found for connection, skipping migration");
           continue;
         }
@@ -118,7 +122,7 @@ export const DATA_V1201: HybridMigration = {
         }
       } else {
         // Has sharedIdentifier: only create pair if identifier exists and is not deleted/pending
-        const identifier = identifiers.find((identifier: any) => {
+        const identifier = identifiers.find((identifier: { id: string }) => {
           return identifier.id === connectionData.sharedIdentifier;
         });
         if (identifier) {
@@ -146,7 +150,11 @@ export const DATA_V1201: HybridMigration = {
 
         for (const connectionPair of connectionPairsToInsert) {
           statements.push(insertItem(connectionPair));
-          statements.push(...insertItemTags(connectionPair as { id: string; tags?: Record<string, unknown> }));
+          statements.push(
+            ...insertItemTags(
+              connectionPair as { id: string; tags?: Record<string, unknown> }
+            )
+          );
         }
       }
     }
@@ -155,11 +163,12 @@ export const DATA_V1201: HybridMigration = {
   },
 
   cloudMigrationStatements: async (signifyClient: SignifyClient) => {
+    // eslint-disable-next-line no-console
     console.log(
       "Starting cloud KERIA migration: Converting connections to account-based model"
     );
 
-    let identifiers: any[] = [];
+    let identifiers: Array<{ prefix: string; name: string }> = [];
     let returned = -1;
     let iteration = 0;
 
@@ -174,7 +183,7 @@ export const DATA_V1201: HybridMigration = {
     }
 
     identifiers = identifiers.filter(
-      (identifier: any) => !identifier.name.startsWith("XX")
+      (identifier) => !identifier.name.startsWith("XX")
     );
 
     const contacts = await signifyClient.contacts().list();
@@ -187,6 +196,7 @@ export const DATA_V1201: HybridMigration = {
 
     for (const contact of contacts) {
       if (contact["version"] === "1.2.0") {
+        // eslint-disable-next-line no-console
         console.log(
           `Contact ${contact.id} is already migrated from v1.2.0, skipping migration`
         );
@@ -200,9 +210,9 @@ export const DATA_V1201: HybridMigration = {
       const historyItems: Array<{
         key: string;
         identifier: string;
-        data: any;
+        data: string;
       }> = [];
-      const noteItems: Array<{ key: string; data: any }> = [];
+      const noteItems: Array<{ key: string; data: unknown }> = [];
 
       for (const key of Object.keys(contact)) {
         if (
@@ -241,7 +251,7 @@ export const DATA_V1201: HybridMigration = {
 
       if (sharedIdentifierPrefix) {
         const sharedIdentifier = identifiers.find(
-          (id: any) => id.prefix === sharedIdentifierPrefix
+          (id) => id.prefix === sharedIdentifierPrefix
         );
 
         if (sharedIdentifier) {
@@ -274,7 +284,7 @@ export const DATA_V1201: HybridMigration = {
         // associate history items to the correct identifier
         for (const historyItem of historyItems) {
           const identifier = identifiers.find(
-            (id: any) => id.prefix === historyItem.identifier
+            (id) => id.prefix === historyItem.identifier
           );
           if (identifier) {
             contactUpdates[`${identifier.prefix}:${historyItem.key}`] =

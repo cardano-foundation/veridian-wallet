@@ -144,16 +144,16 @@ class MultiSigService extends AgentService {
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
-        mHab,
-        states,
-        groupName,
-        threshold,
-        {
-          initiator: true,
-          groupConnections,
+          mHab,
+          states,
+          groupName,
           threshold,
-        }
-      );
+          {
+            initiator: true,
+            groupConnections,
+            threshold,
+          }
+        );
     await this.inceptGroup(mHab, states, inceptionData);
 
     // Share witness OOBIs with other group members
@@ -490,18 +490,18 @@ class MultiSigService extends AgentService {
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
-        mHab,
-        states,
-        groupName,
-        Number(exn.e.icp.kt),
-        {
-          initiator: false,
-          notificationId,
-          notificationSaid,
-        },
-        exn.e.icp.bt,
-        exn.e.icp.b
-      );
+          mHab,
+          states,
+          groupName,
+          Number(exn.e.icp.kt),
+          {
+            initiator: false,
+            notificationId,
+            notificationSaid,
+          },
+          exn.e.icp.bt,
+          exn.e.icp.b
+        );
     await this.inceptGroup(mHab, states, inceptionData);
 
     const multisigId = inceptionData.icp.i;

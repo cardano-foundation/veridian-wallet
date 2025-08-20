@@ -142,8 +142,10 @@ class IonicStorage<T extends BaseRecord> implements StorageService<T> {
         if (Array.isArray(queryVal) && queryVal.length > 0) {
           // compare them item by item
           const tags = record.tags as Record<string, unknown>;
-          const check = queryVal.every((element) =>
-            Array.isArray(tags?.[queryKey]) && tags[queryKey]?.includes(element)
+          const check = queryVal.every(
+            (element) =>
+              Array.isArray(tags?.[queryKey]) &&
+              tags[queryKey]?.includes(element)
           );
           if (!check) {
             return false;

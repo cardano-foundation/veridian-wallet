@@ -329,12 +329,12 @@ const expectAllWitnessIntroductions = () => {
     expect(submitRpyMock).toHaveBeenNthCalledWith(
       index + 1,
       linkedContacts[0].id,
-      expect.stringContaining("\"t\":\"rpy\"")
+      expect.stringContaining('"t":"rpy"')
     );
     expect(submitRpyMock).toHaveBeenNthCalledWith(
       index + 1,
       linkedContacts[0].id,
-      expect.stringContaining("\"r\":\"/introduce\"")
+      expect.stringContaining('"r":"/introduce"')
     );
   });
 };

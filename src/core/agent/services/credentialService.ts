@@ -208,7 +208,6 @@ class CredentialService extends AgentService {
   }
 
   async syncKeriaCredentials(): Promise<void> {
-
     const cloudCredentials: KeriaCredential[] = [];
     let returned = -1;
     let iteration = 0;

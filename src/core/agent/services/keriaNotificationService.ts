@@ -480,9 +480,9 @@ class KeriaNotificationService extends AgentService {
       }
     } else {
       const receivingPre = exn.exn.r.startsWith("/multisig")
-        ? exn.exn.a.gid as string
-        : exn.exn.rp as string;
-      
+        ? (exn.exn.a.gid as string)
+        : (exn.exn.rp as string);
+
       const hab = await this.props.signifyClient
         .identifiers()
         .get(receivingPre);
@@ -528,7 +528,7 @@ class KeriaNotificationService extends AgentService {
 
     const existingCredential =
       await this.credentialStorage.getCredentialMetadata(exchange.exn.e.acdc.d);
-    
+
     const telStatus = (
       await this.props.signifyClient
         .credentials()
@@ -715,7 +715,7 @@ class KeriaNotificationService extends AgentService {
     exchange: ExnMessage
   ): Promise<false> {
     const exnData = exchange.exn.e?.exn;
-    
+
     switch (exnData.r) {
       case ExchangeRoute.IpexAdmit: {
         const grantNotificationRecords =

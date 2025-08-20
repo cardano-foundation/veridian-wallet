@@ -4238,7 +4238,7 @@ describe("Long running operation tracker", () => {
     );
   });
 
-  test("Should retry connection when \"Failed to fetch\" error occurs when process operation", async () => {
+  test('Should retry connection when "Failed to fetch" error occurs when process operation', async () => {
     const operationRecord = {
       type: "OperationPendingRecord",
       id: "exchange.receivecredential.AOCUvGbpidkplC7gAoJOxLgXX1P2j4xlWMbzk3gM8JzA",

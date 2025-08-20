@@ -544,15 +544,15 @@ class IdentifierService extends AgentService {
   }
 
   async syncKeriaIdentifiers(): Promise<void> {
-    const cloudIdentifiers: Array<{ 
-      prefix: string; 
-      name: string; 
-      group?: { 
-        mhab: { 
-          name: string; 
-          prefix: string 
-        } 
-      } 
+    const cloudIdentifiers: Array<{
+      prefix: string;
+      name: string;
+      group?: {
+        mhab: {
+          name: string;
+          prefix: string;
+        };
+      };
     }> = [];
     let returned = -1;
     let iteration = 0;
