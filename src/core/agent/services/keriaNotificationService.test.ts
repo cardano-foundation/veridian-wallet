@@ -475,7 +475,8 @@ describe("Signify notification service of agent", () => {
       agentServicesProps.signifyClient,
       notificationStorage,
       id,
-      NotificationRoute.ExnIpexGrant
+      NotificationRoute.ExnIpexGrant,
+      undefined
     );
     expect(notificationStorage.deleteById).toBeCalledWith(id);
     expect(markNotificationMock).toBeCalledWith(id);
@@ -491,7 +492,8 @@ describe("Signify notification service of agent", () => {
       agentServicesProps.signifyClient,
       notificationStorage,
       id,
-      NotificationRoute.LocalAcdcRevoked
+      NotificationRoute.LocalAcdcRevoked,
+      undefined
     );
     expect(notificationStorage.deleteById).toBeCalledWith(id);
     expect(markNotificationMock).not.toBeCalled();
