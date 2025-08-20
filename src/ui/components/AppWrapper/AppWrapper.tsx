@@ -6,6 +6,8 @@ import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
   MiscRecordId,
+  MultisigConnectionDetails,
+  RegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import {
   AcdcStateChangedEvent,
@@ -398,12 +400,16 @@ const AppWrapper = (props: { children: ReactNode }) => {
             profileIdentifier,
             profileCredentials,
             profileArchivedCredentials,
+            profileConnections,
+            profileMultisigConnections,
             profilePeerConnections,
             profileNotifications,
           } = filterProfileData(
             identifiersDict,
             credsCache,
             credsArchivedCache,
+            allConnections as RegularConnectionDetails[],
+            allMultisigConnections as MultisigConnectionDetails[],
             storedPeerConnections,
             notifications,
             identifier.id
@@ -411,9 +417,8 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
           acc[identifier.id] = {
             identity: profileIdentifier,
-            // TODO: add filtering for connections once we have connections per account merged
-            connections: Object.values(allConnections),
-            multisigConnections: Object.values(allMultisigConnections),
+            connections: profileConnections,
+            multisigConnections: profileMultisigConnections,
             peerConnections: profilePeerConnections,
             credentials: profileCredentials,
             archivedCredentials: profileArchivedCredentials,

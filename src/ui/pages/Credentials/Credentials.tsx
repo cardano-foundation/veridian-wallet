@@ -78,16 +78,20 @@ const Credentials = () => {
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
   const currentProfile = useAppSelector(getCurrentProfile);
-  const revokedCreds = credsCache.filter(
+  const profileCreds: CredentialShortDetails[] =
+    (currentProfile?.credentials as CredentialShortDetails[]) ?? [];
+  const profileArchivedCreds: CredentialShortDetails[] =
+    (currentProfile?.archivedCredentials as CredentialShortDetails[]) ?? [];
+  const revokedCreds = profileCreds.filter(
     (item) => item.status === CredentialStatus.REVOKED
   );
-  const pendingCreds = credsCache.filter(
+  const pendingCreds = profileCreds.filter(
     (item) => item.status === CredentialStatus.PENDING
   );
   const confirmedCreds = useMemo(
     () =>
-      credsCache.filter((item) => item.status === CredentialStatus.CONFIRMED),
-    [credsCache]
+      profileCreds.filter((item) => item.status === CredentialStatus.CONFIRMED),
+    [profileCreds]
   );
 
   const fetchArchivedCreds = useCallback(async () => {
@@ -104,7 +108,7 @@ const Credentials = () => {
     return found ? found.time : null;
   };
 
-  const favouriteCredentials = credsCache.filter((cred) =>
+  const favouriteCredentials = profileCreds.filter((cred) =>
     favouriteCredentialsCache?.some((fav) => fav.id === cred.id)
   );
 
@@ -381,7 +385,7 @@ const Credentials = () => {
       />
       <ArchivedCredentials
         revokedCreds={revokedCreds}
-        archivedCreds={archivedCreds}
+        archivedCreds={profileArchivedCreds}
         archivedCredentialsIsOpen={archivedCredentialsIsOpen}
         setArchivedCredentialsIsOpen={handleArchivedCredentialsDisplayChange}
       />

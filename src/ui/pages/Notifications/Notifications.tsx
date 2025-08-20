@@ -39,7 +39,10 @@ const Notifications = () => {
   const history = useHistory();
   const connectionsCache = useAppSelector(getConnectionsCache);
   const notificationsCache = useAppSelector(getNotificationsCache);
-  const notifications = [...notificationsCache].sort(
+  const currentProfile = useAppSelector(getCurrentProfile);
+  const profileNotifications: KeriaNotification[] =
+    (currentProfile?.notifications as KeriaNotification[]) ?? [];
+  const notifications = [...profileNotifications].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
   const [selectedFilter, setSelectedFilter] = useState<NotificationFilters>(
@@ -59,7 +62,6 @@ const Notifications = () => {
     openUnknownPresentConnectionAlert,
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
-  const currentProfile = useAppSelector(getCurrentProfile);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
