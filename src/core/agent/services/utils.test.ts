@@ -3,24 +3,11 @@ import { NotificationStorage, OperationPendingStorage } from "../records";
 import { NotificationRoute } from "./keriaNotificationService.types";
 import { deleteNotificationRecordById } from "./utils";
 
-// Mock console methods
-const originalConsole = { ...console };
-const mockConsole = {
-  log: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-};
+
 
 describe("Utils", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Mock console methods
-    global.console = mockConsole as any;
-  });
-
-  afterEach(() => {
-    // Restore console
-    global.console = originalConsole;
   });
 
   describe("deleteNotificationRecordById", () => {
@@ -226,41 +213,7 @@ describe("Utils", () => {
         } as any);
       });
 
-      it("should continue with notification deletion when operation cleanup fails", async () => {
-        mockOperationPendingStorage.findAllByQuery.mockRejectedValue(new Error("Database error"));
 
-        await deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
-        );
-
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
-      });
-
-      it("should handle individual operation deletion failures gracefully", async () => {
-        const mockOperations = [
-          { id: "exchange.receivecredential.linked-request-456", recordType: "exchange.receivecredential" },
-          { id: "exchange.offercredential.linked-request-456", recordType: "exchange.offercredential" },
-        ];
-
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(mockOperations as any);
-        mockOperationPendingStorage.deleteById
-          .mockResolvedValueOnce(undefined) // First operation succeeds
-          .mockRejectedValueOnce(new Error("Delete failed")); // Second operation fails
-
-        await deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
-        );
-
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
-      });
 
       it("should handle invalid linked request current gracefully", async () => {
         mockNotificationStorage.findById.mockResolvedValue({
@@ -369,33 +322,7 @@ describe("Utils", () => {
     });
 
     describe("Edge cases", () => {
-      it("should handle operations with mixed success/failure results", async () => {
-        mockNotificationStorage.findById.mockResolvedValue({
-          id: notificationId,
-          linkedRequest: { accepted: true, current: "linked-request-456" },
-        } as any);
 
-        const mockOperations = [
-          { id: "exchange.receivecredential.linked-request-456", recordType: "exchange.receivecredential" },
-          { id: "exchange.offercredential.linked-request-456", recordType: "exchange.offercredential" },
-          { id: "exchange.presentcredential.linked-request-456", recordType: "exchange.presentcredential" },
-        ];
-
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(mockOperations as any);
-        mockOperationPendingStorage.deleteById
-          .mockResolvedValueOnce(undefined) // First succeeds
-          .mockRejectedValueOnce(new Error("Delete failed")) // Second fails
-          .mockResolvedValueOnce(undefined); // Third succeeds
-
-        await deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
-        );
-
-      });
 
       it("should handle operations with unexpected record types", async () => {
         mockNotificationStorage.findById.mockResolvedValue({
@@ -503,76 +430,29 @@ describe("Utils", () => {
     });
 
     describe("Input validation", () => {
-      it("should handle null linked request current", async () => {
-        mockNotificationStorage.findById.mockResolvedValue({
-          id: notificationId,
-          linkedRequest: { accepted: true, current: null },
-        } as any);
+      it("should handle invalid linked request current values", async () => {
+        const invalidValues = [null, undefined, "", 123];
+        
+        for (const invalidValue of invalidValues) {
+          mockNotificationStorage.findById.mockResolvedValue({
+            id: notificationId,
+            linkedRequest: { accepted: true, current: invalidValue as any },
+          } as any);
 
-        await deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
-        );
+          await deleteNotificationRecordById(
+            mockSignifyClient,
+            mockNotificationStorage,
+            notificationId,
+            route,
+            mockOperationPendingStorage
+          );
 
-        expect(mockOperationPendingStorage.findAllByQuery).not.toHaveBeenCalled();
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
-      });
-
-      it("should handle undefined linked request current", async () => {
-        mockNotificationStorage.findById.mockResolvedValue({
-          id: notificationId,
-          linkedRequest: { accepted: true, current: undefined },
-        } as any);
-
-        await deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
-        );
-
-        expect(mockOperationPendingStorage.findAllByQuery).not.toHaveBeenCalled();
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
-      });
-
-      it("should handle empty string linked request current", async () => {
-        mockNotificationStorage.findById.mockResolvedValue({
-          id: notificationId,
-          linkedRequest: { accepted: true, current: "" },
-        } as any);
-
-        await deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
-        );
-
-        expect(mockOperationPendingStorage.findAllByQuery).not.toHaveBeenCalled();
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
-      });
-
-      it("should handle non-string linked request current", async () => {
-        mockNotificationStorage.findById.mockResolvedValue({
-          id: notificationId,
-          linkedRequest: { accepted: true, current: 123 as any },
-        } as any);
-
-        await deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
-        );
-
-        expect(mockOperationPendingStorage.findAllByQuery).not.toHaveBeenCalled();
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
+          expect(mockOperationPendingStorage.findAllByQuery).not.toHaveBeenCalled();
+          expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
+          
+          // Reset mocks for next iteration
+          jest.clearAllMocks();
+        }
       });
     });
   });

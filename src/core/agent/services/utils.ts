@@ -98,7 +98,7 @@ export const deleteNotificationRecordById = async (
 
   // Clean up any pending operations if this notification has linked requests
   if (operationPendingStorage && notificationRecord?.linkedRequest?.current) {
-    await cleanupPendingOperations(operationPendingStorage, notificationRecord.linkedRequest.current, id);
+    await cleanupPendingOperations(operationPendingStorage, notificationRecord.linkedRequest.current);
   }
 
   await notificationStorage.deleteById(id);
@@ -108,76 +108,53 @@ export const deleteNotificationRecordById = async (
  * Clean up pending operations related to a notification's linked request
  * @param operationPendingStorage - Storage for pending operations
  * @param linkedRequestCurrent - The current linked request identifier
- * @param notificationId - The notification ID for logging purposes
  */
 async function cleanupPendingOperations(
   operationPendingStorage: OperationPendingStorage,
   linkedRequestCurrent: string,
-  _notificationId: string
 ): Promise<void> {
-  try {
-    // Validate the linked request identifier
-    if (!linkedRequestCurrent || typeof linkedRequestCurrent !== 'string') {
-      // Invalid identifier, skip cleanup
-      return;
-    }
-
-    // Find pending operations related to this notification
-    // Look for operations that end with the linked request identifier
-    // This covers the pattern: {operationType}.{linkedRequestId}
-    const pendingOperations = await operationPendingStorage.findAllByQuery({
-      filter: {
-        id: { $regex: `^.*\\.${linkedRequestCurrent}$` }
-      }
-    });
-
-    // Early return if no operations found
-    if (!Array.isArray(pendingOperations) || pendingOperations.length === 0) {
-      return;
-    }
-
-    // Filter operations by type to ensure we only clean up relevant ones
-    // These are the IPEX-related operation types that should be cleaned up
-    const relevantOperationTypes = [
-      'exchange.receivecredential',
-      'exchange.offercredential', 
-      'exchange.presentcredential'
-    ];
-    
-    const filteredOperations = pendingOperations.filter(operation => 
-      relevantOperationTypes.includes(operation.recordType)
-    );
-
-    if (filteredOperations.length === 0) {
-      return;
-    }
-
-    // Group operations by type for potential future use
-    // const operationsByType = filteredOperations.reduce((acc, operation) => {
-    //   acc[operation.recordType] = (acc[operation.recordType] || 0) + 1;
-    //   return acc;
-    // }, {} as Record<string, number>);
-
-    // Batch delete operations for better performance
-    const deletePromises = filteredOperations.map(async (operation) => {
-      try {
-        await operationPendingStorage.deleteById(operation.id);
-        return { success: true, id: operation.id, type: operation.recordType };
-      } catch (error) {
-        // Failed to delete operation, return failure status
-        return { success: false, id: operation.id, type: operation.recordType, error };
-      }
-    });
-
-    // Execute all delete operations and wait for completion
-    await Promise.allSettled(deletePromises);
-    
-    // Results available for potential future use if needed
-
-  } catch (error) {
-    // Error occurred during cleanup, but don't fail the deletion
-    // Error details are available in the error object for debugging if needed
+  // Validate the linked request identifier
+  if (!linkedRequestCurrent || typeof linkedRequestCurrent !== 'string') {
+    // Invalid identifier, skip cleanup
+    return;
   }
+
+  // Find pending operations related to this notification
+  // Look for operations that end with the linked request identifier
+  // This covers the pattern: {operationType}.{linkedRequestId}
+  const pendingOperations = await operationPendingStorage.findAllByQuery({
+    filter: {
+      id: { $regex: `^.*\\.${linkedRequestCurrent}$` }
+    }
+  });
+
+  // Early return if no operations found
+  if (!Array.isArray(pendingOperations) || pendingOperations.length === 0) {
+    return;
+  }
+
+  // Filter operations by type to ensure we only clean up relevant ones
+  // These are the IPEX-related operation types that should be cleaned up
+  const relevantOperationTypes = [
+    'exchange.receivecredential',
+    'exchange.offercredential', 
+    'exchange.presentcredential'
+  ];
+  
+  const filteredOperations = pendingOperations.filter(operation => 
+    relevantOperationTypes.includes(operation.recordType)
+  );
+
+  if (filteredOperations.length === 0) {
+    return;
+  }
+
+  // Batch delete operations for better performance
+  const deletePromises = filteredOperations.map(async (operation) => {
+      await operationPendingStorage.deleteById(operation.id);
+  });
+
+  await Promise.allSettled(deletePromises);
 }
 
 function randomSalt(): string {
