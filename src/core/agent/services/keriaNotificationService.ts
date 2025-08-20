@@ -1265,9 +1265,12 @@ class KeriaNotificationService extends AgentService {
               .catch(() => undefined);
 
             if (!keriaContact) {
-              const contact = (await this.contactStorage.findById(
+              const contact = await this.contactStorage.findById(
                 connectionPairRecord.contactId
-              ))!;
+              );
+              if (!contact) {
+                continue;
+              }
 
               await this.props.signifyClient
                 .contacts()

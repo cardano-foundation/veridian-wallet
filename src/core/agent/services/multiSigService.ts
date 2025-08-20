@@ -746,7 +746,7 @@ class MultiSigService extends AgentService {
           throw new Error("Group data missing for initiator");
         }
         await this.createGroup(
-          queued.data.group!.mhab.prefix,
+          queued.data.group.mhab.prefix,
           queued.groupConnections as MultisigConnectionDetails[],
           queued.threshold,
           true

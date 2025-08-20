@@ -398,9 +398,11 @@ class IdentifierService extends AgentService {
         }:${localMember.displayName}`,
       });
 
-      await this.connections.deleteAllConnectionsForGroup(
-        localMember.groupMetadata!.groupId
-      );
+      if (localMember.groupMetadata?.groupId) {
+        await this.connections.deleteAllConnectionsForGroup(
+          localMember.groupMetadata.groupId
+        );
+      }
 
       for (const notification of await this.notificationStorage.findAllByQuery({
         receivingPre: metadata.groupMemberPre,

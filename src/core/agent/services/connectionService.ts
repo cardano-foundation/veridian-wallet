@@ -23,6 +23,7 @@ import {
   MultisigConnectionDetails,
   MultisigConnectionDetailsFull,
   OobiType,
+  OOBI_AGENT_ONLY_RE,
   OOBI_RE,
   OobiScan,
   RegularConnectionDetails,
@@ -236,7 +237,7 @@ class ConnectionService extends AgentService {
   }
 
   async getConnections(identifier?: string): Promise<ConnectionShortDetails[]> {
-    const connections: any[] = [];
+    const connections: ContactDetailsRecord[] = [];
 
     const connectionPairs = await this.connectionPairStorage.findAllByQuery({
       pendingDeletion: false,
@@ -254,16 +255,18 @@ class ConnectionService extends AgentService {
       }
       const contact = contactRecordMap.get(connectionPair.contactId);
 
-      connections.push({
-        id: connectionPair.contactId,
-        alias: contact?.alias,
-        createdAt: connectionPair.createdAt,
-        oobi: contact?.oobi,
-        groupId: contact?.groupId,
-        creationStatus: connectionPair.creationStatus,
-        pendingDeletion: connectionPair.pendingDeletion,
-        identifier: connectionPair.identifier, // Include identifier from connection pair
-      });
+      if (contact?.alias && contact?.oobi) {
+        connections.push({
+          id: connectionPair.contactId,
+          alias: contact.alias,
+          createdAt: connectionPair.createdAt,
+          oobi: contact.oobi,
+          groupId: contact.groupId,
+          creationStatus: connectionPair.creationStatus,
+          pendingDeletion: connectionPair.pendingDeletion,
+          identifier: connectionPair.identifier, // Include identifier from connection pair
+        });
+      }
     }
 
     return connections.map((connection) =>
@@ -315,7 +318,7 @@ class ConnectionService extends AgentService {
       contactId: record.id,
       ...(record.groupId
         ? { groupId: record.groupId }
-        : { identifier: record.identifier! }),
+        : { identifier: record.identifier || "" }),
     };
   }
 
