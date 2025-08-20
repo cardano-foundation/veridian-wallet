@@ -33,7 +33,7 @@ class SqliteSession {
     return this.sessionInstance;
   }
 
-  private async getKv(key: string): Promise<any> {
+  private async getKv(key: string): Promise<unknown> {
     const qValues = await this.sessionInstance?.query(
       SqliteSession.GET_KV_SQL,
       [key]
@@ -44,7 +44,7 @@ class SqliteSession {
     return undefined;
   }
 
-  private async setKv(key: string, value: any): Promise<void> {
+  private async setKv(key: string, value: unknown): Promise<void> {
     await this.sessionInstance?.query(SqliteSession.INSERT_KV_SQL, [
       key,
       JSON.stringify(value),
@@ -56,7 +56,7 @@ class SqliteSession {
       const currentVersionDatabase = await this.getKv(
         SqliteSession.VERSION_DATABASE_KEY
       );
-      return currentVersionDatabase ?? SqliteSession.BASE_VERSION;
+      return (currentVersionDatabase as string) ?? SqliteSession.BASE_VERSION;
     } catch (error) {
       return SqliteSession.BASE_VERSION;
     }
@@ -65,7 +65,7 @@ class SqliteSession {
   private async getCloudMigrationStatus(): Promise<Record<string, boolean>> {
     try {
       const status = await this.getKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY);
-      return status ?? {};
+      return (status as Record<string, boolean>) ?? {};
     } catch (error) {
       return {};
     }
@@ -110,8 +110,11 @@ class SqliteSession {
       );
     }
     await this.sessionInstance.open();
+    if (!this.sessionInstance) {
+      throw new Error("Failed to open SQLite session");
+    }
     this.basicStorageService = new BasicStorage(
-      new SqliteStorage<BasicRecord>(this.session!)
+      new SqliteStorage<BasicRecord>(this.sessionInstance)
     );
     await this.migrateDb();
   }
@@ -184,14 +187,22 @@ class SqliteSession {
           migrationStatements.push({ statement: sqlStatement });
         }
       } else if (migration.type === MigrationType.TS) {
-        const statements = await migration.migrationStatements(this.session!);
+        if (!this.sessionInstance) {
+          throw new Error("SQLite session not available for migration");
+        }
+        const statements = await migration.migrationStatements(
+          this.sessionInstance
+        );
         migrationStatements.push(...statements);
       } else if (migration.type === MigrationType.CLOUD) {
         // Handle cloud migrations
         await this.performCloudMigration(migration);
       } else if (migration.type === MigrationType.HYBRID) {
+        if (!this.sessionInstance) {
+          throw new Error("SQLite session not available for migration");
+        }
         const statements = await migration.localMigrationStatements(
-          this.session!
+          this.sessionInstance
         );
         migrationStatements.push(...statements);
         await this.performCloudMigration(migration, false);
@@ -207,7 +218,10 @@ class SqliteSession {
       });
 
       if (migrationStatements.length > 0) {
-        await this.session!.executeTransaction(migrationStatements);
+        if (!this.sessionInstance) {
+          throw new Error("SQLite session not available for transaction");
+        }
+        await this.sessionInstance.executeTransaction(migrationStatements);
       }
     }
   }

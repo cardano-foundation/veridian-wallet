@@ -1,4 +1,8 @@
-import { StorageMessage, StorageService } from "../../storage/storage.types";
+import {
+  StorageMessage,
+  StorageService,
+  Query,
+} from "../../storage/storage.types";
 import {
   ConnectionPairRecord,
   ConnectionPairRecordStorageProps,
@@ -40,7 +44,9 @@ export class ConnectionPairStorage {
     return record;
   }
 
-  findAllByQuery(query: any): Promise<ConnectionPairRecord[]> {
+  findAllByQuery(
+    query: Query<ConnectionPairRecord>
+  ): Promise<ConnectionPairRecord[]> {
     return this.storageService.findAllByQuery(query, ConnectionPairRecord);
   }
 

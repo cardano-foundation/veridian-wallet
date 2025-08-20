@@ -9,11 +9,11 @@ export const DATA_V1200: TsMigration = {
       "Running migration v1.2.0.0: Peer Connection Account Migration"
     );
 
-    function insertItemTags(itemRecord: any) {
+    function insertItemTags(itemRecord: Record<string, unknown>) {
       const statements: { statement: string; values?: unknown[] }[] = [];
       const statement =
         "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
-      const tags = itemRecord.tags;
+      const tags = itemRecord.tags as Record<string, unknown>;
       if (!tags) {
         return statements;
       }

@@ -161,7 +161,7 @@ class IdentifierService extends AgentService {
     if (hab.group) {
       members = (
         await this.props.signifyClient.identifiers().members(identifier)
-      ).signing.map((member: any) => member.aid);
+      ).signing.map((member: { aid: string }) => member.aid);
     }
 
     return {
@@ -299,9 +299,12 @@ class IdentifierService extends AgentService {
       .identifiers()
       .get(identifier)) as HabState;
 
+    if (!this.props.signifyClient.agent) {
+      throw new Error("Agent not initialized");
+    }
     const addRoleOperation = await this.props.signifyClient
       .identifiers()
-      .addEndRole(identifier, "agent", this.props.signifyClient.agent!.pre);
+      .addEndRole(identifier, "agent", this.props.signifyClient.agent.pre);
     await addRoleOperation.op();
 
     const creationStatus = CreationStatus.PENDING;
@@ -395,9 +398,11 @@ class IdentifierService extends AgentService {
         }:${localMember.displayName}`,
       });
 
-      await this.connections.deleteAllConnectionsForGroup(
-        localMember.groupMetadata!.groupId
-      );
+      if (localMember.groupMetadata?.groupId) {
+        await this.connections.deleteAllConnectionsForGroup(
+          localMember.groupMetadata.groupId
+        );
+      }
 
       for (const notification of await this.notificationStorage.findAllByQuery({
         receivingPre: metadata.groupMemberPre,
@@ -539,7 +544,16 @@ class IdentifierService extends AgentService {
   }
 
   async syncKeriaIdentifiers(): Promise<void> {
-    const cloudIdentifiers: any[] = [];
+    const cloudIdentifiers: Array<{
+      prefix: string;
+      name: string;
+      group?: {
+        mhab: {
+          name: string;
+          prefix: string;
+        };
+      };
+    }> = [];
     let returned = -1;
     let iteration = 0;
 
@@ -634,6 +648,9 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
+      if (!identifier.group) {
+        throw new Error("Group identifier missing group data");
+      }
       const nameToParse = identifier.name.startsWith(
         IdentifierService.DELETED_IDENTIFIER_THEME
       )

@@ -81,7 +81,22 @@ type QueuedGroupCreation = QueuedIdentifierCreation & QueuedGroupProps;
 
 interface GroupParticipants {
   ourIdentifier: IdentifierMetadataRecord;
-  multisigMembers: any;
+  multisigMembers: {
+    signing: Array<{
+      aid: string;
+      ends: {
+        agent: Record<string, { http: string }>;
+        witness: Record<string, { http: string; tcp: string }>;
+      };
+    }>;
+    rotation: Array<{
+      aid: string;
+      ends: {
+        agent: Record<string, { http: string }>;
+        witness: Record<string, { http: string; tcp: string }>;
+      };
+    }>;
+  };
 }
 
 interface RemoteSignRequest {

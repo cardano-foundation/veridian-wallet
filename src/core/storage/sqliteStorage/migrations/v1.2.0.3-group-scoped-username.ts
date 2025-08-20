@@ -13,11 +13,11 @@ export const MIGRATION_V1203: HybridMigration = {
     const statements = [];
 
     // TODO: @jimcase - refactor this to use a common function for inserting tags
-    function insertItemTags(itemRecord: any) {
+    function insertItemTags(itemRecord: Record<string, unknown>) {
       const statements: { statement: string; values?: unknown[] }[] = [];
       const statement =
         "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
-      const tags = itemRecord.tags;
+      const tags = itemRecord.tags as Record<string, unknown>;
       if (!tags) {
         return statements;
       }
