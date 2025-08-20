@@ -32,6 +32,7 @@ import { OperationPendingRecordType } from "../records/operationPendingRecord.ty
 import { Agent } from "../agent";
 import { PeerConnection } from "../../cardano/walletConnect/peerConnection";
 import { ConnectionService } from "./connectionService";
+import { CredentialService } from "./credentialService";
 import {
   EventTypes,
   IdentifierAddedEvent,
@@ -72,28 +73,29 @@ class IdentifierService extends AgentService {
   protected readonly operationPendingStorage: OperationPendingStorage;
   protected readonly basicStorage: BasicStorage;
   protected readonly notificationStorage: NotificationStorage;
+  protected readonly connections: ConnectionService;
+  protected readonly credentials: CredentialService;
 
   constructor(
     agentServiceProps: AgentServicesProps,
     identifierStorage: IdentifierStorage,
     operationPendingStorage: OperationPendingStorage,
     basicStorage: BasicStorage,
-    notificationStorage: NotificationStorage
+    notificationStorage: NotificationStorage,
+    connections: ConnectionService,
+    credentials: CredentialService
   ) {
     super(agentServiceProps);
     this.identifierStorage = identifierStorage;
     this.operationPendingStorage = operationPendingStorage;
     this.basicStorage = basicStorage;
     this.notificationStorage = notificationStorage;
+    this.connections = connections;
+    this.credentials = credentials;
   }
 
-  onIdentifierRemoved() {
-    this.props.eventEmitter.on(
-      EventTypes.IdentifierRemoved,
-      (data: IdentifierRemovedEvent) => {
-        this.deleteIdentifier(data.payload.id);
-      }
-    );
+  onIdentifierRemoved(callback: (event: IdentifierRemovedEvent) => void) {
+    this.props.eventEmitter.on(EventTypes.IdentifierRemoved, callback);
   }
 
   onIdentifierAdded(callback: (event: IdentifierAddedEvent) => void) {

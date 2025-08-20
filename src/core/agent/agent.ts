@@ -114,7 +114,9 @@ class Agent {
         this.identifierStorage,
         this.operationPendingStorage,
         this.basicStorage,
-        this.notificationStorage
+        this.notificationStorage,
+        this.connections,
+        this.credentials
       );
     }
     return this.identifierService;
@@ -541,7 +543,7 @@ class Agent {
     );
     this.connections.onConnectionRemoved();
     this.connections.onConnectionAdded();
-    this.identifiers.onIdentifierRemoved();
+    this.identifiers.onIdentifierRemoved((event) => this.deleteProfile(event.payload.id));
     this.credentials.onCredentialRemoved();
   }
 
@@ -556,6 +558,8 @@ class Agent {
     } else {
       await this.connections.deleteAllConnectionsForIdentifier(identifier);
     }
+
+    await this.credentials.deleteAllCredentialsForIdentifier(identifier);
 
     if (metadata.groupMemberPre) {
       await this.connections.deleteAllConnectionsForGroup(

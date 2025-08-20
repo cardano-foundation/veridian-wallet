@@ -718,4 +718,37 @@ describe("Credential service of agent", () => {
       "id2"
     );
   });
+
+  test("should delete all credentials for a given identifier", async () => {
+    const identifierId = "test-identifier-id";
+    const credentials = [
+      { id: "cred-1", identifierId: identifierId },
+      { id: "cred-2", identifierId: "another-identifier-id" },
+      { id: "cred-3", identifierId: identifierId },
+    ];
+    credentialStorage.getAllCredentialMetadata.mockImplementation(
+      (isGetArchive, identifierId) => {
+        if (identifierId) {
+          return Promise.resolve(
+            credentials.filter((cred) => cred.identifierId === identifierId)
+          );
+        }
+        return Promise.resolve(credentials);
+      }
+    );
+    credentialService.deleteCredential = jest.fn();
+
+    await credentialService.deleteAllCredentialsForIdentifier(identifierId);
+
+    expect(credentialStorage.getAllCredentialMetadata).toHaveBeenCalledWith(
+      undefined,
+      identifierId
+    );
+    expect(credentialService.deleteCredential).toHaveBeenCalledTimes(2);
+    expect(credentialService.deleteCredential).toHaveBeenCalledWith("cred-1");
+    expect(credentialService.deleteCredential).toHaveBeenCalledWith("cred-3");
+    expect(credentialService.deleteCredential).not.toHaveBeenCalledWith(
+      "cred-2"
+    );
+  });
 });
