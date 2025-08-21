@@ -1906,7 +1906,7 @@ describe("Connection service of agent", () => {
     });
     expect(result.historyItems).toHaveLength(2);
     expect(
-      result.historyItems!.some(
+      result.historyItems?.some(
         (item) => item.type === ConnectionHistoryType.IPEX_AGREE_COMPLETE
       )
     ).toBe(true);
@@ -1986,7 +1986,7 @@ describe("Connection service of agent", () => {
     });
     expect(result.historyItems).toHaveLength(1);
     expect(
-      result.historyItems!.some(
+      result.historyItems?.some(
         (item) => item.type === ConnectionHistoryType.IPEX_AGREE_COMPLETE
       )
     ).toBe(false);
@@ -2019,7 +2019,7 @@ describe("Connection service of agent", () => {
     expect(submitRpyMock.mock.calls[0][0]).toBe("connectionId");
     const rpyIms: string = submitRpyMock.mock.calls[0][1];
     expect(rpyIms.includes("/introduce"));
-    expect(rpyIms.includes("\"http://oobi.com/oobi/ourIdentifier?name=Alice\""));
+    expect(rpyIms.includes('"http://oobi.com/oobi/ourIdentifier?name=Alice"'));
   });
 
   test("Shared identifier OOBIs carry over the external ID hint", async () => {
@@ -2051,8 +2051,56 @@ describe("Connection service of agent", () => {
     expect(rpyIms.includes("/introduce"));
     expect(
       rpyIms.includes(
-        "\"http://oobi.com/oobi/ourIdentifier?name=Alice&externalId=test123\""
+        '"http://oobi.com/oobi/ourIdentifier?name=Alice&externalId=test123"'
       )
+    );
+  });
+
+  test("should delete all connections for a given identifier", async () => {
+    const identifierId = "test-identifier";
+    const connectionPairs = [
+      { contactId: "contact-1", identifier: identifierId },
+      { contactId: "contact-2", identifier: identifierId },
+    ];
+    connectionPairStorage.findAllByQuery.mockResolvedValue(connectionPairs);
+    connectionService.deleteConnectionByIdAndIdentifier = jest.fn();
+
+    await connectionService.deleteAllConnectionsForIdentifier(identifierId);
+
+    expect(connectionPairStorage.findAllByQuery).toHaveBeenCalledWith({
+      identifier: identifierId,
+    });
+    expect(
+      connectionService.deleteConnectionByIdAndIdentifier
+    ).toHaveBeenCalledTimes(2);
+    expect(
+      connectionService.deleteConnectionByIdAndIdentifier
+    ).toHaveBeenCalledWith("contact-1", identifierId);
+    expect(
+      connectionService.deleteConnectionByIdAndIdentifier
+    ).toHaveBeenCalledWith("contact-2", identifierId);
+  });
+
+  test("should delete all connections for a given group", async () => {
+    const groupId = "test-group";
+    const groupContacts = [
+      { id: "contact-1", groupId },
+      { id: "contact-2", groupId },
+    ];
+    contactStorage.findAllByQuery.mockResolvedValue(groupContacts);
+    connectionService.deleteMultisigConnectionById = jest.fn();
+
+    await connectionService.deleteAllConnectionsForGroup(groupId);
+
+    expect(contactStorage.findAllByQuery).toHaveBeenCalledWith({ groupId });
+    expect(
+      connectionService.deleteMultisigConnectionById
+    ).toHaveBeenCalledTimes(2);
+    expect(connectionService.deleteMultisigConnectionById).toHaveBeenCalledWith(
+      "contact-1"
+    );
+    expect(connectionService.deleteMultisigConnectionById).toHaveBeenCalledWith(
+      "contact-2"
     );
   });
 

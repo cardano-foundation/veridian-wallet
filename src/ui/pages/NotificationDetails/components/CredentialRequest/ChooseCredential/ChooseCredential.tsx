@@ -35,6 +35,8 @@ import {
   ChooseCredentialProps,
   RequestCredential,
 } from "../CredentialRequest.types";
+import type { ACDC } from "../CredentialRequest.types";
+import type { CredentialMetadataRecordProps } from "../../../../../../core/agent/records/credentialMetadataRecord.types";
 import { LightCredentialDetailModal } from "../LightCredentialDetailModal";
 import "./ChooseCredential.scss";
 
@@ -64,17 +66,18 @@ const ChooseCredential = ({
 
   const mappedCredentials = credentialRequest.credentials.map(
     (cred): CardItem<RequestCredential> => {
+      const acdc = cred.acdc as unknown as ACDC;
       const connection =
         connections?.[cred.connectionId]?.label ||
         i18n.t("tabs.connections.unknown");
 
       return {
-        id: cred.acdc.d,
+        id: acdc.d,
         title: connection,
-        subtitle: `${formatShortDate(cred.acdc.a.dt)} - ${formatTimeToSec(
-          cred.acdc.a.dt
+        subtitle: `${formatShortDate(String(acdc.a.dt))} - ${formatTimeToSec(
+          String(acdc.a.dt)
         )}`,
-        data: cred,
+        data: { connectionId: cred.connectionId, acdc },
       };
     }
   );
@@ -86,8 +89,8 @@ const ChooseCredential = ({
     if (a.title > b.title) {
       return 1;
     }
-    const dateA = new Date(a.data.acdc.a.dt).getTime();
-    const dateB = new Date(b.data.acdc.a.dt).getTime();
+    const dateA = new Date(String(a.data.acdc.a.dt)).getTime();
+    const dateB = new Date(String(b.data.acdc.a.dt)).getTime();
     return dateA - dateB;
   });
 
@@ -138,7 +141,7 @@ const ChooseCredential = ({
 
       await Agent.agent.ipexCommunications.offerAcdcFromApply(
         notificationDetails.id,
-        selectedCred.acdc
+        selectedCred.acdc as unknown as CredentialMetadataRecordProps
       );
 
       if (!linkedGroup) {

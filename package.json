@@ -106,6 +106,7 @@
     "css-minimizer-webpack-plugin": "^4.0.0",
     "date-fns": "^4.1.0",
     "eslint": "^8.36.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-react": "^7.32.2",

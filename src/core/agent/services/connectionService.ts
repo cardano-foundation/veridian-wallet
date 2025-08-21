@@ -58,7 +58,7 @@ import {
   OobiQueryParams,
   RpyRoute,
 } from "./connectionService.types";
-import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/migrations";
+import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
 class ConnectionService extends AgentService {
   protected readonly connectionPairStorage!: ConnectionPairStorage;
@@ -141,10 +141,11 @@ class ConnectionService extends AgentService {
     }
 
     const multiSigInvite = url.includes(OobiQueryParams.GROUP_ID);
-    const connectionId = new URL(url).pathname
-      .split("/oobi/")
-      .pop()!
-      .split("/")[0];
+    const oobiPath = new URL(url).pathname.split("/oobi/").pop();
+    if (!oobiPath) {
+      throw new Error(ConnectionService.OOBI_INVALID);
+    }
+    const connectionId = oobiPath.split("/")[0];
 
     const alias =
       new URL(url).searchParams.get(OobiQueryParams.NAME) ?? randomSalt();
@@ -236,7 +237,7 @@ class ConnectionService extends AgentService {
   }
 
   async getConnections(identifier?: string): Promise<ConnectionShortDetails[]> {
-    const connections: any[] = [];
+    const connections: ContactDetailsRecord[] = [];
 
     const connectionPairs = await this.connectionPairStorage.findAllByQuery({
       pendingDeletion: false,
@@ -254,16 +255,18 @@ class ConnectionService extends AgentService {
       }
       const contact = contactRecordMap.get(connectionPair.contactId);
 
-      connections.push({
-        id: connectionPair.contactId,
-        alias: contact?.alias,
-        createdAt: connectionPair.createdAt,
-        oobi: contact?.oobi,
-        groupId: contact?.groupId,
-        creationStatus: connectionPair.creationStatus,
-        pendingDeletion: connectionPair.pendingDeletion,
-        identifier: connectionPair.identifier, // Include identifier from connection pair
-      });
+      if (contact?.alias && contact?.oobi) {
+        connections.push({
+          id: connectionPair.contactId,
+          alias: contact.alias,
+          createdAt: connectionPair.createdAt,
+          oobi: contact.oobi,
+          groupId: contact.groupId,
+          creationStatus: connectionPair.creationStatus,
+          pendingDeletion: connectionPair.pendingDeletion,
+          identifier: connectionPair.identifier, // Include identifier from connection pair
+        });
+      }
     }
 
     return connections.map((connection) =>
@@ -315,7 +318,7 @@ class ConnectionService extends AgentService {
       contactId: record.id,
       ...(record.groupId
         ? { groupId: record.groupId }
-        : { identifier: record.identifier! }),
+        : { identifier: record.identifier || "" }),
     };
   }
 
@@ -880,6 +883,27 @@ class ConnectionService extends AgentService {
       c: exn.a.c,
       l: exn.a.l,
     };
+  }
+
+  async deleteAllConnectionsForIdentifier(identifierId: string): Promise<void> {
+    const pairsToDelete = await this.connectionPairStorage.findAllByQuery({
+      identifier: identifierId,
+    });
+
+    for (const pair of pairsToDelete) {
+      await this.deleteConnectionByIdAndIdentifier(
+        pair.contactId,
+        pair.identifier
+      );
+    }
+  }
+
+  async deleteAllConnectionsForGroup(groupId: string): Promise<void> {
+    const groupContacts = await this.contactStorage.findAllByQuery({ groupId });
+
+    for (const contact of groupContacts) {
+      await this.deleteMultisigConnectionById(contact.id);
+    }
   }
 }
 

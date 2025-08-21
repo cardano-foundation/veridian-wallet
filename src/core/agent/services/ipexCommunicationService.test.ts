@@ -49,6 +49,8 @@ import {
 import { MultiSigRoute } from "./multiSig.types";
 import { NotificationRecord } from "../records";
 import { StorageMessage } from "../../storage/storage.types";
+import { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
+import { IdentifierType } from "./identifier.types";
 
 const notificationStorage = jest.mocked({
   open: jest.fn(),
@@ -305,17 +307,19 @@ const ipexCommunicationService = new IpexCommunicationService(
   connections as any
 );
 
-let originalFetch;
+let originalFetch: typeof global.fetch;
 beforeAll(() => {
   originalFetch = global.fetch;
   global.fetch = jest.fn().mockResolvedValue({
     text: () =>
-      "{\"v\":\"KERI10JSON00012b_\",\"t\":\"icp\",\"d\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"0\",\"kt\":\"1\",\"k\":[\"DGKzvhMMz2_MYhXyV5lGso_akvBYpGnOG5fTD299IsmO\"],\"nt\":\"1\",\"n\":[\"EBhg4MS4f4GZpuNZxk1D4mln9sv9l30rbtsk17AVOEmh\"],\"bt\":\"0\",\"b\":[],\"c\":[],\"a\":[]}-VAn-AABAADt-Cs8HoN9KBS5Kk23JCAaJzOl1InvbZ4FT0AQ0muKe6pSr8QvUJNNFTUImZg8XtBFqT75AY184rX3mKPKKgYI-EAB0AAAAAAAAAAAAAAAAAAAAAAA1AAG2025-01-21T13c24c58d219360p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"1\",\"p\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"a\":[{\"i\":\"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l\",\"s\":\"0\",\"d\":\"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l\"}]}-VAn-AABAADGIyEdPqQ4wJw6KWgFOF3guadzJYWTzy9EjDbxqnBEBmUIiGquNZvNtk--gDOYcOf_EsgIsmfZ8jwIvP0xICgL-EAB0AAAAAAAAAAAAAAAAAAAAAAB1AAG2025-01-21T13c24c59d693615p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"2\",\"p\":\"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL\",\"a\":[{\"i\":\"EMcWk38kBLvGdKH2b93HMujB_Xx5-ugwD-vrQJVVIJIl\",\"s\":\"0\",\"d\":\"EIlV2FfP39_0EOLUKDi2_ljF9FMty8OCp9myBepidVij\"}]}-VAn-AABAACDrd4dm-E3OT2IlRwu4A3M7OzLkOgsoYi2-FPfS9Tmwr3awoCP2R-718qVHHUPNCb0MsnzQ2rTqVnNEw0QLWUB-EAB0AAAAAAAAAAAAAAAAAAAAAAC1AAG2025-01-21T13c47c06d452176p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"3\",\"p\":\"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG\",\"a\":[{\"i\":\"EDR-8z0CviOyrntUK3pyabMTiIuKn0AXGhQvD0C12gkX\",\"s\":\"0\",\"d\":\"EGCPj1fDEsyLgRAXwDoD9qrX6lJkwxXfBx0XNoDHtMLl\"}]}-VAn-AABAAD6qIPXPrbqhKNPDRuU91_-EzQi01V53f1RFw0AV1sMe4JBjQmOdIwn4-FW88Lo-oht6e7C7sObbgk3-aJbQS4H-EAB0AAAAAAAAAAAAAAAAAAAAAAD1AAG2025-01-21T14c03c51d890362p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"4\",\"p\":\"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S\",\"a\":[{\"i\":\"EGsSqpbkJ-0SQnhyS-1FxNChZ7p1NV6yTXPPHIdyvjkZ\",\"s\":\"0\",\"d\":\"EMNJNkHlDqyrOHWbafUGPpHVrvvj5VbrCZML_ZgXk-Rk\"}]}-VAn-AABAAAVj_8Zldpds_naKbRyuIOef3RKABaF23AHjkEKfc_Gb2j1559uY6NA8BV6ZmCKQU1_mpJbLbtaBMes-Oub2yUL-EAB0AAAAAAAAAAAAAAAAAAAAAAE1AAG2025-01-21T14c11c23d141088p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EC0Gh5X0JGSEkhUllR5sINwapxeAzYoKOWwP9UU7KdLn\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"5\",\"p\":\"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx\",\"a\":[{\"i\":\"ENMi3aqTIgCSuXROeMywH7VFuUD1-ubK3EMlumKkRkc7\",\"s\":\"0\",\"d\":\"EKdvQCM1oSTgjcPezvOw2YanOe8Wdi6wkbViE6vHpEjg\"}]}-VAn-AABAABAaL6bwARu41XPQHGnHXuxmvPrIPP8vkghXhQbOTd07xdRZ5X2_kjMXu4UsHNyQcR7mNOht0kPeUPmafGx23EP-EAB0AAAAAAAAAAAAAAAAAAAAAAF1AAG2025-01-21T14c14c51d268032p00c00{\"v\":\"KERI10JSON00012b_\",\"t\":\"icp\",\"d\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"0\",\"kt\":\"1\",\"k\":[\"DGKzvhMMz2_MYhXyV5lGso_akvBYpGnOG5fTD299IsmO\"],\"nt\":\"1\",\"n\":[\"EBhg4MS4f4GZpuNZxk1D4mln9sv9l30rbtsk17AVOEmh\"],\"bt\":\"0\",\"b\":[],\"c\":[],\"a\":[]}-VAn-AABAADt-Cs8HoN9KBS5Kk23JCAaJzOl1InvbZ4FT0AQ0muKe6pSr8QvUJNNFTUImZg8XtBFqT75AY184rX3mKPKKgYI-EAB0AAAAAAAAAAAAAAAAAAAAAAA1AAG2025-01-21T13c24c58d219360p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"1\",\"p\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"a\":[{\"i\":\"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l\",\"s\":\"0\",\"d\":\"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l\"}]}-VAn-AABAADGIyEdPqQ4wJw6KWgFOF3guadzJYWTzy9EjDbxqnBEBmUIiGquNZvNtk--gDOYcOf_EsgIsmfZ8jwIvP0xICgL-EAB0AAAAAAAAAAAAAAAAAAAAAAB1AAG2025-01-21T13c24c59d693615p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"2\",\"p\":\"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL\",\"a\":[{\"i\":\"EMcWk38kBLvGdKH2b93HMujB_Xx5-ugwD-vrQJVVIJIl\",\"s\":\"0\",\"d\":\"EIlV2FfP39_0EOLUKDi2_ljF9FMty8OCp9myBepidVij\"}]}-VAn-AABAACDrd4dm-E3OT2IlRwu4A3M7OzLkOgsoYi2-FPfS9Tmwr3awoCP2R-718qVHHUPNCb0MsnzQ2rTqVnNEw0QLWUB-EAB0AAAAAAAAAAAAAAAAAAAAAAC1AAG2025-01-21T13c47c06d452176p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"3\",\"p\":\"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG\",\"a\":[{\"i\":\"EDR-8z0CviOyrntUK3pyabMTiIuKn0AXGhQvD0C12gkX\",\"s\":\"0\",\"d\":\"EGCPj1fDEsyLgRAXwDoD9qrX6lJkwxXfBx0XNoDHtMLl\"}]}-VAn-AABAAD6qIPXPrbqhKNPDRuU91_-EzQi01V53f1RFw0AV1sMe4JBjQmOdIwn4-FW88Lo-oht6e7C7sObbgk3-aJbQS4H-EAB0AAAAAAAAAAAAAAAAAAAAAAD1AAG2025-01-21T14c03c51d890362p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"4\",\"p\":\"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S\",\"a\":[{\"i\":\"EGsSqpbkJ-0SQnhyS-1FxNChZ7p1NV6yTXPPHIdyvjkZ\",\"s\":\"0\",\"d\":\"EMNJNkHlDqyrOHWbafUGPpHVrvvj5VbrCZML_ZgXk-Rk\"}]}-VAn-AABAAAVj_8Zldpds_naKbRyuIOef3RKABaF23AHjkEKfc_Gb2j1559uY6NA8BV6ZmCKQU1_mpJbLbtaBMes-Oub2yUL-EAB0AAAAAAAAAAAAAAAAAAAAAAE1AAG2025-01-21T14c11c23d141088p00c00{\"v\":\"KERI10JSON00013a_\",\"t\":\"ixn\",\"d\":\"EC0Gh5X0JGSEkhUllR5sINwapxeAzYoKOWwP9UU7KdLn\",\"i\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"s\":\"5\",\"p\":\"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx\",\"a\":[{\"i\":\"ENMi3aqTIgCSuXROeMywH7VFuUD1-ubK3EMlumKkRkc7\",\"s\":\"0\",\"d\":\"EKdvQCM1oSTgjcPezvOw2YanOe8Wdi6wkbViE6vHpEjg\"}]}-VAn-AABAABAaL6bwARu41XPQHGnHXuxmvPrIPP8vkghXhQbOTd07xdRZ5X2_kjMXu4UsHNyQcR7mNOht0kPeUPmafGx23EP-EAB0AAAAAAAAAAAAAAAAAAAAAAF1AAG2025-01-21T14c14c51d268032p00c00{\"v\":\"KERI10JSON0000f9_\",\"t\":\"rpy\",\"d\":\"ELrQF_D6YFL_2SU7RbDOrTYRtGj0v_GlOmi-YWVyChol\",\"dt\":\"2025-01-21T13:24:59.001000+00:00\",\"r\":\"/loc/scheme\",\"a\":{\"eid\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"url\":\"http://127.0.0.1:3001\",\"scheme\":\"http\"}}-VA0-FABEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--80AAAAAAAAAAAAAAAAAAAAAAAEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8-AABAAA8QzT_XDXtB_5bK8P-dVrCZIlQ69WniFPWkGmGthK683v1E2ymGA7RlkXogXtIEHekVjdl0Tg5r6lr5aREjxcL{\"v\":\"KERI10JSON000113_\",\"t\":\"rpy\",\"d\":\"EA5z8Q3g-llvOK86bvE1QAceLb7g0FzcY9INn4Ch0Hu5\",\"dt\":\"2025-01-21T13:24:58.660000+00:00\",\"r\":\"/end/role/add\",\"a\":{\"cid\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\",\"role\":\"indexer\",\"eid\":\"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8\"}}-VA0-FABEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--80AAAAAAAAAAAAAAAAAAAAAAAEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8-AABAADCsrTysi5_3hhzgP9VUyilJIPE8x-8Yi-lNtyB28tbc0a_S3igdY_v0yLg14tTzOyQn9sv3rGZEt4ZKb4-xl8D",
+      '{"v":"KERI10JSON00012b_","t":"icp","d":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"0","kt":"1","k":["DGKzvhMMz2_MYhXyV5lGso_akvBYpGnOG5fTD299IsmO"],"nt":"1","n":["EBhg4MS4f4GZpuNZxk1D4mln9sv9l30rbtsk17AVOEmh"],"bt":"0","b":[],"c":[],"a":[]}-VAn-AABAADt-Cs8HoN9KBS5Kk23JCAaJzOl1InvbZ4FT0AQ0muKe6pSr8QvUJNNFTUImZg8XtBFqT75AY184rX3mKPKKgYI-EAB0AAAAAAAAAAAAAAAAAAAAAAA1AAG2025-01-21T13c24c58d219360p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"1","p":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","a":[{"i":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l","s":"0","d":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l"}]}-VAn-AABAADGIyEdPqQ4wJw6KWgFOF3guadzJYWTzy9EjDbxqnBEBmUIiGquNZvNtk--gDOYcOf_EsgIsmfZ8jwIvP0xICgL-EAB0AAAAAAAAAAAAAAAAAAAAAAB1AAG2025-01-21T13c24c59d693615p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"2","p":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","a":[{"i":"EMcWk38kBLvGdKH2b93HMujB_Xx5-ugwD-vrQJVVIJIl","s":"0","d":"EIlV2FfP39_0EOLUKDi2_ljF9FMty8OCp9myBepidVij"}]}-VAn-AABAACDrd4dm-E3OT2IlRwu4A3M7OzLkOgsoYi2-FPfS9Tmwr3awoCP2R-718qVHHUPNCb0MsnzQ2rTqVnNEw0QLWUB-EAB0AAAAAAAAAAAAAAAAAAAAAAC1AAG2025-01-21T13c47c06d452176p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"3","p":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","a":[{"i":"EDR-8z0CviOyrntUK3pyabMTiIuKn0AXGhQvD0C12gkX","s":"0","d":"EGCPj1fDEsyLgRAXwDoD9qrX6lJkwxXfBx0XNoDHtMLl"}]}-VAn-AABAAD6qIPXPrbqhKNPDRuU91_-EzQi01V53f1RFw0AV1sMe4JBjQmOdIwn4-FW88Lo-oht6e7C7sObbgk3-aJbQS4H-EAB0AAAAAAAAAAAAAAAAAAAAAAD1AAG2025-01-21T14c03c51d890362p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"4","p":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","a":[{"i":"EGsSqpbkJ-0SQnhyS-1FxNChZ7p1NV6yTXPPHIdyvjkZ","s":"0","d":"EMNJNkHlDqyrOHWbafUGPpHVrvvj5VbrCZML_ZgXk-Rk"}]}-VAn-AABAAAVj_8Zldpds_naKbRyuIOef3RKABaF23AHjkEKfc_Gb2j1559uY6NA8BV6ZmCKQU1_mpJbLbtaBMes-Oub2yUL-EAB0AAAAAAAAAAAAAAAAAAAAAAE1AAG2025-01-21T14c11c23d141088p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EC0Gh5X0JGSEkhUllR5sINwapxeAzYoKOWwP9UU7KdLn","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"5","p":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","a":[{"i":"ENMi3aqTIgCSuXROeMywH7VFuUD1-ubK3EMlumKkRkc7","s":"0","d":"EKdvQCM1oSTgjcPezvOw2YanOe8Wdi6wkbViE6vHpEjg"}]}-VAn-AABAABAaL6bwARu41XPQHGnHXuxmvPrIPP8vkghXhQbOTd07xdRZ5X2_kjMXu4UsHNyQcR7mNOht0kPeUPmafGx23EP-EAB0AAAAAAAAAAAAAAAAAAAAAAF1AAG2025-01-21T14c14c51d268032p00c00{"v":"KERI10JSON00012b_","t":"icp","d":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"0","kt":"1","k":["DGKzvhMMz2_MYhXyV5lGso_akvBYpGnOG5fTD299IsmO"],"nt":"1","n":["EBhg4MS4f4GZpuNZxk1D4mln9sv9l30rbtsk17AVOEmh"],"bt":"0","b":[],"c":[],"a":[]}-VAn-AABAADt-Cs8HoN9KBS5Kk23JCAaJzOl1InvbZ4FT0AQ0muKe6pSr8QvUJNNFTUImZg8XtBFqT75AY184rX3mKPKKgYI-EAB0AAAAAAAAAAAAAAAAAAAAAAA1AAG2025-01-21T13c24c58d219360p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"1","p":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","a":[{"i":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l","s":"0","d":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l"}]}-VAn-AABAADGIyEdPqQ4wJw6KWgFOF3guadzJYWTzy9EjDbxqnBEBmUIiGquNZvNtk--gDOYcOf_EsgIsmfZ8jwIvP0xICgL-EAB0AAAAAAAAAAAAAAAAAAAAAAB1AAG2025-01-21T13c24c59d693615p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"2","p":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","a":[{"i":"EMcWk38kBLvGdKH2b93HMujB_Xx5-ugwD-vrQJVVIJIl","s":"0","d":"EIlV2FfP39_0EOLUKDi2_ljF9FMty8OCp9myBepidVij"}]}-VAn-AABAACDrd4dm-E3OT2IlRwu4A3M7OzLkOgsoYi2-FPfS9Tmwr3awoCP2R-718qVHHUPNCb0MsnzQ2rTqVnNEw0QLWUB-EAB0AAAAAAAAAAAAAAAAAAAAAAC1AAG2025-01-21T13c47c06d452176p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"3","p":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","a":[{"i":"EDR-8z0CviOyrntUK3pyabMTiIuKn0AXGhQvD0C12gkX","s":"0","d":"EGCPj1fDEsyLgRAXwDoD9qrX6lJkwxXfBx0XNoDHtMLl"}]}-VAn-AABAAD6qIPXPrbqhKNPDRuU91_-EzQi01V53f1RFw0AV1sMe4JBjQmOdIwn4-FW88Lo-oht6e7C7sObbgk3-aJbQS4H-EAB0AAAAAAAAAAAAAAAAAAAAAAD1AAG2025-01-21T14c03c51d890362p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"4","p":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","a":[{"i":"EGsSqpbkJ-0SQnhyS-1FxNChZ7p1NV6yTXPPHIdyvjkZ","s":"0","d":"EMNJNkHlDqyrOHWbafUGPpHVrvvj5VbrCZML_ZgXk-Rk"}]}-VAn-AABAAAVj_8Zldpds_naKbRyuIOef3RKABaF23AHjkEKfc_Gb2j1559uY6NA8BV6ZmCKQU1_mpJbLbtaBMes-Oub2yUL-EAB0AAAAAAAAAAAAAAAAAAAAAAE1AAG2025-01-21T14c11c23d141088p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EC0Gh5X0JGSEkhUllR5sINwapxeAzYoKOWwP9UU7KdLn","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"5","p":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","a":[{"i":"ENMi3aqTIgCSuXROeMywH7VFuUD1-ubK3EMlumKkRkc7","s":"0","d":"EKdvQCM1oSTgjcPezvOw2YanOe8Wdi6wkbViE6vHpEjg"}]}-VAn-AABAABAaL6bwARu41XPQHGnHXuxmvPrIPP8vkghXhQbOTd07xdRZ5X2_kjMXu4UsHNyQcR7mNOht0kPeUPmafGx23EP-EAB0AAAAAAAAAAAAAAAAAAAAAAF1AAG2025-01-21T14c14c51d268032p00c00{"v":"KERI10JSON0000f9_","t":"rpy","d":"ELrQF_D6YFL_2SU7RbDOrTYRtGj0v_GlOmi-YWVyChol","dt":"2025-01-21T13:24:59.001000+00:00","r":"/loc/scheme","a":{"eid":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","url":"http://127.0.0.1:3001","scheme":"http"}}-VA0-FABEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--80AAAAAAAAAAAAAAAAAAAAAAAEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8-AABAAA8QzT_XDXtB_5bK8P-dVrCZIlQ69WniFPWkGmGthK683v1E2ymGA7RlkXogXtIEHekVjdl0Tg5r6lr5aREjxcL{"v":"KERI10JSON000113_","t":"rpy","d":"EA5z8Q3g-llvOK86bvE1QAceLb7g0FzcY9INn4Ch0Hu5","dt":"2025-01-21T13:24:58.660000+00:00","r":"/end/role/add","a":{"cid":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","role":"indexer","eid":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8"}}-VA0-FABEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--80AAAAAAAAAAAAAAAAAAAAAAAEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8-AABAADCsrTysi5_3hhzgP9VUyilJIPE8x-8Yi-lNtyB28tbc0a_S3igdY_v0yLg14tTzOyQn9sv3rGZEt4ZKb4-xl8D',
   }) as jest.Mock;
 });
 
 afterAll(() => {
-  global.fetch = originalFetch!;
+  if (global.fetch) {
+    global.fetch = originalFetch;
+  }
 });
 
 const DATETIME = new Date();
@@ -592,16 +596,19 @@ describe("Receive group ACDC actions", () => {
           userName: "",
         },
       },
-      multisigMembers: [
-        {
-          aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
-          ends: [],
-        },
-        {
-          aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
-          ends: [],
-        },
-      ],
+      multisigMembers: {
+        signing: [
+          {
+            aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
+            ends: [],
+          },
+          {
+            aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
+            ends: [],
+          },
+        ],
+        rotation: [],
+      },
     });
     identifiersGetMock = jest
       .fn()
@@ -781,16 +788,19 @@ describe("Receive group ACDC actions", () => {
           userName: "",
         },
       },
-      multisigMembers: [
-        {
-          aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
-          ends: [],
-        },
-        {
-          aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
-          ends: [],
-        },
-      ],
+      multisigMembers: {
+        signing: [
+          {
+            aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
+            ends: [],
+          },
+          {
+            aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
+            ends: [],
+          },
+        ],
+        rotation: [],
+      },
     });
     getManagerMock.mockReturnValue({
       sign: () => [
@@ -929,16 +939,19 @@ describe("Receive group ACDC actions", () => {
           userName: "",
         },
       },
-      multisigMembers: [
-        {
-          aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
-          ends: [],
-        },
-        {
-          aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
-          ends: [],
-        },
-      ],
+      multisigMembers: {
+        signing: [
+          {
+            aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
+            ends: [],
+          },
+          {
+            aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
+            ends: [],
+          },
+        ],
+        rotation: [],
+      },
     });
     getManagerMock.mockReturnValue({
       sign: () => [
@@ -1311,10 +1324,21 @@ describe("Offer ACDC individual actions", () => {
     });
     markNotificationMock.mockResolvedValueOnce({ status: "done" });
 
-    await ipexCommunicationService.offerAcdcFromApply(
-      id,
-      grantForIssuanceExnMessage.exn.e.acdc
-    );
+    const credentialProps: CredentialMetadataRecordProps = {
+      id: "credential-id",
+      issuanceDate: "2024-01-01T00:00:00.000Z",
+      credentialType: "Test Credential",
+      status: CredentialStatus.CONFIRMED,
+      connectionId: "connection-id",
+      schema: "schema-said",
+      identifierId: "identifier-id",
+      identifierType: IdentifierType.Individual,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      isArchived: false,
+      pendingDeletion: false,
+    };
+
+    await ipexCommunicationService.offerAcdcFromApply(id, credentialProps);
 
     expect(operationPendingStorage.save).toBeCalledWith({
       id: "opName",
@@ -1323,7 +1347,7 @@ describe("Offer ACDC individual actions", () => {
     expect(ipexOfferMock).toBeCalledWith({
       senderName: "abc123",
       recipient: "i",
-      acdc: new Serder(grantForIssuanceExnMessage.exn.e.acdc),
+      acdc: new Serder(credentialProps),
       applySaid: "d",
     });
     expect(ipexSubmitOfferMock).toBeCalledWith(
@@ -1356,11 +1380,22 @@ describe("Offer ACDC individual actions", () => {
     eventEmitter.emit = jest.fn();
     notificationStorage.findById.mockResolvedValueOnce(null);
 
+    const credentialProps: CredentialMetadataRecordProps = {
+      id: "credential-id",
+      issuanceDate: "2024-01-01T00:00:00.000Z",
+      credentialType: "Test Credential",
+      status: CredentialStatus.CONFIRMED,
+      connectionId: "connection-id",
+      schema: "schema-said",
+      identifierId: "identifier-id",
+      identifierType: IdentifierType.Individual,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      isArchived: false,
+      pendingDeletion: false,
+    };
+
     await expect(
-      ipexCommunicationService.offerAcdcFromApply(
-        id,
-        grantForIssuanceExnMessage.exn.e.acdc
-      )
+      ipexCommunicationService.offerAcdcFromApply(id, credentialProps)
     ).rejects.toThrowError(
       `${IpexCommunicationService.NOTIFICATION_NOT_FOUND} ${id}`
     );
@@ -1419,12 +1454,26 @@ describe("Offer ACDC group actions", () => {
       recordType: OperationPendingRecordType.ExchangeOfferCredential,
     });
 
-    await ipexCommunicationService.offerAcdcFromApply(id, credentialRecord);
+    const credentialProps: CredentialMetadataRecordProps = {
+      id: "credential-id",
+      issuanceDate: "2024-01-01T00:00:00.000Z",
+      credentialType: "Test Credential",
+      status: CredentialStatus.CONFIRMED,
+      connectionId: "connection-id",
+      schema: "schema-said",
+      identifierId: "identifier-id",
+      identifierType: IdentifierType.Group,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      isArchived: false,
+      pendingDeletion: false,
+    };
+
+    await ipexCommunicationService.offerAcdcFromApply(id, credentialProps);
 
     expect(ipexOfferMock).toBeCalledWith({
       senderName: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
       recipient: "ECS7jn05fIP_JK1Ub4E6hPviRKEdC55QhxZToxDIHo_E",
-      acdc: new Serder(grantForIssuanceExnMessage.exn.e.acdc),
+      acdc: new Serder(credentialProps),
       applySaid: "EIDUavcmyHBseNZAdAHR3SF8QMfX1kSJ3Ct0OqS0-HCW",
       message: "",
       datetime: expect.any(String),
@@ -1468,11 +1517,22 @@ describe("Offer ACDC group actions", () => {
     };
     notificationStorage.findById.mockResolvedValue(applyNoteRecord);
 
+    const credentialProps: CredentialMetadataRecordProps = {
+      id: "credential-id",
+      issuanceDate: "2024-01-01T00:00:00.000Z",
+      credentialType: "Test Credential",
+      status: CredentialStatus.CONFIRMED,
+      connectionId: "connection-id",
+      schema: "schema-said",
+      identifierId: "identifier-id",
+      identifierType: IdentifierType.Individual,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      isArchived: false,
+      pendingDeletion: false,
+    };
+
     await expect(
-      ipexCommunicationService.offerAcdcFromApply(
-        "id",
-        grantForIssuanceExnMessage.exn.e.acdc
-      )
+      ipexCommunicationService.offerAcdcFromApply("id", credentialProps)
     ).rejects.toThrowError(IpexCommunicationService.IPEX_ALREADY_REPLIED);
 
     expect(ipexOfferMock).not.toBeCalled();
@@ -2462,8 +2522,23 @@ describe("IPEX communication service of agent", () => {
       groupReplied: false,
       receivingPre: "EGR7Jm38EcsXRIidKDZBYDm_xox6eapfU1tqxdAUzkFA",
     };
+
+    const credentialProps: CredentialMetadataRecordProps = {
+      id: "credential-id",
+      issuanceDate: "2024-01-01T00:00:00.000Z",
+      credentialType: "Test Credential",
+      status: CredentialStatus.CONFIRMED,
+      connectionId: "connection-id",
+      schema: "schema-said",
+      identifierId: "identifier-id",
+      identifierType: IdentifierType.Individual,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      isArchived: false,
+      pendingDeletion: false,
+    };
+
     await expect(
-      ipexCommunicationService.offerAcdcFromApply(noti.id, {})
+      ipexCommunicationService.offerAcdcFromApply(noti.id, credentialProps)
     ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
     await expect(
       ipexCommunicationService.grantAcdcFromAgree(noti.a.d)

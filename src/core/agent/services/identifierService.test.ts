@@ -119,6 +119,12 @@ const connections = jest.mocked({
   getMultisigLinkedContacts: jest.fn(),
   deleteConnectionByIdAndIdentifier: jest.fn(),
   deleteMultisigConnectionById: jest.fn(),
+  deleteAllConnectionsForGroup: jest.fn().mockResolvedValue(undefined),
+  deleteAllConnectionsForIdentifier: jest.fn().mockResolvedValue(undefined),
+});
+
+const credentials = jest.mocked({
+  deleteAllCredentialsForIdentifier: jest.fn().mockResolvedValue(undefined),
 });
 
 const basicStorage = jest.mocked({
@@ -141,7 +147,8 @@ const identifierService = new IdentifierService(
   operationPendingStorage as any,
   basicStorage as any,
   notificationStorage as any,
-  connections as any
+  connections as any,
+  credentials as any
 );
 
 jest.mock("../../cardano/walletConnect/peerConnection", () => ({
@@ -1138,9 +1145,7 @@ describe("Single sig service of agent", () => {
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
-    expect(connections.deleteMultisigConnectionById).toBeCalledWith(
-      "EHxEwa9UAcThqxuxbq56BYMq7YPWYxA63A1nau2AZ-1A"
-    );
+    expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
       findNotificationsResult[0].id
@@ -1196,7 +1201,7 @@ describe("Single sig service of agent", () => {
 
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
-    expect(connections.deleteMultisigConnectionById).toBeCalledWith("group-id");
+    expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       "manageAid",
       {
@@ -1272,6 +1277,9 @@ describe("Single sig service of agent", () => {
     await identifierService.deleteIdentifier(identifierMetadataRecord.id);
 
     expect(identifierStorage.getIdentifierMetadata).toBeCalledWith(
+      identifierMetadataRecord.id
+    );
+    expect(credentials.deleteAllCredentialsForIdentifier).toBeCalledWith(
       identifierMetadataRecord.id
     );
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(

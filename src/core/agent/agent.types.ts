@@ -102,6 +102,62 @@ type JSONValue =
   | { [x: string]: JSONValue }
   | JSONArray;
 
+// Define types for the 'a' property in ExnMessage
+interface ExnMessageA {
+  m?: string;
+  i?: string;
+  s?: string;
+  a?: Record<string, unknown>;
+  smids: string[];
+  gid: string;
+  t?: string;
+  st?: string;
+  c?: string[];
+  l?: {
+    t: string;
+    a: string;
+  };
+  d?: string;
+  r?: string;
+  exn?: {
+    r: string;
+    p: string;
+  };
+}
+
+// Define types for the 'e' property in ExnMessage
+interface ExnMessageE {
+  acdc: {
+    d: string;
+    i: string;
+    s: string;
+    ri: string;
+    a: {
+      d: string;
+      i: string;
+      dt: string;
+      attendeeName?: string;
+      [key: string]: unknown;
+    };
+  };
+  iss?: {
+    t: string;
+    d: string;
+    i: string;
+    s: string;
+    dt: string;
+  };
+  d?: string;
+  icp: {
+    i: string;
+  };
+  exn: {
+    r: string;
+    p: string;
+  };
+  [key: string]: unknown;
+}
+
 type ExnMessage = {
   exn: {
     v: string;
@@ -112,8 +168,8 @@ type ExnMessage = {
     dt: string;
     r: string;
     q: JSONValue;
-    a: any;
-    e: any;
+    a: ExnMessageA;
+    e: ExnMessageE;
     rp: string;
   };
   pathed: {
