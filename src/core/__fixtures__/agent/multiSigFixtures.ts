@@ -14,9 +14,10 @@ const memberMetadataRecordProps: IdentifierMetadataRecordProps = {
   createdAt: now,
   theme: 0,
   groupMetadata: {
-    groupId: "group-id",
+    groupId: "groupid",
     groupInitiator: true,
     groupCreated: false,
+    userName: "testUser",
   },
 };
 
@@ -118,6 +119,7 @@ const memberIdentifierRecord = {
     groupId: "08f22dee-8cb0-4d65-8600-a82bbc3f6fd7",
     groupInitiator: true,
     groupCreated: true,
+    userName: "testUser",
   },
   updatedAt: new Date("2024-06-28T03:55:04.260Z"),
 } as IdentifierMetadataRecordProps;
@@ -379,7 +381,10 @@ const multisigExnIpexGrantSerder = {
     dt: "2024-08-09T10:27:01.653000+00:00",
     r: "/multisig/exn",
     q: {},
-    a: { gid: "EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY" },
+    a: {
+      gid: "EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY",
+      smids: ["EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY"],
+    },
     e: {
       exn: {
         v: "KERI10JSON00051e_",
@@ -390,7 +395,12 @@ const multisigExnIpexGrantSerder = {
         dt: "2024-08-09T10:27:00.155000+00:00",
         r: "/ipex/grant",
         q: {},
-        a: { m: "", i: "ENDDYy0SVuFOI3rEnB3HbNFB_BFjhl4fQbZSeDZHGQf9" },
+        a: {
+          m: "",
+          i: "ENDDYy0SVuFOI3rEnB3HbNFB_BFjhl4fQbZSeDZHGQf9",
+          smids: ["ENDDYy0SVuFOI3rEnB3HbNFB_BFjhl4fQbZSeDZHGQf9"],
+          gid: "ENDDYy0SVuFOI3rEnB3HbNFB_BFjhl4fQbZSeDZHGQf9",
+        },
         e: {
           acdc: {
             v: "ACDC10JSON000197_",
@@ -846,12 +856,12 @@ const linkedContacts = [
     status: ConnectionStatus.CONFIRMED,
     createdAtUTC: new Date().toISOString(),
     contactId: "ENsj-3icUgAutHtrUHYnUPnP8RiafT5tOdVIZarFHuyP",
-    groupId: "group-id",
+    groupId: "groupid",
   },
 ];
 
 const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
-  name: "0:Identifier 2",
+  name: "1.2.0.3:0:Identifier 2",
   data: inceptionDataFix,
   initiator: true,
   groupConnections: linkedContacts,
@@ -859,7 +869,7 @@ const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
 };
 
 const queuedJoin: QueuedGroupCreation & { initiator: false } = {
-  name: "0:Identifier 2",
+  name: "0:testUser",
   data: inceptionDataFix,
   initiator: false,
   notificationId: "notification-id",

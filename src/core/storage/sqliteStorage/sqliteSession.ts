@@ -29,7 +29,7 @@ class SqliteSession {
     return this.sessionInstance;
   }
 
-  private async getKv(key: string): Promise<any> {
+  private async getKv(key: string): Promise<unknown> {
     const qValues = await this.sessionInstance?.query(
       SqliteSession.GET_KV_SQL,
       [key]
@@ -40,7 +40,7 @@ class SqliteSession {
     return undefined;
   }
 
-  private async setKv(key: string, value: any): Promise<void> {
+  private async setKv(key: string, value: unknown): Promise<void> {
     await this.sessionInstance?.query(SqliteSession.INSERT_KV_SQL, [
       key,
       JSON.stringify(value),
@@ -52,7 +52,7 @@ class SqliteSession {
       const currentVersionDatabase = await this.getKv(
         SqliteSession.VERSION_DATABASE_KEY
       );
-      return currentVersionDatabase ?? SqliteSession.BASE_VERSION;
+      return (currentVersionDatabase as string) ?? SqliteSession.BASE_VERSION;
     } catch (error) {
       return SqliteSession.BASE_VERSION;
     }
@@ -104,8 +104,11 @@ class SqliteSession {
       );
     }
     await this.sessionInstance.open();
+    if (!this.sessionInstance) {
+      throw new Error("Failed to open SQLite session");
+    }
     this.basicStorageService = new BasicStorage(
-      new SqliteStorage<BasicRecord>(this.session!)
+      new SqliteStorage<BasicRecord>(this.sessionInstance)
     );
     await this.migrateDb();
   }

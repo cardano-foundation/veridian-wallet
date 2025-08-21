@@ -15,7 +15,8 @@
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react-hooks/recommended",
-    "plugin:import/warnings"
+    "plugin:import/warnings",
+    "prettier"
   ],
   "overrides": [
     {
@@ -29,18 +30,21 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest",
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
   "plugins": ["react", "@typescript-eslint", "import", "jest"],
   "rules": {
     "@typescript-eslint/no-duplicate-enum-values": "error",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-non-null-assertion": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "react/no-unescaped-entities": 0,
     "react/react-in-jsx-scope": "off",
     "no-console": "error",
-    "no-unused-vars": "off",
     "no-undef": "error",
-    "indent": ["warn", 2, { "SwitchCase": 1 }],
-    "quotes": ["warn", "double"],
+    "react/display-name": "off",
+    "react-hooks/exhaustive-deps": "warn",
     "import/order": [
       "warn",
       {
@@ -50,8 +54,7 @@
           ["parent", "sibling", "index"]
         ]
       }
-    ],
-    "react/display-name": "off"
+    ]
   },
   "settings": {
     "react": {

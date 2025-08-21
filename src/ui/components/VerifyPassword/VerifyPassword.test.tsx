@@ -13,9 +13,9 @@ import { SecureStorage } from "../../../core/storage";
 import ENG_Trans from "../../../locales/en/en.json";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { VerifyPassword } from "./VerifyPassword";
-import { makeTestStore } from "../../utils/makeTestStore";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
 
@@ -59,8 +59,6 @@ const initialStateNoPassword = {
       "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
     bran: "bran",
   },
-  credsCache: { creds: credsFixAcdc },
-  credsArchivedCache: { creds: credsFixAcdc },
 };
 
 const initialStateWithPassword = {
@@ -80,8 +78,6 @@ const initialStateWithPassword = {
       "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
     bran: "bran",
   },
-  credsCache: { creds: credsFixAcdc },
-  credsArchivedCache: { creds: credsFixAcdc },
 };
 
 jest.mock("../CustomInput", () => ({

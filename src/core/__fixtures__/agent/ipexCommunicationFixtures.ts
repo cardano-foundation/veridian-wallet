@@ -14,13 +14,19 @@ const grantForIssuanceExnMessage = {
     dt: "2024-07-30T04:19:55.801000+00:00",
     r: ExchangeRoute.IpexGrant,
     q: {},
-    a: { m: "", i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
+    a: {
+      m: "",
+      i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      smids: ["EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"],
+      gid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+    },
     rp: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
     e: {
       acdc: {
         d: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
         i: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
         s: "EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+        ri: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         a: {
           d: "ELHCh_X2aw7C-aYesOM4La23a5lsoNuJDuCsJuxwO2nq",
           i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
@@ -34,6 +40,13 @@ const grantForIssuanceExnMessage = {
         i: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         s: "0",
         dt: "2024-07-30T04:19:55.348000+00:00",
+      },
+      icp: {
+        i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      },
+      exn: {
+        r: ExchangeRoute.IpexGrant,
+        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
       },
       d: "EKBPPnWxYw2I5CtQSyhyn5VUdSTJ61qF_-h-NwmFRkIF",
     },
@@ -61,8 +74,29 @@ const applyForPresentingExnMessage = {
       m: "",
       s: "EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb",
       a: { attendeeName: "4" },
+      smids: ["EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK"],
+      gid: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
     },
-    e: {},
+    e: {
+      acdc: {
+        d: "EFbd-N8VoWbHzpwPUKm4hPF6ZKCRNHfnYiKKYDT7N0KS",
+        i: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
+        s: "EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb",
+        ri: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
+        a: {
+          d: "EFbd-N8VoWbHzpwPUKm4hPF6ZKCRNHfnYiKKYDT7N0KS",
+          i: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
+          dt: "2024-09-12T09:42:43.794000+00:00",
+        },
+      },
+      icp: {
+        i: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
+      },
+      exn: {
+        r: ExchangeRoute.IpexApply,
+        p: "EFbd-N8VoWbHzpwPUKm4hPF6ZKCRNHfnYiKKYDT7N0KS",
+      },
+    },
   },
   pathed: {},
 };
@@ -77,12 +111,18 @@ const offerForPresentingExnMessage = {
     dt: "2024-07-30T04:19:55.801000+00:00",
     r: ExchangeRoute.IpexOffer,
     q: {},
-    a: { m: "", i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
+    a: {
+      m: "",
+      i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      smids: ["EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"],
+      gid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+    },
     e: {
       acdc: {
         d: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
         i: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
         s: "EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+        ri: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         a: {
           d: "ELHCh_X2aw7C-aYesOM4La23a5lsoNuJDuCsJuxwO2nq",
           i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
@@ -97,12 +137,19 @@ const offerForPresentingExnMessage = {
         s: "0",
         dt: "2024-07-30T04:19:55.348000+00:00",
       },
+      icp: {
+        i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      },
+      exn: {
+        r: ExchangeRoute.IpexOffer,
+        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
+      },
       d: "EKBPPnWxYw2I5CtQSyhyn5VUdSTJ61qF_-h-NwmFRkIF",
     },
   },
   pathed: {
     acdc: "-IABEEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn0AAAAAAAAAAAAAAAAAAAAAAAEHStOgwJku_Ln-YN2ohgWUH-CI07SyJnFppSbF8kG4PO",
-    iss: "-VAS-GAB0AAAAAAAAAAAAAAAAAAAAAAAEEO0xKzC8FOAXV-JgFZGgb0aIT2A3cPXPt9_0l_qcGM9",
+    iss: "-VAS-GAB0AAAAAAAAAAAAAAAAAAAAAAAEEO0xKzC8FOAXV-JgFZGgb0Bzxdn",
     anc: "-AABAACBlQqbI_qNpKYkzIog6tauSgt0XufBvGtrumfbnhSInFjSwnaIqZi353QT-c1W_gE9KIz3rgX5QNNWLcqA7bcM",
   },
 };
@@ -121,8 +168,29 @@ const admitForIssuanceExnMessage = {
     a: {
       i: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
       m: "",
+      smids: ["EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK"],
+      gid: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
     },
-    e: {},
+    e: {
+      acdc: {
+        d: "EEqJBi-JmK5IG-rU4wnn5cplcnmAk6exhAwE2GkAG895",
+        i: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+        s: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+        ri: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+        a: {
+          d: "EEqJBi-JmK5IG-rU4wnn5cplcnmAk6exhAwE2GkAG895",
+          i: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+          dt: "2024-12-23T07:42:34.448000+00:00",
+        },
+      },
+      icp: {
+        i: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+      },
+      exn: {
+        r: ExchangeRoute.IpexAdmit,
+        p: "EFYtFiqA6l2xlCtTwKksHpWtTSvIilwQGamB_qFvPuER",
+      },
+    },
   },
   pathed: {},
 };
@@ -138,13 +206,19 @@ const agreeForPresentingExnMessage = {
     dt: "2024-07-30T04:19:55.801000+00:00",
     r: ExchangeRoute.IpexAgree,
     q: {},
-    a: { m: "", i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
+    a: {
+      m: "",
+      i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      smids: ["EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"],
+      gid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+    },
     rp: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
     e: {
       acdc: {
         d: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
         i: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
         s: "EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+        ri: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         a: {
           d: "ELHCh_X2aw7C-aYesOM4La23a5lsoNuJDuCsJuxwO2nq",
           i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
@@ -158,6 +232,13 @@ const agreeForPresentingExnMessage = {
         i: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         s: "0",
         dt: "2024-07-30T04:19:55.348000+00:00",
+      },
+      icp: {
+        i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      },
+      exn: {
+        r: ExchangeRoute.IpexAgree,
+        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
       },
       d: "EKBPPnWxYw2I5CtQSyhyn5VUdSTJ61qF_-h-NwmFRkIF",
     },
@@ -222,6 +303,7 @@ const multisigExnOfferForPresenting = {
     a: {
       i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
       gid: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+      smids: ["EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn"],
     },
     e: {
       exn: {
@@ -243,7 +325,26 @@ const multisigExnOfferForPresenting = {
       d: "EE8_Xc0ZUh_sUJLtmBpVSEr-RFS2mRUIpFyL-pmvtPvx",
     },
   },
-  pathed: {},
+  pathed: {
+    exn: {
+      v: "KERI10JSON000178_",
+      t: "exn",
+      d: "EKa94ERqArLOvNf9AmItMJtsoGKZPVb3e_pEo_1D37qt",
+      i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+      rp: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
+      p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
+      dt: "2024-08-28T06:39:51.416000+00:00",
+      r: ExchangeRoute.IpexGrant,
+      q: {},
+      a: {
+        i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
+        m: "",
+      },
+      e: {
+        acdc: { d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT" },
+      },
+    },
+  },
 };
 
 const multisigExnAdmitForIssuance = {
@@ -298,24 +399,33 @@ const multisigExnGrant = {
     a: {
       i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
       gid: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+      smids: ["EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn"],
     },
     e: {
-      exn: {
-        v: "KERI10JSON000178_",
-        t: "exn",
-        d: "EKa94ERqArLOvNf9AmItMJtsoGKZPVb3e_pEo_1D37qt",
+      acdc: {
+        d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT",
         i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
-        rp: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
-        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
-        dt: "2024-08-28T06:39:51.416000+00:00",
-        r: ExchangeRoute.IpexGrant,
-        q: {},
+        s: "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao",
+        ri: "EGtWoXT4ahu5YnmGCAV8stolM-fgdqCu_eggQ46uSSoi",
         a: {
-          i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
-          m: "",
+          d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT",
+          i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+          dt: "2024-08-28T06:39:51.416000+00:00",
         },
+      },
+      icp: {
+        i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+      },
+      exn: {
+        i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+        r: ExchangeRoute.IpexGrant,
+        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
         e: {
-          acdc: { d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT" },
+          acdc: {
+            i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+            d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT",
+            s: "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao",
+          },
         },
       },
       d: "EE8_Xc0ZUh_sUJLtmBpVSEr-RFS2mRUIpFyL-pmvtPvx",
@@ -404,18 +514,46 @@ const multisigParticipantsProps = {
       groupId: "group-id",
       groupInitiator: true,
       groupCreated: true,
+      userName: "IdentifierName2",
     },
   },
-  multisigMembers: [
-    {
-      aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
-      ends: [],
-    },
-    {
-      aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
-      ends: [],
-    },
-  ],
+  multisigMembers: {
+    signing: [
+      {
+        aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
+        ends: {
+          agent: {
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8": {
+              http: "http://keria:3902/",
+            },
+          },
+          witness: {
+            "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha": {
+              http: "http://witness-demo:5642/",
+              tcp: "tcp://witness-demo:5632/",
+            },
+          },
+        },
+      },
+      {
+        aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
+        ends: {
+          agent: {
+            "EBkResDyD-lZslJAZLe2gOCIlGLTd4Wts7Wy0EgDBi4d": {
+              http: "http://keria:3902/",
+            },
+          },
+          witness: {
+            "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha": {
+              http: "http://witness-demo:5642/",
+              tcp: "tcp://witness-demo:5632/",
+            },
+          },
+        },
+      },
+    ],
+    rotation: [],
+  },
 };
 
 const ipexGrantSerder = {
@@ -460,7 +598,10 @@ const ipexSubmitGrantSerder = {
     dt: "2024-08-09T10:27:01.653000+00:00",
     r: NotificationRoute.MultiSigExn,
     q: {},
-    a: { gid: "EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY" },
+    a: {
+      gid: "EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY",
+      smids: ["EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY"],
+    },
     e: {
       exn: {
         v: "KERI10JSON00051e_",
@@ -542,6 +683,8 @@ const ipexOfferSerder = {
     a: {
       i: "EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd",
       m: "",
+      smids: ["EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd"],
+      gid: "EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd",
     },
     e: {
       acdc: {
@@ -556,6 +699,13 @@ const ipexOfferSerder = {
           attendeeName: "99",
           dt: "2024-10-02T15:21:50.607000+00:00",
         },
+      },
+      icp: {
+        i: "EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd",
+      },
+      exn: {
+        r: ExchangeRoute.IpexOffer,
+        p: "ELKa5OdxusflKLZBqmHI09vYgyiySh4ZM1CQcoS6Nabh",
       },
       d: "ECc3mOk1p4QceI4bGBoVhv7cVX34n-UOlK73VSm7m_fS",
     },
@@ -583,6 +733,7 @@ const multisigOfferSerder = {
     a: {
       i: "EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd",
       gid: "EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4",
+      smids: ["EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd"],
     },
     e: {
       exn: {

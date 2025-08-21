@@ -1,6 +1,12 @@
 import { render, fireEvent } from "@testing-library/react";
 import { useAppSelector } from "../../../store/hooks";
 import { Avatar } from "./Avatar";
+import {
+  defaultProfileDataFix,
+  profileCacheFixData,
+  profilesCachesFix,
+} from "../../__fixtures__/storeDataFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 
 jest.mock("@ionic/react", () => ({
   IonButton: ({ children, ...props }: any) => (
@@ -12,16 +18,10 @@ jest.mock("../../../store/hooks", () => ({
   useAppSelector: jest.fn(),
 }));
 
-const mockIdentifiers = {
-  "id-1": { displayName: "Alice", createdAtUTC: "2023-01-01T00:00:00Z" },
-  "id-2": { displayName: "Bob", createdAtUTC: "2023-01-02T00:00:00Z" },
-  "id-3": { displayName: "Charlie", createdAtUTC: "2023-01-03T00:00:00Z" },
-};
-
 describe("Avatar", () => {
   beforeEach(() => {
     (useAppSelector as jest.Mock).mockImplementation((selector) =>
-      selector.name === "getIdentifiersCache" ? mockIdentifiers : {}
+      selector.name === "getProfiles" ? profilesCachesFix : {}
     );
   });
 
@@ -32,17 +32,17 @@ describe("Avatar", () => {
   it("renders the first letter of the displayName in uppercase", () => {
     const { getByText } = render(
       <Avatar
-        id="id-1"
+        id={filteredIdentifierFix[0].id}
         handleAvatarClick={jest.fn()}
       />
     );
-    expect(getByText("A")).toBeInTheDocument();
+    expect(getByText("P")).toBeInTheDocument();
   });
 
   it("applies the correct rank class", () => {
     const { getByTestId } = render(
       <Avatar
-        id="id-2"
+        id={filteredIdentifierFix[1].id}
         handleAvatarClick={jest.fn()}
       />
     );
@@ -54,7 +54,7 @@ describe("Avatar", () => {
     const handleClick = jest.fn();
     const { getByTestId } = render(
       <Avatar
-        id="id-3"
+        id={filteredIdentifierFix[2].id}
         handleAvatarClick={handleClick}
       />
     );
@@ -63,11 +63,6 @@ describe("Avatar", () => {
   });
 
   it("renders empty span if displayName is missing", () => {
-    const identifiers = {
-      ...mockIdentifiers,
-      "id-4": { createdAtUTC: "2023-01-04T00:00:00Z" },
-    };
-    (useAppSelector as jest.Mock).mockReturnValue(identifiers);
     const { getByTestId } = render(
       <Avatar
         id="id-4"

@@ -13,7 +13,7 @@ const notificationsFix: KeriaNotification[] = [
     connectionId: "EJNd_YCOZA_g5fT8BnvY6KWgSMbIP9selgebbVNu8gNw",
     read: false,
     groupReplied: false,
-    receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
+    receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
   },
   {
     id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmG",
@@ -26,7 +26,7 @@ const notificationsFix: KeriaNotification[] = [
     connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
     read: false,
     groupReplied: false,
-    receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
+    receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
   },
   {
     id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmv",
@@ -39,7 +39,7 @@ const notificationsFix: KeriaNotification[] = [
     connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
     read: false,
     groupReplied: false,
-    receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
+    receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
   },
   {
     id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmk",
@@ -54,7 +54,7 @@ const notificationsFix: KeriaNotification[] = [
     connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
     read: false,
     groupReplied: false,
-    receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
+    receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
   },
   {
     id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmc",
@@ -69,7 +69,7 @@ const notificationsFix: KeriaNotification[] = [
     connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
     read: false,
     groupReplied: false,
-    receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
+    receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
   },
   {
     id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMm1",
@@ -78,12 +78,12 @@ const notificationsFix: KeriaNotification[] = [
       r: "/local/acdc/revoked",
       d: "EMT02ZHUhpnr4gFFk104B-pLwb2bJC8aip2VYmbPztnk",
       m: "",
-      credentialId: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMm4",
+      credentialId: "EBgG1lhkxiv_UQ8IiF2G4j5HQlnT5K5XZy_zRFg_EGCS",
     },
     connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
     read: false,
     groupReplied: false,
-    receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
+    receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
   },
   {
     id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMm2",
@@ -96,7 +96,7 @@ const notificationsFix: KeriaNotification[] = [
     connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
     read: false,
     groupReplied: false,
-    receivingPre: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfA",
+    receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
   },
   {
     id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMm3",

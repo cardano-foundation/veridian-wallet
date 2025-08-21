@@ -1,5 +1,5 @@
 import { config } from "../config";
-import { CredentialIssueRequest } from "./credential.types";
+import { CredentialIssueRequest, CredentialRequest } from "./credential.types";
 import { httpInstance } from "./http";
 
 const CredentialService = {
@@ -15,7 +15,7 @@ const CredentialService = {
       data
     );
   },
-  requestPresentation: (data: CredentialIssueRequest) => {
+  requestPresentation: (data: CredentialRequest) => {
     return httpInstance.post(
       `${config.endpoint}${config.path.requestDisclosure}`,
       data

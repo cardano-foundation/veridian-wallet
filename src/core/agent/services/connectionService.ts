@@ -86,11 +86,6 @@ class ConnectionService extends AgentService {
     this.contactStorage = contactStorage;
   }
 
-  static readonly CONNECTION_NOTE_RECORD_NOT_FOUND =
-    "Connection note record not found";
-  static readonly CONTACT_METADATA_RECORD_NOT_FOUND =
-    "Contact metadata record not found";
-  static readonly DEFAULT_ROLE = "agent";
   static readonly FAILED_TO_RESOLVE_OOBI =
     "Failed to resolve OOBI, operation not completing...";
   static readonly CANNOT_GET_OOBI = "No OOBI available from KERIA";
@@ -146,10 +141,11 @@ class ConnectionService extends AgentService {
     }
 
     const multiSigInvite = url.includes(OobiQueryParams.GROUP_ID);
-    const connectionId = new URL(url).pathname
-      .split("/oobi/")
-      .pop()!
-      .split("/")[0];
+    const oobiPath = new URL(url).pathname.split("/oobi/").pop();
+    if (!oobiPath) {
+      throw new Error(ConnectionService.OOBI_INVALID);
+    }
+    const connectionId = oobiPath.split("/")[0];
 
     const alias =
       new URL(url).searchParams.get(OobiQueryParams.NAME) ?? randomSalt();
@@ -241,7 +237,7 @@ class ConnectionService extends AgentService {
   }
 
   async getConnections(identifier?: string): Promise<ConnectionShortDetails[]> {
-    const connections: any[] = [];
+    const connections: ContactDetailsRecord[] = [];
 
     const connectionPairs = await this.connectionPairStorage.findAllByQuery({
       pendingDeletion: false,
@@ -259,16 +255,18 @@ class ConnectionService extends AgentService {
       }
       const contact = contactRecordMap.get(connectionPair.contactId);
 
-      connections.push({
-        id: connectionPair.contactId,
-        alias: contact?.alias,
-        createdAt: connectionPair.createdAt,
-        oobi: contact?.oobi,
-        groupId: contact?.groupId,
-        creationStatus: connectionPair.creationStatus,
-        pendingDeletion: connectionPair.pendingDeletion,
-        identifier: connectionPair.identifier, // Include identifier from connection pair
-      });
+      if (contact?.alias && contact?.oobi) {
+        connections.push({
+          id: connectionPair.contactId,
+          alias: contact.alias,
+          createdAt: connectionPair.createdAt,
+          oobi: contact.oobi,
+          groupId: contact.groupId,
+          creationStatus: connectionPair.creationStatus,
+          pendingDeletion: connectionPair.pendingDeletion,
+          identifier: connectionPair.identifier, // Include identifier from connection pair
+        });
+      }
     }
 
     return connections.map((connection) =>
@@ -320,7 +318,7 @@ class ConnectionService extends AgentService {
       contactId: record.id,
       ...(record.groupId
         ? { groupId: record.groupId }
-        : { identifier: record.identifier! }),
+        : { identifier: record.identifier || "" }),
     };
   }
 
@@ -441,13 +439,9 @@ class ConnectionService extends AgentService {
     identifier: string
   ): Promise<void> {
     // Check if the connection pair exists
-    const connectionPair = await this.connectionPairStorage.findById(
+    const connectionPair = await this.connectionPairStorage.findExpectedById(
       `${identifier}:${contactId}`
     );
-
-    if (!connectionPair) {
-      return; // Nothing to delete
-    }
 
     // Get all connection pairs for this contactId to determine if this is the last one
     const allConnectionPairs = await this.connectionPairStorage.findAllByQuery({
@@ -507,10 +501,10 @@ class ConnectionService extends AgentService {
     contactId: string,
     identifier: string
   ): Promise<void> {
-    const connectionPairProps = await this.connectionPairStorage.findById(
-      `${identifier}:${contactId}`
-    );
-    if (!connectionPairProps) return;
+    const connectionPairProps =
+      await this.connectionPairStorage.findExpectedById(
+        `${identifier}:${contactId}`
+      );
 
     connectionPairProps.pendingDeletion = true;
     await this.connectionPairStorage.update(connectionPairProps);
@@ -573,7 +567,28 @@ class ConnectionService extends AgentService {
     id: string,
     identifier?: string
   ): Promise<MultisigConnectionDetails | RegularConnectionDetails> {
-    const metadata = await this.getContactMetadataById(id, identifier);
+    const contact = await this.contactStorage.findExpectedById(id);
+
+    let metadata: ContactDetailsRecord;
+    if (identifier) {
+      const connectionPair = await this.connectionPairStorage.findExpectedById(
+        `${identifier}:${id}`
+      );
+
+      metadata = {
+        id,
+        alias: contact.alias,
+        createdAt: connectionPair.createdAt,
+        oobi: contact.oobi,
+        groupId: contact.groupId,
+        creationStatus: connectionPair.creationStatus,
+        pendingDeletion: connectionPair.pendingDeletion,
+        identifier,
+      };
+    } else {
+      metadata = contact;
+    }
+
     return this.getConnectionShortDetails(metadata);
   }
 
@@ -619,6 +634,7 @@ class ConnectionService extends AgentService {
     id: string,
     alias?: string,
     groupId?: string,
+    groupName?: string,
     externalId?: string
   ): Promise<string> {
     const result = await this.props.signifyClient.oobis().get(id);
@@ -637,11 +653,18 @@ class ConnectionService extends AgentService {
         oobi.pathname = pathName.substring(0, agentIndex);
       }
     }
-    if (alias !== undefined) oobi.searchParams.set(OobiQueryParams.NAME, alias);
-    if (groupId !== undefined)
+    if (alias !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.NAME, alias);
+    }
+    if (groupId !== undefined) {
       oobi.searchParams.set(OobiQueryParams.GROUP_ID, groupId);
-    if (externalId !== undefined)
+    }
+    if (groupName !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.GROUP_NAME, groupName);
+    }
+    if (externalId !== undefined) {
       oobi.searchParams.set(OobiQueryParams.EXTERNAL_ID, externalId);
+    }
 
     return oobi.toString();
   }
@@ -675,57 +698,49 @@ class ConnectionService extends AgentService {
     }
   }
 
-  private async getContactMetadataById(
-    contactId: string,
-    identifier?: string
-  ): Promise<ContactDetailsRecord> {
-    const contact = await this.contactStorage.findById(contactId);
-    if (!contact) {
-      throw new Error(ConnectionService.CONTACT_METADATA_RECORD_NOT_FOUND);
-    }
+  async syncKeriaContacts(): Promise<void> {
+    const localIdentifiers = await this.identifierStorage.getAllIdentifiers();
+    const localAIDs = localIdentifiers.map((id) => id.id);
+    const cloudContacts = await this.props.signifyClient.contacts().list();
 
-    if (identifier) {
-      const connectionPair = await this.connectionPairStorage.findById(
-        `${identifier}:${contactId}`
-      );
+    for (const contact of cloudContacts) {
+      const contactExists = await this.contactStorage.findById(contact.id);
 
-      if (!connectionPair) {
-        throw new Error(ConnectionService.CONTACT_METADATA_RECORD_NOT_FOUND);
+      if (!contactExists) {
+        await this.contactStorage.save({
+          id: contact.id,
+          alias: contact.alias,
+          oobi: contact.oobi,
+          groupId: contact.groupCreationId as string | undefined,
+          createdAt: contact.groupCreationId
+            ? new Date(contact.createdAt as string)
+            : new Date(),
+        });
       }
 
-      return {
-        id: contactId,
-        alias: contact.alias,
-        createdAt: connectionPair.createdAt,
-        oobi: contact.oobi,
-        groupId: contact.groupId,
-        creationStatus: connectionPair.creationStatus,
-        pendingDeletion: connectionPair.pendingDeletion,
-        identifier,
-      };
-    }
+      for (const key of Object.keys(contact)) {
+        const keyParts = key.split(":");
+        if (keyParts.length === 2 && keyParts[1] === "createdAt") {
+          const aid = keyParts[0];
+          if (localAIDs.includes(aid)) {
+            const pairId = `${aid}:${contact.id}`;
+            const pairExists = await this.connectionPairStorage.findById(
+              pairId
+            );
 
-    return contact;
-  }
-
-  async syncKeriaContacts(): Promise<void> {
-    const cloudContacts = await this.props.signifyClient.contacts().list();
-    const localContacts = await this.contactStorage.getAll();
-
-    const unSyncedData = cloudContacts.filter(
-      (contact: Contact) =>
-        !localContacts.find((item: ContactRecord) => contact.id == item.id)
-    );
-
-    for (const contact of unSyncedData) {
-      await this.createConnectionMetadata(contact.id, {
-        alias: contact.alias,
-        oobi: contact.oobi,
-        groupId: contact.groupCreationId,
-        createdAtUTC: contact.createdAt,
-        sharedIdentifier: contact.sharedIdentifier ?? "",
-        creationStatus: CreationStatus.COMPLETE,
-      });
+            if (!pairExists) {
+              await this.connectionPairStorage.save({
+                id: pairId,
+                contactId: contact.id,
+                identifier: aid,
+                creationStatus: CreationStatus.COMPLETE,
+                pendingDeletion: false,
+                createdAt: new Date(contact[key] as string),
+              });
+            }
+          }
+        }
+      }
     }
   }
 
@@ -824,17 +839,15 @@ class ConnectionService extends AgentService {
     connectionId: string,
     identifier: string
   ): Promise<void> {
-    const userName = (
-      await this.identifierStorage.getIdentifierMetadata(identifier)
-    ).displayName;
-
-    const contact = await this.getContactMetadataById(connectionId);
+    const contact = await this.contactStorage.findExpectedById(connectionId);
     const externalId = new URL(contact.oobi).searchParams.get(
       OobiQueryParams.EXTERNAL_ID
     );
+    const identifierMetadata =
+      await this.identifierStorage.getIdentifierMetadata(identifier);
     const oobi = await this.getOobi(
       identifier,
-      userName,
+      identifierMetadata.displayName,
       undefined,
       externalId ?? undefined
     );
@@ -870,6 +883,27 @@ class ConnectionService extends AgentService {
       c: exn.a.c,
       l: exn.a.l,
     };
+  }
+
+  async deleteAllConnectionsForIdentifier(identifierId: string): Promise<void> {
+    const pairsToDelete = await this.connectionPairStorage.findAllByQuery({
+      identifier: identifierId,
+    });
+
+    for (const pair of pairsToDelete) {
+      await this.deleteConnectionByIdAndIdentifier(
+        pair.contactId,
+        pair.identifier
+      );
+    }
+  }
+
+  async deleteAllConnectionsForGroup(groupId: string): Promise<void> {
+    const groupContacts = await this.contactStorage.findAllByQuery({ groupId });
+
+    for (const contact of groupContacts) {
+      await this.deleteMultisigConnectionById(contact.id);
+    }
   }
 }
 

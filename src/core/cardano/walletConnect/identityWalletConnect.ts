@@ -96,13 +96,13 @@ class IdentityWalletConnect extends CardanoPeerConnect {
     throw new Error("Method not implemented.");
   }
   protected getUtxos(
-    amount?: string | undefined,
-    paginate?: Paginate | undefined
+    _amount?: string | undefined,
+    _paginate?: Paginate | undefined
   ): Promise<string[] | null> {
     throw new Error("Method not implemented.");
   }
   protected getCollateral(
-    params?: { amount?: string | undefined } | undefined
+    _params?: { amount?: string | undefined } | undefined
   ): Promise<string[] | null> {
     throw new Error("Method not implemented.");
   }
@@ -121,16 +121,16 @@ class IdentityWalletConnect extends CardanoPeerConnect {
   protected async getRewardAddresses(): Promise<string[]> {
     throw new Error("Method not implemented.");
   }
-  protected signTx(tx: string, partialSign: boolean): Promise<string> {
+  protected signTx(_tx: string, _partialSign: boolean): Promise<string> {
     throw new Error("Method not implemented.");
   }
   protected async signData(
-    addr: string,
-    payload: string
+    _addr: string,
+    _payload: string
   ): Promise<Cip30DataSignature> {
     throw new Error("Method not implemented.");
   }
-  protected submitTx(tx: string): Promise<string> {
+  protected submitTx(_tx: string): Promise<string> {
     throw new Error("Method not implemented.");
   }
 }

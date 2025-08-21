@@ -8,8 +8,6 @@ import {
   Siger,
   State,
   b,
-  Cigar,
-  Signer,
   reply,
   Serials,
 } from "signify-ts";
@@ -46,6 +44,8 @@ import { ConnectionService } from "./connectionService";
 import { IdentifierService } from "./identifierService";
 import { StorageMessage } from "../../storage/storage.types";
 import { RpyRoute } from "./connectionService.types";
+import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/migrations";
+
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
   static readonly CANNOT_GET_KEYSTATE_OF_IDENTIFIER =
@@ -139,8 +139,8 @@ class MultiSigService extends AgentService {
       )
     );
     const states = [mHab["state"], ...connectionStates];
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
 
+    const groupName = `${LATEST_IDENTIFIER_VERSION}:${mHabRecord.theme}:${mHabRecord.displayName}`;
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
@@ -339,7 +339,10 @@ class MultiSigService extends AgentService {
     groupConnections: ConnectionShortDetails[]
   ): Promise<void> {
     const { witnesses } = await this.identifiers.getAvailableWitnesses();
-    const keeper = this.props.signifyClient.manager!.get(mHab);
+    if (!this.props.signifyClient.manager) {
+      throw new Error("Signify client manager not initialized");
+    }
+    const keeper = this.props.signifyClient.manager.get(mHab);
 
     for (const witness of witnesses) {
       const rpyData = {
@@ -452,6 +455,7 @@ class MultiSigService extends AgentService {
           throw error;
         }
       });
+
     const exn = icpMsg[0].exn;
 
     const identifiers = await this.identifiers.getIdentifiers(false);
@@ -470,7 +474,8 @@ class MultiSigService extends AgentService {
     const mHab = await this.props.signifyClient
       .identifiers()
       .get(mHabRecord.id);
-    const groupName = `${mHabRecord.theme}:${mHabRecord.displayName}`;
+
+    const groupName = `${LATEST_IDENTIFIER_VERSION}:${mHabRecord.theme}:${mHabRecord.displayName}`;
 
     // @TODO - foconnor: We should error here if smids no longer matches once we have multi-sig rotation.
     const states = await Promise.all(
@@ -537,8 +542,8 @@ class MultiSigService extends AgentService {
       payload: {
         group: {
           id: multisigId,
-          displayName: mHabRecord.displayName,
           theme: mHabRecord.theme,
+          displayName: mHabRecord.displayName,
           creationStatus,
           groupMemberPre: mHabRecord.id,
           createdAtUTC: multisigDetail.icp_dt,
@@ -590,10 +595,9 @@ class MultiSigService extends AgentService {
     const members = await this.props.signifyClient
       .identifiers()
       .members(multisigId);
-    const multisigMembers = members.signing;
 
     let ourIdentifier;
-    for (const member of multisigMembers) {
+    for (const member of members.signing) {
       const identifier = await this.identifierStorage
         .getIdentifierMetadata(member.aid)
         .catch((error) => {
@@ -619,7 +623,10 @@ class MultiSigService extends AgentService {
 
     return {
       ourIdentifier,
-      multisigMembers,
+      multisigMembers: {
+        signing: members.signing,
+        rotation: members.rotation || [],
+      },
     };
   }
 
@@ -632,11 +639,11 @@ class MultiSigService extends AgentService {
       .identifiers()
       .get(ourIdentifier.id as string);
 
-    const recp = multisigMembers
-      .filter((signing: any) => signing.aid !== ourIdentifier.id)
-      .map((member: any) => member.aid);
+    const recp = multisigMembers.signing
+      .filter((signing) => signing.aid !== ourIdentifier.id)
+      .map((member) => member.aid);
 
-    for (const member of multisigMembers) {
+    for (const member of multisigMembers.signing) {
       const eid = Object.keys(member.ends.agent)[0]; //agent of member
       const endRoleRes = await this.props.signifyClient
         .identifiers()
@@ -706,9 +713,9 @@ class MultiSigService extends AgentService {
 
     const { ourIdentifier, multisigMembers } =
       await this.getMultisigParticipants(multisigId);
-    const recp = multisigMembers
-      .filter((signing: any) => signing.aid !== ourIdentifier.id)
-      .map((member: any) => member.aid);
+    const recp = multisigMembers.signing
+      .filter((signing) => signing.aid !== ourIdentifier.id)
+      .map((member) => member.aid);
     const mHab = await this.props.signifyClient
       .identifiers()
       .get(ourIdentifier.id as string);
@@ -735,8 +742,11 @@ class MultiSigService extends AgentService {
     for (const queued of pendingGroupsRecord.content
       .queued as QueuedGroupCreation[]) {
       if (queued.initiator) {
+        if (!queued.data.group) {
+          throw new Error("Group data missing for initiator");
+        }
         await this.createGroup(
-          queued.data.group!.mhab.prefix,
+          queued.data.group.mhab.prefix,
           queued.groupConnections as MultisigConnectionDetails[],
           queued.threshold,
           true

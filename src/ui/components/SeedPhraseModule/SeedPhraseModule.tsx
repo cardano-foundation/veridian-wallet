@@ -31,7 +31,7 @@ const SeedPhraseModule = forwardRef<SeedPhraseModuleRef, SeedPhraseModuleProps>(
     },
     ref
   ) => {
-    const seedInputs = useRef<(HTMLElement | null)[]>([]);
+    const seedInputs = useRef<(HTMLIonInputElement | null)[]>([]);
     const { hideKeyboard } = useHideKeyboard();
 
     useImperativeHandle(ref, () => ({
@@ -71,7 +71,6 @@ const SeedPhraseModule = forwardRef<SeedPhraseModuleRef, SeedPhraseModuleProps>(
           </p>
           {showSeedPhraseButton && (
             <IonButton
-              shape="round"
               fill="outline"
               data-testid="reveal-seed-phrase-button"
               onClick={() => setHideSeedPhrase && setHideSeedPhrase(false)}

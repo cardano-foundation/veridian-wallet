@@ -20,31 +20,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { Agent } from "../../../core/agent/agent";
-import {
-  OOBI_AGENT_ONLY_RE,
-  OobiType,
-  WOOBI_RE,
-} from "../../../core/agent/agent.types";
-import { OobiQueryParams } from "../../../core/agent/services/connectionService.types";
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
-import { StorageMessage } from "../../../core/storage/storage.types";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
-  getConnectionsCache,
-  setMissingAliasConnection,
-  setOpenConnectionId,
-  updateOrAddMultisigConnectionCache,
-} from "../../../store/reducers/connectionsCache";
-import {
-  getIdentifiersCache,
-  getMultiSigGroupCache,
-  getScanGroupId,
-  setMultiSigGroupCache,
-  setOpenMultiSigId,
-} from "../../../store/reducers/identifiersCache";
-import { MultiSigGroup } from "../../../store/reducers/identifiersCache/identifiersCache.types";
+  getProfileGroupCache,
+  getProfiles,
+} from "../../../store/reducers/profileCache";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {
   getAuthentication,
@@ -60,25 +42,18 @@ import {
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
-import { isValidConnectionUrl, isValidHttpUrl } from "../../utils/urlChecker";
 import { Alert } from "../Alert";
-import { CreateGroupIdentifier } from "../CreateGroupIdentifier";
-import { CreateIdentifier } from "../CreateIdentifier";
 import { CustomInput } from "../CustomInput";
-import { IdentifierSelectorModal } from "../IdentifierSelectorModal";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { OptionModal } from "../OptionsModal";
 import { PageFooter } from "../PageFooter";
 import "./Scanner.scss";
-import { ErrorMessage, ScannerProps } from "./Scanner.types";
-
-const OPEN_CONNECTION_TIME = 250;
+import { ScannerProps } from "./Scanner.types";
 
 const Scanner = forwardRef(
   (
     {
       routePath,
-      setIsValueCaptured,
       handleReset,
       onCheckPermissionFinish,
       cameraDirection = LensFacing.Back,
@@ -88,13 +63,10 @@ const Scanner = forwardRef(
     const componentId = "scanner";
     const platforms = getPlatforms();
     const dispatch = useAppDispatch();
-    const multiSigGroupCache = useAppSelector(getMultiSigGroupCache);
-    const connections = useAppSelector(getConnectionsCache);
+    const multiSigGroupCache = useAppSelector(getProfileGroupCache);
     const currentOperation = useAppSelector(getCurrentOperation);
-    const scanGroupId = useAppSelector(getScanGroupId);
     const currentToastMsgs = useAppSelector(getToastMsgs);
     const loggedIn = useAppSelector(getAuthentication).loggedIn;
-    const identifiers = useAppSelector(getIdentifiersCache);
     const [createIdentifierModalIsOpen, setCreateIdentifierModalIsOpen] =
       useState(false);
     const [pasteModalIsOpen, setPasteModalIsOpen] = useState(false);
@@ -104,39 +76,11 @@ const Scanner = forwardRef(
     const [permission, setPermisson] = useState(false);
     const [mobileweb, setMobileweb] = useState(false);
     const [scanUnavailable, setScanUnavailable] = useState(false);
-    const [groupIdentifierOpen, setGroupIdentifierOpen] = useState(false);
-    const [resumeMultiSig, setResumeMultiSig] =
-      useState<IdentifierShortDetails | null>(null);
     const isHandlingQR = useRef(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [isAlreadyLoaded, setIsAlreadyLoaded] = useState(false);
-    const [openIdentifierSelector, setOpenIdentifierSelector] = useState(false);
     const [openIdentifierMissingAlert, setOpenIdentifierMissingAlert] =
       useState<boolean>(false);
-    const scannedConnection = useRef("");
-    const [createdIdentifiers, setCreatedIdentifiers] = useState<
-      IdentifierShortDetails[]
-    >([]);
-
-    const scanByTab = routePath === TabsRoutePath.SCAN;
-
-    const getCreatedIdentifiers = async () => {
-      const identifierList = Object.values(identifiers);
-      const checkOobiResponse = await Promise.allSettled(
-        identifierList.map((identifier) =>
-          Agent.agent.connections.getOobi(identifier.id)
-        )
-      );
-
-      const result: IdentifierShortDetails[] = [];
-      checkOobiResponse.forEach((response, index) => {
-        if (response.status === "fulfilled" && response.value) {
-          result.push(identifierList[index]);
-        }
-      });
-
-      return result;
-    };
 
     useEffect(() => {
       if (platforms.includes("mobileweb")) {
@@ -192,8 +136,7 @@ const Scanner = forwardRef(
       const onLoad = async () => {
         if (
           (routePath === TabsRoutePath.SCAN && createIdentifierModalIsOpen) ||
-          !loggedIn ||
-          openIdentifierSelector
+          !loggedIn
         ) {
           await stopScan();
           return;
@@ -294,25 +237,10 @@ const Scanner = forwardRef(
           })
         );
         dispatch(showConnectWallet(true));
-        handleReset && handleReset(TabsRoutePath.MENU);
+        handleReset?.();
       } else {
         dispatch(setToastMsg(ToastMsgType.PEER_ID_ERROR));
       }
-    };
-
-    const updateConnections = async (groupId: string) => {
-      // TODO: We should avoid calling getMultisigLinkedContacts every time we scan a QR code,
-      // ideally once the OOBI is resolved we can insert the connection details into Redux -
-      // should change when we do scanner error handling
-      const connections =
-        await Agent.agent.connections.getMultisigLinkedContacts(groupId);
-
-      const newMultiSigGroup: MultiSigGroup = {
-        groupId,
-        connections,
-      };
-
-      dispatch(setMultiSigGroupCache(newMultiSigGroup));
     };
 
     const handleSSIScan = (content: string) => {
@@ -326,320 +254,6 @@ const Scanner = forwardRef(
 
       dispatch(setCurrentOperation(OperationType.IDLE));
       handleReset && handleReset();
-    };
-
-    const openGroupIdentifierSetupWhenScanByFullPage = async (
-      groupId: string
-    ) => {
-      await updateConnections(groupId);
-      handleReset?.(
-        TabsRoutePath.IDENTIFIERS,
-        OperationType.OPEN_MULTISIG_IDENTIFIER
-      );
-    };
-
-    const handleAfterSelectIdentifier = (
-      identifier: IdentifierShortDetails
-    ) => {
-      handleResolveConnection(scannedConnection.current, identifier.id);
-      scannedConnection.current = "";
-    };
-
-    const openGroupIdentifierSetup = (identifier?: IdentifierShortDetails) => {
-      if (
-        !groupId &&
-        scannedConnection.current &&
-        identifier &&
-        !identifier.groupMetadata
-      ) {
-        handleAfterSelectIdentifier(identifier);
-        return;
-      }
-
-      if (!scanByTab && identifier?.groupMetadata?.groupId) {
-        openGroupIdentifierSetupWhenScanByFullPage(
-          identifier?.groupMetadata?.groupId
-        );
-        return;
-      }
-
-      if (identifier?.groupMetadata || identifier?.groupMemberPre) {
-        setResumeMultiSig(identifier);
-        setGroupIdentifierOpen(true);
-        dispatch(setCurrentOperation(OperationType.IDLE));
-      }
-    };
-
-    const handleAfterScanMultisig = (groupId: string | null) => {
-      if (!groupId) return;
-      const identifier = Object.values(identifiers).find(
-        (identifier) => identifier.groupMetadata?.groupId === groupId
-      );
-
-      if (!identifier) {
-        throw new Error(ErrorMessage.GROUP_ID_NOT_MATCH);
-      }
-
-      openGroupIdentifierSetup(identifier);
-    };
-
-    const handleDuplicateConnectionError = async (
-      e: Error,
-      url: string,
-      isMultisig: boolean
-    ) => {
-      let urlId: string | null = null;
-      if (isMultisig) {
-        urlId = new URL(url).searchParams.get(OobiQueryParams.GROUP_ID);
-      } else {
-        urlId = e.message
-          .replace(StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG, "")
-          .trim();
-      }
-
-      if (!urlId) {
-        showError("Scanner Error:", e, dispatch, ToastMsgType.SCANNER_ERROR);
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        await initScan();
-        return;
-      }
-
-      showError(
-        "Scanner Error:",
-        e,
-        dispatch,
-        ToastMsgType.DUPLICATE_CONNECTION
-      );
-
-      if (isMultisig) {
-        // NOTE: Scan duplicate multisig on multisign page
-        if (scanGroupId) {
-          handleReset?.();
-          dispatch(setCurrentOperation(OperationType.IDLE));
-          return;
-        }
-
-        dispatch(setOpenMultiSigId(urlId));
-        handleReset?.(TabsRoutePath.IDENTIFIERS);
-        return;
-      } else {
-        dispatch(setOpenConnectionId(urlId));
-      }
-
-      handleReset?.();
-    };
-
-    const checkUrl = (url: string) => {
-      const isMultiSigUrl = url.includes(OobiQueryParams.GROUP_ID);
-      const urlGroupId = new URL(url).searchParams.get(
-        OobiQueryParams.GROUP_ID
-      );
-      const openScanFromMultiSig = [
-        OperationType.MULTI_SIG_INITIATOR_SCAN,
-        OperationType.MULTI_SIG_RECEIVER_SCAN,
-      ].includes(currentOperation);
-
-      // NOTE: When user scan multisig connection on multisig page and group id of url not match with current connection page
-      if (
-        openScanFromMultiSig &&
-        (!isMultiSigUrl || urlGroupId !== scanGroupId)
-      ) {
-        throw new Error(ErrorMessage.GROUP_ID_NOT_MATCH);
-      }
-
-      if (
-        (!isMultiSigUrl && !isValidConnectionUrl(url)) ||
-        (isMultiSigUrl && !isValidHttpUrl(url)) ||
-        (!new URL(url).pathname.match(OOBI_AGENT_ONLY_RE) &&
-          !new URL(url).pathname.match(WOOBI_RE))
-      ) {
-        throw new Error(ErrorMessage.INVALID_CONNECTION_URL);
-      }
-
-      return true;
-    };
-
-    const resolveGroupOobi = async (content: string) => {
-      try {
-        checkUrl(content);
-
-        const invitation = await Agent.agent.connections.connectByOobiUrl(
-          content
-        );
-
-        if (invitation.type === OobiType.NORMAL) {
-          setIsValueCaptured && setIsValueCaptured(true);
-          const groupId = new URL(content).searchParams.get(
-            OobiQueryParams.GROUP_ID
-          );
-
-          if (
-            currentOperation === OperationType.MULTI_SIG_INITIATOR_SCAN ||
-            currentOperation === OperationType.MULTI_SIG_RECEIVER_SCAN ||
-            // Initiator scan group
-            !!groupId
-          ) {
-            groupId && updateConnections(groupId);
-            dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
-
-            if (!scanByTab) {
-              // If scan on setup group identifier page (scanGroupId exist) => close scan page
-              // If scan on full page scan (ex: Connections) => close scan page, redirect to identifier and open setup group identifier page
-              scanGroupId
-                ? handleReset?.()
-                : groupId &&
-                  openGroupIdentifierSetupWhenScanByFullPage(groupId);
-            } else {
-              handleAfterScanMultisig(groupId);
-            }
-          }
-        }
-
-        if (invitation.type === OobiType.MULTI_SIG_INITIATOR) {
-          setGroupId(invitation.groupId);
-          dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
-          setCreateIdentifierModalIsOpen(true);
-          dispatch(setToastMsg(ToastMsgType.NEW_MULTI_SIGN_MEMBER));
-        }
-
-        if (!scanByTab) {
-          return;
-        }
-
-        dispatch(setCurrentOperation(OperationType.IDLE));
-      } catch (e) {
-        const errorMessage = (e as Error).message;
-
-        if (
-          errorMessage.includes(StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG)
-        ) {
-          await handleDuplicateConnectionError(e as Error, content, true);
-          return;
-        }
-
-        if (errorMessage.includes(ErrorMessage.GROUP_ID_NOT_MATCH)) {
-          showError(
-            "Scanner Error:",
-            e,
-            dispatch,
-            ToastMsgType.GROUP_ID_NOT_MATCH_ERROR
-          );
-          handleReset?.();
-          return;
-        }
-
-        throw e;
-      } finally {
-        isHandlingQR.current = false;
-      }
-    };
-
-    const resolveConnectionOobi = async (
-      content: string,
-      sharedIdentifier: string
-    ) => {
-      // Adding a pending connection item to the UI.
-      // This will be removed when the create connection process ends.
-      const connectionName = new URL(content).searchParams.get(
-        OobiQueryParams.NAME
-      );
-      if (!connectionName) {
-        setTimeout(() => {
-          dispatch(
-            setMissingAliasConnection({
-              url: content,
-              identifier: sharedIdentifier,
-            })
-          );
-        }, OPEN_CONNECTION_TIME);
-        return;
-      }
-
-      try {
-        const connectionId = new URL(content).pathname
-          .split("/oobi/")
-          .pop()
-          ?.split("/")[0];
-
-        if (connectionId && connections[connectionId]) {
-          throw new Error(
-            `${StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG}: ${connectionId}`
-          );
-        }
-
-        await Agent.agent.connections.connectByOobiUrl(
-          content,
-          sharedIdentifier
-        );
-      } catch (e) {
-        const errorMessage = (e as Error).message;
-
-        if (
-          errorMessage.includes(StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG)
-        ) {
-          await handleDuplicateConnectionError(e as Error, content, false);
-          return;
-        }
-
-        showError("Scanner Error:", e, dispatch);
-      } finally {
-        isHandlingQR.current = false;
-      }
-    };
-
-    const handleResolveConnection = async (
-      connection: string,
-      sharedIdentifier?: string
-    ) => {
-      let identifier = sharedIdentifier;
-      if (!sharedIdentifier) {
-        scannedConnection.current = connection;
-        const createdIdentifiers = await getCreatedIdentifiers();
-        if (createdIdentifiers.length === 0) {
-          setOpenIdentifierMissingAlert(true);
-          return;
-        }
-
-        if (createdIdentifiers.length > 1) {
-          setCreatedIdentifiers(createdIdentifiers);
-          setOpenIdentifierSelector(true);
-          return;
-        }
-
-        scannedConnection.current = "";
-        identifier = createdIdentifiers[0].id;
-      }
-
-      if (!identifier) return;
-      checkUrl(connection);
-      resolveConnectionOobi(connection, identifier);
-      handleReset?.();
-      setIsValueCaptured?.(true);
-    };
-
-    const handleResolveOobi = async (content: string) => {
-      const isMultisigUrl = content.includes(OobiQueryParams.GROUP_ID);
-
-      try {
-        if (!isMultisigUrl) {
-          handleResolveConnection(content);
-          return;
-        }
-
-        await resolveGroupOobi(content);
-      } catch (e) {
-        if (OperationType.SCAN_WALLET_CONNECTION === currentOperation) {
-          dispatch(setToastMsg(ToastMsgType.PEER_ID_ERROR));
-          handleReset?.();
-          return;
-        }
-
-        showError("Scanner Error:", e, dispatch, ToastMsgType.SCANNER_ERROR);
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        await initScan();
-      } finally {
-        isHandlingQR.current = false;
-      }
     };
 
     const processValue = async (content: string) => {
@@ -661,8 +275,6 @@ const Scanner = forwardRef(
         isHandlingQR.current = false;
         return;
       }
-
-      handleResolveOobi(content);
     };
 
     const handlePrimaryButtonAction = () => {
@@ -693,11 +305,11 @@ const Scanner = forwardRef(
           return (
             <PageFooter
               pageId={componentId}
-              primaryButtonText={`${i18n.t("createidentifier.scan.initiate")}`}
+              primaryButtonText={`${i18n.t("setupgroupprofile.scan.initiate")}`}
               primaryButtonAction={handlePrimaryButtonAction}
               primaryButtonDisabled={!multiSigGroupCache?.connections.length}
               secondaryButtonText={`${i18n.t(
-                "createidentifier.scan.pasteoobi"
+                "setupgroupprofile.scan.pasteoobi"
               )}`}
               secondaryButtonAction={openPasteModal}
             />
@@ -707,7 +319,7 @@ const Scanner = forwardRef(
             <PageFooter
               pageId={componentId}
               secondaryButtonText={`${i18n.t(
-                "createidentifier.scan.pasteoobi"
+                "setupgroupprofile.scan.pasteoobi"
               )}`}
               secondaryButtonAction={openPasteModal}
             />
@@ -720,7 +332,7 @@ const Scanner = forwardRef(
             <PageFooter
               pageId={componentId}
               secondaryButtonText={`${i18n.t(
-                "createidentifier.scan.pastecontents"
+                "setupgroupprofile.scan.pastecontents"
               )}`}
               secondaryButtonAction={openPasteModal}
             />
@@ -784,18 +396,6 @@ const Scanner = forwardRef(
             </div>
           )}
         </IonGrid>
-        <CreateIdentifier
-          modalIsOpen={createIdentifierModalIsOpen}
-          setModalIsOpen={setCreateIdentifierModalIsOpen}
-          onClose={openGroupIdentifierSetup}
-          groupId={groupId}
-        />
-        <CreateGroupIdentifier
-          modalIsOpen={groupIdentifierOpen}
-          setModalIsOpen={setGroupIdentifierOpen}
-          setResumeMultiSig={setResumeMultiSig}
-          resumeMultiSig={resumeMultiSig}
-        />
         <OptionModal
           modalIsOpen={pasteModalIsOpen}
           componentId={componentId + "-input-modal"}
@@ -804,21 +404,19 @@ const Scanner = forwardRef(
           header={{
             closeButton: true,
             closeButtonAction: () => setPasteModalIsOpen(false),
-            closeButtonLabel: `${i18n.t("createidentifier.scan.cancel")}`,
+            closeButtonLabel: `${i18n.t("setupgroupprofile.scan.cancel")}`,
             title: `${
               currentOperation === OperationType.MULTI_SIG_INITIATOR_SCAN ||
               currentOperation === OperationType.MULTI_SIG_RECEIVER_SCAN
-                ? `${i18n.t("createidentifier.scan.pasteoobi")}`
+                ? `${i18n.t("setupgroupprofile.scan.pasteoobi")}`
                 : currentOperation === OperationType.SCAN_WALLET_CONNECTION
-                ? i18n.t(
-                    "tabs.menu.tab.items.connectwallet.inputpidmodal.header"
-                  )
-                : `${i18n.t("createidentifier.scan.pastecontents")}`
+                  ? i18n.t("connectdapp.inputpidmodal.header")
+                  : `${i18n.t("setupgroupprofile.scan.pastecontents")}`
             }`,
             actionButton: true,
             actionButtonDisabled: !pastedValue,
             actionButtonAction: handleSubmitPastedValue,
-            actionButtonLabel: `${i18n.t("createidentifier.scan.confirm")}`,
+            actionButtonLabel: `${i18n.t("setupgroupprofile.scan.confirm")}`,
           }}
         >
           <CustomInput
@@ -828,12 +426,6 @@ const Scanner = forwardRef(
             value={pastedValue}
           />
         </OptionModal>
-        <IdentifierSelectorModal
-          open={openIdentifierSelector}
-          setOpen={setOpenIdentifierSelector}
-          onSubmit={handleAfterSelectIdentifier}
-          identifiers={createdIdentifiers}
-        />
         <Alert
           isOpen={openIdentifierMissingAlert}
           setIsOpen={setOpenIdentifierMissingAlert}

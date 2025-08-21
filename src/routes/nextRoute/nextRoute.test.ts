@@ -1,22 +1,21 @@
+import { CreationStatus } from "../../core/agent/agent.types";
+import { RootState } from "../../store";
+import { setAuthentication } from "../../store/reducers/stateCache";
+import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
+import { OperationType } from "../../ui/globals/types";
+import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
+import { RoutePath } from "../index";
+import { TabsRoutePath } from "../paths";
 import {
+  getNextCreateSSIAgentRoute,
   getNextGenerateSeedPhraseRoute,
   getNextOnboardingRoute,
-  getNextSetPasscodeRoute,
   getNextRoute,
-  updateStoreAfterSetPasscodeRoute,
+  getNextSetPasscodeRoute,
   getNextVerifySeedPhraseRoute,
-  getNextCreateSSIAgentRoute,
+  updateStoreAfterSetPasscodeRoute,
 } from "./nextRoute";
-import { RootState } from "../../store";
-import { RoutePath } from "../index";
-import { setAuthentication } from "../../store/reducers/stateCache";
 import { DataProps } from "./nextRoute.types";
-import { OperationType } from "../../ui/globals/types";
-import { IdentifiersFilters } from "../../ui/pages/Identifiers/Identifiers.types";
-import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
-import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
-import { TabsRoutePath } from "../paths";
-import { CreationStatus } from "../../core/agent/agent.types";
 
 describe("NextRoute", () => {
   let localStorageMock: any;
@@ -49,21 +48,6 @@ describe("NextRoute", () => {
           firstAppLaunch: false,
           finishSetupBiometrics: false,
         },
-        currentProfile: {
-          identity: {
-            id: "",
-            displayName: "",
-            createdAtUTC: "",
-            theme: 0,
-            creationStatus: CreationStatus.PENDING,
-          },
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        },
         toastMsgs: [],
         currentOperation: OperationType.IDLE,
         queueIncomingRequest: {
@@ -76,38 +60,25 @@ describe("NextRoute", () => {
         seedPhrase: "",
         bran: "",
       },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-        filters: IdentifiersFilters.All,
+      profilesCache: {
+        profiles: {},
+        recentProfiles: [],
+        multiSigGroup: undefined,
       },
-      credsCache: {
-        creds: [],
-        favourites: [],
-        filters: CredentialsFilters.All,
-      },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
+          favourites: [],
+          filters: CredentialsFilters.All,
         },
       },
       biometricsCache: {
@@ -116,9 +87,6 @@ describe("NextRoute", () => {
       ssiAgentCache: {
         bootUrl: "",
         connectUrl: "",
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
     data = {
@@ -340,54 +308,30 @@ describe("getNextRoute", () => {
         queues: [],
         isPaused: false,
       },
-      currentProfile: {
-        identity: {
-          id: "",
-          displayName: "",
-          createdAtUTC: "",
-          theme: 0,
-          creationStatus: CreationStatus.PENDING,
-        },
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
-        notifications: [],
-      },
+    },
+    profilesCache: {
+      profiles: {},
+      recentProfiles: [],
+      multiSigGroup: undefined,
     },
     seedPhraseCache: {
       seedPhrase: "",
       bran: "",
     },
-    identifiersCache: {
-      identifiers: {},
-      favourites: [],
-      multiSigGroup: {
-        groupId: "",
-        connections: [],
-      },
-      filters: IdentifiersFilters.All,
-    },
-    credsCache: { creds: [], favourites: [], filters: CredentialsFilters.All },
-    credsArchivedCache: { creds: [] },
     connectionsCache: {
       connections: {},
       multisigConnections: {},
     },
     walletConnectionsCache: {
-      walletConnections: [],
       connectedWallet: null,
       pendingConnection: null,
     },
     viewTypeCache: {
-      identifier: {
-        viewType: null,
-        favouriteIndex: 0,
-      },
       credential: {
         viewType: null,
         favouriteIndex: 0,
+        favourites: [],
+        filters: CredentialsFilters.All,
       },
     },
     biometricsCache: {
@@ -396,9 +340,6 @@ describe("getNextRoute", () => {
     ssiAgentCache: {
       bootUrl: "",
       connectUrl: "",
-    },
-    notificationsCache: {
-      notifications: [],
     },
   };
   const state = {};

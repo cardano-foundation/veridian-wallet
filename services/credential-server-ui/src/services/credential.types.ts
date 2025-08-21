@@ -4,4 +4,10 @@ interface CredentialIssueRequest {
   [key: string]: string;
 }
 
-export type { CredentialIssueRequest };
+interface CredentialRequest {
+  schemaSaid: string;
+  aid: string;
+  attributes: Record<string, unknown>;
+}
+
+export type { CredentialIssueRequest, CredentialRequest };

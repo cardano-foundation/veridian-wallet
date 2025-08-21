@@ -25,7 +25,6 @@ import { removeConnectionCache } from "../../../store/reducers/connectionsCache"
 import {
   setCurrentOperation,
   setToastMsg,
-  getCurrentProfile,
 } from "../../../store/reducers/stateCache";
 import { Alert as AlertDeleteConnection } from "../../components/Alert";
 import { CardDetailsBlock } from "../../components/CardDetails";
@@ -51,7 +50,6 @@ const ConnectionDetails = ({
 }: ConnectionDetailsProps) => {
   const pageId = "connection-details";
   const dispatch = useAppDispatch();
-  const currentProfile = useAppSelector(getCurrentProfile);
   const [connectionDetails, setConnectionDetails] =
     useState<RegularConnectionDetailsFull>();
   const [connectionHistory, setConnectionHistory] = useState<

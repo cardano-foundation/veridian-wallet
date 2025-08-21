@@ -1,10 +1,8 @@
 import { arrowBackOutline, repeatOutline } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch } from "../../../store/hooks";
 import { setCurrentOperation } from "../../../store/reducers/stateCache";
-import { showConnectWallet } from "../../../store/reducers/walletConnectionsCache";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
 import { PageHeader } from "../../components/PageHeader";
 import { Scanner } from "../../components/Scanner";
@@ -39,9 +37,6 @@ const FullPageScanner = ({ showScan, setShowScan }: FullPageScannerProps) => {
 
     if (navTo) {
       history.push(navTo);
-      if (navTo === TabsRoutePath.MENU) {
-        dispatch(dispatch(showConnectWallet(true)));
-      }
     }
   };
 

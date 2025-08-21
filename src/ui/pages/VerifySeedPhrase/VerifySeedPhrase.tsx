@@ -1,5 +1,5 @@
 import { IonButton, IonIcon } from "@ionic/react";
-import { closeOutline, refreshOutline } from "ionicons/icons";
+import { backspaceOutline, refreshOutline } from "ionicons/icons";
 import { useCallback, useEffect, useState } from "react";
 import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
 import { i18n } from "../../../i18n";
@@ -204,7 +204,7 @@ const VerifySeedPhrase = () => {
             >
               <IonIcon
                 slot="start"
-                icon={closeOutline}
+                icon={backspaceOutline}
               />
               {i18n.t("verifyseedphrase.onboarding.button.clear")}
             </IonButton>

@@ -6,7 +6,7 @@ import { NotificationRoute } from "./keriaNotificationService.types";
 
 async function waitAndGetDoneOp(
   client: SignifyClient,
-  op: any,
+  op: Operation,
   timeout = 15000,
   interval = 250
 ): Promise<Operation> {
@@ -34,12 +34,12 @@ function getCredentialShortDetails(
 }
 
 const OnlineOnly = (
-  _target: any,
+  _target: unknown,
   _propertyKey: string,
   descriptor: PropertyDescriptor
 ) => {
   const originalMethod = descriptor.value;
-  descriptor.value = async function (...args: any[]) {
+  descriptor.value = async function (...args: unknown[]) {
     if (!Agent.agent.getKeriaOnlineStatus()) {
       throw new Error(Agent.KERIA_CONNECTION_BROKEN);
     }

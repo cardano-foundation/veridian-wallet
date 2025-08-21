@@ -10,4 +10,14 @@ const LOCAL_MIGRATIONS: LocalMigration[] = [
   DATA_V1201, // TS migration for connections per account (local part only)
 ];
 
-export { LOCAL_MIGRATIONS };
+const LATEST_CONTACT_VERSION = "1.2.0.1";
+
+const CURRENT_VERSION = LOCAL_MIGRATIONS[LOCAL_MIGRATIONS.length - 1].version;
+const LATEST_IDENTIFIER_VERSION = "1.2.0.3";
+
+export {
+  LOCAL_MIGRATIONS,
+  LATEST_CONTACT_VERSION,
+  CURRENT_VERSION,
+  LATEST_IDENTIFIER_VERSION,
+};
