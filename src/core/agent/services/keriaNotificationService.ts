@@ -49,7 +49,7 @@ import { NotificationAttempts } from "../records/notificationRecord.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { IdentifierService } from "./identifierService";
 import { ConnectionService } from "./connectionService";
-import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/migrations";
+import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
 class KeriaNotificationService extends AgentService {
   static readonly NOTIFICATION_NOT_FOUND = "Notification record not found";
