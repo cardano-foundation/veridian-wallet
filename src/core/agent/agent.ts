@@ -360,17 +360,12 @@ class Agent {
       bootUrl: "",
     });
 
-    // Validate and run any missed cloud migrations after recovery
-    if (this.storageSession instanceof SqliteSession) {
-      await this.storageSession.validateCloudMigrationsOnRecovery();
-    }
-
     await this.syncWithKeria();
   }
 
   async syncWithKeria() {
-    await this.identifiers.syncKeriaIdentifiers();
     await this.connections.syncKeriaContacts();
+    await this.identifiers.syncKeriaIdentifiers();
     await this.credentials.syncKeriaCredentials();
 
     await this.basicStorage.createOrUpdateBasicRecord(
@@ -411,6 +406,11 @@ class Agent {
     Agent.isOnline = online;
 
     if (online) {
+      // Execute cloud migrations when we come online
+      if (this.storageSession instanceof SqliteSession) {
+        this.storageSession.executeCloudMigrationsOnConnection();
+      }
+
       this.connections.removeConnectionsPendingDeletion();
       this.connections.resolvePendingConnections();
       this.identifiers.removeIdentifiersPendingDeletion();
@@ -779,22 +779,22 @@ class Agent {
     this.markAgentStatus(false);
   }
 
-    /**
+  /**
    * Wipe local database and secure storage to start fresh.
    */
-    async wipeLocalDatabase(): Promise<void> {
-      // Stop background services
-      this.keriaNotificationService.stopPolling();
-  
-      // Wipe the storage session (this deletes the database file)
-      await this.storageSession.wipe(walletId);
-  
-      // Wipe secure storage
-      await SecureStorage.wipe();
-  
-      // Mark agent as offline
-      this.markAgentStatus(false);
-    }
+  async wipeLocalDatabase(): Promise<void> {
+    // Stop background services
+    this.keriaNotificationService.stopPolling();
+
+    // Wipe the storage session (this deletes the database file)
+    await this.storageSession.wipe(walletId);
+
+    // Wipe secure storage
+    await SecureStorage.wipe();
+
+    // Mark agent as offline
+    this.markAgentStatus(false);
+  }
 }
 
 export { Agent };

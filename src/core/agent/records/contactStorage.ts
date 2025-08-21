@@ -37,7 +37,7 @@ export class ContactStorage {
     return record;
   }
 
-  findAllByQuery(query: any): Promise<ContactRecord[]> {
+  findAllByQuery(query: Record<string, unknown>): Promise<ContactRecord[]> {
     return this.storageService.findAllByQuery(query, ContactRecord);
   }
 

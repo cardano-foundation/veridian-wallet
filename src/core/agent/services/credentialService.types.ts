@@ -27,5 +27,22 @@ interface ACDCDetails
   };
 }
 
+interface KeriaCredential {
+  sad: {
+    d: string;
+    a: {
+      i: string;
+      dt: string;
+      [key: string]: unknown;
+    };
+    i: string;
+    ri: string;
+  };
+  schema: {
+    title: string;
+    $id: string;
+  };
+}
+
 export { CredentialStatus };
-export type { CredentialShortDetails, ACDCDetails };
+export type { CredentialShortDetails, ACDCDetails, KeriaCredential };

@@ -40,7 +40,7 @@ import {
 } from "../event.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { OobiQueryParams } from "./connectionService.types";
-import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/migrations";
+import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
 const UI_THEMES = [
   0, 1, 2, 3, 10, 11, 12, 13, 20, 21, 22, 23, 30, 31, 32, 33, 40, 41, 42, 43,
@@ -83,6 +83,8 @@ class IdentifierService extends AgentService {
     notificationStorage: NotificationStorage,
     connections: ConnectionService,
     credentials: CredentialService
+    connections: ConnectionService,
+    credentials: CredentialService
   ) {
     super(agentServiceProps);
     this.identifierStorage = identifierStorage;
@@ -90,6 +92,7 @@ class IdentifierService extends AgentService {
     this.basicStorage = basicStorage;
     this.notificationStorage = notificationStorage;
     this.connections = connections;
+    this.credentials = credentials;
     this.credentials = credentials;
   }
 
@@ -155,7 +158,7 @@ class IdentifierService extends AgentService {
     if (hab.group) {
       members = (
         await this.props.signifyClient.identifiers().members(identifier)
-      ).signing.map((member: any) => member.aid);
+      ).signing.map((member: { aid: string }) => member.aid);
     }
 
     return {
@@ -293,9 +296,12 @@ class IdentifierService extends AgentService {
       .identifiers()
       .get(identifier)) as HabState;
 
+    if (!this.props.signifyClient.agent) {
+      throw new Error("Agent not initialized");
+    }
     const addRoleOperation = await this.props.signifyClient
       .identifiers()
-      .addEndRole(identifier, "agent", this.props.signifyClient.agent!.pre);
+      .addEndRole(identifier, "agent", this.props.signifyClient.agent.pre);
     await addRoleOperation.op();
 
     const creationStatus = CreationStatus.PENDING;
@@ -474,7 +480,16 @@ class IdentifierService extends AgentService {
   }
 
   async syncKeriaIdentifiers(): Promise<void> {
-    const cloudIdentifiers: any[] = [];
+    const cloudIdentifiers: Array<{
+      prefix: string;
+      name: string;
+      group?: {
+        mhab: {
+          name: string;
+          prefix: string;
+        };
+      };
+    }> = [];
     let returned = -1;
     let iteration = 0;
 
@@ -569,6 +584,9 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
+      if (!identifier.group) {
+        throw new Error("Group identifier missing group data");
+      }
       const nameToParse = identifier.name.startsWith(
         IdentifierService.DELETED_IDENTIFIER_THEME
       )
