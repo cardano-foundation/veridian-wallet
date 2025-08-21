@@ -5,13 +5,8 @@ import {
 } from "@capacitor-community/sqlite";
 import { Capacitor } from "@capacitor/core";
 import { randomPasscode } from "signify-ts";
-import { versionCompare } from "./utils";
-import { MIGRATIONS } from "./migrations";
-import {
-  MigrationType,
-  CloudMigration,
-  HybridMigration,
-} from "./migrations/migrations.types";
+import { LocalMigrationManager } from "./migrations/localMigrationManager";
+import { CloudMigrationManager } from "./cloudMigrations/cloudMigrationManager";
 import { KeyStoreKeys, SecureStorage } from "../secureStorage";
 import { BasicStorage } from "../../agent/records/basicStorage";
 import { SqliteStorage } from "./sqliteStorage";
@@ -21,13 +16,14 @@ import { MiscRecordId } from "../../agent/agent.types";
 
 class SqliteSession {
   static readonly VERSION_DATABASE_KEY = "VERSION_DATABASE_KEY";
-  static readonly CLOUD_MIGRATION_STATUS_KEY = "CLOUD_MIGRATION_STATUS_KEY";
+  static readonly CLOUD_VERSION_KEY = "CLOUD_VERSION_KEY";
   static readonly GET_KV_SQL = "SELECT * FROM kv where key = ?";
   static readonly INSERT_KV_SQL =
     "INSERT OR REPLACE INTO kv (key,value) VALUES (?,?)";
   static readonly BASE_VERSION = "0.0.0";
   private sessionInstance?: SQLiteDBConnection;
   private basicStorageService!: BasicStorage;
+  private localMigrationManager?: LocalMigrationManager;
 
   get session() {
     return this.sessionInstance;
@@ -62,19 +58,17 @@ class SqliteSession {
     }
   }
 
-  private async getCloudMigrationStatus(): Promise<Record<string, boolean>> {
+  private async getCloudVersion(): Promise<string> {
     try {
-      const status = await this.getKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY);
-      return (status as Record<string, boolean>) ?? {};
+      const cloudVersion = await this.getKv(SqliteSession.CLOUD_VERSION_KEY);
+      return (cloudVersion as string) ?? SqliteSession.BASE_VERSION;
     } catch (error) {
-      return {};
+      return SqliteSession.BASE_VERSION;
     }
   }
 
-  private async markCloudMigrationComplete(version: string): Promise<void> {
-    const status = await this.getCloudMigrationStatus();
-    status[version] = true;
-    await this.setKv(SqliteSession.CLOUD_MIGRATION_STATUS_KEY, status);
+  private async setCloudVersion(version: string): Promise<void> {
+    await this.setKv(SqliteSession.CLOUD_VERSION_KEY, version);
   }
 
   async open(storageName: string): Promise<void> {
@@ -125,134 +119,44 @@ class SqliteSession {
   }
 
   /**
-   * Validates and runs any missed cloud migrations after recovery
-   * Should be called when KERIA connection is established after recovery
+   * Executes cloud migrations when connecting to KERIA
+   * Should be called on normal startup or recovery when KERIA connection is established
    */
-  async validateCloudMigrationsOnRecovery(): Promise<void> {
-    // eslint-disable-next-line no-console
-    console.log("Validating cloud migrations after recovery...");
-
-    const currentLocalVersion = await this.getCurrentVersionDatabase();
-    const cloudMigrationStatus = await this.getCloudMigrationStatus();
-
-    const orderedMigrations = MIGRATIONS.sort((a, b) =>
-      versionCompare(a.version, b.version)
-    );
-
-    const missedCloudMigrations = orderedMigrations.filter(
-      (migration) =>
-        (migration.type === MigrationType.CLOUD ||
-          migration.type === MigrationType.HYBRID) &&
-        versionCompare(migration.version, currentLocalVersion) <= 0 && // Migration version is at or before current local version
-        !cloudMigrationStatus[migration.version] // But cloud migration wasn't completed
-    );
-
-    if (missedCloudMigrations.length == 0) {
+  async executeCloudMigrationsOnConnection(): Promise<void> {
+    const isKeriaConfigured = await this.isKeriaConfigured();
+    if (!isKeriaConfigured) {
       // eslint-disable-next-line no-console
-      console.log("No missed cloud migrations found");
+      console.log("Skipping cloud migrations - KERIA not configured");
       return;
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
-      `Found ${missedCloudMigrations.length} missed cloud migrations to run`
+    if (!Agent.isOnline) {
+      await this.temporaryKeriaConnection();
+    }
+
+    const cloudMigrationManager = new CloudMigrationManager(
+      Agent.agent.client,
+      this.getCloudVersion.bind(this),
+      this.setCloudVersion.bind(this)
     );
 
-    for (const migration of missedCloudMigrations) {
-      // eslint-disable-next-line no-console
-      console.log(`Running missed cloud migration: ${migration.version}`);
-      await this.performCloudMigration(
-        migration as CloudMigration | HybridMigration,
-        true
-      );
-    }
+    await cloudMigrationManager.executeCloudMigrations();
   }
 
   private async migrateDb(): Promise<void> {
     const currentVersion = await this.getCurrentVersionDatabase();
-
-    const orderedMigrations = MIGRATIONS.sort((a, b) =>
-      versionCompare(a.version, b.version)
-    );
-
-    for (const migration of orderedMigrations) {
-      if (versionCompare(migration.version, currentVersion) !== 1) {
-        continue;
-      }
-
-      const migrationStatements = [];
-
-      if (migration.type === MigrationType.SQL) {
-        for (const sqlStatement of migration.sql) {
-          migrationStatements.push({ statement: sqlStatement });
-        }
-      } else if (migration.type === MigrationType.TS) {
-        if (!this.sessionInstance) {
-          throw new Error("SQLite session not available for migration");
-        }
-        const statements = await migration.migrationStatements(
-          this.sessionInstance
-        );
-        migrationStatements.push(...statements);
-      } else if (migration.type === MigrationType.CLOUD) {
-        // Handle cloud migrations
-        await this.performCloudMigration(migration);
-      } else if (migration.type === MigrationType.HYBRID) {
-        if (!this.sessionInstance) {
-          throw new Error("SQLite session not available for migration");
-        }
-        const statements = await migration.localMigrationStatements(
-          this.sessionInstance
-        );
-        migrationStatements.push(...statements);
-        await this.performCloudMigration(migration, false);
-      }
-
-      // Update version for all migration types
-      migrationStatements.push({
-        statement: SqliteSession.INSERT_KV_SQL,
-        values: [
-          SqliteSession.VERSION_DATABASE_KEY,
-          JSON.stringify(migration.version),
-        ],
-      });
-
-      if (migrationStatements.length > 0) {
-        if (!this.sessionInstance) {
-          throw new Error("SQLite session not available for transaction");
-        }
-        await this.sessionInstance.executeTransaction(migrationStatements);
-      }
-    }
+    await this.executeLocalMigrations(currentVersion);
   }
 
-  private async performCloudMigration(
-    migration: CloudMigration | HybridMigration,
-    isRecoveryValidation = false
-  ): Promise<void> {
-    const isKeriaConfigured = await this.isKeriaConfigured();
-    if (!isKeriaConfigured) {
-      const action = isRecoveryValidation
-        ? "recovery validation"
-        : "initial migration";
-      // eslint-disable-next-line no-console
-      console.log(
-        `Skipping cloud migration ${migration.version} during ${action} - KERIA not configured`
-      );
-    } else {
-      await this.temporaryKeriaConnection();
-
-      const action = isRecoveryValidation ? "recovery validation" : "migration";
-      // eslint-disable-next-line no-console
-      console.log(`Starting cloud ${action} ${migration.version}`);
-      const signifyClient = Agent.agent.client;
-      await migration.cloudMigrationStatements(signifyClient);
-      // eslint-disable-next-line no-console
-      console.log(`Completed cloud ${action} ${migration.version}`);
-
-      // Mark cloud migration as complete
-      await this.markCloudMigrationComplete(migration.version);
+  private async executeLocalMigrations(currentVersion: string): Promise<void> {
+    if (!this.localMigrationManager) {
+      if (!this.sessionInstance) {
+        throw new Error("Session instance not available");
+      }
+      this.localMigrationManager = new LocalMigrationManager(this.sessionInstance);
     }
+
+    await this.localMigrationManager.executeLocalMigrations(currentVersion);
   }
 
   private async isKeriaConfigured(): Promise<boolean> {

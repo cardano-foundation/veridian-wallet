@@ -44,7 +44,7 @@ import { ConnectionService } from "./connectionService";
 import { IdentifierService } from "./identifierService";
 import { StorageMessage } from "../../storage/storage.types";
 import { RpyRoute } from "./connectionService.types";
-import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/migrations";
+import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
