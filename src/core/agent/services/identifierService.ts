@@ -83,8 +83,6 @@ class IdentifierService extends AgentService {
     notificationStorage: NotificationStorage,
     connections: ConnectionService,
     credentials: CredentialService
-    connections: ConnectionService,
-    credentials: CredentialService
   ) {
     super(agentServiceProps);
     this.identifierStorage = identifierStorage;
