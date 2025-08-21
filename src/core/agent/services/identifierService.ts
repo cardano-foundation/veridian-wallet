@@ -12,7 +12,6 @@ import {
   MiscRecordId,
 } from "../agent.types";
 import {
-  NotificationRoute,
   ExchangeRoute,
 } from "./keriaNotificationService.types";
 import {

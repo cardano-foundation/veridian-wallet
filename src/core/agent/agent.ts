@@ -541,6 +541,16 @@ class Agent {
     this.peerConnectionPairStorage = new PeerConnectionPairStorage(
       this.getStorageService<PeerConnectionPairRecord>(this.storageSession)
     );
+
+    // Force initialization of services
+    this.identifiers;
+    this.multiSigs;
+    this.ipexCommunications;
+    this.connections;
+    this.credentials;
+    this.keriaNotifications;
+    this.auth;
+
     this.connections.onConnectionRemoved();
     this.connections.onConnectionAdded();
     this.identifiers.onIdentifierRemoved((event) => this.deleteProfile(event.payload.id));

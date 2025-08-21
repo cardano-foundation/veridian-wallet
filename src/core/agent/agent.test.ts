@@ -90,6 +90,7 @@ const mockIdentifierService = {
 const mockCredentialService = {
   syncKeriaCredentials: jest.fn(),
   removeCredentialsPendingDeletion: jest.fn(),
+  deleteAllCredentialsForIdentifier: jest.fn(),
 };
 const mockMultiSigService = {
   processGroupsPendingCreation: jest.fn(),
@@ -774,6 +775,7 @@ describe("Agent delete profile", () => {
     (agent as any).connectionService = mockConnectionService;
     (agent as any).notificationStorage = mockNotificationStorage;
     (agent as any).agentServicesProps = mockAgentServicesProps;
+    (agent as any).credentialService = mockCredentialService;
 
     mockIdentifierStorage.getIdentifierMetadata.mockResolvedValue({
       id: "test-id",
@@ -918,6 +920,7 @@ describe("Agent delete profile", () => {
     (agent as any).connectionService = mockConnectionService;
     (agent as any).notificationStorage = mockNotificationStorage;
     (agent as any).agentServicesProps = mockAgentServicesProps;
+    (agent as any).credentialService = mockCredentialService;
 
     mockIdentifierStorage.getIdentifierMetadata.mockResolvedValue({
       id: "test-id",
