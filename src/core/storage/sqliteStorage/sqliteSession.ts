@@ -61,7 +61,7 @@ class SqliteSession {
   private async getCloudVersion(): Promise<string> {
     try {
       const cloudVersion = await this.getKv(SqliteSession.CLOUD_VERSION_KEY);
-      return cloudVersion ?? SqliteSession.BASE_VERSION;
+      return (cloudVersion as string) ?? SqliteSession.BASE_VERSION;
     } catch (error) {
       return SqliteSession.BASE_VERSION;
     }

@@ -1,6 +1,5 @@
 import { SignifyClient } from "signify-ts";
 import { versionCompare } from "../utils";
-import { CloudMigration } from "./cloudMigrations.types";
 import { CLOUD_MIGRATIONS } from "./index";
 
 export class CloudMigrationManager {
