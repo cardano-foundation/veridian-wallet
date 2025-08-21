@@ -91,7 +91,6 @@ class IdentifierService extends AgentService {
     this.notificationStorage = notificationStorage;
     this.connections = connections;
     this.credentials = credentials;
-    this.credentials = credentials;
   }
 
   onIdentifierRemoved(callback: (event: IdentifierRemovedEvent) => void) {
