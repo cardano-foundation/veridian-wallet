@@ -21,7 +21,6 @@
     "audit": "better-npm-audit audit"
   },
   "dependencies": {
-    "@aparajita/capacitor-biometric-auth": "^8.0.2",
     "@capacitor-community/privacy-screen": "^6.0.0",
     "@capacitor-community/sqlite": "^7.0.0",
     "@capacitor-community/tap-jacking": "^7.0.0",

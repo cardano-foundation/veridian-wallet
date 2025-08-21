@@ -1,13 +1,10 @@
 import {
-  BiometricAuth,
-  BiometryError,
-  BiometryErrorType,
-} from "@aparajita/capacitor-biometric-auth";
-import {
-  AndroidBiometryStrength,
-  CheckBiometryResult,
-} from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
-import { Capacitor, PluginListenerHandle } from "@capacitor/core";
+  AvailableResult,
+  BiometricAuthError,
+  BiometryType,
+  NativeBiometric,
+} from "@capgo/capacitor-native-biometric";
+import { Capacitor } from "@capacitor/core";
 import { useEffect, useState } from "react";
 import { i18n } from "../../i18n";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -15,87 +12,82 @@ import { getAuthentication } from "../../store/reducers/stateCache";
 import { useActivityTimer } from "../components/AppWrapper/hooks/useActivityTimer";
 import { showError } from "../utils/error";
 
+
+const BIOMETRIC_SERVER_NAME = "com.veridianwallet.biometrics.key";
+
+interface BiometricInfo {
+  isAvailable: boolean;
+  biometryType?: BiometryType;
+}
+
 const useBiometricAuth = (isLockPage?: boolean) => {
   const dispatch = useAppDispatch();
-  const [biometricInfo, setBiometricInfo] = useState<CheckBiometryResult>();
+  const [biometricInfo, setBiometricInfo] = useState<BiometricInfo>({
+    isAvailable: false,
+  });
   const { setPauseTimestamp } = useActivityTimer();
   const { passwordIsSet } = useAppSelector(getAuthentication);
 
-  useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      checkBiometrics();
-    }
-  }, []);
-
-  useEffect(() => {
-    let appListener: PluginListenerHandle;
-
-    const updateBiometrics = async () => {
-      try {
-        appListener = await BiometricAuth.addResumeListener(setBiometricInfo);
-      } catch (error) {
-        if (error instanceof Error) {
-          showError("Unable to add biometric event", error, dispatch);
-        }
-      }
-    };
-    updateBiometrics();
-
-    return () => {
-      appListener?.remove();
-    };
-  }, [dispatch]);
-
   const checkBiometrics = async () => {
-    const biometricResult = await BiometricAuth.checkBiometry();
+    const biometricResult: AvailableResult = await NativeBiometric.isAvailable();
     setBiometricInfo(biometricResult);
     return biometricResult;
   };
 
-  const handleBiometricAuth = async (): Promise<boolean | BiometryError> => {
-    const biometricResult = await checkBiometrics();
+  useEffect(() => {
+    checkBiometrics();
+  }, []);
 
-    if (!biometricResult?.strongBiometryIsAvailable) {
-      return new BiometryError(
-        "Biometry too weak",
-        BiometryErrorType.biometryNotAvailable
-      );
-    } else if (!biometricResult?.isAvailable) {
-      return new BiometryError(
-        "Biometry not available",
-        BiometryErrorType.biometryNotAvailable
-      );
+  const handleBiometricAuth = async (): Promise<boolean> => {
+    const { isAvailable, errorCode } = await checkBiometrics();
+    if (!isAvailable) {
+      // TODO
     }
-
+     
     try {
-      await BiometricAuth.authenticate({
+      await NativeBiometric.verifyIdentity({
         reason: i18n.t("biometry.reason") as string,
-        cancelTitle: i18n.t("biometry.canceltitle") as string,
-        iosFallbackTitle: i18n.t(
-          !isLockPage && passwordIsSet
-            ? "biometry.iosfallbackpasswordtitle"
-            : "biometry.iosfallbacktitle"
-        ) as string,
-        androidTitle: i18n.t("biometry.androidtitle") as string,
-        androidSubtitle: i18n.t("biometry.androidsubtitle") as string,
-        androidConfirmationRequired: false,
-        androidBiometryStrength: AndroidBiometryStrength.strong,
+        title: i18n.t("biometry.title") as string,
+        subtitle: i18n.t("biometry.title") as string,
+        description: i18n.t("biometry.title") as string,
+        negativeButtonText: i18n.t("biometry.canceltitle") as string
+      });
+
+      await NativeBiometric.getCredentials({
+        server: BIOMETRIC_SERVER_NAME,
       });
 
       setPauseTimestamp(new Date().getTime());
       return true;
     } catch (error) {
-      if (error instanceof BiometryError) {
-        return error;
+      if (error instanceof Error) {
+        return new Error(error.message, error.errorCode);
       }
-      return new BiometryError(`${error}`, BiometryErrorType.none);
+      return new BiometryError(`${error}`, "none");
+    }
+  };
+
+  const setupBiometrics = async () => {
+    try {
+      const digitalKey = "veridian_wallet_biometric_key";
+      await NativeBiometric.setCredentials({
+        server: BIOMETRIC_SERVER_NAME,
+        username: "appUnlockKey",
+        password: digitalKey,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        showError("Unable to set up biometrics", error, dispatch);
+      }
     }
   };
 
   return {
     biometricInfo,
     handleBiometricAuth,
+    setupBiometrics,
+    checkBiometrics,
   };
 };
 
-export { useBiometricAuth };
+export { BiometryError, useBiometricAuth };
