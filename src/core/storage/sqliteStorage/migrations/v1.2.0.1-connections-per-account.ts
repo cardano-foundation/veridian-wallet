@@ -15,13 +15,14 @@ export const DATA_V1201: TsMigration = {
 
     let identifiers = identifierResult.values;
     identifiers = identifiers
-      ?.map((identifier: any) => JSON.parse(identifier.value))
+      ?.map((identifier: { value: string }) => JSON.parse(identifier.value))
       .filter(
-        (identifier: any) =>
+        (identifier: { isDeleted?: boolean; pendingDeletion?: boolean }) =>
           !identifier.isDeleted && !identifier.pendingDeletion
       );
 
     if (!identifiers || identifiers.length === 0) {
+      // eslint-disable-next-line no-console
       console.log(
         "No identifiers found in local database, deleting all connections"
       );
@@ -60,10 +61,20 @@ export const DATA_V1201: TsMigration = {
         values: [connection.id],
       });
 
-      const connectionPairsToInsert: any[] = [];
+      const connectionPairsToInsert: Array<{
+        id: string;
+        contactId: string;
+        createdAt: string;
+        identifier: string;
+        creationStatus: string;
+        pendingDeletion: boolean;
+        tags: Record<string, unknown>;
+        type: string;
+      }> = [];
 
       if (!connectionData.sharedIdentifier) {
         if (!connectionData.groupId) {
+          // eslint-disable-next-line no-console
           console.log("No groupId found for connection, skipping migration");
           continue;
         }
@@ -88,7 +99,7 @@ export const DATA_V1201: TsMigration = {
         }
       } else {
         // Has sharedIdentifier: only create pair if identifier exists and is not deleted/pending
-        const identifier = identifiers.find((identifier: any) => {
+        const identifier = identifiers.find((identifier: { id: string }) => {
           return identifier.id === connectionData.sharedIdentifier;
         });
         if (identifier) {

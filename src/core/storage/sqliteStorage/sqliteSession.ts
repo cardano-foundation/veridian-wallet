@@ -150,7 +150,10 @@ class SqliteSession {
 
   private async executeLocalMigrations(currentVersion: string): Promise<void> {
     if (!this.localMigrationManager) {
-      this.localMigrationManager = new LocalMigrationManager(this.session!);
+      if (!this.sessionInstance) {
+        throw new Error("Session instance not available");
+      }
+      this.localMigrationManager = new LocalMigrationManager(this.sessionInstance);
     }
 
     await this.localMigrationManager.executeLocalMigrations(currentVersion);

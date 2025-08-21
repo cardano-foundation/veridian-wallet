@@ -72,13 +72,13 @@ export class LocalMigrationManager {
 
     if (migration.type === MigrationType.SQL) {
       // Handle SQL migrations
-      const sqlMigration = migration as any;
+      const sqlMigration = migration as { sql: string[] };
       for (const sqlStatement of sqlMigration.sql) {
         migrationStatements.push({ statement: sqlStatement });
       }
     } else if (migration.type === MigrationType.TS) {
       // Handle TypeScript migrations
-      const tsMigration = migration as any;
+      const tsMigration = migration as { migrationStatements: (session: SQLiteDBConnection) => Promise<{ statement: string; values?: unknown[] }[]> };
       const statements = await tsMigration.migrationStatements(this.session);
       migrationStatements.push(...statements);
     }

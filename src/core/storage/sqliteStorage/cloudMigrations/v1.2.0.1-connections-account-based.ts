@@ -4,11 +4,12 @@ import { CloudMigration } from "./cloudMigrations.types";
 export const CLOUD_V1201: CloudMigration = {
   version: "1.2.0.1",
   cloudMigrationStatements: async (signifyClient: SignifyClient) => {
+    // eslint-disable-next-line no-console
     console.log(
       "Starting cloud KERIA migration: Converting connections to account-based model"
     );
 
-    let identifiers: any[] = [];
+    let identifiers: Array<{ prefix: string; name: string }> = [];
     let returned = -1;
     let iteration = 0;
 
@@ -23,7 +24,7 @@ export const CLOUD_V1201: CloudMigration = {
     }
 
     identifiers = identifiers.filter(
-      (identifier: any) => !identifier.name.startsWith("XX")
+      (identifier: { prefix: string; name: string }) => !identifier.name.startsWith("XX")
     );
 
     const contacts = await signifyClient.contacts().list();
@@ -36,6 +37,7 @@ export const CLOUD_V1201: CloudMigration = {
 
     for (const contact of contacts) {
       if (contact["version"] === "1.2.0") {
+        // eslint-disable-next-line no-console
         console.log(
           `Contact ${contact.id} is already migrated from v1.2.0, skipping migration`
         );
@@ -49,9 +51,9 @@ export const CLOUD_V1201: CloudMigration = {
       const historyItems: Array<{
         key: string;
         identifier: string;
-        data: any;
+        data: string;
       }> = [];
-      const noteItems: Array<{ key: string; data: any }> = [];
+      const noteItems: Array<{ key: string; data: unknown }> = [];
 
       for (const key of Object.keys(contact)) {
         if (
@@ -90,7 +92,7 @@ export const CLOUD_V1201: CloudMigration = {
 
       if (sharedIdentifierPrefix) {
         const sharedIdentifier = identifiers.find(
-          (id: any) => id.prefix === sharedIdentifierPrefix
+          (id: { prefix: string; name: string }) => id.prefix === sharedIdentifierPrefix
         );
 
         if (sharedIdentifier) {
@@ -123,7 +125,7 @@ export const CLOUD_V1201: CloudMigration = {
         // associate history items to the correct identifier
         for (const historyItem of historyItems) {
           const identifier = identifiers.find(
-            (id: any) => id.prefix === historyItem.identifier
+            (id: { prefix: string; name: string }) => id.prefix === historyItem.identifier
           );
           if (identifier) {
             contactUpdates[`${identifier.prefix}:${historyItem.key}`] =
@@ -156,6 +158,7 @@ export const CLOUD_V1201: CloudMigration = {
       await signifyClient.contacts().update(contact.id, contactUpdates);
     }
 
+    // eslint-disable-next-line no-console
     console.log(
       `Cloud migration completed: ${contacts.length} connections migrated to account-based model`
     );
