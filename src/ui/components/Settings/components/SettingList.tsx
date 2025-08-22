@@ -1,4 +1,4 @@
-import { BiometryErrorType } from "@aparajita/capacitor-biometric-auth";
+import { BiometricAuthError } from "@capgo/capacitor-native-biometric";
 import { IonCard, IonList, IonToggle } from "@ionic/react";
 import {
   AndroidSettings,
@@ -54,11 +54,12 @@ import { Alert } from "../../Alert";
 import { Verification } from "../../Verification";
 import { InfoCard } from "../../InfoCard";
 
+
 const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   const dispatch = useAppDispatch();
   const biometricsCache = useSelector(getBiometricsCache);
   const [option, setOption] = useState<number | null>(null);
-  const { biometricInfo, handleBiometricAuth } = useBiometricAuth();
+  const { biometricInfo, handleBiometricAuth, setupBiometrics } = useBiometricAuth();
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [changePinIsOpen, setChangePinIsOpen] = useState(false);
   const { disablePrivacy, enablePrivacy } = usePrivacyScreen();
@@ -86,7 +87,6 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
 
   if (
     biometricsCache.enabled !== undefined &&
-    biometricInfo?.strongBiometryIsAvailable &&
     biometricInfo?.isAvailable
   ) {
     securityItems.unshift({
@@ -140,9 +140,9 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
 
   const handleBiometricUpdate = () => {
     if (
-      !biometricInfo?.strongBiometryIsAvailable &&
-      (biometricInfo?.code === BiometryErrorType.biometryNotEnrolled ||
-        biometricInfo?.code === BiometryErrorType.biometryNotAvailable)
+      !biometricInfo?.isAvailable &&
+      (biometricInfo?.errorCode === BiometricAuthError.BIOMETRICS_NOT_ENROLLED ||
+        biometricInfo?.errorCode === BiometricAuthError.BIOMETRICS_UNAVAILABLE)
     ) {
       setOpenBiometricAlert(true);
       return;
@@ -159,6 +159,7 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   const biometricAuth = async () => {
     try {
       await disablePrivacy();
+      await setupBiometrics();
       const result = await handleBiometricAuth();
       await enablePrivacy();
       if (result === true) handleToggleBiometricAuth();

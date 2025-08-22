@@ -1,9 +1,6 @@
-import {
-  BiometryError,
-  BiometryErrorType,
-} from "@aparajita/capacitor-biometric-auth";
 import { Capacitor } from "@capacitor/core";
 import { IonIcon } from "@ionic/react";
+import { BiometricAuthError } from "@capgo/capacitor-native-biometric";
 import { fingerPrintOutline } from "ionicons/icons";
 import { useState } from "react";
 import { Agent } from "../../../core/agent/agent";
@@ -28,8 +25,10 @@ import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayo
 import { ToastMsgType } from "../../globals/types";
 import { useAppIonRouter } from "../../hooks";
 import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
-import { useBiometricAuth } from "../../hooks/useBiometricsHook";
+import { BiometryError, useBiometricAuth } from "../../hooks/useBiometricsHook";
 import "./SetupBiometrics.scss";
+import { showError } from "../../utils/error";
+
 
 const SetupBiometrics = () => {
   const pageId = "set-biometrics";
@@ -42,7 +41,7 @@ const SetupBiometrics = () => {
   const cancelBiometricsHeaderText = i18n.t("biometry.cancelbiometryheader");
   const cancelBiometricsConfirmText = setupBiometricsConfirmtext;
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
-  const { handleBiometricAuth } = useBiometricAuth();
+  const { handleBiometricAuth, setupBiometrics } = useBiometricAuth();
 
   const navToNextStep = async () => {
     await Agent.agent.basicStorage
@@ -88,8 +87,12 @@ const SetupBiometrics = () => {
     }
 
     try {
+      await setupBiometrics();
       await disablePrivacy();
       isBiometricAuthenticated = await handleBiometricAuth();
+    } catch (error) {
+      showError("Biometric process failed", error, dispatch, ToastMsgType.UNKNOWN_ERROR);
+      throw error;
     } finally {
       await enablePrivacy();
     }
@@ -108,8 +111,8 @@ const SetupBiometrics = () => {
       navToNextStep();
     } else if (isBiometricAuthenticated instanceof BiometryError) {
       if (
-        isBiometricAuthenticated.code === BiometryErrorType.userCancel ||
-        isBiometricAuthenticated.code === BiometryErrorType.biometryNotAvailable
+        isBiometricAuthenticated.code === BiometricAuthError.USER_CANCEL ||
+        isBiometricAuthenticated.code === BiometricAuthError.BIOMETRICS_UNAVAILABLE
       ) {
         setShowCancelBiometricsAlert(true);
       }

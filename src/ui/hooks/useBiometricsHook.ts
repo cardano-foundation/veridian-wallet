@@ -3,6 +3,7 @@ import {
   BiometricAuthError,
   BiometryType,
   NativeBiometric,
+  SetCredentialOptions,
 } from "@capgo/capacitor-native-biometric";
 import { Capacitor } from "@capacitor/core";
 import { useEffect, useState } from "react";
@@ -22,7 +23,8 @@ export class BiometryError extends Error {
   }
 }
 
-const BIOMETRIC_SERVER_NAME = "com.veridianwallet.biometrics.key";
+const BIOMETRIC_SERVER_KEY = "com.veridianwallet.biometrics.key";
+const BIOMETRIC_SERVER_USERNAME = "biometric_app_username";
 
 const useBiometricAuth = (isLockPage?: boolean) => {
   const dispatch = useAppDispatch();
@@ -91,7 +93,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
       });
 
       await NativeBiometric.getCredentials({
-        server: BIOMETRIC_SERVER_NAME,
+        server: BIOMETRIC_SERVER_KEY,
       });
 
       setPauseTimestamp(new Date().getTime());
@@ -112,16 +114,42 @@ const useBiometricAuth = (isLockPage?: boolean) => {
   };
 
   const setupBiometrics = async () => {
+    const { isAvailable, biometryType } = await checkBiometrics();
+
+    if (!isAvailable) {
+      return;
+    }
+
+    const isStrongBiometry =
+      biometryType === BiometryType.FACE_ID ||
+      biometryType === BiometryType.TOUCH_ID ||
+      biometryType === BiometryType.FINGERPRINT;
+
+    if (!isStrongBiometry) {
+      showError(
+        "Only strong biometrics (FaceID, Fingerprint) are allowed.",
+        new Error("Weak biometry"),
+        dispatch
+      );
+      return;
+    }
+
     try {
-      const digitalKey = "veridian_wallet_biometric_key";
-      await NativeBiometric.setCredentials({
-        server: BIOMETRIC_SERVER_NAME,
-        username: "appUnlockKey",
-        password: digitalKey,
+      await NativeBiometric.getCredentials({
+        server: BIOMETRIC_SERVER_KEY,
       });
     } catch (error) {
-      if (error instanceof Error) {
-        showError("Unable to set up biometrics", error, dispatch);
+      try {
+        const credOptions: SetCredentialOptions = {
+          server: BIOMETRIC_SERVER_KEY,
+          username: BIOMETRIC_SERVER_USERNAME,
+          password: "",
+        };
+        await NativeBiometric.setCredentials(credOptions);
+      } catch (error) {
+        if (error instanceof Error) {
+          showError("Unable to set up biometrics", error, dispatch);
+        }
       }
     }
   };
