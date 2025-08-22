@@ -1425,9 +1425,10 @@
   "biometry": {
     "reason": "Please authenticate",
     "canceltitle": "Cancel",
+    "iosfallbacktitle": "Enter Passcode",
+    "iosfallbackpasswordtitle": "Enter Password",
     "subtitle": "subtitle",
     "description": "description",
-    "error": "Unable to veriy biometrics",
     "setupbiometryheader": "Do you want to allow “Veridian” to use biometrics?",
     "setupbiometryconfirm": "Ok",
     "setupbiometrycancel": "Don't allow",
