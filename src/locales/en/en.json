@@ -34,7 +34,8 @@
     "errormatch": "Passcode already in use",
     "cantremember": "Can't remember?",
     "repeat": "Avoid matching numbers e.g. 111111",
-    "consecutive": "Avoid consecutive numbers e.g. 123456"
+    "consecutive": "Avoid consecutive numbers e.g. 123456",
+    "saveFailed": "Unable to save app passcode"
   },
   "setpasscode": {
     "enterpasscode": "Create your Passcode",
@@ -1432,7 +1433,15 @@
     "setupbiometryheader": "Do you want to allow “Veridian” to use biometrics?",
     "setupbiometryconfirm": "Ok",
     "setupbiometrycancel": "Don't allow",
-    "cancelbiometryheader": "You canceled Biometrics. You can set this up later via the settings page."
+    "cancelbiometryheader": "You canceled Biometrics. You can set this up later via the settings page.",
+    "errors": {
+      "notAvailable": "Biometry is not available on this device.",
+      "strongBiometricsRequired": "Only strong biometrics (FaceID, Fingerprint) are allowed.",
+      "unknownAuthError": "An unknown error occurred during biometric authentication.",
+      "setupFailed": "Unable to set up biometrics",
+      "processFailed": "Biometric process failed",
+      "toggleFailed": "Unable to enable/disable biometric auth"
+    }
   },
   "genericerror": {
     "text": "Something went wrong. Please try again.",

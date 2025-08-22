@@ -164,7 +164,7 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
       await enablePrivacy();
       if (result === true) handleToggleBiometricAuth();
     } catch (e) {
-      showError("Unable to enable/disable biometric auth", e, dispatch);
+      showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
     }
   };
 

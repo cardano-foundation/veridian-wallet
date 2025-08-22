@@ -27,7 +27,6 @@ import { useAppIonRouter } from "../../hooks";
 import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
 import { BiometryError, useBiometricAuth } from "../../hooks/useBiometricsHook";
 import "./SetupBiometrics.scss";
-import { showError } from "../../utils/error";
 
 
 const SetupBiometrics = () => {
@@ -91,7 +90,7 @@ const SetupBiometrics = () => {
       await disablePrivacy();
       isBiometricAuthenticated = await handleBiometricAuth();
     } catch (error) {
-      showError("Biometric process failed", error, dispatch, ToastMsgType.UNKNOWN_ERROR);
+      dispatch(showGenericError(true));
       throw error;
     } finally {
       await enablePrivacy();

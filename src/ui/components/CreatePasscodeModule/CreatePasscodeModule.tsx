@@ -132,7 +132,7 @@ const CreatePasscodeModule = forwardRef<
         );
         onCreateSuccess();
       } catch (e) {
-        showError("Unable to save app passcode", e, dispatch);
+        showError(i18n.t("createpasscodemodule.saveFailed"), e, dispatch);
       }
     };
 

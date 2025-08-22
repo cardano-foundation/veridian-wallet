@@ -62,7 +62,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
 
     if (!isAvailable) {
       return new BiometryError(
-        "Biometry is not available on this device.",
+        i18n.t("biometry.errors.notAvailable"),
         BiometricAuthError.BIOMETRICS_UNAVAILABLE,
       );
     }
@@ -74,7 +74,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
 
     if (!isStrongBiometry) {
       return new BiometryError(
-        "Only strong biometrics (FaceID, Fingerprint) are allowed.",
+        i18n.t("biometry.errors.strongBiometricsRequired"),
         BiometricAuthError.BIOMETRICS_UNAVAILABLE,
       );
     }
@@ -99,7 +99,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
       setPauseTimestamp(new Date().getTime());
       return true;
     } catch (error) {
-      let message = "An unknown error occurred during biometric authentication.";
+      let message = i18n.t("biometry.errors.unknownAuthError");
       let code = BiometricAuthError.UNKNOWN_ERROR;
 
       if (typeof error === 'object' && error !== null && 'code' in error && 'message' in error) {
@@ -127,7 +127,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
 
     if (!isStrongBiometry) {
       showError(
-        "Only strong biometrics (FaceID, Fingerprint) are allowed.",
+        i18n.t("biometry.errors.strongBiometricsRequired"),
         new Error("Weak biometry"),
         dispatch
       );
@@ -148,7 +148,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
         await NativeBiometric.setCredentials(credOptions);
       } catch (error) {
         if (error instanceof Error) {
-          showError("Unable to set up biometrics", error, dispatch);
+          showError(i18n.t("biometry.errors.setupFailed"), error, dispatch);
         }
       }
     }
