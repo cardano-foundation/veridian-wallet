@@ -1,3 +1,4 @@
+/* global HTMLIonInputElement */
 import { IonButton, IonChip, IonIcon, IonInput } from "@ionic/react";
 import { eyeOffOutline } from "ionicons/icons";
 import { forwardRef, useImperativeHandle, useRef } from "react";

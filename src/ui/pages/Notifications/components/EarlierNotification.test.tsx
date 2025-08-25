@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { mockIonicReact } from "@ionic/react-test-utils";
 import { TabsRoutePath } from "../../../../routes/paths";
 import { notificationsFix } from "../../../__fixtures__/notificationsFix";
-import { connectionsForNotifications } from "../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../__fixtures__/connectionsFix";
 import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { EarlierNotification } from "./EarlierNotification";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
@@ -60,7 +60,7 @@ const initialState = {
               ...profileCacheFixData.profiles[
                 profileCacheFixData.defaultProfile as string
               ],
-              connections: Object.values(connectionsForNotifications),
+              connections: connectionsForNotificationsValues,
             },
           }
         : {}),

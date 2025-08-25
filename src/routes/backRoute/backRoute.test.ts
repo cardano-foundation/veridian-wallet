@@ -15,8 +15,19 @@ jest.mock("../../store/reducers/seedPhraseCache", () => ({
   clearSeedPhraseCache: jest.fn(),
 }));
 
+type BackRouteStore = Pick<
+  RootState,
+  | "seedPhraseCache"
+  | "ssiAgentCache"
+  | "stateCache"
+  | "profilesCache"
+  | "walletConnectionsCache"
+  | "viewTypeCache"
+  | "biometricsCache"
+>;
+
 describe("getBackRoute", () => {
-  let storeMock: any;
+  let storeMock: BackRouteStore;
 
   beforeEach(() => {
     storeMock = {
@@ -89,7 +100,7 @@ describe("getBackRoute", () => {
   test("should return the correct 'backPath' and 'updateRedux' when currentPath is '/'", () => {
     const currentPath = "/";
     const data: DataProps = {
-      store: storeMock,
+      store: storeMock as unknown as RootState,
     };
 
     const result = getBackRoute(currentPath, data);
@@ -101,7 +112,7 @@ describe("getBackRoute", () => {
   test("should return the correct back path when currentPath is /generateseedphrase", () => {
     const currentPath = "/generateseedphrase";
     const data: DataProps = {
-      store: storeMock,
+      store: storeMock as unknown as RootState,
     };
 
     const result = getBackRoute(currentPath, data);
@@ -113,7 +124,7 @@ describe("getBackRoute", () => {
   test("should return the correct back path when currentPath is /verifyseedphrase", () => {
     const currentPath = "/verifyseedphrase";
     const data: DataProps = {
-      store: storeMock,
+      store: storeMock as unknown as RootState,
     };
 
     const result = getBackRoute(currentPath, data);
@@ -125,7 +136,7 @@ describe("getBackRoute", () => {
   test("should return the correct back path when currentPath is /setpasscode", () => {
     const currentPath = "/setpasscode";
     const data: DataProps = {
-      store: storeMock,
+      store: storeMock as unknown as RootState,
     };
 
     const result = getBackRoute(currentPath, data);

@@ -2,16 +2,13 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { store } from "../../../../../store";
-import {
-  connectionsFix,
-  connectionsMapFix,
-} from "../../../../__fixtures__/connectionsFix";
+import { connectionsFix } from "../../../../__fixtures__/connectionsFix";
 import { shortCredsFix } from "../../../../__fixtures__/shortCredsFix";
 import { TabsRoutePath } from "../../../navigation/TabsMenu";
 import { KeriCardTemplate } from "./KeriCardTemplate";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 
-const firstConnId = Object.keys(connectionsMapFix)[0] as string;
+const firstConnId = connectionsFix[0].id as string;
 
 const storeState = {
   stateCache: {
@@ -38,10 +35,10 @@ const storeState = {
       [firstConnId]: {
         identity: {
           id: firstConnId,
-          displayName: (connectionsMapFix as any)[firstConnId].label,
+          displayName: connectionsFix[0].label,
           createdAtUTC: "2000-01-01T00:00:00.000Z",
         },
-        connections: [(connectionsMapFix as any)[firstConnId]],
+        connections: [connectionsFix[0]],
         multisigConnections: [],
         peerConnections: [],
         credentials: [],

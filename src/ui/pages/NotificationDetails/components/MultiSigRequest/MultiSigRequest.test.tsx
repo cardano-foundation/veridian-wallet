@@ -9,7 +9,7 @@ import { TabsRoutePath } from "../../../../../routes/paths";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import {
   connectionsFix,
-  connectionsForNotifications,
+  connectionsForNotificationsValues,
 } from "../../../../__fixtures__/connectionsFix";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { MultiSigRequest } from "./MultiSigRequest";

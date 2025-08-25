@@ -7,7 +7,7 @@ import { Provider } from "react-redux";
 
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
-import { connectionsForNotifications } from "../../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../__fixtures__/credRequestFix";
 import { credsFixAcdc } from "../../../../__fixtures__/credsFix";
 import {
@@ -71,15 +71,17 @@ const initialState = {
       EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB: {
         identity: {
           id: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
-          displayName: (connectionsForNotifications as any)[
-            "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
-          ].label,
+          displayName: (
+            connectionsForNotificationsValues.find(
+              (c) => c.id === "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
+            ) || { label: "" }
+          ).label,
           createdAtUTC: "2000-01-01T00:00:00.000Z",
         },
         connections: [
-          (connectionsForNotifications as any)[
-            "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
-          ],
+          connectionsForNotificationsValues.find(
+            (c) => c.id === "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
+          ) || {},
         ],
         multisigConnections: [],
         peerConnections: [],

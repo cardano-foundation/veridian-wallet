@@ -14,10 +14,7 @@ import {
   addFavouritesCredsCache,
   removeFavouritesCredsCache,
 } from "../../../store/reducers/viewTypeCache";
-import {
-  connectionsFix,
-  connectionsMapFix,
-} from "../../__fixtures__/connectionsFix";
+import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { credsFixAcdc, revokedCredFixs } from "../../__fixtures__/credsFix";
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
 import { ToastMsgType } from "../../globals/types";
@@ -121,7 +118,7 @@ const initialStateNoPasswordCurrent = {
               ...profileCacheFixData.profiles[
                 profileCacheFixData.defaultProfile as string
               ],
-              connections: connectionsMapFix,
+              connections: connectionsFix,
             },
           }
         : {}),
@@ -159,7 +156,7 @@ const initialStateNoPasswordArchived = {
               ...profileCacheFixData.profiles[
                 profileCacheFixData.defaultProfile as string
               ],
-              connections: connectionsMapFix,
+              connections: connectionsFix,
             },
           }
         : {}),
@@ -375,7 +372,7 @@ describe("Cred Detail Module - current not archived credential", () => {
                   ...profileCacheFixData.profiles[
                     profileCacheFixData.defaultProfile as string
                   ],
-                  connections: connectionsMapFix,
+                  connections: connectionsFix,
                 },
               }
             : {}),
@@ -458,7 +455,7 @@ describe("Cred Detail Module - current not archived credential", () => {
                   ...profileCacheFixData.profiles[
                     profileCacheFixData.defaultProfile as string
                   ],
-                  connections: connectionsMapFix,
+                  connections: connectionsFix,
                 },
               }
             : {}),
@@ -740,7 +737,7 @@ describe("Cred Detail Module - light mode", () => {
                 ...profileCacheFixData.profiles[
                   profileCacheFixData.defaultProfile as string
                 ],
-                connections: connectionsMapFix,
+                connections: connectionsFix,
               },
             }
           : {}),

@@ -10,7 +10,7 @@ import { KeyStoreKeys } from "../../../../../core/storage";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { showGenericError } from "../../../../../store/reducers/stateCache";
-import { connectionsForNotifications } from "../../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../../../__fixtures__/credsFix";
 import {
   filteredIdentifierFix,
@@ -356,7 +356,7 @@ describe("Receive credential", () => {
                   ...profileCacheFixData.profiles[
                     profileCacheFixData.defaultProfile as string
                   ],
-                  connections: Object.values(connectionsForNotifications),
+                  connections: connectionsForNotificationsValues,
                 },
               }
             : {}),

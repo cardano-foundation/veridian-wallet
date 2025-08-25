@@ -17,7 +17,7 @@ import {
   setCurrentRoute,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
-import { connectionsMapFix } from "../../__fixtures__/connectionsFix";
+import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
@@ -97,7 +97,7 @@ const initialStateNoPasswordCurrent = {
               ...profileCacheFixData.profiles[
                 profileCacheFixData.defaultProfile as string
               ],
-              connections: Object.values(connectionsMapFix),
+              connections: connectionsFix,
             },
           }
         : {}),
@@ -135,7 +135,7 @@ const initialStateNoPasswordArchived = {
               ...profileCacheFixData.profiles[
                 profileCacheFixData.defaultProfile as string
               ],
-              connections: Object.values(connectionsMapFix),
+              connections: connectionsFix,
             },
           }
         : {}),

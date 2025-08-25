@@ -8,12 +8,9 @@ import { MemoryRouter } from "react-router-dom";
 import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import { connectionsForNotifications } from "../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
-import {
-  filteredIdentifierFix,
-  filteredIdentifierMapFix,
-} from "../../__fixtures__/filteredIdentifierFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { NotificationFilters } from "./Notification.types";
@@ -111,15 +108,17 @@ const fullState = {
       EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB: {
         identity: {
           id: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
-          displayName: (connectionsForNotifications as any)[
-            "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
-          ].label,
+          displayName: (
+            connectionsForNotificationsValues.find(
+              (c) => c.id === "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
+            ) || { label: "" }
+          ).label,
           createdAtUTC: "2000-01-01T00:00:00.000Z",
         },
         connections: [
-          (connectionsForNotifications as any)[
-            "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
-          ],
+          connectionsForNotificationsValues.find(
+            (c) => c.id === "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
+          ) || {},
         ],
         multisigConnections: [],
         peerConnections: [],
