@@ -26,6 +26,17 @@ export class BiometryError extends Error {
 const BIOMETRIC_SERVER_KEY = "com.veridianwallet.biometrics.key";
 const BIOMETRIC_SERVER_USERNAME = "biometric_app_username";
 
+const isBiometricPluginError = (
+  error: unknown,
+): error is { code: BiometricAuthError; message: string } => {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    "message" in error
+  );
+};
+
 const useBiometricAuth = (isLockPage?: boolean) => {
   const dispatch = useAppDispatch();
   const [biometricInfo, setBiometricInfo] = useState<AvailableResult>({
@@ -42,7 +53,8 @@ const useBiometricAuth = (isLockPage?: boolean) => {
       return result;
     }
     try {
-      const biometricResult:AvailableResult = await NativeBiometric.isAvailable();
+      const biometricResult: AvailableResult =
+        await NativeBiometric.isAvailable();
       setBiometricInfo(biometricResult);
       return biometricResult;
     } catch (error) {
@@ -102,9 +114,9 @@ const useBiometricAuth = (isLockPage?: boolean) => {
       let message = i18n.t("biometry.errors.unknownAuthError");
       let code = BiometricAuthError.UNKNOWN_ERROR;
 
-      if (typeof error === 'object' && error !== null && 'code' in error && 'message' in error) {
-        code = (error as any).code;
-        message = (error as any).message;
+      if (isBiometricPluginError(error)) {
+        code = error.code;
+        message = error.message;
       } else if (error instanceof Error) {
         message = error.message;
       }
@@ -129,7 +141,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
       showError(
         i18n.t("biometry.errors.strongBiometricsRequired"),
         new Error("Weak biometry"),
-        dispatch
+        dispatch,
       );
       return;
     }
