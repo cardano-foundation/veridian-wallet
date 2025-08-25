@@ -13,3 +13,4 @@ export * from "./contactStorage";
 export * from "./connectionPairStorage";
 export * from "./notificationStorage";
 export * from "./operationPendingStorage";
+export * from "./operationPendingRecord.type";

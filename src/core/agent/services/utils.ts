@@ -1,5 +1,5 @@
 import { Operation, Salter, SignifyClient } from "signify-ts";
-import { CredentialMetadataRecord, NotificationStorage } from "../records";
+import { CredentialMetadataRecord, NotificationStorage, OperationPendingRecordType } from "../records";
 import { CredentialShortDetails } from "./credentialService.types";
 import { Agent } from "../agent";
 import { NotificationRoute } from "./keriaNotificationService.types";
@@ -74,15 +74,7 @@ export const deleteNotificationRecordById = async (
   operationPendingStorage?: OperationPendingStorage
 ): Promise<void> => {
   // Get the notification record before deleting to check for linked requests
-  let notificationRecord = null;
-  if (operationPendingStorage) {
-    try {
-      notificationRecord = await notificationStorage.findById(id);
-    } catch (error) {
-      // If we can't find the notification, proceed with deletion anyway
-      // Silently continue with deletion
-    }
-  }
+  const notificationRecord = await notificationStorage.findExpectedById(id);
 
   if (!/^\/local/.test(route)) {
     await client
@@ -136,9 +128,9 @@ async function cleanupPendingOperations(
   // Filter operations by type to ensure we only clean up relevant ones
   // These are the IPEX-related operation types that should be cleaned up
   const relevantOperationTypes = [
-    'exchange.receivecredential',
-    'exchange.offercredential', 
-    'exchange.presentcredential'
+    OperationPendingRecordType.ExchangeReceiveCredential,
+    OperationPendingRecordType.ExchangeOfferCredential,
+    OperationPendingRecordType.ExchangePresentCredential,
   ];
   
   const filteredOperations = pendingOperations.filter(operation => 
