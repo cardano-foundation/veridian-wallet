@@ -16,7 +16,7 @@ jest.mock("../../store/reducers/seedPhraseCache", () => ({
 }));
 
 describe("getBackRoute", () => {
-  let storeMock: RootState;
+  let storeMock: any;
 
   beforeEach(() => {
     storeMock = {
@@ -28,11 +28,7 @@ describe("getBackRoute", () => {
         bootUrl: "",
         connectUrl: "",
       },
-      profilesCache: {
-        profiles: {},
-        recentProfiles: [],
-        multiSigGroup: undefined,
-      },
+
       stateCache: {
         isOnline: true,
         initializationPhase: InitializationPhase.PHASE_TWO,
@@ -63,9 +59,10 @@ describe("getBackRoute", () => {
         },
         toastMsgs: [],
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
+      profilesCache: {
+        profiles: {},
+        recentProfiles: [],
+        multiSigGroup: undefined,
       },
       walletConnectionsCache: {
         connectedWallet: null,
@@ -154,7 +151,7 @@ describe("calcPreviousRoute", () => {
 });
 
 describe("getPreviousRoute", () => {
-  let storeMock: RootState;
+  let storeMock: any;
   beforeEach(() => {
     storeMock = {
       seedPhraseCache: {
@@ -200,10 +197,7 @@ describe("getPreviousRoute", () => {
         },
         toastMsgs: [],
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
+
       walletConnectionsCache: {
         connectedWallet: null,
         pendingConnection: null,

@@ -49,9 +49,6 @@ const initialState = {
       favouriteIndex: 0,
     },
   },
-  connectionsCache: {
-    connections: connectionsMapFix,
-  },
 };
 let mockedStore: Store<unknown, AnyAction>;
 const dispatchMock = jest.fn();

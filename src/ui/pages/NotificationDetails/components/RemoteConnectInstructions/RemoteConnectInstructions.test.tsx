@@ -11,6 +11,7 @@ import {
 } from "../../../../__fixtures__/notificationsFix";
 import { RemoteConnectInstructions } from "./RemoteConnectInstructions";
 import { makeTestStore } from "../../../../utils/makeTestStore";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 
 const dispatchMock = jest.fn();
 
@@ -23,8 +24,8 @@ const initialState = {
       passcodeIsSet: true,
     },
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
+  profilesCache: {
+    ...profileCacheFixData,
   },
 };
 

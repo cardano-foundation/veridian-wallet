@@ -24,6 +24,7 @@ import { TabsRoutePath } from "../../components/navigation/TabsMenu";
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { CredentialDetails } from "./CredentialDetails";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
 
@@ -86,8 +87,21 @@ const initialStateNoPasswordCurrent = {
   biometricsCache: {
     enabled: false,
   },
-  connectionsCache: {
-    connections: connectionsMapFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      ...(profileCacheFixData.defaultProfile
+        ? {
+            [profileCacheFixData.defaultProfile as string]: {
+              ...profileCacheFixData.profiles[
+                profileCacheFixData.defaultProfile as string
+              ],
+              connections: Object.values(connectionsMapFix),
+            },
+          }
+        : {}),
+    },
   },
 };
 
@@ -111,8 +125,21 @@ const initialStateNoPasswordArchived = {
   biometricsCache: {
     enabled: false,
   },
-  connectionsCache: {
-    connections: connectionsMapFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      ...(profileCacheFixData.defaultProfile
+        ? {
+            [profileCacheFixData.defaultProfile as string]: {
+              ...profileCacheFixData.profiles[
+                profileCacheFixData.defaultProfile as string
+              ],
+              connections: Object.values(connectionsMapFix),
+            },
+          }
+        : {}),
+    },
   },
 };
 
@@ -168,9 +195,7 @@ describe("Cred Details page - current not archived credential", () => {
           "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
         bran: "bran",
       },
-      connectionsCache: {
-        connections: [],
-      },
+
       biometricsCache: {
         enabled: false,
       },

@@ -85,9 +85,7 @@ const initialState = {
     },
     toastMsgs: [],
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
-  },
+
   profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,

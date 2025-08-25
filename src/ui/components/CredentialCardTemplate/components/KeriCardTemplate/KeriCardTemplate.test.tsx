@@ -11,6 +11,8 @@ import { TabsRoutePath } from "../../../navigation/TabsMenu";
 import { KeriCardTemplate } from "./KeriCardTemplate";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 
+const firstConnId = Object.keys(connectionsMapFix)[0] as string;
+
 const storeState = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
@@ -31,8 +33,23 @@ const storeState = {
   biometricsCache: {
     enabled: false,
   },
-  connectionsCache: {
-    connections: connectionsMapFix,
+  profilesCache: {
+    profiles: {
+      [firstConnId]: {
+        identity: {
+          id: firstConnId,
+          displayName: (connectionsMapFix as any)[firstConnId].label,
+          createdAtUTC: "2000-01-01T00:00:00.000Z",
+        },
+        connections: [(connectionsMapFix as any)[firstConnId]],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+        notifications: [],
+      },
+    },
+    defaultProfile: firstConnId,
   },
 };
 

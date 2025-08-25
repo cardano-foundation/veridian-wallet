@@ -108,12 +108,24 @@ const initialStateNoPasswordCurrent = {
       "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
     bran: "bran",
   },
-  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
-  connectionsCache: {
-    connections: connectionsMapFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      ...(profileCacheFixData.defaultProfile
+        ? {
+            [profileCacheFixData.defaultProfile as string]: {
+              ...profileCacheFixData.profiles[
+                profileCacheFixData.defaultProfile as string
+              ],
+              connections: connectionsMapFix,
+            },
+          }
+        : {}),
+    },
   },
 };
 
@@ -134,12 +146,24 @@ const initialStateNoPasswordArchived = {
       "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
     bran: "bran",
   },
-  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
-  connectionsCache: {
-    connections: connectionsMapFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      ...(profileCacheFixData.defaultProfile
+        ? {
+            [profileCacheFixData.defaultProfile as string]: {
+              ...profileCacheFixData.profiles[
+                profileCacheFixData.defaultProfile as string
+              ],
+              connections: connectionsMapFix,
+            },
+          }
+        : {}),
+    },
   },
 };
 
@@ -331,7 +355,6 @@ describe("Cred Detail Module - current not archived credential", () => {
           "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15",
         bran: "bran",
       },
-      profilesCache: profileCacheFixData,
       viewTypeCache: {
         credential: {
           favourites: [
@@ -342,8 +365,21 @@ describe("Cred Detail Module - current not archived credential", () => {
           ],
         },
       },
-      connectionsCache: {
-        connections: connectionsMapFix,
+      profilesCache: {
+        ...profileCacheFixData,
+        profiles: {
+          ...profileCacheFixData.profiles,
+          ...(profileCacheFixData.defaultProfile
+            ? {
+                [profileCacheFixData.defaultProfile as string]: {
+                  ...profileCacheFixData.profiles[
+                    profileCacheFixData.defaultProfile as string
+                  ],
+                  connections: connectionsMapFix,
+                },
+              }
+            : {}),
+        },
       },
       biometricsCache: {
         enabled: false,
@@ -412,9 +448,21 @@ describe("Cred Detail Module - current not archived credential", () => {
           })),
         },
       },
-      profilesCache: profileCacheFixData,
-      connectionsCache: {
-        connections: connectionsMapFix,
+      profilesCache: {
+        ...profileCacheFixData,
+        profiles: {
+          ...profileCacheFixData.profiles,
+          ...(profileCacheFixData.defaultProfile
+            ? {
+                [profileCacheFixData.defaultProfile as string]: {
+                  ...profileCacheFixData.profiles[
+                    profileCacheFixData.defaultProfile as string
+                  ],
+                  connections: connectionsMapFix,
+                },
+              }
+            : {}),
+        },
       },
       biometricsCache: {
         enabled: false,
@@ -682,8 +730,21 @@ describe("Cred Detail Module - light mode", () => {
     biometricsCache: {
       enabled: false,
     },
-    connectionsCache: {
-      connections: connectionsMapFix,
+    profilesCache: {
+      ...profileCacheFixData,
+      profiles: {
+        ...profileCacheFixData.profiles,
+        ...(profileCacheFixData.defaultProfile
+          ? {
+              [profileCacheFixData.defaultProfile as string]: {
+                ...profileCacheFixData.profiles[
+                  profileCacheFixData.defaultProfile as string
+                ],
+                connections: connectionsMapFix,
+              },
+            }
+          : {}),
+      },
     },
   };
 
@@ -743,9 +804,6 @@ describe("Cred detail - revoked", () => {
     profilesCache: profileCacheFixData,
     biometricsCache: {
       enabled: false,
-    },
-    connectionsCache: {
-      connections: connectionsMapFix,
     },
   };
 
@@ -857,9 +915,6 @@ describe("Cred detail - view only", () => {
     profilesCache: profileCacheFixData,
     biometricsCache: {
       enabled: false,
-    },
-    connectionsCache: {
-      connections: connectionsMapFix,
     },
   };
 

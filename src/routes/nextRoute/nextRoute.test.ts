@@ -19,8 +19,8 @@ import { DataProps } from "./nextRoute.types";
 
 describe("NextRoute", () => {
   let localStorageMock: any;
-  let storeMock: RootState;
-  let data = {};
+  let storeMock: any;
+  let data: any = {};
 
   beforeEach(() => {
     localStorageMock = {};
@@ -64,10 +64,6 @@ describe("NextRoute", () => {
         profiles: {},
         recentProfiles: [],
         multiSigGroup: undefined,
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
       },
       walletConnectionsCache: {
         connectedWallet: null,
@@ -277,7 +273,7 @@ describe("NextRoute", () => {
 });
 
 describe("getNextRoute", () => {
-  const storeMock: RootState = {
+  const storeMock: any = {
     stateCache: {
       isOnline: true,
       initializationPhase: InitializationPhase.PHASE_TWO,
@@ -317,10 +313,6 @@ describe("getNextRoute", () => {
     seedPhraseCache: {
       seedPhrase: "",
       bran: "",
-    },
-    connectionsCache: {
-      connections: {},
-      multisigConnections: {},
     },
     walletConnectionsCache: {
       connectedWallet: null,

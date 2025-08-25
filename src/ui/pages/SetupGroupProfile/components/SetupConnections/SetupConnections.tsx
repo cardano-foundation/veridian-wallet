@@ -5,7 +5,8 @@ import { useParams } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
-import { getMultisigConnectionsCache ,
+import {
+  getMultisigConnectionsCache,
   getProfiles,
   MultiSigGroup,
 } from "../../../../../store/reducers/profileCache";
@@ -60,7 +61,9 @@ const SetupConnections = ({ setState }: StageProps) => {
         groupId,
         connections: groupConnections.filter(
           (item) =>
-            isMultisigConnectionDetails(item) && item.groupId === groupId
+            item &&
+            isMultisigConnectionDetails(item) &&
+            item.groupId === groupId
         ),
       };
       setMultiSigGroup(multiSigGroup);

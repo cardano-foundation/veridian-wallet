@@ -82,13 +82,15 @@ const initialState = {
     },
     isOnline: true,
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...(profileCacheFixData.profiles || {}),
+    },
   },
   biometricsCache: {
     enabled: false,
   },
-  profilesCache: profileCacheFixData,
 };
 
 describe("Multisign request", () => {

@@ -90,9 +90,6 @@ const initialState = {
     ...profileCacheFixData,
     defaultProfile: filteredIdentifierFix[2].id,
   },
-  connectionsCache: {
-    connections: {},
-  },
   biometricsCache: {
     enabled: false,
   },
@@ -107,11 +104,31 @@ const fullState = {
       passcodeIsSet: true,
     },
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
-    multisigConnectionsCache: connectionsForNotifications,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB: {
+        identity: {
+          id: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
+          displayName: (connectionsForNotifications as any)[
+            "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
+          ].label,
+          createdAtUTC: "2000-01-01T00:00:00.000Z",
+        },
+        connections: [
+          (connectionsForNotifications as any)[
+            "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
+          ],
+        ],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+        notifications: [],
+      },
+    },
   },
-  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -125,9 +142,6 @@ const filterTestData = {
       time: Date.now(),
       passcodeIsSet: true,
     },
-  },
-  connectionsCache: {
-    connections: connectionsForNotifications,
   },
   profilesCache: profileCacheFixData,
   biometricsCache: {
@@ -145,9 +159,6 @@ const emptyConnection = {
     },
   },
   profilesCache: profileCacheFixData,
-  connectionsCache: {
-    connections: {},
-  },
   biometricsCache: {
     enabled: false,
   },
@@ -455,9 +466,30 @@ describe("Notifications Tab", () => {
     const { getByTestId } = render(
       <Provider
         store={makeTestStore({
-          connectionsCache: {
-            connections: {
-              "connection-test-id": { label: customConnectionName },
+          profilesCache: {
+            ...profileCacheFixData,
+            defaultProfile: "connection-test-profile",
+            profiles: {
+              ...profileCacheFixData.profiles,
+              "connection-test-profile": {
+                identity: {
+                  id: "connection-test-profile",
+                  displayName: customConnectionName,
+                  createdAtUTC: "2000-01-01T00:00:00.000Z",
+                },
+                connections: [
+                  {
+                    id: "connection-test-id",
+                    label: customConnectionName,
+                    contactId: "connection-test-id",
+                  },
+                ],
+                multisigConnections: [],
+                peerConnections: [],
+                credentials: [],
+                archivedCredentials: [],
+                notifications: [],
+              },
             },
           },
         })}

@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { connectionsForNotifications } from "../../../../__fixtures__/connectionsFix";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 import { filteredIdentifierMapFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
@@ -49,9 +50,7 @@ const initialState = {
       passcodeIsSet: true,
     },
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },

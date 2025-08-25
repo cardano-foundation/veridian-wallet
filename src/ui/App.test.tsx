@@ -221,10 +221,6 @@ const initialState = {
     profiles: {},
     defaultProfile: undefined,
   },
-  connectionsCache: {
-    connections: {},
-    multisigConnections: {},
-  },
   walletConnectionsCache: {
     connectedWallet: null,
     pendingConnection: null,
@@ -508,10 +504,7 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
+
       walletConnectionsCache: {
         connectedWallet: null,
         pendingConnection: null,
@@ -585,10 +578,7 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
+
       walletConnectionsCache: {
         connectedWallet: null,
         pendingConnection: null,
@@ -824,10 +814,7 @@ describe("System threat alert", () => {
         seedPhrase: "",
         bran: "",
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
+
       walletConnectionsCache: {
         connectedWallet: null,
         pendingConnection: null,

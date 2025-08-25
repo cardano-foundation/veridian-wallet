@@ -77,9 +77,6 @@ const initialStateFull = {
     },
   },
   seedPhraseCache: {},
-  connectionsCache: {
-    connections: connectionsFix,
-  },
 };
 
 const mockNow = 1466424490000;
@@ -172,24 +169,25 @@ describe("Edit Connection Modal", () => {
       ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
-    const { getByTestId, unmount, getByText, queryByText } = render(
-      <Provider store={storeMocked}>
-        <EditConnectionsContainer
-          onConfirm={jest.fn()}
-          modalIsOpen={true}
-          setModalIsOpen={jest.fn()}
-          setNotes={jest.fn()}
-          notes={[
-            {
-              id: "1",
-              title: "Mock Note",
-              message: "Mock Note",
-            },
-          ]}
-          connectionDetails={connectionsFix[0]}
-        />
-      </Provider>
-    );
+    const { getByTestId, unmount, getByText, queryByText, getAllByText } =
+      render(
+        <Provider store={storeMocked}>
+          <EditConnectionsContainer
+            onConfirm={jest.fn()}
+            modalIsOpen={true}
+            setModalIsOpen={jest.fn()}
+            setNotes={jest.fn()}
+            notes={[
+              {
+                id: "1",
+                title: "Mock Note",
+                message: "Mock Note",
+              },
+            ]}
+            connectionDetails={connectionsFix[0]}
+          />
+        </Provider>
+      );
 
     await waitFor(() => {
       expect(getByTestId("connection-name").innerHTML).toBe(
@@ -208,12 +206,16 @@ describe("Edit Connection Modal", () => {
     });
 
     await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote
-            .title
-        )
-      ).toBeVisible();
+      const alerts = Array.from(
+        document.querySelectorAll('[data-testid="alert-confirm-delete-note"]')
+      ) as HTMLElement[];
+      const openAlert = alerts.find(
+        (a) => a.getAttribute("is-open") === "true"
+      );
+      expect(openAlert).toBeDefined();
+      expect(openAlert?.textContent).toContain(
+        EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote.title
+      );
     });
 
     fireEvent.click(getByTestId("alert-confirm-delete-note-confirm-button"));
@@ -422,34 +424,35 @@ describe("Edit Connection Modal", () => {
 
     const confirmFn = jest.fn();
 
-    const { getByTestId, getByText, queryByText, unmount } = render(
-      <Provider store={storeMocked}>
-        <EditConnectionsContainer
-          onConfirm={confirmFn}
-          modalIsOpen={true}
-          setModalIsOpen={jest.fn()}
-          setNotes={jest.fn()}
-          notes={[
-            {
-              id: "temp-1",
-              title: "Note temp",
-              message: "Note message temp",
-            },
-            {
-              id: "1",
-              title: "Note 1",
-              message: "Note message 1",
-            },
-            {
-              id: "2",
-              title: "Note 1",
-              message: "Note message 1",
-            },
-          ]}
-          connectionDetails={connectionsFix[0]}
-        />
-      </Provider>
-    );
+    const { getByTestId, getByText, queryByText, unmount, getAllByText } =
+      render(
+        <Provider store={storeMocked}>
+          <EditConnectionsContainer
+            onConfirm={confirmFn}
+            modalIsOpen={true}
+            setModalIsOpen={jest.fn()}
+            setNotes={jest.fn()}
+            notes={[
+              {
+                id: "temp-1",
+                title: "Note temp",
+                message: "Note message temp",
+              },
+              {
+                id: "1",
+                title: "Note 1",
+                message: "Note message 1",
+              },
+              {
+                id: "2",
+                title: "Note 1",
+                message: "Note message 1",
+              },
+            ]}
+            connectionDetails={connectionsFix[0]}
+          />
+        </Provider>
+      );
 
     await waitFor(() => {
       expect(getByTestId("connection-name").innerHTML).toBe(
@@ -482,12 +485,16 @@ describe("Edit Connection Modal", () => {
     });
 
     await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote
-            .title
-        )
-      ).toBeVisible();
+      const alerts = Array.from(
+        document.querySelectorAll('[data-testid="alert-confirm-delete-note"]')
+      ) as HTMLElement[];
+      const openAlert = alerts.find(
+        (a) => a.getAttribute("is-open") === "true"
+      );
+      expect(openAlert).toBeDefined();
+      expect(openAlert?.textContent).toContain(
+        EN_TRANSLATIONS.tabs.connections.details.options.alert.deletenote.title
+      );
     });
 
     act(() => {

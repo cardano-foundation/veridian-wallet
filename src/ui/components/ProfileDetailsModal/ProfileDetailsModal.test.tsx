@@ -121,9 +121,6 @@ const initialStateKeri = {
     bran: "bran",
   },
   profilesCache: profileCacheFixData,
-  connectionsCache: {
-    multisigConnections: {},
-  },
   biometricsCache: {
     enabled: false,
   },
@@ -470,9 +467,6 @@ describe("Individual profile details page", () => {
         seedPhrase: "",
         bran: "bran",
       },
-      connectionsCache: {
-        multisigConnections: {},
-      },
       profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
@@ -630,25 +624,37 @@ describe("Group profile details page", () => {
       seedPhrase: "",
       bran: "bran",
     },
-    profilesCache: profileCacheFixData,
-    connectionsCache: {
-      multisigConnections: {
-        "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu": {
-          id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
-          label: "Member 0",
-          connectionDate: "2024-10-14T13:11:44.501Z",
-          status: "confirmed",
-          oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
-          groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
-        },
-        "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYB2": {
-          id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
-          label: "Member 1",
-          connectionDate: "2024-10-14T13:11:44.501Z",
-          status: "confirmed",
-          oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
-          groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
-        },
+    profilesCache: {
+      ...profileCacheFixData,
+      profiles: {
+        ...profileCacheFixData.profiles,
+        ...(profileCacheFixData.defaultProfile
+          ? {
+              [profileCacheFixData.defaultProfile as string]: {
+                ...profileCacheFixData.profiles[
+                  profileCacheFixData.defaultProfile as string
+                ],
+                multisigConnections: [
+                  {
+                    id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
+                    label: "Member 0",
+                    connectionDate: "2024-10-14T13:11:44.501Z",
+                    status: "confirmed",
+                    oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
+                    groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
+                  },
+                  {
+                    id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYB2",
+                    label: "Member 1",
+                    connectionDate: "2024-10-14T13:11:44.501Z",
+                    status: "confirmed",
+                    oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
+                    groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
+                  },
+                ],
+              },
+            }
+          : {}),
       },
     },
     biometricsCache: {
@@ -695,25 +701,37 @@ describe("Group profile details page", () => {
         seedPhrase: "",
         bran: "bran",
       },
-      profilesCache: profileCacheFixData,
-      connectionsCache: {
-        multisigConnections: {
-          "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu": {
-            id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
-            label: "Member 0",
-            connectionDate: "2024-10-14T13:11:44.501Z",
-            status: "confirmed",
-            oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
-            groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
-          },
-          "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYB2": {
-            id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
-            label: "Member 1",
-            connectionDate: "2024-10-14T13:11:44.501Z",
-            status: "confirmed",
-            oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
-            groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
-          },
+      profilesCache: {
+        ...profileCacheFixData,
+        profiles: {
+          ...profileCacheFixData.profiles,
+          ...(profileCacheFixData.defaultProfile
+            ? {
+                [profileCacheFixData.defaultProfile as string]: {
+                  ...profileCacheFixData.profiles[
+                    profileCacheFixData.defaultProfile as string
+                  ],
+                  multisigConnections: [
+                    {
+                      id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
+                      label: "Member 0",
+                      connectionDate: "2024-10-14T13:11:44.501Z",
+                      status: "confirmed",
+                      oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
+                      groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
+                    },
+                    {
+                      id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYB2",
+                      label: "Member 1",
+                      connectionDate: "2024-10-14T13:11:44.501Z",
+                      status: "confirmed",
+                      oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
+                      groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
+                    },
+                  ],
+                },
+              }
+            : {}),
         },
       },
       biometricsCache: {
@@ -1076,9 +1094,6 @@ describe("Group profile details page", () => {
         bran: "bran",
       },
       profilesCache: profileCacheFixData,
-      connectionsCache: {
-        multisigConnections: {},
-      },
       biometricsCache: {
         enabled: false,
       },
@@ -1144,9 +1159,7 @@ describe("Checking the profile details page when information is missing from the
         bran: "bran",
       },
       profilesCache: profileCacheFixData,
-      connectionsCache: {
-        multisigConnections: {},
-      },
+
       biometricsCache: {
         enabled: false,
       },

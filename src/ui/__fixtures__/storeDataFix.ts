@@ -92,10 +92,6 @@ export const storeStateFixData: RootState = {
     seedPhrase: "",
     bran: "",
   },
-  connectionsCache: {
-    connections: {},
-    multisigConnections: {},
-  },
   walletConnectionsCache: {
     connectedWallet: null,
     pendingConnection: null,

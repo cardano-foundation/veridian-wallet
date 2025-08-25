@@ -5,7 +5,10 @@ import { Trans } from "react-i18next";
 import { IdentifierShortDetails } from "../../../../../core/agent/services/identifier.types";
 import { i18n } from "../../../../../i18n";
 import { useAppSelector } from "../../../../../store/hooks";
-import { getMultisigConnectionsCache , getProfiles } from "../../../../../store/reducers/profileCache";
+import {
+  getMultisigConnectionsCache,
+  getProfiles,
+} from "../../../../../store/reducers/profileCache";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
@@ -35,9 +38,10 @@ const ErrorPage = ({
     const connection = connectionsCache.find(
       (c) => c.id === notificationDetails.connectionId
     );
-    const multiSignGroupId = isMultisigConnectionDetails(connection)
-      ? connection.groupId
-      : undefined;
+    const multiSignGroupId =
+      connection && isMultisigConnectionDetails(connection)
+        ? connection.groupId
+        : undefined;
 
     const identifier = Object.values(profiles).find(
       (item) => item.identity.groupMetadata?.groupId === multiSignGroupId

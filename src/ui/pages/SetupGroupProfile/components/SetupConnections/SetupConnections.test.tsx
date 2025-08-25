@@ -402,8 +402,31 @@ describe("Setup Connection", () => {
       RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
     );
 
+    const seededProfiles = {
+      ...initialState.profilesCache,
+      profiles: {
+        ...initialState.profilesCache.profiles,
+        ...(initialState.profilesCache.defaultProfile
+          ? {
+              [initialState.profilesCache.defaultProfile]: {
+                ...initialState.profilesCache.profiles[
+                  initialState.profilesCache.defaultProfile
+                ],
+                connections: [connectionsFix[0]],
+                multisigConnections: [connection],
+              },
+            }
+          : {}),
+      },
+    };
+
+    const store = makeTestStore({
+      ...initialState,
+      profilesCache: seededProfiles,
+    });
+
     const { getByText, getByTestId } = render(
-      <Provider store={makeTestStore(initialState)}>
+      <Provider store={store}>
         <IonReactMemoryRouter history={history}>
           <SetupConnections
             state={stage1State}

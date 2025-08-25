@@ -69,9 +69,21 @@ const initialStateNoPassword = {
   biometricsCache: {
     enabled: false,
   },
-  profilesCache: profileCacheFixData,
-  connectionsCache: {
-    connections: connectionsMapFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      ...(profileCacheFixData.defaultProfile
+        ? {
+            [profileCacheFixData.defaultProfile as string]: {
+              ...profileCacheFixData.profiles[
+                profileCacheFixData.defaultProfile as string
+              ],
+              connections: Object.values(connectionsMapFix),
+            },
+          }
+        : {}),
+    },
   },
 };
 

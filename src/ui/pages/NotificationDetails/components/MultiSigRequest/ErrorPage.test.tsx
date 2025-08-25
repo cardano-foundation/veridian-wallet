@@ -55,9 +55,6 @@ const initialState = {
       isPaused: false,
     },
   },
-  connectionsCache: {
-    multisigConnections: connectionsForNotifications,
-  },
   profilesCache: {
     ...profileCacheFixData,
   },

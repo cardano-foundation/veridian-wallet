@@ -4,7 +4,7 @@ import { ThunkDispatch } from "redux-thunk";
 import { DataProps } from "../routes/nextRoute/nextRoute.types";
 import { RootState } from "./index";
 import { clearBiometricsCache } from "./reducers/biometricsCache";
-import { clearConnectionsCache } from "./reducers/connectionsCache";
+import { clearProfiles } from "./reducers/profileCache";
 import { clearSeedPhraseCache } from "./reducers/seedPhraseCache";
 import { clearSSIAgent } from "./reducers/ssiAgent";
 import { clearStateCache } from "./reducers/stateCache";
@@ -30,7 +30,7 @@ const updateReduxState = (
 };
 
 const CLEAR_STORE_ACTIONS = [
-  clearConnectionsCache,
+  clearProfiles,
   clearBiometricsCache,
   clearSeedPhraseCache,
   clearSSIAgent,

@@ -5,9 +5,7 @@ import { Agent } from "../../../core/agent/agent";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import {
-  setToastMsg
-} from "../../../store/reducers/stateCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { ToastMsgType } from "../../globals/types";
@@ -65,9 +63,6 @@ const initialState = {
   },
   identifiersCache: {
     identifiers: filteredIdentifierFix,
-  },
-  connectionsCache: {
-    connections: {},
   },
   profilesCache: profileCacheFixData,
   biometricsCache: {
