@@ -38,6 +38,8 @@ interface ProfileCache {
   multiSigGroup: MultiSigGroup | undefined;
   scanGroupId?: string;
   individualFirstCreate?: boolean;
+  openConnectionId?: string;
+  missingAliasUrl?: { url: string; identifier?: string };
 }
 
 export type { Profile, ProfileCache, ConnectionData, MultiSigGroup };

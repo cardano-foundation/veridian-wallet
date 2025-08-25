@@ -29,7 +29,15 @@ import {
   PeerDisconnectedEvent,
 } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { store } from "../../../store";
-import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
+import { updateOrAddConnectionCache ,
+  ConnectionData,
+  addGroupProfile,
+  addOrUpdateProfileIdentity,
+  setPeerConnections,
+  updateOrAddCredsCache,
+  updatePeerConnectionsFromCore,
+  updateProfileCreationStatus,
+} from "../../../store/reducers/profileCache";
 import {
   setQueueIncomingRequest,
   setToastMsg,
@@ -217,15 +225,6 @@ const peerConnectionBrokenEvent: PeerConnectionBrokenEvent = {
 };
 
 import { PeerConnectionPairRecord } from "../../../core/agent/records";
-import {
-  ConnectionData,
-  addGroupProfile,
-  addOrUpdateProfileIdentity,
-  setPeerConnections,
-  updateOrAddCredsCache,
-  updatePeerConnectionsFromCore,
-  updateProfileCreationStatus,
-} from "../../../store/reducers/profileCache";
 
 const mockPeerConnectionPairRecordInstance = new PeerConnectionPairRecord({
   id: "dApp-address:identifier",

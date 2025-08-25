@@ -13,8 +13,7 @@ import {
   setMissingAliasConnection,
   setOpenConnectionId,
   updateOrAddMultisigConnectionCache,
-} from "../../../../store/reducers/connectionsCache";
-import { getCurrentProfile } from "../../../../store/reducers/profileCache";
+ getCurrentProfile } from "../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../globals/types";
 import { showError } from "../../../utils/error";
@@ -31,7 +30,7 @@ enum ErrorMessage {
 const useScanHandle = () => {
   const dispatch = useAppDispatch();
   const defaultIdentifier = useAppSelector(getCurrentProfile)?.identity.id;
-  const connections = useAppSelector(getConnectionsCache);
+  const connections = useAppSelector(getConnectionsCache) as any[];
 
   const handleDuplicateConnectionError = useCallback(
     async (
@@ -117,7 +116,7 @@ const useScanHandle = () => {
           .pop()
           ?.split("/")[0];
 
-        if (connectionId && connections[connectionId]) {
+        if (connectionId && connections.find((c) => c.id === connectionId)) {
           throw new Error(
             `${StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG}: ${connectionId}`
           );

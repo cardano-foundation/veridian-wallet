@@ -5,7 +5,10 @@ import { useParams } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
-import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
+import { getMultisigConnectionsCache ,
+  getProfiles,
+  MultiSigGroup,
+} from "../../../../../store/reducers/profileCache";
 import { Avatar } from "../../../../components/Avatar";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
@@ -22,10 +25,6 @@ import { StageProps } from "../../SetupGroupProfile.types";
 import "./SetupConnections.scss";
 import { Tab } from "./SetupConnections.types";
 import { ShareConnections } from "./ShareConnections";
-import {
-  getProfiles,
-  MultiSigGroup,
-} from "../../../../../store/reducers/profileCache";
 import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
 
 const SetupConnections = ({ setState }: StageProps) => {
@@ -43,7 +42,7 @@ const SetupConnections = ({ setState }: StageProps) => {
   const { id: profileId } = useParams<{ id: string }>();
   const profile = profiles[profileId]?.identity;
   const groupId = profile?.groupMetadata?.groupId;
-  const groupConnections = useAppSelector(getMultisigConnectionsCache);
+  const groupConnections = useAppSelector(getMultisigConnectionsCache) as any[];
   const [multiSigGroup, setMultiSigGroup] = useState<
     MultiSigGroup | undefined
   >();
@@ -59,8 +58,9 @@ const SetupConnections = ({ setState }: StageProps) => {
       if (!groupId) return;
       const multiSigGroup: MultiSigGroup = {
         groupId,
-        connections: Object.values(groupConnections).filter(
-          (item) => isMultisigConnectionDetails(item) && item.groupId === groupId
+        connections: groupConnections.filter(
+          (item) =>
+            isMultisigConnectionDetails(item) && item.groupId === groupId
         ),
       };
       setMultiSigGroup(multiSigGroup);

@@ -22,8 +22,7 @@ import {
 } from "react";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
-import {
+import { getConnectionsCache ,
   getProfileGroupCache,
   getProfiles,
 } from "../../../store/reducers/profileCache";
@@ -410,8 +409,8 @@ const Scanner = forwardRef(
               currentOperation === OperationType.MULTI_SIG_RECEIVER_SCAN
                 ? `${i18n.t("setupgroupprofile.scan.pasteoobi")}`
                 : currentOperation === OperationType.SCAN_WALLET_CONNECTION
-                  ? i18n.t("connectdapp.inputpidmodal.header")
-                  : `${i18n.t("setupgroupprofile.scan.pastecontents")}`
+                ? i18n.t("connectdapp.inputpidmodal.header")
+                : `${i18n.t("setupgroupprofile.scan.pastecontents")}`
             }`,
             actionButton: true,
             actionButtonDisabled: !pastedValue,

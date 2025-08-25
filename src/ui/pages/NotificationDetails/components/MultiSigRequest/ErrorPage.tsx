@@ -5,7 +5,7 @@ import { Trans } from "react-i18next";
 import { IdentifierShortDetails } from "../../../../../core/agent/services/identifier.types";
 import { i18n } from "../../../../../i18n";
 import { useAppSelector } from "../../../../../store/hooks";
-import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
+import { getMultisigConnectionsCache , getProfiles } from "../../../../../store/reducers/profileCache";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
@@ -14,7 +14,6 @@ import { PageHeader } from "../../../../components/PageHeader";
 import { SUPPORT_EMAIL } from "../../../../globals/constants";
 import "./ErrorPage.scss";
 import { ErrorPageProps } from "./ErrorPage.types";
-import { getProfiles } from "../../../../../store/reducers/profileCache";
 import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
 
 const ErrorPage = ({
@@ -25,7 +24,7 @@ const ErrorPage = ({
   onFinishSetup,
 }: ErrorPageProps) => {
   const profiles = useAppSelector(getProfiles);
-  const connectionsCache = useAppSelector(getMultisigConnectionsCache);
+  const connectionsCache = useAppSelector(getMultisigConnectionsCache) as any[];
   const [resumeMultiSig, setResumeMultiSig] =
     useState<IdentifierShortDetails | null>(null);
 
@@ -33,7 +32,9 @@ const ErrorPage = ({
     useState(false);
 
   const actionAccept = () => {
-    const connection = connectionsCache[notificationDetails.connectionId];
+    const connection = connectionsCache.find(
+      (c) => c.id === notificationDetails.connectionId
+    );
     const multiSignGroupId = isMultisigConnectionDetails(connection)
       ? connection.groupId
       : undefined;

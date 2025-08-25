@@ -14,7 +14,7 @@ import {
   getOpenConnectionId,
   removeConnectionCache,
   setOpenConnectionId,
-} from "../../../store/reducers/connectionsCache";
+ getCurrentProfile } from "../../../store/reducers/profileCache";
 import {
   setCurrentOperation,
   setCurrentRoute,
@@ -37,7 +37,6 @@ import { ConnectionsBody } from "./components/ConnectionsBody";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
-import { getCurrentProfile } from "../../../store/reducers/profileCache";
 
 const Connections = () => {
   const pageId = "connections-tab";

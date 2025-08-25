@@ -32,8 +32,7 @@ import {
   setConnectionsCache,
   setMultisigConnectionsCache,
   updateOrAddConnectionCache,
-} from "../../../store/reducers/connectionsCache";
-import {
+
   ConnectionData,
   Profile,
   setCredsArchivedCache,
@@ -42,8 +41,7 @@ import {
   setProfiles,
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
-  updateRecentProfiles,
-} from "../../../store/reducers/profileCache";
+  updateRecentProfiles} from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   getForceInitApp,

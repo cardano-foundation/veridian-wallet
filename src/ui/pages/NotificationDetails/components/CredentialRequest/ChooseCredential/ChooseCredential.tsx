@@ -13,8 +13,7 @@ import { Agent } from "../../../../../../core/agent/agent";
 import { CredentialStatus } from "../../../../../../core/agent/services/credentialService.types";
 import { i18n } from "../../../../../../i18n";
 import { useAppSelector } from "../../../../../../store/hooks";
-import { getConnectionsCache } from "../../../../../../store/reducers/connectionsCache";
-import {
+import { getConnectionsCache ,
   deleteNotificationById,
   getCredsCache,
 } from "../../../../../../store/reducers/profileCache";
@@ -53,7 +52,7 @@ const ChooseCredential = ({
   reloadData,
 }: ChooseCredentialProps) => {
   const credsCache = useAppSelector(getCredsCache);
-  const connections = useAppSelector(getConnectionsCache);
+  const connections = useAppSelector(getConnectionsCache) as any[];
   const dispatch = useDispatch();
   const [selectedCred, setSelectedCred] = useState<RequestCredential | null>(
     null
@@ -68,7 +67,7 @@ const ChooseCredential = ({
     (cred): CardItem<RequestCredential> => {
       const acdc = cred.acdc as unknown as ACDC;
       const connection =
-        connections?.[cred.connectionId]?.label ||
+        connections?.find((c) => c.id === cred.connectionId)?.label ||
         i18n.t("tabs.connections.unknown");
 
       return {
@@ -141,7 +140,7 @@ const ChooseCredential = ({
 
       await Agent.agent.ipexCommunications.offerAcdcFromApply(
         notificationDetails.id,
-        (selectedCred.acdc as unknown as CredentialMetadataRecordProps)
+        selectedCred.acdc as unknown as CredentialMetadataRecordProps
       );
 
       if (!linkedGroup) {

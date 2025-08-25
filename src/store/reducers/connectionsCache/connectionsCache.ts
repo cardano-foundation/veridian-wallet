@@ -2,6 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ConnectionShortDetails } from "../../../core/agent/agent.types";
 import { RootState } from "../../index";
 import {
+  getConnectionsCache as getProfileConnectionsCache,
+  getMultisigConnectionsCache as getProfileMultisigConnectionsCache,
+  getOpenConnectionId as getProfileOpenConnectionId,
+  getMissingAliasConnection as getProfileMissingAliasConnection,
+} from "../profileCache/profilesCache";
+import {
   ConnectionsCacheState,
   MissingAliasConnection,
 } from "./connectionsCache.types";
@@ -95,17 +101,43 @@ export const {
   clearConnectionsCache,
 } = connectionsCacheSlice.actions;
 
-const getConnectionsCache = (state: RootState) =>
-  state.connectionsCache.connections;
+// Backwards-compat selectors: prefer the new profilesCache selectors when
+// `profilesCache` exists on the RootState, but if tests or legacy callers
+// provide only the old `connectionsCache` slice, fall back to reading those
+// legacy fields so consumers remain working during the staged migration.
+const getConnectionsCache = (state: RootState) => {
+  // If profilesCache is present, use the profile-based selector
+  if ((state as any) && (state as any).profilesCache) {
+    return getProfileConnectionsCache(state);
+  }
 
-const getMultisigConnectionsCache = (state: RootState) =>
-  state.connectionsCache.multisigConnections;
+  // Otherwise, fall back to the legacy shape
+  return (state as any).connectionsCache?.connections || {};
+};
 
-const getOpenConnectionId = (state: RootState) =>
-  state.connectionsCache.openConnectionId;
+const getMultisigConnectionsCache = (state: RootState) => {
+  if ((state as any) && (state as any).profilesCache) {
+    return getProfileMultisigConnectionsCache(state);
+  }
 
-const getMissingAliasConnection = (state: RootState) =>
-  state.connectionsCache.missingAliasUrl;
+  return (state as any).connectionsCache?.multisigConnections || {};
+};
+
+const getOpenConnectionId = (state: RootState) => {
+  if ((state as any) && (state as any).profilesCache) {
+    return getProfileOpenConnectionId(state);
+  }
+
+  return (state as any).connectionsCache?.openConnectionId;
+};
+
+const getMissingAliasConnection = (state: RootState) => {
+  if ((state as any) && (state as any).profilesCache) {
+    return getProfileMissingAliasConnection(state);
+  }
+
+  return (state as any).connectionsCache?.missingAliasUrl;
+};
 
 export {
   getConnectionsCache,

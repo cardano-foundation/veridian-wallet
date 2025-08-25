@@ -1,6 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
+import {
+  RegularConnectionDetails,
+  MultisigConnectionDetails,
+} from "../../../core/agent/agent.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 import { RootState } from "../../index";
 import {
@@ -10,11 +14,14 @@ import {
   ProfileCache,
 } from "./profilesCache.types";
 
+// Shared empty arrays — return these to keep selector return references stable
 const DefaultArrayValue = {
   Notifications: [] as KeriaNotification[],
   PeerConn: [] as ConnectionData[],
   ArchivedCreds: [] as CredentialShortDetails[],
   Credentials: [] as CredentialShortDetails[],
+  Connections: [] as RegularConnectionDetails[],
+  MultisigConnections: [] as MultisigConnectionDetails[],
 };
 
 const initialState: ProfileCache = {
@@ -191,6 +198,33 @@ export const profilesCacheSlice = createSlice({
 
       defaultProfile.archivedCredentials = action.payload;
     },
+    updateOrAddConnectionCache: (
+      state,
+      action: PayloadAction<any> /* ConnectionShortDetails */
+    ) => {
+      const conn = action.payload as any;
+
+      // Determine profile id: prefer explicit identifier, then contactId, then defaultProfile
+      const profileId =
+        conn.identifier || conn.contactId || state.defaultProfile;
+      if (!profileId) return;
+
+      const targetProfile = state.profiles[profileId];
+      if (!targetProfile) return;
+
+      const existing = targetProfile.connections.filter(
+        (c) => c.id !== conn.id
+      );
+
+      // Ensure the stored connection includes identifier/contactId for downstream filters
+      const mapped = {
+        ...conn,
+        identifier: conn.identifier || profileId,
+        contactId: conn.contactId || conn.id,
+      } as any;
+
+      targetProfile.connections = [...existing, mapped];
+    },
     setPeerConnections: (state, action: PayloadAction<ConnectionData[]>) => {
       if (!state.defaultProfile) return;
       const defaultProfile = state.profiles[state.defaultProfile];
@@ -225,6 +259,83 @@ export const profilesCacheSlice = createSlice({
     setIndividualFirstCreate: (state, action: PayloadAction<boolean>) => {
       state.individualFirstCreate = action.payload;
     },
+    setConnectionsCache: (state, action: PayloadAction<any[]>) => {
+      // action.payload expected to be ConnectionShortDetails[]
+      const allConns = action.payload as any[];
+
+      Object.keys(state.profiles).forEach((profileId) => {
+        const profile = state.profiles[profileId];
+        if (!profile) return;
+        profile.connections = allConns
+          .filter((c) => c.identifier === profileId)
+          .map((c) => ({
+            ...c,
+            identifier: c.identifier || profileId,
+            contactId: c.contactId || c.id,
+          }));
+      });
+    },
+
+    removeConnectionCache: (state, action: PayloadAction<string>) => {
+      if (!state.defaultProfile) return;
+      const defaultProfile = state.profiles[state.defaultProfile];
+      if (!defaultProfile) return;
+
+      defaultProfile.connections = defaultProfile.connections.filter(
+        (c) => c.id !== action.payload
+      );
+    },
+
+    setMultisigConnectionsCache: (state, action: PayloadAction<any[]>) => {
+      // action.payload expected to be MultisigConnectionDetails[]
+      const allMultisig = action.payload as any[];
+
+      Object.keys(state.profiles).forEach((profileId) => {
+        const profile = state.profiles[profileId];
+        if (!profile) return;
+        profile.multisigConnections = allMultisig
+          .filter((c) => c.contactId === profileId && "groupId" in c)
+          .map((c) => ({
+            ...c,
+            contactId: c.contactId || profileId,
+            groupId: c.groupId || c.groupId || "",
+          }));
+      });
+    },
+
+    updateOrAddMultisigConnectionCache: (
+      state,
+      action: PayloadAction<any> /* MultisigConnectionDetails */
+    ) => {
+      const conn = action.payload as any;
+      const profileId =
+        conn.contactId || conn.identifier || state.defaultProfile;
+      if (!profileId) return;
+      const targetProfile = state.profiles[profileId];
+      if (!targetProfile) return;
+
+      const existing = targetProfile.multisigConnections.filter(
+        (c) => c.id !== conn.id
+      );
+
+      const mapped = {
+        ...conn,
+        contactId: conn.contactId || profileId,
+        groupId: conn.groupId || conn.groupId || "",
+      } as any;
+
+      targetProfile.multisigConnections = [...existing, mapped];
+    },
+
+    setOpenConnectionId: (state, action: PayloadAction<string | undefined>) => {
+      state.openConnectionId = action.payload;
+    },
+    setMissingAliasConnection: (
+      state,
+      action: PayloadAction<{ url: string; identifier?: string } | undefined>
+    ) => {
+      state.missingAliasUrl = action.payload;
+    },
   },
 });
 
@@ -250,6 +361,13 @@ export const {
   setCurrentProfile,
   setScanGroupId,
   updatePeerConnectionsFromCore,
+  setConnectionsCache,
+  setMultisigConnectionsCache,
+  updateOrAddConnectionCache,
+  removeConnectionCache,
+  updateOrAddMultisigConnectionCache,
+  setOpenConnectionId,
+  setMissingAliasConnection,
 } = profilesCacheSlice.actions;
 
 const getProfiles = (state: RootState) => state.profilesCache.profiles;
@@ -262,6 +380,19 @@ const getRecentProfiles = (state: RootState) =>
 
 const getNotificationsCache = (state: RootState) =>
   getCurrentProfile(state)?.notifications || DefaultArrayValue.Notifications;
+
+const getConnectionsCache = (state: RootState) =>
+  getCurrentProfile(state)?.connections || DefaultArrayValue.Connections;
+
+const getMultisigConnectionsCache = (state: RootState) =>
+  getCurrentProfile(state)?.multisigConnections ||
+  DefaultArrayValue.MultisigConnections;
+
+const getOpenConnectionId = (state: RootState) =>
+  state.profilesCache.openConnectionId;
+
+const getMissingAliasConnection = (state: RootState) =>
+  state.profilesCache.missingAliasUrl;
 
 const getCredsCache = (state: RootState) =>
   getCurrentProfile(state)?.credentials || DefaultArrayValue.Credentials;
@@ -292,4 +423,8 @@ export {
   getProfiles,
   getRecentProfiles,
   getScanGroupId,
+  getConnectionsCache,
+  getMultisigConnectionsCache,
+  getOpenConnectionId,
+  getMissingAliasConnection,
 };

@@ -12,7 +12,7 @@ import { TabsRoutePath } from "../../../routes/paths";
 import {
   setMissingAliasConnection,
   setOpenConnectionId,
-} from "../../../store/reducers/connectionsCache";
+} from "../../../store/reducers/profileCache";
 import {
   setToastMsg,
   showGenericError,

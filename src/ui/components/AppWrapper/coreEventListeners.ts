@@ -9,8 +9,7 @@ import {
 } from "../../../core/agent/event.types";
 import { OperationPendingRecordType } from "../../../core/agent/records/operationPendingRecord.type";
 import { useAppDispatch } from "../../../store/hooks";
-import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
-import {
+import { updateOrAddConnectionCache ,
   addGroupProfile,
   addNotification,
   addOrUpdateProfileIdentity,

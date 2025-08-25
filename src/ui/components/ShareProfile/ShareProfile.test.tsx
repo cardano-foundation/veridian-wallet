@@ -11,7 +11,7 @@ import EN_Translation from "../../../locales/en/en.json";
 import {
   setMissingAliasConnection,
   setOpenConnectionId,
-} from "../../../store/reducers/connectionsCache";
+} from "../../../store/reducers/profileCache";
 import {
   setToastMsg,
   showGenericError,
@@ -131,14 +131,6 @@ describe("Share Profile", () => {
         time: Date.now(),
         passcodeIsSet: true,
         passwordIsSet: false,
-      },
-      currentProfile: {
-        identity: filteredIdentifierFix[0],
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
       },
     },
     profilesCache: profileCacheFixData,
