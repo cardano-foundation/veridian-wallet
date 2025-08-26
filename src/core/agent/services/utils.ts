@@ -1,5 +1,5 @@
 import { Operation, Salter, SignifyClient } from "signify-ts";
-import { CredentialMetadataRecord, NotificationStorage, OperationPendingRecordType } from "../records";
+import { CredentialMetadataRecord, NotificationStorage } from "../records";
 import { CredentialShortDetails } from "./credentialService.types";
 import { Agent } from "../agent";
 import { NotificationRoute } from "./keriaNotificationService.types";
@@ -119,21 +119,7 @@ async function cleanupPendingOperations(
     return;
   }
 
-  const relevantOperationTypes = [
-    OperationPendingRecordType.ExchangeReceiveCredential,
-    OperationPendingRecordType.ExchangeOfferCredential,
-    OperationPendingRecordType.ExchangePresentCredential,
-  ];
-  
-  const filteredOperations = pendingOperations.filter(operation => 
-    relevantOperationTypes.includes(operation.recordType)
-  );
-
-  if (filteredOperations.length === 0) {
-    return;
-  }
-
-  const deletePromises = filteredOperations.map(async (operation) => {
+  const deletePromises = pendingOperations.map(async (operation) => {
       await operationPendingStorage.deleteById(operation.id);
   });
 
