@@ -587,7 +587,8 @@ class Agent {
           this.client,
           this.notificationStorage,
           notification.id,
-          notification.a.r as NotificationRoute
+          notification.a.r as NotificationRoute,
+          this.operationPendingStorage
         );
 
         this.agentServicesProps.eventEmitter.emit<NotificationRemovedEvent>({
@@ -606,7 +607,8 @@ class Agent {
         this.client,
         this.notificationStorage,
         notification.id,
-        notification.a.r as NotificationRoute
+        notification.a.r as NotificationRoute,
+        this.operationPendingStorage
       );
 
       this.agentServicesProps.eventEmitter.emit<NotificationRemovedEvent>({

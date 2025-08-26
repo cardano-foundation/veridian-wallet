@@ -39,12 +39,18 @@ describe("Utils", () => {
     });
 
     describe("Basic functionality", () => {
-      it("should delete notification without operation cleanup when operationPendingStorage is not provided", async () => {
+      it("should delete notification without operation cleanup when no linked requests exist", async () => {
+        mockNotificationStorage.findExpectedById.mockResolvedValue({
+          id: notificationId,
+          linkedRequest: { accepted: false },
+        } as any);
+
         await deleteNotificationRecordById(
           mockSignifyClient,
           mockNotificationStorage,
           notificationId,
-          route
+          route,
+          mockOperationPendingStorage
         );
 
         expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
@@ -318,7 +324,8 @@ describe("Utils", () => {
           mockSignifyClient,
           mockNotificationStorage,
           notificationId,
-          NotificationRoute.ExnIpexGrant
+          NotificationRoute.ExnIpexGrant,
+          mockOperationPendingStorage
         );
 
         expect(mockMarkFunction).toHaveBeenCalledWith(notificationId);
@@ -334,7 +341,8 @@ describe("Utils", () => {
           mockSignifyClient,
           mockNotificationStorage,
           notificationId,
-          NotificationRoute.LocalAcdcRevoked
+          NotificationRoute.LocalAcdcRevoked,
+          mockOperationPendingStorage
         );
 
         expect(mockMarkFunction).not.toHaveBeenCalled();
@@ -352,7 +360,8 @@ describe("Utils", () => {
             mockSignifyClient,
             mockNotificationStorage,
             notificationId,
-            NotificationRoute.ExnIpexGrant
+            NotificationRoute.ExnIpexGrant,
+            mockOperationPendingStorage
           )
         ).rejects.toThrow("KERIA error");
       });
@@ -368,7 +377,8 @@ describe("Utils", () => {
           mockSignifyClient,
           mockNotificationStorage,
           notificationId,
-          NotificationRoute.ExnIpexGrant
+          NotificationRoute.ExnIpexGrant,
+          mockOperationPendingStorage
         );
 
         // Should not throw and should continue with deletion

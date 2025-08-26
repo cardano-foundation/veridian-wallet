@@ -71,7 +71,7 @@ export const deleteNotificationRecordById = async (
   notificationStorage: NotificationStorage,
   id: string,
   route: NotificationRoute,
-  operationPendingStorage?: OperationPendingStorage
+  operationPendingStorage: OperationPendingStorage
 ): Promise<void> => {
   // Get the notification record before deleting to check for linked requests
   const notificationRecord = await notificationStorage.findExpectedById(id);
@@ -89,7 +89,7 @@ export const deleteNotificationRecordById = async (
   }
 
   // Clean up any pending operations if this notification has linked requests
-  if (operationPendingStorage && notificationRecord?.linkedRequest?.current) {
+  if (notificationRecord?.linkedRequest?.current) {
     await cleanupPendingOperations(operationPendingStorage, notificationRecord.linkedRequest.current);
   }
 

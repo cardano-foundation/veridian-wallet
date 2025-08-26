@@ -471,12 +471,17 @@ describe("Signify notification service of agent", () => {
     );
 
     notificationStorage.deleteById = jest.fn();
+    const mockOperationPendingStorage = {
+      findAllByQuery: jest.fn(),
+      deleteById: jest.fn(),
+    } as any;
+    
     await deleteNotificationRecordById(
       agentServicesProps.signifyClient,
       notificationStorage,
       id,
       NotificationRoute.ExnIpexGrant,
-      undefined
+      mockOperationPendingStorage
     );
     expect(notificationStorage.deleteById).toBeCalledWith(id);
     expect(markNotificationMock).toBeCalledWith(id);
@@ -488,12 +493,17 @@ describe("Signify notification service of agent", () => {
       agentServicesProps.signifyClient
     );
     notificationStorage.deleteById = jest.fn();
+    const mockOperationPendingStorage = {
+      findAllByQuery: jest.fn(),
+      deleteById: jest.fn(),
+    } as any;
+    
     await deleteNotificationRecordById(
       agentServicesProps.signifyClient,
       notificationStorage,
       id,
       NotificationRoute.LocalAcdcRevoked,
-      undefined
+      mockOperationPendingStorage
     );
     expect(notificationStorage.deleteById).toBeCalledWith(id);
     expect(markNotificationMock).not.toBeCalled();
