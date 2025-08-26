@@ -105,28 +105,20 @@ async function cleanupPendingOperations(
   operationPendingStorage: OperationPendingStorage,
   linkedRequestCurrent: string,
 ): Promise<void> {
-  // Validate the linked request identifier
   if (!linkedRequestCurrent || typeof linkedRequestCurrent !== 'string') {
-    // Invalid identifier, skip cleanup
     return;
   }
 
-  // Find pending operations related to this notification
-  // Look for operations that end with the linked request identifier
-  // This covers the pattern: {operationType}.{linkedRequestId}
   const pendingOperations = await operationPendingStorage.findAllByQuery({
     filter: {
       id: { $regex: `^.*\\.${linkedRequestCurrent}$` }
     }
   });
 
-  // Early return if no operations found
   if (!Array.isArray(pendingOperations) || pendingOperations.length === 0) {
     return;
   }
 
-  // Filter operations by type to ensure we only clean up relevant ones
-  // These are the IPEX-related operation types that should be cleaned up
   const relevantOperationTypes = [
     OperationPendingRecordType.ExchangeReceiveCredential,
     OperationPendingRecordType.ExchangeOfferCredential,
@@ -141,7 +133,6 @@ async function cleanupPendingOperations(
     return;
   }
 
-  // Batch delete operations for better performance
   const deletePromises = filteredOperations.map(async (operation) => {
       await operationPendingStorage.deleteById(operation.id);
   });
