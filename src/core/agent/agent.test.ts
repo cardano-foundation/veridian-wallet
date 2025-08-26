@@ -63,6 +63,11 @@ jest.mock("bip39", () => ({
 
 const mockAgentServicesProps = {
   eventEmitter: eventEmitter,
+  signifyClient: {
+    identifiers: () => ({
+      update: jest.fn().mockResolvedValue(undefined)
+    })
+  }
 };
 
 const mockGetBranValue = "AEsI_2YqNsQlf8brzDJaP";
@@ -101,6 +106,7 @@ const mockKeriaNotificationService = {
 const mockIdentifierStorage = {
   getAllIdentifiers: jest.fn(),
   getIdentifierMetadata: jest.fn(),
+  updateIdentifierMetadata: jest.fn(),
 };
 const mockCredentialStorage = {
   getAllCredentialMetadata: jest.fn(),
@@ -828,13 +834,15 @@ describe("Agent delete profile", () => {
       expect.anything(),
       expect.anything(),
       "note1",
-      "/some/route"
+      "/some/route",
+      expect.anything()
     );
     expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       "note2",
-      "/local/route"
+      "/local/route",
+      expect.anything()
     ); // Local notifications should not be deleted via signifyClient
     expect(
       PeerConnection.peerConnection.getConnectedDAppAddress
@@ -889,13 +897,15 @@ describe("Agent delete profile", () => {
       expect.anything(),
       expect.anything(),
       "group-note1",
-      "/some/route"
+      "/some/route",
+      expect.anything()
     );
     expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       "group-note2",
-      "/local/route"
+      "/local/route",
+      expect.anything()
     );
     expect(
       PeerConnection.peerConnection.getConnectedDAppAddress
@@ -909,7 +919,6 @@ describe("Agent delete profile", () => {
     );
   });
 });
-
 describe("Agent delete profile", () => {
   let agent: Agent;
 
@@ -973,13 +982,15 @@ describe("Agent delete profile", () => {
       expect.anything(),
       expect.anything(),
       "note1",
-      "/some/route"
+      "/some/route",
+      expect.anything()
     );
     expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       "note2",
-      "/local/route"
+      "/local/route",
+      expect.anything()
     ); // Local notifications should not be deleted via signifyClient
     expect(
       PeerConnection.peerConnection.getConnectedDAppAddress
@@ -1034,13 +1045,15 @@ describe("Agent delete profile", () => {
       expect.anything(),
       expect.anything(),
       "group-note1",
-      "/some/route"
+      "/some/route",
+      expect.anything()
     );
     expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       "group-note2",
-      "/local/route"
+      "/local/route",
+      expect.anything()
     );
     expect(
       PeerConnection.peerConnection.getConnectedDAppAddress
@@ -1054,3 +1067,4 @@ describe("Agent delete profile", () => {
     );
   });
 });
+
