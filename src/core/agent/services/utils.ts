@@ -73,7 +73,6 @@ export const deleteNotificationRecordById = async (
   route: NotificationRoute,
   operationPendingStorage: OperationPendingStorage
 ): Promise<void> => {
-  // Get the notification record before deleting to check for linked requests
   const notificationRecord = await notificationStorage.findExpectedById(id);
 
   if (!/^\/local/.test(route)) {
@@ -88,7 +87,6 @@ export const deleteNotificationRecordById = async (
       });
   }
 
-  // Clean up any pending operations if this notification has linked requests
   if (notificationRecord?.linkedRequest?.current) {
     await cleanupPendingOperations(operationPendingStorage, notificationRecord.linkedRequest.current);
   }
@@ -105,17 +103,13 @@ async function cleanupPendingOperations(
   operationPendingStorage: OperationPendingStorage,
   linkedRequestCurrent: string,
 ): Promise<void> {
-  if (!linkedRequestCurrent || typeof linkedRequestCurrent !== 'string') {
-    return;
-  }
-
   const pendingOperations = await operationPendingStorage.findAllByQuery({
     filter: {
       id: { $regex: `^.*\\.${linkedRequestCurrent}$` }
     }
   });
 
-  if (!Array.isArray(pendingOperations) || pendingOperations.length === 0) {
+  if (pendingOperations.length === 0) {
     return;
   }
 
