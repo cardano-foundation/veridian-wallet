@@ -141,7 +141,7 @@ const ChooseCredential = ({
 
       await Agent.agent.ipexCommunications.offerAcdcFromApply(
         notificationDetails.id,
-        (selectedCred.acdc as unknown as CredentialMetadataRecordProps)
+        selectedCred.acdc as unknown as CredentialMetadataRecordProps
       );
 
       if (!linkedGroup) {

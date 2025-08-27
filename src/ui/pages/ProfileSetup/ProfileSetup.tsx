@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Salter } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -14,6 +14,8 @@ import {
 } from "../../../store/reducers/profileCache";
 import {
   getStateCache,
+  setPendingJoinGroupMetadata,
+  setToastMsg,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
@@ -24,14 +26,22 @@ import { Spinner } from "../../components/Spinner";
 import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
 import { useAppIonRouter } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
-import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
-import { SetupGroup } from "./components/SetupGroup";
+import { GroupSetup } from "./components/GroupSetup";
 import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
 import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
+import { Scan } from "../../components/Scan";
+import { ScanRef } from "../../components/Scan/Scan.types";
+import { useScanHandle } from "../../components/Scan/hook/useScanHandle";
+import { useCameraDirection } from "../../components/Scan/hook/useCameraDirection";
+import { repeatOutline } from "ionicons/icons";
+import { BasicRecord } from "../../../core/agent/records";
+import { ToastMsgType } from "../../globals/types";
+import { getMultisigConnectionsCache } from "../../../store/reducers/connectionsCache";
+import { showError } from "../../utils/error";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
@@ -44,23 +54,36 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const [userName, setUserName] = useState("");
   const [groupName, setGroupName] = useState("");
   const [isLoading, setLoading] = useState(false);
+  const [isScanOpen, setIsScanOpen] = useState(false);
   const ionRouter = useAppIonRouter();
   const cacheIdentifier = useRef("");
+  const connectionsCache = useAppSelector(getMultisigConnectionsCache);
+  const scanRef = useRef<ScanRef>(null);
+  const { resolveGroupConnection } = useScanHandle();
+  const { cameraDirection, changeCameraDirection, supportMultiCamera } =
+    useCameraDirection();
+  const [enableCameraDirection, setEnableCameraDirection] = useState(false);
 
   const isModal = !!onClose;
 
   const title = i18n.t(`setupprofile.${step}.title`);
-  const back = [
-    SetupProfileStep.SetupProfile,
-    SetupProfileStep.SetupGroup,
-  ].includes(step)
-    ? i18n.t("setupprofile.button.back")
-    : isModal && defaultProfile
+  const back = stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
+    ? undefined // Disable back button if pending join group
+    : isScanOpen
       ? i18n.t("setupprofile.button.cancel")
-      : undefined;
+      : [
+        SetupProfileStep.SetupProfile,
+        SetupProfileStep.GroupSetupStart,
+      ].includes(step)
+        ? i18n.t("setupprofile.button.back")
+        : isModal && defaultProfile
+          ? i18n.t("setupprofile.button.cancel")
+          : undefined;
 
   const getButtonText = () => {
     switch (step) {
+      case SetupProfileStep.GroupSetupConfirm:
+        return i18n.t("setupprofile.groupsetupconfirm.button");
       case SetupProfileStep.FinishSetup:
         return i18n.t("setupprofile.button.started");
       default:
@@ -70,7 +93,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
   const handleBack = () => {
     if (
-      step === SetupProfileStep.SetupGroup ||
+      step === SetupProfileStep.GroupSetupStart ||
       (step === SetupProfileStep.SetupProfile &&
         profileType !== ProfileType.Group)
     ) {
@@ -79,7 +102,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
 
     if (step === SetupProfileStep.SetupProfile) {
-      setStep(SetupProfileStep.SetupGroup);
+      setStep(SetupProfileStep.GroupSetupStart);
       return;
     }
 
@@ -89,7 +112,10 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const createIdentifier = async () => {
     const error = nameChecker.getError(userName);
 
-    if (error) return;
+    if (error) {
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
+      return;
+    }
 
     const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
@@ -97,42 +123,110 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       theme: 0,
     };
 
+    let groupId = null;
+
     if (isGroup) {
       const groupMetadata = {
-        groupId: new Salter({}).qb64,
-        groupInitiator: true,
+        groupId:
+          stateCache.pendingJoinGroupMetadata?.groupId || new Salter({}).qb64, // Use existing groupId if joining
+        groupInitiator: stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
+          ? false // Ensure joiner is not the initiator
+          : true,
         groupCreated: false,
         userName: userName,
+        initiatorName: stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
+          ? stateCache.pendingJoinGroupMetadata?.initiatorName || undefined
+          : userName, // Set initiatorName to userName for the initiator
       };
       metadata.groupMetadata = groupMetadata;
+      groupId = groupMetadata.groupId; // Store groupId for later navigation
     }
 
     try {
       setLoading(true);
 
-      // Create the identifier
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
       );
 
       if (individualFirstCreate) {
-        await Agent.agent.basicStorage
-          .deleteById(MiscRecordId.INDIVIDUAL_FIRST_CREATE)
-          .then(() => dispatch(setIndividualFirstCreate(false)));
+        try {
+          await Agent.agent.basicStorage.deleteById(
+            MiscRecordId.INDIVIDUAL_FIRST_CREATE
+          );
+        } catch (cleanupErr) {
+          const msg = (cleanupErr as Error)?.message || "";
+          if (
+            !msg.includes("Record does not exist") &&
+            !msg.toLowerCase().includes("not found")
+          ) {
+            showError("Failed to delete INDIVIDUAL_FIRST_CREATE:", cleanupErr);
+          }
+        } finally {
+          dispatch(setIndividualFirstCreate(false));
+        }
+      }
+
+      try {
+        await Agent.agent.basicStorage.deleteById(
+          MiscRecordId.IS_SETUP_PROFILE
+        );
+      } catch (cleanupErr) {
+        const msg = (cleanupErr as Error)?.message || "";
+        if (
+          !msg.includes("Record does not exist") &&
+          !msg.toLowerCase().includes("not found")
+        ) {
+          showError("Failed to delete IS_SETUP_PROFILE:", cleanupErr);
+        }
       }
 
       await updateDefaultProfile(identifier);
 
       if (isModal) {
-        onClose();
+        onClose?.();
         navToCredentials(identifier);
         return;
       }
 
-      await Agent.agent.basicStorage.deleteById(MiscRecordId.IS_SETUP_PROFILE);
       cacheIdentifier.current = identifier;
+
       setStep(SetupProfileStep.FinishSetup);
+
+      if (groupId) {
+        dispatch(
+          setPendingJoinGroupMetadata({
+            isPendingJoinGroup: true,
+            groupId,
+            groupName,
+            initiatorName:
+              stateCache.pendingJoinGroupMetadata?.initiatorName || null,
+          })
+        );
+      }
+
+      // Only clear pending join metadata for group flows.
+      if (isGroup) {
+        dispatch(setPendingJoinGroupMetadata(null));
+        try {
+          await Agent.agent.basicStorage.deleteById(
+            MiscRecordId.PENDING_JOIN_GROUP_METADATA
+          );
+        } catch (cleanupErr) {
+          const msg = (cleanupErr as Error)?.message || "";
+          if (
+            !msg.includes("Record does not exist") &&
+            !msg.toLowerCase().includes("not found")
+          ) {
+            showError(
+              "Failed to delete PENDING_JOIN_GROUP_METADATA:",
+              cleanupErr
+            );
+          }
+        }
+      }
     } catch (e) {
+      showError("createIdentifier error:", e);
       const errorMessage = (e as Error).message;
 
       if (
@@ -147,7 +241,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         return;
       }
 
-      showError("Unable to create identifier", e, dispatch);
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
     } finally {
       setLoading(false);
     }
@@ -176,7 +270,11 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   };
 
   const handleOpenScan = () => {
-    // TODO: implement on next ticket
+    setIsScanOpen(true);
+  };
+
+  const handleCloseScan = () => {
+    setIsScanOpen(false);
   };
 
   const handleChangeStep = () => {
@@ -186,6 +284,22 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
 
     if (step === SetupProfileStep.FinishSetup) {
+      if (stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup) {
+        const { groupId, groupName } = stateCache.pendingJoinGroupMetadata;
+
+        dispatch(setPendingJoinGroupMetadata(null));
+        Agent.agent.basicStorage.deleteById(
+          MiscRecordId.PENDING_JOIN_GROUP_METADATA
+        );
+
+        ionRouter.push(
+          `/group-profile-setup/${groupId}?groupName=${encodeURIComponent(
+            groupName
+          )}`
+        );
+        return;
+      }
+
       navToCredentials(cacheIdentifier.current);
       return;
     }
@@ -194,8 +308,106 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       profileType === ProfileType.Group &&
       step === SetupProfileStep.SetupType
     ) {
-      setStep(SetupProfileStep.SetupGroup);
+      setStep(SetupProfileStep.GroupSetupStart);
       return;
+    }
+
+    setStep(SetupProfileStep.SetupProfile);
+  };
+
+  const handleScanFinish = async (content: string) => {
+    try {
+      const url = new URL(content);
+      const scanGroupId = url.searchParams.get("groupId");
+      const scannedGroupName = url.searchParams.get("groupName");
+      const groupInitiator = url.searchParams.get("name");
+
+      // prevent joining a group already present in connections cache
+      if (
+        scanGroupId &&
+        connectionsCache &&
+        Object.values(connectionsCache).some(
+          (c: any) => String(c.groupId) === String(scanGroupId)
+        )
+      ) {
+        handleCloseScan();
+        dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR));
+        return;
+      }
+
+      if (!scanGroupId) {
+        handleCloseScan();
+        dispatch(setToastMsg(ToastMsgType.GROUP_ID_NOT_FOUND_ERROR));
+        return;
+      }
+
+      if (!scannedGroupName) {
+        handleCloseScan();
+        dispatch(setToastMsg(ToastMsgType.GROUP_NAME_NOT_FOUND_ERROR));
+        return;
+      }
+
+      const isInitiator = false; // Ensure joiner is not the initiator
+
+      await resolveGroupConnection(
+        content,
+        scanGroupId,
+        isInitiator,
+        () => handleCloseScan(),
+        undefined,
+        (id: string) =>
+          dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR))
+      );
+
+      // Update Redux state with all metadata, including initiatorName
+      dispatch(
+        setPendingJoinGroupMetadata({
+          isPendingJoinGroup: true,
+          groupId: scanGroupId,
+          groupName: scannedGroupName,
+          initiatorName: groupInitiator,
+        })
+      );
+
+      // Update local state
+      setGroupName(scannedGroupName);
+      setStep(SetupProfileStep.GroupSetupConfirm);
+
+      // Update persistent storage
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.PENDING_JOIN_GROUP_METADATA,
+          content: {
+            isPendingJoinGroup: true,
+            groupId: scanGroupId,
+            groupName: scannedGroupName,
+            initiatorName: groupInitiator,
+          },
+        })
+      );
+    } catch (error) {
+      handleCloseScan();
+      dispatch(setToastMsg(ToastMsgType.SCANNER_ERROR));
+    }
+  };
+
+  const handleConfirmJoinGroup = async () => {
+    // Clear pendingJoinGroupMetadata in memory
+    dispatch(setPendingJoinGroupMetadata(null));
+
+    // Remove persisted pending metadata if present. Ignore "not found" errors.
+    try {
+      await Agent.agent.basicStorage.deleteById(
+        MiscRecordId.PENDING_JOIN_GROUP_METADATA
+      );
+    } catch (cleanupErr) {
+      const msg = (cleanupErr as Error)?.message || "";
+      if (
+        !msg.includes("Record does not exist") &&
+        !msg.toLowerCase().includes("not found")
+      ) {
+        showError("Failed to delete PENDING_JOIN_GROUP_METADATA:", cleanupErr);
+      }
     }
 
     setStep(SetupProfileStep.SetupProfile);
@@ -208,14 +420,25 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           <SetupProfile
             userName={userName}
             onChangeUserName={setUserName}
+            isGroupProfile={true}
           />
         );
-      case SetupProfileStep.SetupGroup:
+      case SetupProfileStep.GroupSetupStart:
         return (
-          <SetupGroup
+          <GroupSetup
             groupName={groupName}
             onChangeGroupName={setGroupName}
-            onClickJoinGroupButton={handleOpenScan}
+            onClickEvent={handleOpenScan}
+            setupProfileStep={step}
+          />
+        );
+      case SetupProfileStep.GroupSetupConfirm:
+        return (
+          <GroupSetup
+            groupName={groupName}
+            onChangeGroupName={setGroupName}
+            onClickEvent={handleConfirmJoinGroup}
+            setupProfileStep={step}
           />
         );
       case SetupProfileStep.FinishSetup:
@@ -231,36 +454,79 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
     }
   };
 
-  return (
-    <ResponsivePageLayout
-      pageId={pageId}
-      customClass={step}
-      header={
-        step !== SetupProfileStep.FinishSetup ? (
-          <PageHeader
-            closeButton={!!back}
-            closeButtonLabel={back}
-            closeButtonAction={handleBack}
-            title={title}
-          />
-        ) : undefined
+  useEffect(() => {
+    if (
+      stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup &&
+      step === SetupProfileStep.SetupType // Only restore if on the initial step
+    ) {
+      const { groupName } = stateCache.pendingJoinGroupMetadata;
+
+      if (groupName) {
+        setGroupName(groupName);
       }
-    >
-      {renderContent()}
-      <PageFooter
-        primaryButtonText={getButtonText()}
-        primaryButtonAction={handleChangeStep}
-        primaryButtonDisabled={
-          (SetupProfileStep.SetupGroup === step && !groupName) ||
-          (SetupProfileStep.SetupProfile === step && !userName) ||
-          isLoading
-        }
-        pageId={pageId}
-      />
-      <Spinner
-        show={isLoading}
-        coverage={SpinnerConverage.Screen}
-      />
-    </ResponsivePageLayout>
+
+      setProfileType(ProfileType.Group);
+      setStep(SetupProfileStep.GroupSetupConfirm);
+    }
+  }, [stateCache.pendingJoinGroupMetadata, step]);
+
+  return (
+    <>
+      {isScanOpen ? (
+        <ResponsivePageLayout
+          pageId={pageId}
+          customClass={"scan"}
+          header={
+            <PageHeader
+              closeButton={!!back}
+              closeButtonLabel={back}
+              closeButtonAction={handleCloseScan}
+              actionButton={supportMultiCamera}
+              actionButtonIcon={repeatOutline}
+              actionButtonAction={changeCameraDirection}
+              actionButtonDisabled={!enableCameraDirection}
+            />
+          }
+        >
+          <Scan
+            ref={scanRef}
+            onFinishScan={handleScanFinish}
+            cameraDirection={cameraDirection}
+            onCheckPermissionFinish={setEnableCameraDirection}
+          />
+        </ResponsivePageLayout>
+      ) : (
+        <ResponsivePageLayout
+          pageId={pageId}
+          customClass={step}
+          header={
+            step !== SetupProfileStep.FinishSetup ? (
+              <PageHeader
+                closeButton={!!back}
+                closeButtonLabel={back}
+                closeButtonAction={handleBack}
+                title={!isScanOpen ? title : undefined}
+              />
+            ) : undefined
+          }
+        >
+          {renderContent()}
+          <PageFooter
+            primaryButtonText={getButtonText()}
+            primaryButtonAction={handleChangeStep}
+            primaryButtonDisabled={
+              (SetupProfileStep.GroupSetupStart === step && !groupName) ||
+              (SetupProfileStep.SetupProfile === step && !userName) ||
+              isLoading
+            }
+            pageId={pageId}
+          />
+          <Spinner
+            show={isLoading}
+            coverage={SpinnerConverage.Screen}
+          />
+        </ResponsivePageLayout>
+      )}
+    </>
   );
 };

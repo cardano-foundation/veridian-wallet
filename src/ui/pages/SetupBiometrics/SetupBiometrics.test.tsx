@@ -6,7 +6,6 @@ import { IonReactMemoryRouter } from "@ionic/react-router";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
-
 import { AuthService } from "../../../core/agent/services";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes/paths";
@@ -147,7 +146,7 @@ describe("SetPasscode Page", () => {
   });
 
   test("Click on skip", async () => {
-    const { getByTestId, getByText } = render(
+    const { getByTestId } = render(
       <IonReactMemoryRouter
         history={history}
         initialEntries={[RoutePath.SETUP_BIOMETRICS]}

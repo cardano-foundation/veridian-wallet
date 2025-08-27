@@ -25,6 +25,12 @@
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unused-vars": "off"
       }
+    },
+    {
+      "files": ["src/core/storage/sqliteStorage/migrations/**/*.ts"],
+      "rules": {
+        "no-console": "off"
+      }
     }
   ],
   "parser": "@typescript-eslint/parser",

@@ -12,6 +12,7 @@ interface GroupMetadata {
   groupInitiator: boolean;
   groupCreated: boolean;
   userName: string;
+  initiatorName?: string;
 }
 
 interface CreateIdentifierInputs {
@@ -114,6 +115,7 @@ export type {
 
 export { IdentifierType };
 export type {
+  GroupMetadata,
   QueuedIdentifierCreation,
   QueuedGroupProps,
   QueuedGroupCreation,

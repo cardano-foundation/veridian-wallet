@@ -336,6 +336,7 @@ describe("Lock Page", () => {
           queues: [],
         },
         toastMsgs: [],
+        pendingJoinGroupMetadata: null,
       },
       seedPhraseCache: {
         seedPhrase: "",

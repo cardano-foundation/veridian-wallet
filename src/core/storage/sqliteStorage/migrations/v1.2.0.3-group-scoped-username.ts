@@ -54,5 +54,5 @@ export const MIGRATION_V1203: LocalMigration = {
       `Local migration for v${migrationVersion} complete. Generated ${statements.length} update statements.`
     );
     return statements;
-  }
+  },
 };
