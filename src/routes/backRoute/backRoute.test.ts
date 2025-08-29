@@ -69,6 +69,7 @@ describe("getBackRoute", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        pendingJoinGroupMetadata: null,
       },
       profilesCache: {
         profiles: {},
@@ -207,6 +208,7 @@ describe("getPreviousRoute", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        pendingJoinGroupMetadata: null,
       },
 
       walletConnectionsCache: {

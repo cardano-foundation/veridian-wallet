@@ -1,6 +1,6 @@
 import { IonLabel, IonSegment, IonSegmentButton } from "@ionic/react";
 import { repeatOutline, warningOutline } from "ionicons/icons";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
@@ -20,12 +20,13 @@ import { useScanHandle } from "../../../../components/Scan/hook/useScanHandle";
 import { ScanRef } from "../../../../components/Scan/Scan.types";
 import { useCameraDirection } from "../../../../components/Scanner/hook/useCameraDirection";
 import { useOnlineStatusEffect } from "../../../../hooks";
-import { showError } from "../../../../utils/error";
 import { Profiles } from "../../../Profiles";
 import { StageProps } from "../../SetupGroupProfile.types";
 import "./SetupConnections.scss";
 import { Tab } from "./SetupConnections.types";
 import { ShareConnections } from "./ShareConnections";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
+import { ToastMsgType } from "../../../../globals/types";
 import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
 
 const SetupConnections = ({ setState }: StageProps) => {
@@ -43,7 +44,11 @@ const SetupConnections = ({ setState }: StageProps) => {
   const { id: profileId } = useParams<{ id: string }>();
   const profile = profiles[profileId]?.identity;
   const groupId = profile?.groupMetadata?.groupId;
-  const groupConnections = useAppSelector(getMultisigConnectionsCache) as any[];
+  const userName = profile?.groupMetadata?.userName;
+
+  // ensure groupConnections is always an object to avoid runtime errors in tests
+  const groupConnections = useAppSelector(getMultisigConnectionsCache) || {};
+
   const [multiSigGroup, setMultiSigGroup] = useState<
     MultiSigGroup | undefined
   >();
@@ -55,41 +60,48 @@ const SetupConnections = ({ setState }: StageProps) => {
   };
 
   const updateMultiSigGroup = useCallback(async () => {
+    if (!groupId) {
+      return;
+    }
+
     try {
-      if (!groupId) return;
       const multiSigGroup: MultiSigGroup = {
         groupId,
-        connections: groupConnections.filter(
+        connections: Object.values(groupConnections).filter(
           (item) =>
-            item &&
-            isMultisigConnectionDetails(item) &&
-            item.groupId === groupId
+            isMultisigConnectionDetails(item) && item.groupId === groupId
         ),
       };
+
       setMultiSigGroup(multiSigGroup);
     } catch (e) {
-      showError("Unable to update multisig", e, dispatch);
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
     }
   }, [dispatch, groupConnections, groupId]);
 
-  useOnlineStatusEffect(updateMultiSigGroup);
+  useEffect(() => {
+    if (groupConnections && Object.keys(groupConnections).length > 0) {
+      updateMultiSigGroup();
+    }
+  }, [groupConnections, groupId]);
 
   const fetchOobi = useCallback(async () => {
-    if (!groupId) return;
+    if (!groupId || !userName) return;
 
     try {
       const oobiValue = await Agent.agent.connections.getOobi(
         profileId,
-        profile.groupMetadata?.userName,
-        groupId
+        userName,
+        groupId,
+        profile?.displayName
       );
       if (oobiValue) {
         setOobi(oobiValue);
       }
     } catch (e) {
-      showError("Unable to fetch Oobi", e, dispatch);
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
     }
-  }, [dispatch, groupId, profile.groupMetadata?.userName, profileId]);
+  }, [dispatch, groupId, userName, profileId]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -104,7 +116,7 @@ const SetupConnections = ({ setState }: StageProps) => {
       await resolveGroupConnection(
         content,
         groupId,
-        !!profile.groupMetadata?.groupInitiator,
+        !!profile?.groupMetadata?.groupInitiator,
         handleClose,
         scanRef.current?.registerScanHandler,
         handleClose
@@ -113,7 +125,7 @@ const SetupConnections = ({ setState }: StageProps) => {
     [
       groupId,
       handleClose,
-      profile.groupMetadata?.groupInitiator,
+      profile?.groupMetadata?.groupInitiator,
       resolveGroupConnection,
     ]
   );
@@ -152,14 +164,15 @@ const SetupConnections = ({ setState }: StageProps) => {
           />
         }
         footer={
-          tab === Tab.SetupMembers && (
+          tab === Tab.SetupMembers &&
+          profile?.groupMetadata?.groupInitiator && (
             <PageFooter
               pageId={componentId}
               primaryButtonAction={handleInit}
               primaryButtonText={`${i18n.t(
-                "setupgroupprofile.setupmembers.initiatebutton"
+                "setupgroupprofile.setupmembers.actions.initiator.initiatebutton"
               )}`}
-              primaryButtonDisabled={multiSigGroup?.connections.length === 0}
+              primaryButtonDisabled={!multiSigGroup?.connections.length}
             />
           )
         }
@@ -169,7 +182,11 @@ const SetupConnections = ({ setState }: StageProps) => {
             <InfoCard
               className="alert"
               icon={warningOutline}
-              content={i18n.t("setupgroupprofile.setupmembers.alert")}
+              content={
+                profile?.groupMetadata?.groupInitiator
+                  ? i18n.t("setupgroupprofile.setupmembers.alert.initiator")
+                  : i18n.t("setupgroupprofile.setupmembers.alert.joiner")
+              }
             />
           )}
           <IonSegment
@@ -195,6 +212,7 @@ const SetupConnections = ({ setState }: StageProps) => {
             <ShareConnections
               oobi={oobi}
               group={multiSigGroup}
+              profile={profile}
             />
           ) : (
             <Scan

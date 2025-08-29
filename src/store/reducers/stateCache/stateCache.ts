@@ -9,6 +9,7 @@ import {
   CurrentRouteCacheProps,
   IncomingRequestProps,
   InitializationPhase,
+  PendingJoinGroupMetadata,
   StateCacheProps,
 } from "./stateCache.types";
 
@@ -42,6 +43,7 @@ const initialState: StateCacheProps = {
   },
   toastMsgs: [],
   forceInitApp: 0,
+  pendingJoinGroupMetadata: null,
 };
 
 const stateCacheSlice = createSlice({
@@ -189,6 +191,12 @@ const stateCacheSlice = createSlice({
     setIsSetupProfile: (state, action: PayloadAction<boolean | undefined>) => {
       state.isSetupProfile = action.payload;
     },
+    setPendingJoinGroupMetadata: (
+      state,
+      action: PayloadAction<PendingJoinGroupMetadata | null>
+    ) => {
+      state.pendingJoinGroupMetadata = action.payload;
+    },
   },
 });
 
@@ -218,6 +226,7 @@ const {
   clearStateCache,
   showGlobalLoading,
   setIsSetupProfile,
+  setPendingJoinGroupMetadata,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -294,6 +303,7 @@ export {
   setFirstAppLaunchComplete,
   setInitializationPhase,
   setIsOnline,
+  setPendingJoinGroupMetadata,
   setIsSetupProfile,
   setLoginAttempt,
   setPauseQueueIncomingRequest,

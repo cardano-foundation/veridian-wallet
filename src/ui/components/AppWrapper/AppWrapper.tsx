@@ -32,7 +32,6 @@ import {
   setConnectionsCache,
   setMultisigConnectionsCache,
   updateOrAddConnectionCache,
-
   ConnectionData,
   Profile,
   setCredsArchivedCache,
@@ -41,7 +40,8 @@ import {
   setProfiles,
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
-  updateRecentProfiles} from "../../../store/reducers/profileCache";
+  updateRecentProfiles,
+} from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   getForceInitApp,
@@ -55,6 +55,7 @@ import {
   setIsOnline,
   setIsSetupProfile,
   setPauseQueueIncomingRequest,
+  setPendingJoinGroupMetadata,
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert,
@@ -62,6 +63,7 @@ import {
 import {
   IncomingRequestType,
   InitializationPhase,
+  PendingJoinGroupMetadata,
 } from "../../../store/reducers/stateCache/stateCache.types";
 import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
@@ -592,6 +594,38 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const finishSetupBiometrics = await Agent.agent.basicStorage.findById(
         MiscRecordId.BIOMETRICS_SETUP
       );
+
+      const pendingJoinGroupMetadata = await Agent.agent.basicStorage.findById(
+        MiscRecordId.PENDING_JOIN_GROUP_METADATA
+      );
+
+      const isPendingJoinGroupMetadata = (
+        data: unknown
+      ): data is PendingJoinGroupMetadata => {
+        return (
+          typeof data === "object" &&
+          data !== null &&
+          typeof (data as Record<string, unknown>).isPendingJoinGroup ===
+            "boolean" &&
+          typeof (data as Record<string, unknown>).groupId === "string" &&
+          typeof (data as Record<string, unknown>).groupName === "string"
+        );
+      };
+
+      if (pendingJoinGroupMetadata) {
+        const content = pendingJoinGroupMetadata.content;
+
+        if (isPendingJoinGroupMetadata(content)) {
+          dispatch(
+            setPendingJoinGroupMetadata({
+              isPendingJoinGroup: content.isPendingJoinGroup,
+              groupId: content.groupId,
+              groupName: content.groupName,
+              initiatorName: content.initiatorName || null,
+            })
+          );
+        }
+      }
 
       dispatch(
         setAuthentication({

@@ -201,7 +201,7 @@ const useScanHandle = () => {
         OobiQueryParams.GROUP_ID
       );
 
-      // NOTE: When user scan multisig connection on multisig page and group id of url not match with current connection page
+      // NOTE: When user scan group connection on group page and group id of url not match with current connection page
       if (!isMultiSigUrl || urlGroupId !== scanGroupId) {
         throw new Error(ErrorMessage.GROUP_ID_NOT_MATCH);
       }
@@ -226,7 +226,6 @@ const useScanHandle = () => {
 
       if (invitation.type === OobiType.MULTI_SIG_INITIATOR) {
         dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
-        dispatch(setToastMsg(ToastMsgType.NEW_MULTI_SIGN_MEMBER));
       }
 
       closeScan?.();

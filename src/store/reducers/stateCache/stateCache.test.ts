@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { CreationStatus } from "../../../core/agent/agent.types";
 import { PeerConnectionEventTypes } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { RoutePath } from "../../../routes";
 import { OperationType } from "../../../ui/globals/types";
@@ -22,6 +21,7 @@ import {
   setIsOnline,
   setPauseQueueIncomingRequest,
   setQueueIncomingRequest,
+  setPendingJoinGroupMetadata,
   showGenericError,
   StateCacheProps,
   stateCacheSlice,
@@ -208,5 +208,30 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialStateMock, action);
     expect(nextState.queueIncomingRequest.queues.length).toEqual(1);
     expect(nextState.queueIncomingRequest.isProcessing).toEqual(true);
+  });
+
+  test("should set pendingJoinGroupMetadata", () => {
+    const action = setPendingJoinGroupMetadata({
+      isPendingJoinGroup: true,
+      groupId: "test-group-id",
+      groupName: "Test Group",
+      initiatorName: "Frank",
+    });
+    const nextState = stateCacheSlice.reducer(initialState, action);
+
+    expect(nextState.pendingJoinGroupMetadata).toEqual({
+      isPendingJoinGroup: true,
+      groupId: "test-group-id",
+      groupName: "Test Group",
+      initiatorName: "Frank",
+    });
+
+    const rootState = { stateCache: nextState } as RootState;
+    expect(getStateCache(rootState).pendingJoinGroupMetadata).toEqual({
+      isPendingJoinGroup: true,
+      groupId: "test-group-id",
+      groupName: "Test Group",
+      initiatorName: "Frank",
+    });
   });
 });

@@ -10,6 +10,7 @@ import {
   getNextCreateSSIAgentRoute,
   getNextGenerateSeedPhraseRoute,
   getNextOnboardingRoute,
+  getNextRootRoute,
   getNextRoute,
   getNextSetPasscodeRoute,
   getNextVerifySeedPhraseRoute,
@@ -55,6 +56,7 @@ describe("NextRoute", () => {
           queues: [],
           isPaused: false,
         },
+        pendingJoinGroupMetadata: null,
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -304,6 +306,7 @@ describe("getNextRoute", () => {
         queues: [],
         isPaused: false,
       },
+      pendingJoinGroupMetadata: null,
     },
     profilesCache: {
       profiles: {},
@@ -378,5 +381,73 @@ describe("getNextRoute", () => {
     expect(result).toEqual({
       pathname: RoutePath.SETUP_BIOMETRICS,
     });
+  });
+
+  test("should redirect to PROFILE_SETUP when isPendingJoinGroup is true", () => {
+    const mockData = {
+      store: {
+        stateCache: {
+          isPendingJoinGroup: true,
+          initializationPhase: InitializationPhase.PHASE_TWO,
+          routes: [],
+          authentication: {
+            loggedIn: false,
+            userName: "",
+            time: 0,
+            passcodeIsSet: true,
+            seedPhraseIsSet: false,
+            passwordIsSet: true,
+            passwordIsSkipped: false,
+            ssiAgentIsSet: true,
+            ssiAgentUrl: "http://keria.com",
+            finishSetupBiometrics: true,
+          },
+          currentOperation: OperationType.IDLE,
+          queueIncomingRequest: {
+            isProcessing: false,
+            queues: [],
+            isPaused: false,
+          },
+        },
+      },
+    };
+
+    const result = getNextRootRoute(mockData as any);
+
+    expect(result.pathname).toEqual(RoutePath.PROFILE_SETUP);
+  });
+
+  test("should follow existing logic when isPendingJoinGroup is false", () => {
+    const mockData = {
+      store: {
+        stateCache: {
+          isPendingJoinGroup: false,
+          initializationPhase: InitializationPhase.PHASE_TWO,
+          routes: [],
+          authentication: {
+            loggedIn: false,
+            userName: "",
+            time: 0,
+            passcodeIsSet: true,
+            seedPhraseIsSet: false,
+            passwordIsSet: true,
+            passwordIsSkipped: false,
+            ssiAgentIsSet: true,
+            ssiAgentUrl: "http://keria.com",
+            finishSetupBiometrics: true,
+          },
+          currentOperation: OperationType.IDLE,
+          queueIncomingRequest: {
+            isProcessing: false,
+            queues: [],
+            isPaused: false,
+          },
+        },
+      },
+    };
+
+    const result = getNextRootRoute(mockData as any);
+
+    expect(result.pathname).toEqual(TabsRoutePath.CREDENTIALS);
   });
 });
