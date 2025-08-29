@@ -1,6 +1,4 @@
 PODS:
-  - AparajitaCapacitorBiometricAuth (8.0.2):
-    - Capacitor
   - Capacitor (7.2.0):
     - CapacitorCordova
   - CapacitorApp (7.0.0):
@@ -38,6 +36,8 @@ PODS:
   - CapacitorSplashScreen (7.0.0):
     - Capacitor
   - CapacitorStatusBar (7.0.0):
+    - Capacitor
+  - CapgoCapacitorNativeBiometric (0.0.1):
     - Capacitor
   - EvvaCapacitorSecureStoragePlugin (3.1.0):
     - Capacitor
@@ -97,7 +97,6 @@ PODS:
   - ZIPFoundation (0.9.19)
 
 DEPENDENCIES:
-  - "AparajitaCapacitorBiometricAuth (from `../../node_modules/@aparajita/capacitor-biometric-auth`)"
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
   - "CapacitorBrowser (from `../../node_modules/@capacitor/browser`)"
@@ -116,6 +115,7 @@ DEPENDENCIES:
   - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - "CapgoCapacitorNativeBiometric (from `../../node_modules/@capgo/capacitor-native-biometric`)"
   - "EvvaCapacitorSecureStoragePlugin (from `../../node_modules/@evva/capacitor-secure-storage-plugin`)"
 
 SPEC REPOS:
@@ -136,8 +136,6 @@ SPEC REPOS:
     - ZIPFoundation
 
 EXTERNAL SOURCES:
-  AparajitaCapacitorBiometricAuth:
-    :path: "../../node_modules/@aparajita/capacitor-biometric-auth"
   Capacitor:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorApp:
@@ -174,11 +172,12 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/splash-screen"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  CapgoCapacitorNativeBiometric:
+    :path: "../../node_modules/@capgo/capacitor-native-biometric"
   EvvaCapacitorSecureStoragePlugin:
     :path: "../../node_modules/@evva/capacitor-secure-storage-plugin"
 
 SPEC CHECKSUMS:
-  AparajitaCapacitorBiometricAuth: c058563fe00160e12b022341e11b3181357ea93a
   Capacitor: 03bc7cbdde6a629a8b910a9d7d78c3cc7ed09ea7
   CapacitorApp: 9cb31064a6c6bb2b1438583733a7bf45557fc1da
   CapacitorBrowser: 55c21db47416dcc8fc3b623e18fd7d09acb26081
@@ -197,6 +196,7 @@ SPEC CHECKSUMS:
   CapacitorShare: d94c53d7656f1ce8f6712ae8d19ab0c18a69259f
   CapacitorSplashScreen: 7e7a0a1113833032f196b3af6fa437baccacf5bc
   CapacitorStatusBar: a8c4c83ed2e973bdafb979e80e4b00d027832cb7
+  CapgoCapacitorNativeBiometric: be4ceeff38739d9c0f59b8c41456a3b01cfeddf0
   EvvaCapacitorSecureStoragePlugin: 43df44513abd5295a63f8e8813e9b5b7159dbfe0
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleMLKit: eff9e23ec1d90ea4157a1ee2e32a4f610c5b3318
@@ -213,6 +213,6 @@ SPEC CHECKSUMS:
   SQLCipher: 77fbe633cd84db04b07876dd50766b4924b57d61
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
 
-PODFILE CHECKSUM: edddec9e8109b205b25d5fc1413526aaa8b9f97f
+PODFILE CHECKSUM: 85928aa0ef380c252549dd2ce154d89edd8d1c9e
 
 COCOAPODS: 1.16.2

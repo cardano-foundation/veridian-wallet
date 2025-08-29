@@ -1,7 +1,5 @@
-import {
-  BiometryError,
-  BiometryErrorType,
-} from "@aparajita/capacitor-biometric-auth";
+import { BiometricAuthError } from "@capgo/capacitor-native-biometric";
+import { BiometryError } from "../../hooks/useBiometricsHook";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
@@ -41,8 +39,8 @@ const Verification = ({
 
       if (authenResult instanceof BiometryError) {
         if (
-          authenResult.code === BiometryErrorType.userCancel ||
-          authenResult.code === BiometryErrorType.appCancel
+          authenResult.code === BiometricAuthError.USER_CANCEL ||
+          authenResult.code === BiometricAuthError.APP_CANCEL
         ) {
           setVerifyIsOpen(false, true);
           return;

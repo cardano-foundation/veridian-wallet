@@ -1,7 +1,5 @@
-import {
-  BiometryError,
-  BiometryErrorType,
-} from "@aparajita/capacitor-biometric-auth";
+import { BiometricAuthError } from "@capgo/capacitor-native-biometric";
+import { BiometryError } from "../../hooks/useBiometricsHook";
 import { App, AppState } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
@@ -146,8 +144,8 @@ const LockPageContainer = () => {
       authenResult = await handleBiometricAuth();
       preventBiometricOnEvent.current =
         (authenResult instanceof BiometryError &&
-          (authenResult.code === BiometryErrorType.userCancel ||
-            authenResult.code === BiometryErrorType.userFallback)) ||
+          (authenResult.code === BiometricAuthError.USER_CANCEL ||
+            authenResult.code === BiometricAuthError.USER_FALLBACK)) ||
         authenResult === true;
     } finally {
       await enablePrivacy();
@@ -318,4 +316,6 @@ const LockPage = () => {
   return <LockPageContainer />;
 };
 
-export { LockPage };
+export {
+  LockPage
+}

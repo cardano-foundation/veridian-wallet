@@ -1,4 +1,4 @@
-import { BiometryErrorType } from "@aparajita/capacitor-biometric-auth";
+import { BiometryType, BiometricAuthError } from "@capgo/capacitor-native-biometric";
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import EngTrans from "../../../locales/en/en.json";
@@ -26,19 +26,29 @@ const handleBiometricAuthMock = jest.fn(() =>
   Promise.resolve<
     | boolean
     | {
-        code: BiometryErrorType;
+        code: BiometricAuthError;
       }
   >(true)
 );
 
 const useBiometricInfoMock = jest.fn(() => ({
+  biometricInfo: {
+    isAvailable: true,
+    biometryType: BiometryType.FINGERPRINT,
+  },
   handleBiometricAuth: () => handleBiometricAuthMock(),
   setBiometricsIsEnabled: jest.fn(),
+  setupBiometrics: jest.fn(),
+  checkBiometrics: jest.fn(),
 }));
 
-jest.mock("../../hooks/useBiometricsHook", () => ({
-  useBiometricAuth: () => useBiometricInfoMock(),
-}));
+jest.mock("../../hooks/useBiometricsHook", () => {
+  const actual = jest.requireActual("../../hooks/useBiometricsHook");
+  return {
+    ...actual,
+    useBiometricAuth: () => useBiometricInfoMock(),
+  }
+});
 
 const dispatchMock = jest.fn();
 
@@ -154,7 +164,7 @@ describe("Verification", () => {
 
     handleBiometricAuthMock.mockImplementation(() =>
       Promise.resolve({
-        code: BiometryErrorType.userCancel,
+        code: BiometricAuthError.USER_CANCEL,
       })
     );
 

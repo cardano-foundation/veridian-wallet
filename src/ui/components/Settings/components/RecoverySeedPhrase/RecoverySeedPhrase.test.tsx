@@ -1,4 +1,4 @@
-import { BiometryType } from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
+import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -26,8 +26,8 @@ jest.mock("../../../../hooks/useBiometricsHook", () => ({
     biometricInfo: {
       isAvailable: false,
       hasCredentials: false,
-      biometryType: BiometryType.fingerprintAuthentication,
-      strongBiometryIsAvailable: true,
+      biometryType: BiometryType.FINGERPRINT,
+      
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(false)),
     setBiometricsIsEnabled: jest.fn(),

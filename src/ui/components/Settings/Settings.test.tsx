@@ -1,7 +1,4 @@
-import {
-  BiometryErrorType,
-  BiometryType,
-} from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
+import { BiometryType, BiometricAuthError } from "@capgo/capacitor-native-biometric";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act, useState } from "react";
 import { Provider } from "react-redux";
@@ -58,11 +55,12 @@ let useBiometricAuthMock = jest.fn(() => {
     biometricInfo: {
       isAvailable: true,
       hasCredentials: false,
-      biometryType: BiometryType.fingerprintAuthentication,
-      strongBiometryIsAvailable: true,
+      biometryType: BiometryType.FINGERPRINT
     },
-    handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
+    handleBiometricAuth: jest.fn(() => true), // Changed to return true directly
     setBiometricsIsEnabled,
+    setupBiometrics: jest.fn(() => Promise.resolve()),
+    checkBiometrics: jest.fn(),
   };
 });
 
@@ -291,14 +289,15 @@ describe("Settings page", () => {
       return {
         biometricsIsEnabled,
         biometricInfo: {
-          isAvailable: true,
+          isAvailable: false,
           hasCredentials: false,
-          biometryType: BiometryType.fingerprintAuthentication,
-          strongBiometryIsAvailable: false,
-          code: BiometryErrorType.biometryNotEnrolled,
+          biometryType: BiometryType.FINGERPRINT,
+          code: BiometricAuthError.BIOMETRICS_NOT_ENROLLED,
         },
-        handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
+        handleBiometricAuth: jest.fn(() => true),
         setBiometricsIsEnabled,
+        setupBiometrics: jest.fn(() => Promise.resolve()),
+        checkBiometrics: jest.fn(),
       };
     });
 
@@ -529,3 +528,4 @@ describe("Settings page", () => {
     });
   });
 });
+

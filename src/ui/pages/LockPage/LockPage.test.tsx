@@ -4,11 +4,8 @@ const resetLoginAttemptsMock = jest.fn();
 const storeSecretMock = jest.fn();
 const verifySecretMock = jest.fn();
 
-import { BiometryErrorType } from "@aparajita/capacitor-biometric-auth";
-import {
-  BiometryError,
-  BiometryType,
-} from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
+import { BiometryType, BiometricAuthError } from "@capgo/capacitor-native-biometric";
+import { BiometryError } from "../../hooks/useBiometricsHook";
 import { IonReactRouter } from "@ionic/react-router";
 import { act } from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
@@ -90,19 +87,25 @@ jest.mock("@capacitor/keyboard", () => {
   };
 });
 
-jest.mock("../../hooks/useBiometricsHook", () => ({
-  useBiometricAuth: jest.fn(() => ({
-    biometricsIsEnabled: true,
-    biometricInfo: {
-      isAvailable: true,
-      hasCredentials: false,
-      biometryType: BiometryType.fingerprintAuthentication,
-      strongBiometryIsAvailable: true,
-    },
-    handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
-    setBiometricsIsEnabled: jest.fn(),
-  })),
-}));
+const handleBiometricAuthMock = jest.fn(() => Promise.resolve(true));
+jest.mock("../../hooks/useBiometricsHook", () => {
+  const actual = jest.requireActual("../../hooks/useBiometricsHook");
+  return {
+    ...actual,
+    useBiometricAuth: jest.fn(() => ({
+      biometricsIsEnabled: true,
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: handleBiometricAuthMock,
+      setBiometricsIsEnabled: jest.fn(),
+      setupBiometrics: jest.fn(),
+      checkBiometrics: jest.fn(),
+    })),
+  }
+});
 
 jest.mock("@capacitor-community/privacy-screen", () => ({
   PrivacyScreen: {
@@ -371,19 +374,7 @@ describe("Lock Page", () => {
   });
 
   test("Login using biometrics", async () => {
-    jest.doMock("../../hooks/useBiometricsHook", () => ({
-      useBiometricAuth: jest.fn(() => ({
-        biometricsIsEnabled: true,
-        biometricInfo: {
-          isAvailable: true,
-          hasCredentials: false,
-          biometryType: BiometryType.fingerprintAuthentication,
-          strongBiometryIsAvailable: true,
-        },
-        handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
-        setBiometricsIsEnabled: jest.fn(),
-      })),
-    }));
+    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(true));
 
     const { queryByTestId } = render(
       <Provider store={storeMocked(initialState)}>
@@ -397,21 +388,7 @@ describe("Lock Page", () => {
   });
 
   test("Cancel login using biometrics and re-enabling", async () => {
-    jest.doMock("../../hooks/useBiometricsHook", () => ({
-      useBiometricAuth: jest.fn(() => ({
-        biometricsIsEnabled: true,
-        biometricInfo: {
-          isAvailable: true,
-          hasCredentials: false,
-          biometryType: BiometryType.fingerprintAuthentication,
-          strongBiometryIsAvailable: true,
-        },
-        handleBiometricAuth: jest.fn(() =>
-          Promise.resolve(new BiometryError("", BiometryErrorType.userCancel))
-        ),
-        setBiometricsIsEnabled: jest.fn(),
-      })),
-    }));
+    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(false));
 
     const { queryByTestId, getByTestId } = render(
       <Provider store={storeMocked(initialState)}>
@@ -423,19 +400,7 @@ describe("Lock Page", () => {
       expect(queryByTestId("passcode-button-#")).toBeInTheDocument();
     });
 
-    jest.doMock("../../hooks/useBiometricsHook", () => ({
-      useBiometricAuth: jest.fn(() => ({
-        biometricsIsEnabled: true,
-        biometricInfo: {
-          isAvailable: true,
-          hasCredentials: false,
-          biometryType: BiometryType.fingerprintAuthentication,
-          strongBiometryIsAvailable: true,
-        },
-        handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
-        setBiometricsIsEnabled: jest.fn(),
-      })),
-    }));
+    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(true));
 
     act(() => {
       fireEvent.click(getByTestId("passcode-button-#"));

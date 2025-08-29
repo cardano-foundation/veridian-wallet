@@ -13,7 +13,7 @@ import { getAuthentication } from "../../store/reducers/stateCache";
 import { useActivityTimer } from "../components/AppWrapper/hooks/useActivityTimer";
 import { showError } from "../utils/error";
 
-export class BiometryError extends Error {
+class BiometryError extends Error {
   public code: BiometricAuthError;
 
   constructor(message: string, code: BiometricAuthError) {
@@ -166,12 +166,17 @@ const useBiometricAuth = (isLockPage?: boolean) => {
     }
   };
 
+  // Implement const isStrongBiometryAvailable =
+  //  biometricInfo.biometryType === BiometryType.FACE_ID ||
+  //  biometricInfo.biometryType === BiometryType.TOUCH_ID ||
+  //  biometricInfo.biometryType === BiometryType.FINGERPRINT;
   return {
     biometricInfo,
     handleBiometricAuth,
     setupBiometrics,
     checkBiometrics,
+    // isStrongBiometryAvailable
   };
 };
 
-export { useBiometricAuth };
+export { useBiometricAuth, BiometryError };

@@ -1,5 +1,5 @@
-import { BiometryErrorType } from "@aparajita/capacitor-biometric-auth";
-import { BiometryError } from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
+import { BiometryType, BiometricAuthError } from "@capgo/capacitor-native-biometric";
+import { BiometryError } from "../../hooks/useBiometricsHook";
 import { getPlatforms } from "@ionic/react";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
@@ -56,6 +56,7 @@ const CreatePasscodeModule = forwardRef<
     const [originalPassCode, setOriginalPassCode] = useState("");
     const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
     const { handleBiometricAuth, biometricInfo } = useBiometricAuth();
+    
 
     const setupBiometricsHeaderText = i18n.t("biometry.setupbiometryheader");
 
@@ -80,7 +81,7 @@ const CreatePasscodeModule = forwardRef<
         if (originalPassCode !== "" && passcode.length === 5) {
           if (originalPassCode === passcode + digit) {
             if (
-              biometricInfo?.strongBiometryIsAvailable &&
+              biometricInfo.isAvailable &&
               !changePasscodeMode
             ) {
               setShowSetupBiometricsAlert(true);
@@ -115,9 +116,9 @@ const CreatePasscodeModule = forwardRef<
         await handlePassAuth();
       } else if (isBiometricAuthenticated instanceof BiometryError) {
         if (
-          isBiometricAuthenticated.code === BiometryErrorType.userCancel ||
+          isBiometricAuthenticated.code === BiometricAuthError.USER_CANCEL ||
           isBiometricAuthenticated.code ===
-            BiometryErrorType.biometryNotAvailable
+            BiometricAuthError.BIOMETRICS_UNAVAILABLE
         ) {
           setShowCancelBiometricsAlert(true);
         }

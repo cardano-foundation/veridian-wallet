@@ -1,11 +1,7 @@
 const storeSecretMock = jest.fn();
 const verifySecretMock = jest.fn();
 
-import { BiometryErrorType } from "@aparajita/capacitor-biometric-auth";
-import {
-  BiometryError,
-  BiometryType,
-} from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
+import { BiometryType, BiometricAuthError } from "@capgo/capacitor-native-biometric";
 import { IonRouterOutlet } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { act } from "react";
@@ -19,6 +15,7 @@ import { store } from "../../../store";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { CreatePasscodeModule } from "./CreatePasscodeModule";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { BiometryError } from "../../hooks/useBiometricsHook";
 
 const isRepeativeMock = jest.fn(() => false);
 const isConsecutiveMock = jest.fn(() => false);
@@ -54,8 +51,7 @@ const useBiometricInfoMock = jest.fn(() => ({
   biometricInfo: {
     isAvailable: true,
     hasCredentials: false,
-    biometryType: BiometryType.fingerprintAuthentication,
-    strongBiometryIsAvailable: true,
+    biometryType: BiometryType.FINGERPRINT
   },
   handleBiometricAuth: () => handleBiometricAuthMock(),
   setBiometricsIsEnabled: jest.fn(),
@@ -111,8 +107,8 @@ describe("SetPasscode Page", () => {
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.fingerprintAuthentication,
-        strongBiometryIsAvailable: true,
+        biometryType: BiometryType.FINGERPRINT,
+  
       },
       handleBiometricAuth: () => handleBiometricAuthMock(),
       setBiometricsIsEnabled: jest.fn(),
@@ -381,8 +377,8 @@ describe("SetPasscode Page", () => {
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.faceId,
-        strongBiometryIsAvailable: true,
+        biometryType: BiometryType.FACE_ID,
+  
       },
       handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
       setBiometricsIsEnabled: jest.fn(),
@@ -461,11 +457,11 @@ describe("SetPasscode Page", () => {
         biometricInfo: {
           isAvailable: true,
           hasCredentials: false,
-          biometryType: BiometryType.faceId,
-          strongBiometryIsAvailable: true,
+          biometryType: BiometryType.FACE_ID,
+    
         },
         handleBiometricAuth: jest.fn(() =>
-          Promise.resolve(new BiometryError("", BiometryErrorType.userCancel))
+          Promise.resolve(new BiometryError("", BiometricAuthError.USER_CANCEL))
         ),
         setBiometricsIsEnabled: jest.fn(),
       })),
@@ -516,3 +512,4 @@ describe("SetPasscode Page", () => {
     );
   });
 });
+
