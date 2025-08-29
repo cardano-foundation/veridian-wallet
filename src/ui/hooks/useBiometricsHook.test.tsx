@@ -10,10 +10,11 @@ import { store } from "../../store";
 import { useBiometricAuth, BiometryError } from "./useBiometricsHook";
 import { makeTestStore } from "../utils/makeTestStore";
 
+const isNativePlatformMock = jest.fn(() => true);
 jest.mock("@capacitor/core", () => ({
   ...jest.requireActual("@capacitor/core"),
   Capacitor: {
-    isNativePlatform: jest.fn(() => true),
+    isNativePlatform: () => isNativePlatformMock(),
   },
   registerPlugin: jest.fn(() => ({
     addListener: jest.fn(),
@@ -170,6 +171,31 @@ describe("useBiometricAuth Hook", () => {
     expect(await findByText(errorMessage)).toBeInTheDocument();
   });
 
+  test("should return a BiometryError when getCredentials fails", async () => {
+    const errorMessage = "Could not get credentials";
+    (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
+      isAvailable: true,
+      biometryType: BiometryType.FACE_ID,
+    });
+    (NativeBiometric.verifyIdentity as jest.Mock).mockResolvedValue(undefined);
+    (NativeBiometric.getCredentials as jest.Mock).mockRejectedValue({
+      message: errorMessage,
+      code: BiometricAuthError.UNKNOWN_ERROR,
+    });
+
+    const { getByTestId, findByText } = render(
+      <Provider store={store}>
+        <TestComponent />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("handle-biometric-btn"));
+    });
+
+    expect(await findByText(errorMessage)).toBeInTheDocument();
+  });
+
   test("should call verifyIdentity with correct fallback title when password is set", async () => {
     const initState = {
       stateCache: {
@@ -209,5 +235,179 @@ describe("useBiometricAuth Hook", () => {
         fallbackTitle: "biometry.iosfallbackpasswordtitle",
       });
     });
+  });
+});
+
+describe("useBiometricAuth Hook: setupBiometrics", () => {
+  const SetupTestComponent = () => {
+    const { setupBiometrics } = useBiometricAuth();
+    return <button data-testid="setup-biometric-btn" onClick={setupBiometrics}>Setup</button>;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should set credentials if they are not set", async () => {
+    (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
+      isAvailable: true,
+      biometryType: BiometryType.FACE_ID,
+    });
+    (NativeBiometric.getCredentials as jest.Mock).mockRejectedValue(new Error("No credentials"));
+    (NativeBiometric.setCredentials as jest.Mock).mockResolvedValue(undefined);
+
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <SetupTestComponent />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("setup-biometric-btn"));
+    });
+
+    await waitFor(() => {
+      expect(NativeBiometric.getCredentials).toHaveBeenCalled();
+      expect(NativeBiometric.setCredentials).toHaveBeenCalled();
+    });
+  });
+
+  test("should not set credentials if they are already set", async () => {
+    (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
+      isAvailable: true,
+      biometryType: BiometryType.FACE_ID,
+    });
+    (NativeBiometric.getCredentials as jest.Mock).mockResolvedValue({
+      username: "test",
+      password: "test",
+    });
+
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <SetupTestComponent />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("setup-biometric-btn"));
+    });
+
+    await waitFor(() => {
+      expect(NativeBiometric.getCredentials).toHaveBeenCalled();
+      expect(NativeBiometric.setCredentials).not.toHaveBeenCalled();
+    });
+  });
+
+  test("should not do anything if biometry is not available", async () => {
+    (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
+      isAvailable: false,
+      biometryType: BiometryType.NONE,
+    });
+
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <SetupTestComponent />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("setup-biometric-btn"));
+    });
+
+    await waitFor(() => {
+      expect(NativeBiometric.getCredentials).not.toHaveBeenCalled();
+      expect(NativeBiometric.setCredentials).not.toHaveBeenCalled();
+    });
+  });
+
+  test("should show error if biometry is weak", async () => {
+    (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
+      isAvailable: true,
+      biometryType: BiometryType.NONE,
+    });
+
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <SetupTestComponent />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("setup-biometric-btn"));
+    });
+
+    await waitFor(() => {
+      expect(NativeBiometric.getCredentials).not.toHaveBeenCalled();
+      expect(NativeBiometric.setCredentials).not.toHaveBeenCalled();
+    });
+  });
+
+  test("should show error if setCredentials fails", async () => {
+    (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
+      isAvailable: true,
+      biometryType: BiometryType.FACE_ID,
+    });
+    (NativeBiometric.getCredentials as jest.Mock).mockRejectedValue(new Error("No credentials"));
+    (NativeBiometric.setCredentials as jest.Mock).mockRejectedValue(new Error("Set credentials failed"));
+
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <SetupTestComponent />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("setup-biometric-btn"));
+    });
+
+    await waitFor(() => {
+      expect(NativeBiometric.getCredentials).toHaveBeenCalled();
+      expect(NativeBiometric.setCredentials).toHaveBeenCalled();
+    });
+  });
+});
+
+describe("useBiometricAuth Hook: checkBiometrics", () => {
+  const CheckBiometricsComponent = () => {
+    const { checkBiometrics } = useBiometricAuth();
+    return <button data-testid="check-biometric-btn" onClick={checkBiometrics}>Check</button>;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should not call isAvailable when not on native platform", async () => {
+    isNativePlatformMock.mockReturnValue(false);
+
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <CheckBiometricsComponent />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("check-biometric-btn"));
+    });
+
+    await waitFor(() => {
+      expect(NativeBiometric.isAvailable).not.toHaveBeenCalled();
+    });
+  });
+
+  test("should return not available when isAvailable throws an error", async () => {
+    (NativeBiometric.isAvailable as jest.Mock).mockRejectedValue(new Error("Some error"));
+
+    const { getByTestId, findByText } = render(
+      <Provider store={store}>
+        <TestComponent />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("handle-biometric-btn"));
+    });
+
+    expect(await findByText("biometry.errors.notAvailable")).toBeInTheDocument();
   });
 });
