@@ -293,13 +293,23 @@ export const profilesCacheSlice = createSlice({
       Object.keys(state.profiles).forEach((profileId) => {
         const profile = state.profiles[profileId];
         if (!profile) return;
-        profile.multisigConnections = allMultisig
-          .filter((c) => c.contactId === profileId && "groupId" in c)
-          .map((c) => ({
-            ...c,
-            contactId: c.contactId || profileId,
-            groupId: c.groupId || c.groupId || "",
-          }));
+
+        // For multisig connections, filter by groupId since all group members should see all connections
+        // Check if this profile has group metadata to determine if it should have multisig connections
+        const profileGroupId = profile.identity?.groupMetadata?.groupId;
+
+        if (profileGroupId) {
+          profile.multisigConnections = allMultisig
+            .filter((c) => "groupId" in c && c.groupId === profileGroupId)
+            .map((c) => ({
+              ...c,
+              contactId: c.contactId || profileId,
+              groupId: c.groupId || profileGroupId,
+            }));
+        } else {
+          // If profile doesn't have group metadata, clear multisig connections
+          profile.multisigConnections = [];
+        }
       });
     },
 
@@ -308,10 +318,13 @@ export const profilesCacheSlice = createSlice({
       action: PayloadAction<any> /* MultisigConnectionDetails */
     ) => {
       const conn = action.payload as any;
-      const profileId =
-        conn.contactId || conn.identifier || state.defaultProfile;
-      if (!profileId) return;
-      const targetProfile = state.profiles[profileId];
+
+      // For multisig connections, store under the current user's profile, not the contactId
+      // The contactId represents the other party, but we want to store this in the current user's profile
+      const currentProfileId = state.defaultProfile;
+      if (!currentProfileId) return;
+
+      const targetProfile = state.profiles[currentProfileId];
       if (!targetProfile) return;
 
       const existing = targetProfile.multisigConnections.filter(
@@ -320,7 +333,7 @@ export const profilesCacheSlice = createSlice({
 
       const mapped = {
         ...conn,
-        contactId: conn.contactId || profileId,
+        contactId: conn.contactId || currentProfileId,
         groupId: conn.groupId || conn.groupId || "",
       } as any;
 
