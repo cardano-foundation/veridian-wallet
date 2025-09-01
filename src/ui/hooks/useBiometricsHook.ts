@@ -44,7 +44,7 @@ const isBiometricPluginError = (
   );
 };
 
-const useBiometricAuth = (isLockPage?: boolean) => {
+const useBiometricAuth = () => {
   const [biometricInfo, setBiometricInfo] = useState<AvailableResult>({
     isAvailable: false,
     biometryType: BiometryType.NONE,

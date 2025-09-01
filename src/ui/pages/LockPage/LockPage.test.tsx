@@ -87,25 +87,7 @@ jest.mock("@capacitor/keyboard", () => {
   };
 });
 
-const handleBiometricAuthMock = jest.fn(() => Promise.resolve(true));
-jest.mock("../../hooks/useBiometricsHook", () => {
-  const actual = jest.requireActual("../../hooks/useBiometricsHook");
-  return {
-    ...actual,
-    useBiometricAuth: jest.fn(() => ({
-      biometricsIsEnabled: true,
-      biometricInfo: {
-        isAvailable: true,
-        hasCredentials: false,
-        biometryType: BiometryType.FINGERPRINT,
-      },
-      handleBiometricAuth: handleBiometricAuthMock,
-      setBiometricsIsEnabled: jest.fn(),
-      setupBiometrics: jest.fn(),
-      checkBiometrics: jest.fn(),
-    })),
-  }
-});
+
 
 jest.mock("@capacitor-community/privacy-screen", () => ({
   PrivacyScreen: {
@@ -167,8 +149,10 @@ const initialState = {
 };
 
 describe("Lock Page", () => {
+  let handleBiometricAuthMock: jest.Mock;
   beforeEach(() => {
     jest.resetModules();
+    handleBiometricAuthMock = jest.fn(() => Promise.resolve(true));
     jest.doMock("@ionic/react", () => {
       const actualIonicReact = jest.requireActual("@ionic/react");
       return {
@@ -177,6 +161,25 @@ describe("Lock Page", () => {
       };
     });
     isNativeMock.mockImplementation(() => false);
+
+    jest.doMock("../../hooks/useBiometricsHook", () => {
+      const actual = jest.requireActual("../../hooks/useBiometricsHook");
+      return {
+        ...actual,
+        useBiometricAuth: jest.fn((isLockPage?: boolean) => ({
+          biometricsIsEnabled: true,
+          biometricInfo: {
+            isAvailable: true,
+            hasCredentials: false,
+            biometryType: actual.BiometryType.FINGERPRINT,
+          },
+          handleBiometricAuth: handleBiometricAuthMock,
+          setBiometricsIsEnabled: jest.fn(),
+          setupBiometrics: jest.fn(),
+          checkBiometrics: jest.fn(),
+        })),
+      };
+    });
   });
 
   test("Renders Lock modal with title and description", () => {
@@ -397,13 +400,13 @@ describe("Lock Page", () => {
     );
 
     await waitFor(() => {
-      expect(queryByTestId("passcode-button-#")).toBeInTheDocument();
+      expect(queryByTestId("passcode-button-0")).toBeInTheDocument();
     });
 
     handleBiometricAuthMock.mockImplementation(() => Promise.resolve(true));
 
     act(() => {
-      fireEvent.click(getByTestId("passcode-button-#"));
+      fireEvent.click(getByTestId("passcode-button-0"));
     });
 
     await waitFor(() => {

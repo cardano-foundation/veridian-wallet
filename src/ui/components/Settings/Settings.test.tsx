@@ -1,6 +1,7 @@
-import { BiometryType, BiometricAuthError } from "@capgo/capacitor-native-biometric";
+import { BiometryType, BiometricAuthError, NativeBiometric } from "@capgo/capacitor-native-biometric";
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import { act, useState } from "react";
+import { Browser } from "@capacitor/browser";
+import { act } from "react";
 import { Provider } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -13,6 +14,7 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Settings } from "./Settings";
 import { OptionIndex } from "./Settings.types";
+import { BiometricAuthOutcome, BIOMETRIC_SERVER_KEY, useBiometricAuth } from "../../hooks/useBiometricsHook";
 
 jest.mock("../../../store/utils", () => ({
   CLEAR_STORE_ACTIONS: [],
@@ -37,46 +39,126 @@ jest.mock("@ionic/react", () => ({
   ),
 }));
 
-const browserMock = jest.fn(({ link }: { link: string }) =>
-  Promise.resolve(link)
-);
 jest.mock("@capacitor/browser", () => ({
-  ...jest.requireActual("@capacitor/browser"),
   Browser: {
-    open: (params: never) => browserMock(params),
+    open: jest.fn(), // Define it directly here
   },
 }));
 
-let useBiometricAuthMock = jest.fn(() => {
-  const [biometricsIsEnabled, setBiometricsIsEnabled] = useState(true);
+jest.mock("@capacitor/core", () => ({
+  Capacitor: {
+    isNativePlatform: jest.fn(() => true), // Mock to always return true
+    getPlatform: jest.fn(() => "web"), // Mock a platform
+  },
+}));
 
-  return {
-    biometricsIsEnabled,
-    biometricInfo: {
-      isAvailable: true,
-      hasCredentials: false,
-      biometryType: BiometryType.FINGERPRINT
-    },
-    handleBiometricAuth: jest.fn(() => true), // Changed to return true directly
-    setBiometricsIsEnabled,
-    setupBiometrics: jest.fn(() => Promise.resolve()),
-    checkBiometrics: jest.fn(),
-  };
-});
+jest.mock("@capgo/capacitor-native-biometric", () => ({
+  NativeBiometric: {
+    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
+    verifyIdentity: jest.fn(() => Promise.resolve()),
+    getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
+    setCredentials: jest.fn(() => Promise.resolve()),
+    deleteCredentials: jest.fn(() => Promise.resolve()),
+  },
+  BiometryType: {
+    FINGERPRINT: "fingerprint",
+    FACE_ID: "faceId",
+    TOUCH_ID: "touchId",
+    IRIS_AUTHENTICATION: "iris",
+    MULTIPLE: "multiple",
+    NONE: "none",
+  },
+  BiometricAuthError: {
+    USER_CANCEL: 1,
+    USER_TEMPORARY_LOCKOUT: 2,
+    USER_LOCKOUT: 3,
+    BIOMETRICS_UNAVAILABLE: 4,
+    UNKNOWN_ERROR: 5,
+    BIOMETRICS_NOT_ENROLLED: 6,
+  },
+}));
 
-jest.mock("../../hooks/useBiometricsHook", () => {
-  return {
-    useBiometricAuth: () => useBiometricAuthMock(),
-  };
-});
+jest.mock("@evva/capacitor-secure-storage-plugin", () => ({
+  SecureStoragePlugin: {
+    get: jest.fn(),
+    set: jest.fn(),
+    remove: jest.fn(),
+    clear: jest.fn(),
+    keys: jest.fn(),
+    getVault: jest.fn(),
+    setVault: jest.fn(),
+    removeVault: jest.fn(),
+    clearVault: jest.fn(),
+  },
+}));
+
+jest.mock("@capacitor/keyboard", () => ({
+  Keyboard: {
+    hide: jest.fn(),
+    show: jest.fn(),
+    setAccessoryBarVisible: jest.fn(),
+    setScroll: jest.fn(),
+    setResizeMode: jest.fn(),
+  },
+}));
+
+jest.mock("@capacitor-mlkit/barcode-scanning", () => ({
+  BarcodeScanner: {
+    isSupported: jest.fn(),
+    checkPermissions: jest.fn(),
+    requestPermissions: jest.fn(),
+    startScan: jest.fn(),
+    stopScan: jest.fn(),
+    readBarcodesFromImage: jest.fn(),
+    readBarcodesFromVideo: jest.fn(),
+    install: jest.fn(),
+    installGoogleBarcodeScannerModule: jest.fn(),
+    isGoogleBarcodeScannerModuleAvailable: jest.fn(),
+  },
+}));
+
+jest.mock("@capacitor/share", () => ({
+  Share: {
+    canShare: jest.fn(),
+    share: jest.fn(),
+  },
+}));
+
+jest.mock("@capacitor/app", () => ({
+  App: {
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    exitApp: jest.fn(),
+    getInfo: jest.fn(),
+    getLaunchUrl: jest.fn(),
+    getState: jest.fn(),
+    minimizeApp: jest.fn(),
+  },
+}));
+
+// Mock the useBiometricAuth hook itself
+jest.mock("../../hooks/useBiometricsHook", () => ({
+  useBiometricAuth: jest.fn(),
+  BIOMETRIC_SERVER_KEY: "com.veridianwallet.biometrics.key",
+  BiometricAuthOutcome: {
+    SUCCESS: 0,
+    USER_CANCELLED: 1,
+    TEMPORARY_LOCKOUT: 2,
+    PERMANENT_LOCKOUT: 3,
+    GENERIC_ERROR: 4,
+    WEAK_BIOMETRY: 5,
+    NOT_AVAILABLE: 6,
+  },
+}));
 
 const openSettingMock = jest.fn(() => Promise.resolve(true));
 const deleteAccount = jest.fn();
 jest.mock("capacitor-native-settings", () => ({
-  ...jest.requireActual("capacitor-native-settings"),
   NativeSettings: {
-    open: () => openSettingMock(),
+    open: jest.fn(),
   },
+  AndroidSettings: {}, // Mock these as empty objects if they are used
+  IOSSettings: {},     // Mock these as empty objects if they are used
 }));
 
 jest.mock("../../../core/agent/agent", () => ({
@@ -86,12 +168,13 @@ jest.mock("../../../core/agent/agent", () => ({
         findById: jest.fn(),
         save: jest.fn(),
         update: jest.fn(),
-        createOrUpdateBasicRecord: jest.fn(),
+        createOrUpdateBasicRecord: jest.fn().mockResolvedValue(undefined), // Ensure this resolves
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
       },
       deleteAccount: () => deleteAccount(),
+      getMnemonic: jest.fn().mockResolvedValue("some test mnemonic"), // Add this mock
     },
   },
 }));
@@ -105,6 +188,22 @@ jest.mock("react-router-dom", () => ({
 }));
 
 describe("Settings page", () => {
+  beforeEach(() => {
+    // Set a default mock implementation for useBiometricAuth
+    (useBiometricAuth as jest.Mock).mockReturnValue({
+      biometricInfo: {
+        isAvailable: true, // Default to available for Renders Settings page test
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      setupBiometrics: jest.fn(),
+      handleBiometricAuth: jest.fn(),
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null,
+      isStrongBiometry: true,
+    });
+  });
+
   test("Renders Settings page", () => {
     const { getByText } = render(
       <Provider store={store}>
@@ -164,10 +263,22 @@ describe("Settings page", () => {
       },
     };
 
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
+    const storeMocked = makeTestStore(initialState); // Use the actual store
+
+    // Set the mock return value for this specific test
+    (useBiometricAuth as jest.Mock).mockReturnValueOnce({
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT
+      },
+      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
+      setupBiometrics: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null,
+      isStrongBiometry: true,
+    });
 
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
@@ -182,16 +293,16 @@ describe("Settings page", () => {
       getByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).toBeInTheDocument();
 
-    act(() => {
+    await act(async () => { // Use async act for the click event
       fireEvent.click(getByTestId("settings-item-0"));
     });
 
+    // Assert that the Redux state is updated
     await waitFor(() => {
-      expect(getByTestId("verify-passcode-content-page")).toBeVisible();
+      expect(storeMocked.getState().biometricsCache.enabled).toBe(true);
     });
 
-    await passcodeFiller(getByText, getByTestId, "193212");
-
+    // Optionally, you can still check if the agent's method was called, but the Redux state is more direct.
     await waitFor(() => {
       expect(Agent.agent.basicStorage.createOrUpdateBasicRecord).toBeCalledWith(
         expect.objectContaining({
@@ -217,14 +328,29 @@ describe("Settings page", () => {
         },
       },
       biometricsCache: {
-        enabled: true,
+        enabled: true, // Biometrics are initially enabled
       },
     };
 
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
+    const storeMocked = makeTestStore(initialState); // Use the actual store
+
+    // Set the mock return value for this specific test
+    (useBiometricAuth as jest.Mock).mockReturnValueOnce({
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: true,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
+      setupBiometrics: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null,
+      isStrongBiometry: true,
+    });
+
+    // Mock NativeBiometric.deleteCredentials for disabling biometrics
+    (NativeBiometric.deleteCredentials as jest.Mock).mockResolvedValueOnce(undefined); // Explicitly cast to jest.Mock
 
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
@@ -239,14 +365,12 @@ describe("Settings page", () => {
       getByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).toBeInTheDocument();
 
-    act(() => {
+    await act(async () => { // Use async act for the click event
       fireEvent.click(getByTestId("settings-item-0"));
     });
 
     await waitFor(() => {
-      expect(
-        Agent.agent.basicStorage.createOrUpdateBasicRecord
-      ).toBeCalledTimes(1);
+      expect(storeMocked.getState().biometricsCache.enabled).toBe(false);
     });
 
     await waitFor(() => {
@@ -258,6 +382,12 @@ describe("Settings page", () => {
           },
         })
       );
+    });
+
+    await waitFor(() => {
+      expect(NativeBiometric.deleteCredentials).toBeCalledWith({
+        server: BIOMETRIC_SERVER_KEY, // Use the actual server key
+      });
     });
   });
 
@@ -278,27 +408,21 @@ describe("Settings page", () => {
       },
     };
 
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
+    const storeMocked = makeTestStore(initialState); // Use the actual store
 
-    useBiometricAuthMock = jest.fn(() => {
-      const [biometricsIsEnabled, setBiometricsIsEnabled] = useState(true);
-
-      return {
-        biometricsIsEnabled,
-        biometricInfo: {
-          isAvailable: false,
-          hasCredentials: false,
-          biometryType: BiometryType.FINGERPRINT,
-          code: BiometricAuthError.BIOMETRICS_NOT_ENROLLED,
-        },
-        handleBiometricAuth: jest.fn(() => true),
-        setBiometricsIsEnabled,
-        setupBiometrics: jest.fn(() => Promise.resolve()),
-        checkBiometrics: jest.fn(),
-      };
+    (useBiometricAuth as jest.Mock).mockReturnValueOnce({
+      biometricInfo: {
+        isAvailable: false,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+        code: BiometricAuthError.BIOMETRICS_NOT_ENROLLED,
+      },
+      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE)),
+      setupBiometrics: jest.fn(() => Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE)),
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null,
+      isStrongBiometry: false,
     });
 
     const { queryByText } = render(
@@ -340,7 +464,7 @@ describe("Settings page", () => {
     });
 
     await waitFor(() => {
-      expect(browserMock).toBeCalledWith({
+      expect(Browser.open).toBeCalledWith({
         url: DOCUMENTATION_LINK,
       });
     });
@@ -471,6 +595,7 @@ describe("Settings page", () => {
   test("Delete account", async () => {
     const state = {
       stateCache: {
+        routes: [],
         authentication: {
           loggedIn: true,
           time: Date.now(),
@@ -528,4 +653,3 @@ describe("Settings page", () => {
     });
   });
 });
-

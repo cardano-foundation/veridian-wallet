@@ -1,10 +1,11 @@
-import { BiometryType, BiometricAuthError } from "@capgo/capacitor-native-biometric";
+import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import EngTrans from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Verification } from "./Verification";
+import { BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
@@ -22,14 +23,33 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
-const handleBiometricAuthMock = jest.fn(() =>
-  Promise.resolve<
-    | boolean
-    | {
-        code: BiometricAuthError;
-      }
-  >(true)
-);
+jest.mock("@capgo/capacitor-native-biometric", () => ({
+  NativeBiometric: {
+    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
+    verifyIdentity: jest.fn(() => Promise.resolve()),
+    getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
+    setCredentials: jest.fn(() => Promise.resolve()),
+    deleteCredentials: jest.fn(() => Promise.resolve()),
+  },
+  BiometryType: {
+    FINGERPRINT: "fingerprint",
+    FACE_ID: "faceId",
+    TOUCH_ID: "touchId",
+    IRIS_AUTHENTICATION: "iris",
+    MULTIPLE: "multiple",
+    NONE: "none",
+  },
+  BiometricAuthError: {
+    USER_CANCEL: 1,
+    USER_TEMPORARY_LOCKOUT: 2,
+    USER_LOCKOUT: 3,
+    BIOMETRICS_UNAVAILABLE: 4,
+    UNKNOWN_ERROR: 5,
+    BIOMETRICS_NOT_ENROLLED: 6,
+  },
+}));
+
+const handleBiometricAuthMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)); 
 
 const useBiometricInfoMock = jest.fn(() => ({
   biometricInfo: {
@@ -98,7 +118,7 @@ describe("Verification", () => {
     const setVerifyOpen = jest.fn();
     const verify = jest.fn();
 
-    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(false));
+    handleBiometricAuthMock.mockImplementation(() =>  Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE)); 
 
     const { getByText } = render(
       <Provider store={storeMocked}>
@@ -141,7 +161,7 @@ describe("Verification", () => {
     const setVerifyOpen = jest.fn();
     const verify = jest.fn();
 
-    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(false));
+    handleBiometricAuthMock.mockImplementation(() =>  Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE));
 
     const { getByText } = render(
       <Provider store={storeMocked}>
@@ -162,11 +182,7 @@ describe("Verification", () => {
     const setVerifyOpen = jest.fn();
     const verify = jest.fn();
 
-    handleBiometricAuthMock.mockImplementation(() =>
-      Promise.resolve({
-        code: BiometricAuthError.USER_CANCEL,
-      })
-    );
+    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(BiometricAuthOutcome.USER_CANCELLED));
 
     const { queryByText } = render(
       <Provider store={storeMocked}>

@@ -49,7 +49,7 @@ const LockPageContainer = () => {
   const preventBiometricOnEvent = useRef(false);
   const isBiometricPromptActive = useRef(false); // Track active biometric prompt
 
-  const { handleBiometricAuth } = useBiometricAuth(true);
+  const { handleBiometricAuth } = useBiometricAuth();
   const biometricsCache = useSelector(getBiometricsCache);
   const firstAppLaunch = useSelector(getFirstAppLaunch);
   const [openRecoveryAuth, setOpenRecoveryAuth] = useState(false);

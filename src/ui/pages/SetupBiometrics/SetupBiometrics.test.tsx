@@ -16,6 +16,7 @@ import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { SetupBiometrics } from "./SetupBiometrics";
 import { Agent } from "../../../core/agent/agent";
+import { BiometricAuthOutcome, useBiometricAuth } from "../../hooks/useBiometricsHook";
 
 jest.mock("../../utils/passcodeChecker", () => ({
   isRepeat: () => false,
@@ -40,21 +41,6 @@ jest.mock("../../../core/agent/agent", () => ({
     },
   },
 }));
-const handleBiometricAuthMock = jest.fn(() => Promise.resolve(true));
-jest.mock("../../hooks/useBiometricsHook", () => ({
-  useBiometricAuth: jest.fn(() => ({
-    biometricsIsEnabled: false,
-    biometricInfo: {
-      isAvailable: false,
-      hasCredentials: false,
-      biometryType: BiometryType.FINGERPRINT,
-    },
-    handleBiometricAuth: () => handleBiometricAuthMock(),
-    setBiometricsIsEnabled: jest.fn(),
-    setupBiometrics: jest.fn(),
-    checkBiometrics: jest.fn(),
-  })),
-}));
 
 jest.mock("@capacitor/core", () => {
   return {
@@ -70,6 +56,19 @@ jest.mock("../../hooks/privacyScreenHook", () => ({
     enablePrivacy: jest.fn(),
     disablePrivacy: jest.fn(),
   }),
+}));
+
+jest.mock("../../hooks/useBiometricsHook", () => ({
+  useBiometricAuth: jest.fn(),
+  BiometricAuthOutcome: {
+    SUCCESS: 0,
+    USER_CANCELLED: 1,
+    TEMPORARY_LOCKOUT: 2,
+    PERMANENT_LOCKOUT: 3,
+    GENERIC_ERROR: 4,
+    WEAK_BIOMETRY: 5,
+    NOT_AVAILABLE: 6,
+  },
 }));
 
 const initialState = {
@@ -108,7 +107,7 @@ const storeMocked = {
   dispatch: dispatchMock,
 };
 
-describe("SetPasscode Page", () => {
+describe("SetupBiometrics Page", () => {
   beforeEach(() => {
     jest.resetModules();
     jest.doMock("@ionic/react", () => {
@@ -121,6 +120,21 @@ describe("SetPasscode Page", () => {
     verifySecretMock.mockRejectedValue(
       new Error(AuthService.SECRET_NOT_STORED)
     );
+
+    (useBiometricAuth as jest.Mock).mockReturnValue({
+      biometricsIsEnabled: false,
+      biometricInfo: {
+        isAvailable: false,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: jest.fn(),
+      setBiometricsIsEnabled: jest.fn(),
+      setupBiometrics: jest.fn(),
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null,
+    });
   });
 
   const history = createMemoryHistory();
@@ -175,7 +189,23 @@ describe("SetPasscode Page", () => {
   });
 
   test("Click on setup", async () => {
-    require("@ionic/react");
+    const setupBiometricsMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
+
+    (useBiometricAuth as jest.Mock).mockReturnValue({
+      biometricsIsEnabled: false,
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: jest.fn(),
+      setBiometricsIsEnabled: jest.fn(),
+      setupBiometrics: setupBiometricsMock,
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null,
+    });
+
     const { getByTestId } = render(
       <IonReactMemoryRouter
         history={history}
@@ -190,7 +220,7 @@ describe("SetPasscode Page", () => {
     fireEvent.click(getByTestId("primary-button"));
 
     await waitFor(() => {
-      expect(handleBiometricAuthMock).toBeCalled();
+      expect(setupBiometricsMock).toBeCalled();
     });
 
     expect(dispatchMock).toBeCalledWith(setEnableBiometricsCache(true));

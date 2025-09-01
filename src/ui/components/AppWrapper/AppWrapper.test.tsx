@@ -151,6 +151,12 @@ jest.mock("../../../core/agent/agent", () => {
   };
 });
 
+jest.mock("@capgo/capacitor-native-biometric", () => ({
+  NativeBiometric: {
+    deleteCredentials: jest.fn(() => Promise.resolve()),
+  }
+}));
+
 describe("App Wrapper", () => {
   test("renders children components", async () => {
     const { getByText } = render(

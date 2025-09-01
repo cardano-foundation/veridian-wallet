@@ -50,7 +50,7 @@ jest.mock("../../i18n", () => ({
   },
 }));
 
-import { BiometricAuthOutcome } from "./useBiometricsHook"; // Import BiometricAuthOutcome
+import { BiometricAuthOutcome } from "./useBiometricsHook";
 
 const TestComponent = () => {
   const { handleBiometricAuth } = useBiometricAuth();

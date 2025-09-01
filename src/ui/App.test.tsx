@@ -1,4 +1,5 @@
 import { Style, StyleOptions } from "@capacitor/status-bar";
+import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { act, render, waitFor } from "@testing-library/react";
 import { startFreeRASP } from "capacitor-freerasp";
 import { Provider } from "react-redux";
@@ -21,6 +22,7 @@ import {
 import { OperationType } from "./globals/types";
 import { makeTestStore } from "./utils/makeTestStore";
 import { filteredIdentifierFix } from "./__fixtures__/filteredIdentifierFix";
+import { useBiometricAuth } from "../ui/hooks/useBiometricsHook";
 
 jest.mock("capacitor-freerasp", () => ({
   startFreeRASP: jest.fn(),
@@ -30,7 +32,7 @@ const mockInitDatabase = jest.fn();
 const getAvailableWitnessesMock = jest.fn();
 const setBackgroundColorMock = jest.fn();
 
-jest.mock("../core/agent/agent", () => ({
+jest.mock("../core/agent/agent", () => ({ 
   Agent: {
     agent: {
       devPreload: jest.fn(),
@@ -182,12 +184,65 @@ jest.mock("@capacitor/keyboard", () => ({
   },
 }));
 
+jest.mock("@capgo/capacitor-native-biometric", () => ({
+  NativeBiometric: {
+    deleteCredentials: jest.fn(() => Promise.resolve()),
+  },
+}));
+
 jest.mock("@capacitor-community/privacy-screen", () => ({
   PrivacyScreen: {
     enable: jest.fn(),
     disable: jest.fn(),
   },
 }));
+
+jest.mock("@capgo/capacitor-native-biometric", () => ({
+  NativeBiometric: {
+    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
+    verifyIdentity: jest.fn(() => Promise.resolve()),
+    getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
+    setCredentials: jest.fn(() => Promise.resolve()),
+    deleteCredentials: jest.fn(() => Promise.resolve()),
+  },
+  BiometryType: {
+    FINGERPRINT: "fingerprint",
+    FACE_ID: "faceId",
+    TOUCH_ID: "touchId",
+    IRIS_AUTHENTICATION: "iris",
+    MULTIPLE: "multiple",
+    NONE: "none",
+  },
+  BiometricAuthError: {
+    USER_CANCEL: 1,
+    USER_TEMPORARY_LOCKOUT: 2,
+    USER_LOCKOUT: 3,
+    BIOMETRICS_UNAVAILABLE: 4,
+    UNKNOWN_ERROR: 5,
+    BIOMETRICS_NOT_ENROLLED: 6,
+  },
+}));
+
+jest.mock("../ui/hooks/useBiometricsHook", () => {
+  const actualCapgoBiometric = jest.requireActual("@capgo/capacitor-native-biometric");
+  return {
+    useBiometricAuth: jest.fn(() => ({
+      biometricInfo: {
+        isAvailable: false, 
+        biometryType: actualCapgoBiometric.BiometryType.NONE,
+      },
+      setupBiometrics: jest.fn(),
+      handleBiometricAuth: jest.fn(),
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null,
+      isStrongBiometry: false,
+    })),
+    BIOMETRIC_SERVER_KEY: actualCapgoBiometric.BIOMETRIC_SERVER_KEY, 
+    BiometricAuthOutcome: actualCapgoBiometric.BiometricAuthOutcome, 
+    BiometryError: actualCapgoBiometric.BiometryError, 
+  };
+});
 
 const dispatchMock = jest.fn();
 const initialState = {
@@ -231,7 +286,7 @@ const initialState = {
     pendingConnection: null,
   },
   viewTypeCache: {
-    identifier: {
+    identifier: { // Added missing identifier object
       viewType: null,
       favouriteIndex: 0,
     },
@@ -261,7 +316,7 @@ describe("App", () => {
     getPlatformsMock.mockImplementation(() => ["android"]);
     getAvailableWitnessesMock.mockClear();
 
-    const deviceInfo = {
+    const deviceInfo = { // Define deviceInfo here
       platform: "ios",
       osVersion: "18.0",
       model: "",
@@ -272,6 +327,21 @@ describe("App", () => {
     };
 
     getDeviceInfo.mockImplementation(() => Promise.resolve(deviceInfo));
+
+    // Reset useBiometricAuth mock before each test
+    (useBiometricAuth as jest.Mock).mockReset();
+    (useBiometricAuth as jest.Mock).mockReturnValue({
+      biometricInfo: {
+        isAvailable: true, // Default to available for most tests
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      setupBiometrics: jest.fn(),
+      handleBiometricAuth: jest.fn(),
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null,
+      isStrongBiometry: true,
+    });
   });
 
   test("Mobile header hidden when app not in preview mode", async () => {
@@ -518,6 +588,10 @@ describe("Witness availability", () => {
         pendingConnection: null,
       },
       viewTypeCache: {
+        identifier: { // Added missing identifier object
+          viewType: null,
+          favouriteIndex: 0,
+        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
@@ -634,6 +708,18 @@ describe("System copatibility alert", () => {
     mockInitDatabase.mockClear();
     getPlatformsMock.mockImplementation(() => ["android"]);
     getAvailableWitnessesMock.mockClear();
+
+    const deviceInfo = { // Define deviceInfo here
+      platform: "ios",
+      osVersion: "18.0",
+      model: "",
+      operatingSystem: "ios",
+      manufacturer: "",
+      isVirtual: false,
+      webViewVersion: "131.0.6778.260",
+    };
+
+    getDeviceInfo.mockImplementation(() => Promise.resolve(deviceInfo));
   });
 
   afterEach(() => {
@@ -641,7 +727,7 @@ describe("System copatibility alert", () => {
   });
 
   test("Android", async () => {
-    const deviceInfo = {
+    const deviceInfo = { // Define deviceInfo here
       platform: "android",
       osVersion: "9.0",
       model: "",
@@ -689,7 +775,7 @@ describe("System copatibility alert", () => {
   });
 
   test("Ios", async () => {
-    const deviceInfo = {
+    const deviceInfo = { // Define deviceInfo here
       platform: "ios",
       osVersion: "11.0",
       model: "",
@@ -733,7 +819,7 @@ describe("System threat alert", () => {
     mockInitDatabase.mockClear();
     getAvailableWitnessesMock.mockClear();
 
-    const deviceInfo = {
+    const deviceInfo = { // Define deviceInfo here
       platform: "android",
       osVersion: "12.0",
       model: "",
