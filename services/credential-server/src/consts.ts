@@ -6,9 +6,10 @@ export const RARE_EVO_DEMO_SCHEMA_SAID =
 export const LE_SCHEMA_SAID = "ENPXp1vQzRF6JwIuS-mp2U8Uf1MoADoP_GqQ62VsDZWY";
 export const F_EMPLOYEE_DEMO_SCHEMA_SAID =
   "EL9oOWU_7zQn_rD--Xsgi3giCWnFDaNvFMUGTOZx1ARO";
-export const BIRTH_CERTIFICATE = "EL2nvC1sGc8d2NH2Uo63lJXB4a6edfEcqm10FNvBjpJS";
+export const BIRTH_CERTIFICATE = "EDMECKwLKx0HI5PjQdtR2mU_5DEjq661vbR0rzmjNYBb";
 export const FISHING_HUNTING_LICENSE =
   "EP0xNetO6wS5ZxmfIXW9R2YR5eyvuoNTM_I9KxzwqRXa";
+export const ROME_OFFSITE = "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt";
 export const ACDC_SCHEMAS_ID = [
   QVI_SCHEMA_SAID,
   LE_SCHEMA_SAID,
@@ -16,6 +17,7 @@ export const ACDC_SCHEMAS_ID = [
   F_EMPLOYEE_DEMO_SCHEMA_SAID,
   BIRTH_CERTIFICATE,
   FISHING_HUNTING_LICENSE,
+  ROME_OFFSITE,
 ];
 
 export const ACDC_SCHEMAS = [
@@ -42,5 +44,9 @@ export const ACDC_SCHEMAS = [
   {
     id: FISHING_HUNTING_LICENSE,
     name: "Fishing & Hunting License",
+  },
+  {
+    id: ROME_OFFSITE,
+    name: "Rome Offsite 2025 Credential",
   },
 ];
