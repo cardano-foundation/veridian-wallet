@@ -1,6 +1,6 @@
 import { IonIcon } from "@ionic/react";
 import { personCircleOutline } from "ionicons/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
@@ -9,10 +9,10 @@ import {
   getPendingDAppConnection,
   setIsConnectingToDApp,
   setPendingDAppConnection,
-
   getCurrentProfile,
   getPeerConnections,
-  setPeerConnections} from "../../../../../store/reducers/profileCache";
+  setPeerConnections,
+} from "../../../../../store/reducers/profileCache";
 import { OperationType, ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { combineClassNames } from "../../../../utils/style";
@@ -37,6 +37,13 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
     hide: !pendingDAppConnection,
   });
 
+  // Reset startingMeerkat when pendingDAppConnection changes
+  useEffect(() => {
+    if (pendingDAppConnection) {
+      setStartingMeerkat(false);
+    }
+  }, [pendingDAppConnection]);
+
   const openDecline = () => {
     setOpenDeclineAlert(true);
   };
@@ -48,6 +55,7 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
 
     setTimeout(() => {
       dispatch(setPendingDAppConnection(null));
+      dispatch(setIsConnectingToDApp(false));
     }, ANIMATION_DURATION);
   };
 

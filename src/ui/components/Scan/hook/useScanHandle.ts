@@ -4,6 +4,7 @@ import {
   OOBI_AGENT_ONLY_RE,
   OobiType,
   WOOBI_RE,
+  isMultisigConnectionDetails,
 } from "../../../../core/agent/agent.types";
 import { OobiQueryParams } from "../../../../core/agent/services/connectionService.types";
 import { StorageMessage } from "../../../../core/storage/storage.types";
@@ -219,13 +220,15 @@ const useScanHandle = () => {
       );
 
       if (invitation.type === OobiType.NORMAL) {
-        if (isInitiator) {
+        if (isInitiator && isMultisigConnectionDetails(invitation.connection)) {
           dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
         }
       }
 
       if (invitation.type === OobiType.MULTI_SIG_INITIATOR) {
-        dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
+        if (isMultisigConnectionDetails(invitation.connection)) {
+          dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
+        }
       }
 
       closeScan?.();

@@ -44,6 +44,7 @@ import {
   getConnectedDApp,
   setConnectedDApp,
   setPendingDAppConnection,
+  setIsConnectingToDApp,
 } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
@@ -112,8 +113,11 @@ const connectionStateChangedHandler = async (
     dispatch(setToastMsg(ToastMsgType.CONNECTION_REQUEST_PENDING));
   } else {
     // @TODO - foconnor: Should be able to just update Redux without fetching from DB.
-    const connectionRecordId = event.payload.connectionId!;
-    const identifier = event.payload.identifier!;
+    const connectionRecordId = event.payload.connectionId;
+    const identifier = event.payload.identifier;
+    if (!connectionRecordId || !identifier) {
+      return;
+    }
     const connectionDetails =
       await Agent.agent.connections.getConnectionShortDetailById(
         connectionRecordId,
@@ -174,20 +178,25 @@ const peerConnectedChangeHandler = async (
   event: PeerConnectedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  const existingConnections =
-    await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
+  try {
+    const existingConnections =
+      await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
 
-  dispatch(updatePeerConnectionsFromCore(existingConnections));
-  const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
-  const connectedWallet = existingConnections.find(
-    (connection) =>
-      `${connection.meerkatId}:${connection.selectedAid}` === newConnectionId
-  );
-  if (connectedWallet) {
-    dispatch(setConnectedDApp(connectedWallet));
+    dispatch(updatePeerConnectionsFromCore(existingConnections));
+    const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
+    const connectedWallet = existingConnections.find(
+      (connection) =>
+        `${connection.meerkatId}:${connection.selectedAid}` === newConnectionId
+    );
+    if (connectedWallet) {
+      dispatch(setConnectedDApp(connectedWallet));
+    }
+    dispatch(setPendingDAppConnection(null));
+    dispatch(setIsConnectingToDApp(false));
+    dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
+  } catch (error) {
+    dispatch(setIsConnectingToDApp(false));
   }
-  dispatch(setPendingDAppConnection(null));
-  dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
 };
 
 const peerDisconnectedChangeHandler = async (
@@ -202,6 +211,7 @@ const peerDisconnectedChangeHandler = async (
     connectedWalletId.includes(event.payload.dAppAddress)
   ) {
     dispatch(setConnectedDApp(null));
+    dispatch(setIsConnectingToDApp(false));
     dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
   }
 };
@@ -211,6 +221,7 @@ const peerConnectionBrokenChangeHandler = async (
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
   dispatch(setConnectedDApp(null));
+  dispatch(setIsConnectingToDApp(false));
   dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
 };
 
@@ -264,6 +275,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   useEffect(() => {
     initApp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forceInitApp]);
 
   useEffect(() => {
@@ -315,6 +327,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (recoveryCompleteNoInterruption) {
       loadDb();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recoveryCompleteNoInterruption]);
 
   useEffect(() => {
@@ -349,6 +362,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (authentication.ssiAgentUrl && !authentication.firstAppLaunch) {
       startAgent();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authentication.ssiAgentUrl, authentication.firstAppLaunch]);
 
   const loadDatabase = async () => {
@@ -467,8 +481,14 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setProfiles(profiles));
       dispatch(setCurrentProfile(currentProfileAid));
       dispatch(setCredsArchivedCache(credsArchivedCache));
-      dispatch(setConnectionsCache(allConnections));
-      dispatch(setMultisigConnectionsCache(allMultisigConnections));
+      dispatch(
+        setConnectionsCache(allConnections as RegularConnectionDetails[])
+      );
+      dispatch(
+        setMultisigConnectionsCache(
+          allMultisigConnections as MultisigConnectionDetails[]
+        )
+      );
 
       // TODO: set current profile data
     } catch (e) {

@@ -200,9 +200,9 @@ export const profilesCacheSlice = createSlice({
     },
     updateOrAddConnectionCache: (
       state,
-      action: PayloadAction<any> /* ConnectionShortDetails */
+      action: PayloadAction<RegularConnectionDetails>
     ) => {
-      const conn = action.payload as any;
+      const conn = action.payload;
 
       // Determine profile id: prefer explicit identifier, then contactId, then defaultProfile
       const profileId =
@@ -217,20 +217,28 @@ export const profilesCacheSlice = createSlice({
       );
 
       // Ensure the stored connection includes identifier/contactId for downstream filters
-      const mapped = {
+      const mapped: RegularConnectionDetails = {
         ...conn,
         identifier: conn.identifier || profileId,
         contactId: conn.contactId || conn.id,
-      } as any;
+      };
 
       targetProfile.connections = [...existing, mapped];
     },
     setPeerConnections: (state, action: PayloadAction<DAppConnection[]>) => {
-      if (!state.defaultProfile) return;
-      const defaultProfile = state.profiles[state.defaultProfile];
-      if (!defaultProfile) return;
+      let profileKey = state.defaultProfile;
+      if (!profileKey && action.payload.length > 0) {
+        profileKey = action.payload[0].selectedAid;
+      }
+      if (!profileKey) {
+        return;
+      }
+      const profile = state.profiles[profileKey];
+      if (!profile) {
+        return;
+      }
 
-      defaultProfile.peerConnections = action.payload;
+      profile.peerConnections = action.payload;
     },
     updatePeerConnectionsFromCore: (
       state,
@@ -238,7 +246,9 @@ export const profilesCacheSlice = createSlice({
     ) => {
       const updateData: Record<string, DAppConnection[]> =
         action.payload.reduce((result, item) => {
-          if (!item.selectedAid) return result;
+          if (!item.selectedAid || item.selectedAid.trim() === "") {
+            return result;
+          }
           let currentArr = result[item.selectedAid];
 
           if (currentArr) {
@@ -252,16 +262,21 @@ export const profilesCacheSlice = createSlice({
         }, {} as Record<string, DAppConnection[]>);
 
       Object.keys(updateData).forEach((key) => {
-        if (!state.profiles[key]) return;
+        if (!state.profiles[key]) {
+          return;
+        }
         state.profiles[key].peerConnections = updateData[key];
       });
     },
     setIndividualFirstCreate: (state, action: PayloadAction<boolean>) => {
       state.individualFirstCreate = action.payload;
     },
-    setConnectionsCache: (state, action: PayloadAction<any[]>) => {
+    setConnectionsCache: (
+      state,
+      action: PayloadAction<RegularConnectionDetails[]>
+    ) => {
       // action.payload expected to be ConnectionShortDetails[]
-      const allConns = action.payload as any[];
+      const allConns = action.payload;
 
       Object.keys(state.profiles).forEach((profileId) => {
         const profile = state.profiles[profileId];
@@ -286,9 +301,12 @@ export const profilesCacheSlice = createSlice({
       );
     },
 
-    setMultisigConnectionsCache: (state, action: PayloadAction<any[]>) => {
+    setMultisigConnectionsCache: (
+      state,
+      action: PayloadAction<MultisigConnectionDetails[]>
+    ) => {
       // action.payload expected to be MultisigConnectionDetails[]
-      const allMultisig = action.payload as any[];
+      const allMultisig = action.payload;
 
       Object.keys(state.profiles).forEach((profileId) => {
         const profile = state.profiles[profileId];
@@ -315,9 +333,9 @@ export const profilesCacheSlice = createSlice({
 
     updateOrAddMultisigConnectionCache: (
       state,
-      action: PayloadAction<any> /* MultisigConnectionDetails */
+      action: PayloadAction<MultisigConnectionDetails>
     ) => {
-      const conn = action.payload as any;
+      const conn = action.payload;
 
       // For multisig connections, store under the current user's profile, not the contactId
       // The contactId represents the other party, but we want to store this in the current user's profile
@@ -331,11 +349,11 @@ export const profilesCacheSlice = createSlice({
         (c) => c.id !== conn.id
       );
 
-      const mapped = {
+      const mapped: MultisigConnectionDetails = {
         ...conn,
         contactId: conn.contactId || currentProfileId,
         groupId: conn.groupId || conn.groupId || "",
-      } as any;
+      };
 
       targetProfile.multisigConnections = [...existing, mapped];
     },
@@ -431,10 +449,12 @@ export const {
 } = profilesCacheSlice.actions;
 
 const getProfiles = (state: RootState) => state.profilesCache.profiles;
-const getCurrentProfile = (state: RootState) =>
-  state.profilesCache.defaultProfile
+const getCurrentProfile = (state: RootState) => {
+  const profile = state.profilesCache.defaultProfile
     ? state.profilesCache.profiles[state.profilesCache.defaultProfile]
     : undefined;
+  return profile;
+};
 const getRecentProfiles = (state: RootState) =>
   state.profilesCache.recentProfiles;
 
@@ -457,8 +477,13 @@ const getMissingAliasConnection = (state: RootState) =>
 const getCredsCache = (state: RootState) =>
   getCurrentProfile(state)?.credentials || DefaultArrayValue.Credentials;
 
-const getPeerConnections = (state: RootState) =>
-  getCurrentProfile(state)?.peerConnections || DefaultArrayValue.PeerConn;
+const getPeerConnections = (state: RootState) => {
+  const currentProfile = getCurrentProfile(state);
+  if (!currentProfile) {
+    return DefaultArrayValue.PeerConn;
+  }
+  return currentProfile.peerConnections || DefaultArrayValue.PeerConn;
+};
 
 const getCredsArchivedCache = (state: RootState) =>
   getCurrentProfile(state)?.archivedCredentials ||
