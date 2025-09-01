@@ -1,6 +1,4 @@
-import { BiometryType, BiometricAuthError } from "@capgo/capacitor-native-biometric";
-import { BiometryError } from "../../hooks/useBiometricsHook";
-import { getPlatforms } from "@ionic/react";
+import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -10,7 +8,6 @@ import { useAppDispatch } from "../../../store/hooks";
 import { setEnableBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
-import { useBiometricAuth } from "../../hooks/useBiometricsHook";
 import { Alert } from "../Alert";
 import { ErrorMessage, MESSAGE_MILLISECONDS } from "../ErrorMessage";
 import { PageFooter } from "../PageFooter";
@@ -94,15 +91,15 @@ const CreatePasscodeModule = forwardRef<
     };
 
     const processBiometrics = async () => {
-      let isBiometricAuthenticated: boolean | BiometryError = false;
+      let biometricOutcome: BiometricAuthOutcome = BiometricAuthOutcome.GENERIC_ERROR;
       try {
         await disablePrivacy();
-        isBiometricAuthenticated = await handleBiometricAuth();
+        biometricOutcome = await handleBiometricAuth();
       } finally {
         await enablePrivacy();
       }
 
-      if (isBiometricAuthenticated === true) {
+      if (biometricOutcome === BiometricAuthOutcome.SUCCESS) {
         await Agent.agent.basicStorage.createOrUpdateBasicRecord(
           new BasicRecord({
             id: MiscRecordId.APP_BIOMETRY,
@@ -114,14 +111,10 @@ const CreatePasscodeModule = forwardRef<
           setToastMsg(ToastMsgType.SETUP_BIOMETRIC_AUTHENTICATION_SUCCESS)
         );
         await handlePassAuth();
-      } else if (isBiometricAuthenticated instanceof BiometryError) {
-        if (
-          isBiometricAuthenticated.code === BiometricAuthError.USER_CANCEL ||
-          isBiometricAuthenticated.code ===
-            BiometricAuthError.BIOMETRICS_UNAVAILABLE
-        ) {
-          setShowCancelBiometricsAlert(true);
-        }
+      } else if (biometricOutcome === BiometricAuthOutcome.USER_CANCELLED) {
+        setShowCancelBiometricsAlert(true);
+      } else {
+        showError(i18n.t("biometry.errors.toggleFailed"), new Error("Biometrics authentication failed"), dispatch);
       }
     };
 

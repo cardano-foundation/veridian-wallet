@@ -1,8 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import { IonIcon } from "@ionic/react";
-import { BiometricAuthError } from "@capgo/capacitor-native-biometric";
 import { fingerPrintOutline } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -25,7 +24,7 @@ import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayo
 import { ToastMsgType } from "../../globals/types";
 import { useAppIonRouter } from "../../hooks";
 import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
-import { BiometryError, useBiometricAuth } from "../../hooks/useBiometricsHook";
+import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
 import "./SetupBiometrics.scss";
 
 
@@ -37,14 +36,12 @@ const SetupBiometrics = () => {
   const [showCancelBiometricsAlert, setShowCancelBiometricsAlert] =
     useState(false);
   const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
-  const [lockoutTimestamp, setLockoutTimestamp] = useState<number | null>(null);
-  const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(30);
   const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
   const setupBiometricsConfirmtext = i18n.t("biometry.setupbiometryconfirm");
   const cancelBiometricsHeaderText = i18n.t("biometry.cancelbiometryheader");
   const cancelBiometricsConfirmText = setupBiometricsConfirmtext;
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
-  const { handleBiometricAuth, setupBiometrics } = useBiometricAuth();
+  const { handleBiometricAuth, setupBiometrics, remainingLockoutSeconds, lockoutTimestamp } = useBiometricAuth();
 
   const navToNextStep = async () => {
     await Agent.agent.basicStorage
@@ -83,16 +80,21 @@ const SetupBiometrics = () => {
   };
 
   const processBiometrics = async () => {
-    let isBiometricAuthenticated: boolean | BiometryError = false;
+    let biometricOutcome: BiometricAuthOutcome;
     if (!Capacitor.isNativePlatform()) {
       navToNextStep();
       return;
     }
 
     try {
-      await setupBiometrics();
+      biometricOutcome = await setupBiometrics();
+      if (biometricOutcome !== BiometricAuthOutcome.SUCCESS) {
+        // If setupBiometrics failed, show generic error and return
+        dispatch(showGenericError(true));
+        return;
+      }
       await disablePrivacy();
-      isBiometricAuthenticated = await handleBiometricAuth();
+      biometricOutcome = await handleBiometricAuth();
     } catch (error) {
       dispatch(showGenericError(true));
       throw error;
@@ -100,31 +102,35 @@ const SetupBiometrics = () => {
       await enablePrivacy();
     }
 
-    if (isBiometricAuthenticated === true) {
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.APP_BIOMETRY,
-          content: { enabled: true },
-        })
-      );
-      dispatch(setEnableBiometricsCache(true));
-      dispatch(
-        setToastMsg(ToastMsgType.SETUP_BIOMETRIC_AUTHENTICATION_SUCCESS)
-      );
-      navToNextStep();
-    } else if (isBiometricAuthenticated instanceof BiometryError) {
-      if (isBiometricAuthenticated.code === BiometricAuthError.USER_TEMPORARY_LOCKOUT) {
-        if (!lockoutTimestamp) {
-          setLockoutTimestamp(Date.now());
-        }
-        setShowMaxAttemptsAlert(true);
-      } else if (isBiometricAuthenticated.code === BiometricAuthError.USER_LOCKOUT) {
-        setShowPermanentLockoutAlert(true);
-      } else if (isBiometricAuthenticated.code === BiometricAuthError.USER_CANCEL || (Capacitor.getPlatform() === 'ios' && isBiometricAuthenticated.code === BiometricAuthError.BIOMETRICS_UNAVAILABLE)) {
+    switch (biometricOutcome) {
+      case BiometricAuthOutcome.SUCCESS:
+        await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+          new BasicRecord({
+            id: MiscRecordId.APP_BIOMETRY,
+            content: { enabled: true },
+          })
+        );
+        dispatch(setEnableBiometricsCache(true));
+        dispatch(
+          setToastMsg(ToastMsgType.SETUP_BIOMETRIC_AUTHENTICATION_SUCCESS)
+        );
+        navToNextStep();
+        break;
+      case BiometricAuthOutcome.USER_CANCELLED:
         setShowCancelBiometricsAlert(true);
-      } else {
+        break;
+      case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+        setShowMaxAttemptsAlert(true);
+        break;
+      case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+        setShowPermanentLockoutAlert(true);
+        break;
+      case BiometricAuthOutcome.WEAK_BIOMETRY:
+      case BiometricAuthOutcome.NOT_AVAILABLE:
+      case BiometricAuthOutcome.GENERIC_ERROR:
+      default:
         dispatch(showGenericError(true));
-      }
+        break;
     }
   };
 
@@ -136,29 +142,7 @@ const SetupBiometrics = () => {
     navToNextStep();
   };
 
-  useEffect(() => {
-    if (showMaxAttemptsAlert && lockoutTimestamp) {
-      const initialElapsed = Math.floor((Date.now() - lockoutTimestamp) / 1000);
-      const initialRemaining = 30 - initialElapsed;
-      setRemainingLockoutSeconds(initialRemaining > 0 ? initialRemaining : 0);
-
-      const interval = setInterval(() => {
-        const elapsedSeconds = Math.floor((Date.now() - lockoutTimestamp) / 1000);
-        const remaining = 30 - elapsedSeconds;
-        setRemainingLockoutSeconds(remaining > 0 ? remaining : 0);
-        if (remaining <= 0) {
-          clearInterval(interval);
-          setShowMaxAttemptsAlert(false);
-          setLockoutTimestamp(null);
-          setTimeout(() => {                                                                                                                          
-            setRemainingLockoutSeconds(30);                                                                                                           
-          }, 500);
-        }
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [showMaxAttemptsAlert, lockoutTimestamp, dispatch]);
+  
 
   return (
     <>
@@ -203,7 +187,7 @@ const SetupBiometrics = () => {
         setIsOpen={setShowMaxAttemptsAlert}
         dataTestId="alert-max-attempts"
         headerText={i18n.t("biometry.lockoutheader") as string}
-        subheaderText={i18n.t("biometry.lockoutmessage", { seconds: remainingLockoutSeconds }) as string}
+                subheaderText={i18n.t("biometry.lockoutmessage", { seconds: remainingLockoutSeconds }) as string}
         confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
         actionConfirm={() => setShowMaxAttemptsAlert(false)}
         backdropDismiss={false}
@@ -213,7 +197,7 @@ const SetupBiometrics = () => {
         setIsOpen={setShowPermanentLockoutAlert}
         dataTestId="alert-permanent-lockout"
         headerText={i18n.t("biometry.permanentlockoutheader") as string}
-        subheaderText={i18n.t("biometry.permanentlockoutmessage") as string}
+                subheaderText={i18n.t("biometry.permanentlockoutmessage") as string}
         confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
         actionConfirm={() => setShowPermanentLockoutAlert(false)}
         backdropDismiss={false}

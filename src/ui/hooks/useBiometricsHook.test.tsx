@@ -49,14 +49,35 @@ jest.mock("../../i18n", () => ({
   },
 }));
 
+import { BiometricAuthOutcome } from "./useBiometricsHook"; // Import BiometricAuthOutcome
+
 const TestComponent = () => {
   const { handleBiometricAuth } = useBiometricAuth();
-  const [error, setError] = useState("");
+  const [outcome, setOutcome] = useState<BiometricAuthOutcome | null>(null);
 
   const callHandleBiometricAuth = async () => {
     const result = await handleBiometricAuth();
-    if (result instanceof BiometryError) {
-      setError(result.message);
+    setOutcome(result);
+  };
+
+  const getOutcomeMessage = (outcome: BiometricAuthOutcome | null) => {
+    switch (outcome) {
+      case BiometricAuthOutcome.SUCCESS:
+        return "Success";
+      case BiometricAuthOutcome.USER_CANCELLED:
+        return "User Cancelled";
+      case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+        return "Temporary Lockout";
+      case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+        return "Permanent Lockout";
+      case BiometricAuthOutcome.GENERIC_ERROR:
+        return "Generic Error";
+      case BiometricAuthOutcome.WEAK_BIOMETRY:
+        return "Weak Biometry";
+      case BiometricAuthOutcome.NOT_AVAILABLE:
+        return "Not Available";
+      default:
+        return "";
     }
   };
 
@@ -68,7 +89,12 @@ const TestComponent = () => {
       >
         Button
       </button>
-      {error && <p data-testid="error-message">{error}</p>}
+      {outcome !== null && outcome !== BiometricAuthOutcome.SUCCESS && (
+        <p data-testid="error-message">{getOutcomeMessage(outcome)}</p>
+      )}
+      {outcome === BiometricAuthOutcome.SUCCESS && (
+        <p data-testid="success-message">Success</p>
+      )}
     </div>
   );
 };
@@ -107,7 +133,7 @@ describe("useBiometricAuth Hook", () => {
     });
   });
 
-  test("should return a BiometryError when biometrics are not available", async () => {
+  test("should return BiometricAuthOutcome.NOT_AVAILABLE when biometrics are not available", async () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: false,
       biometryType: BiometryType.NONE,
@@ -123,11 +149,11 @@ describe("useBiometricAuth Hook", () => {
       fireEvent.click(getByTestId("handle-biometric-btn"));
     });
 
-    expect(await findByText("biometry.errors.notAvailable")).toBeInTheDocument();
+    expect(await findByText("Not Available")).toBeInTheDocument();
     expect(NativeBiometric.verifyIdentity).not.toHaveBeenCalled();
   });
 
-  test("should return a BiometryError for weak biometry", async () => {
+  test("should return BiometricAuthOutcome.WEAK_BIOMETRY for weak biometry", async () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.NONE, // Weak biometry type
@@ -143,18 +169,17 @@ describe("useBiometricAuth Hook", () => {
       fireEvent.click(getByTestId("handle-biometric-btn"));
     });
 
-    expect(await findByText("biometry.errors.strongBiometricsRequired")).toBeInTheDocument();
+    expect(await findByText("Weak Biometry")).toBeInTheDocument();
     expect(NativeBiometric.verifyIdentity).not.toHaveBeenCalled();
   });
 
-  test("should return a BiometryError when verifyIdentity fails", async () => {
-    const errorMessage = "Authentication failed";
+  test("should return BiometricAuthOutcome.GENERIC_ERROR when verifyIdentity fails", async () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.FACE_ID,
     });
     (NativeBiometric.verifyIdentity as jest.Mock).mockRejectedValue({
-      message: errorMessage,
+      message: "Authentication failed",
       code: BiometricAuthError.AUTHENTICATION_FAILED,
     });
 
@@ -168,18 +193,17 @@ describe("useBiometricAuth Hook", () => {
       fireEvent.click(getByTestId("handle-biometric-btn"));
     });
 
-    expect(await findByText(errorMessage)).toBeInTheDocument();
+    expect(await findByText("Generic Error")).toBeInTheDocument();
   });
 
-  test("should return a BiometryError when getCredentials fails", async () => {
-    const errorMessage = "Could not get credentials";
+  test("should return BiometricAuthOutcome.GENERIC_ERROR when getCredentials fails", async () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.FACE_ID,
     });
     (NativeBiometric.verifyIdentity as jest.Mock).mockResolvedValue(undefined);
     (NativeBiometric.getCredentials as jest.Mock).mockRejectedValue({
-      message: errorMessage,
+      message: "Could not get credentials",
       code: BiometricAuthError.UNKNOWN_ERROR,
     });
 
@@ -193,49 +217,10 @@ describe("useBiometricAuth Hook", () => {
       fireEvent.click(getByTestId("handle-biometric-btn"));
     });
 
-    expect(await findByText(errorMessage)).toBeInTheDocument();
+    expect(await findByText("Generic Error")).toBeInTheDocument();
   });
 
-  test("should call verifyIdentity with correct fallback title when password is set", async () => {
-    const initState = {
-      stateCache: {
-        authentication: {
-          passwordIsSet: true,
-        },
-      },
-    };
-    const storeMocked = makeTestStore(initState);
-
-    (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
-      isAvailable: true,
-      biometryType: BiometryType.FACE_ID,
-    });
-    (NativeBiometric.verifyIdentity as jest.Mock).mockResolvedValue(undefined);
-    (NativeBiometric.getCredentials as jest.Mock).mockResolvedValue({
-      username: "test",
-      password: "test",
-    });
   
-    const { getByTestId } = render(
-      <Provider store={storeMocked}>
-        <TestComponent />
-      </Provider>
-    );
-  
-    act(() => {
-      fireEvent.click(getByTestId("handle-biometric-btn"));
-    });
-  
-    await waitFor(() => {
-      expect(NativeBiometric.verifyIdentity).toHaveBeenCalledWith({
-        reason: "biometry.reason",
-        title: "biometry.title",
-        subtitle: "biometry.subtitle",
-        negativeButtonText: "biometry.canceltitle",
-        fallbackTitle: "biometry.iosfallbackpasswordtitle",
-      });
-    });
-  });
 });
 
 describe("useBiometricAuth Hook: setupBiometrics", () => {

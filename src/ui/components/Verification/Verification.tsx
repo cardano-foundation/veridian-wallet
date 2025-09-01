@@ -1,11 +1,10 @@
-import { BiometricAuthError } from "@capgo/capacitor-native-biometric";
-import { BiometryError } from "../../hooks/useBiometricsHook";
+
+import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { getStateCache } from "../../../store/reducers/stateCache";
 import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
-import { useBiometricAuth } from "../../hooks/useBiometricsHook";
 import { showError } from "../../utils/error";
 import { VerifyPasscode } from "../VerifyPasscode";
 import { VerifyPassword } from "../VerifyPassword";
@@ -32,26 +31,23 @@ const Verification = ({
       await disablePrivacy();
       const authenResult = await handleBiometricAuth();
 
-      if (authenResult === false) {
-        setOpenModalAfterBiometricFail(true);
-        return;
-      }
-
-      if (authenResult instanceof BiometryError) {
-        if (
-          authenResult.code === BiometricAuthError.USER_CANCEL ||
-          authenResult.code === BiometricAuthError.APP_CANCEL
-        ) {
+      switch (authenResult) {
+        case BiometricAuthOutcome.SUCCESS:
+          onVerify();
+          setVerifyIsOpen(false);
+          break;
+        case BiometricAuthOutcome.USER_CANCELLED:
           setVerifyIsOpen(false, true);
-          return;
-        }
-
-        setOpenModalAfterBiometricFail(true);
-        return;
+          break;
+        case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+        case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+        case BiometricAuthOutcome.WEAK_BIOMETRY:
+        case BiometricAuthOutcome.NOT_AVAILABLE:
+        case BiometricAuthOutcome.GENERIC_ERROR:
+        default:
+          setOpenModalAfterBiometricFail(true);
+          break;
       }
-
-      onVerify();
-      setVerifyIsOpen(false);
     } catch (e) {
       showError("Failed to biometric auth", e);
     } finally {

@@ -1,11 +1,10 @@
-import { BiometricAuthError } from "@capgo/capacitor-native-biometric";
-import { BiometryError } from "../../hooks/useBiometricsHook";
 import { App, AppState } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
@@ -43,7 +42,6 @@ import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayo
 import { BackEventPriorityType } from "../../globals/types";
 import { useExitAppWithDoubleTap } from "../../hooks/exitAppWithDoubleTapHook";
 import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
-import { useBiometricAuth } from "../../hooks/useBiometricsHook";
 import { showError } from "../../utils/error";
 import "./LockPage.scss";
 import { InitializationPhase } from "../../../store/reducers/stateCache/stateCache.types";
@@ -138,22 +136,33 @@ const LockPageContainer = () => {
   };
 
   const handleBiometrics = async () => {
-    let authenResult: boolean | BiometryError = false;
+    let authenResult: BiometricAuthOutcome;
     try {
       await disablePrivacy();
       authenResult = await handleBiometricAuth();
       preventBiometricOnEvent.current =
-        (authenResult instanceof BiometryError &&
-          (authenResult.code === BiometricAuthError.USER_CANCEL ||
-            authenResult.code === BiometricAuthError.USER_FALLBACK)) ||
-        authenResult === true;
+        authenResult === BiometricAuthOutcome.USER_CANCELLED ||
+        authenResult === BiometricAuthOutcome.SUCCESS;
     } finally {
       await enablePrivacy();
     }
 
-    if (authenResult === true) {
-      dispatch(login());
-      dispatch(setFirstAppLaunchComplete());
+    switch (authenResult) {
+      case BiometricAuthOutcome.SUCCESS:
+        dispatch(login());
+        dispatch(setFirstAppLaunchComplete());
+        break;
+      case BiometricAuthOutcome.USER_CANCELLED:
+        // Do nothing, user cancelled
+        break;
+      case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+      case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+      case BiometricAuthOutcome.WEAK_BIOMETRY:
+      case BiometricAuthOutcome.NOT_AVAILABLE:
+      case BiometricAuthOutcome.GENERIC_ERROR:
+      default:
+        // Do nothing
+        break;
     }
   };
 

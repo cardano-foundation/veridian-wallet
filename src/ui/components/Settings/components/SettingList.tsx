@@ -25,7 +25,7 @@ import {
   getBiometricsCache,
   setEnableBiometricsCache,
 } from "../../../../store/reducers/biometricsCache";
-import { useBiometricAuth } from "../../../hooks/useBiometricsHook";
+import { BiometricAuthOutcome, useBiometricAuth } from "../../../hooks/useBiometricsHook";
 import { usePrivacyScreen } from "../../../hooks/privacyScreenHook";
 import {
   OptionIndex,
@@ -138,32 +138,42 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
     dispatch(setEnableBiometricsCache(!biometricsCache.enabled));
   };
 
-  const handleBiometricUpdate = () => {
-    if (
-      !biometricInfo?.isAvailable &&
-      (biometricInfo?.errorCode === BiometricAuthError.BIOMETRICS_NOT_ENROLLED ||
-        biometricInfo?.errorCode === BiometricAuthError.BIOMETRICS_UNAVAILABLE)
-    ) {
-      setOpenBiometricAlert(true);
-      return;
-    }
-
+  const handleBiometricUpdate = async () => {
     if (biometricsCache.enabled) {
       handleToggleBiometricAuth();
       return;
     }
-
-    setVerifyIsOpen(true);
+    // Call biometricAuth directly, it will handle the flow and errors
+    biometricAuth();
   };
 
   const biometricAuth = async () => {
     try {
       await disablePrivacy();
-      await setupBiometrics();
-      const result = await handleBiometricAuth();
+
+      const setupResult = await setupBiometrics();
+      if (setupResult !== BiometricAuthOutcome.SUCCESS) {
+        // setupBiometrics already handles showing specific errors for WEAK_BIOMETRY and NOT_AVAILABLE
+        // For other errors, it returns GENERIC_ERROR.
+        // So, we just need to enable privacy and return.
+        await enablePrivacy();
+        return;
+      }
+
+      const authResult = await handleBiometricAuth();
       await enablePrivacy();
-      if (result === true) handleToggleBiometricAuth();
+
+      if (authResult === BiometricAuthOutcome.SUCCESS) {
+        handleToggleBiometricAuth();
+      } else if (authResult === BiometricAuthOutcome.USER_CANCELLED) {
+        // Do nothing, user cancelled
+      } else {
+        // All other errors (TEMPORARY_LOCKOUT, PERMANENT_LOCKOUT, WEAK_BIOMETRY, NOT_AVAILABLE, GENERIC_ERROR)
+        // SettingList doesn't have specific alerts for these. Show generic error.
+        showError(i18n.t("biometry.errors.toggleFailed"), new Error("Biometrics authentication failed"), dispatch);
+      }
     } catch (e) {
+      // This catch block is for unexpected errors during the process.
       showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
     }
   };
