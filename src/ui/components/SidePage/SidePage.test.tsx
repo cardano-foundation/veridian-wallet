@@ -61,7 +61,12 @@ describe("Side Page: wallet connect", () => {
     },
     profilesCache: {
       ...profileCacheFixData,
-      pendingConnection: "pending-meerkat",
+      pendingDAppConnection: {
+        meerkatId: "pending-meerkat",
+        name: "Test DApp",
+        selectedAid: "test-aid",
+        url: "http://test.com",
+      },
     },
     biometricsCache: {
       enabled: false,

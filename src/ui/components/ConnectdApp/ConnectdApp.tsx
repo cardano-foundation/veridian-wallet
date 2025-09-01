@@ -22,9 +22,9 @@ import {
   getPendingDAppConnection,
   setConnectedDApp,
   setPendingDAppConnection,
-
   getPeerConnections,
-  setPeerConnections} from "../../../store/reducers/profileCache";
+  setPeerConnections,
+} from "../../../store/reducers/profileCache";
 import { Alert } from "../../components/Alert";
 import { CardList } from "../../components/CardList";
 import { CardsPlaceholder } from "../../components/CardsPlaceholder";
@@ -49,7 +49,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
   const toastMsgs = useAppSelector(getToastMsgs);
   const pendingConnection = useAppSelector(getPendingDAppConnection);
   const connections = useAppSelector(getPeerConnections);
-  const connectedWallet = useAppSelector(getConnectedDApp);
+  const connectedDApp = useAppSelector(getConnectedDApp);
   const currentOperation = useAppSelector(getCurrentOperation);
   const pageId = "wallet-connect";
   const [actionInfo, setActionInfo] = useState<ActionInfo>({
@@ -113,10 +113,8 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
       setActionInfo({
         type: ActionType.None,
       });
-      if (connectedWallet) {
-        PeerConnection.peerConnection.disconnectDApp(
-          connectedWallet?.meerkatId
-        );
+      if (connectedDApp) {
+        PeerConnection.peerConnection.disconnectDApp(connectedDApp?.meerkatId);
         dispatch(setConnectedDApp(null));
       }
       await Agent.agent.peerConnectionPair.deletePeerConnectionPairRecord(
@@ -142,20 +140,20 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
   };
 
   const disconnectWallet = () => {
-    if (!connectedWallet) return;
-    PeerConnection.peerConnection.disconnectDApp(connectedWallet?.meerkatId);
+    if (!connectedDApp) return;
+    PeerConnection.peerConnection.disconnectDApp(connectedDApp?.meerkatId);
   };
 
   const toggleConnected = () => {
     if (!actionInfo.data) return;
     const isConnectedItem =
-      actionInfo.data.meerkatId === connectedWallet?.meerkatId;
+      actionInfo.data.meerkatId === connectedDApp?.meerkatId;
     if (isConnectedItem) {
       disconnectWallet();
       return;
     }
 
-    if (connectedWallet) {
+    if (connectedDApp) {
       setOpenExistConnectedWalletAlert(true);
       return;
     }
@@ -172,7 +170,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
   };
 
   const handleScanQR = () => {
-    if (connectedWallet) {
+    if (connectedDApp) {
       setActionInfo({
         type: ActionType.Add,
       });
@@ -207,15 +205,15 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
         (item) => item.message === ToastMsgType.CONNECT_WALLET_SUCCESS
       ) &&
       !pendingConnection &&
-      connectedWallet &&
+      connectedDApp &&
       openConfirmConnectModal
     ) {
       setActionInfo({
         type: ActionType.Connect,
-        data: connectedWallet,
+        data: connectedDApp,
       });
     }
-  }, [connectedWallet, toastMsgs, pendingConnection, openConfirmConnectModal]);
+  }, [connectedDApp, toastMsgs, pendingConnection, openConfirmConnectModal]);
 
   useEffect(() => {
     if (!pendingConnection) return;
@@ -297,7 +295,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
                       );
                     }
 
-                    if (data.meerkatId !== connectedWallet?.meerkatId)
+                    if (data.meerkatId !== connectedDApp?.meerkatId)
                       return null;
 
                     return (
@@ -324,9 +322,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
         </ScrollablePageLayout>
       </SideSlider>
       <ConfirmConnectModal
-        isConnectModal={
-          actionInfo.data?.meerkatId !== connectedWallet?.meerkatId
-        }
+        isConnectModal={actionInfo.data?.meerkatId !== connectedDApp?.meerkatId}
         openModal={openConfirmConnectModal}
         closeModal={() => setOpenConfirmConnectModal(false)}
         onConfirm={toggleConnected}

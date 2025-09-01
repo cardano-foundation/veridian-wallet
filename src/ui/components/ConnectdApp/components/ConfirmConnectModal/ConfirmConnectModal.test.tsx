@@ -180,7 +180,7 @@ describe("Confirm connect modal", () => {
       },
       profilesCache: {
         ...profileCacheFixData,
-        pendingConnection: walletConnectionsFix[0],
+        pendingDAppConnection: walletConnectionsFix[0],
       },
     };
 

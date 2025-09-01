@@ -507,10 +507,10 @@ describe("Witness availability", () => {
       profilesCache: {
         profiles: {},
         defaultProfile: undefined,
-        connectedWallet: null,
-        pendingConnection: null,
-        isConnecting: false,
-        showConnectWallet: false,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {
@@ -584,10 +584,10 @@ describe("Witness availability", () => {
       profilesCache: {
         profiles: {},
         defaultProfile: undefined,
-        connectedWallet: null,
-        pendingConnection: null,
-        isConnecting: false,
-        showConnectWallet: false,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {
@@ -823,10 +823,10 @@ describe("System threat alert", () => {
       profilesCache: {
         profiles: {},
         defaultProfile: undefined,
-        connectedWallet: null,
-        pendingConnection: null,
-        isConnecting: false,
-        showConnectWallet: false,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {

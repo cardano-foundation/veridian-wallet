@@ -8,7 +8,10 @@ import {
   setCurrentOperation,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
-import { setPendingDAppConnection } from "../../../store/reducers/profileCache";
+import {
+  setPendingDAppConnection,
+  setPeerConnections,
+} from "../../../store/reducers/profileCache";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { walletConnectionsFix } from "../../__fixtures__/walletConnectionsFix";
 import { OperationType, ToastMsgType } from "../../globals/types";
@@ -74,7 +77,7 @@ const initialState = {
   },
   profilesCache: {
     ...profileCacheFixData,
-    connectedWallet: walletConnectionsFix[1],
+    connectedDApp: walletConnectionsFix[1],
   },
   biometricsCache: {
     enabled: false,
@@ -146,7 +149,7 @@ describe("Wallet connect: empty history", () => {
       profilesCache: {
         ...profileCacheFixData,
         defaultProfile: filteredIdentifierFix[2].id,
-        connectedWallet: walletConnectionsFix[1],
+        connectedDApp: walletConnectionsFix[1],
       },
       biometricsCache: {
         enabled: false,
@@ -368,7 +371,7 @@ describe("Wallet connect", () => {
       },
       profilesCache: {
         ...profileCacheFixData,
-        pendingConnection: walletConnectionsFix[0],
+        pendingDAppConnection: walletConnectionsFix[0],
       },
       biometricsCache: {
         enabled: false,
@@ -416,6 +419,9 @@ describe("Wallet connect", () => {
     passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(
+        setPeerConnections(walletConnectionsFix.slice(1))
+      );
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
@@ -513,8 +519,8 @@ describe("Wallet connect", () => {
       },
       profilesCache: {
         ...profileCacheFixData,
-        connectedWallet: null,
-        pendingConnection: walletConnectionsFix[0],
+        connectedDApp: null,
+        pendingDAppConnection: walletConnectionsFix[0],
       },
       biometricsCache: {
         enabled: false,
@@ -553,8 +559,8 @@ describe("Wallet connect", () => {
       },
       profilesCache: {
         ...profileCacheFixData,
-        connectedWallet: null,
-        pendingConnection: null,
+        connectedDApp: null,
+        pendingDAppConnection: null,
       },
       biometricsCache: {
         enabled: false,

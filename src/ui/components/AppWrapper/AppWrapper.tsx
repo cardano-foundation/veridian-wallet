@@ -41,10 +41,10 @@ import {
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
   updateRecentProfiles,
-
   getConnectedDApp,
   setConnectedDApp,
-  setPendingDAppConnection} from "../../../store/reducers/profileCache";
+  setPendingDAppConnection,
+} from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   getForceInitApp,
@@ -218,7 +218,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
   const isOnline = useAppSelector(getIsOnline);
   const dispatch = useAppDispatch();
   const authentication = useAppSelector(getAuthentication);
-  const connectedWallet = useAppSelector(getConnectedDApp);
+  const connectedDApp = useAppSelector(getConnectedDApp);
   const initializationPhase = useAppSelector(getInitializationPhase);
   const recoveryCompleteNoInterruption = useAppSelector(
     getRecoveryCompleteNoInterruption
@@ -294,12 +294,12 @@ const AppWrapper = (props: { children: ReactNode }) => {
   }, [authentication.loggedIn, initializationPhase]);
 
   useEffect(() => {
-    if (!connectedWallet?.meerkatId) {
+    if (!connectedDApp?.meerkatId) {
       return;
     }
 
     const eventHandler = async (event: PeerDisconnectedEvent) => {
-      peerDisconnectedChangeHandler(event, connectedWallet.meerkatId, dispatch);
+      peerDisconnectedChangeHandler(event, connectedDApp.meerkatId, dispatch);
     };
 
     PeerConnection.peerConnection.onPeerDisconnectedStateChanged(eventHandler);
@@ -309,7 +309,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
         eventHandler
       );
     };
-  }, [connectedWallet?.meerkatId, dispatch]);
+  }, [connectedDApp?.meerkatId, dispatch]);
 
   useEffect(() => {
     if (recoveryCompleteNoInterruption) {
