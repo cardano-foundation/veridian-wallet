@@ -6,9 +6,9 @@ export const RARE_EVO_DEMO_SCHEMA_SAID =
 export const LE_SCHEMA_SAID = "ENPXp1vQzRF6JwIuS-mp2U8Uf1MoADoP_GqQ62VsDZWY";
 export const F_EMPLOYEE_DEMO_SCHEMA_SAID =
   "EL9oOWU_7zQn_rD--Xsgi3giCWnFDaNvFMUGTOZx1ARO";
-export const BIRTH_CERTIFICATE = "EDMECKwLKx0HI5PjQdtR2mU_5DEjq661vbR0rzmjNYBb";
+export const BIRTH_CERTIFICATE = "EE6DAsJPqDspkLhbk1pVELQVbqyz6TFSEKXdS1Iz-Nz1";
 export const FISHING_HUNTING_LICENSE =
-  "EP0xNetO6wS5ZxmfIXW9R2YR5eyvuoNTM_I9KxzwqRXa";
+  "EFVZujklqUEubsyY9PRgBRMf39HgHzCPo3Ii_-xhkOlF";
 export const ROME_OFFSITE = "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt";
 export const ACDC_SCHEMAS_ID = [
   QVI_SCHEMA_SAID,

@@ -1,10 +1,10 @@
 {
-  "$id": "EDMECKwLKx0HI5PjQdtR2mU_5DEjq661vbR0rzmjNYBb",
+  "$id": "EFVZujklqUEubsyY9PRgBRMf39HgHzCPo3Ii_-xhkOlF",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Birth Certificate",
-  "description": "This credential represents an official Birth Certificate. It establishes proof of identity and birth details for the individual issuee, including their full name, sex, date of birth, and place of birth.",
+  "title": "Fishing & Hunting License",
+  "description": "This credential represents an official Fishing & Hunting License. It authorizes the individual issuee to engage in regulated fishing and hunting activities within the specified jurisdiction.",
   "type": "object",
-  "credentialType": "BirthCertificate",
+  "credentialType": "FishingHuntingLicense",
   "version": "1.0.0",
   "properties": {
     "v": {
@@ -38,12 +38,16 @@
           "type": "string"
         },
         {
-          "$id": "EEXvQgR03OpVk1k83IeIQLvFRHtKGjZaTZ1ckGcoNMaV",
+          "$id": "EFZrnG5StYAw2zvIFUlPf35W2FnP6vDAbSo_2MO88ww4",
           "description": "Attributes block",
           "type": "object",
           "properties": {
             "d": {
               "description": "Attributes block SAID",
+              "type": "string"
+            },
+            "u": {
+              "description": "One time use nonce",
               "type": "string"
             },
             "i": {
@@ -59,36 +63,28 @@
               "description": "Full name",
               "type": "string"
             },
-            "sex": {
-              "description": "Sex",
+            "address": {
+              "description": "Address",
               "type": "string"
             },
             "dateOfBirth": {
               "description": "Date of birth",
               "type": "string"
             },
-            "placeOfBirth": {
-              "description": "Place of birth",
+            "troutStampValidity": {
+              "description": "Trout stamp validity",
               "type": "string"
             },
-            "countryOfBirth": {
-              "description": "Country of birth",
+            "turkeyStampValidity": {
+              "description": "Turkey stamp validity",
               "type": "string"
             },
-            "parentsFullName": {
-              "description": "Full name(s) of parents",
+            "duckStampValidity": {
+              "description": "Duck stamp validity",
               "type": "string"
             },
-            "mothersMaidenSurname": {
-              "description": "Mother's maiden surname",
-              "type": "string"
-            },
-            "parentsAddressess": {
-              "description": "Parent's addresses",
-              "type": "string"
-            },
-            "parentsBirthDetails": {
-              "description": "Parent's places and dates of birth",
+            "deerStampValidity": {
+              "description": "Deer stamp validity",
               "type": "string"
             }
           },
@@ -97,14 +93,8 @@
             "i",
             "dt",
             "fullName",
-            "sex",
-            "dateOfBirth",
-            "placeOfBirth",
-            "countryOfBirth",
-            "parentsFullName",
-            "mothersMaidenSurname",
-            "parentsAddressess",
-            "parentsBirthDetails"
+            "address",
+            "dateOfBirth"
           ]
         }
       ]
