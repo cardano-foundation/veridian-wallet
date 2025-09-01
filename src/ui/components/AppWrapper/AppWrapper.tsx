@@ -91,6 +91,8 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
+import { NativeBiometric } from "@capgo/capacitor-native-biometric";
+import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -669,8 +671,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
     const initState = await Agent.agent.basicStorage.findById(
       MiscRecordId.APP_ALREADY_INIT
     );
+    
     if (!initState) {
       await SecureStorage.wipe();
+      await NativeBiometric.deleteCredentials({ server: BIOMETRIC_SERVER_KEY });
     }
 
     // This will skip the onboarding screen with dev mode.

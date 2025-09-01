@@ -8,7 +8,6 @@ import {
 import { Capacitor } from "@capacitor/core";
 import { useEffect, useState } from "react";
 import { i18n } from "../../i18n";
-import { useAppDispatch } from "../../store/hooks";
 import { useActivityTimer } from "../components/AppWrapper/hooks/useActivityTimer";
 
 class BiometryError extends Error {
@@ -32,7 +31,6 @@ enum BiometricAuthOutcome {
   GENERIC_ERROR,
   WEAK_BIOMETRY,
   NOT_AVAILABLE,
-  
 }
 
 const isBiometricPluginError = (
@@ -51,7 +49,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
     isAvailable: false,
     biometryType: BiometryType.NONE,
   });
-  const [lockoutTimestamp, setLockoutTimestamp] = useState<number | null>(null);
+  const [lockoutEndTime, setLockoutEndTime] = useState<number | null>(null);
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(30);
   const { setPauseTimestamp } = useActivityTimer();
 
@@ -62,12 +60,10 @@ const useBiometricAuth = (isLockPage?: boolean) => {
       return result;
     }
     try {
-      const biometricResult: AvailableResult =
-        await NativeBiometric.isAvailable();
+      const biometricResult: AvailableResult = await NativeBiometric.isAvailable();
       setBiometricInfo(biometricResult);
       return biometricResult;
     } catch (error) {
-      // In case of an error checking biometrics, assume it's not available.
       const result = { isAvailable: false, biometryType: BiometryType.NONE };
       setBiometricInfo(result);
       return result;
@@ -79,27 +75,30 @@ const useBiometricAuth = (isLockPage?: boolean) => {
   }, []);
 
   useEffect(() => {
-    if (lockoutTimestamp) {
-      const initialElapsed = Math.floor((Date.now() - lockoutTimestamp) / 1000);
-      const initialRemaining = 30 - initialElapsed;
-      setRemainingLockoutSeconds(initialRemaining > 0 ? initialRemaining : 0);
-
-      const interval = setInterval(() => {
-        const elapsedSeconds = Math.floor((Date.now() - lockoutTimestamp) / 1000);
-        const remaining = 30 - elapsedSeconds;
-        setRemainingLockoutSeconds(remaining > 0 ? remaining : 0);
+    let interval: NodeJS.Timeout | undefined;
+    if (lockoutEndTime) {
+      const updateRemaining = () => {
+        const remaining = Math.max(0, Math.ceil((lockoutEndTime - Date.now()) / 1000));
+        setRemainingLockoutSeconds(remaining);
         if (remaining <= 0) {
           clearInterval(interval);
-          setLockoutTimestamp(null);
-          setRemainingLockoutSeconds(30); // Reset for next lockout
+          setLockoutEndTime(null);
+          setRemainingLockoutSeconds(30);
         }
-      }, 1000);
+      };
 
-      return () => clearInterval(interval);
+      updateRemaining();
+      interval = setInterval(updateRemaining, 1000);
+
+      return () => {
+        clearInterval(interval);
+      };
+    } else {
+      setRemainingLockoutSeconds(30);
     }
-  }, [lockoutTimestamp]);
+  }, [lockoutEndTime]);
 
-  const handleBiometricAuth = async (): Promise<BiometricAuthOutcome> => {
+  const handleBiometricAuth = async (isInitialSetup = false): Promise<BiometricAuthOutcome> => {
     const { isAvailable, biometryType } = await checkBiometrics();
 
     if (!isAvailable) {
@@ -130,7 +129,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
           ],
           maxAttempts: 5,
         });
-      } else { // iOS
+      } else {
         await NativeBiometric.verifyIdentity({
           reason: i18n.t("biometry.reason") as string,
           title: i18n.t("biometry.title") as string,
@@ -139,9 +138,11 @@ const useBiometricAuth = (isLockPage?: boolean) => {
         });
       }
 
-      await NativeBiometric.getCredentials({
-        server: BIOMETRIC_SERVER_KEY,
-      });
+      if (!isInitialSetup) {
+        await NativeBiometric.getCredentials({
+          server: BIOMETRIC_SERVER_KEY,
+        });
+      }
 
       setPauseTimestamp(new Date().getTime());
       return BiometricAuthOutcome.SUCCESS;
@@ -155,7 +156,6 @@ const useBiometricAuth = (isLockPage?: boolean) => {
 
       let outcome: BiometricAuthOutcome;
 
-      // Workaround for iOS cancel issue
       if (Capacitor.getPlatform() === 'ios' && code === BiometricAuthError.BIOMETRICS_UNAVAILABLE) {
         outcome = BiometricAuthOutcome.USER_CANCELLED;
       } else {
@@ -164,7 +164,9 @@ const useBiometricAuth = (isLockPage?: boolean) => {
             outcome = BiometricAuthOutcome.USER_CANCELLED;
             break;
           case BiometricAuthError.USER_TEMPORARY_LOCKOUT:
-            setLockoutTimestamp(Date.now());
+            if (lockoutEndTime === null) {
+              setLockoutEndTime(Date.now() + (30 * 1000));
+            }
             outcome = BiometricAuthOutcome.TEMPORARY_LOCKOUT;
             break;
           case BiometricAuthError.USER_LOCKOUT:
@@ -194,7 +196,6 @@ const useBiometricAuth = (isLockPage?: boolean) => {
       biometryType === BiometryType.TOUCH_ID ||
       biometryType === BiometryType.FINGERPRINT ||
       biometryType === BiometryType.IRIS_AUTHENTICATION ||
-      // TODO: remove
       biometryType === BiometryType.MULTIPLE;
 
     if (!isStrongBiometry) {
@@ -202,29 +203,22 @@ const useBiometricAuth = (isLockPage?: boolean) => {
     }
 
     try {
-      // 1. Try to get existing credentials
       await NativeBiometric.getCredentials({
         server: BIOMETRIC_SERVER_KEY,
       });
-      return BiometricAuthOutcome.SUCCESS; // Credentials exist, so success
+      return BiometricAuthOutcome.SUCCESS;
     } catch (error) {
-      // 2. If getting credentials fails (e.g., no credentials found), then try to set them
-      //    But first, verify identity to authenticate the user.
       let authOutcome: BiometricAuthOutcome;
       try {
-        authOutcome = await handleBiometricAuth(); // This will prompt the user for authentication
+        authOutcome = await handleBiometricAuth(true);
       } catch (authError) {
-        // handleBiometricAuth should not throw, it returns an outcome.
-        // This catch block is a safeguard.
         return BiometricAuthOutcome.GENERIC_ERROR;
       }
 
       if (authOutcome !== BiometricAuthOutcome.SUCCESS) {
-        // If authentication failed (e.g., user cancelled, lockout), return that outcome
         return authOutcome;
       }
 
-      // 3. If authentication succeeded, then set the credentials
       try {
         const credOptions: SetCredentialOptions = {
           server: BIOMETRIC_SERVER_KEY,
@@ -232,33 +226,21 @@ const useBiometricAuth = (isLockPage?: boolean) => {
           password: "",
         };
         await NativeBiometric.setCredentials(credOptions);
-        return BiometricAuthOutcome.SUCCESS; // Credentials set, so success
+        return BiometricAuthOutcome.SUCCESS;
       } catch (setCredError) {
-        // If setting credentials fails even after authentication, it's a generic error
-        if (setCredError instanceof Error) {
-          // The "User not authenticated" error should not happen here if verifyIdentity succeeded.
-          // So, any error here is truly generic.
-          return BiometricAuthOutcome.GENERIC_ERROR;
-        }
-        return BiometricAuthOutcome.GENERIC_ERROR; // Fallback
+        return BiometricAuthOutcome.GENERIC_ERROR;
       }
     }
   };
 
-  // Implement const isStrongBiometryAvailable =
-  //  biometricInfo.biometryType === BiometryType.FACE_ID ||
-  //  biometricInfo.biometryType === BiometryType.TOUCH_ID ||
-  //  biometricInfo.biometryType === BiometryType.FINGERPRINT;
   return {
     biometricInfo,
     handleBiometricAuth,
     setupBiometrics,
     checkBiometrics,
     remainingLockoutSeconds,
-    lockoutTimestamp,
-    // isStrongBiometryAvailable
+    lockoutEndTime
   };
 };
 
-
-export { useBiometricAuth, BiometryError, BiometricAuthOutcome };
+export { useBiometricAuth, BiometryError, BiometricAuthOutcome, BIOMETRIC_SERVER_KEY };
