@@ -15,6 +15,7 @@ jest.mock("@capacitor/core", () => ({
   ...jest.requireActual("@capacitor/core"),
   Capacitor: {
     isNativePlatform: () => isNativePlatformMock(),
+    getPlatform: jest.fn(() => 'ios'),
   },
   registerPlugin: jest.fn(() => ({
     addListener: jest.fn(),
@@ -393,6 +394,6 @@ describe("useBiometricAuth Hook: checkBiometrics", () => {
       fireEvent.click(getByTestId("handle-biometric-btn"));
     });
 
-    expect(await findByText("biometry.errors.notAvailable")).toBeInTheDocument();
+    expect(await findByText("Not Available")).toBeInTheDocument();
   });
 });
