@@ -205,9 +205,19 @@ describe("Manage password", () => {
     });
 
     act(() => {
-      fireEvent.click(
-        getByTestId("alert-cancel-enable-password-confirm-button")
+      // Find the confirm button from the open alert
+      const alerts = Array.from(
+        document.querySelectorAll(
+          '[data-testid="alert-cancel-enable-password"]'
+        )
+      ) as HTMLElement[];
+      const openAlert = alerts.find(
+        (a) => a.getAttribute("is-open") === "true"
       );
+      const confirmButton = openAlert?.querySelector(
+        '[data-testid="alert-cancel-enable-password-confirm-button"]'
+      ) as HTMLElement;
+      fireEvent.click(confirmButton);
     });
 
     await waitFor(() => {

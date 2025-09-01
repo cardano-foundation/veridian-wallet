@@ -38,9 +38,9 @@ import {
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
   updateProfileCreationStatus,
-
   setConnectedDApp,
-  setPendingDAppConnection} from "../../../store/reducers/profileCache";
+  setPendingDAppConnection,
+} from "../../../store/reducers/profileCache";
 import {
   setQueueIncomingRequest,
   setToastMsg,
@@ -460,9 +460,11 @@ describe("KERIA operation state changed handler", () => {
     const id = "id";
     const connectionMock = {
       id: "id",
-      creationStatus: CreationStatus.PENDING,
-      createdAt: new Date().toISOString(),
-      alias: "CF Credential Issuance",
+      label: "CF Credential Issuance",
+      createdAtUTC: new Date().toISOString(),
+      status: ConnectionStatus.PENDING,
+      contactId: "contact-id",
+      identifier: "test-identifier",
       oobi: "http://oobi.com/",
     };
     getConnectionShortDetailByIdMock.mockResolvedValue(connectionMock);
