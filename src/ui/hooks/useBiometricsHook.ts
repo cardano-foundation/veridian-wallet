@@ -51,21 +51,32 @@ const useBiometricAuth = (isLockPage?: boolean) => {
   });
   const [lockoutEndTime, setLockoutEndTime] = useState<number | null>(null);
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(30);
+  const [isStrongBiometry, setIsStrongBiometry] = useState(false);
   const { setPauseTimestamp } = useActivityTimer();
 
   const checkBiometrics = async () => {
     if (!Capacitor.isNativePlatform()) {
       const result = { isAvailable: false, biometryType: BiometryType.NONE };
       setBiometricInfo(result);
+      setIsStrongBiometry(false);
       return result;
     }
     try {
       const biometricResult: AvailableResult = await NativeBiometric.isAvailable();
       setBiometricInfo(biometricResult);
+
+      const strongBiometry =
+        biometricResult.biometryType === BiometryType.FACE_ID ||
+        biometricResult.biometryType === BiometryType.TOUCH_ID ||
+        biometricResult.biometryType === BiometryType.FINGERPRINT ||
+        biometricResult.biometryType === BiometryType.IRIS_AUTHENTICATION;
+        
+      setIsStrongBiometry(strongBiometry);
       return biometricResult;
     } catch (error) {
       const result = { isAvailable: false, biometryType: BiometryType.NONE };
       setBiometricInfo(result);
+      setIsStrongBiometry(false);
       return result;
     }
   };
@@ -239,7 +250,8 @@ const useBiometricAuth = (isLockPage?: boolean) => {
     setupBiometrics,
     checkBiometrics,
     remainingLockoutSeconds,
-    lockoutEndTime
+    lockoutEndTime,
+    isStrongBiometry
   };
 };
 

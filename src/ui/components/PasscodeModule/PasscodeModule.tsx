@@ -18,11 +18,7 @@ const PasscodeModule = ({
   handleBiometricButtonClick,
 }: PasscodeModuleProps) => {
   const biometricsCache = useSelector(getBiometricsCache);
-  const { biometricInfo } = useBiometricAuth();
-  const isStrongBiometry =
-    biometricInfo.biometryType === BiometryType.FACE_ID ||
-    biometricInfo.biometryType === BiometryType.TOUCH_ID ||
-    biometricInfo.biometryType === BiometryType.FINGERPRINT;
+  const { biometricInfo, isStrongBiometry } = useBiometricAuth();
   const numbers = PASSCODE_MAPPING.numbers;
   const labels = PASSCODE_MAPPING.labels;
   const rows = [];
