@@ -3,7 +3,7 @@ import {
   BiometricAuthError,
   BiometryType,
   NativeBiometric,
-  SetCredentialOptions,
+  SetCredentialOptions
 } from "@capgo/capacitor-native-biometric";
 import { Capacitor } from "@capacitor/core";
 import { useEffect, useState } from "react";
@@ -28,7 +28,7 @@ const BIOMETRIC_SERVER_USERNAME = "biometric_app_username";
 
 const isBiometricPluginError = (
   error: unknown,
-): error is { code: BiometricAuthError; message: string } => {
+): error is { code: BiometricAuthError | string; message: string } => {
   return (
     typeof error === "object" &&
     error !== null &&
@@ -44,7 +44,6 @@ const useBiometricAuth = (isLockPage?: boolean) => {
     biometryType: BiometryType.NONE,
   });
   const { setPauseTimestamp } = useActivityTimer();
-  const { passwordIsSet } = useAppSelector(getAuthentication);
 
   const checkBiometrics = async () => {
     if (!Capacitor.isNativePlatform()) {
@@ -82,7 +81,9 @@ const useBiometricAuth = (isLockPage?: boolean) => {
     const isStrongBiometry =
       biometryType === BiometryType.FACE_ID ||
       biometryType === BiometryType.TOUCH_ID ||
-      biometryType === BiometryType.FINGERPRINT;
+      biometryType === BiometryType.FINGERPRINT ||
+      biometryType === BiometryType.IRIS_AUTHENTICATION ||
+      biometryType === BiometryType.MULTIPLE;
 
     if (!isStrongBiometry) {
       return new BiometryError(
@@ -92,17 +93,26 @@ const useBiometricAuth = (isLockPage?: boolean) => {
     }
 
     try {
-      await NativeBiometric.verifyIdentity({
-        reason: i18n.t("biometry.reason") as string,
-        title: i18n.t("biometry.title") as string,
-        subtitle: i18n.t("biometry.subtitle") as string,
-        negativeButtonText: i18n.t("biometry.canceltitle") as string,
-        fallbackTitle: i18n.t(
-          !isLockPage && passwordIsSet
-            ? "biometry.iosfallbackpasswordtitle"
-            : "biometry.iosfallbacktitle",
-        ) as string,
-      });
+      if (Capacitor.getPlatform() === 'android') {
+        await NativeBiometric.verifyIdentity({
+          reason: i18n.t("biometry.reason") as string,
+          title: i18n.t("biometry.title") as string,
+          subtitle: i18n.t("biometry.subtitle") as string,
+          negativeButtonText: i18n.t("biometry.canceltitle") as string,
+          allowedBiometryTypes: [
+            BiometryType.FINGERPRINT,
+            BiometryType.IRIS_AUTHENTICATION,
+          ],
+          maxAttempts: 5,
+        });
+      } else { // iOS
+        await NativeBiometric.verifyIdentity({
+          reason: i18n.t("biometry.reason") as string,
+          title: i18n.t("biometry.title") as string,
+          subtitle: i18n.t("biometry.subtitle") as string,
+          negativeButtonText: i18n.t("biometry.canceltitle") as string,
+        });
+      }
 
       await NativeBiometric.getCredentials({
         server: BIOMETRIC_SERVER_KEY,
@@ -115,11 +125,13 @@ const useBiometricAuth = (isLockPage?: boolean) => {
       let code = BiometricAuthError.UNKNOWN_ERROR;
 
       if (isBiometricPluginError(error)) {
-        code = error.code;
+        const parsedCode = typeof error.code === 'string' ? parseInt(error.code, 10) : error.code;
+        code = isNaN(parsedCode) ? BiometricAuthError.UNKNOWN_ERROR : parsedCode;
         message = error.message;
       } else if (error instanceof Error) {
         message = error.message;
       }
+
 
       return new BiometryError(message, code);
     }
@@ -135,7 +147,9 @@ const useBiometricAuth = (isLockPage?: boolean) => {
     const isStrongBiometry =
       biometryType === BiometryType.FACE_ID ||
       biometryType === BiometryType.TOUCH_ID ||
-      biometryType === BiometryType.FINGERPRINT;
+      biometryType === BiometryType.FINGERPRINT ||
+      biometryType === BiometryType.IRIS_AUTHENTICATION ||
+      biometryType === BiometryType.MULTIPLE;
 
     if (!isStrongBiometry) {
       showError(
@@ -160,7 +174,7 @@ const useBiometricAuth = (isLockPage?: boolean) => {
         await NativeBiometric.setCredentials(credOptions);
       } catch (error) {
         if (error instanceof Error) {
-          showError(i18n.t("biometry.errors.setupFailed"), error, dispatch);
+          throw new Error(i18n.t("biometry.errors.setupFailed") as string);
         }
       }
     }
@@ -178,5 +192,6 @@ const useBiometricAuth = (isLockPage?: boolean) => {
     // isStrongBiometryAvailable
   };
 };
+
 
 export { useBiometricAuth, BiometryError };
