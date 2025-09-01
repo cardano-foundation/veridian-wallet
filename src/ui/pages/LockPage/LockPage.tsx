@@ -1,5 +1,5 @@
 import { App, AppState } from "@capacitor/app";
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, PluginListenerHandle } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -26,16 +26,10 @@ import {
   setInitializationPhase,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
-import {
-  ErrorMessage,
-  MESSAGE_MILLISECONDS,
-} from "../../components/ErrorMessage";
+import { ErrorMessage, MESSAGE_MILLISECONDS } from "../../components/ErrorMessage";
 import { ForgotAuthInfo } from "../../components/ForgotAuthInfo";
 import { ForgotType } from "../../components/ForgotAuthInfo/ForgotAuthInfo.types";
-import {
-  MaxLoginAttemptAlert,
-  useLoginAttempt,
-} from "../../components/MaxLoginAttemptAlert";
+import { MaxLoginAttemptAlert, useLoginAttempt } from "../../components/MaxLoginAttemptAlert";
 import { PageFooter } from "../../components/PageFooter";
 import { PasscodeModule } from "../../components/PasscodeModule";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
@@ -53,6 +47,7 @@ const LockPageContainer = () => {
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [passcodeIncorrect, setPasscodeIncorrect] = useState(false);
   const preventBiometricOnEvent = useRef(false);
+  const isBiometricPromptActive = useRef(false); // Track active biometric prompt
 
   const { handleBiometricAuth } = useBiometricAuth(true);
   const biometricsCache = useSelector(getBiometricsCache);
@@ -94,17 +89,22 @@ const LockPageContainer = () => {
     }
   }, [passcodeIncorrect]);
 
+  const handleUseBiometrics = useCallback(async () => {
+    if (biometricsCache.enabled && !isBiometricPromptActive.current) {
+      isBiometricPromptActive.current = true;
+      try {
+        await handleBiometrics();
+      } finally {
+        isBiometricPromptActive.current = false;
+      }
+    }
+  }, [biometricsCache.enabled]);
+
   useEffect(() => {
     if (firstAppLaunch) {
       handleUseBiometrics();
     }
-  }, []);
-
-  const handleUseBiometrics = async () => {
-    if (biometricsCache.enabled) {
-      await handleBiometrics();
-    }
-  };
+  }, [firstAppLaunch, handleUseBiometrics]);
 
   const handlePinChange = async (digit: number) => {
     const updatedPasscode = `${passcode}${digit}`;
@@ -182,7 +182,6 @@ const LockPageContainer = () => {
 
   const outFocusAfterLockPage = useCallback(() => {
     if (Capacitor.isNativePlatform()) {
-      // NOTE: focus to passcode button when open lock page to close keyboard and unfocus any textbox
       Keyboard.hide();
       document.getElementById("passcode-button-1")?.focus();
     }
@@ -192,23 +191,28 @@ const LockPageContainer = () => {
     outFocusAfterLockPage();
   }, [outFocusAfterLockPage]);
 
-  useEffect(() => {
-    const handleAppStateChange = async (state: AppState) => {
+  const handleAppStateChange = useCallback(
+    async (state: AppState) => {
       outFocusAfterLockPage();
 
-      if (state.isActive && !preventBiometricOnEvent.current) {
+      if (state.isActive && !preventBiometricOnEvent.current && !isBiometricPromptActive.current) {
         handleUseBiometrics();
       }
-    };
+    },
+    [outFocusAfterLockPage, handleUseBiometrics]
+  );
 
-    const listener = App.addListener("appStateChange", handleAppStateChange);
-
+  useEffect(() => {
+    let listenerHandle: PluginListenerHandle;
+    if (Capacitor.isNativePlatform()) {
+      App.addListener("appStateChange", handleAppStateChange).then((handle) => {
+        listenerHandle = handle;
+      });
+    }
     return () => {
-      listener
-        .then((value) => value.remove())
-        .catch((e) => showError("Unable to clear listener", e));
+      listenerHandle?.remove();
     };
-  }, []);
+  }, [handleAppStateChange]);
 
   const handleRecoveryButtonClick = async () => {
     if (authentication.seedPhraseIsSet) {
@@ -258,10 +262,7 @@ const LockPageContainer = () => {
         <MaxLoginAttemptAlert lockDuration={lockDuration} />
       ) : (
         <>
-          <h2
-            className={`${pageId}-title`}
-            data-testid={`${pageId}-title`}
-          >
+          <h2 className={`${pageId}-title`} data-testid={`${pageId}-title`}>
             {i18n.t("lockpage.title")}
           </h2>
           <p
@@ -272,11 +273,7 @@ const LockPageContainer = () => {
           </p>
           <PasscodeModule
             error={
-              <ErrorMessage
-                message={error}
-                timeout={true}
-                key={error}
-              />
+              <ErrorMessage message={error} timeout={true} key={error} />
             }
             hasError={!!error}
             passcode={passcode}
@@ -325,6 +322,4 @@ const LockPage = () => {
   return <LockPageContainer />;
 };
 
-export {
-  LockPage
-}
+export { LockPage };
