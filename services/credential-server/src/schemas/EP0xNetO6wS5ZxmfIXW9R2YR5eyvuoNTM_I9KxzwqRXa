@@ -1,0 +1,107 @@
+{
+  "$id": "EP0xNetO6wS5ZxmfIXW9R2YR5eyvuoNTM_I9KxzwqRXa",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Fishing & Hunting License",
+  "description": "This credential represents an official Fishing & Hunting License. It authorizes the individual issuee to engage in regulated fishing and hunting activities within the specified jurisdiction.",
+  "type": "object",
+  "credentialType": "FishingHuntingLicense",
+  "version": "1.0.0",
+  "properties": {
+    "v": {
+      "description": "Version",
+      "type": "string"
+    },
+    "d": {
+      "description": "Credential SAID",
+      "type": "string"
+    },
+    "u": {
+      "description": "One time use nonce",
+      "type": "string"
+    },
+    "i": {
+      "description": "Issuee AID",
+      "type": "string"
+    },
+    "ri": {
+      "description": "Credential status registry",
+      "type": "string"
+    },
+    "s": {
+      "description": "Schema SAID",
+      "type": "string"
+    },
+    "a": {
+      "oneOf": [
+        {
+          "description": "Attributes block SAID",
+          "type": "string"
+        },
+        {
+          "$id": "ECz16hWA0iWvr9YPKcAyAqTyIIj3GaKUdG9Tip35cmqp",
+          "description": "Attributes block",
+          "type": "object",
+          "properties": {
+            "d": {
+              "description": "Attributes block SAID",
+              "type": "string"
+            },
+            "i": {
+              "description": "Issuee AID",
+              "type": "string"
+            },
+            "dt": {
+              "description": "Issuance date time",
+              "type": "string",
+              "format": "date-time"
+            },
+            "fullName": {
+              "description": "Full name",
+              "type": "string"
+            },
+            "address": {
+              "description": "Address",
+              "type": "string"
+            },
+            "dateOfBirth": {
+              "description": "Date of birth",
+              "type": "string"
+            },
+            "troutStampValidity": {
+              "description": "Trout stamp validity",
+              "type": "string"
+            },
+            "turkeyStampValidity": {
+              "description": "Turkey stamp validity",
+              "type": "string"
+            },
+            "duckStampValidity": {
+              "description": "Duck stamp validity",
+              "type": "string"
+            },
+            "deerStampValidity": {
+              "description": "Deer stamp validity",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "i",
+            "dt",
+            "fullName",
+            "address",
+            "dateOfBirth"
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "i",
+    "ri",
+    "s",
+    "d",
+    "a"
+  ]
+}

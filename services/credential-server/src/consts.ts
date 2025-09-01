@@ -6,11 +6,16 @@ export const RARE_EVO_DEMO_SCHEMA_SAID =
 export const LE_SCHEMA_SAID = "ENPXp1vQzRF6JwIuS-mp2U8Uf1MoADoP_GqQ62VsDZWY";
 export const F_EMPLOYEE_DEMO_SCHEMA_SAID =
   "EL9oOWU_7zQn_rD--Xsgi3giCWnFDaNvFMUGTOZx1ARO";
+export const BIRTH_CERTIFICATE = "EL2nvC1sGc8d2NH2Uo63lJXB4a6edfEcqm10FNvBjpJS";
+export const FISHING_HUNTING_LICENSE =
+  "EP0xNetO6wS5ZxmfIXW9R2YR5eyvuoNTM_I9KxzwqRXa";
 export const ACDC_SCHEMAS_ID = [
   QVI_SCHEMA_SAID,
   LE_SCHEMA_SAID,
   RARE_EVO_DEMO_SCHEMA_SAID,
   F_EMPLOYEE_DEMO_SCHEMA_SAID,
+  BIRTH_CERTIFICATE,
+  FISHING_HUNTING_LICENSE,
 ];
 
 export const ACDC_SCHEMAS = [
@@ -29,5 +34,13 @@ export const ACDC_SCHEMAS = [
   {
     id: LE_SCHEMA_SAID,
     name: "Legal Entity vLEI Credential",
+  },
+  {
+    id: BIRTH_CERTIFICATE,
+    name: "Birth Certificate",
+  },
+  {
+    id: FISHING_HUNTING_LICENSE,
+    name: "Fishing & Hunting License",
   },
 ];

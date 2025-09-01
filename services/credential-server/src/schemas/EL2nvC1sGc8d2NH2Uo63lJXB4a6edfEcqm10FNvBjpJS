@@ -1,0 +1,101 @@
+{
+  "$id": "EL2nvC1sGc8d2NH2Uo63lJXB4a6edfEcqm10FNvBjpJS",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Birth Certificate",
+  "description": "This credential represents an official Birth Certificate. It establishes proof of identity and birth details for the individual issuee, including their full name, sex, date of birth, and place of birth.",
+  "type": "object",
+  "credentialType": "BirthCertificate",
+  "version": "1.0.0",
+  "properties": {
+    "v": {
+      "description": "Version",
+      "type": "string"
+    },
+    "d": {
+      "description": "Credential SAID",
+      "type": "string"
+    },
+    "u": {
+      "description": "One time use nonce",
+      "type": "string"
+    },
+    "i": {
+      "description": "Issuee AID",
+      "type": "string"
+    },
+    "ri": {
+      "description": "Credential status registry",
+      "type": "string"
+    },
+    "s": {
+      "description": "Schema SAID",
+      "type": "string"
+    },
+    "a": {
+      "oneOf": [
+        {
+          "description": "Attributes block SAID",
+          "type": "string"
+        },
+        {
+          "$id": "EFwz35iPWRAHsmhiRABhm913F8oiSTi3dxGxQJ9_qcw0",
+          "description": "Attributes block",
+          "type": "object",
+          "properties": {
+            "d": {
+              "description": "Attributes block SAID",
+              "type": "string"
+            },
+            "i": {
+              "description": "Issuee AID",
+              "type": "string"
+            },
+            "dt": {
+              "description": "Issuance date time",
+              "type": "string",
+              "format": "date-time"
+            },
+            "fullName": {
+              "description": "Full name",
+              "type": "string"
+            },
+            "sex": {
+              "description": "Sex",
+              "type": "string"
+            },
+            "dateOfBirth": {
+              "description": "Date of birth",
+              "type": "string"
+            },
+            "placeOfBirth": {
+              "description": "Place of birth",
+              "type": "string"
+            },
+            "countryOfBirth": {
+              "description": "Country of birth",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "i",
+            "dt",
+            "fullName",
+            "sex",
+            "dateOfBirth",
+            "placeOfBirth",
+            "countryOfBirth"
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "i",
+    "ri",
+    "s",
+    "d",
+    "a"
+  ]
+}
