@@ -12,7 +12,7 @@ interface MultiSigGroup {
   connections: ConnectionShortDetails[];
 }
 
-interface ConnectionData {
+interface DAppConnection {
   meerkatId: string; //<dappId>
   name?: string;
   url?: string;
@@ -25,10 +25,12 @@ interface Profile {
   identity: IdentifierShortDetails;
   connections: RegularConnectionDetails[];
   multisigConnections: MultisigConnectionDetails[];
-  peerConnections: ConnectionData[];
+  peerConnections: DAppConnection[];
   credentials: CredentialShortDetails[];
   archivedCredentials: CredentialShortDetails[];
   notifications: KeriaNotification[];
+  connectedDApp?: DAppConnection | null;
+  pendingDAppConnection?: DAppConnection | null;
 }
 
 interface ProfileCache {
@@ -40,6 +42,10 @@ interface ProfileCache {
   individualFirstCreate?: boolean;
   openConnectionId?: string;
   missingAliasUrl?: { url: string; identifier?: string };
+  connectedDApp?: DAppConnection | null;
+  pendingDAppConnection?: DAppConnection | null;
+  isConnectingToDApp?: boolean;
+  showDAppConnect?: boolean;
 }
 
-export type { Profile, ProfileCache, ConnectionData, MultiSigGroup };
+export type { Profile, ProfileCache, DAppConnection, MultiSigGroup };

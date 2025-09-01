@@ -8,7 +8,7 @@ import {
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 import { RootState } from "../../index";
 import {
-  ConnectionData,
+  DAppConnection,
   MultiSigGroup,
   Profile,
   ProfileCache,
@@ -17,7 +17,7 @@ import {
 // Shared empty arrays — return these to keep selector return references stable
 const DefaultArrayValue = {
   Notifications: [] as KeriaNotification[],
-  PeerConn: [] as ConnectionData[],
+  PeerConn: [] as DAppConnection[],
   ArchivedCreds: [] as CredentialShortDetails[],
   Credentials: [] as CredentialShortDetails[],
   Connections: [] as RegularConnectionDetails[],
@@ -225,7 +225,7 @@ export const profilesCacheSlice = createSlice({
 
       targetProfile.connections = [...existing, mapped];
     },
-    setPeerConnections: (state, action: PayloadAction<ConnectionData[]>) => {
+    setPeerConnections: (state, action: PayloadAction<DAppConnection[]>) => {
       if (!state.defaultProfile) return;
       const defaultProfile = state.profiles[state.defaultProfile];
       if (!defaultProfile) return;
@@ -234,9 +234,9 @@ export const profilesCacheSlice = createSlice({
     },
     updatePeerConnectionsFromCore: (
       state,
-      action: PayloadAction<ConnectionData[]>
+      action: PayloadAction<DAppConnection[]>
     ) => {
-      const updateData: Record<string, ConnectionData[]> =
+      const updateData: Record<string, DAppConnection[]> =
         action.payload.reduce((result, item) => {
           if (!item.selectedAid) return result;
           let currentArr = result[item.selectedAid];
@@ -249,7 +249,7 @@ export const profilesCacheSlice = createSlice({
 
           result[item.selectedAid] = currentArr;
           return result;
-        }, {} as Record<string, ConnectionData[]>);
+        }, {} as Record<string, DAppConnection[]>);
 
       Object.keys(updateData).forEach((key) => {
         if (!state.profiles[key]) return;
@@ -340,6 +340,48 @@ export const profilesCacheSlice = createSlice({
       targetProfile.multisigConnections = [...existing, mapped];
     },
 
+    // Wallet Connection Actions
+    setConnectedDApp: (state, action: PayloadAction<DAppConnection | null>) => {
+      // Store in global state for cross-profile access
+      state.connectedDApp = action.payload;
+
+      // Also store in current profile for profile-specific access
+      if (state.defaultProfile && state.profiles[state.defaultProfile]) {
+        state.profiles[state.defaultProfile].connectedDApp = action.payload;
+      }
+    },
+    setPendingDAppConnection: (
+      state,
+      action: PayloadAction<DAppConnection | null>
+    ) => {
+      // Store in global state for cross-profile access
+      state.pendingDAppConnection = action.payload;
+
+      // Also store in current profile for profile-specific access
+      if (state.defaultProfile && state.profiles[state.defaultProfile]) {
+        state.profiles[state.defaultProfile].pendingDAppConnection =
+          action.payload;
+      }
+    },
+    setIsConnectingToDApp: (state, action: PayloadAction<boolean>) => {
+      state.isConnectingToDApp = action.payload;
+    },
+    showDAppConnect: (state, action: PayloadAction<boolean>) => {
+      state.showDAppConnect = action.payload;
+    },
+    clearDAppConnection: (state) => {
+      state.connectedDApp = null;
+      state.pendingDAppConnection = null;
+      state.isConnectingToDApp = false;
+      state.showDAppConnect = false;
+
+      // Clear from current profile as well
+      if (state.defaultProfile && state.profiles[state.defaultProfile]) {
+        state.profiles[state.defaultProfile].connectedDApp = null;
+        state.profiles[state.defaultProfile].pendingDAppConnection = null;
+      }
+    },
+
     setOpenConnectionId: (state, action: PayloadAction<string | undefined>) => {
       state.openConnectionId = action.payload;
     },
@@ -381,6 +423,11 @@ export const {
   updateOrAddMultisigConnectionCache,
   setOpenConnectionId,
   setMissingAliasConnection,
+  setConnectedDApp,
+  setPendingDAppConnection,
+  setIsConnectingToDApp,
+  showDAppConnect,
+  clearDAppConnection,
 } = profilesCacheSlice.actions;
 
 const getProfiles = (state: RootState) => state.profilesCache.profiles;
@@ -425,6 +472,18 @@ const getIndividualFirstCreateSetting = (state: RootState) =>
 
 const getScanGroupId = (state: RootState) => state.profilesCache?.scanGroupId;
 
+const getConnectedDApp = (state: RootState) =>
+  state.profilesCache.connectedDApp;
+
+const getPendingDAppConnection = (state: RootState) =>
+  state.profilesCache.pendingDAppConnection;
+
+const getIsConnectingToDApp = (state: RootState) =>
+  state.profilesCache.isConnectingToDApp;
+
+const getShowDAppConnect = (state: RootState) =>
+  state.profilesCache.showDAppConnect;
+
 export {
   getCredsArchivedCache,
   getCredsCache,
@@ -440,4 +499,8 @@ export {
   getMultisigConnectionsCache,
   getOpenConnectionId,
   getMissingAliasConnection,
+  getConnectedDApp,
+  getPendingDAppConnection,
+  getIsConnectingToDApp,
+  getShowDAppConnect,
 };

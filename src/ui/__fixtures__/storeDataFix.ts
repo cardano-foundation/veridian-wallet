@@ -52,6 +52,10 @@ export const profileCacheFixData: ProfileCache = {
   defaultProfile: filteredIdentifierFix[0].id,
   recentProfiles: [...recentProfilesDataFix],
   multiSigGroup: undefined,
+  connectedDApp: null,
+  pendingDAppConnection: null,
+  isConnectingToDApp: false,
+  showDAppConnect: false,
 };
 
 export const defaultProfileDataFix =
@@ -92,10 +96,6 @@ export const storeStateFixData: RootState = {
   seedPhraseCache: {
     seedPhrase: "",
     bran: "",
-  },
-  walletConnectionsCache: {
-    connectedWallet: null,
-    pendingConnection: null,
   },
   viewTypeCache: {
     credential: {

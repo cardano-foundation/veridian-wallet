@@ -66,10 +66,10 @@ describe("NextRoute", () => {
         profiles: {},
         recentProfiles: [],
         multiSigGroup: undefined,
-      },
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {
@@ -312,14 +312,10 @@ describe("getNextRoute", () => {
       profiles: {},
       recentProfiles: [],
       multiSigGroup: undefined,
-    },
-    seedPhraseCache: {
-      seedPhrase: "",
-      bran: "",
-    },
-    walletConnectionsCache: {
-      connectedWallet: null,
-      pendingConnection: null,
+      connectedDApp: null,
+      pendingDAppConnection: null,
+      isConnectingToDApp: false,
+      showDAppConnect: false,
     },
     viewTypeCache: {
       credential: {

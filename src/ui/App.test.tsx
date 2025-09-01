@@ -220,10 +220,10 @@ const initialState = {
   profilesCache: {
     profiles: {},
     defaultProfile: undefined,
-  },
-  walletConnectionsCache: {
-    connectedWallet: null,
-    pendingConnection: null,
+    connectedDApp: null,
+    pendingDAppConnection: null,
+    isConnectingToDApp: false,
+    showDAppConnect: false,
   },
   viewTypeCache: {
     identifier: {
@@ -504,10 +504,13 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-
-      walletConnectionsCache: {
+      profilesCache: {
+        profiles: {},
+        defaultProfile: undefined,
         connectedWallet: null,
         pendingConnection: null,
+        isConnecting: false,
+        showConnectWallet: false,
       },
       viewTypeCache: {
         credential: {
@@ -578,10 +581,13 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-
-      walletConnectionsCache: {
+      profilesCache: {
+        profiles: {},
+        defaultProfile: undefined,
         connectedWallet: null,
         pendingConnection: null,
+        isConnecting: false,
+        showConnectWallet: false,
       },
       viewTypeCache: {
         credential: {
@@ -814,10 +820,13 @@ describe("System threat alert", () => {
         seedPhrase: "",
         bran: "",
       },
-
-      walletConnectionsCache: {
+      profilesCache: {
+        profiles: {},
+        defaultProfile: undefined,
         connectedWallet: null,
         pendingConnection: null,
+        isConnecting: false,
+        showConnectWallet: false,
       },
       viewTypeCache: {
         credential: {

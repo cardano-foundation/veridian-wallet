@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 import { ToastMsgType } from "../../../../globals/types";
@@ -35,7 +36,8 @@ const initialState = {
     },
     toastMsgs: [],
   },
-  walletConnectionsCache: {
+  profilesCache: {
+    ...profileCacheFixData,
     pendingConnection: null,
   },
 };
@@ -176,7 +178,8 @@ describe("Confirm connect modal", () => {
           passwordIsSet: true,
         },
       },
-      walletConnectionsCache: {
+      profilesCache: {
+        ...profileCacheFixData,
         pendingConnection: walletConnectionsFix[0],
       },
     };

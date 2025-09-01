@@ -6,10 +6,13 @@ import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { setCurrentOperation } from "../../../../../store/reducers/stateCache";
 import {
-  getPendingConnection,
-  setIsConnecting,
-  setPendingConnection,
-} from "../../../../../store/reducers/walletConnectionsCache";
+  getPendingDAppConnection,
+  setIsConnectingToDApp,
+  setPendingDAppConnection,
+
+  getCurrentProfile,
+  getPeerConnections,
+  setPeerConnections} from "../../../../../store/reducers/profileCache";
 import { OperationType, ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { combineClassNames } from "../../../../utils/style";
@@ -20,14 +23,9 @@ import { PageHeader } from "../../../PageHeader";
 import { SidePageContentProps } from "../../../SidePage/SidePage.types";
 import { ANIMATION_DURATION } from "../../../SideSlider/SideSlider.types";
 import "./WalletConnect.scss";
-import {
-  getCurrentProfile,
-  getPeerConnections,
-  setPeerConnections,
-} from "../../../../../store/reducers/profileCache";
 
 const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
-  const pendingConnection = useAppSelector(getPendingConnection);
+  const pendingDAppConnection = useAppSelector(getPendingDAppConnection);
   const dispatch = useAppDispatch();
   const defaultProfile = useAppSelector(getCurrentProfile);
   const [openDeclineAlert, setOpenDeclineAlert] = useState(false);
@@ -35,27 +33,27 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
   const existingConnections = useAppSelector(getPeerConnections);
 
   const classes = combineClassNames({
-    show: !!pendingConnection,
-    hide: !pendingConnection,
+    show: !!pendingDAppConnection,
+    hide: !pendingDAppConnection,
   });
 
   const openDecline = () => {
     setOpenDeclineAlert(true);
   };
 
-  if (!pendingConnection) return null;
+  if (!pendingDAppConnection) return null;
 
   const handleClose = () => {
     setOpenPage(false);
 
     setTimeout(() => {
-      dispatch(setPendingConnection(null));
+      dispatch(setPendingDAppConnection(null));
     }, ANIMATION_DURATION);
   };
 
   const handleAccept = async () => {
     if (!defaultProfile) return;
-    const pendingDAppMeerkat = pendingConnection.meerkatId;
+    const pendingDAppMeerkat = pendingDAppConnection.meerkatId;
     const peerConnectionId = `${pendingDAppMeerkat}:${defaultProfile.identity.id}`;
 
     try {
@@ -93,7 +91,7 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
           );
         }
 
-        dispatch(setIsConnecting(true));
+        dispatch(setIsConnectingToDApp(true));
         dispatch(
           setCurrentOperation(OperationType.OPEN_WALLET_CONNECTION_DETAIL)
         );
@@ -117,7 +115,7 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
     <>
       <ResponsivePageLayout
         pageId="connect-wallet-stage-one"
-        activeStatus={!!pendingConnection}
+        activeStatus={!!pendingDAppConnection}
         customClass={classes}
         header={
           <PageHeader

@@ -21,7 +21,6 @@ type BackRouteStore = Pick<
   | "ssiAgentCache"
   | "stateCache"
   | "profilesCache"
-  | "walletConnectionsCache"
   | "viewTypeCache"
   | "biometricsCache"
 >;
@@ -75,10 +74,10 @@ describe("getBackRoute", () => {
         profiles: {},
         recentProfiles: [],
         multiSigGroup: undefined,
-      },
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {
@@ -178,6 +177,10 @@ describe("getPreviousRoute", () => {
         profiles: {},
         recentProfiles: [],
         multiSigGroup: undefined,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       stateCache: {
         isOnline: true,
@@ -209,11 +212,6 @@ describe("getPreviousRoute", () => {
         },
         toastMsgs: [],
         pendingJoinGroupMetadata: null,
-      },
-
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
       },
       viewTypeCache: {
         credential: {

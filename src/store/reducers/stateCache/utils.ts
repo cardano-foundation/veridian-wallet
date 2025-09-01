@@ -5,7 +5,7 @@ import {
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
-import { ConnectionData } from "../profileCache";
+import { DAppConnection } from "../profileCache";
 
 const filterProfileData = (
   identifiers: Record<string, IdentifierShortDetails>,
@@ -13,7 +13,7 @@ const filterProfileData = (
   allArchivedCreds: CredentialShortDetails[],
   allConnections: RegularConnectionDetails[],
   allMultisigConnections: MultisigConnectionDetails[],
-  allPeerConnections: ConnectionData[],
+  allPeerConnections: DAppConnection[],
   allNotifications: KeriaNotification[],
   profileId: string
 ) => {

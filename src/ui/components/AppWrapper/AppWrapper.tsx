@@ -32,7 +32,7 @@ import {
   setConnectionsCache,
   setMultisigConnectionsCache,
   updateOrAddConnectionCache,
-  ConnectionData,
+  DAppConnection,
   Profile,
   setCredsArchivedCache,
   setCurrentProfile,
@@ -41,7 +41,10 @@ import {
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
   updateRecentProfiles,
-} from "../../../store/reducers/profileCache";
+
+  getConnectedDApp,
+  setConnectedDApp,
+  setPendingDAppConnection} from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   getForceInitApp,
@@ -73,11 +76,6 @@ import {
   setFavouritesCredsCache,
 } from "../../../store/reducers/viewTypeCache";
 import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
-import {
-  getConnectedWallet,
-  setConnectedWallet,
-  setPendingConnection,
-} from "../../../store/reducers/walletConnectionsCache";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { useProfile } from "../../hooks/useProfile";
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
@@ -153,7 +151,7 @@ const peerConnectRequestSignChangeHandler = async (
     );
 
   if (peerConnectionRecord) {
-    const peerConnection: ConnectionData = {
+    const peerConnection: DAppConnection = {
       meerkatId: peerConnectionRecord.meerkatId,
       name: peerConnectionRecord.name,
       url: peerConnectionRecord.url,
@@ -186,9 +184,9 @@ const peerConnectedChangeHandler = async (
       `${connection.meerkatId}:${connection.selectedAid}` === newConnectionId
   );
   if (connectedWallet) {
-    dispatch(setConnectedWallet(connectedWallet));
+    dispatch(setConnectedDApp(connectedWallet));
   }
-  dispatch(setPendingConnection(null));
+  dispatch(setPendingDAppConnection(null));
   dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
 };
 
@@ -203,7 +201,7 @@ const peerDisconnectedChangeHandler = async (
     connectedWalletId &&
     connectedWalletId.includes(event.payload.dAppAddress)
   ) {
-    dispatch(setConnectedWallet(null));
+    dispatch(setConnectedDApp(null));
     dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
   }
 };
@@ -212,7 +210,7 @@ const peerConnectionBrokenChangeHandler = async (
   event: PeerConnectionBrokenEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  dispatch(setConnectedWallet(null));
+  dispatch(setConnectedDApp(null));
   dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
 };
 
@@ -220,7 +218,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
   const isOnline = useAppSelector(getIsOnline);
   const dispatch = useAppDispatch();
   const authentication = useAppSelector(getAuthentication);
-  const connectedWallet = useAppSelector(getConnectedWallet);
+  const connectedWallet = useAppSelector(getConnectedDApp);
   const initializationPhase = useAppSelector(getInitializationPhase);
   const recoveryCompleteNoInterruption = useAppSelector(
     getRecoveryCompleteNoInterruption

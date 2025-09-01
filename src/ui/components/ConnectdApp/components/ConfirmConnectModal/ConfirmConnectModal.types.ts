@@ -1,12 +1,12 @@
-import { ConnectionData } from "../../ConnectdApp.types";
+import { DAppConnection } from "../../ConnectdApp.types";
 
 interface ConfirmConnectModalProps {
   openModal: boolean;
   closeModal: () => void;
   onConfirm: () => void;
-  onDeleteConnection: (data: ConnectionData) => void;
+  onDeleteConnection: (data: DAppConnection) => void;
   isConnectModal: boolean;
-  connectionData?: ConnectionData;
+  connectionData?: DAppConnection;
 }
 
 export type { ConfirmConnectModalProps };

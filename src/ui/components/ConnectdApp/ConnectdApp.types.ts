@@ -1,4 +1,4 @@
-import { ConnectionData } from "../../../store/reducers/profileCache";
+import { DAppConnection } from "../../../store/reducers/profileCache";
 
 interface ConnectdAppProps {
   isOpen: boolean;
@@ -7,7 +7,7 @@ interface ConnectdAppProps {
 
 type ActionInfo = {
   type: ActionType;
-  data?: ConnectionData;
+  data?: DAppConnection;
 };
 
 enum ActionType {
@@ -19,4 +19,4 @@ enum ActionType {
 
 export { ActionType };
 
-export type { ActionInfo, ConnectdAppProps, ConnectionData };
+export type { ActionInfo, ConnectdAppProps, DAppConnection };
