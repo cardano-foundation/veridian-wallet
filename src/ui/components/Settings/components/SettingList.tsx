@@ -1,4 +1,4 @@
-import { BiometricAuthError } from "@capgo/capacitor-native-biometric";
+import { NativeBiometric } from "@capgo/capacitor-native-biometric";
 import { IonCard, IonList, IonToggle } from "@ionic/react";
 import {
   AndroidSettings,
@@ -25,7 +25,7 @@ import {
   getBiometricsCache,
   setEnableBiometricsCache,
 } from "../../../../store/reducers/biometricsCache";
-import { BiometricAuthOutcome, useBiometricAuth } from "../../../hooks/useBiometricsHook";
+import { BiometricAuthOutcome, useBiometricAuth, BIOMETRIC_SERVER_KEY } from "../../../hooks/useBiometricsHook";
 import { usePrivacyScreen } from "../../../hooks/privacyScreenHook";
 import {
   OptionIndex,
@@ -59,7 +59,7 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   const dispatch = useAppDispatch();
   const biometricsCache = useSelector(getBiometricsCache);
   const [option, setOption] = useState<number | null>(null);
-  const { biometricInfo, handleBiometricAuth, setupBiometrics } = useBiometricAuth();
+  const { biometricInfo, setupBiometrics } = useBiometricAuth();
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [changePinIsOpen, setChangePinIsOpen] = useState(false);
   const { disablePrivacy, enablePrivacy } = usePrivacyScreen();
@@ -129,13 +129,24 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   ];
 
   const handleToggleBiometricAuth = async () => {
-    await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-      new BasicRecord({
-        id: MiscRecordId.APP_BIOMETRY,
-        content: { enabled: !biometricsCache.enabled },
-      })
-    );
-    dispatch(setEnableBiometricsCache(!biometricsCache.enabled));
+    const newBiometricsEnabledState = !biometricsCache.enabled;
+
+    try {
+      if (!newBiometricsEnabledState) {
+        await NativeBiometric.deleteCredentials({ server: BIOMETRIC_SERVER_KEY });
+      }
+
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.APP_BIOMETRY,
+          content: { enabled: newBiometricsEnabledState },
+        })
+      );
+      dispatch(setEnableBiometricsCache(newBiometricsEnabledState));
+
+    } catch (e) {
+      showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
+    }
   };
 
   const handleBiometricUpdate = async () => {
@@ -152,20 +163,11 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
       await disablePrivacy();
 
       const setupResult = await setupBiometrics();
-      if (setupResult !== BiometricAuthOutcome.SUCCESS) {
-        // setupBiometrics already handles showing specific errors for WEAK_BIOMETRY and NOT_AVAILABLE
-        // For other errors, it returns GENERIC_ERROR.
-        // So, we just need to enable privacy and return.
-        await enablePrivacy();
-        return;
-      }
-
-      const authResult = await handleBiometricAuth();
       await enablePrivacy();
 
-      if (authResult === BiometricAuthOutcome.SUCCESS) {
+      if (setupResult === BiometricAuthOutcome.SUCCESS) {
         handleToggleBiometricAuth();
-      } else if (authResult === BiometricAuthOutcome.USER_CANCELLED) {
+      } else if (setupResult === BiometricAuthOutcome.USER_CANCELLED) {
         // Do nothing, user cancelled
       } else {
         // All other errors (TEMPORARY_LOCKOUT, PERMANENT_LOCKOUT, WEAK_BIOMETRY, NOT_AVAILABLE, GENERIC_ERROR)
