@@ -44,7 +44,7 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
-const handleBiometricAuthMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)); // Modified to return BiometricAuthOutcome.SUCCESS
+const handleBiometricAuthMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
 
 jest.mock("../../hooks/useBiometricsHook", () => {
   const actual = jest.requireActual("../../hooks/useBiometricsHook");
@@ -94,11 +94,11 @@ describe("SetPasscode Page", () => {
     isReverseConsecutiveMock.mockImplementation(() => false);
     isConsecutiveMock.mockImplementation(() => false);
     isRepeativeMock.mockImplementation(() => false);
-    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)); // Modified here too
+    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
     (useBiometricAuth as jest.Mock).mockReturnValue({
       biometricsIsEnabled: false,
-      biometricInfo: { // Ensure biometricInfo is always defined
-        isAvailable: true, // Default to true for tests that expect biometry
+      biometricInfo: { 
+        isAvailable: true, 
         hasCredentials: false,
         biometryType: BiometryType.FINGERPRINT,
       },
@@ -126,7 +126,6 @@ describe("SetPasscode Page", () => {
       getByText(EN_TRANSLATIONS.setpasscode.description)
     ).toBeInTheDocument();
     expect(getByTestId("set-passcode-footer")).toHaveClass("hide");
-    // Removed expectation for biometry text as it's conditionally rendered
   });
 
   test("The user can add and remove digits from the passcode", () => {
@@ -372,7 +371,7 @@ describe("SetPasscode Page", () => {
         biometryType: BiometryType.FACE_ID,
   
       },
-      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)), // Modified here
+      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
       setBiometricsIsEnabled: jest.fn(),
     });
     getPlatformsMock.mockImplementation(() => ["ios"]);
@@ -452,11 +451,11 @@ describe("SetPasscode Page", () => {
           biometricInfo: {
             isAvailable: true,
             hasCredentials: false,
-            biometryType: actual.BiometryType.FACE_ID, // Use actual BiometryType
+            biometryType: actual.BiometryType.FACE_ID, 
       
           },
           handleBiometricAuth: jest.fn(() =>
-            Promise.resolve(new actual.BiometryError("", actual.BiometricAuthError.USER_CANCEL)) // Use actual BiometryError and BiometricAuthError
+            Promise.resolve(new actual.BiometryError("", actual.BiometricAuthError.USER_CANCEL)) 
           ),
           setBiometricsIsEnabled: jest.fn(),
         })),

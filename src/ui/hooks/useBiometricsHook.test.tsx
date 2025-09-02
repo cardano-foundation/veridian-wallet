@@ -157,7 +157,7 @@ describe("useBiometricAuth Hook", () => {
   test("should return BiometricAuthOutcome.WEAK_BIOMETRY for weak biometry", async () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
-      biometryType: BiometryType.NONE, // Weak biometry type
+      biometryType: BiometryType.NONE,
     });
 
     const { getByTestId, findByText } = render(

@@ -11,12 +11,13 @@ import { AuthService } from "../../../core/agent/services";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes/paths";
 import { setEnableBiometricsCache } from "../../../store/reducers/biometricsCache";
-import { setToastMsg } from "../../../store/reducers/stateCache";
+import { setToastMsg, showGenericError } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { SetupBiometrics } from "./SetupBiometrics";
 import { Agent } from "../../../core/agent/agent";
 import { BiometricAuthOutcome, useBiometricAuth } from "../../hooks/useBiometricsHook";
+import { IonAlert } from "@ionic/react";
 
 jest.mock("../../utils/passcodeChecker", () => ({
   isRepeat: () => false,
@@ -42,19 +43,19 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
-jest.mock("@capacitor/core", () => {
-  return {
-    ...jest.requireActual("@capacitor/core"),
-    Capacitor: {
-      isNativePlatform: () => true,
-    },
-  };
-});
+jest.mock("@capacitor/core", () => ({
+  ...jest.requireActual("@capacitor/core"),
+  Capacitor: {
+    isNativePlatform: () => true,
+  },
+}));
 
+const enablePrivacy = jest.fn(() => Promise.resolve());
+const disablePrivacy = jest.fn(() => Promise.resolve());
 jest.mock("../../hooks/privacyScreenHook", () => ({
   usePrivacyScreen: () => ({
-    enablePrivacy: jest.fn(),
-    disablePrivacy: jest.fn(),
+    enablePrivacy,
+    disablePrivacy,
   }),
 }));
 
@@ -121,6 +122,12 @@ describe("SetupBiometrics Page", () => {
       new Error(AuthService.SECRET_NOT_STORED)
     );
 
+    (Agent.agent.basicStorage.createOrUpdateBasicRecord as jest.Mock).mockReset();
+    (Agent.agent.basicStorage.createOrUpdateBasicRecord as jest.Mock).mockResolvedValue(undefined);
+
+    enablePrivacy.mockReset();
+    disablePrivacy.mockReset();
+
     (useBiometricAuth as jest.Mock).mockReturnValue({
       biometricsIsEnabled: false,
       biometricInfo: {
@@ -133,8 +140,9 @@ describe("SetupBiometrics Page", () => {
       setupBiometrics: jest.fn(),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: null,
+      lockoutEndTime: null as number | null, // Allow null for lockoutEndTime
     });
+
   });
 
   const history = createMemoryHistory();
@@ -152,17 +160,12 @@ describe("SetupBiometrics Page", () => {
     );
 
     expect(getAllByText(EN_TRANSLATIONS.setupbiometrics.title).length).toBe(2);
-
-    expect(
-      getByText(EN_TRANSLATIONS.setupbiometrics.description)
-    ).toBeVisible();
-    expect(
-      getByText(EN_TRANSLATIONS.setupbiometrics.button.skip)
-    ).toBeVisible();
+    expect(getByText(EN_TRANSLATIONS.setupbiometrics.description)).toBeVisible();
+    expect(getByText(EN_TRANSLATIONS.setupbiometrics.button.skip)).toBeVisible();
   });
 
   test("Click on skip", async () => {
-    const { getByTestId, getByText } = render(
+    const { getByTestId } = render(
       <IonReactMemoryRouter
         history={history}
         initialEntries={[RoutePath.SETUP_BIOMETRICS]}
@@ -176,7 +179,7 @@ describe("SetupBiometrics Page", () => {
     fireEvent.click(getByTestId("action-button"));
 
     await waitFor(() => {
-      expect(getByTestId("alert-cancel-biometry")).toBeVisible();
+      expect(getByTestId("alert-cancel-biometry")).toHaveAttribute('is-open', 'true');
     });
 
     fireEvent.click(getByTestId("alert-cancel-biometry-confirm-button"));
@@ -203,7 +206,7 @@ describe("SetupBiometrics Page", () => {
       setupBiometrics: setupBiometricsMock,
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: null,
+      lockoutEndTime: null as number | null,
     });
 
     const { getByTestId } = render(
@@ -233,5 +236,157 @@ describe("SetupBiometrics Page", () => {
     });
 
     expect(dispatchMock).toBeCalled();
+  });
+
+  test("Click on setup with GENERIC_ERROR outcome", async () => {
+    const setupBiometricsMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.GENERIC_ERROR));
+
+    (useBiometricAuth as jest.Mock).mockReturnValue({
+      biometricsIsEnabled: false,
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: jest.fn(),
+      setBiometricsIsEnabled: jest.fn(),
+      setupBiometrics: setupBiometricsMock,
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null as number | null,
+    });
+
+    const { getByTestId } = render(
+      <IonReactMemoryRouter
+        history={history}
+        initialEntries={[RoutePath.SETUP_BIOMETRICS]}
+      >
+        <Provider store={storeMocked}>
+          <SetupBiometrics />
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    fireEvent.click(getByTestId("primary-button"));
+
+    await waitFor(() => {
+      expect(setupBiometricsMock).toBeCalled();
+    });
+
+    expect(dispatchMock).toBeCalledWith(showGenericError(true));
+  });
+
+  test("Click on setup with WEAK_BIOMETRY outcome", async () => {
+    const setupBiometricsMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.WEAK_BIOMETRY));
+
+    (useBiometricAuth as jest.Mock).mockReturnValue({
+      biometricsIsEnabled: false,
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: jest.fn(),
+      setBiometricsIsEnabled: jest.fn(),
+      setupBiometrics: setupBiometricsMock,
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null as number | null,
+    });
+
+    const { getByTestId } = render(
+      <IonReactMemoryRouter
+        history={history}
+        initialEntries={[RoutePath.SETUP_BIOMETRICS]}
+      >
+        <Provider store={storeMocked}>
+          <SetupBiometrics />
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    fireEvent.click(getByTestId("primary-button"));
+
+    await waitFor(() => {
+      expect(setupBiometricsMock).toBeCalled();
+    });
+
+    expect(dispatchMock).toBeCalledWith(showGenericError(true));
+  });
+
+  test("Click on setup with NOT_AVAILABLE outcome", async () => {
+    const setupBiometricsMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE));
+
+    (useBiometricAuth as jest.Mock).mockReturnValue({
+      biometricsIsEnabled: false,
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: jest.fn(),
+      setBiometricsIsEnabled: jest.fn(),
+      setupBiometrics: setupBiometricsMock,
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null as number | null,
+    });
+
+    const { getByTestId } = render(
+      <IonReactMemoryRouter
+        history={history}
+        initialEntries={[RoutePath.SETUP_BIOMETRICS]}
+      >
+        <Provider store={storeMocked}>
+          <SetupBiometrics />
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    fireEvent.click(getByTestId("primary-button"));
+
+    await waitFor(() => {
+      expect(setupBiometricsMock).toBeCalled();
+    });
+
+    expect(dispatchMock).toBeCalledWith(showGenericError(true));
+  });
+
+  test("Privacy screen is disabled and enabled during biometrics setup", async () => {
+    const setupBiometricsMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
+
+    (useBiometricAuth as jest.Mock).mockReturnValue({
+      biometricsIsEnabled: false,
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: jest.fn(),
+      setBiometricsIsEnabled: jest.fn(),
+      setupBiometrics: setupBiometricsMock,
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null as number | null,
+    });
+
+    const { getByTestId } = render(
+      <IonReactMemoryRouter
+        history={history}
+        initialEntries={[RoutePath.SETUP_BIOMETRICS]}
+      >
+        <Provider store={storeMocked}>
+          <SetupBiometrics />
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    fireEvent.click(getByTestId("primary-button"));
+
+    await waitFor(() => {
+      expect(disablePrivacy).toBeCalled();
+      expect(setupBiometricsMock).toBeCalled();
+      expect(enablePrivacy).toBeCalled();
+    });
   });
 });

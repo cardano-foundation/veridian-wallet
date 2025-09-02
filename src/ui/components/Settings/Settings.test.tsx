@@ -41,14 +41,14 @@ jest.mock("@ionic/react", () => ({
 
 jest.mock("@capacitor/browser", () => ({
   Browser: {
-    open: jest.fn(), // Define it directly here
+    open: jest.fn(),
   },
 }));
 
 jest.mock("@capacitor/core", () => ({
   Capacitor: {
-    isNativePlatform: jest.fn(() => true), // Mock to always return true
-    getPlatform: jest.fn(() => "web"), // Mock a platform
+    isNativePlatform: jest.fn(() => true),
+    getPlatform: jest.fn(() => "web"),
   },
 }));
 
@@ -136,7 +136,6 @@ jest.mock("@capacitor/app", () => ({
   },
 }));
 
-// Mock the useBiometricAuth hook itself
 jest.mock("../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: jest.fn(),
   BIOMETRIC_SERVER_KEY: "com.veridianwallet.biometrics.key",
@@ -157,8 +156,8 @@ jest.mock("capacitor-native-settings", () => ({
   NativeSettings: {
     open: jest.fn(),
   },
-  AndroidSettings: {}, // Mock these as empty objects if they are used
-  IOSSettings: {},     // Mock these as empty objects if they are used
+  AndroidSettings: {}, 
+  IOSSettings: {},
 }));
 
 jest.mock("../../../core/agent/agent", () => ({
@@ -168,13 +167,13 @@ jest.mock("../../../core/agent/agent", () => ({
         findById: jest.fn(),
         save: jest.fn(),
         update: jest.fn(),
-        createOrUpdateBasicRecord: jest.fn().mockResolvedValue(undefined), // Ensure this resolves
+        createOrUpdateBasicRecord: jest.fn().mockResolvedValue(undefined),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
       },
       deleteAccount: () => deleteAccount(),
-      getMnemonic: jest.fn().mockResolvedValue("some test mnemonic"), // Add this mock
+      getMnemonic: jest.fn().mockResolvedValue("some test mnemonic"),
     },
   },
 }));
@@ -189,10 +188,10 @@ jest.mock("react-router-dom", () => ({
 
 describe("Settings page", () => {
   beforeEach(() => {
-    // Set a default mock implementation for useBiometricAuth
+    
     (useBiometricAuth as jest.Mock).mockReturnValue({
       biometricInfo: {
-        isAvailable: true, // Default to available for Renders Settings page test
+        isAvailable: true,
         biometryType: BiometryType.FINGERPRINT,
       },
       setupBiometrics: jest.fn(),
@@ -263,9 +262,8 @@ describe("Settings page", () => {
       },
     };
 
-    const storeMocked = makeTestStore(initialState); // Use the actual store
+    const storeMocked = makeTestStore(initialState);
 
-    // Set the mock return value for this specific test
     (useBiometricAuth as jest.Mock).mockReturnValueOnce({
       biometricInfo: {
         isAvailable: true,
@@ -293,11 +291,10 @@ describe("Settings page", () => {
       getByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).toBeInTheDocument();
 
-    await act(async () => { // Use async act for the click event
+    await act(async () => { 
       fireEvent.click(getByTestId("settings-item-0"));
     });
 
-    // Assert that the Redux state is updated
     await waitFor(() => {
       expect(storeMocked.getState().biometricsCache.enabled).toBe(true);
     });
@@ -328,13 +325,12 @@ describe("Settings page", () => {
         },
       },
       biometricsCache: {
-        enabled: true, // Biometrics are initially enabled
+        enabled: true,
       },
     };
 
-    const storeMocked = makeTestStore(initialState); // Use the actual store
+    const storeMocked = makeTestStore(initialState);
 
-    // Set the mock return value for this specific test
     (useBiometricAuth as jest.Mock).mockReturnValueOnce({
       biometricInfo: {
         isAvailable: true,
@@ -349,8 +345,7 @@ describe("Settings page", () => {
       isStrongBiometry: true,
     });
 
-    // Mock NativeBiometric.deleteCredentials for disabling biometrics
-    (NativeBiometric.deleteCredentials as jest.Mock).mockResolvedValueOnce(undefined); // Explicitly cast to jest.Mock
+    (NativeBiometric.deleteCredentials as jest.Mock).mockResolvedValueOnce(undefined);
 
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
@@ -365,7 +360,7 @@ describe("Settings page", () => {
       getByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).toBeInTheDocument();
 
-    await act(async () => { // Use async act for the click event
+    await act(async () => { 
       fireEvent.click(getByTestId("settings-item-0"));
     });
 
@@ -386,7 +381,7 @@ describe("Settings page", () => {
 
     await waitFor(() => {
       expect(NativeBiometric.deleteCredentials).toBeCalledWith({
-        server: BIOMETRIC_SERVER_KEY, // Use the actual server key
+        server: BIOMETRIC_SERVER_KEY,
       });
     });
   });
@@ -408,7 +403,7 @@ describe("Settings page", () => {
       },
     };
 
-    const storeMocked = makeTestStore(initialState); // Use the actual store
+    const storeMocked = makeTestStore(initialState);
 
     (useBiometricAuth as jest.Mock).mockReturnValueOnce({
       biometricInfo: {
