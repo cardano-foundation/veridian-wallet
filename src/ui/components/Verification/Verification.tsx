@@ -1,7 +1,7 @@
 
-import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
 import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { getStateCache } from "../../../store/reducers/stateCache";
 import { usePrivacyScreen } from "../../hooks/privacyScreenHook";

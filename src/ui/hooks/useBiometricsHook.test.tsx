@@ -7,15 +7,14 @@ import { BiometricAuthError, BiometryType, NativeBiometric } from "@capgo/capaci
 import { act, useState } from "react";
 import { Provider } from "react-redux";
 import { store } from "../../store";
-import { useBiometricAuth, BiometryError } from "./useBiometricsHook";
-import { makeTestStore } from "../utils/makeTestStore";
+import { useBiometricAuth, BiometricAuthOutcome } from "./useBiometricsHook";
 
 const isNativePlatformMock = jest.fn(() => true);
 jest.mock("@capacitor/core", () => ({
   ...jest.requireActual("@capacitor/core"),
   Capacitor: {
     isNativePlatform: () => isNativePlatformMock(),
-    getPlatform: jest.fn(() => 'ios'),
+    getPlatform: jest.fn(() => "ios"),
   },
   registerPlugin: jest.fn(() => ({
     addListener: jest.fn(),
@@ -46,11 +45,9 @@ jest.mock("@capgo/capacitor-native-biometric", () => ({
 
 jest.mock("../../i18n", () => ({
   i18n: {
-    t: (key: string) => key, // Just return the key
+    t: (key: string) => key,
   },
 }));
-
-import { BiometricAuthOutcome } from "./useBiometricsHook";
 
 const TestComponent = () => {
   const { handleBiometricAuth } = useBiometricAuth();

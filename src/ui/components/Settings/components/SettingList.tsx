@@ -164,7 +164,6 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
       handleToggleBiometricAuth();
       return;
     }
-    // Call biometricAuth directly, it will handle the flow and errors
     biometricAuth();
   };
 

@@ -286,7 +286,7 @@ const initialState = {
     pendingConnection: null,
   },
   viewTypeCache: {
-    identifier: { // Added missing identifier object
+    identifier: {
       viewType: null,
       favouriteIndex: 0,
     },
@@ -316,7 +316,7 @@ describe("App", () => {
     getPlatformsMock.mockImplementation(() => ["android"]);
     getAvailableWitnessesMock.mockClear();
 
-    const deviceInfo = { // Define deviceInfo here
+    const deviceInfo = {
       platform: "ios",
       osVersion: "18.0",
       model: "",
@@ -332,7 +332,7 @@ describe("App", () => {
     (useBiometricAuth as jest.Mock).mockReset();
     (useBiometricAuth as jest.Mock).mockReturnValue({
       biometricInfo: {
-        isAvailable: true, // Default to available for most tests
+        isAvailable: true,
         biometryType: BiometryType.FINGERPRINT,
       },
       setupBiometrics: jest.fn(),
@@ -588,7 +588,7 @@ describe("Witness availability", () => {
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: { // Added missing identifier object
+        identifier: {
           viewType: null,
           favouriteIndex: 0,
         },
@@ -709,7 +709,7 @@ describe("System copatibility alert", () => {
     getPlatformsMock.mockImplementation(() => ["android"]);
     getAvailableWitnessesMock.mockClear();
 
-    const deviceInfo = { // Define deviceInfo here
+    const deviceInfo = {
       platform: "ios",
       osVersion: "18.0",
       model: "",
@@ -727,7 +727,7 @@ describe("System copatibility alert", () => {
   });
 
   test("Android", async () => {
-    const deviceInfo = { // Define deviceInfo here
+    const deviceInfo = {
       platform: "android",
       osVersion: "9.0",
       model: "",
@@ -775,7 +775,7 @@ describe("System copatibility alert", () => {
   });
 
   test("Ios", async () => {
-    const deviceInfo = { // Define deviceInfo here
+    const deviceInfo = {
       platform: "ios",
       osVersion: "11.0",
       model: "",
@@ -819,7 +819,7 @@ describe("System threat alert", () => {
     mockInitDatabase.mockClear();
     getAvailableWitnessesMock.mockClear();
 
-    const deviceInfo = { // Define deviceInfo here
+    const deviceInfo = {
       platform: "android",
       osVersion: "12.0",
       model: "",

@@ -15,6 +15,10 @@ const initialState = {
       time: Date.now(),
       passcodeIsSet: true,
       seedPhraseIsSet: false,
+      loginAttempt: {
+        attempts: 0,
+        lockedUntil: Date.now(),
+      },
     },
     currentOperation: OperationType.IDLE,
   },

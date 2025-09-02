@@ -120,15 +120,14 @@ const useBiometricAuth = () => {
       biometryType === BiometryType.FACE_ID ||
       biometryType === BiometryType.TOUCH_ID ||
       biometryType === BiometryType.FINGERPRINT ||
-      biometryType === BiometryType.IRIS_AUTHENTICATION ||
-      biometryType === BiometryType.MULTIPLE;
+      biometryType === BiometryType.IRIS_AUTHENTICATION;
 
     if (!isStrongBiometry) {
       return BiometricAuthOutcome.WEAK_BIOMETRY;
     }
 
     try {
-      if (Capacitor.getPlatform() === 'android') {
+      if (Capacitor.getPlatform() === "android") {
         await NativeBiometric.verifyIdentity({
           reason: i18n.t("biometry.reason") as string,
           title: i18n.t("biometry.title") as string,
@@ -161,13 +160,13 @@ const useBiometricAuth = () => {
       let code = BiometricAuthError.UNKNOWN_ERROR;
 
       if (isBiometricPluginError(error)) {
-        const parsedCode = typeof error.code === 'string' ? parseInt(error.code, 10) : error.code;
+        const parsedCode = typeof error.code === "string" ? parseInt(error.code, 10) : error.code;
         code = isNaN(parsedCode) ? BiometricAuthError.UNKNOWN_ERROR : parsedCode;
       }
 
       let outcome: BiometricAuthOutcome;
 
-      if (Capacitor.getPlatform() === 'ios' && code === BiometricAuthError.BIOMETRICS_UNAVAILABLE) {
+      if (Capacitor.getPlatform() === "ios" && code === BiometricAuthError.BIOMETRICS_UNAVAILABLE) {
         outcome = BiometricAuthOutcome.USER_CANCELLED;
       } else {
         switch (code) {
@@ -206,8 +205,7 @@ const useBiometricAuth = () => {
       biometryType === BiometryType.FACE_ID ||
       biometryType === BiometryType.TOUCH_ID ||
       biometryType === BiometryType.FINGERPRINT ||
-      biometryType === BiometryType.IRIS_AUTHENTICATION ||
-      biometryType === BiometryType.MULTIPLE;
+      biometryType === BiometryType.IRIS_AUTHENTICATION;
 
     if (!isStrongBiometry) {
       return BiometricAuthOutcome.WEAK_BIOMETRY;
