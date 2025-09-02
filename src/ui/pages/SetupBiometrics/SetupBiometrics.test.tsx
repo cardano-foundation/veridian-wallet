@@ -105,7 +105,7 @@ describe("SetupBiometrics Page", () => {
       setupBiometrics: setupBiometricsMock,
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: null, // Default value for most tests
+      lockoutEndTime: null,
     }));
     (Agent.agent.basicStorage.createOrUpdateBasicRecord as jest.Mock).mockResolvedValue(undefined);
     verifySecretMock.mockRejectedValue(new Error(AuthService.SECRET_NOT_STORED));
@@ -194,7 +194,7 @@ describe("SetupBiometrics Page", () => {
     });
   });
 
-  test("Click on setup with USER_CANCELLED outcome", async () => {
+  test("should display cancel message when status is USER_CANCELLED", async () => {
     setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.USER_CANCELLED);
     const { getByTestId, findByText } = renderComponent();
     fireEvent.click(getByTestId("primary-button"));
@@ -205,7 +205,6 @@ describe("SetupBiometrics Page", () => {
   });
 
   test("should display temporary lockout message when status is TEMPORARY_LOCKOUT", async () => {
-    // --- FIX #3: Provide a specific mock for this test to avoid the useEffect bug ---
     (useBiometricAuth as jest.Mock).mockImplementation(() => ({
       biometricsIsEnabled: false,
       biometricInfo: { isAvailable: true, hasCredentials: false, biometryType: BiometryType.FINGERPRINT },
@@ -214,7 +213,7 @@ describe("SetupBiometrics Page", () => {
       setupBiometrics: setupBiometricsMock,
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: Date.now() + 30000, // Provide a future timestamp so it's not null
+      lockoutEndTime: Date.now() + 30000,
     }));
 
     setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.TEMPORARY_LOCKOUT);
@@ -222,9 +221,7 @@ describe("SetupBiometrics Page", () => {
     fireEvent.click(screen.getByTestId("primary-button"));
 
     await waitFor(async () => {
-      // Now this assertion will pass because the hook is correctly mocked
       expect(setupBiometricsMock).toBeCalled();
-      // And this assertion will pass because the useEffect doesn't hide the alert
       const lockoutAlert = await screen.findByTestId("alert-max-attempts");
       expect(lockoutAlert).toBeInTheDocument();
       expect(lockoutAlert).toHaveTextContent(EN_TRANSLATIONS.biometry.lockoutheader);
@@ -241,5 +238,5 @@ describe("SetupBiometrics Page", () => {
       expect(lockoutAlert).toBeInTheDocument();
       expect(lockoutAlert).toHaveTextContent(EN_TRANSLATIONS.biometry.permanentlockoutheader);
     });
-  });
+  });  
 });
