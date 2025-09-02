@@ -3,7 +3,7 @@ import {
   BiometricAuthError,
   BiometryType,
   NativeBiometric,
-  SetCredentialOptions
+  SetCredentialOptions,
 } from "@capgo/capacitor-native-biometric";
 import { Capacitor } from "@capacitor/core";
 import { useEffect, useState } from "react";
@@ -34,7 +34,7 @@ enum BiometricAuthOutcome {
 }
 
 const isBiometricPluginError = (
-  error: unknown,
+  error: unknown
 ): error is { code: BiometricAuthError | string; message: string } => {
   return (
     typeof error === "object" &&
@@ -62,15 +62,17 @@ const useBiometricAuth = () => {
       return result;
     }
     try {
-      const biometricResult: AvailableResult = await NativeBiometric.isAvailable();
+      const biometricResult: AvailableResult =
+        await NativeBiometric.isAvailable();
       setBiometricInfo(biometricResult);
 
       const strongBiometry =
         biometricResult.biometryType === BiometryType.FACE_ID ||
         biometricResult.biometryType === BiometryType.TOUCH_ID ||
         biometricResult.biometryType === BiometryType.FINGERPRINT ||
-        biometricResult.biometryType === BiometryType.IRIS_AUTHENTICATION;
-        
+        biometricResult.biometryType === BiometryType.IRIS_AUTHENTICATION ||
+        biometricResult.biometryType === BiometryType.MULTIPLE;
+
       setIsStrongBiometry(strongBiometry);
       return biometricResult;
     } catch (error) {
@@ -89,7 +91,10 @@ const useBiometricAuth = () => {
     let interval: NodeJS.Timeout | undefined;
     if (lockoutEndTime) {
       const updateRemaining = () => {
-        const remaining = Math.max(0, Math.ceil((lockoutEndTime - Date.now()) / 1000));
+        const remaining = Math.max(
+          0,
+          Math.ceil((lockoutEndTime - Date.now()) / 1000)
+        );
         setRemainingLockoutSeconds(remaining);
         if (remaining <= 0) {
           clearInterval(interval);
@@ -109,7 +114,9 @@ const useBiometricAuth = () => {
     }
   }, [lockoutEndTime]);
 
-  const handleBiometricAuth = async (isInitialSetup = false): Promise<BiometricAuthOutcome> => {
+  const handleBiometricAuth = async (
+    isInitialSetup = false
+  ): Promise<BiometricAuthOutcome> => {
     const { isAvailable, biometryType } = await checkBiometrics();
 
     if (!isAvailable) {
@@ -120,7 +127,8 @@ const useBiometricAuth = () => {
       biometryType === BiometryType.FACE_ID ||
       biometryType === BiometryType.TOUCH_ID ||
       biometryType === BiometryType.FINGERPRINT ||
-      biometryType === BiometryType.IRIS_AUTHENTICATION;
+      biometryType === BiometryType.IRIS_AUTHENTICATION ||
+      biometryType === BiometryType.MULTIPLE;
 
     if (!isStrongBiometry) {
       return BiometricAuthOutcome.WEAK_BIOMETRY;
@@ -160,13 +168,21 @@ const useBiometricAuth = () => {
       let code = BiometricAuthError.UNKNOWN_ERROR;
 
       if (isBiometricPluginError(error)) {
-        const parsedCode = typeof error.code === "string" ? parseInt(error.code, 10) : error.code;
-        code = isNaN(parsedCode) ? BiometricAuthError.UNKNOWN_ERROR : parsedCode;
+        const parsedCode =
+          typeof error.code === "string"
+            ? parseInt(error.code, 10)
+            : error.code;
+        code = isNaN(parsedCode)
+          ? BiometricAuthError.UNKNOWN_ERROR
+          : parsedCode;
       }
 
       let outcome: BiometricAuthOutcome;
 
-      if (Capacitor.getPlatform() === "ios" && code === BiometricAuthError.BIOMETRICS_UNAVAILABLE) {
+      if (
+        Capacitor.getPlatform() === "ios" &&
+        code === BiometricAuthError.BIOMETRICS_UNAVAILABLE
+      ) {
         outcome = BiometricAuthOutcome.USER_CANCELLED;
       } else {
         switch (code) {
@@ -175,7 +191,7 @@ const useBiometricAuth = () => {
             break;
           case BiometricAuthError.USER_TEMPORARY_LOCKOUT:
             if (lockoutEndTime === null) {
-              setLockoutEndTime(Date.now() + (30 * 1000));
+              setLockoutEndTime(Date.now() + 30 * 1000);
             }
             outcome = BiometricAuthOutcome.TEMPORARY_LOCKOUT;
             break;
@@ -205,7 +221,8 @@ const useBiometricAuth = () => {
       biometryType === BiometryType.FACE_ID ||
       biometryType === BiometryType.TOUCH_ID ||
       biometryType === BiometryType.FINGERPRINT ||
-      biometryType === BiometryType.IRIS_AUTHENTICATION;
+      biometryType === BiometryType.IRIS_AUTHENTICATION ||
+      biometryType === BiometryType.MULTIPLE;
 
     if (!isStrongBiometry) {
       return BiometricAuthOutcome.WEAK_BIOMETRY;
@@ -249,8 +266,13 @@ const useBiometricAuth = () => {
     checkBiometrics,
     remainingLockoutSeconds,
     lockoutEndTime,
-    isStrongBiometry
+    isStrongBiometry,
   };
 };
 
-export { useBiometricAuth, BiometryError, BiometricAuthOutcome, BIOMETRIC_SERVER_KEY };
+export {
+  useBiometricAuth,
+  BiometryError,
+  BiometricAuthOutcome,
+  BIOMETRIC_SERVER_KEY,
+};

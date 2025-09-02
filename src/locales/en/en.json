@@ -1426,10 +1426,8 @@
   "biometry": {
     "reason": "Please authenticate",
     "canceltitle": "Cancel",
-    "iosfallbacktitle": "Enter Passcode",
-    "iosfallbackpasswordtitle": "Enter Password",
-    "title": "Biometric Authentication",
-    "subtitle": "An extra layer of security",
+    "title": "Authentication",
+    "subtitle": "Authentication using biometrics",
     "setupbiometryheader": "Do you want to allow “Veridian” to use biometrics?",
     "setupbiometryconfirm": "Ok",
     "setupbiometrycancel": "Don't allow",
