@@ -15,7 +15,7 @@ import {
   libraryOutline,
   lockClosedOutline,
 } from "ionicons/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import pJson from "../../../../../package.json";
@@ -42,6 +42,7 @@ import { showError } from "../../../utils/error";
 import { openBrowserLink } from "../../../utils/openBrowserLink";
 import {
   setToastMsg,
+  showGenericError,
   showGlobalLoading,
 } from "../../../../store/reducers/stateCache";
 import { CLEAR_STORE_ACTIONS } from "../../../../store/utils";
@@ -59,14 +60,23 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   const dispatch = useAppDispatch();
   const biometricsCache = useSelector(getBiometricsCache);
   const [option, setOption] = useState<number | null>(null);
-  const { biometricInfo, setupBiometrics } = useBiometricAuth();
+  const { biometricInfo, setupBiometrics, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
+
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [changePinIsOpen, setChangePinIsOpen] = useState(false);
   const { disablePrivacy, enablePrivacy } = usePrivacyScreen();
   const [openBiometricAlert, setOpenBiometricAlert] = useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+  const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
+  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
   const history = useHistory();
 
+  useEffect(() => {
+    if (lockoutEndTime === null && showMaxAttemptsAlert) {
+      setShowMaxAttemptsAlert(false);
+    }
+  }, [lockoutEndTime, showMaxAttemptsAlert]);
+  
   const securityItems: OptionProps[] = [
     {
       index: OptionIndex.ChangePin,
@@ -165,14 +175,25 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
       const setupResult = await setupBiometrics();
       await enablePrivacy();
 
-      if (setupResult === BiometricAuthOutcome.SUCCESS) {
-        handleToggleBiometricAuth();
-      } else if (setupResult === BiometricAuthOutcome.USER_CANCELLED) {
-        // Do nothing, user cancelled
-      } else {
-        // All other errors (TEMPORARY_LOCKOUT, PERMANENT_LOCKOUT, WEAK_BIOMETRY, NOT_AVAILABLE, GENERIC_ERROR)
-        // SettingList doesn't have specific alerts for these. Show generic error.
-        showError(i18n.t("biometry.errors.toggleFailed"), new Error("Biometrics authentication failed"), dispatch);
+      switch (setupResult) {
+        case BiometricAuthOutcome.SUCCESS:
+          handleToggleBiometricAuth();
+          break;
+        case BiometricAuthOutcome.USER_CANCELLED:
+          // Do nothing, user cancelled
+          break;
+        case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+          setShowMaxAttemptsAlert(true);
+          break;
+        case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+          setShowPermanentLockoutAlert(true);
+          break;
+        case BiometricAuthOutcome.WEAK_BIOMETRY:
+        case BiometricAuthOutcome.NOT_AVAILABLE:
+        case BiometricAuthOutcome.GENERIC_ERROR:
+        default:
+          dispatch(showGenericError(true));
+          break;
       }
     } catch (e) {
       // This catch block is for unexpected errors during the process.
@@ -366,6 +387,24 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
         verifyIsOpen={verifyIsOpen}
         setVerifyIsOpen={setVerifyIsOpen}
         onVerify={onVerify}
+      />
+      <Alert
+        isOpen={showMaxAttemptsAlert}
+        setIsOpen={setShowMaxAttemptsAlert}
+        dataTestId="alert-max-attempts"
+        headerText={i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds }) as string}
+        confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
+        actionConfirm={() => setShowMaxAttemptsAlert(false)}
+        backdropDismiss={false}
+      />
+      <Alert
+        isOpen={showPermanentLockoutAlert}
+        setIsOpen={setShowPermanentLockoutAlert}
+        dataTestId="alert-permanent-lockout"
+        headerText={i18n.t("biometry.permanentlockoutheader") as string}
+        confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
+        actionConfirm={() => setShowPermanentLockoutAlert(false)}
+        backdropDismiss={false}
       />
     </>
   );
