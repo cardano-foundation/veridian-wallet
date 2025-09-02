@@ -15,11 +15,8 @@ import { MultiSigIcpRequestDetails } from "../../../../../core/agent/services/id
 import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
 import { MultiSigService } from "../../../../../core/agent/services/multiSigService";
 import { i18n } from "../../../../../i18n";
-import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
-import {
-  getNotificationsCache,
-  setNotificationsCache,
-} from "../../../../../store/reducers/notificationsCache";
+import { useAppDispatch } from "../../../../../store/hooks";
+import { deleteNotificationById } from "../../../../../store/reducers/profileCache";
 import { Alert as AlertDecline } from "../../../../components/Alert";
 import { FallbackIcon } from "../../../../components/FallbackIcon";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
@@ -44,8 +41,6 @@ const MultiSigRequest = ({
   handleBack,
 }: NotificationDetailsProps) => {
   const dispatch = useAppDispatch();
-  const notificationsCache = useAppSelector(getNotificationsCache);
-  const [notifications, setNotifications] = useState(notificationsCache);
   const [spinner, setSpinner] = useState(false);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
   const [multisigIcpDetails, setMultisigIcpDetails] =
@@ -78,11 +73,7 @@ const MultiSigRequest = ({
   useOnlineStatusEffect(getDetails);
 
   const handleNotificationUpdate = async () => {
-    const updatedNotifications = notifications.filter(
-      (notification) => notification.id !== notificationDetails.id
-    );
-    setNotifications(updatedNotifications);
-    dispatch(setNotificationsCache(updatedNotifications));
+    dispatch(deleteNotificationById(notificationDetails.id));
   };
 
   const actionAccept = async () => {

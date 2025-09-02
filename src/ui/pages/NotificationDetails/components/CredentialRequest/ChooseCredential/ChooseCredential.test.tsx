@@ -25,6 +25,8 @@ import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { ACDC } from "../CredentialRequest.types";
 import { ChooseCredential } from "./ChooseCredential";
 import { makeTestStore } from "../../../../../utils/makeTestStore";
+import { profileCacheFixData } from "../../../../../__fixtures__/storeDataFix";
+import { revokedCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
 
 mockIonicReact();
 
@@ -88,18 +90,10 @@ const initialState = {
       passcodeIsSet: true,
     },
   },
-  credsCache: {
-    creds: [],
-  },
   connectionsCache: {
     connections: connectionsForNotifications,
   },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierMapFix,
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -244,17 +238,7 @@ describe("Credential request - choose request", () => {
       connectionsCache: {
         connections: connectionsForNotifications,
       },
-      notificationsCache: {
-        notifications: notificationsFix,
-      },
-      credsCache: {
-        creds: [
-          { ...credsFixAcdc[0], id: credRequestFix.credentials[0].acdc.d },
-        ],
-      },
-      identifiersCache: {
-        identifiers: {},
-      },
+      profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
       },
@@ -387,15 +371,9 @@ describe("Credential request - choose request", () => {
           passcodeIsSet: true,
         },
       },
-      credsCache: {
-        creds: [],
-      },
+      profilesCache: profileCacheFixData,
       connectionsCache: {
         connections: connectionsForNotifications,
-      },
-      notificationsCache: {
-        notifications: notificationsFix,
-        notificationDetailCache: null,
       },
       biometricsCache: {
         enabled: false,
@@ -503,14 +481,9 @@ describe("Credential request - choose request", () => {
         passcodeIsSet: true,
       },
     },
-    credsCache: {
-      creds: credsCacheMock,
-    },
+    profilesCache: profileCacheFixData,
     connectionsCache: {
       connections: connectionsForNotifications,
-    },
-    notificationsCache: {
-      notifications: notificationsFix,
     },
     biometricsCache: {
       enabled: false,
@@ -528,6 +501,11 @@ describe("Credential request - choose request", () => {
       credentials: [
         {
           ...credRequestFix.credentials[0],
+          id: revokedCredsFix[0].id,
+          acdc: {
+            ...credRequestFix.credentials[0].acdc,
+            d: revokedCredsFix[0].id,
+          },
           status: CredentialStatus.REVOKED,
         },
       ],
@@ -578,7 +556,7 @@ describe("Credential request - choose request", () => {
 
     await waitFor(() =>
       expect(
-        getByTestId("card-item-" + credRequestFix.credentials[0].acdc.d)
+        getByTestId("card-item-" + credMock.credentials[0].acdc.d)
       ).toBeVisible()
     );
   });

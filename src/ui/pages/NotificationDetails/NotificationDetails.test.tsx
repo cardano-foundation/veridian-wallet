@@ -15,6 +15,7 @@ import { notificationsFix } from "../../__fixtures__/notificationsFix";
 import { NotificationDetails } from "./NotificationDetails";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 mockIonicReact();
 
@@ -57,18 +58,7 @@ const initialState = {
   connectionsCache: {
     connections: [],
   },
-  identifiersCache: {
-    identifiers: filteredIdentifierFix,
-  },
-  notificationsCache: {
-    notifications: notificationsFix,
-  },
-  credsCache: {
-    creds: [],
-  },
-  credsArchivedCache: {
-    creds: [],
-  },
+  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },

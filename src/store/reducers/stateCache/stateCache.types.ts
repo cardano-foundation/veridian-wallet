@@ -1,15 +1,8 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
-import {
-  PeerConnection,
-  PeerConnectSigningEvent,
-} from "../../../core/cardano/walletConnect/peerConnection.types";
+import { PeerConnectSigningEvent } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { OperationType, ToastMsgType } from "../../../ui/globals/types";
-import { ConnectionData } from "../walletConnectionsCache";
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
-import { ConnectionShortDetails } from "../../../core/agent/agent.types";
-import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
-import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
+import { ConnectionData } from "../profileCache";
 
 interface PayloadData<T = any> {
   [key: string]: T;
@@ -59,14 +52,11 @@ interface ToastStackItem {
   message: ToastMsgType;
 }
 
-interface CurrentProfileProps {
-  identity: IdentifierShortDetails;
-  connections: ConnectionShortDetails[];
-  multisigConnections: ConnectionShortDetails[];
-  peerConnections: ConnectionData[];
-  credentials: CredentialShortDetails[];
-  archivedCredentials: CredentialShortDetails[];
-  notifications: KeriaNotification[];
+interface PendingJoinGroupMetadata {
+  isPendingJoinGroup: boolean;
+  groupId: string;
+  groupName: string;
+  initiatorName: string | null;
 }
 
 interface StateCacheProps {
@@ -74,7 +64,6 @@ interface StateCacheProps {
   recoveryCompleteNoInterruption: boolean;
   isOnline: boolean;
   routes: CurrentRouteCacheProps[];
-  currentProfile: CurrentProfileProps;
   authentication: AuthenticationCacheProps;
   currentOperation: OperationType;
   queueIncomingRequest: QueueProps<IncomingRequestProps>;
@@ -85,6 +74,7 @@ interface StateCacheProps {
   forceInitApp?: number;
   showLoading?: boolean;
   isSetupProfile?: boolean;
+  pendingJoinGroupMetadata: PendingJoinGroupMetadata | null;
 }
 
 enum InitializationPhase {
@@ -101,6 +91,7 @@ export type {
   IncomingRequestProps,
   PayloadData,
   PeerConnectSigningEventRequest,
+  PendingJoinGroupMetadata,
   QueueProps,
   StateCacheProps,
   ToastStackItem,

@@ -10,11 +10,13 @@ class CredentialStorage {
   }
 
   async getAllCredentialMetadata(
-    isArchived?: boolean
+    isArchived?: boolean,
+    identifierId?: string
   ): Promise<CredentialMetadataRecord[]> {
     const records = await this.storageService.findAllByQuery(
       {
         ...(isArchived !== undefined ? { isArchived } : {}),
+        ...(identifierId !== undefined ? { identifierId } : {}),
         pendingDeletion: false,
       },
       CredentialMetadataRecord

@@ -1,9 +1,7 @@
-import { CreationStatus } from "../../core/agent/agent.types";
 import { RootState } from "../../store";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
 import { OperationType } from "../../ui/globals/types";
 import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
-import { IdentifiersFilters } from "../../ui/pages/Identifiers/Identifiers.types";
 import { DataProps } from "../nextRoute/nextRoute.types";
 import { calcPreviousRoute, getBackRoute, getPreviousRoute } from "./backRoute";
 
@@ -30,26 +28,16 @@ describe("getBackRoute", () => {
         bootUrl: "",
         connectUrl: "",
       },
+      profilesCache: {
+        profiles: {},
+        recentProfiles: [],
+        multiSigGroup: undefined,
+      },
       stateCache: {
         isOnline: true,
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
-        currentProfile: {
-          identity: {
-            id: "",
-            displayName: "",
-            createdAtUTC: "",
-            theme: 0,
-            creationStatus: CreationStatus.PENDING,
-          },
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        },
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
@@ -74,46 +62,26 @@ describe("getBackRoute", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        pendingJoinGroupMetadata: null,
       },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-        filters: IdentifiersFilters.All,
-      },
-      credsCache: {
-        creds: [],
-        favourites: [],
-        filters: CredentialsFilters.All,
-      },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
+          favourites: [],
+          filters: CredentialsFilters.All,
         },
       },
       biometricsCache: {
         enabled: false,
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
   });
@@ -198,26 +166,16 @@ describe("getPreviousRoute", () => {
         bootUrl: "",
         connectUrl: "",
       },
+      profilesCache: {
+        profiles: {},
+        recentProfiles: [],
+        multiSigGroup: undefined,
+      },
       stateCache: {
         isOnline: true,
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
-        currentProfile: {
-          identity: {
-            id: "",
-            displayName: "",
-            createdAtUTC: "",
-            theme: 0,
-            creationStatus: CreationStatus.PENDING,
-          },
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        },
         authentication: {
           passcodeIsSet: true,
           seedPhraseIsSet: false,
@@ -242,46 +200,26 @@ describe("getPreviousRoute", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        pendingJoinGroupMetadata: null,
       },
-      identifiersCache: {
-        identifiers: {},
-        favourites: [],
-        multiSigGroup: {
-          groupId: "",
-          connections: [],
-        },
-        filters: IdentifiersFilters.All,
-      },
-      credsCache: {
-        creds: [],
-        favourites: [],
-        filters: CredentialsFilters.All,
-      },
-      credsArchivedCache: { creds: [] },
       connectionsCache: {
         connections: {},
         multisigConnections: {},
       },
       walletConnectionsCache: {
-        walletConnections: [],
         connectedWallet: null,
         pendingConnection: null,
       },
       viewTypeCache: {
-        identifier: {
-          viewType: null,
-          favouriteIndex: 0,
-        },
         credential: {
           viewType: null,
           favouriteIndex: 0,
+          favourites: [],
+          filters: CredentialsFilters.All,
         },
       },
       biometricsCache: {
         enabled: false,
-      },
-      notificationsCache: {
-        notifications: [],
       },
     };
   });

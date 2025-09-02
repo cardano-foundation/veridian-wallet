@@ -13,7 +13,6 @@ import {
 } from "../agent.types";
 import {
   ExchangeRoute,
-  NotificationRoute,
 } from "./keriaNotificationService.types";
 import {
   IdentifierMetadataRecord,
@@ -32,6 +31,7 @@ import { OperationPendingRecordType } from "../records/operationPendingRecord.ty
 import { Agent } from "../agent";
 import { PeerConnection } from "../../cardano/walletConnect/peerConnection";
 import { ConnectionService } from "./connectionService";
+import { CredentialService } from "./credentialService";
 import {
   EventTypes,
   IdentifierAddedEvent,
@@ -40,7 +40,7 @@ import {
 } from "../event.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { OobiQueryParams } from "./connectionService.types";
-import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/migrations";
+import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
 const UI_THEMES = [
   0, 1, 2, 3, 10, 11, 12, 13, 20, 21, 22, 23, 30, 31, 32, 33, 40, 41, 42, 43,
@@ -73,6 +73,7 @@ class IdentifierService extends AgentService {
   protected readonly basicStorage: BasicStorage;
   protected readonly notificationStorage: NotificationStorage;
   protected readonly connections: ConnectionService;
+  protected readonly credentials: CredentialService;
 
   constructor(
     agentServiceProps: AgentServicesProps,
@@ -80,7 +81,8 @@ class IdentifierService extends AgentService {
     operationPendingStorage: OperationPendingStorage,
     basicStorage: BasicStorage,
     notificationStorage: NotificationStorage,
-    connections: ConnectionService
+    connections: ConnectionService,
+    credentials: CredentialService
   ) {
     super(agentServiceProps);
     this.identifierStorage = identifierStorage;
@@ -88,15 +90,11 @@ class IdentifierService extends AgentService {
     this.basicStorage = basicStorage;
     this.notificationStorage = notificationStorage;
     this.connections = connections;
+    this.credentials = credentials;
   }
 
-  onIdentifierRemoved() {
-    this.props.eventEmitter.on(
-      EventTypes.IdentifierRemoved,
-      (data: IdentifierRemovedEvent) => {
-        this.deleteIdentifier(data.payload.id);
-      }
-    );
+  onIdentifierRemoved(callback: (event: IdentifierRemovedEvent) => void) {
+    this.props.eventEmitter.on(EventTypes.IdentifierRemoved, callback);
   }
 
   onIdentifierAdded(callback: (event: IdentifierAddedEvent) => void) {
@@ -157,7 +155,7 @@ class IdentifierService extends AgentService {
     if (hab.group) {
       members = (
         await this.props.signifyClient.identifiers().members(identifier)
-      ).signing.map((member: any) => member.aid);
+      ).signing.map((member: { aid: string }) => member.aid);
     }
 
     return {
@@ -295,9 +293,12 @@ class IdentifierService extends AgentService {
       .identifiers()
       .get(identifier)) as HabState;
 
+    if (!this.props.signifyClient.agent) {
+      throw new Error("Agent not initialized");
+    }
     const addRoleOperation = await this.props.signifyClient
       .identifiers()
-      .addEndRole(identifier, "agent", this.props.signifyClient.agent!.pre);
+      .addEndRole(identifier, "agent", this.props.signifyClient.agent.pre);
     await addRoleOperation.op();
 
     const creationStatus = CreationStatus.PENDING;
@@ -363,9 +364,6 @@ class IdentifierService extends AgentService {
     const metadata = await this.identifierStorage.getIdentifierMetadata(
       identifier
     );
-    if (metadata.groupMetadata) {
-      await this.deleteGroupLinkedConnections(metadata.groupMetadata.groupId);
-    }
 
     if (metadata.groupMemberPre) {
       const localMember = await this.identifierStorage.getIdentifierMetadata(
@@ -384,28 +382,6 @@ class IdentifierService extends AgentService {
           localMember.groupMetadata?.groupId
         }:${localMember.displayName}`,
       });
-
-      await this.deleteGroupLinkedConnections(
-        localMember.groupMetadata!.groupId
-      );
-
-      for (const notification of await this.notificationStorage.findAllByQuery({
-        receivingPre: metadata.groupMemberPre,
-      })) {
-        await deleteNotificationRecordById(
-          this.props.signifyClient,
-          this.notificationStorage,
-          notification.id,
-          notification.a.r as NotificationRoute
-        );
-
-        this.props.eventEmitter.emit<NotificationRemovedEvent>({
-          type: EventTypes.NotificationRemoved,
-          payload: {
-            id: notification.id,
-          },
-        });
-      }
     }
 
     await this.props.signifyClient.identifiers().update(identifier, {
@@ -413,34 +389,6 @@ class IdentifierService extends AgentService {
         metadata.displayName
       }`,
     });
-
-    for (const notification of await this.notificationStorage.findAllByQuery({
-      receivingPre: identifier,
-    })) {
-      await deleteNotificationRecordById(
-        this.props.signifyClient,
-        this.notificationStorage,
-        notification.id,
-        notification.a.r as NotificationRoute
-      );
-
-      this.props.eventEmitter.emit<NotificationRemovedEvent>({
-        type: EventTypes.NotificationRemoved,
-        payload: {
-          id: notification.id,
-        },
-      });
-    }
-
-    const connectedDApp =
-      PeerConnection.peerConnection.getConnectedDAppAddress();
-    if (
-      connectedDApp !== "" &&
-      metadata.id ===
-        (await PeerConnection.peerConnection.getConnectingIdentifier()).id
-    ) {
-      PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
-    }
 
     await this.identifierStorage.updateIdentifierMetadata(identifier, {
       isDeleted: true,
@@ -483,7 +431,7 @@ class IdentifierService extends AgentService {
       groupId
     );
     for (const connection of connections) {
-      await this.connections.deleteConnectionById(connection.id);
+      await this.connections.deleteMultisigConnectionById(connection.id);
     }
   }
 
@@ -529,7 +477,16 @@ class IdentifierService extends AgentService {
   }
 
   async syncKeriaIdentifiers(): Promise<void> {
-    const cloudIdentifiers: any[] = [];
+    const cloudIdentifiers: Array<{
+      prefix: string;
+      name: string;
+      group?: {
+        mhab: {
+          name: string;
+          prefix: string;
+        };
+      };
+    }> = [];
     let returned = -1;
     let iteration = 0;
 
@@ -624,6 +581,9 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
+      if (!identifier.group) {
+        throw new Error("Group identifier missing group data");
+      }
       const nameToParse = identifier.name.startsWith(
         IdentifierService.DELETED_IDENTIFIER_THEME
       )

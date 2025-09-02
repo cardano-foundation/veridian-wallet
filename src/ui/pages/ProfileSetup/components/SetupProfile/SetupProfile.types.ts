@@ -1,6 +1,7 @@
 interface SetupProfileProps {
-  onChangeUserName: (userName: string) => void;
   userName: string;
+  onChangeUserName: (userName: string) => void;
+  isGroupProfile?: boolean;
 }
 
 export type { SetupProfileProps };

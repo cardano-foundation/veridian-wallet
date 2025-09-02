@@ -6,6 +6,7 @@ import {
   CredentialShortDetails,
   ACDCDetails,
   CredentialStatus,
+  KeriaCredential,
 } from "./credentialService.types";
 import { CredentialMetadataRecord } from "../records/credentialMetadataRecord";
 import { getCredentialShortDetails, OnlineOnly } from "./utils";
@@ -145,6 +146,18 @@ class CredentialService extends AgentService {
     await this.credentialStorage.deleteCredentialMetadata(id);
   }
 
+  async deleteAllCredentialsForIdentifier(identifierId: string): Promise<void> {
+    const credentialsToDelete =
+      await this.credentialStorage.getAllCredentialMetadata(
+        undefined,
+        identifierId
+      );
+
+    for (const credential of credentialsToDelete) {
+      await this.deleteCredential(credential.id);
+    }
+  }
+
   async markCredentialPendingDeletion(id: string): Promise<void> {
     const metadata = await this.getMetadataById(id);
     this.validArchivedCredential(metadata);
@@ -195,7 +208,7 @@ class CredentialService extends AgentService {
   }
 
   async syncKeriaCredentials(): Promise<void> {
-    const cloudCredentials: any[] = [];
+    const cloudCredentials: KeriaCredential[] = [];
     let returned = -1;
     let iteration = 0;
 
@@ -214,7 +227,7 @@ class CredentialService extends AgentService {
       await this.credentialStorage.getAllCredentialMetadata();
 
     const unSyncedData = cloudCredentials.filter(
-      (credential: any) =>
+      (credential: KeriaCredential) =>
         !localCredentials.find((item) => credential.sad.d === item.id)
     );
 

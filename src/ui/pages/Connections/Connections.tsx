@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
+  RegularConnectionDetails,
   ConnectionStatus,
 } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
@@ -14,9 +15,7 @@ import {
   removeConnectionCache,
   setOpenConnectionId,
 } from "../../../store/reducers/connectionsCache";
-import { getIdentifiersCache } from "../../../store/reducers/identifiersCache";
 import {
-  getCurrentProfile,
   setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
@@ -38,15 +37,15 @@ import { ConnectionsBody } from "./components/ConnectionsBody";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
+import { getCurrentProfile } from "../../../store/reducers/profileCache";
 
 const Connections = () => {
   const pageId = "connections-tab";
   const dispatch = useAppDispatch();
-  const identifiers = useAppSelector(getIdentifiersCache);
   const connectionsCache = useAppSelector(getConnectionsCache);
   const openDetailId = useAppSelector(getOpenConnectionId);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
-    ConnectionShortDetails | undefined
+    RegularConnectionDetails | undefined
   >(undefined);
   const [mappedConnections, setMappedConnections] = useState<
     MappedConnections[]
@@ -54,13 +53,12 @@ const Connections = () => {
   const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const [deletePendingItem, setDeletePendingItem] =
-    useState<ConnectionShortDetails | null>(null);
+    useState<RegularConnectionDetails | null>(null);
   const [openDeletePendingAlert, setOpenDeletePendingAlert] = useState(false);
   const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
   const currentProfile = useAppSelector(getCurrentProfile);
-  const identifier = identifiers[currentProfile.identity.id];
 
   const showPlaceholder = Object.keys(connectionsCache).length === 0;
 
@@ -75,12 +73,13 @@ const Connections = () => {
       dispatch(setOpenConnectionId(undefined));
       if (
         !connection ||
+        !("identifier" in connection) ||
         connection.status === ConnectionStatus.PENDING ||
         connection.status === ConnectionStatus.FAILED
       ) {
         return;
       } else {
-        await getConnectionShortDetails(openDetailId);
+        await getConnectionShortDetails(openDetailId, connection.identifier);
       }
     };
 
@@ -112,19 +111,25 @@ const Connections = () => {
     }
   }, [connectionsCache]);
 
-  const getConnectionShortDetails = async (connectionId: string) => {
+  const getConnectionShortDetails = async (
+    connectionId: string,
+    identifier: string
+  ) => {
     const shortDetails =
-      await Agent.agent.connections.getConnectionShortDetailById(connectionId);
+      await Agent.agent.connections.getConnectionShortDetailById(
+        connectionId,
+        identifier
+      );
     setConnectionShortDetails(shortDetails);
   };
 
   const fetchOobi = useCallback(async () => {
     try {
-      if (!currentProfile.identity.id) return;
+      if (!currentProfile?.identity.id) return;
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${currentProfile.identity.id}`,
-        identifier?.displayName || ""
+        currentProfile?.identity.displayName || ""
       );
       if (oobiValue) {
         setOobi(oobiValue);
@@ -132,11 +137,15 @@ const Connections = () => {
     } catch (e) {
       showError("Unable to fetch connection oobi", e, dispatch);
     }
-  }, [currentProfile.identity.id, identifier?.displayName, dispatch]);
+  }, [
+    currentProfile?.identity.id,
+    currentProfile?.identity.displayName,
+    dispatch,
+  ]);
 
   useOnlineStatusEffect(fetchOobi);
 
-  const handleShowConnectionDetails = (item: ConnectionShortDetails) => {
+  const handleShowConnectionDetails = (item: RegularConnectionDetails) => {
     if (
       item.status === ConnectionStatus.PENDING ||
       item.status === ConnectionStatus.FAILED
@@ -146,6 +155,7 @@ const Connections = () => {
       return;
     }
 
+    // Only show details for regular connections
     setConnectionShortDetails(item);
   };
 
@@ -160,8 +170,10 @@ const Connections = () => {
 
     try {
       setDeletePendingItem(null);
+
       await Agent.agent.connections.deleteStaleLocalConnectionById(
-        deletePendingItem.id
+        deletePendingItem.id,
+        deletePendingItem.identifier!
       );
       dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
       dispatch(removeConnectionCache(deletePendingItem.id));
@@ -200,7 +212,7 @@ const Connections = () => {
           />
         </IonButton>
         <Avatar
-          id={currentProfile.identity.id}
+          id={currentProfile?.identity.id || ""}
           handleAvatarClick={handleAvatarClick}
         />
       </>
@@ -246,7 +258,9 @@ const Connections = () => {
               buttonAction={handleConnectModal}
               testId={pageId}
               buttonIcon={ScanIconWhite}
-            />
+            >
+              <div className="placeholder-spacer" />
+            </CardsPlaceholder>
           )
         }
       >

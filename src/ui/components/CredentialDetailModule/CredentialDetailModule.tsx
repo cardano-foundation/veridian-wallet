@@ -4,33 +4,36 @@ import { useCallback, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionShortDetails,
+  RegularConnectionDetails,
   MiscRecordId,
 } from "../../../core/agent/agent.types";
-import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { BasicRecord } from "../../../core/agent/records";
 import {
   ACDCDetails,
   CredentialStatus,
 } from "../../../core/agent/services/credentialService.types";
+import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { setCredsArchivedCache } from "../../../store/reducers/credsArchivedCache";
+import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import {
-  addFavouritesCredsCache,
+  getCredsArchivedCache,
   getCredsCache,
-  getFavouritesCredsCache,
-  removeFavouritesCredsCache,
-  setCredsCache,
-} from "../../../store/reducers/credsCache";
-import {
   getNotificationsCache,
+  setCredsArchivedCache,
+  setCredsCache,
   setNotificationsCache,
-} from "../../../store/reducers/notificationsCache";
+} from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
   setCurrentOperation,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
+import {
+  addFavouritesCredsCache,
+  getFavouritesCredsCache,
+  removeFavouritesCredsCache,
+} from "../../../store/reducers/viewTypeCache";
 import "../../components/CardDetails/CardDetails.scss";
 import { MAX_FAVOURITES } from "../../globals/constants";
 import { OperationType, ToastMsgType } from "../../globals/types";
@@ -52,7 +55,6 @@ import {
   BackReason,
   CredentialDetailModuleProps,
 } from "./CredentialDetailModule.types";
-import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 
 const CredentialDetailModule = ({
   pageId,
@@ -70,6 +72,7 @@ const CredentialDetailModule = ({
   const setSelected = isLightMode ? props.setSelected : undefined;
   const dispatch = useAppDispatch();
   const credsCache = useAppSelector(getCredsCache);
+  const archivedCred = useAppSelector(getCredsArchivedCache);
   const biometrics = useAppSelector(getBiometricsCache);
   const favouritesCredsCache = useAppSelector(getFavouritesCredsCache);
   const passwordAuthentication =
@@ -83,12 +86,12 @@ const CredentialDetailModule = ({
   const [cardData, setCardData] = useState<ACDCDetails>();
   const [hidden, setHidden] = useState(false);
   const [openConnectionlModal, setOpenConnectionlModal] = useState(false);
-  const isArchived = credsCache.filter((item) => item.id === id).length === 0;
+  const isArchived = archivedCred.some((item) => item.id === id);
   const isRevoked = cardData?.status === CredentialStatus.REVOKED;
   const isFavourite = favouritesCredsCache?.some((fav) => fav.id === id);
   const [cloudError, setCloudError] = useState(false);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
-    ConnectionShortDetails | undefined
+    RegularConnectionDetails | undefined
   >(undefined);
 
   const isInactiveCred = (isArchived || isRevoked || cloudError) && !viewOnly;
@@ -102,22 +105,26 @@ const CredentialDetailModule = ({
     }
   }, [dispatch]);
 
-  const getConnection = useCallback(async (connectionId: string) => {
-    try {
-      const shortDetails =
-        await Agent.agent.connections.getConnectionShortDetailById(
-          connectionId
-        );
-      setConnectionShortDetails(shortDetails);
-    } catch (error) {
-      showError("Unable to load connection", error);
-    }
-  }, []);
+  const getConnection = useCallback(
+    async (connectionId: string, identifier: string) => {
+      try {
+        const shortDetails =
+          await Agent.agent.connections.getConnectionShortDetailById(
+            connectionId,
+            identifier
+          );
+        setConnectionShortDetails(shortDetails);
+      } catch (error) {
+        showError("Unable to load connection", error);
+      }
+    },
+    []
+  );
 
   const getCredDetails = useCallback(async () => {
     if (credDetail) {
       setCardData(credDetail);
-      getConnection(credDetail.i);
+      getConnection(credDetail.i, credDetail.identifierId);
       return;
     }
 
@@ -127,7 +134,7 @@ const CredentialDetailModule = ({
       const cardDetails =
         await Agent.agent.credentials.getCredentialDetailsById(id);
       setCardData(cardDetails);
-      getConnection(cardDetails.i);
+      getConnection(cardDetails.i, cardDetails.identifierId);
     } catch (error) {
       setCloudError(true);
       showError("Unable to get credential detail", error);
@@ -433,7 +440,7 @@ const CredentialDetailModule = ({
           header={
             <PageHeader
               closeButton={true}
-              closeButtonLabel={`${i18n.t("tabs.identifiers.details.done")}`}
+              closeButtonLabel={`${i18n.t("profiledetails.done")}`}
               closeButtonAction={() => onClose?.(BackReason.CLOSE)}
             />
           }

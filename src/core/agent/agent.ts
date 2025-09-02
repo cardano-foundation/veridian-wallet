@@ -25,14 +25,16 @@ import { CoreEventEmitter } from "./event";
 import {
   BasicRecord,
   BasicStorage,
-  ConnectionRecord,
-  ConnectionStorage,
   CredentialMetadataRecord,
   CredentialStorage,
   IdentifierMetadataRecord,
   IdentifierStorage,
   NotificationRecord,
   NotificationStorage,
+  ContactStorage,
+  ConnectionPairStorage,
+  ContactRecord,
+  ConnectionPairRecord,
   PeerConnectionPairRecord,
   PeerConnectionPairStorage,
 } from "./records";
@@ -44,9 +46,19 @@ import { SqliteStorage } from "../storage/sqliteStorage";
 import { BaseRecord } from "../storage/storage.types";
 import { OperationPendingStorage } from "./records/operationPendingStorage";
 import { OperationPendingRecord } from "./records/operationPendingRecord";
-import { EventTypes, KeriaStatusChangedEvent } from "./event.types";
-import { isNetworkError, OnlineOnly, randomSalt } from "./services/utils";
+import {
+  EventTypes,
+  KeriaStatusChangedEvent,
+  NotificationRemovedEvent,
+} from "./event.types";
+import {
+  isNetworkError,
+  OnlineOnly,
+  randomSalt,
+  deleteNotificationRecordById,
+} from "./services/utils";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
+import { NotificationRoute } from "./services/keriaNotificationService.types";
 
 const walletId = "idw";
 class Agent {
@@ -79,10 +91,11 @@ class Agent {
   private basicStorageService!: BasicStorage;
   private identifierStorage!: IdentifierStorage;
   private credentialStorage!: CredentialStorage;
-  private connectionStorage!: ConnectionStorage;
   private notificationStorage!: NotificationStorage;
 
   private operationPendingStorage!: OperationPendingStorage;
+  private connectionPairStorage!: ConnectionPairStorage;
+  private contactStorage!: ContactStorage;
   private peerConnectionPairStorage!: PeerConnectionPairStorage;
   private identifierService!: IdentifierService;
   private multiSigService!: MultiSigService;
@@ -102,7 +115,8 @@ class Agent {
         this.operationPendingStorage,
         this.basicStorage,
         this.notificationStorage,
-        this.connections
+        this.connections,
+        this.credentials
       );
     }
     return this.identifierService;
@@ -142,11 +156,12 @@ class Agent {
     if (!this.connectionService) {
       this.connectionService = new ConnectionService(
         this.agentServicesProps,
-        this.connectionStorage,
         this.credentialStorage,
         this.operationPendingStorage,
         this.identifierStorage,
-        this.basicStorage
+        this.basicStorage,
+        this.connectionPairStorage,
+        this.contactStorage
       );
     }
     return this.connectionService;
@@ -179,7 +194,8 @@ class Agent {
         this.notificationStorage,
         this.identifierStorage,
         this.operationPendingStorage,
-        this.connectionStorage,
+        this.contactStorage,
+        this.connectionPairStorage,
         this.credentialStorage,
         this.basicStorage,
         this.multiSigs,
@@ -344,11 +360,6 @@ class Agent {
       bootUrl: "",
     });
 
-    // Validate and run any missed cloud migrations after recovery
-    if (this.storageSession instanceof SqliteSession) {
-      await this.storageSession.validateCloudMigrationsOnRecovery();
-    }
-
     await this.syncWithKeria();
   }
 
@@ -395,6 +406,11 @@ class Agent {
     Agent.isOnline = online;
 
     if (online) {
+      // Execute cloud migrations when we come online
+      if (this.storageSession instanceof SqliteSession) {
+        this.storageSession.executeCloudMigrationsOnConnection();
+      }
+
       this.connections.removeConnectionsPendingDeletion();
       this.connections.resolvePendingConnections();
       this.identifiers.removeIdentifiersPendingDeletion();
@@ -508,9 +524,6 @@ class Agent {
     this.credentialStorage = new CredentialStorage(
       this.getStorageService<CredentialMetadataRecord>(this.storageSession)
     );
-    this.connectionStorage = new ConnectionStorage(
-      this.getStorageService<ConnectionRecord>(this.storageSession)
-    );
     this.notificationStorage = new NotificationStorage(
       this.getStorageService<NotificationRecord>(this.storageSession)
     );
@@ -519,13 +532,102 @@ class Agent {
       this.getStorageService<OperationPendingRecord>(this.storageSession),
       this.agentServicesProps.eventEmitter
     );
+    this.connectionPairStorage = new ConnectionPairStorage(
+      this.getStorageService<ConnectionPairRecord>(this.storageSession)
+    );
+    this.contactStorage = new ContactStorage(
+      this.getStorageService<ContactRecord>(this.storageSession)
+    );
     this.peerConnectionPairStorage = new PeerConnectionPairStorage(
       this.getStorageService<PeerConnectionPairRecord>(this.storageSession)
     );
+
+    // Force initialization of services
+    this.identifiers;
+    this.multiSigs;
+    this.ipexCommunications;
+    this.connections;
+    this.credentials;
+    this.keriaNotifications;
+    this.auth;
+
     this.connections.onConnectionRemoved();
     this.connections.onConnectionAdded();
-    this.identifiers.onIdentifierRemoved();
+    this.identifiers.onIdentifierRemoved((event) => this.deleteProfile(event.payload.id));
     this.credentials.onCredentialRemoved();
+  }
+
+  private async deleteProfile(identifier: string): Promise<void> {
+    const metadata = await this.identifierStorage.getIdentifierMetadata(
+      identifier
+    );
+    if (metadata.groupMetadata) {
+      await this.connections.deleteAllConnectionsForGroup(
+        metadata.groupMetadata.groupId
+      );
+    } else {
+      await this.connections.deleteAllConnectionsForIdentifier(identifier);
+    }
+
+    await this.credentials.deleteAllCredentialsForIdentifier(identifier);
+
+    if (metadata.groupMemberPre) {
+      await this.connections.deleteAllConnectionsForGroup(
+        (
+          await this.identifierStorage.getIdentifierMetadata(
+            metadata.groupMemberPre
+          )
+        ).groupMetadata!.groupId
+      );
+
+      for (const notification of await this.notificationStorage.findAllByQuery({
+        receivingPre: metadata.groupMemberPre,
+      })) {
+        await deleteNotificationRecordById(
+          this.client,
+          this.notificationStorage,
+          notification.id,
+          notification.a.r as NotificationRoute
+        );
+
+        this.agentServicesProps.eventEmitter.emit<NotificationRemovedEvent>({
+          type: EventTypes.NotificationRemoved,
+          payload: {
+            id: notification.id,
+          },
+        });
+      }
+    }
+
+    for (const notification of await this.notificationStorage.findAllByQuery({
+      receivingPre: identifier,
+    })) {
+      await deleteNotificationRecordById(
+        this.client,
+        this.notificationStorage,
+        notification.id,
+        notification.a.r as NotificationRoute
+      );
+
+      this.agentServicesProps.eventEmitter.emit<NotificationRemovedEvent>({
+        type: EventTypes.NotificationRemoved,
+        payload: {
+          id: notification.id,
+        },
+      });
+    }
+
+    const connectedDApp =
+      PeerConnection.peerConnection.getConnectedDAppAddress();
+    if (
+      connectedDApp !== "" &&
+      metadata.id ===
+        (await PeerConnection.peerConnection.getConnectingIdentifier()).id
+    ) {
+      PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
+    }
+
+    await this.identifiers.deleteIdentifier(identifier);
   }
 
   async connect(
@@ -644,7 +746,7 @@ class Agent {
         });
     }
 
-    const connections = await this.connectionStorage.getAll();
+    const connections = await this.contactStorage.getAll();
     for (const connection of connections) {
       await this.agentServicesProps.signifyClient
         .contacts()
@@ -674,6 +776,23 @@ class Agent {
 
     await this.storageSession.wipe(walletId);
     await SecureStorage.wipe();
+    this.markAgentStatus(false);
+  }
+
+  /**
+   * Wipe local database and secure storage to start fresh.
+   */
+  async wipeLocalDatabase(): Promise<void> {
+    // Stop background services
+    this.keriaNotificationService.stopPolling();
+
+    // Wipe the storage session (this deletes the database file)
+    await this.storageSession.wipe(walletId);
+
+    // Wipe secure storage
+    await SecureStorage.wipe();
+
+    // Mark agent as offline
     this.markAgentStatus(false);
   }
 }

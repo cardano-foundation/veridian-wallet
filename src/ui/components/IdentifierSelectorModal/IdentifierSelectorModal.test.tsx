@@ -5,42 +5,13 @@ import { act, ReactNode } from "react";
 import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import { IdentifierSelectorModal } from "./IdentifierSelectorModal";
-import { CreationStatus } from "../../../core/agent/agent.types";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { IdentifierSelectorModal } from "./IdentifierSelectorModal";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 
 setupIonicReact();
 mockIonicReact();
-
-const identifierCache = [
-  {
-    displayName: "mutil sign",
-    id: "testid_00",
-    createdAtUTC: "2024-07-02T02:59:06.013Z",
-    theme: 0,
-    creationStatus: CreationStatus.COMPLETE,
-    groupMemberPre: "EHNPqg5RyNVWfpwUYDK135xuUMFGK1GXZoDVqGc0DPsy",
-  },
-  {
-    displayName: "mutil sign 1",
-    id: "testid_0",
-    createdAtUTC: "2024-07-02T02:59:06.013Z",
-    theme: 0,
-    creationStatus: CreationStatus.COMPLETE,
-    groupMetadata: {
-      groupId: "test",
-      groupInitiator: true,
-      groupCreated: true,
-    },
-  },
-  {
-    displayName: "mutil sign 2",
-    id: "testid_1",
-    createdAtUTC: "2024-07-02T02:59:06.013Z",
-    theme: 0,
-    creationStatus: CreationStatus.COMPLETE,
-  },
-];
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -52,7 +23,7 @@ jest.mock("@ionic/react", () => ({
 describe("Identifier Selector Modal", () => {
   const initialState = {
     stateCache: {
-      routes: [TabsRoutePath.IDENTIFIERS],
+      routes: [TabsRoutePath.CREDENTIALS],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -63,9 +34,7 @@ describe("Identifier Selector Modal", () => {
     walletConnectionsCache: {
       walletConnections: [],
     },
-    identifiersCache: {
-      identifiers: identifierCache,
-    },
+    profilesCache: profileCacheFixData,
   };
 
   const dispatchMock = jest.fn();
@@ -100,7 +69,9 @@ describe("Identifier Selector Modal", () => {
       )
     ).toBeVisible();
 
-    expect(getByTestId(`card-item-${identifierCache[2].id}`)).toBeVisible();
+    expect(
+      getByTestId(`card-item-${filteredIdentifierFix[1].id}`)
+    ).toBeVisible();
 
     expect(getByTestId("primary-button")).toBeVisible();
 
@@ -121,12 +92,12 @@ describe("Identifier Selector Modal", () => {
     await waitForIonicReact();
 
     expect(
-      getByTestId("identifier-select-" + identifierCache[2].id)
+      getByTestId("identifier-select-" + filteredIdentifierFix[1].id)
     ).toBeVisible();
 
     act(() => {
       fireEvent.click(
-        getByTestId("identifier-select-" + identifierCache[2].id)
+        getByTestId("identifier-select-" + filteredIdentifierFix[1].id)
       );
     });
 

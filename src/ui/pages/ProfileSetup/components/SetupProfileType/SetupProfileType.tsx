@@ -10,13 +10,15 @@ const SetupProfileType = ({
 }: ProfileTypeProps) => {
   return (
     <IonContent className="profile-type">
-      <p className="title">{i18n.t("setupprofile.profiletype.description")}</p>
+      <p className="subtitle">
+        {i18n.t("setupprofile.profiletype.description")}
+      </p>
       {Object.values(ProfileType).map((value) => {
         const checked = value === profileType;
         const title = i18n.t(`setupprofile.profiletype.${value}.title`);
         const text = i18n.t(`setupprofile.profiletype.${value}.text`);
         const className = combineClassNames(
-          "profile-type",
+          "profile-type-option",
           checked ? "active" : undefined
         );
 

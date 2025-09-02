@@ -37,6 +37,9 @@ jobs:
         npm ci
         npm run audit
     
+    - name: Run ESLint (Core Only)
+      run: npx eslint src/core --ext .ts,.tsx
+    
     - name: Run unit tests
       env:
         NODE_OPTIONS: "--max_old_space_size=8192"

@@ -237,7 +237,7 @@ p {
 .decline-button,
 .archive-button {
   font-size: 1rem;
-  height: 3.25rem;
+  height: 3.5rem;
   --background-activated: var(--ion-color-neutral-400);
   --border-radius: 1rem;
 
@@ -254,7 +254,7 @@ p {
   .delete-button,
   .archive-button {
     font-size: 0.8rem;
-    height: 2.5rem;
+    height: 2.8rem;
     margin: 0 auto 0.8rem;
   }
 }
@@ -298,6 +298,12 @@ ion-segment {
   --background: var(--ion-color-neutral-300);
 
   ion-segment-button {
+    height: 2.25rem;
+
+    &.md {
+      height: 2.25rem;
+    }
+
     &.segment-button-checked {
       --color-checked: var(--ion-color-neutral-100);
       &::part(indicator-background) {
@@ -318,9 +324,13 @@ ion-segment {
       margin: 0 auto;
     }
 
-    ion-segment-button.md {
-      height: 2.4rem;
-      min-height: 2.4rem;
+    ion-segment-button {
+      height: 1.8rem;
+
+      &.md {
+        height: 2.4rem;
+        min-height: 2.4rem;
+      }
     }
   }
 }

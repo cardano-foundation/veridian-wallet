@@ -14,6 +14,7 @@ import { act } from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
+import { configureStore } from "@reduxjs/toolkit";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { OperationType } from "../../globals/types";
@@ -23,6 +24,25 @@ import { LockPage } from "./LockPage";
 import { KeyStoreKeys } from "../../../core/storage";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { rootReducer } from "../../../store"; // adjust path as needed
+import { InitializationPhase } from "../../../store/reducers/stateCache/stateCache.types";
+
+function makeRealStore(
+  preloadedState?: Partial<ReturnType<typeof rootReducer>>
+) {
+  return configureStore({
+    reducer: rootReducer,
+    preloadedState,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActionPaths: [
+            "payload.signTransaction.payload.approvalCallback",
+          ],
+        },
+      }),
+  });
+}
 
 const deleteSecureStorageMock = jest.fn();
 jest.mock("../../../core/storage", () => ({
@@ -284,30 +304,58 @@ describe("Lock Page", () => {
   });
 
   test("Verifies passcode and hides page upon correct input", async () => {
-    jest.doMock("../../hooks/useBiometricsHook", () => ({
-      useBiometricAuth: jest.fn(() => ({
-        biometricsIsEnabled: false,
-        biometricInfo: {
-          isAvailable: false,
-          hasCredentials: false,
-          biometryType: BiometryType.none,
-          strongBiometryIsAvailable: false,
-        },
-        handleBiometricAuth: jest.fn(() =>
-          Promise.resolve(
-            new BiometryError("", BiometryErrorType.biometryNotAvailable)
-          )
-        ),
-        setBiometricsIsEnabled: jest.fn(),
-      })),
-    }));
     verifySecretMock.mockResolvedValueOnce(true);
 
+    const store = makeRealStore({
+      stateCache: {
+        routes: [{ path: RoutePath.GENERATE_SEED_PHRASE }],
+        authentication: {
+          loggedIn: false,
+          time: Date.now(),
+          passcodeIsSet: true,
+          seedPhraseIsSet: true,
+          loginAttempt: {
+            attempts: 0,
+            lockedUntil: Date.now(),
+          },
+          userName: "",
+          passwordIsSet: false,
+          passwordIsSkipped: false,
+          ssiAgentIsSet: false,
+          ssiAgentUrl: "",
+          recoveryWalletProgress: false,
+          firstAppLaunch: false,
+        },
+        currentOperation: OperationType.IDLE,
+        initializationPhase: InitializationPhase.PHASE_ONE,
+        recoveryCompleteNoInterruption: false,
+        isOnline: true,
+        queueIncomingRequest: {
+          isPaused: false,
+          isProcessing: false,
+          queues: [],
+        },
+        toastMsgs: [],
+        pendingJoinGroupMetadata: null,
+      },
+      seedPhraseCache: {
+        seedPhrase: "",
+        bran: "",
+      },
+      biometricsCache: {
+        enabled: true,
+      },
+    });
+
     const { getByText, queryByTestId, getByTestId } = render(
-      <Provider store={storeMocked(initialState)}>
+      <Provider store={store}>
         <LockPage />
       </Provider>
     );
+
+    await waitFor(() => {
+      expect(queryByTestId("lock-page-title")).toBeInTheDocument();
+    });
 
     await passcodeFiller(getByText, getByTestId, "193212");
 
@@ -319,7 +367,7 @@ describe("Lock Page", () => {
     });
 
     await waitFor(() => {
-      expect(queryByTestId("lock-page")).not.toBeInTheDocument();
+      expect(queryByTestId("lock-page-title")).not.toBeInTheDocument();
     });
   });
 

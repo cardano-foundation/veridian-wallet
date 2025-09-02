@@ -10,6 +10,7 @@
 
   ion-toolbar {
     --background: transparent;
+    margin-top: 0.625rem;
 
     ion-title.md {
       margin-left: 0;
@@ -24,7 +25,6 @@
     --padding-end: 0;
   }
 
-  ion-toolbar,
   ion-buttons,
   ion-button {
     margin: 0;

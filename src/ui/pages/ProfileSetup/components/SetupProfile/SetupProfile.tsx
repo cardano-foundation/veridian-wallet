@@ -7,13 +7,21 @@ import { nameChecker } from "../../../../utils/nameChecker";
 import "./SetupProfile.scss";
 import { SetupProfileProps } from "./SetupProfile.types";
 
-const SetupProfile = ({ userName, onChangeUserName }: SetupProfileProps) => {
+const SetupProfile = ({
+  userName,
+  onChangeUserName,
+  isGroupProfile,
+}: SetupProfileProps) => {
   const [inputChange, setInputChange] = useState(false);
   const errorMessage = inputChange ? nameChecker.getError(userName) : undefined;
 
   return (
     <IonContent className="setup-profile">
-      <p className="title">{i18n.t("setupprofile.profilesetup.description")}</p>
+      <p className="subtitle">
+        {isGroupProfile
+          ? i18n.t("setupprofile.profilesetup.description.group")
+          : i18n.t("setupprofile.profilesetup.description.individual")}
+      </p>
       <CustomInput
         title={`${i18n.t("setupprofile.profilesetup.form.input")}`}
         placeholder={`${i18n.t("setupprofile.profilesetup.form.placeholder")}`}

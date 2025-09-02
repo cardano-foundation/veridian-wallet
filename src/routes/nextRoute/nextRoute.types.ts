@@ -1,3 +1,4 @@
+import { Profile } from "../../store/reducers/profileCache";
 import { SeedPhraseCacheProps } from "../../store/reducers/seedPhraseCache";
 import { StateCacheProps } from "../../store/reducers/stateCache";
 import { RoutePath, TabsRoutePath } from "../paths";
@@ -11,6 +12,7 @@ interface PayloadProps {
 interface StoreState {
   stateCache: StateCacheProps;
   seedPhraseCache?: SeedPhraseCacheProps;
+  currentProfile?: Profile;
 }
 
 interface NextRoute {
