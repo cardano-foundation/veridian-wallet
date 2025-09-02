@@ -1,6 +1,3 @@
-// Filename: LockPage.test.tsx
-
-// Before imports to avoid hoisting issues
 const incrementLoginAttemptMock = jest.fn();
 const resetLoginAttemptsMock = jest.fn();
 const storeSecretMock = jest.fn();
@@ -97,7 +94,6 @@ jest.mock("@capacitor-community/privacy-screen", () => ({
   },
 }));
 
-// Mock the hook at the top level, as in the reference file
 jest.mock("../../hooks/useBiometricsHook");
 
 interface StoreMockedProps {
@@ -172,7 +168,6 @@ describe("Lock Page", () => {
     });
     isNativeMock.mockImplementation(() => false);
 
-    // Set a default implementation for the mock, as in the reference file
     (useBiometricAuth as jest.Mock).mockImplementation(() => ({
       biometricsIsEnabled: true,
       biometricInfo: {
@@ -406,7 +401,6 @@ describe("Lock Page", () => {
       lockoutEndTime: Date.now() + 30000,
     }));
 
-    // Render the LockPage component
     render(
       <Provider store={storeMocked(initialState)}>
         <LockPage />

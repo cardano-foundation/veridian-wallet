@@ -196,7 +196,7 @@ describe("SetupBiometrics Page", () => {
     });
   });
 
-  test("should display cancel message when status is USER_CANCELLED", async () => {
+  test("Should display cancel message when status is USER_CANCELLED", async () => {
     setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.USER_CANCELLED);
     const { getByTestId, findByText } = renderComponent();
     fireEvent.click(getByTestId("primary-button"));
@@ -206,7 +206,7 @@ describe("SetupBiometrics Page", () => {
     expect(await findByText(EN_TRANSLATIONS.biometry.cancelbiometryheader)).toBeInTheDocument();
   });
 
-  test("should display temporary lockout message when status is TEMPORARY_LOCKOUT", async () => {
+  test("Should display temporary lockout message when status is TEMPORARY_LOCKOUT", async () => {
 
     (useBiometricAuth as jest.Mock).mockImplementation(() => ({
       biometricsIsEnabled: false,
@@ -231,7 +231,7 @@ describe("SetupBiometrics Page", () => {
     });
   });
 
-  test("should display permanent lockout message when status is PERMANENT_LOCKOUT", async () => {
+  test("Should display permanent lockout message when status is PERMANENT_LOCKOUT", async () => {
     setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.PERMANENT_LOCKOUT);
     renderComponent();
     fireEvent.click(screen.getByTestId("primary-button"));
