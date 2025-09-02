@@ -52,6 +52,13 @@ interface ToastStackItem {
   message: ToastMsgType;
 }
 
+interface PendingJoinGroupMetadata {
+  isPendingJoinGroup: boolean;
+  groupId: string;
+  groupName: string;
+  initiatorName: string | null;
+}
+
 interface StateCacheProps {
   initializationPhase: InitializationPhase;
   recoveryCompleteNoInterruption: boolean;
@@ -67,6 +74,7 @@ interface StateCacheProps {
   forceInitApp?: number;
   showLoading?: boolean;
   isSetupProfile?: boolean;
+  pendingJoinGroupMetadata: PendingJoinGroupMetadata | null;
 }
 
 enum InitializationPhase {
@@ -83,6 +91,7 @@ export type {
   IncomingRequestProps,
   PayloadData,
   PeerConnectSigningEventRequest,
+  PendingJoinGroupMetadata,
   QueueProps,
   StateCacheProps,
   ToastStackItem,

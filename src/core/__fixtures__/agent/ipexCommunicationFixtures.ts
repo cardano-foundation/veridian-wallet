@@ -14,13 +14,19 @@ const grantForIssuanceExnMessage = {
     dt: "2024-07-30T04:19:55.801000+00:00",
     r: ExchangeRoute.IpexGrant,
     q: {},
-    a: { m: "", i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
+    a: {
+      m: "",
+      i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      smids: ["EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"],
+      gid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+    },
     rp: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
     e: {
       acdc: {
         d: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
         i: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
         s: "EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+        ri: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         a: {
           d: "ELHCh_X2aw7C-aYesOM4La23a5lsoNuJDuCsJuxwO2nq",
           i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
@@ -34,6 +40,13 @@ const grantForIssuanceExnMessage = {
         i: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         s: "0",
         dt: "2024-07-30T04:19:55.348000+00:00",
+      },
+      icp: {
+        i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      },
+      exn: {
+        r: ExchangeRoute.IpexGrant,
+        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
       },
       d: "EKBPPnWxYw2I5CtQSyhyn5VUdSTJ61qF_-h-NwmFRkIF",
     },
@@ -61,8 +74,29 @@ const applyForPresentingExnMessage = {
       m: "",
       s: "EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb",
       a: { attendeeName: "4" },
+      smids: ["EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK"],
+      gid: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
     },
-    e: {},
+    e: {
+      acdc: {
+        d: "EFbd-N8VoWbHzpwPUKm4hPF6ZKCRNHfnYiKKYDT7N0KS",
+        i: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
+        s: "EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb",
+        ri: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
+        a: {
+          d: "EFbd-N8VoWbHzpwPUKm4hPF6ZKCRNHfnYiKKYDT7N0KS",
+          i: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
+          dt: "2024-09-12T09:42:43.794000+00:00",
+        },
+      },
+      icp: {
+        i: "EFPQ7LAydMjiYYxPzvTcNs9rqzj5Khb8fNtAli9DraQK",
+      },
+      exn: {
+        r: ExchangeRoute.IpexApply,
+        p: "EFbd-N8VoWbHzpwPUKm4hPF6ZKCRNHfnYiKKYDT7N0KS",
+      },
+    },
   },
   pathed: {},
 };
@@ -77,12 +111,18 @@ const offerForPresentingExnMessage = {
     dt: "2024-07-30T04:19:55.801000+00:00",
     r: ExchangeRoute.IpexOffer,
     q: {},
-    a: { m: "", i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
+    a: {
+      m: "",
+      i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      smids: ["EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"],
+      gid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+    },
     e: {
       acdc: {
         d: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
         i: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
         s: "EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+        ri: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         a: {
           d: "ELHCh_X2aw7C-aYesOM4La23a5lsoNuJDuCsJuxwO2nq",
           i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
@@ -97,12 +137,19 @@ const offerForPresentingExnMessage = {
         s: "0",
         dt: "2024-07-30T04:19:55.348000+00:00",
       },
+      icp: {
+        i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      },
+      exn: {
+        r: ExchangeRoute.IpexOffer,
+        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
+      },
       d: "EKBPPnWxYw2I5CtQSyhyn5VUdSTJ61qF_-h-NwmFRkIF",
     },
   },
   pathed: {
     acdc: "-IABEEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn0AAAAAAAAAAAAAAAAAAAAAAAEHStOgwJku_Ln-YN2ohgWUH-CI07SyJnFppSbF8kG4PO",
-    iss: "-VAS-GAB0AAAAAAAAAAAAAAAAAAAAAAAEEO0xKzC8FOAXV-JgFZGgb0aIT2A3cPXPt9_0l_qcGM9",
+    iss: "-VAS-GAB0AAAAAAAAAAAAAAAAAAAAAAAEEO0xKzC8FOAXV-JgFZGgb0Bzxdn",
     anc: "-AABAACBlQqbI_qNpKYkzIog6tauSgt0XufBvGtrumfbnhSInFjSwnaIqZi353QT-c1W_gE9KIz3rgX5QNNWLcqA7bcM",
   },
 };
@@ -121,8 +168,29 @@ const admitForIssuanceExnMessage = {
     a: {
       i: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
       m: "",
+      smids: ["EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK"],
+      gid: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
     },
-    e: {},
+    e: {
+      acdc: {
+        d: "EEqJBi-JmK5IG-rU4wnn5cplcnmAk6exhAwE2GkAG895",
+        i: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+        s: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+        ri: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+        a: {
+          d: "EEqJBi-JmK5IG-rU4wnn5cplcnmAk6exhAwE2GkAG895",
+          i: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+          dt: "2024-12-23T07:42:34.448000+00:00",
+        },
+      },
+      icp: {
+        i: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+      },
+      exn: {
+        r: ExchangeRoute.IpexAdmit,
+        p: "EFYtFiqA6l2xlCtTwKksHpWtTSvIilwQGamB_qFvPuER",
+      },
+    },
   },
   pathed: {},
 };
@@ -138,13 +206,19 @@ const agreeForPresentingExnMessage = {
     dt: "2024-07-30T04:19:55.801000+00:00",
     r: ExchangeRoute.IpexAgree,
     q: {},
-    a: { m: "", i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
+    a: {
+      m: "",
+      i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      smids: ["EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"],
+      gid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+    },
     rp: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
     e: {
       acdc: {
         d: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
         i: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
         s: "EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+        ri: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         a: {
           d: "ELHCh_X2aw7C-aYesOM4La23a5lsoNuJDuCsJuxwO2nq",
           i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
@@ -158,6 +232,13 @@ const agreeForPresentingExnMessage = {
         i: "EEqfWy-6jx_FG0RNuNxZBh_jq6Lq1OPuvX5m3v1Bzxdn",
         s: "0",
         dt: "2024-07-30T04:19:55.348000+00:00",
+      },
+      icp: {
+        i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      },
+      exn: {
+        r: ExchangeRoute.IpexAgree,
+        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
       },
       d: "EKBPPnWxYw2I5CtQSyhyn5VUdSTJ61qF_-h-NwmFRkIF",
     },
@@ -222,6 +303,7 @@ const multisigExnOfferForPresenting = {
     a: {
       i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
       gid: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+      smids: ["EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn"],
     },
     e: {
       exn: {
@@ -243,7 +325,26 @@ const multisigExnOfferForPresenting = {
       d: "EE8_Xc0ZUh_sUJLtmBpVSEr-RFS2mRUIpFyL-pmvtPvx",
     },
   },
-  pathed: {},
+  pathed: {
+    exn: {
+      v: "KERI10JSON000178_",
+      t: "exn",
+      d: "EKa94ERqArLOvNf9AmItMJtsoGKZPVb3e_pEo_1D37qt",
+      i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+      rp: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
+      p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
+      dt: "2024-08-28T06:39:51.416000+00:00",
+      r: ExchangeRoute.IpexGrant,
+      q: {},
+      a: {
+        i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
+        m: "",
+      },
+      e: {
+        acdc: { d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT" },
+      },
+    },
+  },
 };
 
 const multisigExnAdmitForIssuance = {
@@ -298,24 +399,33 @@ const multisigExnGrant = {
     a: {
       i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
       gid: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+      smids: ["EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn"],
     },
     e: {
-      exn: {
-        v: "KERI10JSON000178_",
-        t: "exn",
-        d: "EKa94ERqArLOvNf9AmItMJtsoGKZPVb3e_pEo_1D37qt",
+      acdc: {
+        d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT",
         i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
-        rp: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
-        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
-        dt: "2024-08-28T06:39:51.416000+00:00",
-        r: ExchangeRoute.IpexGrant,
-        q: {},
+        s: "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao",
+        ri: "EGtWoXT4ahu5YnmGCAV8stolM-fgdqCu_eggQ46uSSoi",
         a: {
-          i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
-          m: "",
+          d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT",
+          i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+          dt: "2024-08-28T06:39:51.416000+00:00",
         },
+      },
+      icp: {
+        i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+      },
+      exn: {
+        i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+        r: ExchangeRoute.IpexGrant,
+        p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
         e: {
-          acdc: { d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT" },
+          acdc: {
+            i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+            d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT",
+            s: "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao",
+          },
         },
       },
       d: "EE8_Xc0ZUh_sUJLtmBpVSEr-RFS2mRUIpFyL-pmvtPvx",
@@ -407,21 +517,48 @@ const multisigParticipantsProps = {
       userName: "IdentifierName2",
     },
   },
-  multisigMembers: [
-    {
-      aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
-      ends: [],
-    },
-    {
-      aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
-      ends: [],
-    },
-  ],
+  multisigMembers: {
+    signing: [
+      {
+        aid: "ELmrDKf0Yq54Yq7cyrHwHZlA4lBB8ZVX9c8Ea3h2VJFF",
+        ends: {
+          agent: {
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8": {
+              http: "http://keria:3902/",
+            },
+          },
+          witness: {
+            "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha": {
+              http: "http://witness-demo:5642/",
+              tcp: "tcp://witness-demo:5632/",
+            },
+          },
+        },
+      },
+      {
+        aid: "EGaEIhOGSTPccSMvnXvfvOVyC1C5AFq62GLTrRKVZBS5",
+        ends: {
+          agent: {
+            "EBkResDyD-lZslJAZLe2gOCIlGLTd4Wts7Wy0EgDBi4d": {
+              http: "http://keria:3902/",
+            },
+          },
+          witness: {
+            "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha": {
+              http: "http://witness-demo:5642/",
+              tcp: "tcp://witness-demo:5632/",
+            },
+          },
+        },
+      },
+    ],
+    rotation: [],
+  },
 };
 
 const ipexGrantSerder = {
   kind: "JSON",
-  raw: "{\"v\":\"KERI10JSON0004b1_\",\"t\":\"exn\",\"d\":\"EIGHcMNSHqnRlQWy-tIg04k24wIy5_mqBfOXDhhAsHvx\",\"i\":\"EHis8uP3C9jJ70OjwRfY9tLxvqefH7qVIazlpaVJI5zm\",\"p\":\"\",\"dt\":\"2024-08-15T08:44:16.867000+00:00\",\"r\":\"/ipex/grant\",\"q\":{},\"a\":{\"m\":\"\",\"i\":\"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9\"},\"e\":{\"acdc\":{\"v\":\"ACDC10JSON000197_\",\"d\":\"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r\",\"i\":\"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9\",\"ri\":\"EPUFfq94pBLYKDRWyfOe7m-RKsET_zriJbfU3iUtM450\",\"s\":\"EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao\",\"a\":{\"d\":\"EIK0Xph_pH3RYIgLniWMuMVlgvoLK8eIICN7cIUJv2j8\",\"i\":\"EHis8uP3C9jJ70OjwRfY9tLxvqefH7qVIazlpaVJI5zm\",\"LEI\":\"5493001KJTIIGC8Y1R17\",\"dt\":\"2024-08-15T08:44:13.141000+00:00\"}},\"iss\":{\"v\":\"KERI10JSON0000ed_\",\"t\":\"iss\",\"d\":\"EEuxEi0sa45nAcVQc_MwGh8EGK0Lh1pgiHY18hbh1yNF\",\"i\":\"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r\",\"s\":\"0\",\"ri\":\"EPUFfq94pBLYKDRWyfOe7m-RKsET_zriJbfU3iUtM450\",\"dt\":\"2024-08-15T08:44:13.141000+00:00\"},\"anc\":{\"v\":\"KERI10JSON0000cd_\",\"t\":\"ixn\",\"d\":\"EK9x8RSjMJ_oxuBHIWftq5lYQcTW7WYZ3HwCT34s62jQ\",\"i\":\"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9\",\"s\":\"1\",\"p\":\"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r\",\"a\":[{}]},\"d\":\"EO_bCCneshP2lNWQ8gKSqyU9frP9V8Zo6tLczIHeXhXg\"}}",
+  raw: '{"v":"KERI10JSON0004b1_","t":"exn","d":"EIGHcMNSHqnRlQWy-tIg04k24wIy5_mqBfOXDhhAsHvx","i":"EHis8uP3C9jJ70OjwRfY9tLxvqefH7qVIazlpaVJI5zm","p":"","dt":"2024-08-15T08:44:16.867000+00:00","r":"/ipex/grant","q":{},"a":{"m":"","i":"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9"},"e":{"acdc":{"v":"ACDC10JSON000197_","d":"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r","i":"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9","ri":"EPUFfq94pBLYKDRWyfOe7m-RKsET_zriJbfU3iUtM450","s":"EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao","a":{"d":"EIK0Xph_pH3RYIgLniWMuMVlgvoLK8eIICN7cIUJv2j8","i":"EHis8uP3C9jJ70OjwRfY9tLxvqefH7qVIazlpaVJI5zm","LEI":"5493001KJTIIGC8Y1R17","dt":"2024-08-15T08:44:13.141000+00:00"}},"iss":{"v":"KERI10JSON0000ed_","t":"iss","d":"EEuxEi0sa45nAcVQc_MwGh8EGK0Lh1pgiHY18hbh1yNF","i":"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r","s":"0","ri":"EPUFfq94pBLYKDRWyfOe7m-RKsET_zriJbfU3iUtM450","dt":"2024-08-15T08:44:13.141000+00:00"},"anc":{"v":"KERI10JSON0000cd_","t":"ixn","d":"EK9x8RSjMJ_oxuBHIWftq5lYQcTW7WYZ3HwCT34s62jQ","i":"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9","s":"1","p":"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r","a":[{}]},"d":"EO_bCCneshP2lNWQ8gKSqyU9frP9V8Zo6tLczIHeXhXg"}}',
   ked: {
     v: "KERI10JSON0004b1_",
     t: "exn",
@@ -451,7 +588,7 @@ const ipexGrantEnd =
 
 const ipexSubmitGrantSerder = {
   kind: "JSON",
-  raw: "{\"v\":\"KERI10JSON00025f_\",\"t\":\"exn\",\"d\":\"EFnDzHLeULKSm_jbQSIN427yWWFr82OBkkxg3iUf2FUW\",\"i\":\"EGUORQAs0r1mup1OmX1H23PITDV7td-o2XGdMVL6lmmk\",\"p\":\"\",\"dt\":\"2024-08-02T03:53:30.133000+00:00\",\"r\":\"/multisig/exn\",\"q\":{},\"a\":{\"gid\":\"EPIKswKD9AiVxIqU4QLn14qpNuiAfgVGzoK-HVU0znjC\"},\"e\":{\"exn\":{\"v\":\"KERI10JSON000111_\",\"t\":\"exn\",\"d\":\"EMTArfbjevIfB-fbxzsepKO35RWHN2gQxTTU5Lov2Dld\",\"i\":\"EPIKswKD9AiVxIqU4QLn14qpNuiAfgVGzoK-HVU0znjC\",\"p\":\"EH-_9IgodejkwXi2Hw--A53rVYcO6bDYnBrbpCId8LOu\",\"dt\":\"2024-08-02T03:53:29.400000+00:00\",\"r\":\"/ipex/admit\",\"q\":{},\"a\":{\"m\":\"\"},\"e\":{}},\"d\":\"ECxCLDUf8A1y62wf7YkWAcj5RN-KVzNaxRefzgE7oIjq\"}}",
+  raw: '{"v":"KERI10JSON00025f_","t":"exn","d":"EFnDzHLeULKSm_jbQSIN427yWWFr82OBkkxg3iUf2FUW","i":"EGUORQAs0r1mup1OmX1H23PITDV7td-o2XGdMVL6lmmk","p":"","dt":"2024-08-02T03:53:30.133000+00:00","r":"/multisig/exn","q":{},"a":{"gid":"EPIKswKD9AiVxIqU4QLn14qpNuiAfgVGzoK-HVU0znjC"},"e":{"exn":{"v":"KERI10JSON000111_","t":"exn","d":"EMTArfbjevIfB-fbxzsepKO35RWHN2gQxTTU5Lov2Dld","i":"EPIKswKD9AiVxIqU4QLn14qpNuiAfgVGzoK-HVU0znjC","p":"EH-_9IgodejkwXi2Hw--A53rVYcO6bDYnBrbpCId8LOu","dt":"2024-08-02T03:53:29.400000+00:00","r":"/ipex/admit","q":{},"a":{"m":""},"e":{}},"d":"ECxCLDUf8A1y62wf7YkWAcj5RN-KVzNaxRefzgE7oIjq"}}',
   ked: {
     v: "KERI10JSON00066c_",
     t: "exn",
@@ -461,7 +598,10 @@ const ipexSubmitGrantSerder = {
     dt: "2024-08-09T10:27:01.653000+00:00",
     r: NotificationRoute.MultiSigExn,
     q: {},
-    a: { gid: "EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY" },
+    a: {
+      gid: "EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY",
+      smids: ["EOfnSCpCa3XmSTUZ7vEgEJoYbruyiYIbl5DYsAwooXTY"],
+    },
     e: {
       exn: {
         v: "KERI10JSON00051e_",
@@ -529,7 +669,7 @@ const ipexSubmitGrantEnd =
 
 const ipexOfferSerder = {
   kind: "JSON",
-  raw: "{\"v\":\"KERI10JSON000340_\",\"t\":\"exn\",\"d\":\"EGfyfKc4tnZtigxgaw_55NEa13-5zpFXkheLv2jZiwI1\",\"i\":\"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4\",\"rp\":\"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd\",\"p\":\"ENdg2aG1gOXitYwI1xKZNch0VFAmZuFpvL0Xftliv0W9\",\"dt\":\"2024-10-02T15:23:50.210000+00:00\",\"r\":\"/ipex/offer\",\"q\":{},\"a\":{\"i\":\"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd\",\"m\":\"\"},\"e\":{\"acdc\":{\"v\":\"ACDC10JSON00018e_\",\"d\":\"ELKa5OdxusflKLZBqmHI09vYgyiySh4ZM1CQcoS6Nabh\",\"i\":\"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd\",\"ri\":\"EN1AomPsN0gmQS47DCaI3hz6rJovMz2aiLSfXDit_UrU\",\"s\":\"EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb\",\"a\":{\"d\":\"ENnh02JAwpkWVo8ExuuwgBGQB9fG8Zapg99H4dT6a_93\",\"i\":\"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4\",\"attendeeName\":\"99\",\"dt\":\"2024-10-02T15:21:50.607000+00:00\"}},\"d\":\"ECc3mOk1p4QceI4bGBoVhv7cVX34n-UOlK73VSm7m_fS\"}}",
+  raw: '{"v":"KERI10JSON000340_","t":"exn","d":"EGfyfKc4tnZtigxgaw_55NEa13-5zpFXkheLv2jZiwI1","i":"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4","rp":"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd","p":"ENdg2aG1gOXitYwI1xKZNch0VFAmZuFpvL0Xftliv0W9","dt":"2024-10-02T15:23:50.210000+00:00","r":"/ipex/offer","q":{},"a":{"i":"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd","m":""},"e":{"acdc":{"v":"ACDC10JSON00018e_","d":"ELKa5OdxusflKLZBqmHI09vYgyiySh4ZM1CQcoS6Nabh","i":"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd","ri":"EN1AomPsN0gmQS47DCaI3hz6rJovMz2aiLSfXDit_UrU","s":"EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb","a":{"d":"ENnh02JAwpkWVo8ExuuwgBGQB9fG8Zapg99H4dT6a_93","i":"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4","attendeeName":"99","dt":"2024-10-02T15:21:50.607000+00:00"}},"d":"ECc3mOk1p4QceI4bGBoVhv7cVX34n-UOlK73VSm7m_fS"}}',
   ked: {
     v: "KERI10JSON000340_",
     t: "exn",
@@ -543,6 +683,8 @@ const ipexOfferSerder = {
     a: {
       i: "EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd",
       m: "",
+      smids: ["EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd"],
+      gid: "EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd",
     },
     e: {
       acdc: {
@@ -558,6 +700,13 @@ const ipexOfferSerder = {
           dt: "2024-10-02T15:21:50.607000+00:00",
         },
       },
+      icp: {
+        i: "EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd",
+      },
+      exn: {
+        r: ExchangeRoute.IpexOffer,
+        p: "ELKa5OdxusflKLZBqmHI09vYgyiySh4ZM1CQcoS6Nabh",
+      },
       d: "ECc3mOk1p4QceI4bGBoVhv7cVX34n-UOlK73VSm7m_fS",
     },
   },
@@ -570,7 +719,7 @@ const ipexOfferSig = [
 
 const multisigOfferSerder = {
   kind: "JSON",
-  raw: "{\"v\":\"KERI10JSON0004f5_\",\"t\":\"exn\",\"d\":\"EARi8kQ1PkSSRyFEIPOFPdnsnv7P2QZYEQqnmr1Eo2N8\",\"i\":\"EAsQ-kwJwO8ug-S2dk1WGwpPlF4hT3q5TJi_OLZSFdEy\",\"rp\":\"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd\",\"p\":\"\",\"dt\":\"2024-10-02T15:26:01.003000+00:00\",\"r\":\"/multisig/exn\",\"q\":{},\"a\":{\"i\":\"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd\",\"gid\":\"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4\"},\"e\":{\"exn\":{\"v\":\"KERI10JSON000340_\",\"t\":\"exn\",\"d\":\"EGfyfKc4tnZtigxgaw_55NEa13-5zpFXkheLv2jZiwI1\",\"i\":\"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4\",\"rp\":\"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd\",\"p\":\"ENdg2aG1gOXitYwI1xKZNch0VFAmZuFpvL0Xftliv0W9\",\"dt\":\"2024-10-02T15:23:50.210000+00:00\",\"r\":\"/ipex/offer\",\"q\":{},\"a\":{\"i\":\"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd\",\"m\":\"\"},\"e\":{\"acdc\":{\"v\":\"ACDC10JSON00018e_\",\"d\":\"ELKa5OdxusflKLZBqmHI09vYgyiySh4ZM1CQcoS6Nabh\",\"i\":\"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd\",\"ri\":\"EN1AomPsN0gmQS47DCaI3hz6rJovMz2aiLSfXDit_UrU\",\"s\":\"EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb\",\"a\":{\"d\":\"ENnh02JAwpkWVo8ExuuwgBGQB9fG8Zapg99H4dT6a_93\",\"i\":\"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4\",\"attendeeName\":\"99\",\"dt\":\"2024-10-02T15:21:50.607000+00:00\"}},\"d\":\"ECc3mOk1p4QceI4bGBoVhv7cVX34n-UOlK73VSm7m_fS\"}},\"d\":\"EKNY8J1PflxKy72qqE05SKmej4SpEecFAGFA3cLSPTKj\"}}",
+  raw: '{"v":"KERI10JSON0004f5_","t":"exn","d":"EARi8kQ1PkSSRyFEIPOFPdnsnv7P2QZYEQqnmr1Eo2N8","i":"EAsQ-kwJwO8ug-S2dk1WGwpPlF4hT3q5TJi_OLZSFdEy","rp":"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd","p":"","dt":"2024-10-02T15:26:01.003000+00:00","r":"/multisig/exn","q":{},"a":{"i":"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd","gid":"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4"},"e":{"exn":{"v":"KERI10JSON000340_","t":"exn","d":"EGfyfKc4tnZtigxgaw_55NEa13-5zpFXkheLv2jZiwI1","i":"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4","rp":"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd","p":"ENdg2aG1gOXitYwI1xKZNch0VFAmZuFpvL0Xftliv0W9","dt":"2024-10-02T15:23:50.210000+00:00","r":"/ipex/offer","q":{},"a":{"i":"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd","m":""},"e":{"acdc":{"v":"ACDC10JSON00018e_","d":"ELKa5OdxusflKLZBqmHI09vYgyiySh4ZM1CQcoS6Nabh","i":"EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd","ri":"EN1AomPsN0gmQS47DCaI3hz6rJovMz2aiLSfXDit_UrU","s":"EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb","a":{"d":"ENnh02JAwpkWVo8ExuuwgBGQB9fG8Zapg99H4dT6a_93","i":"EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4","attendeeName":"99","dt":"2024-10-02T15:21:50.607000+00:00"}},"d":"ECc3mOk1p4QceI4bGBoVhv7cVX34n-UOlK73VSm7m_fS"}},"d":"EKNY8J1PflxKy72qqE05SKmej4SpEecFAGFA3cLSPTKj"}}',
   ked: {
     v: "KERI10JSON0004f5_",
     t: "exn",
@@ -584,6 +733,7 @@ const multisigOfferSerder = {
     a: {
       i: "EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd",
       gid: "EBopw9UjL8plPiTfqJbb819-l2Jsr-0de7YXGxzKGRq4",
+      smids: ["EOb2ITawuAc6mAeSn4SMuHZtB9mIHfZzac_1NO28eytd"],
     },
     e: {
       exn: {
@@ -632,7 +782,7 @@ const multisigOfferEnd =
 
 const ipexAdmitSerder = {
   kind: "JSON",
-  raw: "{\"v\":\"KERI10JSON0004b1_\",\"t\":\"exn\",\"d\":\"EIGHcMNSHqnRlQWy-tIg04k24wIy5_mqBfOXDhhAsHvx\",\"i\":\"EHis8uP3C9jJ70OjwRfY9tLxvqefH7qVIazlpaVJI5zm\",\"p\":\"\",\"dt\":\"2024-08-15T08:44:16.867000+00:00\",\"r\":\"/ipex/grant\",\"q\":{},\"a\":{\"m\":\"\",\"i\":\"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9\"},\"e\":{\"acdc\":{\"v\":\"ACDC10JSON000197_\",\"d\":\"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r\",\"i\":\"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9\",\"ri\":\"EPUFfq94pBLYKDRWyfOe7m-RKsET_zriJbfU3iUtM450\",\"s\":\"EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao\",\"a\":{\"d\":\"EIK0Xph_pH3RYIgLniWMuMVlgvoLK8eIICN7cIUJv2j8\",\"i\":\"EHis8uP3C9jJ70OjwRfY9tLxvqefH7qVIazlpaVJI5zm\",\"LEI\":\"5493001KJTIIGC8Y1R17\",\"dt\":\"2024-08-15T08:44:13.141000+00:00\"}},\"iss\":{\"v\":\"KERI10JSON0000ed_\",\"t\":\"iss\",\"d\":\"EEuxEi0sa45nAcVQc_MwGh8EGK0Lh1pgiHY18hbh1yNF\",\"i\":\"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r\",\"s\":\"0\",\"ri\":\"EPUFfq94pBLYKDRWyfOe7m-RKsET_zriJbfU3iUtM450\",\"dt\":\"2024-08-15T08:44:13.141000+00:00\"},\"anc\":{\"v\":\"KERI10JSON0000cd_\",\"t\":\"ixn\",\"d\":\"EK9x8RSjMJ_oxuBHIWftq5lYQcTW7WYZ3HwCT34s62jQ\",\"i\":\"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9\",\"s\":\"1\",\"p\":\"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r\",\"a\":[{}]},\"d\":\"EO_bCCneshP2lNWQ8gKSqyU9frP9V8Zo6tLczIHeXhXg\"}}",
+  raw: '{"v":"KERI10JSON0004b1_","t":"exn","d":"EIGHcMNSHqnRlQWy-tIg04k24wIy5_mqBfOXDhhAsHvx","i":"EHis8uP3C9jJ70OjwRfY9tLxvqefH7qVIazlpaVJI5zm","p":"","dt":"2024-08-15T08:44:16.867000+00:00","r":"/ipex/grant","q":{},"a":{"m":"","i":"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9"},"e":{"acdc":{"v":"ACDC10JSON000197_","d":"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r","i":"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9","ri":"EPUFfq94pBLYKDRWyfOe7m-RKsET_zriJbfU3iUtM450","s":"EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao","a":{"d":"EIK0Xph_pH3RYIgLniWMuMVlgvoLK8eIICN7cIUJv2j8","i":"EHis8uP3C9jJ70OjwRfY9tLxvqefH7qVIazlpaVJI5zm","LEI":"5493001KJTIIGC8Y1R17","dt":"2024-08-15T08:44:13.141000+00:00"}},"iss":{"v":"KERI10JSON0000ed_","t":"iss","d":"EEuxEi0sa45nAcVQc_MwGh8EGK0Lh1pgiHY18hbh1yNF","i":"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r","s":"0","ri":"EPUFfq94pBLYKDRWyfOe7m-RKsET_zriJbfU3iUtM450","dt":"2024-08-15T08:44:13.141000+00:00"},"anc":{"v":"KERI10JSON0000cd_","t":"ixn","d":"EK9x8RSjMJ_oxuBHIWftq5lYQcTW7WYZ3HwCT34s62jQ","i":"EEozWLiY6DrCMCLfPqdBaIvUX1aUyjLKkT6-RxFrIMd9","s":"1","p":"EBJHAbtBAi8yYspNjLDaw0s5A7PZyjoj1lrhSE-Dn28r","a":[{}]},"d":"EO_bCCneshP2lNWQ8gKSqyU9frP9V8Zo6tLczIHeXhXg"}}',
   ked: {
     v: "KERI10JSON000178_",
     t: "exn",
@@ -661,7 +811,7 @@ const ipexAdmitEnd =
 
 const ipexSubmitAdmitSerder = {
   kind: "JSON",
-  raw: "{\"v\":\"KERI10JSON00032d_\",\"t\":\"exn\",\"d\":\"EL3A2jk9gvmVe4ROISB2iWmM8yPSNwQlmar6-SFVWSPW\",\"i\":\"EJ6cZ3ErT6857EAbYquE82waXZv2vftHTbBgtvNE3-J2\",\"rp\":\"EDxLVG6ffRnsjqdvffpM4Id2W4q9APTu0Ej35sdjtKYN\",\"p\":\"\",\"dt\":\"2024-10-09T12:20:55.832000+00:00\",\"r\":\"/multisig/exn\",\"q\":{},\"a\":{\"i\":\"EDxLVG6ffRnsjqdvffpM4Id2W4q9APTu0Ej35sdjtKYN\",\"gid\":\"EB6wkTnyxwgEgwgPv23OM-bWUSB_jdnlMIab9Q0JUNac\"},\"e\":{\"exn\":{\"v\":\"KERI10JSON000178_\",\"t\":\"exn\",\"d\":\"EJjQmGwlatWTgbaawivz0Qs-8O3XvburFSRLmi6fj25d\",\"i\":\"EB6wkTnyxwgEgwgPv23OM-bWUSB_jdnlMIab9Q0JUNac\",\"rp\":\"EBvkzD-Kn4bBQVjrpkjyh3PvUKF-9yuM3RYTvLK5k_5z\",\"p\":\"EGic7AcZLZAwA_cLbXmzFZleQoitx_ghgQtv8E9QMShk\",\"dt\":\"2024-10-09T12:20:43.875000+00:00\",\"r\":\"/ipex/admit\",\"q\":{},\"a\":{\"i\":\"EBvkzD-Kn4bBQVjrpkjyh3PvUKF-9yuM3RYTvLK5k_5z\",\"m\":\"\"},\"e\":{}},\"d\":\"EEtr51v8dSBepGheENmzRgySXbb5kkxibt7s-NyQyn_j\"}}",
+  raw: '{"v":"KERI10JSON00032d_","t":"exn","d":"EL3A2jk9gvmVe4ROISB2iWmM8yPSNwQlmar6-SFVWSPW","i":"EJ6cZ3ErT6857EAbYquE82waXZv2vftHTbBgtvNE3-J2","rp":"EDxLVG6ffRnsjqdvffpM4Id2W4q9APTu0Ej35sdjtKYN","p":"","dt":"2024-10-09T12:20:55.832000+00:00","r":"/multisig/exn","q":{},"a":{"i":"EDxLVG6ffRnsjqdvffpM4Id2W4q9APTu0Ej35sdjtKYN","gid":"EB6wkTnyxwgEgwgPv23OM-bWUSB_jdnlMIab9Q0JUNac"},"e":{"exn":{"v":"KERI10JSON000178_","t":"exn","d":"EJjQmGwlatWTgbaawivz0Qs-8O3XvburFSRLmi6fj25d","i":"EB6wkTnyxwgEgwgPv23OM-bWUSB_jdnlMIab9Q0JUNac","rp":"EBvkzD-Kn4bBQVjrpkjyh3PvUKF-9yuM3RYTvLK5k_5z","p":"EGic7AcZLZAwA_cLbXmzFZleQoitx_ghgQtv8E9QMShk","dt":"2024-10-09T12:20:43.875000+00:00","r":"/ipex/admit","q":{},"a":{"i":"EBvkzD-Kn4bBQVjrpkjyh3PvUKF-9yuM3RYTvLK5k_5z","m":""},"e":{}},"d":"EEtr51v8dSBepGheENmzRgySXbb5kkxibt7s-NyQyn_j"}}',
   ked: {
     v: "KERI10JSON00032d_",
     t: "exn",

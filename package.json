@@ -106,6 +106,7 @@
     "css-minimizer-webpack-plugin": "^4.0.0",
     "date-fns": "^4.1.0",
     "eslint": "^8.36.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-react": "^7.32.2",
@@ -150,7 +151,29 @@
     "axios": "^1.8.2",
     "base-x": "^4.0.0",
     "ipaddr.js": "^2.2.0",
-    "validate.js": "^0.13.1"
+    "validate.js": "^0.13.1",
+    "sharp": {
+      "@img/sharp-libvips-linux-ppc64": "1.2.0",
+      "@img/sharp-linux-x64": "0.34.3",
+      "@img/sharp-win32-arm64": "0.34.3",
+      "@img/sharp-darwin-arm64": "0.34.2",
+      "@img/sharp-darwin-x64": "0.34.2",
+      "@img/sharp-libvips-darwin-arm64": "1.1.0",
+      "@img/sharp-libvips-darwin-x64": "1.1.0",
+      "@img/sharp-libvips-linux-arm": "1.1.0",
+      "@img/sharp-libvips-linux-arm64": "1.1.0",
+      "@img/sharp-libvips-linux-s390x": "1.1.0",
+      "@img/sharp-libvips-linuxmusl-arm64": "1.1.0",
+      "@img/sharp-libvips-linuxmusl-x64": "1.1.0",
+      "@img/sharp-linux-arm": "0.34.2",
+      "@img/sharp-linux-arm64": "0.34.2",
+      "@img/sharp-linux-s390x": "0.34.2",
+      "@img/sharp-linuxmusl-arm64": "0.34.2",
+      "@img/sharp-linuxmusl-x64": "0.34.2",
+      "@img/sharp-wasm32": "0.34.2",
+      "@img/sharp-win32-ia32": "0.34.2",
+      "@img/sharp-win32-x64": "0.34.2"
+    }
   },
   "eslintConfig": {
     "extends": [

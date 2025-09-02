@@ -1,6 +1,6 @@
 import {
-  ConnectionDetails,
   ConnectionNoteDetails,
+  RegularConnectionDetailsFull,
 } from "../../../../core/agent/agent.types";
 
 interface EditConnectionsModalProps {
@@ -8,7 +8,7 @@ interface EditConnectionsModalProps {
   setNotes: (value: ConnectionNoteDetails[]) => void;
   modalIsOpen: boolean;
   setModalIsOpen: (value: boolean) => void;
-  connectionDetails: ConnectionDetails;
+  connectionDetails: RegularConnectionDetailsFull;
   onConfirm: () => void;
 }
 

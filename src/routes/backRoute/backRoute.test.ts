@@ -62,6 +62,7 @@ describe("getBackRoute", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        pendingJoinGroupMetadata: null,
       },
       connectionsCache: {
         connections: {},
@@ -199,6 +200,7 @@ describe("getPreviousRoute", () => {
           isPaused: false,
         },
         toastMsgs: [],
+        pendingJoinGroupMetadata: null,
       },
       connectionsCache: {
         connections: {},

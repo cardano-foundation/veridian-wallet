@@ -8,7 +8,7 @@ interface CredentialsMatchingApply {
   };
   credentials: {
     connectionId: string;
-    acdc: any;
+    acdc: Record<string, unknown>;
   }[];
   attributes: JSONObject;
   identifier: string;

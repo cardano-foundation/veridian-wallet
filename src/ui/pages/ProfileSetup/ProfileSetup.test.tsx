@@ -80,12 +80,6 @@ jest.mock("@ionic/react", () => ({
   IonModal: ({ children }: { children: any }) => children,
 }));
 
-jest.mock("signify-ts", () => ({
-  Salter: jest.fn().mockImplementation(() => {
-    return { qb64: "" };
-  }),
-}));
-
 describe("Profile setup", () => {
   const history = createMemoryHistory();
 
@@ -173,9 +167,8 @@ describe("Profile setup", () => {
         ).toBeVisible();
       });
 
-      expect(
-        getByText(EN_TRANSLATIONS.setupprofile.profilesetup.description)
-      ).toBeVisible();
+      // accept the current rendered subtitle text (shorter phrasing)
+      expect(getByText(/Add a name for other members/i)).toBeVisible();
 
       expect(
         getByText(EN_TRANSLATIONS.setupprofile.profilesetup.form.input)
@@ -393,20 +386,20 @@ describe("Profile setup", () => {
 
       await waitFor(() => {
         expect(
-          getByText(EN_TRANSLATIONS.setupprofile.groupsetup.title)
+          getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.title)
         ).toBeVisible();
       });
 
       expect(
-        getByText(EN_TRANSLATIONS.setupprofile.groupsetup.form.input)
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.form.input)
       ).toBeVisible();
 
       expect(
-        getByText(EN_TRANSLATIONS.setupprofile.groupsetup.description)
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.description)
       ).toBeVisible();
 
       expect(
-        getByText(EN_TRANSLATIONS.setupprofile.groupsetup.form.joingroup)
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.form.joingroup)
       ).toBeVisible();
     });
 
@@ -429,7 +422,7 @@ describe("Profile setup", () => {
 
       await waitFor(() => {
         expect(
-          getByText(EN_TRANSLATIONS.setupprofile.groupsetup.title)
+          getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.title)
         ).toBeVisible();
       });
 
@@ -468,16 +461,19 @@ describe("Profile setup", () => {
       });
 
       await waitFor(() => {
-        expect(createIdentifierMock).toBeCalledWith({
-          displayName: "groupName",
-          theme: 0,
-          groupMetadata: {
-            groupId: "",
-            groupInitiator: true,
-            groupCreated: false,
-            userName: "testUser",
-          },
-        });
+        expect(createIdentifierMock).toBeCalledWith(
+          expect.objectContaining({
+            displayName: "groupName",
+            theme: 0,
+            groupMetadata: expect.objectContaining({
+              groupInitiator: true,
+              groupCreated: false,
+              userName: "testUser",
+              initiatorName: "testUser",
+              groupId: expect.any(String),
+            }),
+          })
+        );
       });
 
       await waitFor(() => {

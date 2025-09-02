@@ -1,7 +1,8 @@
 enum SetupProfileStep {
   SetupType = "profiletype",
   SetupProfile = "profilesetup",
-  SetupGroup = "groupsetup",
+  GroupSetupStart = "groupsetupstart",
+  GroupSetupConfirm = "groupsetupconfirm",
   FinishSetup = "finishsetup",
 }
 

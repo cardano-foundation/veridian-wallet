@@ -25,6 +25,11 @@ ion-button.avatar-button {
     --background: var(--ion-color-primary-300);
   }
 
+  &.no-ripple {
+    --ripple-color: transparent;
+    --background-activated: transparent;
+  }
+
   span {
     color: var(--ion-color-neutral-700);
     text-align: center;

@@ -25,6 +25,7 @@ const initialState = {
 const multisigConnection: ConnectionShortDetails = {
   groupId: "group-id",
   id: "did:example:ebfeb1ebc6f1c276ef71212ec21",
+  contactId: "did:example:ebfeb1ebc6f1c276ef71212ec21",
   label: "Cambridge University",
   createdAtUTC: "2017-08-13T19:23:24Z",
   logo: "logo.png",
@@ -33,6 +34,8 @@ const multisigConnection: ConnectionShortDetails = {
 
 const connection: ConnectionShortDetails = {
   id: "did:example:ebfeb1ebc6f1c276ef71212ec21",
+  contactId: "did:example:ebfeb1ebc6f1c276ef71212ec21",
+  identifier: "did:example:some-identifier",
   label: "Cambridge University",
   createdAtUTC: "2017-08-13T19:23:24Z",
   logo: "logo.png",

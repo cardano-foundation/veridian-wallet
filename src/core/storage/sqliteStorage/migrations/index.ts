@@ -1,17 +1,13 @@
-import {
-  SqlMigration,
-  TsMigration,
-  CloudMigration,
-  HybridMigration,
-} from "./migrations.types";
+import { LocalMigration } from "./migrations.types";
 import { DATA_V001 } from "./v0.0.1-init_sql";
 import { DATA_V1201 } from "./v1.2.0.1-connections-per-account";
 import { DATA_V1200 } from "./v1.2.0.0-peer_connection_account_migration";
 
-type Migration = SqlMigration | TsMigration | CloudMigration | HybridMigration;
-const MIGRATIONS: Migration[] = [DATA_V001, DATA_V1200, DATA_V1201];
+// Local migrations (SQLite database only)
+const LOCAL_MIGRATIONS: LocalMigration[] = [
+  DATA_V001, // SQL migration for database initialization
+  DATA_V1200, // TS migration for peer connection account migration
+  DATA_V1201, // TS migration for connections per account (local part only)
+];
 
-const CURRENT_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;
-const LATEST_IDENTIFIER_VERSION = "1.2.0.3";
-
-export { MIGRATIONS, CURRENT_VERSION, LATEST_IDENTIFIER_VERSION };
+export { LOCAL_MIGRATIONS };

@@ -329,12 +329,12 @@ const expectAllWitnessIntroductions = () => {
     expect(submitRpyMock).toHaveBeenNthCalledWith(
       index + 1,
       linkedContacts[0].id,
-      expect.stringContaining("\"t\":\"rpy\"")
+      expect.stringContaining('"t":"rpy"')
     );
     expect(submitRpyMock).toHaveBeenNthCalledWith(
       index + 1,
       linkedContacts[0].id,
-      expect.stringContaining("\"r\":\"/introduce\"")
+      expect.stringContaining('"r":"/introduce"')
     );
   });
 };
@@ -1438,7 +1438,7 @@ describe("Creation of multi-sig", () => {
     await multiSigService.processGroupsPendingCreation();
 
     expect(multiSigService.createGroup).toHaveBeenCalledWith(
-      queuedIdentifier.data.group!.mhab.prefix,
+      queuedIdentifier.data.group?.mhab.prefix,
       queuedIdentifier.groupConnections,
       2,
       true

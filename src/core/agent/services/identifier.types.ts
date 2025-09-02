@@ -1,6 +1,7 @@
 import { CreateIdentifierBody } from "signify-ts";
 import {
   ConnectionShortDetails,
+  MultisigConnectionDetails,
   CreationStatus,
   JSONObject,
 } from "../agent.types";
@@ -11,6 +12,7 @@ interface GroupMetadata {
   groupInitiator: boolean;
   groupCreated: boolean;
   userName: string;
+  initiatorName?: string;
 }
 
 interface CreateIdentifierInputs {
@@ -67,7 +69,7 @@ type QueuedIdentifierCreation = {
 type QueuedGroupProps =
   | {
       initiator: true;
-      groupConnections: ConnectionShortDetails[];
+      groupConnections: MultisigConnectionDetails[];
       threshold: number;
     }
   | {
@@ -80,7 +82,22 @@ type QueuedGroupCreation = QueuedIdentifierCreation & QueuedGroupProps;
 
 interface GroupParticipants {
   ourIdentifier: IdentifierMetadataRecord;
-  multisigMembers: any;
+  multisigMembers: {
+    signing: Array<{
+      aid: string;
+      ends: {
+        agent: Record<string, { http: string }>;
+        witness: Record<string, { http: string; tcp: string }>;
+      };
+    }>;
+    rotation: Array<{
+      aid: string;
+      ends: {
+        agent: Record<string, { http: string }>;
+        witness: Record<string, { http: string; tcp: string }>;
+      };
+    }>;
+  };
 }
 
 interface RemoteSignRequest {
@@ -98,6 +115,7 @@ export type {
 
 export { IdentifierType };
 export type {
+  GroupMetadata,
   QueuedIdentifierCreation,
   QueuedGroupProps,
   QueuedGroupCreation,

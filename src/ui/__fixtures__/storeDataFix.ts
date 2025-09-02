@@ -87,6 +87,7 @@ export const storeStateFixData: RootState = {
       isPaused: false,
     },
     toastMsgs: [],
+    pendingJoinGroupMetadata: null,
   },
   seedPhraseCache: {
     seedPhrase: "",

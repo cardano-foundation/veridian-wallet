@@ -1,4 +1,8 @@
 import { MigrationType, TsMigration } from "./migrations.types";
+import {
+  createInsertItemTagsStatements,
+  createInsertItemStatement,
+} from "./migrationUtils";
 
 export const DATA_V1200: TsMigration = {
   type: MigrationType.TS,
@@ -8,33 +12,6 @@ export const DATA_V1200: TsMigration = {
     console.log(
       "Running migration v1.2.0.0: Peer Connection Account Migration"
     );
-
-    function insertItemTags(itemRecord: any) {
-      const statements: { statement: string; values?: unknown[] }[] = [];
-      const statement =
-        "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
-      const tags = itemRecord.tags;
-      if (!tags) {
-        return statements;
-      }
-      // eslint-disable-next-line no-console
-      console.log(`    - Inserting tags for ${itemRecord.id}:`, tags);
-      for (const key of Object.keys(tags)) {
-        if (tags[key] === undefined || tags[key] === null) continue;
-        if (typeof tags[key] === "boolean") {
-          statements.push({
-            statement: statement,
-            values: [itemRecord.id, key, tags[key] ? "1" : "0", "boolean"],
-          });
-        } else if (typeof tags[key] === "string") {
-          statements.push({
-            statement: statement,
-            values: [itemRecord.id, key, tags[key], "string"],
-          });
-        }
-      }
-      return statements;
-    }
 
     // Get all identifiers from local database
     const identifierResult = await session.query(
@@ -113,17 +90,8 @@ export const DATA_V1200: TsMigration = {
 
         // eslint-disable-next-line no-console
         console.log(`    - New record ID: ${newRecordId}`);
-        statements.push({
-          statement:
-            "INSERT items (id, category, name, value) VALUES (?, ?, ?, ?)",
-          values: [
-            newRecordId,
-            "peerConnectionPairRecord",
-            newRecordId,
-            JSON.stringify(newRecordValue),
-          ],
-        });
-        statements.push(...insertItemTags(newRecordValue));
+        statements.push(createInsertItemStatement(newRecordValue));
+        statements.push(...createInsertItemTagsStatements(newRecordValue));
       } else {
         // eslint-disable-next-line no-console
         console.log(
