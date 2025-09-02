@@ -17,7 +17,17 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { SetupBiometrics } from "./SetupBiometrics";
 import { Agent } from "../../../core/agent/agent";
 import { BiometricAuthOutcome, useBiometricAuth } from "../../hooks/useBiometricsHook";
-import { IonAlert } from "@ionic/react";
+
+jest.mock("../../components/Alert", () => ({
+  Alert: ({ isOpen, headerText, confirmButtonText, actionConfirm }: any) => {
+    return isOpen ? (
+      <div>
+        <h1>{headerText}</h1>
+        <button onClick={actionConfirm}>{confirmButtonText}</button>
+      </div>
+    ) : null;
+  },
+}));
 
 jest.mock("../../utils/passcodeChecker", () => ({
   isRepeat: () => false,
@@ -165,7 +175,7 @@ describe("SetupBiometrics Page", () => {
   });
 
   test("Click on skip", async () => {
-    const { getByTestId } = render(
+    const { getByTestId, findByText, getByText } = render(
       <IonReactMemoryRouter
         history={history}
         initialEntries={[RoutePath.SETUP_BIOMETRICS]}
@@ -178,11 +188,9 @@ describe("SetupBiometrics Page", () => {
 
     fireEvent.click(getByTestId("action-button"));
 
-    await waitFor(() => {
-      expect(getByTestId("alert-cancel-biometry")).toHaveAttribute('is-open', 'true');
-    });
+    expect(await findByText(EN_TRANSLATIONS.biometry.cancelbiometryheader)).toBeInTheDocument();
 
-    fireEvent.click(getByTestId("alert-cancel-biometry-confirm-button"));
+    fireEvent.click(getByText(EN_TRANSLATIONS.biometry.setupbiometryconfirm));
 
     await waitFor(() => {
       expect(Agent.agent.basicStorage.createOrUpdateBasicRecord).toBeCalled();
@@ -388,5 +396,43 @@ describe("SetupBiometrics Page", () => {
       expect(setupBiometricsMock).toBeCalled();
       expect(enablePrivacy).toBeCalled();
     });
+  });
+
+  test("Click on setup with USER_CANCELLED outcome", async () => {
+    const setupBiometricsMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.USER_CANCELLED));
+
+    (useBiometricAuth as jest.Mock).mockReturnValue({
+      biometricsIsEnabled: false,
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: jest.fn(),
+      setBiometricsIsEnabled: jest.fn(),
+      setupBiometrics: setupBiometricsMock,
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null as number | null,
+    });
+
+    const { getByTestId, findByText } = render(
+      <IonReactMemoryRouter
+        history={history}
+        initialEntries={[RoutePath.SETUP_BIOMETRICS]}
+      >
+        <Provider store={storeMocked}>
+          <SetupBiometrics />
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    fireEvent.click(getByTestId("primary-button"));
+
+    await waitFor(() => {
+      expect(setupBiometricsMock).toBeCalled();
+    });
+
+    expect(await findByText(EN_TRANSLATIONS.biometry.cancelbiometryheader)).toBeInTheDocument();
   });
 });
