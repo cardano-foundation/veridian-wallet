@@ -6,7 +6,7 @@ import {
   SetCredentialOptions,
 } from "@capgo/capacitor-native-biometric";
 import { Capacitor } from "@capacitor/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { i18n } from "../../i18n";
 import { useActivityTimer } from "../components/AppWrapper/hooks/useActivityTimer";
 
@@ -99,7 +99,6 @@ const useBiometricAuth = () => {
         if (remaining <= 0) {
           clearInterval(interval);
           setLockoutEndTime(null);
-          setRemainingLockoutSeconds(30);
         }
       };
 
@@ -110,7 +109,9 @@ const useBiometricAuth = () => {
         clearInterval(interval);
       };
     } else {
-      setRemainingLockoutSeconds(30);
+      setTimeout(() => {
+        setRemainingLockoutSeconds(30);
+      }, 500);
     }
   }, [lockoutEndTime]);
 
@@ -123,19 +124,21 @@ const useBiometricAuth = () => {
       return BiometricAuthOutcome.NOT_AVAILABLE;
     }
 
-    const isStrongBiometry =
+    const isStrongBiometryCheck =
       biometryType === BiometryType.FACE_ID ||
       biometryType === BiometryType.TOUCH_ID ||
       biometryType === BiometryType.FINGERPRINT ||
       biometryType === BiometryType.IRIS_AUTHENTICATION ||
       biometryType === BiometryType.MULTIPLE;
 
-    if (!isStrongBiometry) {
+    if (!isStrongBiometryCheck) {
       return BiometricAuthOutcome.WEAK_BIOMETRY;
     }
 
     try {
-      if (Capacitor.getPlatform() === "android") {
+      const platform = Capacitor.getPlatform();
+
+      if (platform === "android") {
         await NativeBiometric.verifyIdentity({
           reason: i18n.t("biometry.reason") as string,
           title: i18n.t("biometry.title") as string,
@@ -217,14 +220,14 @@ const useBiometricAuth = () => {
       return BiometricAuthOutcome.NOT_AVAILABLE;
     }
 
-    const isStrongBiometry =
+    const isStrongBiometryCheck =
       biometryType === BiometryType.FACE_ID ||
       biometryType === BiometryType.TOUCH_ID ||
       biometryType === BiometryType.FINGERPRINT ||
       biometryType === BiometryType.IRIS_AUTHENTICATION ||
       biometryType === BiometryType.MULTIPLE;
 
-    if (!isStrongBiometry) {
+    if (!isStrongBiometryCheck) {
       return BiometricAuthOutcome.WEAK_BIOMETRY;
     }
 
