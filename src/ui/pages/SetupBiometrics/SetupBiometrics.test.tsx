@@ -90,6 +90,8 @@ const initialState = {
 const dispatchMock = jest.fn();
 const storeMocked = { ...makeTestStore(initialState), dispatch: dispatchMock };
 
+const EN_TRANSLATIONS_ACTUAL = jest.requireActual("../../../locales/en/en.json");
+
 describe("SetupBiometrics Page", () => {
   afterEach(() => {
     cleanup();
@@ -205,6 +207,7 @@ describe("SetupBiometrics Page", () => {
   });
 
   test("should display temporary lockout message when status is TEMPORARY_LOCKOUT", async () => {
+
     (useBiometricAuth as jest.Mock).mockImplementation(() => ({
       biometricsIsEnabled: false,
       biometricInfo: { isAvailable: true, hasCredentials: false, biometryType: BiometryType.FINGERPRINT },
@@ -224,7 +227,7 @@ describe("SetupBiometrics Page", () => {
       expect(setupBiometricsMock).toBeCalled();
       const lockoutAlert = await screen.findByTestId("alert-max-attempts");
       expect(lockoutAlert).toBeInTheDocument();
-      expect(screen.getByText(EN_TRANSLATIONS.biometry.lockoutheader.replace("{{seconds}}", "30"))).toBeInTheDocument();
+      expect(screen.getByText(EN_TRANSLATIONS_ACTUAL.biometry.lockoutheader.replace("{{seconds}}", "30"))).toBeInTheDocument();
     });
   });
 

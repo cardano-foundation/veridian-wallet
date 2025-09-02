@@ -43,6 +43,12 @@ const SetupBiometrics = () => {
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
   const { setupBiometrics, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
 
+  useEffect(() => {
+    if (lockoutEndTime === null && showMaxAttemptsAlert) {
+      setShowMaxAttemptsAlert(false);
+    }
+  }, [lockoutEndTime, showMaxAttemptsAlert]);
+  
   const navToNextStep = async () => {
     await Agent.agent.basicStorage
       .createOrUpdateBasicRecord(
@@ -134,15 +140,7 @@ const SetupBiometrics = () => {
 
   const handleCancelBiometrics = () => {
     navToNextStep();
-  };
-
-  useEffect(() => {
-    if (lockoutEndTime === null && showMaxAttemptsAlert) {
-      setShowMaxAttemptsAlert(false);
-    }
-  }, [lockoutEndTime, showMaxAttemptsAlert]);
-
-  
+  };  
 
   return (
     <>
