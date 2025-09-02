@@ -224,7 +224,7 @@ describe("SetupBiometrics Page", () => {
       expect(setupBiometricsMock).toBeCalled();
       const lockoutAlert = await screen.findByTestId("alert-max-attempts");
       expect(lockoutAlert).toBeInTheDocument();
-      expect(lockoutAlert).toHaveTextContent(EN_TRANSLATIONS.biometry.lockoutheader);
+      expect(screen.getByText(EN_TRANSLATIONS.biometry.lockoutheader.replace("{{seconds}}", "30"))).toBeInTheDocument();
     });
   });
 
