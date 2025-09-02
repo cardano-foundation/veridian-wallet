@@ -24,6 +24,7 @@ import {
   setAuthentication,
   setFirstAppLaunchComplete,
   setInitializationPhase,
+  showGenericError,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
 import { ErrorMessage, MESSAGE_MILLISECONDS } from "../../components/ErrorMessage";
@@ -46,8 +47,10 @@ const LockPageContainer = () => {
   const [passcode, setPasscode] = useState("");
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [passcodeIncorrect, setPasscodeIncorrect] = useState(false);
+  const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
+
   const preventBiometricOnEvent = useRef(false);
-  const isBiometricPromptActive = useRef(false); // Track active biometric prompt
+  const isBiometricPromptActive = useRef(false);
 
   const { handleBiometricAuth } = useBiometricAuth();
   const biometricsCache = useSelector(getBiometricsCache);
@@ -56,6 +59,12 @@ const LockPageContainer = () => {
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
   const authentication = useAppSelector(getAuthentication);
   const router = useHistory();
+
+  const { setupBiometrics, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
+  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
+  const [showWeakBiometryAlert, setShowWeakBiometryAlert] = useState(false);
+  const [showNotAvailableAlert, setShowNotAvailableAlert] = useState(false);
+  const [showGenericBiometricErrorAlert, setShowGenericBiometricErrorAlert] = useState(false);
 
   const {
     isLock,
@@ -73,6 +82,12 @@ const LockPageContainer = () => {
   const headerText = i18n.t("lockpage.alert.text.verify");
   const confirmButtonText = i18n.t("lockpage.alert.button.verify");
   const cancelButtonText = i18n.t("lockpage.alert.button.cancel");
+
+  useEffect(() => {
+    if (lockoutEndTime === null && showMaxAttemptsAlert) {
+      setShowMaxAttemptsAlert(false);
+    }
+  }, [lockoutEndTime, showMaxAttemptsAlert]);
 
   const handleClearState = () => {
     setAlertIsOpen(false);
@@ -156,12 +171,16 @@ const LockPageContainer = () => {
         // Do nothing, user cancelled
         break;
       case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+        setShowMaxAttemptsAlert(true);
+        break;
       case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+        setShowPermanentLockoutAlert(true);
+        break;
       case BiometricAuthOutcome.WEAK_BIOMETRY:
       case BiometricAuthOutcome.NOT_AVAILABLE:
       case BiometricAuthOutcome.GENERIC_ERROR:
       default:
-        // Do nothing
+        dispatch(showGenericError(true));
         break;
     }
   };
@@ -299,6 +318,24 @@ const LockPageContainer = () => {
         cancelButtonText={cancelButtonText}
         actionConfirm={resetPasscode}
         className="alert-forgotten"
+      />
+      <Alert
+        isOpen={showMaxAttemptsAlert}
+        setIsOpen={setShowMaxAttemptsAlert}
+        dataTestId="alert-max-attempts"
+        headerText={i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds }) as string}
+        confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
+        actionConfirm={() => setShowMaxAttemptsAlert(false)}
+        backdropDismiss={false}
+      />
+      <Alert
+        isOpen={showPermanentLockoutAlert}
+        setIsOpen={setShowPermanentLockoutAlert}
+        dataTestId="alert-permanent-lockout"
+        headerText={i18n.t("biometry.permanentlockoutheader") as string}
+        confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
+        actionConfirm={() => setShowPermanentLockoutAlert(false)}
+        backdropDismiss={false}
       />
       <ForgotAuthInfo
         isOpen={openRecoveryAuth}
