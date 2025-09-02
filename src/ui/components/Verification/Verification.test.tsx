@@ -1,202 +1,153 @@
 import { BiometryType } from "@capgo/capacitor-native-biometric";
-import { render, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import EngTrans from "../../../locales/en/en.json";
+import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
+import { BiometricAuthOutcome, useBiometricAuth } from "../../hooks/useBiometricsHook";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Verification } from "./Verification";
-import { BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
+
+jest.mock("../Alert", () => ({
+  Alert: ({ isOpen, headerText, dataTestId, actionConfirm, confirmButtonText }: any) => {
+    return isOpen ? (
+      <div data-testid={dataTestId}>
+        <h1>{headerText}</h1>
+        <button onClick={actionConfirm}>{confirmButtonText}</button>
+      </div>
+    ) : null;
+  },
+}));
+
+jest.mock("../../hooks/useBiometricsHook");
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
-      credentials: {
-        getCredentialDetailsById: jest.fn(),
-      },
-      basicStorage: {
-        findById: jest.fn(),
-      },
-      auth: {
-        verifySecret: jest.fn(),
-      },
+      auth: { verifySecret: jest.fn() },
+      basicStorage: { findById: jest.fn() },
     },
   },
 }));
 
-jest.mock("@capgo/capacitor-native-biometric", () => ({
-  NativeBiometric: {
-    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
-    verifyIdentity: jest.fn(() => Promise.resolve()),
-    getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
-    setCredentials: jest.fn(() => Promise.resolve()),
-    deleteCredentials: jest.fn(() => Promise.resolve()),
-  },
-  BiometryType: {
-    FINGERPRINT: "fingerprint",
-    FACE_ID: "faceId",
-    TOUCH_ID: "touchId",
-    IRIS_AUTHENTICATION: "iris",
-    MULTIPLE: "multiple",
-    NONE: "none",
-  },
-  BiometricAuthError: {
-    USER_CANCEL: 1,
-    USER_TEMPORARY_LOCKOUT: 2,
-    USER_LOCKOUT: 3,
-    BIOMETRICS_UNAVAILABLE: 4,
-    UNKNOWN_ERROR: 5,
-    BIOMETRICS_NOT_ENROLLED: 6,
-  },
-}));
-
-const handleBiometricAuthMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)); 
-
-const useBiometricInfoMock = jest.fn(() => ({
-  biometricInfo: {
-    isAvailable: true,
-    biometryType: BiometryType.FINGERPRINT,
-  },
-  handleBiometricAuth: () => handleBiometricAuthMock(),
-  setBiometricsIsEnabled: jest.fn(),
-  setupBiometrics: jest.fn(),
-  checkBiometrics: jest.fn(),
-}));
-
-jest.mock("../../hooks/useBiometricsHook", () => {
-  const actual = jest.requireActual("../../hooks/useBiometricsHook");
-  return {
-    ...actual,
-    useBiometricAuth: () => useBiometricInfoMock(),
-  }
-});
-
+const handleBiometricAuthMock = jest.fn();
 const dispatchMock = jest.fn();
 
 const initState = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
-      loggedIn: true,
-      time: Date.now(),
-      passcodeIsSet: true,
-      passwordIsSet: false,
-      firstAppLaunch: false,
+      loggedIn: true, time: Date.now(), passcodeIsSet: true,
+      passwordIsSet: false, firstAppLaunch: false,
     },
     isOnline: true,
   },
-  biometricsCache: {
-    enabled: true,
-  },
+  biometricsCache: { enabled: true },
 };
 
-const storeMocked = {
-  ...makeTestStore(initState),
-  dispatch: dispatchMock,
-};
+const storeMocked = { ...makeTestStore(initState), dispatch: dispatchMock };
 
 describe("Verification", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    
+    (useBiometricAuth as jest.Mock).mockImplementation(() => ({
+      biometricInfo: { isAvailable: true, biometryType: BiometryType.FINGERPRINT },
+      handleBiometricAuth: handleBiometricAuthMock,
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: null,
+    }));
+  });
+
   test("Use biometrics auth", async () => {
+    handleBiometricAuthMock.mockResolvedValue(BiometricAuthOutcome.SUCCESS);
     const setVerifyOpen = jest.fn();
     const verify = jest.fn();
-    render(
-      <Provider store={storeMocked}>
-        <Verification
-          verifyIsOpen
-          setVerifyIsOpen={setVerifyOpen}
-          onVerify={verify}
-        />
-      </Provider>
-    );
+
+    render(<Provider store={storeMocked}> <Verification verifyIsOpen setVerifyIsOpen={setVerifyOpen} onVerify={verify} /> </Provider>);
 
     await waitFor(() => {
       expect(handleBiometricAuthMock).toBeCalled();
       expect(verify).toBeCalled();
+      expect(setVerifyOpen).toBeCalledWith(false);
     });
   });
 
   test("Show passcode option when auth fail", async () => {
+    handleBiometricAuthMock.mockResolvedValue(BiometricAuthOutcome.NOT_AVAILABLE);
     const setVerifyOpen = jest.fn();
     const verify = jest.fn();
 
-    handleBiometricAuthMock.mockImplementation(() =>  Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE)); 
-
-    const { getByText } = render(
-      <Provider store={storeMocked}>
-        <Verification
-          verifyIsOpen
-          setVerifyIsOpen={setVerifyOpen}
-          onVerify={verify}
-        />
-      </Provider>
-    );
+    const { getByText } = render(<Provider store={storeMocked}> <Verification verifyIsOpen setVerifyIsOpen={setVerifyOpen} onVerify={verify} /> </Provider>);
 
     await waitFor(() => {
-      expect(getByText(EngTrans.verifypasscode.title)).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
     });
   });
 
   test("Show password when biometric auth fail", async () => {
-    const initState = {
-      stateCache: {
-        routes: [TabsRoutePath.CREDENTIALS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: true,
-          firstAppLaunch: false,
-        },
-        isOnline: true,
-      },
-      biometricsCache: {
-        enabled: true,
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initState),
-      dispatch: dispatchMock,
-    };
-
+    const customInitState = { ...initState, stateCache: { ...initState.stateCache, authentication: { ...initState.stateCache.authentication, passwordIsSet: true } } };
+    const customStoreMocked = { ...makeTestStore(customInitState), dispatch: dispatchMock };
+    handleBiometricAuthMock.mockResolvedValue(BiometricAuthOutcome.NOT_AVAILABLE);
     const setVerifyOpen = jest.fn();
     const verify = jest.fn();
 
-    handleBiometricAuthMock.mockImplementation(() =>  Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE));
-
-    const { getByText } = render(
-      <Provider store={storeMocked}>
-        <Verification
-          verifyIsOpen
-          setVerifyIsOpen={setVerifyOpen}
-          onVerify={verify}
-        />
-      </Provider>
-    );
+    const { getByText } = render(<Provider store={customStoreMocked}> <Verification verifyIsOpen setVerifyIsOpen={setVerifyOpen} onVerify={verify} /> </Provider>);
 
     await waitFor(() => {
-      expect(getByText(EngTrans.verifypassword.title)).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.verifypassword.title)).toBeVisible();
     });
   });
 
   test("Cancel auth when user cancel", async () => {
+    handleBiometricAuthMock.mockResolvedValue(BiometricAuthOutcome.USER_CANCELLED);
     const setVerifyOpen = jest.fn();
     const verify = jest.fn();
 
-    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(BiometricAuthOutcome.USER_CANCELLED));
-
-    const { queryByText } = render(
-      <Provider store={storeMocked}>
-        <Verification
-          verifyIsOpen
-          setVerifyIsOpen={setVerifyOpen}
-          onVerify={verify}
-        />
-      </Provider>
-    );
+    render(<Provider store={storeMocked}> <Verification verifyIsOpen setVerifyIsOpen={setVerifyOpen} onVerify={verify} /> </Provider>);
 
     await waitFor(() => {
-      expect(queryByText(EngTrans.verifypassword.title)).toBeNull();
-      expect(queryByText(EngTrans.verifypasscode.title)).toBeNull();
+      expect(setVerifyOpen).toBeCalledWith(false, true);
+    });
+  });
+  
+  test("should display temporary lockout message when status is TEMPORARY_LOCKOUT", async () => {
+    (useBiometricAuth as jest.Mock).mockImplementation(() => ({
+      biometricInfo: { isAvailable: true, biometryType: BiometryType.FINGERPRINT },
+      handleBiometricAuth: jest.fn().mockResolvedValue(BiometricAuthOutcome.TEMPORARY_LOCKOUT),
+      remainingLockoutSeconds: 30,
+      lockoutEndTime: Date.now() + 30000,
+    }));
+    
+    const setVerifyOpen = jest.fn();
+    const verify = jest.fn();
+
+    render(<Provider store={storeMocked}> <Verification verifyIsOpen setVerifyIsOpen={setVerifyOpen} onVerify={verify} /> </Provider>);
+
+    await waitFor(async () => {
+      const lockoutAlert = await screen.findByTestId("alert-max-attempts");
+      expect(lockoutAlert).toBeInTheDocument();
+      const expectedText = EN_TRANSLATIONS.biometry.lockoutheader.replace("{{seconds}}", "30");
+      expect(lockoutAlert).toHaveTextContent(expectedText);
+    });
+  });
+
+  test("should display permanent lockout message when status is PERMANENT_LOCKOUT", async () => {
+    (useBiometricAuth as jest.Mock).mockImplementation(() => ({
+      biometricInfo: { isAvailable: true, biometryType: BiometryType.FINGERPRINT },
+      handleBiometricAuth: jest.fn().mockResolvedValue(BiometricAuthOutcome.PERMANENT_LOCKOUT),
+      remainingLockoutSeconds: 0,
+      lockoutEndTime: null,
+    }));
+    
+    const setVerifyOpen = jest.fn();
+    const verify = jest.fn();
+
+    render(<Provider store={storeMocked}> <Verification verifyIsOpen setVerifyIsOpen={setVerifyOpen} onVerify={verify} /> </Provider>);
+
+    await waitFor(async () => {
+      const lockoutAlert = await screen.findByTestId("alert-permanent-lockout");
+      expect(lockoutAlert).toBeInTheDocument();
+      expect(lockoutAlert).toHaveTextContent(EN_TRANSLATIONS.biometry.permanentlockoutheader);
     });
   });
 });

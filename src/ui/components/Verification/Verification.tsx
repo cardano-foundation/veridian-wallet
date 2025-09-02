@@ -9,6 +9,8 @@ import { showError } from "../../utils/error";
 import { VerifyPasscode } from "../VerifyPasscode";
 import { VerifyPassword } from "../VerifyPassword";
 import { VerifyProps } from "./Verification.types";
+import { Alert } from "../Alert";
+import { i18n } from "../../../i18n";
 
 const Verification = ({
   verifyIsOpen,
@@ -17,14 +19,23 @@ const Verification = ({
 }: VerifyProps) => {
   const [openModalAfterBiometricFail, setOpenModalAfterBiometricFail] =
     useState(false);
+  const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
+  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
+  
   const stateCache = useSelector(getStateCache);
   const biometrics = useSelector(getBiometricsCache);
   const authentication = stateCache.authentication;
-  const { handleBiometricAuth } = useBiometricAuth();
+  const { handleBiometricAuth, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
   const { disablePrivacy, enablePrivacy } = usePrivacyScreen();
 
   const canOpenModal =
     verifyIsOpen && (!biometrics.enabled || openModalAfterBiometricFail);
+
+  useEffect(() => {
+    if (lockoutEndTime === null && showMaxAttemptsAlert) {
+      setShowMaxAttemptsAlert(false);
+    }
+  }, [lockoutEndTime, showMaxAttemptsAlert]);
 
   const handleBiometrics = async () => {
     try {
@@ -40,7 +51,11 @@ const Verification = ({
           setVerifyIsOpen(false, true);
           break;
         case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+          setShowMaxAttemptsAlert(true);
+          break;
         case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+          setShowPermanentLockoutAlert(true);
+          break;
         case BiometricAuthOutcome.WEAK_BIOMETRY:
         case BiometricAuthOutcome.NOT_AVAILABLE:
         case BiometricAuthOutcome.GENERIC_ERROR:
@@ -68,7 +83,7 @@ const Verification = ({
     }
   }, [verifyIsOpen]);
 
-  return (
+  return (<>{
     canOpenModal &&
     (authentication.passwordIsSet ? (
       <VerifyPassword
@@ -83,6 +98,26 @@ const Verification = ({
         onVerify={onVerify}
       />
     ))
+  }
+  <Alert
+    isOpen={showMaxAttemptsAlert}
+    setIsOpen={setShowMaxAttemptsAlert}
+    dataTestId="alert-max-attempts"
+    headerText={i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds }) as string}
+    confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
+    actionConfirm={() => setShowMaxAttemptsAlert(false)}
+    backdropDismiss={false}
+  />
+  <Alert
+    isOpen={showPermanentLockoutAlert}
+    setIsOpen={setShowPermanentLockoutAlert}
+    dataTestId="alert-permanent-lockout"
+    headerText={i18n.t("biometry.permanentlockoutheader") as string}
+    confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
+    actionConfirm={() => setShowPermanentLockoutAlert(false)}
+    backdropDismiss={false}
+  />
+  </>
   );
 };
 

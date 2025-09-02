@@ -9,7 +9,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
-import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { KeyStoreKeys } from "../../../core/storage";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
@@ -22,7 +21,6 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { SetPasscode } from "../SetPasscode";
 import { LockPage } from "./LockPage";
-
 
 function makeRealStore(
   preloadedState?: Partial<ReturnType<typeof rootReducer>>

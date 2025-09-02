@@ -60,11 +60,8 @@ const LockPageContainer = () => {
   const authentication = useAppSelector(getAuthentication);
   const router = useHistory();
 
-  const { setupBiometrics, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
+  const { remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
   const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
-  const [showWeakBiometryAlert, setShowWeakBiometryAlert] = useState(false);
-  const [showNotAvailableAlert, setShowNotAvailableAlert] = useState(false);
-  const [showGenericBiometricErrorAlert, setShowGenericBiometricErrorAlert] = useState(false);
 
   const {
     isLock,
