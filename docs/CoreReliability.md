@@ -1,10 +1,10 @@
 # Core Reliability
 
-Our wallet is an edge device which connects to a cloud agent, and uses the Signify library to send signed requests.
+Our wallet is an edge device which connects to a cloud agent ([KERIA](https://github.com/WebOfTrust/keria)), and uses the [Signify-TS](https://github.com/WebOfTrust/signify-ts) library to send signed requests.
 Signify itself is stateless, but we use SQLite locally to add reliability into our usage of it, and for other reasons.
 
 Many applications may take advantage of database transactions to make user interactions atomic, but this is not an option for us as a single interaction may require a series of local database updates and Signify remote calls mixed together.
-As such, it is critical that actions in our wallet are idempotent and auto-retried.
+As such, it is critical that actions in our wallet are idempotent and auto-retried, where idempotent means that the action can be performed multiple times and will always have the same result as the initiation application (retry friendly).
 
 For example, when deleting an identifier we will always:
 - Mark the local SQLite record with `pendingDeletion: true`.
@@ -37,6 +37,7 @@ It's always possible that these can fail halfway through and need be be re-tried
 
 In the case of notification processing, it's very possible due to the async nature of KERI that the notification came out of order so cannot be processed fully right now.
 We use a failed notification list record to track any notifications we need to retry so that we can move onto processing the next notification without being blocked.
+Note that we poll for new notifications in the wallet right now, but we intend to replace this with server sent events in the future.
 
 ### Operation chaining
 
