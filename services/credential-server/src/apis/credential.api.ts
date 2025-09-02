@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { Operation, Saider, Serder, SignifyClient } from "signify-ts";
+import { Operation, Saider, Salter, Serder, SignifyClient } from "signify-ts";
 import { ACDC_SCHEMAS_ID, ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
 import { getRegistry, OP_TIMEOUT, waitAndGetDoneOp } from "../utils/utils";
 import { QviCredential } from "../utils/utils.types";
@@ -69,11 +69,18 @@ export async function issueAcdcCredential(
       ancAttachment: true,
     };
   } else {
+    const priv = [
+      "EE6DAsJPqDspkLhbk1pVELQVbqyz6TFSEKXdS1Iz-Nz1",
+      "EFVZujklqUEubsyY9PRgBRMf39HgHzCPo3Ii_-xhkOlF",
+      "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt",
+    ].includes(schemaSaid);
     issueParams = {
       ri: keriRegistryRegk,
       s: schemaSaid,
+      u: priv ? new Salter({}).qb64 : undefined,
       a: {
         i: aid,
+        u: priv ? new Salter({}).qb64 : undefined,
         ...attribute,
       },
     };
