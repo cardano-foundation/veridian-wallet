@@ -16,6 +16,7 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Settings } from "./Settings";
 import { OptionIndex } from "./Settings.types";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 jest.mock("../../../store/utils", () => ({
   CLEAR_STORE_ACTIONS: [],
@@ -480,11 +481,24 @@ describe("Settings page", () => {
           passwordIsSkipped: true,
         },
       },
-      connectionsCache: {
-        multisigConnections: {},
+      profilesCache: {
+        ...profileCacheFixData,
+        profiles: {
+          ...profileCacheFixData.profiles,
+          ...(profileCacheFixData.defaultProfile
+            ? {
+                [profileCacheFixData.defaultProfile as string]: {
+                  ...profileCacheFixData.profiles[
+                    profileCacheFixData.defaultProfile as string
+                  ],
+                  multisigConnections: [],
+                },
+              }
+            : {}),
+        },
       },
       biometricsCache: {
-        enable: false,
+        enabled: false,
       },
     };
 

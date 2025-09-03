@@ -93,9 +93,12 @@
         z-index: 99;
 
         ion-segment-button {
-          &.segment-button-checked {
+          &.segment-button-checked,
+          &.segment-button-checked.md {
+            --background-checked: var(--ion-color-neutral-600);
+
             &::part(indicator-background) {
-              background: var(--ion-color-neutral-600);
+              background: var(--ion-color-neutral-700);
             }
           }
 
@@ -121,6 +124,8 @@
 }
 
 .setup-members-content {
+  width: 100%;
+
   .members-list-title {
     margin-top: 2.25rem;
 
@@ -213,6 +218,8 @@
     }
 
     .share-button {
+      width: 12.5rem;
+
       &:not(.button-disabled) {
         --background: transparent;
         --border-color: var(--ion-color-primary-700);

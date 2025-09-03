@@ -8,7 +8,10 @@ import {
   setCurrentOperation,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
-import { setPendingConnection } from "../../../store/reducers/walletConnectionsCache";
+import {
+  setPendingDAppConnection,
+  setPeerConnections,
+} from "../../../store/reducers/profileCache";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { walletConnectionsFix } from "../../__fixtures__/walletConnectionsFix";
 import { OperationType, ToastMsgType } from "../../globals/types";
@@ -72,10 +75,10 @@ const initialState = {
     },
     toastMsgs: [],
   },
-  walletConnectionsCache: {
-    connectedWallet: walletConnectionsFix[1],
+  profilesCache: {
+    ...profileCacheFixData,
+    connectedDApp: walletConnectionsFix[1],
   },
-  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -143,12 +146,10 @@ describe("Wallet connect: empty history", () => {
         },
         toastMsgs: [],
       },
-      walletConnectionsCache: {
-        connectedWallet: walletConnectionsFix[1],
-      },
       profilesCache: {
         ...profileCacheFixData,
         defaultProfile: filteredIdentifierFix[2].id,
+        connectedDApp: walletConnectionsFix[1],
       },
       biometricsCache: {
         enabled: false,
@@ -368,10 +369,10 @@ describe("Wallet connect", () => {
         },
         toastMsgs: [],
       },
-      walletConnectionsCache: {
-        pendingConnection: walletConnectionsFix[0],
+      profilesCache: {
+        ...profileCacheFixData,
+        pendingDAppConnection: walletConnectionsFix[0],
       },
-      profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
       },
@@ -419,9 +420,12 @@ describe("Wallet connect", () => {
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
+        setPeerConnections(walletConnectionsFix.slice(1))
+      );
+      expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED)
       );
-      expect(dispatchMock).toBeCalledWith(setPendingConnection(null));
+      expect(dispatchMock).toBeCalledWith(setPendingDAppConnection(null));
     });
   });
 
@@ -475,7 +479,7 @@ describe("Wallet connect", () => {
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
-        setPendingConnection(walletConnectionsFix[0])
+        setPendingDAppConnection(walletConnectionsFix[0])
       );
     });
 
@@ -513,10 +517,10 @@ describe("Wallet connect", () => {
         currentOperation: OperationType.OPEN_WALLET_CONNECTION_DETAIL,
         toastMsgs: [],
       },
-      profilesCache: profileCacheFixData,
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: walletConnectionsFix[0],
+      profilesCache: {
+        ...profileCacheFixData,
+        connectedDApp: null,
+        pendingDAppConnection: walletConnectionsFix[0],
       },
       biometricsCache: {
         enabled: false,
@@ -553,10 +557,10 @@ describe("Wallet connect", () => {
         toastMsg: ToastMsgType.CONNECT_WALLET_SUCCESS,
         toastMsgs: [],
       },
-      profilesCache: profileCacheFixData,
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
+      profilesCache: {
+        ...profileCacheFixData,
+        connectedDApp: null,
+        pendingDAppConnection: null,
       },
       biometricsCache: {
         enabled: false,

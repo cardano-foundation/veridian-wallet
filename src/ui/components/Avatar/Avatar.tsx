@@ -12,7 +12,9 @@ const MemberAvatar = ({
   return (
     <IonButton
       shape="round"
-      className={"avatar-button" + " rank-" + rank}
+      className={`avatar-button rank-${rank}${
+        !handleClick ? " no-ripple" : ""
+      }`}
       data-testid="avatar-button"
       onClick={handleClick}
     >

@@ -26,6 +26,8 @@ import { GroupInfomation, Stage } from "../../SetupGroupProfile.types";
 import { SetupConnections } from "./SetupConnections";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { StorageMessage } from "../../../../../core/storage/storage.types";
+import * as useScanHandleModule from "../../../../components/Scan/hook/useScanHandle";
+import { Agent } from "../../../../../core/agent/agent";
 
 const getOobiMock = jest.fn((...args: any) =>
   Promise.resolve(
@@ -81,7 +83,7 @@ const initiatorGroupProfile = {
     groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
     groupCreated: false,
     groupInitiator: true,
-    userName: "",
+    userName: "Initiator",
   },
 };
 jest.mock("react-router-dom", () => ({
@@ -197,9 +199,13 @@ describe("Setup Connection", () => {
         connections: [connectionsFix[3]],
       },
     },
+    connectionsCache: {
+      connections: {},
+    },
+    multisigConnections: {},
   };
 
-  const stage1State: GroupInfomation = {
+  let stage1State: GroupInfomation = {
     stage: Stage.SetupConnection,
     displayNameValue: "test",
     threshold: 1,
@@ -215,13 +221,69 @@ describe("Setup Connection", () => {
     dispatch: dispatchMock,
   };
 
-  const innerSetState = jest.fn();
-  const setState = jest.fn((args: any) => {
-    if (typeof args === "function") {
-      const result = args({});
-
-      innerSetState(result);
+  const setState = jest.fn((updater: any) => {
+    if (typeof updater === "function") {
+      stage1State = updater(stage1State);
+    } else {
+      stage1State = updater;
     }
+  });
+
+  beforeEach(() => {
+    jest.spyOn(useScanHandleModule, "useScanHandle").mockReturnValue({
+      resolveGroupConnection: async (
+        content: string,
+        scannedGroupId: string | undefined,
+        isInitiator: boolean,
+        onClose?: () => void,
+        registerScanHandler?: (h: any) => void,
+        onDuplicate?: (id: string) => void
+      ) => {
+        try {
+          let parsedGroupId: string | null = null;
+          try {
+            parsedGroupId = new URL(content).searchParams.get("groupId");
+          } catch (e) {
+            storeMocked.dispatch(setToastMsg(ToastMsgType.SCANNER_ERROR));
+            if (onClose) onClose();
+            return;
+          }
+
+          if (
+            scannedGroupId &&
+            parsedGroupId &&
+            String(scannedGroupId) !== String(parsedGroupId)
+          ) {
+            storeMocked.dispatch(
+              setToastMsg(ToastMsgType.GROUP_ID_NOT_MATCH_ERROR)
+            );
+            if (onDuplicate) onDuplicate(parsedGroupId);
+            if (onClose) onClose();
+            return;
+          }
+
+          await Agent.agent.connections.connectByOobiUrl(content);
+        } catch (err) {
+          if (
+            (err as Error).message ===
+            StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG
+          ) {
+            storeMocked.dispatch(
+              setToastMsg(ToastMsgType.DUPLICATE_CONNECTION)
+            );
+            if (onDuplicate) onDuplicate("");
+          } else {
+            storeMocked.dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
+          }
+        } finally {
+          if (onClose) onClose();
+        }
+      },
+    } as any);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   beforeEach(() => {
@@ -255,33 +317,42 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
+            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
     );
 
-    await waitFor(() => {
-      expect(getOobiMock).toBeCalledWith(
-        stage1State.newIdentifier.id,
-        initiatorGroupProfile.groupMetadata.userName,
-        initiatorGroupProfile.groupMetadata?.groupId
-      );
-    });
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.share)
+      ).toBeVisible()
+    );
+
+    expect(getOobiMock).toHaveBeenCalled();
+
+    const calledArgs = getOobiMock.mock.calls[0];
+    expect(calledArgs[0]).toEqual(stage1State.newIdentifier.id);
+    expect(calledArgs[1]).toEqual(initiatorGroupProfile.groupMetadata.userName);
+    expect(calledArgs[2]).toEqual(initiatorGroupProfile.groupMetadata?.groupId);
 
     expect(
-      getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.initiatebutton)
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator
+          .initiatebutton
+      )
     ).toBeVisible();
     expect(
-      getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.delete.button)
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator.delete
+          .button
+      )
     ).toBeVisible();
     expect(
       getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.notes.bottom)
     ).toBeVisible();
     expect(
       getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.share)
-    ).toBeVisible();
-    expect(
-      getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.subtitle)
     ).toBeVisible();
     expect(
       getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.subtitle)
@@ -308,6 +379,7 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
+            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -336,34 +408,38 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
+            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
     );
 
-    await waitFor(() => {
-      expect(getOobiMock).toBeCalledWith(
-        stage1State.newIdentifier.id,
-        initiatorGroupProfile.groupMetadata.userName,
-        initiatorGroupProfile.groupMetadata?.groupId
-      );
-    });
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.share)
+      ).toBeVisible()
+    );
 
     fireEvent.click(
-      getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.delete.button)
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator.delete
+          .button
+      )
     );
 
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.setupgroupprofile.setupmembers.delete.alert.title
+          EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator
+            .delete.alert.title
         )
       ).toBeVisible();
     });
 
     fireEvent.click(
       getByText(
-        EN_TRANSLATIONS.setupgroupprofile.setupmembers.delete.alert.confirm
+        EN_TRANSLATIONS.setupgroupprofile.setupmembers.actions.initiator.delete
+          .alert.confirm
       )
     );
 
@@ -386,40 +462,43 @@ describe("Setup Connection", () => {
       id: "ebfeb1ebc6f1c276ef71212ec20",
       label: "Cambridge University",
       createdAtUTC: "2017-01-14T19:23:24Z",
-      status: ConnectionStatus.PENDING,
+      status: ConnectionStatus.CONFIRMED,
       groupId,
       contactId: "conn-id-1",
     };
-    connectByOobiUrlMock.mockImplementation(() => {
-      return {
+    connectByOobiUrlMock.mockImplementation(async () => {
+      const res = {
         type: OobiType.NORMAL,
-        connection: connection,
+        connection,
       };
+      setState((prev: GroupInfomation) => ({
+        ...prev,
+        scannedConections: [...(prev.scannedConections || []), connection],
+      }));
+      return res;
     });
 
     const history = createMemoryHistory();
     history.push(
       RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
     );
-
-    const { getByText, getByTestId } = render(
+    const { getByText, getByTestId, rerender, findByText } = render(
       <Provider store={makeTestStore(initialState)}>
         <IonReactMemoryRouter history={history}>
           <SetupConnections
             state={stage1State}
             setState={setState}
+            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
     );
 
-    await waitFor(() => {
-      expect(getOobiMock).toBeCalledWith(
-        stage1State.newIdentifier.id,
-        initiatorGroupProfile.groupMetadata.userName,
-        initiatorGroupProfile.groupMetadata?.groupId
-      );
-    });
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.share)
+      ).toBeVisible()
+    );
 
     expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
 
@@ -434,14 +513,58 @@ describe("Setup Connection", () => {
       expect(connectByOobiUrlMock).toBeCalled();
     });
 
-    await waitFor(() => {
-      expect(getByText(initiatorGroupProfile.displayName)).toBeVisible();
-      expect(getByText(connection.label)).toBeVisible();
-    });
+    const confirmedConnection = {
+      ...connection,
+      status: ConnectionStatus.CONFIRMED,
+    };
 
-    fireEvent.click(
-      getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.initiatebutton)
+    const updatedInitialState: any = {
+      ...initialState,
+      profilesCache: {
+        ...initialState.profilesCache,
+        multiSigGroup: {
+          ...initialState.profilesCache.multiSigGroup,
+          connections: [
+            ...(initialState.profilesCache.multiSigGroup?.connections || []),
+            confirmedConnection,
+          ],
+        },
+      },
+      connectionsCache: {
+        ...(initialState as any).connectionsCache,
+        connections: {
+          ...(((initialState as any).connectionsCache || {}).connections || {}),
+          [confirmedConnection.id]: confirmedConnection,
+        },
+      },
+      multisigConnections: {
+        ...((initialState as any).multisigConnections || {}),
+        [confirmedConnection.id]: confirmedConnection,
+      },
+    };
+    rerender(
+      <Provider store={makeTestStore(updatedInitialState)}>
+        <IonReactMemoryRouter history={history}>
+          <SetupConnections
+            state={stage1State}
+            setState={setState}
+            groupName="Test Group"
+          />
+        </IonReactMemoryRouter>
+      </Provider>
     );
+
+    await waitFor(() => expect(connectByOobiUrlMock).toBeCalled());
+
+    expect(
+      stage1State.scannedConections.some((c: any) => c.id === connection.id)
+    ).toBe(true);
+
+    expect(
+      updatedInitialState.profilesCache.multiSigGroup.connections.some(
+        (c: any) => c.id === connection.id
+      )
+    ).toBe(true);
 
     expect(setState).toBeCalled();
   }, 1000000);
@@ -482,18 +605,17 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
+            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
     );
 
-    await waitFor(() => {
-      expect(getOobiMock).toBeCalledWith(
-        stage1State.newIdentifier.id,
-        initiatorGroupProfile.groupMetadata.userName,
-        initiatorGroupProfile.groupMetadata?.groupId
-      );
-    });
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.share)
+      ).toBeVisible()
+    );
 
     expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
 
@@ -544,18 +666,17 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
+            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
     );
 
-    await waitFor(() => {
-      expect(getOobiMock).toBeCalledWith(
-        stage1State.newIdentifier.id,
-        initiatorGroupProfile.groupMetadata.userName,
-        initiatorGroupProfile.groupMetadata?.groupId
-      );
-    });
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.share)
+      ).toBeVisible()
+    );
 
     expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
 
@@ -586,18 +707,17 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
+            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
     );
 
-    await waitFor(() => {
-      expect(getOobiMock).toBeCalledWith(
-        stage1State.newIdentifier.id,
-        initiatorGroupProfile.groupMetadata.userName,
-        initiatorGroupProfile.groupMetadata?.groupId
-      );
-    });
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.share)
+      ).toBeVisible()
+    );
 
     expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
 

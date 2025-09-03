@@ -7,6 +7,7 @@ import {
   getDefaultNormalizer,
   render,
   waitFor,
+  findByTestId,
 } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -48,27 +49,79 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
-const getIndentifier = jest.fn(() => identifierFix[0]);
-
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useParams: () => ({
-    id: identifierFix[0].id,
-  }),
-}));
-
-const deleteStaleLocalIdentifierMock = jest.fn();
-
-jest.mock("@ionic/react", () => ({
-  ...jest.requireActual("@ionic/react"),
-  IonModal: ({ children, isOpen, ...props }: any) =>
-    isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
-}));
+jest.mock("@ionic/react", () => {
+  const actual = jest.requireActual("@ionic/react");
+  return {
+    ...actual,
+    IonAlert: (props: any) =>
+      props.isOpen ? (
+        <div data-testid="mock-ion-alert">
+          <h2>{props.header}</h2>
+          {props.subHeader && <h3>{props.subHeader}</h3>}
+          {props.message && <p>{props.message}</p>}
+          {props.buttons?.map((button: any, index: number) => (
+            <button
+              key={index}
+              data-testid={
+                button.htmlAttributes?.["data-testid"] ||
+                button["data-testid"] ||
+                `alert-button-${index}`
+              }
+              onClick={button.handler}
+            >
+              {button.text}
+            </button>
+          ))}
+        </div>
+      ) : null,
+    IonModal: ({ children, isOpen, ...props }: any) =>
+      isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
+  };
+});
 
 const rotateIdentifierMock = jest.fn((id: string) => Promise.resolve(id));
 const deleteIdentifier = jest.fn(() => Promise.resolve());
 const markIdentifierPendingDelete = jest.fn(() => Promise.resolve());
 const createOrUpdateMock = jest.fn().mockResolvedValue(undefined);
+
+const getIndentifier = jest.fn(() => identifierFix[0]);
+const deleteStaleLocalIdentifierMock = jest.fn();
+
+jest.mock("../../components/Alert", () => ({
+  Alert: ({
+    isOpen,
+    setIsOpen,
+    dataTestId,
+    headerText,
+    confirmButtonText,
+    cancelButtonText,
+    actionConfirm,
+    actionCancel,
+  }: any) =>
+    isOpen ? (
+      <div data-testid="mock-ion-alert">
+        <h2>{headerText}</h2>
+        <button
+          data-testid={`${dataTestId}-confirm-button`}
+          onClick={() => {
+            setIsOpen(false);
+            actionConfirm && actionConfirm();
+          }}
+        >
+          {confirmButtonText}
+        </button>
+        <button
+          data-testid={`${dataTestId}-cancel-button`}
+          onClick={() => {
+            setIsOpen(false);
+            actionCancel && actionCancel();
+          }}
+        >
+          {cancelButtonText}
+        </button>
+      </div>
+    ) : null,
+}));
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
@@ -121,9 +174,6 @@ const initialStateKeri = {
     bran: "bran",
   },
   profilesCache: profileCacheFixData,
-  connectionsCache: {
-    multisigConnections: {},
-  },
   biometricsCache: {
     enabled: false,
   },
@@ -470,9 +520,6 @@ describe("Individual profile details page", () => {
         seedPhrase: "",
         bran: "bran",
       },
-      connectionsCache: {
-        multisigConnections: {},
-      },
       profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
@@ -630,25 +677,37 @@ describe("Group profile details page", () => {
       seedPhrase: "",
       bran: "bran",
     },
-    profilesCache: profileCacheFixData,
-    connectionsCache: {
-      multisigConnections: {
-        "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu": {
-          id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
-          label: "Member 0",
-          connectionDate: "2024-10-14T13:11:44.501Z",
-          status: "confirmed",
-          oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
-          groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
-        },
-        "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYB2": {
-          id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
-          label: "Member 1",
-          connectionDate: "2024-10-14T13:11:44.501Z",
-          status: "confirmed",
-          oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
-          groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
-        },
+    profilesCache: {
+      ...profileCacheFixData,
+      profiles: {
+        ...profileCacheFixData.profiles,
+        ...(profileCacheFixData.defaultProfile
+          ? {
+              [profileCacheFixData.defaultProfile as string]: {
+                ...profileCacheFixData.profiles[
+                  profileCacheFixData.defaultProfile as string
+                ],
+                multisigConnections: [
+                  {
+                    id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
+                    label: "Member 0",
+                    connectionDate: "2024-10-14T13:11:44.501Z",
+                    status: "confirmed",
+                    oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
+                    groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
+                  },
+                  {
+                    id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYB2",
+                    label: "Member 1",
+                    connectionDate: "2024-10-14T13:11:44.501Z",
+                    status: "confirmed",
+                    oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
+                    groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
+                  },
+                ],
+              },
+            }
+          : {}),
       },
     },
     biometricsCache: {
@@ -695,25 +754,37 @@ describe("Group profile details page", () => {
         seedPhrase: "",
         bran: "bran",
       },
-      profilesCache: profileCacheFixData,
-      connectionsCache: {
-        multisigConnections: {
-          "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu": {
-            id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
-            label: "Member 0",
-            connectionDate: "2024-10-14T13:11:44.501Z",
-            status: "confirmed",
-            oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
-            groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
-          },
-          "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYB2": {
-            id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
-            label: "Member 1",
-            connectionDate: "2024-10-14T13:11:44.501Z",
-            status: "confirmed",
-            oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
-            groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
-          },
+      profilesCache: {
+        ...profileCacheFixData,
+        profiles: {
+          ...profileCacheFixData.profiles,
+          ...(profileCacheFixData.defaultProfile
+            ? {
+                [profileCacheFixData.defaultProfile as string]: {
+                  ...profileCacheFixData.profiles[
+                    profileCacheFixData.defaultProfile as string
+                  ],
+                  multisigConnections: [
+                    {
+                      id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
+                      label: "Member 0",
+                      connectionDate: "2024-10-14T13:11:44.501Z",
+                      status: "confirmed",
+                      oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
+                      groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
+                    },
+                    {
+                      id: "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYB2",
+                      label: "Member 1",
+                      connectionDate: "2024-10-14T13:11:44.501Z",
+                      status: "confirmed",
+                      oobi: "http://keria:3902/oobi/EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu/agent/EMrn5s4fG1bzxdlrtyRusPQ23fohlGuH6LkZBSRiDtKy?name=Brave&groupId=9a12f939-1412-4450-aa61-a9a8a697ceca",
+                      groupId: "9a12f939-1412-4450-aa61-a9a8a697ceca",
+                    },
+                  ],
+                },
+              }
+            : {}),
         },
       },
       biometricsCache: {
@@ -1076,9 +1147,6 @@ describe("Group profile details page", () => {
         bran: "bran",
       },
       profilesCache: profileCacheFixData,
-      connectionsCache: {
-        multisigConnections: {},
-      },
       biometricsCache: {
         enabled: false,
       },
@@ -1144,9 +1212,7 @@ describe("Checking the profile details page when information is missing from the
         bran: "bran",
       },
       profilesCache: profileCacheFixData,
-      connectionsCache: {
-        multisigConnections: {},
-      },
+
       biometricsCache: {
         enabled: false,
       },
@@ -1190,9 +1256,6 @@ describe("Checking the profile details page when information is missing from the
 
     fireEvent.click(
       getByTestId("alert-confirm-identifier-delete-details-confirm-button")
-    );
-    fireEvent.click(
-      getByTestId("alert-confirm-identifier-delete-details-cancel-button")
     );
 
     await waitFor(() => {
@@ -1425,17 +1488,18 @@ describe("Set default profile when delete profile", () => {
       dispatch: dispatchMock,
     };
 
-    const { findByText, getByText, queryByText, getByTestId } = render(
-      <Provider store={storeMockedAidKeri}>
-        <ProfileDetailsModal
-          profileId={filteredIdentifierFix[0].id}
-          onClose={jest.fn()}
-          pageId={pageId}
-          isOpen
-          setIsOpen={jest.fn}
-        />
-      </Provider>
-    );
+    const { findByText, getByText, queryByText, getByTestId, findByTestId } =
+      render(
+        <Provider store={storeMockedAidKeri}>
+          <ProfileDetailsModal
+            profileId={filteredIdentifierFix[0].id}
+            onClose={jest.fn()}
+            pageId={pageId}
+            isOpen
+            setIsOpen={jest.fn}
+          />
+        </Provider>
+      );
     await waitFor(() =>
       expect(
         getByText(EN_TRANSLATIONS.profiledetails.delete.button)
@@ -1444,17 +1508,17 @@ describe("Set default profile when delete profile", () => {
 
     fireEvent.click(getByText(EN_TRANSLATIONS.profiledetails.delete.button));
 
-    const alertTitle = await findByText(
-      EN_TRANSLATIONS.profiledetails.delete.alert.title
-    );
+    const alertTitle = await findByTestId("mock-ion-alert");
 
     await waitFor(() => {
       expect(alertTitle).toBeVisible();
     });
 
-    fireEvent.click(
-      getByText(EN_TRANSLATIONS.profiledetails.delete.alert.confirm)
+    // Click the confirm button in the mocked alert
+    const confirmButton = getByTestId(
+      "alert-confirm-identifier-delete-details-confirm-button"
     );
+    fireEvent.click(confirmButton);
 
     await waitFor(() => {
       expect(

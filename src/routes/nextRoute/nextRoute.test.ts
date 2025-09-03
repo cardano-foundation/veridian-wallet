@@ -10,6 +10,7 @@ import {
   getNextCreateSSIAgentRoute,
   getNextGenerateSeedPhraseRoute,
   getNextOnboardingRoute,
+  getNextRootRoute,
   getNextRoute,
   getNextSetPasscodeRoute,
   getNextVerifySeedPhraseRoute,
@@ -19,8 +20,8 @@ import { DataProps } from "./nextRoute.types";
 
 describe("NextRoute", () => {
   let localStorageMock: any;
-  let storeMock: RootState;
-  let data = {};
+  let storeMock: any;
+  let data: any = {};
 
   beforeEach(() => {
     localStorageMock = {};
@@ -55,6 +56,7 @@ describe("NextRoute", () => {
           queues: [],
           isPaused: false,
         },
+        pendingJoinGroupMetadata: null,
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -64,14 +66,10 @@ describe("NextRoute", () => {
         profiles: {},
         recentProfiles: [],
         multiSigGroup: undefined,
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {
@@ -277,7 +275,7 @@ describe("NextRoute", () => {
 });
 
 describe("getNextRoute", () => {
-  const storeMock: RootState = {
+  const storeMock: any = {
     stateCache: {
       isOnline: true,
       initializationPhase: InitializationPhase.PHASE_TWO,
@@ -308,23 +306,16 @@ describe("getNextRoute", () => {
         queues: [],
         isPaused: false,
       },
+      pendingJoinGroupMetadata: null,
     },
     profilesCache: {
       profiles: {},
       recentProfiles: [],
       multiSigGroup: undefined,
-    },
-    seedPhraseCache: {
-      seedPhrase: "",
-      bran: "",
-    },
-    connectionsCache: {
-      connections: {},
-      multisigConnections: {},
-    },
-    walletConnectionsCache: {
-      connectedWallet: null,
-      pendingConnection: null,
+      connectedDApp: null,
+      pendingDAppConnection: null,
+      isConnectingToDApp: false,
+      showDAppConnect: false,
     },
     viewTypeCache: {
       credential: {
@@ -386,5 +377,73 @@ describe("getNextRoute", () => {
     expect(result).toEqual({
       pathname: RoutePath.SETUP_BIOMETRICS,
     });
+  });
+
+  test("should redirect to PROFILE_SETUP when isPendingJoinGroup is true", () => {
+    const mockData = {
+      store: {
+        stateCache: {
+          isPendingJoinGroup: true,
+          initializationPhase: InitializationPhase.PHASE_TWO,
+          routes: [],
+          authentication: {
+            loggedIn: false,
+            userName: "",
+            time: 0,
+            passcodeIsSet: true,
+            seedPhraseIsSet: false,
+            passwordIsSet: true,
+            passwordIsSkipped: false,
+            ssiAgentIsSet: true,
+            ssiAgentUrl: "http://keria.com",
+            finishSetupBiometrics: true,
+          },
+          currentOperation: OperationType.IDLE,
+          queueIncomingRequest: {
+            isProcessing: false,
+            queues: [],
+            isPaused: false,
+          },
+        },
+      },
+    };
+
+    const result = getNextRootRoute(mockData as any);
+
+    expect(result.pathname).toEqual(RoutePath.PROFILE_SETUP);
+  });
+
+  test("should follow existing logic when isPendingJoinGroup is false", () => {
+    const mockData = {
+      store: {
+        stateCache: {
+          isPendingJoinGroup: false,
+          initializationPhase: InitializationPhase.PHASE_TWO,
+          routes: [],
+          authentication: {
+            loggedIn: false,
+            userName: "",
+            time: 0,
+            passcodeIsSet: true,
+            seedPhraseIsSet: false,
+            passwordIsSet: true,
+            passwordIsSkipped: false,
+            ssiAgentIsSet: true,
+            ssiAgentUrl: "http://keria.com",
+            finishSetupBiometrics: true,
+          },
+          currentOperation: OperationType.IDLE,
+          queueIncomingRequest: {
+            isProcessing: false,
+            queues: [],
+            isPaused: false,
+          },
+        },
+      },
+    };
+
+    const result = getNextRootRoute(mockData as any);
+
+    expect(result.pathname).toEqual(TabsRoutePath.CREDENTIALS);
   });
 });

@@ -20,8 +20,6 @@ import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
   getConnectionsCache,
   getMultisigConnectionsCache,
-} from "../../../../../store/reducers/connectionsCache";
-import {
   deleteNotificationById,
   getProfiles,
 } from "../../../../../store/reducers/profileCache";
@@ -63,8 +61,10 @@ const ReceiveCredential = ({
 }: NotificationDetailsProps) => {
   const dispatch = useAppDispatch();
   const userName = useAppSelector(getAuthentication)?.userName;
-  const connectionsCache = useAppSelector(getConnectionsCache);
-  const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
+  const connectionsCache = useAppSelector(getConnectionsCache) as any[];
+  const multisignConnectionsCache = useAppSelector(
+    getMultisigConnectionsCache
+  ) as any[];
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [initiateAnimation, setInitiateAnimation] = useState(false);
@@ -88,8 +88,9 @@ const ReceiveCredential = ({
   const [isRevoked, setIsRevoked] = useState(false);
   const [openIdentifierDetail, setOpenIdentifierDetail] = useState(false);
 
-  const connection =
-    connectionsCache?.[notificationDetails.connectionId]?.label;
+  const connection = connectionsCache?.find(
+    (c) => c.id === notificationDetails.connectionId
+  )?.label;
 
   const userAccepted = multisigMemberStatus.linkedRequest.accepted;
   const maxThreshold =
@@ -263,7 +264,9 @@ const ReceiveCredential = ({
   );
 
   const members = multisigMemberStatus.members.map((member) => {
-    const memberConnection = multisignConnectionsCache[member];
+    const memberConnection = multisignConnectionsCache.find(
+      (c) => c.id === member
+    );
 
     let name = memberConnection?.label || member;
 
@@ -296,12 +299,12 @@ const ReceiveCredential = ({
   const primaryButtonText = isRevoked
     ? undefined
     : `${i18n.t(
-      displayInitiatorNotAcceptedAlert
-        ? "tabs.notifications.details.buttons.ok"
-        : maxThreshold
+        displayInitiatorNotAcceptedAlert
+          ? "tabs.notifications.details.buttons.ok"
+          : maxThreshold
           ? "tabs.notifications.details.buttons.addcred"
           : "tabs.notifications.details.buttons.accept"
-    )}`;
+      )}`;
 
   const declineButtonText =
     maxThreshold || isRevoked || displayInitiatorNotAcceptedAlert

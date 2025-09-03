@@ -1,6 +1,6 @@
 .finish-setup {
   .container {
-    margin-top: 10vh;
+    margin-top: 40%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -17,6 +17,7 @@
       margin: 0;
       line-height: 1.5rem;
       font-weight: 500;
+      padding-inline: 1.25rem;
     }
   }
 }

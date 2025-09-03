@@ -24,7 +24,8 @@ export const CLOUD_V1201: CloudMigration = {
     }
 
     identifiers = identifiers.filter(
-      (identifier: { prefix: string; name: string }) => !identifier.name.startsWith("XX")
+      (identifier: { prefix: string; name: string }) =>
+        !identifier.name.startsWith("XX")
     );
 
     const contacts = await signifyClient.contacts().list();
@@ -92,7 +93,8 @@ export const CLOUD_V1201: CloudMigration = {
 
       if (sharedIdentifierPrefix) {
         const sharedIdentifier = identifiers.find(
-          (id: { prefix: string; name: string }) => id.prefix === sharedIdentifierPrefix
+          (id: { prefix: string; name: string }) =>
+            id.prefix === sharedIdentifierPrefix
         );
 
         if (sharedIdentifier) {
@@ -125,7 +127,8 @@ export const CLOUD_V1201: CloudMigration = {
         // associate history items to the correct identifier
         for (const historyItem of historyItems) {
           const identifier = identifiers.find(
-            (id: { prefix: string; name: string }) => id.prefix === historyItem.identifier
+            (id: { prefix: string; name: string }) =>
+              id.prefix === historyItem.identifier
           );
           if (identifier) {
             contactUpdates[`${identifier.prefix}:${historyItem.key}`] =

@@ -5,7 +5,10 @@ import { IdentifierType } from "../../../../../core/agent/services/identifier.ty
 import { CredentialsMatchingApply } from "../../../../../core/agent/services/ipexCommunicationService.types";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
-import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
+import {
+  getMultisigConnectionsCache,
+  getProfiles,
+} from "../../../../../store/reducers/profileCache";
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
 import { useOnlineStatusEffect } from "../../../../hooks";
@@ -15,7 +18,6 @@ import { ChooseCredential } from "./ChooseCredential";
 import "./CredentialRequest.scss";
 import { LinkedGroup } from "./CredentialRequest.types";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
-import { getProfiles } from "../../../../../store/reducers/profileCache";
 
 const CredentialRequest = ({
   pageId,
@@ -25,7 +27,9 @@ const CredentialRequest = ({
 }: NotificationDetailsProps) => {
   const dispatch = useAppDispatch();
   const profiles = useAppSelector(getProfiles);
-  const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
+  const multisignConnectionsCache = useAppSelector(
+    getMultisigConnectionsCache
+  ) as any[];
   const userName = useAppSelector(getAuthentication)?.userName;
   const [requestStage, setRequestStage] = useState(0);
   const [credentialRequest, setCredentialRequest] =
@@ -42,7 +46,7 @@ const CredentialRequest = ({
 
   const userAID = !credentialRequest
     ? null
-    : profiles[credentialRequest.identifier]?.identity.groupMemberPre || null;
+    : profiles[credentialRequest.identifier!]?.identity.groupMemberPre || null;
 
   const getMultisigInfo = useCallback(async () => {
     const linkedGroup =
@@ -51,7 +55,9 @@ const CredentialRequest = ({
       );
 
     const memberInfos = linkedGroup.members.map((member: string) => {
-      const memberConnection = multisignConnectionsCache[member];
+      const memberConnection = multisignConnectionsCache.find(
+        (c) => c.id === member
+      );
       if (!memberConnection) {
         return {
           aid: member,
