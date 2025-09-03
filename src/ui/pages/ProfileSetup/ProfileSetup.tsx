@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
   setIndividualFirstCreate,
-} from "../../../store/reducers/profileCache";
+ getMultisigConnectionsCache } from "../../../store/reducers/profileCache";
 import {
   getStateCache,
   setPendingJoinGroupMetadata,
@@ -40,7 +40,6 @@ import { useCameraDirection } from "../../components/Scan/hook/useCameraDirectio
 import { repeatOutline } from "ionicons/icons";
 import { BasicRecord } from "../../../core/agent/records";
 import { ToastMsgType } from "../../globals/types";
-import { getMultisigConnectionsCache } from "../../../store/reducers/profileCache";
 import { showError } from "../../utils/error";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {

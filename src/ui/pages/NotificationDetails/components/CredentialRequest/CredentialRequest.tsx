@@ -5,7 +5,10 @@ import { IdentifierType } from "../../../../../core/agent/services/identifier.ty
 import { CredentialsMatchingApply } from "../../../../../core/agent/services/ipexCommunicationService.types";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
-import { getMultisigConnectionsCache , getProfiles } from "../../../../../store/reducers/profileCache";
+import {
+  getMultisigConnectionsCache,
+  getProfiles,
+} from "../../../../../store/reducers/profileCache";
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
 import { useOnlineStatusEffect } from "../../../../hooks";

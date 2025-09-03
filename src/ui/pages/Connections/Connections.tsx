@@ -14,7 +14,8 @@ import {
   getOpenConnectionId,
   removeConnectionCache,
   setOpenConnectionId,
- getCurrentProfile } from "../../../store/reducers/profileCache";
+  getCurrentProfile,
+} from "../../../store/reducers/profileCache";
 import {
   setCurrentOperation,
   setCurrentRoute,

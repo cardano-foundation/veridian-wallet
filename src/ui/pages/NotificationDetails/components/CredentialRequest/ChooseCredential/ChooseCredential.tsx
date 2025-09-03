@@ -13,7 +13,8 @@ import { Agent } from "../../../../../../core/agent/agent";
 import { CredentialStatus } from "../../../../../../core/agent/services/credentialService.types";
 import { i18n } from "../../../../../../i18n";
 import { useAppSelector } from "../../../../../../store/hooks";
-import { getConnectionsCache ,
+import {
+  getConnectionsCache,
   deleteNotificationById,
   getCredsCache,
 } from "../../../../../../store/reducers/profileCache";

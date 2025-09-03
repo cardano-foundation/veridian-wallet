@@ -11,7 +11,10 @@ import {
 import { useCallback, useState } from "react";
 import { i18n } from "../../../../i18n";
 import { useAppSelector } from "../../../../store/hooks";
-import { getMultisigConnectionsCache , getProfiles } from "../../../../store/reducers/profileCache";
+import {
+  getMultisigConnectionsCache,
+  getProfiles,
+} from "../../../../store/reducers/profileCache";
 import {
   formatShortDate,
   formatTimeToSec,

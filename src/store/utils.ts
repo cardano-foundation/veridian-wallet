@@ -4,7 +4,7 @@ import { ThunkDispatch } from "redux-thunk";
 import { DataProps } from "../routes/nextRoute/nextRoute.types";
 import { RootState } from "./index";
 import { clearBiometricsCache } from "./reducers/biometricsCache";
-import { clearProfiles , clearDAppConnection } from "./reducers/profileCache";
+import { clearProfiles, clearDAppConnection } from "./reducers/profileCache";
 import { clearSeedPhraseCache } from "./reducers/seedPhraseCache";
 import { clearSSIAgent } from "./reducers/ssiAgent";
 import { clearStateCache } from "./reducers/stateCache";

@@ -20,9 +20,9 @@ import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
   getConnectionsCache,
   getMultisigConnectionsCache,
-
   deleteNotificationById,
-  getProfiles} from "../../../../../store/reducers/profileCache";
+  getProfiles,
+} from "../../../../../store/reducers/profileCache";
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert, Alert as AlertDecline } from "../../../../components/Alert";
 import { CardDetailsBlock } from "../../../../components/CardDetails";

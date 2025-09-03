@@ -26,9 +26,9 @@ import {
   getConnectionsCache,
   getProfileGroupCache,
   getProfiles,
-
   setPendingDAppConnection,
-  showDAppConnect} from "../../../store/reducers/profileCache";
+  showDAppConnect,
+} from "../../../store/reducers/profileCache";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {
   getAuthentication,
