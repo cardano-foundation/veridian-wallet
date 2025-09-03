@@ -46,10 +46,9 @@ import { SqliteStorage } from "../storage/sqliteStorage";
 import { BaseRecord } from "../storage/storage.types";
 import { OperationPendingStorage } from "./records/operationPendingStorage";
 import { OperationPendingRecord } from "./records/operationPendingRecord";
-import { EventTypes, KeriaStatusChangedEvent, NotificationRemovedEvent } from "./event.types";
-import { deleteNotificationRecordById, isNetworkError, OnlineOnly, randomSalt } from "./services/utils";
+import { EventTypes, KeriaStatusChangedEvent } from "./event.types";
+import { isNetworkError, OnlineOnly, randomSalt } from "./services/utils";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
-import { NotificationRoute } from "./services/keriaNotificationService.types";
 
 const walletId = "idw";
 class Agent {
@@ -536,6 +535,81 @@ class Agent {
     this.connections.onConnectionAdded();
     this.identifiers.onIdentifierRemoved();
     this.credentials.onCredentialRemoved();
+  }
+
+  private async deleteProfile(identifier: string): Promise<void> {
+    const metadata = await this.identifierStorage.getIdentifierMetadata(
+      identifier
+    );
+    if (metadata.groupMetadata) {
+      await this.connections.deleteAllConnectionsForGroup(
+        metadata.groupMetadata.groupId
+      );
+    } else {
+      await this.connections.deleteAllConnectionsForIdentifier(identifier);
+    }
+
+    await this.credentials.deleteAllCredentialsForIdentifier(identifier);
+
+    if (metadata.groupMemberPre) {
+      await this.connections.deleteAllConnectionsForGroup(
+        (
+          await this.identifierStorage.getIdentifierMetadata(
+            metadata.groupMemberPre
+          )
+        ).groupMetadata!.groupId
+      );
+
+      for (const notification of await this.notificationStorage.findAllByQuery({
+        receivingPre: metadata.groupMemberPre,
+      })) {
+        await deleteNotificationRecordById(
+          this.client,
+          this.notificationStorage,
+          notification.id,
+          notification.a.r as NotificationRoute,
+          this.operationPendingStorage
+        );
+
+        this.agentServicesProps.eventEmitter.emit<NotificationRemovedEvent>({
+          type: EventTypes.NotificationRemoved,
+          payload: {
+            id: notification.id,
+          },
+        });
+      }
+    }
+
+    for (const notification of await this.notificationStorage.findAllByQuery({
+      receivingPre: identifier,
+    })) {
+      await deleteNotificationRecordById(
+        this.client,
+        this.notificationStorage,
+        notification.id,
+        notification.a.r as NotificationRoute,
+        this.operationPendingStorage
+      );
+
+      this.agentServicesProps.eventEmitter.emit<NotificationRemovedEvent>({
+        type: EventTypes.NotificationRemoved,
+        payload: {
+          id: notification.id,
+        },
+      });
+    }
+
+    const connectedDApp =
+      PeerConnection.peerConnection.getConnectedDAppAddress();
+    if (
+      connectedDApp !== "" &&
+      metadata.id ===
+        (await PeerConnection.peerConnection.getConnectingIdentifier()).id
+    ) {
+      PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
+    }
+
+    await this.identifiers.deleteIdentifier(identifier);
   }
 
   async connect(
