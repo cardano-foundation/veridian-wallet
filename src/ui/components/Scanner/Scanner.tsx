@@ -22,11 +22,13 @@ import {
 } from "react";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
+  getConnectionsCache,
   getProfileGroupCache,
   getProfiles,
-} from "../../../store/reducers/profileCache";
+
+  setPendingDAppConnection,
+  showDAppConnect} from "../../../store/reducers/profileCache";
 import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {
   getAuthentication,
@@ -35,10 +37,6 @@ import {
   setCurrentOperation,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
-import {
-  setPendingConnection,
-  showConnectWallet,
-} from "../../../store/reducers/walletConnectionsCache";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
@@ -232,11 +230,11 @@ const Scanner = forwardRef(
       if (/^b[1-9A-HJ-NP-Za-km-z]{33}/.test(id)) {
         dispatch(setToastMsg(ToastMsgType.PEER_ID_SUCCESS));
         dispatch(
-          setPendingConnection({
+          setPendingDAppConnection({
             meerkatId: id,
           })
         );
-        dispatch(showConnectWallet(true));
+        dispatch(showDAppConnect(true));
         handleReset?.();
       } else {
         dispatch(setToastMsg(ToastMsgType.PEER_ID_ERROR));
@@ -410,8 +408,8 @@ const Scanner = forwardRef(
               currentOperation === OperationType.MULTI_SIG_RECEIVER_SCAN
                 ? `${i18n.t("setupgroupprofile.scan.pasteoobi")}`
                 : currentOperation === OperationType.SCAN_WALLET_CONNECTION
-                  ? i18n.t("connectdapp.inputpidmodal.header")
-                  : `${i18n.t("setupgroupprofile.scan.pastecontents")}`
+                ? i18n.t("connectdapp.inputpidmodal.header")
+                : `${i18n.t("setupgroupprofile.scan.pastecontents")}`
             }`,
             actionButton: true,
             actionButtonDisabled: !pastedValue,

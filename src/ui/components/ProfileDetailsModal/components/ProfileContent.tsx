@@ -11,8 +11,7 @@ import {
 import { useCallback, useState } from "react";
 import { i18n } from "../../../../i18n";
 import { useAppSelector } from "../../../../store/hooks";
-import { getMultisigConnectionsCache } from "../../../../store/reducers/connectionsCache";
-import { getProfiles } from "../../../../store/reducers/profileCache";
+import { getMultisigConnectionsCache , getProfiles } from "../../../../store/reducers/profileCache";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -51,7 +50,9 @@ const ProfileContent = ({
   setCardData,
 }: ProfileContentProps) => {
   const profiles = useAppSelector(getProfiles);
-  const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
+  const multisignConnectionsCache = useAppSelector(
+    getMultisigConnectionsCache
+  ) as any[];
   const memberCount = cardData.members?.length || 0;
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [viewType, setViewType] = useState(DetailView.AdvancedDetail);
@@ -74,7 +75,9 @@ const ProfileContent = ({
 
   const members = cardData.members
     ?.map((member, index) => {
-      const memberConnection = multisignConnectionsCache[member];
+      const memberConnection = multisignConnectionsCache.find(
+        (c) => c.id === member
+      );
       let name = memberConnection?.label || member;
 
       if (!memberConnection?.label) {

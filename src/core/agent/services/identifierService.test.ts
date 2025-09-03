@@ -126,7 +126,7 @@ const connections = jest.mocked({
 const credentials = jest.mocked({
   deleteAllCredentialsForIdentifier: jest.fn().mockResolvedValue(undefined),
   deleteAllConnectionsForGroup: jest.fn().mockResolvedValue(undefined),
-  deleteAllConnectionsForIdentifier: jest.fn().mockResolvedValue(undefined)
+  deleteAllConnectionsForIdentifier: jest.fn().mockResolvedValue(undefined),
 });
 
 const basicStorage = jest.mocked({
@@ -1254,7 +1254,7 @@ describe("Single sig service of agent", () => {
     expect(identifierStorage.getIdentifierMetadata).toBeCalledWith(
       identifierMetadataRecord.id
     );
-    
+
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       identifierMetadataRecord.id,
       { isDeleted: true, pendingDeletion: false }

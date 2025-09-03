@@ -54,7 +54,7 @@ import {
   updateRecentProfiles,
 } from "./profilesCache";
 import {
-  ConnectionData,
+  DAppConnection,
   MultiSigGroup,
   ProfileCache,
 } from "./profilesCache.types";
@@ -203,7 +203,7 @@ describe("Profile cache", () => {
   });
 
   it("should handle setPeerConnections", () => {
-    const connections: ConnectionData[] = [
+    const connections: DAppConnection[] = [
       {
         meerkatId: "6",
         name: "Wallet name #2",

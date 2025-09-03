@@ -1,7 +1,7 @@
 import KeriLogo from "../assets/images/KeriGeneric.jpg";
-import { ConnectionData } from "../components/ConnectdApp";
+import { DAppConnection } from "../components/ConnectdApp";
 
-const walletConnectionsFix: ConnectionData[] = [
+const walletConnectionsFix: DAppConnection[] = [
   {
     meerkatId: "1",
     name: "Wallet name #1",

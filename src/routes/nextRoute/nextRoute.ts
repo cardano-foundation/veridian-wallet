@@ -47,9 +47,9 @@ const getNextRootRoute = (data: DataProps) => {
   ) {
     path = data.store.currentProfile.identity.groupMetadata
       ? RoutePath.GROUP_PROFILE_SETUP.replace(
-        ":id",
-        data.store.currentProfile.identity.id
-      )
+          ":id",
+          data.store.currentProfile.identity.id
+        )
       : path;
   }
 

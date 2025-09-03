@@ -7,7 +7,7 @@ import { Provider } from "react-redux";
 
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
-import { connectionsForNotifications } from "../../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../__fixtures__/credRequestFix";
 import { credsFixAcdc } from "../../../../__fixtures__/credsFix";
 import {
@@ -64,10 +64,34 @@ const initialState = {
     },
     isOnline: true,
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB: {
+        identity: {
+          id: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
+          displayName: (
+            connectionsForNotificationsValues.find(
+              (c) => c.id === "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
+            ) || { label: "" }
+          ).label,
+          createdAtUTC: "2000-01-01T00:00:00.000Z",
+        },
+        connections: [
+          connectionsForNotificationsValues.find(
+            (c) => c.id === "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
+          ) || {},
+        ],
+        multisigConnections: [],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+        notifications: [],
+      },
+    },
+    defaultProfile: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
   },
-  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -188,6 +212,7 @@ describe("Credential request: Multisig", () => {
     profilesCache: {
       ...profileCacheFixData,
       profiles: {
+        ...(profileCacheFixData.profiles || {}),
         id: {
           identity: {
             ...multisignIdentifierFix[0],
@@ -195,7 +220,13 @@ describe("Credential request: Multisig", () => {
             id: "id",
           },
           connections: [],
-          multisigConnections: [],
+          multisigConnections: [
+            { id: "member-1", label: "Member 1" },
+            { id: "member-2", label: "Member 2" },
+            { id: "member-3", label: "Member 3" },
+            { id: "member-4", label: "Member 4" },
+            { id: "member-5", label: "Member 5" },
+          ],
           peerConnections: [],
           credentials: [],
           archivedCredentials: [],
@@ -203,26 +234,6 @@ describe("Credential request: Multisig", () => {
         },
       },
       defaultProfile: "id",
-    },
-    connectionsCache: {
-      connections: connectionsForNotifications,
-      multisigConnections: {
-        "member-1": {
-          label: "Member 1",
-        },
-        "member-2": {
-          label: "Member 2",
-        },
-        "member-3": {
-          label: "Member 3",
-        },
-        "member-4": {
-          label: "Member 4",
-        },
-        "member-5": {
-          label: "Member 5",
-        },
-      },
     },
     biometricsCache: {
       enabled: false,

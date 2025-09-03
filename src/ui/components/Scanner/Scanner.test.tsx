@@ -173,10 +173,8 @@ describe("Scanner", () => {
       currentOperation: OperationType.SCAN_WALLET_CONNECTION,
       toastMsgs: [],
     },
-    profilesCache: profileCacheFixData,
-    connectionsCache: {
-      connections: {},
-      multisigConnections: {},
+    profilesCache: {
+      ...profileCacheFixData,
     },
   };
 
@@ -348,10 +346,6 @@ describe("Scanner", () => {
       profilesCache: {
         ...profileCacheFixData,
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
     };
 
     const storeMocked = {
@@ -385,10 +379,6 @@ describe("Scanner", () => {
         toastMsgs: [],
       },
       profilesCache: profileCacheFixData,
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
     };
 
     const storeMocked = {
@@ -454,10 +444,6 @@ describe("Scanner", () => {
       },
       profilesCache: {
         ...profileCacheFixData,
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
       },
     };
 
@@ -537,10 +523,6 @@ describe("Scanner", () => {
       profilesCache: {
         ...profileCacheFixData,
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
     };
 
     const storeMocked = {
@@ -609,10 +591,6 @@ describe("Scanner", () => {
       profilesCache: {
         ...profileCacheFixData,
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
     };
 
     const storeMocked = {
@@ -668,10 +646,6 @@ describe("Scanner", () => {
       },
       profilesCache: {
         ...profileCacheFixData,
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
       },
     };
 

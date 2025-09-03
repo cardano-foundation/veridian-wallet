@@ -64,9 +64,6 @@ const initialStateEmpty = {
     isOnline: true,
   },
   seedPhraseCache: {},
-  connectionsCache: {
-    connections: [],
-  },
   profilesCache: {
     ...profileCacheFixData,
     defaultProfile: filteredIdentifierFix[2].id,
@@ -105,10 +102,16 @@ const initialStateFull = {
     },
   },
   seedPhraseCache: {},
-  connectionsCache: {
-    connections: connectionsFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      [filteredIdentifierFix[0].id]: {
+        ...(profileCacheFixData.profiles as any)[filteredIdentifierFix[0].id],
+        connections: connectionsFix,
+      },
+    },
   },
-  profilesCache: profileCacheFixData,
   viewTypeCache: {
     credential: {
       viewType: null,
@@ -141,9 +144,15 @@ const archivedAndRevokedState = {
     },
   },
   seedPhraseCache: {},
-  profilesCache: profileCacheFixData,
-  connectionsCache: {
-    connections: connectionsFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      [filteredIdentifierFix[0].id]: {
+        ...(profileCacheFixData.profiles as any)[filteredIdentifierFix[0].id],
+        connections: connectionsFix,
+      },
+    },
   },
   viewTypeCache: {
     credential: {
@@ -447,10 +456,6 @@ describe("Creds Tab", () => {
         },
       },
       seedPhraseCache: {},
-      profilesCache: {
-        ...profileCacheFixData,
-        defaultProfile: filteredIdentifierFix[1].id,
-      },
       viewTypeCache: {
         identifier: {
           viewType: null,
@@ -461,8 +466,16 @@ describe("Creds Tab", () => {
           favouriteIndex: 0,
         },
       },
-      connectionsCache: {
-        connections: connectionsFix,
+      profilesCache: {
+        ...profileCacheFixData,
+        defaultProfile: filteredIdentifierFix[1].id,
+        profiles: {
+          ...profileCacheFixData.profiles,
+          [filteredIdentifierFix[1].id]: {
+            ...profileCacheFixData.profiles[filteredIdentifierFix[1].id],
+            connections: connectionsFix,
+          },
+        },
       },
       biometricsCache: {
         enabled: false,

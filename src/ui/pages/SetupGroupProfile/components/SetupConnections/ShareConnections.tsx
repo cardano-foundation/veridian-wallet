@@ -174,11 +174,11 @@ const ShareConnections = ({ group, oobi, profile }: SetupConnectionsProps) => {
           />
           {isInitiator
             ? i18n.t(
-              "setupgroupprofile.setupmembers.actions.initiator.delete.button"
-            )
+                "setupgroupprofile.setupmembers.actions.initiator.delete.button"
+              )
             : i18n.t(
-              "setupgroupprofile.setupmembers.actions.joiner.leave.button"
-            )}
+                "setupgroupprofile.setupmembers.actions.joiner.leave.button"
+              )}
         </IonButton>
       </div>
       <Alert
@@ -188,29 +188,29 @@ const ShareConnections = ({ group, oobi, profile }: SetupConnectionsProps) => {
         headerText={
           isInitiator
             ? i18n.t(
-              "setupgroupprofile.setupmembers.actions.initiator.delete.alert.title"
-            )
+                "setupgroupprofile.setupmembers.actions.initiator.delete.alert.title"
+              )
             : i18n.t(
-              "setupgroupprofile.setupmembers.actions.joiner.leave.alert.title"
-            )
+                "setupgroupprofile.setupmembers.actions.joiner.leave.alert.title"
+              )
         }
         confirmButtonText={`${
           isInitiator
             ? i18n.t(
-              "setupgroupprofile.setupmembers.actions.initiator.delete.alert.confirm"
-            )
+                "setupgroupprofile.setupmembers.actions.initiator.delete.alert.confirm"
+              )
             : i18n.t(
-              "setupgroupprofile.setupmembers.actions.joiner.leave.alert.confirm"
-            )
+                "setupgroupprofile.setupmembers.actions.joiner.leave.alert.confirm"
+              )
         }`}
         cancelButtonText={`${
           isInitiator
             ? i18n.t(
-              "setupgroupprofile.setupmembers.actions.initiator.delete.alert.cancel"
-            )
+                "setupgroupprofile.setupmembers.actions.initiator.delete.alert.cancel"
+              )
             : i18n.t(
-              "setupgroupprofile.setupmembers.actions.joiner.leave.alert.cancel"
-            )
+                "setupgroupprofile.setupmembers.actions.joiner.leave.alert.cancel"
+              )
         }`}
         actionConfirm={() => setVerifyIsOpen(true)}
         actionCancel={closeAlert}

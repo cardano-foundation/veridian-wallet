@@ -553,7 +553,9 @@ class Agent {
 
     this.connections.onConnectionRemoved();
     this.connections.onConnectionAdded();
-    this.identifiers.onIdentifierRemoved((event) => this.deleteProfile(event.payload.id));
+    this.identifiers.onIdentifierRemoved((event) =>
+      this.deleteProfile(event.payload.id)
+    );
     this.credentials.onCredentialRemoved();
   }
 

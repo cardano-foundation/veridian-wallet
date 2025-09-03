@@ -220,14 +220,10 @@ const initialState = {
   profilesCache: {
     profiles: {},
     defaultProfile: undefined,
-  },
-  connectionsCache: {
-    connections: {},
-    multisigConnections: {},
-  },
-  walletConnectionsCache: {
-    connectedWallet: null,
-    pendingConnection: null,
+    connectedDApp: null,
+    pendingDAppConnection: null,
+    isConnectingToDApp: false,
+    showDAppConnect: false,
   },
   viewTypeCache: {
     identifier: {
@@ -508,13 +504,13 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
+      profilesCache: {
+        profiles: {},
+        defaultProfile: undefined,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {
@@ -585,13 +581,13 @@ describe("Witness availability", () => {
         seedPhrase: "",
         bran: "",
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
+      profilesCache: {
+        profiles: {},
+        defaultProfile: undefined,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {
@@ -824,13 +820,13 @@ describe("System threat alert", () => {
         seedPhrase: "",
         bran: "",
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
+      profilesCache: {
+        profiles: {},
+        defaultProfile: undefined,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {

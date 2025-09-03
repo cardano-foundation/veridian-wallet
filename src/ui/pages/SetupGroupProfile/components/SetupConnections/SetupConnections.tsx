@@ -5,7 +5,11 @@ import { useParams } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
-import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
+import {
+  getMultisigConnectionsCache,
+  getProfiles,
+  MultiSigGroup,
+} from "../../../../../store/reducers/profileCache";
 import { Avatar } from "../../../../components/Avatar";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
@@ -21,10 +25,6 @@ import { StageProps } from "../../SetupGroupProfile.types";
 import "./SetupConnections.scss";
 import { Tab } from "./SetupConnections.types";
 import { ShareConnections } from "./ShareConnections";
-import {
-  getProfiles,
-  MultiSigGroup,
-} from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../../globals/types";
 import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
@@ -48,6 +48,7 @@ const SetupConnections = ({ setState }: StageProps) => {
 
   // ensure groupConnections is always an object to avoid runtime errors in tests
   const groupConnections = useAppSelector(getMultisigConnectionsCache) || {};
+
   const [multiSigGroup, setMultiSigGroup] = useState<
     MultiSigGroup | undefined
   >();

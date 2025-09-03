@@ -1,5 +1,8 @@
 import { Agent } from "../../../core/agent/agent";
-import { CreationStatus } from "../../../core/agent/agent.types";
+import {
+  CreationStatus,
+  isRegularConnectionDetails,
+} from "../../../core/agent/agent.types";
 import {
   EventTypes,
   GroupCreatedEvent,
@@ -9,8 +12,8 @@ import {
 } from "../../../core/agent/event.types";
 import { OperationPendingRecordType } from "../../../core/agent/records/operationPendingRecord.type";
 import { useAppDispatch } from "../../../store/hooks";
-import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
 import {
+  updateOrAddConnectionCache,
   addGroupProfile,
   addNotification,
   addOrUpdateProfileIdentity,
@@ -72,7 +75,9 @@ const operationFailureHandler = async (
     case OperationPendingRecordType.Oobi: {
       const connectionDetails =
         await Agent.agent.connections.getConnectionShortDetailById(oid);
-      dispatch(updateOrAddConnectionCache(connectionDetails));
+      if (isRegularConnectionDetails(connectionDetails)) {
+        dispatch(updateOrAddConnectionCache(connectionDetails));
+      }
       break;
     }
     default: {

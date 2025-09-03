@@ -29,16 +29,23 @@ import {
   PeerDisconnectedEvent,
 } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { store } from "../../../store";
-import { updateOrAddConnectionCache } from "../../../store/reducers/connectionsCache";
+import {
+  updateOrAddConnectionCache,
+  DAppConnection,
+  addGroupProfile,
+  addOrUpdateProfileIdentity,
+  setPeerConnections,
+  updateOrAddCredsCache,
+  updatePeerConnectionsFromCore,
+  updateProfileCreationStatus,
+  setConnectedDApp,
+  setPendingDAppConnection,
+} from "../../../store/reducers/profileCache";
 import {
   setQueueIncomingRequest,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { IncomingRequestType } from "../../../store/reducers/stateCache/stateCache.types";
-import {
-  setConnectedWallet,
-  setPendingConnection,
-} from "../../../store/reducers/walletConnectionsCache";
 import {
   pendingGroupIdentifierFix,
   pendingIdentifierFix,
@@ -217,15 +224,6 @@ const peerConnectionBrokenEvent: PeerConnectionBrokenEvent = {
 };
 
 import { PeerConnectionPairRecord } from "../../../core/agent/records";
-import {
-  ConnectionData,
-  addGroupProfile,
-  addOrUpdateProfileIdentity,
-  setPeerConnections,
-  updateOrAddCredsCache,
-  updatePeerConnectionsFromCore,
-  updateProfileCreationStatus,
-} from "../../../store/reducers/profileCache";
 
 const mockPeerConnectionPairRecordInstance = new PeerConnectionPairRecord({
   id: "dApp-address:identifier",
@@ -236,7 +234,7 @@ const mockPeerConnectionPairRecordInstance = new PeerConnectionPairRecord({
   createdAt: new Date(),
 });
 
-const peerConnection: ConnectionData = {
+const peerConnection: DAppConnection = {
   meerkatId: mockPeerConnectionPairRecordInstance.id,
   name: mockPeerConnectionPairRecordInstance.name,
   url: mockPeerConnectionPairRecordInstance.url,
@@ -358,7 +356,7 @@ describe("Peer connection states changed handler", () => {
       .mockResolvedValue([mockPeerConnectionPairRecordInstance]);
     await peerConnectedChangeHandler(peerConnectedEvent, dispatch);
     await waitFor(() => {
-      expect(dispatch).toBeCalledWith(setPendingConnection(null));
+      expect(dispatch).toBeCalledWith(setPendingDAppConnection(null));
     });
     expect(dispatch).toBeCalledWith(
       updatePeerConnectionsFromCore(
@@ -383,7 +381,7 @@ describe("Peer connection states changed handler", () => {
       peerConnection.meerkatId,
       dispatch
     );
-    expect(dispatch).toBeCalledWith(setConnectedWallet(null));
+    expect(dispatch).toBeCalledWith(setConnectedDApp(null));
     expect(dispatch).toBeCalledWith(
       setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS)
     );
@@ -415,7 +413,7 @@ describe("Peer connection states changed handler", () => {
       peerConnectionBrokenEvent,
       dispatch
     );
-    expect(dispatch).toBeCalledWith(setConnectedWallet(null));
+    expect(dispatch).toBeCalledWith(setConnectedDApp(null));
     expect(dispatch).toBeCalledWith(
       setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS)
     );
@@ -462,9 +460,11 @@ describe("KERIA operation state changed handler", () => {
     const id = "id";
     const connectionMock = {
       id: "id",
-      creationStatus: CreationStatus.PENDING,
-      createdAt: new Date().toISOString(),
-      alias: "CF Credential Issuance",
+      label: "CF Credential Issuance",
+      createdAtUTC: new Date().toISOString(),
+      status: ConnectionStatus.PENDING,
+      contactId: "contact-id",
+      identifier: "test-identifier",
       oobi: "http://oobi.com/",
     };
     getConnectionShortDetailByIdMock.mockResolvedValue(connectionMock);

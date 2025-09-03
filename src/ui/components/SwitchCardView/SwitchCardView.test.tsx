@@ -2,7 +2,7 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import { connectionsMapFix } from "../../__fixtures__/connectionsFix";
+// connectionsMapFix is not needed here; keep fixture imports minimal
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
 import { CardType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
@@ -48,9 +48,6 @@ const initialState = {
       viewType: null,
       favouriteIndex: 0,
     },
-  },
-  connectionsCache: {
-    connections: connectionsMapFix,
   },
 };
 let mockedStore: Store<unknown, AnyAction>;

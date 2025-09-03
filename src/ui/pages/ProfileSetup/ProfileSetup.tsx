@@ -40,7 +40,7 @@ import { useCameraDirection } from "../../components/Scan/hook/useCameraDirectio
 import { repeatOutline } from "ionicons/icons";
 import { BasicRecord } from "../../../core/agent/records";
 import { ToastMsgType } from "../../globals/types";
-import { getMultisigConnectionsCache } from "../../../store/reducers/connectionsCache";
+import { getMultisigConnectionsCache } from "../../../store/reducers/profileCache";
 import { showError } from "../../utils/error";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
@@ -70,15 +70,15 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const back = stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
     ? undefined // Disable back button if pending join group
     : isScanOpen
-      ? i18n.t("setupprofile.button.cancel")
-      : [
+    ? i18n.t("setupprofile.button.cancel")
+    : [
         SetupProfileStep.SetupProfile,
         SetupProfileStep.GroupSetupStart,
       ].includes(step)
-        ? i18n.t("setupprofile.button.back")
-        : isModal && defaultProfile
-          ? i18n.t("setupprofile.button.cancel")
-          : undefined;
+    ? i18n.t("setupprofile.button.back")
+    : isModal && defaultProfile
+    ? i18n.t("setupprofile.button.cancel")
+    : undefined;
 
   const getButtonText = () => {
     switch (step) {

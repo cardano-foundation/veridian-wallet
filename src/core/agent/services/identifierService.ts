@@ -11,9 +11,7 @@ import {
   AgentServicesProps,
   MiscRecordId,
 } from "../agent.types";
-import {
-  ExchangeRoute,
-} from "./keriaNotificationService.types";
+import { ExchangeRoute } from "./keriaNotificationService.types";
 import {
   IdentifierMetadataRecord,
   IdentifierMetadataRecordProps,

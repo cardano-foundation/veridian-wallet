@@ -106,9 +106,7 @@ describe("Profile setup", () => {
         },
         profileHistories: [],
       },
-      connectionsCache: {
-        connections: connectionsFix,
-      },
+
       profilesCache: profileCacheFixData,
     });
 
@@ -356,9 +354,7 @@ describe("Profile setup", () => {
           firstAppLaunch: true,
         },
       },
-      connectionsCache: {
-        connections: connectionsFix,
-      },
+
       profilesCache: profileCacheFixData,
     });
 
@@ -573,9 +569,7 @@ describe("Profile setup: use as modal", () => {
       },
       profileHistories: [],
     },
-    connectionsCache: {
-      connections: connectionsFix,
-    },
+
     profilesCache: profileCacheFixData,
   });
 

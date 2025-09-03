@@ -32,12 +32,6 @@ import {
   PeerConnectSigningEventRequest,
 } from "./stateCache.types";
 
-// Mock the selectors
-jest.mock("../connectionsCache", () => ({
-  getConnectionsCache: jest.fn(),
-  getMultisigConnectionsCache: jest.fn(),
-}));
-
 const signingRequest: PeerConnectSigningEventRequest = {
   type: IncomingRequestType.PEER_CONNECT_SIGN,
   signTransaction: {
@@ -45,8 +39,7 @@ const signingRequest: PeerConnectSigningEventRequest = {
     payload: {
       identifier: "a",
       payload: "tosign",
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      approvalCallback: () => {},
+      approvalCallback: () => undefined,
     },
   },
   peerConnection: { meerkatId: "connection" },

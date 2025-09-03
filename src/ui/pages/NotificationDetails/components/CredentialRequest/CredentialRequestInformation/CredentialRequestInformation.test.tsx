@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 
 import EN_TRANSLATIONS from "../../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../../routes/paths";
-import { connectionsForNotifications } from "../../../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../../__fixtures__/credRequestFix";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
 import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
@@ -85,9 +85,7 @@ const initialState = {
     },
     toastMsgs: [],
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
-  },
+
   profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
@@ -103,20 +101,21 @@ describe("Credential request information", () => {
       ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
-    const { getByText, getByTestId, queryByText, unmount } = render(
-      <Provider store={storeMocked}>
-        <CredentialRequestInformation
-          pageId="multi-sign"
-          activeStatus
-          onBack={jest.fn()}
-          onAccept={jest.fn()}
-          notificationDetails={notificationsFix[4]}
-          credentialRequest={credRequestFix}
-          linkedGroup={null}
-          onReloadData={jest.fn()}
-        />
-      </Provider>
-    );
+    const { getByText, getByTestId, getAllByText, queryByText, unmount } =
+      render(
+        <Provider store={storeMocked}>
+          <CredentialRequestInformation
+            pageId="multi-sign"
+            activeStatus
+            onBack={jest.fn()}
+            onAccept={jest.fn()}
+            notificationDetails={notificationsFix[4]}
+            credentialRequest={credRequestFix}
+            linkedGroup={null}
+            onReloadData={jest.fn()}
+          />
+        </Provider>
+      );
 
     await waitFor(() => {
       expect(
@@ -189,6 +188,11 @@ describe("Credential request information: multisig", () => {
       },
     ],
   };
+
+  beforeEach(() => {
+    // Clear any leftover DOM overlays (ion-alert overlays) between tests
+    document.body.innerHTML = "";
+  });
 
   test("Initiator open request before proposing", async () => {
     const storeMocked = {

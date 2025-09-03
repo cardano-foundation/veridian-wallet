@@ -12,7 +12,7 @@ import { TabsRoutePath } from "../../../routes/paths";
 import {
   setMissingAliasConnection,
   setOpenConnectionId,
-} from "../../../store/reducers/connectionsCache";
+} from "../../../store/reducers/profileCache";
 import {
   setToastMsg,
   showGenericError,
@@ -384,12 +384,29 @@ describe("Setup Connections", () => {
 
     const state = {
       ...initialState,
-      connectionsCache: {
-        connections: {
-          EKDTSzuyUb7ICP1rFzrFGXc1AwC4yFtTkzIHbbjoJDO6: connectionsFix[0],
-        },
-      },
     };
+
+    // Seed the scanned connection id into the current profile for this test
+    const defaultProfile = state.profilesCache.defaultProfile;
+    if (defaultProfile) {
+      const sampleConn = { ...connectionsFix[0] };
+      sampleConn.id = "EKDTSzuyUb7ICP1rFzrFGXc1AwC4yFtTkzIHbbjoJDO6";
+
+      state.profilesCache = {
+        ...state.profilesCache,
+        profiles: {
+          ...state.profilesCache.profiles,
+          [defaultProfile]: {
+            ...state.profilesCache.profiles[defaultProfile],
+            connections: [
+              ...(state.profilesCache.profiles[defaultProfile].connections ||
+                []),
+              sampleConn,
+            ],
+          },
+        },
+      };
+    }
 
     const dispatchMock = jest.fn();
     const storeMocked = {

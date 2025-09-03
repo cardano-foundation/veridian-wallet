@@ -11,7 +11,7 @@ import { CredentialCardTemplateProps } from "../../CredentialCardTemplate.types"
 import "./KeriCardTemplate.scss";
 import { CardTheme } from "../../../CardTheme";
 import { useAppSelector } from "../../../../../store/hooks";
-import { getConnectionsCache } from "../../../../../store/reducers/connectionsCache";
+import { getConnectionsCache } from "../../../../../store/reducers/profileCache";
 
 const KeriCardTemplate = ({
   name = "default",
@@ -21,7 +21,7 @@ const KeriCardTemplate = ({
   onHandleShowCardDetails,
   pickedCard,
 }: CredentialCardTemplateProps) => {
-  const connections = useAppSelector(getConnectionsCache);
+  const connections = useAppSelector(getConnectionsCache) as any[];
   const { getCardOffsetTop, cardRef } = useCardOffsetTop();
 
   const [alertIsOpen, setAlertIsOpen] = useState(false);
@@ -41,7 +41,7 @@ const KeriCardTemplate = ({
     }
   };
 
-  const connection = connections[cardData.connectionId];
+  const connection = connections.find((c) => c.id === cardData.connectionId);
 
   return (
     <div

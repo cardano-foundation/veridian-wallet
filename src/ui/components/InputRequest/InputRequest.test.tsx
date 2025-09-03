@@ -5,7 +5,7 @@ import { act } from "react";
 import { Provider } from "react-redux";
 import { StorageMessage } from "../../../core/storage/storage.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
-import { setOpenConnectionId } from "../../../store/reducers/connectionsCache";
+import { setOpenConnectionId } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { identifierFix } from "../../__fixtures__/identifierFix";
@@ -92,8 +92,19 @@ describe("Set connection alias", () => {
         },
       },
     },
-    connectionsCache: {
-      connections: connectionsFix,
+    // use profilesCache shape for connections
+    profilesCache: {
+      defaultProfile: identifierFix[0].id,
+      profiles: {
+        [identifierFix[0].id]: {
+          identity: identifierFix[0],
+          connections: connectionsFix,
+          multisigConnections: [],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+        },
+      },
       missingAliasUrl: {
         url: "http://keria:3902/oobi/EJ0XanWANawPeyCzyPxAbilMId9FNHY8eobED84Gxfij/agent/ENmmQwmKjO7UQdRMGd2STVUvjV8y1sKCkg1Wc_QvpZU3",
         identifier: identifierFix[0].id,

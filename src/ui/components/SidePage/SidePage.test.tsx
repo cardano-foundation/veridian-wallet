@@ -59,10 +59,14 @@ describe("Side Page: wallet connect", () => {
       },
       isOnline: true,
     },
-    profilesCache: profileCacheFixData,
-    walletConnectionsCache: {
-      pendingConnection: "pending-meerkat",
-      walletConnections: [],
+    profilesCache: {
+      ...profileCacheFixData,
+      pendingDAppConnection: {
+        meerkatId: "pending-meerkat",
+        name: "Test DApp",
+        selectedAid: "test-aid",
+        url: "http://test.com",
+      },
     },
     biometricsCache: {
       enabled: false,
@@ -121,8 +125,13 @@ describe("Side Page: incoming request", () => {
         isPaused: false,
       },
     },
-    profilesCache: profileCacheFixData,
-    walletConnectionsCache: {},
+    profilesCache: {
+      ...profileCacheFixData,
+      connectedDApp: null,
+      pendingDAppConnection: null,
+      isConnectingToDApp: false,
+      showDAppConnect: false,
+    },
     biometricsCache: {
       enabled: false,
     },
