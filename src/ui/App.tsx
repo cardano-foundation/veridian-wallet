@@ -183,6 +183,31 @@ const App = () => {
     checkCompatibility();
   }, []);
 
+  // Fix for aria-hidden focus warning by blurring focused elements on hidden elements
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "attributes") {
+          const el = mutation.target as HTMLElement;
+          if (
+            (el.classList.contains("ion-page-hidden") ||
+              el.getAttribute("aria-hidden") === "true") &&
+            el.querySelector(":focus")
+          ) {
+            (el.querySelector(":focus") as HTMLElement).blur();
+          }
+        }
+      });
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class", "aria-hidden"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
   const renderContentByInitPhase = (initPhase: InitializationPhase) => {
     switch (initPhase) {
       case InitializationPhase.PHASE_ZERO:
