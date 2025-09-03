@@ -561,7 +561,8 @@ class MultiSigService extends AgentService {
         this.props.signifyClient,
         this.notificationStorage,
         notificationId,
-        NotificationRoute.MultiSigIcp
+        NotificationRoute.MultiSigIcp,
+        this.operationPendingStorage
       );
     } catch (error) {
       if (

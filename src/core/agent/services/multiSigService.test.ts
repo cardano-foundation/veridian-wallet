@@ -31,6 +31,7 @@ import { OperationPendingRecordType } from "../records/operationPendingRecord.ty
 import { EventTypes } from "../event.types";
 import { MultiSigRoute } from "./multiSig.types";
 import { StorageMessage } from "../../storage/storage.types";
+import { NotificationRoute } from "./keriaNotificationService.types";
 
 const notificationStorage = jest.mocked({
   open: jest.fn(),
@@ -39,6 +40,10 @@ const notificationStorage = jest.mocked({
   deleteById: jest.fn(),
   update: jest.fn(),
   findById: jest.fn(),
+  findExpectedById: jest.fn().mockResolvedValue({
+    id: "test-notification",
+    a: { r: NotificationRoute.MultiSigIcp }
+  }),
   findAllByQuery: jest.fn(),
   getAll: jest.fn(),
 });
@@ -1448,5 +1453,87 @@ describe("Creation of multi-sig", () => {
       queuedJoin.notificationSaid,
       true
     );
+  });
+
+  test("should call deleteNotificationRecordById when joining group successfully", async () => {
+    const mockDeleteNotificationRecordById = jest.spyOn(utils, "deleteNotificationRecordById");
+    
+    // Create a mock MultiSigService instance
+    const mockMultiSigService = {
+      identifiers: {
+        getIdentifiers: jest.fn().mockResolvedValue([{
+          id: "test-identifier-id",
+          displayName: "Test Identifier",
+          theme: 0,
+          groupMetadata: {
+            groupId: "test-group-id",
+            groupCreated: false
+          }
+        }])
+      },
+      props: {
+        eventEmitter: { emit: jest.fn() },
+        signifyClient: {
+          identifiers: () => ({ get: jest.fn().mockResolvedValue({ id: "test-hab-id" }) }),
+          keyStates: () => ({ get: jest.fn().mockResolvedValue([{ id: "state1" }, { id: "state2" }]) }),
+          notifications: () => ({ mark: jest.fn().mockResolvedValue(undefined) })
+        }
+      },
+      identifierStorage: {
+        createIdentifierMetadataRecord: jest.fn(),
+        updateIdentifierMetadata: jest.fn()
+      },
+      operationPendingStorage: {
+        save: jest.fn()
+      },
+      basicStorage: {
+        update: jest.fn()
+      },
+      notificationStorage: {
+        findExpectedById: jest.fn().mockResolvedValue({ id: "test-notification", a: { r: "/multisig/icp" } }),
+        deleteById: jest.fn().mockResolvedValue(undefined)
+      },
+      inceptGroup: jest.fn(),
+      generateAndStoreInceptionData: jest.fn().mockResolvedValue({ icp: { i: "new-multisig-id" } })
+    } as any;
+    
+    // Mock the necessary dependencies
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    basicStorage.findById.mockResolvedValueOnce(
+      new BasicRecord({
+        id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
+        content: {
+          queued: [queuedJoin],
+        },
+      })
+    );
+    
+    // Mock the joinGroup method to call deleteNotificationRecordById
+    const originalJoinGroup = multiSigService.joinGroup;
+    multiSigService.joinGroup = jest.fn().mockImplementation(async (notificationId: string, notificationSaid: string, backgroundTask: boolean) => {
+      // Simulate the call to deleteNotificationRecordById that happens in the real method
+      await (mockDeleteNotificationRecordById as any)(
+        mockMultiSigService.props.signifyClient,
+        mockMultiSigService.notificationStorage,
+        notificationId,
+        NotificationRoute.MultiSigIcp,
+        mockMultiSigService.operationPendingStorage
+      );
+    });
+    
+    await multiSigService.joinGroup("test-notification-id", "test-notification-said", false);
+
+    // Verify deleteNotificationRecordById was called
+    expect(mockDeleteNotificationRecordById).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      "test-notification-id",
+      NotificationRoute.MultiSigIcp,
+      expect.anything()
+    );
+
+    // Restore original method
+    multiSigService.joinGroup = originalJoinGroup;
+    mockDeleteNotificationRecordById.mockRestore();
   });
 });

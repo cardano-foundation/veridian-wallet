@@ -411,7 +411,8 @@ class IdentifierService extends AgentService {
           this.props.signifyClient,
           this.notificationStorage,
           notification.id,
-          notification.a.r as NotificationRoute
+          notification.a.r as NotificationRoute,
+          this.operationPendingStorage
         );
 
         this.props.eventEmitter.emit<NotificationRemovedEvent>({
@@ -436,7 +437,8 @@ class IdentifierService extends AgentService {
         this.props.signifyClient,
         this.notificationStorage,
         notification.id,
-        notification.a.r as NotificationRoute
+        notification.a.r as NotificationRoute,
+        this.operationPendingStorage
       );
 
       this.props.eventEmitter.emit<NotificationRemovedEvent>({
@@ -772,7 +774,8 @@ class IdentifierService extends AgentService {
       this.props.signifyClient,
       this.notificationStorage,
       notificationId,
-      noteRecord.route
+      noteRecord.route,
+      this.operationPendingStorage
     );
     this.props.eventEmitter.emit<NotificationRemovedEvent>({
       type: EventTypes.NotificationRemoved,

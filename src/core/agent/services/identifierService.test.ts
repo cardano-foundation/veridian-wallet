@@ -1311,6 +1311,58 @@ describe("Single sig service of agent", () => {
     );
   });
 
+  test("should call deleteNotificationRecordById when deleting identifier with notifications", async () => {
+    const mockDeleteNotificationRecordById = jest.spyOn(utils, "deleteNotificationRecordById");
+    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
+      ...identifierMetadataRecord,
+      groupMetadata: undefined,
+    });
+    identifierStorage.updateIdentifierMetadata = jest.fn();
+    PeerConnection.peerConnection.getConnectedDAppAddress = jest
+      .fn()
+      .mockReturnValue("");
+    PeerConnection.peerConnection.getConnectingIdentifier = jest
+      .fn()
+      .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
+    jest.spyOn(utils, "randomSalt").mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
+    
+    // Mock notifications that need to be cleaned up
+    const mockNotifications = [
+      {
+        id: "notification1",
+        a: { r: NotificationRoute.ExnIpexApply },
+        receivingPre: identifierMetadataRecord.id
+      },
+      {
+        id: "notification2", 
+        a: { r: NotificationRoute.ExnIpexGrant },
+        receivingPre: identifierMetadataRecord.id
+      }
+    ];
+    notificationStorage.findAllByQuery.mockResolvedValue(mockNotifications);
+
+    await identifierService.deleteIdentifier(identifierMetadataRecord.id);
+
+    // Verify deleteNotificationRecordById was called for each notification
+    expect(mockDeleteNotificationRecordById).toHaveBeenCalledTimes(2);
+    expect(mockDeleteNotificationRecordById).toHaveBeenCalledWith(
+      signifyClient,
+      notificationStorage,
+      "notification1",
+      NotificationRoute.ExnIpexApply,
+      operationPendingStorage
+    );
+    expect(mockDeleteNotificationRecordById).toHaveBeenCalledWith(
+      signifyClient,
+      notificationStorage,
+      "notification2",
+      NotificationRoute.ExnIpexGrant,
+      operationPendingStorage
+    );
+
+    mockDeleteNotificationRecordById.mockRestore();
+  });
+
   test("Should correctly sync identifiers, handling both group and non-group cases, initiator and not initiator", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     listIdentifiersMock
