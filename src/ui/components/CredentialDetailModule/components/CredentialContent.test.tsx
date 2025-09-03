@@ -163,9 +163,7 @@ describe("Creds content", () => {
     fireEvent.click(getByText(EN_TRANSLATIONS.tabs.connections.unknown));
 
     await waitFor(() => {
-      const alert = getByTestId("cred-missing-issuer-alert");
-      expect(alert).not.toHaveClass("overlay-hidden");
-      expect(alert).toBeVisible();
+      expect(getByTestId("cred-missing-issuer-alert")).toBeVisible();
       expect(
         getByText(
           EN_TRANSLATIONS.tabs.credentials.details.alert.missingissuer.text

@@ -206,7 +206,7 @@ describe("Forgot Passcode Page", () => {
     await waitFor(() => {
       expect(onCloseMock).toHaveBeenCalled();
     });
-  }, 10000);
+  });
 });
 
 describe("Forgot Password Page", () => {
