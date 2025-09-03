@@ -46,9 +46,10 @@ import { SqliteStorage } from "../storage/sqliteStorage";
 import { BaseRecord } from "../storage/storage.types";
 import { OperationPendingStorage } from "./records/operationPendingStorage";
 import { OperationPendingRecord } from "./records/operationPendingRecord";
-import { EventTypes, KeriaStatusChangedEvent } from "./event.types";
-import { isNetworkError, OnlineOnly, randomSalt } from "./services/utils";
+import { EventTypes, KeriaStatusChangedEvent, NotificationRemovedEvent } from "./event.types";
+import { deleteNotificationRecordById, isNetworkError, OnlineOnly, randomSalt } from "./services/utils";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
+import { NotificationRoute } from "./services/keriaNotificationService.types";
 
 const walletId = "idw";
 class Agent {

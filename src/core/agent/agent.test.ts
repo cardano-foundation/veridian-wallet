@@ -2,7 +2,11 @@ const stopPollingMock = jest.fn();
 const getAllIdentifiersMock = jest.fn();
 const getAllCredentialsMock = jest.fn();
 const getAllConnectionsMock = jest.fn();
-const getAllNotificationsMock = jest.fn();
+const mockNotificationStorage = {
+  getAll: jest.fn(),
+  findAllByQuery: jest.fn(),
+};
+mockNotificationStorage.getAll.mockResolvedValue([]);
 const updateIdentifierMock = jest.fn();
 const deleteCredentialMock = jest.fn().mockResolvedValue(undefined);
 const deleteContactMock = jest.fn().mockResolvedValue(undefined);
@@ -18,6 +22,7 @@ import { CoreEventEmitter } from "./event";
 import { EventTypes } from "./event.types";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
 import { IdentifierService } from "./services";
+import * as utils from "./services/utils";
 
 jest.mock("signify-ts", () => ({
   SignifyClient: jest.fn(),
@@ -37,6 +42,7 @@ jest.mock("../cardano/walletConnect/peerConnection", () => ({
     peerConnection: {
       getConnectedDAppAddress: jest.fn(),
       disconnectDApp: jest.fn(),
+      getConnectingIdentifier: jest.fn(),
     },
   },
 }));
@@ -57,11 +63,6 @@ jest.mock("bip39", () => ({
 
 const mockAgentServicesProps = {
   eventEmitter: eventEmitter,
-  signifyClient: {
-    identifiers: () => ({
-      update: jest.fn().mockResolvedValue(undefined)
-    })
-  }
 };
 
 const mockGetBranValue = "AEsI_2YqNsQlf8brzDJaP";
@@ -77,15 +78,19 @@ const mockConnectionService = {
   removeConnectionsPendingDeletion: jest.fn(),
   resolvePendingConnections: jest.fn(),
   syncKeriaContacts: jest.fn(),
+  deleteAllConnectionsForGroup: jest.fn(),
+  deleteAllConnectionsForIdentifier: jest.fn(),
 };
 const mockIdentifierService = {
   processIdentifiersPendingCreation: jest.fn(),
   removeIdentifiersPendingDeletion: jest.fn(),
   syncKeriaIdentifiers: jest.fn(),
+  deleteIdentifier: jest.fn(),
 };
 const mockCredentialService = {
   syncKeriaCredentials: jest.fn(),
   removeCredentialsPendingDeletion: jest.fn(),
+  deleteAllCredentialsForIdentifier: jest.fn(),
 };
 const mockMultiSigService = {
   processGroupsPendingCreation: jest.fn(),
@@ -94,17 +99,14 @@ const mockKeriaNotificationService = {
   stopPolling: stopPollingMock,
 };
 const mockIdentifierStorage = {
-  getAllIdentifiers: getAllIdentifiersMock,
-  updateIdentifierMetadata: jest.fn(),
+  getAllIdentifiers: jest.fn(),
+  getIdentifierMetadata: jest.fn(),
 };
 const mockCredentialStorage = {
-  getAllCredentialMetadata: getAllCredentialsMock,
+  getAllCredentialMetadata: jest.fn(),
 };
-const mockContactStorage = {
-  getAll: getAllConnectionsMock,
-};
-const mockNotificationStorage = {
-  getAll: getAllNotificationsMock,
+const mockConnectionStorage = {
+  getAll: jest.fn(),
 };
 
 const mockEntropy = "00000000000000000000000000000000";
@@ -687,8 +689,10 @@ describe("Agent setup and wiping", () => {
     (agent as any).keriaNotificationService = mockKeriaNotificationService;
     (agent as any).identifierStorage = mockIdentifierStorage;
     (agent as any).credentialStorage = mockCredentialStorage;
-    (agent as any).contactStorage = mockContactStorage;
+    (agent as any).contactStorage = mockConnectionStorage;
     (agent as any).notificationStorage = mockNotificationStorage;
+
+    jest.spyOn(utils, "randomSalt").mockReturnValue("my-salt");
 
     mockAgentUrls = {
       url: "http://127.0.0.1:3901",
@@ -701,12 +705,18 @@ describe("Agent setup and wiping", () => {
     PeerConnection.peerConnection.getConnectedDAppAddress = jest
       .fn()
       .mockReturnValue("");
-    getAllIdentifiersMock.mockResolvedValue([
+    mockIdentifierStorage.getAllIdentifiers.mockResolvedValue([]);
+    mockCredentialStorage.getAllCredentialMetadata.mockResolvedValue([
+      { id: "credential-id" },
+    ]);
+    mockConnectionStorage.getAll.mockResolvedValue([{ id: "connection-id" }]);
+    mockNotificationStorage.getAll.mockResolvedValue([
+      { id: "note-id", route: "/some/remote/route" },
+    ]);
+
+    mockIdentifierStorage.getAllIdentifiers.mockResolvedValue([
       { id: "identifier", displayName: "my-identifier" },
     ]);
-    getAllCredentialsMock.mockResolvedValue([{ id: "credential-id" }]);
-    getAllConnectionsMock.mockResolvedValue([{ id: "connection-id" }]);
-    getAllNotificationsMock.mockResolvedValue([{ id: "note-id" }]);
 
     await Agent.agent.deleteAccount();
 
@@ -726,10 +736,10 @@ describe("Agent setup and wiping", () => {
     PeerConnection.peerConnection.getConnectedDAppAddress = jest
       .fn()
       .mockReturnValue("meerkat-id");
-    getAllIdentifiersMock.mockResolvedValue([]);
+    mockIdentifierStorage.getAllIdentifiers.mockResolvedValue([]);
     getAllCredentialsMock.mockResolvedValue([]);
     getAllConnectionsMock.mockResolvedValue([]);
-    getAllNotificationsMock.mockResolvedValue([]);
+    mockNotificationStorage.getAll.mockResolvedValue([]);
 
     await agent.deleteAccount();
 
@@ -818,15 +828,13 @@ describe("Agent delete profile", () => {
       expect.anything(),
       expect.anything(),
       "note1",
-      "/some/route",
-      expect.anything()
+      "/some/route"
     );
     expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       "note2",
-      "/local/route",
-      expect.anything()
+      "/local/route"
     ); // Local notifications should not be deleted via signifyClient
     expect(
       PeerConnection.peerConnection.getConnectedDAppAddress
@@ -881,15 +889,13 @@ describe("Agent delete profile", () => {
       expect.anything(),
       expect.anything(),
       "group-note1",
-      "/some/route",
-      expect.anything()
+      "/some/route"
     );
     expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       "group-note2",
-      "/local/route",
-      expect.anything()
+      "/local/route"
     );
     expect(
       PeerConnection.peerConnection.getConnectedDAppAddress
@@ -903,6 +909,7 @@ describe("Agent delete profile", () => {
     );
   });
 });
+
 describe("Agent delete profile", () => {
   let agent: Agent;
 
@@ -966,15 +973,13 @@ describe("Agent delete profile", () => {
       expect.anything(),
       expect.anything(),
       "note1",
-      "/some/route",
-      expect.anything()
+      "/some/route"
     );
     expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       "note2",
-      "/local/route",
-      expect.anything()
+      "/local/route"
     ); // Local notifications should not be deleted via signifyClient
     expect(
       PeerConnection.peerConnection.getConnectedDAppAddress
@@ -1029,15 +1034,13 @@ describe("Agent delete profile", () => {
       expect.anything(),
       expect.anything(),
       "group-note1",
-      "/some/route",
-      expect.anything()
+      "/some/route"
     );
     expect(utils.deleteNotificationRecordById).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       "group-note2",
-      "/local/route",
-      expect.anything()
+      "/local/route"
     );
     expect(
       PeerConnection.peerConnection.getConnectedDAppAddress
@@ -1051,4 +1054,3 @@ describe("Agent delete profile", () => {
     );
   });
 });
-
