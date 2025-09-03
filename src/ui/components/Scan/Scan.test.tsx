@@ -189,7 +189,9 @@ describe("Scan", () => {
     });
 
     await waitFor(() => {
-      expect(getByTestId("action-button").getAttribute("disabled")).toBe(null);
+      expect(getByTestId("action-button").getAttribute("disabled")).toBe(
+        "false"
+      );
     });
 
     act(() => {

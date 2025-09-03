@@ -766,7 +766,7 @@ describe("Edit Connection Modal", () => {
 
     await waitFor(() => {
       const confirmBtn = getByTestId("action-button");
-      expect(confirmBtn).not.toBeDisabled();
+      expect(confirmBtn.getAttribute("disabled")).toBe("false");
     });
 
     act(() => {
