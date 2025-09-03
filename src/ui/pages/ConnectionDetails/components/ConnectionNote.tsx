@@ -29,10 +29,9 @@ const ConnectionNote = ({
 
   const hasErrorRef = useRef<boolean>();
   useEffect(() => {
-    // Always report the current error state on mount
     onErrorChange(id, hasError);
     hasErrorRef.current = hasError;
-  }, []); // Empty dependency array - runs only on mount
+  }, []);
 
   useEffect(() => {
     if (hasErrorRef.current !== hasError) {
@@ -41,10 +40,9 @@ const ConnectionNote = ({
     }
   }, [hasError, onErrorChange, id]);
 
-  // Also call onErrorChange on mount to ensure initial state is reported
   useEffect(() => {
     onErrorChange(id, hasError);
-  }, []); // Empty dependency array means this runs only on mount
+  }, []);
 
   const submitNoteChange = () => {
     onNoteDataChange({

@@ -188,25 +188,24 @@ describe("Edit Connection Modal", () => {
       ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
-    const { getByTestId, unmount, getByText, queryByText, getAllByText } =
-      render(
-        <Provider store={storeMocked}>
-          <EditConnectionsContainer
-            onConfirm={jest.fn()}
-            modalIsOpen={true}
-            setModalIsOpen={jest.fn()}
-            setNotes={jest.fn()}
-            notes={[
-              {
-                id: "1",
-                title: "Mock Note",
-                message: "Mock Note",
-              },
-            ]}
-            connectionDetails={connectionsFix[0]}
-          />
-        </Provider>
-      );
+    const { getByTestId, unmount, queryByText } = render(
+      <Provider store={storeMocked}>
+        <EditConnectionsContainer
+          onConfirm={jest.fn()}
+          modalIsOpen={true}
+          setModalIsOpen={jest.fn()}
+          setNotes={jest.fn()}
+          notes={[
+            {
+              id: "1",
+              title: "Mock Note",
+              message: "Mock Note",
+            },
+          ]}
+          connectionDetails={connectionsFix[0]}
+        />
+      </Provider>
+    );
 
     await waitFor(() => {
       expect(
@@ -457,35 +456,34 @@ describe("Edit Connection Modal", () => {
 
     const confirmFn = jest.fn();
 
-    const { getByTestId, getByText, queryByText, unmount, getAllByText } =
-      render(
-        <Provider store={storeMocked}>
-          <EditConnectionsContainer
-            onConfirm={confirmFn}
-            modalIsOpen={true}
-            setModalIsOpen={jest.fn()}
-            setNotes={jest.fn()}
-            notes={[
-              {
-                id: "temp-1",
-                title: "Note temp",
-                message: "Note message temp",
-              },
-              {
-                id: "1",
-                title: "Note 1",
-                message: "Note message 1",
-              },
-              {
-                id: "2",
-                title: "Note 1",
-                message: "Note message 1",
-              },
-            ]}
-            connectionDetails={connectionsFix[0]}
-          />
-        </Provider>
-      );
+    const { getByTestId, unmount } = render(
+      <Provider store={storeMocked}>
+        <EditConnectionsContainer
+          onConfirm={confirmFn}
+          modalIsOpen={true}
+          setModalIsOpen={jest.fn()}
+          setNotes={jest.fn()}
+          notes={[
+            {
+              id: "temp-1",
+              title: "Note temp",
+              message: "Note message temp",
+            },
+            {
+              id: "1",
+              title: "Note 1",
+              message: "Note message 1",
+            },
+            {
+              id: "2",
+              title: "Note 1",
+              message: "Note message 1",
+            },
+          ]}
+          connectionDetails={connectionsFix[0]}
+        />
+      </Provider>
+    );
 
     await waitFor(() => {
       expect(
@@ -667,7 +665,7 @@ describe("Edit Connection Modal", () => {
           notes={[
             {
               id: "1",
-              title: "A".repeat(65), // Exceeds 64 character limit
+              title: "A".repeat(65),
               message: "Valid message",
             },
           ]}

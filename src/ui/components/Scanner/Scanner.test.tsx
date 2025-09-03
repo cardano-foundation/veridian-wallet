@@ -273,9 +273,7 @@ describe("Scanner", () => {
     });
 
     await waitFor(() => {
-      expect(getByTestId("action-button").getAttribute("disabled")).toBe(
-        "false"
-      );
+      expect(getByTestId("action-button").getAttribute("disabled")).toBe(null);
     });
 
     act(() => {
@@ -314,9 +312,7 @@ describe("Scanner", () => {
     });
 
     await waitFor(() => {
-      expect(getByTestId("action-button").getAttribute("disabled")).toBe(
-        "false"
-      );
+      expect(getByTestId("action-button").getAttribute("disabled")).toBe(null);
     });
 
     act(() => {

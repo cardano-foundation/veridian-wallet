@@ -38,14 +38,8 @@ export const EditConnectionsContainer = ({
   const [alertDeleteNoteIsOpen, setAlertDeleteNoteIsOpen] = useState(false);
   const deleteNoteId = useRef("");
 
-  const {
-    hasErrors,
-    updateNoteError,
-    removeNoteError,
-    addNoteError,
-    recalculateErrors,
-    resetErrors,
-  } = useNoteErrors(updatedNotes);
+  const { hasErrors, updateNoteError, removeNoteError, addNoteError } =
+    useNoteErrors(updatedNotes);
 
   const connectionInfo: CardItem<RegularConnectionDetailsFull>[] = [
     {
@@ -60,11 +54,8 @@ export const EditConnectionsContainer = ({
   useEffect(() => {
     if (modalIsOpen) {
       setUpdatedNotes([...notes]);
-      // Note: resetErrors() is not called here anymore since useNoteErrors now initializes with correct error states
     }
   }, [modalIsOpen, notes]);
-
-  // Removed global validation - individual notes handle their own validation
 
   const confirm = async () => {
     try {
