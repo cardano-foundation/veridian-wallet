@@ -1,9 +1,14 @@
 ion-item.custom-input {
   --background: transparent;
   --border-width: 0;
+  --border-radius: 0.5rem;
   --inner-border-width: 0;
   --padding-start: 0;
   --inner-padding-end: 0;
+
+  ion-input {
+    --background: var(--ion-color-neutral-100);
+  }
 
   &.has-action {
     .input-label {
@@ -43,7 +48,7 @@ ion-item.custom-input {
     display: flex;
     width: 100%;
     border: 1px solid var(--ion-color-neutral-400);
-    border-radius: 8px;
+    border-radius: 0.5rem;
 
     &:focus-within {
       border-color: var(--ion-color-neutral-700);

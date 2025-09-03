@@ -10,6 +10,4 @@ const LOCAL_MIGRATIONS: LocalMigration[] = [
   DATA_V1201, // TS migration for connections per account (local part only)
 ];
 
-export {
-  LOCAL_MIGRATIONS
-};
+export { LOCAL_MIGRATIONS };

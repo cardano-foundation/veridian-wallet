@@ -8,7 +8,7 @@ import {
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { getPendingConnection } from "../../../../../store/reducers/walletConnectionsCache";
+import { getPendingDAppConnection } from "../../../../../store/reducers/profileCache";
 import { OptionModal } from "../../../../components/OptionsModal";
 import { ToastMsgType } from "../../../../globals/types";
 import { writeToClipboard } from "../../../../utils/clipboard";
@@ -26,7 +26,7 @@ const ConfirmConnectModal = ({
   onDeleteConnection,
 }: ConfirmConnectModalProps) => {
   const dispatch = useAppDispatch();
-  const pendingConnection = useAppSelector(getPendingConnection);
+  const pendingDAppConnection = useAppSelector(getPendingDAppConnection);
 
   const cardImg = connectionData?.iconB64 ? (
     <img
@@ -47,19 +47,19 @@ const ConfirmConnectModal = ({
     </div>
   );
 
-  const isConnecting =
-    !!pendingConnection &&
-    pendingConnection.meerkatId === connectionData?.meerkatId;
+  const isConnectingToDApp =
+    !!pendingDAppConnection &&
+    pendingDAppConnection.meerkatId === connectionData?.meerkatId;
   const dAppName = !connectionData?.name
     ? ellipsisText(connectionData?.meerkatId || "", 25)
     : connectionData?.name;
 
   const buttonTitle = i18n.t(
-    isConnecting
+    isConnectingToDApp
       ? "connectdapp.connectionhistory.confirmconnect.connectingbtn"
       : isConnectModal
-        ? "connectdapp.connectionhistory.confirmconnect.connectbtn"
-        : "connectdapp.connectionhistory.confirmconnect.disconnectbtn"
+      ? "connectdapp.connectionhistory.confirmconnect.connectbtn"
+      : "connectdapp.connectionhistory.confirmconnect.disconnectbtn"
   );
 
   const meerkatId = connectionData?.meerkatId
@@ -109,7 +109,7 @@ const ConfirmConnectModal = ({
       >
         {dAppName}
       </h3>
-      {!isConnecting && (
+      {!isConnectingToDApp && (
         <p
           data-testid="connect-wallet-indetifier-name"
           className="confirm-modal-name"
@@ -117,7 +117,7 @@ const ConfirmConnectModal = ({
           {connectionData?.url}
         </p>
       )}
-      {!isConnecting && connectionData?.name && (
+      {!isConnectingToDApp && connectionData?.name && (
         <div
           onClick={() => {
             if (!connectionData?.meerkatId) return;
@@ -131,7 +131,7 @@ const ConfirmConnectModal = ({
           <IonIcon icon={copyOutline} />
         </div>
       )}
-      {isConnecting && (
+      {isConnectingToDApp && (
         <IonChip className="pending-chip">
           <IonIcon
             data-testid="pending-chip"
@@ -144,7 +144,7 @@ const ConfirmConnectModal = ({
         </IonChip>
       )}
       <IonButton
-        disabled={isConnecting}
+        disabled={isConnectingToDApp}
         className={confirmClass}
         data-testid="confirm-connect-btn"
         onClick={confirm}

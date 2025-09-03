@@ -6,16 +6,14 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
-
 import { KeriaNotification } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { CredentialStatus } from "../../../../../../core/agent/services/credentialService.types";
 import { KeyStoreKeys, SecureStorage } from "../../../../../../core/storage";
 import EN_TRANSLATIONS from "../../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../../routes/paths";
-import { connectionsForNotifications } from "../../../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../../__fixtures__/credRequestFix";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
-import { filteredIdentifierMapFix } from "../../../../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
 import {
   formatShortDate,
@@ -90,9 +88,7 @@ const initialState = {
       passcodeIsSet: true,
     },
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
-  },
+
   profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
@@ -101,8 +97,38 @@ const initialState = {
 
 describe("Credential request - choose request", () => {
   test("Render full active credentials & empty revoked tab", async () => {
+    // Seed the profile's connections so the component can resolve connection labels
+    const seededConns = connectionsForNotificationsValues.map((c: any) => ({
+      id: c.id,
+      label: c.label,
+      createdAtUTC: c.connectionDate,
+      status: c.status,
+    }));
+
+    const seededProfilesCache = {
+      ...profileCacheFixData,
+      profiles: {
+        ...profileCacheFixData.profiles,
+        ...(profileCacheFixData.defaultProfile
+          ? {
+              [profileCacheFixData.defaultProfile as string]: {
+                ...profileCacheFixData.profiles[
+                  profileCacheFixData.defaultProfile as string
+                ],
+                connections: [
+                  ...(profileCacheFixData.profiles[
+                    profileCacheFixData.defaultProfile as string
+                  ]?.connections || []),
+                  ...seededConns,
+                ],
+              },
+            }
+          : {}),
+      },
+    };
+
     const storeMocked = {
-      ...makeTestStore(initialState),
+      ...makeTestStore({ ...initialState, profilesCache: seededProfilesCache }),
       dispatch: dispatchMock,
     };
 
@@ -142,7 +168,7 @@ describe("Credential request - choose request", () => {
     ).toBeVisible();
 
     expect(
-      getAllByText(Object.values(connectionsForNotifications)[0].label).length
+      getAllByText(connectionsForNotificationsValues[0].label).length
     ).toBe(2);
 
     expect(
@@ -235,9 +261,7 @@ describe("Credential request - choose request", () => {
         },
         isOnline: true,
       },
-      connectionsCache: {
-        connections: connectionsForNotifications,
-      },
+
       profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
@@ -372,9 +396,7 @@ describe("Credential request - choose request", () => {
         },
       },
       profilesCache: profileCacheFixData,
-      connectionsCache: {
-        connections: connectionsForNotifications,
-      },
+
       biometricsCache: {
         enabled: false,
       },
@@ -482,9 +504,7 @@ describe("Credential request - choose request", () => {
       },
     },
     profilesCache: profileCacheFixData,
-    connectionsCache: {
-      connections: connectionsForNotifications,
-    },
+
     biometricsCache: {
       enabled: false,
     },

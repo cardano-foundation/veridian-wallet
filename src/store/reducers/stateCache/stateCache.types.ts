@@ -2,7 +2,7 @@ import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
 import { PeerConnectSigningEvent } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { OperationType, ToastMsgType } from "../../../ui/globals/types";
-import { ConnectionData } from "../profileCache";
+import { DAppConnection } from "../profileCache";
 
 interface PayloadData<T = any> {
   [key: string]: T;
@@ -36,7 +36,7 @@ enum IncomingRequestType {
 type PeerConnectSigningEventRequest = {
   type: IncomingRequestType.PEER_CONNECT_SIGN;
   signTransaction: PeerConnectSigningEvent;
-  peerConnection: ConnectionData;
+  peerConnection: DAppConnection;
 };
 
 type IncomingRequestProps = PeerConnectSigningEventRequest;
@@ -50,6 +50,13 @@ interface QueueProps<T> {
 interface ToastStackItem {
   id: string;
   message: ToastMsgType;
+}
+
+interface PendingJoinGroupMetadata {
+  isPendingJoinGroup: boolean;
+  groupId: string;
+  groupName: string;
+  initiatorName: string | null;
 }
 
 interface StateCacheProps {
@@ -67,6 +74,7 @@ interface StateCacheProps {
   forceInitApp?: number;
   showLoading?: boolean;
   isSetupProfile?: boolean;
+  pendingJoinGroupMetadata: PendingJoinGroupMetadata | null;
 }
 
 enum InitializationPhase {
@@ -83,6 +91,7 @@ export type {
   IncomingRequestProps,
   PayloadData,
   PeerConnectSigningEventRequest,
+  PendingJoinGroupMetadata,
   QueueProps,
   StateCacheProps,
   ToastStackItem,

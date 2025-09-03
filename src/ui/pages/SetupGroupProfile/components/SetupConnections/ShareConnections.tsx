@@ -7,7 +7,7 @@ import {
   IonList,
   IonSpinner,
 } from "@ionic/react";
-import { shareOutline, trashOutline } from "ionicons/icons";
+import { exitOutline, shareOutline, trashOutline } from "ionicons/icons";
 import { useState } from "react";
 import { QRCode } from "react-qrcode-logo";
 import { useParams } from "react-router-dom";
@@ -77,6 +77,7 @@ const ShareConnections = ({ group, oobi, profile }: SetupConnectionsProps) => {
   const closeAlert = () => setAlertDeleteOpen(false);
 
   const isPending = profile?.creationStatus === CreationStatus.PENDING;
+  const isInitiator = profile?.groupMetadata?.groupInitiator;
 
   return (
     <div className="setup-members-content">
@@ -168,23 +169,49 @@ const ShareConnections = ({ group, oobi, profile }: SetupConnectionsProps) => {
           <IonIcon
             slot="icon-only"
             size="small"
-            icon={trashOutline}
+            icon={isInitiator ? trashOutline : exitOutline}
             color="primary"
           />
-          {i18n.t("setupgroupprofile.setupmembers.delete.button")}
+          {isInitiator
+            ? i18n.t(
+                "setupgroupprofile.setupmembers.actions.initiator.delete.button"
+              )
+            : i18n.t(
+                "setupgroupprofile.setupmembers.actions.joiner.leave.button"
+              )}
         </IonButton>
       </div>
       <Alert
         isOpen={alertDeleteOpen}
         setIsOpen={setAlertDeleteOpen}
         dataTestId="alert-confirm-identifier-delete-details"
-        headerText={i18n.t("setupgroupprofile.setupmembers.delete.alert.title")}
-        confirmButtonText={`${i18n.t(
-          "setupgroupprofile.setupmembers.delete.alert.confirm"
-        )}`}
-        cancelButtonText={`${i18n.t(
-          "setupgroupprofile.setupmembers.delete.alert.cancel"
-        )}`}
+        headerText={
+          isInitiator
+            ? i18n.t(
+                "setupgroupprofile.setupmembers.actions.initiator.delete.alert.title"
+              )
+            : i18n.t(
+                "setupgroupprofile.setupmembers.actions.joiner.leave.alert.title"
+              )
+        }
+        confirmButtonText={`${
+          isInitiator
+            ? i18n.t(
+                "setupgroupprofile.setupmembers.actions.initiator.delete.alert.confirm"
+              )
+            : i18n.t(
+                "setupgroupprofile.setupmembers.actions.joiner.leave.alert.confirm"
+              )
+        }`}
+        cancelButtonText={`${
+          isInitiator
+            ? i18n.t(
+                "setupgroupprofile.setupmembers.actions.initiator.delete.alert.cancel"
+              )
+            : i18n.t(
+                "setupgroupprofile.setupmembers.actions.joiner.leave.alert.cancel"
+              )
+        }`}
         actionConfirm={() => setVerifyIsOpen(true)}
         actionCancel={closeAlert}
         actionDismiss={closeAlert}

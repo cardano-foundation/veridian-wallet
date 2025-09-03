@@ -6,6 +6,8 @@ import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
   MiscRecordId,
+  MultisigConnectionDetails,
+  RegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import {
   AcdcStateChangedEvent,
@@ -30,9 +32,7 @@ import {
   setConnectionsCache,
   setMultisigConnectionsCache,
   updateOrAddConnectionCache,
-} from "../../../store/reducers/connectionsCache";
-import {
-  ConnectionData,
+  DAppConnection,
   Profile,
   setCredsArchivedCache,
   setCurrentProfile,
@@ -41,6 +41,10 @@ import {
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
   updateRecentProfiles,
+  getConnectedDApp,
+  setConnectedDApp,
+  setPendingDAppConnection,
+  setIsConnectingToDApp,
 } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
@@ -55,6 +59,7 @@ import {
   setIsOnline,
   setIsSetupProfile,
   setPauseQueueIncomingRequest,
+  setPendingJoinGroupMetadata,
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert,
@@ -62,6 +67,7 @@ import {
 import {
   IncomingRequestType,
   InitializationPhase,
+  PendingJoinGroupMetadata,
 } from "../../../store/reducers/stateCache/stateCache.types";
 import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
@@ -71,11 +77,6 @@ import {
   setFavouritesCredsCache,
 } from "../../../store/reducers/viewTypeCache";
 import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
-import {
-  getConnectedWallet,
-  setConnectedWallet,
-  setPendingConnection,
-} from "../../../store/reducers/walletConnectionsCache";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { useProfile } from "../../hooks/useProfile";
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
@@ -112,8 +113,11 @@ const connectionStateChangedHandler = async (
     dispatch(setToastMsg(ToastMsgType.CONNECTION_REQUEST_PENDING));
   } else {
     // @TODO - foconnor: Should be able to just update Redux without fetching from DB.
-    const connectionRecordId = event.payload.connectionId!;
-    const identifier = event.payload.identifier!;
+    const connectionRecordId = event.payload.connectionId;
+    const identifier = event.payload.identifier;
+    if (!connectionRecordId || !identifier) {
+      return;
+    }
     const connectionDetails =
       await Agent.agent.connections.getConnectionShortDetailById(
         connectionRecordId,
@@ -151,7 +155,7 @@ const peerConnectRequestSignChangeHandler = async (
     );
 
   if (peerConnectionRecord) {
-    const peerConnection: ConnectionData = {
+    const peerConnection: DAppConnection = {
       meerkatId: peerConnectionRecord.meerkatId,
       name: peerConnectionRecord.name,
       url: peerConnectionRecord.url,
@@ -174,20 +178,25 @@ const peerConnectedChangeHandler = async (
   event: PeerConnectedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  const existingConnections =
-    await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
+  try {
+    const existingConnections =
+      await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
 
-  dispatch(updatePeerConnectionsFromCore(existingConnections));
-  const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
-  const connectedWallet = existingConnections.find(
-    (connection) =>
-      `${connection.meerkatId}:${connection.selectedAid}` === newConnectionId
-  );
-  if (connectedWallet) {
-    dispatch(setConnectedWallet(connectedWallet));
+    dispatch(updatePeerConnectionsFromCore(existingConnections));
+    const newConnectionId = `${event.payload.dAppAddress}:${event.payload.identifier}`;
+    const connectedWallet = existingConnections.find(
+      (connection) =>
+        `${connection.meerkatId}:${connection.selectedAid}` === newConnectionId
+    );
+    if (connectedWallet) {
+      dispatch(setConnectedDApp(connectedWallet));
+    }
+    dispatch(setPendingDAppConnection(null));
+    dispatch(setIsConnectingToDApp(false));
+    dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
+  } catch (error) {
+    dispatch(setIsConnectingToDApp(false));
   }
-  dispatch(setPendingConnection(null));
-  dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
 };
 
 const peerDisconnectedChangeHandler = async (
@@ -201,7 +210,8 @@ const peerDisconnectedChangeHandler = async (
     connectedWalletId &&
     connectedWalletId.includes(event.payload.dAppAddress)
   ) {
-    dispatch(setConnectedWallet(null));
+    dispatch(setConnectedDApp(null));
+    dispatch(setIsConnectingToDApp(false));
     dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
   }
 };
@@ -210,7 +220,8 @@ const peerConnectionBrokenChangeHandler = async (
   event: PeerConnectionBrokenEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  dispatch(setConnectedWallet(null));
+  dispatch(setConnectedDApp(null));
+  dispatch(setIsConnectingToDApp(false));
   dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
 };
 
@@ -218,7 +229,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
   const isOnline = useAppSelector(getIsOnline);
   const dispatch = useAppDispatch();
   const authentication = useAppSelector(getAuthentication);
-  const connectedWallet = useAppSelector(getConnectedWallet);
+  const connectedDApp = useAppSelector(getConnectedDApp);
   const initializationPhase = useAppSelector(getInitializationPhase);
   const recoveryCompleteNoInterruption = useAppSelector(
     getRecoveryCompleteNoInterruption
@@ -264,6 +275,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   useEffect(() => {
     initApp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forceInitApp]);
 
   useEffect(() => {
@@ -294,12 +306,12 @@ const AppWrapper = (props: { children: ReactNode }) => {
   }, [authentication.loggedIn, initializationPhase]);
 
   useEffect(() => {
-    if (!connectedWallet?.meerkatId) {
+    if (!connectedDApp?.meerkatId) {
       return;
     }
 
     const eventHandler = async (event: PeerDisconnectedEvent) => {
-      peerDisconnectedChangeHandler(event, connectedWallet.meerkatId, dispatch);
+      peerDisconnectedChangeHandler(event, connectedDApp.meerkatId, dispatch);
     };
 
     PeerConnection.peerConnection.onPeerDisconnectedStateChanged(eventHandler);
@@ -309,12 +321,13 @@ const AppWrapper = (props: { children: ReactNode }) => {
         eventHandler
       );
     };
-  }, [connectedWallet?.meerkatId, dispatch]);
+  }, [connectedDApp?.meerkatId, dispatch]);
 
   useEffect(() => {
     if (recoveryCompleteNoInterruption) {
       loadDb();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recoveryCompleteNoInterruption]);
 
   useEffect(() => {
@@ -349,6 +362,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (authentication.ssiAgentUrl && !authentication.firstAppLaunch) {
       startAgent();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authentication.ssiAgentUrl, authentication.firstAppLaunch]);
 
   const loadDatabase = async () => {
@@ -398,12 +412,16 @@ const AppWrapper = (props: { children: ReactNode }) => {
             profileIdentifier,
             profileCredentials,
             profileArchivedCredentials,
+            profileConnections,
+            profileMultisigConnections,
             profilePeerConnections,
             profileNotifications,
           } = filterProfileData(
             identifiersDict,
             credsCache,
             credsArchivedCache,
+            allConnections as RegularConnectionDetails[],
+            allMultisigConnections as MultisigConnectionDetails[],
             storedPeerConnections,
             notifications,
             identifier.id
@@ -411,9 +429,8 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
           acc[identifier.id] = {
             identity: profileIdentifier,
-            // TODO: add filtering for connections once we have connections per account merged
-            connections: Object.values(allConnections),
-            multisigConnections: Object.values(allMultisigConnections),
+            connections: profileConnections,
+            multisigConnections: profileMultisigConnections,
             peerConnections: profilePeerConnections,
             credentials: profileCredentials,
             archivedCredentials: profileArchivedCredentials,
@@ -464,8 +481,14 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setProfiles(profiles));
       dispatch(setCurrentProfile(currentProfileAid));
       dispatch(setCredsArchivedCache(credsArchivedCache));
-      dispatch(setConnectionsCache(allConnections));
-      dispatch(setMultisigConnectionsCache(allMultisigConnections));
+      dispatch(
+        setConnectionsCache(allConnections as RegularConnectionDetails[])
+      );
+      dispatch(
+        setMultisigConnectionsCache(
+          allMultisigConnections as MultisigConnectionDetails[]
+        )
+      );
 
       // TODO: set current profile data
     } catch (e) {
@@ -589,6 +612,38 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const finishSetupBiometrics = await Agent.agent.basicStorage.findById(
         MiscRecordId.BIOMETRICS_SETUP
       );
+
+      const pendingJoinGroupMetadata = await Agent.agent.basicStorage.findById(
+        MiscRecordId.PENDING_JOIN_GROUP_METADATA
+      );
+
+      const isPendingJoinGroupMetadata = (
+        data: unknown
+      ): data is PendingJoinGroupMetadata => {
+        return (
+          typeof data === "object" &&
+          data !== null &&
+          typeof (data as Record<string, unknown>).isPendingJoinGroup ===
+            "boolean" &&
+          typeof (data as Record<string, unknown>).groupId === "string" &&
+          typeof (data as Record<string, unknown>).groupName === "string"
+        );
+      };
+
+      if (pendingJoinGroupMetadata) {
+        const content = pendingJoinGroupMetadata.content;
+
+        if (isPendingJoinGroupMetadata(content)) {
+          dispatch(
+            setPendingJoinGroupMetadata({
+              isPendingJoinGroup: content.isPendingJoinGroup,
+              groupId: content.groupId,
+              groupName: content.groupName,
+              initiatorName: content.initiatorName || null,
+            })
+          );
+        }
+      }
 
       dispatch(
         setAuthentication({

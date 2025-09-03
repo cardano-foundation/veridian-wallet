@@ -69,9 +69,6 @@ describe("Creds content", () => {
         },
       },
       profilesCache: profileCacheFixData,
-      connectionsCache: {
-        multisigConnections: {},
-      },
       biometricsCache: {
         enabled: false,
       },
@@ -187,11 +184,7 @@ describe("Creds content", () => {
         toastMsgs: [],
       },
       profilesCache: profileCacheFixData,
-      connectionsCache: {
-        multisigConnections: {
-          [connectionDetailsFix.id]: connectionDetailsFix,
-        },
-      },
+
       biometricsCache: {
         enabled: false,
       },

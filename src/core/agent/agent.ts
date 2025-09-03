@@ -46,19 +46,9 @@ import { SqliteStorage } from "../storage/sqliteStorage";
 import { BaseRecord } from "../storage/storage.types";
 import { OperationPendingStorage } from "./records/operationPendingStorage";
 import { OperationPendingRecord } from "./records/operationPendingRecord";
-import {
-  EventTypes,
-  KeriaStatusChangedEvent,
-  NotificationRemovedEvent,
-} from "./event.types";
-import {
-  isNetworkError,
-  OnlineOnly,
-  randomSalt,
-  deleteNotificationRecordById,
-} from "./services/utils";
+import { EventTypes, KeriaStatusChangedEvent } from "./event.types";
+import { isNetworkError, OnlineOnly, randomSalt } from "./services/utils";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
-import { NotificationRoute } from "./services/keriaNotificationService.types";
 
 const walletId = "idw";
 class Agent {
@@ -541,19 +531,9 @@ class Agent {
     this.peerConnectionPairStorage = new PeerConnectionPairStorage(
       this.getStorageService<PeerConnectionPairRecord>(this.storageSession)
     );
-
-    // Force initialization of services
-    this.identifiers;
-    this.multiSigs;
-    this.ipexCommunications;
-    this.connections;
-    this.credentials;
-    this.keriaNotifications;
-    this.auth;
-
     this.connections.onConnectionRemoved();
     this.connections.onConnectionAdded();
-    this.identifiers.onIdentifierRemoved((event) => this.deleteProfile(event.payload.id));
+    this.identifiers.onIdentifierRemoved();
     this.credentials.onCredentialRemoved();
   }
 

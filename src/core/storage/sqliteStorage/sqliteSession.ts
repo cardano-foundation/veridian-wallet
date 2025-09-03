@@ -153,7 +153,9 @@ class SqliteSession {
       if (!this.sessionInstance) {
         throw new Error("Session instance not available");
       }
-      this.localMigrationManager = new LocalMigrationManager(this.sessionInstance);
+      this.localMigrationManager = new LocalMigrationManager(
+        this.sessionInstance
+      );
     }
 
     await this.localMigrationManager.executeLocalMigrations(currentVersion);

@@ -94,8 +94,13 @@ class IdentifierService extends AgentService {
     this.credentials = credentials;
   }
 
-  onIdentifierRemoved(callback: (event: IdentifierRemovedEvent) => void) {
-    this.props.eventEmitter.on(EventTypes.IdentifierRemoved, callback);
+  onIdentifierRemoved() {
+    this.props.eventEmitter.on(
+      EventTypes.IdentifierRemoved,
+      (data: IdentifierRemovedEvent) => {
+        this.deleteIdentifier(data.payload.id);
+      }
+    );
   }
 
   onIdentifierAdded(callback: (event: IdentifierAddedEvent) => void) {
@@ -365,6 +370,15 @@ class IdentifierService extends AgentService {
     const metadata = await this.identifierStorage.getIdentifierMetadata(
       identifier
     );
+    if (metadata.groupMetadata) {
+      await this.connections.deleteAllConnectionsForGroup(
+        metadata.groupMetadata.groupId
+      );
+    } else {
+      await this.connections.deleteAllConnectionsForIdentifier(identifier);
+    }
+
+    await this.credentials.deleteAllCredentialsForIdentifier(identifier);
 
     if (metadata.groupMemberPre) {
       const localMember = await this.identifierStorage.getIdentifierMetadata(

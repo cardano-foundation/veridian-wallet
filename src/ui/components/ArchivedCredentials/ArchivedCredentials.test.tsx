@@ -68,10 +68,6 @@ const initialStateEmpty = {
   biometricsCache: {
     enabled: false,
   },
-  connectionsCache: {
-    connections: {},
-    multisigConnections: {},
-  },
   profilesCache: profileCacheFixData,
 };
 
@@ -278,13 +274,25 @@ describe("Archived and revoked credentials", () => {
           passcodeIsSet: true,
         },
       },
-      profilesCache: profileCacheFixData,
+      profilesCache: {
+        ...profileCacheFixData,
+        profiles: {
+          ...profileCacheFixData.profiles,
+          ...(profileCacheFixData.defaultProfile
+            ? {
+                [profileCacheFixData.defaultProfile as string]: {
+                  ...profileCacheFixData.profiles[
+                    profileCacheFixData.defaultProfile as string
+                  ],
+                  connections: [],
+                  multisigConnections: [],
+                },
+              }
+            : {}),
+        },
+      },
       biometricsCache: {
         enabled: false,
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
       },
     };
 

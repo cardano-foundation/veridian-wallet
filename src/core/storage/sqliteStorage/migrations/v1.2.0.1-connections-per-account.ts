@@ -22,7 +22,6 @@ export const DATA_V1201: TsMigration = {
       );
 
     if (!identifiers || identifiers.length === 0) {
-      // eslint-disable-next-line no-console
       console.log(
         "No identifiers found in local database, deleting all connections"
       );
@@ -74,7 +73,6 @@ export const DATA_V1201: TsMigration = {
 
       if (!connectionData.sharedIdentifier) {
         if (!connectionData.groupId) {
-          // eslint-disable-next-line no-console
           console.log("No groupId found for connection, skipping migration");
           continue;
         }

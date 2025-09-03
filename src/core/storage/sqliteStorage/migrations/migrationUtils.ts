@@ -7,9 +7,10 @@
  * @param itemRecord The record containing tags to insert
  * @returns Array of SQL statements with values for inserting tags
  */
-export function createInsertItemTagsStatements(
-  itemRecord: { id: string; tags?: Record<string, unknown> }
-): { statement: string; values?: unknown[] }[] {
+export function createInsertItemTagsStatements(itemRecord: {
+  id: string;
+  tags?: Record<string, unknown>;
+}): { statement: string; values?: unknown[] }[] {
   const statements: { statement: string; values?: unknown[] }[] = [];
   const statement =
     "INSERT INTO items_tags (item_id, name, value, type) VALUES (?,?,?,?)";
@@ -43,7 +44,10 @@ export function createInsertItemTagsStatements(
  * @param record The record to insert
  * @returns SQL statement with values for inserting the item
  */
-export function createInsertItemStatement(record: { id: string; type: string }): {
+export function createInsertItemStatement(record: {
+  id: string;
+  type: string;
+}): {
   statement: string;
   values?: unknown[];
 } {

@@ -1,7 +1,7 @@
 import { IonModal } from "@ionic/react";
 import { i18n } from "../../../../../i18n";
 import { useAppSelector } from "../../../../../store/hooks";
-import { getMultisigConnectionsCache } from "../../../../../store/reducers/connectionsCache";
+import { getMultisigConnectionsCache } from "../../../../../store/reducers/profileCache";
 import { MemberAvatar } from "../../../Avatar";
 import { InfoCard } from "../../../InfoCard";
 import { ScrollablePageLayout } from "../../../layout/ScrollablePageLayout";
@@ -23,7 +23,9 @@ const IdentifierAttributeDetailModal = ({
   data,
   setViewType,
 }: IdentifierAttributeDetailModalProps) => {
-  const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
+  const multisignConnectionsCache = useAppSelector(
+    getMultisigConnectionsCache
+  ) as any[];
 
   const handleClose = () => {
     setOpen(false);
@@ -32,7 +34,9 @@ const IdentifierAttributeDetailModal = ({
   const renderContent = () => {
     let currentUserIndex = 0;
     const members = data.members?.map((member, index) => {
-      const memberConnection = multisignConnectionsCache[member];
+      const memberConnection = multisignConnectionsCache.find(
+        (c) => c.id === member
+      );
       let name = memberConnection?.label || member;
 
       if (!memberConnection?.label) {

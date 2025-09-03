@@ -10,11 +10,7 @@ import { MemoryRouter } from "react-router-dom";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
-import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
-import {
-  filteredIdentifierFix,
-  filteredIdentifierMapFix,
-} from "../../__fixtures__/filteredIdentifierFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { formatShortDate } from "../../utils/formatters";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
@@ -105,10 +101,8 @@ const initialStateFull = {
       favouriteIndex: 0,
     },
   },
-  connectionsCache: {
-    connections: connectionsFix,
-  },
-  profilesCache: profileCacheFixData,
+
+  // profilesCache intentionally provided per-test where needed; kept out of global initialState
   biometricsCache: {
     enabled: false,
   },
@@ -120,8 +114,30 @@ describe("Connections tab", () => {
   const dispatchMock = jest.fn();
 
   beforeEach(() => {
+    // Seed the default profile with connection fixtures so the UI renders
+    // connection items during tests that use the shared mockedStore.
+    const seededProfilesCache = {
+      ...profileCacheFixData,
+      profiles: {
+        ...profileCacheFixData.profiles,
+        ...(profileCacheFixData.defaultProfile
+          ? {
+              [profileCacheFixData.defaultProfile as string]: {
+                ...profileCacheFixData.profiles[
+                  profileCacheFixData.defaultProfile as string
+                ],
+                connections: connectionsFix,
+              },
+            }
+          : {}),
+      },
+    };
+
     mockedStore = {
-      ...makeTestStore(initialStateFull),
+      ...makeTestStore({
+        ...initialStateFull,
+        profilesCache: seededProfilesCache,
+      }),
       dispatch: dispatchMock,
     };
     verifySecretMock.mockResolvedValue(true);
@@ -152,9 +168,22 @@ describe("Connections tab", () => {
           },
         },
         seedPhraseCache: {},
-        profilesCache: profileCacheFixData,
-        connectionsCache: {
-          connections: [],
+        // empty connections moved into profilesCache for tests
+        profilesCache: {
+          ...profileCacheFixData,
+          profiles: {
+            ...profileCacheFixData.profiles,
+            ...(profileCacheFixData.defaultProfile
+              ? {
+                  [profileCacheFixData.defaultProfile as string]: {
+                    ...profileCacheFixData.profiles[
+                      profileCacheFixData.defaultProfile as string
+                    ],
+                    connections: [],
+                  },
+                }
+              : {}),
+          },
         },
         biometricsCache: {
           enabled: false,
@@ -195,9 +224,7 @@ describe("Connections tab", () => {
         },
       },
       profilesCache: profileCacheFixData,
-      connectionsCache: {
-        connections: [],
-      },
+
       biometricsCache: {
         enabled: false,
       },
@@ -249,14 +276,8 @@ describe("Connections tab", () => {
   });
 
   test("Search", async () => {
-    const dispatchMock = jest.fn();
-    const storeMocked = {
-      ...makeTestStore(initialStateFull),
-      dispatch: dispatchMock,
-    };
-
     const { getByTestId, getByText, queryByTestId } = render(
-      <Provider store={storeMocked}>
+      <Provider store={mockedStore}>
         <Connections />
       </Provider>
     );
@@ -331,15 +352,9 @@ describe("Connections tab", () => {
   });
 
   test("Remove pending connection alert", async () => {
-    const dispatchMock = jest.fn();
-    const storeMocked = {
-      ...makeTestStore(initialStateFull),
-      dispatch: dispatchMock,
-    };
-
     const { getByTestId, getByText, unmount } = render(
       <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
-        <Provider store={storeMocked}>
+        <Provider store={mockedStore}>
           <Connections />
         </Provider>
       </MemoryRouter>

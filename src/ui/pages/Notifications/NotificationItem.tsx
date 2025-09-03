@@ -17,7 +17,7 @@ import { useAppSelector } from "../../../store/hooks";
 import {
   getConnectionsCache,
   getMultisigConnectionsCache,
-} from "../../../store/reducers/connectionsCache";
+} from "../../../store/reducers/profileCache";
 import { FallbackIcon } from "../../components/FallbackIcon";
 import { timeDifference } from "../../utils/formatters";
 import { NotificationItemProps } from "./Notification.types";
@@ -27,11 +27,16 @@ const NotificationItem = ({
   onClick,
   onOptionButtonClick,
 }: NotificationItemProps) => {
-  const connectionsCache = useAppSelector(getConnectionsCache);
-  const multisigConnectionsCache = useAppSelector(getMultisigConnectionsCache);
+  const connectionsCache = useAppSelector(getConnectionsCache) as any[];
+  const multisigConnectionsCache = useAppSelector(
+    getMultisigConnectionsCache
+  ) as any[];
 
   const notificationLabelText = (() => {
-    const connectionName = connectionsCache?.[item.connectionId]?.label;
+    const connection = connectionsCache?.find(
+      (c) => c.id === item.connectionId
+    );
+    const connectionName = connection?.label;
 
     switch (item.a.r) {
       case NotificationRoute.ExnIpexGrant:
@@ -41,8 +46,8 @@ const NotificationItem = ({
       case NotificationRoute.MultiSigIcp:
         return t("tabs.notifications.tab.labels.multisigicp", {
           connection:
-            multisigConnectionsCache?.[item.connectionId]?.label ||
-            t("tabs.connections.unknown"),
+            multisigConnectionsCache?.find((c) => c.id === item.connectionId)
+              ?.label || t("tabs.connections.unknown"),
         });
       case NotificationRoute.ExnIpexApply: {
         if (
@@ -51,7 +56,9 @@ const NotificationItem = ({
           item.groupInitiatorPre
         ) {
           const initiator = item.groupInitiatorPre
-            ? multisigConnectionsCache[item.groupInitiatorPre].label
+            ? multisigConnectionsCache.find(
+                (c) => c.id === item.groupInitiatorPre
+              )?.label || t("tabs.connections.unknown")
             : t("tabs.connections.unknown");
           return t("tabs.notifications.tab.labels.exnipexapplyproposed", {
             connection: connectionName || t("tabs.connections.unknown"),

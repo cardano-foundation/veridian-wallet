@@ -2,11 +2,7 @@ const stopPollingMock = jest.fn();
 const getAllIdentifiersMock = jest.fn();
 const getAllCredentialsMock = jest.fn();
 const getAllConnectionsMock = jest.fn();
-const mockNotificationStorage = {
-  getAll: jest.fn(),
-  findAllByQuery: jest.fn(),
-};
-mockNotificationStorage.getAll.mockResolvedValue([]);
+const getAllNotificationsMock = jest.fn();
 const updateIdentifierMock = jest.fn();
 const deleteCredentialMock = jest.fn().mockResolvedValue(undefined);
 const deleteContactMock = jest.fn().mockResolvedValue(undefined);
@@ -22,7 +18,6 @@ import { CoreEventEmitter } from "./event";
 import { EventTypes } from "./event.types";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
 import { IdentifierService } from "./services";
-import * as utils from "./services/utils";
 
 jest.mock("signify-ts", () => ({
   SignifyClient: jest.fn(),
@@ -42,7 +37,6 @@ jest.mock("../cardano/walletConnect/peerConnection", () => ({
     peerConnection: {
       getConnectedDAppAddress: jest.fn(),
       disconnectDApp: jest.fn(),
-      getConnectingIdentifier: jest.fn(),
     },
   },
 }));
@@ -83,19 +77,15 @@ const mockConnectionService = {
   removeConnectionsPendingDeletion: jest.fn(),
   resolvePendingConnections: jest.fn(),
   syncKeriaContacts: jest.fn(),
-  deleteAllConnectionsForGroup: jest.fn(),
-  deleteAllConnectionsForIdentifier: jest.fn(),
 };
 const mockIdentifierService = {
   processIdentifiersPendingCreation: jest.fn(),
   removeIdentifiersPendingDeletion: jest.fn(),
   syncKeriaIdentifiers: jest.fn(),
-  deleteIdentifier: jest.fn(),
 };
 const mockCredentialService = {
   syncKeriaCredentials: jest.fn(),
   removeCredentialsPendingDeletion: jest.fn(),
-  deleteAllCredentialsForIdentifier: jest.fn(),
 };
 const mockMultiSigService = {
   processGroupsPendingCreation: jest.fn(),
@@ -104,15 +94,17 @@ const mockKeriaNotificationService = {
   stopPolling: stopPollingMock,
 };
 const mockIdentifierStorage = {
-  getAllIdentifiers: jest.fn(),
-  getIdentifierMetadata: jest.fn(),
+  getAllIdentifiers: getAllIdentifiersMock,
   updateIdentifierMetadata: jest.fn(),
 };
 const mockCredentialStorage = {
-  getAllCredentialMetadata: jest.fn(),
+  getAllCredentialMetadata: getAllCredentialsMock,
 };
-const mockConnectionStorage = {
-  getAll: jest.fn(),
+const mockContactStorage = {
+  getAll: getAllConnectionsMock,
+};
+const mockNotificationStorage = {
+  getAll: getAllNotificationsMock,
 };
 
 const mockEntropy = "00000000000000000000000000000000";
@@ -695,10 +687,8 @@ describe("Agent setup and wiping", () => {
     (agent as any).keriaNotificationService = mockKeriaNotificationService;
     (agent as any).identifierStorage = mockIdentifierStorage;
     (agent as any).credentialStorage = mockCredentialStorage;
-    (agent as any).contactStorage = mockConnectionStorage;
+    (agent as any).contactStorage = mockContactStorage;
     (agent as any).notificationStorage = mockNotificationStorage;
-
-    jest.spyOn(utils, "randomSalt").mockReturnValue("my-salt");
 
     mockAgentUrls = {
       url: "http://127.0.0.1:3901",
@@ -711,18 +701,12 @@ describe("Agent setup and wiping", () => {
     PeerConnection.peerConnection.getConnectedDAppAddress = jest
       .fn()
       .mockReturnValue("");
-    mockIdentifierStorage.getAllIdentifiers.mockResolvedValue([]);
-    mockCredentialStorage.getAllCredentialMetadata.mockResolvedValue([
-      { id: "credential-id" },
-    ]);
-    mockConnectionStorage.getAll.mockResolvedValue([{ id: "connection-id" }]);
-    mockNotificationStorage.getAll.mockResolvedValue([
-      { id: "note-id", route: "/some/remote/route" },
-    ]);
-
-    mockIdentifierStorage.getAllIdentifiers.mockResolvedValue([
+    getAllIdentifiersMock.mockResolvedValue([
       { id: "identifier", displayName: "my-identifier" },
     ]);
+    getAllCredentialsMock.mockResolvedValue([{ id: "credential-id" }]);
+    getAllConnectionsMock.mockResolvedValue([{ id: "connection-id" }]);
+    getAllNotificationsMock.mockResolvedValue([{ id: "note-id" }]);
 
     await Agent.agent.deleteAccount();
 
@@ -742,10 +726,10 @@ describe("Agent setup and wiping", () => {
     PeerConnection.peerConnection.getConnectedDAppAddress = jest
       .fn()
       .mockReturnValue("meerkat-id");
-    mockIdentifierStorage.getAllIdentifiers.mockResolvedValue([]);
+    getAllIdentifiersMock.mockResolvedValue([]);
     getAllCredentialsMock.mockResolvedValue([]);
     getAllConnectionsMock.mockResolvedValue([]);
-    mockNotificationStorage.getAll.mockResolvedValue([]);
+    getAllNotificationsMock.mockResolvedValue([]);
 
     await agent.deleteAccount();
 
