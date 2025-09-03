@@ -482,7 +482,6 @@ describe("Setup Connection", () => {
     history.push(
       RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
     );
-
     const { getByText, getByTestId, rerender, findByText } = render(
       <Provider store={makeTestStore(initialState)}>
         <IonReactMemoryRouter history={history}>

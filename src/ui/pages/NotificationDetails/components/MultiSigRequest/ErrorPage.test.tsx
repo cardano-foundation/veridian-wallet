@@ -6,10 +6,7 @@ import { Provider } from "react-redux";
 import { CreationStatus } from "../../../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
-import {
-  connectionsFix,
-  connectionsForNotifications,
-} from "../../../../__fixtures__/connectionsFix";
+import { connectionsFix } from "../../../../__fixtures__/connectionsFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../../../utils/makeTestStore";
@@ -54,9 +51,6 @@ const initialState = {
       queues: [],
       isPaused: false,
     },
-  },
-  connectionsCache: {
-    multisigConnections: connectionsForNotifications,
   },
   profilesCache: {
     ...profileCacheFixData,

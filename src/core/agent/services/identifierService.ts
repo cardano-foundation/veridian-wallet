@@ -13,6 +13,7 @@ import {
 } from "../agent.types";
 import {
   ExchangeRoute,
+  NotificationRoute,
 } from "./keriaNotificationService.types";
 import {
   IdentifierMetadataRecord,
@@ -93,8 +94,13 @@ class IdentifierService extends AgentService {
     this.credentials = credentials;
   }
 
-  onIdentifierRemoved(callback: (event: IdentifierRemovedEvent) => void) {
-    this.props.eventEmitter.on(EventTypes.IdentifierRemoved, callback);
+  onIdentifierRemoved() {
+    this.props.eventEmitter.on(
+      EventTypes.IdentifierRemoved,
+      (data: IdentifierRemovedEvent) => {
+        this.deleteIdentifier(data.payload.id);
+      }
+    );
   }
 
   onIdentifierAdded(callback: (event: IdentifierAddedEvent) => void) {
@@ -364,6 +370,15 @@ class IdentifierService extends AgentService {
     const metadata = await this.identifierStorage.getIdentifierMetadata(
       identifier
     );
+    if (metadata.groupMetadata) {
+      await this.connections.deleteAllConnectionsForGroup(
+        metadata.groupMetadata.groupId
+      );
+    } else {
+      await this.connections.deleteAllConnectionsForIdentifier(identifier);
+    }
+
+    await this.credentials.deleteAllCredentialsForIdentifier(identifier);
 
     if (metadata.groupMemberPre) {
       const localMember = await this.identifierStorage.getIdentifierMetadata(
@@ -382,6 +397,30 @@ class IdentifierService extends AgentService {
           localMember.groupMetadata?.groupId
         }:${localMember.displayName}`,
       });
+
+      if (localMember.groupMetadata?.groupId) {
+        await this.connections.deleteAllConnectionsForGroup(
+          localMember.groupMetadata.groupId
+        );
+      }
+
+      for (const notification of await this.notificationStorage.findAllByQuery({
+        receivingPre: metadata.groupMemberPre,
+      })) {
+        await deleteNotificationRecordById(
+          this.props.signifyClient,
+          this.notificationStorage,
+          notification.id,
+          notification.a.r as NotificationRoute
+        );
+
+        this.props.eventEmitter.emit<NotificationRemovedEvent>({
+          type: EventTypes.NotificationRemoved,
+          payload: {
+            id: notification.id,
+          },
+        });
+      }
     }
 
     await this.props.signifyClient.identifiers().update(identifier, {
@@ -389,6 +428,34 @@ class IdentifierService extends AgentService {
         metadata.displayName
       }`,
     });
+
+    for (const notification of await this.notificationStorage.findAllByQuery({
+      receivingPre: identifier,
+    })) {
+      await deleteNotificationRecordById(
+        this.props.signifyClient,
+        this.notificationStorage,
+        notification.id,
+        notification.a.r as NotificationRoute
+      );
+
+      this.props.eventEmitter.emit<NotificationRemovedEvent>({
+        type: EventTypes.NotificationRemoved,
+        payload: {
+          id: notification.id,
+        },
+      });
+    }
+
+    const connectedDApp =
+      PeerConnection.peerConnection.getConnectedDAppAddress();
+    if (
+      connectedDApp !== "" &&
+      metadata.id ===
+        (await PeerConnection.peerConnection.getConnectingIdentifier()).id
+    ) {
+      PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
+    }
 
     await this.identifierStorage.updateIdentifierMetadata(identifier, {
       isDeleted: true,

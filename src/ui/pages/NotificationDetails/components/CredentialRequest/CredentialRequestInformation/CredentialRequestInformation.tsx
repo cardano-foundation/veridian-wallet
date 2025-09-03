@@ -5,8 +5,8 @@ import { Agent } from "../../../../../../core/agent/agent";
 import { NotificationRoute } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../../store/hooks";
-import { getConnectionsCache } from "../../../../../../store/reducers/connectionsCache";
 import {
+  getConnectionsCache,
   deleteNotificationById,
   getCredsArchivedCache,
   getCredsCache,
@@ -46,7 +46,7 @@ const CredentialRequestInformation = ({
   onReloadData,
 }: CredentialRequestProps) => {
   const dispatch = useAppDispatch();
-  const connectionsCache = useAppSelector(getConnectionsCache);
+  const connectionsCache = useAppSelector(getConnectionsCache) as any[];
   const credsCache = useAppSelector(getCredsCache);
   const archivedCredsCache = useAppSelector(getCredsArchivedCache);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
@@ -55,7 +55,9 @@ const CredentialRequestInformation = ({
   const [loading, setLoading] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
 
-  const connection = connectionsCache?.[notificationDetails.connectionId];
+  const connection = connectionsCache?.find(
+    (c) => c.id === notificationDetails.connectionId
+  );
 
   const isGroup = !!linkedGroup;
   const isGroupInitiator = linkedGroup?.members[0] === userAID;
@@ -66,11 +68,11 @@ const CredentialRequestInformation = ({
 
   const missingProposedCred = proposedCredId
     ? !(
-      credsCache.some((credential) => credential.id === proposedCredId) ||
+        credsCache.some((credential) => credential.id === proposedCredId) ||
         archivedCredsCache.some(
           (credential) => credential.id === proposedCredId
         )
-    )
+      )
     : false;
 
   const getCred = useCallback(async () => {

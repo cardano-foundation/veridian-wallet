@@ -15,6 +15,7 @@ import {
   setCurrentOperation,
 } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { OperationType } from "../../globals/types";
 import { FullPageScanner } from "./FullPageScanner";
 import { makeTestStore } from "../../utils/makeTestStore";
@@ -157,9 +158,8 @@ describe("Full page scanner", () => {
       currentOperation: OperationType.SCAN_WALLET_CONNECTION,
       toastMsgs: [],
     },
-    connectionsCache: {
-      connections: {},
-      multisigConnections: {},
+    profilesCache: {
+      ...profileCacheFixData,
     },
   };
 
@@ -201,10 +201,6 @@ describe("Full page scanner", () => {
         },
         currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
         toastMsgs: [],
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
       },
     };
 
@@ -282,10 +278,6 @@ describe("Full page scanner", () => {
         },
         currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
         toastMsgs: [],
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
       },
     };
 

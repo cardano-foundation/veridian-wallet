@@ -4,7 +4,8 @@ import { Provider } from "react-redux";
 import { mockIonicReact } from "@ionic/react-test-utils";
 import { TabsRoutePath } from "../../../../routes/paths";
 import { notificationsFix } from "../../../__fixtures__/notificationsFix";
-import { connectionsForNotifications } from "../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../__fixtures__/connectionsFix";
+import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { EarlierNotification } from "./EarlierNotification";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { makeTestStore } from "../../../utils/makeTestStore";
@@ -49,8 +50,21 @@ const initialState = {
       passcodeIsSet: true,
     },
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      ...(profileCacheFixData.defaultProfile
+        ? {
+            [profileCacheFixData.defaultProfile as string]: {
+              ...profileCacheFixData.profiles[
+                profileCacheFixData.defaultProfile as string
+              ],
+              connections: connectionsForNotificationsValues,
+            },
+          }
+        : {}),
+    },
   },
 };
 

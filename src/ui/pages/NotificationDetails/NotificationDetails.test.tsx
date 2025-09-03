@@ -1,11 +1,9 @@
 import { IonReactMemoryRouter } from "@ionic/react-router";
 import { mockIonicReact } from "@ionic/react-test-utils";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor, act } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
 import { Route } from "react-router-dom";
-
-import { act } from "react";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
@@ -54,9 +52,6 @@ const initialState = {
       passcodeIsSet: true,
     },
     isOnline: true,
-  },
-  connectionsCache: {
-    connections: [],
   },
   profilesCache: profileCacheFixData,
   biometricsCache: {

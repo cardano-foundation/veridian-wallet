@@ -10,7 +10,7 @@ import {
   getMissingAliasConnection,
   setMissingAliasConnection,
   setOpenConnectionId,
-} from "../../../store/reducers/connectionsCache";
+} from "../../../store/reducers/profileCache";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
@@ -21,7 +21,7 @@ import "./InputRequest.scss";
 
 const InputRequest = () => {
   const dispatch = useAppDispatch();
-  const connections = useAppSelector(getConnectionsCache);
+  const connections = useAppSelector(getConnectionsCache) as any[];
   const missingAliasConnection = useAppSelector(getMissingAliasConnection);
   const missingAliasUrl = missingAliasConnection?.url;
 
@@ -48,7 +48,7 @@ const InputRequest = () => {
         .pop()
         ?.split("/")[0];
 
-      if (connectionId && connections[connectionId]) {
+      if (connectionId && connections.find((c) => c.id === connectionId)) {
         throw new Error(
           `${StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG}: ${connectionId}`
         );

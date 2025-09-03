@@ -1,4 +1,8 @@
-import { ConnectionShortDetails } from "../../../core/agent/agent.types";
+import {
+  ConnectionShortDetails,
+  MultisigConnectionDetails,
+  RegularConnectionDetails,
+} from "../../../core/agent/agent.types";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
@@ -8,7 +12,7 @@ interface MultiSigGroup {
   connections: ConnectionShortDetails[];
 }
 
-interface ConnectionData {
+interface DAppConnection {
   meerkatId: string; //<dappId>
   name?: string;
   url?: string;
@@ -19,12 +23,14 @@ interface ConnectionData {
 
 interface Profile {
   identity: IdentifierShortDetails;
-  connections: ConnectionShortDetails[];
-  multisigConnections: ConnectionShortDetails[];
-  peerConnections: ConnectionData[];
+  connections: RegularConnectionDetails[];
+  multisigConnections: MultisigConnectionDetails[];
+  peerConnections: DAppConnection[];
   credentials: CredentialShortDetails[];
   archivedCredentials: CredentialShortDetails[];
   notifications: KeriaNotification[];
+  connectedDApp?: DAppConnection | null;
+  pendingDAppConnection?: DAppConnection | null;
 }
 
 interface ProfileCache {
@@ -34,6 +40,12 @@ interface ProfileCache {
   multiSigGroup: MultiSigGroup | undefined;
   scanGroupId?: string;
   individualFirstCreate?: boolean;
+  openConnectionId?: string;
+  missingAliasUrl?: { url: string; identifier?: string };
+  connectedDApp?: DAppConnection | null;
+  pendingDAppConnection?: DAppConnection | null;
+  isConnectingToDApp?: boolean;
+  showDAppConnect?: boolean;
 }
 
-export type { Profile, ProfileCache, ConnectionData, MultiSigGroup };
+export type { Profile, ProfileCache, DAppConnection, MultiSigGroup };

@@ -1,3 +1,4 @@
+/* global HTMLIonInputElement */
 import { Keyboard } from "@capacitor/keyboard";
 import { useCallback, KeyboardEvent } from "react";
 

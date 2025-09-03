@@ -8,7 +8,7 @@ import { MemoryRouter, Route } from "react-router-dom";
 
 import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
-import { connectionsMapFix } from "../../__fixtures__/connectionsFix";
+import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
 import { CredentialDetails } from "../../pages/CredentialDetails";
@@ -69,9 +69,21 @@ const initialStateNoPassword = {
   biometricsCache: {
     enabled: false,
   },
-  profilesCache: profileCacheFixData,
-  connectionsCache: {
-    connections: connectionsMapFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      ...(profileCacheFixData.defaultProfile
+        ? {
+            [profileCacheFixData.defaultProfile as string]: {
+              ...profileCacheFixData.profiles[
+                profileCacheFixData.defaultProfile as string
+              ],
+              connections: connectionsFix,
+            },
+          }
+        : {}),
+    },
   },
 };
 

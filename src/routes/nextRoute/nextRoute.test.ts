@@ -20,8 +20,8 @@ import { DataProps } from "./nextRoute.types";
 
 describe("NextRoute", () => {
   let localStorageMock: any;
-  let storeMock: RootState;
-  let data = {};
+  let storeMock: any;
+  let data: any = {};
 
   beforeEach(() => {
     localStorageMock = {};
@@ -66,14 +66,10 @@ describe("NextRoute", () => {
         profiles: {},
         recentProfiles: [],
         multiSigGroup: undefined,
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {
@@ -279,7 +275,7 @@ describe("NextRoute", () => {
 });
 
 describe("getNextRoute", () => {
-  const storeMock: RootState = {
+  const storeMock: any = {
     stateCache: {
       isOnline: true,
       initializationPhase: InitializationPhase.PHASE_TWO,
@@ -316,18 +312,10 @@ describe("getNextRoute", () => {
       profiles: {},
       recentProfiles: [],
       multiSigGroup: undefined,
-    },
-    seedPhraseCache: {
-      seedPhrase: "",
-      bran: "",
-    },
-    connectionsCache: {
-      connections: {},
-      multisigConnections: {},
-    },
-    walletConnectionsCache: {
-      connectedWallet: null,
-      pendingConnection: null,
+      connectedDApp: null,
+      pendingDAppConnection: null,
+      isConnectingToDApp: false,
+      showDAppConnect: false,
     },
     viewTypeCache: {
       credential: {

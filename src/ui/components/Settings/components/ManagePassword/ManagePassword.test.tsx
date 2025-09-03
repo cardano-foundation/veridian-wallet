@@ -170,11 +170,12 @@ describe("Manage password", () => {
   });
 
   test("Password not set", async () => {
-    const { queryByTestId, getByTestId, getByText, queryByText } = render(
-      <Provider store={storeMocked}>
-        <ManagePassword />
-      </Provider>
-    );
+    const { queryByTestId, getByTestId, getByText, queryByText, getAllByText } =
+      render(
+        <Provider store={storeMocked}>
+          <ManagePassword />
+        </Provider>
+      );
 
     await waitFor(() => {
       expect(getByTestId("settings-item-toggle-password")).toBeVisible();
@@ -186,18 +187,36 @@ describe("Manage password", () => {
     });
 
     await waitFor(() => {
-      expect(
-        getByText(
-          TRANSLATIONS.settings.sections.security.managepassword.page.alert
-            .enablemessage
+      // find the visible alert element (some alert overlays may be present but hidden)
+      const alerts = Array.from(
+        document.querySelectorAll(
+          '[data-testid="alert-cancel-enable-password"]'
         )
-      ).toBeVisible();
+      ) as HTMLElement[];
+      const openAlert = alerts.find(
+        (a) => a.getAttribute("is-open") === "true"
+      );
+      expect(openAlert).toBeDefined();
+      expect(openAlert?.textContent).toContain(
+        TRANSLATIONS.settings.sections.security.managepassword.page.alert
+          .enablemessage
+      );
     });
 
     act(() => {
-      fireEvent.click(
-        getByTestId("alert-cancel-enable-password-confirm-button")
+      // Find the confirm button from the open alert
+      const alerts = Array.from(
+        document.querySelectorAll(
+          '[data-testid="alert-cancel-enable-password"]'
+        )
+      ) as HTMLElement[];
+      const openAlert = alerts.find(
+        (a) => a.getAttribute("is-open") === "true"
       );
+      const confirmButton = openAlert?.querySelector(
+        '[data-testid="alert-cancel-enable-password-confirm-button"]'
+      ) as HTMLElement;
+      fireEvent.click(confirmButton);
     });
 
     await waitFor(() => {

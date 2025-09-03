@@ -15,6 +15,7 @@ import {
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import {
@@ -89,8 +90,15 @@ const initialStateFull = {
     isOnline: true,
   },
   seedPhraseCache: {},
-  connectionsCache: {
-    connections: connectionsFix,
+  profilesCache: {
+    ...profileCacheFixData,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      [filteredIdentifierFix[0].id]: {
+        ...(profileCacheFixData.profiles as any)[filteredIdentifierFix[0].id],
+        connections: connectionsFix,
+      },
+    },
   },
   biometricsCache: {
     enabled: false,

@@ -10,7 +10,7 @@ import { KeyStoreKeys } from "../../../../../core/storage";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { showGenericError } from "../../../../../store/reducers/stateCache";
-import { connectionsForNotifications } from "../../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../../../__fixtures__/credsFix";
 import {
   filteredIdentifierFix,
@@ -87,10 +87,44 @@ const initialState = {
       passcodeIsSet: true,
     },
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
+  profilesCache: {
+    ...profileCacheFixData,
+    defaultProfile: filteredIdentifierFix[2].id,
+    profiles: {
+      ...profileCacheFixData.profiles,
+      [filteredIdentifierFix[2].id]: {
+        identity: {
+          id: filteredIdentifierFix[2].id,
+          displayName:
+            profileCacheFixData.profiles[filteredIdentifierFix[2].id]?.identity
+              ?.displayName || "Test MS",
+          createdAtUTC: "2000-01-01T00:00:00.000Z",
+          groupMetadata: true,
+        },
+        connections:
+          profileCacheFixData.profiles[filteredIdentifierFix[2].id]
+            ?.connections || [],
+        multisigConnections: [
+          {
+            id: "member-1",
+            contactId: filteredIdentifierFix[2].id,
+            label: "Member 1",
+            groupId: "g1",
+          },
+          {
+            id: "member-2",
+            contactId: filteredIdentifierFix[2].id,
+            label: "Member 2",
+            groupId: "g1",
+          },
+        ],
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+        notifications: [],
+      },
+    },
   },
-  profilesCache: profileCacheFixData,
   biometricsCache: {
     enabled: false,
   },
@@ -260,9 +294,6 @@ describe("Receive credential", () => {
           passcodeIsSet: true,
         },
       },
-      connectionsCache: {
-        connections: [],
-      },
       profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
@@ -314,10 +345,22 @@ describe("Receive credential", () => {
         profileHistories: [],
         isOnline: true,
       },
-      connectionsCache: {
-        connections: connectionsForNotifications,
+      profilesCache: {
+        ...profileCacheFixData,
+        profiles: {
+          ...profileCacheFixData.profiles,
+          ...(profileCacheFixData.defaultProfile
+            ? {
+                [profileCacheFixData.defaultProfile as string]: {
+                  ...profileCacheFixData.profiles[
+                    profileCacheFixData.defaultProfile as string
+                  ],
+                  connections: connectionsForNotificationsValues,
+                },
+              }
+            : {}),
+        },
       },
-      profilesCache: profileCacheFixData,
       biometricsCache: {
         enabled: false,
       },
@@ -416,18 +459,44 @@ describe("Credential request: Multisig", () => {
       },
       isOnline: true,
     },
-    connectionsCache: {
-      connections: connectionsForNotifications,
-      multisigConnections: {
-        "member-1": {
-          label: "Member 1",
-        },
-        "member-2": {
-          label: "Member 2",
+    profilesCache: {
+      ...profileCacheFixData,
+      profiles: {
+        ...profileCacheFixData.profiles,
+        [filteredIdentifierFix[2].id]: {
+          identity: {
+            id: filteredIdentifierFix[2].id,
+            displayName:
+              profileCacheFixData.profiles[filteredIdentifierFix[2].id]
+                ?.identity?.displayName || "Test MS",
+            createdAtUTC: "2000-01-01T00:00:00.000Z",
+            groupMetadata: true,
+          },
+          connections:
+            profileCacheFixData.profiles[filteredIdentifierFix[2].id]
+              ?.connections || [],
+          multisigConnections: [
+            {
+              id: "member-1",
+              contactId: filteredIdentifierFix[2].id,
+              label: "Member 1",
+              groupId: "g1",
+            },
+            {
+              id: "member-2",
+              contactId: filteredIdentifierFix[2].id,
+              label: "Member 2",
+              groupId: "g1",
+            },
+          ],
+          peerConnections: [],
+          credentials: [],
+          archivedCredentials: [],
+          notifications: [],
         },
       },
+      defaultProfile: filteredIdentifierFix[2].id,
     },
-    profilesCache: profileCacheFixData,
     biometricsCache: {
       enabled: false,
     },

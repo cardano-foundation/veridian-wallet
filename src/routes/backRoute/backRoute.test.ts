@@ -15,8 +15,18 @@ jest.mock("../../store/reducers/seedPhraseCache", () => ({
   clearSeedPhraseCache: jest.fn(),
 }));
 
+type BackRouteStore = Pick<
+  RootState,
+  | "seedPhraseCache"
+  | "ssiAgentCache"
+  | "stateCache"
+  | "profilesCache"
+  | "viewTypeCache"
+  | "biometricsCache"
+>;
+
 describe("getBackRoute", () => {
-  let storeMock: RootState;
+  let storeMock: BackRouteStore;
 
   beforeEach(() => {
     storeMock = {
@@ -28,11 +38,7 @@ describe("getBackRoute", () => {
         bootUrl: "",
         connectUrl: "",
       },
-      profilesCache: {
-        profiles: {},
-        recentProfiles: [],
-        multiSigGroup: undefined,
-      },
+
       stateCache: {
         isOnline: true,
         initializationPhase: InitializationPhase.PHASE_TWO,
@@ -64,13 +70,14 @@ describe("getBackRoute", () => {
         toastMsgs: [],
         pendingJoinGroupMetadata: null,
       },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
+      profilesCache: {
+        profiles: {},
+        recentProfiles: [],
+        multiSigGroup: undefined,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       viewTypeCache: {
         credential: {
@@ -93,7 +100,7 @@ describe("getBackRoute", () => {
   test("should return the correct 'backPath' and 'updateRedux' when currentPath is '/'", () => {
     const currentPath = "/";
     const data: DataProps = {
-      store: storeMock,
+      store: storeMock as unknown as RootState,
     };
 
     const result = getBackRoute(currentPath, data);
@@ -105,7 +112,7 @@ describe("getBackRoute", () => {
   test("should return the correct back path when currentPath is /generateseedphrase", () => {
     const currentPath = "/generateseedphrase";
     const data: DataProps = {
-      store: storeMock,
+      store: storeMock as unknown as RootState,
     };
 
     const result = getBackRoute(currentPath, data);
@@ -117,7 +124,7 @@ describe("getBackRoute", () => {
   test("should return the correct back path when currentPath is /verifyseedphrase", () => {
     const currentPath = "/verifyseedphrase";
     const data: DataProps = {
-      store: storeMock,
+      store: storeMock as unknown as RootState,
     };
 
     const result = getBackRoute(currentPath, data);
@@ -129,7 +136,7 @@ describe("getBackRoute", () => {
   test("should return the correct back path when currentPath is /setpasscode", () => {
     const currentPath = "/setpasscode";
     const data: DataProps = {
-      store: storeMock,
+      store: storeMock as unknown as RootState,
     };
 
     const result = getBackRoute(currentPath, data);
@@ -155,7 +162,7 @@ describe("calcPreviousRoute", () => {
 });
 
 describe("getPreviousRoute", () => {
-  let storeMock: RootState;
+  let storeMock: any;
   beforeEach(() => {
     storeMock = {
       seedPhraseCache: {
@@ -170,6 +177,10 @@ describe("getPreviousRoute", () => {
         profiles: {},
         recentProfiles: [],
         multiSigGroup: undefined,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
       },
       stateCache: {
         isOnline: true,
@@ -201,14 +212,6 @@ describe("getPreviousRoute", () => {
         },
         toastMsgs: [],
         pendingJoinGroupMetadata: null,
-      },
-      connectionsCache: {
-        connections: {},
-        multisigConnections: {},
-      },
-      walletConnectionsCache: {
-        connectedWallet: null,
-        pendingConnection: null,
       },
       viewTypeCache: {
         credential: {

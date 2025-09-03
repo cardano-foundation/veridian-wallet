@@ -31,10 +31,13 @@ describe("Identifier Selector Modal", () => {
         passwordIsSet: false,
       },
     },
-    walletConnectionsCache: {
-      walletConnections: [],
+    profilesCache: {
+      ...profileCacheFixData,
+      connectedDApp: null,
+      pendingDAppConnection: null,
+      isConnectingToDApp: false,
+      showDAppConnect: false,
     },
-    profilesCache: profileCacheFixData,
   };
 
   const dispatchMock = jest.fn();

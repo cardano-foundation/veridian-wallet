@@ -38,10 +38,10 @@ jest.mock("@ionic/react", () => ({
 
 describe("Wallet Connect Request", () => {
   const initialState: Partial<RootState> = {
-    profilesCache: profileCacheFixData,
-    walletConnectionsCache: {
-      connectedWallet: null,
-      pendingConnection: walletConnectionsFix[4],
+    profilesCache: {
+      ...profileCacheFixData,
+      connectedDApp: null,
+      pendingDAppConnection: walletConnectionsFix[4],
     },
   };
 

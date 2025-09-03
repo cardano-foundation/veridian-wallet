@@ -14,7 +14,8 @@ import {
   getOpenConnectionId,
   removeConnectionCache,
   setOpenConnectionId,
-} from "../../../store/reducers/connectionsCache";
+  getCurrentProfile,
+} from "../../../store/reducers/profileCache";
 import {
   setCurrentOperation,
   setCurrentRoute,
@@ -37,12 +38,10 @@ import { ConnectionsBody } from "./components/ConnectionsBody";
 import { SearchInput } from "./components/SearchInput";
 import "./Connections.scss";
 import { MappedConnections } from "./Connections.types";
-import { getCurrentProfile } from "../../../store/reducers/profileCache";
 
 const Connections = () => {
   const pageId = "connections-tab";
   const dispatch = useAppDispatch();
-  const connectionsCache = useAppSelector(getConnectionsCache);
   const openDetailId = useAppSelector(getOpenConnectionId);
   const [connectionShortDetails, setConnectionShortDetails] = useState<
     RegularConnectionDetails | undefined
@@ -59,8 +58,10 @@ const Connections = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
   const currentProfile = useAppSelector(getCurrentProfile);
+  const profileConnections: RegularConnectionDetails[] =
+    (currentProfile?.connections as RegularConnectionDetails[]) ?? [];
 
-  const showPlaceholder = Object.keys(connectionsCache).length === 0;
+  const showPlaceholder = profileConnections.length === 0;
 
   useIonViewWillEnter(() => {
     dispatch(setCurrentRoute({ path: TabsRoutePath.CONNECTIONS }));
@@ -69,8 +70,10 @@ const Connections = () => {
   useEffect(() => {
     const fetchConnectionDetails = async () => {
       if (openDetailId === undefined) return;
-      const connection = connectionsCache[openDetailId];
       dispatch(setOpenConnectionId(undefined));
+      const connection =
+        profileConnections.find((c) => c.id === openDetailId) || undefined;
+
       if (
         !connection ||
         !("identifier" in connection) ||
@@ -78,16 +81,16 @@ const Connections = () => {
         connection.status === ConnectionStatus.FAILED
       ) {
         return;
-      } else {
-        await getConnectionShortDetails(openDetailId, connection.identifier);
       }
+
+      await getConnectionShortDetails(openDetailId, connection.identifier);
     };
 
     fetchConnectionDetails();
-  }, [connectionsCache, dispatch, openDetailId]);
+  }, [dispatch, openDetailId]);
 
   useEffect(() => {
-    const connections = Object.values(connectionsCache);
+    const connections = profileConnections;
     if (connections.length) {
       const sortedConnections = [...connections].sort(function (a, b) {
         const textA = a.label.toUpperCase();
@@ -109,7 +112,7 @@ const Connections = () => {
       }));
       setMappedConnections(mapToArray);
     }
-  }, [connectionsCache]);
+  }, [profileConnections]);
 
   const getConnectionShortDetails = async (
     connectionId: string,

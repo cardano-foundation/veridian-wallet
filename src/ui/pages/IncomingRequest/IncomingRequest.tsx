@@ -12,14 +12,14 @@ import {
   IncomingRequestType,
   PeerConnectSigningEventRequest,
 } from "../../../store/reducers/stateCache/stateCache.types";
-import { getConnectedWallet } from "../../../store/reducers/walletConnectionsCache";
+import { getConnectedDApp } from "../../../store/reducers/profileCache";
 import { ToastMsgType } from "../../globals/types";
 
 const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
   const pageId = "incoming-request";
   const dispatch = useAppDispatch();
   const queueIncomingRequest = useAppSelector(getQueueIncomingRequest);
-  const connectedWallet = useAppSelector(getConnectedWallet);
+  const connectedDApp = useAppSelector(getConnectedDApp);
   const incomingRequest = useMemo(() => {
     if (
       !queueIncomingRequest.isProcessing ||
@@ -49,14 +49,14 @@ const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
     }
     if (
       incomingRequest.type === IncomingRequestType.PEER_CONNECT_SIGN &&
-      (!connectedWallet ||
-        connectedWallet.meerkatId !== incomingRequest.peerConnection?.meerkatId)
+      (!connectedDApp ||
+        connectedDApp.meerkatId !== incomingRequest.peerConnection?.meerkatId)
     ) {
       handleReset();
     }
     setRequestData(incomingRequest);
     setOpenPage(true);
-  }, [connectedWallet, incomingRequest, setOpenPage]);
+  }, [connectedDApp, incomingRequest, setOpenPage]);
 
   useEffect(() => {
     if (blur) {

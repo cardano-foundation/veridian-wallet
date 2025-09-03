@@ -9,11 +9,11 @@ import {
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getConnectionsCache } from "../../../store/reducers/connectionsCache";
 import {
   getCurrentProfile,
   getNotificationsCache,
   markNotificationAsRead,
+  getConnectionsCache,
 } from "../../../store/reducers/profileCache";
 import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
@@ -39,7 +39,10 @@ const Notifications = () => {
   const history = useHistory();
   const connectionsCache = useAppSelector(getConnectionsCache);
   const notificationsCache = useAppSelector(getNotificationsCache);
-  const notifications = [...notificationsCache].sort(
+  const currentProfile = useAppSelector(getCurrentProfile);
+  const profileNotifications: KeriaNotification[] =
+    (currentProfile?.notifications as KeriaNotification[]) ?? [];
+  const notifications = [...profileNotifications].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
   const [selectedFilter, setSelectedFilter] = useState<NotificationFilters>(
@@ -59,7 +62,6 @@ const Notifications = () => {
     openUnknownPresentConnectionAlert,
     setOpenUnknownPresentConnectionAlert,
   ] = useState(false);
-  const currentProfile = useAppSelector(getCurrentProfile);
 
   const filteredNotification = (() => {
     if (selectedFilter === NotificationFilters.All) {
@@ -117,20 +119,20 @@ const Notifications = () => {
   const handleNotificationClick = async (item: KeriaNotification) => {
     await maskAsReaded(item);
 
-    if (
-      item.a.r === NotificationRoute.ExnIpexApply &&
-      !connectionsCache[item.connectionId]?.label
-    ) {
-      setOpenUnknownPresentConnectionAlert(true);
-      return;
+    if (item.a.r === NotificationRoute.ExnIpexApply) {
+      const conn = connectionsCache.find((c) => c.id === item.connectionId);
+      if (!conn?.label) {
+        setOpenUnknownPresentConnectionAlert(true);
+        return;
+      }
     }
 
-    if (
-      item.a.r === NotificationRoute.ExnIpexGrant &&
-      !connectionsCache?.[item.connectionId]?.label
-    ) {
-      setOpenUnknownConnectionAlert(true);
-      return;
+    if (item.a.r === NotificationRoute.ExnIpexGrant) {
+      const conn = connectionsCache.find((c) => c.id === item.connectionId);
+      if (!conn?.label) {
+        setOpenUnknownConnectionAlert(true);
+        return;
+      }
     }
 
     if (item.a.r === NotificationRoute.LocalAcdcRevoked) {

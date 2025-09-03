@@ -3,7 +3,7 @@ import { Provider } from "react-redux";
 
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
-import { connectionsForNotifications } from "../../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
 import { filteredIdentifierMapFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import {
   connectInstructionsFix,
@@ -11,6 +11,7 @@ import {
 } from "../../../../__fixtures__/notificationsFix";
 import { RemoteConnectInstructions } from "./RemoteConnectInstructions";
 import { makeTestStore } from "../../../../utils/makeTestStore";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 
 const dispatchMock = jest.fn();
 
@@ -23,8 +24,8 @@ const initialState = {
       passcodeIsSet: true,
     },
   },
-  connectionsCache: {
-    connections: connectionsForNotifications,
+  profilesCache: {
+    ...profileCacheFixData,
   },
 };
 
