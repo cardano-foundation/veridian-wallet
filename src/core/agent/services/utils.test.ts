@@ -338,8 +338,6 @@ describe("Utils", () => {
     });
 
     describe("Edge cases", () => {
-
-
       test("should handle operations with unexpected record types", async () => {
         mockNotificationStorage.findExpectedById.mockResolvedValue({
           id: notificationId,
@@ -368,7 +366,7 @@ describe("Utils", () => {
         expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("unknown.linked-request-456");
       });
 
-      test("should handle all three relevant operation types", async () => {
+      test("should delete all operations regardless of type", async () => {
         mockNotificationStorage.findExpectedById.mockResolvedValue({
           id: notificationId,
           linkedRequest: { accepted: true, current: "linked-request-456" },
@@ -393,39 +391,6 @@ describe("Utils", () => {
 
         expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledTimes(3);
       });
-
-
-
-      test("should delete operations with all non-relevant types", async () => {
-        mockNotificationStorage.findExpectedById.mockResolvedValue({
-          id: notificationId,
-          linkedRequest: { accepted: true, current: "linked-request-456" },
-        } as any);
-
-        const mockOperations = [
-          { id: "witness.linked-request-456", recordType: OperationPendingRecordType.Witness },
-          { id: "group.linked-request-456", recordType: OperationPendingRecordType.Group },
-          { id: "oobi.linked-request-456", recordType: OperationPendingRecordType.Oobi },
-        ];
-
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(mockOperations as any);
-        mockOperationPendingStorage.deleteById.mockResolvedValue(undefined);
-
-        await deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
-        );
-
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledTimes(3);
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("witness.linked-request-456");
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("group.linked-request-456");
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("oobi.linked-request-456");
-      });
     });
-
-
   });
 });
