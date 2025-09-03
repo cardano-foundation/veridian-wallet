@@ -1,21 +1,26 @@
 import { IonButton, IonIcon, IonModal } from "@ionic/react";
 import { addOutline, createOutline } from "ionicons/icons";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Agent } from "../../../../core/agent/agent";
-import { ConnectionNoteDetails } from "../../../../core/agent/agent.types";
+import {
+  ConnectionNoteDetails,
+  RegularConnectionDetailsFull,
+} from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
 import { useAppDispatch } from "../../../../store/hooks";
 import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { Alert } from "../../../components/Alert";
+import { CardList, CardItem } from "../../../components/CardList";
 import { ScrollablePageLayout } from "../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { ToastMsgType } from "../../../globals/types";
 import { showError } from "../../../utils/error";
-import ConnectionDetailsHeader from "./ConnectionDetailsHeader";
 import { ConnectionNote } from "./ConnectionNote";
 import "./EditConnectionsModal.scss";
 import { EditConnectionsModalProps } from "./EditConnectionsModal.types";
+import { formatShortDate } from "../../../utils/formatters";
+import { useNoteErrors } from "./useNoteErrors";
 
 export const EditConnectionsContainer = ({
   notes,
@@ -33,14 +38,38 @@ export const EditConnectionsContainer = ({
   const [alertDeleteNoteIsOpen, setAlertDeleteNoteIsOpen] = useState(false);
   const deleteNoteId = useRef("");
 
+  const {
+    hasErrors,
+    updateNoteError,
+    removeNoteError,
+    addNoteError,
+    recalculateErrors,
+    resetErrors,
+  } = useNoteErrors(updatedNotes);
+
+  const connectionInfo: CardItem<RegularConnectionDetailsFull>[] = [
+    {
+      id: connectionDetails.id,
+      title: connectionDetails.label,
+      subtitle: formatShortDate(`${connectionDetails?.createdAtUTC}`),
+      image: connectionDetails.logo,
+      data: connectionDetails,
+    },
+  ];
+
   useEffect(() => {
-    if (modalIsOpen) setUpdatedNotes([...notes]);
+    if (modalIsOpen) {
+      setUpdatedNotes([...notes]);
+      // Note: resetErrors() is not called here anymore since useNoteErrors now initializes with correct error states
+    }
   }, [modalIsOpen, notes]);
+
+  // Removed global validation - individual notes handle their own validation
 
   const confirm = async () => {
     try {
       const filteredNotes = updatedNotes.filter(
-        (note) => note.title !== "" && note.message !== ""
+        (note) => note.title !== "" || note.message !== ""
       );
 
       let update = false;
@@ -91,9 +120,8 @@ export const EditConnectionsContainer = ({
       if (update) {
         setNotes(filteredNotes);
         dispatch(setToastMsg(ToastMsgType.NOTES_UPDATED));
-        onConfirm();
-        update = false;
       }
+      onConfirm();
     } catch (e) {
       showError(
         "Failed to update connection",
@@ -107,14 +135,16 @@ export const EditConnectionsContainer = ({
   };
 
   const handleAddNewNote = () => {
+    const newNoteId = TEMP_ID_PREFIX + Date.now();
     setUpdatedNotes((currentNotes) => [
       ...currentNotes,
       {
         title: "",
         message: "",
-        id: TEMP_ID_PREFIX + Date.now(),
+        id: newNoteId,
       },
     ]);
+    addNoteError(newNoteId, false);
   };
 
   const handleUpdateNotes = (note: ConnectionNoteDetails) => {
@@ -149,11 +179,19 @@ export const EditConnectionsContainer = ({
       (note) => note.id !== deleteNoteId.current
     );
     setUpdatedNotes(newNotes);
+    removeNoteError(deleteNoteId.current);
     deleteNoteId.current = "";
     dispatch(setToastMsg(ToastMsgType.NOTE_REMOVED));
   };
 
   const cancelDeleteNote = () => setAlertDeleteNoteIsOpen(false);
+
+  const handleErrorChange = useCallback(
+    (id: string, hasError: boolean) => {
+      updateNoteError(id, hasError);
+    },
+    [updateNoteError]
+  );
 
   return (
     <>
@@ -167,32 +205,30 @@ export const EditConnectionsContainer = ({
               setModalIsOpen(false);
             }}
             actionButton={true}
+            actionButtonDisabled={hasErrors}
             actionButtonAction={confirm}
             actionButtonLabel={`${i18n.t("tabs.connections.details.confirm")}`}
           />
         }
       >
         <div className="connection-details-content">
-          <ConnectionDetailsHeader
-            logo={connectionDetails?.logo}
-            label={connectionDetails?.label}
-            date={connectionDetails?.createdAtUTC}
+          <CardList
+            className="connections-card-list"
+            data={connectionInfo}
+            lines="none"
+            testId={"connection-info"}
           />
           <div className="connection-details-info-block">
             {updatedNotes.length ? (
-              <>
-                <h3 className="note-title">
-                  {i18n.t("tabs.connections.details.notes")}
-                </h3>
-                {updatedNotes.map((note) => (
-                  <ConnectionNote
-                    data={note}
-                    onNoteDataChange={handleUpdateNotes}
-                    onDeleteNote={openAlert}
-                    key={note.id}
-                  />
-                ))}
-              </>
+              updatedNotes.map((note) => (
+                <ConnectionNote
+                  data={note}
+                  onNoteDataChange={handleUpdateNotes}
+                  onDeleteNote={openAlert}
+                  onErrorChange={handleErrorChange}
+                  key={note.id}
+                />
+              ))
             ) : (
               <>
                 <p className="connection-details-info-block-nonotes">

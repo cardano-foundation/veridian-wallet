@@ -226,7 +226,7 @@ const PageHeader = ({
             {actionButton && !actionButtonLabel && (
               <IonButton
                 shape="round"
-                disabled={actionButtonDisabled}
+                {...(actionButtonDisabled ? { disabled: true } : {})}
                 className="action-button"
                 onClick={actionButtonAction}
                 data-testid="action-button"
@@ -242,7 +242,7 @@ const PageHeader = ({
 
             {actionButton && actionButtonLabel && (
               <IonButton
-                disabled={actionButtonDisabled}
+                {...(actionButtonDisabled ? { disabled: true } : {})}
                 className="action-button-label"
                 onClick={actionButtonAction}
                 data-testid="action-button"

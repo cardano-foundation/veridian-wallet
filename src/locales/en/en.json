@@ -1086,14 +1086,14 @@
         "update": "“{{ credential }}“ has been revoked",
         "presented": "Presented “{{ credentialType }}“ credential",
         "notavailable": "N/A",
-        "details": "Details",
-        "notes": "Notes",
         "nocurrentnotes": "No current notes",
         "nocurrentnotesext": "There are currently no notes associated with this connection.",
+        "segment": {
+          "details": "Details",
+          "notes": "Notes"
+        },
         "cancel": "Cancel",
         "confirm": "Confirm",
-        "title": "Title",
-        "message": "Message",
         "delete": "Delete connection",
         "options": {
           "title": "Connection options",
@@ -1113,6 +1113,19 @@
               "confirm": "Yes, I'm sure",
               "cancel": "Cancel"
             }
+          }
+        },
+        "notes": {
+          "title": "Notes",
+          "notetitle": "Title",
+          "notemessage": "Message",
+          "placeholders": {
+            "title": "e.g. New note",
+            "message": "e.g. This is a note"
+          },
+          "errors": {
+            "title": "Must be 64 characters or less",
+            "message": "Must be 576 characters or less"
           }
         },
         "clouderror": "We couldn’t locate this connection in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this connection, tap “Delete connection” to remove."
