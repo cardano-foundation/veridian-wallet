@@ -55,6 +55,19 @@ ion-tab-bar {
     }
   }
 
+  .bubble-counter {
+    position: absolute;
+    top: 0.2rem;
+    left: 0.85rem;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .bubble-counter {
+      top: 0.25rem;
+      left: 0.75rem;
+    }
+  }
+
   @media screen and (min-height: 655px) {
     &.ios {
       padding-bottom: 0.75rem;
