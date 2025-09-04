@@ -239,10 +239,9 @@ const RequestPresentationModal = ({
         );
       }
       case RequestPresentationStage.InputAttribute: {
-        const schemaRequiredAttributes =
-          schema?.properties.a.oneOf[1].required || [];
+        const schemaAttributes = schema?.properties.a.oneOf[1].properties || [];
 
-        const requiredAttributes = schemaRequiredAttributes.filter(
+        const requiredAttributes = Object.keys(schemaAttributes).filter(
           (item) => !IGNORE_ATTRIBUTES.includes(item)
         );
 

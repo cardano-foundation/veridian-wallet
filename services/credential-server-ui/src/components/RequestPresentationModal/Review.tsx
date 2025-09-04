@@ -67,11 +67,7 @@ const Review = ({
           key={credAttribute.key}
           sx={{ textAlign: "left" }}
         >
-          <Typography variant="subtitle1">
-            {i18n.t(
-              `pages.credentialDetails.issueCredential.inputAttribute.label.${credAttribute.label.toLowerCase()}`
-            )}
-          </Typography>
+          <Typography variant="subtitle1">{credAttribute.label}</Typography>
           <Typography
             className="content"
             variant="body2"
