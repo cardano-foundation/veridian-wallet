@@ -3,8 +3,8 @@ import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { getCurrentProfile } from "../../store/reducers/profileCache";
 import { useNotificationService } from "../../core/services/notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
-import { showError } from "../../ui/utils/error";
 import { useBackgroundNotifications } from "./useBackgroundNotifications";
+import { showError } from "../../ui/utils/error";
 
 export const useNotificationManager = () => {
   const currentProfile = useAppSelector(getCurrentProfile);
@@ -12,9 +12,9 @@ export const useNotificationManager = () => {
   const notificationService = useNotificationService();
   const backgroundNotifications = useBackgroundNotifications();
 
+  // Initialize notification permissions on mount
   useEffect(() => {
-    // Initialize notification permissions on app start
-    const initializeNotifications = async () => {
+    const initializePermissions = async () => {
       try {
         const granted = await notificationService.requestPermissions();
         if (granted) {
@@ -23,11 +23,15 @@ export const useNotificationManager = () => {
           showError("Notification permissions denied", null, dispatch);
         }
       } catch (error) {
-        showError("Failed to initialize notifications", error, dispatch);
+        showError(
+          "Failed to initialize notifications",
+          error as Error,
+          dispatch
+        );
       }
     };
 
-    initializeNotifications();
+    initializePermissions();
   }, [notificationService, dispatch]);
 
   const showProfileNotification = (notification: KeriaNotification) => {
