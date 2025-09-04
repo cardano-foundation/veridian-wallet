@@ -23,9 +23,7 @@ import {
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getConnectionsCache,
   getProfileGroupCache,
-  getProfiles,
   setPendingDAppConnection,
   showDAppConnect,
 } from "../../../store/reducers/profileCache";

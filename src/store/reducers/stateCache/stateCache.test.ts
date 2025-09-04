@@ -31,6 +31,8 @@ import {
   IncomingRequestType,
   PeerConnectSigningEventRequest,
 } from "./stateCache.types";
+import { connectionDetailsFix } from "../../../ui/__fixtures__/credsFix";
+import { ConnectionStatus } from "../../../core/agent/agent.types";
 
 const signingRequest: PeerConnectSigningEventRequest = {
   type: IncomingRequestType.PEER_CONNECT_SIGN,
@@ -216,6 +218,15 @@ describe("State Cache", () => {
       groupId: "test-group-id",
       groupName: "Test Group",
       initiatorName: "Frank",
+      connection: {
+        id: "ebfeb1ebc6f1c276ef71212ec20",
+        label: "Cambridge University",
+        createdAtUTC: "2017-01-14T19:23:24Z",
+        status: ConnectionStatus.PENDING,
+        contactId: "ebfeb1ebc6f1c276ef71212ec20",
+        oobi: "http://keria:3902/oobi/ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86/agent/ENGnzDMWk8PlFbOoYCauLs1rDuQbvsIStxNzkjZPikSo?name=CF%20Credential%20Issuance",
+        groupId: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPyi",
+      },
     });
     const nextState = stateCacheSlice.reducer(initialState, action);
 
@@ -224,6 +235,15 @@ describe("State Cache", () => {
       groupId: "test-group-id",
       groupName: "Test Group",
       initiatorName: "Frank",
+      connection: {
+        id: "ebfeb1ebc6f1c276ef71212ec20",
+        label: "Cambridge University",
+        createdAtUTC: "2017-01-14T19:23:24Z",
+        status: ConnectionStatus.PENDING,
+        contactId: "ebfeb1ebc6f1c276ef71212ec20",
+        oobi: "http://keria:3902/oobi/ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86/agent/ENGnzDMWk8PlFbOoYCauLs1rDuQbvsIStxNzkjZPikSo?name=CF%20Credential%20Issuance",
+        groupId: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPyi",
+      },
     });
 
     const rootState = { stateCache: nextState } as RootState;
@@ -232,6 +252,15 @@ describe("State Cache", () => {
       groupId: "test-group-id",
       groupName: "Test Group",
       initiatorName: "Frank",
+      connection: {
+        id: "ebfeb1ebc6f1c276ef71212ec20",
+        label: "Cambridge University",
+        createdAtUTC: "2017-01-14T19:23:24Z",
+        status: ConnectionStatus.PENDING,
+        contactId: "ebfeb1ebc6f1c276ef71212ec20",
+        oobi: "http://keria:3902/oobi/ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86/agent/ENGnzDMWk8PlFbOoYCauLs1rDuQbvsIStxNzkjZPikSo?name=CF%20Credential%20Issuance",
+        groupId: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPyi",
+      },
     });
   });
 });

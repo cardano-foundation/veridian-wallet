@@ -1363,6 +1363,7 @@
     "connectiondeleted": "Connection deleted successfully",
     "qrsuccess": "QR code scanned successfully",
     "qrerror": "QR code not recognised",
+    "connectionerror": "Connection not recognized",
     "connectionrequestincoming": "New Connection Request",
     "connectionrequestpending": "Connection request pending",
     "newconnectionadded": "New connection added",

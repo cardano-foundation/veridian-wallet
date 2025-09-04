@@ -1,14 +1,14 @@
 import { IonButton, IonContent, IonIcon } from "@ionic/react";
+import { peopleCircleOutline } from "ionicons/icons";
 import { useState } from "react";
 import { i18n } from "../../../../../i18n";
+import { MemberAvatar } from "../../../../components/Avatar";
 import { CustomInput } from "../../../../components/CustomInput";
 import { ErrorMessage } from "../../../../components/ErrorMessage";
 import { nameChecker } from "../../../../utils/nameChecker";
+import { SetupProfileStep } from "../../ProfileSetup.types";
 import "./GroupSetup.scss";
 import { SetupGroupProps } from "./GroupSetup.types";
-import { peopleCircleOutline } from "ionicons/icons";
-import { SetupProfileStep } from "../../ProfileSetup.types";
-import { MemberAvatar } from "../../../../components/Avatar";
 
 const GroupSetup = ({
   groupName,

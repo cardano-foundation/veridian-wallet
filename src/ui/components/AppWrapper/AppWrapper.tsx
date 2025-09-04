@@ -640,6 +640,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
               groupId: content.groupId,
               groupName: content.groupName,
               initiatorName: content.initiatorName || null,
+              connection: content.connection,
             })
           );
         }
