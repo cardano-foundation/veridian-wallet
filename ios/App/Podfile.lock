@@ -24,6 +24,8 @@ PODS:
     - Capacitor
   - CapacitorKeyboard (7.0.0):
     - Capacitor
+  - CapacitorLocalNotifications (7.0.2):
+    - Capacitor
   - CapacitorMlkitBarcodeScanning (7.0.0):
     - Capacitor
     - GoogleMLKit/BarcodeScanning (= 7.0.0)
@@ -109,6 +111,7 @@ DEPENDENCIES:
   - "CapacitorDevice (from `../../node_modules/@capacitor/device`)"
   - CapacitorFreerasp (from `../../node_modules/capacitor-freerasp`)
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
+  - "CapacitorLocalNotifications (from `../../node_modules/@capacitor/local-notifications`)"
   - "CapacitorMlkitBarcodeScanning (from `../../node_modules/@capacitor-mlkit/barcode-scanning`)"
   - CapacitorNativeSettings (from `../../node_modules/capacitor-native-settings`)
   - CapacitorPluginSafeArea (from `../../node_modules/capacitor-plugin-safe-area`)
@@ -160,6 +163,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/capacitor-freerasp"
   CapacitorKeyboard:
     :path: "../../node_modules/@capacitor/keyboard"
+  CapacitorLocalNotifications:
+    :path: "../../node_modules/@capacitor/local-notifications"
   CapacitorMlkitBarcodeScanning:
     :path: "../../node_modules/@capacitor-mlkit/barcode-scanning"
   CapacitorNativeSettings:
@@ -190,6 +195,7 @@ SPEC CHECKSUMS:
   CapacitorDevice: 069faf433b3a99c3d5f0e500fbe634f60a8c6a84
   CapacitorFreerasp: 4477326ed8cd7049ed556aa16aabf4fd400926d0
   CapacitorKeyboard: 4db71e694e7afb5d7c0be09b05495c19f7d6c914
+  CapacitorLocalNotifications: 665188ae8accd40806129073896fb2b39322d858
   CapacitorMlkitBarcodeScanning: db64496b3e8f41be79e3ef81bfd1bb430adcb0ca
   CapacitorNativeSettings: bef37b3c7e2184da7416a3f162c71de19fd27593
   CapacitorPluginSafeArea: 22031c3436269ca80fac90ec2c94bc7c1e59a81d
@@ -213,6 +219,6 @@ SPEC CHECKSUMS:
   SQLCipher: 77fbe633cd84db04b07876dd50766b4924b57d61
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
 
-PODFILE CHECKSUM: edddec9e8109b205b25d5fc1413526aaa8b9f97f
+PODFILE CHECKSUM: bce21da69b8b9fa70d6734aa111bea3259a8a84d
 
 COCOAPODS: 1.16.2
