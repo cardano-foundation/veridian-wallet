@@ -33,10 +33,15 @@
 
   .connection-details-content {
     min-height: calc(100vh - (5.425rem + var(--ion-safe-area-top)));
+
+    .card-list {
+      border-bottom: none;
+      margin-top: 1rem;
+    }
   }
 
   .connection-details-info-block {
-    margin-top: 1.5rem;
+    margin-top: 2.5rem;
     color: var(--ion-color-neutral-700);
 
     h3 {
@@ -69,7 +74,9 @@
         width: 3rem;
         height: 3rem;
         border-radius: 1.875rem;
-        --ion-color-danger-contrast: var(--ion-color-error-100);
+        color: var(--ion-color-error-800);
+        --background: var(--ion-color-error-100);
+        --background-activated: var(--ion-color-neutral-400);
 
         &::part(native) {
           padding: 0;
@@ -96,12 +103,17 @@
   }
 
   .connection-details-info-block-data {
+    &:first-of-type {
+      margin-bottom: 1.5rem;
+    }
+
     ion-input,
     ion-textarea {
       border-radius: 0.5rem;
       border: 1px solid var(--ion-color-neutral-400);
       margin-top: 0.5rem;
       min-height: 1.25rem;
+      font-weight: 400;
 
       input,
       textarea,
@@ -115,16 +127,16 @@
       }
     }
 
-    ion-input {
-      margin-bottom: 1.5rem;
-    }
-
     .input-highlight.sc-ion-input-md {
       display: none;
     }
 
     .textarea-highlight.sc-ion-textarea-md {
       display: none;
+    }
+
+    p {
+      text-align: left;
     }
   }
 
@@ -144,7 +156,7 @@
       }
 
       &.add-note-button {
-        --background: var(--ion-color-primary-600);
+        --background: var(--ion-color-primary-700);
         --border-radius: 1.875rem;
       }
 

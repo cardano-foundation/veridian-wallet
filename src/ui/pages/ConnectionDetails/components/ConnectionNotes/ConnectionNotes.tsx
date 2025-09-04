@@ -19,13 +19,19 @@ const ConnectionNotes = ({
             key={index}
             className="connection-details-notes"
             title={
-              index === 0 ? i18n.t("tabs.connections.details.notes") : undefined
+              index === 0
+                ? i18n.t("tabs.connections.details.notes.title")
+                : undefined
             }
           >
-            <h4 className="connection-details-note-title">{note.title}</h4>
-            <IonText className="connection-details-note-text">
-              {note.message}
-            </IonText>
+            {note.title && (
+              <h4 className="connection-details-note-title">{note.title}</h4>
+            )}
+            {note.message && (
+              <IonText className="connection-details-note-text">
+                {note.message}
+              </IonText>
+            )}
           </CardDetailsBlock>
         ))
       ) : (

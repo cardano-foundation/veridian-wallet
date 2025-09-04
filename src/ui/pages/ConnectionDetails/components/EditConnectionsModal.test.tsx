@@ -10,7 +10,6 @@ import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../routes/paths";
 import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { connectionsFix } from "../../../__fixtures__/connectionsFix";
-import { filteredCredsFix } from "../../../__fixtures__/filteredCredsFix";
 import { ToastMsgType } from "../../../globals/types";
 import { formatShortDate } from "../../../utils/formatters";
 import {
@@ -23,12 +22,19 @@ mockIonicReact();
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
   IonInput: (props: any) => {
-    const { onIonBlur, onIonFocus, onIonInput, value, ...componentProps } =
-      props;
+    const {
+      onIonBlur,
+      onIonFocus,
+      onIonInput,
+      value,
+      placeholder,
+      ...componentProps
+    } = props;
 
     return (
       <input
         value={value}
+        placeholder={placeholder}
         data-testid={componentProps["data-testid"]}
         onBlur={(e) => onIonBlur?.(e)}
         onFocus={(e) => onIonFocus?.(e)}
@@ -37,11 +43,18 @@ jest.mock("@ionic/react", () => ({
     );
   },
   IonTextarea: (props: any) => {
-    const { onIonBlur, onIonFocus, onIonInput, value, ...componentProps } =
-      props;
+    const {
+      onIonBlur,
+      onIonFocus,
+      onIonInput,
+      value,
+      placeholder,
+      ...componentProps
+    } = props;
     return (
       <textarea
         value={value}
+        placeholder={placeholder}
         data-testid={componentProps["data-testid"]}
         onBlur={(e) => onIonBlur?.(e)}
         onFocus={(e) => onIonFocus?.(e)}
@@ -110,13 +123,13 @@ describe("Edit Connection Modal", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("connection-name").innerHTML).toBe(
-        connectionsFix[0].label
-      );
+      expect(
+        getByTestId("card-title-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+      ).toBe(connectionsFix[0].label);
     });
-    expect(getByTestId("data-connection-time").innerHTML).toBe(
-      formatShortDate(connectionsFix[0].createdAtUTC)
-    );
+    expect(
+      getByTestId("card-subtitle-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+    ).toBe(formatShortDate(connectionsFix[0].createdAtUTC));
     expect(getByTestId("action-button")).toBeVisible();
     expect(getByTestId("close-button")).toBeVisible();
     expect(getByTestId("add-note-button")).toBeVisible();
@@ -150,9 +163,9 @@ describe("Edit Connection Modal", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("connection-name").innerHTML).toBe(
-        connectionsFix[0].label
-      );
+      expect(
+        getByTestId("card-title-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+      ).toBe(connectionsFix[0].label);
     });
 
     await waitFor(() => {
@@ -161,6 +174,12 @@ describe("Edit Connection Modal", () => {
 
       expect((titleInput as HTMLInputElement).value).toBe("Mock Note");
       expect((messageInput as HTMLTextAreaElement).value).toBe("Mock Note");
+      expect((titleInput as HTMLInputElement).placeholder).toBe(
+        EN_TRANSLATIONS.tabs.connections.details.notes.placeholders.title
+      );
+      expect((messageInput as HTMLTextAreaElement).placeholder).toBe(
+        EN_TRANSLATIONS.tabs.connections.details.notes.placeholders.message
+      );
     });
   });
 
@@ -169,30 +188,29 @@ describe("Edit Connection Modal", () => {
       ...makeTestStore(initialStateFull),
       dispatch: dispatchMock,
     };
-    const { getByTestId, unmount, getByText, queryByText, getAllByText } =
-      render(
-        <Provider store={storeMocked}>
-          <EditConnectionsContainer
-            onConfirm={jest.fn()}
-            modalIsOpen={true}
-            setModalIsOpen={jest.fn()}
-            setNotes={jest.fn()}
-            notes={[
-              {
-                id: "1",
-                title: "Mock Note",
-                message: "Mock Note",
-              },
-            ]}
-            connectionDetails={connectionsFix[0]}
-          />
-        </Provider>
-      );
+    const { getByTestId, unmount, queryByText } = render(
+      <Provider store={storeMocked}>
+        <EditConnectionsContainer
+          onConfirm={jest.fn()}
+          modalIsOpen={true}
+          setModalIsOpen={jest.fn()}
+          setNotes={jest.fn()}
+          notes={[
+            {
+              id: "1",
+              title: "Mock Note",
+              message: "Mock Note",
+            },
+          ]}
+          connectionDetails={connectionsFix[0]}
+        />
+      </Provider>
+    );
 
     await waitFor(() => {
-      expect(getByTestId("connection-name").innerHTML).toBe(
-        connectionsFix[0].label
-      );
+      expect(
+        getByTestId("card-title-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+      ).toBe(connectionsFix[0].label);
     });
 
     await waitFor(() => {
@@ -255,9 +273,9 @@ describe("Edit Connection Modal", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("connection-name").innerHTML).toBe(
-        connectionsFix[0].label
-      );
+      expect(
+        getByTestId("card-title-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+      ).toBe(connectionsFix[0].label);
     });
 
     act(() => {
@@ -291,9 +309,9 @@ describe("Edit Connection Modal", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("connection-name").innerHTML).toBe(
-        connectionsFix[0].label
-      );
+      expect(
+        getByTestId("card-title-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+      ).toBe(connectionsFix[0].label);
       expect(getByTestId("action-button")).toBeVisible();
     });
 
@@ -305,12 +323,26 @@ describe("Edit Connection Modal", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.tabs.connections.details.notes)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.notes.notetitle)
       ).toBeVisible();
       expect(getAllByTestId("connection-note").length).toBe(1);
       expect(
-        getByText(EN_TRANSLATIONS.tabs.connections.details.title)
+        getByText(EN_TRANSLATIONS.tabs.connections.details.notes.notemessage)
       ).toBeVisible();
+
+      // Check placeholders for the newly added note
+      const titleInput = getByTestId(
+        "edit-connections-modal-note-title-temp1466424490000"
+      );
+      const messageInput = getByTestId(
+        "edit-connections-modal-note-message-temp1466424490000"
+      );
+      expect((titleInput as HTMLInputElement).placeholder).toBe(
+        EN_TRANSLATIONS.tabs.connections.details.notes.placeholders.title
+      );
+      expect((messageInput as HTMLTextAreaElement).placeholder).toBe(
+        EN_TRANSLATIONS.tabs.connections.details.notes.placeholders.message
+      );
     });
 
     const actionBtn = getByTestId("action-button");
@@ -348,9 +380,9 @@ describe("Edit Connection Modal", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("connection-name").innerHTML).toBe(
-        connectionsFix[0].label
-      );
+      expect(
+        getByTestId("card-title-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+      ).toBe(connectionsFix[0].label);
     });
     const noteInput = getByTestId("edit-connections-modal-note-title-1");
     const noteMessageInput = getByTestId(
@@ -400,9 +432,9 @@ describe("Edit Connection Modal", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("connection-name").innerHTML).toBe(
-        connectionsFix[0].label
-      );
+      expect(
+        getByTestId("card-title-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+      ).toBe(connectionsFix[0].label);
     });
 
     const noteInput = getByTestId("edit-connections-modal-note-title-1");
@@ -424,40 +456,39 @@ describe("Edit Connection Modal", () => {
 
     const confirmFn = jest.fn();
 
-    const { getByTestId, getByText, queryByText, unmount, getAllByText } =
-      render(
-        <Provider store={storeMocked}>
-          <EditConnectionsContainer
-            onConfirm={confirmFn}
-            modalIsOpen={true}
-            setModalIsOpen={jest.fn()}
-            setNotes={jest.fn()}
-            notes={[
-              {
-                id: "temp-1",
-                title: "Note temp",
-                message: "Note message temp",
-              },
-              {
-                id: "1",
-                title: "Note 1",
-                message: "Note message 1",
-              },
-              {
-                id: "2",
-                title: "Note 1",
-                message: "Note message 1",
-              },
-            ]}
-            connectionDetails={connectionsFix[0]}
-          />
-        </Provider>
-      );
+    const { getByTestId, unmount } = render(
+      <Provider store={storeMocked}>
+        <EditConnectionsContainer
+          onConfirm={confirmFn}
+          modalIsOpen={true}
+          setModalIsOpen={jest.fn()}
+          setNotes={jest.fn()}
+          notes={[
+            {
+              id: "temp-1",
+              title: "Note temp",
+              message: "Note message temp",
+            },
+            {
+              id: "1",
+              title: "Note 1",
+              message: "Note message 1",
+            },
+            {
+              id: "2",
+              title: "Note 1",
+              message: "Note message 1",
+            },
+          ]}
+          connectionDetails={connectionsFix[0]}
+        />
+      </Provider>
+    );
 
     await waitFor(() => {
-      expect(getByTestId("connection-name").innerHTML).toBe(
-        connectionsFix[0].label
-      );
+      expect(
+        getByTestId("card-title-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+      ).toBe(connectionsFix[0].label);
     });
     const noteInput = getByTestId("edit-connections-modal-note-title-1");
     const noteMessageInput = getByTestId(
@@ -559,9 +590,9 @@ describe("Edit Connection Modal", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("connection-name").innerHTML).toBe(
-        connectionsFix[0].label
-      );
+      expect(
+        getByTestId("card-title-ebfeb1ebc6f1c276ef71212ec20").innerHTML
+      ).toBe(connectionsFix[0].label);
     });
 
     const actionBtn = getByTestId("action-button");
@@ -574,6 +605,177 @@ describe("Edit Connection Modal", () => {
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.FAILED_UPDATE_CONNECTION)
       );
+    });
+  });
+
+  test("Done button closes modal without saving changes", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialStateFull),
+      dispatch: dispatchMock,
+    };
+
+    const setModalIsOpenMock = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <EditConnectionsContainer
+          onConfirm={jest.fn()}
+          modalIsOpen={true}
+          setModalIsOpen={setModalIsOpenMock}
+          setNotes={jest.fn()}
+          notes={[
+            {
+              id: "1",
+              title: "Note 1",
+              message: "Note message 1",
+            },
+          ]}
+          connectionDetails={connectionsFix[0]}
+        />
+      </Provider>
+    );
+
+    const closeBtn = getByTestId("close-button");
+
+    act(() => {
+      ionFireEvent.click(closeBtn);
+    });
+
+    await waitFor(() => {
+      expect(setModalIsOpenMock).toBeCalledWith(false);
+      expect(createNoteMock).not.toBeCalled();
+      expect(updateNoteMock).not.toBeCalled();
+      expect(deleteNoteMock).not.toBeCalled();
+    });
+  });
+
+  test("Confirm button disabled when validation errors exist", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialStateFull),
+      dispatch: dispatchMock,
+    };
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <EditConnectionsContainer
+          onConfirm={jest.fn()}
+          modalIsOpen={true}
+          setModalIsOpen={jest.fn()}
+          setNotes={jest.fn()}
+          notes={[
+            {
+              id: "1",
+              title: "A".repeat(65),
+              message: "Valid message",
+            },
+          ]}
+          connectionDetails={connectionsFix[0]}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      const actionBtn = getByTestId("action-button");
+      expect(actionBtn).toBeDisabled();
+    });
+  });
+
+  test("Connection icon is displayed", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialStateFull),
+      dispatch: dispatchMock,
+    };
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <EditConnectionsModal
+          onConfirm={jest.fn()}
+          modalIsOpen={true}
+          setModalIsOpen={jest.fn()}
+          setNotes={jest.fn()}
+          notes={[]}
+          connectionDetails={connectionsFix[0]}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("card-fallback-logo")).toBeVisible();
+    });
+  });
+
+  test("Error messages displayed for invalid input", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialStateFull),
+      dispatch: dispatchMock,
+    };
+
+    const { getByTestId, getByText } = render(
+      <Provider store={storeMocked}>
+        <EditConnectionsContainer
+          onConfirm={jest.fn()}
+          modalIsOpen={true}
+          setModalIsOpen={jest.fn()}
+          setNotes={jest.fn()}
+          notes={[
+            {
+              id: "1",
+              title:
+                "This is a very long title that exceeds the maximum length of 64 characters and should show an error message", // Title too long should show error
+              message: "Valid message",
+            },
+          ]}
+          connectionDetails={connectionsFix[0]}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.tabs.connections.details.notes.errors.title)
+      ).toBeVisible();
+    });
+  });
+
+  test("Confirm button enabled when no changes made", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialStateFull),
+      dispatch: dispatchMock,
+    };
+
+    const confirmFn = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <EditConnectionsContainer
+          onConfirm={confirmFn}
+          modalIsOpen={true}
+          setModalIsOpen={jest.fn()}
+          setNotes={jest.fn()}
+          notes={[
+            {
+              id: "1",
+              title: "Note 1",
+              message: "Note message 1",
+            },
+          ]}
+          connectionDetails={connectionsFix[0]}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      const confirmBtn = getByTestId("action-button");
+      expect(confirmBtn.getAttribute("disabled")).toBe("false");
+    });
+
+    act(() => {
+      const confirmBtn = getByTestId("action-button");
+      ionFireEvent.click(confirmBtn);
+    });
+
+    await waitFor(() => {
+      expect(confirmFn).toBeCalledTimes(1);
     });
   });
 });
