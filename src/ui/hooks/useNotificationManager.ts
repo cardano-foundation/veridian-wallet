@@ -4,11 +4,13 @@ import { getCurrentProfile } from "../../store/reducers/profileCache";
 import { useNotificationService } from "../../core/services/notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 import { showError } from "../../ui/utils/error";
+import { useBackgroundNotifications } from "./useBackgroundNotifications";
 
 export const useNotificationManager = () => {
   const currentProfile = useAppSelector(getCurrentProfile);
   const dispatch = useAppDispatch();
   const notificationService = useNotificationService();
+  const backgroundNotifications = useBackgroundNotifications();
 
   useEffect(() => {
     // Initialize notification permissions on app start
@@ -41,5 +43,7 @@ export const useNotificationManager = () => {
   return {
     showProfileNotification,
     requestPermissions: () => notificationService.requestPermissions(),
+    triggerBackgroundCheck: backgroundNotifications.triggerBackgroundCheck,
+    getBackgroundStatus: backgroundNotifications.getStatus,
   };
 };

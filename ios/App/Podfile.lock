@@ -41,6 +41,8 @@ PODS:
     - Capacitor
   - CapacitorStatusBar (7.0.0):
     - Capacitor
+  - CapawesomeCapacitorBackgroundTask (7.0.1):
+    - Capacitor
   - EvvaCapacitorSecureStoragePlugin (3.1.0):
     - Capacitor
     - SimpleKeychain
@@ -119,6 +121,7 @@ DEPENDENCIES:
   - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - "CapawesomeCapacitorBackgroundTask (from `../../node_modules/@capawesome/capacitor-background-task`)"
   - "EvvaCapacitorSecureStoragePlugin (from `../../node_modules/@evva/capacitor-secure-storage-plugin`)"
 
 SPEC REPOS:
@@ -179,6 +182,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/splash-screen"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  CapawesomeCapacitorBackgroundTask:
+    :path: "../../node_modules/@capawesome/capacitor-background-task"
   EvvaCapacitorSecureStoragePlugin:
     :path: "../../node_modules/@evva/capacitor-secure-storage-plugin"
 
@@ -203,6 +208,7 @@ SPEC CHECKSUMS:
   CapacitorShare: d94c53d7656f1ce8f6712ae8d19ab0c18a69259f
   CapacitorSplashScreen: 7e7a0a1113833032f196b3af6fa437baccacf5bc
   CapacitorStatusBar: a8c4c83ed2e973bdafb979e80e4b00d027832cb7
+  CapawesomeCapacitorBackgroundTask: e17ea2608e9bdd14889d8eba2d793ff9c337db6c
   EvvaCapacitorSecureStoragePlugin: 43df44513abd5295a63f8e8813e9b5b7159dbfe0
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleMLKit: eff9e23ec1d90ea4157a1ee2e32a4f610c5b3318
@@ -219,6 +225,6 @@ SPEC CHECKSUMS:
   SQLCipher: 77fbe633cd84db04b07876dd50766b4924b57d61
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
 
-PODFILE CHECKSUM: bce21da69b8b9fa70d6734aa111bea3259a8a84d
+PODFILE CHECKSUM: 3c489312b285c0feb33d27a88d402019e544a9ab
 
 COCOAPODS: 1.16.2
