@@ -46,6 +46,7 @@ import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
 import { SystemThreatAlert } from "./pages/SystemThreatAlert/SystemThreatAlert";
 import { ConfigurationService } from "../core/configuration";
 import { i18n } from "../i18n";
+import { useNotificationManager } from "./hooks/useNotificationManager";
 
 setupIonicReact();
 
@@ -64,6 +65,9 @@ const App = () => {
 
   const [threatsDetected, setThreatsDetected] = useState<ThreatCheck[]>([]);
   const dispatch = useAppDispatch();
+
+  // Initialize notification system
+  useNotificationManager();
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;

@@ -79,6 +79,7 @@ import {
 import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { useProfile } from "../../hooks/useProfile";
+import { useLocalNotifications } from "../../hooks/useLocalNotifications";
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
 import { showError } from "../../utils/error";
 import { Alert } from "../Alert";
@@ -238,6 +239,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
   const [isAlertPeerBrokenOpen, setIsAlertPeerBrokenOpen] = useState(false);
   const { getRecentDefaultProfile, updateProfileHistories } = useProfile();
   useActivityTimer();
+  useLocalNotifications();
 
   const setOnlineStatus = useCallback(
     (value: boolean) => {
