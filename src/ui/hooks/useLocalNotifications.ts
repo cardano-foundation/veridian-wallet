@@ -1,40 +1,78 @@
 import { useEffect, useRef } from "react";
-import { useAppSelector } from "../../store/hooks";
-import { getNotificationsCache } from "../../store/reducers/profileCache";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
+import {
+  getCurrentProfile,
+  setCurrentProfile,
+  getProfiles,
+} from "../../store/reducers/profileCache";
 import { useNotificationService } from "../../core/services/notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 
 export const useLocalNotifications = () => {
-  const notifications = useAppSelector(getNotificationsCache);
+  const allProfiles = useAppSelector(getProfiles);
+  const currentProfile = useAppSelector(getCurrentProfile);
+  const dispatch = useAppDispatch();
   const notificationService = useNotificationService();
   const shownNotificationsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    // Show local notifications for newly unread notifications
-    const unreadNotifications = notifications.filter(
-      (notification) =>
-        !notification.read &&
-        !shownNotificationsRef.current.has(notification.id)
-    );
+    // Set up profile switcher for notification taps
+    notificationService.setProfileSwitcher((profileId: string) => {
+      dispatch(setCurrentProfile(profileId));
+    });
+  }, [notificationService, dispatch]);
 
-    unreadNotifications.forEach((notification) => {
-      notificationService.showLocalNotification(notification);
+  useEffect(() => {
+    // Get all unread notifications from all profiles
+    const allUnreadNotifications: KeriaNotification[] = [];
+
+    if (allProfiles) {
+      Object.values(allProfiles).forEach((profile) => {
+        if (profile.notifications) {
+          const unreadFromProfile = profile.notifications.filter(
+            (notification) =>
+              !notification.read &&
+              !shownNotificationsRef.current.has(notification.id)
+          );
+          allUnreadNotifications.push(...unreadFromProfile);
+        }
+      });
+    }
+
+    allUnreadNotifications.forEach((notification) => {
+      notificationService.showLocalNotification(
+        notification,
+        currentProfile?.identity.id
+      );
       shownNotificationsRef.current.add(notification.id);
     });
 
-    // Clean up shown notifications that are no longer in the cache
-    const currentNotificationIds = new Set(notifications.map((n) => n.id));
+    // Clean up shown notifications that are no longer in any profile's cache
+    const allCurrentNotificationIds = new Set<string>();
+    if (allProfiles) {
+      Object.values(allProfiles).forEach((profile) => {
+        if (profile.notifications) {
+          profile.notifications.forEach((notification) => {
+            allCurrentNotificationIds.add(notification.id);
+          });
+        }
+      });
+    }
+
     shownNotificationsRef.current.forEach((id) => {
-      if (!currentNotificationIds.has(id)) {
+      if (!allCurrentNotificationIds.has(id)) {
         shownNotificationsRef.current.delete(id);
       }
     });
-  }, [notifications, notificationService]);
+  }, [allProfiles, notificationService, currentProfile]);
 
   return {
     showNotification: (notification: KeriaNotification) => {
       if (!shownNotificationsRef.current.has(notification.id)) {
-        notificationService.showLocalNotification(notification);
+        notificationService.showLocalNotification(
+          notification,
+          currentProfile?.identity.id
+        );
         shownNotificationsRef.current.add(notification.id);
       }
     },

@@ -1,5 +1,6 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { App } from "@capacitor/app";
+import { Device } from "@capacitor/device";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
 import {
@@ -22,12 +23,15 @@ interface LocalNotification {
   id: number;
   extra?: {
     route?: string;
-    [key: string]: any;
+    profileId?: string;
+    [key: string]: unknown;
   };
 }
 
 class NotificationService {
   private history: ReturnType<typeof useHistory> | null = null;
+  private profileSwitcher: ((profileId: string) => void) | null = null;
+  private pendingNotificationTaps: LocalNotification[] = [];
 
   constructor() {
     this.initialize();
@@ -35,13 +39,23 @@ class NotificationService {
 
   setHistory(history: ReturnType<typeof useHistory>) {
     this.history = history;
+    // Process any pending notification taps now that we have history
+    this.processPendingNotificationTaps();
+  }
+
+  setProfileSwitcher(profileSwitcher: (profileId: string) => void) {
+    this.profileSwitcher = profileSwitcher;
   }
 
   private async initialize() {
     // Request permissions on app start
     await this.requestPermissions();
 
-    // Listen for notification actions (taps)
+    // Get device info to determine platform
+    const deviceInfo = await Device.getInfo();
+    const isIOS = deviceInfo.platform === "ios";
+
+    // Listen for notification actions (taps) - works on both platforms
     LocalNotifications.addListener(
       "localNotificationActionPerformed",
       (event) => {
@@ -49,10 +63,23 @@ class NotificationService {
       }
     );
 
+    // On iOS, also listen for notification received as fallback
+    if (isIOS) {
+      LocalNotifications.addListener("localNotificationReceived", (event) => {
+        // On iOS, sometimes tapping a notification triggers this event
+        // Try to handle it as a tap if we have the notification data
+        if (event && event.extra) {
+          this.handleNotificationTap(event as LocalNotification);
+        }
+      });
+    }
+
     // Listen for app coming to foreground
     App.addListener("appStateChange", (state) => {
       if (state.isActive) {
         this.clearDeliveredNotifications();
+        // Check if app was launched from notification
+        this.checkAppLaunchFromNotification();
       }
     });
   }
@@ -67,6 +94,41 @@ class NotificationService {
     }
   }
 
+  private async registerNotificationActions(): Promise<void> {
+    try {
+      // Only register actions on iOS
+      const deviceInfo = await Device.getInfo();
+      if (deviceInfo.platform === "ios") {
+        await LocalNotifications.registerActionTypes({
+          types: [
+            {
+              id: "default",
+              actions: [
+                {
+                  id: "tap",
+                  title: "Open",
+                  foreground: true,
+                },
+              ],
+            },
+          ],
+        });
+      }
+    } catch (error) {
+      // Failed to register notification actions - silently ignore
+    }
+  }
+
+  private async isAppInForeground(): Promise<boolean> {
+    try {
+      const state = await App.getState();
+      return state.isActive;
+    } catch (error) {
+      // If we can't determine app state, assume it's in foreground to be safe
+      return true;
+    }
+  }
+
   async scheduleNotification(payload: NotificationPayload): Promise<void> {
     try {
       await LocalNotifications.schedule({
@@ -75,7 +137,8 @@ class NotificationService {
             id: parseInt(payload.notificationId),
             title: payload.title,
             body: payload.body,
-            schedule: { at: new Date() }, // Immediate delivery
+            // Remove schedule for immediate delivery
+            actionTypeId: "default", // Add default action for iOS tap handling
             extra: {
               profileId: payload.profileId,
               type: payload.type,
@@ -90,8 +153,15 @@ class NotificationService {
   }
 
   async showLocalNotification(
-    keriaNotification: KeriaNotification
+    keriaNotification: KeriaNotification,
+    _currentProfileId?: string
   ): Promise<void> {
+    // Only show notifications when app is in foreground
+    const isAppActive = await this.isAppInForeground();
+    if (!isAppActive) {
+      return;
+    }
+
     const payload = this.mapKeriaNotificationToPayload(keriaNotification);
 
     if (payload) {
@@ -164,7 +234,7 @@ class NotificationService {
   }
 
   private getNotificationTitle(
-    notification: KeriaNotification,
+    _notification: KeriaNotification,
     _type: string
   ): string {
     return "Cardano Foundation";
@@ -206,13 +276,70 @@ class NotificationService {
   }
 
   private handleNotificationTap(notification: LocalNotification): void {
+    // Try to process immediately if history is available
+    if (this.history) {
+      this.processNotificationTap(notification);
+      return;
+    }
+
+    // If history is not available, queue and try again with increasing delays
+    this.pendingNotificationTaps.push(notification);
+
+    // Try multiple times with increasing delays
+    const tryProcess = (attempt: number) => {
+      if (this.history && this.pendingNotificationTaps.length > 0) {
+        this.processPendingNotificationTaps();
+      } else if (attempt < 5) {
+        // Try up to 5 times
+        setTimeout(() => tryProcess(attempt + 1), attempt * 500); // 0.5s, 1s, 1.5s, 2s, 2.5s
+      } else {
+        // Clear the queue if we can't process after multiple attempts
+        this.pendingNotificationTaps = [];
+      }
+    };
+
+    setTimeout(() => tryProcess(1), 500);
+  }
+
+  private processNotificationTap(notification: LocalNotification): void {
+    const extra = notification.extra || {};
+    const profileId = extra.profileId;
+
+    // Switch to the relevant profile if different from current
+    if (profileId && this.profileSwitcher) {
+      this.profileSwitcher(profileId);
+    }
+
+    // Navigate to the notifications tab using hash navigation
+    // This works with Ionic's router system
+    window.location.hash = TabsRoutePath.NOTIFICATIONS;
+  }
+
+  private async checkAppLaunchFromNotification(): Promise<void> {
+    try {
+      // Check if app was launched from a notification
+      const launchUrl = await App.getLaunchUrl();
+      if (launchUrl && launchUrl.url) {
+        // If launched from URL, it might be from a notification
+        // For now, just process any pending taps
+        if (this.pendingNotificationTaps.length > 0) {
+          this.processPendingNotificationTaps();
+        }
+      }
+    } catch (error) {
+      // Failed to check app launch - silently ignore
+    }
+  }
+
+  private processPendingNotificationTaps(): void {
     if (!this.history) return;
 
-    const extra = notification.extra || {};
-    const route = extra.route || TabsRoutePath.NOTIFICATIONS;
-
-    // Navigate to the appropriate section
-    this.history.push(route);
+    while (this.pendingNotificationTaps.length > 0) {
+      const notification = this.pendingNotificationTaps.shift();
+      if (notification) {
+        this.processNotificationTap(notification);
+      }
+    }
   }
 
   async clearDeliveredNotifications(): Promise<void> {

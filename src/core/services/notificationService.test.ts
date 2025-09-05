@@ -1,9 +1,5 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
-import { App } from "@capacitor/app";
-import {
-  notificationService,
-  NotificationService,
-} from "./notificationService";
+import { notificationService } from "./notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 
 // Mock Capacitor plugins
@@ -113,7 +109,7 @@ describe("NotificationService", () => {
             id: 1,
             title: "Test Notification",
             body: "Test body",
-            schedule: { at: expect.any(Date) },
+            actionTypeId: "default",
             extra: {
               profileId: "profile-123",
               type: "general",
@@ -259,6 +255,7 @@ describe("NotificationService", () => {
       expect(scheduledNotification.title).toBe("Cardano Foundation");
       expect(scheduledNotification.extra.type).toBe("multisig");
       expect(scheduledNotification.extra.route).toBe("/tabs/credentials");
+      expect(scheduledNotification.actionTypeId).toBe("default");
     });
 
     it("should map credential notifications correctly", async () => {
@@ -285,6 +282,7 @@ describe("NotificationService", () => {
       expect(scheduledNotification.title).toBe("Cardano Foundation");
       expect(scheduledNotification.extra.type).toBe("credential");
       expect(scheduledNotification.extra.route).toBe("/tabs/credentials");
+      expect(scheduledNotification.actionTypeId).toBe("default");
     });
 
     it("should handle unknown notification types", async () => {
@@ -311,11 +309,20 @@ describe("NotificationService", () => {
       expect(scheduledNotification.title).toBe("Cardano Foundation");
       expect(scheduledNotification.extra.type).toBe("connection");
       expect(scheduledNotification.extra.route).toBe("/tabs/connections");
+      expect(scheduledNotification.actionTypeId).toBe("default");
     });
   });
 
   describe("notification tap handling", () => {
-    it("should navigate to specified route when notification is tapped", () => {
+    beforeEach(() => {
+      // Mock window.location.hash
+      Object.defineProperty(window, "location", {
+        value: { hash: "" },
+        writable: true,
+      });
+    });
+
+    it("should navigate to notifications when notification is tapped", () => {
       const notification = {
         id: 1,
         extra: {
@@ -326,7 +333,7 @@ describe("NotificationService", () => {
       // Access private method for testing
       (notificationService as any).handleNotificationTap(notification);
 
-      expect(mockHistory.push).toHaveBeenCalledWith("/credentials");
+      expect(window.location.hash).toBe("/tabs/notifications");
     });
 
     it("should navigate to notifications when no route specified", () => {
@@ -337,10 +344,10 @@ describe("NotificationService", () => {
 
       (notificationService as any).handleNotificationTap(notification);
 
-      expect(mockHistory.push).toHaveBeenCalledWith("/tabs/notifications");
+      expect(window.location.hash).toBe("/tabs/notifications");
     });
 
-    it("should not navigate if no history set", () => {
+    it("should queue notification tap if no history set", () => {
       (notificationService as any).history = null;
 
       const notification = {
@@ -351,6 +358,37 @@ describe("NotificationService", () => {
       (notificationService as any).handleNotificationTap(notification);
 
       expect(mockHistory.push).not.toHaveBeenCalled();
+      expect((notificationService as any).pendingNotificationTaps).toHaveLength(
+        1
+      );
+      expect((notificationService as any).pendingNotificationTaps[0]).toBe(
+        notification
+      );
+    });
+
+    it("should process pending notification taps when history is set", () => {
+      (notificationService as any).history = null;
+
+      const notification = {
+        id: 1,
+        extra: { route: "/test" },
+      };
+
+      (notificationService as any).handleNotificationTap(notification);
+      expect((notificationService as any).pendingNotificationTaps).toHaveLength(
+        1
+      );
+
+      // Set history
+      (notificationService as any).history = mockHistory;
+
+      // Process pending taps
+      (notificationService as any).processPendingNotificationTaps();
+
+      expect(window.location.hash).toBe("/tabs/notifications");
+      expect((notificationService as any).pendingNotificationTaps).toHaveLength(
+        0
+      );
     });
   });
 });

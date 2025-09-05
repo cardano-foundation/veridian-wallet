@@ -5,6 +5,7 @@ import { KeriaNotification } from "../../core/agent/services/keriaNotificationSe
 // Mock React Redux
 jest.mock("../../store/hooks", () => ({
   useAppSelector: jest.fn(),
+  useAppDispatch: jest.fn(),
 }));
 
 // Mock notification service
@@ -13,11 +14,19 @@ jest.mock("../../core/services/notificationService", () => ({
 }));
 
 // Import the mocked functions
-import { useAppSelector } from "../../store/hooks";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { useNotificationService } from "../../core/services/notificationService";
+import {
+  getNotificationsCache,
+  getCurrentProfile,
+  getProfiles,
+} from "../../store/reducers/profileCache";
 
 const mockUseAppSelector = useAppSelector as jest.MockedFunction<
   typeof useAppSelector
+>;
+const mockUseAppDispatch = useAppDispatch as jest.MockedFunction<
+  typeof useAppDispatch
 >;
 const mockUseNotificationService =
   useNotificationService as jest.MockedFunction<typeof useNotificationService>;
@@ -26,19 +35,31 @@ describe("useLocalNotifications", () => {
   const mockShowLocalNotification = jest.fn();
   const mockRequestPermissions = jest.fn();
 
-  const mockNotificationService = {
-    showLocalNotification: mockShowLocalNotification,
-    requestPermissions: mockRequestPermissions,
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseAppSelector.mockReturnValue([]);
+
+    // Mock useAppSelector to return different values based on the selector
+    mockUseAppSelector.mockImplementation((selector) => {
+      if (selector === getNotificationsCache) {
+        return [];
+      }
+      if (selector === getCurrentProfile) {
+        return { identity: { id: "test-profile-id" } };
+      }
+      if (selector === getProfiles) {
+        return {};
+      }
+      return undefined;
+    });
+
+    // Mock useAppDispatch
+    mockUseAppDispatch.mockReturnValue(jest.fn());
 
     // Mock only the methods we actually use
     mockUseNotificationService.mockReturnValue({
       showLocalNotification: mockShowLocalNotification,
       requestPermissions: mockRequestPermissions,
+      setProfileSwitcher: jest.fn(),
     } as any);
   });
 
@@ -71,7 +92,10 @@ describe("useLocalNotifications", () => {
       result.current.showNotification(mockNotification);
     });
 
-    expect(mockShowLocalNotification).toHaveBeenCalledWith(mockNotification);
+    expect(mockShowLocalNotification).toHaveBeenCalledWith(
+      mockNotification,
+      "test-profile-id"
+    );
     expect(mockShowLocalNotification).toHaveBeenCalledTimes(1);
   });
 
@@ -117,19 +141,50 @@ describe("useLocalNotifications", () => {
       },
     ];
 
-    mockUseAppSelector.mockReturnValue(mockNotifications);
+    const mockProfiles = {
+      "test-profile-id": {
+        notifications: mockNotifications,
+      },
+    };
+
+    // Mock useAppSelector to return profiles with notifications
+    mockUseAppSelector.mockImplementation((selector) => {
+      if (selector === getProfiles) {
+        return mockProfiles;
+      }
+      if (selector === getCurrentProfile) {
+        return { identity: { id: "test-profile-id" } };
+      }
+      return undefined;
+    });
 
     renderHook(() => useLocalNotifications());
 
     // Should only show the unread notification
     expect(mockShowLocalNotification).toHaveBeenCalledTimes(1);
     expect(mockShowLocalNotification).toHaveBeenCalledWith(
-      mockNotifications[1]
+      mockNotifications[1],
+      "test-profile-id"
     );
   });
 
   it("should handle empty notifications array", () => {
-    mockUseAppSelector.mockReturnValue([]);
+    const mockProfiles = {
+      "test-profile-id": {
+        notifications: [],
+      },
+    };
+
+    // Mock useAppSelector to return profiles with empty notifications
+    mockUseAppSelector.mockImplementation((selector) => {
+      if (selector === getProfiles) {
+        return mockProfiles;
+      }
+      if (selector === getCurrentProfile) {
+        return { identity: { id: "test-profile-id" } };
+      }
+      return undefined;
+    });
 
     renderHook(() => useLocalNotifications());
 
