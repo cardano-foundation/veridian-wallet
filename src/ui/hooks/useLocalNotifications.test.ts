@@ -10,12 +10,16 @@ jest.mock("../../store/hooks", () => ({
 
 // Mock notification service
 jest.mock("../../core/services/notificationService", () => ({
-  useNotificationService: jest.fn(),
+  notificationService: {
+    showLocalNotification: jest.fn(),
+    requestPermissions: jest.fn(),
+    setProfileSwitcher: jest.fn(),
+  },
 }));
 
 // Import the mocked functions
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { useNotificationService } from "../../core/services/notificationService";
+import { notificationService } from "../../core/services/notificationService";
 import {
   getNotificationsCache,
   getCurrentProfile,
@@ -28,8 +32,9 @@ const mockUseAppSelector = useAppSelector as jest.MockedFunction<
 const mockUseAppDispatch = useAppDispatch as jest.MockedFunction<
   typeof useAppDispatch
 >;
-const mockUseNotificationService =
-  useNotificationService as jest.MockedFunction<typeof useNotificationService>;
+const mockNotificationService = notificationService as jest.Mocked<
+  typeof notificationService
+>;
 
 describe("useLocalNotifications", () => {
   const mockShowLocalNotification = jest.fn();
@@ -56,11 +61,8 @@ describe("useLocalNotifications", () => {
     mockUseAppDispatch.mockReturnValue(jest.fn());
 
     // Mock only the methods we actually use
-    mockUseNotificationService.mockReturnValue({
-      showLocalNotification: mockShowLocalNotification,
-      requestPermissions: mockRequestPermissions,
-      setProfileSwitcher: jest.fn(),
-    } as any);
+    mockNotificationService.showLocalNotification = mockShowLocalNotification;
+    mockNotificationService.requestPermissions = mockRequestPermissions;
   });
 
   it("should return showNotification and requestPermissions functions", () => {

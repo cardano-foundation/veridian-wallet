@@ -32,22 +32,11 @@ jest.mock("react-router-dom", () => ({
 }));
 
 describe("NotificationService", () => {
-  let mockHistory: any;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    mockHistory = {
-      push: jest.fn(),
-      replace: jest.fn(),
-      goBack: jest.fn(),
-      length: 1,
-      action: "PUSH",
-      location: { pathname: "/", search: "", hash: "", state: null },
-    };
 
     // Reset the singleton instance
     (notificationService as any).history = null;
-    notificationService.setHistory(mockHistory);
   });
 
   describe("requestPermissions", () => {
@@ -209,27 +198,6 @@ describe("NotificationService", () => {
     });
   });
 
-  describe("setHistory", () => {
-    it("should set the history object", () => {
-      const newHistory = {
-        push: jest.fn(),
-        replace: jest.fn(),
-        goBack: jest.fn(),
-        go: jest.fn(),
-        goForward: jest.fn(),
-        block: jest.fn(),
-        listen: jest.fn(),
-        createHref: jest.fn(),
-        length: 1,
-        action: "PUSH" as const,
-        location: { pathname: "/", search: "", hash: "", state: null },
-      };
-      notificationService.setHistory(newHistory);
-
-      expect((notificationService as any).history).toBe(newHistory);
-    });
-  });
-
   describe("private methods via showLocalNotification", () => {
     it("should map multisig notifications correctly", async () => {
       const notification: KeriaNotification = {
@@ -322,7 +290,7 @@ describe("NotificationService", () => {
       });
     });
 
-    it("should navigate to notifications when notification is tapped", () => {
+    it("should navigate to notifications when notification is tapped", async () => {
       const notification = {
         id: 1,
         extra: {
@@ -333,10 +301,13 @@ describe("NotificationService", () => {
       // Access private method for testing
       (notificationService as any).handleNotificationTap(notification);
 
+      // Wait for the setTimeout to complete
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
       expect(window.location.hash).toBe("/tabs/notifications");
     });
 
-    it("should navigate to notifications when no route specified", () => {
+    it("should navigate to notifications when no route specified", async () => {
       const notification = {
         id: 1,
         extra: {},
@@ -344,12 +315,13 @@ describe("NotificationService", () => {
 
       (notificationService as any).handleNotificationTap(notification);
 
+      // Wait for the setTimeout to complete
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
       expect(window.location.hash).toBe("/tabs/notifications");
     });
 
-    it("should queue notification tap if no history set", () => {
-      (notificationService as any).history = null;
-
+    it("should process notification tap immediately", async () => {
       const notification = {
         id: 1,
         extra: { route: "/test" },
@@ -357,38 +329,10 @@ describe("NotificationService", () => {
 
       (notificationService as any).handleNotificationTap(notification);
 
-      expect(mockHistory.push).not.toHaveBeenCalled();
-      expect((notificationService as any).pendingNotificationTaps).toHaveLength(
-        1
-      );
-      expect((notificationService as any).pendingNotificationTaps[0]).toBe(
-        notification
-      );
-    });
-
-    it("should process pending notification taps when history is set", () => {
-      (notificationService as any).history = null;
-
-      const notification = {
-        id: 1,
-        extra: { route: "/test" },
-      };
-
-      (notificationService as any).handleNotificationTap(notification);
-      expect((notificationService as any).pendingNotificationTaps).toHaveLength(
-        1
-      );
-
-      // Set history
-      (notificationService as any).history = mockHistory;
-
-      // Process pending taps
-      (notificationService as any).processPendingNotificationTaps();
+      // Wait for the setTimeout to complete
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       expect(window.location.hash).toBe("/tabs/notifications");
-      expect((notificationService as any).pendingNotificationTaps).toHaveLength(
-        0
-      );
     });
   });
 });

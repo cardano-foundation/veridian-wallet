@@ -1,8 +1,6 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { App } from "@capacitor/app";
 import { Device } from "@capacitor/device";
-import { useHistory } from "react-router-dom";
-import { useEffect } from "react";
 import {
   KeriaNotification,
   ExchangeRoute,
@@ -29,18 +27,10 @@ interface LocalNotification {
 }
 
 class NotificationService {
-  private history: ReturnType<typeof useHistory> | null = null;
   private profileSwitcher: ((profileId: string) => void) | null = null;
-  private pendingNotificationTaps: LocalNotification[] = [];
 
   constructor() {
     this.initialize();
-  }
-
-  setHistory(history: ReturnType<typeof useHistory>) {
-    this.history = history;
-    // Process any pending notification taps now that we have history
-    this.processPendingNotificationTaps();
   }
 
   setProfileSwitcher(profileSwitcher: (profileId: string) => void) {
@@ -53,7 +43,7 @@ class NotificationService {
 
     // Get device info to determine platform
     const deviceInfo = await Device.getInfo();
-    const isIOS = deviceInfo.platform === "ios";
+    const isIOS = deviceInfo?.platform === "ios";
 
     // Listen for notification actions (taps) - works on both platforms
     LocalNotifications.addListener(
@@ -66,11 +56,9 @@ class NotificationService {
     // On iOS, also listen for notification received as fallback
     if (isIOS) {
       LocalNotifications.addListener("localNotificationReceived", (event) => {
-        // On iOS, sometimes tapping a notification triggers this event
-        // Try to handle it as a tap if we have the notification data
-        if (event && event.extra) {
-          this.handleNotificationTap(event as LocalNotification);
-        }
+        // On iOS, sometimes tapping a notification triggers this event instead of actionPerformed
+        // Only process if this is actually a tap (not just receipt)
+        // This listener should be removed or made more specific to avoid auto-processing
       });
     }
 
@@ -276,29 +264,8 @@ class NotificationService {
   }
 
   private handleNotificationTap(notification: LocalNotification): void {
-    // Try to process immediately if history is available
-    if (this.history) {
-      this.processNotificationTap(notification);
-      return;
-    }
-
-    // If history is not available, queue and try again with increasing delays
-    this.pendingNotificationTaps.push(notification);
-
-    // Try multiple times with increasing delays
-    const tryProcess = (attempt: number) => {
-      if (this.history && this.pendingNotificationTaps.length > 0) {
-        this.processPendingNotificationTaps();
-      } else if (attempt < 5) {
-        // Try up to 5 times
-        setTimeout(() => tryProcess(attempt + 1), attempt * 500); // 0.5s, 1s, 1.5s, 2s, 2.5s
-      } else {
-        // Clear the queue if we can't process after multiple attempts
-        this.pendingNotificationTaps = [];
-      }
-    };
-
-    setTimeout(() => tryProcess(1), 500);
+    // Process immediately using hash navigation - no need to wait for React Router
+    this.processNotificationTap(notification);
   }
 
   private processNotificationTap(notification: LocalNotification): void {
@@ -310,9 +277,12 @@ class NotificationService {
       this.profileSwitcher(profileId);
     }
 
-    // Navigate to the notifications tab using hash navigation
-    // This works with Ionic's router system
-    window.location.hash = TabsRoutePath.NOTIFICATIONS;
+    // Small delay to allow profile switch to take effect before navigation
+    setTimeout(() => {
+      // Navigate to the notifications tab using hash navigation
+      // This works with Ionic's router system
+      window.location.hash = TabsRoutePath.NOTIFICATIONS;
+    }, 100);
   }
 
   private async checkAppLaunchFromNotification(): Promise<void> {
@@ -320,25 +290,10 @@ class NotificationService {
       // Check if app was launched from a notification
       const launchUrl = await App.getLaunchUrl();
       if (launchUrl && launchUrl.url) {
-        // If launched from URL, it might be from a notification
-        // For now, just process any pending taps
-        if (this.pendingNotificationTaps.length > 0) {
-          this.processPendingNotificationTaps();
-        }
+        // App was launched from notification - navigation will be handled by the router
       }
     } catch (error) {
       // Failed to check app launch - silently ignore
-    }
-  }
-
-  private processPendingNotificationTaps(): void {
-    if (!this.history) return;
-
-    while (this.pendingNotificationTaps.length > 0) {
-      const notification = this.pendingNotificationTaps.shift();
-      if (notification) {
-        this.processNotificationTap(notification);
-      }
     }
   }
 
@@ -366,14 +321,3 @@ export const notificationService = new NotificationService();
 
 // Export class for testing
 export { NotificationService };
-
-// React hook for components to use the notification service
-export const useNotificationService = () => {
-  const history = useHistory();
-
-  useEffect(() => {
-    notificationService.setHistory(history);
-  }, [history]);
-
-  return notificationService;
-};

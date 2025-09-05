@@ -222,7 +222,7 @@ class KeriaNotificationService extends AgentService {
           await this.processNotification(notif);
         } catch (error) {
           /* eslint-disable no-console */
-          console.error(`Error when processing notification ${notif.i}`, error);
+          console.warn(`Error when processing notification ${notif.i}`, error);
 
           const failedNotifications = await this.basicStorage.findById(
             MiscRecordId.FAILED_NOTIFICATIONS

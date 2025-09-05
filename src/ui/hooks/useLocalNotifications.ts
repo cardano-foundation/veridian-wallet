@@ -5,14 +5,13 @@ import {
   setCurrentProfile,
   getProfiles,
 } from "../../store/reducers/profileCache";
-import { useNotificationService } from "../../core/services/notificationService";
+import { notificationService } from "../../core/services/notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 
 export const useLocalNotifications = () => {
   const allProfiles = useAppSelector(getProfiles);
   const currentProfile = useAppSelector(getCurrentProfile);
   const dispatch = useAppDispatch();
-  const notificationService = useNotificationService();
   const shownNotificationsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -20,15 +19,19 @@ export const useLocalNotifications = () => {
     notificationService.setProfileSwitcher((profileId: string) => {
       dispatch(setCurrentProfile(profileId));
     });
-  }, [notificationService, dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
-    // Get all unread notifications from all profiles
+    // Get all unread notifications from OTHER profiles (not current profile)
     const allUnreadNotifications: KeriaNotification[] = [];
 
-    if (allProfiles) {
+    if (allProfiles && currentProfile) {
       Object.values(allProfiles).forEach((profile) => {
-        if (profile.notifications) {
+        // Only show notifications from profiles OTHER than the current one
+        if (
+          profile.identity?.id !== currentProfile.identity?.id &&
+          profile.notifications
+        ) {
           const unreadFromProfile = profile.notifications.filter(
             (notification) =>
               !notification.read &&
@@ -64,7 +67,7 @@ export const useLocalNotifications = () => {
         shownNotificationsRef.current.delete(id);
       }
     });
-  }, [allProfiles, notificationService, currentProfile]);
+  }, [allProfiles, currentProfile]);
 
   return {
     showNotification: (notification: KeriaNotification) => {
