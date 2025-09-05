@@ -3,6 +3,7 @@ import { CredentialMetadataRecord, NotificationStorage } from "../records";
 import { CredentialShortDetails } from "./credentialService.types";
 import { Agent } from "../agent";
 import { NotificationRoute } from "./keriaNotificationService.types";
+import { OperationPendingStorage } from "../records/operationPendingStorage";
 
 async function waitAndGetDoneOp(
   client: SignifyClient,
@@ -69,8 +70,11 @@ export const deleteNotificationRecordById = async (
   client: SignifyClient,
   notificationStorage: NotificationStorage,
   id: string,
-  route: NotificationRoute
+  route: NotificationRoute,
+  operationPendingStorage: OperationPendingStorage
 ): Promise<void> => {
+  const notificationRecord = await notificationStorage.findExpectedById(id);
+
   if (!/^\/local/.test(route)) {
     await client
       .notifications()
@@ -82,8 +86,39 @@ export const deleteNotificationRecordById = async (
         }
       });
   }
+
+  if (notificationRecord?.linkedRequest?.current) {
+    await cleanupPendingOperations(operationPendingStorage, notificationRecord.linkedRequest.current);
+  }
+
   await notificationStorage.deleteById(id);
 };
+
+/**
+ * Clean up pending operations related to a notification's linked request
+ * @param operationPendingStorage - Storage for pending operations
+ * @param linkedRequestCurrent - The current linked request identifier
+ */
+async function cleanupPendingOperations(
+  operationPendingStorage: OperationPendingStorage,
+  linkedRequestCurrent: string,
+): Promise<void> {
+  const pendingOperations = await operationPendingStorage.findAllByQuery({
+    filter: {
+      id: { $regex: `^.*\\.${linkedRequestCurrent}$` }
+    }
+  });
+
+  if (pendingOperations.length === 0) {
+    return;
+  }
+
+  const deletePromises = pendingOperations.map(async (operation) => {
+      await operationPendingStorage.deleteById(operation.id);
+  });
+
+  await Promise.allSettled(deletePromises);
+}
 
 function randomSalt(): string {
   return new Salter({}).qb64;

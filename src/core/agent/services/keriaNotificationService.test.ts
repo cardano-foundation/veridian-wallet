@@ -163,6 +163,10 @@ const notificationStorage = jest.mocked({
   deleteById: jest.fn(),
   update: jest.fn(),
   findById: jest.fn(),
+  findExpectedById: jest.fn().mockResolvedValue({
+    id: "test-notification",
+    a: { r: NotificationRoute.ExnIpexGrant }
+  }),
   findAllByQuery: jest.fn(),
   getAll: jest.fn(),
 });
@@ -471,11 +475,21 @@ describe("Signify notification service of agent", () => {
     );
 
     notificationStorage.deleteById = jest.fn();
+    notificationStorage.findExpectedById = jest.fn().mockResolvedValue({
+      id: "uuid",
+      a: { r: NotificationRoute.ExnIpexGrant }
+    });
+    const mockOperationPendingStorage = {
+      findAllByQuery: jest.fn(),
+      deleteById: jest.fn(),
+    } as any;
+    
     await deleteNotificationRecordById(
       agentServicesProps.signifyClient,
       notificationStorage,
       id,
-      NotificationRoute.ExnIpexGrant
+      NotificationRoute.ExnIpexGrant,
+      mockOperationPendingStorage
     );
     expect(notificationStorage.deleteById).toBeCalledWith(id);
     expect(markNotificationMock).toBeCalledWith(id);
@@ -487,11 +501,21 @@ describe("Signify notification service of agent", () => {
       agentServicesProps.signifyClient
     );
     notificationStorage.deleteById = jest.fn();
+    notificationStorage.findExpectedById = jest.fn().mockResolvedValue({
+      id: "uuid",
+      a: { r: NotificationRoute.LocalAcdcRevoked }
+    });
+    const mockOperationPendingStorage = {
+      findAllByQuery: jest.fn(),
+      deleteById: jest.fn(),
+    } as any;
+    
     await deleteNotificationRecordById(
       agentServicesProps.signifyClient,
       notificationStorage,
       id,
-      NotificationRoute.LocalAcdcRevoked
+      NotificationRoute.LocalAcdcRevoked,
+      mockOperationPendingStorage
     );
     expect(notificationStorage.deleteById).toBeCalledWith(id);
     expect(markNotificationMock).not.toBeCalled();

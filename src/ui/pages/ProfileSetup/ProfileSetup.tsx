@@ -1,7 +1,9 @@
+import { repeatOutline } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import { Salter } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
+import { BasicRecord } from "../../../core/agent/records";
 import { IdentifierService } from "../../../core/agent/services";
 import { CreateIdentifierInputs } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
@@ -10,8 +12,9 @@ import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
-  setIndividualFirstCreate,
- getMultisigConnectionsCache } from "../../../store/reducers/profileCache";
+  setGroupProfileCache,
+  setIndividualFirstCreate
+} from "../../../store/reducers/profileCache";
 import {
   getStateCache,
   setPendingJoinGroupMetadata,
@@ -22,10 +25,16 @@ import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
 import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
+import { Scan } from "../../components/Scan";
+import { useCameraDirection } from "../../components/Scan/hook/useCameraDirection";
+import { useScanHandle } from "../../components/Scan/hook/useScanHandle";
+import { ScanRef } from "../../components/Scan/Scan.types";
 import { Spinner } from "../../components/Spinner";
 import { SpinnerConverage } from "../../components/Spinner/Spinner.type";
+import { ToastMsgType } from "../../globals/types";
 import { useAppIonRouter } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
+import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
 import { GroupSetup } from "./components/GroupSetup";
 import { SetupProfile } from "./components/SetupProfile";
@@ -33,14 +42,6 @@ import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
 import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
 import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
-import { Scan } from "../../components/Scan";
-import { ScanRef } from "../../components/Scan/Scan.types";
-import { useScanHandle } from "../../components/Scan/hook/useScanHandle";
-import { useCameraDirection } from "../../components/Scan/hook/useCameraDirection";
-import { repeatOutline } from "ionicons/icons";
-import { BasicRecord } from "../../../core/agent/records";
-import { ToastMsgType } from "../../globals/types";
-import { showError } from "../../utils/error";
 
 export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
@@ -56,7 +57,6 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const [isScanOpen, setIsScanOpen] = useState(false);
   const ionRouter = useAppIonRouter();
   const cacheIdentifier = useRef("");
-  const connectionsCache = useAppSelector(getMultisigConnectionsCache);
   const scanRef = useRef<ScanRef>(null);
   const { resolveGroupConnection } = useScanHandle();
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
@@ -122,8 +122,6 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       theme: 0,
     };
 
-    let groupId = null;
-
     if (isGroup) {
       const groupMetadata = {
         groupId:
@@ -138,7 +136,18 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           : userName, // Set initiatorName to userName for the initiator
       };
       metadata.groupMetadata = groupMetadata;
-      groupId = groupMetadata.groupId; // Store groupId for later navigation
+
+      if (
+        stateCache.pendingJoinGroupMetadata &&
+        metadata.groupMetadata?.groupId
+      ) {
+        dispatch(
+          setGroupProfileCache({
+            groupId: metadata.groupMetadata?.groupId,
+            connections: [stateCache.pendingJoinGroupMetadata.connection],
+          })
+        );
+      }
     }
 
     try {
@@ -182,28 +191,6 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
       await updateDefaultProfile(identifier);
 
-      if (isModal) {
-        onClose?.();
-        navToCredentials(identifier);
-        return;
-      }
-
-      cacheIdentifier.current = identifier;
-
-      setStep(SetupProfileStep.FinishSetup);
-
-      if (groupId) {
-        dispatch(
-          setPendingJoinGroupMetadata({
-            isPendingJoinGroup: true,
-            groupId,
-            groupName,
-            initiatorName:
-              stateCache.pendingJoinGroupMetadata?.initiatorName || null,
-          })
-        );
-      }
-
       // Only clear pending join metadata for group flows.
       if (isGroup) {
         dispatch(setPendingJoinGroupMetadata(null));
@@ -224,6 +211,16 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
           }
         }
       }
+
+      if (isModal) {
+        onClose?.();
+        navToCredentials(identifier);
+        return;
+      }
+
+      cacheIdentifier.current = identifier;
+
+      setStep(SetupProfileStep.FinishSetup);
     } catch (e) {
       showError("createIdentifier error:", e);
       const errorMessage = (e as Error).message;
@@ -321,19 +318,6 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       const scannedGroupName = url.searchParams.get("groupName");
       const groupInitiator = url.searchParams.get("name");
 
-      // prevent joining a group already present in connections cache
-      if (
-        scanGroupId &&
-        connectionsCache &&
-        Object.values(connectionsCache).some(
-          (c: any) => String(c.groupId) === String(scanGroupId)
-        )
-      ) {
-        handleCloseScan();
-        dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR));
-        return;
-      }
-
       if (!scanGroupId) {
         handleCloseScan();
         dispatch(setToastMsg(ToastMsgType.GROUP_ID_NOT_FOUND_ERROR));
@@ -346,27 +330,25 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
         return;
       }
 
-      const isInitiator = false; // Ensure joiner is not the initiator
-
-      await resolveGroupConnection(
+      const invitation = await resolveGroupConnection(
         content,
         scanGroupId,
-        isInitiator,
         () => handleCloseScan(),
         undefined,
-        (id: string) =>
-          dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR))
+        () => dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR))
       );
 
+      if (!invitation) return;
+
       // Update Redux state with all metadata, including initiatorName
-      dispatch(
-        setPendingJoinGroupMetadata({
-          isPendingJoinGroup: true,
-          groupId: scanGroupId,
-          groupName: scannedGroupName,
-          initiatorName: groupInitiator,
-        })
-      );
+      const pendingJoinData = {
+        isPendingJoinGroup: true,
+        groupId: scanGroupId,
+        groupName: scannedGroupName,
+        initiatorName: groupInitiator,
+        connection: invitation.connection,
+      };
+      dispatch(setPendingJoinGroupMetadata(pendingJoinData));
 
       // Update local state
       setGroupName(scannedGroupName);
@@ -376,12 +358,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
           id: MiscRecordId.PENDING_JOIN_GROUP_METADATA,
-          content: {
-            isPendingJoinGroup: true,
-            groupId: scanGroupId,
-            groupName: scannedGroupName,
-            initiatorName: groupInitiator,
-          },
+          content: pendingJoinData,
         })
       );
     } catch (error) {

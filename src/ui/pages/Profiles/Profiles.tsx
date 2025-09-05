@@ -1,7 +1,6 @@
-import { IonButton, IonChip, IonIcon, IonModal } from "@ionic/react";
+import { IonButton, IonIcon, IonModal } from "@ionic/react";
 import {
   addCircleOutline,
-  hourglassOutline,
   peopleCircleOutline,
   personCircleOutline,
   settingsOutline,
@@ -15,7 +14,6 @@ import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getProfiles } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
-import { Avatar } from "../../components/Avatar";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
 import { ProfileDetailsModal } from "../../components/ProfileDetailsModal";
@@ -27,40 +25,8 @@ import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { ProfileSetup } from "../ProfileSetup";
 import "./Profiles.scss";
-import {
-  OptionButtonProps,
-  ProfileItemsProps,
-  ProfilesProps,
-} from "./Profiles.types";
-
-const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
-  if (!identifier) return null;
-  const { id, displayName, creationStatus } = identifier;
-
-  return (
-    <div
-      className="profiles-list-item"
-      onClick={onClick}
-      data-testid={`profiles-list-item-${id}`}
-    >
-      <div className="profiles-list-item-avatar">
-        <Avatar id={id} />
-      </div>
-      <span className="profiles-list-item-inner">
-        <div className="profiles-list-item-name">{displayName}</div>
-        {creationStatus === CreationStatus.PENDING && (
-          <IonChip data-testid={`profiles-list-item-${id}-status`}>
-            <IonIcon
-              icon={hourglassOutline}
-              color="primary"
-            />
-            <span>{CreationStatus.PENDING.toLowerCase()}</span>
-          </IonChip>
-        )}
-      </span>
-    </div>
-  );
-};
+import { OptionButtonProps, ProfilesProps } from "./Profiles.types";
+import { ProfileItem } from "./components/ProfileItem";
 
 const OptionButton = ({ icon, text, action, disabled }: OptionButtonProps) => {
   return (

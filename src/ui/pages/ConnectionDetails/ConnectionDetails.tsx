@@ -241,7 +241,7 @@ const ConnectionDetails = ({
                 data-testid="connection-details-segment-button"
               >
                 <IonLabel>{`${i18n.t(
-                  "tabs.connections.details.details"
+                  "tabs.connections.details.segment.details"
                 )}`}</IonLabel>
               </IonSegmentButton>
               <IonSegmentButton
@@ -249,7 +249,7 @@ const ConnectionDetails = ({
                 data-testid="connection-notes-segment-button"
               >
                 <IonLabel>{`${i18n.t(
-                  "tabs.connections.details.notes"
+                  "tabs.connections.details.segment.notes"
                 )}`}</IonLabel>
               </IonSegmentButton>
             </IonSegment>

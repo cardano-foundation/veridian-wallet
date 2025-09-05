@@ -291,7 +291,8 @@ class KeriaNotificationService extends AgentService {
       this.props.signifyClient,
       this.notificationStorage,
       id,
-      route
+      route,
+      this.operationPendingStorage
     );
   }
 
@@ -1318,7 +1319,8 @@ class KeriaNotificationService extends AgentService {
                 this.props.signifyClient,
                 this.notificationStorage,
                 notification.id,
-                notification.a.r as NotificationRoute
+                notification.a.r as NotificationRoute,
+                this.operationPendingStorage
               );
 
               this.props.eventEmitter.emit<NotificationRemovedEvent>({
@@ -1377,7 +1379,8 @@ class KeriaNotificationService extends AgentService {
                   this.props.signifyClient,
                   this.notificationStorage,
                   notification.id,
-                  notification.a.r as NotificationRoute
+                  notification.a.r as NotificationRoute,
+                  this.operationPendingStorage
                 );
                 continue;
               }
@@ -1444,7 +1447,8 @@ class KeriaNotificationService extends AgentService {
                 this.props.signifyClient,
                 this.notificationStorage,
                 notification.id,
-                notification.a.r as NotificationRoute
+                notification.a.r as NotificationRoute,
+                this.operationPendingStorage
               );
             }
 

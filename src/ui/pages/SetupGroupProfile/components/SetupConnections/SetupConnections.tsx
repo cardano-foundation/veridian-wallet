@@ -3,13 +3,19 @@ import { repeatOutline, warningOutline } from "ionicons/icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
+import {
+  isMultisigConnectionDetails,
+  OobiType,
+} from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
   getMultisigConnectionsCache,
   getProfiles,
   MultiSigGroup,
+  updateOrAddMultisigConnectionCache,
 } from "../../../../../store/reducers/profileCache";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { Avatar } from "../../../../components/Avatar";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
@@ -19,15 +25,13 @@ import { Scan } from "../../../../components/Scan";
 import { useScanHandle } from "../../../../components/Scan/hook/useScanHandle";
 import { ScanRef } from "../../../../components/Scan/Scan.types";
 import { useCameraDirection } from "../../../../components/Scanner/hook/useCameraDirection";
+import { ToastMsgType } from "../../../../globals/types";
 import { useOnlineStatusEffect } from "../../../../hooks";
 import { Profiles } from "../../../Profiles";
 import { StageProps } from "../../SetupGroupProfile.types";
 import "./SetupConnections.scss";
 import { Tab } from "./SetupConnections.types";
 import { ShareConnections } from "./ShareConnections";
-import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../../../globals/types";
-import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
 
 const SetupConnections = ({ setState }: StageProps) => {
   const componentId = "setup-group-profile";
@@ -47,7 +51,7 @@ const SetupConnections = ({ setState }: StageProps) => {
   const userName = profile?.groupMetadata?.userName;
 
   // ensure groupConnections is always an object to avoid runtime errors in tests
-  const groupConnections = useAppSelector(getMultisigConnectionsCache) || {};
+  const groupConnections = useAppSelector(getMultisigConnectionsCache);
 
   const [multiSigGroup, setMultiSigGroup] = useState<
     MultiSigGroup | undefined
@@ -80,10 +84,8 @@ const SetupConnections = ({ setState }: StageProps) => {
   }, [dispatch, groupConnections, groupId]);
 
   useEffect(() => {
-    if (groupConnections && Object.keys(groupConnections).length > 0) {
-      updateMultiSigGroup();
-    }
-  }, [groupConnections, groupId]);
+    updateMultiSigGroup();
+  }, [groupConnections, groupId, updateMultiSigGroup]);
 
   const fetchOobi = useCallback(async () => {
     if (!groupId || !userName) return;
@@ -101,7 +103,7 @@ const SetupConnections = ({ setState }: StageProps) => {
     } catch (e) {
       dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
     }
-  }, [dispatch, groupId, userName, profileId]);
+  }, [groupId, userName, profileId, profile?.displayName, dispatch]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -113,21 +115,25 @@ const SetupConnections = ({ setState }: StageProps) => {
   const handleScan = useCallback(
     async (content: string) => {
       if (!groupId) return;
-      await resolveGroupConnection(
+      const invitation = await resolveGroupConnection(
         content,
         groupId,
-        !!profile?.groupMetadata?.groupInitiator,
         handleClose,
         scanRef.current?.registerScanHandler,
         handleClose
       );
+
+      if (!invitation) return;
+
+      if (isMultisigConnectionDetails(invitation.connection)) {
+        dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
+      }
+
+      if (invitation.type === OobiType.NORMAL) {
+        dispatch(setToastMsg(ToastMsgType.NEW_MULTI_SIGN_MEMBER));
+      }
     },
-    [
-      groupId,
-      handleClose,
-      profile?.groupMetadata?.groupInitiator,
-      resolveGroupConnection,
-    ]
+    [dispatch, groupId, handleClose, resolveGroupConnection]
   );
 
   const handleInit = () => {
