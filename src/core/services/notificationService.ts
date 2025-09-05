@@ -2,7 +2,10 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import { App } from "@capacitor/app";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
-import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
+import {
+  KeriaNotification,
+  ExchangeRoute,
+} from "../../core/agent/services/keriaNotificationService.types";
 import { TabsRoutePath } from "../../routes/paths";
 import { showError } from "../../ui/utils/error";
 
@@ -128,31 +131,62 @@ class NotificationService {
     return "general";
   }
 
+  private getNotificationMessage(route: string, prefix: string): string {
+    switch (route) {
+      case ExchangeRoute.IpexAdmit:
+        return `${prefix} IpexAdmit`;
+      case ExchangeRoute.IpexGrant:
+        return `${prefix} IpexGrant`;
+      case ExchangeRoute.IpexApply:
+        return `${prefix} IpexApply`;
+      case ExchangeRoute.IpexAgree:
+        return `${prefix} IpexAgree`;
+      case ExchangeRoute.IpexOffer:
+        return `${prefix} IpexOffer`;
+      case ExchangeRoute.RemoteSignRef:
+        return `${prefix} RemoteSignRef`;
+      default:
+        // Check for other notification routes
+        if (route.includes("/multisig")) {
+          return prefix === "Title for"
+            ? "Multi-signature Request"
+            : `${prefix} Multi-signature operation`;
+        }
+        if (route.includes("/exn/ipex") || route.includes("/credential")) {
+          return prefix === "Title for"
+            ? "New Credential Message"
+            : `${prefix} Credential exchange`;
+        }
+        return prefix === "Title for"
+          ? "New Connection"
+          : `${prefix} notification`;
+    }
+  }
+
   private getNotificationTitle(
     notification: KeriaNotification,
-    type: string
+    _type: string
   ): string {
-    switch (type) {
-      case "credential":
-        return "New Credential Received";
-      case "multisig":
-        return "Multi-signature Request";
-      case "connection":
-        return "New Connection";
-      default:
-        return "Veridian Wallet";
-    }
+    return "Cardano Foundation";
   }
 
   private getNotificationBody(
     notification: KeriaNotification,
     _type: string
   ): string {
-    // Extract meaningful content from the notification
+    // First, check if notification.a.m exists and is not empty
     const message = notification.a?.m;
-    return typeof message === "string"
-      ? message
-      : "You have a new notification";
+    if (typeof message === "string" && message.trim()) {
+      return message;
+    }
+
+    // If no message, use pre-defined message based on ExchangeRoute
+    const route = notification.a?.r;
+    if (typeof route === "string") {
+      return this.getNotificationMessage(route, "Body for");
+    }
+
+    return "You have a new notification";
   }
 
   private getNotificationRoute(

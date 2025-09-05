@@ -256,7 +256,7 @@ describe("NotificationService", () => {
         .calls[0][0];
       const scheduledNotification = scheduleCall.notifications[0];
 
-      expect(scheduledNotification.title).toBe("Multi-signature Request");
+      expect(scheduledNotification.title).toBe("Cardano Foundation");
       expect(scheduledNotification.extra.type).toBe("multisig");
       expect(scheduledNotification.extra.route).toBe("/tabs/credentials");
     });
@@ -282,7 +282,7 @@ describe("NotificationService", () => {
         .calls[0][0];
       const scheduledNotification = scheduleCall.notifications[0];
 
-      expect(scheduledNotification.title).toBe("New Credential Received");
+      expect(scheduledNotification.title).toBe("Cardano Foundation");
       expect(scheduledNotification.extra.type).toBe("credential");
       expect(scheduledNotification.extra.route).toBe("/tabs/credentials");
     });
@@ -308,7 +308,7 @@ describe("NotificationService", () => {
         .calls[0][0];
       const scheduledNotification = scheduleCall.notifications[0];
 
-      expect(scheduledNotification.title).toBe("New Connection");
+      expect(scheduledNotification.title).toBe("Cardano Foundation");
       expect(scheduledNotification.extra.type).toBe("connection");
       expect(scheduledNotification.extra.route).toBe("/tabs/connections");
     });
