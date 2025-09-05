@@ -39,8 +39,17 @@ export class MenuSettingsSupportScreen {
   async navigateToAnotherWebview() {
     const contexts = await driver.getContexts();
     log.info(`Contexts: ${contexts}`);
-    await driver.switchContext("WEBVIEW_org.cardanofoundation.idw");
-    await driver.switchContext("WEBVIEW_chrome");
+    // Chỉ switch nếu context tồn tại
+    if (contexts.includes("WEBVIEW_org.cardanofoundation.idw")) {
+      await driver.switchContext("WEBVIEW_org.cardanofoundation.idw");
+    } else {
+      throw new Error("WEBVIEW_org.cardanofoundation.idw context not found. Contexts: " + contexts.join(", "));
+    }
+    if (contexts.includes("WEBVIEW_chrome")) {
+      await driver.switchContext("WEBVIEW_chrome");
+    } else {
+      throw new Error("WEBVIEW_chrome context not found. Contexts: " + contexts.join(", "));
+    }
   }
 
   async checkTitle(titleText: string) {
