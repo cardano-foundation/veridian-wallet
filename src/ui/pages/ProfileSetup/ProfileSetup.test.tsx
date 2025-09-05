@@ -5,6 +5,11 @@ const createOrUpdateBasicRecordMock = jest.fn(() => {
   return Promise.resolve(true);
 });
 
+import {
+  BarcodeFormat,
+  BarcodesScannedEvent,
+  BarcodeValueType,
+} from "@capacitor-mlkit/barcode-scanning";
 import { IonInput, IonLabel } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
 import { ionFireEvent } from "@ionic/react-test-utils";
@@ -16,11 +21,15 @@ import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { setCurrentRoute } from "../../../store/reducers/stateCache";
-import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { ProfileSetup } from "./ProfileSetup";
+import {
+  ConnectionShortDetails,
+  ConnectionStatus,
+  OobiType,
+} from "../../../core/agent/agent.types";
 
 jest.mock("signify-ts", () => ({
   ...jest.requireActual("signify-ts"),
@@ -29,9 +38,27 @@ jest.mock("signify-ts", () => ({
   })),
 }));
 
+const connection: ConnectionShortDetails = {
+  id: "ebfeb1ebc6f1c276ef71212ec20",
+  label: "Cambridge University",
+  createdAtUTC: "2017-01-14T19:23:24Z",
+  status: ConnectionStatus.CONFIRMED,
+  groupId: "0AAPHBnxoGK4tDuL4g87Eo9D",
+  contactId: "conn-id-1",
+};
+
+const connectByOobiUrlMock = jest.fn((...arg: unknown[]) => {
+  return {
+    type: OobiType.NORMAL,
+    connection,
+  };
+});
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
+      connections: {
+        connectByOobiUrl: (...arg: unknown[]) => connectByOobiUrlMock(...arg),
+      },
       basicStorage: {
         findById: jest.fn(),
         save: jest.fn(),
@@ -79,6 +106,63 @@ jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
   IonModal: ({ children }: { children: any }) => children,
 }));
+
+jest.mock("@capacitor/core", () => {
+  return {
+    ...jest.requireActual("@capacitor/core"),
+    Capacitor: {
+      isNativePlatform: () => true,
+    },
+  };
+});
+const barcodes = [
+  {
+    displayValue: `http://keria:3902/oobi/EItAgpb3J4xQ5WLyIjFvNaeU07tYPF-dRp6VPHwqEama/agent/EGpkfv0Tw9pdtZHW2iSzLSm1ZreYyyD_1FJRpEl2xiB3?name=Leader&groupId=0AAPHBnxoGK4tDuL4g87Eo9D&groupName=MockGroup`,
+    format: BarcodeFormat.QrCode,
+    rawValue: `http://keria:3902/oobi/EItAgpb3J4xQ5WLyIjFvNaeU07tYPF-dRp6VPHwqEama/agent/EGpkfv0Tw9pdtZHW2iSzLSm1ZreYyyD_1FJRpEl2xiB3?name=Leader&groupId=0AAPHBnxoGK4tDuL4g87Eo9D&groupName=MockGroup`,
+    valueType: BarcodeValueType.Url,
+  },
+];
+
+const addListener = jest.fn(
+  (eventName: string, listenerFunc: (result: BarcodesScannedEvent) => void) => {
+    setTimeout(() => {
+      listenerFunc({
+        barcodes,
+      });
+    }, 100);
+
+    return {
+      remove: jest.fn(),
+    };
+  }
+);
+
+const checkPermisson = jest.fn(() =>
+  Promise.resolve({
+    camera: "granted",
+  })
+);
+
+const requestPermission = jest.fn();
+const startScan = jest.fn();
+const stopScan = jest.fn();
+jest.mock("@capacitor-mlkit/barcode-scanning", () => {
+  return {
+    ...jest.requireActual("@capacitor-mlkit/barcode-scanning"),
+    BarcodeScanner: {
+      checkPermissions: () => checkPermisson(),
+      requestPermissions: () => requestPermission(),
+      addListener: (
+        eventName: string,
+        listenerFunc: (result: BarcodesScannedEvent) => void
+      ) => addListener(eventName, listenerFunc),
+      startScan: () => startScan(),
+      stopScan: () => stopScan(),
+      removeAllListeners: jest.fn(),
+    },
+  };
+});
 
 describe("Profile setup", () => {
   const history = createMemoryHistory();
@@ -631,5 +715,63 @@ describe("Profile setup: use as modal", () => {
         path: TabsRoutePath.CREDENTIALS,
       })
     );
+  });
+
+  test("Join group", async () => {
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ProfileSetup />
+      </Provider>
+    );
+
+    fireEvent.click(getByTestId("identifier-select-group"));
+
+    expect(
+      getByText(EN_TRANSLATIONS.setupprofile.button.confirm)
+    ).toBeVisible();
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.setupprofile.button.confirm));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("join-group-button"));
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+    });
+
+    await waitFor(() => {
+      expect(getByText("MockGroup")).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("primary-button-profile-setup"));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.setupprofile.profilesetup.title)
+      ).toBeVisible();
+    });
+
+    act(() => {
+      ionFireEvent.ionInput(getByTestId("profile-user-name"), "testUser");
+    });
+
+    await waitFor(() => {
+      expect((getByTestId("profile-user-name") as HTMLInputElement).value).toBe(
+        "testUser"
+      );
+    });
+
+    act(() => {
+      fireEvent.click(getByText(EN_TRANSLATIONS.inputrequest.button.confirm));
+    });
+
+    await waitFor(() => {
+      expect(createIdentifierMock).toBeCalled();
+    });
   });
 });

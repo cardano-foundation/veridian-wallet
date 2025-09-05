@@ -50,6 +50,7 @@ const GroupSetup = ({
             expand="block"
             className="open-scan secondary-button"
             onClick={onClickEvent}
+            data-testid="join-group-button"
           >
             <IonIcon
               slot="start"
