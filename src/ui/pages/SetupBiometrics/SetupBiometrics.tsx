@@ -184,7 +184,7 @@ const SetupBiometrics = () => {
         isOpen={showMaxAttemptsAlert}
         setIsOpen={setShowMaxAttemptsAlert}
         dataTestId="alert-max-attempts"
-        headerText={i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds }) as string}
+        headerText={`${i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds })}`}
         confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
         actionConfirm={() => setShowMaxAttemptsAlert(false)}
         backdropDismiss={false}
