@@ -2,22 +2,18 @@ import { useCallback } from "react";
 import { Agent } from "../../../../core/agent/agent";
 import {
   OOBI_AGENT_ONLY_RE,
-  OobiType,
   WOOBI_RE,
-  isMultisigConnectionDetails,
 } from "../../../../core/agent/agent.types";
 import { OobiQueryParams } from "../../../../core/agent/services/connectionService.types";
 import { StorageMessage } from "../../../../core/storage/storage.types";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import {
   getConnectionsCache,
-  setMissingAliasConnection,
-  setOpenConnectionId,
-  updateOrAddMultisigConnectionCache,
   getCurrentProfile,
   getProfiles,
+  setMissingAliasConnection,
+  setOpenConnectionId,
 } from "../../../../store/reducers/profileCache";
-import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../globals/types";
 import { showError } from "../../../utils/error";
 import {
@@ -33,8 +29,8 @@ enum ErrorMessage {
 const useScanHandle = () => {
   const dispatch = useAppDispatch();
   const defaultIdentifier = useAppSelector(getCurrentProfile)?.identity.id;
-  const connections = useAppSelector(getConnectionsCache) as any[];
-  const allProfiles = useAppSelector(getProfiles) as Record<string, any>;
+  const connections = useAppSelector(getConnectionsCache);
+  const allProfiles = useAppSelector(getProfiles);
 
   const handleDuplicateConnectionError = useCallback(
     async (
@@ -122,9 +118,9 @@ const useScanHandle = () => {
         // legacy-root map) so the UI can open the existing connection without
         // invoking the Agent when tests/fixtures already supply the data.
         const existsInAnyProfile = Object.values(allProfiles || {}).some(
-          (p: any) =>
+          (p) =>
             Array.isArray(p.connections) &&
-            p.connections.some((c: any) => c.id === connectionId)
+            p.connections.some((c) => c.id === connectionId)
         );
 
         const existsLocally =
@@ -134,8 +130,8 @@ const useScanHandle = () => {
 
         if (existsLocally) {
           // Duplicate detected: surface it to the UI the same way the Agent would.
-          dispatch(setOpenConnectionId(connectionId!));
-          handleDuplicate?.(connectionId!);
+          dispatch(setOpenConnectionId(connectionId));
+          handleDuplicate?.(connectionId);
           await closeScan?.();
           return;
         }
@@ -191,7 +187,6 @@ const useScanHandle = () => {
   const resolveGroupConnection = async (
     content: string,
     scanGroupId: string,
-    isInitiator: boolean,
     closeScan?: () => void,
     reloadScan?: () => Promise<void>,
     handleDuplicate?: (id: string) => void
@@ -219,19 +214,9 @@ const useScanHandle = () => {
         content
       );
 
-      if (invitation.type === OobiType.NORMAL) {
-        if (isInitiator && isMultisigConnectionDetails(invitation.connection)) {
-          dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
-        }
-      }
-
-      if (invitation.type === OobiType.MULTI_SIG_INITIATOR) {
-        if (isMultisigConnectionDetails(invitation.connection)) {
-          dispatch(updateOrAddMultisigConnectionCache(invitation.connection));
-        }
-      }
-
       closeScan?.();
+
+      return invitation;
     } catch (e) {
       const errorMessage = (e as Error).message;
 
@@ -259,7 +244,7 @@ const useScanHandle = () => {
         return;
       }
 
-      showError("Scanner Error:", e, dispatch, ToastMsgType.SCANNER_ERROR);
+      showError("Scanner Error:", e, dispatch, ToastMsgType.CONNECTION_ERROR);
       await new Promise((resolve) => setTimeout(resolve, 500));
       await reloadScan?.();
     }

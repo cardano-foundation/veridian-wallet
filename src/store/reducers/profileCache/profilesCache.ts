@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  MultisigConnectionDetails,
+  RegularConnectionDetails,
+} from "../../../core/agent/agent.types";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
-import {
-  RegularConnectionDetails,
-  MultisigConnectionDetails,
-} from "../../../core/agent/agent.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 import { RootState } from "../../index";
 import {
@@ -63,15 +63,22 @@ export const profilesCacheSlice = createSlice({
       if (existedProfile) {
         existedProfile.identity = action.payload;
       } else {
+        const multisigConnections =
+          action.payload.groupMetadata?.groupId === state.multiSigGroup?.groupId
+            ? (state.multiSigGroup?.connections as MultisigConnectionDetails[])
+            : [];
+
         state.profiles[action.payload.id] = {
           identity: action.payload,
           connections: [],
-          multisigConnections: [],
+          multisigConnections: multisigConnections || [],
           peerConnections: [],
           credentials: [],
           archivedCredentials: [],
           notifications: [],
         };
+
+        state.multiSigGroup = undefined;
       }
     },
     addGroupProfile: (state, action: PayloadAction<IdentifierShortDetails>) => {
@@ -510,22 +517,22 @@ const getShowDAppConnect = (state: RootState) =>
   state.profilesCache.showDAppConnect;
 
 export {
+  getConnectedDApp,
+  getConnectionsCache,
   getCredsArchivedCache,
   getCredsCache,
   getCurrentProfile,
   getIndividualFirstCreateSetting,
-  getProfileGroupCache,
+  getIsConnectingToDApp,
+  getMissingAliasConnection,
+  getMultisigConnectionsCache,
   getNotificationsCache,
+  getOpenConnectionId,
   getPeerConnections,
+  getPendingDAppConnection,
+  getProfileGroupCache,
   getProfiles,
   getRecentProfiles,
   getScanGroupId,
-  getConnectionsCache,
-  getMultisigConnectionsCache,
-  getOpenConnectionId,
-  getMissingAliasConnection,
-  getConnectedDApp,
-  getPendingDAppConnection,
-  getIsConnectingToDApp,
   getShowDAppConnect,
 };
