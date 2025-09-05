@@ -14,6 +14,7 @@ jest.mock("../../core/services/notificationService", () => ({
     showLocalNotification: jest.fn(),
     requestPermissions: jest.fn(),
     setProfileSwitcher: jest.fn(),
+    setNavigator: jest.fn(),
   },
 }));
 

@@ -5,8 +5,10 @@ import {
   setCurrentProfile,
   getProfiles,
 } from "../../store/reducers/profileCache";
+import { setCurrentRoute, setToastMsg } from "../../store/reducers/stateCache";
 import { notificationService } from "../../core/services/notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
+import { ToastMsgType } from "../globals/types";
 
 export const useLocalNotifications = () => {
   const allProfiles = useAppSelector(getProfiles);
@@ -18,6 +20,12 @@ export const useLocalNotifications = () => {
     // Set up profile switcher for notification taps
     notificationService.setProfileSwitcher((profileId: string) => {
       dispatch(setCurrentProfile(profileId));
+      dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
+    });
+
+    // Set up navigator for notification navigation
+    notificationService.setNavigator((path: string) => {
+      dispatch(setCurrentRoute({ path }));
     });
   }, [dispatch]);
 

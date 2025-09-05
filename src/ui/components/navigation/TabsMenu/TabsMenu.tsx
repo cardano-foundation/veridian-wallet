@@ -14,14 +14,14 @@ import {
   peopleCircle,
   peopleCircleOutline,
 } from "ionicons/icons";
-import { ComponentType } from "react";
+import { ComponentType, useEffect } from "react";
 import { Redirect, Route } from "react-router";
-import { useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
+import { getCurrentRoute , setCurrentRoute } from "../../../../store/reducers/stateCache";
 import { i18n } from "../../../../i18n";
 import { TabsRoutePath } from "../../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { getNotificationsCache } from "../../../../store/reducers/profileCache";
-import { setCurrentRoute } from "../../../../store/reducers/stateCache";
 import { Connections } from "../../../pages/Connections";
 import { Credentials } from "../../../pages/Credentials";
 import { Notifications } from "../../../pages/Notifications";
@@ -49,8 +49,10 @@ const tabsRoutes = [
 ];
 const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
   const location = useLocation();
+  const history = useHistory();
   const dispatch = useAppDispatch();
   const notifications = useAppSelector(getNotificationsCache);
+  const currentRoute = useAppSelector(getCurrentRoute);
   const notificationsCounter = notifications.filter(
     (notification) => !notification.read
   ).length;
@@ -58,6 +60,13 @@ const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
   const handleTabClick = (tabPath: string) => {
     dispatch(setCurrentRoute({ path: tabPath }));
   };
+
+  // Listen to Redux state changes for navigation (used by notifications)
+  useEffect(() => {
+    if (currentRoute && currentRoute.path !== location.pathname) {
+      history.push(currentRoute.path);
+    }
+  }, [currentRoute, location.pathname, history]);
 
   return (
     <IonTabs>

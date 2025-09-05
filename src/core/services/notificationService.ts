@@ -1,6 +1,5 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { App } from "@capacitor/app";
-import { Device } from "@capacitor/device";
 import {
   KeriaNotification,
   ExchangeRoute,
@@ -28,6 +27,7 @@ interface LocalNotification {
 
 class NotificationService {
   private profileSwitcher: ((profileId: string) => void) | null = null;
+  private navigator: ((path: string) => void) | null = null;
 
   constructor() {
     this.initialize();
@@ -37,13 +37,13 @@ class NotificationService {
     this.profileSwitcher = profileSwitcher;
   }
 
+  setNavigator(navigator: (path: string) => void) {
+    this.navigator = navigator;
+  }
+
   private async initialize() {
     // Request permissions on app start
     await this.requestPermissions();
-
-    // Get device info to determine platform
-    const deviceInfo = await Device.getInfo();
-    const isIOS = deviceInfo?.platform === "ios";
 
     // Listen for notification actions (taps) - works on both platforms
     LocalNotifications.addListener(
@@ -52,15 +52,6 @@ class NotificationService {
         this.handleNotificationTap(event.notification);
       }
     );
-
-    // On iOS, also listen for notification received as fallback
-    if (isIOS) {
-      LocalNotifications.addListener("localNotificationReceived", (event) => {
-        // On iOS, sometimes tapping a notification triggers this event instead of actionPerformed
-        // Only process if this is actually a tap (not just receipt)
-        // This listener should be removed or made more specific to avoid auto-processing
-      });
-    }
 
     // Listen for app coming to foreground
     App.addListener("appStateChange", (state) => {
@@ -82,31 +73,6 @@ class NotificationService {
     }
   }
 
-  private async registerNotificationActions(): Promise<void> {
-    try {
-      // Only register actions on iOS
-      const deviceInfo = await Device.getInfo();
-      if (deviceInfo.platform === "ios") {
-        await LocalNotifications.registerActionTypes({
-          types: [
-            {
-              id: "default",
-              actions: [
-                {
-                  id: "tap",
-                  title: "Open",
-                  foreground: true,
-                },
-              ],
-            },
-          ],
-        });
-      }
-    } catch (error) {
-      // Failed to register notification actions - silently ignore
-    }
-  }
-
   private async isAppInForeground(): Promise<boolean> {
     try {
       const state = await App.getState();
@@ -125,7 +91,6 @@ class NotificationService {
             id: parseInt(payload.notificationId),
             title: payload.title,
             body: payload.body,
-            // Remove schedule for immediate delivery
             actionTypeId: "default", // Add default action for iOS tap handling
             extra: {
               profileId: payload.profileId,
@@ -279,9 +244,13 @@ class NotificationService {
 
     // Small delay to allow profile switch to take effect before navigation
     setTimeout(() => {
-      // Navigate to the notifications tab using hash navigation
-      // This works with Ionic's router system
-      window.location.hash = TabsRoutePath.NOTIFICATIONS;
+      // Use the navigator callback if available, otherwise fallback to hash navigation
+      if (this.navigator) {
+        this.navigator(TabsRoutePath.NOTIFICATIONS);
+      } else {
+        // Fallback to hash navigation
+        window.location.hash = TabsRoutePath.NOTIFICATIONS;
+      }
     }, 100);
   }
 
