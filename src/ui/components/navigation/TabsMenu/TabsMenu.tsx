@@ -20,6 +20,7 @@ import { useLocation } from "react-router-dom";
 import { i18n } from "../../../../i18n";
 import { TabsRoutePath } from "../../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { BubbleCounter } from "../../BubbleCounter";
 import { getNotificationsCache } from "../../../../store/reducers/profileCache";
 import { setCurrentRoute } from "../../../../store/reducers/stateCache";
 import { Connections } from "../../../pages/Connections";
@@ -96,16 +97,15 @@ const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
             >
               <div className="border-top" />
               <div className="icon-container">
-                {!!notificationsCounter && (
-                  <span className="notifications-counter">
-                    {notificationsCounter > 99 ? "99+" : notificationsCounter}
-                  </span>
-                )}
                 <IonIcon
                   icon={
                     tab.path === location.pathname ? tab.icon[0] : tab.icon[1]
                   }
                 />
+                {tab.label === i18n.t("tabsmenu.label.notifications") &&
+                  tab.path !== location.pathname && (
+                    <BubbleCounter counter={notificationsCounter} />
+                  )}
               </div>
               <IonLabel>{tab.label}</IonLabel>
             </IonTabButton>

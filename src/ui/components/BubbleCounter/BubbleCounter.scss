@@ -1,0 +1,23 @@
+.bubble-counter {
+  display: flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  line-height: 1rem;
+  color: var(--ion-color-neutral-100);
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.625rem;
+  border: 1px solid var(--ion-color-error-800);
+  background: var(--ion-color-error-800);
+  opacity: 1;
+  z-index: 10;
+  font-size: 0.75rem;
+}
+
+@media screen and (min-width: 250px) and (max-width: 370px) {
+  .bubble-counter {
+    width: 1rem;
+    height: 1rem;
+    font-size: 0.6rem;
+  }
+}
