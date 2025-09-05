@@ -53,7 +53,14 @@ describe("useLocalNotifications", () => {
         return { identity: { id: "test-profile-id" } };
       }
       if (selector === getProfiles) {
-        return {};
+        return {
+          "test-profile": {
+            identity: {
+              id: "test-receiving-pre",
+              displayName: "Test Profile",
+            },
+          },
+        };
       }
       return undefined;
     });
@@ -97,7 +104,8 @@ describe("useLocalNotifications", () => {
 
     expect(mockShowLocalNotification).toHaveBeenCalledWith(
       mockNotification,
-      "test-profile-id"
+      "test-profile-id",
+      "Test Profile"
     );
     expect(mockShowLocalNotification).toHaveBeenCalledTimes(1);
   });
@@ -146,6 +154,10 @@ describe("useLocalNotifications", () => {
 
     const mockProfiles = {
       "test-profile-id": {
+        identity: {
+          id: "test-receiving-pre",
+          displayName: "Test Profile",
+        },
         notifications: mockNotifications,
       },
     };
@@ -167,7 +179,8 @@ describe("useLocalNotifications", () => {
     expect(mockShowLocalNotification).toHaveBeenCalledTimes(1);
     expect(mockShowLocalNotification).toHaveBeenCalledWith(
       mockNotifications[1],
-      "test-profile-id"
+      "test-profile-id",
+      "Test Profile"
     );
   });
 

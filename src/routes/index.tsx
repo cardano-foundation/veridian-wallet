@@ -1,4 +1,4 @@
-import { IonRouterOutlet } from "@ionic/react";
+import { IonRouterOutlet, useIonRouter } from "@ionic/react";
 import { useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -29,6 +29,7 @@ const Routes = () => {
   const currentProfile = useAppSelector(getCurrentProfile);
   const dispatch = useAppDispatch();
   const routes = useAppSelector(getRoutes);
+  const ionRouter = useIonRouter();
 
   const { nextPath } = getNextRoute(RoutePath.ROOT, {
     store: { stateCache, currentProfile },
@@ -37,6 +38,26 @@ const Routes = () => {
   useEffect(() => {
     if (!routes.length) dispatch(setCurrentRoute({ path: nextPath.pathname }));
   }, [routes, nextPath.pathname, dispatch]);
+
+  // Listen for notification navigation events
+  useEffect(() => {
+    const handleNotificationNavigation = (event: CustomEvent) => {
+      const { path } = event.detail;
+      ionRouter.push(path);
+    };
+
+    window.addEventListener(
+      "notificationNavigation",
+      handleNotificationNavigation as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "notificationNavigation",
+        handleNotificationNavigation as EventListener
+      );
+    };
+  }, [ionRouter]);
 
   return (
     <IonRouterOutlet animated={false}>

@@ -145,10 +145,10 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   useEffect(() => {
-    if (!defaultProfile || profileList.length === 0) {
+    if (!defaultProfile) {
       setOpenSetupProfile(true);
     }
-  }, [defaultProfile, profileList.length]);
+  }, [defaultProfile]);
 
   return (
     <>

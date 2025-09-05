@@ -1,25 +1,27 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { App } from "@capacitor/app";
-import {
-  KeriaNotification,
-  ExchangeRoute,
-} from "../../core/agent/services/keriaNotificationService.types";
+import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 import { TabsRoutePath } from "../../routes/paths";
 import { showError } from "../../ui/utils/error";
+
+export const NOTIFICATION_MESSAGES = {
+  NEW_CREDENTIAL: "New credential received", //r: '/exn/ipex/grant'
+  CREDENTIAL_PRESENTATION_REQUEST:
+    "A credential presentation is being requested", //r: '/exn/ipex/apply'
+  NEW_CONNECTION: "You have a new connection", //r: '/exn/ipex/connect'
+  GROUP_INITIATED: "Your group has been initiated", //r: '/exn/ipex/group'
+} as const;
 
 export interface NotificationPayload {
   notificationId: string;
   profileId: string;
-  type: "credential" | "connection" | "multisig" | "general";
   title: string;
   body: string;
-  route?: string;
 }
 
 interface LocalNotification {
   id: number;
   extra?: {
-    route?: string;
     profileId?: string;
     [key: string]: unknown;
   };
@@ -94,8 +96,6 @@ class NotificationService {
             actionTypeId: "default", // Add default action for iOS tap handling
             extra: {
               profileId: payload.profileId,
-              type: payload.type,
-              route: payload.route,
             },
           },
         ],
@@ -107,7 +107,8 @@ class NotificationService {
 
   async showLocalNotification(
     keriaNotification: KeriaNotification,
-    _currentProfileId?: string
+    _currentProfileId: string,
+    profileDisplayName: string
   ): Promise<void> {
     // Only show notifications when app is in foreground
     const isAppActive = await this.isAppInForeground();
@@ -115,7 +116,10 @@ class NotificationService {
       return;
     }
 
-    const payload = this.mapKeriaNotificationToPayload(keriaNotification);
+    const payload = this.mapKeriaNotificationToPayload(
+      keriaNotification,
+      profileDisplayName
+    );
 
     if (payload) {
       await this.scheduleNotification(payload);
@@ -123,109 +127,46 @@ class NotificationService {
   }
 
   private mapKeriaNotificationToPayload(
-    notification: KeriaNotification
+    notification: KeriaNotification,
+    profileDisplayName: string
   ): NotificationPayload | null {
     // Map KERIA notification types to local notification format
-    const type = this.getNotificationType(notification);
-    const title = this.getNotificationTitle(notification, type);
-    const body = this.getNotificationBody(notification, type);
-    const route = this.getNotificationRoute(notification, type);
+    const title = this.getNotificationTitle(notification, profileDisplayName);
+    const body = this.getNotificationBody(notification);
 
     return {
       notificationId: notification.id,
       profileId: notification.receivingPre,
-      type,
       title,
       body,
-      route,
     };
-  }
-
-  private getNotificationType(
-    notification: KeriaNotification
-  ): NotificationPayload["type"] {
-    // Map based on notification route or content
-    const route = notification.a?.r;
-    if (typeof route === "string") {
-      if (route.includes("credential")) return "credential";
-      if (route.includes("multisig")) return "multisig";
-    }
-    if (notification.connectionId) return "connection";
-    return "general";
-  }
-
-  private getNotificationMessage(route: string, prefix: string): string {
-    switch (route) {
-      case ExchangeRoute.IpexAdmit:
-        return `${prefix} IpexAdmit`;
-      case ExchangeRoute.IpexGrant:
-        return `${prefix} IpexGrant`;
-      case ExchangeRoute.IpexApply:
-        return `${prefix} IpexApply`;
-      case ExchangeRoute.IpexAgree:
-        return `${prefix} IpexAgree`;
-      case ExchangeRoute.IpexOffer:
-        return `${prefix} IpexOffer`;
-      case ExchangeRoute.RemoteSignRef:
-        return `${prefix} RemoteSignRef`;
-      default:
-        // Check for other notification routes
-        if (route.includes("/multisig")) {
-          return prefix === "Title for"
-            ? "Multi-signature Request"
-            : `${prefix} Multi-signature operation`;
-        }
-        if (route.includes("/exn/ipex") || route.includes("/credential")) {
-          return prefix === "Title for"
-            ? "New Credential Message"
-            : `${prefix} Credential exchange`;
-        }
-        return prefix === "Title for"
-          ? "New Connection"
-          : `${prefix} notification`;
-    }
   }
 
   private getNotificationTitle(
     _notification: KeriaNotification,
-    _type: string
+    profileDisplayName: string
   ): string {
-    return "Cardano Foundation";
+    // Use profile displayName (profiles always have a displayName)
+    return profileDisplayName;
   }
 
-  private getNotificationBody(
-    notification: KeriaNotification,
-    _type: string
-  ): string {
-    // First, check if notification.a.m exists and is not empty
-    const message = notification.a?.m;
-    if (typeof message === "string" && message.trim()) {
-      return message;
-    }
-
-    // If no message, use pre-defined message based on ExchangeRoute
+  private getNotificationBody(notification: KeriaNotification): string {
     const route = notification.a?.r;
     if (typeof route === "string") {
-      return this.getNotificationMessage(route, "Body for");
+      if (route === "/exn/ipex/grant") {
+        return NOTIFICATION_MESSAGES.NEW_CREDENTIAL;
+      }
+      if (route === "/exn/ipex/apply") {
+        return NOTIFICATION_MESSAGES.CREDENTIAL_PRESENTATION_REQUEST;
+      }
+      if (route === "/exn/ipex/connect") {
+        return NOTIFICATION_MESSAGES.NEW_CONNECTION;
+      }
+      if (route === "/exn/ipex/group") {
+        return NOTIFICATION_MESSAGES.GROUP_INITIATED;
+      }
     }
-
-    return "You have a new notification";
-  }
-
-  private getNotificationRoute(
-    notification: KeriaNotification,
-    type: string
-  ): string {
-    switch (type) {
-      case "credential":
-        return TabsRoutePath.CREDENTIALS;
-      case "multisig":
-        return TabsRoutePath.CREDENTIALS; // Could be specific multisig route
-      case "connection":
-        return TabsRoutePath.CONNECTIONS;
-      default:
-        return TabsRoutePath.NOTIFICATIONS;
-    }
+    return "You have a new notification"; // fallback
   }
 
   private handleNotificationTap(notification: LocalNotification): void {
@@ -242,16 +183,22 @@ class NotificationService {
       this.profileSwitcher(profileId);
     }
 
-    // Small delay to allow profile switch to take effect before navigation
+    // Longer delay to allow profile switch to take effect before navigation
     setTimeout(() => {
       // Use the navigator callback if available, otherwise fallback to hash navigation
       if (this.navigator) {
-        this.navigator(TabsRoutePath.NOTIFICATIONS);
+        try {
+          this.navigator(TabsRoutePath.NOTIFICATIONS);
+        } catch (error) {
+          showError("Failed to navigate via navigator", error);
+          // Fallback to hash navigation
+          window.location.hash = TabsRoutePath.NOTIFICATIONS;
+        }
       } else {
         // Fallback to hash navigation
         window.location.hash = TabsRoutePath.NOTIFICATIONS;
       }
-    }, 100);
+    }, 500); // Increased delay to allow profile switch and router to be ready
   }
 
   private async checkAppLaunchFromNotification(): Promise<void> {

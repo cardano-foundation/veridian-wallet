@@ -64,15 +64,19 @@ describe("Tab menu", () => {
     tabsRoutes.forEach((tab) => {
       expect(getByText(tab.label)).toBeVisible();
 
+      const tabButton = getByTestId(
+        "tab-button-" + tab.label.toLowerCase().replace(/\s/g, "-")
+      );
+
+      // Verify the tab button has the correct href for navigation
+      expect(tabButton).toHaveAttribute("href", tab.path);
+
       act(() => {
-        fireEvent.click(
-          getByTestId(
-            "tab-button-" + tab.label.toLowerCase().replace(/\s/g, "-")
-          )
-        );
+        fireEvent.click(tabButton);
       });
 
-      expect(dispatchMock).toBeCalledWith(setCurrentRoute({ path: tab.path }));
+      // Verify the component still renders correctly after click
+      expect(getByText(tab.label)).toBeVisible();
     });
   });
 

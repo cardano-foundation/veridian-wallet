@@ -1,11 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
+import { useAppIonRouter } from "./appIonRouterHook";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import {
   getCurrentProfile,
   setCurrentProfile,
   getProfiles,
 } from "../../store/reducers/profileCache";
-import { setCurrentRoute, setToastMsg } from "../../store/reducers/stateCache";
+import { setToastMsg } from "../../store/reducers/stateCache";
 import { notificationService } from "../../core/services/notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 import { ToastMsgType } from "../globals/types";
@@ -14,51 +15,30 @@ export const useLocalNotifications = () => {
   const allProfiles = useAppSelector(getProfiles);
   const currentProfile = useAppSelector(getCurrentProfile);
   const dispatch = useAppDispatch();
+  const ionRouter = useAppIonRouter();
   const shownNotificationsRef = useRef<Set<string>>(new Set());
 
-  useEffect(() => {
-    // Set up profile switcher for notification taps
-    notificationService.setProfileSwitcher((profileId: string) => {
-      dispatch(setCurrentProfile(profileId));
-      dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
-    });
+  const currentProfileId = currentProfile?.identity.id || "";
 
-    // Set up navigator for notification navigation
-    notificationService.setNavigator((path: string) => {
-      dispatch(setCurrentRoute({ path }));
-    });
-  }, [dispatch]);
-
-  useEffect(() => {
-    // Get all unread notifications from OTHER profiles (not current profile)
-    const allUnreadNotifications: KeriaNotification[] = [];
-
-    if (allProfiles && currentProfile) {
-      Object.values(allProfiles).forEach((profile) => {
-        // Only show notifications from profiles OTHER than the current one
-        if (
-          profile.identity?.id !== currentProfile.identity?.id &&
-          profile.notifications
-        ) {
-          const unreadFromProfile = profile.notifications.filter(
-            (notification) =>
-              !notification.read &&
-              !shownNotificationsRef.current.has(notification.id)
-          );
-          allUnreadNotifications.push(...unreadFromProfile);
-        }
-      });
-    }
-
-    allUnreadNotifications.forEach((notification) => {
-      notificationService.showLocalNotification(
-        notification,
-        currentProfile?.identity.id
+  const displayNotification = useCallback(
+    (notification: KeriaNotification) => {
+      const notificationProfile = Object.values(allProfiles).find(
+        (profile) => profile.identity?.id === notification.receivingPre
       );
-      shownNotificationsRef.current.add(notification.id);
-    });
 
-    // Clean up shown notifications that are no longer in any profile's cache
+      if (notificationProfile) {
+        notificationService.showLocalNotification(
+          notification,
+          currentProfileId,
+          notificationProfile.identity.displayName
+        );
+        shownNotificationsRef.current.add(notification.id);
+      }
+    },
+    [allProfiles, currentProfileId]
+  );
+
+  const cleanupShownNotifications = useCallback(() => {
     const allCurrentNotificationIds = new Set<string>();
     if (allProfiles) {
       Object.values(allProfiles).forEach((profile) => {
@@ -75,16 +55,71 @@ export const useLocalNotifications = () => {
         shownNotificationsRef.current.delete(id);
       }
     });
-  }, [allProfiles, currentProfile]);
+  }, [allProfiles]);
+
+  const getUnreadNotificationsFromOtherProfiles =
+    useCallback((): KeriaNotification[] => {
+      const unreadNotifications: KeriaNotification[] = [];
+
+      if (allProfiles && currentProfile) {
+        Object.values(allProfiles).forEach((profile) => {
+          // Only show notifications from profiles OTHER than the current one
+          if (
+            profile.identity?.id !== currentProfile.identity?.id &&
+            profile.notifications
+          ) {
+            const unreadFromProfile = profile.notifications.filter(
+              (notification) =>
+                !notification.read &&
+                !shownNotificationsRef.current.has(notification.id)
+            );
+            unreadNotifications.push(...unreadFromProfile);
+          }
+        });
+      }
+
+      return unreadNotifications;
+    }, [allProfiles, currentProfile]);
+
+  useEffect(() => {
+    // Set up profile switcher for notification taps
+    notificationService.setProfileSwitcher((profileId: string) => {
+      dispatch(setCurrentProfile(profileId));
+      dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
+    });
+
+    // Set up navigator for notification navigation
+    notificationService.setNavigator((path: string) => {
+      // Use browser history API for navigation outside React context
+      window.history.pushState(null, "", path);
+      // Dispatch a custom event to notify the app of navigation
+      window.dispatchEvent(
+        new CustomEvent("notificationNavigation", { detail: { path } })
+      );
+    });
+  }, [dispatch, ionRouter]);
+
+  useEffect(() => {
+    // Get all unread notifications from OTHER profiles (not current profile)
+    const allUnreadNotifications = getUnreadNotificationsFromOtherProfiles();
+
+    allUnreadNotifications.forEach((notification) => {
+      displayNotification(notification);
+    });
+
+    cleanupShownNotifications();
+  }, [
+    allProfiles,
+    currentProfile,
+    displayNotification,
+    getUnreadNotificationsFromOtherProfiles,
+    cleanupShownNotifications,
+  ]);
 
   return {
     showNotification: (notification: KeriaNotification) => {
       if (!shownNotificationsRef.current.has(notification.id)) {
-        notificationService.showLocalNotification(
-          notification,
-          currentProfile?.identity.id
-        );
-        shownNotificationsRef.current.add(notification.id);
+        displayNotification(notification);
       }
     },
     requestPermissions: () => notificationService.requestPermissions(),

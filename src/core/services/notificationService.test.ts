@@ -101,8 +101,6 @@ describe("NotificationService", () => {
             actionTypeId: "default",
             extra: {
               profileId: "profile-123",
-              type: "general",
-              route: "/test",
             },
           },
         ],
@@ -144,7 +142,11 @@ describe("NotificationService", () => {
         notifications: [],
       });
 
-      await notificationService.showLocalNotification(keriaNotification);
+      await notificationService.showLocalNotification(
+        keriaNotification,
+        "",
+        "Test Profile"
+      );
 
       expect(LocalNotifications.schedule).toHaveBeenCalled();
     });
@@ -214,15 +216,17 @@ describe("NotificationService", () => {
         notifications: [],
       });
 
-      await notificationService.showLocalNotification(notification);
+      await notificationService.showLocalNotification(
+        notification,
+        "",
+        "Test Profile"
+      );
 
       const scheduleCall = (LocalNotifications.schedule as jest.Mock).mock
         .calls[0][0];
       const scheduledNotification = scheduleCall.notifications[0];
 
-      expect(scheduledNotification.title).toBe("Cardano Foundation");
-      expect(scheduledNotification.extra.type).toBe("multisig");
-      expect(scheduledNotification.extra.route).toBe("/tabs/credentials");
+      expect(scheduledNotification.title).toBe("Test Profile");
       expect(scheduledNotification.actionTypeId).toBe("default");
     });
 
@@ -241,15 +245,17 @@ describe("NotificationService", () => {
         notifications: [],
       });
 
-      await notificationService.showLocalNotification(notification);
+      await notificationService.showLocalNotification(
+        notification,
+        "",
+        "Test Profile"
+      );
 
       const scheduleCall = (LocalNotifications.schedule as jest.Mock).mock
         .calls[0][0];
       const scheduledNotification = scheduleCall.notifications[0];
 
-      expect(scheduledNotification.title).toBe("Cardano Foundation");
-      expect(scheduledNotification.extra.type).toBe("credential");
-      expect(scheduledNotification.extra.route).toBe("/tabs/credentials");
+      expect(scheduledNotification.title).toBe("Test Profile");
       expect(scheduledNotification.actionTypeId).toBe("default");
     });
 
@@ -268,22 +274,29 @@ describe("NotificationService", () => {
         notifications: [],
       });
 
-      await notificationService.showLocalNotification(notification);
+      await notificationService.showLocalNotification(
+        notification,
+        "",
+        "Test Profile"
+      );
 
       const scheduleCall = (LocalNotifications.schedule as jest.Mock).mock
         .calls[0][0];
       const scheduledNotification = scheduleCall.notifications[0];
 
-      expect(scheduledNotification.title).toBe("Cardano Foundation");
-      expect(scheduledNotification.extra.type).toBe("connection");
-      expect(scheduledNotification.extra.route).toBe("/tabs/connections");
+      expect(scheduledNotification.title).toBe("Test Profile");
       expect(scheduledNotification.actionTypeId).toBe("default");
     });
   });
 
   describe("notification tap handling", () => {
+    let mockNavigator: jest.Mock;
+
     beforeEach(() => {
-      // Mock window.location.hash
+      mockNavigator = jest.fn();
+      notificationService.setNavigator(mockNavigator);
+
+      // Mock window.location.hash for fallback
       Object.defineProperty(window, "location", {
         value: { hash: "" },
         writable: true,
@@ -301,10 +314,10 @@ describe("NotificationService", () => {
       // Access private method for testing
       (notificationService as any).handleNotificationTap(notification);
 
-      // Wait for the setTimeout to complete
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      // Wait for the setTimeout to complete (500ms delay)
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
-      expect(window.location.hash).toBe("/tabs/notifications");
+      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
     });
 
     it("should navigate to notifications when no route specified", async () => {
@@ -315,24 +328,26 @@ describe("NotificationService", () => {
 
       (notificationService as any).handleNotificationTap(notification);
 
-      // Wait for the setTimeout to complete
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      // Wait for the setTimeout to complete (500ms delay)
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
-      expect(window.location.hash).toBe("/tabs/notifications");
+      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
     });
 
     it("should process notification tap immediately", async () => {
       const notification = {
         id: 1,
-        extra: { route: "/test" },
+        extra: {
+          profileId: "test-profile",
+        },
       };
 
       (notificationService as any).handleNotificationTap(notification);
 
-      // Wait for the setTimeout to complete
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      // Wait for the setTimeout to complete (500ms delay)
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
-      expect(window.location.hash).toBe("/tabs/notifications");
+      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
     });
   });
 });
