@@ -1,412 +1,266 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { PeerConnectionEventTypes } from "../../../core/cardano/walletConnect/peerConnection.types";
+import { RoutePath } from "../../../routes";
+import { OperationType } from "../../../ui/globals/types";
+import { RootState } from "../../index";
 import {
-  ConnectionStatus,
-  CreationStatus,
-} from "../../../core/agent/agent.types";
+  AuthenticationCacheProps,
+  CurrentRouteCacheProps,
+  dequeueIncomingRequest,
+  enqueueIncomingRequest,
+  getAuthentication,
+  getCurrentOperation,
+  getCurrentRoute,
+  getStateCache,
+  initialState,
+  login,
+  logout,
+  setAuthentication,
+  setCurrentOperation,
+  setCurrentRoute,
+  setIsOnline,
+  setPauseQueueIncomingRequest,
+  setQueueIncomingRequest,
+  setPendingJoinGroupMetadata,
+  showGenericError,
+  StateCacheProps,
+  stateCacheSlice,
+} from "./stateCache";
 import {
-  CredentialShortDetails,
-  CredentialStatus,
-} from "../../../core/agent/services/credentialService.types";
-import {
-  IdentifierShortDetails,
-  IdentifierType,
-} from "../../../core/agent/services/identifier.types";
-import { filteredCredsFix } from "../../../ui/__fixtures__/filteredCredsFix";
-import {
-  pendingGroupIdentifierFix,
-  pendingIdentifierFix,
-  pendingMemberIdentifierFix,
-} from "../../../ui/__fixtures__/filteredIdentifierFix";
-import { notificationsFix } from "../../../ui/__fixtures__/notificationsFix";
-import {
-  defaultProfileDataFix,
-  defaultProfileIdentifierFix,
-  profileCacheFixData,
-  profilesCachesFix,
-  recentProfilesDataFix,
-  storeStateFixData,
-} from "../../../ui/__fixtures__/storeDataFix";
-import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
-import { 
-    addGroupProfile,
-  addNotification,
-  addOrUpdateProfileIdentity,
-  DAppConnection,
-  deleteNotificationById,
-  getCredsArchivedCache,
-  getCredsCache,
-  getCurrentProfile,
-  getNotificationsCache,
-  getPeerConnections,
-  getProfileGroupCache,
-  getRecentProfiles,
-  getScanGroupId,
-  markNotificationAsRead,
-  MultiSigGroup,
-  ProfileCache,
-  profilesCacheSlice,
-  setCredsArchivedCache,
-  setCredsCache,
-  setGroupProfileCache,
-  setNotificationsCache,
-  setPeerConnections,
-  setProfiles,
-  setScanGroupId,
-  updateCurrentProfile,
-  updateOrAddCredsCache,
-  updateProfileCreationStatus,
-  updateRecentProfiles 
-} from "../profileCache";
+  IncomingRequestProps,
+  IncomingRequestType,
+  PeerConnectSigningEventRequest,
+} from "./stateCache.types";
+import { connectionDetailsFix } from "../../../ui/__fixtures__/credsFix";
+import { ConnectionStatus } from "../../../core/agent/agent.types";
 
-describe("Profile cache", () => {
-  const initialState: ProfileCache = {
-    profiles: {},
-    recentProfiles: [],
-    multiSigGroup: undefined,
-  };
+const signingRequest: PeerConnectSigningEventRequest = {
+  type: IncomingRequestType.PEER_CONNECT_SIGN,
+  signTransaction: {
+    type: PeerConnectionEventTypes.PeerConnectSign,
+    payload: {
+      identifier: "a",
+      payload: "tosign",
+      approvalCallback: () => undefined,
+    },
+  },
+  peerConnection: { meerkatId: "connection" },
+};
 
-  it("should return the initial state", () => {
-    expect(profilesCacheSlice.reducer(undefined, {} as PayloadAction)).toEqual(
+const signingRequestB = { ...signingRequest };
+signingRequestB.signTransaction.payload.identifier = "b";
+
+const signingRequestC = { ...signingRequest };
+signingRequestB.signTransaction.payload.identifier = "c";
+
+describe("State Cache", () => {
+  test("should return the initial state on first run", () => {
+    expect(stateCacheSlice.reducer(undefined, {} as PayloadAction)).toEqual(
       initialState
     );
   });
 
-  it("should return default profile", () => {
-    const data = getCurrentProfile(storeStateFixData);
-    expect(data).toEqual(defaultProfileDataFix);
+  test("should set showGenericError", () => {
+    const action = showGenericError(true);
+    const nextState = stateCacheSlice.reducer(initialState, action);
+
+    expect(nextState.showGenericError).toEqual(true);
   });
 
-  it("should return recents profile", () => {
-    const data = getRecentProfiles(storeStateFixData);
-    expect(data).toEqual(recentProfilesDataFix);
-  });
-
-  it("should set profiles", () => {
-    const action = setProfiles(profilesCachesFix);
-    const nextState = profilesCacheSlice.reducer(initialState, action);
-
-    expect(nextState.profiles).toEqual(profilesCachesFix);
-  });
-
-  it("should set current profile", () => {
-    const action = updateCurrentProfile(defaultProfileIdentifierFix.id);
-    const nextState = profilesCacheSlice.reducer(initialState, action);
-
-    expect(nextState.defaultProfile).toEqual(defaultProfileIdentifierFix.id);
-  });
-
-  it("should update recent profile", () => {
-    const action = updateRecentProfiles(recentProfilesDataFix);
-    const nextState = profilesCacheSlice.reducer(initialState, action);
-
-    expect(nextState.recentProfiles).toEqual(recentProfilesDataFix);
-  });
-
-  it("should return notifications", () => {
-    const data = getNotificationsCache(storeStateFixData);
-    expect(data).toEqual(defaultProfileDataFix.notifications);
-  });
-
-  it("should set notification cache", () => {
-    const action = setNotificationsCache(notificationsFix);
-    const nextState = profilesCacheSlice.reducer(profileCacheFixData, action);
-
-    const defaultProfile = nextState.profiles[defaultProfileIdentifierFix.id];
-
-    expect(defaultProfile.notifications).toEqual(notificationsFix);
-  });
-
-  it("should set mark notification read", () => {
-    const notification =
-      profileCacheFixData.profiles[defaultProfileIdentifierFix.id]
-        .notifications[0].id;
-
-    const action = markNotificationAsRead({
-      id: notification,
-      read: true,
-    });
-
-    const nextState = profilesCacheSlice.reducer(profileCacheFixData, action);
-
-    const defaultProfile = nextState.profiles[defaultProfileIdentifierFix.id];
-
-    expect(defaultProfile.notifications[0].read).toEqual(true);
-  });
-
-  it("should delete notification", () => {
-    const notification =
-      profileCacheFixData.profiles[defaultProfileIdentifierFix.id]
-        .notifications[0].id;
-
-    const action = deleteNotificationById(notification);
-
-    const nextState = profilesCacheSlice.reducer(profileCacheFixData, action);
-
-    const defaultProfile = nextState.profiles[defaultProfileIdentifierFix.id];
-
-    expect(
-      defaultProfile.notifications.find((item:KeriaNotification) => item.id === notification)
-    ).toEqual(undefined);
-  });
-
-  it("should add notification", () => {
-    const newNoti = {
-      ...notificationsFix[2],
-      receivingPre: defaultProfileIdentifierFix.id,
+  test("should set the current route cache", () => {
+    const currentRoute: CurrentRouteCacheProps = {
+      path: RoutePath.ONBOARDING,
+      payload: {},
     };
-    const action = addNotification(newNoti);
+    const action = setCurrentRoute(currentRoute);
+    const nextState = stateCacheSlice.reducer(initialState, action);
 
-    const nextState = profilesCacheSlice.reducer(profileCacheFixData, action);
+    expect(nextState.routes[0]).toEqual(currentRoute);
+    expect(nextState).not.toBe(initialState);
 
-    const defaultProfile = nextState.profiles[defaultProfileIdentifierFix.id];
-
-    expect(
-      defaultProfile.notifications.some((item:KeriaNotification) => item.id === newNoti.id)
-    ).toEqual(true);
+    const rootState = { stateCache: nextState } as RootState;
+    expect(getCurrentRoute(rootState)).toEqual(nextState.routes[0]);
+    expect(getStateCache(rootState)).toEqual(nextState);
   });
 
-  it("should get cred cache", () => {
-    const data = getCredsCache(storeStateFixData);
-    expect(data).toEqual(defaultProfileDataFix.credentials);
+  test("should set online status", () => {
+    const action = setIsOnline(false);
+    const nextState = stateCacheSlice.reducer(initialState, action);
+
+    expect(nextState.isOnline).toEqual(false);
   });
 
-  it("should set cred cache", () => {
-    const action = setCredsCache(filteredCredsFix);
-
-    const nextState = profilesCacheSlice.reducer(profileCacheFixData, action);
-
-    const defaultProfile = nextState.profiles[defaultProfileIdentifierFix.id];
-
-    expect(defaultProfile.credentials).toEqual(filteredCredsFix);
-  });
-
-  it("should add or update cred cache", () => {
-    const newCred = {
-      ...filteredCredsFix[1],
-      identifierId: defaultProfileIdentifierFix.id,
-    };
-    const action = updateOrAddCredsCache(newCred);
-    const nextState = profilesCacheSlice.reducer(profileCacheFixData, action);
-    const defaultProfile = nextState.profiles[defaultProfileIdentifierFix.id];
-    expect(
-      defaultProfile.credentials.some((item:CredentialShortDetails) => item.id === newCred.id)
-    ).toEqual(true);
-  });
-
-  it("should return the wallet connetions cache from RootState", () => {
-    const connectionCache = getPeerConnections(storeStateFixData);
-
-    const defaultProfile =
-      storeStateFixData.profilesCache.profiles[defaultProfileIdentifierFix.id];
-    expect(connectionCache).toEqual(defaultProfile.peerConnections);
-  });
-
-  it("should handle setPeerConnections", () => {
-    const connections: DAppConnection[] = [
-      {
-        meerkatId: "6",
-        name: "Wallet name #2",
-        selectedAid: defaultProfileIdentifierFix.id,
-        url: "http://localhost:3001/",
+  test("should set the authentication cache", () => {
+    const authentication: AuthenticationCacheProps = {
+      loggedIn: false,
+      userName: "",
+      time: 0,
+      passcodeIsSet: false,
+      seedPhraseIsSet: false,
+      passwordIsSet: false,
+      passwordIsSkipped: false,
+      ssiAgentIsSet: false,
+      ssiAgentUrl: "",
+      recoveryWalletProgress: false,
+      loginAttempt: {
+        attempts: 0,
+        lockedUntil: Date.now(),
       },
+      firstAppLaunch: false,
+    };
+    const action = setAuthentication(authentication);
+    const nextState = stateCacheSlice.reducer(initialState, action);
+
+    expect(nextState.authentication).toEqual(authentication);
+    expect(nextState).not.toBe(initialState);
+
+    const rootState = { stateCache: nextState } as RootState;
+    expect(getAuthentication(rootState)).toEqual(nextState.authentication);
+    expect(getStateCache(rootState)).toEqual(nextState);
+  });
+
+  test("should logout", () => {
+    const action = logout();
+    const nextState = stateCacheSlice.reducer(initialState, action);
+    expect(nextState.authentication.loggedIn).toEqual(false);
+    expect(nextState).not.toBe(initialState);
+  });
+
+  test("should login", () => {
+    const action = login();
+    const nextState = stateCacheSlice.reducer(initialState, action);
+    expect(nextState.authentication.loggedIn).toEqual(true);
+    expect(nextState).not.toBe(initialState);
+  });
+
+  test("should set the currentOperation cache", () => {
+    const op = OperationType.SCAN_CONNECTION;
+    const action = setCurrentOperation(op);
+    const nextState = stateCacheSlice.reducer(initialState, action);
+
+    expect(nextState.currentOperation).toEqual(op);
+    expect(nextState).not.toBe(initialState);
+
+    const rootState = { stateCache: nextState } as RootState;
+    expect(getCurrentOperation(rootState)).toEqual(nextState.currentOperation);
+    expect(getStateCache(rootState)).toEqual(nextState);
+  });
+
+  test("should queue incoming request", () => {
+    const action = setQueueIncomingRequest(signingRequest);
+    const nextState = stateCacheSlice.reducer(initialState, action);
+    expect(nextState.queueIncomingRequest.queues[0]).toEqual(signingRequest);
+  });
+
+  test("can batch incoming requests", () => {
+    const initialStateMock: StateCacheProps = JSON.parse(
+      JSON.stringify(initialState)
+    );
+    initialStateMock.queueIncomingRequest.queues = [signingRequest];
+    const batchIncomingRequestProps: IncomingRequestProps[] = [
+      signingRequestB,
+      signingRequestC,
     ];
-    const newState = profilesCacheSlice.reducer(
-      profileCacheFixData,
-      setPeerConnections(connections)
+    const action = enqueueIncomingRequest(batchIncomingRequestProps);
+    const nextState = stateCacheSlice.reducer(initialStateMock, action);
+    expect(nextState.queueIncomingRequest.queues).toEqual([
+      ...initialStateMock.queueIncomingRequest.queues,
+      ...batchIncomingRequestProps,
+    ]);
+  });
+
+  test("can dequeue incoming request", () => {
+    const initialStateMock: StateCacheProps = JSON.parse(
+      JSON.stringify(initialState)
     );
-    expect(
-      newState.profiles[defaultProfileIdentifierFix.id].peerConnections
-    ).toEqual(connections);
-  });
-
-  it("should return the archived state", () => {
-    const data = getCredsArchivedCache(storeStateFixData);
-
-    const defaultProfile =
-      storeStateFixData.profilesCache.profiles[defaultProfileIdentifierFix.id];
-    expect(data).toEqual(defaultProfile.archivedCredentials);
-  });
-
-  it("should handle setCredsArchivedCache", () => {
-    const creds: CredentialShortDetails[] = [
-      {
-        id: "did:example:ebfeb1f712ebc6f1c276e12ec21",
-        issuanceDate: "2010-01-01T19:23:24Z",
-        credentialType: "University Credential",
-        status: CredentialStatus.CONFIRMED,
-        schema: "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao",
-        identifierType: IdentifierType.Individual,
-        identifierId: defaultProfileIdentifierFix.id,
-        connectionId: "ebfeb1ebc6f1c276ef71212ec20",
-      },
+    initialStateMock.queueIncomingRequest.queues = [
+      signingRequest,
+      signingRequestB,
     ];
-    const newState = profilesCacheSlice.reducer(
-      profileCacheFixData,
-      setCredsArchivedCache(creds)
-    );
-
-    const defaultProfile = newState.profiles[defaultProfileIdentifierFix.id];
-    expect(defaultProfile.archivedCredentials).toEqual(creds);
+    const action = dequeueIncomingRequest();
+    const nextState = stateCacheSlice.reducer(initialStateMock, action);
+    expect(nextState.queueIncomingRequest.queues.length).toEqual(1);
+    expect(nextState.queueIncomingRequest.isProcessing).toEqual(true);
   });
 
-  test("should handle setGroupProfileCache", () => {
-    const multiSigGroup: MultiSigGroup = {
-      groupId: "group-id",
-      connections: [
-        {
-          id: "did:example:ebfeb1ebc6f1c276ef71212ec21",
-          label: "Cambridge University",
-          createdAtUTC: "2017-08-13T19:23:24Z",
-          logo: "logo.png",
-          status: ConnectionStatus.CONFIRMED,
-          contactId: "conn-id-1",
-          groupId: "group-id",
-        },
-      ],
-    };
-    const newState = profilesCacheSlice.reducer(
-      initialState,
-      setGroupProfileCache(multiSigGroup)
-    );
-    expect(newState.multiSigGroup).toEqual(multiSigGroup);
+  test("can pause incoming request queue", () => {
+    const action = setPauseQueueIncomingRequest(true);
+    const nextState = stateCacheSlice.reducer(initialState, action);
+    expect(nextState.queueIncomingRequest.isPaused).toEqual(true);
   });
 
-  test("should handle addOrUpdateProfileIdentity", () => {
-    const profile = {
-      id: "id-1",
-      displayName: "example-name",
-      createdAtUTC: "example-date",
-      theme: 0,
-      creationStatus: CreationStatus.COMPLETE,
-    };
-
-    const newState = profilesCacheSlice.reducer(
-      initialState,
-      addOrUpdateProfileIdentity(profile)
-    );
-
-    expect(newState.profiles[profile.id].identity).toEqual(profile);
+  test("isProcessing should be false when isPause equal true", () => {
+    const action1 = setPauseQueueIncomingRequest(true);
+    const nextState1 = stateCacheSlice.reducer(initialState, action1);
+    const action2 = setQueueIncomingRequest(signingRequest);
+    const nextState2 = stateCacheSlice.reducer(nextState1, action2);
+    expect(nextState2.queueIncomingRequest.isProcessing).toEqual(false);
+    expect(nextState2.queueIncomingRequest.queues[0]).toEqual(signingRequest);
   });
 
-  test("should handle updateCreationStatus", () => {
-    const identifier: IdentifierShortDetails = {
-      id: "id-1",
-      displayName: "example-name",
-      createdAtUTC: "example-date",
-      theme: 0,
-      creationStatus: CreationStatus.PENDING,
-    };
-
-    const currentState = profilesCacheSlice.reducer(
-      initialState,
-      addOrUpdateProfileIdentity(identifier)
+  test("isProcessing should be true after dequeueCredentialRequest and queue still has elements", () => {
+    const initialStateMock: StateCacheProps = JSON.parse(
+      JSON.stringify(initialState)
     );
-
-    const identifierNew: IdentifierShortDetails = {
-      id: "id-1",
-      displayName: "example-name",
-      createdAtUTC: "example-date",
-      theme: 0,
-      creationStatus: CreationStatus.COMPLETE,
-    };
-
-    const newState = profilesCacheSlice.reducer(
-      currentState,
-      updateProfileCreationStatus({
-        id: identifierNew.id,
-        creationStatus: identifierNew.creationStatus,
-      })
-    );
-
-    expect(newState.profiles[identifierNew.id].identity).toEqual(identifierNew);
+    initialStateMock.queueIncomingRequest.queues = [
+      signingRequest,
+      signingRequestB,
+    ];
+    const action = dequeueIncomingRequest();
+    const nextState = stateCacheSlice.reducer(initialStateMock, action);
+    expect(nextState.queueIncomingRequest.queues.length).toEqual(1);
+    expect(nextState.queueIncomingRequest.isProcessing).toEqual(true);
   });
 
-  test("should handle setScanGroupId", () => {
-    const newState = profilesCacheSlice.reducer(
-      initialState,
-      setScanGroupId("id")
-    );
-    expect(newState.scanGroupId).toEqual("id");
-  });
-
-  test("should handle addGroupIdentifierCache", () => {
-    const state = {
-      ...initialState,
-      profiles: {
-        [pendingMemberIdentifierFix[0].id]: {
-          identity: pendingMemberIdentifierFix[0],
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        },
-        [pendingIdentifierFix.id]: {
-          identity: pendingIdentifierFix,
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        },
-      },
-    };
-    const newState = profilesCacheSlice.reducer(
-      state,
-      addGroupProfile(pendingGroupIdentifierFix)
-    );
-    expect(newState.profiles).toEqual({
-      [pendingIdentifierFix.id]: {
-        identity: pendingIdentifierFix,
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
-        notifications: [],
-      },
-      [pendingGroupIdentifierFix.id]: {
-        identity: pendingGroupIdentifierFix,
-        connections: [],
-        multisigConnections: [],
-        peerConnections: [],
-        credentials: [],
-        archivedCredentials: [],
-        notifications: [],
+  test("should set pendingJoinGroupMetadata", () => {
+    const action = setPendingJoinGroupMetadata({
+      isPendingJoinGroup: true,
+      groupId: "test-group-id",
+      groupName: "Test Group",
+      initiatorName: "Frank",
+      connection: {
+        id: "ebfeb1ebc6f1c276ef71212ec20",
+        label: "Cambridge University",
+        createdAtUTC: "2017-01-14T19:23:24Z",
+        status: ConnectionStatus.PENDING,
+        contactId: "ebfeb1ebc6f1c276ef71212ec20",
+        oobi: "http://keria:3902/oobi/ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86/agent/ENGnzDMWk8PlFbOoYCauLs1rDuQbvsIStxNzkjZPikSo?name=CF%20Credential%20Issuance",
+        groupId: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPyi",
       },
     });
-  });
+    const nextState = stateCacheSlice.reducer(initialState, action);
 
-  test("should return the multiSigGroupCache from RootState", () => {
-    const state = {
-      profilesCache: {
-        multiSigGroup: {
-          groupId: "group-id",
-          connections: [
-            {
-              id: "did:example:ebfeb1ebc6f1c276ef71212ec21",
-              label: "Cambridge University",
-              createdAtUTC: "2017-08-13T19:23:24Z",
-              logo: "logo.png",
-              status: ConnectionStatus.CONFIRMED,
-            },
-          ],
-        },
+    expect(nextState.pendingJoinGroupMetadata).toEqual({
+      isPendingJoinGroup: true,
+      groupId: "test-group-id",
+      groupName: "Test Group",
+      initiatorName: "Frank",
+      connection: {
+        id: "ebfeb1ebc6f1c276ef71212ec20",
+        label: "Cambridge University",
+        createdAtUTC: "2017-01-14T19:23:24Z",
+        status: ConnectionStatus.PENDING,
+        contactId: "ebfeb1ebc6f1c276ef71212ec20",
+        oobi: "http://keria:3902/oobi/ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86/agent/ENGnzDMWk8PlFbOoYCauLs1rDuQbvsIStxNzkjZPikSo?name=CF%20Credential%20Issuance",
+        groupId: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPyi",
       },
-    } as any;
-    const profiles = getProfileGroupCache(state);
-    expect(profiles).toEqual(state.profilesCache.multiSigGroup);
-  });
+    });
 
-  test("should return the scanGroupId from RootState", () => {
-    const state = {
-      profilesCache: {
-        scanGroupId: "groupId",
+    const rootState = { stateCache: nextState } as RootState;
+    expect(getStateCache(rootState).pendingJoinGroupMetadata).toEqual({
+      isPendingJoinGroup: true,
+      groupId: "test-group-id",
+      groupName: "Test Group",
+      initiatorName: "Frank",
+      connection: {
+        id: "ebfeb1ebc6f1c276ef71212ec20",
+        label: "Cambridge University",
+        createdAtUTC: "2017-01-14T19:23:24Z",
+        status: ConnectionStatus.PENDING,
+        contactId: "ebfeb1ebc6f1c276ef71212ec20",
+        oobi: "http://keria:3902/oobi/ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86/agent/ENGnzDMWk8PlFbOoYCauLs1rDuQbvsIStxNzkjZPikSo?name=CF%20Credential%20Issuance",
+        groupId: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPyi",
       },
-    } as any;
-    const scanGroupId = getScanGroupId(state);
-    expect(scanGroupId).toEqual(state.profilesCache.scanGroupId);
+    });
   });
 });
