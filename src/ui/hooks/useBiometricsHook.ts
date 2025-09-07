@@ -6,7 +6,7 @@ import {
   SetCredentialOptions,
 } from "@capgo/capacitor-native-biometric";
 import { Capacitor } from "@capacitor/core";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { i18n } from "../../i18n";
 import { useActivityTimer } from "../components/AppWrapper/hooks/useActivityTimer";
 
@@ -83,9 +83,12 @@ const useBiometricAuth = () => {
     }
   };
 
+  // Memoize checkBiometrics as it's a dependency for other memoized functions
+  const memoizedCheckBiometrics = useCallback(checkBiometrics, []);
+
   useEffect(() => {
-    checkBiometrics();
-  }, []);
+    memoizedCheckBiometrics();
+  }, [memoizedCheckBiometrics]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
@@ -118,7 +121,7 @@ const useBiometricAuth = () => {
   const handleBiometricAuth = async (
     isInitialSetup = false
   ): Promise<BiometricAuthOutcome> => {
-    const { isAvailable, biometryType } = await checkBiometrics();
+    const { isAvailable, biometryType } = await memoizedCheckBiometrics();
 
     if (!isAvailable) {
       return BiometricAuthOutcome.NOT_AVAILABLE;
@@ -214,7 +217,7 @@ const useBiometricAuth = () => {
   };
 
   const setupBiometrics = async (): Promise<BiometricAuthOutcome> => {
-    const { isAvailable, biometryType } = await checkBiometrics();
+    const { isAvailable, biometryType } = await memoizedCheckBiometrics();
 
     if (!isAvailable) {
       return BiometricAuthOutcome.NOT_AVAILABLE;
@@ -261,12 +264,17 @@ const useBiometricAuth = () => {
       }
     }
   };
+  
+  // --- CORRECTION: Memoize returned functions ---
+  // Memoize the functions to provide stable references to consumers.
+  const memoizedHandleBiometricAuth = useCallback(handleBiometricAuth, [memoizedCheckBiometrics, lockoutEndTime, setPauseTimestamp]);
+  const memoizedSetupBiometrics = useCallback(setupBiometrics, [memoizedCheckBiometrics, memoizedHandleBiometricAuth]);
 
   return {
     biometricInfo,
-    handleBiometricAuth,
-    setupBiometrics,
-    checkBiometrics,
+    handleBiometricAuth: memoizedHandleBiometricAuth,
+    setupBiometrics: memoizedSetupBiometrics,
+    checkBiometrics: memoizedCheckBiometrics,
     remainingLockoutSeconds,
     lockoutEndTime,
     isStrongBiometry,
