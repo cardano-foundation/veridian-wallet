@@ -33,15 +33,27 @@ enum BiometricAuthOutcome {
   NOT_AVAILABLE,
 }
 
+const validErrorCodes = new Set(Object.values(BiometricAuthError).filter(v => typeof v === 'number'));
+
 const isBiometricPluginError = (
   error: unknown
 ): error is { code: BiometricAuthError | string; message: string } => {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    "message" in error
-  );
+  if (typeof error !== "object" || error === null || !("code" in error) || !("message" in error)) {
+    return false;
+  }
+
+  const err = error as { code: string | number; message: string };
+
+  if (typeof err.code === 'number') {
+    return validErrorCodes.has(err.code);
+  }
+
+  if (typeof err.code === 'string') {
+    const parsedCode = parseInt(err.code, 10);
+    return !isNaN(parsedCode) && validErrorCodes.has(parsedCode);
+  }
+
+  return false;
 };
 
 const useBiometricAuth = () => {
