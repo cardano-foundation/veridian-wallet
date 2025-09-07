@@ -32,7 +32,7 @@ const Verification = ({
     verifyIsOpen && (!biometrics.enabled || openModalAfterBiometricFail);
 
   useEffect(() => {
-    if (lockoutEndTime === null && showMaxAttemptsAlert) {
+    if (!lockoutEndTime && showMaxAttemptsAlert) {
       setShowMaxAttemptsAlert(false);
     }
   }, [lockoutEndTime, showMaxAttemptsAlert]);

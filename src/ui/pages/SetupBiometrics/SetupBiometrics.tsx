@@ -44,7 +44,7 @@ const SetupBiometrics = () => {
   const { setupBiometrics, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
 
   useEffect(() => {
-    if (lockoutEndTime === null && showMaxAttemptsAlert) {
+    if (!lockoutEndTime && showMaxAttemptsAlert) {
       setShowMaxAttemptsAlert(false);
     }
   }, [lockoutEndTime, showMaxAttemptsAlert]);

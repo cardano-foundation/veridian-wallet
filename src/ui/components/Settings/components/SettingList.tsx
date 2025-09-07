@@ -72,7 +72,7 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   const history = useHistory();
 
   useEffect(() => {
-    if (lockoutEndTime === null && showMaxAttemptsAlert) {
+    if (!lockoutEndTime && showMaxAttemptsAlert) {
       setShowMaxAttemptsAlert(false);
     }
   }, [lockoutEndTime, showMaxAttemptsAlert]);

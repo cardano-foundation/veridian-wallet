@@ -96,7 +96,7 @@ const LockPageContainer = () => {
   };
 
   useEffect(() => {
-    if (lockoutEndTime === null && showMaxAttemptsAlert) {
+    if (!lockoutEndTime && showMaxAttemptsAlert) {
       setShowMaxAttemptsAlert(false);
     }
   }, [lockoutEndTime, showMaxAttemptsAlert]);

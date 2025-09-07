@@ -200,7 +200,7 @@ const useBiometricAuth = () => {
             outcome = BiometricAuthOutcome.USER_CANCELLED;
             break;
           case BiometricAuthError.USER_TEMPORARY_LOCKOUT:
-            if (lockoutEndTime === null) {
+            if (!lockoutEndTime) {
               setLockoutEndTime(Date.now() + 30 * 1000);
             }
             outcome = BiometricAuthOutcome.TEMPORARY_LOCKOUT;
