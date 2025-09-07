@@ -49,7 +49,7 @@ const useBiometricAuth = () => {
     isAvailable: false,
     biometryType: BiometryType.NONE,
   });
-  const [lockoutEndTime, setLockoutEndTime] = useState<number | undefined>(undefined);
+  const [lockoutEndTime, setLockoutEndTime] = useState<number>();
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(30);
   const [isStrongBiometry, setIsStrongBiometry] = useState(false);
   const { setPauseTimestamp } = useActivityTimer();
