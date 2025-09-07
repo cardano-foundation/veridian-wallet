@@ -185,7 +185,7 @@ const SetupBiometrics = () => {
         setIsOpen={setShowMaxAttemptsAlert}
         dataTestId="alert-max-attempts"
         headerText={`${i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds })}`}
-        confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
+        confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
         actionConfirm={() => setShowMaxAttemptsAlert(false)}
         backdropDismiss={false}
       />
@@ -193,8 +193,8 @@ const SetupBiometrics = () => {
         isOpen={showPermanentLockoutAlert}
         setIsOpen={setShowPermanentLockoutAlert}
         dataTestId="alert-permanent-lockout"
-        headerText={i18n.t("biometry.permanentlockoutheader") as string}
-        confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
+        headerText={`${i18n.t("biometry.permanentlockoutheader")}`}
+        confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
         actionConfirm={() => setShowPermanentLockoutAlert(false)}
         backdropDismiss={false}
       />
