@@ -20,7 +20,7 @@ class BiometryError extends Error {
   }
 }
 
-const BIOMETRIC_SERVER_KEY = "com.veridianwallet.biometrics.key";
+const BIOMETRIC_SERVER_KEY = "org.cardanofoundation.idw.biometrics.key";
 const BIOMETRIC_SERVER_USERNAME = "biometric_app_username";
 
 enum BiometricAuthOutcome {
@@ -49,7 +49,7 @@ const useBiometricAuth = () => {
     isAvailable: false,
     biometryType: BiometryType.NONE,
   });
-  const [lockoutEndTime, setLockoutEndTime] = useState<number | null>(null);
+  const [lockoutEndTime, setLockoutEndTime] = useState<number | undefined>(undefined);
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(30);
   const [isStrongBiometry, setIsStrongBiometry] = useState(false);
   const { setPauseTimestamp } = useActivityTimer();
@@ -101,7 +101,7 @@ const useBiometricAuth = () => {
         setRemainingLockoutSeconds(remaining);
         if (remaining <= 0) {
           clearInterval(interval);
-          setLockoutEndTime(null);
+          setLockoutEndTime(undefined);
         }
       };
 

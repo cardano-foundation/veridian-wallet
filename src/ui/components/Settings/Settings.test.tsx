@@ -139,7 +139,7 @@ jest.mock("@capacitor/app", () => ({
 
 jest.mock("../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: jest.fn(),
-  BIOMETRIC_SERVER_KEY: "com.veridianwallet.biometrics.key",
+  BIOMETRIC_SERVER_KEY: "org.cardanofoundation.idw.biometrics.key",
   BiometricAuthOutcome: {
     SUCCESS: 0,
     USER_CANCELLED: 1,
