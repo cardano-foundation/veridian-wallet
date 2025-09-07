@@ -1,6 +1,6 @@
 interface VerifyProps {
   verifyIsOpen: boolean;
-  setVerifyIsOpen: (value: boolean, isCancel?: boolean) => void;
+  setVerifyIsOpen: (value: boolean) => void;
   onVerify: () => void;
 }
 

@@ -48,7 +48,7 @@ const Verification = ({
           setVerifyIsOpen(false);
           break;
         case BiometricAuthOutcome.USER_CANCELLED:
-          setVerifyIsOpen(false, true);
+          setVerifyIsOpen(false);
           break;
         case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
           setShowMaxAttemptsAlert(true);
