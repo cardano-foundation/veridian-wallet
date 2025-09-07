@@ -40,6 +40,10 @@
   display: none;
 }
 
+.force-on-top {
+  z-index: 2147483647 !important;
+}
+
 .alert-button-group {
   flex-direction: column !important;
   padding: 0 !important;
