@@ -265,8 +265,9 @@ const useBiometricAuth = () => {
     }
   };
   
-  // --- CORRECTION: Memoize returned functions ---
-  // Memoize the functions to provide stable references to consumers.
+  // By wrapping these functions in useCallback, we provide stable references to any
+  // component that uses this hook. This is crucial to prevent unintended side effects,
+  // like re-running useEffects, and avoids unnecessary re-renders.
   const memoizedHandleBiometricAuth = useCallback(handleBiometricAuth, [memoizedCheckBiometrics, lockoutEndTime, setPauseTimestamp]);
   const memoizedSetupBiometrics = useCallback(setupBiometrics, [memoizedCheckBiometrics, memoizedHandleBiometricAuth]);
 
