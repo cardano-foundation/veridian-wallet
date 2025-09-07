@@ -107,6 +107,7 @@ const Verification = ({
     confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
     actionConfirm={() => setShowMaxAttemptsAlert(false)}
     backdropDismiss={false}
+    className="force-on-top"
   />
   <Alert
     isOpen={showPermanentLockoutAlert}
@@ -116,6 +117,7 @@ const Verification = ({
     confirmButtonText={i18n.t("biometry.lockoutconfirm") as string}
     actionConfirm={() => setShowPermanentLockoutAlert(false)}
     backdropDismiss={false}
+    className="force-on-top"
   />
   </>
   );
