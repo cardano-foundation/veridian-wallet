@@ -50,7 +50,7 @@ const useBiometricAuth = () => {
     biometryType: BiometryType.NONE,
   });
   const [lockoutEndTime, setLockoutEndTime] = useState<number>();
-  const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(30);
+  const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(0);
   const [isStrongBiometry, setIsStrongBiometry] = useState(false);
   const { setPauseTimestamp } = useActivityTimer();
 
@@ -91,30 +91,34 @@ const useBiometricAuth = () => {
   }, [memoizedCheckBiometrics]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | undefined;
     if (lockoutEndTime) {
-      const updateRemaining = () => {
+      const duration = lockoutEndTime - Date.now();
+      const timer = setTimeout(
+        () => {
+          setLockoutEndTime(undefined);
+        },
+        duration > 0 ? duration : 0
+      );
+      return () => clearTimeout(timer);
+    }
+  }, [lockoutEndTime]);
+
+  useEffect(() => {
+    if (lockoutEndTime) {
+      const updateCountdown = () => {
         const remaining = Math.max(
           0,
           Math.ceil((lockoutEndTime - Date.now()) / 1000)
         );
         setRemainingLockoutSeconds(remaining);
-        if (remaining <= 0) {
-          clearInterval(interval);
-          setLockoutEndTime(undefined);
-        }
       };
 
-      updateRemaining();
-      interval = setInterval(updateRemaining, 1000);
+      const interval = setInterval(updateCountdown, 1000);
+      updateCountdown();
 
-      return () => {
-        clearInterval(interval);
-      };
+      return () => clearInterval(interval);
     } else {
-      setTimeout(() => {
-        setRemainingLockoutSeconds(30);
-      }, 500);
+      setRemainingLockoutSeconds(0);
     }
   }, [lockoutEndTime]);
 
