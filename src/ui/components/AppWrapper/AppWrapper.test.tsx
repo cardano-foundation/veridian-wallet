@@ -161,7 +161,22 @@ jest.mock("../../../core/agent/agent", () => {
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {
     deleteCredentials: jest.fn(() => Promise.resolve()),
-  }
+  },
+  BiometricAuthError: {
+    UNKNOWN_ERROR: 0,
+    BIOMETRICS_UNAVAILABLE: 1,
+    USER_LOCKOUT: 2,
+    BIOMETRICS_NOT_ENROLLED: 3,
+    USER_TEMPORARY_LOCKOUT: 4,
+    AUTHENTICATION_FAILED: 10,
+    APP_CANCEL: 11,
+    INVALID_CONTEXT: 12,
+    NOT_INTERACTIVE: 13,
+    PASSCODE_NOT_SET: 14,
+    SYSTEM_CANCEL: 15,
+    USER_CANCEL: 16,
+    USER_FALLBACK: 17,
+  },
 }));
 
 describe("App Wrapper", () => {
