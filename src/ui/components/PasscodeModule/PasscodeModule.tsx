@@ -18,7 +18,7 @@ const PasscodeModule = ({
   handleBiometricButtonClick,
 }: PasscodeModuleProps) => {
   const biometricsCache = useSelector(getBiometricsCache);
-  const { biometricInfo, isStrongBiometry } = useBiometricAuth();
+  const { biometricInfo } = useBiometricAuth();
   const numbers = PASSCODE_MAPPING.numbers;
   const labels = PASSCODE_MAPPING.labels;
   const rows = [];
@@ -91,16 +91,12 @@ const PasscodeModule = ({
                   <IonCol>
                     {handleBiometricButtonClick &&
                     biometricsCache.enabled &&
-                    isStrongBiometry &&
                     biometricInfo?.isAvailable ? (
                         <IonButton
                           data-testid="passcode-button-#"
                           className="passcode-module-number-button"
                           disabled={hasError}
-                          onClick={() =>
-                            isStrongBiometry &&
-                          handleBiometricButton()
-                          }
+                          onClick={() => handleBiometricButton()}
                         >
                           {getBiometricIcon()}
                         </IonButton>

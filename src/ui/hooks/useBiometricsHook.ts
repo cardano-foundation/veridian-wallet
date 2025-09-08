@@ -31,7 +31,6 @@ enum BiometricAuthOutcome {
   TEMPORARY_LOCKOUT,
   PERMANENT_LOCKOUT,
   GENERIC_ERROR,
-  WEAK_BIOMETRY,
   NOT_AVAILABLE,
 }
 
@@ -65,7 +64,6 @@ const useBiometricAuth = (isLockPage = false) => {
   });
   const [lockoutEndTime, setLockoutEndTime] = useState<number>();
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(0);
-  const [isStrongBiometry, setIsStrongBiometry] = useState(false);
   const { passwordIsSet } = useAppSelector(getAuthentication);
   const { setPauseTimestamp } = useActivityTimer();
 
@@ -73,21 +71,16 @@ const useBiometricAuth = (isLockPage = false) => {
     if (!Capacitor.isNativePlatform()) {
       const result = { isAvailable: false, biometryType: BiometryType.NONE };
       setBiometricInfo(result);
-      setIsStrongBiometry(false);
       return result;
     }
+
+    // The plugin is configured by default to only look for biometrics that meet Android's "strong" security level. iOS biometry is always considered strong.
+    // https://github.com/Cap-go/capacitor-native-biometric/blob/a6bbf89be872cc964a8e867119dee4cb8269fc77/android/src/main/java/ee/forgr/biometric/NativeBiometric.java#L79-L80
+
     const biometricResult: AvailableResult =
         await NativeBiometric.isAvailable();
       setBiometricInfo(biometricResult);
 
-    const strongBiometry =
-      biometricResult.biometryType === BiometryType.FACE_ID ||
-      biometricResult.biometryType === BiometryType.TOUCH_ID ||
-      biometricResult.biometryType === BiometryType.FINGERPRINT ||
-      biometricResult.biometryType === BiometryType.IRIS_AUTHENTICATION ||
-      biometricResult.biometryType === BiometryType.MULTIPLE;
-
-    setIsStrongBiometry(strongBiometry);
     return biometricResult;
   };
 
@@ -137,17 +130,6 @@ const useBiometricAuth = (isLockPage = false) => {
 
     if (!isAvailable) {
       return BiometricAuthOutcome.NOT_AVAILABLE;
-    }
-
-    const isStrongBiometryCheck =
-      biometryType === BiometryType.FACE_ID ||
-      biometryType === BiometryType.TOUCH_ID ||
-      biometryType === BiometryType.FINGERPRINT ||
-      biometryType === BiometryType.IRIS_AUTHENTICATION ||
-      biometryType === BiometryType.MULTIPLE;
-
-    if (!isStrongBiometryCheck) {
-      return BiometricAuthOutcome.WEAK_BIOMETRY;
     }
 
     try {
@@ -239,17 +221,6 @@ const useBiometricAuth = (isLockPage = false) => {
       return BiometricAuthOutcome.NOT_AVAILABLE;
     }
 
-    const isStrongBiometryCheck =
-      biometryType === BiometryType.FACE_ID ||
-      biometryType === BiometryType.TOUCH_ID ||
-      biometryType === BiometryType.FINGERPRINT ||
-      biometryType === BiometryType.IRIS_AUTHENTICATION ||
-      biometryType === BiometryType.MULTIPLE;
-
-    if (!isStrongBiometryCheck) {
-      return BiometricAuthOutcome.WEAK_BIOMETRY;
-    }
-
     try {
       await NativeBiometric.getCredentials({
         server: BIOMETRIC_SERVER_KEY,
@@ -293,8 +264,7 @@ const useBiometricAuth = (isLockPage = false) => {
     setupBiometrics: memoizedSetupBiometrics,
     checkBiometrics: memoizedCheckBiometrics,
     remainingLockoutSeconds,
-    lockoutEndTime,
-    isStrongBiometry,
+    lockoutEndTime
   };
 };
 

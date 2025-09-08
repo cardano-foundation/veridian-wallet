@@ -70,8 +70,6 @@ const TestComponent = () => {
         return "Permanent Lockout";
       case BiometricAuthOutcome.GENERIC_ERROR:
         return "Generic Error";
-      case BiometricAuthOutcome.WEAK_BIOMETRY:
-        return "Weak Biometry";
       case BiometricAuthOutcome.NOT_AVAILABLE:
         return "Not Available";
       default:
@@ -148,26 +146,6 @@ describe("useBiometricAuth Hook", () => {
     });
 
     expect(await findByText("Not Available")).toBeInTheDocument();
-    expect(NativeBiometric.verifyIdentity).not.toHaveBeenCalled();
-  });
-
-  test("should return BiometricAuthOutcome.WEAK_BIOMETRY for weak biometry", async () => {
-    (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
-      isAvailable: true,
-      biometryType: BiometryType.NONE,
-    });
-
-    const { getByTestId, findByText } = render(
-      <Provider store={store}>
-        <TestComponent />
-      </Provider>
-    );
-
-    act(() => {
-      fireEvent.click(getByTestId("handle-biometric-btn"));
-    });
-
-    expect(await findByText("Weak Biometry")).toBeInTheDocument();
     expect(NativeBiometric.verifyIdentity).not.toHaveBeenCalled();
   });
 

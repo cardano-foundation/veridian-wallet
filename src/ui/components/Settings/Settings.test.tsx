@@ -146,7 +146,6 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
     TEMPORARY_LOCKOUT: 2,
     PERMANENT_LOCKOUT: 3,
     GENERIC_ERROR: 4,
-    WEAK_BIOMETRY: 5,
     NOT_AVAILABLE: 6,
   },
 }));
@@ -200,7 +199,6 @@ describe("Settings page", () => {
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
       lockoutEndTime: null,
-      isStrongBiometry: true,
     });
   });
 
@@ -276,7 +274,6 @@ describe("Settings page", () => {
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
       lockoutEndTime: null,
-      isStrongBiometry: true,
     });
 
     const { getByText, getByTestId } = render(
@@ -343,7 +340,6 @@ describe("Settings page", () => {
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
       lockoutEndTime: null,
-      isStrongBiometry: true,
     });
 
     (NativeBiometric.deleteCredentials as jest.Mock).mockResolvedValueOnce(undefined);
@@ -418,7 +414,6 @@ describe("Settings page", () => {
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
       lockoutEndTime: null,
-      isStrongBiometry: false,
     });
 
     const { queryByText } = render(

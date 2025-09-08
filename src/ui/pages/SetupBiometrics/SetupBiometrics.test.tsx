@@ -165,16 +165,6 @@ describe("SetupBiometrics Page", () => {
     expect(dispatchMock).toBeCalledWith(showGenericError(true));
   });
 
-  test("Click on setup with WEAK_BIOMETRY outcome", async () => {
-    setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.WEAK_BIOMETRY);
-    const { getByTestId } = renderComponent();
-    fireEvent.click(getByTestId("primary-button"));
-    await waitFor(() => {
-      expect(setupBiometricsMock).toBeCalled();
-    });
-    expect(dispatchMock).toBeCalledWith(showGenericError(true));
-  });
-
   test("Click on setup with NOT_AVAILABLE outcome", async () => {
     setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.NOT_AVAILABLE);
     const { getByTestId } = renderComponent();

@@ -234,8 +234,7 @@ jest.mock("../ui/hooks/useBiometricsHook", () => {
       handleBiometricAuth: jest.fn(),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: null,
-      isStrongBiometry: false,
+      lockoutEndTime: null
     })),
     BIOMETRIC_SERVER_KEY: actualCapgoBiometric.BIOMETRIC_SERVER_KEY, 
     BiometricAuthOutcome: actualCapgoBiometric.BiometricAuthOutcome, 
@@ -334,8 +333,7 @@ describe("App", () => {
       handleBiometricAuth: jest.fn(),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: null,
-      isStrongBiometry: true,
+      lockoutEndTime: null
     });
   });
 

@@ -90,7 +90,6 @@ const Alert = ({
 
   const alerClasses = combineClassNames(className, "custom-alert");
 
-  console.log("Alert isOpen2222:", isOpen);
   return (
     <div
       data-testid={dataTestId + "-container"}

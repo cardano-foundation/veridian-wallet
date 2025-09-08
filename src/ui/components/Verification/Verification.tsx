@@ -56,7 +56,6 @@ const Verification = ({
         case BiometricAuthOutcome.PERMANENT_LOCKOUT:
           setShowPermanentLockoutAlert(true);
           break;
-        case BiometricAuthOutcome.WEAK_BIOMETRY:
         case BiometricAuthOutcome.NOT_AVAILABLE:
         case BiometricAuthOutcome.GENERIC_ERROR:
         default:

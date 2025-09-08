@@ -52,7 +52,7 @@ const CreatePasscodeModule = forwardRef<
       useState(false);
     const [originalPassCode, setOriginalPassCode] = useState("");
     const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
-    const { handleBiometricAuth, biometricInfo, isStrongBiometry } = useBiometricAuth();
+    const { handleBiometricAuth, biometricInfo } = useBiometricAuth();
     
 
     const setupBiometricsHeaderText = i18n.t("biometry.setupbiometryheader");
@@ -78,7 +78,7 @@ const CreatePasscodeModule = forwardRef<
         if (originalPassCode !== "" && passcode.length === 5) {
           if (originalPassCode === passcode + digit) {
             if (
-              isStrongBiometry && biometricInfo.isAvailable &&
+              biometricInfo.isAvailable &&
               !changePasscodeMode
             ) {
               setShowSetupBiometricsAlert(true);
