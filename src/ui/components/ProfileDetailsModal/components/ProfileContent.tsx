@@ -14,6 +14,9 @@ import { useAppSelector } from "../../../../store/hooks";
 import {
   getMultisigConnectionsCache,
   getProfiles,
+  getCurrentProfile,
+  getCredsCache,
+  getPeerConnections,
 } from "../../../../store/reducers/profileCache";
 import {
   formatShortDate,
@@ -56,6 +59,14 @@ const ProfileContent = ({
   const multisignConnectionsCache = useAppSelector(
     getMultisigConnectionsCache
   ) as any[];
+  const currentProfile = useAppSelector(getCurrentProfile);
+  const credentials = useAppSelector(getCredsCache);
+  const peerConnections = useAppSelector(getPeerConnections);
+  const credentialsCount = credentials.length;
+  const connectionsCount =
+    (currentProfile?.connections?.length || 0) +
+    (currentProfile?.multisigConnections?.length || 0);
+  const dappsCount = peerConnections.length;
   const memberCount = cardData.members?.length || 0;
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [viewType, setViewType] = useState(DetailView.AdvancedDetail);
@@ -109,19 +120,19 @@ const ProfileContent = ({
         <IonGrid>
           <IonRow className="profile-info-row">
             <ProfileInformation
-              value="4"
+              value={`${credentialsCount}`}
               text={i18n.t(
                 "profiledetails.identifierdetail.information.credentials"
               )}
             />
             <ProfileInformation
-              value="10"
+              value={`${connectionsCount}`}
               text={i18n.t(
                 "profiledetails.identifierdetail.information.connections"
               )}
             />
             <ProfileInformation
-              value="2"
+              value={`${dappsCount}`}
               text={i18n.t("profiledetails.identifierdetail.information.dapps")}
             />
           </IonRow>
