@@ -1464,6 +1464,7 @@
     "title": "Authentication",
     "subtitle": "Authentication using biometrics",
     "iosfallbacktitle": "Enter Passcode",
+    "iosfallbackpasswordtitle": "Enter Password",
     "setupbiometryheader": "Do you want to allow “Veridian” to use biometrics?",
     "setupbiometryconfirm": "Ok",
     "setupbiometrycancel": "Don't allow",
