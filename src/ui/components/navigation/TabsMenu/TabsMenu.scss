@@ -13,7 +13,7 @@ ion-tab-bar {
     &:not(.tab-selected) {
       color: var(--ion-color-neutral-700);
 
-      > *:not(.notifications-counter) {
+      > * {
         opacity: 70%;
       }
 
@@ -21,29 +21,6 @@ ion-tab-bar {
         opacity: 1;
         position: relative;
       }
-
-      .notifications-counter {
-        display: flex;
-        width: 1.25rem;
-        height: 1.25rem;
-        line-height: 1rem;
-        position: absolute;
-        color: var(--ion-color-neutral-100);
-        justify-content: center;
-        align-items: center;
-        border-radius: 0.625rem;
-        border: 1px solid var(--ion-color-error-800);
-        background: var(--ion-color-error-800);
-        opacity: 1;
-        z-index: 10;
-        position: absolute;
-        top: 0.2rem;
-        left: 0.85rem;
-      }
-    }
-
-    &:not(.tab-button-notifications) .notifications-counter {
-      display: none;
     }
 
     .border-top {
@@ -64,10 +41,6 @@ ion-tab-bar {
       .border-top {
         border-color: var(--ion-color-primary-700);
       }
-
-      .notifications-counter {
-        display: none;
-      }
     }
 
     ion-icon,
@@ -79,6 +52,19 @@ ion-tab-bar {
     ion-label {
       max-width: 20vw;
       font-size: 0.75rem;
+    }
+  }
+
+  .bubble-counter {
+    position: absolute;
+    top: 0.2rem;
+    left: 0.85rem;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .bubble-counter {
+      top: 0.25rem;
+      left: 0.75rem;
     }
   }
 
@@ -99,14 +85,6 @@ ion-tab-bar {
 
       ion-label {
         font-size: 0.6rem;
-      }
-
-      &:not(.tab-selected) .notifications-counter {
-        width: 1rem;
-        height: 1rem;
-        font-size: 0.6rem;
-        top: 0.25rem;
-        left: 0.75rem;
       }
     }
   }

@@ -199,10 +199,6 @@ describe("Setup Connection", () => {
         connections: [connectionsFix[3]],
       },
     },
-    connectionsCache: {
-      connections: {},
-    },
-    multisigConnections: {},
   };
 
   let stage1State: GroupInfomation = {
@@ -227,59 +223,6 @@ describe("Setup Connection", () => {
     } else {
       stage1State = updater;
     }
-  });
-
-  beforeEach(() => {
-    jest.spyOn(useScanHandleModule, "useScanHandle").mockReturnValue({
-      resolveGroupConnection: async (
-        content: string,
-        scannedGroupId: string | undefined,
-        isInitiator: boolean,
-        onClose?: () => void,
-        registerScanHandler?: (h: any) => void,
-        onDuplicate?: (id: string) => void
-      ) => {
-        try {
-          let parsedGroupId: string | null = null;
-          try {
-            parsedGroupId = new URL(content).searchParams.get("groupId");
-          } catch (e) {
-            storeMocked.dispatch(setToastMsg(ToastMsgType.SCANNER_ERROR));
-            if (onClose) onClose();
-            return;
-          }
-
-          if (
-            scannedGroupId &&
-            parsedGroupId &&
-            String(scannedGroupId) !== String(parsedGroupId)
-          ) {
-            storeMocked.dispatch(
-              setToastMsg(ToastMsgType.GROUP_ID_NOT_MATCH_ERROR)
-            );
-            if (onDuplicate) onDuplicate(parsedGroupId);
-            if (onClose) onClose();
-            return;
-          }
-
-          await Agent.agent.connections.connectByOobiUrl(content);
-        } catch (err) {
-          if (
-            (err as Error).message ===
-            StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG
-          ) {
-            storeMocked.dispatch(
-              setToastMsg(ToastMsgType.DUPLICATE_CONNECTION)
-            );
-            if (onDuplicate) onDuplicate("");
-          } else {
-            storeMocked.dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
-          }
-        } finally {
-          if (onClose) onClose();
-        }
-      },
-    } as any);
   });
 
   afterEach(() => {
@@ -530,17 +473,6 @@ describe("Setup Connection", () => {
           ],
         },
       },
-      connectionsCache: {
-        ...(initialState as any).connectionsCache,
-        connections: {
-          ...(((initialState as any).connectionsCache || {}).connections || {}),
-          [confirmedConnection.id]: confirmedConnection,
-        },
-      },
-      multisigConnections: {
-        ...((initialState as any).multisigConnections || {}),
-        [confirmedConnection.id]: confirmedConnection,
-      },
     };
     rerender(
       <Provider store={makeTestStore(updatedInitialState)}>
@@ -623,7 +555,7 @@ describe("Setup Connection", () => {
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
-        setToastMsg(ToastMsgType.SCANNER_ERROR)
+        setToastMsg(ToastMsgType.CONNECTION_ERROR)
       );
     });
   });

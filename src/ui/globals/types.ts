@@ -56,6 +56,7 @@ enum ToastMsgType {
   ROTATE_KEY_SUCCESS = "rotatekeysuccess",
   ROTATE_KEY_ERROR = "rotatekeyerror",
   SCANNER_ERROR = "qrerror",
+  CONNECTION_ERROR = "connectionerror",
   NEW_MULTI_SIGN_MEMBER = "newmultisignmember",
   PASSCODE_UPDATED = "passcodeupdated",
   PASSWORD_UPDATED = "passwordupdated",

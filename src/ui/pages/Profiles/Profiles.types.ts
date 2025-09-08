@@ -1,5 +1,3 @@
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
-
 interface AvatarProfilesProps {
   defaultProfile: string;
 }
@@ -15,14 +13,4 @@ interface OptionButtonProps {
   action: () => void;
 }
 
-interface ProfileItemsProps {
-  identifier?: IdentifierShortDetails;
-  onClick?: () => void;
-}
-
-export type {
-  ProfilesProps,
-  OptionButtonProps,
-  ProfileItemsProps,
-  AvatarProfilesProps,
-};
+export type { ProfilesProps, OptionButtonProps, AvatarProfilesProps };
