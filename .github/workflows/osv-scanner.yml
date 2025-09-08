@@ -1,0 +1,28 @@
+name: OSV-Scanner Dependency Scan
+
+on:
+  push:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'ios/**'
+      - 'android/**'
+      - '**/*.gradle'
+      - '**/Podfile*'
+      - '**/Package*.swift'
+  pull_request:
+    types: [ opened, synchronize ]
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  security-events: write
+  contents: read
+
+jobs:
+  scan-scheduled:
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
+    with:
+      scan-args: |-
+        --recursive
+        ./
