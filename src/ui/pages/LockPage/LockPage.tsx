@@ -60,7 +60,7 @@ const LockPageContainer = () => {
   const hasTriggeredInitialBiometrics = useRef(false);
 
   const { handleBiometricAuth, remainingLockoutSeconds, lockoutEndTime } =
-    useBiometricAuth();
+    useBiometricAuth(true);
 
   const biometricsCache = useSelector(getBiometricsCache);
   const firstAppLaunch = useSelector(getFirstAppLaunch);

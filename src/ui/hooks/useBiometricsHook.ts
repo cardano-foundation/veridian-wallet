@@ -9,6 +9,8 @@ import { Capacitor } from "@capacitor/core";
 import { useCallback, useEffect, useState } from "react";
 import { i18n } from "../../i18n";
 import { useActivityTimer } from "../components/AppWrapper/hooks/useActivityTimer";
+import { getAuthentication } from "../../store/reducers/stateCache";
+import { useAppSelector } from "../../store/hooks";
 
 class BiometryError extends Error {
   public code: BiometricAuthError;
@@ -56,7 +58,7 @@ const isBiometricPluginError = (
   return false;
 };
 
-const useBiometricAuth = () => {
+const useBiometricAuth = (isLockPage = false) => {
   const [biometricInfo, setBiometricInfo] = useState<AvailableResult>({
     isAvailable: false,
     biometryType: BiometryType.NONE,
@@ -64,6 +66,7 @@ const useBiometricAuth = () => {
   const [lockoutEndTime, setLockoutEndTime] = useState<number>();
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(0);
   const [isStrongBiometry, setIsStrongBiometry] = useState(false);
+  const { passwordIsSet } = useAppSelector(getAuthentication);
   const { setPauseTimestamp } = useActivityTimer();
 
   const checkBiometrics = async () => {
@@ -175,7 +178,10 @@ const useBiometricAuth = () => {
           title: i18n.t("biometry.title") as string,
           subtitle: i18n.t("biometry.subtitle") as string,
           negativeButtonText: i18n.t("biometry.canceltitle") as string,
-          fallbackTitle: i18n.t("biometry.iosfallbacktitle") as string,
+          fallbackTitle: i18n.t(
+          !isLockPage && passwordIsSet
+            ? "biometry.iosfallbackpasswordtitle"  : "biometry.iosfallbacktitle"
+        ) as string,
         });
       }
 
