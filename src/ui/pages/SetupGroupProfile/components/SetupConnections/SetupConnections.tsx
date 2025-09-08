@@ -91,12 +91,11 @@ const SetupConnections = ({ setState }: StageProps) => {
     if (!groupId || !userName) return;
 
     try {
-      const oobiValue = await Agent.agent.connections.getOobi(
-        profileId,
-        userName,
-        groupId,
-        profile?.displayName
-      );
+      const oobiValue = await Agent.agent.connections.getOobi(profileId, {
+        alias: profile?.displayName,
+        groupId: groupId,
+        groupName: userName,
+      });
       if (oobiValue) {
         setOobi(oobiValue);
       }

@@ -789,7 +789,9 @@ describe("Connection service of agent", () => {
     });
     const id = "keriuuid";
 
-    const oobi = await connectionService.getOobi(id, "alias with spaces");
+    const oobi = await connectionService.getOobi(id, {
+      alias: "alias with spaces",
+    });
 
     expect(oobi).toEqual(`${oobiPrefix}${id}?name=alias+with+spaces`);
   });
@@ -803,7 +805,7 @@ describe("Connection service of agent", () => {
       };
     });
     const id = "id";
-    const KeriOobi = await connectionService.getOobi(id, "alias", "123");
+    const KeriOobi = await connectionService.getOobi(id, { alias: "alias", groupId: "123" });
     expect(KeriOobi).toEqual(`${oobiPrefix}${id}?name=alias&groupId=123`);
   });
 
