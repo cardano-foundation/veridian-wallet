@@ -276,8 +276,11 @@ describe("Setup Connection", () => {
 
     const calledArgs = getOobiMock.mock.calls[0];
     expect(calledArgs[0]).toEqual(stage1State.newIdentifier.id);
-    expect(calledArgs[1]).toEqual(initiatorGroupProfile.groupMetadata.userName);
-    expect(calledArgs[2]).toEqual(initiatorGroupProfile.groupMetadata?.groupId);
+    expect(calledArgs[1]).toEqual({
+      alias: initiatorGroupProfile.displayName,
+      groupId: initiatorGroupProfile.groupMetadata.groupId,
+      groupName: initiatorGroupProfile.groupMetadata.userName,
+    });
 
     expect(
       getByText(
