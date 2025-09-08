@@ -204,7 +204,10 @@ describe("Setup Connection", () => {
   let stage1State: GroupInfomation = {
     stage: Stage.SetupConnection,
     displayNameValue: "test",
-    threshold: 1,
+    signer: {
+      recoverySigners: 0,
+      requiredSigners: 0,
+    },
     scannedConections: [connectionsFix[3]],
     selectedConnections: [],
     ourIdentifier: initiatorGroupProfile.id,

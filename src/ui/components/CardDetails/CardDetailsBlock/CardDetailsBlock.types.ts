@@ -23,6 +23,7 @@ interface CardBlockProps {
   className?: string;
   copyContent?: string;
   icon?: string;
+  endSlotIcon?: string;
 }
 
 export type { CardDetailsBlockProps, CardBlockProps };

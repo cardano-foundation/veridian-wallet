@@ -1,0 +1,123 @@
+.init-group {
+  .header-text {
+    text-align: center;
+    line-height: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .group-members {
+    .member {
+      margin-bottom: 0.75rem;
+    }
+
+    ion-item {
+      display: flex;
+      align-items: center;
+
+      &.card-header {
+        padding-bottom: 1.25rem;
+
+        .action-button {
+          color: var(--ion-color-neutral-500);
+        }
+      }
+    }
+
+    .card-details-info-block-line {
+      align-items: center;
+      .card-details-info-block-line-start-icon {
+        height: auto;
+
+        ion-button.avatar-button {
+          width: 1.5rem;
+          min-height: auto;
+          margin-bottom: 0.125rem;
+
+          span {
+            font-size: 1rem;
+            line-height: 1rem;
+          }
+
+          &::part(native) {
+            width: 1.5rem;
+            height: 1.5rem;
+          }
+        }
+
+        @media screen and (min-width: 250px) and (max-width: 370px) {
+          width: auto;
+        }
+      }
+    }
+
+    .user-label {
+      padding: 0.25rem 0.5rem;
+      background: var(--ion-color-card-theme-one);
+      border-radius: 0.25rem;
+      display: flex;
+      align-items: center;
+      margin-left: 0.5rem;
+      color: var(--ion-color-neutral-100);
+
+      &.hidden {
+        visibility: hidden;
+      }
+
+      ion-icon {
+        margin-right: 0.25rem;
+      }
+
+      span {
+        font-weight: 400;
+        font-size: 0.75rem;
+        line-height: 1rem;
+      }
+    }
+
+    .bottom-text {
+      text-align: center;
+      color: var(--ion-color-neutral-500);
+      font-size: 0.875rem;
+      line-height: 1.5rem;
+      margin: 0;
+    }
+  }
+
+  .signer-alert {
+    ion-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      ion-icon {
+        width: 2.75rem;
+        height: 2.75rem;
+        color: var(--ion-color-warning-800);
+      }
+
+      .alert-text {
+        text-align: center;
+        line-height: 1.5rem;
+        margin: 0.75rem 0 0.625rem;
+      }
+
+      .secondary-button {
+        width: 100%;
+        --color: var(--ion-color-primary-700);
+        --background: var(--ion-color-neutral-100);
+        --background-activated: var(--ion-color-neutral-200);
+        --color-activated: var(--ion-color-primary-700);
+
+        &::part(native) {
+          border: 1px solid var(--ion-color-primary-700);
+        }
+      }
+    }
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .header-text {
+      font-size: 0.8rem;
+    }
+  }
+}

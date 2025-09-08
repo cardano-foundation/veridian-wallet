@@ -1255,14 +1255,6 @@
         "bottom": "Check back later or contact support if it persists."
       }
     },
-    "receive": {
-      "title": "Setup identifier",
-      "confirmbutton": "Add identifier",
-      "notes": {
-        "top": "Before proceeding, please make sure everyone included as a member scans this QR code.",
-        "middle": "Remember to scan everyone else’s QR code too!"
-      }
-    },
     "scan": {
       "cancel": "Cancel",
       "confirm": "Confirm",
@@ -1271,48 +1263,54 @@
       "scanqrcode": "Scan QR code",
       "pastecontents": "Paste contents"
     },
-    "connections": {
-      "title": "Connections",
-      "subtitle": "These are the members you scanned. Please review before proceeding.",
-      "continue": "Confirm connections"
-    },
-    "threshold": {
-      "title": "Set a Threshold",
-      "subtitle": "Set the threshold to determine the level of consensus required",
-      "label": "Threshold",
-      "continue": "Confirm threshold"
-    },
-    "confirm": {
+    "initgroup": {
       "title": "Confirm",
-      "subtitle": "Confirm all details for your group identifier are accurate",
-      "displayname": "Display Name",
-      "selectedmembers": "Selected Members",
-      "treshold": "Threshold",
-      "continue": "Confirm identifier",
-      "cancel": "Cancel",
-      "alert": {
-        "text": "Cancelling now means you'll need to restart the group initiation process.",
-        "cancel": "Yes, cancel",
-        "back": "Back"
+      "text": "Confirm all details for your group are accurate",
+      "name": "Group name",
+      "members": "Group members",
+      "numberofmember": "{{members}} group members",
+      "thresholdalert": "It’s important you choose the minimum number of members required to sign on actions and to help with recovery",
+      "button": {
+        "setsigner": "Set signers",
+        "back": "Back",
+        "sendrequest": "Send requests",
+        "cancel": "Cancel"
+      },
+      "setsigner": {
+        "title": "Signers",
+        "text": "Choose the minimum number of members required to sign on actions and to help with recovery",
+        "requiredsigners": "Required signers",
+        "requiredsignershelptext": "This sets the minimum number of group members who must approve an action for it to go ahead.",
+        "recoverysigners": "Recovery signers",
+        "recoverysignershelptext": "This sets the minimum number of group members needed to recover the group profile if something goes wrong.",
+        "button": {
+          "back": "Back",
+          "confirm": "Confirm signers"
+        },
+        "error": {
+          "min": "Value must be at least 1",
+          "max": "Value must be below the maximum number of members"
+        }
+      },
+      "setconnections": {
+        "title": "Members",
+        "text": "These are the members included. Please review before proceeding.",
+        "button": {
+          "back": "Back",
+          "confirm": "Confirm members"
+        }
       }
     },
-    "displayname": {
-      "title": "Display name",
-      "placeholder": "Create a name for this identifier"
-    },
-    "color": {
-      "title": "Choose card colour"
-    },
-    "aidtype": {
-      "title": "Identifier type",
-      "default": {
-        "label": "Individual"
+    "confirm": {
+      "init": {
+        "text": "Before initiating the group, it's important that all members, including yourself, have connected with each other",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
       },
-      "multisig": {
-        "label": "Group"
-      },
-      "delegated": {
-        "label": "Delegated"
+      "cancel": {
+        "text": "Cancelling now means you'll need to restart the group initiation process.",
+        "confirm": "Yes, cancel",
+        "cancel": "Back"
       }
     },
     "aidinfo": {
@@ -1333,12 +1331,6 @@
       "button": {
         "done": "Done"
       }
-    },
-    "theme": {
-      "title": "Choose card style"
-    },
-    "error": {
-      "maxlength": "Must be less than 32 characters long"
     }
   },
   "offline": {

@@ -1,0 +1,91 @@
+.setup-signer-modal {
+  .header-text {
+    text-align: center;
+    line-height: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .error-message {
+    text-align: left;
+    p {
+      margin: 0.25rem 0;
+    }
+  }
+
+  .signer-threshold {
+    margin-bottom: 0;
+
+    .input-line {
+      overflow: hidden;
+      background-color: var(--ion-color-neutral-100);
+    }
+
+    .signer-threshold-controls {
+      display: flex;
+      background-color: var(--ion-color-neutral-100);
+      padding-right: 0.5rem;
+    }
+
+    .decrease-threshold-button,
+    .increase-threshold-button {
+      width: 1.5rem;
+      height: 1.5rem;
+      min-height: 1.5rem;
+      min-width: 1.5rem;
+      --padding-start: 0;
+      --padding-end: 0;
+      border-radius: 2rem;
+      margin-inline-end: 0.25rem;
+      margin-inline-start: 0.25rem;
+
+      &::part(native) {
+        border: 1px solid var(--ion-color-neutral-300);
+        --background-activated: var(--ion-color-neutral-100);
+        background: var(--ion-color-neutral-100);
+        color: var(--ion-color-neutral-700);
+      }
+
+      ion-icon {
+        font-size: 1.2rem;
+        color: var(--ion-color-neutral-700);
+      }
+    }
+
+    .decrease-threshold-button.inactive::part(native) {
+      background: var(--ion-color-neutral-200);
+      border: none;
+    }
+    .increase-threshold-button.inactive::part(native) {
+      background: var(--ion-color-neutral-200);
+      border: none;
+    }
+  }
+
+  .info-card {
+    margin: 1.5rem 0;
+  }
+
+  .page-footer {
+    padding-bottom: 1.5rem;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .header-text {
+      font-size: 0.8rem;
+    }
+
+    .signer-threshold {
+      .decrease-threshold-button,
+      .increase-threshold-button {
+        width: 1.55rem;
+        height: 1.55rem;
+        min-height: 1.55rem;
+        min-width: 1.55rem;
+
+        ion-icon {
+          font-size: 0.96rem;
+        }
+      }
+    }
+  }
+}
