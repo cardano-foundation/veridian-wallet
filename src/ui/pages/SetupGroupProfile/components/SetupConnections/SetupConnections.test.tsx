@@ -98,6 +98,32 @@ jest.mock("react-router-dom", () => ({
   }),
 }));
 
+jest.mock("@capgo/capacitor-native-biometric", () => ({
+  NativeBiometric: {
+    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
+    verifyIdentity: jest.fn(() => Promise.resolve()),
+    getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
+    setCredentials: jest.fn(() => Promise.resolve()),
+    deleteCredentials: jest.fn(() => Promise.resolve()),
+  },
+  BiometryType: {
+    FINGERPRINT: "fingerprint",
+    FACE_ID: "faceId",
+    TOUCH_ID: "touchId",
+    IRIS_AUTHENTICATION: "iris",
+    MULTIPLE: "multiple",
+    NONE: "none",
+  },
+  BiometricAuthError: {
+    USER_CANCEL: 1,
+    USER_TEMPORARY_LOCKOUT: 2,
+    USER_LOCKOUT: 3,
+    BIOMETRICS_UNAVAILABLE: 4,
+    UNKNOWN_ERROR: 5,
+    BIOMETRICS_NOT_ENROLLED: 6,
+  },
+}));
+
 const getPlatformMock = jest.fn(() => ["mobile"]);
 
 const isNativePlatformMock = jest.fn(() => true);
