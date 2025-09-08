@@ -175,6 +175,7 @@ const useBiometricAuth = () => {
           title: i18n.t("biometry.title") as string,
           subtitle: i18n.t("biometry.subtitle") as string,
           negativeButtonText: i18n.t("biometry.canceltitle") as string,
+          fallbackTitle: i18n.t("biometry.iosfallbacktitle") as string,
         });
       }
 
