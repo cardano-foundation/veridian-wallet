@@ -1283,6 +1283,7 @@
         "requiredsignershelptext": "This sets the minimum number of group members who must approve an action for it to go ahead.",
         "recoverysigners": "Recovery signers",
         "recoverysignershelptext": "This sets the minimum number of group members needed to recover the group profile if something goes wrong.",
+        "members": "{{members}} members",
         "button": {
           "back": "Back",
           "confirm": "Confirm signers"

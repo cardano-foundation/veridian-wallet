@@ -1,6 +1,6 @@
 import { IonButton, IonIcon, IonModal } from "@ionic/react";
 import { addOutline, removeOutline } from "ionicons/icons";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { i18n } from "../../../../../i18n";
 import { CustomInput } from "../../../../components/CustomInput";
 import { ErrorMessage } from "../../../../components/ErrorMessage";
@@ -103,12 +103,13 @@ const SignerInput = ({
 export const SetupSignerModal = ({
   isOpen,
   connectionsLength,
+  currentValue,
   setOpen,
   onSubmit,
 }: SetupSignerModalProps) => {
   const [data, setData] = useState<SignerData>({
     recoverySigners: 1,
-    requiredSigners: 1,
+    requiredSigners: connectionsLength,
   });
 
   const handleClose = () => {
@@ -120,17 +121,28 @@ export const SetupSignerModal = ({
     handleClose();
   };
 
+  const isValidData = useCallback(
+    (signer: number) => {
+      return signer >= 1 && signer <= connectionsLength;
+    },
+    [connectionsLength]
+  );
+
+  useEffect(() => {
+    if (
+      isOpen &&
+      isValidData(currentValue.recoverySigners) &&
+      isValidData(currentValue.requiredSigners)
+    )
+      setData({ ...currentValue });
+  }, [isOpen, currentValue, isValidData]);
+
   const setField = (name: keyof SignerData, value: number) => {
     setData((values) => ({
       ...values,
       [name]: value,
     }));
   };
-
-  const isValidData = (signer: number) => {
-    return signer >= 1 && signer <= connectionsLength;
-  };
-
   return (
     <IonModal
       isOpen={isOpen}

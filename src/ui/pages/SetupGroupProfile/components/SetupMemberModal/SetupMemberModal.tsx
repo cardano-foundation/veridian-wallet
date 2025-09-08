@@ -1,5 +1,5 @@
 import { IonCheckbox, IonModal } from "@ionic/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ConnectionShortDetails } from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
 import { MemberAvatar } from "../../../../components/Avatar";
@@ -13,10 +13,17 @@ import { SetupMemberModalProps } from "./SetupMemberModal.types";
 export const SetupMemberModal = ({
   isOpen,
   connections,
+  currentSelectedConnections,
   setOpen,
   onSubmit,
 }: SetupMemberModalProps) => {
-  const [data, setData] = useState<ConnectionShortDetails[]>([]);
+  const [data, setData] = useState<ConnectionShortDetails[]>([
+    ...currentSelectedConnections,
+  ]);
+
+  useEffect(() => {
+    if (isOpen) setData([...currentSelectedConnections]);
+  }, [currentSelectedConnections, isOpen]);
 
   const handleClose = () => {
     setOpen(false);

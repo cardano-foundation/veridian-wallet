@@ -14,6 +14,7 @@ interface SignerInputProps {
 interface SetupSignerModalProps {
   isOpen: boolean;
   connectionsLength: number;
+  currentValue: SignerData;
   setOpen: (value: boolean) => void;
   onSubmit: (data: SignerData) => void;
 }

@@ -11,6 +11,7 @@ import {
   CardBlock,
   CardDetailsContent,
   CardDetailsItem,
+  FlatBorderType,
 } from "../../../../components/CardDetails";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
@@ -56,13 +57,15 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
     }));
   }, [profile?.identity.displayName, state.selectedConnections]);
 
+  const openSignerModal = () => setOpenSigners(true);
+
   const updateMembers = (data: ConnectionShortDetails[]) => {
     setState((state) => ({
       ...state,
       selectedConnections: [...data],
     }));
 
-    setOpenSigners(true);
+    openSignerModal();
   };
 
   const updateSigners = (data: SignerData) => {
@@ -105,10 +108,11 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
         </p>
         <CardBlock
           title={i18n.t("setupgroupprofile.initgroup.name")}
-          testId="rotate-signing-key-block"
+          testId="groupname-block"
+          className="groupname-block"
         >
           <CardDetailsContent
-            testId="rotate-signing-key"
+            testId="groupname"
             mainContent={`${state.newIdentifier.displayName}`}
           />
         </CardBlock>
@@ -149,38 +153,84 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
             })}
           </p>
         </CardBlock>
-        <CardBlock
-          testId="signer-alert"
-          className="signer-alert"
-        >
-          <IonIcon
-            className="signer-alert-icon"
-            icon={warningOutline}
-          />
-          <p className="alert-text">
-            {i18n.t("setupgroupprofile.initgroup.thresholdalert")}
-          </p>
-          <IonButton
-            shape="round"
-            expand="full"
-            fill="outline"
-            className="secondary-button"
-            onClick={() => setOpenSigners(true)}
+        {state.signer.recoverySigners === 0 ||
+        state.signer.requiredSigners === 0 ? (
+          <CardBlock
+            testId="signer-alert"
+            className="signer-alert"
           >
-            {i18n.t("setupgroupprofile.initgroup.button.setsigner")}
-          </IonButton>
-        </CardBlock>
+            <IonIcon
+              className="signer-alert-icon"
+              icon={warningOutline}
+            />
+            <p className="alert-text">
+              {i18n.t("setupgroupprofile.initgroup.thresholdalert")}
+            </p>
+            <IonButton
+              shape="round"
+              expand="full"
+              fill="outline"
+              className="secondary-button"
+              onClick={openSignerModal}
+            >
+              {i18n.t("setupgroupprofile.initgroup.button.setsigner")}
+            </IonButton>
+          </CardBlock>
+        ) : (
+          <>
+            <CardBlock
+              flatBorder={FlatBorderType.BOT}
+              title={i18n.t(
+                "setupgroupprofile.initgroup.setsigner.requiredsigners"
+              )}
+              testId="required-signer-block"
+              className="required-signer"
+              endSlotIcon={pencilOutline}
+              onClick={openSignerModal}
+            >
+              <CardDetailsContent
+                testId="required-signer-key"
+                mainContent={`${i18n.t(
+                  `setupgroupprofile.initgroup.setsigner.members`,
+                  {
+                    members: state.signer.requiredSigners,
+                  }
+                )}`}
+              />
+            </CardBlock>
+            <CardBlock
+              className="recovery-signer"
+              title={i18n.t(
+                "setupgroupprofile.initgroup.setsigner.recoverysigners"
+              )}
+              flatBorder={FlatBorderType.TOP}
+              testId="recovery-signer-block"
+            >
+              <CardDetailsContent
+                testId="recovery-signer-key"
+                mainContent={`${i18n.t(
+                  `setupgroupprofile.initgroup.setsigner.members`,
+                  {
+                    members: state.signer.recoverySigners,
+                  }
+                )}`}
+              />
+            </CardBlock>
+          </>
+        )}
       </ScrollablePageLayout>
       <SetupSignerModal
         isOpen={openSigners}
         setOpen={setOpenSigners}
         connectionsLength={state.selectedConnections.length + 1}
+        currentValue={state.signer}
         onSubmit={updateSigners}
       />
       <SetupMemberModal
         isOpen={openEditMembers}
         setOpen={setOpenEditMembers}
         connections={state.scannedConections}
+        currentSelectedConnections={state.selectedConnections}
         onSubmit={updateMembers}
       />
       <Alert
