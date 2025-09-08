@@ -76,26 +76,19 @@ const useBiometricAuth = (isLockPage = false) => {
       setIsStrongBiometry(false);
       return result;
     }
-    try {
-      const biometricResult: AvailableResult =
+    const biometricResult: AvailableResult =
         await NativeBiometric.isAvailable();
       setBiometricInfo(biometricResult);
 
-      const strongBiometry =
-        biometricResult.biometryType === BiometryType.FACE_ID ||
-        biometricResult.biometryType === BiometryType.TOUCH_ID ||
-        biometricResult.biometryType === BiometryType.FINGERPRINT ||
-        biometricResult.biometryType === BiometryType.IRIS_AUTHENTICATION ||
-        biometricResult.biometryType === BiometryType.MULTIPLE;
+    const strongBiometry =
+      biometricResult.biometryType === BiometryType.FACE_ID ||
+      biometricResult.biometryType === BiometryType.TOUCH_ID ||
+      biometricResult.biometryType === BiometryType.FINGERPRINT ||
+      biometricResult.biometryType === BiometryType.IRIS_AUTHENTICATION ||
+      biometricResult.biometryType === BiometryType.MULTIPLE;
 
-      setIsStrongBiometry(strongBiometry);
-      return biometricResult;
-    } catch (error) {
-      const result = { isAvailable: false, biometryType: BiometryType.NONE };
-      setBiometricInfo(result);
-      setIsStrongBiometry(false);
-      return result;
-    }
+    setIsStrongBiometry(strongBiometry);
+    return biometricResult;
   };
 
   // Memoize checkBiometrics as it's a dependency for other memoized functions
