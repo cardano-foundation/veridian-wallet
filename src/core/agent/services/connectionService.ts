@@ -50,13 +50,16 @@ import {
   EventTypes,
 } from "../event.types";
 import {
-  ConnectionHistoryItem,
   ConnectionHistoryType,
-  ContactDetailsRecord,
-  HumanReadableMessage,
   KeriaContactKeyPrefix,
   OobiQueryParams,
   RpyRoute,
+} from "./connectionService.types";
+import type {
+  ConnectionHistoryItem,
+  ContactDetailsRecord,
+  GetOobiParameters,
+  HumanReadableMessage,
 } from "./connectionService.types";
 import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
@@ -632,11 +635,9 @@ class ConnectionService extends AgentService {
   @OnlineOnly
   async getOobi(
     id: string,
-    alias?: string,
-    groupId?: string,
-    groupName?: string,
-    externalId?: string
+    parameters: GetOobiParameters
   ): Promise<string> {
+    const { alias, groupId, groupName, externalId } = parameters;
     const result = await this.props.signifyClient.oobis().get(id);
     if (!result.oobis[0]) {
       throw new Error(ConnectionService.CANNOT_GET_OOBI);
