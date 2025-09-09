@@ -1,16 +1,22 @@
-name: OWASP Dependency-Check (iOS)
+name: dependency-check-owasp-android
 
 on:
   push:
-    paths:
-      - "ios/**"
-      - "**/Podfile*"
-      - "**/Package*.swift"
+    paths: &shared-trigger-paths
+      - "android/**"
+      - "**/*.gradle"
+      - "**/gradle*.properties"
+      - ".github/workflows/dependency-check-owasp-android.yml"
+    branches:
+      - main
+      - develop
+      - 'releases/**'
   pull_request:
+    paths: *shared-trigger-paths
     types: [ opened, synchronize ]
 
 jobs:
-  depcheck-ios:
+  depcheck:
     runs-on: ubuntu-latest
 
     permissions:
@@ -27,17 +33,17 @@ jobs:
       - name: Run Dependency-Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: "veridian-wallet-ios"
-          path: "ios"
+          project: "veridian-wallet-android"
+          path: "android"
           format: "ALL"
           out: "reports"
-          args: "--failOnCVSS 7 --nvdApiKey ${{ env.NVD_API_KEY }}"
+          args: "--failOnCVSS 7 --nvdApiKey ${{ env.NVD_API_KEY }} --disableCentral"
         continue-on-error: false
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
-          name: depcheck-ios-report
+          name: depcheck-android-report
           path: "reports/dependency-check-report.html"
 
       - name: Upload SARIF to code scanning
