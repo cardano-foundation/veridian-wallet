@@ -63,9 +63,7 @@ const ProfileContent = ({
   const credentials = useAppSelector(getCredsCache);
   const peerConnections = useAppSelector(getPeerConnections);
   const credentialsCount = credentials.length;
-  const connectionsCount =
-    (currentProfile?.connections?.length || 0) +
-    (currentProfile?.multisigConnections?.length || 0);
+  const connectionsCount = currentProfile?.connections?.length || 0;
   const dappsCount = peerConnections.length;
   const memberCount = cardData.members?.length || 0;
   const [openDetailModal, setOpenDetailModal] = useState(false);

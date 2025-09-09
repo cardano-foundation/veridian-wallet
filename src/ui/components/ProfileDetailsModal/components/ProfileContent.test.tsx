@@ -1,11 +1,10 @@
-import { render } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { ProfileContent } from "./ProfileContent";
 import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { identifierFix } from "../../../__fixtures__/identifierFix";
 
-// Mock the required modules
 jest.mock("../../../../i18n", () => ({
   i18n: {
     t: jest.fn((key: string) => key),
@@ -13,7 +12,8 @@ jest.mock("../../../../i18n", () => ({
 }));
 
 jest.mock("../../ConnectdApp", () => ({
-  ConnectdApp: () => <div data-testid="connect-dapp">ConnectDApp</div>,
+  ConnectdApp: ({ isOpen }: { isOpen: boolean }) =>
+    isOpen ? <div data-testid="connect-dapp">ConnectDApp</div> : null,
 }));
 
 jest.mock("../../EditProfile", () => ({
@@ -44,8 +44,21 @@ jest.mock("../../CardDetails", () => ({
 }));
 
 jest.mock("../../CardDetails/CardDetailsBlock", () => ({
-  CardBlock: ({ title, testId }: { title: string; testId?: string }) => (
-    <div data-testid={testId || "card-block"}>{title}</div>
+  CardBlock: ({
+    title,
+    testId,
+    onClick,
+  }: {
+    title: string;
+    testId?: string;
+    onClick?: () => void;
+  }) => (
+    <div
+      data-testid={testId || "card-block"}
+      onClick={onClick}
+    >
+      {title}
+    </div>
   ),
   FlatBorderType: {
     BOT: "bot",
@@ -109,29 +122,36 @@ describe("ProfileContent", () => {
 
   describe("Profile Information Display", () => {
     it("should display dynamic credential count from current profile", () => {
-      const { getByText } = renderComponent();
+      renderComponent();
 
-      // The test store should have credentials for the current profile
-      // This will test that we're getting the count from Redux instead of hardcoded values
-      expect(
-        getByText("profiledetails.identifierdetail.information.credentials")
-      ).toBeInTheDocument();
+      const credentialsLabel = screen.getByText(
+        "profiledetails.identifierdetail.information.credentials"
+      );
+      const credentialsValue = credentialsLabel.previousElementSibling;
+
+      expect(credentialsValue?.textContent).toBe("4");
     });
 
     it("should display dynamic connections count from current profile", () => {
-      const { getByText } = renderComponent();
+      renderComponent();
 
-      expect(
-        getByText("profiledetails.identifierdetail.information.connections")
-      ).toBeInTheDocument();
+      const connectionsLabel = screen.getByText(
+        "profiledetails.identifierdetail.information.connections"
+      );
+      const connectionsValue = connectionsLabel.previousElementSibling;
+
+      expect(connectionsValue?.textContent).toBe("0");
     });
 
     it("should display dynamic dapps count from current profile", () => {
-      const { getByText } = renderComponent();
+      renderComponent();
 
-      expect(
-        getByText("profiledetails.identifierdetail.information.dapps")
-      ).toBeInTheDocument();
+      const dappsLabel = screen.getByText(
+        "profiledetails.identifierdetail.information.dapps"
+      );
+      const dappsValue = dappsLabel.previousElementSibling;
+
+      expect(dappsValue?.textContent).toBe("5");
     });
 
     it("should display '0' when profile has no credentials", () => {
@@ -149,14 +169,14 @@ describe("ProfileContent", () => {
         },
       };
 
-      const { getByText } = renderComponent(storeWithEmptyProfile);
+      renderComponent(storeWithEmptyProfile);
 
-      // Find the credentials value specifically
-      const credentialsElement = getByText(
+      const credentialsLabel = screen.getByText(
         "profiledetails.identifierdetail.information.credentials"
-      ).previousElementSibling as HTMLElement;
+      );
+      const credentialsValue = credentialsLabel.previousElementSibling;
 
-      expect(credentialsElement.textContent).toBe("0");
+      expect(credentialsValue?.textContent).toBe("0");
     });
 
     it("should display '0' when profile has no connections", () => {
@@ -175,14 +195,14 @@ describe("ProfileContent", () => {
         },
       };
 
-      const { getByText } = renderComponent(storeWithEmptyProfile);
+      renderComponent(storeWithEmptyProfile);
 
-      // Find the connections value specifically
-      const connectionsElement = getByText(
+      const connectionsLabel = screen.getByText(
         "profiledetails.identifierdetail.information.connections"
-      ).previousElementSibling as HTMLElement;
+      );
+      const connectionsValue = connectionsLabel.previousElementSibling;
 
-      expect(connectionsElement.textContent).toBe("0");
+      expect(connectionsValue?.textContent).toBe("0");
     });
 
     it("should display '0' when profile has no dapp connections", () => {
@@ -200,17 +220,17 @@ describe("ProfileContent", () => {
         },
       };
 
-      const { getByText } = renderComponent(storeWithEmptyProfile);
+      renderComponent(storeWithEmptyProfile);
 
-      // Find the dapps value specifically
-      const dappsElement = getByText(
+      const dappsLabel = screen.getByText(
         "profiledetails.identifierdetail.information.dapps"
-      ).previousElementSibling as HTMLElement;
+      );
+      const dappsValue = dappsLabel.previousElementSibling;
 
-      expect(dappsElement.textContent).toBe("0");
+      expect(dappsValue?.textContent).toBe("0");
     });
 
-    it("should combine regular and multisig connections in total count", () => {
+    it("should display correct connections count excluding multisig connections", () => {
       const storeWithMixedConnections = {
         profilesCache: {
           ...profileCacheFixData,
@@ -230,19 +250,18 @@ describe("ProfileContent", () => {
         },
       };
 
-      const { getByText } = renderComponent(storeWithMixedConnections);
+      renderComponent(storeWithMixedConnections);
 
-      // Find the connections value specifically
-      const connectionsElement = getByText(
+      const connectionsLabel = screen.getByText(
         "profiledetails.identifierdetail.information.connections"
-      ).previousElementSibling as HTMLElement;
+      );
+      const connectionsValue = connectionsLabel.previousElementSibling;
 
-      // Should display "5" (2 regular + 3 multisig connections)
-      expect(connectionsElement.textContent).toBe("5");
+      expect(connectionsValue?.textContent).toBe("2");
     });
 
-    it("should handle undefined multisigConnections gracefully", () => {
-      const storeWithUndefinedMultisig = {
+    it("should handle undefined connections gracefully", () => {
+      const storeWithUndefinedConnections = {
         profilesCache: {
           ...profileCacheFixData,
           profiles: {
@@ -250,22 +269,20 @@ describe("ProfileContent", () => {
               ...profileCacheFixData.profiles[
                 profileCacheFixData.defaultProfile!
               ],
-              connections: [{ id: "conn1" }],
-              multisigConnections: undefined,
+              connections: undefined,
             },
           },
         },
       };
 
-      const { getByText } = renderComponent(storeWithUndefinedMultisig);
+      renderComponent(storeWithUndefinedConnections);
 
-      // Find the connections value specifically
-      const connectionsElement = getByText(
+      const connectionsLabel = screen.getByText(
         "profiledetails.identifierdetail.information.connections"
-      ).previousElementSibling as HTMLElement;
+      );
+      const connectionsValue = connectionsLabel.previousElementSibling;
 
-      // Should display "1" (only regular connections)
-      expect(connectionsElement.textContent).toBe("1");
+      expect(connectionsValue?.textContent).toBe("0");
     });
   });
 
@@ -293,24 +310,16 @@ describe("ProfileContent", () => {
 
       expect(getByTestId("dapp-block")).toBeInTheDocument();
     });
-  });
 
-  describe("Profile Information Component", () => {
-    it("should convert numbers to strings using template literals", () => {
-      // This test verifies that we're using template literals instead of .toString()
-      const { container } = renderComponent();
+    it("should open ConnectdApp modal when DApp block is clicked", () => {
+      const { getByTestId, queryByTestId } = renderComponent();
 
-      // Find all profile information value elements
-      const valueElements = container.querySelectorAll(
-        ".profile-information-value"
-      );
+      expect(queryByTestId("connect-dapp")).not.toBeInTheDocument();
 
-      // Each value should be a string representation of a number
-      valueElements.forEach((element) => {
-        const textContent = element.textContent;
-        expect(textContent).toMatch(/^\d+$/); // Should be numeric string
-        expect(typeof textContent).toBe("string");
-      });
+      const dappBlock = getByTestId("dapp-block");
+      fireEvent.click(dappBlock);
+
+      expect(queryByTestId("connect-dapp")).toBeInTheDocument();
     });
   });
 });
