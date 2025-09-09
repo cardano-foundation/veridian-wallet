@@ -1,8 +1,8 @@
-name: OSV-Scanner Dependency Scan
+name: dependency-check-google-osv
 
 on:
   push:
-    paths:
+    paths: &shared-trigger-paths
       - 'package.json'
       - 'package-lock.json'
       - 'ios/**'
@@ -10,8 +10,14 @@ on:
       - '**/*.gradle'
       - '**/Podfile*'
       - '**/Package*.swift'
+      - '.github/dependency-check-google-osv.yaml'
+    branches:
+      - main
+      - develop
+      - 'releases/**'
   pull_request:
     types: [ opened, synchronize ]
+    paths: *shared-trigger-paths
   workflow_dispatch:
 
 permissions:
@@ -20,7 +26,7 @@ permissions:
   contents: read
 
 jobs:
-  scan-scheduled:
+  depcheck:
     uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
     with:
       scan-args: |-

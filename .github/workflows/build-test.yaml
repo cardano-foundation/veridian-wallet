@@ -1,0 +1,36 @@
+name: build-test
+
+on:
+  pull_request:
+    types: [ opened, synchronize ]
+  push:
+    branches:
+      - main
+      - develop
+      - release/**
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+          submodules: recursive  # Fetch private content
+          fetch-depth: 1         # Fetch all history for .GitInfo and .Lastmod
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: "package.json"
+
+    - name: Run unit tests
+      env:
+        NODE_OPTIONS: "--max_old_space_size=8192"
+      run: |
+        npm ci
+        npm run test
+
+    - name: 🔨 Build project
+      run: npm run build

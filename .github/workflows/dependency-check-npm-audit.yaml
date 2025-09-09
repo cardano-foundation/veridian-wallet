@@ -1,0 +1,54 @@
+name: dependency-check-npm-audit
+
+on:
+  pull_request:
+    paths: &shared-trigger-paths
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/dependency-check-npm-audit.yaml'
+    types: [ opened, synchronize ]
+  push:
+    paths: *shared-trigger-paths
+    branches:
+      - main
+      - develop
+      - release/**
+
+jobs:
+  depcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+          submodules: recursive  # Fetch private content
+          fetch-depth: 1         # Fetch all history for .GitInfo and .Lastmod
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: "package.json"
+
+    - name: Install dependencies
+      env:
+        NODE_OPTIONS: "--max_old_space_size=8192"
+      run: |
+        npm ci
+
+    - name: Run npm audit
+      run: npm audit --json > audit.json
+
+    - name: Convert npm audit results to SARIF
+      if: always()
+      run: |
+        npx npm-audit-sarif audit.json > audit.sarif.json
+        # potentially fix levels that are not recognized by GitHub
+        jq '(.runs[].results[] | select(.level != "none" and .level != "note" and .level != "warning" and .level != "error") | .level) |= "warning"' audit.sarif.json > fixed-audit.sarif.json
+        mv fixed-audit.sarif.json audit.sarif.json
+
+    - name: Upload SARIF file to GitHub Security tab
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: audit.sarif.json
