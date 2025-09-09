@@ -22,7 +22,8 @@ export const SetupMemberModal = ({
   ]);
 
   useEffect(() => {
-    if (isOpen) setData([...currentSelectedConnections]);
+    if (isOpen && currentSelectedConnections.length > 0)
+      setData([...currentSelectedConnections]);
   }, [currentSelectedConnections, isOpen]);
 
   const handleClose = () => {

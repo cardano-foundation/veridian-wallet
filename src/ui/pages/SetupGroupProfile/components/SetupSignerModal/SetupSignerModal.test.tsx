@@ -40,6 +40,10 @@ describe("Setup signer modal", () => {
           isOpen
           setOpen={jest.fn}
           onSubmit={jest.fn}
+          currentValue={{
+            recoverySigners: 0,
+            requiredSigners: 0,
+          }}
         />
       </Provider>
     );
@@ -105,6 +109,10 @@ describe("Setup signer modal", () => {
           isOpen
           setOpen={jest.fn}
           onSubmit={submit}
+          currentValue={{
+            recoverySigners: 0,
+            requiredSigners: 0,
+          }}
         />
       </Provider>
     );

@@ -69,10 +69,10 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   };
 
   const updateSigners = (data: SignerData) => {
-    setState((value) => ({
-      ...value,
+    setState({
+      ...state,
       signer: data,
-    }));
+    });
   };
 
   return (
@@ -121,7 +121,9 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
           testId="group-member-block"
           className="group-members"
           endSlotIcon={pencilOutline}
-          onClick={() => setOpenEditMembers(true)}
+          onClick={() => {
+            setOpenEditMembers(true);
+          }}
         >
           {members.map((item, index) => {
             return (
