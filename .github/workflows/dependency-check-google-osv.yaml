@@ -52,3 +52,15 @@ jobs:
       scan-args: |-
         --recursive
         ./
+
+  depcheck-services:
+    permissions:
+      actions: read
+      security-events: write
+      contents: read
+    continue-on-error: true
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
+    with:
+      scan-args: |-
+        --recursive
+        ./services
