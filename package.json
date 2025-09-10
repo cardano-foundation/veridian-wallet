@@ -21,7 +21,7 @@
     "wdio:ios:15promax": "npx wdio tests/config/wdio.sim.ios.iphone15ProMax.config.ts",
     "wdio:ios:16promax": "npx wdio tests/config/wdio.sim.ios.iphone16ProMax.config.ts",
     "prepare": "husky install",
-    "audit": "npx audit-ci --report --report-type full --config audit-ci.jsonc"
+    "audit": "npx audit-ci@latest --report --report-type full --config audit-ci.jsonc"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^8.0.2",
