@@ -20,14 +20,15 @@ on:
     paths: *shared-trigger-paths
   workflow_dispatch:
 
-permissions:
-  actions: read
-  security-events: write
-  contents: read
-
 jobs:
   depcheck:
+    permissions:
+      actions: read
+      security-events: write
+      contents: read
+
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout
       uses: actions/checkout@v5
