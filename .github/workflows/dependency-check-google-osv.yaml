@@ -21,14 +21,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  depcheck:
-    permissions:
-      actions: read
-      security-events: write
-      contents: read
-
+  set-gitignore-artifact:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout
       uses: actions/checkout@v5
@@ -39,9 +33,20 @@ jobs:
       run: |
         echo 'services/*' >> .gitignore
 
-    - name: Run Google OSV Scanner
-      uses: google/osv-scanner-action@v2.2.2
+    - name: Upload .gitignore artifact
+      uses: actions/upload-artifact@v3
       with:
-        scan-args: |-
-          --recursive
-          ./
+        name: gitignore-artifact
+
+  depcheck:
+    permissions:
+      actions: read
+      security-events: write
+      contents: read
+    needs: set-gitignore-artifact
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
+    with:
+      download-artifact: gitignore-artifact
+      scan-args: |-
+        --recursive
+        ./
