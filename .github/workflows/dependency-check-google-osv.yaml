@@ -40,7 +40,8 @@ jobs:
         echo 'services/*' >> .gitignore
 
     - name: Run Google OSV Scanner
-      uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
+      uses: google/osv-scanner-action@v2.2.2
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
       with:
         scan-args: |-
           --recursive
