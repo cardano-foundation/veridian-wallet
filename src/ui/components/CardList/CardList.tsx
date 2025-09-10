@@ -48,7 +48,7 @@ const CardInfo = <T extends object = object>({
       className="card-item"
     >
       {renderStartSlot?.(card.data, index)}
-      {!!hiddenImage && cardImg}
+      {!hiddenImage && cardImg}
       <div className="card-info">
         <p
           data-testid={`card-title-${card.id}`}
@@ -77,6 +77,7 @@ const CardItem = <T extends object = object>({
   onRenderCardAction,
   onRenderEndSlot,
   onRenderStartSlot: renderStartSlot,
+  hiddenImage,
 }: CardItemProps<T>) => {
   if (!onRenderCardAction) {
     return (
@@ -86,6 +87,7 @@ const CardItem = <T extends object = object>({
         onCardClick={onCardClick}
         onRenderEndSlot={onRenderEndSlot}
         onRenderStartSlot={renderStartSlot}
+        hiddenImage={hiddenImage}
       />
     );
   }
@@ -98,6 +100,7 @@ const CardItem = <T extends object = object>({
         onCardClick={onCardClick}
         onRenderEndSlot={onRenderEndSlot}
         onRenderStartSlot={renderStartSlot}
+        hiddenImage={hiddenImage}
       />
       <IonItemOptions data-testid="card-actions">
         {onRenderCardAction(card.data)}
@@ -116,6 +119,7 @@ const CardList = <T extends object = object>({
   onCardClick,
   onRenderEndSlot,
   onRenderStartSlot: renderStartSlot,
+  hiddenImage,
 }: CardListProps<T>) => {
   const classes = combineClassNames("card-list", className, {
     "rounde-img": rounded,
@@ -136,6 +140,7 @@ const CardList = <T extends object = object>({
           onRenderCardAction={onRenderCardAction}
           onRenderEndSlot={onRenderEndSlot}
           onRenderStartSlot={renderStartSlot}
+          hiddenImage={hiddenImage}
         />
       ))}
     </IonList>
