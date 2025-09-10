@@ -21,7 +21,7 @@
     "wdio:ios:15promax": "npx wdio tests/config/wdio.sim.ios.iphone15ProMax.config.ts",
     "wdio:ios:16promax": "npx wdio tests/config/wdio.sim.ios.iphone16ProMax.config.ts",
     "prepare": "husky install",
-    "audit": "npx audit-ci@latest --report --report-type full --config audit-ci.jsonc"
+    "audit": "audit-ci --report --report-type full --config audit-ci.jsonc"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^8.0.2",
@@ -100,6 +100,7 @@
     "appium-safari-driver": "^3.5.23",
     "appium-uiautomator2-driver": "^4.2.2",
     "appium-xcuitest-driver": "^9.2.2",
+    "audit-ci": "7.1.0",
     "babel-jest": "^29.5.0",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^11.0.0",
