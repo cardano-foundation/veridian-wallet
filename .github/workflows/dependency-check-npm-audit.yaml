@@ -32,16 +32,14 @@ jobs:
       with:
         node-version-file: "package.json"
 
-    - name: Install dependencies
-      run: |
-        npm ci
-
     - name: Run npm audit
+      env:
+        AUDIT_CI_VERSION: latest
       run: |
        # We always save the report so it's uploaded to the Security tab
-       npx audit-ci --report --report-type full --config audit-ci.jsonc -o json > audit.json || true
+       npx -y audit-ci@${AUDIT_CI_VERSION} --report --report-type full --config audit-ci.jsonc -o json > audit.json || true
        # We run it again in text mode to have a better output in the logs and let it fail if there are vulnerabilities (criticity set in audit-ci.jsonc)
-       npx audit-ci --report --report-type full --config audit-ci.jsonc
+       npx -y audit-ci@${AUDIT_CI_VERSION} --report --report-type full --config audit-ci.jsonc
 
     - name: Convert npm audit results to SARIF
       if: always()
