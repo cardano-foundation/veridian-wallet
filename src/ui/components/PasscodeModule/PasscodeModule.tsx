@@ -1,7 +1,7 @@
 import { IonButton, IonCol, IonGrid, IonIcon, IonRow } from "@ionic/react";
 import { backspaceSharp, fingerPrintSharp } from "ionicons/icons";
 import { useSelector } from "react-redux";
-import { BiometryType } from "@aparajita/capacitor-biometric-auth";
+import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { PasscodeModuleProps } from "./PasscodeModule.types";
 import "./PasscodeModule.scss";
 import { PASSCODE_MAPPING } from "../../globals/types";
@@ -41,7 +41,7 @@ const PasscodeModule = ({
     if (!biometricInfo) return null;
 
     if (
-      [BiometryType.faceAuthentication, BiometryType.faceId].includes(
+      [BiometryType.FACE_ID].includes(
         biometricInfo?.biometryType
       )
     ) {
@@ -91,16 +91,12 @@ const PasscodeModule = ({
                   <IonCol>
                     {handleBiometricButtonClick &&
                     biometricsCache.enabled &&
-                    biometricInfo?.strongBiometryIsAvailable &&
                     biometricInfo?.isAvailable ? (
                         <IonButton
                           data-testid="passcode-button-#"
                           className="passcode-module-number-button"
                           disabled={hasError}
-                          onClick={() =>
-                            biometricInfo?.strongBiometryIsAvailable &&
-                          handleBiometricButton()
-                          }
+                          onClick={() => handleBiometricButton()}
                         >
                           {getBiometricIcon()}
                         </IonButton>

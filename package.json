@@ -20,7 +20,6 @@
     "audit": "better-npm-audit audit"
   },
   "dependencies": {
-    "@aparajita/capacitor-biometric-auth": "^8.0.2",
     "@capacitor-community/privacy-screen": "^6.0.0",
     "@capacitor-community/sqlite": "^7.0.0",
     "@capacitor-community/tap-jacking": "^7.0.0",
@@ -37,6 +36,7 @@
     "@capacitor/share": "^7.0.0",
     "@capacitor/splash-screen": "^7.0.0",
     "@capacitor/status-bar": "^7.0.0",
+    "@capgo/capacitor-native-biometric": "^7.1.13",
     "@evva/capacitor-secure-storage-plugin": "^3.1.0",
     "@fabianbormann/cardano-peer-connect": "^1.2.18",
     "@ionic/react": "^8.6.0",
@@ -141,12 +141,6 @@
     "yaml-loader": "^0.8.0"
   },
   "overrides": {
-    "@aparajita/capacitor-biometric-auth": {
-      "@capacitor/android": "^7.0.0",
-      "@capacitor/app": "7.0.0",
-      "@capacitor/core": "^7.0.0",
-      "@capacitor/ios": "^7.0.0"
-    },
     "@evva/capacitor-secure-storage-plugin": {
       "@capacitor/android": "^7.0.0",
       "@capacitor/app": "7.0.0",

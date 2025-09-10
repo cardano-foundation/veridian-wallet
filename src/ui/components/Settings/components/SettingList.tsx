@@ -1,4 +1,4 @@
-import { BiometryErrorType } from "@aparajita/capacitor-biometric-auth";
+import { NativeBiometric } from "@capgo/capacitor-native-biometric";
 import { IonCard, IonList, IonToggle } from "@ionic/react";
 import {
   AndroidSettings,
@@ -15,7 +15,7 @@ import {
   libraryOutline,
   lockClosedOutline,
 } from "ionicons/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import pJson from "../../../../../package.json";
@@ -25,7 +25,7 @@ import {
   getBiometricsCache,
   setEnableBiometricsCache,
 } from "../../../../store/reducers/biometricsCache";
-import { useBiometricAuth } from "../../../hooks/useBiometricsHook";
+import { BiometricAuthOutcome, useBiometricAuth, BIOMETRIC_SERVER_KEY } from "../../../hooks/useBiometricsHook";
 import { usePrivacyScreen } from "../../../hooks/privacyScreenHook";
 import {
   OptionIndex,
@@ -42,6 +42,7 @@ import { showError } from "../../../utils/error";
 import { openBrowserLink } from "../../../utils/openBrowserLink";
 import {
   setToastMsg,
+  showGenericError,
   showGlobalLoading,
 } from "../../../../store/reducers/stateCache";
 import { CLEAR_STORE_ACTIONS } from "../../../../store/utils";
@@ -54,18 +55,28 @@ import { Alert } from "../../Alert";
 import { Verification } from "../../Verification";
 import { InfoCard } from "../../InfoCard";
 
+
 const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   const dispatch = useAppDispatch();
   const biometricsCache = useSelector(getBiometricsCache);
   const [option, setOption] = useState<number | null>(null);
-  const { biometricInfo, handleBiometricAuth } = useBiometricAuth();
+  const { biometricInfo, setupBiometrics, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
+
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [changePinIsOpen, setChangePinIsOpen] = useState(false);
   const { disablePrivacy, enablePrivacy } = usePrivacyScreen();
   const [openBiometricAlert, setOpenBiometricAlert] = useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+  const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
+  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
   const history = useHistory();
 
+  useEffect(() => {
+    if (!lockoutEndTime && showMaxAttemptsAlert) {
+      setShowMaxAttemptsAlert(false);
+    }
+  }, [lockoutEndTime, showMaxAttemptsAlert]);
+  
   const securityItems: OptionProps[] = [
     {
       index: OptionIndex.ChangePin,
@@ -86,7 +97,6 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
 
   if (
     biometricsCache.enabled !== undefined &&
-    biometricInfo?.strongBiometryIsAvailable &&
     biometricInfo?.isAvailable
   ) {
     securityItems.unshift({
@@ -129,41 +139,63 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   ];
 
   const handleToggleBiometricAuth = async () => {
-    await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-      new BasicRecord({
-        id: MiscRecordId.APP_BIOMETRY,
-        content: { enabled: !biometricsCache.enabled },
-      })
-    );
-    dispatch(setEnableBiometricsCache(!biometricsCache.enabled));
+    const newBiometricsEnabledState = !biometricsCache.enabled;
+
+    try {
+      if (!newBiometricsEnabledState) {
+        await NativeBiometric.deleteCredentials({ server: BIOMETRIC_SERVER_KEY });
+      }
+
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.APP_BIOMETRY,
+          content: { enabled: newBiometricsEnabledState },
+        })
+      );
+      dispatch(setEnableBiometricsCache(newBiometricsEnabledState));
+
+    } catch (e) {
+      showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
+    }
   };
 
-  const handleBiometricUpdate = () => {
-    if (
-      !biometricInfo?.strongBiometryIsAvailable &&
-      (biometricInfo?.code === BiometryErrorType.biometryNotEnrolled ||
-        biometricInfo?.code === BiometryErrorType.biometryNotAvailable)
-    ) {
-      setOpenBiometricAlert(true);
-      return;
-    }
-
+  const handleBiometricUpdate = async () => {
     if (biometricsCache.enabled) {
       handleToggleBiometricAuth();
       return;
     }
-
-    setVerifyIsOpen(true);
+    biometricAuth();
   };
 
   const biometricAuth = async () => {
     try {
       await disablePrivacy();
-      const result = await handleBiometricAuth();
+
+      const setupResult = await setupBiometrics();
       await enablePrivacy();
-      if (result === true) handleToggleBiometricAuth();
+
+      switch (setupResult) {
+        case BiometricAuthOutcome.SUCCESS:
+          handleToggleBiometricAuth();
+          break;
+        case BiometricAuthOutcome.USER_CANCELLED:
+          // Do nothing, user cancelled
+          break;
+        case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+          setShowMaxAttemptsAlert(true);
+          break;
+        case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+          setShowPermanentLockoutAlert(true);
+          break;
+        case BiometricAuthOutcome.NOT_AVAILABLE:
+        case BiometricAuthOutcome.GENERIC_ERROR:
+        default:
+          dispatch(showGenericError(true));
+          break;
+      }
     } catch (e) {
-      showError("Unable to enable/disable biometric auth", e, dispatch);
+      // This catch block is for unexpected errors during the process.
+      showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
     }
   };
 
@@ -353,6 +385,24 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
         verifyIsOpen={verifyIsOpen}
         setVerifyIsOpen={setVerifyIsOpen}
         onVerify={onVerify}
+      />
+      <Alert
+        isOpen={showMaxAttemptsAlert}
+        setIsOpen={setShowMaxAttemptsAlert}
+        dataTestId="alert-max-attempts"
+        headerText={`${i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds })}`}
+        confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
+        actionConfirm={() => setShowMaxAttemptsAlert(false)}
+        backdropDismiss={false}
+      />
+      <Alert
+        isOpen={showPermanentLockoutAlert}
+        setIsOpen={setShowPermanentLockoutAlert}
+        dataTestId="alert-permanent-lockout"
+        headerText={`${i18n.t("biometry.permanentlockoutheader")}`}
+        confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
+        actionConfirm={() => setShowPermanentLockoutAlert(false)}
+        backdropDismiss={false}
       />
     </>
   );

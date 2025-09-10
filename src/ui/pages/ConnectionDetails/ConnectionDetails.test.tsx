@@ -1,4 +1,4 @@
-import { BiometryType } from "@aparajita/capacitor-biometric-auth";
+import { BiometryType } from "@capgo/capacitor-native-biometric";
 import {
   ionFireEvent as fireEvent,
   waitForIonicReact,
@@ -40,8 +40,7 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
     biometricInfo: {
       isAvailable: true,
       hasCredentials: false,
-      biometryType: BiometryType.fingerprintAuthentication,
-      strongBiometryIsAvailable: true,
+      biometryType: BiometryType.FINGERPRINT
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
     setBiometricsIsEnabled: jest.fn(),
@@ -766,3 +765,6 @@ describe("Checking the Connection Details Page when connection is missing from t
     });
   });
 });
+
+
+

@@ -26,6 +26,10 @@ const initialState = {
       time: Date.now(),
       passcodeIsSet: true,
       seedPhraseIsSet: false,
+      loginAttempt: {
+        attempts: 0,
+        lockedUntil: Date.now(),
+      },
     },
     currentOperation: OperationType.IDLE,
   },
@@ -324,6 +328,10 @@ describe("Password Module", () => {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
           passwordIsSet: true,
+          loginAttempt: {
+            attempts: 0,
+            lockedUntil: Date.now(),
+          },
         },
         currentOperation: OperationType.IDLE,
       },
@@ -336,7 +344,7 @@ describe("Password Module", () => {
       },
     };
 
-    const { getByTestId, getByText, queryByText } = render(
+    const { getByTestId, getByText } = render(
       <Provider store={storeMocked(initialState)}>
         <PasswordModule
           title="Password Module"

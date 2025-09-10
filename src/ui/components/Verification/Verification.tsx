@@ -1,17 +1,16 @@
-import {
-  BiometryError,
-  BiometryErrorType,
-} from "@aparajita/capacitor-biometric-auth";
+
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
 import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { getStateCache } from "../../../store/reducers/stateCache";
 import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
-import { useBiometricAuth } from "../../hooks/useBiometricsHook";
 import { showError } from "../../utils/error";
 import { VerifyPasscode } from "../VerifyPasscode";
 import { VerifyPassword } from "../VerifyPassword";
 import { VerifyProps } from "./Verification.types";
+import { Alert } from "../Alert";
+import { i18n } from "../../../i18n";
 
 const Verification = ({
   verifyIsOpen,
@@ -20,40 +19,49 @@ const Verification = ({
 }: VerifyProps) => {
   const [openModalAfterBiometricFail, setOpenModalAfterBiometricFail] =
     useState(false);
+  const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
+  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
+  
   const stateCache = useSelector(getStateCache);
   const biometrics = useSelector(getBiometricsCache);
   const authentication = stateCache.authentication;
-  const { handleBiometricAuth } = useBiometricAuth();
+  const { handleBiometricAuth, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
   const { disablePrivacy, enablePrivacy } = usePrivacyScreen();
 
   const canOpenModal =
     verifyIsOpen && (!biometrics.enabled || openModalAfterBiometricFail);
+
+  useEffect(() => {
+    if (!lockoutEndTime && showMaxAttemptsAlert) {
+      setShowMaxAttemptsAlert(false);
+    }
+  }, [lockoutEndTime, showMaxAttemptsAlert]);
 
   const handleBiometrics = async () => {
     try {
       await disablePrivacy();
       const authenResult = await handleBiometricAuth();
 
-      if (authenResult === false) {
-        setOpenModalAfterBiometricFail(true);
-        return;
-      }
-
-      if (authenResult instanceof BiometryError) {
-        if (
-          authenResult.code === BiometryErrorType.userCancel ||
-          authenResult.code === BiometryErrorType.appCancel
-        ) {
+      switch (authenResult) {
+        case BiometricAuthOutcome.SUCCESS:
+          onVerify();
+          setVerifyIsOpen(false);
+          break;
+        case BiometricAuthOutcome.USER_CANCELLED:
           setVerifyIsOpen(false, true);
-          return;
-        }
-
-        setOpenModalAfterBiometricFail(true);
-        return;
+          break;
+        case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+          setShowMaxAttemptsAlert(true);
+          break;
+        case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+          setShowPermanentLockoutAlert(true);
+          break;
+        case BiometricAuthOutcome.NOT_AVAILABLE:
+        case BiometricAuthOutcome.GENERIC_ERROR:
+        default:
+          setOpenModalAfterBiometricFail(true);
+          break;
       }
-
-      onVerify();
-      setVerifyIsOpen(false);
     } catch (e) {
       showError("Failed to biometric auth", e);
     } finally {
@@ -74,7 +82,7 @@ const Verification = ({
     }
   }, [verifyIsOpen]);
 
-  return (
+  return (<>{
     canOpenModal &&
     (authentication.passwordIsSet ? (
       <VerifyPassword
@@ -89,6 +97,28 @@ const Verification = ({
         onVerify={onVerify}
       />
     ))
+  }
+  <Alert
+    isOpen={showMaxAttemptsAlert}
+    setIsOpen={setShowMaxAttemptsAlert}
+    dataTestId="alert-max-attempts"
+    headerText={`${i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds })}`}
+    confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
+    actionConfirm={() => setShowMaxAttemptsAlert(false)}
+    backdropDismiss={false}
+    className="force-on-top"
+  />
+  <Alert
+    isOpen={showPermanentLockoutAlert}
+    setIsOpen={setShowPermanentLockoutAlert}
+    dataTestId="alert-permanent-lockout"
+    headerText={`${i18n.t("biometry.permanentlockoutheader")}`}
+    confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
+    actionConfirm={() => setShowPermanentLockoutAlert(false)}
+    backdropDismiss={false}
+    className="force-on-top"
+  />
+  </>
   );
 };
 

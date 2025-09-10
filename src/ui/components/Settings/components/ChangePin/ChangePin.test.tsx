@@ -1,7 +1,7 @@
 const verifySecretMock = jest.fn();
 const storeSecretMock = jest.fn();
 
-import { BiometryType } from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
+import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -69,8 +69,7 @@ describe("ChangePin Modal", () => {
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.fingerprintAuthentication,
-        strongBiometryIsAvailable: false,
+        biometryType: BiometryType.FINGERPRINT
       },
       handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
       setBiometricsIsEnabled: jest.fn(),
@@ -147,8 +146,7 @@ describe("ChangePin Modal", () => {
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.fingerprintAuthentication,
-        strongBiometryIsAvailable: false,
+        biometryType: BiometryType.FINGERPRINT
       },
       handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
       setBiometricsIsEnabled: jest.fn(),
@@ -203,3 +201,4 @@ describe("ChangePin Modal", () => {
     });
   });
 });
+

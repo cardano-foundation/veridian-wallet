@@ -1,7 +1,7 @@
 const verifySecretMock = jest.fn();
 const storeSecretMock = jest.fn();
 
-import { BiometryType } from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
+import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { IonRouterOutlet } from "@ionic/react";
 import { IonReactMemoryRouter, IonReactRouter } from "@ionic/react-router";
 import { fireEvent, render, waitFor } from "@testing-library/react";
@@ -48,8 +48,7 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
     biometricInfo: {
       isAvailable: false,
       hasCredentials: false,
-      biometryType: BiometryType.fingerprintAuthentication,
-      strongBiometryIsAvailable: false,
+      biometryType: BiometryType.FINGERPRINT
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
     setBiometricsIsEnabled: jest.fn(),

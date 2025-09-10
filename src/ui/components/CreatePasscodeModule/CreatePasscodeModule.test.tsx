@@ -1,11 +1,7 @@
 const storeSecretMock = jest.fn();
 const verifySecretMock = jest.fn();
 
-import { BiometryErrorType } from "@aparajita/capacitor-biometric-auth";
-import {
-  BiometryError,
-  BiometryType,
-} from "@aparajita/capacitor-biometric-auth/dist/esm/definitions";
+import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { IonRouterOutlet } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { act } from "react";
@@ -19,6 +15,7 @@ import { store } from "../../../store";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { CreatePasscodeModule } from "./CreatePasscodeModule";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { BiometricAuthOutcome, BiometryError, useBiometricAuth } from "../../hooks/useBiometricsHook";
 
 const isRepeativeMock = jest.fn(() => false);
 const isConsecutiveMock = jest.fn(() => false);
@@ -47,23 +44,15 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
-const handleBiometricAuthMock = jest.fn(() => Promise.resolve(true));
+const handleBiometricAuthMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
 
-const useBiometricInfoMock = jest.fn(() => ({
-  biometricsIsEnabled: false,
-  biometricInfo: {
-    isAvailable: true,
-    hasCredentials: false,
-    biometryType: BiometryType.fingerprintAuthentication,
-    strongBiometryIsAvailable: true,
-  },
-  handleBiometricAuth: () => handleBiometricAuthMock(),
-  setBiometricsIsEnabled: jest.fn(),
-}));
-
-jest.mock("../../hooks/useBiometricsHook", () => ({
-  useBiometricAuth: () => useBiometricInfoMock(),
-}));
+jest.mock("../../hooks/useBiometricsHook", () => {
+  const actual = jest.requireActual("../../hooks/useBiometricsHook");
+  return {
+    ...actual, 
+    useBiometricAuth: jest.fn(),
+  };
+});
 
 const getPlatformsMock = jest.fn(() => ["android"]);
 
@@ -105,18 +94,17 @@ describe("SetPasscode Page", () => {
     isReverseConsecutiveMock.mockImplementation(() => false);
     isConsecutiveMock.mockImplementation(() => false);
     isRepeativeMock.mockImplementation(() => false);
-    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(true));
-    useBiometricInfoMock.mockImplementation(() => ({
+    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
+    (useBiometricAuth as jest.Mock).mockReturnValue({
       biometricsIsEnabled: false,
-      biometricInfo: {
-        isAvailable: true,
+      biometricInfo: { 
+        isAvailable: true, 
         hasCredentials: false,
-        biometryType: BiometryType.fingerprintAuthentication,
-        strongBiometryIsAvailable: true,
+        biometryType: BiometryType.FINGERPRINT,
       },
-      handleBiometricAuth: () => handleBiometricAuthMock(),
+      handleBiometricAuth: handleBiometricAuthMock,
       setBiometricsIsEnabled: jest.fn(),
-    }));
+    });
   });
 
   test("Renders Create Passcode page with title and description", () => {
@@ -376,17 +364,16 @@ describe("SetPasscode Page", () => {
 
   test("Setup passcode and iOS biometrics", async () => {
     verifySecretMock.mockResolvedValue(false);
-    useBiometricInfoMock.mockImplementation(() => ({
-      biometricsIsEnabled: false,
+    (useBiometricAuth as jest.Mock).mockReturnValueOnce({
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.faceId,
-        strongBiometryIsAvailable: true,
+        biometryType: BiometryType.FACE_ID,
+  
       },
-      handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
+      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
       setBiometricsIsEnabled: jest.fn(),
-    }));
+    });
     getPlatformsMock.mockImplementation(() => ["ios"]);
 
     const onCreateSuccessMock = jest.fn();
@@ -455,21 +442,25 @@ describe("SetPasscode Page", () => {
 
   test("Setup passcode and cancel iOS biometrics", async () => {
     verifySecretMock.mockResolvedValue(false);
-    jest.doMock("../../hooks/useBiometricsHook", () => ({
-      useBiometricAuth: jest.fn(() => ({
-        biometricsIsEnabled: false,
-        biometricInfo: {
-          isAvailable: true,
-          hasCredentials: false,
-          biometryType: BiometryType.faceId,
-          strongBiometryIsAvailable: true,
-        },
-        handleBiometricAuth: jest.fn(() =>
-          Promise.resolve(new BiometryError("", BiometryErrorType.userCancel))
-        ),
-        setBiometricsIsEnabled: jest.fn(),
-      })),
-    }));
+    jest.doMock("../../hooks/useBiometricsHook", () => {
+      const actual = jest.requireActual("../../hooks/useBiometricsHook");
+      return {
+        ...actual,
+        useBiometricAuth: jest.fn(() => ({
+          biometricsIsEnabled: false,
+          biometricInfo: {
+            isAvailable: true,
+            hasCredentials: false,
+            biometryType: actual.BiometryType.FACE_ID, 
+      
+          },
+          handleBiometricAuth: jest.fn(() =>
+            Promise.resolve(new actual.BiometryError("", actual.BiometricAuthError.USER_CANCEL)) 
+          ),
+          setBiometricsIsEnabled: jest.fn(),
+        })),
+      };
+    });
     getPlatformsMock.mockImplementation(() => ["ios"]);
     require("@ionic/react");
 
