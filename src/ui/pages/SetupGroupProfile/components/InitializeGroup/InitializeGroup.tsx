@@ -96,6 +96,10 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
             primaryButtonText={`${i18n.t(
               "setupgroupprofile.initgroup.button.sendrequest"
             )}`}
+            primaryButtonDisabled={
+              state.signer.recoverySigners === 0 ||
+              state.signer.requiredSigners === 0
+            }
             tertiaryButtonAction={openCloseAlert}
             tertiaryButtonText={`${i18n.t(
               "setupgroupprofile.initgroup.button.cancel"
