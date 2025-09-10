@@ -52,16 +52,3 @@ jobs:
       scan-args: |-
         --recursive
         ./
-
-  depcheck-services:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    permissions:
-      actions: read
-      security-events: write
-      contents: read
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
-    with:
-      scan-args: |-
-        --recursive
-        ./services
