@@ -34,7 +34,7 @@ jobs:
         echo 'services/*' >> .gitignore
 
     - name: Upload .gitignore artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: gitignore-artifact
 
