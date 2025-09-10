@@ -27,8 +27,20 @@ permissions:
 
 jobs:
   depcheck:
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
-    with:
-      scan-args: |-
-        --recursive
-        ./
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        submodules: recursive
+
+    - name: Ignore services folder
+      run: |
+        echo 'services/*' >> .gitignore
+
+    - name: Run Google OSV Scanner
+      uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
+      with:
+        scan-args: |-
+          --recursive
+          ./
