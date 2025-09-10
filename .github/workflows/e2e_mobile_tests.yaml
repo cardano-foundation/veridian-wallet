@@ -7,10 +7,12 @@ jobs:
     runs-on: [self-hosted, macOS, ARM64]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
       - name: 🦾 Create .env file
         run: |
           echo APP_PATH=$HOME/Documents/xcode/DerivedData/Build/Products/Debug-iphonesimulator/App.app > .env
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:

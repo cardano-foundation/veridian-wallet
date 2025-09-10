@@ -27,7 +27,9 @@ jobs:
       NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
 
       # Run OWASP Dependency-Check via the official Action
       - name: Run Dependency-Check

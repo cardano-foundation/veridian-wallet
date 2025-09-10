@@ -23,10 +23,9 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
       with:
-          submodules: recursive  # Fetch private content
-          fetch-depth: 1         # Fetch all history for .GitInfo and .Lastmod
+          submodules: recursive
 
     - name: Setup Node
       uses: actions/setup-node@v4
