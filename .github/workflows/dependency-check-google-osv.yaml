@@ -54,11 +54,12 @@ jobs:
         ./
 
   depcheck-services:
+    runs-on: ubuntu-latest
+    continue-on-error: true
     permissions:
       actions: read
       security-events: write
       contents: read
-    continue-on-error: true
     uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
     with:
       scan-args: |-
