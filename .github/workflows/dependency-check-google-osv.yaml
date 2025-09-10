@@ -40,8 +40,7 @@ jobs:
         echo 'services/*' >> .gitignore
 
     - name: Run Google OSV Scanner
-      uses: google/osv-scanner-action@v2.2.2
-      with:
-        scan-args: |-
+      uses: docker://ghcr.io/google/osv-scanner-action:v2.2.2
+      args: |-
           --recursive
           ./
