@@ -70,7 +70,7 @@ const ProfileDetailsModule = ({
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${profile.id}`,
-        profile.displayName
+        { alias: profile.displayName }
       );
       if (oobiValue) {
         setOobi(oobiValue);

@@ -50,13 +50,16 @@ import {
   EventTypes,
 } from "../event.types";
 import {
-  ConnectionHistoryItem,
   ConnectionHistoryType,
-  ContactDetailsRecord,
-  HumanReadableMessage,
   KeriaContactKeyPrefix,
   OobiQueryParams,
   RpyRoute,
+} from "./connectionService.types";
+import type {
+  ConnectionHistoryItem,
+  ContactDetailsRecord,
+  GetOobiParameters,
+  HumanReadableMessage,
 } from "./connectionService.types";
 import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
@@ -632,10 +635,7 @@ class ConnectionService extends AgentService {
   @OnlineOnly
   async getOobi(
     id: string,
-    alias?: string,
-    groupId?: string,
-    groupName?: string,
-    externalId?: string
+    parameters?: GetOobiParameters
   ): Promise<string> {
     const result = await this.props.signifyClient.oobis().get(id);
     if (!result.oobis[0]) {
@@ -653,17 +653,17 @@ class ConnectionService extends AgentService {
         oobi.pathname = pathName.substring(0, agentIndex);
       }
     }
-    if (alias !== undefined) {
-      oobi.searchParams.set(OobiQueryParams.NAME, alias);
+    if (parameters?.alias !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.NAME, parameters.alias);
     }
-    if (groupId !== undefined) {
-      oobi.searchParams.set(OobiQueryParams.GROUP_ID, groupId);
+    if (parameters?.groupId !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.GROUP_ID, parameters.groupId);
     }
-    if (groupName !== undefined) {
-      oobi.searchParams.set(OobiQueryParams.GROUP_NAME, groupName);
+    if (parameters?.groupName !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.GROUP_NAME, parameters.groupName);
     }
-    if (externalId !== undefined) {
-      oobi.searchParams.set(OobiQueryParams.EXTERNAL_ID, externalId);
+    if (parameters?.externalId !== undefined) {
+      oobi.searchParams.set(OobiQueryParams.EXTERNAL_ID, parameters.externalId);
     }
 
     return oobi.toString();
@@ -845,12 +845,10 @@ class ConnectionService extends AgentService {
     );
     const identifierMetadata =
       await this.identifierStorage.getIdentifierMetadata(identifier);
-    const oobi = await this.getOobi(
-      identifier,
-      identifierMetadata.displayName,
-      undefined,
-      externalId ?? undefined
-    );
+    const oobi = await this.getOobi(identifier, {
+      alias: identifierMetadata.displayName,
+      externalId: externalId ?? undefined,
+    });
 
     const signer = new Signer({ transferable: false });
     const rpyData = {
@@ -908,3 +906,4 @@ class ConnectionService extends AgentService {
 }
 
 export { ConnectionService };
+
