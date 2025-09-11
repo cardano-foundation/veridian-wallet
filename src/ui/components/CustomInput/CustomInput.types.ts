@@ -1,9 +1,23 @@
 import {
   Dispatch,
-  SetStateAction,
   MouseEvent as ReactMouseEvent,
   ReactNode,
+  SetStateAction,
 } from "react";
+
+type TextFieldTypes =
+  | "date"
+  | "email"
+  | "number"
+  | "password"
+  | "search"
+  | "tel"
+  | "text"
+  | "url"
+  | "time"
+  | "week"
+  | "month"
+  | "datetime-local";
 
 interface CustomInputProps {
   dataTestId: string;
@@ -20,6 +34,8 @@ interface CustomInputProps {
   action?: (e: ReactMouseEvent<HTMLElement, MouseEvent>) => void;
   className?: string;
   labelAction?: ReactNode;
+  endAction?: ReactNode;
+  type?: TextFieldTypes;
 }
 
 export type { CustomInputProps };

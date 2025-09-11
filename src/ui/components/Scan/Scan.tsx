@@ -187,10 +187,15 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       };
     }, [stopScan, loggedIn]);
 
+    const closePasteContentModal = () => {
+      setPasteModalIsOpen(false);
+      setPastedValue("");
+    };
+
     const handleSubmitPastedValue = async () => {
+      closePasteContentModal();
       await handleScanValue(pastedValue);
       setScanning(true);
-      setPasteModalIsOpen(false);
     };
 
     const containerClass = combineClassNames("profile-scanner", {
@@ -202,8 +207,6 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       const newKey = customTranslateKey ? `${customTranslateKey}.${key}` : key;
       return i18n.exists(newKey) ? i18n.t(newKey) : i18n.t(key);
     };
-
-    const closePasteContentModal = () => setPasteModalIsOpen(false);
 
     return (
       <>
