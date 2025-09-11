@@ -376,8 +376,16 @@ describe("Creation of multi-sig", () => {
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            { ...queuedIdentifier, name: "1.2.0.3:0:different identifier" },
-            { ...queuedIdentifier, name: "1.2.0.3:0:Identifier 2" },
+            {
+              ...queuedIdentifier,
+              name: "1.2.0.3:0:different identifier",
+              threshold: { signingThreshold: 2, rotationThreshold: 1 },
+            },
+            {
+              ...queuedIdentifier,
+              name: "1.2.0.3:0:Identifier 2",
+              threshold: { signingThreshold: 2, rotationThreshold: 1 },
+            },
           ],
         },
       })
@@ -398,7 +406,7 @@ describe("Creation of multi-sig", () => {
       memberPrefix,
       linkedContacts,
 
-      createThresholds(linkedContacts.length + 1)
+      createThresholds(linkedContacts.length + 1, linkedContacts.length) // Explicitly pass different thresholds
     );
 
     expectAllWitnessIntroductions();
@@ -407,8 +415,8 @@ describe("Creation of multi-sig", () => {
       {
         algo: "group",
         mhab: getMemberIdentifierResponse,
-        isith: 2,
-        nsith: 2,
+        isith: 2, // Signing threshold
+        nsith: 1, // Different rotation threshold
         toad: 3,
         wits: [],
         states: [
@@ -513,14 +521,14 @@ describe("Creation of multi-sig", () => {
       multiSigService.createGroup(
         memberPrefix,
         linkedContacts,
-        createThresholds(0)
+        createThresholds(0, 0)
       )
     ).rejects.toThrowError(MultiSigService.INVALID_THRESHOLD);
     await expect(
       multiSigService.createGroup(
         memberPrefix,
         linkedContacts,
-        createThresholds(linkedContacts.length + 2)
+        createThresholds(linkedContacts.length + 2, linkedContacts.length + 1) // Different thresholds for testing
       )
     ).rejects.toThrowError(MultiSigService.INVALID_THRESHOLD);
   });
@@ -537,7 +545,7 @@ describe("Creation of multi-sig", () => {
       multiSigService.createGroup(
         memberPrefix,
         linkedContacts,
-        createThresholds(1)
+        createThresholds(1, 2)
       )
     ).rejects.toThrowError(MultiSigService.MISSING_GROUP_METADATA);
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue(
@@ -555,7 +563,7 @@ describe("Creation of multi-sig", () => {
       multiSigService.createGroup(
         memberPrefix,
         linkedContacts,
-        createThresholds(1)
+        createThresholds(1, 2)
       )
     ).rejects.toThrowError(MultiSigService.ONLY_ALLOW_GROUP_INITIATOR);
   });
@@ -575,7 +583,7 @@ describe("Creation of multi-sig", () => {
             groupId: "wrong-group-id",
           },
         ],
-        createThresholds(2)
+        createThresholds(2, 1)
       )
     ).rejects.toThrowError(MultiSigService.ONLY_ALLOW_LINKED_CONTACTS);
   });
@@ -618,7 +626,7 @@ describe("Creation of multi-sig", () => {
     await multiSigService.createGroup(
       memberPrefix,
       linkedContacts,
-      createThresholds(linkedContacts.length + 1),
+      createThresholds(linkedContacts.length + 1, linkedContacts.length), // Use different thresholds
       true
     );
 
@@ -740,7 +748,7 @@ describe("Creation of multi-sig", () => {
     await multiSigService.createGroup(
       memberPrefix,
       linkedContacts,
-      createThresholds(linkedContacts.length + 1),
+      createThresholds(linkedContacts.length + 1, linkedContacts.length), // Use different thresholds
       true
     );
 
@@ -837,7 +845,7 @@ describe("Creation of multi-sig", () => {
       multiSigService.createGroup(
         memberPrefix,
         linkedContacts,
-        createThresholds(linkedContacts.length + 1),
+        createThresholds(linkedContacts.length + 1, linkedContacts.length), // Use different thresholds
         true
       )
     ).rejects.toThrowError(MultiSigService.QUEUED_GROUP_DATA_MISSING);
@@ -896,8 +904,8 @@ describe("Creation of multi-sig", () => {
       {
         algo: "group",
         mhab: getMemberIdentifierResponse,
-        isith: 2,
-        nsith: 2,
+        isith: 2, // Signing threshold
+        nsith: 2, // In joinGroup test it uses kt only (line 521 in multiSigService.ts)
         toad: 4,
         wits: [
           "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha",
@@ -1276,7 +1284,7 @@ describe("Creation of multi-sig", () => {
     expect(result.sender.id).toBe(initiatorConnectionShortDetails.id);
     expect(result.otherConnections.length).toBe(0);
     expect(result.signingThreshold).toBe(2);
-    expect(result.rotationThreshold).toBe(2);
+    expect(result.rotationThreshold).toBe(3); // From fixture, not from createThresholds
   });
 
   test("Throw error if the group join request contains unknown identifiers", async () => {
@@ -1346,7 +1354,7 @@ describe("Creation of multi-sig", () => {
     expect(result.sender.id).toBe(initiatorConnectionShortDetails.id);
     expect(result.otherConnections.length).toBe(0);
     expect(result.signingThreshold).toBe(2);
-    expect(result.rotationThreshold).toBe(2);
+    expect(result.rotationThreshold).toBe(3); // From fixture, not from createThresholds
   });
 
   test("Can get multisig icp details of 3 person group", async () => {
@@ -1364,7 +1372,7 @@ describe("Creation of multi-sig", () => {
               "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ",
             ],
           },
-          e: { icp: { kt: 3, nt: 3 } },
+          e: { icp: { kt: 2, nt: 3 } },
         },
       },
     ]);
@@ -1394,8 +1402,8 @@ describe("Creation of multi-sig", () => {
     expect(result.otherConnections[0].id).toBe(
       "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"
     );
-    expect(result.signingThreshold).toBe(3);
-    expect(result.rotationThreshold).toBe(3);
+    expect(result.signingThreshold).toBe(2);
+    expect(result.rotationThreshold).toBe(3); // From fixture, not from createThresholds
   });
 
   test("Cannot get multisig icp details if the exn is missing", async () => {
@@ -1520,12 +1528,10 @@ describe("Creation of multi-sig", () => {
         update: jest.fn(),
       },
       notificationStorage: {
-        findExpectedById: jest
-          .fn()
-          .mockResolvedValue({
-            id: "test-notification",
-            a: { r: "/multisig/icp" },
-          }),
+        findExpectedById: jest.fn().mockResolvedValue({
+          id: "test-notification",
+          a: { r: "/multisig/icp" },
+        }),
         deleteById: jest.fn().mockResolvedValue(undefined),
       },
       inceptGroup: jest.fn(),

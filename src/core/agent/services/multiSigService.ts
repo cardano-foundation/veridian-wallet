@@ -110,12 +110,10 @@ class MultiSigService extends AgentService {
     const participantsCount = groupConnections.length + 1;
 
     if (typeof threshold === "number") {
-      // For backward compatibility
       if (threshold < 1 || threshold > participantsCount) {
         throw new Error(MultiSigService.INVALID_THRESHOLD);
       }
     } else {
-      // Validate threshold object
       if (
         threshold.signingThreshold < 1 ||
         threshold.signingThreshold > participantsCount ||
