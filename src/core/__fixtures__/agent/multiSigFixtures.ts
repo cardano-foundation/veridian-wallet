@@ -5,6 +5,7 @@ import {
   IdentifierMetadataRecordProps,
 } from "../../agent/records";
 import { QueuedGroupCreation } from "../../agent/services/identifier.types";
+import type { MultisigThresholds } from "../../agent/services/identifier.types";
 
 const now = new Date();
 
@@ -865,7 +866,10 @@ const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
   data: inceptionDataFix,
   initiator: true,
   groupConnections: linkedContacts,
-  threshold: linkedContacts.length + 1,
+  threshold: {
+    signingThreshold: linkedContacts.length + 1,
+    rotationThreshold: linkedContacts.length + 1,
+  },
 };
 
 const queuedJoin: QueuedGroupCreation & { initiator: false } = {

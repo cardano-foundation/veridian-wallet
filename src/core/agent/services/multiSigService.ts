@@ -36,6 +36,7 @@ import {
   QueuedGroupCreation,
   QueuedGroupProps,
 } from "./identifier.types";
+import type { MultisigThresholds } from "./identifier.types";
 import { MultiSigRoute, InceptMultiSigExnMessage } from "./multiSig.types";
 import { deleteNotificationRecordById, OnlineOnly } from "./utils";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
@@ -103,11 +104,26 @@ class MultiSigService extends AgentService {
   async createGroup(
     memberPrefix: string,
     groupConnections: MultisigConnectionDetails[],
-    threshold: number,
+    threshold: number | MultisigThresholds,
     backgroundTask = false
-  ): Promise<void> {
-    if (threshold < 1 || threshold > groupConnections.length + 1) {
-      throw new Error(MultiSigService.INVALID_THRESHOLD);
+  ): Promise<string> {
+    const participantsCount = groupConnections.length + 1;
+
+    if (typeof threshold === "number") {
+      // For backward compatibility
+      if (threshold < 1 || threshold > participantsCount) {
+        throw new Error(MultiSigService.INVALID_THRESHOLD);
+      }
+    } else {
+      // Validate threshold object
+      if (
+        threshold.signingThreshold < 1 ||
+        threshold.signingThreshold > participantsCount ||
+        threshold.rotationThreshold < 1 ||
+        threshold.rotationThreshold > participantsCount
+      ) {
+        throw new Error(MultiSigService.INVALID_THRESHOLD);
+      }
     }
 
     const mHabRecord = await this.identifierStorage.getIdentifierMetadata(
@@ -223,6 +239,8 @@ class MultiSigService extends AgentService {
       queued.splice(index, 1);
     }
     await this.basicStorage.update(pendingGroupsRecord);
+
+    return multisigId;
   }
 
   private async getInceptionData(
@@ -245,7 +263,7 @@ class MultiSigService extends AgentService {
     mHab: HabState,
     states: State[],
     groupName: string,
-    threshold: number,
+    threshold: number | MultisigThresholds,
     queuedProps: QueuedGroupProps,
     toad?: string,
     wits?: string[]
@@ -262,13 +280,19 @@ class MultiSigService extends AgentService {
       queued = currentQueue;
     }
 
+    // Handle both number and threshold object formats
+    const signingThreshold =
+      typeof threshold === "number" ? threshold : threshold.signingThreshold;
+    const rotationThreshold =
+      typeof threshold === "number" ? threshold : threshold.rotationThreshold;
+
     const inceptionData = await this.props.signifyClient
       .identifiers()
       .createInceptionData(groupName, {
         algo: Algos.group,
         mhab: mHab,
-        isith: threshold,
-        nsith: threshold,
+        isith: signingThreshold,
+        nsith: rotationThreshold,
         toad: Number(toad ?? mHab.state.bt),
         wits: wits ?? mHab.state.b,
         states: states,
@@ -432,7 +456,8 @@ class MultiSigService extends AgentService {
       ourIdentifier,
       sender: senderContact,
       otherConnections,
-      threshold: parseInt(icpMsg[0].exn.e.icp.kt as string),
+      signingThreshold: parseInt(icpMsg[0].exn.e.icp.kt as string),
+      rotationThreshold: parseInt(icpMsg[0].exn.e.icp.nt as string),
     };
   }
 
@@ -746,10 +771,12 @@ class MultiSigService extends AgentService {
         if (!queued.data.group) {
           throw new Error("Group data missing for initiator");
         }
+
+        const threshold = queued.threshold;
         await this.createGroup(
           queued.data.group.mhab.prefix,
           queued.groupConnections as MultisigConnectionDetails[],
-          queued.threshold,
+          threshold,
           true
         );
       } else {

@@ -4,6 +4,7 @@ import { ConnectionStatus, MiscRecordId, CreationStatus } from "../agent.types";
 import { Agent } from "../agent";
 import { CoreEventEmitter } from "../event";
 import { MultiSigService } from "./multiSigService";
+import type { MultisigThresholds } from "./identifier.types";
 import {
   BasicRecord,
   IdentifierMetadataRecord,
@@ -42,7 +43,7 @@ const notificationStorage = jest.mocked({
   findById: jest.fn(),
   findExpectedById: jest.fn().mockResolvedValue({
     id: "test-notification",
-    a: { r: NotificationRoute.MultiSigIcp }
+    a: { r: NotificationRoute.MultiSigIcp },
   }),
   findAllByQuery: jest.fn(),
   getAll: jest.fn(),
@@ -396,7 +397,8 @@ describe("Creation of multi-sig", () => {
     await multiSigService.createGroup(
       memberPrefix,
       linkedContacts,
-      linkedContacts.length + 1
+
+      createThresholds(linkedContacts.length + 1)
     );
 
     expectAllWitnessIntroductions();
@@ -508,13 +510,17 @@ describe("Creation of multi-sig", () => {
   test("Cannot create a group if the threshold is invalid", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     await expect(
-      multiSigService.createGroup(memberPrefix, linkedContacts, 0)
+      multiSigService.createGroup(
+        memberPrefix,
+        linkedContacts,
+        createThresholds(0)
+      )
     ).rejects.toThrowError(MultiSigService.INVALID_THRESHOLD);
     await expect(
       multiSigService.createGroup(
         memberPrefix,
         linkedContacts,
-        linkedContacts.length + 2
+        createThresholds(linkedContacts.length + 2)
       )
     ).rejects.toThrowError(MultiSigService.INVALID_THRESHOLD);
   });
@@ -528,7 +534,11 @@ describe("Creation of multi-sig", () => {
       })
     );
     await expect(
-      multiSigService.createGroup(memberPrefix, linkedContacts, 1)
+      multiSigService.createGroup(
+        memberPrefix,
+        linkedContacts,
+        createThresholds(1)
+      )
     ).rejects.toThrowError(MultiSigService.MISSING_GROUP_METADATA);
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue(
       new IdentifierMetadataRecord({
@@ -542,7 +552,11 @@ describe("Creation of multi-sig", () => {
       })
     );
     await expect(
-      multiSigService.createGroup(memberPrefix, linkedContacts, 1)
+      multiSigService.createGroup(
+        memberPrefix,
+        linkedContacts,
+        createThresholds(1)
+      )
     ).rejects.toThrowError(MultiSigService.ONLY_ALLOW_GROUP_INITIATOR);
   });
 
@@ -561,7 +575,7 @@ describe("Creation of multi-sig", () => {
             groupId: "wrong-group-id",
           },
         ],
-        2
+        createThresholds(2)
       )
     ).rejects.toThrowError(MultiSigService.ONLY_ALLOW_LINKED_CONTACTS);
   });
@@ -604,7 +618,7 @@ describe("Creation of multi-sig", () => {
     await multiSigService.createGroup(
       memberPrefix,
       linkedContacts,
-      linkedContacts.length + 1,
+      createThresholds(linkedContacts.length + 1),
       true
     );
 
@@ -726,7 +740,7 @@ describe("Creation of multi-sig", () => {
     await multiSigService.createGroup(
       memberPrefix,
       linkedContacts,
-      linkedContacts.length + 1,
+      createThresholds(linkedContacts.length + 1),
       true
     );
 
@@ -823,7 +837,7 @@ describe("Creation of multi-sig", () => {
       multiSigService.createGroup(
         memberPrefix,
         linkedContacts,
-        linkedContacts.length + 1,
+        createThresholds(linkedContacts.length + 1),
         true
       )
     ).rejects.toThrowError(MultiSigService.QUEUED_GROUP_DATA_MISSING);
@@ -1261,7 +1275,8 @@ describe("Creation of multi-sig", () => {
     expect(result.ourIdentifier.id).toBe(memberMetadataRecord.id);
     expect(result.sender.id).toBe(initiatorConnectionShortDetails.id);
     expect(result.otherConnections.length).toBe(0);
-    expect(result.threshold).toBe(2);
+    expect(result.signingThreshold).toBe(2);
+    expect(result.rotationThreshold).toBe(2);
   });
 
   test("Throw error if the group join request contains unknown identifiers", async () => {
@@ -1330,7 +1345,8 @@ describe("Creation of multi-sig", () => {
     expect(result.ourIdentifier.id).toBe(memberMetadataRecord.id);
     expect(result.sender.id).toBe(initiatorConnectionShortDetails.id);
     expect(result.otherConnections.length).toBe(0);
-    expect(result.threshold).toBe(2);
+    expect(result.signingThreshold).toBe(2);
+    expect(result.rotationThreshold).toBe(2);
   });
 
   test("Can get multisig icp details of 3 person group", async () => {
@@ -1348,7 +1364,7 @@ describe("Creation of multi-sig", () => {
               "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ",
             ],
           },
-          e: { icp: { kt: 3 } },
+          e: { icp: { kt: 3, nt: 3 } },
         },
       },
     ]);
@@ -1378,7 +1394,8 @@ describe("Creation of multi-sig", () => {
     expect(result.otherConnections[0].id).toBe(
       "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"
     );
-    expect(result.threshold).toBe(3);
+    expect(result.signingThreshold).toBe(3);
+    expect(result.rotationThreshold).toBe(3);
   });
 
   test("Cannot get multisig icp details if the exn is missing", async () => {
@@ -1445,7 +1462,7 @@ describe("Creation of multi-sig", () => {
     expect(multiSigService.createGroup).toHaveBeenCalledWith(
       queuedIdentifier.data.group?.mhab.prefix,
       queuedIdentifier.groupConnections,
-      2,
+      queuedIdentifier.threshold,
       true
     );
     expect(multiSigService.joinGroup).toBeCalledWith(
@@ -1456,47 +1473,67 @@ describe("Creation of multi-sig", () => {
   });
 
   test("should call deleteNotificationRecordById when joining group successfully", async () => {
-    const mockDeleteNotificationRecordById = jest.spyOn(utils, "deleteNotificationRecordById");
-    
+    const mockDeleteNotificationRecordById = jest.spyOn(
+      utils,
+      "deleteNotificationRecordById"
+    );
+
     // Create a mock MultiSigService instance
     const mockMultiSigService = {
       identifiers: {
-        getIdentifiers: jest.fn().mockResolvedValue([{
-          id: "test-identifier-id",
-          displayName: "Test Identifier",
-          theme: 0,
-          groupMetadata: {
-            groupId: "test-group-id",
-            groupCreated: false
-          }
-        }])
+        getIdentifiers: jest.fn().mockResolvedValue([
+          {
+            id: "test-identifier-id",
+            displayName: "Test Identifier",
+            theme: 0,
+            groupMetadata: {
+              groupId: "test-group-id",
+              groupCreated: false,
+            },
+          },
+        ]),
       },
       props: {
         eventEmitter: { emit: jest.fn() },
         signifyClient: {
-          identifiers: () => ({ get: jest.fn().mockResolvedValue({ id: "test-hab-id" }) }),
-          keyStates: () => ({ get: jest.fn().mockResolvedValue([{ id: "state1" }, { id: "state2" }]) }),
-          notifications: () => ({ mark: jest.fn().mockResolvedValue(undefined) })
-        }
+          identifiers: () => ({
+            get: jest.fn().mockResolvedValue({ id: "test-hab-id" }),
+          }),
+          keyStates: () => ({
+            get: jest
+              .fn()
+              .mockResolvedValue([{ id: "state1" }, { id: "state2" }]),
+          }),
+          notifications: () => ({
+            mark: jest.fn().mockResolvedValue(undefined),
+          }),
+        },
       },
       identifierStorage: {
         createIdentifierMetadataRecord: jest.fn(),
-        updateIdentifierMetadata: jest.fn()
+        updateIdentifierMetadata: jest.fn(),
       },
       operationPendingStorage: {
-        save: jest.fn()
+        save: jest.fn(),
       },
       basicStorage: {
-        update: jest.fn()
+        update: jest.fn(),
       },
       notificationStorage: {
-        findExpectedById: jest.fn().mockResolvedValue({ id: "test-notification", a: { r: "/multisig/icp" } }),
-        deleteById: jest.fn().mockResolvedValue(undefined)
+        findExpectedById: jest
+          .fn()
+          .mockResolvedValue({
+            id: "test-notification",
+            a: { r: "/multisig/icp" },
+          }),
+        deleteById: jest.fn().mockResolvedValue(undefined),
       },
       inceptGroup: jest.fn(),
-      generateAndStoreInceptionData: jest.fn().mockResolvedValue({ icp: { i: "new-multisig-id" } })
+      generateAndStoreInceptionData: jest
+        .fn()
+        .mockResolvedValue({ icp: { i: "new-multisig-id" } }),
     } as any;
-    
+
     // Mock the necessary dependencies
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     basicStorage.findById.mockResolvedValueOnce(
@@ -1507,21 +1544,33 @@ describe("Creation of multi-sig", () => {
         },
       })
     );
-    
+
     // Mock the joinGroup method to call deleteNotificationRecordById
     const originalJoinGroup = multiSigService.joinGroup;
-    multiSigService.joinGroup = jest.fn().mockImplementation(async (notificationId: string, notificationSaid: string, backgroundTask: boolean) => {
-      // Simulate the call to deleteNotificationRecordById that happens in the real method
-      await (mockDeleteNotificationRecordById as any)(
-        mockMultiSigService.props.signifyClient,
-        mockMultiSigService.notificationStorage,
-        notificationId,
-        NotificationRoute.MultiSigIcp,
-        mockMultiSigService.operationPendingStorage
+    multiSigService.joinGroup = jest
+      .fn()
+      .mockImplementation(
+        async (
+          notificationId: string,
+          notificationSaid: string,
+          backgroundTask: boolean
+        ) => {
+          // Simulate the call to deleteNotificationRecordById that happens in the real method
+          await (mockDeleteNotificationRecordById as any)(
+            mockMultiSigService.props.signifyClient,
+            mockMultiSigService.notificationStorage,
+            notificationId,
+            NotificationRoute.MultiSigIcp,
+            mockMultiSigService.operationPendingStorage
+          );
+        }
       );
-    });
-    
-    await multiSigService.joinGroup("test-notification-id", "test-notification-said", false);
+
+    await multiSigService.joinGroup(
+      "test-notification-id",
+      "test-notification-said",
+      false
+    );
 
     // Verify deleteNotificationRecordById was called
     expect(mockDeleteNotificationRecordById).toHaveBeenCalledWith(
@@ -1536,4 +1585,12 @@ describe("Creation of multi-sig", () => {
     multiSigService.joinGroup = originalJoinGroup;
     mockDeleteNotificationRecordById.mockRestore();
   });
+});
+
+const createThresholds = (
+  signing: number,
+  rotation: number = signing
+): MultisigThresholds => ({
+  signingThreshold: signing,
+  rotationThreshold: rotation,
 });
