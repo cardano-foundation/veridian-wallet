@@ -799,18 +799,10 @@ class MultiSigService extends AgentService {
     }
   }
 
-  /**
-   * Get detailed information about a group from a notification ID
-   * Including members acceptance status and thresholds
-   *
-   * @param notificationId - The notification ID related to the group
-   * @returns Group information with acceptance and threshold details
-   */
   @OnlineOnly
   async getGroupInformation(notificationId: string): Promise<GroupInformation> {
     const ipexService = this.ipexCommunications;
 
-    // Get notification record to determine the route type
     const notificationRecord = await this.notificationStorage.findById(
       notificationId
     );
