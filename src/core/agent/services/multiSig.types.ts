@@ -1,3 +1,5 @@
+import { MultisigThresholds } from "./identifier.types";
+
 interface CommonExn {
   v: string;
   t: "exn";
@@ -131,6 +133,31 @@ interface GrantToJoinMultisigExnPayload {
   atc: string;
 }
 
+/**
+ * Information about a group member with their acceptance status
+ */
+interface GroupMemberInfo {
+  /** Member's AID */
+  aid: string;
+  /** Whether the member has accepted to join the group */
+  hasAccepted: boolean;
+}
+
+/**
+ * Extended group information with acceptance and threshold details
+ */
+interface GroupInformation {
+  threshold: MultisigThresholds;
+  /** List of all members in the group */
+  members: GroupMemberInfo[];
+  /** Information about linked request */
+  linkedRequest: {
+    accepted: boolean;
+    current?: string;
+    previous?: string;
+  };
+}
+
 export { MultiSigRoute };
 
 export type {
@@ -139,4 +166,6 @@ export type {
   IpexGrantMultiSigExn,
   InceptMultiSigExnMessage,
   IpexAdmitMultiSigRequest,
+  GroupMemberInfo,
+  GroupInformation,
 };

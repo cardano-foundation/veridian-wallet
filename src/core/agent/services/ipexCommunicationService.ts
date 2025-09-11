@@ -1181,7 +1181,10 @@ class IpexCommunicationService extends AgentService {
     }
 
     return {
-      threshold: multisigAidDetails.state.kt,
+      threshold: {
+        signingThreshold: Number(multisigAidDetails.state.kt),
+        rotationThreshold: Number(multisigAidDetails.state.nt),
+      },
       members: memberAids,
       othersJoined: othersJoined,
       linkedRequest: grantNoteRecord.linkedRequest,
@@ -1221,7 +1224,10 @@ class IpexCommunicationService extends AgentService {
     }
 
     return {
-      threshold: multisigAidDetails.state.kt,
+      threshold: {
+        signingThreshold: Number(multisigAidDetails.state.kt),
+        rotationThreshold: Number(multisigAidDetails.state.nt),
+      },
       members: memberAids,
       othersJoined: othersJoined,
       linkedRequest: applyNoteRecord.linkedRequest,

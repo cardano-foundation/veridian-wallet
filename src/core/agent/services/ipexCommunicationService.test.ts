@@ -1191,6 +1191,7 @@ describe("Receive group ACDC progress", () => {
     identifiersGetMock = jest.fn().mockResolvedValueOnce({
       state: {
         kt: "2",
+        nt: "2",
       },
     });
 
@@ -1219,7 +1220,10 @@ describe("Receive group ACDC progress", () => {
 
     expect(result).toEqual({
       members: ["memberA", "memberB", "memberC"],
-      threshold: "2",
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2,
+      },
       othersJoined: ["memberB", "memberC"],
       linkedRequest: {
         accepted: true,
@@ -1256,6 +1260,7 @@ describe("Receive group ACDC progress", () => {
     identifiersGetMock = jest.fn().mockResolvedValueOnce({
       state: {
         kt: "2",
+        nt: "2",
       },
     });
 
@@ -1265,7 +1270,10 @@ describe("Receive group ACDC progress", () => {
 
     expect(result).toEqual({
       members: ["memberA", "memberB", "memberC"],
-      threshold: "2",
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2,
+      },
       othersJoined: [],
       linkedRequest: {
         accepted: false,
@@ -1743,6 +1751,7 @@ describe("Offer ACDC group progress", () => {
     identifiersGetMock = jest.fn().mockResolvedValueOnce({
       state: {
         kt: "2",
+        nt: "2",
       },
     });
     identifiersMemberMock.mockResolvedValueOnce({
@@ -1769,7 +1778,10 @@ describe("Offer ACDC group progress", () => {
 
     expect(result).toEqual({
       members: ["memberA", "memberB", "memberC"],
-      threshold: "2",
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2,
+      },
       linkedRequest: {
         accepted: true,
         current: "current-offer-said",
@@ -1791,6 +1803,7 @@ describe("Offer ACDC group progress", () => {
     identifiersGetMock = jest.fn().mockResolvedValue({
       state: {
         kt: "2",
+        nt: "2",
       },
     });
     identifiersMemberMock.mockResolvedValue({
@@ -1811,7 +1824,10 @@ describe("Offer ACDC group progress", () => {
 
     expect(result).toEqual({
       members: ["memberA", "memberB"],
-      threshold: "2",
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2,
+      },
       linkedRequest: { accepted: false },
       othersJoined: [],
     });

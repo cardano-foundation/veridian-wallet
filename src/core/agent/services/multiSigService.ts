@@ -37,7 +37,12 @@ import {
   QueuedGroupProps,
 } from "./identifier.types";
 import type { MultisigThresholds } from "./identifier.types";
-import { MultiSigRoute, InceptMultiSigExnMessage } from "./multiSig.types";
+import {
+  MultiSigRoute,
+  InceptMultiSigExnMessage,
+  GroupMemberInfo,
+  GroupInformation,
+} from "./multiSig.types";
 import { deleteNotificationRecordById, OnlineOnly } from "./utils";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { EventTypes, GroupCreatedEvent } from "../event.types";
@@ -46,6 +51,8 @@ import { IdentifierService } from "./identifierService";
 import { StorageMessage } from "../../storage/storage.types";
 import { RpyRoute } from "./connectionService.types";
 import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
+import { LinkedGroupInfo } from "./ipexCommunicationService.types";
+import { IpexCommunicationService } from "./ipexCommunicationService";
 
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
@@ -70,6 +77,8 @@ class MultiSigService extends AgentService {
     "We do not control any member AID of the multi-sig";
   static readonly QUEUED_GROUP_DATA_MISSING =
     "Cannot retry creating group identifier if retry data is missing from the DB";
+  static readonly NO_GROUP_FOUND =
+    "No group information found for the given notification";
 
   protected readonly identifierStorage: IdentifierStorage;
   protected readonly operationPendingStorage: OperationPendingStorage;
@@ -77,6 +86,7 @@ class MultiSigService extends AgentService {
   protected readonly basicStorage: BasicStorage;
   protected readonly connections: ConnectionService;
   protected readonly identifiers: IdentifierService;
+  protected readonly ipexCommunications: IpexCommunicationService;
 
   constructor(
     agentServiceProps: AgentServicesProps,
@@ -85,7 +95,8 @@ class MultiSigService extends AgentService {
     notificationStorage: NotificationStorage,
     basicStorage: BasicStorage,
     connections: ConnectionService,
-    identifiers: IdentifierService
+    identifiers: IdentifierService,
+    ipexCommunications: IpexCommunicationService
   ) {
     super(agentServiceProps);
     this.identifierStorage = identifierStorage;
@@ -94,6 +105,7 @@ class MultiSigService extends AgentService {
     this.basicStorage = basicStorage;
     this.connections = connections;
     this.identifiers = identifiers;
+    this.ipexCommunications = ipexCommunications;
   }
 
   onGroupAdded(callback: (event: GroupCreatedEvent) => void) {
@@ -785,6 +797,58 @@ class MultiSigService extends AgentService {
         );
       }
     }
+  }
+
+  /**
+   * Get detailed information about a group from a notification ID
+   * Including members acceptance status and thresholds
+   *
+   * @param notificationId - The notification ID related to the group
+   * @returns Group information with acceptance and threshold details
+   */
+  @OnlineOnly
+  async getGroupInformation(notificationId: string): Promise<GroupInformation> {
+    const ipexService = this.ipexCommunications;
+
+    // Get notification record to determine the route type
+    const notificationRecord = await this.notificationStorage.findById(
+      notificationId
+    );
+    if (!notificationRecord) {
+      throw new Error(MultiSigService.NO_GROUP_FOUND);
+    }
+
+    let linkedGroupInfo: LinkedGroupInfo;
+
+    if (notificationRecord.route === NotificationRoute.ExnIpexGrant) {
+      linkedGroupInfo = await ipexService.getLinkedGroupFromIpexGrant(
+        notificationId
+      );
+    } else if (notificationRecord.route === NotificationRoute.ExnIpexApply) {
+      linkedGroupInfo = await ipexService.getLinkedGroupFromIpexApply(
+        notificationId
+      );
+    } else {
+      throw new Error(MultiSigService.NO_GROUP_FOUND);
+    }
+
+    const members: GroupMemberInfo[] = [];
+    const othersJoinedSet = new Set(linkedGroupInfo.othersJoined);
+
+    for (const memberId of linkedGroupInfo.members) {
+      const memberInfo: GroupMemberInfo = {
+        aid: memberId,
+        hasAccepted: othersJoinedSet.has(memberId),
+      };
+
+      members.push(memberInfo);
+    }
+
+    return {
+      threshold: linkedGroupInfo.threshold,
+      members,
+      linkedRequest: linkedGroupInfo.linkedRequest,
+    };
   }
 }
 

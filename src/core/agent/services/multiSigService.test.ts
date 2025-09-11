@@ -175,6 +175,11 @@ const identifiers = jest.mocked({
   getAvailableWitnesses: jest.fn(),
 });
 
+const ipexCommunications = jest.mocked({
+  getLinkedGroupFromIpexGrant: jest.fn(),
+  getLinkedGroupFromIpexApply: jest.fn(),
+});
+
 const multiSigService = new MultiSigService(
   agentServicesProps,
   identifierStorage as any,
@@ -182,7 +187,8 @@ const multiSigService = new MultiSigService(
   notificationStorage as any,
   basicStorage as any,
   connections as any,
-  identifiers as any
+  identifiers as any,
+  ipexCommunications as any
 );
 
 const now = new Date();
@@ -1599,4 +1605,260 @@ const createThresholds = (
 ): MultisigThresholds => ({
   signingThreshold: signing,
   rotationThreshold: rotation,
+});
+
+describe("getGroupInformation", () => {
+  const NOTIFICATION_ID = "notification-123";
+  const EXCHANGE_SAID = "exchange-said-123";
+  const GROUP_ID = "group-123";
+  const CURRENT_REQUEST_SAID = "request-said-123";
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should retrieve group information with member acceptance status and thresholds", async () => {
+    // Mock notification record with grant route
+    const linkedRequest = {
+      accepted: true,
+      current: CURRENT_REQUEST_SAID,
+    };
+
+    notificationStorage.findById.mockResolvedValue({
+      id: NOTIFICATION_ID,
+      route: NotificationRoute.ExnIpexGrant,
+    });
+
+    const linkedGroupInfo = {
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2,
+      },
+      members: ["member1", "member2", "member3", "member4"],
+      othersJoined: ["member1", "member3"],
+      linkedRequest,
+    };
+
+    ipexCommunications.getLinkedGroupFromIpexGrant.mockResolvedValue(
+      linkedGroupInfo
+    );
+
+    // Call the method being tested
+    const result = await multiSigService.getGroupInformation(NOTIFICATION_ID);
+
+    // Verify notification was retrieved
+    expect(notificationStorage.findById).toHaveBeenCalledWith(NOTIFICATION_ID);
+
+    // Verify ipexCommunications was called with correct method
+    expect(ipexCommunications.getLinkedGroupFromIpexGrant).toHaveBeenCalledWith(
+      NOTIFICATION_ID
+    );
+    expect(
+      ipexCommunications.getLinkedGroupFromIpexApply
+    ).not.toHaveBeenCalled();
+
+    // Verify the result
+    expect(result).toEqual({
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2,
+      },
+      members: [
+        { aid: "member1", hasAccepted: true },
+        { aid: "member2", hasAccepted: false },
+        { aid: "member3", hasAccepted: true },
+        { aid: "member4", hasAccepted: false },
+      ],
+      linkedRequest,
+    });
+  });
+
+  it("should use signing threshold as rotation threshold when rotation threshold is not available", async () => {
+    const linkedRequest = {
+      accepted: true,
+      current: CURRENT_REQUEST_SAID,
+    };
+
+    notificationStorage.findById.mockResolvedValue({
+      id: NOTIFICATION_ID,
+      route: NotificationRoute.ExnIpexGrant,
+    });
+
+    const linkedGroupInfo = {
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2,
+      },
+      members: ["member1", "member2"],
+      othersJoined: ["member1"],
+      linkedRequest,
+    };
+
+    ipexCommunications.getLinkedGroupFromIpexGrant.mockResolvedValue(
+      linkedGroupInfo
+    );
+
+    const result = await multiSigService.getGroupInformation(NOTIFICATION_ID);
+
+    expect(result).toEqual({
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2, // Should default to signing threshold
+      },
+      members: [
+        { aid: "member1", hasAccepted: true },
+        { aid: "member2", hasAccepted: false },
+      ],
+      linkedRequest,
+    });
+  });
+
+  it("should handle array thresholds", async () => {
+    const linkedRequest = {
+      accepted: false,
+      current: CURRENT_REQUEST_SAID,
+    };
+
+    notificationStorage.findById.mockResolvedValue({
+      id: NOTIFICATION_ID,
+      route: NotificationRoute.ExnIpexGrant,
+    });
+
+    const linkedGroupInfo = {
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 3,
+      },
+      members: ["member1", "member2", "member3"],
+      othersJoined: [],
+      linkedRequest,
+    };
+
+    ipexCommunications.getLinkedGroupFromIpexGrant.mockResolvedValue(
+      linkedGroupInfo
+    );
+
+    const result = await multiSigService.getGroupInformation(NOTIFICATION_ID);
+
+    expect(result).toEqual({
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 3,
+      },
+      members: [
+        { aid: "member1", hasAccepted: false },
+        { aid: "member2", hasAccepted: false },
+        { aid: "member3", hasAccepted: false },
+      ],
+      linkedRequest,
+    });
+  });
+
+  it("should throw an error when notification is not found", async () => {
+    notificationStorage.findById.mockResolvedValue(null);
+
+    await expect(
+      multiSigService.getGroupInformation(NOTIFICATION_ID)
+    ).rejects.toThrow(MultiSigService.NO_GROUP_FOUND);
+
+    expect(notificationStorage.findById).toHaveBeenCalledWith(NOTIFICATION_ID);
+  });
+
+  it("should throw an error when notification route is not supported", async () => {
+    notificationStorage.findById.mockResolvedValue({
+      id: NOTIFICATION_ID,
+      route: NotificationRoute.MultiSigIcp, // Not a supported route
+    });
+
+    await expect(
+      multiSigService.getGroupInformation(NOTIFICATION_ID)
+    ).rejects.toThrow(MultiSigService.NO_GROUP_FOUND);
+
+    expect(notificationStorage.findById).toHaveBeenCalledWith(NOTIFICATION_ID);
+  });
+
+  it("should handle when linkedRequest.current is not available", async () => {
+    const linkedRequest = {
+      accepted: false,
+      // No current property
+    };
+
+    notificationStorage.findById.mockResolvedValue({
+      id: NOTIFICATION_ID,
+      route: NotificationRoute.ExnIpexGrant,
+    });
+
+    const linkedGroupInfo = {
+      threshold: {
+        signingThreshold: 1,
+        rotationThreshold: 1,
+      },
+      members: ["member1"],
+      othersJoined: [],
+      linkedRequest,
+    };
+
+    ipexCommunications.getLinkedGroupFromIpexGrant.mockResolvedValue(
+      linkedGroupInfo
+    );
+
+    const result = await multiSigService.getGroupInformation(NOTIFICATION_ID);
+
+    expect(result).toEqual({
+      threshold: {
+        signingThreshold: 1,
+        rotationThreshold: 1,
+      },
+      members: [{ aid: "member1", hasAccepted: false }],
+      linkedRequest,
+    });
+  });
+
+  it("should call apply method for ExnIpexApply notifications", async () => {
+    const linkedRequest = {
+      accepted: true,
+      current: CURRENT_REQUEST_SAID,
+    };
+
+    notificationStorage.findById.mockResolvedValue({
+      id: NOTIFICATION_ID,
+      route: NotificationRoute.ExnIpexApply,
+    });
+
+    const linkedGroupInfo = {
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2,
+      },
+      members: ["member1", "member2"],
+      othersJoined: ["member1"],
+      linkedRequest,
+    };
+
+    ipexCommunications.getLinkedGroupFromIpexApply.mockResolvedValue(
+      linkedGroupInfo
+    );
+
+    const result = await multiSigService.getGroupInformation(NOTIFICATION_ID);
+
+    expect(notificationStorage.findById).toHaveBeenCalledWith(NOTIFICATION_ID);
+    expect(ipexCommunications.getLinkedGroupFromIpexApply).toHaveBeenCalledWith(
+      NOTIFICATION_ID
+    );
+    expect(
+      ipexCommunications.getLinkedGroupFromIpexGrant
+    ).not.toHaveBeenCalled();
+
+    expect(result).toEqual({
+      threshold: {
+        signingThreshold: 2,
+        rotationThreshold: 2,
+      },
+      members: [
+        { aid: "member1", hasAccepted: true },
+        { aid: "member2", hasAccepted: false },
+      ],
+      linkedRequest,
+    });
+  });
 });

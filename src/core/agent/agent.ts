@@ -121,7 +121,8 @@ class Agent {
         this.notificationStorage,
         this.basicStorage,
         this.connections,
-        this.identifierService
+        this.identifierService,
+        this.ipexCommunications
       );
     }
     return this.multiSigService;
