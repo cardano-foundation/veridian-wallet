@@ -4,6 +4,7 @@
   "moderate": false,
   "critical": true,
   "allowlist": [
+    "GHSA-fjxv-7rqg-78g4",
     {
       "1100267": {
         "active": true,
