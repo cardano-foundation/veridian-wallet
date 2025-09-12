@@ -9,6 +9,7 @@ import { SignerData } from "./components/SetupSignerModal/SetupSignerModal.types
 enum Stage {
   SetupConnection,
   InitGroup,
+  Pending,
 }
 
 interface StageProps {

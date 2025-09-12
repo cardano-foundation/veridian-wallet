@@ -1,3 +1,21 @@
+const getOobiMock = jest.fn((...args: any) =>
+  Promise.resolve(
+    "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org:3902"
+  )
+);
+const deleteIdentifier = jest.fn();
+const markIdentifierPendingDelete = jest.fn();
+const shareFnc = jest.fn(() => Promise.resolve(true));
+const historyPushMock = jest.fn();
+const checkPermisson = jest.fn(() =>
+  Promise.resolve({
+    camera: "granted",
+  })
+);
+const requestPermission = jest.fn();
+const startScan = jest.fn();
+const stopScan = jest.fn();
+
 import {
   BarcodeFormat,
   BarcodesScannedEvent,
@@ -14,6 +32,7 @@ import {
   ConnectionStatus,
   OobiType,
 } from "../../../../../core/agent/agent.types";
+import { StorageMessage } from "../../../../../core/storage/storage.types";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { RoutePath } from "../../../../../routes/paths";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
@@ -22,21 +41,9 @@ import { multisignIdentifierFix } from "../../../../__fixtures__/filteredIdentif
 import { CustomInputProps } from "../../../../components/CustomInput/CustomInput.types";
 import { ToastMsgType } from "../../../../globals/types";
 import { makeTestStore } from "../../../../utils/makeTestStore";
+import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { GroupInfomation, Stage } from "../../SetupGroupProfile.types";
 import { SetupConnections } from "./SetupConnections";
-import { passcodeFiller } from "../../../../utils/passcodeFiller";
-import { StorageMessage } from "../../../../../core/storage/storage.types";
-import * as useScanHandleModule from "../../../../components/Scan/hook/useScanHandle";
-import { Agent } from "../../../../../core/agent/agent";
-
-const getOobiMock = jest.fn((...args: any) =>
-  Promise.resolve(
-    "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org:3902"
-  )
-);
-
-const deleteIdentifier = jest.fn();
-const markIdentifierPendingDelete = jest.fn();
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -46,7 +53,6 @@ jest.mock("@ionic/react", () => ({
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
 }));
 
-const shareFnc = jest.fn(() => Promise.resolve(true));
 jest.mock("@capacitor/share", () => ({
   ...jest.requireActual("@capacitor/share"),
   Share: {
@@ -76,7 +82,6 @@ jest.mock("../../../../../core/agent/agent", () => ({
   },
 }));
 
-const historyPushMock = jest.fn();
 const initiatorGroupProfile = {
   ...multisignIdentifierFix[0],
   groupMetadata: {
@@ -161,16 +166,6 @@ const addListener = jest.fn(
     };
   }
 );
-
-const checkPermisson = jest.fn(() =>
-  Promise.resolve({
-    camera: "granted",
-  })
-);
-
-const requestPermission = jest.fn();
-const startScan = jest.fn();
-const stopScan = jest.fn();
 jest.mock("@capacitor-mlkit/barcode-scanning", () => {
   return {
     ...jest.requireActual("@capacitor-mlkit/barcode-scanning"),

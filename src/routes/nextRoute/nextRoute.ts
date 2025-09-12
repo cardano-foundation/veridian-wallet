@@ -11,6 +11,7 @@ import {
 } from "../../store/reducers/stateCache";
 import { RoutePath, TabsRoutePath } from "../paths";
 import { DataProps, NextRoute, StoreState } from "./nextRoute.types";
+import { CreationStatus } from "../../core/agent/agent.types";
 
 const getNextRootRoute = (data: DataProps) => {
   const authentication = data.store.stateCache.authentication;
@@ -41,21 +42,25 @@ const getNextRootRoute = (data: DataProps) => {
       : TabsRoutePath.CREDENTIALS;
   }
 
+  const { currentProfile } = data.store;
   if (
-    data.store.currentProfile &&
+    currentProfile &&
     data.store.stateCache.routes[0]?.path !== RoutePath.PROFILE_SETUP
   ) {
-    path = data.store.currentProfile.identity.groupMetadata
-      ? RoutePath.GROUP_PROFILE_SETUP.replace(
-          ":id",
-          data.store.currentProfile.identity.id
-        )
-      : path;
+    // If group is in setup phrase or status of group is pending (waiting other member approve it), show group detail page
+    path =
+      currentProfile.identity.groupMetadata ||
+      currentProfile.identity.creationStatus === CreationStatus.PENDING
+        ? RoutePath.GROUP_PROFILE_SETUP.replace(
+            ":id",
+            currentProfile.identity.id
+          )
+        : path;
   }
 
   if (
     data.store.stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup ||
-    (data.store.stateCache as any).isPendingJoinGroup === true
+    (data.store.stateCache as any).isPendingJoinGroup
   ) {
     path = RoutePath.PROFILE_SETUP;
   }

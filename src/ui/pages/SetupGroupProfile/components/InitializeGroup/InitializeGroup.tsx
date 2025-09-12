@@ -1,9 +1,12 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { pencilOutline, star, warningOutline } from "ionicons/icons";
 import { useMemo, useState } from "react";
-import { ConnectionShortDetails } from "../../../../../core/agent/agent.types";
+import {
+  ConnectionShortDetails,
+  MultisigConnectionDetails,
+} from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
-import { useAppSelector } from "../../../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getCurrentProfile } from "../../../../../store/reducers/profileCache";
 import { Alert } from "../../../../components/Alert";
 import { MemberAvatar } from "../../../../components/Avatar";
@@ -21,12 +24,20 @@ import { SetupMemberModal } from "../SetupMemberModal/SetupMemberModal";
 import { SetupSignerModal } from "../SetupSignerModal";
 import { SignerData } from "../SetupSignerModal/SetupSignerModal.types";
 import "./InitializeGroup.scss";
+import { Agent } from "../../../../../core/agent/agent";
+import { showError } from "../../../../utils/error";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
+import { ToastMsgType } from "../../../../globals/types";
+import { Spinner } from "../../../../components/Spinner";
+import { SpinnerConverage } from "../../../../components/Spinner/Spinner.type";
 
 const InitializeGroup = ({ state, setState }: StageProps) => {
+  const dispatch = useAppDispatch();
   const componentId = "init-group";
   const [openCancelAlert, setOpenCancelAlert] = useState(false);
   const [openSigners, setOpenSigners] = useState(false);
   const [openEditMembers, setOpenEditMembers] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const profile = useAppSelector(getCurrentProfile);
 
@@ -75,6 +86,36 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
     });
   };
 
+  const createMultisigIdentifier = async () => {
+    const { ourIdentifier } = state;
+    if (!ourIdentifier) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        "Attempting to create multi-sig without a corresponding normal AID to manage local keys"
+      );
+      return;
+    } else {
+      setLoading(true);
+      try {
+        await Agent.agent.multiSigs.createGroup(
+          ourIdentifier,
+          state.selectedConnections as MultisigConnectionDetails[],
+          state.signer.requiredSigners
+        );
+        dispatch(setToastMsg(ToastMsgType.GROUP_REQUEST_SEND));
+      } catch (e) {
+        showError(
+          "Unable to create group",
+          e,
+          dispatch,
+          ToastMsgType.UNABLE_CREATE_GROUP_ERROR
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <>
       <ScrollablePageLayout
@@ -92,7 +133,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
         footer={
           <PageFooter
             pageId={componentId}
-            primaryButtonAction={() => true}
+            primaryButtonAction={createMultisigIdentifier}
             primaryButtonText={`${i18n.t(
               "setupgroupprofile.initgroup.button.sendrequest"
             )}`}
@@ -225,6 +266,10 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
           </>
         )}
       </ScrollablePageLayout>
+      <Spinner
+        show={loading}
+        coverage={SpinnerConverage.Screen}
+      />
       <SetupSignerModal
         isOpen={openSigners}
         setOpen={setOpenSigners}

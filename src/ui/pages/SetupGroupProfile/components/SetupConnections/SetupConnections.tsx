@@ -47,8 +47,10 @@ const SetupConnections = ({ setState }: StageProps) => {
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const scanRef = useRef<ScanRef>(null);
+
   const { id: profileId } = useParams<{ id: string }>();
   const profile = profiles[profileId]?.identity;
+
   const groupId = profile?.groupMetadata?.groupId;
   const userName = profile?.groupMetadata?.userName;
   const { resolveGroupConnection } = useScanHandle();
