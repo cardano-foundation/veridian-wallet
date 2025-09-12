@@ -84,7 +84,7 @@ enum ToastMsgType {
   UNKNOWN_ERROR = "unknownerror",
   PROFILE_SWITCHED = "profileswitched",
   UNABLE_TO_SWITCH_PROFILE = "unabletoswitchprofile",
-  GROUP_ID_NOT_FOUND_ERROR = "groupidnotfounderror",
+  NOT_VALID_GROUP_INVITE = "notvalidgrouperror",
   GROUP_NAME_NOT_FOUND_ERROR = "groupnamenotfounderror",
   DUPLICATE_GROUP_ID_ERROR = "duplicategroupiderror",
   GROUP_METADATA_NOT_FOUND_ERROR = "groupmetadatanotfounderror",

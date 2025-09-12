@@ -336,7 +336,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
 
       if (!scanGroupId) {
         handleCloseScan();
-        dispatch(setToastMsg(ToastMsgType.GROUP_ID_NOT_FOUND_ERROR));
+        dispatch(setToastMsg(ToastMsgType.NOT_VALID_GROUP_INVITE));
         return;
       }
 
