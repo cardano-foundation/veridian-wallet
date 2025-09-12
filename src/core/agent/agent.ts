@@ -119,6 +119,7 @@ class Agent {
         this.identifierStorage,
         this.operationPendingStorage,
         this.notificationStorage,
+        this.contactStorage,
         this.basicStorage,
         this.connections,
         this.identifierService

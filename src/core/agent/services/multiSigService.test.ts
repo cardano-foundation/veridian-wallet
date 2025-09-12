@@ -157,10 +157,16 @@ const basicStorage = jest.mocked({
   findExpectedById: jest.fn(),
 });
 
+const contactStorage = jest.mocked({
+  findById: jest.fn(),
+  findAllByQuery: jest.fn(),
+});
+
 const eventEmitter = new CoreEventEmitter();
 const agentServicesProps = {
   signifyClient: signifyClient as any,
   eventEmitter,
+  contactStorage: contactStorage as any,
 };
 
 const connections = jest.mocked({
@@ -182,6 +188,7 @@ const multiSigService = new MultiSigService(
   identifierStorage as any,
   operationPendingStorage as any,
   notificationStorage as any,
+  contactStorage as any,
   basicStorage as any,
   connections as any,
   identifiers as any
@@ -1603,6 +1610,100 @@ const createThresholds = (
   rotationThreshold: rotation,
 });
 
+describe("getGroupMembers", () => {
+  const NOTIFICATION_ID = "notification-123";
+  const EXCHANGE_SAID = "exchange-said-123";
+  const GROUP_ID = "group-123";
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should retrieve group members with names and acceptance status", async () => {
+    notificationStorage.findById.mockResolvedValue({
+      id: NOTIFICATION_ID,
+      a: { d: EXCHANGE_SAID },
+    });
+
+    const groupRequest = {
+      exn: {
+        a: {
+          gid: GROUP_ID,
+          smids: ["member1", "member2", "member3"],
+        },
+        e: {
+          icp: {
+            kt: "2",
+            nt: "2",
+          },
+        },
+      },
+    };
+
+    groupGetRequestMock.mockResolvedValue([groupRequest]);
+
+    identifiersMembersMock.mockResolvedValue({
+      signing: [{ aid: "member1" }, { aid: "member3" }],
+    });
+
+    // Mock contact storage to return names
+    contactStorage.findById
+      .mockResolvedValueOnce({ alias: "Alice" })
+      .mockResolvedValueOnce({ alias: "Bob" })
+      .mockResolvedValueOnce({ alias: "Charlie" });
+
+    const result = await multiSigService.getGroupMembers(NOTIFICATION_ID);
+
+    expect(notificationStorage.findById).toHaveBeenCalledWith(NOTIFICATION_ID);
+    expect(groupGetRequestMock).toHaveBeenCalledWith(EXCHANGE_SAID);
+    expect(identifiersMembersMock).toHaveBeenCalledWith(GROUP_ID);
+
+    expect(result).toEqual([
+      { aid: "member1", name: "Alice", hasAccepted: true },
+      { aid: "member2", name: "Bob", hasAccepted: false },
+      { aid: "member3", name: "Charlie", hasAccepted: true },
+    ]);
+  });
+
+  it("should use AID as name when contact not found", async () => {
+    notificationStorage.findById.mockResolvedValue({
+      id: NOTIFICATION_ID,
+      a: { d: EXCHANGE_SAID },
+    });
+
+    const groupRequest = {
+      exn: {
+        a: {
+          gid: GROUP_ID,
+          smids: ["member1", "member2"],
+        },
+        e: {
+          icp: {
+            kt: "2",
+            nt: "2",
+          },
+        },
+      },
+    };
+
+    groupGetRequestMock.mockResolvedValue([groupRequest]);
+
+    identifiersMembersMock.mockResolvedValue({
+      signing: [{ aid: "member1" }],
+    });
+
+    // Mock contact storage to return null (contact not found)
+    contactStorage.findById.mockResolvedValue(null);
+
+    const result = await multiSigService.getGroupMembers(NOTIFICATION_ID);
+
+    expect(result).toEqual([
+      { aid: "member1", name: "member1", hasAccepted: true },
+      { aid: "member2", name: "member2", hasAccepted: false },
+    ]);
+  });
+});
+
 describe("getGroupInformation", () => {
   const NOTIFICATION_ID = "notification-123";
   const EXCHANGE_SAID = "exchange-said-123";
@@ -1636,14 +1737,16 @@ describe("getGroupInformation", () => {
 
     groupGetRequestMock.mockResolvedValue([groupRequest]);
 
-    identifiersGetMock.mockResolvedValue({
-      prefix: GROUP_ID,
-      state: { kt: "2", nt: "2" },
-    });
-
     identifiersMembersMock.mockResolvedValue({
       signing: [{ aid: "member1" }, { aid: "member3" }],
     });
+
+    // Mock contact storage to return names
+    contactStorage.findById
+      .mockResolvedValueOnce({ alias: "Alice" })
+      .mockResolvedValueOnce({ alias: "Bob" })
+      .mockResolvedValueOnce({ alias: "Charlie" })
+      .mockResolvedValueOnce({ alias: "David" });
 
     const result = await multiSigService.getGroupInformation(NOTIFICATION_ID);
 
@@ -1657,10 +1760,10 @@ describe("getGroupInformation", () => {
         rotationThreshold: 2,
       },
       members: [
-        { aid: "member1", hasAccepted: true },
-        { aid: "member2", hasAccepted: false },
-        { aid: "member3", hasAccepted: true },
-        { aid: "member4", hasAccepted: false },
+        { aid: "member1", name: "Alice", hasAccepted: true },
+        { aid: "member2", name: "Bob", hasAccepted: false },
+        { aid: "member3", name: "Charlie", hasAccepted: true },
+        { aid: "member4", name: "David", hasAccepted: false },
       ],
     });
   });
@@ -1687,13 +1790,14 @@ describe("getGroupInformation", () => {
     };
 
     groupGetRequestMock.mockResolvedValue([groupRequest]);
-    identifiersGetMock.mockResolvedValue({
-      prefix: GROUP_ID,
-      state: { kt: "3", nt: "2" },
-    });
     identifiersMembersMock.mockResolvedValue({
       signing: [{ aid: "member1" }],
     });
+
+    // Mock contact storage
+    contactStorage.findById
+      .mockResolvedValueOnce({ alias: "Alice" })
+      .mockResolvedValueOnce({ alias: "Bob" });
 
     const result = await multiSigService.getGroupInformation(NOTIFICATION_ID);
 
@@ -1703,8 +1807,8 @@ describe("getGroupInformation", () => {
         rotationThreshold: 2,
       },
       members: [
-        { aid: "member1", hasAccepted: true },
-        { aid: "member2", hasAccepted: false },
+        { aid: "member1", name: "Alice", hasAccepted: true },
+        { aid: "member2", name: "Bob", hasAccepted: false },
       ],
     });
   });
@@ -1731,10 +1835,6 @@ describe("getGroupInformation", () => {
     };
 
     groupGetRequestMock.mockResolvedValue([groupRequest]);
-    identifiersGetMock.mockResolvedValue({
-      prefix: GROUP_ID,
-      state: { kt: "1", nt: "1" },
-    });
     identifiersMembersMock.mockResolvedValue({
       signing: [],
     });

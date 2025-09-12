@@ -135,6 +135,7 @@ interface GrantToJoinMultisigExnPayload {
 
 interface GroupMemberInfo {
   aid: string;
+  name: string;
   hasAccepted: boolean;
 }
 
