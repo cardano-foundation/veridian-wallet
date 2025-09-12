@@ -20,7 +20,10 @@ import { Provider } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import { setCurrentRoute } from "../../../store/reducers/stateCache";
+import {
+  setCurrentRoute,
+  setToastMsg,
+} from "../../../store/reducers/stateCache";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import { makeTestStore } from "../../utils/makeTestStore";
@@ -28,8 +31,10 @@ import { ProfileSetup } from "./ProfileSetup";
 import {
   ConnectionShortDetails,
   ConnectionStatus,
+  CreationStatus,
   OobiType,
 } from "../../../core/agent/agent.types";
+import { ToastMsgType } from "../../globals/types";
 
 jest.mock("signify-ts", () => ({
   ...jest.requireActual("signify-ts"),
@@ -47,11 +52,11 @@ const connection: ConnectionShortDetails = {
   contactId: "conn-id-1",
 };
 
-const connectByOobiUrlMock = jest.fn((...arg: unknown[]) => {
-  return {
+const connectByOobiUrlMock = jest.fn((...arg: unknown[]): Promise<unknown> => {
+  return Promise.resolve({
     type: OobiType.NORMAL,
     connection,
-  };
+  });
 });
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
@@ -664,6 +669,25 @@ describe("Profile setup: use as modal", () => {
     dispatch: dispatchMock,
   };
 
+  beforeEach(() => {
+    addListener.mockImplementation(
+      (
+        eventName: string,
+        listenerFunc: (result: BarcodesScannedEvent) => void
+      ) => {
+        setTimeout(() => {
+          listenerFunc({
+            barcodes,
+          });
+        }, 100);
+
+        return {
+          remove: jest.fn(),
+        };
+      }
+    );
+  });
+
   test("Skip welcome and dipslay credential page after setup profile", async () => {
     const history = createMemoryHistory();
     const onClose = jest.fn();
@@ -772,6 +796,219 @@ describe("Profile setup: use as modal", () => {
 
     await waitFor(() => {
       expect(createIdentifierMock).toBeCalled();
+    });
+  });
+
+  test("Invalid group invite url", async () => {
+    const barcodes = [
+      {
+        displayValue: `http://keria:3902/oobi/EItAgpb3J4xQ5WLyIjFvNaeU07tYPF-dRp6VPHwqEama/agent/EGpkfv0Tw9pdtZHW2iSzLSm1ZreYyyD_1FJRpEl2xiB3?name=Leader&groupName=MockGroup`,
+        format: BarcodeFormat.QrCode,
+        rawValue: `http://keria:3902/oobi/EItAgpb3J4xQ5WLyIjFvNaeU07tYPF-dRp6VPHwqEama/agent/EGpkfv0Tw9pdtZHW2iSzLSm1ZreYyyD_1FJRpEl2xiB3?name=Leader&groupName=MockGroup`,
+        valueType: BarcodeValueType.Url,
+      },
+    ];
+
+    addListener.mockImplementation(
+      (
+        eventName: string,
+        listenerFunc: (result: BarcodesScannedEvent) => void
+      ) => {
+        setTimeout(() => {
+          listenerFunc({
+            barcodes,
+          });
+        }, 100);
+
+        return {
+          remove: jest.fn(),
+        };
+      }
+    );
+
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ProfileSetup />
+      </Provider>
+    );
+
+    fireEvent.click(getByTestId("identifier-select-group"));
+
+    expect(
+      getByText(EN_TRANSLATIONS.setupprofile.button.confirm)
+    ).toBeVisible();
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.setupprofile.button.confirm));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("join-group-button"));
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+    });
+
+    await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(
+        setToastMsg(ToastMsgType.NOT_VALID_GROUP_INVITE)
+      );
+    });
+  });
+
+  test("Duplicate group", async () => {
+    const barcodes = [
+      {
+        displayValue: `http://keria:3902/oobi/EItAgpb3J4xQ5WLyIjFvNaeU07tYPF-dRp6VPHwqEama/agent/EGpkfv0Tw9pdtZHW2iSzLSm1ZreYyyD_1FJRpEl2xiB3?name=Leader&groupId=0AAPHBnxoGK4tDuL4g87Eo9D&groupName=MockGroup`,
+        format: BarcodeFormat.QrCode,
+        rawValue: `http://keria:3902/oobi/EItAgpb3J4xQ5WLyIjFvNaeU07tYPF-dRp6VPHwqEama/agent/EGpkfv0Tw9pdtZHW2iSzLSm1ZreYyyD_1FJRpEl2xiB3?name=Leader&groupId=0AAPHBnxoGK4tDuL4g87Eo9D&groupName=MockGroup`,
+        valueType: BarcodeValueType.Url,
+      },
+    ];
+
+    addListener.mockImplementation(
+      (
+        eventName: string,
+        listenerFunc: (result: BarcodesScannedEvent) => void
+      ) => {
+        setTimeout(() => {
+          listenerFunc({
+            barcodes,
+          });
+        }, 100);
+
+        return {
+          remove: jest.fn(),
+        };
+      }
+    );
+
+    const mockStore = makeTestStore({
+      stateCache: {
+        routes: ["/"],
+        authentication: {
+          defaultProfile: "",
+          loggedIn: true,
+          time: 0,
+          passcodeIsSet: true,
+          seedPhraseIsSet: true,
+          passwordIsSet: false,
+          passwordIsSkipped: true,
+          ssiAgentIsSet: true,
+          ssiAgentUrl: "http://keria.com",
+          recoveryWalletProgress: false,
+          loginAttempt: {
+            attempts: 0,
+            lockedUntil: 0,
+          },
+          firstAppLaunch: false,
+        },
+      },
+      profilesCache: {
+        profiles: {
+          ["ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"]: {
+            identity: {
+              id: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
+              displayName: "Professional ID",
+              createdAtUTC: "2023-01-01T19:23:24Z",
+              theme: 0,
+              creationStatus: CreationStatus.COMPLETE,
+              groupMetadata: {
+                groupId: "0AAPHBnxoGK4tDuL4g87Eo9D",
+                groupCreated: false,
+                groupInitiator: false,
+                userName: "test",
+              },
+            },
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [],
+          },
+        },
+      },
+    });
+
+    const dispatchMock = jest.fn();
+
+    const storeMocked = {
+      ...mockStore,
+      dispatch: dispatchMock,
+    };
+
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ProfileSetup />
+      </Provider>
+    );
+
+    fireEvent.click(getByTestId("identifier-select-group"));
+
+    expect(
+      getByText(EN_TRANSLATIONS.setupprofile.button.confirm)
+    ).toBeVisible();
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.setupprofile.button.confirm));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("join-group-button"));
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+    });
+
+    await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(
+        setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR)
+      );
+    });
+  });
+
+  test("Unexpected error", async () => {
+    connectByOobiUrlMock.mockImplementation(async () => {
+      throw new Error("Cannot resolve oobi");
+    });
+
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ProfileSetup />
+      </Provider>
+    );
+
+    fireEvent.click(getByTestId("identifier-select-group"));
+
+    expect(
+      getByText(EN_TRANSLATIONS.setupprofile.button.confirm)
+    ).toBeVisible();
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.setupprofile.button.confirm));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("join-group-button"));
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+    });
+
+    await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(
+        setToastMsg(ToastMsgType.CONNECTION_ERROR)
+      );
     });
   });
 });
