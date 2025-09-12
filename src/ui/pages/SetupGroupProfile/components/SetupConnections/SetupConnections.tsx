@@ -16,6 +16,7 @@ import {
   updateOrAddMultisigConnectionCache,
 } from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
+import { Alert } from "../../../../components/Alert";
 import { Avatar } from "../../../../components/Avatar";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
@@ -28,7 +29,7 @@ import { useCameraDirection } from "../../../../components/Scanner/hook/useCamer
 import { ToastMsgType } from "../../../../globals/types";
 import { useOnlineStatusEffect } from "../../../../hooks";
 import { Profiles } from "../../../Profiles";
-import { StageProps } from "../../SetupGroupProfile.types";
+import { Stage, StageProps } from "../../SetupGroupProfile.types";
 import "./SetupConnections.scss";
 import { Tab } from "./SetupConnections.types";
 import { ShareConnections } from "./ShareConnections";
@@ -39,6 +40,7 @@ const SetupConnections = ({ setState }: StageProps) => {
   const profiles = useAppSelector(getProfiles);
   const [oobi, setOobi] = useState("");
   const [tab, setTab] = useState<Tab>(Tab.SetupMembers);
+  const [openInitGroupAlert, setOpenInitAlertGroup] = useState(false);
   const isScanTab = Tab.Scan === tab;
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
     useCameraDirection();
@@ -91,12 +93,11 @@ const SetupConnections = ({ setState }: StageProps) => {
     if (!groupId || !userName) return;
 
     try {
-      const oobiValue = await Agent.agent.connections.getOobi(
-        profileId,
-        userName,
-        groupId,
-        profile?.displayName
-      );
+      const oobiValue = await Agent.agent.connections.getOobi(profileId, {
+        alias: profile?.displayName,
+        groupId: groupId,
+        groupName: userName,
+      });
       if (oobiValue) {
         setOobi(oobiValue);
       }
@@ -142,8 +143,10 @@ const SetupConnections = ({ setState }: StageProps) => {
     setState((value) => ({
       ...value,
       scannedConections: multiSigGroup.connections,
+      selectedConnections: multiSigGroup.connections,
       ourIdentifier: profileId,
       newIdentifier: profile,
+      stage: Stage.InitGroup,
     }));
   };
 
@@ -174,7 +177,7 @@ const SetupConnections = ({ setState }: StageProps) => {
           profile?.groupMetadata?.groupInitiator && (
             <PageFooter
               pageId={componentId}
-              primaryButtonAction={handleInit}
+              primaryButtonAction={() => setOpenInitAlertGroup(true)}
               primaryButtonText={`${i18n.t(
                 "setupgroupprofile.setupmembers.actions.initiator.initiatebutton"
               )}`}
@@ -233,6 +236,18 @@ const SetupConnections = ({ setState }: StageProps) => {
       <Profiles
         isOpen={openProfiles}
         setIsOpen={setOpenProfiles}
+      />
+      <Alert
+        isOpen={openInitGroupAlert}
+        setIsOpen={setOpenInitAlertGroup}
+        dataTestId="alert-confirm-init-group"
+        headerText={i18n.t("setupgroupprofile.confirm.init.text")}
+        confirmButtonText={`${i18n.t(
+          "setupgroupprofile.confirm.init.confirm"
+        )}`}
+        cancelButtonText={`${i18n.t("setupgroupprofile.confirm.init.cancel")}`}
+        actionConfirm={handleInit}
+        actionDismiss={() => setOpenInitAlertGroup(false)}
       />
     </>
   );

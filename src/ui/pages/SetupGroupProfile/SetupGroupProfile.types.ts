@@ -4,12 +4,11 @@ import {
   GroupMetadata,
   IdentifierShortDetails,
 } from "../../../core/agent/services/identifier.types";
+import { SignerData } from "./components/SetupSignerModal/SetupSignerModal.types";
 
 enum Stage {
   SetupConnection,
-  Members,
-  SetupThreshold,
-  Summary,
+  InitGroup,
 }
 
 interface StageProps {
@@ -22,7 +21,7 @@ interface StageProps {
 interface GroupInfomation {
   stage: Stage;
   displayNameValue: string;
-  threshold: number;
+  signer: SignerData;
   scannedConections: ConnectionShortDetails[];
   selectedConnections: ConnectionShortDetails[];
   newIdentifier: IdentifierShortDetails;

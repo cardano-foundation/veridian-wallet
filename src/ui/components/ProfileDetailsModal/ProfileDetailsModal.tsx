@@ -68,10 +68,9 @@ const ProfileDetailsModule = ({
     try {
       if (!profile?.id) return;
 
-      const oobiValue = await Agent.agent.connections.getOobi(
-        `${profile.id}`,
-        profile.displayName
-      );
+      const oobiValue = await Agent.agent.connections.getOobi(`${profile.id}`, {
+        alias: profile.displayName,
+      });
       if (oobiValue) {
         setOobi(oobiValue);
       }
@@ -117,8 +116,8 @@ const ProfileDetailsModule = ({
       const filterId = profile
         ? profile.id
         : cloudError
-          ? profileId
-          : undefined;
+        ? profileId
+        : undefined;
 
       await deleteIdentifier();
       if (defaultProfile?.identity.id === filterId) {

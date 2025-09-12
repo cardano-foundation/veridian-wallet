@@ -1,0 +1,38 @@
+.setup-connections-modal {
+  .header-text {
+    text-align: center;
+  }
+
+  .member-list {
+    .checkbox {
+      width: fit-content;
+      --checkbox-background-checked: var(--ion-color-primary-700);
+      --checkmark-color: var(--ion-color-primary-100);
+      --border-width: 0.115rem;
+      flex: none;
+
+      &.checkbox-checked {
+        --border-width: 0;
+      }
+    }
+
+    .card-item {
+      --background-activated: transparent;
+    }
+  }
+
+  .page-footer {
+    padding-bottom: 1.5rem;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .title {
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .checkbox {
+      --size: 1.25rem;
+    }
+  }
+}

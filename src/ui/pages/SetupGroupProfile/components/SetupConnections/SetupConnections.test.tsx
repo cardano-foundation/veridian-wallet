@@ -100,7 +100,9 @@ jest.mock("react-router-dom", () => ({
 
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {
-    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
+    isAvailable: jest.fn(() =>
+      Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })
+    ),
     verifyIdentity: jest.fn(() => Promise.resolve()),
     getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
     setCredentials: jest.fn(() => Promise.resolve()),
@@ -230,7 +232,10 @@ describe("Setup Connection", () => {
   let stage1State: GroupInfomation = {
     stage: Stage.SetupConnection,
     displayNameValue: "test",
-    threshold: 1,
+    signer: {
+      recoverySigners: 0,
+      requiredSigners: 0,
+    },
     scannedConections: [connectionsFix[3]],
     selectedConnections: [],
     ourIdentifier: initiatorGroupProfile.id,
@@ -302,8 +307,11 @@ describe("Setup Connection", () => {
 
     const calledArgs = getOobiMock.mock.calls[0];
     expect(calledArgs[0]).toEqual(stage1State.newIdentifier.id);
-    expect(calledArgs[1]).toEqual(initiatorGroupProfile.groupMetadata.userName);
-    expect(calledArgs[2]).toEqual(initiatorGroupProfile.groupMetadata?.groupId);
+    expect(calledArgs[1]).toEqual({
+      alias: initiatorGroupProfile.displayName,
+      groupId: initiatorGroupProfile.groupMetadata.groupId,
+      groupName: initiatorGroupProfile.groupMetadata.userName,
+    });
 
     expect(
       getByText(

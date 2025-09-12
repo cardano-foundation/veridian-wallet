@@ -64,10 +64,18 @@ export {
   OobiQueryParams,
 };
 
+interface GetOobiParameters {
+  alias?: string;
+  groupId?: string;
+  groupName?: string;
+  externalId?: string;
+}
+
 export type {
   ConnectionHistoryItem,
   ContactDetailsRecord,
   ExnMessage,
   ExternalLink,
   HumanReadableMessage,
+  GetOobiParameters,
 };
