@@ -652,10 +652,8 @@
     }
   },
   "connectdapp": {
-    "title": "Cardano connect",
-    "sublabel": "CIP-45",
-    "tabheader": "Cardano Connect",
-    "connectbtn": "Connect with Cardano",
+    "title": "dApps",
+    "connectbtn": "Connect dApp",
     "disconnectbeforecreatealert": {
       "message": "You are currently connected. To connect with a new wallet, you will be disconnected from your current selection. Would you like to disconnect and continue?",
       "confirm": "Continue",
@@ -666,7 +664,7 @@
       "confirm": "Ok"
     },
     "inputpidmodal": {
-      "header": "Paste Meerkat ID",
+      "header": "Paste Peer ID",
       "cancel": "Cancel",
       "confirm": "Confirm",
       "scanQR": "Scan QR code"
@@ -677,7 +675,7 @@
         "delete": "Delete"
       },
       "deletealert": {
-        "message": "Are you sure you want to delete this connection?",
+        "message": "Are you sure you want to delete this dApp?",
         "confirm": "Yes, I’m sure",
         "cancel": "Cancel"
       },
@@ -696,7 +694,7 @@
     },
     "request": {
       "stageone": {
-        "title": "Connect Cardano",
+        "title": "Connect dApp",
         "message": "Would you like to establish a CIP-45 Connection?",
         "alert": {
           "titleconfirm": "Are you sure you want to decline this connection?",
@@ -864,7 +862,7 @@
           "cancel": "Cancel"
         }
       },
-      "pastemeerkatid": "Paste Meerkat ID"
+      "pastemeerkatid": "Paste Peer ID"
     },
     "notifications": {
       "tab": {
@@ -1366,7 +1364,7 @@
     "notesupdated": "Notes updated successfully",
     "noteremoved": "Note removed successfully",
     "maxfavouritesreached": "Maximum of 5 favourites reached",
-    "walletconnectiondeleted": "Delete successfully",
+    "dappconnectiondeleted": "dApp deleted successfully",
     "connectwalletsuccess": "Connected successfully",
     "disconnectwallet": "Disconnected successfully",
     "unableconnectwalleterror": "Unable to connect",
