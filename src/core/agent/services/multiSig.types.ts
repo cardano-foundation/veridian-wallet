@@ -141,11 +141,6 @@ interface GroupMemberInfo {
 interface GroupInformation {
   threshold: MultisigThresholds;
   members: GroupMemberInfo[];
-  linkedRequest: {
-    accepted: boolean;
-    current?: string;
-    previous?: string;
-  };
 }
 
 export { MultiSigRoute };

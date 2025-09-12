@@ -51,8 +51,6 @@ import { IdentifierService } from "./identifierService";
 import { StorageMessage } from "../../storage/storage.types";
 import { RpyRoute } from "./connectionService.types";
 import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
-import { LinkedGroupInfo } from "./ipexCommunicationService.types";
-import { IpexCommunicationService } from "./ipexCommunicationService";
 
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
@@ -86,7 +84,6 @@ class MultiSigService extends AgentService {
   protected readonly basicStorage: BasicStorage;
   protected readonly connections: ConnectionService;
   protected readonly identifiers: IdentifierService;
-  protected readonly ipexCommunications: IpexCommunicationService;
 
   constructor(
     agentServiceProps: AgentServicesProps,
@@ -95,8 +92,7 @@ class MultiSigService extends AgentService {
     notificationStorage: NotificationStorage,
     basicStorage: BasicStorage,
     connections: ConnectionService,
-    identifiers: IdentifierService,
-    ipexCommunications: IpexCommunicationService
+    identifiers: IdentifierService
   ) {
     super(agentServiceProps);
     this.identifierStorage = identifierStorage;
@@ -105,7 +101,6 @@ class MultiSigService extends AgentService {
     this.basicStorage = basicStorage;
     this.connections = connections;
     this.identifiers = identifiers;
-    this.ipexCommunications = ipexCommunications;
   }
 
   onGroupAdded(callback: (event: GroupCreatedEvent) => void) {
@@ -801,8 +796,6 @@ class MultiSigService extends AgentService {
 
   @OnlineOnly
   async getGroupInformation(notificationId: string): Promise<GroupInformation> {
-    const ipexService = this.ipexCommunications;
-
     const notificationRecord = await this.notificationStorage.findById(
       notificationId
     );
@@ -810,36 +803,48 @@ class MultiSigService extends AgentService {
       throw new Error(MultiSigService.NO_GROUP_FOUND);
     }
 
-    let linkedGroupInfo: LinkedGroupInfo;
+    const groupRequests = await this.props.signifyClient
+      .groups()
+      .getRequest(notificationRecord.a.d as string)
+      .catch((error) => {
+        if (error.message.includes("404")) {
+          throw new Error(MultiSigService.NO_GROUP_FOUND);
+        } else {
+          throw error;
+        }
+      });
 
-    if (notificationRecord.route === NotificationRoute.ExnIpexGrant) {
-      linkedGroupInfo = await ipexService.getLinkedGroupFromIpexGrant(
-        notificationId
-      );
-    } else if (notificationRecord.route === NotificationRoute.ExnIpexApply) {
-      linkedGroupInfo = await ipexService.getLinkedGroupFromIpexApply(
-        notificationId
-      );
-    } else {
+    if (!groupRequests || !groupRequests.length) {
       throw new Error(MultiSigService.NO_GROUP_FOUND);
     }
 
-    const members: GroupMemberInfo[] = [];
-    const othersJoinedSet = new Set(linkedGroupInfo.othersJoined);
+    const groupRequest = groupRequests[0];
+    const exn = groupRequest.exn;
 
-    for (const memberId of linkedGroupInfo.members) {
-      const memberInfo: GroupMemberInfo = {
-        aid: memberId,
-        hasAccepted: othersJoinedSet.has(memberId),
-      };
+    const memberAids = exn.a.smids || [];
+    const signingThreshold = parseInt(exn.e.icp.kt as string);
+    const rotationThreshold = parseInt(exn.e.icp.nt as string);
 
-      members.push(memberInfo);
-    }
+    const groupId = exn.a.gid;
+    const groupMembers = await this.props.signifyClient
+      .identifiers()
+      .members(groupId);
+
+    const acceptedMembers = new Set(
+      (groupMembers?.signing || []).map((member: { aid: string }) => member.aid)
+    );
+
+    const members: GroupMemberInfo[] = memberAids.map((aid: string) => ({
+      aid,
+      hasAccepted: acceptedMembers.has(aid),
+    }));
 
     return {
-      threshold: linkedGroupInfo.threshold,
+      threshold: {
+        signingThreshold,
+        rotationThreshold,
+      },
       members,
-      linkedRequest: linkedGroupInfo.linkedRequest,
     };
   }
 }
