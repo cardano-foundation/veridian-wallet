@@ -633,10 +633,7 @@ class ConnectionService extends AgentService {
   }
 
   @OnlineOnly
-  async getOobi(
-    id: string,
-    parameters?: GetOobiParameters
-  ): Promise<string> {
+  async getOobi(id: string, parameters?: GetOobiParameters): Promise<string> {
     const result = await this.props.signifyClient.oobis().get(id);
     if (!result.oobis[0]) {
       throw new Error(ConnectionService.CANNOT_GET_OOBI);
@@ -906,4 +903,3 @@ class ConnectionService extends AgentService {
 }
 
 export { ConnectionService };
-

@@ -48,7 +48,8 @@ interface MultiSigIcpRequestDetails {
   ourIdentifier: IdentifierShortDetails;
   sender: ConnectionShortDetails;
   otherConnections: ConnectionShortDetails[];
-  threshold: number;
+  signingThreshold: number;
+  rotationThreshold: number;
 }
 
 interface CreateIdentifierResult {
@@ -66,11 +67,16 @@ type QueuedIdentifierCreation = {
   data: CreateIdentifierBody;
 };
 
+interface MultisigThresholds {
+  signingThreshold: number;
+  rotationThreshold: number;
+}
+
 type QueuedGroupProps =
   | {
       initiator: true;
       groupConnections: MultisigConnectionDetails[];
-      threshold: number;
+      threshold: number | MultisigThresholds;
     }
   | {
       initiator: false;
@@ -111,6 +117,7 @@ export type {
   MultiSigIcpRequestDetails,
   CreateIdentifierInputs,
   CreateIdentifierResult,
+  MultisigThresholds,
 };
 
 export { IdentifierType };

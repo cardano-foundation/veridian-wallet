@@ -805,7 +805,10 @@ describe("Connection service of agent", () => {
       };
     });
     const id = "id";
-    const KeriOobi = await connectionService.getOobi(id, { alias: "alias", groupId: "123" });
+    const KeriOobi = await connectionService.getOobi(id, {
+      alias: "alias",
+      groupId: "123",
+    });
     expect(KeriOobi).toEqual(`${oobiPrefix}${id}?name=alias&groupId=123`);
   });
 

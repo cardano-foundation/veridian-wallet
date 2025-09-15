@@ -602,7 +602,7 @@ const getRequestMultisigIcp = {
           "DF3YsSD2hvoQDDUPL39AtMOPou0IXUPdXoslqtAK70AC",
           "DJQU5RElChMsVUPbsbITts-rb564VYznYougeh2onWS4",
         ],
-        nt: "2",
+        nt: "3",
         n: [
           "EN9Gd-_TlXafq_8EEHOy_HZQyqYLj2_fW_JvbyNeDvpC",
           "EOWP49ymarMj78Xjct0UnN25e9kRHYdKqQ6ZfK0YxQ85",
@@ -865,7 +865,10 @@ const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
   data: inceptionDataFix,
   initiator: true,
   groupConnections: linkedContacts,
-  threshold: linkedContacts.length + 1,
+  threshold: {
+    signingThreshold: linkedContacts.length + 1,
+    rotationThreshold: linkedContacts.length,
+  },
 };
 
 const queuedJoin: QueuedGroupCreation & { initiator: false } = {

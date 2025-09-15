@@ -100,7 +100,9 @@ jest.mock("react-router-dom", () => ({
 
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {
-    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
+    isAvailable: jest.fn(() =>
+      Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })
+    ),
     verifyIdentity: jest.fn(() => Promise.resolve()),
     getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
     setCredentials: jest.fn(() => Promise.resolve()),
