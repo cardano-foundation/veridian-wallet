@@ -421,7 +421,7 @@ const CredentialRequestInformation = ({
               >
                 <div className="threshold">
                   <IonText className="requested-credential">
-                    {linkedGroup.threshold}
+                    {linkedGroup.threshold.signingThreshold}
                   </IonText>
                 </div>
               </CardDetailsBlock>

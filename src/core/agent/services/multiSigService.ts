@@ -799,17 +799,17 @@ class MultiSigService extends AgentService {
   }
 
   @OnlineOnly
-  async getGroupMembers(notificationId: string): Promise<GroupMemberInfo[]> {
-    const notificationRecord = await this.notificationStorage.findById(
-      notificationId
-    );
-    if (!notificationRecord) {
+  async getGroupMembers(groupId: string): Promise<GroupMemberInfo[]> {
+    const groupMetadata = await this.identifierStorage.getIdentifierMetadataByGroupId(groupId);
+    if (!groupMetadata) {
       throw new Error(MultiSigService.NO_GROUP_FOUND);
     }
+    
+    const multisigId = groupMetadata.id;
 
-    const groupRequests = await this.props.signifyClient
-      .groups()
-      .getRequest(notificationRecord.a.d as string)
+    const groupDetails = await this.props.signifyClient
+      .identifiers()
+      .get(multisigId)
       .catch((error) => {
         if (error.message.includes("404")) {
           throw new Error(MultiSigService.NO_GROUP_FOUND);
@@ -818,34 +818,23 @@ class MultiSigService extends AgentService {
         }
       });
 
-    if (!groupRequests || !groupRequests.length) {
-      throw new Error(MultiSigService.NO_GROUP_FOUND);
-    }
-
-    const groupRequest = groupRequests[0];
-    const exn = groupRequest.exn;
-
-    const memberAids = exn.a.smids || [];
-    const groupId = exn.a.gid;
     const groupMembers = await this.props.signifyClient
       .identifiers()
-      .members(groupId);
+      .members(multisigId);
 
     const acceptedMembers = new Set(
       (groupMembers?.signing || []).map((member: { aid: string }) => member.aid)
     );
 
+    const memberAids = groupDetails.state.k || [];
+
     const members: GroupMemberInfo[] = await Promise.all(
       memberAids.map(async (aid: string) => {
-        let name = aid; // Default to AID if name not found
+        let name = aid;
 
-        try {
-          const contact = await this.contactStorage.findById(aid);
-          if (contact?.alias) {
-            name = contact.alias;
-          }
-        } catch (error) {
-          // If contact not found, use AID as name
+        const contact = await this.contactStorage.findExpectedById(aid);
+        if (contact?.alias) {
+          name = contact.alias;
         }
 
         return {
@@ -860,17 +849,18 @@ class MultiSigService extends AgentService {
   }
 
   @OnlineOnly
-  async getGroupInformation(notificationId: string): Promise<GroupInformation> {
-    const notificationRecord = await this.notificationStorage.findById(
-      notificationId
-    );
-    if (!notificationRecord) {
+  async getGroupInformation(groupId: string): Promise<GroupInformation> {
+    // First, get the multisigId from the database using groupId
+    const groupMetadata = await this.identifierStorage.getIdentifierMetadataByGroupId(groupId);
+    if (!groupMetadata) {
       throw new Error(MultiSigService.NO_GROUP_FOUND);
     }
+    
+    const multisigId = groupMetadata.id;
 
-    const groupRequests = await this.props.signifyClient
-      .groups()
-      .getRequest(notificationRecord.a.d as string)
+    const groupDetails = await this.props.signifyClient
+      .identifiers()
+      .get(multisigId)
       .catch((error) => {
         if (error.message.includes("404")) {
           throw new Error(MultiSigService.NO_GROUP_FOUND);
@@ -879,17 +869,10 @@ class MultiSigService extends AgentService {
         }
       });
 
-    if (!groupRequests || !groupRequests.length) {
-      throw new Error(MultiSigService.NO_GROUP_FOUND);
-    }
+    const signingThreshold = parseInt(groupDetails.state.kt as string);
+    const rotationThreshold = parseInt(groupDetails.state.nt as string);
 
-    const groupRequest = groupRequests[0];
-    const exn = groupRequest.exn;
-
-    const signingThreshold = parseInt(exn.e.icp.kt as string);
-    const rotationThreshold = parseInt(exn.e.icp.nt as string);
-
-    const members = await this.getGroupMembers(notificationId);
+    const members = await this.getGroupMembers(groupId);
 
     return {
       threshold: {

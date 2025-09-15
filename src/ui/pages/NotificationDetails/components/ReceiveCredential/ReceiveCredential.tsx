@@ -74,7 +74,7 @@ const ReceiveCredential = ({
   const [credDetail, setCredDetail] = useState<ACDCDetails>();
   const [multisigMemberStatus, setMultisigMemberStatus] =
     useState<LinkedGroupInfo>({
-      threshold: "0",
+      threshold: { signingThreshold: 0, rotationThreshold: 0 },
       members: [],
       othersJoined: [],
       linkedRequest: {

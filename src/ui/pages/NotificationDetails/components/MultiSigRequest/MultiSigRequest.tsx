@@ -89,7 +89,7 @@ const MultiSigRequest = ({
         notificationDetails.id,
         notificationDetails.a.d as string
       );
-      multisigIcpDetails.threshold === 1
+      multisigIcpDetails.signingThreshold === 1
         ? ToastMsgType.IDENTIFIER_CREATED
         : ToastMsgType.IDENTIFIER_REQUESTED;
       handleNotificationUpdate();
@@ -263,7 +263,7 @@ const MultiSigRequest = ({
           <IonCard className="multisig-request-details">
             <IonList lines="none">
               <IonItem className="multisig-request-item">
-                <IonLabel>{multisigIcpDetails?.threshold}</IonLabel>
+                <IonLabel>{multisigIcpDetails?.signingThreshold}</IonLabel>
               </IonItem>
             </IonList>
           </IonCard>
