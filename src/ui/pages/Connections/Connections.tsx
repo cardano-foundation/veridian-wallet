@@ -132,7 +132,7 @@ const Connections = () => {
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${currentProfile.identity.id}`,
-        currentProfile?.identity.displayName || ""
+        { alias: currentProfile?.identity.displayName || "" }
       );
       if (oobiValue) {
         setOobi(oobiValue);

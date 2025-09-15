@@ -4,13 +4,17 @@ import { CreationStatus } from "../../../core/agent/agent.types";
 import { SetupConnections } from "./components/SetupConnections";
 import "./SetupGroupProfile.scss";
 import { GroupInfomation, Stage } from "./SetupGroupProfile.types";
+import { InitializeGroup } from "./components/InitializeGroup/InitializeGroup";
 
-const stages = [SetupConnections];
+const stages = [SetupConnections, InitializeGroup];
 
 const initialState: GroupInfomation = {
   stage: Stage.SetupConnection,
   displayNameValue: "",
-  threshold: 1,
+  signer: {
+    requiredSigners: 0,
+    recoverySigners: 0,
+  },
   scannedConections: [],
   selectedConnections: [],
   ourIdentifier: "",

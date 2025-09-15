@@ -10,15 +10,17 @@ interface CardItem<T> {
 }
 
 interface CardItemProps<T> {
+  index: number;
   card: CardItem<T>;
+  hiddenImage?: boolean;
   onRenderCardAction?: (data: T) => ReactNode;
   onCardClick?: (data: T, e: ReactMouseEvent<HTMLElement, MouseEvent>) => void;
   onRenderEndSlot?: (data: T) => ReactNode;
-  onRenderStartSlot?: (data: T) => ReactNode;
+  onRenderStartSlot?: (data: T, index: number) => ReactNode;
 }
 
 interface CardListProps<T extends object = object>
-  extends Omit<CardItemProps<T>, "card"> {
+  extends Omit<CardItemProps<T>, "card" | "index"> {
   data: CardItem<T>[];
   lines?: "full" | "inset" | "none";
   className?: string;

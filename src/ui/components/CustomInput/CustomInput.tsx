@@ -22,6 +22,8 @@ const CustomInput = ({
   actionIcon,
   className,
   labelAction,
+  endAction,
+  type = "text",
 }: CustomInputProps) => {
   const [hidden, setHidden] = useState(hiddenInput);
   const { hideKeyboard } = useHideKeyboard();
@@ -78,7 +80,7 @@ const CustomInput = ({
           label={title}
           aria-label={`input-${title}`}
           labelPlacement="stacked"
-          type={hidden ? "password" : "text"}
+          type={hidden ? "password" : type}
           autofocus={autofocus}
           placeholder={placeholder}
           onIonInput={(e) => onChangeInput(e.target.value as string)}
@@ -117,6 +119,7 @@ const CustomInput = ({
             />
           </IonButton>
         )}
+        {endAction}
       </div>
     </IonItem>
   );

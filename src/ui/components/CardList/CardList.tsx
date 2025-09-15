@@ -6,12 +6,14 @@ import {
   IonList,
 } from "@ionic/react";
 import { personCircleOutline } from "ionicons/icons";
-import { CardItemProps, CardListProps } from "./CardList.types";
-import "./CardList.scss";
 import { combineClassNames } from "../../utils/style";
+import "./CardList.scss";
+import { CardItemProps, CardListProps } from "./CardList.types";
 
 const CardInfo = <T extends object = object>({
+  index,
   card,
+  hiddenImage,
   onCardClick,
   onRenderEndSlot,
   onRenderStartSlot: renderStartSlot,
@@ -45,8 +47,8 @@ const CardInfo = <T extends object = object>({
       data-testid={`card-item-${card.id}`}
       className="card-item"
     >
-      {renderStartSlot?.(card.data)}
-      {cardImg}
+      {renderStartSlot?.(card.data, index)}
+      {!hiddenImage && cardImg}
       <div className="card-info">
         <p
           data-testid={`card-title-${card.id}`}
@@ -69,19 +71,23 @@ const CardInfo = <T extends object = object>({
 };
 
 const CardItem = <T extends object = object>({
+  index,
   card,
   onCardClick,
   onRenderCardAction,
   onRenderEndSlot,
   onRenderStartSlot: renderStartSlot,
+  hiddenImage,
 }: CardItemProps<T>) => {
   if (!onRenderCardAction) {
     return (
       <CardInfo
+        index={index}
         card={card}
         onCardClick={onCardClick}
         onRenderEndSlot={onRenderEndSlot}
         onRenderStartSlot={renderStartSlot}
+        hiddenImage={hiddenImage}
       />
     );
   }
@@ -89,10 +95,12 @@ const CardItem = <T extends object = object>({
   return (
     <IonItemSliding>
       <CardInfo
+        index={index}
         card={card}
         onCardClick={onCardClick}
         onRenderEndSlot={onRenderEndSlot}
         onRenderStartSlot={renderStartSlot}
+        hiddenImage={hiddenImage}
       />
       <IonItemOptions data-testid="card-actions">
         {onRenderCardAction(card.data)}
@@ -111,6 +119,7 @@ const CardList = <T extends object = object>({
   onCardClick,
   onRenderEndSlot,
   onRenderStartSlot: renderStartSlot,
+  hiddenImage,
 }: CardListProps<T>) => {
   const classes = combineClassNames("card-list", className, {
     "rounde-img": rounded,
@@ -122,14 +131,16 @@ const CardList = <T extends object = object>({
       data-testid={testId}
       className={classes}
     >
-      {data.map((card) => (
+      {data.map((card, index) => (
         <CardItem
           card={card}
           key={card.id}
+          index={index}
           onCardClick={onCardClick}
           onRenderCardAction={onRenderCardAction}
           onRenderEndSlot={onRenderEndSlot}
           onRenderStartSlot={renderStartSlot}
+          hiddenImage={hiddenImage}
         />
       ))}
     </IonList>

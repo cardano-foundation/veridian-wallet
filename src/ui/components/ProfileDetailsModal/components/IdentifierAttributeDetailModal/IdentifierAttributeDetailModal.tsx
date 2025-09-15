@@ -23,9 +23,7 @@ const IdentifierAttributeDetailModal = ({
   data,
   setViewType,
 }: IdentifierAttributeDetailModalProps) => {
-  const multisignConnectionsCache = useAppSelector(
-    getMultisigConnectionsCache
-  ) as any[];
+  const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
 
   const handleClose = () => {
     setOpen(false);

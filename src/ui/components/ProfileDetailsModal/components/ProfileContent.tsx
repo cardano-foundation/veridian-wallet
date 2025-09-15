@@ -12,11 +12,11 @@ import { useCallback, useState } from "react";
 import { i18n } from "../../../../i18n";
 import { useAppSelector } from "../../../../store/hooks";
 import {
-  getMultisigConnectionsCache,
-  getProfiles,
-  getCurrentProfile,
   getCredsCache,
+  getCurrentProfile,
+  getMultisigConnectionsCache,
   getPeerConnections,
+  getProfiles,
 } from "../../../../store/reducers/profileCache";
 import {
   formatShortDate,
@@ -56,9 +56,7 @@ const ProfileContent = ({
   setCardData,
 }: ProfileContentProps) => {
   const profiles = useAppSelector(getProfiles);
-  const multisignConnectionsCache = useAppSelector(
-    getMultisigConnectionsCache
-  ) as any[];
+  const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const currentProfile = useAppSelector(getCurrentProfile);
   const credentials = useAppSelector(getCredsCache);
   const peerConnections = useAppSelector(getPeerConnections);
