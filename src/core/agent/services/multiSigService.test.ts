@@ -160,6 +160,7 @@ const basicStorage = jest.mocked({
 
 const contactStorage = jest.mocked({
   findById: jest.fn(),
+  findExpectedById: jest.fn(),
   findAllByQuery: jest.fn(),
 });
 
@@ -1639,7 +1640,7 @@ describe("getGroupMembers", () => {
     });
 
     // Mock contact storage to return names
-    contactStorage.findById
+    contactStorage.findExpectedById
       .mockResolvedValueOnce({ alias: "Alice" })
       .mockResolvedValueOnce({ alias: "Bob" })
       .mockResolvedValueOnce({ alias: "Charlie" });
@@ -1678,7 +1679,7 @@ describe("getGroupMembers", () => {
     });
 
     // Mock contact storage to return null (contact not found)
-    contactStorage.findById.mockResolvedValue(null);
+    contactStorage.findExpectedById.mockResolvedValue(null);
 
     const result = await multiSigService.getGroupMembers(GROUP_ID);
 
@@ -1717,7 +1718,7 @@ describe("getGroupInformation", () => {
     });
 
     // Mock contact storage to return names
-    contactStorage.findById
+    contactStorage.findExpectedById
       .mockResolvedValueOnce({ alias: "Alice" })
       .mockResolvedValueOnce({ alias: "Bob" })
       .mockResolvedValueOnce({ alias: "Charlie" })
@@ -1763,7 +1764,7 @@ describe("getGroupInformation", () => {
     });
 
     // Mock contact storage
-    contactStorage.findById
+    contactStorage.findExpectedById
       .mockResolvedValueOnce({ alias: "Alice" })
       .mockResolvedValueOnce({ alias: "Bob" });
 
