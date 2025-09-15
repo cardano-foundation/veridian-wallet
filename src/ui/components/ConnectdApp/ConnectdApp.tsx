@@ -51,7 +51,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
   const connections = useAppSelector(getPeerConnections);
   const connectedDApp = useAppSelector(getConnectedDApp);
   const currentOperation = useAppSelector(getCurrentOperation);
-  const pageId = "wallet-connect";
+  const pageId = "connect-dapp";
   const [actionInfo, setActionInfo] = useState<ActionInfo>({
     type: ActionType.None,
   });
@@ -243,7 +243,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
               closeButton
               closeButtonAction={() => setIsOpen(false)}
               closeButtonIcon={arrowBackOutline}
-              title={`${i18n.t("connectdapp.tabheader")}`}
+              title={`${i18n.t("connectdapp.title")}`}
               additionalButtons={
                 <IonButton
                   shape="round"
