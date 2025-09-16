@@ -8,6 +8,7 @@ enum SetupProfileStep {
 
 interface ProfileSetupProps {
   onClose?: (cancel?: boolean) => void;
+  joinGroupMode?: boolean;
 }
 
 export type { ProfileSetupProps };

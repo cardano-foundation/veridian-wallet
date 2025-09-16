@@ -210,4 +210,52 @@ describe("Profiles", () => {
       CreationStatus.PENDING.toLowerCase()
     );
   });
+
+  test("handleAddProfile opens ProfileSetup in normal mode", async () => {
+    const setIsOpenMock = jest.fn();
+    const { getByText } = render(
+      <Provider store={storeMocked}>
+        <Profiles
+          isOpen
+          setIsOpen={setIsOpenMock}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeInTheDocument();
+    });
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.profiles.options.add));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.setupprofile.profiletype.title)
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("handleJoinGroup opens ProfileSetup in join group mode", async () => {
+    const setIsOpenMock = jest.fn();
+    const { getByText } = render(
+      <Provider store={storeMocked}>
+        <Profiles
+          isOpen
+          setIsOpen={setIsOpenMock}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeInTheDocument();
+    });
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.profiles.options.join));
+
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-testid="profile-scanner"]')
+      ).toBeInTheDocument();
+    });
+  });
 });

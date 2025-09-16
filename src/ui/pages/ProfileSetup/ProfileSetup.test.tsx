@@ -1011,4 +1011,65 @@ describe("Profile setup: use as modal", () => {
       );
     });
   });
+
+  test("joinGroupMode opens scan directly", async () => {
+    const onCloseMock = jest.fn();
+    const { getByText } = render(
+      <Provider store={storeMocked}>
+        <ProfileSetup
+          onClose={onCloseMock}
+          joinGroupMode={true}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+    });
+  });
+
+  test("normal mode shows profile type selection", async () => {
+    const onCloseMock = jest.fn();
+    const { getByText } = render(
+      <Provider store={storeMocked}>
+        <ProfileSetup
+          onClose={onCloseMock}
+          joinGroupMode={false}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.setupprofile.profiletype.title)
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("handleCloseScan in joinGroupMode calls onClose", async () => {
+    const onCloseMock = jest.fn();
+    const { getAllByText } = render(
+      <Provider store={storeMocked}>
+        <ProfileSetup
+          onClose={onCloseMock}
+          joinGroupMode={true}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-testid="profile-scanner"]')
+      ).toBeVisible();
+    });
+
+    const cancelButtons = getAllByText(
+      EN_TRANSLATIONS.setupprofile.button.cancel
+    );
+    fireEvent.click(cancelButtons[0]);
+
+    await waitFor(() => {
+      expect(onCloseMock).toBeCalledWith(true);
+    });
+  });
 });
