@@ -51,15 +51,11 @@ const SetupConnections = ({ setState }: StageProps) => {
   const profile = profiles[profileId]?.identity;
   const groupId = profile?.groupMetadata?.groupId;
   const userName = profile?.groupMetadata?.userName;
-
-  // ensure groupConnections is always an object to avoid runtime errors in tests
+  const { resolveGroupConnection } = useScanHandle();
   const groupConnections = useAppSelector(getMultisigConnectionsCache);
-
   const [multiSigGroup, setMultiSigGroup] = useState<
     MultiSigGroup | undefined
   >();
-
-  const { resolveGroupConnection } = useScanHandle();
 
   const handleAvatarClick = () => {
     setOpenProfiles(true);
@@ -94,9 +90,9 @@ const SetupConnections = ({ setState }: StageProps) => {
 
     try {
       const oobiValue = await Agent.agent.connections.getOobi(profileId, {
-        alias: profile?.displayName,
+        alias: userName,
         groupId: groupId,
-        groupName: userName,
+        groupName: profile?.displayName,
       });
       if (oobiValue) {
         setOobi(oobiValue);
