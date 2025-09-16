@@ -12,8 +12,9 @@ import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
+  getProfiles,
   setGroupProfileCache,
-  setIndividualFirstCreate
+  setIndividualFirstCreate,
 } from "../../../store/reducers/profileCache";
 import {
   getStateCache,
@@ -47,6 +48,7 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
+  const profiles = useAppSelector(getProfiles);
   const dispatch = useAppDispatch();
   const { updateDefaultProfile, defaultProfile } = useProfile();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
@@ -318,9 +320,23 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       const scannedGroupName = url.searchParams.get("groupName");
       const groupInitiator = url.searchParams.get("name");
 
+      if (
+        scanGroupId &&
+        profiles &&
+        Object.values(profiles).some(
+          (profile) =>
+            profile.identity.id === scanGroupId ||
+            profile.identity.groupMetadata?.groupId === scanGroupId
+        )
+      ) {
+        handleCloseScan();
+        dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR));
+        return;
+      }
+
       if (!scanGroupId) {
         handleCloseScan();
-        dispatch(setToastMsg(ToastMsgType.GROUP_ID_NOT_FOUND_ERROR));
+        dispatch(setToastMsg(ToastMsgType.NOT_VALID_GROUP_INVITE));
         return;
       }
 

@@ -1355,7 +1355,7 @@
     "connectiondeleted": "Connection deleted successfully",
     "qrsuccess": "QR code scanned successfully",
     "qrerror": "QR code not recognised",
-    "connectionerror": "Connection not recognized",
+    "connectionerror": "Something went wrong. Please try again.",
     "connectionrequestincoming": "New Connection Request",
     "connectionrequestpending": "Connection request pending",
     "newconnectionadded": "New connection added",
@@ -1403,7 +1403,7 @@
     "remotesignsuccess": "Signed successfully",
     "profileswitched": "Profile switched",
     "unabletoswitchprofile": "Unable to switch profile",
-    "groupidnotfounderror": "Group ID not found",
+    "notvalidgrouperror": "Not a valid group invitation",
     "groupnamenotfounderror": "Group name not found",
     "duplicategroupiderror": "Group already exists",
     "groupmetadatanotfounderror": "Group metadata is missing. Please try again."
