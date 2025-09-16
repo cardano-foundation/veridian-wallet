@@ -2,6 +2,7 @@ import { TapJacking } from "@capacitor-community/tap-jacking";
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { Device } from "@capacitor/device";
 import { ReactNode, useCallback, useEffect, useState } from "react";
+import { NativeBiometric } from "@capgo/capacitor-native-biometric";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
@@ -92,7 +93,6 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
-import { NativeBiometric } from "@capgo/capacitor-native-biometric";
 import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
 
 const connectionStateChangedHandler = async (
@@ -731,10 +731,15 @@ const AppWrapper = (props: { children: ReactNode }) => {
     const initState = await Agent.agent.basicStorage.findById(
       MiscRecordId.APP_ALREADY_INIT
     );
-    
+
     if (!initState) {
       await SecureStorage.wipe();
-      await NativeBiometric.deleteCredentials({ server: BIOMETRIC_SERVER_KEY });
+      const platforms = (await Device.getInfo()).platform;
+      if (platforms.includes("ios") || platforms.includes("android")) {
+        await NativeBiometric.deleteCredentials({
+          server: BIOMETRIC_SERVER_KEY,
+        });
+      }
     }
 
     // This will skip the onboarding screen with dev mode.
