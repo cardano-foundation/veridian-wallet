@@ -1,0 +1,41 @@
+name: build-test
+
+on:
+  pull_request:
+    types: [ opened, synchronize ]
+  push:
+    branches:
+      - main
+      - develop
+      - release/**
+
+env:
+  NODE_OPTIONS: "--max_old_space_size=8192"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+          submodules: recursive
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: "package.json"
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run ESLint (Core Only)
+      run: npx eslint src/core --ext .ts,.tsx
+
+    - name: Run unit tests
+
+      run: npm run test
+
+    - name: 🔨 Build project
+      run: npm run build
