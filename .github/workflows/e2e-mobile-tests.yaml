@@ -1,4 +1,4 @@
-name: e2e mobile tests
+name: e2e-mobile-tests
 on:
   workflow_dispatch:
 jobs:
