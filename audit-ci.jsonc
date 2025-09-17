@@ -1,0 +1,43 @@
+{
+  // $schema provides code completion hints to IDEs.
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  "moderate": false,
+  "critical": true,
+  "allowlist": [
+    "GHSA-fjxv-7rqg-78g4",
+    {
+      "1100267": {
+        "active": true,
+        "notes": "This is a ReDOS vulnerability for email inputs in Appium drivers, so not applicable."
+      },
+      "1101851": {
+        "active": true,
+        "notes": "SSRF attacks are not relevant to our usage of Meerkat."
+      },
+      "1103618": {
+        "active": true,
+        "notes": "SSRF attacks on the Appium server when e2e testing do not impact the wallet."
+      },
+      "1105443": {
+        "active": true,
+        "notes": "REDS attacks on @capacitor/assets and the Appium server when e2e testing do not impact the wallet."
+      },
+      "1105444": {
+        "active": true,
+        "notes": "REDS attacks on @capacitor/assets and the Appium server when e2e testing do not impact the wallet."
+      },
+      "1106812": {
+        "active": true,
+        "notes": "On-headers is vulnerable to http response header on Appium server do not impact the wallet."
+      },
+      "1106507": {
+        "active": true,
+        "notes": "form-data uses Math.random() to select a boundary value for multipart form-encoded data. A hacker Can observe values produced by Math.random in the application and control the field of a form-data request on Appium server do not impact the wallet."
+      },
+      "1106849": {
+        "active": true,
+        "notes": "tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter"
+      }
+    }
+  ]
+}

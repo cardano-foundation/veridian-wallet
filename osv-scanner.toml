@@ -1,0 +1,21 @@
+[[IgnoredVulns]]
+id = "GHSA-2p57-rm9w-gvfp"
+reason = "pkg: ip - npte: no fix available yet"
+ignoreUntil = 2025-10-31 # lets review it at this date
+
+[[IgnoredVulns]]
+id = "GHSA-4hjh-wcwx-xvwj"
+reason =  "pkg: axiox (dev) - note: used in e2e tests"
+
+[[IgnoredVulns]]
+id = "GHSA-52f5-9888-hmc6"
+reason = "pkg: tmp (dev) - note: used by cucumber"
+# 
+# ├─────────────────────────────────────┼──────┼───────────┼───────────────────┼─────────┼───────────────┼───────────────────────┤
+# │ https://osv.dev/GHSA-v6h2-p8h4-qcjw │ 3.1  │ npm       │ brace-expansion   │ 1.1.11  │ 1.1.12        │ src/package-lock.json │
+# │ https://osv.dev/GHSA-v6h2-p8h4-qcjw │ 3.1  │ npm       │ brace-expansion   │ 2.0.1   │ 2.0.2         │ src/package-lock.json │
+# │ https://osv.dev/GHSA-fjxv-7rqg-78g4 │ 9.4  │ npm       │ form-data (dev)   │ 4.0.2   │ 4.0.4         │ src/package-lock.json │
+# │ https://osv.dev/GHSA-76c9-3jph-rj3q │ 3.4  │ npm       │ on-headers (dev)  │ 1.0.2   │ 1.1.0         │ src/package-lock.json │
+# │ https://osv.dev/GHSA-95m3-7q98-8xr5 │ 9.1  │ npm       │ sha.js (dev)      │ 2.4.11  │ 2.4.12        │ src/package-lock.json │
+# │ https://osv.dev/GHSA-rv73-9c8w-jp4c │ 6.6  │ npm       │ validate.js (dev) │ 0.13.1  │ --            │ src/package-lock.json │
+# ╰─────────────────────────────────────┴──────┴───────────┴───────────────────┴─────────┴───────────────┴───────────────────────╯
