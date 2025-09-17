@@ -228,6 +228,7 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: memberPrefix,
           createdAtUTC: multisigDetail.icp_dt,
+          groupMetadata: mHabRecord.groupMetadata,
         },
       },
     });
@@ -581,6 +582,7 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: mHabRecord.id,
           createdAtUTC: multisigDetail.icp_dt,
+          groupMetadata: mHabRecord.groupMetadata,
         },
       },
     });
@@ -808,12 +810,10 @@ class MultiSigService extends AgentService {
       .members(multisigId);
 
     // TODO check joined members
-    const memberInfos = members.signing.map(
-      (member: { aid: string }) => ({
-        aid: member.aid,
-        hasAccepted: false, 
-      })
-    );
+    const memberInfos = members.signing.map((member: { aid: string }) => ({
+      aid: member.aid,
+      hasAccepted: false,
+    }));
 
     const signingThreshold = Number(multisigAidDetails.group?.mhab.state.kt);
     const rotationThreshold = Number(multisigAidDetails.group?.mhab.state.nt);
