@@ -507,6 +507,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberPrefix,
           theme: 0,
+          groupMetadata: {
+            groupId: "groupid",
+            groupInitiator: true,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -695,6 +701,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberPrefix,
           theme: 0,
+          groupMetadata: {
+            groupId: "groupid",
+            groupInitiator: true,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -817,6 +829,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberPrefix,
           theme: 0,
+          groupMetadata: {
+            groupId: "groupid",
+            groupInitiator: true,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -989,6 +1007,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberMetadataRecord.id,
           theme: 0,
+          groupMetadata: {
+            groupId: "groupid",
+            groupInitiator: true,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -1120,6 +1144,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberMetadataRecord.id,
           theme: 0,
+          groupMetadata: {
+            groupId: "groupid",
+            groupInitiator: true,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -1230,6 +1260,12 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberMetadataRecord.id,
           theme: 0,
+          groupMetadata: {
+            groupId: "groupid",
+            groupInitiator: true,
+            groupCreated: true,
+            userName: "testUser",
+          },
         },
       },
     });
@@ -1738,4 +1774,3 @@ const createThresholds = (
 //     ).rejects.toThrow("Group members not found");
 //   });
 // });
-
