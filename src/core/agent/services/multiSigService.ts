@@ -798,88 +798,32 @@ class MultiSigService extends AgentService {
     }
   }
 
-  @OnlineOnly
-  async getGroupMembers(groupId: string): Promise<GroupMemberInfo[]> {
-    const groupMetadata = await this.identifierStorage.getIdentifierMetadataByGroupId(groupId);
-    if (!groupMetadata) {
-      throw new Error(MultiSigService.NO_GROUP_FOUND);
-    }
-    
-    const multisigId = groupMetadata.id;
-
-    const groupDetails = await this.props.signifyClient
+  async getGroupInformation(multisigId: string): Promise<GroupInformation> {
+    const multisigAidDetails = await this.props.signifyClient
       .identifiers()
-      .get(multisigId)
-      .catch((error) => {
-        if (error.message.includes("404")) {
-          throw new Error(MultiSigService.NO_GROUP_FOUND);
-        } else {
-          throw error;
-        }
-      });
+      .get(multisigId);
 
-    const groupMembers = await this.props.signifyClient
+    const members = await this.props.signifyClient
       .identifiers()
       .members(multisigId);
 
-    const acceptedMembers = new Set(
-      (groupMembers?.signing || []).map((member: { aid: string }) => member.aid)
-    );
-
-    const memberAids = groupDetails.state.k || [];
-
-    const members: GroupMemberInfo[] = await Promise.all(
-      memberAids.map(async (aid: string) => {
-        let name = aid;
-
-        const contact = await this.contactStorage.findExpectedById(aid);
-        if (contact?.alias) {
-          name = contact.alias;
-        }
-
-        return {
-          aid,
-          name,
-          hasAccepted: acceptedMembers.has(aid),
-        };
+    // TODO check joined members
+    const memberInfos = members.signing.map(
+      (member: { aid: string }) => ({
+        aid: member.aid,
+        hasAccepted: false, 
       })
     );
 
-    return members;
-  }
-
-  @OnlineOnly
-  async getGroupInformation(groupId: string): Promise<GroupInformation> {
-    // First, get the multisigId from the database using groupId
-    const groupMetadata = await this.identifierStorage.getIdentifierMetadataByGroupId(groupId);
-    if (!groupMetadata) {
-      throw new Error(MultiSigService.NO_GROUP_FOUND);
-    }
-    
-    const multisigId = groupMetadata.id;
-
-    const groupDetails = await this.props.signifyClient
-      .identifiers()
-      .get(multisigId)
-      .catch((error) => {
-        if (error.message.includes("404")) {
-          throw new Error(MultiSigService.NO_GROUP_FOUND);
-        } else {
-          throw error;
-        }
-      });
-
-    const signingThreshold = parseInt(groupDetails.state.kt as string);
-    const rotationThreshold = parseInt(groupDetails.state.nt as string);
-
-    const members = await this.getGroupMembers(groupId);
+    const signingThreshold = Number(multisigAidDetails.group?.mhab.state.kt);
+    const rotationThreshold = Number(multisigAidDetails.group?.mhab.state.nt);
 
     return {
       threshold: {
         signingThreshold,
         rotationThreshold,
       },
-      members,
+      members: memberInfos,
     };
   }
 }

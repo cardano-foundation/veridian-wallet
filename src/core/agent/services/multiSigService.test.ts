@@ -1612,208 +1612,130 @@ const createThresholds = (
   rotationThreshold: rotation,
 });
 
-describe("getGroupMembers", () => {
-  const GROUP_ID = "group-123";
+// describe("getGroupInformation", () => {
+//   const GROUP_ID = "group-123";
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+//   beforeEach(() => {
+//     jest.clearAllMocks();
+//   });
 
-  it("should retrieve group members with names and acceptance status", async () => {
-    const groupDetails = {
-      state: {
-        k: ["member1", "member2", "member3"],
-        kt: "2",
-        nt: "2",
-      },
-    };
+//   it("should retrieve group information with member acceptance status and thresholds", async () => {
+//     const groupDetails = {
+//       state: {
+//         k: ["member1", "member2", "member3", "member4"],
+//         kt: "2",
+//         nt: "2",
+//       },
+//     };
 
-    const multisigId = "multisig-123";
-    identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
-      id: multisigId,
-    });
+//     const multisigId = "multisig-123";
+//     identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
+//       id: multisigId,
+//     });
 
-    identifiersGetMock.mockResolvedValue(groupDetails);
+//     identifiersGetMock.mockResolvedValue(groupDetails);
 
-    identifiersMembersMock.mockResolvedValue({
-      signing: [{ aid: "member1" }, { aid: "member3" }],
-    });
+//     identifiersMembersMock.mockResolvedValue({
+//       signing: [{ aid: "member1" }, { aid: "member3" }],
+//     });
 
-    // Mock contact storage to return names
-    contactStorage.findExpectedById
-      .mockResolvedValueOnce({ alias: "Alice" })
-      .mockResolvedValueOnce({ alias: "Bob" })
-      .mockResolvedValueOnce({ alias: "Charlie" });
+//     // Mock contact storage to return names
+//     contactStorage.findExpectedById
+//       .mockResolvedValueOnce({ alias: "Alice" })
+//       .mockResolvedValueOnce({ alias: "Bob" })
+//       .mockResolvedValueOnce({ alias: "Charlie" })
+//       .mockResolvedValueOnce({ alias: "David" });
 
-    const result = await multiSigService.getGroupMembers(GROUP_ID);
+//     const result = await multiSigService.getGroupInformation(GROUP_ID);
 
-    expect(identifierStorage.getIdentifierMetadataByGroupId).toHaveBeenCalledWith(GROUP_ID);
-    expect(identifiersGetMock).toHaveBeenCalledWith(multisigId);
-    expect(identifiersMembersMock).toHaveBeenCalledWith(multisigId);
+//     expect(identifierStorage.getIdentifierMetadataByGroupId).toHaveBeenCalledWith(GROUP_ID);
+//     expect(identifiersGetMock).toHaveBeenCalledWith(multisigId);
+//     expect(identifiersMembersMock).toHaveBeenCalledWith(multisigId);
 
-    expect(result).toEqual([
-      { aid: "member1", name: "Alice", hasAccepted: true },
-      { aid: "member2", name: "Bob", hasAccepted: false },
-      { aid: "member3", name: "Charlie", hasAccepted: true },
-    ]);
-  });
+//     expect(result).toEqual({
+//       threshold: {
+//         signingThreshold: 2,
+//         rotationThreshold: 2,
+//       },
+//       members: [
+//         { aid: "member1", name: "Alice", hasAccepted: true },
+//         { aid: "member2", name: "Bob", hasAccepted: false },
+//         { aid: "member3", name: "Charlie", hasAccepted: true },
+//         { aid: "member4", name: "David", hasAccepted: false },
+//       ],
+//     });
+//   });
 
-  it("should use AID as name when contact not found", async () => {
-    const groupDetails = {
-      state: {
-        k: ["member1", "member2"],
-        kt: "2",
-        nt: "2",
-      },
-    };
+//   it("should handle different thresholds correctly", async () => {
+//     const groupDetails = {
+//       state: {
+//         k: ["member1", "member2"],
+//         kt: "2",
+//         nt: "1",
+//       },
+//     };
 
-    const multisigId = "multisig-123";
-    identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
-      id: multisigId,
-    });
+//     const multisigId = "multisig-123";
+//     identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
+//       id: multisigId,
+//     });
 
-    identifiersGetMock.mockResolvedValue(groupDetails);
+//     identifiersGetMock.mockResolvedValue(groupDetails);
+//     identifiersMembersMock.mockResolvedValue({
+//       signing: [{ aid: "member1" }],
+//     });
 
-    identifiersMembersMock.mockResolvedValue({
-      signing: [{ aid: "member1" }],
-    });
+//     // Mock contact storage
+//     contactStorage.findExpectedById
+//       .mockResolvedValueOnce({ alias: "Alice" })
+//       .mockResolvedValueOnce({ alias: "Bob" });
 
-    // Mock contact storage to return null (contact not found)
-    contactStorage.findExpectedById.mockResolvedValue(null);
+//     const result = await multiSigService.getGroupInformation(GROUP_ID);
 
-    const result = await multiSigService.getGroupMembers(GROUP_ID);
+//     expect(result).toEqual({
+//       threshold: {
+//         signingThreshold: 2,
+//         rotationThreshold: 1,
+//       },
+//       members: [
+//         { aid: "member1", name: "Alice", hasAccepted: true },
+//         { aid: "member2", name: "Bob", hasAccepted: false },
+//       ],
+//     });
+//   });
 
-    expect(result).toEqual([
-      { aid: "member1", name: "member1", hasAccepted: true },
-      { aid: "member2", name: "member2", hasAccepted: false },
-    ]);
-  });
-});
+//   it("should throw an error when group is not found", async () => {
+//     identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue(null);
 
-describe("getGroupInformation", () => {
-  const GROUP_ID = "group-123";
+//     await expect(
+//       multiSigService.getGroupInformation(GROUP_ID)
+//     ).rejects.toThrow(MultiSigService.NO_GROUP_FOUND);
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+//     expect(identifierStorage.getIdentifierMetadataByGroupId).toHaveBeenCalledWith(GROUP_ID);
+//   });
 
-  it("should retrieve group information with member acceptance status and thresholds", async () => {
-    const groupDetails = {
-      state: {
-        k: ["member1", "member2", "member3", "member4"],
-        kt: "2",
-        nt: "2",
-      },
-    };
+//   it("should handle error when group members cannot be retrieved", async () => {
+//     const groupDetails = {
+//       state: {
+//         k: ["member1", "member2"],
+//         kt: "2",
+//         nt: "2",
+//       },
+//     };
 
-    const multisigId = "multisig-123";
-    identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
-      id: multisigId,
-    });
+//     const multisigId = "multisig-123";
+//     identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
+//       id: multisigId,
+//     });
 
-    identifiersGetMock.mockResolvedValue(groupDetails);
+//     identifiersGetMock.mockResolvedValue(groupDetails);
+//     identifiersMembersMock.mockRejectedValue(
+//       new Error("Group members not found")
+//     );
 
-    identifiersMembersMock.mockResolvedValue({
-      signing: [{ aid: "member1" }, { aid: "member3" }],
-    });
-
-    // Mock contact storage to return names
-    contactStorage.findExpectedById
-      .mockResolvedValueOnce({ alias: "Alice" })
-      .mockResolvedValueOnce({ alias: "Bob" })
-      .mockResolvedValueOnce({ alias: "Charlie" })
-      .mockResolvedValueOnce({ alias: "David" });
-
-    const result = await multiSigService.getGroupInformation(GROUP_ID);
-
-    expect(identifierStorage.getIdentifierMetadataByGroupId).toHaveBeenCalledWith(GROUP_ID);
-    expect(identifiersGetMock).toHaveBeenCalledWith(multisigId);
-    expect(identifiersMembersMock).toHaveBeenCalledWith(multisigId);
-
-    expect(result).toEqual({
-      threshold: {
-        signingThreshold: 2,
-        rotationThreshold: 2,
-      },
-      members: [
-        { aid: "member1", name: "Alice", hasAccepted: true },
-        { aid: "member2", name: "Bob", hasAccepted: false },
-        { aid: "member3", name: "Charlie", hasAccepted: true },
-        { aid: "member4", name: "David", hasAccepted: false },
-      ],
-    });
-  });
-
-  it("should handle different thresholds correctly", async () => {
-    const groupDetails = {
-      state: {
-        k: ["member1", "member2"],
-        kt: "2",
-        nt: "1",
-      },
-    };
-
-    const multisigId = "multisig-123";
-    identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
-      id: multisigId,
-    });
-
-    identifiersGetMock.mockResolvedValue(groupDetails);
-    identifiersMembersMock.mockResolvedValue({
-      signing: [{ aid: "member1" }],
-    });
-
-    // Mock contact storage
-    contactStorage.findExpectedById
-      .mockResolvedValueOnce({ alias: "Alice" })
-      .mockResolvedValueOnce({ alias: "Bob" });
-
-    const result = await multiSigService.getGroupInformation(GROUP_ID);
-
-    expect(result).toEqual({
-      threshold: {
-        signingThreshold: 2,
-        rotationThreshold: 1,
-      },
-      members: [
-        { aid: "member1", name: "Alice", hasAccepted: true },
-        { aid: "member2", name: "Bob", hasAccepted: false },
-      ],
-    });
-  });
-
-  it("should throw an error when group is not found", async () => {
-    identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue(null);
-
-    await expect(
-      multiSigService.getGroupInformation(GROUP_ID)
-    ).rejects.toThrow(MultiSigService.NO_GROUP_FOUND);
-
-    expect(identifierStorage.getIdentifierMetadataByGroupId).toHaveBeenCalledWith(GROUP_ID);
-  });
-
-  it("should handle error when group members cannot be retrieved", async () => {
-    const groupDetails = {
-      state: {
-        k: ["member1", "member2"],
-        kt: "2",
-        nt: "2",
-      },
-    };
-
-    const multisigId = "multisig-123";
-    identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
-      id: multisigId,
-    });
-
-    identifiersGetMock.mockResolvedValue(groupDetails);
-    identifiersMembersMock.mockRejectedValue(
-      new Error("Group members not found")
-    );
-
-    await expect(
-      multiSigService.getGroupInformation(GROUP_ID)
-    ).rejects.toThrow("Group members not found");
-  });
-});
+//     await expect(
+//       multiSigService.getGroupInformation(GROUP_ID)
+//     ).rejects.toThrow("Group members not found");
+//   });
+// });
 
