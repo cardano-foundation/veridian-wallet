@@ -44,7 +44,7 @@ import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
 import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
 
-export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
+export const ProfileSetup = ({ onClose, joinGroupMode }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
@@ -272,7 +272,11 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
   };
 
   const handleCloseScan = () => {
-    setIsScanOpen(false);
+    if (joinGroupMode) {
+      onClose?.(true);
+    } else {
+      setIsScanOpen(false);
+    }
   };
 
   const handleChangeStep = () => {
@@ -461,6 +465,13 @@ export const ProfileSetup = ({ onClose }: ProfileSetupProps) => {
       setStep(SetupProfileStep.GroupSetupConfirm);
     }
   }, [stateCache.pendingJoinGroupMetadata, step]);
+
+  useEffect(() => {
+    if (joinGroupMode) {
+      setProfileType(ProfileType.Group);
+      setIsScanOpen(true);
+    }
+  }, [joinGroupMode]);
 
   return (
     <>

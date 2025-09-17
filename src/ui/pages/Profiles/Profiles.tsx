@@ -65,6 +65,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const [openSetting, setOpenSetting] = useState(false);
   const [openProfileDetail, setOpenProfileDetail] = useState(false);
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
+  const [isJoinGroupMode, setIsJoinGroupMode] = useState(false);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -75,11 +76,13 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   const handleAddProfile = () => {
+    setIsJoinGroupMode(false);
     setOpenSetupProfile(true);
   };
 
   const handleCloseSetupProfile = () => {
     setOpenSetupProfile(false);
+    setIsJoinGroupMode(false);
   };
 
   const handleOpenProfile = () => {
@@ -87,7 +90,8 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   const handleJoinGroup = () => {
-    // TODO: Implement the logic to join a group
+    setIsJoinGroupMode(true);
+    setOpenSetupProfile(true);
   };
 
   const handleSelectProfile = async (profile: IdentifierShortDetails) => {
@@ -112,6 +116,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
 
   useEffect(() => {
     if (!defaultProfile || profileList.length === 0) {
+      setIsJoinGroupMode(false);
       setOpenSetupProfile(true);
     }
   }, [defaultProfile, profileList.length]);
@@ -194,6 +199,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
             handleCloseSetupProfile();
             if (!cancel) setIsOpen(false);
           }}
+          joinGroupMode={isJoinGroupMode}
         />
       </SideSlider>
       <ProfileDetailsModal
