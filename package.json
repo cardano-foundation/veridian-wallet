@@ -2,9 +2,6 @@
   "name": "veridian-wallet",
   "version": "1.2.0",
   "private": true,
-  "engines": {
-    "node": "20.x"
-  },
   "scripts": {
     "dev": "webpack serve --config webpack.dev.cjs --host 0.0.0.0 --port 3003",
     "build": "cross-env ENVIRONMENT=remote webpack --config webpack.prod.cjs",
@@ -12,7 +9,6 @@
     "build:cap": "npm run build && npx cap sync",
     "build:e2e": "npm run build:local && npx cap sync",
     "build:ios:flags": "find ios/xcconfig-overwrites -name '*.release.xcconfig' -exec sh -c 'cp \"$1\" \"ios/App/Pods/Target Support Files/$(basename $(dirname \"$1\"))/\"' _ {} \\;",
-    "build:android:proguard": "cp android/proguard-overwrites/proguard-rules.pro node_modules/capacitor-freerasp/android/proguard-rules.pro",
     "build:release": "cross-env ENVIRONMENT=prod webpack --config webpack.prod.cjs && ENVIRONMENT=prod npx cap sync",
     "prettier": "npx prettier --write './src/**/*.{ts,tsx,scss}' 'services/{credential-server,credential-server-ui}/src/**/*.{ts,tsx,scss}'",
     "eslint": "eslint 'src/**/*.{ts,tsx}'",
@@ -21,10 +17,9 @@
     "wdio:ios:15promax": "npx wdio tests/config/wdio.sim.ios.iphone15ProMax.config.ts",
     "wdio:ios:16promax": "npx wdio tests/config/wdio.sim.ios.iphone16ProMax.config.ts",
     "prepare": "husky install",
-    "audit": "audit-ci --report --report-type full --config audit-ci.jsonc"
+    "audit": "better-npm-audit audit"
   },
   "dependencies": {
-    "@aparajita/capacitor-biometric-auth": "^8.0.2",
     "@capacitor-community/privacy-screen": "^6.0.0",
     "@capacitor-community/sqlite": "^7.0.0",
     "@capacitor-community/tap-jacking": "^7.0.0",
@@ -41,6 +36,7 @@
     "@capacitor/share": "^7.0.0",
     "@capacitor/splash-screen": "^7.0.0",
     "@capacitor/status-bar": "^7.0.0",
+    "@capgo/capacitor-native-biometric": "^7.1.13",
     "@evva/capacitor-secure-storage-plugin": "^3.1.0",
     "@fabianbormann/cardano-peer-connect": "^1.2.18",
     "@ionic/react": "^8.6.0",
@@ -48,7 +44,7 @@
     "@ionic/storage": "^3.0.6",
     "@reduxjs/toolkit": "^1.9.5",
     "bip39": "^3.0.4",
-    "capacitor-freerasp": "^1.10.0",
+    "capacitor-freerasp": "^2.2.2",
     "capacitor-native-settings": "^7.0.1",
     "capacitor-plugin-safe-area": "^4.0.0",
     "dotenv": "^16.4.7",
@@ -94,14 +90,14 @@
     "@wdio/spec-reporter": "^9.12.6",
     "@wdio/types": "^9.12.6",
     "allure-commandline": "^2.33.0",
-    "appium": "^3.0.2",
-    "appium-chromedriver": "^8.0.7",
-    "appium-chromium-driver": "^2.0.2",
+    "appium": "^2.17.1",
+    "appium-chromedriver": "^7.0.16",
+    "appium-chromium-driver": "^1.5.1",
     "appium-safari-driver": "^3.5.23",
-    "appium-uiautomator2-driver": "^5.0.3",
-    "appium-xcuitest-driver": "^10.1.2",
-    "audit-ci": "7.1.0",
+    "appium-uiautomator2-driver": "^4.2.2",
+    "appium-xcuitest-driver": "^9.2.2",
     "babel-jest": "^29.5.0",
+    "better-npm-audit": "^3.11.0",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
@@ -145,12 +141,6 @@
     "yaml-loader": "^0.8.0"
   },
   "overrides": {
-    "@aparajita/capacitor-biometric-auth": {
-      "@capacitor/android": "^7.0.0",
-      "@capacitor/app": "7.0.0",
-      "@capacitor/core": "^7.0.0",
-      "@capacitor/ios": "^7.0.0"
-    },
     "@evva/capacitor-secure-storage-plugin": {
       "@capacitor/android": "^7.0.0",
       "@capacitor/app": "7.0.0",
@@ -160,7 +150,29 @@
     "axios": "^1.8.2",
     "base-x": "^4.0.0",
     "ipaddr.js": "^2.2.0",
-    "validate.js": "^0.13.1"
+    "validate.js": "^0.13.1",
+    "sharp": {
+      "@img/sharp-libvips-linux-ppc64": "1.2.0",
+      "@img/sharp-linux-x64": "0.34.3",
+      "@img/sharp-win32-arm64": "0.34.3",
+      "@img/sharp-darwin-arm64": "0.34.2",
+      "@img/sharp-darwin-x64": "0.34.2",
+      "@img/sharp-libvips-darwin-arm64": "1.1.0",
+      "@img/sharp-libvips-darwin-x64": "1.1.0",
+      "@img/sharp-libvips-linux-arm": "1.1.0",
+      "@img/sharp-libvips-linux-arm64": "1.1.0",
+      "@img/sharp-libvips-linux-s390x": "1.1.0",
+      "@img/sharp-libvips-linuxmusl-arm64": "1.1.0",
+      "@img/sharp-libvips-linuxmusl-x64": "1.1.0",
+      "@img/sharp-linux-arm": "0.34.2",
+      "@img/sharp-linux-arm64": "0.34.2",
+      "@img/sharp-linux-s390x": "0.34.2",
+      "@img/sharp-linuxmusl-arm64": "0.34.2",
+      "@img/sharp-linuxmusl-x64": "0.34.2",
+      "@img/sharp-wasm32": "0.34.2",
+      "@img/sharp-win32-ia32": "0.34.2",
+      "@img/sharp-win32-x64": "0.34.2"
+    }
   },
   "eslintConfig": {
     "extends": [
