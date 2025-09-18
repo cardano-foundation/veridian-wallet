@@ -1657,19 +1657,6 @@ describe("getInceptionStatus", () => {
   });
 
   test("should retrieve group information with member acceptance status and thresholds", async () => {
-    const multisigAidDetails = {
-      group: {
-        mhab: {
-          state: {
-            kt: "4",
-            nt: "4",
-          },
-        },
-      },
-    };
-
-    identifiersGetMock.mockResolvedValue(multisigAidDetails);
-
     identifiersMembersMock.mockResolvedValue({
       signing: [
         { aid: "member1" },
@@ -1679,11 +1666,23 @@ describe("getInceptionStatus", () => {
       ],
     });
 
-    listExchangesMock.mockResolvedValue([{ i: "member1" }, { i: "member3" }]);
+    listExchangesMock.mockResolvedValue([
+      {
+        i: "member1",
+        exn: {
+          e: {
+            icp: {
+              kt: "4",
+              nt: "4",
+            },
+          },
+        },
+      },
+      { i: "member3" },
+    ]);
 
     const result = await multiSigService.getInceptionStatus(MULTISIG_ID);
 
-    expect(identifiersGetMock).toHaveBeenCalledWith(MULTISIG_ID);
     expect(identifiersMembersMock).toHaveBeenCalledWith(MULTISIG_ID);
     expect(listExchangesMock).toHaveBeenCalledWith({
       filter: { "-r": MultiSigRoute.ICP, "-a-gid": MULTISIG_ID },
@@ -1701,5 +1700,33 @@ describe("getInceptionStatus", () => {
         { aid: "member4", hasAccepted: false },
       ],
     });
+  });
+
+  test("should throw error when no exchanges are found", async () => {
+    identifiersMembersMock.mockResolvedValue({
+      signing: [{ aid: "member1" }, { aid: "member2" }],
+    });
+
+    listExchangesMock.mockResolvedValue([]);
+
+    await expect(
+      multiSigService.getInceptionStatus(MULTISIG_ID)
+    ).rejects.toThrow(
+      MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
+    );
+  });
+
+  test("should throw error when first exchange is undefined", async () => {
+    identifiersMembersMock.mockResolvedValue({
+      signing: [{ aid: "member1" }, { aid: "member2" }],
+    });
+
+    listExchangesMock.mockResolvedValue([undefined]);
+
+    await expect(
+      multiSigService.getInceptionStatus(MULTISIG_ID)
+    ).rejects.toThrow(
+      MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
+    );
   });
 });

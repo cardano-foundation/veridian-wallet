@@ -25,7 +25,6 @@ import type {
 import {
   BasicRecord,
   BasicStorage,
-  ContactStorage,
   IdentifierStorage,
   NotificationStorage,
   OperationPendingStorage,
@@ -41,7 +40,6 @@ import type { MultisigThresholds } from "./identifier.types";
 import {
   MultiSigRoute,
   InceptMultiSigExnMessage,
-  GroupMemberInfo,
   GroupInformation,
 } from "./multiSig.types";
 import { deleteNotificationRecordById, OnlineOnly } from "./utils";
@@ -76,6 +74,8 @@ class MultiSigService extends AgentService {
     "We do not control any member AID of the multi-sig";
   static readonly QUEUED_GROUP_DATA_MISSING =
     "Cannot retry creating group identifier if retry data is missing from the DB";
+  static readonly MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND =
+    "Cannot find inception exchange message for multisigId";
 
   protected readonly identifierStorage: IdentifierStorage;
   protected readonly operationPendingStorage: OperationPendingStorage;
@@ -796,10 +796,6 @@ class MultiSigService extends AgentService {
   }
 
   async getInceptionStatus(multisigId: string): Promise<GroupInformation> {
-    const multisigAidDetails = await this.props.signifyClient
-      .identifiers()
-      .get(multisigId);
-
     const members = await this.props.signifyClient
       .identifiers()
       .members(multisigId);
@@ -808,25 +804,36 @@ class MultiSigService extends AgentService {
       filter: { "-r": MultiSigRoute.ICP, "-a-gid": multisigId },
     });
 
-    const memberInfos = members.signing.map((member: { aid: string }) => {
-      const hasAccepted = exchanges.some((exn: any) => exn.i === member.aid);
+    if (exchanges.length > 0) {
+      if (exchanges[0] === undefined) {
+        throw new Error(
+          MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
+        );
+      }
+
+      const memberInfos = members.signing.map((member: { aid: string }) => {
+        const hasAccepted = exchanges.some(
+          (exn: { i: string }) => exn.i === member.aid
+        );
+
+        return {
+          aid: member.aid,
+          hasAccepted,
+        };
+      });
 
       return {
-        aid: member.aid,
-        hasAccepted,
+        threshold: {
+          signingThreshold: Number(exchanges[0].exn.e.icp.kt),
+          rotationThreshold: Number(exchanges[0].exn.e.icp.nt),
+        },
+        members: memberInfos,
       };
-    });
-
-    const signingThreshold = Number(multisigAidDetails.group?.mhab.state.kt);
-    const rotationThreshold = Number(multisigAidDetails.group?.mhab.state.nt);
-
-    return {
-      threshold: {
-        signingThreshold,
-        rotationThreshold,
-      },
-      members: memberInfos,
-    };
+    } else {
+      throw new Error(
+        MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
+      );
+    }
   }
 }
 
