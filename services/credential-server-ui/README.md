@@ -2,7 +2,7 @@
 
 This folder contains a Web Interface to interact with the [Credential Issuance Server](../credential-server)
 
-## Features
+## Features testing injection with no URL encoding
     - Connect to a credential issuance server
     - Issue custom credentials
     - Request custom credentials
