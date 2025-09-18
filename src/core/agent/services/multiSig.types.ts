@@ -1,3 +1,5 @@
+import { MultisigThresholds } from "./identifier.types";
+
 interface CommonExn {
   v: string;
   t: "exn";
@@ -131,6 +133,17 @@ interface GrantToJoinMultisigExnPayload {
   atc: string;
 }
 
+interface GroupMemberInfo {
+  aid: string;
+  name: string;
+  hasAccepted: boolean;
+}
+
+interface GroupInformation {
+  threshold: MultisigThresholds;
+  members: GroupMemberInfo[];
+}
+
 export { MultiSigRoute };
 
 export type {
@@ -139,4 +152,6 @@ export type {
   IpexGrantMultiSigExn,
   InceptMultiSigExnMessage,
   IpexAdmitMultiSigRequest,
+  GroupMemberInfo,
+  GroupInformation,
 };

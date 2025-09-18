@@ -172,7 +172,7 @@ describe("Credential request information: multisig", () => {
       current: "",
       previous: undefined,
     },
-    threshold: "2",
+    threshold: { signingThreshold: 2, rotationThreshold: 2 },
     members: ["member-1", "member-2"],
     othersJoined: [],
     memberInfos: [
@@ -283,7 +283,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: [],
       memberInfos: [
@@ -386,7 +386,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: ["member-2"],
       memberInfos: [
@@ -489,7 +489,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: [],
       memberInfos: [
@@ -600,7 +600,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: ["member-2"],
       memberInfos: [
@@ -711,7 +711,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: [],
       memberInfos: [
@@ -797,7 +797,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: ["member-1"],
       memberInfos: [
@@ -934,7 +934,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: ["member-1"],
       memberInfos: [
@@ -1073,7 +1073,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "3",
+      threshold: { signingThreshold: 3, rotationThreshold: 3 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1"],
       memberInfos: [
@@ -1177,7 +1177,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1"],
       memberInfos: [
@@ -1281,7 +1281,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1", "member-3"],
       memberInfos: [
@@ -1386,7 +1386,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1"],
       memberInfos: [
@@ -1499,7 +1499,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1", "member-3"],
       memberInfos: [
@@ -1612,7 +1612,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "3",
+      threshold: { signingThreshold: 3, rotationThreshold: 3 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1"],
       memberInfos: [
@@ -1725,7 +1725,7 @@ describe("Credential request information: multisig", () => {
         current: "cred-id",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1"],
       memberInfos: [
@@ -1838,7 +1838,7 @@ describe("Credential request information: multisig", () => {
         current: "EKfweht5lOkjaguB5dz42BMkfejhBFIF9-ghumzCJ6nv",
         previous: undefined,
       },
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 2 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1"],
       memberInfos: [

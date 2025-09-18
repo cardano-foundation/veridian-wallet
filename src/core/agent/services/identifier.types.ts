@@ -46,8 +46,8 @@ interface IdentifierDetails extends IdentifierShortDetails {
 
 interface MultiSigIcpRequestDetails {
   ourIdentifier: IdentifierShortDetails;
-  sender: ConnectionShortDetails;
-  otherConnections: ConnectionShortDetails[];
+  sender: MultisigConnectionDetails;
+  otherConnections: MultisigConnectionDetails[];
   signingThreshold: number;
   rotationThreshold: number;
 }

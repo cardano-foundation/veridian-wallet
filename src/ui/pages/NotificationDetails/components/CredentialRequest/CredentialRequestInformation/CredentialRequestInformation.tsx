@@ -142,7 +142,7 @@ const CredentialRequestInformation = ({
     linkedGroup &&
     linkedGroup.othersJoined.length +
       (linkedGroup.linkedRequest.accepted ? 1 : 0) >=
-      Number(linkedGroup.threshold);
+      Number(linkedGroup.threshold.signingThreshold);
 
   const showProvidedCred = () => {
     if (missingProposedCred) return;
@@ -421,7 +421,7 @@ const CredentialRequestInformation = ({
               >
                 <div className="threshold">
                   <IonText className="requested-credential">
-                    {linkedGroup.threshold}
+                    {linkedGroup.threshold.signingThreshold}
                   </IonText>
                 </div>
               </CardDetailsBlock>

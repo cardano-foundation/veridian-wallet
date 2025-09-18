@@ -1,6 +1,7 @@
 import { Operation } from "signify-ts";
 import { LinkedRequest } from "../records/notificationRecord.types";
 import { JSONObject } from "../agent.types";
+import { MultisigThresholds } from "./identifier.types";
 interface CredentialsMatchingApply {
   schema: {
     name: string;
@@ -15,7 +16,7 @@ interface CredentialsMatchingApply {
 }
 
 interface LinkedGroupInfo {
-  threshold: string | string[];
+  threshold: MultisigThresholds;
   members: string[];
   othersJoined: string[];
   linkedRequest: LinkedRequest;

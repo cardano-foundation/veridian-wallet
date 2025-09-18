@@ -42,7 +42,7 @@ const CredentialRequest = ({
     linkedGroup &&
     linkedGroup.othersJoined.length +
       (linkedGroup.linkedRequest.accepted ? 1 : 0) >=
-      Number(linkedGroup.threshold);
+      Number(linkedGroup.threshold.signingThreshold);
 
   const userAID = !credentialRequest
     ? null

@@ -37,7 +37,11 @@ import {
   QueuedGroupProps,
 } from "./identifier.types";
 import type { MultisigThresholds } from "./identifier.types";
-import { MultiSigRoute, InceptMultiSigExnMessage } from "./multiSig.types";
+import {
+  MultiSigRoute,
+  InceptMultiSigExnMessage,
+  GroupInformation,
+} from "./multiSig.types";
 import { deleteNotificationRecordById, OnlineOnly } from "./utils";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { EventTypes, GroupCreatedEvent } from "../event.types";
@@ -70,6 +74,8 @@ class MultiSigService extends AgentService {
     "We do not control any member AID of the multi-sig";
   static readonly QUEUED_GROUP_DATA_MISSING =
     "Cannot retry creating group identifier if retry data is missing from the DB";
+  static readonly MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND =
+    "Cannot find inception exchange message for multisigId";
 
   protected readonly identifierStorage: IdentifierStorage;
   protected readonly operationPendingStorage: OperationPendingStorage;
@@ -187,6 +193,7 @@ class MultiSigService extends AgentService {
         theme: mHabRecord.theme,
         creationStatus,
         groupMemberPre: memberPrefix,
+        groupMetadata: mHabRecord.groupMetadata,
         createdAt: new Date(multisigDetail.icp_dt),
       });
     } catch (error) {
@@ -217,6 +224,7 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: memberPrefix,
           createdAtUTC: multisigDetail.icp_dt,
+          groupMetadata: mHabRecord.groupMetadata,
         },
       },
     });
@@ -433,9 +441,16 @@ class MultiSigService extends AgentService {
       throw new Error(MultiSigService.MEMBER_AID_NOT_FOUND);
     }
 
+    senderContact.groupId = icpMsg[0].exn.a.gid;
+
     const linkedConnections = await this.connections.getMultisigLinkedContacts(
       ourIdentifier.groupMetadata.groupId
     );
+
+    const exchanges = await this.props.signifyClient.exchanges().list({
+      filter: { "-r": MultiSigRoute.ICP, "-a-gid": icpMsg[0].exn.a.gid },
+    });
+
     const otherConnections = [];
     for (const prefix of smids) {
       if (prefix === senderPrefix || prefix === ourIdentifier.id) continue;
@@ -443,11 +458,20 @@ class MultiSigService extends AgentService {
       const linkedConnection = linkedConnections.find(
         (connection) => connection.id === prefix
       );
+
       if (!linkedConnection) {
         throw new Error(MultiSigService.UNKNOWN_AIDS_IN_MULTISIG_ICP);
       }
 
-      otherConnections.push(linkedConnection);
+      const hasAccepted = exchanges.some(
+        (exn: { i: string }) => exn.i === prefix
+      );
+
+      otherConnections.push({
+        ...linkedConnection,
+        hasAccepted,
+        groupId: ourIdentifier.groupMetadata.groupId,
+      });
     }
 
     return {
@@ -540,6 +564,7 @@ class MultiSigService extends AgentService {
         theme: mHabRecord.theme,
         creationStatus,
         groupMemberPre: mHabRecord.id,
+        groupMetadata: mHabRecord.groupMetadata,
         createdAt: new Date(multisigDetail.icp_dt),
       });
     } catch (error) {
@@ -570,6 +595,7 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: mHabRecord.id,
           createdAtUTC: multisigDetail.icp_dt,
+          groupMetadata: mHabRecord.groupMetadata,
         },
       },
     });
@@ -785,6 +811,41 @@ class MultiSigService extends AgentService {
         );
       }
     }
+  }
+
+  async getInceptionStatus(multisigId: string): Promise<GroupInformation> {
+    const members = await this.props.signifyClient
+      .identifiers()
+      .members(multisigId);
+
+    const exchanges = await this.props.signifyClient.exchanges().list({
+      filter: { "-r": MultiSigRoute.ICP, "-a-gid": multisigId },
+    });
+
+    if (exchanges.length === 0 || exchanges[0] === undefined) {
+      throw new Error(
+        MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
+      );
+    }
+
+    const memberInfos = members.signing.map((member: { aid: string }) => {
+      const hasAccepted = exchanges.some(
+        (exn: { i: string }) => exn.i === member.aid
+      );
+
+      return {
+        aid: member.aid,
+        hasAccepted,
+      };
+    });
+
+    return {
+      threshold: {
+        signingThreshold: Number(exchanges[0].exn.e.icp.kt),
+        rotationThreshold: Number(exchanges[0].exn.e.icp.nt),
+      },
+      members: memberInfos,
+    };
   }
 }
 
