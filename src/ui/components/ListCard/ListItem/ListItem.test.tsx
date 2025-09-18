@@ -35,7 +35,6 @@ describe("ListItem", () => {
       "list-item",
       "custom-class"
     );
-    // Start icon should not be present by default
     expect(container.querySelector('[slot="start"]')).not.toBeInTheDocument();
     expect(container.querySelector('[slot="end"]')).toBeInTheDocument();
   });
