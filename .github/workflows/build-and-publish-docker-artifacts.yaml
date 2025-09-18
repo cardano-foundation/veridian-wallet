@@ -124,8 +124,13 @@ jobs:
           
           if [ "$TRIGGERING_REF" == "pr" ]
           then
-
+            if [[ ! "$PR_HEAD_REPO" =~ ^[a-zA-Z0-9._/-]+$ ]] || [[ ! "$PR_HEAD_REF" =~ ^[a-zA-Z0-9._/-]+$ ]];
+            then
+              echo "[!] Invalid PR branch or repo name (!= ^[a-zA-Z0-9._/-]+\$). Aborting for security reasons."
+              exit 1
+            fi
             if [ "$IS_PR_FROM_FORK" == "true" ]; then
+
               echo "External PR detected: fetching branch from $PR_HEAD_REPO"
               git fetch https://github.com/${PR_HEAD_REPO}.git "$PR_HEAD_REF"
               git checkout FETCH_HEAD
