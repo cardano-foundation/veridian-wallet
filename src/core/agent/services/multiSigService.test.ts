@@ -64,6 +64,7 @@ const queryKeyStateGetMock = jest.fn();
 const addEndRoleMock = jest.fn();
 const sendExchangesMock = jest.fn();
 const getExchangesMock = jest.fn();
+const listExchangesMock = jest.fn();
 const markNotificationMock = jest.fn();
 const createExchangeMessageMock = jest.fn();
 const getMemberMock = jest.fn();
@@ -119,6 +120,7 @@ const signifyClient = jest.mocked({
     get: getExchangesMock,
     send: sendExchangesMock,
     createExchangeMessage: createExchangeMessageMock,
+    list: listExchangesMock,
   }),
   replies: () => ({
     submitRpy: submitRpyMock,
@@ -1647,129 +1649,57 @@ const createThresholds = (
   rotationThreshold: rotation,
 });
 
-// describe("getGroupInformation", () => {
-//   const GROUP_ID = "group-123";
+describe("getInceptionStatus", () => {
+  const MULTISIG_ID = "multisig-123";
 
-//   beforeEach(() => {
-//     jest.clearAllMocks();
-//   });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-//   it("should retrieve group information with member acceptance status and thresholds", async () => {
-//     const groupDetails = {
-//       state: {
-//         k: ["member1", "member2", "member3", "member4"],
-//         kt: "2",
-//         nt: "2",
-//       },
-//     };
+  test("should retrieve group information with member acceptance status and thresholds", async () => {
+    const multisigAidDetails = {
+      group: {
+        mhab: {
+          state: {
+            kt: "4",
+            nt: "4",
+          },
+        },
+      },
+    };
 
-//     const multisigId = "multisig-123";
-//     identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
-//       id: multisigId,
-//     });
+    identifiersGetMock.mockResolvedValue(multisigAidDetails);
 
-//     identifiersGetMock.mockResolvedValue(groupDetails);
+    identifiersMembersMock.mockResolvedValue({
+      signing: [
+        { aid: "member1" },
+        { aid: "member2" },
+        { aid: "member3" },
+        { aid: "member4" },
+      ],
+    });
 
-//     identifiersMembersMock.mockResolvedValue({
-//       signing: [{ aid: "member1" }, { aid: "member3" }],
-//     });
+    listExchangesMock.mockResolvedValue([{ i: "member1" }, { i: "member3" }]);
 
-//     // Mock contact storage to return names
-//     contactStorage.findExpectedById
-//       .mockResolvedValueOnce({ alias: "Alice" })
-//       .mockResolvedValueOnce({ alias: "Bob" })
-//       .mockResolvedValueOnce({ alias: "Charlie" })
-//       .mockResolvedValueOnce({ alias: "David" });
+    const result = await multiSigService.getInceptionStatus(MULTISIG_ID);
 
-//     const result = await multiSigService.getGroupInformation(GROUP_ID);
+    expect(identifiersGetMock).toHaveBeenCalledWith(MULTISIG_ID);
+    expect(identifiersMembersMock).toHaveBeenCalledWith(MULTISIG_ID);
+    expect(listExchangesMock).toHaveBeenCalledWith({
+      filter: { "-r": MultiSigRoute.ICP, "-a-gid": MULTISIG_ID },
+    });
 
-//     expect(identifierStorage.getIdentifierMetadataByGroupId).toHaveBeenCalledWith(GROUP_ID);
-//     expect(identifiersGetMock).toHaveBeenCalledWith(multisigId);
-//     expect(identifiersMembersMock).toHaveBeenCalledWith(multisigId);
-
-//     expect(result).toEqual({
-//       threshold: {
-//         signingThreshold: 2,
-//         rotationThreshold: 2,
-//       },
-//       members: [
-//         { aid: "member1", name: "Alice", hasAccepted: true },
-//         { aid: "member2", name: "Bob", hasAccepted: false },
-//         { aid: "member3", name: "Charlie", hasAccepted: true },
-//         { aid: "member4", name: "David", hasAccepted: false },
-//       ],
-//     });
-//   });
-
-//   it("should handle different thresholds correctly", async () => {
-//     const groupDetails = {
-//       state: {
-//         k: ["member1", "member2"],
-//         kt: "2",
-//         nt: "1",
-//       },
-//     };
-
-//     const multisigId = "multisig-123";
-//     identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
-//       id: multisigId,
-//     });
-
-//     identifiersGetMock.mockResolvedValue(groupDetails);
-//     identifiersMembersMock.mockResolvedValue({
-//       signing: [{ aid: "member1" }],
-//     });
-
-//     // Mock contact storage
-//     contactStorage.findExpectedById
-//       .mockResolvedValueOnce({ alias: "Alice" })
-//       .mockResolvedValueOnce({ alias: "Bob" });
-
-//     const result = await multiSigService.getGroupInformation(GROUP_ID);
-
-//     expect(result).toEqual({
-//       threshold: {
-//         signingThreshold: 2,
-//         rotationThreshold: 1,
-//       },
-//       members: [
-//         { aid: "member1", name: "Alice", hasAccepted: true },
-//         { aid: "member2", name: "Bob", hasAccepted: false },
-//       ],
-//     });
-//   });
-
-//   it("should throw an error when group is not found", async () => {
-//     identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue(null);
-
-//     await expect(
-//       multiSigService.getGroupInformation(GROUP_ID)
-//     ).rejects.toThrow(MultiSigService.NO_GROUP_FOUND);
-
-//     expect(identifierStorage.getIdentifierMetadataByGroupId).toHaveBeenCalledWith(GROUP_ID);
-//   });
-
-//   it("should handle error when group members cannot be retrieved", async () => {
-//     const groupDetails = {
-//       state: {
-//         k: ["member1", "member2"],
-//         kt: "2",
-//         nt: "2",
-//       },
-//     };
-
-//     const multisigId = "multisig-123";
-//     identifierStorage.getIdentifierMetadataByGroupId.mockResolvedValue({
-//       id: multisigId,
-//     });
-
-//     identifiersGetMock.mockResolvedValue(groupDetails);
-//     identifiersMembersMock.mockRejectedValue(
-//       new Error("Group members not found")
-//     );
-
-//     await expect(
-//       multiSigService.getGroupInformation(GROUP_ID)
-//     ).rejects.toThrow("Group members not found");
-//   });
-// });
+    expect(result).toEqual({
+      threshold: {
+        signingThreshold: 4,
+        rotationThreshold: 4,
+      },
+      members: [
+        { aid: "member1", hasAccepted: true },
+        { aid: "member2", hasAccepted: false },
+        { aid: "member3", hasAccepted: true },
+        { aid: "member4", hasAccepted: false },
+      ],
+    });
+  });
+});
