@@ -804,36 +804,30 @@ class MultiSigService extends AgentService {
       filter: { "-r": MultiSigRoute.ICP, "-a-gid": multisigId },
     });
 
-    if (exchanges.length > 0) {
-      if (exchanges[0] === undefined) {
-        throw new Error(
-          MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
-        );
-      }
-
-      const memberInfos = members.signing.map((member: { aid: string }) => {
-        const hasAccepted = exchanges.some(
-          (exn: { i: string }) => exn.i === member.aid
-        );
-
-        return {
-          aid: member.aid,
-          hasAccepted,
-        };
-      });
-
-      return {
-        threshold: {
-          signingThreshold: Number(exchanges[0].exn.e.icp.kt),
-          rotationThreshold: Number(exchanges[0].exn.e.icp.nt),
-        },
-        members: memberInfos,
-      };
-    } else {
+    if (exchanges.length === 0 || exchanges[0] === undefined) {
       throw new Error(
         MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
       );
     }
+
+    const memberInfos = members.signing.map((member: { aid: string }) => {
+      const hasAccepted = exchanges.some(
+        (exn: { i: string }) => exn.i === member.aid
+      );
+
+      return {
+        aid: member.aid,
+        hasAccepted,
+      };
+    });
+
+    return {
+      threshold: {
+        signingThreshold: Number(exchanges[0].exn.e.icp.kt),
+        rotationThreshold: Number(exchanges[0].exn.e.icp.nt),
+      },
+      members: memberInfos,
+    };
   }
 }
 
