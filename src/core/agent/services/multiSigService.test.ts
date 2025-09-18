@@ -1332,25 +1332,8 @@ describe("Creation of multi-sig", () => {
       .mockResolvedValue(initiatorConnectionShortDetails);
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([]);
 
-    // Mock the dependencies for getInceptionStatus
-    identifiersMembersMock.mockResolvedValue({
-      signing: [
-        { aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
-        { aid: "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7" },
-      ],
-    });
     listExchangesMock.mockResolvedValue([
-      {
-        i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
-        exn: {
-          e: {
-            icp: {
-              kt: "3",
-              nt: "2",
-            },
-          },
-        },
-      },
+      { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
     ]);
 
     const result = await multiSigService.getMultisigIcpDetails(
@@ -1362,10 +1345,15 @@ describe("Creation of multi-sig", () => {
     expect(result.sender.groupId).toBe(
       "EBHG7UW-48EAF4bMYbaCsPQfSuFk-INidVXLexDMk6pN"
     );
-    expect(result.sender.hasAccepted).toBe(true);
     expect(result.otherConnections.length).toBe(0);
     expect(result.signingThreshold).toBe(3);
     expect(result.rotationThreshold).toBe(2);
+    expect(listExchangesMock).toHaveBeenCalledWith({
+      filter: {
+        "-r": "/multisig/icp",
+        "-a-gid": "EBHG7UW-48EAF4bMYbaCsPQfSuFk-INidVXLexDMk6pN",
+      },
+    });
   });
 
   test("Throw error if the group join request contains unknown identifiers", async () => {
@@ -1395,25 +1383,8 @@ describe("Creation of multi-sig", () => {
       .mockResolvedValue(initiatorConnectionShortDetails);
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([]);
 
-    identifiersMembersMock.mockResolvedValue({
-      signing: [
-        { aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
-        { aid: "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ" },
-        // Note: EI8fS00-AxbbqXmwoivpw-0ui0qgZtGbh8Ue-ZVbxYST is not in members (unknown identifier)
-      ],
-    });
     listExchangesMock.mockResolvedValue([
-      {
-        i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
-        exn: {
-          e: {
-            icp: {
-              kt: "3",
-              nt: "3",
-            },
-          },
-        },
-      },
+      { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
     ]);
 
     await expect(
@@ -1457,25 +1428,8 @@ describe("Creation of multi-sig", () => {
       },
     ]);
 
-    // Mock the dependencies for getInceptionStatus
-    identifiersMembersMock.mockResolvedValue({
-      signing: [
-        { aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
-        { aid: "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7" },
-      ],
-    });
     listExchangesMock.mockResolvedValue([
-      {
-        i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
-        exn: {
-          e: {
-            icp: {
-              kt: "3",
-              nt: "2",
-            },
-          },
-        },
-      },
+      { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
     ]);
 
     const result = await multiSigService.getMultisigIcpDetails(
@@ -1487,7 +1441,6 @@ describe("Creation of multi-sig", () => {
     expect(result.sender.groupId).toBe(
       "EBHG7UW-48EAF4bMYbaCsPQfSuFk-INidVXLexDMk6pN"
     );
-    expect(result.sender.hasAccepted).toBe(true);
     expect(result.otherConnections.length).toBe(0);
     expect(result.signingThreshold).toBe(3);
     expect(result.rotationThreshold).toBe(2);
@@ -1534,26 +1487,8 @@ describe("Creation of multi-sig", () => {
       },
     ]);
 
-    // Mock the dependencies for getInceptionStatus
-    identifiersMembersMock.mockResolvedValue({
-      signing: [
-        { aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
-        { aid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
-        { aid: "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ" },
-      ],
-    });
     listExchangesMock.mockResolvedValue([
-      {
-        i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
-        exn: {
-          e: {
-            icp: {
-              kt: "3",
-              nt: "2",
-            },
-          },
-        },
-      },
+      { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
       { i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
     ]);
 
@@ -1566,7 +1501,6 @@ describe("Creation of multi-sig", () => {
     expect(result.sender.groupId).toBe(
       "EBHG7UW-48EAF4bMYbaCsPQfSuFk-INidVXLexDMk6pN"
     );
-    expect(result.sender.hasAccepted).toBe(true);
     expect(result.otherConnections.length).toBe(1);
     expect(result.otherConnections[0].id).toBe(
       "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"

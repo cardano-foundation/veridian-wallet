@@ -442,15 +442,15 @@ class MultiSigService extends AgentService {
     }
 
     senderContact.groupId = icpMsg[0].exn.a.gid;
-    senderContact.hasAccepted = icpMsg[0].exn.a.smids.includes(senderPrefix);
 
     const linkedConnections = await this.connections.getMultisigLinkedContacts(
       ourIdentifier.groupMetadata.groupId
     );
 
-    const groupInceptionStatus = await this.getInceptionStatus(
-      icpMsg[0].exn.a.gid
-    );
+    const exchanges = await this.props.signifyClient.exchanges().list({
+      filter: { "-r": MultiSigRoute.ICP, "-a-gid": icpMsg[0].exn.a.gid },
+    });
+
     const otherConnections = [];
     for (const prefix of smids) {
       if (prefix === senderPrefix || prefix === ourIdentifier.id) continue;
@@ -459,17 +459,17 @@ class MultiSigService extends AgentService {
         (connection) => connection.id === prefix
       );
 
-      const memberStatus = groupInceptionStatus.members.find(
-        (member) => member.aid === prefix
-      );
-
-      if (!linkedConnection || !memberStatus) {
+      if (!linkedConnection) {
         throw new Error(MultiSigService.UNKNOWN_AIDS_IN_MULTISIG_ICP);
       }
 
+      const hasAccepted = exchanges.some(
+        (exn: { i: string }) => exn.i === prefix
+      );
+
       otherConnections.push({
         ...linkedConnection,
-        hasAccepted: memberStatus.hasAccepted,
+        hasAccepted,
         groupId: ourIdentifier.groupMetadata.groupId,
       });
     }
