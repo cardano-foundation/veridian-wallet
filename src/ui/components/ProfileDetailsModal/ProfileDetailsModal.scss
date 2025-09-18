@@ -93,13 +93,12 @@
       }
     }
 
+    .list-card {
+      margin: 1.5rem 0;
+    }
+
     .card-block {
       margin: 0.75rem 0 0;
-
-      &.dapp-block .card-details-info-block-inner {
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-      }
 
       .identifier-id {
         .card-details-info-content {

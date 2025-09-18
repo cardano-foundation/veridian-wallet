@@ -31,6 +31,8 @@ import { ConnectdApp } from "../../ConnectdApp";
 import { EditProfile } from "../../EditProfile";
 import { ListHeader } from "../../ListHeader";
 import { ShareConnection } from "../../ShareConnection";
+import { ListCard } from "../../ListCard/ListCard";
+import { ListItem } from "../../ListCard/ListItem";
 import { IdentifierAttributeDetailModal } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal";
 import { DetailView } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal.types";
 import {
@@ -166,12 +168,25 @@ const ProfileContent = ({
           <span>{i18n.t("profiledetails.options.share")}</span>
         </IonButton>
       </div>
-      <CardBlock
-        title={i18n.t("profiledetails.identifierdetail.dapp")}
-        testId="dapp-block"
-        className="dapp-block"
-        icon={appsOutline}
-        onClick={showDapp}
+      <ListCard
+        items={[
+          {
+            label: i18n.t("profiledetails.identifierdetail.listoptions.dapp"),
+            icon: appsOutline,
+            onClick: showDapp,
+          },
+        ]}
+        renderItem={(item, index) => (
+          <ListItem
+            key={index}
+            icon={item.icon}
+            label={item.label}
+            onClick={item.onClick}
+            testId={`profiledetails-list-option-${index}`}
+            className="list-item"
+            showStartIcon={true}
+          />
+        )}
       />
       {isMultiSig && members && (
         <>
@@ -327,10 +342,24 @@ const ProfileContent = ({
           </CardBlock>
         </>
       )}
-      <CardBlock
-        title={i18n.t("profiledetails.identifierdetail.showadvanced")}
-        onClick={() => openPropDetailModal(DetailView.AdvancedDetail)}
-        testId="show-advanced-block"
+      <ListCard
+        items={[
+          {
+            label: i18n.t("profiledetails.identifierdetail.showadvanced"),
+            icon: appsOutline,
+            onClick: () => openPropDetailModal(DetailView.AdvancedDetail),
+          },
+        ]}
+        renderItem={(item, index) => (
+          <ListItem
+            key={index}
+            icon={item.icon}
+            label={item.label}
+            onClick={item.onClick}
+            testId="show-advanced-block"
+            className="list-item"
+          />
+        )}
       />
       <IdentifierAttributeDetailModal
         isOpen={openDetailModal}

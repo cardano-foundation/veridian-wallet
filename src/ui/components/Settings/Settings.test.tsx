@@ -1,4 +1,8 @@
-import { BiometryType, BiometricAuthError, NativeBiometric } from "@capgo/capacitor-native-biometric";
+import {
+  BiometryType,
+  BiometricAuthError,
+  NativeBiometric,
+} from "@capgo/capacitor-native-biometric";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Browser } from "@capacitor/browser";
 import { act } from "react";
@@ -15,7 +19,11 @@ import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Settings } from "./Settings";
 import { OptionIndex } from "./Settings.types";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
-import { BiometricAuthOutcome, BIOMETRIC_SERVER_KEY, useBiometricAuth } from "../../hooks/useBiometricsHook";
+import {
+  BiometricAuthOutcome,
+  BIOMETRIC_SERVER_KEY,
+  useBiometricAuth,
+} from "../../hooks/useBiometricsHook";
 
 jest.mock("../../../store/utils", () => ({
   CLEAR_STORE_ACTIONS: [],
@@ -55,7 +63,9 @@ jest.mock("@capacitor/core", () => ({
 
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {
-    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
+    isAvailable: jest.fn(() =>
+      Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })
+    ),
     verifyIdentity: jest.fn(() => Promise.resolve()),
     getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
     setCredentials: jest.fn(() => Promise.resolve()),
@@ -156,7 +166,7 @@ jest.mock("capacitor-native-settings", () => ({
   NativeSettings: {
     open: jest.fn(),
   },
-  AndroidSettings: {}, 
+  AndroidSettings: {},
   IOSSettings: {},
 }));
 
@@ -188,7 +198,6 @@ jest.mock("react-router-dom", () => ({
 
 describe("Settings page", () => {
   beforeEach(() => {
-    
     (useBiometricAuth as jest.Mock).mockReturnValue({
       biometricInfo: {
         isAvailable: true,
@@ -267,10 +276,14 @@ describe("Settings page", () => {
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.FINGERPRINT
+        biometryType: BiometryType.FINGERPRINT,
       },
-      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
-      setupBiometrics: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
+      handleBiometricAuth: jest.fn(() =>
+        Promise.resolve(BiometricAuthOutcome.SUCCESS)
+      ),
+      setupBiometrics: jest.fn(() =>
+        Promise.resolve(BiometricAuthOutcome.SUCCESS)
+      ),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
       lockoutEndTime: null,
@@ -289,8 +302,8 @@ describe("Settings page", () => {
       getByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).toBeInTheDocument();
 
-    await act(async () => { 
-      fireEvent.click(getByTestId("settings-item-0"));
+    await act(async () => {
+      fireEvent.click(getByTestId("settings-security-list-item-0"));
     });
 
     await waitFor(() => {
@@ -335,14 +348,20 @@ describe("Settings page", () => {
         hasCredentials: true,
         biometryType: BiometryType.FINGERPRINT,
       },
-      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
-      setupBiometrics: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
+      handleBiometricAuth: jest.fn(() =>
+        Promise.resolve(BiometricAuthOutcome.SUCCESS)
+      ),
+      setupBiometrics: jest.fn(() =>
+        Promise.resolve(BiometricAuthOutcome.SUCCESS)
+      ),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
       lockoutEndTime: null,
     });
 
-    (NativeBiometric.deleteCredentials as jest.Mock).mockResolvedValueOnce(undefined);
+    (NativeBiometric.deleteCredentials as jest.Mock).mockResolvedValueOnce(
+      undefined
+    );
 
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
@@ -357,8 +376,8 @@ describe("Settings page", () => {
       getByText(EN_TRANSLATIONS.settings.sections.security.biometry)
     ).toBeInTheDocument();
 
-    await act(async () => { 
-      fireEvent.click(getByTestId("settings-item-0"));
+    await act(async () => {
+      fireEvent.click(getByTestId("settings-security-list-item-0"));
     });
 
     await waitFor(() => {
@@ -409,8 +428,12 @@ describe("Settings page", () => {
         biometryType: BiometryType.FINGERPRINT,
         code: BiometricAuthError.BIOMETRICS_NOT_ENROLLED,
       },
-      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE)),
-      setupBiometrics: jest.fn(() => Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE)),
+      handleBiometricAuth: jest.fn(() =>
+        Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE)
+      ),
+      setupBiometrics: jest.fn(() =>
+        Promise.resolve(BiometricAuthOutcome.NOT_AVAILABLE)
+      ),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
       lockoutEndTime: null,
@@ -450,7 +473,7 @@ describe("Settings page", () => {
 
     act(() => {
       fireEvent.click(
-        getByTestId(`settings-item-${OptionIndex.Documentation}`)
+        getByTestId(`settings-support-list-item-${OptionIndex.Documentation}`)
       );
     });
 
@@ -476,7 +499,9 @@ describe("Settings page", () => {
     ).toBeInTheDocument();
 
     act(() => {
-      fireEvent.click(getByTestId(`settings-item-${OptionIndex.Term}`));
+      fireEvent.click(
+        getByTestId(`settings-support-list-item-${OptionIndex.Term}`)
+      );
     });
 
     await waitFor(() => {
@@ -509,7 +534,7 @@ describe("Settings page", () => {
 
     act(() => {
       fireEvent.click(
-        getByTestId(`settings-item-${OptionIndex.ManagePassword}`)
+        getByTestId(`settings-security-list-item-${OptionIndex.ManagePassword}`)
       );
     });
 
@@ -538,7 +563,9 @@ describe("Settings page", () => {
 
     act(() => {
       fireEvent.click(
-        getByTestId(`settings-item-${OptionIndex.RecoverySeedPhrase}`)
+        getByTestId(
+          `settings-security-list-item-${OptionIndex.RecoverySeedPhrase}`
+        )
       );
     });
 
@@ -566,7 +593,9 @@ describe("Settings page", () => {
     ).toBeInTheDocument();
 
     act(() => {
-      fireEvent.click(getByTestId(`settings-item-${OptionIndex.ChangePin}`));
+      fireEvent.click(
+        getByTestId(`settings-security-list-item-${OptionIndex.ChangePin}`)
+      );
     });
 
     await waitFor(() => {

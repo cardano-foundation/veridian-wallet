@@ -4,7 +4,7 @@ import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import { PageHeader } from "../PageHeader";
 import { SideSlider } from "../SideSlider";
 import { ManagePassword } from "./components/ManagePassword";
-import { SettingList } from "./components/SettingList";
+import { SettingsList } from "./components/SettingsList";
 import { TermsAndPrivacy } from "./components/TermsAndPrivacy";
 import { SettingScreen, SettingsProps } from "./Settings.types";
 import { RecoverySeedPhrase } from "./components/RecoverySeedPhrase";
@@ -45,7 +45,7 @@ export const Settings = ({ show, setShow }: SettingsProps) => {
         return <RecoverySeedPhrase onClose={handleClose} />;
       default:
         return (
-          <SettingList
+          <SettingsList
             switchView={setScreen}
             handleClose={handleClose}
           />

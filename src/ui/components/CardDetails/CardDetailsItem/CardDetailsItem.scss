@@ -8,6 +8,7 @@
     width: 1.5rem;
     height: 1.5rem;
     overflow: hidden;
+    color: var(--ion-color-neutral-500);
   }
 
   ion-button.action-button {
@@ -18,7 +19,6 @@
     --background-activated: var(--ion-color-neutral-100);
 
     ion-icon {
-      opacity: 0.5;
       width: 1.375rem;
       height: 1.375rem;
     }

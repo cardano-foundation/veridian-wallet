@@ -1,15 +1,6 @@
-import {
-  IonCard,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonModal,
-  IonToggle,
-} from "@ionic/react";
+import { IonModal, IonToggle } from "@ionic/react";
 import { useSelector } from "react-redux";
 import { useRef, useState } from "react";
-import { chevronForward } from "ionicons/icons";
 import { useAppDispatch } from "../../../../../store/hooks";
 import {
   getStateCache,
@@ -23,6 +14,8 @@ import { i18n } from "../../../../../i18n";
 import { Alert } from "../../../Alert";
 import { VerifyPassword } from "../../../VerifyPassword";
 import { VerifyPasscode } from "../../../VerifyPasscode";
+import { ListCard } from "../../../ListCard/ListCard";
+import { ListItem } from "../../../ListCard/ListItem/ListItem";
 import { CreatePassword } from "../../../../pages/CreatePassword";
 
 const ManagePassword = () => {
@@ -86,52 +79,46 @@ const ManagePassword = () => {
   return (
     <>
       <div className="settings-section-title-placeholder" />
-      <IonCard>
-        <IonList
-          lines="none"
-          data-testid="settings-security-items"
-        >
-          <IonItem
+      <ListCard
+        items={[{ id: "toggle-password" }]}
+        renderItem={(item) => (
+          <ListItem
+            key={item.id}
             onClick={() => handleToggle()}
-            className="settings-item"
-            data-testid={"settings-item-toggle-password"}
-          >
-            <IonLabel>
-              {i18n.t("settings.sections.security.managepassword.page.enable")}
-            </IonLabel>
-            <IonToggle
-              aria-label={`${i18n.t(
-                "settings.sections.security.managepassword.page.enable"
-              )}`}
-              className="toggle-button"
-              checked={passwordIsSet}
-            />
-          </IonItem>
-        </IonList>
-      </IonCard>
-      {passwordIsSet && (
-        <IonCard>
-          <IonList
-            lines="none"
-            data-testid="settings-security-items"
-          >
-            <IonItem
-              onClick={() => handleChange()}
-              className="settings-item"
-              data-testid={"settings-item-change-password"}
-            >
-              <IonLabel>{`${i18n.t(
-                "settings.sections.security.managepassword.page.change"
-              )}`}</IonLabel>
-
-              <IonIcon
-                aria-hidden="true"
-                icon={chevronForward}
-                slot="end"
+            testId="settings-item-toggle-password"
+            className="list-item"
+            label={`${i18n.t(
+              "settings.sections.security.managepassword.page.enable"
+            )}`}
+            actionIcon={
+              <IonToggle
+                aria-label={`${i18n.t(
+                  "settings.sections.security.managepassword.page.enable"
+                )}`}
+                className="toggle-button"
+                checked={passwordIsSet}
               />
-            </IonItem>
-          </IonList>
-        </IonCard>
+            }
+          />
+        )}
+        testId="settings-security-items"
+      />
+      {passwordIsSet && (
+        <ListCard
+          items={[{ id: "change-password" }]}
+          renderItem={(item) => (
+            <ListItem
+              key={item.id}
+              onClick={() => handleChange()}
+              testId="settings-item-change-password"
+              className="list-item"
+              label={`${i18n.t(
+                "settings.sections.security.managepassword.page.change"
+              )}`}
+            />
+          )}
+          testId="settings-security-items"
+        />
       )}
       <Alert
         isOpen={alertEnableIsOpen}
