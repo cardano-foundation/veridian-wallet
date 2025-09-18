@@ -193,6 +193,7 @@ class MultiSigService extends AgentService {
         theme: mHabRecord.theme,
         creationStatus,
         groupMemberPre: memberPrefix,
+        groupMetadata: mHabRecord.groupMetadata,
         createdAt: new Date(multisigDetail.icp_dt),
       });
     } catch (error) {
@@ -547,6 +548,7 @@ class MultiSigService extends AgentService {
         theme: mHabRecord.theme,
         creationStatus,
         groupMemberPre: mHabRecord.id,
+        groupMetadata: mHabRecord.groupMetadata,
         createdAt: new Date(multisigDetail.icp_dt),
       });
     } catch (error) {
