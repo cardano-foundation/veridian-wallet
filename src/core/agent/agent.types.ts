@@ -34,6 +34,7 @@ interface RegularConnectionDetails extends ConnectionShortDetailsBase {
 // Multisig connection with groupId
 interface MultisigConnectionDetails extends ConnectionShortDetailsBase {
   groupId: string;
+  hasAccepted?: boolean;
 }
 
 type ConnectionShortDetails =

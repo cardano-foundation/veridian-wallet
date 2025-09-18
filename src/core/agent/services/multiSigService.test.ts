@@ -1315,7 +1315,15 @@ describe("Creation of multi-sig", () => {
 
   test("Can get multisig icp details of 2 person group", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
-    groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
+    groupGetRequestMock.mockResolvedValue([
+      {
+        ...getRequestMultisigIcp,
+        exn: {
+          ...getRequestMultisigIcp.exn,
+          e: { icp: { kt: "3", nt: "2" } },
+        },
+      },
+    ]);
     identifiers.getIdentifiers = jest
       .fn()
       .mockResolvedValue([memberMetadataRecord]);
@@ -1324,15 +1332,40 @@ describe("Creation of multi-sig", () => {
       .mockResolvedValue(initiatorConnectionShortDetails);
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([]);
 
+    // Mock the dependencies for getInceptionStatus
+    identifiersMembersMock.mockResolvedValue({
+      signing: [
+        { aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+        { aid: "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7" },
+      ],
+    });
+    listExchangesMock.mockResolvedValue([
+      {
+        i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
+        exn: {
+          e: {
+            icp: {
+              kt: "3",
+              nt: "2",
+            },
+          },
+        },
+      },
+    ]);
+
     const result = await multiSigService.getMultisigIcpDetails(
       "ELLb0OvktIxeHDeeOnRJ2pc9IkYJ38An4PXYigUQ_3AO"
     );
 
     expect(result.ourIdentifier.id).toBe(memberMetadataRecord.id);
     expect(result.sender.id).toBe(initiatorConnectionShortDetails.id);
+    expect(result.sender.groupId).toBe(
+      "EBHG7UW-48EAF4bMYbaCsPQfSuFk-INidVXLexDMk6pN"
+    );
+    expect(result.sender.hasAccepted).toBe(true);
     expect(result.otherConnections.length).toBe(0);
-    expect(result.signingThreshold).toBe(2);
-    expect(result.rotationThreshold).toBe(3); // From fixture, not from createThresholds
+    expect(result.signingThreshold).toBe(3);
+    expect(result.rotationThreshold).toBe(2);
   });
 
   test("Throw error if the group join request contains unknown identifiers", async () => {
@@ -1361,6 +1394,28 @@ describe("Creation of multi-sig", () => {
       .fn()
       .mockResolvedValue(initiatorConnectionShortDetails);
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([]);
+
+    identifiersMembersMock.mockResolvedValue({
+      signing: [
+        { aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+        { aid: "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ" },
+        // Note: EI8fS00-AxbbqXmwoivpw-0ui0qgZtGbh8Ue-ZVbxYST is not in members (unknown identifier)
+      ],
+    });
+    listExchangesMock.mockResolvedValue([
+      {
+        i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
+        exn: {
+          e: {
+            icp: {
+              kt: "3",
+              nt: "3",
+            },
+          },
+        },
+      },
+    ]);
+
     await expect(
       multiSigService.getMultisigIcpDetails(
         "ELLb0OvktIxeHDeeOnRJ2pc9IkYJ38An4PXYigUQ_3AO"
@@ -1370,7 +1425,15 @@ describe("Creation of multi-sig", () => {
 
   test("Should not error if we have extra linked contacts", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
-    groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
+    groupGetRequestMock.mockResolvedValue([
+      {
+        ...getRequestMultisigIcp,
+        exn: {
+          ...getRequestMultisigIcp.exn,
+          e: { icp: { kt: "3", nt: "2" } },
+        },
+      },
+    ]);
     identifiers.getIdentifiers = jest
       .fn()
       .mockResolvedValue([memberMetadataRecord]);
@@ -1394,15 +1457,46 @@ describe("Creation of multi-sig", () => {
       },
     ]);
 
+    // Mock the dependencies for getInceptionStatus
+    identifiersMembersMock.mockResolvedValue({
+      signing: [
+        { aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+        { aid: "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7" },
+      ],
+    });
+    listExchangesMock.mockResolvedValue([
+      {
+        i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
+        exn: {
+          e: {
+            icp: {
+              kt: "3",
+              nt: "2",
+            },
+          },
+        },
+      },
+    ]);
+
     const result = await multiSigService.getMultisigIcpDetails(
       "ELLb0OvktIxeHDeeOnRJ2pc9IkYJ38An4PXYigUQ_3AO"
     );
 
     expect(result.ourIdentifier.id).toBe(memberMetadataRecord.id);
     expect(result.sender.id).toBe(initiatorConnectionShortDetails.id);
+    expect(result.sender.groupId).toBe(
+      "EBHG7UW-48EAF4bMYbaCsPQfSuFk-INidVXLexDMk6pN"
+    );
+    expect(result.sender.hasAccepted).toBe(true);
     expect(result.otherConnections.length).toBe(0);
-    expect(result.signingThreshold).toBe(2);
-    expect(result.rotationThreshold).toBe(3); // From fixture, not from createThresholds
+    expect(result.signingThreshold).toBe(3);
+    expect(result.rotationThreshold).toBe(2);
+    expect(listExchangesMock).toHaveBeenCalledWith({
+      filter: {
+        "-r": "/multisig/icp",
+        "-a-gid": "EBHG7UW-48EAF4bMYbaCsPQfSuFk-INidVXLexDMk6pN",
+      },
+    });
   });
 
   test("Can get multisig icp details of 3 person group", async () => {
@@ -1420,7 +1514,7 @@ describe("Creation of multi-sig", () => {
               "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ",
             ],
           },
-          e: { icp: { kt: 2, nt: 3 } },
+          e: { icp: { kt: "3", nt: "2" } },
         },
       },
     ]);
@@ -1440,18 +1534,47 @@ describe("Creation of multi-sig", () => {
       },
     ]);
 
+    // Mock the dependencies for getInceptionStatus
+    identifiersMembersMock.mockResolvedValue({
+      signing: [
+        { aid: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+        { aid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
+        { aid: "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ" },
+      ],
+    });
+    listExchangesMock.mockResolvedValue([
+      {
+        i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
+        exn: {
+          e: {
+            icp: {
+              kt: "3",
+              nt: "2",
+            },
+          },
+        },
+      },
+      { i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
+    ]);
+
     const result = await multiSigService.getMultisigIcpDetails(
       "ED-gjeEni5eCdpFlBtG7s4wkv7LJ0TmWplCS4DNQwW2P"
     );
 
     expect(result.ourIdentifier.id).toBe(memberMetadataRecord.id);
     expect(result.sender.id).toBe(initiatorConnectionShortDetails.id);
+    expect(result.sender.groupId).toBe(
+      "EBHG7UW-48EAF4bMYbaCsPQfSuFk-INidVXLexDMk6pN"
+    );
+    expect(result.sender.hasAccepted).toBe(true);
     expect(result.otherConnections.length).toBe(1);
     expect(result.otherConnections[0].id).toBe(
       "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"
     );
-    expect(result.signingThreshold).toBe(2);
-    expect(result.rotationThreshold).toBe(3); // From fixture, not from createThresholds
+    expect(result.otherConnections[0].hasAccepted).toBe(true);
+    expect(result.otherConnections[0].groupId).toBe("groupid");
+    expect(result.signingThreshold).toBe(3);
+    expect(result.rotationThreshold).toBe(2);
   });
 
   test("Cannot get multisig icp details if the exn is missing", async () => {

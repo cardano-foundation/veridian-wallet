@@ -441,8 +441,15 @@ class MultiSigService extends AgentService {
       throw new Error(MultiSigService.MEMBER_AID_NOT_FOUND);
     }
 
+    senderContact.groupId = icpMsg[0].exn.a.gid;
+    senderContact.hasAccepted = icpMsg[0].exn.a.smids.includes(senderPrefix);
+
     const linkedConnections = await this.connections.getMultisigLinkedContacts(
       ourIdentifier.groupMetadata.groupId
+    );
+
+    const groupInceptionStatus = await this.getInceptionStatus(
+      icpMsg[0].exn.a.gid
     );
     const otherConnections = [];
     for (const prefix of smids) {
@@ -451,11 +458,20 @@ class MultiSigService extends AgentService {
       const linkedConnection = linkedConnections.find(
         (connection) => connection.id === prefix
       );
-      if (!linkedConnection) {
+
+      const memberStatus = groupInceptionStatus.members.find(
+        (member) => member.aid === prefix
+      );
+
+      if (!linkedConnection || !memberStatus) {
         throw new Error(MultiSigService.UNKNOWN_AIDS_IN_MULTISIG_ICP);
       }
 
-      otherConnections.push(linkedConnection);
+      otherConnections.push({
+        ...linkedConnection,
+        hasAccepted: memberStatus.hasAccepted,
+        groupId: ourIdentifier.groupMetadata.groupId,
+      });
     }
 
     return {
