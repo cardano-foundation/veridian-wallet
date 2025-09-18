@@ -76,13 +76,10 @@ class MultiSigService extends AgentService {
     "We do not control any member AID of the multi-sig";
   static readonly QUEUED_GROUP_DATA_MISSING =
     "Cannot retry creating group identifier if retry data is missing from the DB";
-  static readonly NO_GROUP_FOUND =
-    "No group information found for the given notification";
 
   protected readonly identifierStorage: IdentifierStorage;
   protected readonly operationPendingStorage: OperationPendingStorage;
   protected readonly notificationStorage: NotificationStorage;
-  protected readonly contactStorage: ContactStorage;
   protected readonly basicStorage: BasicStorage;
   protected readonly connections: ConnectionService;
   protected readonly identifiers: IdentifierService;
@@ -92,7 +89,6 @@ class MultiSigService extends AgentService {
     identifierStorage: IdentifierStorage,
     operationPendingStorage: OperationPendingStorage,
     notificationStorage: NotificationStorage,
-    contactStorage: ContactStorage,
     basicStorage: BasicStorage,
     connections: ConnectionService,
     identifiers: IdentifierService
@@ -101,7 +97,6 @@ class MultiSigService extends AgentService {
     this.identifierStorage = identifierStorage;
     this.operationPendingStorage = operationPendingStorage;
     this.notificationStorage = notificationStorage;
-    this.contactStorage = contactStorage;
     this.basicStorage = basicStorage;
     this.connections = connections;
     this.identifiers = identifiers;
@@ -800,7 +795,7 @@ class MultiSigService extends AgentService {
     }
   }
 
-  async getGroupInformation(multisigId: string): Promise<GroupInformation> {
+  async getInceptionStatus(multisigId: string): Promise<GroupInformation> {
     const multisigAidDetails = await this.props.signifyClient
       .identifiers()
       .get(multisigId);
@@ -809,11 +804,18 @@ class MultiSigService extends AgentService {
       .identifiers()
       .members(multisigId);
 
-    // TODO check joined members
-    const memberInfos = members.signing.map((member: { aid: string }) => ({
-      aid: member.aid,
-      hasAccepted: false,
-    }));
+    const exchanges = await this.props.signifyClient.exchanges().list({
+      filter: { "-r": MultiSigRoute.ICP, "-a-gid": multisigId },
+    });
+
+    const memberInfos = members.signing.map((member: { aid: string }) => {
+      const hasAccepted = exchanges.some((exn: any) => exn.i === member.aid);
+
+      return {
+        aid: member.aid,
+        hasAccepted,
+      };
+    });
 
     const signingThreshold = Number(multisigAidDetails.group?.mhab.state.kt);
     const rotationThreshold = Number(multisigAidDetails.group?.mhab.state.nt);

@@ -190,7 +190,6 @@ const multiSigService = new MultiSigService(
   identifierStorage as any,
   operationPendingStorage as any,
   notificationStorage as any,
-  contactStorage as any,
   basicStorage as any,
   connections as any,
   identifiers as any
