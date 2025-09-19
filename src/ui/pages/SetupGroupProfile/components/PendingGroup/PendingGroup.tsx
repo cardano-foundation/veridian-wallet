@@ -7,13 +7,15 @@ import {
   star,
   warningOutline,
 } from "ionicons/icons";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
+import { GroupInformation } from "../../../../../core/agent/services/multiSig.types";
 import { i18n } from "../../../../../i18n";
 import { RoutePath, TabsRoutePath } from "../../../../../routes/paths";
 import { useAppDispatch } from "../../../../../store/hooks";
 import { removeProfile } from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
+import { Alert } from "../../../../components/Alert";
 import { Avatar, MemberAvatar } from "../../../../components/Avatar";
 import {
   CardBlock,
@@ -25,46 +27,56 @@ import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { ListHeader } from "../../../../components/ListHeader";
 import { PageHeader } from "../../../../components/PageHeader";
+import { Spinner } from "../../../../components/Spinner";
+import { SpinnerConverage } from "../../../../components/Spinner/Spinner.type";
 import { Verification } from "../../../../components/Verification";
 import { ToastMsgType } from "../../../../globals/types";
-import { useAppIonRouter } from "../../../../hooks";
+import { useAppIonRouter, useOnlineStatusEffect } from "../../../../hooks";
 import { useProfile } from "../../../../hooks/useProfile";
 import { showError } from "../../../../utils/error";
 import { combineClassNames } from "../../../../utils/style";
 import { Profiles } from "../../../Profiles";
 import { StageProps } from "../../SetupGroupProfile.types";
 import "./PendingGroup.scss";
-import { Alert } from "../../../../components/Alert";
 
 const PendingGroup = ({ state }: StageProps) => {
   const componentId = "pending-group";
   const [openProfiles, setOpenProfiles] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [alertDeleteOpen, setAlertDeleteOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { setRecentProfileAsDefault, defaultProfile } = useProfile();
   const identity = defaultProfile?.identity;
   const dispatch = useAppDispatch();
   const ionRouter = useAppIonRouter();
+
+  const [multisigIcpDetails, setMultisigIcpDetails] =
+    useState<GroupInformation | null>(null);
 
   const handleAvatarClick = () => {
     setOpenProfiles(true);
   };
 
   const members = useMemo(() => {
-    const members = state.selectedConnections?.map((member) => {
-      const name = member?.label || "";
+    const members = state.selectedConnections?.map((connection) => {
+      const name = connection?.label || "";
 
       return {
         name,
         isCurrentUser: false,
-        accepted: false,
+        accepted: !!multisigIcpDetails?.members.find(
+          (member) => member.aid === connection.id
+        )?.hasAccepted,
       };
     });
 
     members.unshift({
-      name: identity?.displayName || "",
+      name: identity?.groupMetadata?.userName || "",
       isCurrentUser: true,
-      accepted: !!identity?.groupMetadata?.groupInitiator,
+      accepted:
+        multisigIcpDetails?.members.find(
+          (item) => item.aid === identity?.groupMemberPre
+        )?.hasAccepted || false,
     });
 
     return members.map((member, index) => ({
@@ -72,8 +84,9 @@ const PendingGroup = ({ state }: StageProps) => {
       rank: index >= 0 ? index % 5 : 0,
     }));
   }, [
-    identity?.displayName,
-    identity?.groupMetadata?.groupInitiator,
+    identity?.groupMemberPre,
+    identity?.groupMetadata?.userName,
+    multisigIcpDetails?.members,
     state.selectedConnections,
   ]);
 
@@ -82,6 +95,7 @@ const PendingGroup = ({ state }: StageProps) => {
 
     try {
       setVerifyIsOpen(false);
+      setLoading(true);
 
       await Agent.agent.identifiers.markIdentifierPendingDelete(identity.id);
       const nextCurrentProfile = await setRecentProfileAsDefault();
@@ -103,12 +117,29 @@ const PendingGroup = ({ state }: StageProps) => {
         dispatch,
         ToastMsgType.DELETE_IDENTIFIER_FAIL
       );
+    } finally {
+      setLoading(false);
     }
   };
 
-  const fetchMembers = () => {
-    // TODO
-  };
+  const getDetails = useCallback(async () => {
+    if (!identity?.id || !identity?.groupMetadata) return;
+
+    try {
+      setLoading(true);
+      const details = await Agent.agent.multiSigs.getInceptionStatus(
+        identity.id
+      );
+
+      setMultisigIcpDetails(details);
+    } catch (e) {
+      showError("Unable to load group: ", e, dispatch);
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch, identity?.groupMetadata, identity?.id]);
+
+  useOnlineStatusEffect(getDetails);
 
   const closeAlert = () => setAlertDeleteOpen(false);
 
@@ -121,7 +152,7 @@ const PendingGroup = ({ state }: StageProps) => {
         customClass="pending-group"
         header={
           <PageHeader
-            title={identity?.displayName}
+            title={identity?.groupMetadata?.userName}
             additionalButtons={
               identity?.id && (
                 <Avatar
@@ -144,7 +175,7 @@ const PendingGroup = ({ state }: StageProps) => {
           testId="group-member-block"
           className="group-members"
           endSlotIcon={refreshOutline}
-          onClick={fetchMembers}
+          onClick={getDetails}
         >
           {members.map((item, index) => {
             return (
@@ -203,7 +234,7 @@ const PendingGroup = ({ state }: StageProps) => {
             mainContent={`${i18n.t(
               `setupgroupprofile.initgroup.setsigner.members`,
               {
-                members: state.signer.requiredSigners,
+                members: multisigIcpDetails?.threshold.signingThreshold || 0,
               }
             )}`}
           />
@@ -221,7 +252,7 @@ const PendingGroup = ({ state }: StageProps) => {
             mainContent={`${i18n.t(
               `setupgroupprofile.initgroup.setsigner.members`,
               {
-                members: state.signer.recoverySigners,
+                members: multisigIcpDetails?.threshold.rotationThreshold || 0,
               }
             )}`}
           />
@@ -243,6 +274,10 @@ const PendingGroup = ({ state }: StageProps) => {
           {i18n.t("setupgroupprofile.pending.leave.button")}
         </IonButton>
       </ScrollablePageLayout>
+      <Spinner
+        show={loading}
+        coverage={SpinnerConverage.Screen}
+      />
       <Alert
         isOpen={alertDeleteOpen}
         setIsOpen={setAlertDeleteOpen}

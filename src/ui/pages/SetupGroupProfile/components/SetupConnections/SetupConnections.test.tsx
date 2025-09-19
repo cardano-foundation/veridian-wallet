@@ -329,7 +329,9 @@ describe("Setup Connection", () => {
     expect(
       getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.subtitle)
     ).toBeVisible();
-    expect(getByText(initiatorGroupProfile.displayName)).toBeVisible();
+    expect(
+      getByText(initiatorGroupProfile.groupMetadata.userName)
+    ).toBeVisible();
     expect(getByTestId("avatar-button")).toBeVisible();
 
     fireEvent.click(getByTestId("avatar-button"));

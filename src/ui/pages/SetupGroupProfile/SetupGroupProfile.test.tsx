@@ -75,6 +75,16 @@ jest.mock("@capacitor/core", () => {
   };
 });
 
+jest.mock("@capgo/capacitor-native-biometric", () => ({
+  ...jest.requireActual("@capgo/capacitor-native-biometric"),
+  NativeBiometric: {
+    isAvailable: jest.fn(),
+    verifyIdentity: jest.fn(),
+    getCredentials: jest.fn(),
+    setCredentials: jest.fn(),
+  },
+}));
+
 const barcodes = [
   {
     displayValue:
@@ -551,7 +561,9 @@ describe("Setup Connections", () => {
     );
 
     await waitFor(() => {
-      expect(getByText(multisignIdentifierFix[0].displayName)).toBeVisible();
+      expect(
+        getByText(multisignIdentifierFix[0].groupMetadata!.userName)
+      ).toBeVisible();
     });
   });
 });

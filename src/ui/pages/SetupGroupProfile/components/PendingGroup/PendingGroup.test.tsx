@@ -5,13 +5,22 @@ import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { RoutePath } from "../../../../../routes/paths";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { connectionsFix } from "../../../../__fixtures__/connectionsFix";
+import {
+  connectionsFix,
+  connectionsForNotificationsValues,
+  multisignConnection,
+} from "../../../../__fixtures__/connectionsFix";
 import { multisignIdentifierFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import { ToastMsgType } from "../../../../globals/types";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { GroupInfomation, Stage } from "../../SetupGroupProfile.types";
 import { PendingGroup } from "./PendingGroup";
+import {
+  ConnectionShortDetails,
+  MultisigConnectionDetailsFull,
+  RegularConnectionDetails,
+} from "../../../../../core/agent/agent.types";
 
 const markIdentifierPendingDelete = jest.fn();
 
@@ -41,6 +50,23 @@ jest.mock("../../../../../core/agent/agent", () => ({
       },
       basicStorage: {
         deleteById: jest.fn(),
+      },
+      multiSigs: {
+        getInceptionStatus: jest.fn(() =>
+          Promise.resolve(() => ({
+            threshold: {
+              signingThreshold: 1,
+              rotationThreshold: 2,
+            },
+            members: [
+              {
+                aid: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+                name: "Leader",
+                hasAccepted: false,
+              },
+            ],
+          }))
+        ),
       },
     },
   },
@@ -99,8 +125,8 @@ describe("Pending group", () => {
       recoverySigners: 0,
       requiredSigners: 0,
     },
-    scannedConections: [connectionsFix[3]],
-    selectedConnections: [],
+    scannedConections: [multisignConnection as ConnectionShortDetails],
+    selectedConnections: [multisignConnection as ConnectionShortDetails],
     ourIdentifier: initiatorGroupProfile.id,
     newIdentifier: initiatorGroupProfile,
   };
@@ -164,6 +190,10 @@ describe("Pending group", () => {
           EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.requiredsigners
         )
       ).toBeVisible();
+
+      await waitFor(() => {
+        expect(getByText(multisignConnection.label)).toBeVisible();
+      });
     });
 
     test("Leave group", async () => {

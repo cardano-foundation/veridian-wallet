@@ -1,6 +1,8 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { pencilOutline, star, warningOutline } from "ionicons/icons";
 import { useMemo, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { Agent } from "../../../../../core/agent/agent";
 import {
   ConnectionShortDetails,
   MultisigConnectionDetails,
@@ -8,6 +10,7 @@ import {
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getCurrentProfile } from "../../../../../store/reducers/profileCache";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
 import { MemberAvatar } from "../../../../components/Avatar";
 import {
@@ -19,17 +22,16 @@ import {
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
+import { Spinner } from "../../../../components/Spinner";
+import { SpinnerConverage } from "../../../../components/Spinner/Spinner.type";
+import { ToastMsgType } from "../../../../globals/types";
+import { showError } from "../../../../utils/error";
 import { Stage, StageProps } from "../../SetupGroupProfile.types";
 import { SetupMemberModal } from "../SetupMemberModal/SetupMemberModal";
 import { SetupSignerModal } from "../SetupSignerModal";
 import { SignerData } from "../SetupSignerModal/SetupSignerModal.types";
 import "./InitializeGroup.scss";
-import { Agent } from "../../../../../core/agent/agent";
-import { showError } from "../../../../utils/error";
-import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../../../globals/types";
-import { Spinner } from "../../../../components/Spinner";
-import { SpinnerConverage } from "../../../../components/Spinner/Spinner.type";
+import { RoutePath } from "../../../../../routes";
 
 const InitializeGroup = ({ state, setState }: StageProps) => {
   const dispatch = useAppDispatch();
@@ -38,6 +40,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   const [openSigners, setOpenSigners] = useState(false);
   const [openEditMembers, setOpenEditMembers] = useState(false);
   const [loading, setLoading] = useState(false);
+  const history = useHistory();
 
   const profile = useAppSelector(getCurrentProfile);
 
@@ -58,7 +61,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
     });
 
     members.unshift({
-      name: profile?.identity.displayName || "",
+      name: profile?.identity.groupMetadata?.userName || "",
       isCurrentUser: true,
     });
 
@@ -66,7 +69,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       ...member,
       rank: index >= 0 ? index % 5 : 0,
     }));
-  }, [profile?.identity.displayName, state.selectedConnections]);
+  }, [profile?.identity.groupMetadata?.userName, state.selectedConnections]);
 
   const openSignerModal = () => setOpenSigners(true);
 
@@ -97,12 +100,18 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
     } else {
       setLoading(true);
       try {
-        await Agent.agent.multiSigs.createGroup(
+        const mutilsigId = await Agent.agent.multiSigs.createGroup(
           ourIdentifier,
           state.selectedConnections as MultisigConnectionDetails[],
-          state.signer.requiredSigners
+          {
+            rotationThreshold: state.signer.recoverySigners,
+            signingThreshold: state.signer.requiredSigners,
+          }
         );
         dispatch(setToastMsg(ToastMsgType.GROUP_REQUEST_SEND));
+        history.replace(
+          RoutePath.GROUP_PROFILE_SETUP.replace(":id", mutilsigId)
+        );
       } catch (e) {
         showError(
           "Unable to create group",

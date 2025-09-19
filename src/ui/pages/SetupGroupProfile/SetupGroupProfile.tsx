@@ -45,7 +45,9 @@ const SetupGroupProfile = () => {
   const [state, setState] = useState<GroupInfomation>({
     ...initialState,
     stage:
-      currentProfile?.identity.creationStatus === CreationStatus.PENDING
+      currentProfile?.identity.creationStatus === CreationStatus.PENDING &&
+      currentProfile.multisigConnections.length > 0 &&
+      currentProfile.identity.groupMetadata?.groupInitiator
         ? Stage.Pending
         : Stage.SetupConnection,
   });
@@ -56,7 +58,9 @@ const SetupGroupProfile = () => {
 
     setState({
       stage:
-        currentProfile.identity.creationStatus === CreationStatus.PENDING
+        currentProfile.identity.creationStatus === CreationStatus.PENDING &&
+        currentProfile.multisigConnections.length > 0 &&
+        currentProfile.identity.groupMetadata?.groupInitiator
           ? Stage.Pending
           : Stage.SetupConnection,
       displayNameValue: currentProfile.identity.displayName,
