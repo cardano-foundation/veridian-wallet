@@ -1,0 +1,33 @@
+.settings-content,
+.nested-content {
+  margin-top: 2rem;
+  --ion-item-background: var(--ion-color-neutral-100);
+
+  .settings-section-title {
+    margin: 0.625rem 1.25rem;
+  }
+
+  .settings-section-title-placeholder {
+    margin-top: 2.25rem;
+  }
+
+  .info-card {
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  .list-card {
+    margin: 0 0 1.5rem;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    margin-top: 1rem;
+
+    ion-card {
+      padding: 0.5rem 1rem;
+    }
+
+    .settings-section-title {
+      font-size: 0.8rem !important;
+    }
+  }
+}

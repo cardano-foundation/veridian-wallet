@@ -1,5 +1,5 @@
 import { NativeBiometric } from "@capgo/capacitor-native-biometric";
-import { IonCard, IonList, IonToggle } from "@ionic/react";
+import { IonToggle } from "@ionic/react";
 import {
   AndroidSettings,
   IOSSettings,
@@ -18,19 +18,25 @@ import {
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { ListItem } from "../../ListCard/ListItem/ListItem";
+import { ListCard } from "../../ListCard/ListCard";
 import pJson from "../../../../../package.json";
-import "./SettingList.scss";
+import "./SettingsList.scss";
 import { useAppDispatch } from "../../../../store/hooks";
 import {
   getBiometricsCache,
   setEnableBiometricsCache,
 } from "../../../../store/reducers/biometricsCache";
-import { BiometricAuthOutcome, useBiometricAuth, BIOMETRIC_SERVER_KEY } from "../../../hooks/useBiometricsHook";
+import {
+  BiometricAuthOutcome,
+  useBiometricAuth,
+  BIOMETRIC_SERVER_KEY,
+} from "../../../hooks/useBiometricsHook";
 import { usePrivacyScreen } from "../../../hooks/privacyScreenHook";
 import {
   OptionIndex,
   OptionProps,
-  SettingListProps,
+  SettingsListProps,
   SettingScreen,
 } from "../Settings.types";
 import { i18n } from "../../../../i18n";
@@ -48,19 +54,22 @@ import {
 import { CLEAR_STORE_ACTIONS } from "../../../../store/utils";
 import { ToastMsgType } from "../../../globals/types";
 import { RoutePath } from "../../../../routes";
-import { SettingsItem } from "./SettingsItem";
 import { PageFooter } from "../../PageFooter";
 import { ChangePin } from "./ChangePin";
 import { Alert } from "../../Alert";
 import { Verification } from "../../Verification";
 import { InfoCard } from "../../InfoCard";
 
-
-const SettingList = ({ switchView, handleClose }: SettingListProps) => {
+const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const dispatch = useAppDispatch();
   const biometricsCache = useSelector(getBiometricsCache);
   const [option, setOption] = useState<number | null>(null);
-  const { biometricInfo, setupBiometrics, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
+  const {
+    biometricInfo,
+    setupBiometrics,
+    remainingLockoutSeconds,
+    lockoutEndTime,
+  } = useBiometricAuth();
 
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [changePinIsOpen, setChangePinIsOpen] = useState(false);
@@ -68,7 +77,8 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   const [openBiometricAlert, setOpenBiometricAlert] = useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
   const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
-  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
+  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] =
+    useState(false);
   const history = useHistory();
 
   useEffect(() => {
@@ -76,7 +86,7 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
       setShowMaxAttemptsAlert(false);
     }
   }, [lockoutEndTime, showMaxAttemptsAlert]);
-  
+
   const securityItems: OptionProps[] = [
     {
       index: OptionIndex.ChangePin,
@@ -95,10 +105,7 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
     },
   ];
 
-  if (
-    biometricsCache.enabled !== undefined &&
-    biometricInfo?.isAvailable
-  ) {
+  if (biometricsCache.enabled !== undefined && biometricInfo?.isAvailable) {
     securityItems.unshift({
       index: OptionIndex.BiometricUpdate,
       icon: fingerPrintOutline,
@@ -143,7 +150,9 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
 
     try {
       if (!newBiometricsEnabledState) {
-        await NativeBiometric.deleteCredentials({ server: BIOMETRIC_SERVER_KEY });
+        await NativeBiometric.deleteCredentials({
+          server: BIOMETRIC_SERVER_KEY,
+        });
       }
 
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
@@ -153,7 +162,6 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
         })
       );
       dispatch(setEnableBiometricsCache(newBiometricsEnabledState));
-
     } catch (e) {
       showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
     }
@@ -306,41 +314,45 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
       <div className="settings-section-title">
         {i18n.t("settings.sections.security.title")}
       </div>
-      <IonCard>
-        <IonList
-          lines="none"
-          data-testid="settings-security-items"
-        >
-          {securityItems.map((item: OptionProps) => {
-            return (
-              <SettingsItem
-                key={item.index}
-                item={item}
-                handleOptionClick={handleOptionClick}
-              />
-            );
-          })}
-        </IonList>
-      </IonCard>
+      <ListCard
+        items={securityItems}
+        renderItem={(item) => (
+          <ListItem
+            key={item.index}
+            index={item.index}
+            icon={item.icon}
+            label={item.label}
+            actionIcon={item.actionIcon}
+            note={item.note}
+            href={item.href}
+            onClick={() => handleOptionClick(item)}
+            testId={`settings-security-list-item-${item.index}`}
+            className="list-item"
+          />
+        )}
+        testId="settings-security-items"
+      />
       <div className="settings-section-title">
         {i18n.t("settings.sections.support.title")}
       </div>
-      <IonCard>
-        <IonList
-          lines="none"
-          data-testid="settings-support-items"
-        >
-          {supportItems.map((item) => {
-            return (
-              <SettingsItem
-                key={item.index}
-                item={item}
-                handleOptionClick={handleOptionClick}
-              />
-            );
-          })}
-        </IonList>
-      </IonCard>
+      <ListCard
+        items={supportItems}
+        renderItem={(item) => (
+          <ListItem
+            key={item.index}
+            index={item.index}
+            icon={item.icon}
+            label={item.label}
+            actionIcon={item.actionIcon}
+            note={item.note}
+            href={item.href}
+            onClick={() => handleOptionClick(item)}
+            testId={`settings-support-list-item-${item.index}`}
+            className="list-item"
+          />
+        )}
+        testId="settings-support-items"
+      />
       <PageFooter
         deleteButtonAction={openDeleteAccountAlert}
         deleteButtonText={`${i18n.t("settings.sections.deleteaccount.button")}`}
@@ -390,7 +402,9 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
         isOpen={showMaxAttemptsAlert}
         setIsOpen={setShowMaxAttemptsAlert}
         dataTestId="alert-max-attempts"
-        headerText={`${i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds })}`}
+        headerText={`${i18n.t("biometry.lockoutheader", {
+          seconds: remainingLockoutSeconds,
+        })}`}
         confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
         actionConfirm={() => setShowMaxAttemptsAlert(false)}
         backdropDismiss={false}
@@ -408,4 +422,4 @@ const SettingList = ({ switchView, handleClose }: SettingListProps) => {
   );
 };
 
-export { SettingList };
+export { SettingsList };

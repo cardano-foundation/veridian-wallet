@@ -95,6 +95,9 @@ jest.mock(
   })
 );
 
+const defaultProfileId =
+  profileCacheFixData.defaultProfile || "test-profile-id";
+
 describe("ProfileContent", () => {
   const mockProps = {
     cardData: identifierFix[0],
@@ -159,10 +162,8 @@ describe("ProfileContent", () => {
         profilesCache: {
           ...profileCacheFixData,
           profiles: {
-            [profileCacheFixData.defaultProfile!]: {
-              ...profileCacheFixData.profiles[
-                profileCacheFixData.defaultProfile!
-              ],
+            [defaultProfileId]: {
+              ...profileCacheFixData.profiles[defaultProfileId],
               credentials: [],
             },
           },
@@ -184,10 +185,8 @@ describe("ProfileContent", () => {
         profilesCache: {
           ...profileCacheFixData,
           profiles: {
-            [profileCacheFixData.defaultProfile!]: {
-              ...profileCacheFixData.profiles[
-                profileCacheFixData.defaultProfile!
-              ],
+            [defaultProfileId]: {
+              ...profileCacheFixData.profiles[defaultProfileId],
               connections: [],
               multisigConnections: [],
             },
@@ -210,10 +209,8 @@ describe("ProfileContent", () => {
         profilesCache: {
           ...profileCacheFixData,
           profiles: {
-            [profileCacheFixData.defaultProfile!]: {
-              ...profileCacheFixData.profiles[
-                profileCacheFixData.defaultProfile!
-              ],
+            [defaultProfileId]: {
+              ...profileCacheFixData.profiles[defaultProfileId],
               peerConnections: [],
             },
           },
@@ -235,10 +232,8 @@ describe("ProfileContent", () => {
         profilesCache: {
           ...profileCacheFixData,
           profiles: {
-            [profileCacheFixData.defaultProfile!]: {
-              ...profileCacheFixData.profiles[
-                profileCacheFixData.defaultProfile!
-              ],
+            [defaultProfileId]: {
+              ...profileCacheFixData.profiles[defaultProfileId],
               connections: [{ id: "conn1" }, { id: "conn2" }],
               multisigConnections: [
                 { id: "multi1" },
@@ -265,10 +260,8 @@ describe("ProfileContent", () => {
         profilesCache: {
           ...profileCacheFixData,
           profiles: {
-            [profileCacheFixData.defaultProfile!]: {
-              ...profileCacheFixData.profiles[
-                profileCacheFixData.defaultProfile!
-              ],
+            [defaultProfileId]: {
+              ...profileCacheFixData.profiles[defaultProfileId],
               connections: undefined,
             },
           },
@@ -308,7 +301,7 @@ describe("ProfileContent", () => {
     it("should render DApp connection block", () => {
       const { getByTestId } = renderComponent();
 
-      expect(getByTestId("dapp-block")).toBeInTheDocument();
+      expect(getByTestId("profiledetails-list-option-0")).toBeInTheDocument();
     });
 
     it("should open ConnectdApp modal when DApp block is clicked", () => {
@@ -316,7 +309,7 @@ describe("ProfileContent", () => {
 
       expect(queryByTestId("connect-dapp")).not.toBeInTheDocument();
 
-      const dappBlock = getByTestId("dapp-block");
+      const dappBlock = getByTestId("profiledetails-list-option-0");
       fireEvent.click(dappBlock);
 
       expect(queryByTestId("connect-dapp")).toBeInTheDocument();

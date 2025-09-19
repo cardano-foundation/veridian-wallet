@@ -7,7 +7,7 @@ enum SettingScreen {
   RecoverySeedPhrase,
 }
 
-interface SettingListProps {
+interface SettingsListProps {
   switchView?: (key: SettingScreen) => void;
   handleClose?: () => void;
 }
@@ -38,10 +38,5 @@ enum OptionIndex {
   DeleteAccount,
 }
 
-interface SettingsItemProps {
-  item: OptionProps;
-  handleOptionClick: (item: OptionProps) => void;
-}
-
-export type { SettingsProps, OptionProps, SettingsItemProps, SettingListProps };
+export type { SettingsProps, OptionProps, SettingsListProps };
 export { OptionIndex, SettingScreen };

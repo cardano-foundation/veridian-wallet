@@ -532,7 +532,9 @@
     "identifierdetail": {
       "title": "Profile details",
       "showadvanced": "Show advanced details",
-      "dapp": "dApps",
+      "listoptions": {
+        "dapp": "dApps"
+      },
       "information": {
         "credentials": "Credentials",
         "connections": "Connections",

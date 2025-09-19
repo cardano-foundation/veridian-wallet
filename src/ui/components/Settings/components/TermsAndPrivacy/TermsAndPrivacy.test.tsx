@@ -18,7 +18,7 @@ describe("Term and Privacy", () => {
     ).toBeVisible();
 
     act(() => {
-      fireEvent.click(getByTestId("terms-modal-btn"));
+      fireEvent.click(getByTestId("terms-of-use-modal-btn"));
     });
 
     await waitFor(() => {
@@ -38,7 +38,7 @@ describe("Term and Privacy", () => {
     ).toBeVisible();
 
     act(() => {
-      fireEvent.click(getByTestId("privacy-modal-btn"));
+      fireEvent.click(getByTestId("privacy-policy-modal-btn"));
     });
 
     await waitFor(() => {

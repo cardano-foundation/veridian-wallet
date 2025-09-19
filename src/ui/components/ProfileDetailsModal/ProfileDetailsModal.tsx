@@ -9,7 +9,6 @@ import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { removeProfile } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
-  getStateCache,
   setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
@@ -49,7 +48,6 @@ const ProfileDetailsModule = ({
 }: ProfileDetailsModalProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const stateCache = useAppSelector(getStateCache);
   const biometrics = useAppSelector(getBiometricsCache);
   const passwordAuthentication =
     useAppSelector(getAuthentication).passwordIsSet;
@@ -57,7 +55,6 @@ const ProfileDetailsModule = ({
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
   const [profile, setProfile] = useState<IdentifierDetailsCore | undefined>();
-  const userName = stateCache.authentication.userName;
   const [oobi, setOobi] = useState("");
   const [cloudError, setCloudError] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -77,7 +74,7 @@ const ProfileDetailsModule = ({
     } catch (e) {
       showError("Unable to fetch oobi", e, dispatch);
     }
-  }, [profile?.id, userName, dispatch]);
+  }, [profile?.id, profile?.displayName, dispatch]);
 
   const getDetails = useCallback(async () => {
     if (!profileId) return;
@@ -198,35 +195,29 @@ const ProfileDetailsModule = ({
             />
           }
         >
-          {!profile ? (
+          {profile ? (
+            <div className="card-details-content">
+              <ProfileContent
+                onRotateKey={openRotateModal}
+                cardData={profile as IdentifierDetailsCore}
+                oobi={oobi}
+                setCardData={setProfile}
+              />
+              {!restrictedOptions && (
+                <PageFooter
+                  pageId={pageId}
+                  deleteButtonText={`${i18n.t("profiledetails.delete.button")}`}
+                  deleteButtonAction={deleteButtonAction}
+                />
+              )}
+            </div>
+          ) : (
             <div
               className="identifier-card-detail-spinner-container"
               data-testid="identifier-card-detail-spinner-container"
             >
               <IonSpinner name="circular" />
             </div>
-          ) : (
-            <>
-              <div className="card-details-content">
-                <ProfileContent
-                  onRotateKey={openRotateModal}
-                  cardData={profile as IdentifierDetailsCore}
-                  oobi={oobi}
-                  setCardData={setProfile}
-                />
-                {restrictedOptions ? (
-                  <></>
-                ) : (
-                  <PageFooter
-                    pageId={pageId}
-                    deleteButtonText={`${i18n.t(
-                      "profiledetails.delete.button"
-                    )}`}
-                    deleteButtonAction={deleteButtonAction}
-                  />
-                )}
-              </div>
-            </>
           )}
         </ScrollablePageLayout>
       )}

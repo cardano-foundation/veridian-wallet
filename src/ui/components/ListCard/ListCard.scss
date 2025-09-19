@@ -1,0 +1,16 @@
+.list-card {
+  &:not(:first-child) {
+    display: flex;
+    background: var(--ion-color-neutral-100);
+    border-radius: 1rem;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 0.5rem 1.25rem;
+    box-shadow: none;
+    --inner-border-width: 0;
+
+    ion-list {
+      padding: 0;
+    }
+  }
+}
