@@ -227,7 +227,7 @@ describe("Share Profile", () => {
     ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
 
     await waitFor(() => {
-      expect(getByTestId("profile-scanner")).toBeVisible();
+      expect(getByTestId("scan")).toBeVisible();
     });
 
     await waitFor(() => {
@@ -285,7 +285,7 @@ describe("Share Profile", () => {
     ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
 
     await waitFor(() => {
-      expect(getByTestId("profile-scanner")).toBeVisible();
+      expect(getByTestId("scan")).toBeVisible();
     });
 
     await waitFor(() => {
@@ -344,7 +344,7 @@ describe("Share Profile", () => {
     ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
 
     await waitFor(() => {
-      expect(getByTestId("profile-scanner")).toBeVisible();
+      expect(getByTestId("scan")).toBeVisible();
     });
 
     await waitFor(() => {
@@ -430,7 +430,7 @@ describe("Share Profile", () => {
     ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
 
     await waitFor(() => {
-      expect(getByTestId("profile-scanner")).toBeVisible();
+      expect(getByTestId("scan")).toBeVisible();
     });
 
     await waitFor(() => {
@@ -491,7 +491,7 @@ describe("Share Profile", () => {
     ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
 
     await waitFor(() => {
-      expect(getByTestId("profile-scanner")).toBeVisible();
+      expect(getByTestId("scan")).toBeVisible();
     });
 
     await waitFor(() => {

@@ -1058,9 +1058,7 @@ describe("Profile setup: use as modal", () => {
     );
 
     await waitFor(() => {
-      expect(
-        document.querySelector('[data-testid="profile-scanner"]')
-      ).toBeVisible();
+      expect(document.querySelector('[data-testid="scan"]')).toBeVisible();
     });
 
     const cancelButtons = getAllByText(

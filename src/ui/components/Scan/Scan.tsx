@@ -261,7 +261,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
         <OptionModal
           modalIsOpen={pasteModalIsOpen}
           componentId={componentId + "-input-modal"}
-          customClasses={componentId + "-modal"}
+          customClasses={componentId + "-input-modal"}
           onDismiss={closePasteContentModal}
           header={{
             closeButton: true,

@@ -254,7 +254,7 @@ describe("Profiles", () => {
 
     await waitFor(() => {
       expect(
-        document.querySelector('[data-testid="profile-scanner"]')
+        document.querySelector('[data-testid="scan"]')
       ).toBeInTheDocument();
     });
   });
