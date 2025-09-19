@@ -31,7 +31,6 @@ const defaultConfigMock = {
 
 import { IonButton, IonIcon, IonInput, IonLabel } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
@@ -231,7 +230,10 @@ describe("SSI agent page", () => {
     );
 
     act(() => {
-      ionFireEvent.ionInput(getByTestId("boot-url-input"), "11111");
+      fireEvent(
+        getByTestId("boot-url-input"),
+        new CustomEvent("ionInput", { detail: { value: "11111" } })
+      );
     });
 
     await waitFor(() => {
@@ -239,7 +241,10 @@ describe("SSI agent page", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(getByTestId("connect-url-input"), "11111");
+      fireEvent(
+        getByTestId("connect-url-input"),
+        new CustomEvent("ionInput", { detail: { value: "11111" } })
+      );
     });
 
     await waitFor(() => {
@@ -276,7 +281,7 @@ describe("SSI agent page", () => {
     );
 
     act(() => {
-      ionFireEvent.ionFocus(getByTestId("boot-url-input"));
+      fireEvent(getByTestId("boot-url-input"), new CustomEvent("ionFocus"));
     });
 
     await waitFor(() => {
@@ -315,7 +320,7 @@ describe("SSI agent page", () => {
     );
 
     act(() => {
-      ionFireEvent.ionFocus(getByTestId("connect-url-input"));
+      fireEvent(getByTestId("connect-url-input"), new CustomEvent("ionFocus"));
     });
 
     await waitFor(() => {
@@ -354,7 +359,7 @@ describe("SSI agent page", () => {
     );
 
     act(() => {
-      ionFireEvent.ionBlur(getByTestId("connect-url-input"));
+      fireEvent(getByTestId("connect-url-input"), new CustomEvent("ionBlur"));
     });
 
     await waitFor(() => {
@@ -393,8 +398,8 @@ describe("SSI agent page", () => {
     );
 
     act(() => {
-      ionFireEvent.ionFocus(getByTestId("boot-url-input"));
-      ionFireEvent.ionFocus(getByTestId("connect-url-input"));
+      fireEvent(getByTestId("boot-url-input"), new CustomEvent("ionFocus"));
+      fireEvent(getByTestId("connect-url-input"), new CustomEvent("ionFocus"));
     });
 
     await waitFor(() => {

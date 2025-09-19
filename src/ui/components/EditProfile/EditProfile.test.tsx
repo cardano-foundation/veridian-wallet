@@ -1,5 +1,4 @@
 import { IonInput, IonLabel } from "@ionic/react";
-import { ionFireEvent, waitForIonicReact } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
@@ -144,8 +143,6 @@ describe("Edit profile", () => {
       </Provider>
     );
 
-    await waitForIonicReact();
-
     expect(getByTestId("edit-name-input")).toBeVisible();
 
     await waitFor(() => {
@@ -176,25 +173,36 @@ describe("Edit profile", () => {
     );
 
     act(() => {
-      ionFireEvent.ionInput(getByTestId("edit-name-input"), "");
-    });
-
-    await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
-    });
-
-    act(() => {
-      ionFireEvent.ionInput(getByTestId("edit-name-input"), "   ");
-    });
-
-    await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
-    });
-
-    act(() => {
-      ionFireEvent.ionInput(
+      fireEvent(
         getByTestId("edit-name-input"),
-        "Duke Duke Duke Duke  Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke"
+        new CustomEvent("ionInput", { detail: { value: "" } })
+      );
+    });
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent(
+        getByTestId("edit-name-input"),
+        new CustomEvent("ionInput", { detail: { value: "   " } })
+      );
+    });
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent(
+        getByTestId("edit-name-input"),
+        new CustomEvent("ionInput", {
+          detail: {
+            value:
+              "Duke Duke Duke Duke  Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke",
+          },
+        })
       );
     });
 
@@ -203,7 +211,10 @@ describe("Edit profile", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(getByTestId("edit-name-input"), "Duke@@");
+      fireEvent(
+        getByTestId("edit-name-input"),
+        new CustomEvent("ionInput", { detail: { value: "Duke@@" } })
+      );
     });
 
     await waitFor(() => {
@@ -211,7 +222,10 @@ describe("Edit profile", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(getByTestId("edit-name-input"), "Test MS");
+      fireEvent(
+        getByTestId("edit-name-input"),
+        new CustomEvent("ionInput", { detail: { value: "Test MS" } })
+      );
     });
 
     act(() => {

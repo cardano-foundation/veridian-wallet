@@ -4,7 +4,6 @@ import { useCallback } from "react";
 import { i18n } from "../../../i18n";
 import { useAppDispatch } from "../../../store/hooks";
 import { removeToastMessage } from "../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../globals/types";
 import { useScreenSize } from "../../hooks";
 import "./CustomToast.scss";
 import { ToastMessageProps } from "./CustomToast.types";

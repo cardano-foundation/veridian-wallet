@@ -1,8 +1,5 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { TabLayout } from "./TabLayout";
-
-mockIonicReact();
 
 const TabTitle = "Tab title";
 describe("Tab layout", () => {

@@ -2,7 +2,6 @@ const storeSecretMock = jest.fn();
 const verifySecretMock = jest.fn();
 
 import { IonButton, IonIcon, IonInput, IonLabel } from "@ionic/react";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -187,8 +186,11 @@ describe("Password Module", () => {
     const input = getByTestId("create-password-input");
 
     act(() => {
-      ionFireEvent.ionInput(input, "pass");
-      ionFireEvent.ionBlur(input);
+      fireEvent(
+        input,
+        new CustomEvent("ionInput", { detail: { value: "pass" } })
+      );
+      fireEvent.blur(input);
     });
 
     await waitFor(() => {
@@ -201,8 +203,12 @@ describe("Password Module", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(input, "passsssssss1@");
-      ionFireEvent.ionBlur(input);
+      fireEvent(input, new CustomEvent("ionInput", { detail: { value: "" } }));
+      fireEvent(
+        input,
+        new CustomEvent("ionInput", { detail: { value: "passsssssss1@" } })
+      );
+      fireEvent.blur(input);
     });
 
     await waitFor(() => {
@@ -215,8 +221,11 @@ describe("Password Module", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(input, "PASSSSSSSSS1@");
-      ionFireEvent.ionBlur(input);
+      fireEvent(
+        input,
+        new CustomEvent("ionInput", { detail: { value: "PASSSSSSSSS1@" } })
+      );
+      fireEvent.blur(input);
     });
 
     await waitFor(() => {
@@ -226,8 +235,11 @@ describe("Password Module", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(input, "Passssssssssssss@");
-      ionFireEvent.ionBlur(input);
+      fireEvent(
+        input,
+        new CustomEvent("ionInput", { detail: { value: "Passssssssssssss@" } })
+      );
+      fireEvent.blur(input);
     });
 
     await waitFor(() => {
@@ -237,8 +249,11 @@ describe("Password Module", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(input, "Passssssssssssss1");
-      ionFireEvent.ionBlur(input);
+      fireEvent(
+        input,
+        new CustomEvent("ionInput", { detail: { value: "Passssssssssssss1" } })
+      );
+      fireEvent.blur(input);
     });
 
     await waitFor(() => {
@@ -248,8 +263,13 @@ describe("Password Module", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(input, "Passssssssssssss@1∞");
-      ionFireEvent.ionBlur(input);
+      fireEvent(
+        input,
+        new CustomEvent("ionInput", {
+          detail: { value: "Passssssssssssss@1∞" },
+        })
+      );
+      fireEvent.blur(input);
     });
 
     await waitFor(() => {
@@ -278,8 +298,14 @@ describe("Password Module", () => {
     const confirmInput = getByTestId("confirm-password-input");
 
     act(() => {
-      ionFireEvent.ionInput(input, "Passssssssssss1@");
-      ionFireEvent.ionInput(confirmInput, "Passssssssss1@");
+      fireEvent(
+        input,
+        new CustomEvent("ionInput", { detail: { value: "Passssssssssss1@" } })
+      );
+      fireEvent(
+        confirmInput,
+        new CustomEvent("ionInput", { detail: { value: "Passssssssss1@" } })
+      );
     });
 
     await waitFor(() => {
@@ -306,9 +332,20 @@ describe("Password Module", () => {
     const hintInput = getByTestId("create-hint-input");
 
     act(() => {
-      ionFireEvent.ionInput(input, "Passssssssss1@");
-      ionFireEvent.ionInput(confirmInput, "Passssssssss1@");
-      ionFireEvent.ionInput(hintInput, "Password is Passssssssss1@");
+      fireEvent(
+        input,
+        new CustomEvent("ionInput", { detail: { value: "Passssssssss1@" } })
+      );
+      fireEvent(
+        confirmInput,
+        new CustomEvent("ionInput", { detail: { value: "Passssssssss1@" } })
+      );
+      fireEvent(
+        hintInput,
+        new CustomEvent("ionInput", {
+          detail: { value: "Password is Passssssssss1@" },
+        })
+      );
     });
 
     await waitFor(() => {
@@ -356,7 +393,7 @@ describe("Password Module", () => {
     );
 
     act(() => {
-      ionFireEvent.click(getByTestId("open-symbol-modal"));
+      fireEvent.click(getByTestId("open-symbol-modal"));
     });
 
     await waitFor(() => {

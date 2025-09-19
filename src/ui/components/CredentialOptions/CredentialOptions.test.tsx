@@ -1,6 +1,5 @@
-import { ionFireEvent, waitForIonicReact } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import { render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { TabsRoutePath } from "../navigation/TabsMenu";
@@ -49,8 +48,6 @@ describe("Credential Options modal", () => {
       </Provider>
     );
 
-    await waitForIonicReact();
-
     expect(getByTestId("creds-options-archive-button")).toBeVisible();
   });
 
@@ -68,12 +65,10 @@ describe("Credential Options modal", () => {
       </Provider>
     );
 
-    await waitForIonicReact();
-
     expect(getByTestId("creds-options-archive-button")).toBeVisible();
 
     act(() => {
-      ionFireEvent.click(getByTestId("creds-options-archive-button"));
+      fireEvent.click(getByTestId("creds-options-archive-button"));
     });
 
     await waitFor(() => {

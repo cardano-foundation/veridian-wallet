@@ -23,7 +23,6 @@ import { combineClassNames } from "../../utils/style";
 import { Alert as AlertExisting } from "../Alert";
 import { CustomInput } from "../CustomInput";
 import { ErrorMessage } from "../ErrorMessage";
-import { PageFooter } from "../PageFooter";
 import "./PasswordModule.scss";
 import { PasswordModuleProps, PasswordModuleRef } from "./PasswordModule.types";
 import { PasswordMeter } from "./components/PasswordMeter";
@@ -80,86 +79,6 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
     useEffect(() => {
       onValidationChange?.(validated);
     }, [validated, onValidationChange]);
-
-    const handleContinue = async (skipped: boolean) => {
-      if (!skipped) {
-        if (authentication.passwordIsSet) {
-          try {
-            if (
-              await Agent.agent.auth.verifySecret(
-                KeyStoreKeys.APP_OP_PASSWORD,
-                createPasswordValue
-              )
-            ) {
-              setAlertExistingIsOpen(true);
-              return;
-            }
-          } catch (error) {
-            if (
-              error instanceof Error &&
-              error.message.startsWith(AuthService.SECRET_NOT_STORED)
-            ) {
-              showError(
-                "Unable to get current password",
-                new Error("Unable to get current password"),
-                dispatch
-              );
-              return;
-            }
-            throw error;
-          }
-        }
-
-        await Agent.agent.auth.storeSecret(
-          KeyStoreKeys.APP_OP_PASSWORD,
-          createPasswordValue
-        );
-
-        if (authentication.passwordIsSkipped) {
-          await Agent.agent.basicStorage.deleteById(
-            MiscRecordId.APP_PASSWORD_SKIPPED
-          );
-        }
-
-        dispatch(
-          setAuthentication({
-            ...authentication,
-            passwordIsSet: true,
-            passwordIsSkipped: false,
-          })
-        );
-        if (hintValue) {
-          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.OP_PASS_HINT,
-              content: { value: hintValue },
-            })
-          );
-        } else {
-          try {
-            const previousHint = (
-              await Agent.agent.basicStorage.findById(MiscRecordId.OP_PASS_HINT)
-            )?.content?.value;
-
-            if (previousHint) {
-              await Agent.agent.basicStorage.deleteById(
-                MiscRecordId.OP_PASS_HINT
-              );
-            }
-          } catch (e) {
-            showError(
-              "Unable to delete password hint",
-              e,
-              dispatch,
-              ToastMsgType.UNABLE_DELETE_PASSWORD_HINT
-            );
-          }
-        }
-      }
-
-      onCreateSuccess(skipped);
-      handleClearState();
-    };
 
     const showPasswordMeter =
       createPasswordValue.length === 0 ||
@@ -254,10 +173,10 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
             {!confirmPasswordFocus &&
               !!confirmPasswordValue.length &&
               createPasswordValueNotMatching && (
-              <ErrorMessage
-                message={`${i18n.t("createpassword.error.hasNoMatch")}`}
-              />
-            )}
+                <ErrorMessage
+                  message={`${i18n.t("createpassword.error.hasNoMatch")}`}
+                />
+              )}
             <CustomInput
               dataTestId="create-hint-input"
               title={`${i18n.t("createpassword.input.third.title")}`}

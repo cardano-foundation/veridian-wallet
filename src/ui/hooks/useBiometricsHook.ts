@@ -34,22 +34,29 @@ enum BiometricAuthOutcome {
   NOT_AVAILABLE,
 }
 
-const validErrorCodes = new Set(Object.values(BiometricAuthError).filter(v => typeof v === 'number'));
+const validErrorCodes = new Set(
+  Object.values(BiometricAuthError).filter((v) => typeof v === "number")
+);
 
 const isBiometricPluginError = (
   error: unknown
 ): error is { code: BiometricAuthError | string; message: string } => {
-  if (typeof error !== "object" || error === null || !("code" in error) || !("message" in error)) {
+  if (
+    typeof error !== "object" ||
+    error === null ||
+    !("code" in error) ||
+    !("message" in error)
+  ) {
     return false;
   }
 
   const err = error as { code: string | number; message: string };
 
-  if (typeof err.code === 'number') {
+  if (typeof err.code === "number") {
     return validErrorCodes.has(err.code);
   }
 
-  if (typeof err.code === 'string') {
+  if (typeof err.code === "string") {
     const parsedCode = parseInt(err.code, 10);
     return !isNaN(parsedCode) && validErrorCodes.has(parsedCode);
   }
@@ -78,8 +85,8 @@ const useBiometricAuth = (isLockPage = false) => {
     // https://github.com/Cap-go/capacitor-native-biometric/blob/a6bbf89be872cc964a8e867119dee4cb8269fc77/android/src/main/java/ee/forgr/biometric/NativeBiometric.java#L79-L80
 
     const biometricResult: AvailableResult =
-        await NativeBiometric.isAvailable();
-      setBiometricInfo(biometricResult);
+      await NativeBiometric.isAvailable();
+    setBiometricInfo(biometricResult);
 
     return biometricResult;
   };
@@ -126,7 +133,7 @@ const useBiometricAuth = (isLockPage = false) => {
   const handleBiometricAuth = async (
     isInitialSetup = false
   ): Promise<BiometricAuthOutcome> => {
-    const { isAvailable, biometryType } = await memoizedCheckBiometrics();
+    const { isAvailable } = await memoizedCheckBiometrics();
 
     if (!isAvailable) {
       return BiometricAuthOutcome.NOT_AVAILABLE;
@@ -154,9 +161,10 @@ const useBiometricAuth = (isLockPage = false) => {
           subtitle: i18n.t("biometry.subtitle") as string,
           negativeButtonText: i18n.t("biometry.canceltitle") as string,
           fallbackTitle: i18n.t(
-          !isLockPage && passwordIsSet
-            ? "biometry.iosfallbackpasswordtitle"  : "biometry.iosfallbacktitle"
-        ) as string,
+            !isLockPage && passwordIsSet
+              ? "biometry.iosfallbackpasswordtitle"
+              : "biometry.iosfallbacktitle"
+          ) as string,
         });
       }
 
@@ -215,7 +223,7 @@ const useBiometricAuth = (isLockPage = false) => {
   };
 
   const setupBiometrics = async (): Promise<BiometricAuthOutcome> => {
-    const { isAvailable, biometryType } = await memoizedCheckBiometrics();
+    const { isAvailable } = await memoizedCheckBiometrics();
 
     if (!isAvailable) {
       return BiometricAuthOutcome.NOT_AVAILABLE;
@@ -251,12 +259,19 @@ const useBiometricAuth = (isLockPage = false) => {
       }
     }
   };
-  
+
   // By wrapping these functions in useCallback, we provide stable references to any
   // component that uses this hook. This is crucial to prevent unintended side effects,
   // like re-running useEffects, and avoids unnecessary re-renders.
-  const memoizedHandleBiometricAuth = useCallback(handleBiometricAuth, [memoizedCheckBiometrics, lockoutEndTime, setPauseTimestamp]);
-  const memoizedSetupBiometrics = useCallback(setupBiometrics, [memoizedCheckBiometrics, memoizedHandleBiometricAuth]);
+  const memoizedHandleBiometricAuth = useCallback(handleBiometricAuth, [
+    memoizedCheckBiometrics,
+    lockoutEndTime,
+    setPauseTimestamp,
+  ]);
+  const memoizedSetupBiometrics = useCallback(setupBiometrics, [
+    memoizedCheckBiometrics,
+    memoizedHandleBiometricAuth,
+  ]);
 
   return {
     biometricInfo,
@@ -264,7 +279,7 @@ const useBiometricAuth = (isLockPage = false) => {
     setupBiometrics: memoizedSetupBiometrics,
     checkBiometrics: memoizedCheckBiometrics,
     remainingLockoutSeconds,
-    lockoutEndTime
+    lockoutEndTime,
   };
 };
 

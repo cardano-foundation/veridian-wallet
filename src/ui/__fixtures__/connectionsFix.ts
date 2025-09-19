@@ -1,5 +1,4 @@
 import {
-  ConnectionDetails,
   ConnectionStatus,
   MultisigConnectionDetails,
   RegularConnectionDetailsFull,

@@ -1,4 +1,3 @@
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { forwardRef, useImperativeHandle } from "react";
 import { Provider } from "react-redux";

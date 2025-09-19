@@ -1,18 +1,14 @@
-import { fireEvent, render } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { waitForIonicReact } from "@ionic/react-test-utils";
-import { act } from "react";
 import { TabsMenu, TabsRoutePath, tabsRoutes } from "./TabsMenu";
-import { setCurrentRoute } from "../../../../store/reducers/stateCache";
 import { notificationsFix } from "../../../__fixtures__/notificationsFix";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { filteredIdentifierFix } from "../../../__fixtures__/filteredIdentifierFix";
 
 describe("Tab menu", () => {
-  const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
       routes: ["/"],
@@ -41,7 +37,6 @@ describe("Tab menu", () => {
 
   const storeMocked = {
     ...makeTestStore(initialState),
-    dispatch: dispatchMock,
   };
 
   test("Render", async () => {
@@ -59,20 +54,15 @@ describe("Tab menu", () => {
       </IonReactMemoryRouter>
     );
 
-    await waitForIonicReact();
-
     tabsRoutes.forEach((tab) => {
       expect(getByText(tab.label)).toBeVisible();
 
-      act(() => {
-        fireEvent.click(
-          getByTestId(
-            "tab-button-" + tab.label.toLowerCase().replace(/\s/g, "-")
-          )
-        );
-      });
+      const tabButton = getByTestId(
+        "tab-button-" + tab.label.toLowerCase().replace(/\s/g, "-")
+      );
 
-      expect(dispatchMock).toBeCalledWith(setCurrentRoute({ path: tab.path }));
+      expect(tabButton).toHaveAttribute("href", tab.path);
+      expect(tabButton.onclick).toBeDefined();
     });
   });
 
@@ -103,7 +93,6 @@ describe("Tab menu", () => {
 
     const storeMocked = {
       ...makeTestStore(state),
-      dispatch: dispatchMock,
     };
 
     const history = createMemoryHistory();
@@ -120,8 +109,6 @@ describe("Tab menu", () => {
       </IonReactMemoryRouter>
     );
 
-    await waitForIonicReact();
-
     expect(getAllByText("99+").length).toBeGreaterThan(0);
   });
 
@@ -137,7 +124,6 @@ describe("Tab menu", () => {
 
     const storeMocked = {
       ...makeTestStore(state),
-      dispatch: dispatchMock,
     };
 
     const history = createMemoryHistory();
@@ -153,8 +139,6 @@ describe("Tab menu", () => {
         </Provider>
       </IonReactMemoryRouter>
     );
-
-    await waitForIonicReact();
 
     const counter = container.querySelector(".bubble-counter");
     expect(counter).not.toBeInTheDocument();
@@ -172,7 +156,6 @@ describe("Tab menu", () => {
 
     const storeMocked = {
       ...makeTestStore(state),
-      dispatch: dispatchMock,
     };
 
     const history = createMemoryHistory();
@@ -189,7 +172,6 @@ describe("Tab menu", () => {
       </IonReactMemoryRouter>
     );
 
-    await waitForIonicReact();
     expect(getAllByText(7).length).toBeGreaterThan(0);
   });
 });

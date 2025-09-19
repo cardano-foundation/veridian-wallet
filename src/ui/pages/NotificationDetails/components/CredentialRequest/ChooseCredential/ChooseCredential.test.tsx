@@ -1,10 +1,8 @@
 const verifySecretMock = jest.fn().mockResolvedValue(true);
 
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { ionFireEvent, mockIonicReact } from "@ionic/react-test-utils";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor, act } from "@testing-library/react";
 import { createMemoryHistory } from "history";
-import { act } from "react";
 import { Provider } from "react-redux";
 import { KeriaNotification } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { CredentialStatus } from "../../../../../../core/agent/services/credentialService.types";
@@ -25,8 +23,6 @@ import { ChooseCredential } from "./ChooseCredential";
 import { makeTestStore } from "../../../../../utils/makeTestStore";
 import { profileCacheFixData } from "../../../../../__fixtures__/storeDataFix";
 import { revokedCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
-
-mockIonicReact();
 
 const deleteNotificationMock = jest.fn((id: string) => Promise.resolve(id));
 const offerAcdcFromApplyMock = jest.fn(
@@ -190,7 +186,12 @@ describe("Credential request - choose request", () => {
     const segment = getByTestId("choose-credential-segment");
 
     act(() => {
-      ionFireEvent.ionChange(segment, "revoked");
+      fireEvent(
+        segment,
+        new CustomEvent("ionChange", {
+          detail: { value: "revoked" },
+        })
+      );
     });
 
     await waitFor(() =>
@@ -571,7 +572,12 @@ describe("Credential request - choose request", () => {
     const segment = getByTestId("choose-credential-segment");
 
     act(() => {
-      ionFireEvent.ionChange(segment, "revoked");
+      fireEvent(
+        segment,
+        new CustomEvent("ionChange", {
+          detail: { value: "revoked" },
+        })
+      );
     });
 
     await waitFor(() =>

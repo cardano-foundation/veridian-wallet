@@ -1,7 +1,4 @@
-const verifySecretMock = jest.fn();
-
-import { ionFireEvent } from "@ionic/react-test-utils";
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { SearchInput } from "./SearchInput";
 
 describe("Search input", () => {
@@ -15,8 +12,10 @@ describe("Search input", () => {
       />
     );
 
-    ionFireEvent.ionCancel(getByTestId("search-bar"));
+    fireEvent(getByTestId("search-bar"), new CustomEvent("ionFocus"));
+    expect(focusMock).toBeCalledWith(true);
 
+    fireEvent(getByTestId("search-bar"), new CustomEvent("ionCancel"));
     expect(focusMock).toBeCalledWith(false);
   });
 
@@ -30,7 +29,7 @@ describe("Search input", () => {
       />
     );
 
-    ionFireEvent.ionFocus(getByTestId("search-bar"));
+    fireEvent(getByTestId("search-bar"), new CustomEvent("ionFocus"));
 
     expect(focusMock).toBeCalledWith(true);
   });
@@ -45,7 +44,7 @@ describe("Search input", () => {
       />
     );
 
-    ionFireEvent.ionBlur(getByTestId("search-bar"));
+    fireEvent(getByTestId("search-bar"), new CustomEvent("ionBlur"));
 
     expect(focusMock).toBeCalledWith(false);
   });
@@ -60,7 +59,7 @@ describe("Search input", () => {
       />
     );
 
-    ionFireEvent.ionBlur(getByTestId("search-bar"));
+    fireEvent(getByTestId("search-bar"), new CustomEvent("ionBlur"));
 
     expect(focusMock).not.toBeCalled();
   });

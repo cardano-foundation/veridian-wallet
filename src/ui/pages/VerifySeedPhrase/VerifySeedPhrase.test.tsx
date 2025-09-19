@@ -1,6 +1,5 @@
 import { IonReactMemoryRouter, IonReactRouter } from "@ionic/react-router";
-import { ionFireEvent as fireEvent } from "@ionic/react-test-utils";
-import { render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -452,7 +451,7 @@ describe("Verify Seed Phrase Page", () => {
 
     await waitFor(() => {
       const seedNumberElements = matchingSeedPhraseContainer.querySelectorAll(
-        "span[data-testid*=\"word-index-number\"]"
+        'span[data-testid*="word-index-number"]'
       );
       expect(seedNumberElements.length).toBe(MNEMONIC_WORDS);
     });
@@ -474,7 +473,7 @@ describe("Verify Seed Phrase Page", () => {
 
     await waitFor(() => {
       const seedNumberElements = originalSeedPhraseContainer.querySelectorAll(
-        "span[data-testid*=\"word-index-number\"]"
+        'span[data-testid*="word-index-number"]'
       );
       expect(seedNumberElements.length).toBe(0);
     });

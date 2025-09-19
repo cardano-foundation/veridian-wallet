@@ -4,7 +4,6 @@ import {
   BarcodeValueType,
 } from "@capacitor-mlkit/barcode-scanning";
 import { IonInput } from "@ionic/react";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -266,9 +265,11 @@ describe("Scanner", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(
+      fireEvent(
         getByTestId("scanner-input"),
-        "bd54hj38aK2sGhE5K9mPqR79Jkd4b23hJf5sL36nHk"
+        new CustomEvent("ionInput", {
+          detail: { value: "bd54hj38aK2sGhE5K9mPqR79Jkd4b23hJf5sL36nHk" },
+        })
       );
     });
 
@@ -310,7 +311,12 @@ describe("Scanner", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(getByTestId("scanner-input"), "ABC123");
+      fireEvent(
+        getByTestId("scanner-input"),
+        new CustomEvent("ionInput", {
+          detail: { value: "ABC123" },
+        })
+      );
     });
 
     await waitFor(() => {

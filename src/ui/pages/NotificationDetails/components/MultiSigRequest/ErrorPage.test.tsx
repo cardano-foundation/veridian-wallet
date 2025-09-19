@@ -1,4 +1,3 @@
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -11,8 +10,6 @@ import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 import { ErrorPage } from "./ErrorPage";
-
-mockIonicReact();
 
 const mockGetMultisigConnection = jest.fn(() =>
   Promise.resolve([connectionsFix[3]])
