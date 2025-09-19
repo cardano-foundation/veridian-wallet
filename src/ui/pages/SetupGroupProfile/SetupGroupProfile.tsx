@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { CreationStatus } from "../../../core/agent/agent.types";
+import { useAppSelector } from "../../../store/hooks";
+import { getCurrentProfile } from "../../../store/reducers/profileCache";
+import { InitializeGroup } from "./components/InitializeGroup/InitializeGroup";
 import { SetupConnections } from "./components/SetupConnections";
 import "./SetupGroupProfile.scss";
 import { GroupInfomation, Stage } from "./SetupGroupProfile.types";
-import { InitializeGroup } from "./components/InitializeGroup/InitializeGroup";
+import { PendingGroup } from "./components/PendingGroup/PendingGroup";
 
-const stages = [SetupConnections, InitializeGroup];
+const stages = [SetupConnections, InitializeGroup, PendingGroup];
 
 const initialState: GroupInfomation = {
   stage: Stage.SetupConnection,
@@ -37,9 +40,41 @@ const initialState: GroupInfomation = {
 const SetupGroupProfile = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
+  const currentProfile = useAppSelector(getCurrentProfile);
   const groupName = queryParams.get("groupName");
-  const [state, setState] = useState<GroupInfomation>(initialState);
+  const [state, setState] = useState<GroupInfomation>({
+    ...initialState,
+    stage:
+      currentProfile?.identity.creationStatus === CreationStatus.PENDING &&
+      currentProfile.multisigConnections.length > 0 &&
+      currentProfile.identity.groupMetadata?.groupInitiator
+        ? Stage.Pending
+        : Stage.SetupConnection,
+  });
   const CurrentStage = stages[state.stage];
+
+  useEffect(() => {
+    if (!currentProfile) return;
+
+    setState({
+      stage:
+        currentProfile.identity.creationStatus === CreationStatus.PENDING &&
+        currentProfile.multisigConnections.length > 0 &&
+        currentProfile.identity.groupMetadata?.groupInitiator
+          ? Stage.Pending
+          : Stage.SetupConnection,
+      displayNameValue: currentProfile.identity.displayName,
+      signer: {
+        requiredSigners: 0,
+        recoverySigners: 0,
+      },
+      scannedConections: currentProfile.multisigConnections,
+      selectedConnections: currentProfile.multisigConnections,
+      ourIdentifier: currentProfile.identity.id,
+      newIdentifier: currentProfile.identity,
+      groupMetadata: currentProfile.identity.groupMetadata,
+    });
+  }, [currentProfile]);
 
   return (
     <CurrentStage

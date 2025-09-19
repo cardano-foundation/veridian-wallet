@@ -1733,17 +1733,24 @@ describe("getInceptionStatus", () => {
               nt: "4",
             },
           },
+          a: {
+            gid: MULTISIG_ID,
+          },
         },
       },
-      { exn: { i: "member3" } },
+      {
+        exn: {
+          i: "member3",
+          a: {
+            gid: MULTISIG_ID,
+          },
+        },
+      },
     ]);
 
     const result = await multiSigService.getInceptionStatus(MULTISIG_ID);
 
     expect(identifiersMembersMock).toHaveBeenCalledWith(MULTISIG_ID);
-    expect(listExchangesMock).toHaveBeenCalledWith({
-      filter: { "-r": MultiSigRoute.ICP, "-a-gid": MULTISIG_ID },
-    });
 
     expect(result).toEqual({
       threshold: {

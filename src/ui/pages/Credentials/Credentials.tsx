@@ -78,10 +78,12 @@ const Credentials = () => {
   >([]);
   const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
   const currentProfile = useAppSelector(getCurrentProfile);
-  const profileCreds: CredentialShortDetails[] =
-    (currentProfile?.credentials as CredentialShortDetails[]) ?? [];
-  const profileArchivedCreds: CredentialShortDetails[] =
-    (currentProfile?.archivedCredentials as CredentialShortDetails[]) ?? [];
+
+  const profileCreds = useMemo(
+    () => currentProfile?.credentials ?? [],
+    [currentProfile?.credentials]
+  );
+  const profileArchivedCreds = currentProfile?.archivedCredentials ?? [];
   const revokedCreds = profileCreds.filter(
     (item) => item.status === CredentialStatus.REVOKED
   );

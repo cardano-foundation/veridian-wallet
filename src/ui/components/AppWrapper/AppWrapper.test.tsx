@@ -40,6 +40,7 @@ import {
   updateProfileCreationStatus,
   setConnectedDApp,
   setPendingDAppConnection,
+  addGroupProfileAsync,
 } from "../../../store/reducers/profileCache";
 import {
   setQueueIncomingRequest,
@@ -152,6 +153,7 @@ jest.mock("../../../core/agent/agent", () => {
         basicStorage: {
           findById: jest.fn(),
           save: jest.fn(),
+          createOrUpdateBasicRecord: jest.fn(),
         },
       },
     },
@@ -510,8 +512,17 @@ describe("Identifier state changed handler", () => {
 
 describe("Group state changed handler", () => {
   test("handles group created event", async () => {
+    const innerDispatch = jest.fn();
+    const getState = jest.fn(() => ({ profilesCache: { recentProfiles: [] } }));
+
+    dispatch.mockImplementation((func) => {
+      func(innerDispatch, getState);
+    });
+
     await groupCreatedHandler(groupCreatedEvent, dispatch);
-    expect(dispatch).toBeCalledWith(addGroupProfile(pendingGroupIdentifierFix));
+    expect(innerDispatch).toBeCalledWith(
+      addGroupProfile(pendingGroupIdentifierFix)
+    );
   });
 });
 

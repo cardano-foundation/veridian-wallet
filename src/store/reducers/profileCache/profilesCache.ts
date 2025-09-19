@@ -1,18 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  MiscRecordId,
   MultisigConnectionDetails,
   RegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
-import { RootState } from "../../index";
+import { AppDispatch, RootState } from "../../index";
 import {
   DAppConnection,
   MultiSigGroup,
   Profile,
   ProfileCache,
 } from "./profilesCache.types";
+import { Agent } from "../../../core/agent/agent";
+import { BasicRecord } from "../../../core/agent/records";
 
 // Shared empty arrays — return these to keep selector return references stable
 const DefaultArrayValue = {
@@ -82,8 +85,13 @@ export const profilesCacheSlice = createSlice({
       }
     },
     addGroupProfile: (state, action: PayloadAction<IdentifierShortDetails>) => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      delete state.profiles[action.payload.groupMemberPre!];
+      if (!action.payload.groupMemberPre) {
+        return;
+      }
+
+      const group = state.profiles[action.payload.groupMemberPre];
+      delete state.profiles[action.payload.groupMemberPre];
+
       // In case it was already added, we want to avoid inserting a "PENDING" one that could be complete already
       if (!state.profiles[action.payload.id]) {
         state.profiles = {
@@ -91,13 +99,17 @@ export const profilesCacheSlice = createSlice({
           [action.payload.id]: {
             identity: action.payload,
             connections: [],
-            multisigConnections: [],
+            multisigConnections: group.multisigConnections,
             peerConnections: [],
             credentials: [],
             archivedCredentials: [],
             notifications: [],
           },
         };
+      }
+
+      if (action.payload.groupMemberPre === state.defaultProfile) {
+        state.defaultProfile = action.payload.id;
       }
     },
     updateProfileCreationStatus: (
@@ -418,6 +430,35 @@ export const profilesCacheSlice = createSlice({
     },
   },
 });
+
+export const addGroupProfileAsync =
+  (group: IdentifierShortDetails) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    dispatch(addGroupProfile(group));
+
+    await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+      new BasicRecord({
+        id: MiscRecordId.DEFAULT_PROFILE,
+        content: { defaultProfile: group.id },
+      })
+    );
+
+    const profileHistories = getState().profilesCache.recentProfiles;
+
+    const replaceHistories = profileHistories.filter(
+      (item) => item !== group.groupMemberPre
+    );
+
+    replaceHistories.push(group.id);
+
+    dispatch(updateRecentProfiles(replaceHistories));
+    await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+      new BasicRecord({
+        id: MiscRecordId.PROFILE_HISTORIES,
+        content: { value: replaceHistories },
+      })
+    );
+  };
 
 export const {
   setProfiles,

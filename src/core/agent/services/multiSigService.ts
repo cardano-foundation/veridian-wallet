@@ -818,9 +818,8 @@ class MultiSigService extends AgentService {
       .identifiers()
       .members(multisigId);
 
-    const exchanges = await this.props.signifyClient.exchanges().list({
-      filter: { "-r": MultiSigRoute.ICP, "-a-gid": multisigId },
-    });
+    // TODO: check filter
+    const exchanges = await this.props.signifyClient.exchanges().list();
 
     if (exchanges.length === 0 || exchanges[0] === undefined) {
       throw new Error(
@@ -828,8 +827,14 @@ class MultiSigService extends AgentService {
       );
     }
 
+    const groupExchanges = exchanges.filter(
+      (exchange: { exn: { a: { gid: string } } }) => {
+        return exchange.exn?.a?.gid === multisigId;
+      }
+    );
+
     const memberInfos = members.signing.map((member: { aid: string }) => {
-      const hasAccepted = exchanges.some(
+      const hasAccepted = groupExchanges.some(
         (exn: { exn: { i: string } }) => exn.exn.i === member.aid
       );
 
