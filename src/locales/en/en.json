@@ -529,10 +529,12 @@
   },
   "profiledetails": {
     "done": "Done",
+    "close": "Close",
     "identifierdetail": {
       "title": "Profile details",
       "showadvanced": "Show advanced details",
       "listoptions": {
+        "browserlogin": "Browser login",
         "dapp": "dApps"
       },
       "information": {

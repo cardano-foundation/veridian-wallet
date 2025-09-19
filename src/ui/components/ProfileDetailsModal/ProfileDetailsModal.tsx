@@ -1,5 +1,6 @@
 import { IonSpinner, useIonViewWillEnter } from "@ionic/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { repeatOutline } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { IdentifierDetails as IdentifierDetailsCore } from "../../../core/agent/services/identifier.types";
@@ -38,6 +39,10 @@ import {
   IdentifierDetailModalProps,
   ProfileDetailsModalProps,
 } from "./ProfileDetailsModal.types";
+import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
+import { ScanRef } from "../Scan/Scan.types";
+import { useCameraDirection } from "../Scan/hook/useCameraDirection";
+import { Scan } from "../Scan";
 
 const ProfileDetailsModule = ({
   profileId,
@@ -58,6 +63,11 @@ const ProfileDetailsModule = ({
   const [oobi, setOobi] = useState("");
   const [cloudError, setCloudError] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [isScanOpen, setIsScanOpen] = useState(false);
+  const scanRef = useRef<ScanRef>(null);
+  const { cameraDirection, changeCameraDirection, supportMultiCamera } =
+    useCameraDirection();
+  const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const { setRecentProfileAsDefault, defaultProfile, defaultName } =
     useProfile();
 
@@ -161,66 +171,117 @@ const ProfileDetailsModule = ({
     "ion-hide": hidden,
   });
 
+  const back = i18n.t("profiledetails.close");
+
+  const handleCloseScan = useCallback(() => {
+    setIsScanOpen(false);
+  }, []);
+
+  const handleScanFinish = useCallback(
+    async (content: string) => {
+      // TODO: Implement scan finish logic for ProfileDetailsModal
+      // eslint-disable-next-line no-console
+      console.log("Scan finished with content:", content);
+      handleCloseScan();
+    },
+    [handleCloseScan]
+  );
+
   return (
     <>
-      {cloudError ? (
-        <CloudError
-          pageId={pageId}
-          header={
-            <PageHeader
-              title={defaultName}
-              additionalButtons={
-                <Avatar id={defaultProfile?.identity.id || ""} />
-              }
-            />
-          }
-          content={`${i18n.t("profiledetails.clouderror")}`}
-        >
-          <PageFooter
-            pageId={pageId}
-            deleteButtonText={`${i18n.t("profiledetails.delete.button")}`}
-            deleteButtonAction={deleteButtonAction}
-          />
-        </CloudError>
-      ) : (
-        <ScrollablePageLayout
-          pageId={pageId}
-          customClass={pageClasses}
-          header={
-            <PageHeader
-              backButton={true}
-              onBack={handleDone}
-              title={profile?.displayName}
-              hardwareBackButtonConfig={hardwareBackButtonConfig}
-            />
-          }
-        >
-          {profile ? (
-            <div className="card-details-content">
-              <ProfileContent
-                onRotateKey={openRotateModal}
-                cardData={profile as IdentifierDetailsCore}
-                oobi={oobi}
-                setCardData={setProfile}
-              />
-              {!restrictedOptions && (
-                <PageFooter
-                  pageId={pageId}
-                  deleteButtonText={`${i18n.t("profiledetails.delete.button")}`}
-                  deleteButtonAction={deleteButtonAction}
+      {(() => {
+        if (cloudError) {
+          return (
+            <CloudError
+              pageId={pageId}
+              header={
+                <PageHeader
+                  title={defaultName}
+                  additionalButtons={
+                    <Avatar id={defaultProfile?.identity.id || ""} />
+                  }
                 />
-              )}
-            </div>
-          ) : (
-            <div
-              className="identifier-card-detail-spinner-container"
-              data-testid="identifier-card-detail-spinner-container"
+              }
+              content={`${i18n.t("profiledetails.clouderror")}`}
             >
-              <IonSpinner name="circular" />
-            </div>
-          )}
-        </ScrollablePageLayout>
-      )}
+              <PageFooter
+                pageId={pageId}
+                deleteButtonText={`${i18n.t("profiledetails.delete.button")}`}
+                deleteButtonAction={deleteButtonAction}
+              />
+            </CloudError>
+          );
+        }
+
+        if (isScanOpen) {
+          return (
+            <ResponsivePageLayout
+              pageId={pageId}
+              customClass={"scan"}
+              header={
+                <PageHeader
+                  closeButton={true}
+                  closeButtonLabel={back}
+                  closeButtonAction={handleCloseScan}
+                  actionButton={supportMultiCamera}
+                  actionButtonIcon={repeatOutline}
+                  actionButtonAction={changeCameraDirection}
+                  actionButtonDisabled={!enableCameraDirection}
+                />
+              }
+            >
+              <Scan
+                ref={scanRef}
+                onFinishScan={handleScanFinish}
+                cameraDirection={cameraDirection}
+                onCheckPermissionFinish={setEnableCameraDirection}
+              />
+            </ResponsivePageLayout>
+          );
+        }
+
+        return (
+          <ScrollablePageLayout
+            pageId={pageId}
+            customClass={pageClasses}
+            header={
+              <PageHeader
+                backButton={true}
+                onBack={handleDone}
+                title={profile?.displayName}
+                hardwareBackButtonConfig={hardwareBackButtonConfig}
+              />
+            }
+          >
+            {profile ? (
+              <div className="card-details-content">
+                <ProfileContent
+                  onRotateKey={openRotateModal}
+                  cardData={profile as IdentifierDetailsCore}
+                  oobi={oobi}
+                  setCardData={setProfile}
+                />
+                {!restrictedOptions && (
+                  <PageFooter
+                    pageId={pageId}
+                    deleteButtonText={`${i18n.t(
+                      "profiledetails.delete.button"
+                    )}`}
+                    deleteButtonAction={deleteButtonAction}
+                  />
+                )}
+              </div>
+            ) : (
+              <div
+                className="identifier-card-detail-spinner-container"
+                data-testid="identifier-card-detail-spinner-container"
+              >
+                <IonSpinner name="circular" />
+              </div>
+            )}
+          </ScrollablePageLayout>
+        );
+      })()}
       <Alert
         isOpen={alertIsOpen}
         setIsOpen={setAlertIsOpen}

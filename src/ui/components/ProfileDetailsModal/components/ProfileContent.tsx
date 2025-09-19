@@ -1,6 +1,7 @@
 import { IonButton, IonCol, IonGrid, IonIcon, IonRow } from "@ionic/react";
 import {
   appsOutline,
+  logInOutline,
   calendarNumberOutline,
   keyOutline,
   pencilOutline,
@@ -107,6 +108,11 @@ const ProfileContent = ({
     .slice(0, DISPLAY_MEMBERS);
 
   const openGroupMember = () => openPropDetailModal(DetailView.GroupMember);
+
+  const showLogin = () => {
+    setConnectdApp(true);
+  };
+
   const showDapp = () => {
     setConnectdApp(true);
   };
@@ -170,6 +176,13 @@ const ProfileContent = ({
       </div>
       <ListCard
         items={[
+          {
+            label: i18n.t(
+              "profiledetails.identifierdetail.listoptions.browserlogin"
+            ),
+            icon: logInOutline,
+            onClick: showLogin,
+          },
           {
             label: i18n.t("profiledetails.identifierdetail.listoptions.dapp"),
             icon: appsOutline,
