@@ -1,6 +1,5 @@
 import { IonButton, IonIcon, IonInput, IonLabel } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import {
   fireEvent,
   queryByText,
@@ -278,15 +277,15 @@ describe("Create Password Page", () => {
       const hintInput = getByTestId("create-hint-input");
 
       act(() => {
-        ionFireEvent.ionInput(input, "Passsssss1@");
-        ionFireEvent.ionInput(confirmInput, "Passsssss1@");
-        ionFireEvent.ionInput(hintInput, "hint");
+        fireEvent.change(input, { target: { value: "Passsssss1@" } });
+        fireEvent.change(confirmInput, { target: { value: "Passsssss1@" } });
+        fireEvent.change(hintInput, { target: { value: "hint" } });
       });
 
       const submitButton = getByTestId("primary-button-create-password");
 
       act(() => {
-        ionFireEvent.click(submitButton);
+        fireEvent.click(submitButton);
       });
 
       await waitFor(() => {
@@ -355,15 +354,15 @@ describe("Create Password Page", () => {
       const hintInput = getByTestId("create-hint-input");
 
       act(() => {
-        ionFireEvent.ionInput(input, "Passsssss1@");
-        ionFireEvent.ionInput(confirmInput, "Passsssss1@");
-        ionFireEvent.ionInput(hintInput, "hint");
+        fireEvent.change(input, { target: { value: "Passsssss1@" } });
+        fireEvent.change(confirmInput, { target: { value: "Passsssss1@" } });
+        fireEvent.change(hintInput, { target: { value: "hint" } });
       });
 
       const submitButton = getByTestId("primary-button-create-password");
 
       act(() => {
-        ionFireEvent.click(submitButton);
+        fireEvent.click(submitButton);
       });
 
       await waitFor(() => {
@@ -410,15 +409,15 @@ describe("Create Password Page", () => {
       const hintInput = getByTestId("create-hint-input");
 
       act(() => {
-        ionFireEvent.ionInput(input, "Passsssss1@");
-        ionFireEvent.ionInput(confirmInput, "Passsssss1@");
-        ionFireEvent.ionInput(hintInput, "hint");
+        fireEvent.change(input, { target: { value: "Passsssss1@" } });
+        fireEvent.change(confirmInput, { target: { value: "Passsssss1@" } });
+        fireEvent.change(hintInput, { target: { value: "hint" } });
       });
 
       const submitButton = getByTestId("primary-button-create-password");
 
       act(() => {
-        ionFireEvent.click(submitButton);
+        fireEvent.click(submitButton);
       });
 
       await waitFor(() => {

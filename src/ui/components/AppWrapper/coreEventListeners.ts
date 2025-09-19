@@ -13,11 +13,11 @@ import {
 import { OperationPendingRecordType } from "../../../core/agent/records/operationPendingRecord.type";
 import { useAppDispatch } from "../../../store/hooks";
 import {
-  updateOrAddConnectionCache,
-  addGroupProfile,
+  addGroupProfileAsync,
   addNotification,
   addOrUpdateProfileIdentity,
   deleteNotificationById,
+  updateOrAddConnectionCache,
   updateProfileCreationStatus,
 } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
@@ -97,7 +97,7 @@ const groupCreatedHandler = async (
   event: GroupCreatedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  dispatch(addGroupProfile(event.payload.group));
+  dispatch(addGroupProfileAsync(event.payload.group));
 };
 
 export {

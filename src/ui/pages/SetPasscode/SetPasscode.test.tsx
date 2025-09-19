@@ -48,7 +48,7 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
     biometricInfo: {
       isAvailable: false,
       hasCredentials: false,
-      biometryType: BiometryType.FINGERPRINT
+      biometryType: BiometryType.FINGERPRINT,
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
     setBiometricsIsEnabled: jest.fn(),
@@ -185,7 +185,6 @@ describe("SetPasscode Page", () => {
   test("calls handleOnBack when back button is clicked", async () => {
     require("@ionic/react");
 
-    const dispatchMock = jest.fn();
     const initialState = {
       stateCache: {
         routes: [RoutePath.SET_PASSCODE, RoutePath.ONBOARDING],
@@ -203,7 +202,6 @@ describe("SetPasscode Page", () => {
 
     const storeMocked = {
       ...makeTestStore(initialState),
-      dispatch: dispatchMock,
     };
 
     const history = createMemoryHistory();

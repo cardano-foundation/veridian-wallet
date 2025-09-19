@@ -1,5 +1,4 @@
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor, act } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
@@ -14,8 +13,6 @@ import { NotificationDetails } from "./NotificationDetails";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
-
-mockIonicReact();
 
 const getMultiSignMock = jest.fn().mockResolvedValue({
   sender: {

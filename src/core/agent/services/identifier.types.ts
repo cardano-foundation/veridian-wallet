@@ -1,6 +1,5 @@
 import { CreateIdentifierBody } from "signify-ts";
 import {
-  ConnectionShortDetails,
   MultisigConnectionDetails,
   CreationStatus,
   JSONObject,

@@ -1,4 +1,3 @@
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
@@ -16,7 +15,6 @@ jest.mock("../../../store/reducers/stateCache", () => ({
   ...jest.requireActual("../../../store/reducers/stateCache"),
   updateCurrentProfile: jest.fn(),
 }));
-mockIonicReact();
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),

@@ -1,5 +1,4 @@
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
@@ -33,8 +32,6 @@ jest.mock("@ionic/react", () => {
       ) : null,
   };
 });
-
-mockIonicReact();
 
 const getIpexApplyDetailsMock = jest.fn(() => Promise.resolve(credRequestFix));
 const getLinkedGroupFromIpexApplyMock = jest.fn();

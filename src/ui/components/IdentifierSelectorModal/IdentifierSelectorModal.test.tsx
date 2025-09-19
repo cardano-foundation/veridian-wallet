@@ -1,5 +1,4 @@
 import { setupIonicReact } from "@ionic/react";
-import { mockIonicReact, waitForIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act, ReactNode } from "react";
 import { Provider } from "react-redux";
@@ -11,7 +10,6 @@ import { IdentifierSelectorModal } from "./IdentifierSelectorModal";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 
 setupIonicReact();
-mockIonicReact();
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -60,8 +58,6 @@ describe("Identifier Selector Modal", () => {
       </Provider>
     );
 
-    await waitForIonicReact();
-
     expect(
       getByText(EN_TRANSLATIONS.tabs.connections.tab.indentifierselector.title)
     ).toBeVisible();
@@ -91,8 +87,6 @@ describe("Identifier Selector Modal", () => {
         />
       </Provider>
     );
-
-    await waitForIonicReact();
 
     expect(
       getByTestId("identifier-select-" + filteredIdentifierFix[1].id)
