@@ -464,7 +464,7 @@ class MultiSigService extends AgentService {
       }
 
       const hasAccepted = exchanges.some(
-        (exn: { i: string }) => exn.i === prefix
+        (exn: { exn: { i: string } }) => exn.exn.i === prefix
       );
 
       otherConnections.push({
@@ -830,7 +830,7 @@ class MultiSigService extends AgentService {
 
     const memberInfos = members.signing.map((member: { aid: string }) => {
       const hasAccepted = exchanges.some(
-        (exn: { i: string }) => exn.i === member.aid
+        (exn: { exn: { i: string } }) => exn.exn.i === member.aid
       );
 
       return {
