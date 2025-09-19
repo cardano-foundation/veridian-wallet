@@ -1,5 +1,4 @@
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
@@ -17,8 +16,6 @@ import { NotificationFilters } from "./Notification.types";
 import { NotificationItem } from "./NotificationItem";
 import { Notifications } from "./Notifications";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
-
-mockIonicReact();
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),

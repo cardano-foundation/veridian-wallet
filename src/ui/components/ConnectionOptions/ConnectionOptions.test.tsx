@@ -1,4 +1,3 @@
-import { waitForIonicReact } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
@@ -53,8 +52,6 @@ describe("Connection Options modal", () => {
       </Provider>
     );
 
-    await waitForIonicReact();
-
     expect(getByTestId("connection-options-manage-button")).toBeVisible();
     expect(getByTestId("delete-button-connection-options")).toBeVisible();
 
@@ -87,7 +84,6 @@ describe("Connection Options modal", () => {
         />
       </Provider>
     );
-    await waitForIonicReact();
 
     await waitFor(() =>
       expect(

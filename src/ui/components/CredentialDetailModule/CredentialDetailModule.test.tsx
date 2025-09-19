@@ -1,7 +1,6 @@
 const getConnectionShortDetailByIdMock = jest.fn().mockResolvedValue([]);
 const getConnectionByIdMock = jest.fn();
 
-import { waitForIonicReact } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
@@ -318,8 +317,6 @@ describe("Cred Detail Module - current not archived credential", () => {
       fireEvent.click(heartButton);
     });
 
-    await waitForIonicReact();
-
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
         addFavouritesCredsCache({
@@ -408,8 +405,6 @@ describe("Cred Detail Module - current not archived credential", () => {
       fireEvent.click(heartButton);
     });
 
-    await waitForIonicReact();
-
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
         removeFavouritesCredsCache(credsFixAcdc[0].id)
@@ -490,8 +485,6 @@ describe("Cred Detail Module - current not archived credential", () => {
     act(() => {
       fireEvent.click(heartButton);
     });
-
-    await waitForIonicReact();
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(

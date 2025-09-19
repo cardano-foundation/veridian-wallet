@@ -69,7 +69,6 @@
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^7.2.0",
     "@faker-js/faker": "^8.4.1",
-    "@ionic/react-test-utils": "^0.4.0",
     "@peculiar/webcrypto": "^1.5.0",
     "@testing-library/dom": "^9.3.1",
     "@testing-library/jest-dom": "^5.11.9",

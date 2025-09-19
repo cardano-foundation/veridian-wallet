@@ -1,6 +1,5 @@
 const verifySecretMock = jest.fn();
 
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
@@ -289,11 +288,11 @@ describe("Connections tab", () => {
     const searchBar = getByTestId("search-bar");
 
     act(() => {
-      ionFireEvent.ionFocus(searchBar);
+      fireEvent.focus(searchBar);
     });
 
     act(() => {
-      ionFireEvent.change(searchBar, {
+      fireEvent.change(searchBar, {
         target: {
           value: "Cambridge",
         },
@@ -308,7 +307,7 @@ describe("Connections tab", () => {
     });
 
     act(() => {
-      ionFireEvent.change(searchBar, {
+      fireEvent.change(searchBar, {
         target: {
           value: "Nothing",
         },
@@ -449,7 +448,7 @@ describe("Connections tab", () => {
     expect(getByTestId("alphabet-selector")).toBeVisible();
     expect(getByTestId("alphabet-selector-C")).toBeVisible();
 
-    ionFireEvent.touchStart(getByTestId("alphabet-selector-C"));
+    fireEvent.touchStart(getByTestId("alphabet-selector-C"));
 
     await waitFor(() => {
       expect(

@@ -1,9 +1,10 @@
 import { BiometryType } from "@capgo/capacitor-native-biometric";
 import {
-  ionFireEvent as fireEvent,
-  waitForIonicReact,
-} from "@ionic/react-test-utils";
-import { getDefaultNormalizer, render, waitFor } from "@testing-library/react";
+  fireEvent,
+  getDefaultNormalizer,
+  render,
+  waitFor,
+} from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
@@ -40,7 +41,7 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
     biometricInfo: {
       isAvailable: true,
       hasCredentials: false,
-      biometryType: BiometryType.FINGERPRINT
+      biometryType: BiometryType.FINGERPRINT,
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
     setBiometricsIsEnabled: jest.fn(),
@@ -300,8 +301,6 @@ describe("ConnectionDetails Page", () => {
       fireEvent.click(getByTestId("connection-options-manage-button"));
     });
 
-    await waitForIonicReact();
-
     await waitFor(() =>
       expect(getByTestId("edit-connections-modal")).toBeVisible()
     );
@@ -333,7 +332,10 @@ describe("ConnectionDetails Page", () => {
 
     const segment = getByTestId("connection-details-segment");
     act(() => {
-      fireEvent.ionChange(segment, "notes");
+      fireEvent(
+        segment,
+        new CustomEvent("ionChange", { detail: { value: "notes" } })
+      );
     });
 
     await waitFor(() =>
@@ -345,7 +347,10 @@ describe("ConnectionDetails Page", () => {
     );
 
     act(() => {
-      fireEvent.ionChange(segment, "details");
+      fireEvent(
+        segment,
+        new CustomEvent("ionChange", { detail: { value: "details" } })
+      );
     });
 
     await waitFor(() =>
@@ -457,7 +462,10 @@ describe("Checking the Connection Details Page when no notes are available", () 
 
     const segment = getByTestId("connection-details-segment");
     act(() => {
-      fireEvent.ionChange(segment, "notes");
+      fireEvent(
+        segment,
+        new CustomEvent("ionChange", { detail: { value: "notes" } })
+      );
     });
 
     await waitFor(() => {
@@ -526,7 +534,10 @@ describe("Checking the Connection Details Page when notes are available", () => 
 
     const segment = getByTestId("connection-details-segment");
     act(() => {
-      fireEvent.ionChange(segment, "notes");
+      fireEvent(
+        segment,
+        new CustomEvent("ionChange", { detail: { value: "notes" } })
+      );
     });
 
     await waitFor(() => expect(getByText("Title")).toBeVisible());
@@ -765,6 +776,3 @@ describe("Checking the Connection Details Page when connection is missing from t
     });
   });
 });
-
-
-

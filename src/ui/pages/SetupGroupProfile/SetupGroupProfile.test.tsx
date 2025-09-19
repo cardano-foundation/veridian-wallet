@@ -4,7 +4,6 @@ import {
   BarcodeValueType,
 } from "@capacitor-mlkit/barcode-scanning";
 import { IonInput } from "@ionic/react";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import EN_Translation from "../../../locales/en/en.json";
@@ -224,7 +223,12 @@ describe("Setup Connections", () => {
       </Provider>
     );
 
-    ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
+    fireEvent(
+      getByTestId("share-profile-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
 
     await waitFor(() => {
       expect(getByTestId("scan")).toBeVisible();
@@ -282,7 +286,12 @@ describe("Setup Connections", () => {
       </Provider>
     );
 
-    ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
+    fireEvent(
+      getByTestId("share-profile-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
 
     await waitFor(() => {
       expect(getByTestId("scan")).toBeVisible();
@@ -341,7 +350,12 @@ describe("Setup Connections", () => {
       </Provider>
     );
 
-    ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
+    fireEvent(
+      getByTestId("share-profile-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
 
     await waitFor(() => {
       expect(getByTestId("scan")).toBeVisible();
@@ -424,7 +438,12 @@ describe("Setup Connections", () => {
       </Provider>
     );
 
-    ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
+    fireEvent(
+      getByTestId("share-profile-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
 
     await waitFor(() => {
       expect(getByTestId("scan")).toBeVisible();
@@ -485,7 +504,12 @@ describe("Setup Connections", () => {
       </Provider>
     );
 
-    ionFireEvent.ionChange(getByTestId("share-profile-segment"), "scan");
+    fireEvent(
+      getByTestId("share-profile-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
 
     await waitFor(() => {
       expect(getByTestId("scan")).toBeVisible();

@@ -12,7 +12,6 @@ import {
 } from "@capacitor-mlkit/barcode-scanning";
 import { IonInput, IonLabel } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
@@ -282,7 +281,12 @@ describe("Profile setup", () => {
       });
 
       act(() => {
-        ionFireEvent.ionInput(getByTestId("profile-user-name"), "testUser");
+        fireEvent(
+          getByTestId("profile-user-name"),
+          new CustomEvent("ionInput", {
+            detail: { value: "testUser" },
+          })
+        );
       });
 
       await waitFor(() => {
@@ -323,25 +327,40 @@ describe("Profile setup", () => {
       });
 
       act(() => {
-        ionFireEvent.ionInput(getByTestId("profile-user-name"), "");
-      });
-
-      await waitFor(() => {
-        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
-      });
-
-      act(() => {
-        ionFireEvent.ionInput(getByTestId("profile-user-name"), "   ");
-      });
-
-      await waitFor(() => {
-        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
-      });
-
-      act(() => {
-        ionFireEvent.ionInput(
+        fireEvent(
           getByTestId("profile-user-name"),
-          "Duke Duke Duke Duke  Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke"
+          new CustomEvent("ionInput", {
+            detail: { value: "" },
+          })
+        );
+      });
+
+      await waitFor(() => {
+        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
+      });
+
+      act(() => {
+        fireEvent(
+          getByTestId("profile-user-name"),
+          new CustomEvent("ionInput", {
+            detail: { value: "   " },
+          })
+        );
+      });
+
+      await waitFor(() => {
+        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
+      });
+
+      act(() => {
+        fireEvent(
+          getByTestId("profile-user-name"),
+          new CustomEvent("ionInput", {
+            detail: {
+              value:
+                "Duke Duke Duke Duke  Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke",
+            },
+          })
         );
       });
 
@@ -349,7 +368,12 @@ describe("Profile setup", () => {
         expect(getByText(EN_TRANSLATIONS.nameerror.maxlength)).toBeVisible();
       });
 
-      ionFireEvent.ionInput(getByTestId("profile-user-name"), "Duke@@");
+      fireEvent(
+        getByTestId("profile-user-name"),
+        new CustomEvent("ionInput", {
+          detail: { value: "Duke@@" },
+        })
+      );
 
       await waitFor(() => {
         expect(
@@ -379,7 +403,12 @@ describe("Profile setup", () => {
         ).toBeVisible();
       });
 
-      ionFireEvent.ionInput(getByTestId("profile-user-name"), "testUser");
+      fireEvent(
+        getByTestId("profile-user-name"),
+        new CustomEvent("ionInput", {
+          detail: { value: "testUser" },
+        })
+      );
 
       await waitFor(() => {
         expect(
@@ -512,7 +541,12 @@ describe("Profile setup", () => {
       });
 
       act(() => {
-        ionFireEvent.ionInput(getByTestId("profile-group-name"), "groupName");
+        fireEvent(
+          getByTestId("profile-group-name"),
+          new CustomEvent("ionInput", {
+            detail: { value: "groupName" },
+          })
+        );
       });
 
       await waitFor(() => {
@@ -532,7 +566,12 @@ describe("Profile setup", () => {
       });
 
       act(() => {
-        ionFireEvent.ionInput(getByTestId("profile-user-name"), "testUser");
+        fireEvent(
+          getByTestId("profile-user-name"),
+          new CustomEvent("ionInput", {
+            detail: { value: "testUser" },
+          })
+        );
       });
 
       await waitFor(() => {
@@ -598,25 +637,40 @@ describe("Profile setup", () => {
       });
 
       act(() => {
-        ionFireEvent.ionInput(getByTestId("profile-group-name"), "");
-      });
-
-      await waitFor(() => {
-        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
-      });
-
-      act(() => {
-        ionFireEvent.ionInput(getByTestId("profile-group-name"), "   ");
-      });
-
-      await waitFor(() => {
-        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
-      });
-
-      act(() => {
-        ionFireEvent.ionInput(
+        fireEvent(
           getByTestId("profile-group-name"),
-          "Duke Duke Duke Duke  Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke"
+          new CustomEvent("ionInput", {
+            detail: { value: "" },
+          })
+        );
+      });
+
+      await waitFor(() => {
+        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
+      });
+
+      act(() => {
+        fireEvent(
+          getByTestId("profile-group-name"),
+          new CustomEvent("ionInput", {
+            detail: { value: "   " },
+          })
+        );
+      });
+
+      await waitFor(() => {
+        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
+      });
+
+      act(() => {
+        fireEvent(
+          getByTestId("profile-group-name"),
+          new CustomEvent("ionInput", {
+            detail: {
+              value:
+                "Duke Duke Duke Duke  Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke",
+            },
+          })
         );
       });
 
@@ -624,7 +678,12 @@ describe("Profile setup", () => {
         expect(getByText(EN_TRANSLATIONS.nameerror.maxlength)).toBeVisible();
       });
 
-      ionFireEvent.ionInput(getByTestId("profile-group-name"), "Duke@@");
+      fireEvent(
+        getByTestId("profile-group-name"),
+        new CustomEvent("ionInput", {
+          detail: { value: "Duke@@" },
+        })
+      );
 
       await waitFor(() => {
         expect(
@@ -711,7 +770,12 @@ describe("Profile setup: use as modal", () => {
       ).toBeVisible();
     });
 
-    ionFireEvent.ionInput(getByTestId("profile-user-name"), "testUser");
+    fireEvent(
+      getByTestId("profile-user-name"),
+      new CustomEvent("ionInput", {
+        detail: { value: "testUser" },
+      })
+    );
 
     await waitFor(() => {
       expect((getByTestId("profile-user-name") as HTMLInputElement).value).toBe(
@@ -781,7 +845,12 @@ describe("Profile setup: use as modal", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(getByTestId("profile-user-name"), "testUser");
+      fireEvent(
+        getByTestId("profile-user-name"),
+        new CustomEvent("ionInput", {
+          detail: { value: "testUser" },
+        })
+      );
     });
 
     await waitFor(() => {

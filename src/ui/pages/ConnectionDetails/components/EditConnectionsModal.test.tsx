@@ -1,8 +1,3 @@
-import {
-  ionFireEvent,
-  mockIonicReact,
-  waitForIonicReact,
-} from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -17,7 +12,6 @@ import {
   EditConnectionsModal,
 } from "./EditConnectionsModal";
 import { makeTestStore } from "../../../utils/makeTestStore";
-mockIonicReact();
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -220,7 +214,7 @@ describe("Edit Connection Modal", () => {
     });
 
     act(() => {
-      ionFireEvent.click(getByTestId("note-delete-button-1"));
+      fireEvent.click(getByTestId("note-delete-button-1"));
     });
 
     await waitFor(() => {
@@ -319,8 +313,6 @@ describe("Edit Connection Modal", () => {
       fireEvent.click(getByTestId("add-note-button"));
     });
 
-    await waitForIonicReact();
-
     await waitFor(() => {
       expect(
         getByText(EN_TRANSLATIONS.tabs.connections.details.notes.notetitle)
@@ -348,7 +340,7 @@ describe("Edit Connection Modal", () => {
     const actionBtn = getByTestId("action-button");
 
     act(() => {
-      ionFireEvent.click(actionBtn);
+      fireEvent.click(actionBtn);
     });
 
     expect(confirmFn).toBeCalledTimes(0);
@@ -512,7 +504,7 @@ describe("Edit Connection Modal", () => {
     });
 
     act(() => {
-      ionFireEvent.click(getByTestId("note-delete-button-2"));
+      fireEvent.click(getByTestId("note-delete-button-2"));
     });
 
     await waitFor(() => {
@@ -529,9 +521,7 @@ describe("Edit Connection Modal", () => {
     });
 
     act(() => {
-      ionFireEvent.click(
-        getByTestId("alert-confirm-delete-note-confirm-button")
-      );
+      fireEvent.click(getByTestId("alert-confirm-delete-note-confirm-button"));
     });
 
     await waitFor(() => {
@@ -540,12 +530,12 @@ describe("Edit Connection Modal", () => {
       );
     });
 
-    ionFireEvent.click(getByTestId("alert-confirm-delete-note-cancel-button"));
+    fireEvent.click(getByTestId("alert-confirm-delete-note-cancel-button"));
 
     const actionBtn = getByTestId("action-button");
 
     act(() => {
-      ionFireEvent.click(actionBtn);
+      fireEvent.click(actionBtn);
     });
 
     await waitFor(() => {
@@ -598,7 +588,7 @@ describe("Edit Connection Modal", () => {
     const actionBtn = getByTestId("action-button");
 
     act(() => {
-      ionFireEvent.click(actionBtn);
+      fireEvent.click(actionBtn);
     });
 
     await waitFor(() => {
@@ -638,7 +628,7 @@ describe("Edit Connection Modal", () => {
     const closeBtn = getByTestId("close-button");
 
     act(() => {
-      ionFireEvent.click(closeBtn);
+      fireEvent.click(closeBtn);
     });
 
     await waitFor(() => {
@@ -771,7 +761,7 @@ describe("Edit Connection Modal", () => {
 
     act(() => {
       const confirmBtn = getByTestId("action-button");
-      ionFireEvent.click(confirmBtn);
+      fireEvent.click(confirmBtn);
     });
 
     await waitFor(() => {

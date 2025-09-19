@@ -1,7 +1,6 @@
 const verifySecretMock = jest.fn();
 
 import { IonInput } from "@ionic/react";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
@@ -151,11 +150,16 @@ describe("Verify Password", () => {
     const confirmButton = await findByTestId("primary-button");
 
     act(() => {
-      ionFireEvent.ionInput(passwordInput, "1111");
+      fireEvent(
+        passwordInput,
+        new CustomEvent("ionInput", {
+          detail: { value: "1111" },
+        })
+      );
     });
 
     act(() => {
-      ionFireEvent.click(confirmButton);
+      fireEvent.click(confirmButton);
     });
 
     await waitFor(() => {
@@ -202,11 +206,16 @@ describe("Verify Password", () => {
     const confirmButton = getByTestId("primary-button");
 
     act(() => {
-      ionFireEvent.ionInput(passwordInput, "1111");
+      fireEvent(
+        passwordInput,
+        new CustomEvent("ionInput", {
+          detail: { value: "1111" },
+        })
+      );
     });
 
     act(() => {
-      ionFireEvent.click(confirmButton);
+      fireEvent.click(confirmButton);
     });
 
     await waitFor(() => {

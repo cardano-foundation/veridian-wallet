@@ -1,6 +1,5 @@
 const verifySecretMock = jest.fn().mockResolvedValue(true);
 
-import { mockIonicReact, waitForIonicReact } from "@ionic/react-test-utils";
 import { act } from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
@@ -16,7 +15,6 @@ import {
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { IncomingRequest } from "./IncomingRequest";
 import { makeTestStore } from "../../utils/makeTestStore";
-mockIonicReact();
 
 const mockApprovalCallback = jest.fn((status: boolean) => status);
 
@@ -94,8 +92,6 @@ describe("Sign request", () => {
         />
       </Provider>
     );
-
-    await waitForIonicReact();
 
     expect(getByText(requestData.peerConnection?.name)).toBeVisible();
     expect(

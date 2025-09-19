@@ -1,5 +1,4 @@
 import {
-  ConnectionDetails,
   ConnectionStatus,
   RegularConnectionDetailsFull,
 } from "../../core/agent/agent.types";

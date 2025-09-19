@@ -1,5 +1,4 @@
 import { IonInput, IonLabel } from "@ionic/react";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -132,9 +131,11 @@ describe("Set connection alias", () => {
     ).toBeVisible();
 
     act(() => {
-      ionFireEvent.ionInput(
+      fireEvent(
         getByTestId("input-request-input"),
-        "connectionName"
+        new CustomEvent("ionInput", {
+          detail: { value: "connectionName" },
+        })
       );
     });
 
@@ -176,9 +177,11 @@ describe("Set connection alias", () => {
     ).toBeVisible();
 
     act(() => {
-      ionFireEvent.ionInput(
+      fireEvent(
         getByTestId("input-request-input"),
-        "connectionName"
+        new CustomEvent("ionInput", {
+          detail: { value: "connectionName" },
+        })
       );
     });
 

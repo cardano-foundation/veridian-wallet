@@ -1,4 +1,3 @@
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { act } from "react";
@@ -9,7 +8,6 @@ import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { ShareConnection } from "./ShareConnection";
 import { ShareConnectionProps, ShareType } from "./ShareConnection.types";
-mockIonicReact();
 
 const setIsOpen = jest.fn();
 const props: ShareConnectionProps = {

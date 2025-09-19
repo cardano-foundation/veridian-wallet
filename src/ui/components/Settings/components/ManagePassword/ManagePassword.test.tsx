@@ -1,6 +1,5 @@
 import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { IonInput } from "@ionic/react";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -45,7 +44,7 @@ jest.mock("../../../../hooks/useBiometricsHook", () => ({
     biometricInfo: {
       isAvailable: false,
       hasCredentials: false,
-      biometryType: BiometryType.FINGERPRINT
+      biometryType: BiometryType.FINGERPRINT,
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(false)),
     setBiometricsIsEnabled: jest.fn(),
@@ -315,9 +314,11 @@ describe("Manage password", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(
+      fireEvent(
         getByTestId("verify-password-value"),
-        "Password@123"
+        new CustomEvent("ionInput", {
+          detail: { value: "Password@123" },
+        })
       );
     });
 
@@ -380,9 +381,11 @@ describe("Manage password", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(
+      fireEvent(
         getByTestId("verify-password-value"),
-        "Password@123"
+        new CustomEvent("ionInput", {
+          detail: { value: "Password@123" },
+        })
       );
     });
 

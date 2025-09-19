@@ -3,7 +3,6 @@ const verifySecretMock = jest.fn().mockResolvedValue(true);
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { act } from "react";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
@@ -23,8 +22,6 @@ import {
   setNotificationsCache,
 } from "../../../../../store/reducers/profileCache";
 import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
-
-mockIonicReact();
 
 const multisigIcpDetails = {
   sender: {

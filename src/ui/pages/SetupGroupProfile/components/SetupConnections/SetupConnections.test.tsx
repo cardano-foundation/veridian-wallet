@@ -5,7 +5,6 @@ import {
 } from "@capacitor-mlkit/barcode-scanning";
 import { IonInput } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
@@ -459,7 +458,7 @@ describe("Setup Connection", () => {
     history.push(
       RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
     );
-    const { getByText, getByTestId, rerender, findByText } = render(
+    const { getByText, getByTestId, rerender } = render(
       <Provider store={makeTestStore(initialState)}>
         <IonReactMemoryRouter history={history}>
           <SetupConnections
@@ -479,7 +478,12 @@ describe("Setup Connection", () => {
 
     expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
 
-    ionFireEvent.ionChange(getByTestId("setup-members-segment"), "scan");
+    fireEvent(
+      getByTestId("setup-members-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
 
     await waitFor(() => {
       expect(getByTestId("scan")).toBeVisible();
@@ -585,7 +589,12 @@ describe("Setup Connection", () => {
 
     expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
 
-    ionFireEvent.ionChange(getByTestId("setup-members-segment"), "scan");
+    fireEvent(
+      getByTestId("setup-members-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
@@ -646,7 +655,12 @@ describe("Setup Connection", () => {
 
     expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
 
-    ionFireEvent.ionChange(getByTestId("setup-members-segment"), "scan");
+    fireEvent(
+      getByTestId("setup-members-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
@@ -687,7 +701,12 @@ describe("Setup Connection", () => {
 
     expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
 
-    ionFireEvent.ionChange(getByTestId("setup-members-segment"), "scan");
+    fireEvent(
+      getByTestId("setup-members-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(

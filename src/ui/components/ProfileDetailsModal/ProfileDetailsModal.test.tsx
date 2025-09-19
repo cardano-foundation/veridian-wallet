@@ -1,7 +1,6 @@
 const verifySecretMock = jest.fn().mockResolvedValue(true);
 
 import { Clipboard } from "@capacitor/clipboard";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import {
   fireEvent,
   getDefaultNormalizer,
@@ -1006,9 +1005,12 @@ describe("Group profile details page", () => {
       )
     ).toBeInTheDocument();
 
-    ionFireEvent.ionChange(getByTestId("key-list"), [
-      AccordionKey.SIGNINGKEY,
-    ] as never);
+    fireEvent(
+      getByTestId("key-list"),
+      new CustomEvent("ionChange", {
+        detail: { value: [AccordionKey.SIGNINGKEY] },
+      })
+    );
 
     await waitFor(() => {
       expect(
@@ -1021,9 +1023,12 @@ describe("Group profile details page", () => {
       ).toBeInTheDocument();
     });
 
-    ionFireEvent.ionChange(getByTestId("key-list"), [
-      AccordionKey.ROTATIONKEY,
-    ] as never);
+    fireEvent(
+      getByTestId("key-list"),
+      new CustomEvent("ionChange", {
+        detail: { value: [AccordionKey.ROTATIONKEY] },
+      })
+    );
 
     await waitFor(() => {
       expect(

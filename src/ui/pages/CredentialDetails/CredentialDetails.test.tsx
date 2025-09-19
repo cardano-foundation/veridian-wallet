@@ -1,4 +1,3 @@
-import { waitForIonicReact } from "@ionic/react-test-utils";
 import { AnyAction, Store } from "@reduxjs/toolkit";
 import {
   fireEvent,
@@ -268,8 +267,6 @@ describe("Checking the Credential Details Page when information is missing from 
         </MemoryRouter>
       </Provider>
     );
-
-    await waitForIonicReact();
 
     await waitFor(() => {
       expect(

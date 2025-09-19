@@ -1,14 +1,11 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { mockIonicReact } from "@ionic/react-test-utils";
 import { CreationStatus } from "../../../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../../core/agent/services/keriaNotificationService.types";
 import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { ProfileItem } from "./ProfileItem";
-
-mockIonicReact();
 
 jest.mock("../../../components/Avatar", () => ({
   Avatar: ({ id }: { id: string }) => (
