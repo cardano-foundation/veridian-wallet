@@ -1333,7 +1333,7 @@ describe("Creation of multi-sig", () => {
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([]);
 
     listExchangesMock.mockResolvedValue([
-      { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+      { exn: { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" } },
     ]);
 
     const result = await multiSigService.getMultisigIcpDetails(
@@ -1384,7 +1384,7 @@ describe("Creation of multi-sig", () => {
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([]);
 
     listExchangesMock.mockResolvedValue([
-      { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+      { exn: { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" } },
     ]);
 
     await expect(
@@ -1429,7 +1429,7 @@ describe("Creation of multi-sig", () => {
     ]);
 
     listExchangesMock.mockResolvedValue([
-      { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+      { exn: { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" } },
     ]);
 
     const result = await multiSigService.getMultisigIcpDetails(
@@ -1488,8 +1488,8 @@ describe("Creation of multi-sig", () => {
     ]);
 
     listExchangesMock.mockResolvedValue([
-      { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
-      { i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" },
+      { exn: { i: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" } },
+      { exn: { i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G" } },
     ]);
 
     const result = await multiSigService.getMultisigIcpDetails(
@@ -1725,8 +1725,8 @@ describe("getInceptionStatus", () => {
 
     listExchangesMock.mockResolvedValue([
       {
-        i: "member1",
         exn: {
+          i: "member1",
           e: {
             icp: {
               kt: "4",
@@ -1735,7 +1735,7 @@ describe("getInceptionStatus", () => {
           },
         },
       },
-      { i: "member3" },
+      { exn: { i: "member3" } },
     ]);
 
     const result = await multiSigService.getInceptionStatus(MULTISIG_ID);
