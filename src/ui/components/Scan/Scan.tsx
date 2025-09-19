@@ -198,7 +198,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       setScanning(true);
     };
 
-    const containerClass = combineClassNames("profile-scanner", {
+    const containerClass = combineClassNames("scan", {
       "no-permission": !permission || mobileweb,
       "scan-unavailable": scanUnavailable,
     });
@@ -212,18 +212,18 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       <>
         <IonGrid
           className={containerClass}
-          data-testid="profile-scanner"
+          data-testid="scan"
         >
           {isTransitioning ? (
             <div
-              className="scanner-spinner-container"
-              data-testid="scanner-spinner-container"
+              className="scan-spinner-container"
+              data-testid="scan-spinner-container"
             />
           ) : scanning || mobileweb || scanUnavailable ? (
             <>
               <IonRow>
                 <IonCol size="12">
-                  <span className="profile-scanner-text">
+                  <span className="scan-text">
                     {getTranslateText("scan.title")}
                   </span>
                 </IonCol>
@@ -232,9 +232,9 @@ const Scan = forwardRef<ScanRef, ScanProps>(
                 <IonIcon
                   icon={scanOutline}
                   color="light"
-                  className="profile-scanner-icon"
+                  className="scan-icon"
                 />
-                <span className="profile-scanner-permission-text">
+                <span className="scan-permission-text">
                   {scanUnavailable
                     ? getTranslateText("scan.cameraunavailable")
                     : getTranslateText("scan.permissionalert")}
@@ -251,8 +251,8 @@ const Scan = forwardRef<ScanRef, ScanProps>(
             </>
           ) : (
             <div
-              className="scanner-spinner-container"
-              data-testid="scanner-spinner-container"
+              className="scan-spinner-container"
+              data-testid="scan-spinner-container"
             >
               <IonSpinner name="circular" />
             </div>

@@ -482,7 +482,7 @@ describe("Setup Connection", () => {
     ionFireEvent.ionChange(getByTestId("setup-members-segment"), "scan");
 
     await waitFor(() => {
-      expect(getByTestId("profile-scanner")).toBeVisible();
+      expect(getByTestId("scan")).toBeVisible();
       expect(getByTestId("paste-content-button")).toBeVisible();
     });
 

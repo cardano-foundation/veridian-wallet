@@ -4,7 +4,6 @@ import {
   BarcodeValueType,
 } from "@capacitor-mlkit/barcode-scanning";
 import { IonInput } from "@ionic/react";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -92,6 +91,7 @@ jest.mock("../CustomInput", () => ({
     return (
       <IonInput
         data-testid={props.dataTestId}
+        value={props.value}
         onIonInput={(e) => {
           props.onChangeInput(e.detail.value as string);
         }}
@@ -153,8 +153,8 @@ describe("Scan", () => {
       </Provider>
     );
 
-    expect(getByTestId("profile-scanner")).toBeVisible();
-    expect(getByTestId("scanner-spinner-container")).toBeVisible();
+    expect(getByTestId("scan")).toBeVisible();
+    expect(getByTestId("scan-spinner-container")).toBeVisible();
 
     unmount();
   });
@@ -169,7 +169,7 @@ describe("Scan", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("profile-scanner")).toBeVisible();
+      expect(getByTestId("scan")).toBeVisible();
       expect(getByTestId("paste-content-button")).toBeVisible();
     });
 
@@ -182,10 +182,11 @@ describe("Scan", () => {
     });
 
     act(() => {
-      ionFireEvent.ionInput(
-        getByTestId("scan-input"),
-        "bd54hj38aK2sGhE5K9mPqR79Jkd4b23hJf5sL36nHk"
-      );
+      const input = getByTestId("scan-input");
+      const event = new CustomEvent("ionInput", {
+        detail: { value: "bd54hj38aK2sGhE5K9mPqR79Jkd4b23hJf5sL36nHk" },
+      });
+      fireEvent(input, event);
     });
 
     await waitFor(() => {
