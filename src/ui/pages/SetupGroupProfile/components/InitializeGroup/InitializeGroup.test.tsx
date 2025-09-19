@@ -1,3 +1,5 @@
+const createGroupMock = jest.fn();
+
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { ConnectionStatus } from "../../../../../core/agent/agent.types";
@@ -11,6 +13,13 @@ jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
   IonModal: ({ children, isOpen, ...props }: any) =>
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
+}));
+
+jest.mock("signify-ts", () => ({
+  ...jest.requireActual("signify-ts"),
+  Salter: jest.fn(() => ({
+    qb64: "",
+  })),
 }));
 
 const memberConnections = [
@@ -66,6 +75,16 @@ const state: GroupInfomation = {
   newIdentifier: initiatorGroupProfile,
 };
 
+jest.mock("../../../../../core/agent/agent", () => ({
+  Agent: {
+    agent: {
+      multiSigs: {
+        createGroup: (...args: any) => createGroupMock(...args),
+      },
+    },
+  },
+}));
+
 describe("Init group", () => {
   test("Render", async () => {
     const { getByText } = render(
@@ -105,7 +124,7 @@ describe("Init group", () => {
     ).toBeVisible();
   });
 
-  test("Config and send request", async () => {
+  test("Config member and signer", async () => {
     const setStateMock = jest.fn();
     const { getByText, getByTestId } = render(
       <Provider store={makeTestStore()}>
@@ -148,6 +167,49 @@ describe("Init group", () => {
           requiredSigners: 4,
         },
       });
+    });
+  });
+
+  test("Send request", async () => {
+    const { getByText } = render(
+      <Provider store={makeTestStore()}>
+        <InitializeGroup
+          state={{
+            ...state,
+            signer: {
+              recoverySigners: 1,
+              requiredSigners: 2,
+            },
+          }}
+          setState={jest.fn}
+          groupName={state.displayNameValue}
+        />
+      </Provider>
+    );
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.members.replace(
+          "{{members}}",
+          "1"
+        )
+      )
+    ).toBeVisible();
+    expect(
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.members.replace(
+          "{{members}}",
+          "2"
+        )
+      )
+    ).toBeVisible();
+
+    fireEvent.click(
+      getByText(EN_TRANSLATIONS.setupgroupprofile.initgroup.button.sendrequest)
+    );
+
+    await waitFor(() => {
+      expect(createGroupMock).toBeCalled();
     });
   });
 });

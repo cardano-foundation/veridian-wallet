@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import {
+  CreationStatus,
   isMultisigConnectionDetails,
   OobiType,
 } from "../../../../../core/agent/agent.types";
@@ -47,8 +48,10 @@ const SetupConnections = ({ setState }: StageProps) => {
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const scanRef = useRef<ScanRef>(null);
+
   const { id: profileId } = useParams<{ id: string }>();
   const profile = profiles[profileId]?.identity;
+
   const groupId = profile?.groupMetadata?.groupId;
   const userName = profile?.groupMetadata?.userName;
   const { resolveGroupConnection } = useScanHandle();
@@ -86,7 +89,13 @@ const SetupConnections = ({ setState }: StageProps) => {
   }, [groupConnections, groupId, updateMultiSigGroup]);
 
   const fetchOobi = useCallback(async () => {
-    if (!groupId || !userName) return;
+    if (
+      !groupId ||
+      !userName ||
+      !profile?.displayName ||
+      profile.creationStatus === CreationStatus.PENDING
+    )
+      return;
 
     try {
       const oobiValue = await Agent.agent.connections.getOobi(profileId, {
@@ -100,7 +109,14 @@ const SetupConnections = ({ setState }: StageProps) => {
     } catch (e) {
       dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
     }
-  }, [groupId, userName, profileId, profile?.displayName, dispatch]);
+  }, [
+    groupId,
+    userName,
+    profile?.displayName,
+    profile.creationStatus,
+    profileId,
+    dispatch,
+  ]);
 
   useOnlineStatusEffect(fetchOobi);
 
@@ -156,7 +172,11 @@ const SetupConnections = ({ setState }: StageProps) => {
         customClass={tab}
         header={
           <PageHeader
-            title={tab === Tab.SetupMembers ? profile?.displayName : undefined}
+            title={
+              tab === Tab.SetupMembers
+                ? profile?.groupMetadata?.userName
+                : undefined
+            }
             actionButton={isScanTab && supportMultiCamera}
             actionButtonIcon={isScanTab ? repeatOutline : undefined}
             actionButtonAction={isScanTab ? changeCameraDirection : undefined}

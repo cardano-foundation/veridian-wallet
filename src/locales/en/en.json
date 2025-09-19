@@ -1218,6 +1218,20 @@
       "title": "Add an identifier",
       "confirmbutton": "Create identifier"
     },
+    "pending": {
+      "groupinfor": "Group information",
+      "alert": {
+        "initiatortext": "This group profile is pending. Once the threshold of members have accepted this profile will be usable."
+      },
+      "leave": {
+        "button": "Leave group",
+        "alert": {
+          "title": "Leaving this group removes your access and future participation. This action can’t be undone.",
+          "confirm": "Leave",
+          "cancel": "Cancel"
+        }
+      }
+    },
     "setupmembers": {
       "subtitle": "Connected members",
       "share": "Share",
@@ -1377,7 +1391,8 @@
     "rotatekeysuccess": "Individual keys rotated successfully",
     "rotatekeyerror": "Unable to rotate keys",
     "newmultisignmember": "New member added",
-    "multisignidentifiercreated": "Identifier added to “For groups“",
+    "grouprequestsend": "Group request sent",
+    "unablecreategrouperror": "Unable to create group",
     "delegatedidentifiercreated": "Identifier added to “For delegates“",
     "passcodeupdated": "Passcode updated successfully",
     "passwordupdated": "Password updated successfully",
