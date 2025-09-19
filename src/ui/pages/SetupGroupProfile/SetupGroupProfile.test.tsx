@@ -17,7 +17,6 @@ import {
 } from "@capacitor-mlkit/barcode-scanning";
 import { IonInput } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { ionFireEvent } from "@ionic/react-test-utils";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
