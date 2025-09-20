@@ -9,18 +9,25 @@ import {
   KeriaCredential,
 } from "./credentialService.types";
 import { CredentialMetadataRecord } from "../records/credentialMetadataRecord";
-import { getCredentialShortDetails, OnlineOnly } from "./utils";
+import {
+  deleteNotificationRecordById,
+  getCredentialShortDetails,
+  OnlineOnly,
+} from "./utils";
 import {
   CredentialStorage,
   IdentifierStorage,
   NotificationStorage,
+  OperationPendingStorage,
 } from "../records";
 import {
   AcdcStateChangedEvent,
   CredentialRemovedEvent,
   EventTypes,
+  NotificationRemovedEvent,
 } from "../event.types";
 import { IdentifierType } from "./identifier.types";
+import { ExchangeRoute } from "./keriaNotificationService.types";
 
 class CredentialService extends AgentService {
   static readonly CREDENTIAL_MISSING_METADATA_ERROR_MSG =
@@ -32,17 +39,20 @@ class CredentialService extends AgentService {
   protected readonly credentialStorage: CredentialStorage;
   protected readonly notificationStorage!: NotificationStorage;
   protected readonly identifierStorage!: IdentifierStorage;
+  protected readonly operationPendingStorage: OperationPendingStorage;
 
   constructor(
     agentServiceProps: AgentServicesProps,
     credentialStorage: CredentialStorage,
     notificationStorage: NotificationStorage,
-    identifierStorage: IdentifierStorage
+    identifierStorage: IdentifierStorage,
+    operationPendingStorage: OperationPendingStorage
   ) {
     super(agentServiceProps);
     this.credentialStorage = credentialStorage;
     this.notificationStorage = notificationStorage;
     this.identifierStorage = identifierStorage;
+    this.operationPendingStorage = operationPendingStorage;
   }
 
   onAcdcStateChanged(callback: (event: AcdcStateChangedEvent) => void) {
@@ -205,6 +215,71 @@ class CredentialService extends AgentService {
       throw new Error(CredentialService.CREDENTIAL_MISSING_METADATA_ERROR_MSG);
     }
     return metadata;
+  }
+
+  async getCredentialShareRequestDetails(requestSaid: string): Promise<any> {
+    const exchange = (
+      await this.props.signifyClient.exchanges().get(requestSaid)
+    ).exn;
+    const payload = exchange.a;
+    delete payload.d;
+
+    // TODO: get contact name from connection id
+    return {
+      identifier: exchange.rp,
+      payload,
+    };
+  }
+
+  @OnlineOnly
+  async shareCredentials(
+    notificationId: string,
+    requestSaid: string
+  ): Promise<void> {
+    const noteRecord = await this.notificationStorage.findExpectedById(
+      notificationId
+    );
+    const exchange = await this.props.signifyClient
+      .exchanges()
+      .get(requestSaid);
+
+    const credentials = await this.props.signifyClient.credentials().list({
+      filter: { "-s": exchange.exn.a.said },
+    });
+
+    const hab = await this.props.signifyClient
+      .identifiers()
+      .get(exchange.exn.rp);
+    const [exn, sigs, atc] = await this.props.signifyClient
+      .exchanges()
+      .createExchangeMessage(
+        hab,
+        ExchangeRoute.CoordinationCredentialsInfoResp,
+        { sads: credentials },
+        [],
+        exchange.exn.i,
+        undefined,
+        requestSaid
+      );
+    await this.props.signifyClient
+      .exchanges()
+      .sendFromEvents(exchange.exn.rp, "credential_share", exn, sigs, atc, [
+        exchange.exn.i,
+      ]);
+
+    await deleteNotificationRecordById(
+      this.props.signifyClient,
+      this.notificationStorage,
+      notificationId,
+      noteRecord.route,
+      this.operationPendingStorage
+    );
+    this.props.eventEmitter.emit<NotificationRemovedEvent>({
+      type: EventTypes.NotificationRemoved,
+      payload: {
+        id: notificationId,
+      },
+    });
   }
 
   async syncKeriaCredentials(): Promise<void> {

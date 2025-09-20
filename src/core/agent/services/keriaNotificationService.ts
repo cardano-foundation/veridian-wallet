@@ -37,6 +37,7 @@ import {
   NotificationRemovedEvent,
   ConnectionStateChangedEvent,
   OperationFailedEvent,
+  CoordinationCredentialsReqEvent,
 } from "../event.types";
 import {
   deleteNotificationRecordById,
@@ -297,6 +298,7 @@ class KeriaNotificationService extends AgentService {
   }
 
   async processNotification(notif: Notification): Promise<void> {
+    console.log("processNotification: ", notif);
     if (
       notif.r ||
       !Object.values(NotificationRoute).includes(notif.a.r as NotificationRoute)
@@ -335,6 +337,13 @@ class KeriaNotificationService extends AgentService {
       );
     } else if (notif.a.r === NotificationRoute.RemoteSignReq) {
       shouldCreateRecord = await this.processRemoteSignReq(notif, exn);
+    } else if (
+      notif.a.r === NotificationRoute.ExnCoordinationCredentialsInfoReq
+    ) {
+      shouldCreateRecord = await this.processCoordinationCredentialsInfoReq(
+        notif,
+        exn
+      );
     }
 
     if (!shouldCreateRecord) {
@@ -932,6 +941,29 @@ class KeriaNotificationService extends AgentService {
     return false;
   }
 
+  private async processCoordinationCredentialsInfoReq(
+    notif: Notification,
+    exchange: ExnMessage
+  ): Promise<boolean> {
+    this.props.eventEmitter.emit<CoordinationCredentialsReqEvent>({
+      type: EventTypes.CoordinationCredentialsReqEvent,
+      payload: {
+        aid: exchange.exn.a.i || "", // TODO: @jimcase
+      },
+    });
+
+    return true;
+  }
+
+  onCoordinationCredentialsReq(
+    callback: (event: CoordinationCredentialsReqEvent) => void
+  ) {
+    this.props.eventEmitter.on(
+      EventTypes.CoordinationCredentialsReqEvent,
+      callback
+    );
+  }
+
   private async processRemoteSignReq(
     notif: Notification,
     exchange: ExnMessage
@@ -1083,6 +1115,7 @@ class KeriaNotificationService extends AgentService {
   }
 
   async _pollLongOperations(): Promise<void> {
+    console.log("_pollLongOperations started");
     this.pendingOperations = await this.operationPendingStorage.getAll();
     // eslint-disable-next-line no-constant-condition
     while (true) {

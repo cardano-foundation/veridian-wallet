@@ -29,6 +29,9 @@ const revokeCredentialMock = jest.fn();
 let deleteCredentialMock = jest.fn();
 const credentialStateMock = jest.fn();
 
+const saveOperationPendingMock = jest.fn();
+const findOperationMock = jest.fn();
+
 const signifyClient = jest.mocked({
   connect: jest.fn(),
   boot: jest.fn(),
@@ -129,11 +132,17 @@ const notificationStorage = jest.mocked({
   getAll: jest.fn(),
 });
 
+const operationPendingStorage = jest.mocked({
+  save: saveOperationPendingMock,
+  findById: findOperationMock,
+});
+
 const credentialService = new CredentialService(
   agentServicesProps,
   credentialStorage as any,
   notificationStorage as any,
-  identifierStorage as any
+  identifierStorage as any,
+  operationPendingStorage as any
 );
 
 const now = new Date();
