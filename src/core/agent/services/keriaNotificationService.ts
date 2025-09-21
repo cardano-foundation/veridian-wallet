@@ -298,7 +298,6 @@ class KeriaNotificationService extends AgentService {
   }
 
   async processNotification(notif: Notification): Promise<void> {
-    console.log("processNotification: ", notif);
     if (
       notif.r ||
       !Object.values(NotificationRoute).includes(notif.a.r as NotificationRoute)

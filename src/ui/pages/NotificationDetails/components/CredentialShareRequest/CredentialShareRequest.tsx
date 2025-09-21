@@ -83,16 +83,14 @@ const CredentialShareRequest = ({
           <PageHeader
             closeButton={true}
             closeButtonAction={handleBack}
-            closeButtonLabel={`${i18n.t(
-              "tabs.notifications.details.buttons.close"
-            )}`}
-            title={`${i18n.t("tabs.notifications.details.share.title")}`}
+            closeButtonLabel="Close"
+            title={"Share Credentials"}
           />
         }
         footer={
           <PageFooter
             customClass="sign-footer"
-            primaryButtonText={`${i18n.t("request.button.share")}`}
+            primaryButtonText="Confirm"
             primaryButtonAction={() => setVerifyIsOpen(true)}
             secondaryButtonText={`${i18n.t("request.button.dontallow")}`}
             secondaryButtonAction={handleBack}
@@ -109,25 +107,7 @@ const CredentialShareRequest = ({
           </div>
           <h2 className="sign-name">{connectionName?.label}</h2>
         </div>
-        <h3 className="sign-info">
-          {i18n.t("tabs.notifications.details.share.info")}
-        </h3>
-        <div className="sign-content">
-          <CardBlock
-            title={`${i18n.t("tabs.notifications.details.share.identifier")}`}
-            testId="identifier-id-block"
-            className="sign-identifier"
-          >
-            <CardDetailsItem
-              info={ellipsisText(requestData?.identifier || "")}
-              icon={keyOutline}
-              testId="identifier-id"
-              className="identifier-id"
-              mask={false}
-              copyButton
-            />
-          </CardBlock>
-        </div>
+        <h3 className="sign-info">Share your credentials</h3>
       </ScrollablePageLayout>
       <Spinner
         show={loading}

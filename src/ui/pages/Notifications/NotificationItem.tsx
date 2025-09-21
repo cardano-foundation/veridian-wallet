@@ -82,6 +82,10 @@ const NotificationItem = ({
         return t("tabs.notifications.tab.labels.sign", {
           connection: connectionName || t("tabs.connections.unknown"),
         });
+      case NotificationRoute.ExnCoordinationCredentialsInfoReq:
+        return t("tabs.notifications.tab.labels.share", {
+          connection: connectionName || t("tabs.connections.unknown"),
+        });
       case NotificationRoute.HumanReadableMessage:
         return item.a.m as string;
       case NotificationRoute.LocalSingletonConnectInstructions:
