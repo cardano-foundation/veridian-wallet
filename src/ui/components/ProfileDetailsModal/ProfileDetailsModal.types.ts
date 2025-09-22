@@ -8,10 +8,24 @@ interface ProfileDetailsModalProps {
   restrictedOptions?: boolean;
 }
 
+interface ProfileDetailsModuleProps extends ProfileDetailsModalProps {
+  setIsOpen: (value: boolean) => void;
+  setShowConfirmation: (value: boolean) => void;
+  confirmConnection: boolean;
+  setConfirmConnection: (value: boolean) => void;
+  scannedValue: string;
+  onScanFinish: (content: string) => void;
+  onConnectionComplete: () => void;
+}
+
 interface IdentifierDetailModalProps
   extends Omit<ProfileDetailsModalProps, "navAnimation"> {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
 }
 
-export type { IdentifierDetailModalProps, ProfileDetailsModalProps };
+export type {
+  IdentifierDetailModalProps,
+  ProfileDetailsModalProps,
+  ProfileDetailsModuleProps,
+};

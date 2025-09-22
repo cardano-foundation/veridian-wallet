@@ -1,5 +1,5 @@
 import { IonSpinner, useIonViewWillEnter } from "@ionic/react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { syncOutline } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
@@ -37,20 +37,27 @@ import { RotateKeyModal } from "./components/RotateKeyModal";
 import "./ProfileDetailsModal.scss";
 import {
   IdentifierDetailModalProps,
-  ProfileDetailsModalProps,
+  ProfileDetailsModuleProps,
 } from "./ProfileDetailsModal.types";
 import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
 import { ScanRef } from "../Scan/Scan.types";
 import { useCameraDirection } from "../Scan/hook/useCameraDirection";
 import { Scan } from "../Scan";
+import { handleConnect } from "./handleConnect";
+import { IncomingRequest } from "./components/IncomingRequest";
 
 const ProfileDetailsModule = ({
   profileId,
   onClose: handleDone,
+  setIsOpen,
   pageId,
   hardwareBackButtonConfig,
   restrictedOptions,
-}: ProfileDetailsModalProps) => {
+  confirmConnection,
+  scannedValue,
+  onScanFinish,
+  onConnectionComplete,
+}: ProfileDetailsModuleProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
   const biometrics = useAppSelector(getBiometricsCache);
@@ -171,138 +178,40 @@ const ProfileDetailsModule = ({
     "ion-hide": hidden,
   });
 
-  const back = i18n.t("profiledetails.close");
-
-  const handleCloseScan = useCallback(() => {
+  const handleCloseScan = () => {
     setIsScanOpen(false);
-  }, []);
+  };
 
-  const handleScanFinish = useCallback(
-    async (content: string) => {
-      try {
-        const scanData = JSON.parse(content);
-        const { backendOobi, sessionAid, backendApi } = scanData;
+  const handleShowConfirmation = async (content: string) => {
+    onScanFinish(content);
+  };
 
-        if (!backendOobi || !sessionAid || !backendApi) {
-          throw new Error("Invalid QR code data: missing required fields");
-        }
+  const handleConnectWrapper = async () => {
+    setIsOpen(false);
+    try {
+      await handleConnect(scannedValue, profileId, profile, dispatch);
+    } finally {
+      setIsProcessing(false);
+      connectionAttemptRef.current = null;
+      onConnectionComplete();
+    }
+  };
 
-        const identifier = await Agent.agent.client
-          .identifiers()
-          .get(profile?.id || profileId);
-        const signer = Agent.agent.client.manager?.get(identifier);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const connectionAttemptRef = useRef<string | null>(null);
 
-        const method = "POST";
-        const path = "/login";
-        const requestBody = JSON.stringify({ sessionAid });
-
-        const headers = new Headers();
-        headers.set("Content-Type", "application/json");
-        headers.set("Signify-Resource", sessionAid);
-        headers.set(
-          "Signify-Timestamp",
-          new Date().toISOString().replace("Z", "+00:00")
-        );
-
-        const bodyBuffer = new TextEncoder().encode(requestBody);
-        const hashBuffer = await crypto.subtle.digest("SHA-256", bodyBuffer);
-        const hashBase64 = Buffer.from(hashBuffer).toString("base64");
-        headers.set("Content-Digest", `sha-256=:${hashBase64}:`);
-
-        const coveredComponents = [
-          "@method",
-          "@path",
-          "signify-resource",
-          "signify-timestamp",
-          "content-digest",
-        ];
-        const signatureInput = `sig1=(${coveredComponents
-          .map((c) => `"${c}"`)
-          .join(" ")});created=${Math.floor(Date.now() / 1000)};keyid="${
-          profile?.id || profileId
-        }"`;
-        headers.set("Signature-Input", signatureInput);
-
-        let payload = "";
-        for (const component of coveredComponents) {
-          if (component === "@method") {
-            payload += `"@method": ${method}\n`;
-          } else if (component === "@path") {
-            payload += `"@path": ${path}\n`;
-          } else {
-            payload += `"${component}": ${headers.get(component)}\n`;
-          }
-        }
-        payload += `"@signature-params": ${signatureInput.substring(
-          signatureInput.indexOf(";")
-        )}`;
-
-        if (!signer) {
-          throw new Error("Unable to get signer for the current profile");
-        }
-
-        const signResult = await signer.sign(Buffer.from(payload));
-
-        let signature: string;
-        if (typeof signResult === "string") {
-          signature = signResult;
-        } else if (Array.isArray(signResult) && signResult.length > 0) {
-          signature = signResult[0];
-        } else if (
-          signResult &&
-          typeof signResult === "object" &&
-          "qb64" in signResult
-        ) {
-          signature = (signResult as any).qb64;
-        } else {
-          throw new Error(`Unexpected sign result type: ${typeof signResult}`);
-        }
-
-        headers.set("Signature", `sig1=:${signature}:`);
-
-        const baseUrl = backendApi
-          .replace(/\/$/, "")
-          .replace("127.0.0.1", "localhost");
-        const fullUrl = `${baseUrl}${path}`;
-
-        // TEMPORARY MOCK: Skip actual API call until backend is fixed
-        // const response = await fetch(fullUrl, {
-        //   method: "POST",
-        //   headers: headers,
-        //   body: requestBody,
-        // });
-
-        // if (!response.ok) {
-        //   const errorText = await response.text();
-        //   throw new Error(
-        //     `HTTP error! status: ${response.status}, body: ${errorText}`
-        //   );
-        // }
-
-        // Mock successful response
-        const mockResponse = {
-          success: true,
-          message: "Login successful",
-          sessionId: "mock-session-" + Date.now(),
-          userId: profile?.id || profileId,
-        };
-
-        // TODO: Not sure what to do with this yet
-        const data = mockResponse;
-
-        dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
-      } catch (error) {
-        showError(
-          "Failed to login with scanned QR code",
-          error instanceof Error ? error : new Error(String(error)),
-          dispatch
-        );
-      } finally {
-        handleCloseScan();
+  useEffect(() => {
+    if (confirmConnection === true && scannedValue && !isProcessing) {
+      const currentAttempt = scannedValue;
+      if (connectionAttemptRef.current !== currentAttempt) {
+        connectionAttemptRef.current = currentAttempt;
+        setIsProcessing(true);
+        handleConnectWrapper();
       }
-    },
-    [profile?.id, profileId, handleCloseScan, dispatch]
-  );
+    } else if (confirmConnection === false) {
+      connectionAttemptRef.current = null;
+    }
+  }, [confirmConnection, scannedValue]);
 
   return (
     <>
@@ -338,7 +247,7 @@ const ProfileDetailsModule = ({
               header={
                 <PageHeader
                   closeButton={true}
-                  closeButtonLabel={back}
+                  closeButtonLabel={`${i18n.t("profiledetails.close")}`}
                   closeButtonAction={handleCloseScan}
                   actionButton={supportMultiCamera}
                   actionButtonIcon={syncOutline}
@@ -349,7 +258,7 @@ const ProfileDetailsModule = ({
             >
               <Scan
                 ref={scanRef}
-                onFinishScan={handleScanFinish}
+                onFinishScan={handleShowConfirmation}
                 cameraDirection={cameraDirection}
                 onCheckPermissionFinish={setEnableCameraDirection}
                 displayOnModal={true}
@@ -440,6 +349,10 @@ const ProfileDetailsModal = ({
   onClose,
   ...props
 }: IdentifierDetailModalProps) => {
+  const dispatch = useAppDispatch();
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmConnection, setConfirmConnection] = useState(false);
+  const [scannedValue, setScannedValue] = useState<string>("");
   const handleClose = useCallback(() => {
     setIsOpen(false);
   }, [setIsOpen]);
@@ -457,17 +370,78 @@ const ProfileDetailsModal = ({
     []
   );
 
+  const handleShowConfirmation = useCallback(
+    (content: string) => {
+      try {
+        const url = new URL(content);
+        const type = url.searchParams.get("type");
+
+        if (!type) {
+          showError(
+            "Unable to find type",
+            new Error("Missing type parameter in scanned URL"),
+            dispatch,
+            ToastMsgType.UNKNOWN_ERROR
+          );
+          return;
+        }
+
+        if (type !== "guardianship") {
+          showError(
+            "Unsupported type",
+            new Error(`Type '${type}' is not supported.`),
+            dispatch,
+            ToastMsgType.UNKNOWN_ERROR
+          );
+          return;
+        }
+
+        setScannedValue(content);
+        setShowConfirmation(true);
+      } catch (error) {
+        showError(
+          "Invalid QR code",
+          error instanceof Error
+            ? error
+            : new Error("Scanned content is not a valid URL"),
+          dispatch,
+          ToastMsgType.UNKNOWN_ERROR
+        );
+      }
+    },
+    [dispatch]
+  );
+
+  const handleConnectionComplete = useCallback(() => {
+    setConfirmConnection(false);
+    setScannedValue("");
+  }, []);
+
   return (
     <SideSlider
       isOpen={isOpen}
       renderAsModal
     >
-      <ProfileDetailsModule
-        {...props}
-        onClose={handleBack}
-        hardwareBackButtonConfig={hardwareBackButtonConfig}
-        restrictedOptions={props.restrictedOptions}
-      />
+      {showConfirmation ? (
+        <IncomingRequest
+          setShowConfirmation={setShowConfirmation}
+          setConfirmConnection={setConfirmConnection}
+        />
+      ) : (
+        <ProfileDetailsModule
+          {...props}
+          onClose={handleBack}
+          setIsOpen={setIsOpen}
+          hardwareBackButtonConfig={hardwareBackButtonConfig}
+          restrictedOptions={props.restrictedOptions}
+          setShowConfirmation={setShowConfirmation}
+          confirmConnection={confirmConnection}
+          setConfirmConnection={setConfirmConnection}
+          scannedValue={scannedValue}
+          onScanFinish={handleShowConfirmation}
+          onConnectionComplete={handleConnectionComplete}
+        />
+      )}
     </SideSlider>
   );
 };
