@@ -13,8 +13,6 @@ enum OperationType {
   IDLE = "idle",
   DELETE_CONNECTION = "deleteConnection",
   SCAN_CONNECTION = "scanConnection",
-  MULTI_SIG_INITIATOR_SCAN = "multiSigInitiatorScan",
-  MULTI_SIG_RECEIVER_SCAN = "multiSigReceiverScan",
   MULTI_SIG_INITIATOR_INIT = "multiSigInitiatorInit",
   SCAN_WALLET_CONNECTION = "scanWalletConnection",
   SCAN_SSI_BOOT_URL = "scanSSIBootUrl",
