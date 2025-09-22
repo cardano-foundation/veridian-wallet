@@ -57,6 +57,7 @@ const ProfileContent = ({
   onRotateKey,
   oobi,
   setCardData,
+  setIsScanOpen,
 }: ProfileContentProps) => {
   const profiles = useAppSelector(getProfiles);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
@@ -110,7 +111,7 @@ const ProfileContent = ({
   const openGroupMember = () => openPropDetailModal(DetailView.GroupMember);
 
   const showLogin = () => {
-    setConnectdApp(true);
+    setIsScanOpen(true);
   };
 
   const showDapp = () => {

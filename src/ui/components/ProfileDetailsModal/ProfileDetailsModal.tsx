@@ -1,6 +1,6 @@
 import { IonSpinner, useIonViewWillEnter } from "@ionic/react";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { repeatOutline } from "ionicons/icons";
+import { syncOutline } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { IdentifierDetails as IdentifierDetailsCore } from "../../../core/agent/services/identifier.types";
@@ -224,7 +224,7 @@ const ProfileDetailsModule = ({
                   closeButtonLabel={back}
                   closeButtonAction={handleCloseScan}
                   actionButton={supportMultiCamera}
-                  actionButtonIcon={repeatOutline}
+                  actionButtonIcon={syncOutline}
                   actionButtonAction={changeCameraDirection}
                   actionButtonDisabled={!enableCameraDirection}
                 />
@@ -235,6 +235,7 @@ const ProfileDetailsModule = ({
                 onFinishScan={handleScanFinish}
                 cameraDirection={cameraDirection}
                 onCheckPermissionFinish={setEnableCameraDirection}
+                displayOnModal={true}
               />
             </ResponsivePageLayout>
           );
@@ -260,6 +261,7 @@ const ProfileDetailsModule = ({
                   cardData={profile as IdentifierDetailsCore}
                   oobi={oobi}
                   setCardData={setProfile}
+                  setIsScanOpen={setIsScanOpen}
                 />
                 {!restrictedOptions && (
                   <PageFooter

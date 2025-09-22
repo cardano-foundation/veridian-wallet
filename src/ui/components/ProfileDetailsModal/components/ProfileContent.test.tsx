@@ -104,6 +104,7 @@ describe("ProfileContent", () => {
     oobi: "test-oobi",
     onRotateKey: jest.fn(),
     setCardData: jest.fn(),
+    setIsScanOpen: jest.fn(),
   };
 
   const renderComponent = (storeOverrides = {}) => {
