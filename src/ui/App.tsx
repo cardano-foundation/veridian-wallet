@@ -9,43 +9,43 @@ import {
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { StrictMode, useEffect, useState } from "react";
 import { SafeArea } from "capacitor-plugin-safe-area";
+import { StrictMode, useEffect, useState } from "react";
+import { ConfigurationService } from "../core/configuration";
+import { SecureStorage } from "../core/storage";
+import { i18n } from "../i18n";
 import { Routes } from "../routes";
+import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   getCurrentOperation,
   getGlobalLoading,
   getInitializationPhase,
 } from "../store/reducers/stateCache";
+import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
+import "./App.scss";
 import { AppOffline } from "./components/AppOffline";
 import { AppWrapper } from "./components/AppWrapper";
 import { ToastStack } from "./components/CustomToast/ToastStack";
 import { GenericError, NoWitnessAlert } from "./components/Error";
 import { InputRequest } from "./components/InputRequest";
 import { SidePage } from "./components/SidePage";
-import { OperationType } from "./globals/types";
-import { FullPageScanner } from "./pages/FullPageScanner";
-import { LoadingPage } from "./pages/LoadingPage/LoadingPage";
-import { LockPage } from "./pages/LockPage/LockPage";
-import "./styles/ionic.scss";
-import "./styles/style.scss";
-import "./App.scss";
-import { showError } from "./utils/error";
-import SystemCompatibilityAlert from "./pages/SystemCompatibilityAlert/SystemCompatibilityAlert";
-import { SecureStorage } from "../core/storage";
-import { compareVersion } from "./utils/version";
 import {
   ANDROID_MIN_VERSION,
   IOS_MIN_VERSION,
   WEBVIEW_MIN_VERSION,
 } from "./globals/constants";
-import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
+import { OperationType } from "./globals/types";
+import { FullPageScanner } from "./pages/FullPageScanner";
+import { LoadingPage } from "./pages/LoadingPage/LoadingPage";
 import { LoadingType } from "./pages/LoadingPage/LoadingPage.types";
-import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
+import { LockPage } from "./pages/LockPage/LockPage";
+import SystemCompatibilityAlert from "./pages/SystemCompatibilityAlert/SystemCompatibilityAlert";
 import { SystemThreatAlert } from "./pages/SystemThreatAlert/SystemThreatAlert";
-import { ConfigurationService } from "../core/configuration";
-import { i18n } from "../i18n";
+import "./styles/ionic.scss";
+import "./styles/style.scss";
+import { showError } from "./utils/error";
+import { compareVersion } from "./utils/version";
 
 setupIonicReact();
 
@@ -116,8 +116,6 @@ const App = () => {
       [
         OperationType.SCAN_CONNECTION,
         OperationType.SCAN_WALLET_CONNECTION,
-        OperationType.MULTI_SIG_INITIATOR_SCAN,
-        OperationType.MULTI_SIG_RECEIVER_SCAN,
         OperationType.SCAN_SSI_BOOT_URL,
         OperationType.SCAN_SSI_CONNECT_URL,
       ].includes(currentOperation)

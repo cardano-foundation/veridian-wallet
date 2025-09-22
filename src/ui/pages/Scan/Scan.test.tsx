@@ -5,13 +5,11 @@ import {
 } from "@capacitor-mlkit/barcode-scanning";
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { StorageMessage } from "../../../core/storage/storage.types";
 import { TabsRoutePath } from "../../../routes/paths";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { OperationType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { Scan } from "./Scan";
-import { RootState } from "../../../store";
-import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -133,7 +131,7 @@ describe("Scan Tab", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
-        currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
+        currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
       profilesCache: profileCacheFixData,
