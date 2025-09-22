@@ -17,6 +17,7 @@ Feature: CreatePasswordValidation
       | C163   | maximum | 64     |
       | C164   | minimum | 8      |
 
+
   Scenario Outline: <caseId> CreatePasswordValidation - <name>
     Given user type in password <password> on Create Password screen
     Then user can see <errorMessage> on Create Password screen
@@ -28,3 +29,4 @@ Feature: CreatePasswordValidation
       | C169   | lack of lowercase in password | !A345678                                                          | Must contain a lowercase letter      |
       | C170   | lack of symbol in password    | 12345678Qw                                                        | Must contain a valid symbol          |
       | C171   | lack of number in password    | !Aasdfgq                                                          | Must contain a number                |
+
