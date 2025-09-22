@@ -763,7 +763,7 @@ describe("Credential service of agent", () => {
     );
   });
 
-  describe("getCredentialShareRequestDetails", () => {
+  it("should return request details successfully for credential share request", async () => {
     const mockRequestSaid = "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p";
     const mockExchangeGetResponse = {
       exn: {
@@ -775,31 +775,28 @@ describe("Credential service of agent", () => {
         d: "some-digest",
       },
     };
+    const exchangesGetMock = jest
+      .fn()
+      .mockResolvedValue(mockExchangeGetResponse);
+    signifyClient.exchanges = jest.fn().mockReturnValue({
+      ...signifyClient.exchanges(),
+      get: exchangesGetMock,
+    });
 
-    it("should return request details successfully", async () => {
-      const exchangesGetMock = jest
-        .fn()
-        .mockResolvedValue(mockExchangeGetResponse);
-      signifyClient.exchanges = jest.fn().mockReturnValue({
-        ...signifyClient.exchanges(),
-        get: exchangesGetMock,
-      });
+    const result = await credentialService.getCredentialShareRequestDetails(
+      mockRequestSaid
+    );
 
-      const result = await credentialService.getCredentialShareRequestDetails(
-        mockRequestSaid
-      );
-
-      expect(exchangesGetMock).toHaveBeenCalledWith(mockRequestSaid);
-      expect(result).toEqual({
-        identifier: mockExchangeGetResponse.exn.rp,
-        payload: {
-          said: mockExchangeGetResponse.exn.a.said,
-        },
-      });
+    expect(exchangesGetMock).toHaveBeenCalledWith(mockRequestSaid);
+    expect(result).toEqual({
+      identifier: mockExchangeGetResponse.exn.rp,
+      payload: {
+        said: mockExchangeGetResponse.exn.a.said,
+      },
     });
   });
 
-  describe("shareCredentials", () => {
+  it("should share credentials and delete notification", async () => {
     const mockRequestSaid = "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p";
     const mockNotificationId = "notification-id-for-share";
     const mockExchangeGetResponse = {
@@ -820,75 +817,72 @@ describe("Credential service of agent", () => {
       name: "test",
     };
     const mockCreateExchangeMessageResponse = ["exn", "sigs", "atc"];
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
+    notificationStorage.findExpectedById.mockResolvedValue({
+      id: mockNotificationId,
+      route: "/exn/coordination/credentials/info/req",
+    });
+    const exchangesGetMock = jest
+      .fn()
+      .mockResolvedValue(mockExchangeGetResponse);
+    const createExchangeMessageMock = jest
+      .fn()
+      .mockResolvedValue(mockCreateExchangeMessageResponse);
+    const sendFromEventsMock = jest.fn().mockResolvedValue({});
+    signifyClient.exchanges = jest.fn().mockReturnValue({
+      get: exchangesGetMock,
+      createExchangeMessage: createExchangeMessageMock,
+      sendFromEvents: sendFromEventsMock,
+    });
+    credentialListMock.mockResolvedValue(mockCredentialListResponse);
+    identifiersGetMock.mockResolvedValue(mockHab);
+    notificationStorage.deleteById = jest.fn();
+    const markMock = jest.fn().mockResolvedValue({});
+    signifyClient.notifications = jest.fn().mockReturnValue({
+      list: jest.fn(),
+      mark: markMock,
+    });
 
-    it("should share credentials and delete notification", async () => {
-      Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
-      notificationStorage.findExpectedById.mockResolvedValue({
+    await credentialService.shareCredentials(
+      mockNotificationId,
+      mockRequestSaid
+    );
+
+    expect(notificationStorage.findExpectedById).toHaveBeenCalledWith(
+      mockNotificationId
+    );
+    expect(exchangesGetMock).toHaveBeenCalledWith(mockRequestSaid);
+    expect(credentialListMock).toHaveBeenCalledWith({
+      filter: { "-s": mockExchangeGetResponse.exn.a.said },
+    });
+    expect(identifiersGetMock).toHaveBeenCalledWith(
+      mockExchangeGetResponse.exn.rp
+    );
+    expect(createExchangeMessageMock).toHaveBeenCalledWith(
+      mockHab,
+      ExchangeRoute.CoordinationCredentialsInfoResp,
+      { sads: mockCredentialListResponse },
+      [],
+      mockExchangeGetResponse.exn.i,
+      undefined,
+      mockRequestSaid
+    );
+    expect(sendFromEventsMock).toHaveBeenCalledWith(
+      mockExchangeGetResponse.exn.rp,
+      "credential_share",
+      "exn",
+      "sigs",
+      "atc",
+      [mockExchangeGetResponse.exn.i]
+    );
+    expect(notificationStorage.deleteById).toHaveBeenCalledWith(
+      mockNotificationId
+    );
+    expect(eventEmitter.emit).toHaveBeenCalledWith({
+      type: EventTypes.NotificationRemoved,
+      payload: {
         id: mockNotificationId,
-        route: "/exn/coordination/credentials/info/req",
-      });
-      const exchangesGetMock = jest
-        .fn()
-        .mockResolvedValue(mockExchangeGetResponse);
-      const createExchangeMessageMock = jest
-        .fn()
-        .mockResolvedValue(mockCreateExchangeMessageResponse);
-      const sendFromEventsMock = jest.fn().mockResolvedValue({});
-      signifyClient.exchanges = jest.fn().mockReturnValue({
-        get: exchangesGetMock,
-        createExchangeMessage: createExchangeMessageMock,
-        sendFromEvents: sendFromEventsMock,
-      });
-      credentialListMock.mockResolvedValue(mockCredentialListResponse);
-      identifiersGetMock.mockResolvedValue(mockHab);
-      notificationStorage.deleteById = jest.fn();
-      const markMock = jest.fn().mockResolvedValue({});
-      signifyClient.notifications = jest.fn().mockReturnValue({
-        list: jest.fn(),
-        mark: markMock,
-      });
-
-      await credentialService.shareCredentials(
-        mockNotificationId,
-        mockRequestSaid
-      );
-
-      expect(notificationStorage.findExpectedById).toHaveBeenCalledWith(
-        mockNotificationId
-      );
-      expect(exchangesGetMock).toHaveBeenCalledWith(mockRequestSaid);
-      expect(credentialListMock).toHaveBeenCalledWith({
-        filter: { "-s": mockExchangeGetResponse.exn.a.said },
-      });
-      expect(identifiersGetMock).toHaveBeenCalledWith(
-        mockExchangeGetResponse.exn.rp
-      );
-      expect(createExchangeMessageMock).toHaveBeenCalledWith(
-        mockHab,
-        ExchangeRoute.CoordinationCredentialsInfoResp,
-        { sads: mockCredentialListResponse },
-        [],
-        mockExchangeGetResponse.exn.i,
-        undefined,
-        mockRequestSaid
-      );
-      expect(sendFromEventsMock).toHaveBeenCalledWith(
-        mockExchangeGetResponse.exn.rp,
-        "credential_share",
-        "exn",
-        "sigs",
-        "atc",
-        [mockExchangeGetResponse.exn.i]
-      );
-      expect(notificationStorage.deleteById).toHaveBeenCalledWith(
-        mockNotificationId
-      );
-      expect(eventEmitter.emit).toHaveBeenCalledWith({
-        type: EventTypes.NotificationRemoved,
-        payload: {
-          id: mockNotificationId,
-        },
-      });
+      },
     });
   });
 });
