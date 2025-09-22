@@ -762,40 +762,7 @@ describe("Credential service of agent", () => {
       "cred-2"
     );
   });
-
-  test("should return request details successfully for credential share request", async () => {
-    const mockRequestSaid = "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p";
-    const mockExchangeGetResponse = {
-      exn: {
-        i: "some-issuer-id",
-        rp: "some-recipient-id",
-        a: {
-          s: "some-schema-said",
-        },
-        d: "some-digest",
-      },
-    };
-    const exchangesGetMock = jest
-      .fn()
-      .mockResolvedValue(mockExchangeGetResponse);
-    signifyClient.exchanges = jest.fn().mockReturnValue({
-      ...signifyClient.exchanges(),
-      get: exchangesGetMock,
-    });
-
-    const result = await credentialService.getCredentialShareRequestDetails(
-      mockRequestSaid
-    );
-
-    expect(exchangesGetMock).toHaveBeenCalledWith(mockRequestSaid);
-    expect(result).toEqual({
-      identifier: mockExchangeGetResponse.exn.rp,
-      payload: {
-        s: mockExchangeGetResponse.exn.a.s,
-      },
-    });
-  });
-
+  
   test("should share credentials and delete notification", async () => {
     const mockRequestSaid = "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p";
     const mockNotificationId = "notification-id-for-share";

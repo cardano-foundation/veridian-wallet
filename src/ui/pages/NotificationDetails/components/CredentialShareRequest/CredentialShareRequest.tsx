@@ -1,12 +1,11 @@
 import { IonIcon } from "@ionic/react";
-import { keyOutline, personCircleOutline } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { personCircleOutline } from "ionicons/icons";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { CardBlock, CardDetailsItem } from "../../../../components/CardDetails";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
@@ -17,10 +16,6 @@ import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./CredentialShareRequest.scss";
-
-function ellipsisText(text: string) {
-  return `${text.substring(0, 8)}...${text.slice(-8)}`;
-}
 
 const CredentialShareRequest = ({
   pageId,
@@ -34,28 +29,7 @@ const CredentialShareRequest = ({
   const connectionName = connections.find(
     (c) => c.id === notificationDetails.connectionId
   );
-  const [requestData, setRequestData] = useState<any>();
   const [loading, showLoading] = useState(true);
-
-  useEffect(() => {
-    const getSignData = async () => {
-      try {
-        showLoading(true);
-        const requestData =
-          await Agent.agent.credentials.getCredentialShareRequestDetails(
-            notificationDetails.a.d as string
-          );
-        setRequestData(requestData);
-      } catch (e) {
-        showError("Failed to get sign data", e, dispatch);
-        handleBack();
-      } finally {
-        showLoading(false);
-      }
-    };
-
-    getSignData();
-  }, [dispatch, handleBack, notificationDetails.a.d]);
 
   const handleShare = async () => {
     try {

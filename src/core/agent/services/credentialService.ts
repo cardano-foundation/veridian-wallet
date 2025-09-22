@@ -217,19 +217,6 @@ class CredentialService extends AgentService {
     return metadata;
   }
 
-  async getCredentialShareRequestDetails(requestSaid: string): Promise<any> {
-    const exchange = (
-      await this.props.signifyClient.exchanges().get(requestSaid)
-    ).exn;
-    const payload = exchange.a;
-
-    // TODO: get identifier name from contact?
-    return {
-      identifier: exchange.rp,
-      payload,
-    };
-  }
-
   @OnlineOnly
   async shareCredentials(
     notificationId: string,
