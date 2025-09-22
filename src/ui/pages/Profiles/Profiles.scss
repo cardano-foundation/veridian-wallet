@@ -1,3 +1,25 @@
+.scan-active {
+  &.scan-modal {
+    div.app-router {
+      display: none;
+    }
+
+    .profiles-modal {
+      display: none;
+    }
+
+    .side-slider-modal {
+      --background: transparent;
+
+      .profile-setup.responsive-page-layout {
+        &.scan {
+          background: transparent;
+        }
+      }
+    }
+  }
+}
+
 .profiles {
   display: flex;
   flex-direction: column;

@@ -23,7 +23,6 @@ import {
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getProfileGroupCache,
   setPendingDAppConnection,
   showDAppConnect,
 } from "../../../store/reducers/profileCache";
@@ -59,14 +58,12 @@ const Scanner = forwardRef(
     const componentId = "scanner";
     const platforms = getPlatforms();
     const dispatch = useAppDispatch();
-    const multiSigGroupCache = useAppSelector(getProfileGroupCache);
     const currentOperation = useAppSelector(getCurrentOperation);
     const currentToastMsgs = useAppSelector(getToastMsgs);
     const loggedIn = useAppSelector(getAuthentication).loggedIn;
     const [createIdentifierModalIsOpen, setCreateIdentifierModalIsOpen] =
       useState(false);
     const [pasteModalIsOpen, setPasteModalIsOpen] = useState(false);
-    const [groupId, setGroupId] = useState("");
     const [pastedValue, setPastedValue] = useState("");
     const [scanning, setScanning] = useState(false);
     const [permission, setPermisson] = useState(false);
@@ -138,9 +135,6 @@ const Scanner = forwardRef(
           return;
         }
 
-        const isDuplicateConnectionToast = currentToastMsgs.some(
-          (item) => ToastMsgType.DUPLICATE_CONNECTION === item.message
-        );
         const isRequestPending = currentToastMsgs.some((item) =>
           [
             ToastMsgType.CONNECTION_REQUEST_PENDING,
@@ -158,15 +152,7 @@ const Scanner = forwardRef(
               OperationType.SCAN_SSI_CONNECT_URL,
             ].includes(currentOperation));
 
-        const isMultisignScan =
-          isFullPageScan &&
-          [
-            OperationType.MULTI_SIG_INITIATOR_SCAN,
-            OperationType.MULTI_SIG_RECEIVER_SCAN,
-          ].includes(currentOperation) &&
-          !isDuplicateConnectionToast;
-
-        if ((isScanning && !isRequestPending) || isMultisignScan) {
+        if (isScanning && !isRequestPending) {
           await initScan();
         } else {
           await stopScan();
@@ -221,7 +207,6 @@ const Scanner = forwardRef(
 
       setScanning(false);
       document?.querySelector("body")?.classList.remove("scanner-active");
-      setGroupId("");
     };
 
     const handleConnectWallet = (id: string) => {
@@ -273,12 +258,6 @@ const Scanner = forwardRef(
       }
     };
 
-    const handlePrimaryButtonAction = () => {
-      stopScan();
-      dispatch(setCurrentOperation(OperationType.MULTI_SIG_INITIATOR_INIT));
-      handleReset && handleReset();
-    };
-
     const handleSubmitPastedValue = () => {
       setPasteModalIsOpen(false);
       processValue(pastedValue);
@@ -295,29 +274,6 @@ const Scanner = forwardRef(
               customClass="actions-button"
               secondaryButtonAction={openPasteModal}
               secondaryButtonText={`${i18n.t("tabs.scan.pastemeerkatid")}`}
-            />
-          );
-        case OperationType.MULTI_SIG_INITIATOR_SCAN:
-          return (
-            <PageFooter
-              pageId={componentId}
-              primaryButtonText={`${i18n.t("setupgroupprofile.scan.initiate")}`}
-              primaryButtonAction={handlePrimaryButtonAction}
-              primaryButtonDisabled={!multiSigGroupCache?.connections.length}
-              secondaryButtonText={`${i18n.t(
-                "setupgroupprofile.scan.pasteoobi"
-              )}`}
-              secondaryButtonAction={openPasteModal}
-            />
-          );
-        case OperationType.MULTI_SIG_RECEIVER_SCAN:
-          return (
-            <PageFooter
-              pageId={componentId}
-              secondaryButtonText={`${i18n.t(
-                "setupgroupprofile.scan.pasteoobi"
-              )}`}
-              secondaryButtonAction={openPasteModal}
             />
           );
         case OperationType.SCAN_SSI_BOOT_URL:
@@ -402,10 +358,7 @@ const Scanner = forwardRef(
             closeButtonAction: () => setPasteModalIsOpen(false),
             closeButtonLabel: `${i18n.t("setupgroupprofile.scan.cancel")}`,
             title: `${
-              currentOperation === OperationType.MULTI_SIG_INITIATOR_SCAN ||
-              currentOperation === OperationType.MULTI_SIG_RECEIVER_SCAN
-                ? `${i18n.t("setupgroupprofile.scan.pasteoobi")}`
-                : currentOperation === OperationType.SCAN_WALLET_CONNECTION
+              currentOperation === OperationType.SCAN_WALLET_CONNECTION
                 ? i18n.t("connectdapp.inputpidmodal.header")
                 : `${i18n.t("setupgroupprofile.scan.pastecontents")}`
             }`,

@@ -194,6 +194,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       <SideSlider
         isOpen={openSetupProfile}
         renderAsModal
+        animation={false}
       >
         <ProfileSetup
           onClose={(cancel) => {
@@ -201,6 +202,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
             if (!cancel) setIsOpen(false);
           }}
           joinGroupMode={isJoinGroupMode}
+          displayOnModal
         />
       </SideSlider>
       <ProfileDetailsModal

@@ -14,15 +14,22 @@ const SideSlider = ({
   renderAsModal = false,
   zIndex = SIDE_SLIDER_Z_INDEX,
   className,
+  animation = true,
 }: SideSliderProps) => {
   const baseClass = combineClassNames(
     className,
-    renderAsModal ? "side-slider-modal" : "side-slider-container"
+    renderAsModal ? "side-slider-modal" : "side-slider-container",
+    animation ? "has-animation" : null
   );
   const [cssClass, setCssClass] = useState<string | undefined>(baseClass);
   const [innerOpen, setInnerOpen] = useState(false);
 
   useEffect(() => {
+    if (!animation) {
+      setInnerOpen(isOpen);
+      return;
+    }
+
     if (isOpen) {
       setInnerOpen(true);
 
@@ -48,7 +55,7 @@ const SideSlider = ({
     return () => {
       clearTimeout(timer);
     };
-  }, [isOpen, baseClass]);
+  }, [isOpen, baseClass, animation]);
 
   if (renderAsModal) {
     return (
