@@ -44,7 +44,11 @@ import { Welcome } from "./components/Welcome";
 import "./ProfileSetup.scss";
 import { ProfileSetupProps, SetupProfileStep } from "./ProfileSetup.types";
 
-export const ProfileSetup = ({ onClose, joinGroupMode }: ProfileSetupProps) => {
+export const ProfileSetup = ({
+  onClose,
+  joinGroupMode,
+  displayOnModal,
+}: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
@@ -496,6 +500,7 @@ export const ProfileSetup = ({ onClose, joinGroupMode }: ProfileSetupProps) => {
             onFinishScan={handleScanFinish}
             cameraDirection={cameraDirection}
             onCheckPermissionFinish={setEnableCameraDirection}
+            displayOnModal={displayOnModal}
           />
         </ResponsivePageLayout>
       ) : (

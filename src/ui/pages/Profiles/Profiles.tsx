@@ -201,6 +201,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
             if (!cancel) setIsOpen(false);
           }}
           joinGroupMode={isJoinGroupMode}
+          displayOnModal
         />
       </SideSlider>
       <ProfileDetailsModal
