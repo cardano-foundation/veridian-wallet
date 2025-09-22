@@ -276,13 +276,11 @@ export const ProfileSetup = ({
   };
 
   const handleCloseScan = () => {
-    scanRef.current?.stopScan().then(() => {
-      if (joinGroupMode) {
-        onClose?.(true);
-      } else {
-        setIsScanOpen(false);
-      }
-    });
+    if (joinGroupMode) {
+      onClose?.(true);
+    } else {
+      setIsScanOpen(false);
+    }
   };
 
   const handleChangeStep = () => {

@@ -23,7 +23,6 @@ import {
   getInitializationPhase,
 } from "../store/reducers/stateCache";
 import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
-import "./App.scss";
 import { AppOffline } from "./components/AppOffline";
 import { AppWrapper } from "./components/AppWrapper";
 import { ToastStack } from "./components/CustomToast/ToastStack";
@@ -44,6 +43,7 @@ import SystemCompatibilityAlert from "./pages/SystemCompatibilityAlert/SystemCom
 import { SystemThreatAlert } from "./pages/SystemThreatAlert/SystemThreatAlert";
 import "./styles/ionic.scss";
 import "./styles/style.scss";
+import "./App.scss";
 import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
 
