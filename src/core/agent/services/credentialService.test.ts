@@ -763,7 +763,7 @@ describe("Credential service of agent", () => {
     );
   });
 
-  it("should return request details successfully for credential share request", async () => {
+  test("should return request details successfully for credential share request", async () => {
     const mockRequestSaid = "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p";
     const mockExchangeGetResponse = {
       exn: {
@@ -796,7 +796,7 @@ describe("Credential service of agent", () => {
     });
   });
 
-  it("should share credentials and delete notification", async () => {
+  test("should share credentials and delete notification", async () => {
     const mockRequestSaid = "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p";
     const mockNotificationId = "notification-id-for-share";
     const mockExchangeGetResponse = {
