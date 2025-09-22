@@ -483,6 +483,31 @@ const remoteSignReqNotification = {
   },
 };
 
+const coordinationCredentialsInfoReqExn = {
+  exn: {
+    i: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
+    p: "",
+    a: {
+      i: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
+      said: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
+    },
+    e: {},
+    d: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
+    r: "/exn/coordination/credentials/info/req",
+    rp: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
+  },
+};
+
+const notificationCoordinationCredentialsInfoReqProp = {
+  i: "notification-id-for-coord-req",
+  dt: new Date().toISOString(),
+  r: false,
+  a: {
+    r: NotificationRoute.ExnCoordinationCredentialsInfoReq,
+    d: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
+  },
+};
+
 export {
   credentialMetadataMock,
   grantForIssuanceExnMessage,
@@ -508,4 +533,6 @@ export {
   humanReadableLinkedExn,
   humanReadableNotification,
   remoteSignReqNotification,
+  coordinationCredentialsInfoReqExn,
+  notificationCoordinationCredentialsInfoReqProp,
 };
