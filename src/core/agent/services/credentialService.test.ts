@@ -770,7 +770,7 @@ describe("Credential service of agent", () => {
         i: "some-issuer-id",
         rp: "some-recipient-id",
         a: {
-          said: "some-schema-said",
+          s: "some-schema-said",
         },
         d: "some-digest",
       },
@@ -791,7 +791,7 @@ describe("Credential service of agent", () => {
     expect(result).toEqual({
       identifier: mockExchangeGetResponse.exn.rp,
       payload: {
-        said: mockExchangeGetResponse.exn.a.said,
+        s: mockExchangeGetResponse.exn.a.s,
       },
     });
   });
@@ -804,7 +804,7 @@ describe("Credential service of agent", () => {
         i: "some-issuer-id",
         rp: "some-recipient-id",
         a: {
-          said: "some-schema-said",
+          s: "some-schema-said",
         },
         d: "some-digest",
       },
@@ -853,7 +853,7 @@ describe("Credential service of agent", () => {
     );
     expect(exchangesGetMock).toHaveBeenCalledWith(mockRequestSaid);
     expect(credentialListMock).toHaveBeenCalledWith({
-      filter: { "-s": mockExchangeGetResponse.exn.a.said },
+      filter: { "-s": mockExchangeGetResponse.exn.a.s },
     });
     expect(identifiersGetMock).toHaveBeenCalledWith(
       mockExchangeGetResponse.exn.rp

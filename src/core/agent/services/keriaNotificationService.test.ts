@@ -547,7 +547,7 @@ describe("Signify notification service of agent", () => {
     expect(eventEmitter.emit).toHaveBeenCalledWith({
       type: EventTypes.CoordinationCredentialsReqEvent,
       payload: {
-        aid: coordinationCredentialsInfoReqExn.exn.a.i,
+        s: coordinationCredentialsInfoReqExn.exn.a.s,
       },
     });
 

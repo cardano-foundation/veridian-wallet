@@ -488,8 +488,7 @@ const coordinationCredentialsInfoReqExn = {
     i: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
     p: "",
     a: {
-      i: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
-      said: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
+      s: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
     },
     e: {},
     d: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
@@ -505,6 +504,7 @@ const notificationCoordinationCredentialsInfoReqProp = {
   a: {
     r: NotificationRoute.ExnCoordinationCredentialsInfoReq,
     d: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
+    s: "A4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
   },
 };
 

@@ -222,9 +222,8 @@ class CredentialService extends AgentService {
       await this.props.signifyClient.exchanges().get(requestSaid)
     ).exn;
     const payload = exchange.a;
-    delete payload.d;
 
-    // TODO: get contact name from connection id
+    // TODO: get identifier name from contact?
     return {
       identifier: exchange.rp,
       payload,
@@ -244,7 +243,7 @@ class CredentialService extends AgentService {
       .get(requestSaid);
 
     const credentials = await this.props.signifyClient.credentials().list({
-      filter: { "-s": exchange.exn.a.said },
+      filter: { "-s": exchange.exn.a.s },
     });
 
     const hab = await this.props.signifyClient

@@ -944,10 +944,16 @@ class KeriaNotificationService extends AgentService {
     notif: Notification,
     exchange: ExnMessage
   ): Promise<boolean> {
+
+    if (!exchange.exn.a.s) {
+      await this.markNotification(notif.i);
+      return false;
+    }
+
     this.props.eventEmitter.emit<CoordinationCredentialsReqEvent>({
       type: EventTypes.CoordinationCredentialsReqEvent,
       payload: {
-        aid: exchange.exn.a.i || "", // TODO: @jimcase
+        s: exchange.exn.a.s
       },
     });
 

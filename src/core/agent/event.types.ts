@@ -133,7 +133,7 @@ interface GroupCreatedEvent extends BaseEventEmitter {
 interface CoordinationCredentialsReqEvent extends BaseEventEmitter {
   type: typeof EventTypes.CoordinationCredentialsReqEvent;
   payload: {
-    aid: string;
+    s: string;
   };
 }
 
