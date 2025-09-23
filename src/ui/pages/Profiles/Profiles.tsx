@@ -210,6 +210,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         isOpen={openProfileDetail}
         setIsOpen={setOpenProfileDetail}
         profileId={defaultProfile?.identity.id || ""}
+        onConnectionComplete={() => setIsOpen(false)}
       />
     </>
   );

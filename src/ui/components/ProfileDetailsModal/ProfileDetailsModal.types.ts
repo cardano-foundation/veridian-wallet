@@ -4,6 +4,7 @@ interface ProfileDetailsModalProps {
   pageId: string;
   profileId: string;
   onClose?: (animation?: boolean) => void;
+  onConnectionComplete?: () => void;
   hardwareBackButtonConfig?: HardwareBackButtonConfig;
   restrictedOptions?: boolean;
 }
@@ -16,6 +17,7 @@ interface ProfileDetailsModuleProps extends ProfileDetailsModalProps {
   scannedValue: string;
   onScanFinish: (content: string) => void;
   onConnectionComplete: () => void;
+  beforeConnectionComplete?: () => void;
 }
 
 interface IdentifierDetailModalProps
