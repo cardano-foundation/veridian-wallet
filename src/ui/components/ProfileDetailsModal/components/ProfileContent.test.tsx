@@ -310,7 +310,7 @@ describe("ProfileContent", () => {
 
       expect(queryByTestId("connect-dapp")).not.toBeInTheDocument();
 
-      const dappBlock = getByTestId("profiledetails-list-option-0");
+      const dappBlock = getByTestId("profiledetails-list-option-1");
       fireEvent.click(dappBlock);
 
       expect(queryByTestId("connect-dapp")).toBeInTheDocument();
