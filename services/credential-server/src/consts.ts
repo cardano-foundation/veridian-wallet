@@ -10,6 +10,7 @@ export const BIRTH_CERTIFICATE = "EE6DAsJPqDspkLhbk1pVELQVbqyz6TFSEKXdS1Iz-Nz1";
 export const FISHING_HUNTING_LICENSE =
   "EFVZujklqUEubsyY9PRgBRMf39HgHzCPo3Ii_-xhkOlF";
 export const ROME_OFFSITE = "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt";
+export const REEVE = "EG9587oc7lSUJGS7mtTkpmRUnJ8F5Ji79-e_pY4jt3Ik";
 export const ACDC_SCHEMAS_ID = [
   QVI_SCHEMA_SAID,
   LE_SCHEMA_SAID,
@@ -18,6 +19,7 @@ export const ACDC_SCHEMAS_ID = [
   BIRTH_CERTIFICATE,
   FISHING_HUNTING_LICENSE,
   ROME_OFFSITE,
+  REEVE,
 ];
 
 export const ACDC_SCHEMAS = [
@@ -48,5 +50,9 @@ export const ACDC_SCHEMAS = [
   {
     id: ROME_OFFSITE,
     name: "Rome Offsite 2025 Credential",
+  },
+  {
+    id: REEVE,
+    name: "Reeve",
   },
 ];
