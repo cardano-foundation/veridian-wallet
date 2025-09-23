@@ -2,7 +2,6 @@ import {
   BarcodeFormat,
   BarcodesScannedEvent,
   BarcodeValueType,
-  LensFacing,
 } from "@capacitor-mlkit/barcode-scanning";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
@@ -10,15 +9,12 @@ import { Provider } from "react-redux";
 
 import { OobiType } from "../../../core/agent/agent.types";
 import { TabsRoutePath } from "../../../routes/paths";
-import {
-  setCameraDirection,
-  setCurrentOperation,
-} from "../../../store/reducers/stateCache";
+import { setCurrentOperation } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { OperationType } from "../../globals/types";
-import { FullPageScanner } from "./FullPageScanner";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { FullPageScanner } from "./FullPageScanner";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -189,83 +185,6 @@ describe("Full page scanner", () => {
     });
   });
 
-  test("Change direction", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.SCAN],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
-        toastMsgs: [],
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    addListener.mockImplementation(
-      (
-        eventName: string,
-        listenerFunc: (result: BarcodesScannedEvent) => void
-      ) => {
-        setTimeout(() => {
-          listenerFunc({
-            barcodes: [
-              {
-                displayValue:
-                  "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org/oobi?groupId=72e2f089cef6",
-                format: BarcodeFormat.QrCode,
-                rawValue:
-                  "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org/oobi?groupId=72e2f089cef6",
-                valueType: BarcodeValueType.Url,
-              },
-            ],
-          });
-        }, 10000000);
-
-        return {
-          remove: jest.fn(),
-        };
-      }
-    );
-
-    isNativeMock.mockImplementation(() => true);
-
-    const setShowScanMock = jest.fn();
-
-    const { getByTestId, unmount } = render(
-      <Provider store={storeMocked}>
-        <FullPageScanner
-          showScan={true}
-          setShowScan={setShowScanMock}
-        />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(
-        getByTestId("qr-code-scanner").classList.contains("no-permission")
-      ).toBeFalsy();
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("action-button"));
-    });
-
-    await waitFor(() => {
-      expect(createOrUpdateBasicRecordMock).toBeCalled();
-      expect(dispatchMock).toBeCalledWith(setCameraDirection(LensFacing.Front));
-    });
-
-    unmount();
-  });
-
   test("Close scan screen", async () => {
     const initialState = {
       stateCache: {
@@ -276,7 +195,7 @@ describe("Full page scanner", () => {
           passcodeIsSet: true,
           passwordIsSet: false,
         },
-        currentOperation: OperationType.MULTI_SIG_RECEIVER_SCAN,
+        currentOperation: OperationType.SCAN_CONNECTION,
         toastMsgs: [],
       },
     };

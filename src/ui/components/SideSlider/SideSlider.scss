@@ -5,11 +5,14 @@
   left: 0;
   height: 100%;
   width: 100%;
-  transform: translateX(100%);
-  transition: transform 0.35s;
 
-  &.slide-in-left {
-    -webkit-transform: translateX(0);
-    transform: translateX(0);
+  &.has-animation {
+    transform: translateX(100%);
+    transition: transform 0.35s;
+
+    &.slide-in-left {
+      -webkit-transform: translateX(0);
+      transform: translateX(0);
+    }
   }
 }
