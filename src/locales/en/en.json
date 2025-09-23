@@ -1220,8 +1220,21 @@
     },
     "pending": {
       "groupinfor": "Group information",
+      "request": "Request from",
       "alert": {
-        "initiatortext": "This group profile is pending. Once the threshold of members have accepted this profile will be usable."
+        "initiatortext": "This group profile is pending. Once the threshold of members have accepted this profile will be usable.",
+        "membertext": "This group’s initiator has triggered the creation. Please, check all information below and choose whether to accept or decline."
+      },
+      "button": {
+        "accept": "Accept",
+        "decline": "Decline"
+      },
+      "decline": {
+        "alert": {
+          "title": "Are you sure you want to decline this request? You won't be able to change your decision later.",
+          "confirm": "Decline",
+          "cancel": "Cancel"
+        }
       },
       "leave": {
         "button": "Leave group",
@@ -1423,7 +1436,9 @@
     "notvalidgrouperror": "Not a valid group invitation",
     "groupnamenotfounderror": "Group name not found",
     "duplicategroupiderror": "Group already exists",
-    "groupmetadatanotfounderror": "Group metadata is missing. Please try again."
+    "groupmetadatanotfounderror": "Group metadata is missing. Please try again.",
+    "unabletoaccepterror": "Unable to accept",
+    "acceptsuccess": "Accepted Successfully"
   },
   "request": {
     "sign": {
