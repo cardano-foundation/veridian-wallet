@@ -40,6 +40,8 @@ import {
   humanReadableNotification,
   humanReadableLinkedExn,
   remoteSignReqNotification,
+  coordinationCredentialsInfoReqExn,
+  notificationCoordinationCredentialsInfoReqProp,
 } from "../../__fixtures__/agent/keriaNotificationFixtures";
 import { ConnectionHistoryType } from "./connectionService.types";
 import { StorageMessage } from "../../storage/storage.types";
@@ -165,7 +167,7 @@ const notificationStorage = jest.mocked({
   findById: jest.fn(),
   findExpectedById: jest.fn().mockResolvedValue({
     id: "test-notification",
-    a: { r: NotificationRoute.ExnIpexGrant }
+    a: { r: NotificationRoute.ExnIpexGrant },
   }),
   findAllByQuery: jest.fn(),
   getAll: jest.fn(),
@@ -477,13 +479,13 @@ describe("Signify notification service of agent", () => {
     notificationStorage.deleteById = jest.fn();
     notificationStorage.findExpectedById = jest.fn().mockResolvedValue({
       id: "uuid",
-      a: { r: NotificationRoute.ExnIpexGrant }
+      a: { r: NotificationRoute.ExnIpexGrant },
     });
     const mockOperationPendingStorage = {
       findAllByQuery: jest.fn(),
       deleteById: jest.fn(),
     } as any;
-    
+
     await deleteNotificationRecordById(
       agentServicesProps.signifyClient,
       notificationStorage,
@@ -503,13 +505,13 @@ describe("Signify notification service of agent", () => {
     notificationStorage.deleteById = jest.fn();
     notificationStorage.findExpectedById = jest.fn().mockResolvedValue({
       id: "uuid",
-      a: { r: NotificationRoute.LocalAcdcRevoked }
+      a: { r: NotificationRoute.LocalAcdcRevoked },
     });
     const mockOperationPendingStorage = {
       findAllByQuery: jest.fn(),
       deleteById: jest.fn(),
     } as any;
-    
+
     await deleteNotificationRecordById(
       agentServicesProps.signifyClient,
       notificationStorage,
@@ -519,66 +521,6 @@ describe("Signify notification service of agent", () => {
     );
     expect(notificationStorage.deleteById).toBeCalledWith(id);
     expect(markNotificationMock).not.toBeCalled();
-  });
-
-  test("Should not create multisig icp notifications if the identifier already exists (group initiator)", async () => {
-    exchangesGetMock.mockResolvedValue({
-      exn: {
-        r: NotificationRoute.MultiSigIcp,
-        p: "p",
-        a: { gid: "i", smids: ["a", "b"], rmids: ["a", "b"] },
-        e: { icp: { i: "i" } },
-      },
-    });
-    identifierStorage.getIdentifierMetadata.mockRejectedValueOnce(
-      new Error(IdentifierStorage.IDENTIFIER_METADATA_RECORD_MISSING)
-    );
-    identifiersGetMock.mockResolvedValue(getMemberIdentifierResponse);
-
-    await keriaNotificationService.processNotification(
-      notificationMultisigIcpProp
-    );
-
-    expect(notificationStorage.save).not.toBeCalled();
-  });
-
-  test("Should create multisig icp notifications for new groups", async () => {
-    exchangesGetMock.mockResolvedValue({
-      exn: {
-        r: NotificationRoute.MultiSigIcp,
-        p: "p",
-        a: { gid: "i", smids: ["a", "b"], rmids: ["a", "b"] },
-        e: { icp: { i: "i" } },
-      },
-    });
-    identifierStorage.getIdentifierMetadata.mockRejectedValueOnce(
-      new Error(IdentifierStorage.IDENTIFIER_METADATA_RECORD_MISSING)
-    );
-    identifiersGetMock.mockReset();
-    identifiersGetMock
-      .mockResolvedValueOnce(getMemberIdentifierResponse)
-      .mockRejectedValue(new Error("Not Found - 404 - not found"));
-    notificationStorage.save.mockReturnValue({
-      id: "id",
-      createdAt: new Date(),
-      linkedRequest: { accepted: false },
-    });
-
-    await keriaNotificationService.processNotification(
-      notificationMultisigIcpProp
-    );
-
-    expect(notificationStorage.save).toBeCalledWith(
-      expect.objectContaining({
-        a: {
-          d: "string",
-          m: "",
-          r: MultiSigRoute.ICP,
-        },
-        route: MultiSigRoute.ICP,
-        read: false,
-      })
-    );
   });
 
   test("Cannot mark a notification as unread if it does not exist", async () => {

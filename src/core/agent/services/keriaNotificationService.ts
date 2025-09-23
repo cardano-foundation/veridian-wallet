@@ -335,6 +335,13 @@ class KeriaNotificationService extends AgentService {
       );
     } else if (notif.a.r === NotificationRoute.RemoteSignReq) {
       shouldCreateRecord = await this.processRemoteSignReq(notif, exn);
+    } else if (
+      notif.a.r === NotificationRoute.ExnCoordinationCredentialsInfoReq
+    ) {
+      shouldCreateRecord = await this.processCoordinationCredentialsInfoReq(
+        notif,
+        exn
+      );
     }
 
     if (!shouldCreateRecord) {
@@ -932,6 +939,19 @@ class KeriaNotificationService extends AgentService {
     return false;
   }
 
+  private async processCoordinationCredentialsInfoReq(
+    notif: Notification,
+    exchange: ExnMessage
+  ): Promise<boolean> {
+
+    if (exchange.exn.a.s) {
+      return true;
+    }
+
+    await this.markNotification(notif.i);
+    return false;
+  }
+
   private async processRemoteSignReq(
     notif: Notification,
     exchange: ExnMessage
@@ -1083,6 +1103,7 @@ class KeriaNotificationService extends AgentService {
   }
 
   async _pollLongOperations(): Promise<void> {
+    console.log("_pollLongOperations started");
     this.pendingOperations = await this.operationPendingStorage.getAll();
     // eslint-disable-next-line no-constant-condition
     while (true) {

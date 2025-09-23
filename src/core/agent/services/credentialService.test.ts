@@ -12,6 +12,7 @@ import {
 } from "../../__fixtures__/agent/multiSigFixtures";
 import { EventTypes } from "../event.types";
 import { hab } from "../../__fixtures__/agent/keriaNotificationFixtures";
+import { ExchangeRoute } from "./keriaNotificationService.types";
 
 const identifiersListMock = jest.fn();
 const identifiersGetMock = jest.fn();
@@ -28,6 +29,9 @@ let getCredentialMock = jest.fn();
 const revokeCredentialMock = jest.fn();
 let deleteCredentialMock = jest.fn();
 const credentialStateMock = jest.fn();
+
+const saveOperationPendingMock = jest.fn();
+const findOperationMock = jest.fn();
 
 const signifyClient = jest.mocked({
   connect: jest.fn(),
@@ -125,15 +129,22 @@ const notificationStorage = jest.mocked({
   deleteById: jest.fn(),
   update: jest.fn(),
   findById: jest.fn(),
+  findExpectedById: jest.fn(),
   findAllByQuery: jest.fn(),
   getAll: jest.fn(),
+});
+
+const operationPendingStorage = jest.mocked({
+  save: saveOperationPendingMock,
+  findById: findOperationMock,
 });
 
 const credentialService = new CredentialService(
   agentServicesProps,
   credentialStorage as any,
   notificationStorage as any,
-  identifierStorage as any
+  identifierStorage as any,
+  operationPendingStorage as any
 );
 
 const now = new Date();
@@ -750,5 +761,94 @@ describe("Credential service of agent", () => {
     expect(credentialService.deleteCredential).not.toHaveBeenCalledWith(
       "cred-2"
     );
+  });
+  
+  test("should share credentials and delete notification", async () => {
+    const mockRequestSaid = "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p";
+    const mockNotificationId = "notification-id-for-share";
+    const mockExchangeGetResponse = {
+      exn: {
+        i: "some-issuer-id",
+        rp: "some-recipient-id",
+        a: {
+          s: "some-schema-said",
+        },
+        d: "some-digest",
+      },
+    };
+    const mockCredentialListResponse = [
+      { sad: { d: "cred-1" } },
+      { sad: { d: "cred-2" } },
+    ];
+    const mockHab = {
+      name: "test",
+    };
+    const mockCreateExchangeMessageResponse = ["exn", "sigs", "atc"];
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
+    notificationStorage.findExpectedById.mockResolvedValue({
+      id: mockNotificationId,
+      route: "/exn/coordination/credentials/info/req",
+    });
+    const exchangesGetMock = jest
+      .fn()
+      .mockResolvedValue(mockExchangeGetResponse);
+    const createExchangeMessageMock = jest
+      .fn()
+      .mockResolvedValue(mockCreateExchangeMessageResponse);
+    const sendFromEventsMock = jest.fn().mockResolvedValue({});
+    signifyClient.exchanges = jest.fn().mockReturnValue({
+      get: exchangesGetMock,
+      createExchangeMessage: createExchangeMessageMock,
+      sendFromEvents: sendFromEventsMock,
+    });
+    credentialListMock.mockResolvedValue(mockCredentialListResponse);
+    identifiersGetMock.mockResolvedValue(mockHab);
+    notificationStorage.deleteById = jest.fn();
+    const markMock = jest.fn().mockResolvedValue({});
+    signifyClient.notifications = jest.fn().mockReturnValue({
+      list: jest.fn(),
+      mark: markMock,
+    });
+
+    await credentialService.shareCredentials(
+      mockNotificationId,
+      mockRequestSaid
+    );
+
+    expect(notificationStorage.findExpectedById).toHaveBeenCalledWith(
+      mockNotificationId
+    );
+    expect(exchangesGetMock).toHaveBeenCalledWith(mockRequestSaid);
+    expect(credentialListMock).toHaveBeenCalledWith({
+      filter: { "-s": mockExchangeGetResponse.exn.a.s },
+    });
+    expect(identifiersGetMock).toHaveBeenCalledWith(
+      mockExchangeGetResponse.exn.rp
+    );
+          expect(createExchangeMessageMock).toHaveBeenCalledWith(
+            mockHab,
+            ExchangeRoute.CoordinationCredentialsInfoResp,
+            { sads: JSON.stringify(mockCredentialListResponse) },      [],
+      mockExchangeGetResponse.exn.i,
+      undefined,
+      mockRequestSaid
+    );
+    expect(sendFromEventsMock).toHaveBeenCalledWith(
+      mockExchangeGetResponse.exn.rp,
+      "credential_share",
+      "exn",
+      "sigs",
+      "atc",
+      [mockExchangeGetResponse.exn.i]
+    );
+    expect(notificationStorage.deleteById).toHaveBeenCalledWith(
+      mockNotificationId
+    );
+    expect(eventEmitter.emit).toHaveBeenCalledWith({
+      type: EventTypes.NotificationRemoved,
+      payload: {
+        id: mockNotificationId,
+      },
+    });
   });
 });

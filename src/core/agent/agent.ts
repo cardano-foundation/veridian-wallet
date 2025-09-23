@@ -163,7 +163,8 @@ class Agent {
         this.agentServicesProps,
         this.credentialStorage,
         this.notificationStorage,
-        this.identifierStorage
+        this.identifierStorage,
+        this.operationPendingStorage
       );
     }
     return this.credentialService;

@@ -26,7 +26,7 @@ enum EventTypes {
   IdentifierRemoved = "IdentifierRemoved",
   CredentialRemovedEvent = "CredentialRemovedEvent",
   IdentifierAdded = "IdentifierAdded",
-  GroupCreated = "GroupCreated",
+  GroupCreated = "GroupCreated"
 }
 
 interface NotificationAddedEvent extends BaseEventEmitter {
@@ -143,6 +143,6 @@ export type {
   IdentifierRemovedEvent,
   CredentialRemovedEvent,
   IdentifierAddedEvent,
-  GroupCreatedEvent,
+  GroupCreatedEvent
 };
 export { EventTypes };

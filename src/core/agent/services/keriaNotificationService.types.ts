@@ -12,6 +12,7 @@ enum NotificationRoute {
   // Notifications from our wallet to give further feedback to the user
   LocalAcdcRevoked = "/local/acdc/revoked",
   LocalSingletonConnectInstructions = "/local/singleton/connectinstructions",
+  ExnCoordinationCredentialsInfoReq = "/exn/coordination/credentials/info/req",
 }
 
 enum ExchangeRoute {
@@ -20,6 +21,7 @@ enum ExchangeRoute {
   IpexApply = "/ipex/apply",
   IpexAgree = "/ipex/agree",
   IpexOffer = "/ipex/offer",
+  CoordinationCredentialsInfoResp = "/coordination/credentials/info/resp",
   RemoteSignRef = "/remotesign/ixn/ref",
 }
 
