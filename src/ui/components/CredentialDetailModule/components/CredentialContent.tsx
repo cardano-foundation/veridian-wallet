@@ -37,7 +37,7 @@ import { getProfiles } from "../../../../store/reducers/profileCache";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
 
-const RelatedIdentifier = ({ identifierId }: IssuedIdentifierProps) => {
+const RelatedProfile = ({ identifierId }: IssuedIdentifierProps) => {
   const profiles = useAppSelector(getProfiles);
   const [openIdentifierDetail, setOpenIdentifierDetail] = useState(false);
   const profile = profiles[identifierId];
@@ -46,7 +46,7 @@ const RelatedIdentifier = ({ identifierId }: IssuedIdentifierProps) => {
     <>
       {profile && (
         <CardBlock
-          title={i18n.t("tabs.credentials.details.relatedidentifier")}
+          title={i18n.t("tabs.credentials.details.relatedprofile")}
           onClick={() => setOpenIdentifierDetail(true)}
           testId="related-identifier-section"
         >
@@ -230,7 +230,7 @@ const CredentialContent = ({
           )} (${getUTCOffset(cardData.lastStatus.dt)})`}
         </p>
       </CardBlock>
-      <RelatedIdentifier identifierId={cardData.identifierId} />
+      <RelatedProfile identifierId={cardData.identifierId} />
     </>
   );
 };

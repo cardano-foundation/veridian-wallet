@@ -171,7 +171,7 @@ describe("Creds content", () => {
     });
   });
 
-  test("Open related identifier", async () => {
+  test("Open Related profile", async () => {
     const state = {
       stateCache: {
         authentication: {
@@ -208,7 +208,7 @@ describe("Creds content", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.tabs.credentials.details.relatedidentifier)
+        getByText(EN_TRANSLATIONS.tabs.credentials.details.relatedprofile)
       ).toBeVisible();
     });
 
