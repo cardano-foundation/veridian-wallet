@@ -825,11 +825,10 @@ describe("Credential service of agent", () => {
     expect(identifiersGetMock).toHaveBeenCalledWith(
       mockExchangeGetResponse.exn.rp
     );
-    expect(createExchangeMessageMock).toHaveBeenCalledWith(
-      mockHab,
-      ExchangeRoute.CoordinationCredentialsInfoResp,
-      { sads: mockCredentialListResponse },
-      [],
+          expect(createExchangeMessageMock).toHaveBeenCalledWith(
+            mockHab,
+            ExchangeRoute.CoordinationCredentialsInfoResp,
+            { sads: JSON.stringify(mockCredentialListResponse) },      [],
       mockExchangeGetResponse.exn.i,
       undefined,
       mockRequestSaid
