@@ -196,7 +196,7 @@ export const handleConnect = async ({
       requestBody
     );
 
-    dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
+    dispatch(setToastMsg(ToastMsgType.LOGIN_SUCCESSFUL));
   } catch (error) {
     showError(
       "Failed to login with scanned QR code",

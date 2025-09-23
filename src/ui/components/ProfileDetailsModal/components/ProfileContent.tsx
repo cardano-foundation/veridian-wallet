@@ -179,7 +179,7 @@ const ProfileContent = ({
         items={[
           {
             label: i18n.t(
-              "profiledetails.identifierdetail.listoptions.browserlogin"
+              "profiledetails.identifierdetail.listoptions.onlinelogin"
             ),
             icon: logInOutline,
             onClick: showLogin,

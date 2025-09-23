@@ -4,15 +4,18 @@ import { PageFooter } from "../../../PageFooter";
 import { PageHeader } from "../../../PageHeader";
 import CitizenPortal from "./citizen-portal.svg";
 import "./IncomingRequest.scss";
+import { IncomingRequestProps } from "./IncomingRequest.types";
 
 const IncomingRequest = ({
   setShowConfirmation,
   setConfirmConnection,
-}: {
-  setShowConfirmation: (show: boolean) => void;
-  setConfirmConnection: (confirm: boolean) => void;
-}) => {
+  scannedValue,
+}: IncomingRequestProps) => {
   const pageId = "connect-incoming-request";
+  const url = new URL(scannedValue);
+  const type = url.searchParams.get("type");
+  const logo = type === "guardianship" ? CitizenPortal : CitizenPortal; //TODO: Placeholder for different logos based on type
+  const requester = type === "guardianship" ? "Citizen Portal" : "Unknown";
 
   const handleAccept = () => {
     setConfirmConnection(true);
@@ -28,27 +31,35 @@ const IncomingRequest = ({
     <ResponsivePageLayout
       pageId={pageId}
       activeStatus={true}
-      header={<PageHeader title="Login request" />}
+      header={
+        <PageHeader
+          title={`${i18n.t("profiledetails.incomingrequest.title")}`}
+        />
+      }
     >
       <div className="connect-incoming-request-center">
         <div className="connect-incoming-request-icons-row">
           <div className="connect-incoming-request-user-logo">
             <img
-              src={CitizenPortal}
+              src={logo}
               alt="Citizen Portal"
             />
           </div>
         </div>
         <p className="connect-incoming-request-message">
-          Citizen Portal is requesting approval for a login attempt
+          {`${i18n.t("profiledetails.incomingrequest.message", { requester })}`}
         </p>
       </div>
       <PageFooter
         customClass="connect-incoming-request-footer"
         pageId={pageId}
-        primaryButtonText={`Login`}
+        primaryButtonText={`${i18n.t(
+          "profiledetails.incomingrequest.button.accept"
+        )}`}
         primaryButtonAction={handleAccept}
-        declineButtonText={`Don't allow`}
+        declineButtonText={`${i18n.t(
+          "profiledetails.incomingrequest.button.decline"
+        )}`}
         declineButtonAction={handleDecline}
       />
     </ResponsivePageLayout>

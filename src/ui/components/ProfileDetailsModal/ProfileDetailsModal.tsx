@@ -38,6 +38,10 @@ import "./ProfileDetailsModal.scss";
 import {
   IdentifierDetailModalProps,
   ProfileDetailsModuleProps,
+  QR_CODE_TYPES,
+  ERROR_MESSAGES,
+  MODAL_STATES,
+  ModalState,
 } from "./ProfileDetailsModal.types";
 import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
 import { ScanRef } from "../Scan/Scan.types";
@@ -46,30 +50,7 @@ import { Scan } from "../Scan";
 import { handleConnect } from "./handleConnect";
 import { IncomingRequest } from "./components/IncomingRequest";
 
-const QR_CODE_TYPES = {
-  GUARDIANSHIP: "guardianship",
-} as const;
-
-const ERROR_MESSAGES = {
-  MISSING_TYPE: "Unable to find type",
-  UNSUPPORTED_TYPE: "Unsupported type",
-  INVALID_QR: "Invalid QR code",
-  UNABLE_TO_FETCH_OOBI: "Unable to fetch oobi",
-  UNABLE_TO_GET_IDENTIFIER_DETAILS: "Unable to get identifier details",
-  UNABLE_TO_DELETE_IDENTIFIER: "Unable to delete identifier",
-} as const;
-
-const MODAL_STATES = {
-  SCAN: "scan",
-  CONFIRMATION: "confirmation",
-  DEFAULT: "default",
-  ERROR: "error",
-  PROFILE: "profile",
-} as const;
-
 const DELAY_TO_CLOSE_MODAL = 300;
-
-type ModalState = (typeof MODAL_STATES)[keyof typeof MODAL_STATES];
 
 const useProfileData = (
   profileId: string | undefined,
@@ -555,6 +536,7 @@ const ProfileDetailsModal = ({
         <IncomingRequest
           setShowConfirmation={setShowConfirmation}
           setConfirmConnection={setConfirmConnection}
+          scannedValue={scannedValue}
         />
       ) : (
         <ProfileDetailsModule
