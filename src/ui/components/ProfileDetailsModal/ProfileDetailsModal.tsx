@@ -483,13 +483,25 @@ const ProfileDetailsModal = ({
   const handleShowConfirmation = useCallback(
     (content: string) => {
       try {
-        const url = new URL(content);
+
+        const { sessionAid, backendOobi, backendApi} = JSON.parse(content);
+
+        if (!sessionAid || !backendApi || !backendOobi){
+          showError(
+            ERROR_MESSAGES.UNSUPPORTED_TYPE,
+            new Error("Missing sessionAid, backendApi and/or backendOobi"),
+            dispatch,
+            ToastMsgType.UNKNOWN_ERROR
+          );
+        }
+
+        const url = new URL(backendOobi);
         const type = url.searchParams.get("type");
 
         if (!type) {
           showError(
             ERROR_MESSAGES.MISSING_TYPE,
-            new Error("Missing type parameter in scanned URL"),
+            new Error("Missing 'type' parameter in scanned URL"),
             dispatch,
             ToastMsgType.UNKNOWN_ERROR
           );
