@@ -4,6 +4,7 @@ import {
   keyOutline,
 } from "ionicons/icons";
 import { useState } from "react";
+import { IonItem, IonText } from "@ionic/react";
 import { JSONObject } from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
 import { useAppSelector } from "../../../../store/hooks";
@@ -12,7 +13,6 @@ import {
   formatTimeToSec,
   getUTCOffset,
 } from "../../../utils/formatters";
-import { getTheme } from "../../../utils/theme";
 import { Alert } from "../../Alert";
 import {
   CardBlock,
@@ -21,9 +21,7 @@ import {
   CardDetailsItem,
   FlatBorderType,
 } from "../../CardDetails";
-import { CardTheme } from "../../CardTheme";
 import { FallbackIcon } from "../../FallbackIcon";
-import { ProfileDetailsModal } from "../../ProfileDetailsModal";
 import { ListHeader } from "../../ListHeader";
 import { ReadMore } from "../../ReadMore";
 import {
@@ -34,36 +32,44 @@ import {
 import { MultisigMember } from "./MultisigMember";
 import { MemberAcceptStatus } from "./MultisigMember.types";
 import { getProfiles } from "../../../../store/reducers/profileCache";
+import { Avatar } from "../../Avatar";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
 
 const RelatedProfile = ({ identifierId }: IssuedIdentifierProps) => {
   const profiles = useAppSelector(getProfiles);
-  const [openIdentifierDetail, setOpenIdentifierDetail] = useState(false);
   const profile = profiles[identifierId];
 
   return (
     <>
       {profile && (
-        <CardBlock
-          title={i18n.t("tabs.credentials.details.relatedprofile")}
-          onClick={() => setOpenIdentifierDetail(true)}
-          testId="related-identifier-section"
+        <CardDetailsBlock
+          className="related-identifiers"
+          data-testid="related-identifier-section"
         >
-          <CardDetailsItem
-            info={profile?.identity.displayName || ""}
+          <IonItem
+            lines="none"
+            className="related-identifier-label"
+          >
+            <IonText>
+              {i18n.t("tabs.credentials.details.relatedprofile")}
+            </IonText>
+          </IonItem>
+          <IonItem
+            lines="none"
             className="related-identifier"
-            testId="related-identifier-name"
-            startSlot={<CardTheme {...getTheme(profile.identity.theme || 0)} />}
-          />
-        </CardBlock>
+            data-testid="related-identifier-detail"
+          >
+            <Avatar id={profile.identity.id} />
+            <IonText
+              className="identifier-name"
+              data-testid="related-identifier-name"
+            >
+              {profile.identity.displayName}
+            </IonText>
+          </IonItem>
+        </CardDetailsBlock>
       )}
-      <ProfileDetailsModal
-        isOpen={openIdentifierDetail}
-        setIsOpen={setOpenIdentifierDetail}
-        profileId={identifierId}
-        pageId="credential-related-identifier"
-      />
     </>
   );
 };
