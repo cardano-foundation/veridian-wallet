@@ -5,6 +5,7 @@ interface ProfileContentProps {
   cardData: IdentifierDetails;
   onRotateKey: () => void;
   setCardData: (value: IdentifierDetails) => void;
+  setIsScanOpen: (value: boolean) => void;
 }
 
 interface ProfileInformationProps {

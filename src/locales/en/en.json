@@ -529,10 +529,12 @@
   },
   "profiledetails": {
     "done": "Done",
+    "close": "Close",
     "identifierdetail": {
       "title": "Profile details",
       "showadvanced": "Show advanced details",
       "listoptions": {
+        "onlinelogin": "Online login",
         "dapp": "dApps"
       },
       "information": {
@@ -650,6 +652,14 @@
           "content": "Displays the list of individuals or entities that jointly control this group profile."
         },
         "bottomtext": "{{members}} group members"
+      }
+    },
+    "incomingrequest": {
+      "title": "Login request",
+      "message": "{{requester}} is requesting approval for a login attempt",
+      "button": {
+        "accept": "Login",
+        "decline": "Don't allow"
       }
     }
   },
@@ -1423,7 +1433,8 @@
     "notvalidgrouperror": "Not a valid group invitation",
     "groupnamenotfounderror": "Group name not found",
     "duplicategroupiderror": "Group already exists",
-    "groupmetadatanotfounderror": "Group metadata is missing. Please try again."
+    "groupmetadatanotfounderror": "Group metadata is missing. Please try again.",
+    "loginsuccessful": "Login successful"
   },
   "request": {
     "sign": {

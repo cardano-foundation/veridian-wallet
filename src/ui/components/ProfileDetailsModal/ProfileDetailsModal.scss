@@ -6,6 +6,27 @@
   }
 }
 
+.profile-details {
+  &.scan {
+    background: transparent;
+
+    .page-header ion-toolbar {
+      ion-button.close-button-label h4 {
+        color: var(--ion-color-neutral-300) !important;
+      }
+
+      .action-button {
+        color: var(--ion-color-neutral-300);
+        background: var(--ion-color-neutral-900);
+      }
+    }
+
+    .scan {
+      margin: 0;
+    }
+  }
+}
+
 .profile-details-module {
   .page-header {
     .back-button {

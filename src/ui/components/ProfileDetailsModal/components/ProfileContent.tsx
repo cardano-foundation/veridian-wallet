@@ -1,6 +1,7 @@
 import { IonButton, IonCol, IonGrid, IonIcon, IonRow } from "@ionic/react";
 import {
   appsOutline,
+  logInOutline,
   calendarNumberOutline,
   keyOutline,
   pencilOutline,
@@ -56,6 +57,7 @@ const ProfileContent = ({
   onRotateKey,
   oobi,
   setCardData,
+  setIsScanOpen,
 }: ProfileContentProps) => {
   const profiles = useAppSelector(getProfiles);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
@@ -107,6 +109,11 @@ const ProfileContent = ({
     .slice(0, DISPLAY_MEMBERS);
 
   const openGroupMember = () => openPropDetailModal(DetailView.GroupMember);
+
+  const showLogin = () => {
+    setIsScanOpen(true);
+  };
+
   const showDapp = () => {
     setConnectdApp(true);
   };
@@ -170,6 +177,13 @@ const ProfileContent = ({
       </div>
       <ListCard
         items={[
+          {
+            label: i18n.t(
+              "profiledetails.identifierdetail.listoptions.onlinelogin"
+            ),
+            icon: logInOutline,
+            onClick: showLogin,
+          },
           {
             label: i18n.t("profiledetails.identifierdetail.listoptions.dapp"),
             icon: appsOutline,
