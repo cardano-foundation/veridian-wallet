@@ -29,7 +29,7 @@ const CredentialShareRequest = ({
   const connectionName = connections.find(
     (c) => c.id === notificationDetails.connectionId
   );
-  const [loading, showLoading] = useState(true);
+  const [loading, showLoading] = useState(false);
 
   const handleShare = async () => {
     try {

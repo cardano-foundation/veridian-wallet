@@ -26,8 +26,7 @@ enum EventTypes {
   IdentifierRemoved = "IdentifierRemoved",
   CredentialRemovedEvent = "CredentialRemovedEvent",
   IdentifierAdded = "IdentifierAdded",
-  GroupCreated = "GroupCreated",
-  CoordinationCredentialsReqEvent = "CoordinationCredentialsReqEvent",
+  GroupCreated = "GroupCreated"
 }
 
 interface NotificationAddedEvent extends BaseEventEmitter {
@@ -130,13 +129,6 @@ interface GroupCreatedEvent extends BaseEventEmitter {
   };
 }
 
-interface CoordinationCredentialsReqEvent extends BaseEventEmitter {
-  type: typeof EventTypes.CoordinationCredentialsReqEvent;
-  payload: {
-    s: string;
-  };
-}
-
 export type {
   NotificationAddedEvent,
   OperationCompleteEvent,
@@ -151,7 +143,6 @@ export type {
   IdentifierRemovedEvent,
   CredentialRemovedEvent,
   IdentifierAddedEvent,
-  GroupCreatedEvent,
-  CoordinationCredentialsReqEvent,
+  GroupCreatedEvent
 };
 export { EventTypes };

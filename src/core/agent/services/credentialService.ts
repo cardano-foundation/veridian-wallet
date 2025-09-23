@@ -241,7 +241,7 @@ class CredentialService extends AgentService {
       .createExchangeMessage(
         hab,
         ExchangeRoute.CoordinationCredentialsInfoResp,
-        { sads: credentials },
+        { sads: JSON.stringify(credentials) },
         [],
         exchange.exn.i,
         undefined,

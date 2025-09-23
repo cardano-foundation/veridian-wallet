@@ -523,42 +523,6 @@ describe("Signify notification service of agent", () => {
     expect(markNotificationMock).not.toBeCalled();
   });
 
-  test("Should emit CoordinationCredentialsReqEvent for coordination/credentials/info/req notification", async () => {
-    exchangesGetMock.mockResolvedValue(coordinationCredentialsInfoReqExn);
-    identifierStorage.getIdentifierMetadata.mockRejectedValueOnce(
-      new Error(IdentifierStorage.IDENTIFIER_METADATA_RECORD_MISSING)
-    );
-    notificationStorage.save = jest.fn().mockReturnValue({
-      id: "notification-id-for-coord-req",
-      createdAt: new Date(),
-      a: {
-        r: NotificationRoute.ExnCoordinationCredentialsInfoReq,
-        d: "E4Zq5_A-rV21bAgI2bBF21s3I4wT9xWjXG0iIe_q_h_p",
-      },
-      connectionId: "some-connection-id",
-      read: false,
-      linkedRequest: { accepted: false },
-    });
-
-    await keriaNotificationService.processNotification(
-      notificationCoordinationCredentialsInfoReqProp
-    );
-
-    expect(eventEmitter.emit).toHaveBeenCalledWith({
-      type: EventTypes.CoordinationCredentialsReqEvent,
-      payload: {
-        s: coordinationCredentialsInfoReqExn.exn.a.s,
-      },
-    });
-
-    expect(eventEmitter.emit).toHaveBeenCalledWith({
-      type: EventTypes.NotificationAdded,
-      payload: {
-        note: expect.any(Object),
-      },
-    });
-  });
-
   test("Cannot mark a notification as unread if it does not exist", async () => {
     notificationStorage.findById = jest.fn().mockResolvedValue(null);
     await expect(

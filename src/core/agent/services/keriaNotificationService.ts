@@ -37,7 +37,6 @@ import {
   NotificationRemovedEvent,
   ConnectionStateChangedEvent,
   OperationFailedEvent,
-  CoordinationCredentialsReqEvent,
 } from "../event.types";
 import {
   deleteNotificationRecordById,
@@ -945,28 +944,12 @@ class KeriaNotificationService extends AgentService {
     exchange: ExnMessage
   ): Promise<boolean> {
 
-    if (!exchange.exn.a.s) {
-      await this.markNotification(notif.i);
-      return false;
+    if (exchange.exn.a.s) {
+      return true;
     }
 
-    this.props.eventEmitter.emit<CoordinationCredentialsReqEvent>({
-      type: EventTypes.CoordinationCredentialsReqEvent,
-      payload: {
-        s: exchange.exn.a.s
-      },
-    });
-
-    return true;
-  }
-
-  onCoordinationCredentialsReq(
-    callback: (event: CoordinationCredentialsReqEvent) => void
-  ) {
-    this.props.eventEmitter.on(
-      EventTypes.CoordinationCredentialsReqEvent,
-      callback
-    );
+    await this.markNotification(notif.i);
+    return false;
   }
 
   private async processRemoteSignReq(
