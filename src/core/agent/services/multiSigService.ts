@@ -823,7 +823,7 @@ class MultiSigService extends AgentService {
       .identifiers()
       .members(multisigId);
 
-    // TODO: check filter
+    // TODO: We have an issue when using the signify-ts filter. Currently, we are loading all exchange messages and filtering them with JavaScript. We need to fix this in the future.
     const exchanges = [];
     let i = 0;
 
