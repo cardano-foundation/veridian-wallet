@@ -1,0 +1,277 @@
+{
+  "$id": "EDayhD6ONnXsz3GhsgdbuJIQv3PI7t6If-r3WAoMWM1_",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Birth Certificate Credential",
+  "description": "A Credential for Birth Certificate verification and attestation",
+  "type": "object",
+  "credentialType": "BirthCertificateCredential",
+  "version": "1.0.0",
+  "properties": {
+    "v": {
+      "description": "Version",
+      "type": "string"
+    },
+    "d": {
+      "description": "Credential SAID",
+      "type": "string"
+    },
+    "u": {
+      "description": "One time use nonce",
+      "type": "string"
+    },
+    "i": {
+      "description": "Issuer AID",
+      "type": "string"
+    },
+    "ri": {
+      "description": "Credential status registry",
+      "type": "string"
+    },
+    "s": {
+      "description": "Schema SAID",
+      "type": "string"
+    },
+    "a": {
+      "oneOf": [
+        {
+          "description": "Attributes block SAID",
+          "type": "string"
+        },
+        {
+          "$id": "EB701WJCg8O5V5GpNRgCsAHHkSAdF3aY4tTCq_I-ySgV",
+          "description": "Attributes block",
+          "type": "object",
+          "properties": {
+            "d": {
+              "description": "Attributes block SAID",
+              "type": "string"
+            },
+            "i": {
+              "description": "Issuer AID",
+              "type": "string"
+            },
+            "dt": {
+              "description": "issuance date time",
+              "type": "string",
+              "format": "date-time"
+            },
+            "registrationNumber": {
+              "description": "Birth registration number",
+              "type": "string"
+            },
+            "childInformation": {
+              "description": "Child information block",
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "description": "Child's first name",
+                  "type": "string"
+                },
+                "middleName": {
+                  "description": "Child's middle name",
+                  "type": "string"
+                },
+                "lastName": {
+                  "description": "Child's last name",
+                  "type": "string"
+                },
+                "suffix": {
+                  "description": "Child's name suffix (Jr., III, etc.)",
+                  "type": "string"
+                },
+                "dateOfBirth": {
+                  "description": "Child's date of birth",
+                  "type": "string",
+                  "format": "date"
+                },
+                "timeOfBirth": {
+                  "description": "Child's time of birth",
+                  "type": "string",
+                  "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "sex": {
+                  "description": "Child's sex",
+                  "type": "string",
+                  "enum": [
+                    "Male",
+                    "Female",
+                    "Other",
+                    "Unknown"
+                  ]
+                },
+                "birthWeight": {
+                  "description": "Child's birth weight in pounds and ounces",
+                  "type": "string",
+                  "pattern": "^\\d+\\s+lbs\\s+\\d+\\s+oz$"
+                },
+                "birthLength": {
+                  "description": "Child's birth length in inches",
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "firstName",
+                "lastName",
+                "dateOfBirth",
+                "sex"
+              ]
+            },
+            "placeOfBirth": {
+              "description": "Place of birth information block",
+              "type": "object",
+              "properties": {
+                "facilityHospitalName": {
+                  "description": "Name of the facility or hospital where birth occurred",
+                  "type": "string"
+                },
+                "city": {
+                  "description": "City where birth occurred",
+                  "type": "string"
+                },
+                "county": {
+                  "description": "County where birth occurred",
+                  "type": "string"
+                },
+                "state": {
+                  "description": "State where birth occurred",
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "facilityHospitalName",
+                "city",
+                "county",
+                "state"
+              ]
+            },
+            "motherParentInformation": {
+              "description": "Mother/Parent information block",
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "description": "Mother's first name",
+                  "type": "string"
+                },
+                "middleName": {
+                  "description": "Mother's middle name",
+                  "type": "string"
+                },
+                "maidenName": {
+                  "description": "Mother's maiden name",
+                  "type": "string"
+                },
+                "dateOfBirth": {
+                  "description": "Mother's date of birth",
+                  "type": "string",
+                  "format": "date"
+                },
+                "birthplace": {
+                  "description": "Mother's birthplace (State/Country)",
+                  "type": "string"
+                },
+                "ssn": {
+                  "description": "Mother's Social Security Number (confidential)",
+                  "type": "string",
+                  "pattern": "^\\d{3}-\\d{2}-\\d{4}$"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "firstName",
+                "maidenName"
+              ]
+            },
+            "fatherParentInformation": {
+              "description": "Father/Parent information block",
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "description": "Father's first name",
+                  "type": "string"
+                },
+                "middleName": {
+                  "description": "Father's middle name",
+                  "type": "string"
+                },
+                "lastName": {
+                  "description": "Father's last name",
+                  "type": "string"
+                },
+                "suffix": {
+                  "description": "Father's name suffix (Jr., III, etc.)",
+                  "type": "string"
+                },
+                "dateOfBirth": {
+                  "description": "Father's date of birth",
+                  "type": "string",
+                  "format": "date"
+                },
+                "birthplace": {
+                  "description": "Father's birthplace (State/Country)",
+                  "type": "string"
+                },
+                "ssn": {
+                  "description": "Father's Social Security Number (confidential)",
+                  "type": "string",
+                  "pattern": "^\\d{3}-\\d{2}-\\d{4}$"
+                }
+              },
+              "additionalProperties": false,
+              "required": []
+            },
+            "certifierInformation": {
+              "description": "Certifier information block",
+              "type": "object",
+              "properties": {
+                "certifierName": {
+                  "description": "Name of the person certifying the birth",
+                  "type": "string"
+                },
+                "title": {
+                  "description": "Title of the certifier",
+                  "type": "string"
+                },
+                "licenseNumber": {
+                  "description": "Certifier's license number",
+                  "type": "string"
+                },
+                "dateSigned": {
+                  "description": "Date the certificate was signed",
+                  "type": "string",
+                  "format": "date"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "certifierName",
+                "title",
+                "dateSigned"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "i",
+            "dt",
+            "registrationNumber",
+            "childInformation",
+            "placeOfBirth",
+            "motherParentInformation",
+            "certifierInformation"
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "i",
+    "ri",
+    "s",
+    "d",
+    "a"
+  ]
+}

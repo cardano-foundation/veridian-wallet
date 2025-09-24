@@ -145,7 +145,6 @@ async function startServer() {
     })
   );
   app.use(bodyParser.json());
-  app.use(router);
   app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
@@ -180,6 +179,8 @@ async function startServer() {
       signifyClientIssuer
     );
     app.set("qviCredentialId", qviCredentialId);
+
+    app.use(router);
 
     log(`Listening on port ${config.port}`);
   });

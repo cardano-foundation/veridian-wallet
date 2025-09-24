@@ -1,8 +1,19 @@
 import { NextFunction, Request, Response } from "express";
 import { Operation, Saider, Serder, SignifyClient } from "signify-ts";
-import { ACDC_SCHEMAS_ID, ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
-import { getRegistry, OP_TIMEOUT, waitAndGetDoneOp } from "../utils/utils";
+import {
+  ACDC_SCHEMAS_ID,
+  ISSUER_NAME,
+  LE_SCHEMA_SAID,
+  BIRTH_CERTIFICATE_SCHEMA_SAID,
+} from "../consts";
+import {
+  getRegistry,
+  OP_TIMEOUT,
+  waitAndGetDoneOp,
+  resolveOobi,
+} from "../utils/utils";
 import { QviCredential } from "../utils/utils.types";
+import { IssueParentBirthCertificateRequest } from "../types/birth-certificate.types";
 
 export const UNKNOW_SCHEMA_ID = "Unknow Schema ID: ";
 export const CREDENTIAL_NOT_FOUND = "Not found credential with ID: ";
@@ -17,12 +28,16 @@ export async function issueAcdcCredential(
   const client: SignifyClient = req.app.get("signifyClient");
   const qviCredentialId = req.app.get("qviCredentialId");
 
-  const { schemaSaid, aid, attribute } = req.body;
+  const { schemaSaid } = req.body;
 
-  if (!ACDC_SCHEMAS_ID.some((schemaId) => schemaId === schemaSaid)) {
+  const isSchemaAllowed = ACDC_SCHEMAS_ID.some(
+    (schemaId) => schemaId === schemaSaid
+  );
+
+  if (!isSchemaAllowed) {
     res.status(409).send({
       success: false,
-      data: "",
+      data: `Schema '${schemaSaid}' not found in allowed schemas`,
     });
     return;
   }
@@ -32,8 +47,11 @@ export async function issueAcdcCredential(
 
   let issueParams: any;
   let grantParams: any;
+  let recipient: any;
 
   if (schemaSaid === LE_SCHEMA_SAID) {
+    const { aid, attribute } = req.body;
+    recipient = aid;
     const qviCredential: QviCredential = await client
       .credentials()
       .get(qviCredentialId);
@@ -68,7 +86,44 @@ export async function issueAcdcCredential(
       recipient: aid,
       ancAttachment: true,
     };
+  } else if (schemaSaid === BIRTH_CERTIFICATE_SCHEMA_SAID) {
+    const {
+      parentOobiUrl,
+      birthCertificateData,
+    }: IssueParentBirthCertificateRequest = req.body;
+
+    if (!parentOobiUrl || !birthCertificateData) {
+      res.status(400).json({
+        error:
+          "Missing required fields: parentOobiUrl and birthCertificateData are required",
+      });
+      return;
+    }
+
+    const resolveOp = await resolveOobi(client, parentOobiUrl);
+    recipient = (resolveOp.response as any).i;
+
+    const currentTimestamp = new Date().toISOString().replace("Z", "000+00:00");
+
+    const credentialAttributes: any = {
+      i: recipient,
+      dt: currentTimestamp,
+      ...birthCertificateData,
+    };
+
+    issueParams = {
+      ri: keriRegistryRegk,
+      s: BIRTH_CERTIFICATE_SCHEMA_SAID,
+      a: credentialAttributes,
+    };
+
+    grantParams = {
+      senderName: ISSUER_NAME,
+      recipient: recipient,
+    };
   } else {
+    const { aid, attribute } = req.body;
+    recipient = aid;
     issueParams = {
       ri: keriRegistryRegk,
       s: schemaSaid,
@@ -102,7 +157,7 @@ export async function issueAcdcCredential(
 
   await client
     .ipex()
-    .submitGrant(grantParams.senderName, grant, gsigs, gend, [aid]);
+    .submitGrant(grantParams.senderName, grant, gsigs, gend, [recipient]);
 
   res.status(200).send({
     success: true,

@@ -4,10 +4,14 @@ export const QVI_SCHEMA_SAID = "EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao";
 export const RARE_EVO_DEMO_SCHEMA_SAID =
   "EJxnJdxkHbRw2wVFNe4IUOPLt8fEtg9Sr3WyTjlgKoIb";
 export const LE_SCHEMA_SAID = "ENPXp1vQzRF6JwIuS-mp2U8Uf1MoADoP_GqQ62VsDZWY";
+export const BIRTH_CERTIFICATE_SCHEMA_SAID =
+  "EDayhD6ONnXsz3GhsgdbuJIQv3PI7t6If-r3WAoMWM1_";
+
 export const ACDC_SCHEMAS_ID = [
   QVI_SCHEMA_SAID,
   LE_SCHEMA_SAID,
   RARE_EVO_DEMO_SCHEMA_SAID,
+  BIRTH_CERTIFICATE_SCHEMA_SAID,
 ];
 
 export const ACDC_SCHEMAS = [
@@ -22,5 +26,9 @@ export const ACDC_SCHEMAS = [
   {
     id: LE_SCHEMA_SAID,
     name: "Legal Entity vLEI Credential",
+  },
+  {
+    id: BIRTH_CERTIFICATE_SCHEMA_SAID,
+    name: "Birth Certificate",
   },
 ];
