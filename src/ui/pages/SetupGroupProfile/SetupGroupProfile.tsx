@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { CreationStatus } from "../../../core/agent/agent.types";
+import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
+import { TabsRoutePath } from "../../../routes/paths";
 import { useAppSelector } from "../../../store/hooks";
 import { getCurrentProfile } from "../../../store/reducers/profileCache";
+import { useAppIonRouter } from "../../hooks";
 import { InitializeGroup } from "./components/InitializeGroup/InitializeGroup";
+import { PendingGroup } from "./components/PendingGroup/PendingGroup";
 import { SetupConnections } from "./components/SetupConnections";
 import "./SetupGroupProfile.scss";
 import { GroupInfomation, Stage } from "./SetupGroupProfile.types";
-import { PendingGroup } from "./components/PendingGroup/PendingGroup";
 
 const stages = [SetupConnections, InitializeGroup, PendingGroup];
 
@@ -38,31 +40,52 @@ const initialState: GroupInfomation = {
 };
 
 const SetupGroupProfile = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
   const currentProfile = useAppSelector(getCurrentProfile);
-  const groupName = queryParams.get("groupName");
-  const [state, setState] = useState<GroupInfomation>({
-    ...initialState,
-    stage:
+  const identity = currentProfile?.identity;
+  const router = useAppIonRouter();
+
+  const isPendingState = useMemo(() => {
+    if (!currentProfile) return false;
+
+    const isInitiatorPending =
       currentProfile?.identity.creationStatus === CreationStatus.PENDING &&
       currentProfile.multisigConnections.length > 0 &&
-      currentProfile.identity.groupMetadata?.groupInitiator
-        ? Stage.Pending
-        : Stage.SetupConnection,
+      currentProfile.identity.groupMetadata?.groupInitiator;
+
+    const existInitGroup = currentProfile.notifications.some(
+      (item) => item.a.r === NotificationRoute.MultiSigIcp
+    );
+
+    const isMemberPending =
+      existInitGroup ||
+      (!existInitGroup &&
+        !currentProfile.identity.groupMetadata?.groupInitiator &&
+        currentProfile?.identity.creationStatus === CreationStatus.PENDING &&
+        currentProfile.identity.groupMemberPre);
+
+    return isInitiatorPending || isMemberPending;
+  }, [currentProfile]);
+
+  const [state, setState] = useState<GroupInfomation>({
+    ...initialState,
+    stage: isPendingState ? Stage.Pending : Stage.SetupConnection,
   });
   const CurrentStage = stages[state.stage];
+
+  useEffect(() => {
+    if (
+      identity?.creationStatus === CreationStatus.COMPLETE &&
+      !!identity?.groupMemberPre
+    ) {
+      router.push(TabsRoutePath.CREDENTIALS, "root", "replace");
+    }
+  }, [identity?.creationStatus, identity?.groupMemberPre, router]);
 
   useEffect(() => {
     if (!currentProfile) return;
 
     setState({
-      stage:
-        currentProfile.identity.creationStatus === CreationStatus.PENDING &&
-        currentProfile.multisigConnections.length > 0 &&
-        currentProfile.identity.groupMetadata?.groupInitiator
-          ? Stage.Pending
-          : Stage.SetupConnection,
+      stage: isPendingState ? Stage.Pending : Stage.SetupConnection,
       displayNameValue: currentProfile.identity.displayName,
       signer: {
         requiredSigners: 0,
@@ -74,21 +97,12 @@ const SetupGroupProfile = () => {
       newIdentifier: currentProfile.identity,
       groupMetadata: currentProfile.identity.groupMetadata,
     });
-  }, [currentProfile]);
+  }, [currentProfile, isPendingState]);
 
   return (
     <CurrentStage
       state={state}
       setState={setState}
-      groupName={groupName}
-      groupMetadata={{
-        ...state.groupMetadata,
-        groupId: state.groupMetadata?.groupId ?? "",
-        groupInitiator: state.groupMetadata?.groupInitiator ?? false,
-        groupCreated: state.groupMetadata?.groupCreated ?? false,
-        userName: state.groupMetadata?.userName ?? "",
-        initiatorName: state.groupMetadata?.initiatorName ?? "",
-      }}
     />
   );
 };

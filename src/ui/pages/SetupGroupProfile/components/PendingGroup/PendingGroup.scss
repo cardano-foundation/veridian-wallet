@@ -7,6 +7,12 @@
       }
     }
 
+    .tertiary-button {
+      &::part(native) {
+        color: var(--ion-color-error-800);
+      }
+    }
+
     .alert {
       margin-top: 1.5rem;
       background-color: rgba(var(--ion-color-warning-800-rgb), 0.1);
@@ -26,7 +32,8 @@
       margin-bottom: 0.75rem;
     }
 
-    .group-members {
+    .group-members,
+    .request-from {
       .member {
         margin-bottom: 0.75rem;
       }
