@@ -995,6 +995,15 @@
             "alert": {
               "textdecline": "Are you sure you want to decline this credential issuance? You won't be able to change your decision later."
             }
+          },
+          "credentialshare": {
+            "title": "Share request",
+            "close": "Close",
+            "message": "{{requester}} is requesting access to your SEDI credentials",
+            "button": {
+              "accept": "Share credentials",
+              "decline": "Decline"
+            }
           }
         },
         "identifier": {

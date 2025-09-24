@@ -6,7 +6,6 @@ import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
 import { Spinner } from "../../../../components/Spinner";
@@ -16,19 +15,23 @@ import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./CredentialShareRequest.scss";
+import CitizenPortal from "./citizen-portal.svg";
+import { ResponsivePageLayout } from "../../../../components/layout/ResponsivePageLayout";
 
 const CredentialShareRequest = ({
-  pageId,
   activeStatus,
   handleBack,
   notificationDetails,
 }: NotificationDetailsProps) => {
+  const pageId = "credential-share-request";
   const dispatch = useAppDispatch();
   const connections = useAppSelector(getConnectionsCache);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const connectionName = connections.find(
     (c) => c.id === notificationDetails.connectionId
   );
+  const requester = connectionName?.label || "Unknown";
+  const logo = requester === "Citizen Portal" ? CitizenPortal : CitizenPortal; //TODO: Placeholder for different logos based on type
   const [loading, showLoading] = useState(false);
 
   const handleShare = async () => {
@@ -49,40 +52,53 @@ const CredentialShareRequest = ({
 
   return (
     <>
-      <ScrollablePageLayout
-        activeStatus={activeStatus}
+      <ResponsivePageLayout
         pageId={pageId}
-        customClass="custom-sign-request"
+        activeStatus={activeStatus}
         header={
           <PageHeader
             closeButton={true}
             closeButtonAction={handleBack}
-            closeButtonLabel="Close"
-            title={"Share Credentials"}
-          />
-        }
-        footer={
-          <PageFooter
-            customClass="sign-footer"
-            primaryButtonText="Confirm"
-            primaryButtonAction={() => setVerifyIsOpen(true)}
-            secondaryButtonText={`${i18n.t("request.button.dontallow")}`}
-            secondaryButtonAction={handleBack}
+            closeButtonLabel={`${i18n.t(
+              "tabs.notifications.details.credential.credentialshare.close"
+            )}`}
+            title={`${i18n.t(
+              "tabs.notifications.details.credential.credentialshare.title"
+            )}`}
           />
         }
       >
-        <div className="sign-header">
-          <div className="sign-owner-logo">
-            <IonIcon
-              data-testid="sign-logo"
-              icon={personCircleOutline}
-              color="light"
-            />
+        <div className="credential-share-request-center">
+          <div className="credential-share-request-icons-row">
+            <div className="credential-share-request-user-logo">
+              <img
+                src={logo}
+                alt="Citizen Portal"
+              />
+            </div>
           </div>
-          <h2 className="sign-name">{connectionName?.label}</h2>
+          <p className="credential-share-request-message">
+            {`${i18n.t(
+              "tabs.notifications.details.credential.credentialshare.message",
+              {
+                requester,
+              }
+            )}`}
+          </p>
         </div>
-        <h3 className="sign-info">Share your credentials</h3>
-      </ScrollablePageLayout>
+        <PageFooter
+          customClass="credential-share-request-footer"
+          pageId={pageId}
+          primaryButtonText={`${i18n.t(
+            "tabs.notifications.details.credential.credentialshare.button.accept"
+          )}`}
+          primaryButtonAction={() => setVerifyIsOpen(true)}
+          declineButtonText={`${i18n.t(
+            "tabs.notifications.details.credential.credentialshare.button.decline"
+          )}`}
+          declineButtonAction={handleBack}
+        />
+      </ResponsivePageLayout>
       <Spinner
         show={loading}
         coverage={SpinnerConverage.Screen}
