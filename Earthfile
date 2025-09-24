@@ -1,5 +1,7 @@
 VERSION 0.8
 
+# trigger build
+
 IMPORT --allow-privileged github.com/cardano-foundation/cf-gha-workflows/./earthfiles/functions:main AS functions
 
 ARG --global DOCKER_IMAGES_TARGETS="idw-keria idw-witness cred-issuance cred-issuance-ui cip45-sample-dapp"
