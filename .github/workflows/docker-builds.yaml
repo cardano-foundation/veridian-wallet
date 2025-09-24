@@ -15,7 +15,7 @@ on:
       - 'release/**'
     tags:
       - '[0-9]+.[0-9]+.[0-9]+*'
-  pull_request_target:
+  pull_request:
     types: [ opened, synchronize ]
     paths:
     - 'Earthfile'
