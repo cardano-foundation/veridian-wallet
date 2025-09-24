@@ -1,3 +1,4 @@
+import { Saider } from "signify-ts";
 import { Agent } from "../../../core/agent/agent";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
@@ -5,196 +6,189 @@ import { setToastMsg } from "../../../store/reducers/stateCache";
 
 interface ConnectParams {
   content: string;
-  profileId: string | undefined;
-  profile: any;
+  profileAid: string | undefined;
   dispatch: any;
 }
 
-interface ParsedQRData {
-  backendOobi: string;
-  sessionAid: string;
-  backendApi: string;
-}
-
-interface LoginRequest {
-  sessionAid: string;
-}
-
-interface LoginResponse {
-  success: boolean;
-  message: string;
-  sessionId: string;
-  userId: string;
-}
-
-const HTTP_METHODS = {
-  POST: "POST",
-} as const;
-
-const API_ENDPOINTS = {
-  LOGIN: "/login",
-} as const;
-
-const SIGNATURE_COMPONENTS = [
-  "@method",
-  "@path",
-  "signify-resource",
-  "signify-timestamp",
-  "content-digest",
-] as const;
-
-const parseQRData = (content: string): ParsedQRData => {
-  const url = new URL(content);
-  const pathParts = url.pathname.split("/");
-  const backendOobi = pathParts[2];
-  const sessionAid = pathParts[4];
-  const backendApi = `${url.protocol}//${url.host}`;
-
-  if (!backendOobi || !sessionAid || !backendApi) {
-    throw new Error("Invalid QR code data: missing required fields");
-  }
-
-  return { backendOobi, sessionAid, backendApi };
-};
-
-const createLoginRequest = (sessionAid: string): LoginRequest => ({
-  sessionAid,
-});
-
-const createHttpSignature = async (
-  method: string,
-  path: string,
-  requestBody: string,
+export async function signedInteractionFetch(
+  profileAid: string,
   sessionAid: string,
-  profileId: string | undefined,
-  profile: any
-): Promise<Headers> => {
-  const identifier = await Agent.agent.client
-    .identifiers()
-    .get(profile?.id || profileId);
-  const signer = Agent.agent.client.manager?.get(identifier);
+  url: string,
+  requestOptions: RequestInit
+): Promise<Response> {
+  const headers = new Headers(requestOptions.headers);
+  const method = requestOptions.method?.toUpperCase() || "GET";
+  const path = new URL(url).pathname;
+  const datetime = new Date();
 
-  if (!signer) {
-    throw new Error("Unable to get signer for the current profile");
-  }
+  const signer = await Agent.agent.identifiers.getSigner(profileAid);
 
-  const headers = new Headers();
-  headers.set("Content-Type", "application/json");
-  headers.set("Signify-Resource", sessionAid);
+  // Base headers
+  headers.set("Signify-Resource", profileAid);
   headers.set(
     "Signify-Timestamp",
-    new Date().toISOString().replace("Z", "+00:00")
+    datetime.toISOString().replace("Z", "+00:00")
   );
 
-  const bodyBuffer = new TextEncoder().encode(requestBody);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", bodyBuffer);
-  const hashBase64 = Buffer.from(hashBuffer).toString("base64");
-  headers.set("Content-Digest", `sha-256=:${hashBase64}:`);
+  // Handle body digest
+  const coveredComponents = [
+    "@method",
+    "@path",
+    "signify-resource",
+    "signify-main-resource",
+    "signify-timestamp",
+  ];
 
-  const signatureInput = `sig1=(${SIGNATURE_COMPONENTS.map(
-    (c) => `"${c}"`
-  ).join(" ")});created=${Math.floor(Date.now() / 1000)};keyid="${
-    profile?.id || profileId
+  if (requestOptions.body) {
+    headers.set("Content-Type", "application/json");
+    const bodyBuffer =
+      typeof requestOptions.body === "string"
+        ? new TextEncoder().encode(requestOptions.body)
+        : new Uint8Array(requestOptions.body as ArrayBuffer);
+
+    const hashBuffer = await window.crypto.subtle.digest("SHA-256", bodyBuffer);
+    const hashBase64 = btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+
+    headers.set("Content-Digest", `sha-256=:${hashBase64}:`);
+    coveredComponents.push("content-digest");
+  }
+
+  // Construct dynamic Signature-Input
+  const signatureInput = `sig1=(${coveredComponents
+    .map((c) => `"${c}"`)
+    .join(" ")});created=${Math.floor(datetime.getTime() / 1000)};keyid="${
+    signer.verfer.qb64
   }"`;
   headers.set("Signature-Input", signatureInput);
 
-  let payload = "";
-  for (const component of SIGNATURE_COMPONENTS) {
-    if (component === "@method") {
-      payload += `"@method": ${method}\n`;
-    } else if (component === "@path") {
-      payload += `"@path": ${path}\n`;
-    } else {
-      payload += `"${component}": ${headers.get(component)}\n`;
-    }
-  }
-  payload += `"@signature-params": ${signatureInput.substring(
-    signatureInput.indexOf(";")
-  )}`;
+  const payload = constructPayload(method, path, headers, signatureInput);
 
-  const signResult = await signer.sign(Buffer.from(payload));
-  const signature = extractSignature(signResult);
-  headers.set("Signature", `sig1=:${signature}:`);
-
-  return headers;
-};
-
-const extractSignature = (signResult: any): string => {
-  if (typeof signResult === "string") {
-    return signResult;
-  } else if (Array.isArray(signResult) && signResult.length > 0) {
-    return signResult[0];
-  } else if (
-    signResult &&
-    typeof signResult === "object" &&
-    "qb64" in signResult
-  ) {
-    return (signResult as any).qb64;
-  } else {
-    throw new Error(`Unexpected sign result type: ${typeof signResult}`);
-  }
-};
-
-const performLoginRequest = async (
-  backendApi: string,
-  headers: Headers,
-  requestBody: string
-): Promise<LoginResponse> => {
-  const baseUrl = backendApi
-    .replace(/\/$/, "")
-    .replace("127.0.0.1", "localhost");
-  const fullUrl = `${baseUrl}${API_ENDPOINTS.LOGIN}`;
-
-  // TEMPORARY MOCK: Skip actual API call until backend is fixed
-  // const response = await fetch(fullUrl, {
-  //   method: HTTP_METHODS.POST,
-  //   headers: headers,
-  //   body: requestBody,
-  // });
-
-  // if (!response.ok) {
-  //   const errorText = await response.text();
-  //   throw new Error(
-  //     `HTTP error! status: ${response.status}, body: ${errorText}`
-  //   );
-  // }
-
-  // Mock successful response
-  const mockResponse: LoginResponse = {
-    success: true,
-    message: "Login successful",
-    sessionId: "mock-session-" + Date.now(),
-    userId: "mock-user-id",
+  const payloadDigest = {
+    ...payload,
+    d: "",
+    sessionAid,
   };
 
-  return mockResponse;
-};
+  const [, ked] = Saider.saidify(payloadDigest);
+
+  const r = await Agent.agent.identifiers.signInteractionEvent(
+    profileAid,
+    ked.d
+  );
+
+  const kelIsVerified = await Agent.agent.identifiers.verifyInteraction(
+    profileAid,
+    ked.d,
+    r.serder.ked.s
+  );
+
+  headers.set("Sequence-Number", r.serder.ked.s);
+  const finalOptions: RequestInit = {
+    ...requestOptions,
+    headers: headers,
+  };
+
+  return fetch(url, finalOptions);
+}
+
+export async function signedFetch(
+  profileAid: string,
+  url: string,
+  requestOptions: RequestInit
+): Promise<Response> {
+  const headers = new Headers(requestOptions.headers);
+  const method = requestOptions.method?.toUpperCase() || "GET";
+  const path = new URL(url).pathname;
+  const datetime = new Date();
+
+  const signer = await Agent.agent.identifiers.getSigner(profileAid);
+  // Base headers
+  headers.set("Signify-Resource", signer.verfer.qb64);
+
+  headers.set(
+    "Signify-Timestamp",
+    datetime.toISOString().replace("Z", "+00:00")
+  );
+  // Handle body digest
+  const coveredComponents = [
+    "@method",
+    "@path",
+    "signify-resource",
+    "signify-timestamp",
+  ];
+
+  if (requestOptions.body) {
+    headers.set("Content-Type", "application/json");
+
+    const bodyBuffer =
+      typeof requestOptions.body === "string"
+        ? new TextEncoder().encode(requestOptions.body)
+        : new Uint8Array(requestOptions.body as ArrayBuffer);
+
+    const hashBuffer = await window.crypto.subtle.digest("SHA-256", bodyBuffer);
+    const hashBase64 = btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+
+    headers.set("Content-Digest", `sha-256=:${hashBase64}:`);
+    coveredComponents.push("content-digest");
+  }
+
+  // Construct dynamic Signature-Input
+  const signatureInput = `sig1=(${coveredComponents
+    .map((c) => `"${c}"`)
+    .join(" ")});created=${Math.floor(datetime.getTime() / 1000)};keyid="${
+    signer.verfer.qb64
+  }"`;
+  headers.set("Signature-Input", signatureInput);
+
+  const payload = constructPayload(method, path, headers, signatureInput);
+
+  const payloadDigest = {
+    d: "",
+    ...payload,
+  };
+
+  const [, ked] = Saider.saidify(payloadDigest);
+
+  const signature = signer.sign(ked.d).qb64;
+  headers.set("Signature", `sig1=:${signature}:`);
+
+  const finalOptions: RequestInit = {
+    ...requestOptions,
+    headers: headers,
+  };
+
+  return fetch(url, finalOptions);
+}
 
 export const handleConnect = async ({
   content,
-  profileId,
-  profile,
+  profileAid,
   dispatch,
 }: ConnectParams): Promise<void> => {
+  if (!profileAid) {
+    throw new Error("Missing profileAid");
+  }
   try {
-    const { sessionAid, backendApi } = parseQRData(content);
-    const loginRequest = createLoginRequest(sessionAid);
-    const requestBody = JSON.stringify(loginRequest);
+    const { sessionAid, backendApi } = JSON.parse(content);
 
-    const headers = await createHttpSignature(
-      HTTP_METHODS.POST,
-      API_ENDPOINTS.LOGIN,
-      requestBody,
-      sessionAid,
-      profileId,
-      profile
-    );
+    const requestPath = "/login";
 
-    const response = await performLoginRequest(
-      backendApi,
-      headers,
-      requestBody
-    );
+    /* TODO: fix verification of interaction event in backend
+    await signedInteractionFetch(profileAid, sessionAid, `${backendApi}${requestPath}`, {
+      method: "POST",
+       body: JSON.stringify({
+        sessionAid,
+        userAid: profileAid
+      })
+    });*/
+
+    await signedFetch(profileAid, `${backendApi}${requestPath}`, {
+      method: "POST",
+      body: JSON.stringify({
+        sessionAid,
+        userAid: profileAid,
+      }),
+    });
 
     dispatch(setToastMsg(ToastMsgType.LOGIN_SUCCESSFUL));
   } catch (error) {
@@ -205,3 +199,30 @@ export const handleConnect = async ({
     );
   }
 };
+
+function constructPayload(
+  method: string,
+  path: string,
+  headers: Headers,
+  signatureInput: string
+): object {
+  const coveredComponents = (signatureInput.match(/\(([^)]+)\)/)?.[1] || "")
+    .split(" ")
+    .map((c) => c.replace(/"/g, ""));
+
+  const payload: { [key: string]: any } = {};
+  for (const component of coveredComponents) {
+    if (component === "@method") {
+      payload[component] = method;
+    } else if (component === "@path") {
+      payload[component] = path;
+    } else {
+      payload[component] = headers.get(component);
+    }
+  }
+  payload["@signature-params"] = signatureInput.substring(
+    signatureInput.indexOf(";")
+  );
+
+  return payload;
+}

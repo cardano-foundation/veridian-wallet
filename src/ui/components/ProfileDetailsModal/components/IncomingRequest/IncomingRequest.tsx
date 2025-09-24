@@ -12,7 +12,13 @@ const IncomingRequest = ({
   scannedValue,
 }: IncomingRequestProps) => {
   const pageId = "connect-incoming-request";
-  const url = new URL(scannedValue);
+  const { backendOobi } = JSON.parse(scannedValue);
+
+  if (!backendOobi) {
+    throw new Error("Invalid QR code data: missing backendOobi field");
+  }
+
+  const url = new URL(backendOobi);
   const type = url.searchParams.get("type");
   const logo = type === "guardianship" ? CitizenPortal : CitizenPortal; //TODO: Placeholder for different logos based on type
   const requester = type === "guardianship" ? "Citizen Portal" : "Unknown";

@@ -1,10 +1,19 @@
-import { HabState, Operation, Signer } from "signify-ts";
+import {
+  Dict,
+  EventResult,
+  HabState,
+  Operation,
+  Signer,
+  SignifyClient,
+  State,
+} from "signify-ts";
 import { parseHabName } from "../../utils/habName";
 import {
   CreateIdentifierResult,
   IdentifierDetails,
   IdentifierShortDetails,
   RemoteSignRequest,
+  SignedInteraction,
 } from "./identifier.types";
 import {
   CreationStatus,
@@ -840,6 +849,60 @@ class IdentifierService extends AgentService {
       returned = result.aids.length;
       iteration += 1;
     }
+  }
+
+  @OnlineOnly
+  async signInteractionEvent(
+    identifier: string,
+    payload: any
+  ): Promise<EventResult> {
+    const data = [payload];
+
+    return await this.props.signifyClient
+      .identifiers()
+      .interact(identifier, data);
+  }
+
+  @OnlineOnly
+  async verifyInteraction(
+    identifier: string,
+    digest: string,
+    sequence: string
+  ): Promise<boolean> {
+    try {
+      const operation = (await this.waitAndGetDoneOp(
+        this.props.signifyClient,
+        await this.props.signifyClient.keyStates().query(identifier, sequence),
+        5000
+      )) as Operation & { response: State };
+
+      if (!operation.done) {
+        throw new Error(`Failed to query KEL state with sequece: ${sequence}]`);
+      }
+
+      const kels = await this.props.signifyClient.keyEvents().get(identifier);
+      const foundItem = kels.find(
+        (item: SignedInteraction) => item.ked.s === sequence
+      );
+      const digestInKel = foundItem.ked.a[0];
+      return digestInKel === digest;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async waitAndGetDoneOp(
+    client: SignifyClient,
+    op: Operation,
+    timeout = 15000,
+    interval = 250
+  ): Promise<Operation> {
+    const startTime = new Date().getTime();
+    while (!op.done && new Date().getTime() < startTime + timeout) {
+      op = await client.operations().get(op.name);
+      await new Promise((resolve) => setTimeout(resolve, interval));
+    }
+    return op;
   }
 }
 
