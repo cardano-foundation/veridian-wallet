@@ -110,6 +110,19 @@ interface RemoteSignRequest {
   payload: JSONObject;
 }
 
+interface SignedInteraction {
+  ked: {
+    v: string;
+    t: string;
+    d: string;
+    i: string;
+    s: string;
+    p: string;
+    a: string[];
+  };
+  atc: string;
+}
+
 export type {
   IdentifierShortDetails,
   IdentifierDetails,
@@ -117,6 +130,7 @@ export type {
   CreateIdentifierInputs,
   CreateIdentifierResult,
   MultisigThresholds,
+  SignedInteraction,
 };
 
 export { IdentifierType };

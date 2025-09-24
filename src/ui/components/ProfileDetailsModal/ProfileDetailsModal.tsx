@@ -140,8 +140,7 @@ const useUIState = () => {
 const useConnectionLogic = (
   confirmConnection: boolean,
   scannedValue: string,
-  profileId: string | undefined,
-  profile: IdentifierDetailsCore | undefined,
+  profileAid: string | undefined,
   dispatch: any,
   setIsOpen: (isOpen: boolean) => void,
   onConnectionComplete: () => void,
@@ -157,8 +156,7 @@ const useConnectionLogic = (
       try {
         await handleConnect({
           content: scannedValue,
-          profileId,
-          profile,
+          profileAid,
           dispatch,
         });
       } finally {
@@ -243,7 +241,6 @@ const ProfileDetailsModule = ({
     confirmConnection,
     scannedValue,
     profileId,
-    profile,
     dispatch,
     setIsOpen,
     onConnectionComplete,
@@ -483,10 +480,9 @@ const ProfileDetailsModal = ({
   const handleShowConfirmation = useCallback(
     (content: string) => {
       try {
+        const { sessionAid, backendOobi, backendApi } = JSON.parse(content);
 
-        const { sessionAid, backendOobi, backendApi} = JSON.parse(content);
-
-        if (!sessionAid || !backendApi || !backendOobi){
+        if (!sessionAid || !backendApi || !backendOobi) {
           showError(
             ERROR_MESSAGES.UNSUPPORTED_TYPE,
             new Error("Missing sessionAid, backendApi and/or backendOobi"),
