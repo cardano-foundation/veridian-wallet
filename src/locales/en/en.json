@@ -1004,6 +1004,19 @@
               "accept": "Share credentials",
               "decline": "Decline"
             }
+          },
+          "credentialissuance": {
+            "title": "Issuance request",
+            "subtitle": "You have received a request to issue a credential",
+            "close": "Close",
+            "message": "{{requester}} is requesting you to issue a credential. The details of this issuance are below.",
+            "issueto": "Issue to",
+            "issuingcredential": "Issuing credential",
+            "credentialdetails": "Credential details",
+            "button": {
+              "accept": "Issue credential",
+              "decline": "Decline"
+            }
           }
         },
         "identifier": {
