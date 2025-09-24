@@ -88,7 +88,9 @@ enum ToastMsgType {
   DUPLICATE_GROUP_ID_ERROR = "duplicategroupiderror",
   GROUP_METADATA_NOT_FOUND_ERROR = "groupmetadatanotfounderror",
   CREDENTIAL_SHARE_SUCCESS = "credentialsharesuccess",
-  LOGIN_SUCCESSFUL = "loginsuccessful"
+  LOGIN_SUCCESSFUL = "loginsuccessful",
+  UNABLE_TO_ACCEPT = "unabletoaccepterror",
+  ACCEPT_SUCCESS = "acceptsuccess",
 }
 
 const PASSCODE_MAPPING = {

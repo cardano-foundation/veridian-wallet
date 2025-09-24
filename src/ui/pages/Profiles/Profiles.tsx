@@ -100,7 +100,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
       ionHistory.push(
-        profile.groupMetadata ||
+        !profile.groupMemberPre ||
           profile.creationStatus === CreationStatus.PENDING
           ? RoutePath.GROUP_PROFILE_SETUP.replace(":id", profile.id)
           : TabsRoutePath.CREDENTIALS

@@ -1,7 +1,6 @@
 import { IonLabel, IonSegment, IonSegmentButton } from "@ionic/react";
 import { repeatOutline, warningOutline } from "ionicons/icons";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import {
   CreationStatus,
@@ -11,8 +10,8 @@ import {
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
+  getCurrentProfile,
   getMultisigConnectionsCache,
-  getProfiles,
   MultiSigGroup,
   updateOrAddMultisigConnectionCache,
 } from "../../../../../store/reducers/profileCache";
@@ -38,7 +37,7 @@ import { ShareConnections } from "./ShareConnections";
 const SetupConnections = ({ setState }: StageProps) => {
   const componentId = "setup-group-profile";
   const dispatch = useAppDispatch();
-  const profiles = useAppSelector(getProfiles);
+  const profile = useAppSelector(getCurrentProfile)?.identity;
   const [oobi, setOobi] = useState("");
   const [tab, setTab] = useState<Tab>(Tab.SetupMembers);
   const [openInitGroupAlert, setOpenInitAlertGroup] = useState(false);
@@ -48,9 +47,6 @@ const SetupConnections = ({ setState }: StageProps) => {
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
   const scanRef = useRef<ScanRef>(null);
-
-  const { id: profileId } = useParams<{ id: string }>();
-  const profile = profiles[profileId]?.identity;
 
   const groupId = profile?.groupMetadata?.groupId;
   const userName = profile?.groupMetadata?.userName;
@@ -93,12 +89,14 @@ const SetupConnections = ({ setState }: StageProps) => {
       !groupId ||
       !userName ||
       !profile?.displayName ||
-      profile.creationStatus === CreationStatus.PENDING
+      profile?.creationStatus === CreationStatus.PENDING ||
+      (profile.creationStatus === CreationStatus.COMPLETE &&
+        !!profile.groupMemberPre)
     )
       return;
 
     try {
-      const oobiValue = await Agent.agent.connections.getOobi(profileId, {
+      const oobiValue = await Agent.agent.connections.getOobi(profile.id, {
         alias: userName,
         groupId: groupId,
         groupName: profile?.displayName,
@@ -113,8 +111,9 @@ const SetupConnections = ({ setState }: StageProps) => {
     groupId,
     userName,
     profile?.displayName,
-    profile.creationStatus,
-    profileId,
+    profile?.creationStatus,
+    profile?.groupMemberPre,
+    profile?.id,
     dispatch,
   ]);
 
@@ -153,13 +152,14 @@ const SetupConnections = ({ setState }: StageProps) => {
   );
 
   const handleInit = () => {
-    if (!multiSigGroup || multiSigGroup.connections.length == 0) return;
+    if (!multiSigGroup || multiSigGroup.connections.length == 0 || !profile)
+      return;
 
     setState((value) => ({
       ...value,
       scannedConections: multiSigGroup.connections,
       selectedConnections: multiSigGroup.connections,
-      ourIdentifier: profileId,
+      ourIdentifier: profile.id,
       newIdentifier: profile,
       stage: Stage.InitGroup,
     }));

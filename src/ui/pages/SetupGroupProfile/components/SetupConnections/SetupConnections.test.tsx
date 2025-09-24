@@ -285,7 +285,6 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
-            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -352,7 +351,6 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
-            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -381,7 +379,6 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
-            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -461,7 +458,6 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
-            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -515,7 +511,6 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
-            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -572,7 +567,6 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
-            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -638,7 +632,6 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
-            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -684,7 +677,6 @@ describe("Setup Connection", () => {
           <SetupConnections
             state={stage1State}
             setState={setState}
-            groupName="Test Group"
           />
         </IonReactMemoryRouter>
       </Provider>

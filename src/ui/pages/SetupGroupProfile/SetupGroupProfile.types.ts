@@ -15,8 +15,6 @@ enum Stage {
 interface StageProps {
   setState: Dispatch<SetStateAction<GroupInfomation>>;
   state: GroupInfomation;
-  groupName: string | null;
-  groupMetadata?: GroupMetadata;
 }
 
 interface GroupInfomation {

@@ -51,6 +51,7 @@ import { StorageMessage } from "../../storage/storage.types";
 import { RpyRoute } from "./connectionService.types";
 import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
+const MAX_LOOP = 1e4;
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
   static readonly CANNOT_GET_KEYSTATE_OF_IDENTIFIER =
@@ -187,6 +188,7 @@ class MultiSigService extends AgentService {
       .get(multisigId as string)) as HabState;
 
     try {
+      // @TODO: groupMetadata is only intended for the mHab - for now, it's copied to gHab so the UI has access to the group name. groupCreated is always kept as false in gHab so it does not disappear from the list of userFacing identifiers - this approach should be tidied up.
       await this.identifierStorage.createIdentifierMetadataRecord({
         id: multisigId,
         displayName: mHabRecord.displayName,
@@ -540,7 +542,10 @@ class MultiSigService extends AgentService {
           mHab,
           states,
           groupName,
-          Number(exn.e.icp.kt),
+          {
+            rotationThreshold: Number(exn.e.icp.nt),
+            signingThreshold: Number(exn.e.icp.kt),
+          },
           {
             initiator: false,
             notificationId,
@@ -819,19 +824,35 @@ class MultiSigService extends AgentService {
       .members(multisigId);
 
     // TODO: check filter
-    const exchanges = await this.props.signifyClient.exchanges().list();
+    const exchanges = [];
+    let i = 0;
 
-    if (exchanges.length === 0 || exchanges[0] === undefined) {
+    while (i < MAX_LOOP) {
+      const result = await this.props.signifyClient.exchanges().list({
+        skip: i * 25,
+        limit: (i + 1) * 25,
+      });
+
+      if (result.length === 0) break;
+
+      exchanges.push(...result);
+      i++;
+    }
+
+    const groupExchanges = exchanges.filter(
+      (exchange: { exn: { a: { gid: string }; r: string } }) => {
+        return (
+          exchange?.exn?.a?.gid === multisigId &&
+          exchange?.exn?.r === MultiSigRoute.ICP
+        );
+      }
+    );
+
+    if (groupExchanges.length === 0 || groupExchanges[0] === undefined) {
       throw new Error(
         MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
       );
     }
-
-    const groupExchanges = exchanges.filter(
-      (exchange: { exn: { a: { gid: string } } }) => {
-        return exchange.exn?.a?.gid === multisigId;
-      }
-    );
 
     const memberInfos = members.signing.map((member: { aid: string }) => {
       const hasAccepted = groupExchanges.some(
@@ -846,8 +867,8 @@ class MultiSigService extends AgentService {
 
     return {
       threshold: {
-        signingThreshold: Number(exchanges[0].exn.e.icp.kt),
-        rotationThreshold: Number(exchanges[0].exn.e.icp.nt),
+        signingThreshold: Number(groupExchanges[0].exn.e.icp.kt),
+        rotationThreshold: Number(groupExchanges[0].exn.e.icp.nt),
       },
       members: memberInfos,
     };

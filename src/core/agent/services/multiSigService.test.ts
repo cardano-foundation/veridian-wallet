@@ -935,7 +935,7 @@ describe("Creation of multi-sig", () => {
         algo: "group",
         mhab: getMemberIdentifierResponse,
         isith: 2, // Signing threshold
-        nsith: 2, // In joinGroup test it uses kt only (line 521 in multiSigService.ts)
+        nsith: 3, // In joinGroup test it uses kt only (line 521 in multiSigService.ts)
         toad: 4,
         wits: [
           "BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha",
@@ -1723,10 +1723,11 @@ describe("getInceptionStatus", () => {
       ],
     });
 
-    listExchangesMock.mockResolvedValue([
+    const listResult = [
       {
         exn: {
           i: "member1",
+          r: NotificationRoute.MultiSigIcp,
           e: {
             icp: {
               kt: "4",
@@ -1741,12 +1742,17 @@ describe("getInceptionStatus", () => {
       {
         exn: {
           i: "member3",
+          r: NotificationRoute.MultiSigIcp,
           a: {
             gid: MULTISIG_ID,
           },
         },
       },
-    ]);
+    ];
+
+    listExchangesMock.mockImplementation(({ skip, limit }) => {
+      return listResult.slice(skip, limit);
+    });
 
     const result = await multiSigService.getInceptionStatus(MULTISIG_ID);
 

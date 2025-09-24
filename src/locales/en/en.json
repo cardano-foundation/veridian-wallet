@@ -761,7 +761,7 @@
         "about": "About",
         "credentialdetails": "Credential details",
         "description": "Description",
-        "relatedidentifier": "Related identifier",
+        "relatedprofile": "Related profile",
         "id": "ID",
         "modal": {
           "about": "About {{ type }}"
@@ -990,7 +990,7 @@
             "credentialdetailbutton": "Credential details",
             "members": "Group members",
             "revokedalert": "This credential has been revoked by the issuer and is no longer available.",
-            "relatedidentifier": "Related identifier",
+            "relatedprofile": "Related profile",
             "initiatoracceptedalert": "Your group is receiving a credential. Once the group initiator accepts it, you’ll be able to accept yours too.",
             "alert": {
               "textdecline": "Are you sure you want to decline this credential issuance? You won't be able to change your decision later."
@@ -1240,8 +1240,21 @@
     },
     "pending": {
       "groupinfor": "Group information",
+      "request": "Request from",
       "alert": {
-        "initiatortext": "This group profile is pending. Once the threshold of members have accepted this profile will be usable."
+        "initiatortext": "This group profile is pending. Once the threshold of members have accepted this profile will be usable.",
+        "membertext": "This group’s initiator has triggered the creation. Please, check all information below and choose whether to accept or decline."
+      },
+      "button": {
+        "accept": "Accept",
+        "decline": "Decline"
+      },
+      "decline": {
+        "alert": {
+          "title": "Are you sure you want to decline this request? You won't be able to change your decision later.",
+          "confirm": "Decline",
+          "cancel": "Cancel"
+        }
       },
       "leave": {
         "button": "Leave group",
@@ -1445,7 +1458,9 @@
     "duplicategroupiderror": "Group already exists",
     "groupmetadatanotfounderror": "Group metadata is missing. Please try again.",
     "credentialsharesuccess": "Shared successfully.",
-    "loginsuccessful": "Login successful"
+    "loginsuccessful": "Login successful",
+    "unabletoaccepterror": "Unable to accept",
+    "acceptsuccess": "Accepted Successfully"
   },
   "request": {
     "sign": {
