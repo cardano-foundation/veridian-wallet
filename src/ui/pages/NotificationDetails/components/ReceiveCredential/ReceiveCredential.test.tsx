@@ -69,7 +69,7 @@ jest.mock("../../../../hooks/useBiometricsHook", () => ({
     biometricInfo: {
       isAvailable: true,
       hasCredentials: false,
-      biometryType: BiometryType.FINGERPRINT
+      biometryType: BiometryType.FINGERPRINT,
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
     setBiometricsIsEnabled: jest.fn(),
@@ -331,80 +331,6 @@ describe("Receive credential", () => {
       ).toBeVisible();
     });
   });
-
-  test("Open identifier details", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.NOTIFICATIONS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-        },
-        toastMsgs: [],
-        profileHistories: [],
-        isOnline: true,
-      },
-      profilesCache: {
-        ...profileCacheFixData,
-        profiles: {
-          ...profileCacheFixData.profiles,
-          ...(profileCacheFixData.defaultProfile
-            ? {
-                [profileCacheFixData.defaultProfile as string]: {
-                  ...profileCacheFixData.profiles[
-                    profileCacheFixData.defaultProfile as string
-                  ],
-                  connections: connectionsForNotificationsValues,
-                },
-              }
-            : {}),
-        },
-      },
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const backMock = jest.fn();
-    const { getAllByText, getByTestId, getByText, queryByTestId } = render(
-      <Provider store={storeMocked}>
-        <ReceiveCredential
-          pageId="creadential-request"
-          activeStatus
-          handleBack={backMock}
-          notificationDetails={notificationsFix[0]}
-        />
-      </Provider>
-    );
-
-    expect(
-      getAllByText(
-        EN_TRANSLATIONS.tabs.notifications.details.credential.receive.title
-      )[0]
-    ).toBeVisible();
-
-    await waitFor(() => {
-      expect(getByText("Profess")).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("related-identifier-detail"));
-
-    await waitFor(() => {
-      expect(getByTestId("profile-details-page")).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("back-button"));
-
-    await waitFor(() => {
-      expect(queryByTestId("profile-details-page")).toBeNull();
-    });
-  }, 10000);
 
   test("Show error when cred open", async () => {
     const storeMocked = {

@@ -92,7 +92,6 @@ describe("Init group", () => {
         <InitializeGroup
           state={state}
           setState={jest.fn}
-          groupName={state.displayNameValue}
         />
       </Provider>
     );
@@ -131,7 +130,6 @@ describe("Init group", () => {
         <InitializeGroup
           state={state}
           setState={setStateMock}
-          groupName={state.displayNameValue}
         />
       </Provider>
     );
@@ -182,7 +180,6 @@ describe("Init group", () => {
             },
           }}
           setState={jest.fn}
-          groupName={state.displayNameValue}
         />
       </Provider>
     );

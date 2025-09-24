@@ -26,7 +26,6 @@ import {
 import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert, Alert as AlertDecline } from "../../../../components/Alert";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
-import { CardTheme } from "../../../../components/CardTheme";
 import { CredentialDetailModal } from "../../../../components/CredentialDetailModule";
 import {
   MemberAcceptStatus,
@@ -50,6 +49,7 @@ import { combineClassNames } from "../../../../utils/style";
 import { getTheme } from "../../../../utils/theme";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./ReceiveCredential.scss";
+import { Avatar } from "../../../../components/Avatar";
 
 const ANIMATION_DELAY = 2600;
 
@@ -465,34 +465,26 @@ const ReceiveCredential = ({
             </CardDetailsBlock>
           )}
           {profile && (
-            <CardDetailsBlock
-              className="related-identifiers"
-              title={i18n.t(
-                "tabs.notifications.details.credential.receive.relatedidentifier"
-              )}
-            >
+            <CardDetailsBlock className="related-identifiers">
+              <IonItem
+                lines="none"
+                className="related-identifier-label"
+              >
+                <IonText>
+                  {i18n.t(
+                    "tabs.notifications.details.credential.receive.relatedprofile"
+                  )}
+                </IonText>
+              </IonItem>
               <IonItem
                 lines="none"
                 className="related-identifier"
-                onClick={() => setOpenIdentifierDetail(true)}
                 data-testid="related-identifier-detail"
               >
-                <div
-                  slot="start"
-                  className="theme"
-                >
-                  <CardTheme {...theme} />
-                </div>
-                <IonText
-                  slot="start"
-                  className="identifier-name"
-                >
+                <Avatar id={profile.identity.id} />
+                <IonText className="identifier-name">
                   {profile.identity.displayName}
                 </IonText>
-                <IonIcon
-                  slot="end"
-                  icon={informationCircleOutline}
-                />
               </IonItem>
             </CardDetailsBlock>
           )}
