@@ -2,7 +2,7 @@ import { i18n } from "../../../../../i18n";
 import { ResponsivePageLayout } from "../../../layout/ResponsivePageLayout";
 import { PageFooter } from "../../../PageFooter";
 import { PageHeader } from "../../../PageHeader";
-import CitizenPortal from "./citizen-portal.svg";
+import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
 import "./IncomingRequest.scss";
 import { IncomingRequestProps } from "./IncomingRequest.types";
 
