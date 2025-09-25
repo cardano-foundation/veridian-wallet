@@ -812,7 +812,7 @@ describe("Group profile details page", () => {
     ).toBeVisible();
 
     await waitFor(() => {
-      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
       getAllByText(identifierFix[2].displayName).forEach((item) => {
         expect(item).toBeVisible();
       });
@@ -861,7 +861,7 @@ describe("Group profile details page", () => {
     ).toBeVisible();
 
     await waitFor(() => {
-      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
       getAllByText(identifierFix[2].displayName).forEach((item) => {
         expect(item).toBeVisible();
       });
@@ -907,7 +907,7 @@ describe("Group profile details page", () => {
     ).toBeVisible();
 
     await waitFor(() => {
-      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
       getAllByText(identifierFix[2].displayName).forEach((item) => {
         expect(item).toBeVisible();
       });
@@ -951,7 +951,7 @@ describe("Group profile details page", () => {
     ).toBeVisible();
 
     await waitFor(() => {
-      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
       getAllByText(identifierFix[2].displayName).forEach((item) => {
         expect(item).toBeVisible();
       });
@@ -1060,7 +1060,7 @@ describe("Group profile details page", () => {
     ).toBeVisible();
 
     await waitFor(() => {
-      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
       getAllByText(identifierFix[2].displayName).forEach((item) => {
         expect(item).toBeVisible();
       });
@@ -1106,7 +1106,7 @@ describe("Group profile details page", () => {
     ).toBeVisible();
 
     await waitFor(() => {
-      expect(getAllByText(identifierFix[2].displayName).length).toBe(2);
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
       getAllByText(identifierFix[2].displayName).forEach((item) => {
         expect(item).toBeVisible();
       });

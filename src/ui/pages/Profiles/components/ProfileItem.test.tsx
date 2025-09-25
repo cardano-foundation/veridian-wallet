@@ -2,7 +2,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { CreationStatus } from "../../../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../../../core/agent/services/identifier.types";
-import { KeriaNotification } from "../../../../core/agent/services/keriaNotificationService.types";
+import {
+  KeriaNotification,
+  NotificationRoute,
+} from "../../../../core/agent/services/keriaNotificationService.types";
 import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { ProfileItem } from "./ProfileItem";
@@ -35,17 +38,34 @@ const mockNotifications: KeriaNotification[] = [
     id: "notification-1",
     receivingPre: "test-profile-id",
     read: false,
-  } as KeriaNotification,
+    a: {
+      r: NotificationRoute.MultiSigIcp,
+    },
+  } as unknown as KeriaNotification,
+  {
+    id: "notification-4",
+    receivingPre: "test-profile-id",
+    read: false,
+    a: {
+      r: NotificationRoute.MultiSigExn,
+    },
+  } as unknown as KeriaNotification,
   {
     id: "notification-2",
     receivingPre: "test-profile-id",
     read: true,
-  } as KeriaNotification,
+    a: {
+      r: NotificationRoute.MultiSigExn,
+    },
+  } as unknown as KeriaNotification,
   {
     id: "notification-3",
     receivingPre: "other-profile-id",
     read: false,
-  } as KeriaNotification,
+    a: {
+      r: NotificationRoute.MultiSigExn,
+    },
+  } as unknown as KeriaNotification,
 ];
 
 const initialState = {
@@ -94,6 +114,12 @@ describe("ProfileItem", () => {
     const pendingIdentifier = {
       ...mockIdentifier,
       creationStatus: CreationStatus.PENDING,
+      groupMetadata: {
+        groupId: "id",
+        groupInitiator: true,
+        groupCreated: false,
+        userName: "initiator",
+      },
     };
     const onClickMock = jest.fn();
 
@@ -107,13 +133,63 @@ describe("ProfileItem", () => {
     );
 
     expect(
-      screen.getByTestId("profiles-list-item-test-profile-id-status")
+      screen.getByTestId("profiles-list-item-pending-test-profile-id-status")
     ).toBeInTheDocument();
     expect(screen.getByText("pending")).toBeInTheDocument();
   });
 
+  test("displays action required chip", () => {
+    const pendingIdentifier = {
+      ...mockIdentifier,
+      creationStatus: CreationStatus.COMPLETE,
+      groupMetadata: {
+        groupId: "id",
+        groupInitiator: true,
+        groupCreated: false,
+        userName: "initiator",
+      },
+    };
+    const onClickMock = jest.fn();
+
+    render(
+      <Provider store={storeMocked}>
+        <ProfileItem
+          identifier={pendingIdentifier}
+          onClick={onClickMock}
+        />
+      </Provider>
+    );
+
+    expect(
+      screen.getByTestId("profiles-list-item-action-test-profile-id-status")
+    ).toBeInTheDocument();
+    expect(screen.getByText("Action required")).toBeInTheDocument();
+  });
+
   test("does not display pending status chip when creationStatus is not PENDING", () => {
     const onClickMock = jest.fn();
+
+    const initialState = {
+      profilesCache: {
+        ...profileCacheFixData,
+        profiles: {
+          ...profileCacheFixData.profiles,
+          "test-profile-id": {
+            identity: mockIdentifier,
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: mockNotifications.filter(
+              (n) => n.receivingPre === "test-profile-id"
+            ),
+          },
+        },
+      },
+    };
+
+    const storeMocked = makeTestStore(initialState);
 
     render(
       <Provider store={storeMocked}>
@@ -125,7 +201,7 @@ describe("ProfileItem", () => {
     );
 
     expect(
-      screen.queryByTestId("profiles-list-item-test-profile-id-status")
+      screen.queryByTestId("profiles-list-item-pending-test-profile-id-status")
     ).not.toBeInTheDocument();
   });
 

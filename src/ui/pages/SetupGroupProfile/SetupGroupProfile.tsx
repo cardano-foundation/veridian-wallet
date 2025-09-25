@@ -103,6 +103,7 @@ const SetupGroupProfile = () => {
     <CurrentStage
       state={state}
       setState={setState}
+      isPendingGroup={!!isPendingState}
     />
   );
 };
