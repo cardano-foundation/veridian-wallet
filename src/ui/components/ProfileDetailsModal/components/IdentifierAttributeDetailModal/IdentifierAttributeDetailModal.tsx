@@ -22,6 +22,7 @@ const IdentifierAttributeDetailModal = ({
   view,
   data,
   setViewType,
+  openEdit,
 }: IdentifierAttributeDetailModalProps) => {
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
 
@@ -80,6 +81,7 @@ const IdentifierAttributeDetailModal = ({
             )}`}
             title={`${i18n.t(`profiledetails.detailsmodal.${view}.title`)}`}
             data={members || []}
+            onButtonClick={openEdit}
             mask
           />
         );

@@ -59,6 +59,28 @@
     }
   }
 
+  .edit-username-button-container {
+    margin-bottom: 0.25rem !important;
+  }
+
+  .edit-username-button {
+    width: 100%;
+    --background: transparent;
+    --box-shadow: none;
+    margin: 0;
+    --background-activated: transparent;
+    min-height: auto;
+
+    p {
+      margin: 0 0.25rem 0 0;
+    }
+
+    p,
+    ion-icon {
+      color: var(--ion-color-primary-700);
+    }
+  }
+
   .list-item {
     ion-item {
       display: flex;

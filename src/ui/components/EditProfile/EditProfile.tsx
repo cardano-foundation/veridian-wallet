@@ -5,12 +5,15 @@ import { useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import {
+  addOrUpdateProfileIdentity,
+  getProfiles,
+} from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { DISPLAY_NAME_LENGTH } from "../../globals/constants";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
-import { createThemeValue, getTheme } from "../../utils/theme";
 import { CustomInput } from "../CustomInput";
 import { ErrorMessage } from "../ErrorMessage";
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
@@ -18,10 +21,6 @@ import { PageFooter } from "../PageFooter";
 import { PageHeader } from "../PageHeader";
 import "./EditProfile.scss";
 import { EditProfileProps } from "./EditProfile.types";
-import {
-  addOrUpdateProfileIdentity,
-  getProfiles,
-} from "../../../store/reducers/profileCache";
 
 const IDENTIFIER_NOT_EXIST = "Identifier not existed. id: ";
 const DUPLICATE_NAME = "Identifier name is a duplicate";
@@ -33,12 +32,15 @@ const EditProfile = ({
   setCardData,
 }: EditProfileProps) => {
   const pageId = "edit-identifier";
+  const isGroup = !!cardData.groupMemberPre;
   const dispatch = useAppDispatch();
   const profiles = useAppSelector(getProfiles);
+  const currentIdentifier = profiles[cardData.id];
   const [isLoading, setLoading] = useState(false);
-  const [newDisplayName, setNewDisplayName] = useState(cardData.displayName);
-  const [newSelectedTheme, setNewSelectedTheme] = useState(0);
-  const [newSelectedColor, setNewSelectedColor] = useState(0);
+
+  const [newDisplayName, setNewDisplayName] = useState(
+    isGroup ? cardData.groupMetadata?.userName || "" : cardData.displayName
+  );
   const [keyboardIsOpen, setKeyboardIsOpen] = useState(false);
 
   const [duplicateName, setDuplicateName] = useState(false);
@@ -69,19 +71,13 @@ const EditProfile = ({
   const verifyDisplayName =
     newDisplayName.length > 0 &&
     newDisplayName.length <= DISPLAY_NAME_LENGTH &&
-    (newDisplayName.trim() !== cardData.displayName.trim() ||
-      createThemeValue(newSelectedColor, newSelectedTheme) !== cardData.theme);
+    newDisplayName.trim() !== cardData.displayName.trim();
 
   useEffect(() => {
-    setNewDisplayName(cardData.displayName);
-  }, [cardData.displayName]);
-
-  useEffect(() => {
-    const theme = getTheme(cardData.theme);
-
-    setNewSelectedColor(Number(theme.color));
-    setNewSelectedTheme(Number(theme.layout));
-  }, [cardData.theme]);
+    setNewDisplayName(
+      isGroup ? cardData.groupMetadata?.userName || "" : cardData.displayName
+    );
+  }, [isGroup, cardData.displayName, cardData.groupMetadata?.userName]);
 
   const handleSubmit = async () => {
     try {
@@ -95,27 +91,30 @@ const EditProfile = ({
       }
 
       setLoading(true);
-      const currentIdentifier = profiles[cardData.id];
 
       if (!currentIdentifier) {
         throw new Error(`${IDENTIFIER_NOT_EXIST} ${cardData.id}`);
       }
 
-      const theme = Number(`${newSelectedColor}${newSelectedTheme}`);
       const updatedIdentifier = {
         ...currentIdentifier.identity,
         displayName: newDisplayName,
-        theme,
       };
-      await Agent.agent.identifiers.updateIdentifier(cardData.id, {
-        displayName: newDisplayName,
-        theme,
-      });
+
+      if (isGroup) {
+        // TODO: Update member user name
+      } else {
+        await Agent.agent.identifiers.updateIdentifier(cardData.id, {
+          displayName: newDisplayName,
+          theme: currentIdentifier.identity.theme,
+        });
+      }
+
       setCardData({
         ...cardData,
         displayName: newDisplayName,
-        theme,
       });
+
       handleCancel();
       dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_UPDATED));
@@ -177,7 +176,11 @@ const EditProfile = ({
         <div className={`indentifier-input${hasError ? " has-error" : ""}`}>
           <CustomInput
             dataTestId="edit-name-input"
-            title={`${i18n.t("profiledetails.options.inner.label")}`}
+            title={`${
+              isGroup
+                ? i18n.t("profiledetails.options.inner.usernamelabel")
+                : i18n.t("profiledetails.options.inner.label")
+            }`}
             hiddenInput={false}
             autofocus={true}
             onChangeInput={handleChangeName}

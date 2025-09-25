@@ -95,6 +95,10 @@
 
     .list-card {
       margin: 1.5rem 0;
+
+      &.show-advance {
+        margin-top: 0.75rem;
+      }
     }
 
     .card-block {
@@ -240,6 +244,10 @@
       --background-hover: var(--ion-color-neutral-300);
       --box-shadow: none;
 
+      &.full-width {
+        width: 100%;
+      }
+
       span {
         font-size: 1rem;
         line-height: 1.5rem;
@@ -258,7 +266,8 @@
     }
   }
 
-  .rotate-keys-button {
+  .rotate-keys-button,
+  .edit-username-button {
     width: 100%;
     --background: transparent;
     --box-shadow: none;
