@@ -15,6 +15,7 @@ enum Stage {
 interface StageProps {
   setState: Dispatch<SetStateAction<GroupInfomation>>;
   state: GroupInfomation;
+  isPendingGroup?: boolean;
 }
 
 interface GroupInfomation {

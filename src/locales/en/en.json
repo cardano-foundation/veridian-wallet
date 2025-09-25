@@ -1004,6 +1004,26 @@
               "accept": "Share credentials",
               "decline": "Decline"
             }
+          },
+          "credentialissuance": {
+            "title": "Issuance request",
+            "subtitle": "You have received a request to issue a credential",
+            "close": "Close",
+            "message": "{{requester}} is requesting you to issue a credential. The details of this issuance are below.",
+            "issueto": "Issue to",
+            "issuingcredential": "Issuing credential",
+            "credentialdetails": {
+              "title": "Credential details",
+              "name": "Name:",
+              "email": "Email:",
+              "dob": "D.O.B.:",
+              "agerange": "Conversation age range:",
+              "curfew": "Curfew hours:"
+            },
+            "button": {
+              "accept": "Issue credential",
+              "decline": "Decline"
+            }
           }
         },
         "identifier": {
@@ -1641,6 +1661,7 @@
   "profiles": {
     "title": "Profiles",
     "cancel": "Cancel",
+    "actionrequired": "Action required",
     "options": {
       "manage": "Manage profile",
       "add": "Add profile",

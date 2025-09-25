@@ -2,6 +2,15 @@
   &.scrollable-page-layout {
     .page-header {
       padding: 1rem 0;
+
+      &.md {
+        padding-bottom: 0;
+
+        .toolbar-title-default {
+          padding-top: 0;
+        }
+      }
+
       ion-title {
         text-align: left;
       }
@@ -151,6 +160,10 @@
 
     .page-footer {
       padding-bottom: 1.5rem;
+
+      @media screen and (min-width: 250px) and (max-width: 370px) {
+        padding-bottom: 1.15rem;
+      }
     }
 
     &.setup-members {

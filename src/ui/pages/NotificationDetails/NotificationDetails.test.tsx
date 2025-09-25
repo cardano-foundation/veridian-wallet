@@ -34,6 +34,14 @@ jest.mock("../../../core/agent/agent", () => ({
         getIpexApplyDetails: jest.fn(() => Promise.resolve(credRequestFix)),
         getAcdcFromIpexGrant: jest.fn(() => Promise.resolve(credsFixAcdc[0])),
         getLinkedGroupFromIpexApply: jest.fn(),
+        getLinkedGroupFromIpexGrant: jest.fn(() =>
+          Promise.resolve({
+            threshold: { main: 2, total: 3 },
+            members: ["member1", "member2", "member3"],
+            othersJoined: ["member1"],
+            linkedRequest: {},
+          })
+        ),
       },
     },
   },
@@ -161,8 +169,8 @@ describe("Notification Detail", () => {
     };
 
     const history = createMemoryHistory();
-    const path = `${TabsRoutePath.NOTIFICATIONS}/${notificationsFix[6].id}`;
-    history.push(path, notificationsFix[6]);
+    const path = `${TabsRoutePath.NOTIFICATIONS}/${notificationsFix[0].id}`;
+    history.push(path, notificationsFix[0]);
 
     const { getByTestId } = render(
       <IonReactMemoryRouter

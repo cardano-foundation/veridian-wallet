@@ -36,6 +36,19 @@
       }
     }
 
+    .citizen-portal-logo-container {
+      width: var(--card-width);
+      height: var(--card-height);
+      border-radius: var(--card-height);
+      background-color: var(--ion-color-primary-700);
+
+      & > img {
+        width: calc(var(--card-width) * 0.8);
+        height: calc(var(--card-height) * 0.8);
+        margin: 10%;
+      }
+    }
+
     .card-info {
       flex: 1;
       overflow: hidden;

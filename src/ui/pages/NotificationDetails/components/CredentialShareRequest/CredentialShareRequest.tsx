@@ -1,6 +1,4 @@
-import { IonIcon } from "@ionic/react";
 import { useEffect, useState } from "react";
-import { personCircleOutline } from "ionicons/icons";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";

@@ -48,9 +48,16 @@ const getNextRootRoute = (data: DataProps) => {
     data.store.stateCache.routes[0]?.path !== RoutePath.PROFILE_SETUP
   ) {
     // If group is in setup phrase or status of group is pending (waiting other member approve it), show group detail page
+
+    const profile = currentProfile.identity;
+    const isGroupProfile = !!(profile.groupMemberPre || profile.groupMetadata);
+
+    const isCreatedGroup =
+      profile.groupMemberPre &&
+      profile.creationStatus === CreationStatus.COMPLETE;
+
     path =
-      currentProfile.identity.groupMetadata ||
-      currentProfile.identity.creationStatus === CreationStatus.PENDING
+      isGroupProfile && !isCreatedGroup
         ? RoutePath.GROUP_PROFILE_SETUP.replace(
             ":id",
             currentProfile.identity.id
