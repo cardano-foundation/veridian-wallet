@@ -108,6 +108,15 @@
         text-transform: capitalize;
         margin-left: 0.31rem;
       }
+
+      &.action-needed {
+        color: var(--ion-color-warning-800);
+        background: rgba(var(--ion-color-warning-800-rgb), 0.1);
+
+        ion-icon {
+          color: var(--ion-color-warning-800) !important;
+        }
+      }
     }
 
     @media screen and (min-width: 250px) and (max-width: 374px) {

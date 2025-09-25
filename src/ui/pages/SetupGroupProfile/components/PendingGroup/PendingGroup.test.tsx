@@ -335,6 +335,7 @@ describe("Pending group", () => {
             <PendingGroup
               state={stage1State}
               setState={setState}
+              isPendingGroup={true}
             />
           </IonReactMemoryRouter>
         </Provider>
@@ -394,6 +395,7 @@ describe("Pending group", () => {
             <PendingGroup
               state={stage1State}
               setState={setState}
+              isPendingGroup
             />
           </IonReactMemoryRouter>
         </Provider>
@@ -448,6 +450,7 @@ describe("Pending group", () => {
             <PendingGroup
               state={stage1State}
               setState={setState}
+              isPendingGroup
             />
           </IonReactMemoryRouter>
         </Provider>
@@ -500,6 +503,7 @@ describe("Pending group", () => {
             <PendingGroup
               state={stage1State}
               setState={setState}
+              isPendingGroup
             />
           </IonReactMemoryRouter>
         </Provider>

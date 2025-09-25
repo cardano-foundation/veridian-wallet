@@ -41,9 +41,8 @@ import { combineClassNames } from "../../../../utils/style";
 import { Profiles } from "../../../Profiles";
 import { StageProps } from "../../SetupGroupProfile.types";
 import "./PendingGroup.scss";
-import { CreationStatus } from "../../../../../core/agent/agent.types";
 
-const PendingGroup = ({ state }: StageProps) => {
+const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const componentId = "pending-group";
   const [openProfiles, setOpenProfiles] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
@@ -197,12 +196,7 @@ const PendingGroup = ({ state }: StageProps) => {
   }, [initGroupNotification]);
 
   const fetchGroupDetails = useCallback(async () => {
-    if (
-      !identity?.groupMetadata ||
-      (identity?.groupMemberPre &&
-        identity.creationStatus === CreationStatus.COMPLETE)
-    )
-      return;
+    if (!isPendingGroup) return;
 
     if (isPendingMember) {
       await fetchMultisigDetails();
@@ -213,9 +207,7 @@ const PendingGroup = ({ state }: StageProps) => {
   }, [
     fetchMultisigDetails,
     getInceptionStatus,
-    identity?.creationStatus,
-    identity?.groupMemberPre,
-    identity?.groupMetadata,
+    isPendingGroup,
     isPendingMember,
   ]);
 

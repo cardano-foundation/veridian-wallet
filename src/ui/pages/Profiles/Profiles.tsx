@@ -99,11 +99,19 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       await updateDefaultProfile(profile.id);
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
+
+      const isGroupProfile = !!(
+        profile.groupMemberPre || profile.groupMetadata
+      );
+
+      const isCreatedGroup =
+        profile.groupMemberPre &&
+        profile.creationStatus === CreationStatus.COMPLETE;
+
       ionHistory.push(
-        !profile.groupMemberPre ||
-          profile.creationStatus === CreationStatus.PENDING
-          ? RoutePath.GROUP_PROFILE_SETUP.replace(":id", profile.id)
-          : TabsRoutePath.CREDENTIALS
+        !isGroupProfile || isCreatedGroup
+          ? TabsRoutePath.CREDENTIALS
+          : RoutePath.GROUP_PROFILE_SETUP.replace(":id", profile.id)
       );
     } catch (e) {
       showError(
@@ -121,6 +129,19 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       setOpenSetupProfile(true);
     }
   }, [defaultProfile, profileList.length]);
+
+  const isDisableManageProfile = () => {
+    const isGroupProfile = !!(
+      defaultProfile?.identity.groupMemberPre ||
+      defaultProfile?.identity.groupMetadata
+    );
+
+    const isCreatedGroup =
+      defaultProfile?.identity.groupMemberPre &&
+      defaultProfile?.identity.creationStatus === CreationStatus.COMPLETE;
+
+    return isGroupProfile && !isCreatedGroup;
+  };
 
   return (
     <>
@@ -154,10 +175,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
               icon={personCircleOutline}
               text={`${i18n.t("profiles.options.manage")}`}
               action={handleOpenProfile}
-              disabled={
-                defaultProfile?.identity?.creationStatus ===
-                CreationStatus.PENDING
-              }
+              disabled={isDisableManageProfile()}
             />
           </div>
           <div className="profiles-list">

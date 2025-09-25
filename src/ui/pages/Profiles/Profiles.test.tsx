@@ -57,10 +57,6 @@ const initialState = {
       credentials: [],
       archivedCredentials: [],
     },
-    profileHistories: [],
-  },
-  identifiersCache: {
-    identifiers: filteredIdentifierFix,
   },
   profilesCache: profileCacheFixData,
   biometricsCache: {
@@ -183,7 +179,8 @@ describe("Profiles", () => {
   test("shows IonChip for identifier with creationStatus PENDING", async () => {
     const setIsOpenMock = jest.fn();
     const pendingIdentifier = filteredIdentifierFix.find(
-      (idObj) => idObj.creationStatus === CreationStatus.PENDING
+      (idObj) =>
+        idObj.creationStatus === CreationStatus.PENDING && !!idObj.groupMetadata
     );
     if (!pendingIdentifier) {
       throw new Error(
@@ -201,12 +198,42 @@ describe("Profiles", () => {
     );
 
     const chip = await waitFor(() =>
-      getByTestId(`profiles-list-item-${pendingIdentifier.id}-status`)
+      getByTestId(`profiles-list-item-pending-${pendingIdentifier.id}-status`)
     );
     expect(chip).toBeVisible();
     expect(chip.textContent?.toLowerCase()).toContain(
       CreationStatus.PENDING.toLowerCase()
     );
+  });
+
+  test("shows IonChip for identifier with creationStatus ACTION", async () => {
+    const setIsOpenMock = jest.fn();
+    const pendingIdentifier = filteredIdentifierFix.find(
+      (idObj) =>
+        idObj.creationStatus === CreationStatus.COMPLETE &&
+        !!idObj.groupMetadata &&
+        !idObj.groupMemberPre
+    );
+    if (!pendingIdentifier) {
+      throw new Error(
+        "No identifier with creationStatus ACTION found in fixture"
+      );
+    }
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <Profiles
+          isOpen
+          setIsOpen={setIsOpenMock}
+        />
+      </Provider>
+    );
+
+    const chip = await waitFor(() =>
+      getByTestId(`profiles-list-item-action-${pendingIdentifier.id}-status`)
+    );
+    expect(chip).toBeVisible();
+    expect(chip.textContent).toContain(EN_TRANSLATIONS.profiles.actionrequired);
   });
 
   test("handleAddProfile opens ProfileSetup in normal mode", async () => {

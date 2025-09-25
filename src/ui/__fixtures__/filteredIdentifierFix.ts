@@ -27,7 +27,7 @@ const multisignIdentifierFix: IdentifierShortDetails[] = [
     groupMetadata: {
       groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
       groupCreated: false,
-      groupInitiator: false,
+      groupInitiator: true,
       userName: "test",
     },
   },
@@ -50,12 +50,18 @@ const pendingMemberIdentifierFix: IdentifierShortDetails[] = [
 ];
 
 const pendingGroupIdentifierFix: IdentifierShortDetails = {
-  id: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPyi",
+  id: "ECHG-cxboMQ78Hwlm2-w6OS3iU275bAKkqC1LjwICPy2",
   displayName: "Test MS",
   createdAtUTC: "2024-03-07T11:54:56.886Z",
   theme: 0,
   creationStatus: CreationStatus.PENDING,
   groupMemberPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
+  groupMetadata: {
+    groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
+    groupCreated: false,
+    groupInitiator: false,
+    userName: "test",
+  },
 };
 
 const filteredIdentifierFix: IdentifierShortDetails[] = [
