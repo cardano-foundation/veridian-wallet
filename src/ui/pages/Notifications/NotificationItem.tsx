@@ -7,9 +7,8 @@ import {
   idCardOutline,
   personCircleOutline,
 } from "ionicons/icons";
-import { MouseEvent } from "react";
+import { MouseEvent, useState, useEffect } from "react";
 import { Trans } from "react-i18next";
-import CitizenPortal from "../../assets/images/citizen-portal.svg";
 import {
   KeriaNotification,
   NotificationRoute,
@@ -22,6 +21,7 @@ import {
 import { FallbackIcon } from "../../components/FallbackIcon";
 import { timeDifference } from "../../utils/formatters";
 import { NotificationItemProps } from "./Notification.types";
+import { Agent } from "../../../core/agent/agent";
 
 const NotificationItem = ({
   item,
@@ -29,21 +29,51 @@ const NotificationItem = ({
   onOptionButtonClick,
 }: NotificationItemProps) => {
   const connectionsCache = useAppSelector(getConnectionsCache);
-  const multisigConnectionsCache = useAppSelector(getMultisigConnectionsCache);
-  const connection = connectionsCache?.find((c) => c.id === item.connectionId);
-  const connectionName = connection?.label;
+  const multisigConnectionsCache = useAppSelector(
+    getMultisigConnectionsCache
+  ) as any[];
+
+  const connection = connectionsCache?.find(
+    (c) => c.id === item.connectionId
+  );
+
+  const unknownConnection = t("tabs.connections.unknown") ?? "Unknown";
+
+  const initialConnectionName = connection?.label || unknownConnection;
+
+  // Used for the one way scanning in the login process where we dont create a contact
+  const [connectionName, setConnectionName] = useState<string>(initialConnectionName);
+
+  useEffect(() => {
+    if (initialConnectionName === "Unknown") {
+      const fetchConnection = async () => {
+        try {
+          // Get the contact created on the way scanning for login
+          const fetchedConnection = await Agent.agent.connections.getConnectionById(
+            item.connectionId
+          );
+          setConnectionName(
+            fetchedConnection.label || unknownConnection
+          );
+        } catch (error) {
+          setConnectionName(unknownConnection);
+        }
+      };
+      fetchConnection();
+    }
+  }, [item.connectionId, connection?.label]);
 
   const notificationLabelText = (() => {
     switch (item.a.r) {
       case NotificationRoute.ExnIpexGrant:
         return t("tabs.notifications.tab.labels.exnipexgrant", {
-          connection: connectionName || t("tabs.connections.unknown"),
+          connection: connectionName,
         });
       case NotificationRoute.MultiSigIcp:
         return t("tabs.notifications.tab.labels.multisigicp", {
           connection:
             multisigConnectionsCache?.find((c) => c.id === item.connectionId)
-              ?.label || t("tabs.connections.unknown"),
+              ?.label || unknownConnection,
         });
       case NotificationRoute.ExnIpexApply: {
         if (
@@ -54,16 +84,16 @@ const NotificationItem = ({
           const initiator = item.groupInitiatorPre
             ? multisigConnectionsCache.find(
                 (c) => c.id === item.groupInitiatorPre
-              )?.label || t("tabs.connections.unknown")
-            : t("tabs.connections.unknown");
+              )?.label || unknownConnection
+            : unknownConnection;
           return t("tabs.notifications.tab.labels.exnipexapplyproposed", {
-            connection: connectionName || t("tabs.connections.unknown"),
+            connection: connectionName,
             initiator,
           });
         }
 
         return t("tabs.notifications.tab.labels.exnipexapply", {
-          connection: connectionName || t("tabs.connections.unknown"),
+          connection: connectionName,
         });
       }
       case NotificationRoute.LocalAcdcRevoked:
@@ -72,21 +102,21 @@ const NotificationItem = ({
         });
       case NotificationRoute.MultiSigExn:
         return t("tabs.notifications.tab.labels.multisigexn", {
-          connection: connectionName || t("tabs.connections.unknown"),
+          connection: connectionName,
         });
       case NotificationRoute.RemoteSignReq:
         return t("tabs.notifications.tab.labels.sign", {
-          connection: connectionName || t("tabs.connections.unknown"),
+          connection: connectionName,
         });
       case NotificationRoute.ExnCoordinationCredentialsInfoReq:
         return t("tabs.notifications.tab.labels.share", {
-          connection: connectionName || t("tabs.connections.unknown"),
+          connection: connectionName,
         });
       case NotificationRoute.HumanReadableMessage:
         return item.a.m as string;
       case NotificationRoute.LocalSingletonConnectInstructions:
         return t("tabs.notifications.tab.labels.connectinstructions", {
-          connection: item.a.name || t("tabs.connections.unknown"),
+          connection: item.a.name || unknownConnection,
         });
       default:
         return "";
@@ -121,27 +151,12 @@ const NotificationItem = ({
       className={`notifications-tab-item${item.read ? "" : " unread"}`}
       data-testid={`notifications-tab-item-${item.id}`}
     >
-      <div
-        className={`notification-logo${
-          connectionName === "Citizen Portal"
-            ? " citizen-portal-logo-container"
-            : ""
-        }`}
-      >
-        {connectionName === "Citizen Portal" ? (
-          <img
-            src={CitizenPortal}
-            className="citizen-portal-logo"
-            alt="Citizen Portal logo"
-          />
-        ) : (
-          <FallbackIcon
-            alt="notifications-tab-item-logo"
-            className="notifications-tab-item-logo"
-            data-testid="notifications-tab-item-logo"
-          />
-        )}
-
+      <div className="notification-logo">
+        <FallbackIcon
+          alt="notifications-tab-item-logo"
+          className="notifications-tab-item-logo"
+          data-testid="notifications-tab-item-logo"
+        />
         <IonIcon
           src={referIcon(item)}
           size="small"

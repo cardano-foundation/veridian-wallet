@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
@@ -12,9 +12,9 @@ import { Verification } from "../../../../components/Verification";
 import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
-import "./CredentialShareRequest.scss";
 import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
 import { ResponsivePageLayout } from "../../../../components/layout/ResponsivePageLayout";
+import "./CredentialShareRequest.scss";
 
 const CredentialShareRequest = ({
   activeStatus,
@@ -25,12 +25,27 @@ const CredentialShareRequest = ({
   const dispatch = useAppDispatch();
   const connections = useAppSelector(getConnectionsCache);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-  const connectionName = connections.find(
+    const connectionName = connections.find(
     (c) => c.id === notificationDetails.connectionId
   );
-  const requester = connectionName?.label || "Unknown";
+  const [requester, setRequester] = useState(connectionName?.label || "Unknown");
+
   const logo = requester === "Citizen Portal" ? CitizenPortal : CitizenPortal; //TODO: Placeholder for different logos based on type
   const [loading, showLoading] = useState(false);
+
+  const check = async () => {
+    const connection = await Agent.agent.connections.getConnectionById(notificationDetails.connectionId);
+    if (connection?.label){
+      setRequester(connection.label)
+    }  
+  }
+
+  useEffect(() => {
+    if (requester === "Unknown"){
+      check();
+    }
+  }, [requester]);
+
 
   const handleShare = async () => {
     try {

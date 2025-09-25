@@ -1103,7 +1103,6 @@ class KeriaNotificationService extends AgentService {
   }
 
   async _pollLongOperations(): Promise<void> {
-    console.log("_pollLongOperations started");
     this.pendingOperations = await this.operationPendingStorage.getAll();
     // eslint-disable-next-line no-constant-condition
     while (true) {

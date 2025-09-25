@@ -759,6 +759,7 @@ class ConnectionService extends AgentService {
 
     const urlObj = new URL(url);
     const alias = urlObj.searchParams.get(OobiQueryParams.NAME) ?? randomSalt();
+
     urlObj.searchParams.delete(OobiQueryParams.NAME);
     const strippedUrl = urlObj.toString();
 
@@ -830,6 +831,46 @@ class ConnectionService extends AgentService {
     for (const pendingConnection of pendingConnections) {
       await this.resolveOobi(pendingConnection.oobi, false);
     }
+  }
+
+  async oneWayScanningLogin(
+    backendOobi: string,
+    connectionId: string,
+    backendApi: string,
+    profileAid: string
+  ): Promise<void> {
+
+    const backendApiUrl = new URL(backendApi);
+    const oobiWithName = new URL(backendOobi);
+    oobiWithName.searchParams.append("name", backendApiUrl.hostname);
+    await this.resolveOobi(oobiWithName.toString());
+
+    const identifierMetadata =
+      await this.identifierStorage.getIdentifierMetadata(profileAid);
+
+    const profileOobi = await this.getOobi(profileAid, {
+      alias: identifierMetadata.displayName,
+    });
+
+    const signer = new Signer({ transferable: false });
+    const rpyData = {
+      cid: signer.verfer.qb64,
+      oobi: profileOobi,
+    };
+
+    const rpy = reply(
+      RpyRoute.INTRODUCE,
+      rpyData,
+      undefined,
+      undefined,
+      Serials.JSON
+    );
+    const sig = signer.sign(new Uint8Array(b(rpy.raw)));
+    const ims = d(
+      messagize(rpy, undefined, undefined, undefined, [sig as Cigar])
+    );
+
+    await this.props.signifyClient.replies().submitRpy(connectionId, ims);
   }
 
   async shareIdentifier(
