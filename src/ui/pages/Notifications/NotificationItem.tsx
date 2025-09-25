@@ -9,6 +9,7 @@ import {
 } from "ionicons/icons";
 import { MouseEvent } from "react";
 import { Trans } from "react-i18next";
+import CitizenPortal from "../../assets/images/citizen-portal.svg";
 import {
   KeriaNotification,
   NotificationRoute,
@@ -27,17 +28,12 @@ const NotificationItem = ({
   onClick,
   onOptionButtonClick,
 }: NotificationItemProps) => {
-  const connectionsCache = useAppSelector(getConnectionsCache) as any[];
-  const multisigConnectionsCache = useAppSelector(
-    getMultisigConnectionsCache
-  ) as any[];
+  const connectionsCache = useAppSelector(getConnectionsCache);
+  const multisigConnectionsCache = useAppSelector(getMultisigConnectionsCache);
+  const connection = connectionsCache?.find((c) => c.id === item.connectionId);
+  const connectionName = connection?.label;
 
   const notificationLabelText = (() => {
-    const connection = connectionsCache?.find(
-      (c) => c.id === item.connectionId
-    );
-    const connectionName = connection?.label;
-
     switch (item.a.r) {
       case NotificationRoute.ExnIpexGrant:
         return t("tabs.notifications.tab.labels.exnipexgrant", {
@@ -125,12 +121,27 @@ const NotificationItem = ({
       className={`notifications-tab-item${item.read ? "" : " unread"}`}
       data-testid={`notifications-tab-item-${item.id}`}
     >
-      <div className="notification-logo">
-        <FallbackIcon
-          alt="notifications-tab-item-logo"
-          className="notifications-tab-item-logo"
-          data-testid="notifications-tab-item-logo"
-        />
+      <div
+        className={`notification-logo${
+          connectionName === "Citizen Portal"
+            ? " citizen-portal-logo-container"
+            : ""
+        }`}
+      >
+        {connectionName === "Citizen Portal" ? (
+          <img
+            src={CitizenPortal}
+            className="citizen-portal-logo"
+            alt="Citizen Portal logo"
+          />
+        ) : (
+          <FallbackIcon
+            alt="notifications-tab-item-logo"
+            className="notifications-tab-item-logo"
+            data-testid="notifications-tab-item-logo"
+          />
+        )}
+
         <IonIcon
           src={referIcon(item)}
           size="small"

@@ -1,6 +1,4 @@
-import { IonIcon } from "@ionic/react";
 import { useState } from "react";
-import { personCircleOutline } from "ionicons/icons";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
@@ -15,7 +13,7 @@ import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./CredentialShareRequest.scss";
-import CitizenPortal from "./citizen-portal.svg";
+import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
 import { ResponsivePageLayout } from "../../../../components/layout/ResponsivePageLayout";
 
 const CredentialShareRequest = ({

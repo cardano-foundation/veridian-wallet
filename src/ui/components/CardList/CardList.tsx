@@ -9,6 +9,7 @@ import { personCircleOutline } from "ionicons/icons";
 import { combineClassNames } from "../../utils/style";
 import "./CardList.scss";
 import { CardItemProps, CardListProps } from "./CardList.types";
+import CitizenPortal from "../../assets/images/citizen-portal.svg";
 
 const CardInfo = <T extends object = object>({
   index,
@@ -22,24 +23,34 @@ const CardInfo = <T extends object = object>({
     "has-subtitle": !!card.subtitle,
   });
 
-  const cardImg = card.image ? (
-    <img
-      src={card.image}
-      alt={card.title}
-      className="card-logo"
-      data-testid="card-logo"
-    />
-  ) : (
-    <div
-      data-testid="card-fallback-logo"
-      className="card-fallback-logo card-logo"
-    >
-      <IonIcon
-        icon={personCircleOutline}
-        color="light"
+  const cardImg =
+    card.title === "Citizen Portal" ? (
+      <div className="citizen-portal-logo-container">
+        <img
+          src={CitizenPortal}
+          alt={card.title}
+          className="card-logo"
+          data-testid="card-logo"
+        />
+      </div>
+    ) : card.image ? (
+      <img
+        src={card.image}
+        alt={card.title}
+        className="card-logo"
+        data-testid="card-logo"
       />
-    </div>
-  );
+    ) : (
+      <div
+        data-testid="card-fallback-logo"
+        className="card-fallback-logo card-logo"
+      >
+        <IonIcon
+          icon={personCircleOutline}
+          color="light"
+        />
+      </div>
+    );
 
   return (
     <IonItem
