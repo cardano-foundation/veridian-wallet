@@ -834,14 +834,30 @@ class ConnectionService extends AgentService {
 
   async oneWayScanningLogin(
     connectionId: string,
+    backendApi: string,
     profileAid: string
   ): Promise<void> {
-    
+    try {
+      await this.props.signifyClient.contacts().get(connectionId);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        /404/gi.test(error.message.split(" - ")[1])
+      ) {
+        await this.props.signifyClient
+          .contacts()
+          .update(connectionId, { alias: backendApi });
+        // TODO: create a real contact for this profile/profileAid if not notifications appear as unknown  
+      } else {
+        throw error;
+      }
+    }
+
     const identifierMetadata =
       await this.identifierStorage.getIdentifierMetadata(profileAid);
 
     const profileOobi = await this.getOobi(profileAid, {
-      alias: identifierMetadata.displayName
+      alias: identifierMetadata.displayName,
     });
 
     const signer = new Signer({ transferable: false });
