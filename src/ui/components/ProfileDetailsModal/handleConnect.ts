@@ -160,6 +160,25 @@ export async function signedFetch(
   return fetch(url, finalOptions);
 }
 
+
+function extractOobiAid(urlString: string): string | null {
+  try {
+    const parsedUrl = new URL(urlString);
+    const pathname = parsedUrl.pathname;
+    const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+    const oobiIndex = pathSegments.indexOf('oobi');
+
+    if (oobiIndex !== -1 && pathSegments.length > oobiIndex + 1) {
+      return pathSegments[oobiIndex + 1];
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+
 export const handleConnect = async ({
   content,
   profileAid,
@@ -168,8 +187,16 @@ export const handleConnect = async ({
   if (!profileAid) {
     throw new Error("Missing profileAid");
   }
+
   try {
-    const { sessionAid, backendApi } = JSON.parse(content);
+    const { sessionAid, backendApi, backendOobi } = JSON.parse(content);
+    
+    const backendAid = extractOobiAid(backendOobi);
+
+    if (!backendAid){
+      throw new Error("backendAid not found in backendOobi");
+    }
+    await Agent.agent.connections.oneWayScanningLogin(backendAid, profileAid);
 
     const requestPath = "/login";
 

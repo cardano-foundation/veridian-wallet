@@ -832,6 +832,39 @@ class ConnectionService extends AgentService {
     }
   }
 
+  async oneWayScanningLogin(
+    connectionId: string,
+    profileAid: string
+  ): Promise<void> {
+    
+    const identifierMetadata =
+      await this.identifierStorage.getIdentifierMetadata(profileAid);
+
+    const profileOobi = await this.getOobi(profileAid, {
+      alias: identifierMetadata.displayName
+    });
+
+    const signer = new Signer({ transferable: false });
+    const rpyData = {
+      cid: signer.verfer.qb64,
+      oobi: profileOobi,
+    };
+
+    const rpy = reply(
+      RpyRoute.INTRODUCE,
+      rpyData,
+      undefined,
+      undefined,
+      Serials.JSON
+    );
+    const sig = signer.sign(new Uint8Array(b(rpy.raw)));
+    const ims = d(
+      messagize(rpy, undefined, undefined, undefined, [sig as Cigar])
+    );
+
+    await this.props.signifyClient.replies().submitRpy(connectionId, ims);
+  }
+
   async shareIdentifier(
     connectionId: string,
     identifier: string

@@ -152,6 +152,7 @@ const useConnectionLogic = (
   const handleConnectWrapper = async () => {
     setIsOpen(false);
     beforeConnectionComplete?.();
+    
     setTimeout(async () => {
       try {
         await handleConnect({
