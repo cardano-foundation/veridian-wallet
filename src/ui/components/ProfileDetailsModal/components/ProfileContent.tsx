@@ -93,7 +93,7 @@ const ProfileContent = ({
       let name = memberConnection?.label || member;
 
       if (!memberConnection?.label) {
-        name = cardData.displayName;
+        name = cardData.groupMetadata?.userName || "";
       }
 
       const rank = index >= 0 ? index % 5 : 0;
