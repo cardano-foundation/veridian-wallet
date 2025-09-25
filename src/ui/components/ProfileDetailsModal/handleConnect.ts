@@ -196,7 +196,9 @@ export const handleConnect = async ({
     if (!backendAid){
       throw new Error("backendAid not found in backendOobi");
     }
-    await Agent.agent.connections.oneWayScanningLogin(backendAid, backendApi, profileAid);
+    await await Agent.agent.connections.deleteAllConnectionsForIdentifier(profileAid);
+
+    await Agent.agent.connections.oneWayScanningLogin(backendOobi, backendAid, backendApi, profileAid);
 
     const requestPath = "/login";
 

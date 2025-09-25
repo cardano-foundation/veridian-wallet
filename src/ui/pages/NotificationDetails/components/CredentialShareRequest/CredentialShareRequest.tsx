@@ -1,5 +1,5 @@
 import { IonIcon } from "@ionic/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { personCircleOutline } from "ionicons/icons";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
@@ -27,12 +27,27 @@ const CredentialShareRequest = ({
   const dispatch = useAppDispatch();
   const connections = useAppSelector(getConnectionsCache);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-  const connectionName = connections.find(
+    const connectionName = connections.find(
     (c) => c.id === notificationDetails.connectionId
   );
-  const requester = connectionName?.label || "Unknown";
+  const [requester, setRequester] = useState(connectionName?.label || "Unknown");
+
   const logo = requester === "Citizen Portal" ? CitizenPortal : CitizenPortal; //TODO: Placeholder for different logos based on type
   const [loading, showLoading] = useState(false);
+
+  const check = async () => {
+    const connection = await Agent.agent.connections.getConnectionById(notificationDetails.connectionId);
+    if (connection?.label){
+      setRequester(connection.label)
+    }  
+  }
+
+  useEffect(() => {
+    if (requester === "Unknown"){
+      check();
+    }
+  }, [requester]);
+
 
   const handleShare = async () => {
     try {

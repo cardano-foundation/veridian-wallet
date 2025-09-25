@@ -759,6 +759,7 @@ class ConnectionService extends AgentService {
 
     const urlObj = new URL(url);
     const alias = urlObj.searchParams.get(OobiQueryParams.NAME) ?? randomSalt();
+
     urlObj.searchParams.delete(OobiQueryParams.NAME);
     const strippedUrl = urlObj.toString();
 
@@ -833,25 +834,16 @@ class ConnectionService extends AgentService {
   }
 
   async oneWayScanningLogin(
+    backendOobi: string,
     connectionId: string,
     backendApi: string,
     profileAid: string
   ): Promise<void> {
-    try {
-      await this.props.signifyClient.contacts().get(connectionId);
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        /404/gi.test(error.message.split(" - ")[1])
-      ) {
-        await this.props.signifyClient
-          .contacts()
-          .update(connectionId, { alias: backendApi });
-        // TODO: create a real contact for this profile/profileAid if not notifications appear as unknown  
-      } else {
-        throw error;
-      }
-    }
+
+    const backendApiUrl = new URL(backendApi);
+    const oobiWithName = new URL(backendOobi);
+    oobiWithName.searchParams.append("name", backendApiUrl.hostname);
+    await this.resolveOobi(oobiWithName.toString());
 
     const identifierMetadata =
       await this.identifierStorage.getIdentifierMetadata(profileAid);
