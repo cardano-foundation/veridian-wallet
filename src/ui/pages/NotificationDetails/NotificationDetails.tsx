@@ -46,7 +46,7 @@ const NotificationDetails = () => {
   const notificationComponents: Record<NotificationRoute, ElementType | null> =
     {
       [NotificationRoute.MultiSigIcp]: MultiSigRequest,
-      [NotificationRoute.ExnIpexGrant]: CredentialIssuanceRequest,
+      [NotificationRoute.ExnIpexGrant]: ReceiveCredential,
       [NotificationRoute.ExnIpexApply]: CredentialRequest,
       [NotificationRoute.MultiSigExn]: ReceiveCredential,
       [NotificationRoute.RemoteSignReq]: RemoteSignRequest,
