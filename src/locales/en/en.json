@@ -1661,6 +1661,7 @@
   "profiles": {
     "title": "Profiles",
     "cancel": "Cancel",
+    "actionrequired": "Action required",
     "options": {
       "manage": "Manage profile",
       "add": "Add profile",
