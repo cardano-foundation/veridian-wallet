@@ -1012,7 +1012,14 @@
             "message": "{{requester}} is requesting you to issue a credential. The details of this issuance are below.",
             "issueto": "Issue to",
             "issuingcredential": "Issuing credential",
-            "credentialdetails": "Credential details",
+            "credentialdetails": {
+              "title": "Credential details",
+              "name": "Name:",
+              "email": "Email:",
+              "dob": "D.O.B.:",
+              "agerange": "Conversation age range:",
+              "curfew": "Curfew hours:"
+            },
             "button": {
               "accept": "Issue credential",
               "decline": "Decline"

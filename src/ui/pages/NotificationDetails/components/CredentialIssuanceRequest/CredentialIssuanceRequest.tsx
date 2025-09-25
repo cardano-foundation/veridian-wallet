@@ -16,11 +16,7 @@ import "./CredentialIssuanceRequest.scss";
 import { informationCircleOutline } from "ionicons/icons";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { InfoCard } from "../../../../components/InfoCard";
-import {
-  CardBlock,
-  CardDetailsBlock,
-  CardDetailsContent,
-} from "../../../../components/CardDetails";
+import { CardDetailsBlock } from "../../../../components/CardDetails";
 import { IonItem, IonText } from "@ionic/react";
 import { MemberAvatar } from "../../../../components/Avatar";
 
@@ -46,6 +42,10 @@ const CredentialIssuanceRequest = ({
       id: "123",
       firstName: "Oliver",
       lastName: "Anderson",
+      email: "oliver.anderson123@gmail.com",
+      dob: "12/07/2012",
+      agerange: ["13", "16"],
+      curfew: ["08:00", "22:00"],
     },
   };
   const [loading, showLoading] = useState(false);
@@ -115,7 +115,9 @@ const CredentialIssuanceRequest = ({
         <CardDetailsBlock>
           <IonItem lines="none">
             <IonText>
-              {i18n.t("tabs.credentials.details.relatedprofile")}
+              {i18n.t(
+                "tabs.notifications.details.credential.credentialissuance.issueto"
+              )}
             </IonText>
           </IonItem>
           <IonItem lines="none">
@@ -123,7 +125,82 @@ const CredentialIssuanceRequest = ({
               firstLetter={`${credential.issueTo.charAt(0)}`}
               rank={0}
             />
-            <IonText>{credential.issueTo}</IonText>
+            <IonText>{profile.identity.firstName}</IonText>
+          </IonItem>
+        </CardDetailsBlock>
+        <CardDetailsBlock>
+          <IonItem lines="none">
+            <IonText>
+              {i18n.t(
+                "tabs.notifications.details.credential.credentialissuance.issuingcredential"
+              )}
+            </IonText>
+          </IonItem>
+          <IonItem lines="none">
+            <IonText>{credential.type}</IonText>
+          </IonItem>
+        </CardDetailsBlock>
+        <CardDetailsBlock>
+          <IonItem lines="none">
+            <IonText>
+              {i18n.t(
+                "tabs.notifications.details.credential.credentialissuance.credentialdetails.title"
+              )}
+            </IonText>
+          </IonItem>
+          <IonItem lines="none">
+            <IonText>
+              <span>
+                {i18n.t(
+                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.name"
+                )}
+              </span>
+              &nbsp;
+              <span>
+                {profile.identity.firstName} {profile.identity.lastName}
+              </span>
+            </IonText>
+          </IonItem>
+          <IonItem lines="none">
+            <IonText>
+              <span>
+                {i18n.t(
+                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.email"
+                )}
+                &nbsp;
+              </span>{" "}
+              <span>{profile.identity.email}</span>
+            </IonText>
+          </IonItem>
+          <IonItem lines="none">
+            <IonText>
+              <span>
+                {i18n.t(
+                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.dob"
+                )}
+              </span>{" "}
+              <span>{profile.identity.dob}</span>
+            </IonText>
+          </IonItem>
+          <IonItem lines="none">
+            <IonText>
+              <span>
+                {i18n.t(
+                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.agerange"
+                )}
+              </span>{" "}
+              <span>{`${profile.identity.agerange[0]}-${profile.identity.agerange[1]}`}</span>
+            </IonText>
+          </IonItem>
+          <IonItem lines="none">
+            <IonText>
+              <span>
+                {i18n.t(
+                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.curfew"
+                )}
+              </span>{" "}
+              <span>{`${profile.identity.curfew[0]}-${profile.identity.curfew[1]}`}</span>
+            </IonText>
           </IonItem>
         </CardDetailsBlock>
       </ScrollablePageLayout>

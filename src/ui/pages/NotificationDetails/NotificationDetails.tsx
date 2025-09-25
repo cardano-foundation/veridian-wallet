@@ -15,6 +15,7 @@ import { RemoteConnectInstructions } from "./components/RemoteConnectInstruction
 import { RemoteMessage } from "./components/RemoteMessage";
 import { RemoteSignRequest } from "./components/RemoteSignRequest";
 import { CredentialShareRequest } from "./components/CredentialShareRequest";
+import { CredentialIssuanceRequest } from "./components/CredentialIssuanceRequest";
 
 const NotificationDetails = () => {
   const pageId = "notification-details";
@@ -45,7 +46,7 @@ const NotificationDetails = () => {
   const notificationComponents: Record<NotificationRoute, ElementType | null> =
     {
       [NotificationRoute.MultiSigIcp]: MultiSigRequest,
-      [NotificationRoute.ExnIpexGrant]: ReceiveCredential,
+      [NotificationRoute.ExnIpexGrant]: CredentialIssuanceRequest,
       [NotificationRoute.ExnIpexApply]: CredentialRequest,
       [NotificationRoute.MultiSigExn]: ReceiveCredential,
       [NotificationRoute.RemoteSignReq]: RemoteSignRequest,
