@@ -12,9 +12,9 @@ import { Verification } from "../../../../components/Verification";
 import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
-import "./CredentialShareRequest.scss";
-import CitizenPortal from "./citizen-portal.svg";
+import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
 import { ResponsivePageLayout } from "../../../../components/layout/ResponsivePageLayout";
+import "./CredentialShareRequest.scss";
 
 const CredentialShareRequest = ({
   activeStatus,
