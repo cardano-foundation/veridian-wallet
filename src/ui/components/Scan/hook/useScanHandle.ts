@@ -114,19 +114,10 @@ const useScanHandle = () => {
           .pop()
           ?.split("/")[0];
 
-        // Detect duplicates locally first (current profile, any profile or
-        // legacy-root map) so the UI can open the existing connection without
-        // invoking the Agent when tests/fixtures already supply the data.
-        const existsInAnyProfile = Object.values(allProfiles || {}).some(
-          (p) =>
-            Array.isArray(p.connections) &&
-            p.connections.some((c) => c.id === connectionId)
-        );
-
+        // Detect duplicates locally first (current profile only)
+        // so the UI can open the existing connection without invoking the Agent
         const existsLocally =
-          !!connectionId &&
-          (connections.some((c) => c.id === connectionId) ||
-            existsInAnyProfile);
+          !!connectionId && connections.some((c) => c.id === connectionId);
 
         if (existsLocally) {
           // Duplicate detected: surface it to the UI the same way the Agent would.
