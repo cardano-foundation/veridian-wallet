@@ -152,7 +152,7 @@ const useConnectionLogic = (
   const handleConnectWrapper = async () => {
     setIsOpen(false);
     beforeConnectionComplete?.();
-    
+
     setTimeout(async () => {
       try {
         await handleConnect({
@@ -505,7 +505,7 @@ const ProfileDetailsModal = ({
           return;
         }
 
-        if (type !== QR_CODE_TYPES.GUARDIANSHIP) {
+        if (!Object.values(QR_CODE_TYPES).includes(type as any)) {
           showError(
             ERROR_MESSAGES.UNSUPPORTED_TYPE,
             new Error(`Type '${type}' is not supported.`),

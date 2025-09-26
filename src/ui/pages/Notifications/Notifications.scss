@@ -89,7 +89,7 @@
         .notification-logo {
           position: relative;
 
-          &.citizen-portal-logo-container {
+          .citizen-portal-logo-container {
             background-color: var(--ion-color-primary-700);
 
             & > img {
@@ -102,6 +102,10 @@
             .notification-ref-icon {
               right: 0;
             }
+          }
+
+          .socialbook-logo-container img {
+            border-radius: inherit;
           }
 
           .notification-ref-icon {
@@ -123,7 +127,8 @@
         }
 
         .notifications-tab-item-logo,
-        .citizen-portal-logo-container {
+        .citizen-portal-logo-container,
+        .socialbook-logo-container {
           border-radius: 3rem;
           width: 3rem;
           height: 3rem;
@@ -132,7 +137,8 @@
 
         @media screen and (min-width: 250px) and (max-width: 370px) {
           .notifications-tab-item-logo,
-          .citizen-portal-logo-container {
+          .citizen-portal-logo-container,
+          .socialbook-logo-container {
             border-radius: 2.4rem;
             width: 2.4rem;
             height: 2.4rem;

@@ -10,6 +10,7 @@ import { combineClassNames } from "../../utils/style";
 import "./CardList.scss";
 import { CardItemProps, CardListProps } from "./CardList.types";
 import CitizenPortal from "../../assets/images/citizen-portal.svg";
+import Socialbook from "../../assets/images/socialbook.svg";
 
 const CardInfo = <T extends object = object>({
   index,
@@ -23,24 +24,45 @@ const CardInfo = <T extends object = object>({
     "has-subtitle": !!card.subtitle,
   });
 
-  const cardImg =
-    card.title === "Citizen Portal" ? (
-      <div className="citizen-portal-logo-container">
+  const cardImg = (() => {
+    if (card.title === "Citizen Portal") {
+      return (
+        <div className="citizen-portal-logo-container">
+          <img
+            src={CitizenPortal}
+            alt={card.title}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (card.title === "Socialbook") {
+      return (
+        <div className="socialbook-logo-container">
+          <img
+            src={Socialbook}
+            alt={card.title}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (card.image) {
+      return (
         <img
-          src={CitizenPortal}
+          src={card.image}
           alt={card.title}
           className="card-logo"
           data-testid="card-logo"
         />
-      </div>
-    ) : card.image ? (
-      <img
-        src={card.image}
-        alt={card.title}
-        className="card-logo"
-        data-testid="card-logo"
-      />
-    ) : (
+      );
+    }
+
+    return (
       <div
         data-testid="card-fallback-logo"
         className="card-fallback-logo card-logo"
@@ -51,6 +73,7 @@ const CardInfo = <T extends object = object>({
         />
       </div>
     );
+  })();
 
   return (
     <IonItem
