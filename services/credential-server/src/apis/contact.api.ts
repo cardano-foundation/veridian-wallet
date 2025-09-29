@@ -6,7 +6,7 @@ export async function contactList(
   res: Response,
   next: NextFunction
 ) {
-  const client: SignifyClient = res.app.get("signifyClient");
+  const client: SignifyClient = res.app.get("issuerClient");
 
   // @TODO - foconnor: Temporary hack to add createdAt after one-way scan, doing this now
   // to avoid updating keripy and making a change which might make backwards compatability or migrations harder later.
@@ -31,7 +31,7 @@ export async function deleteContact(
   res: Response,
   next: NextFunction
 ) {
-  const client: SignifyClient = res.app.get("signifyClient");
+  const client: SignifyClient = res.app.get("issuerClient");
   const { id } = req.query;
 
   const data = await client.contacts().delete(id as string);

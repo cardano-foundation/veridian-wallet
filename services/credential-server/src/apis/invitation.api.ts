@@ -8,7 +8,7 @@ export async function keriOobiApi(
   res: Response,
   next: NextFunction
 ) {
-  const client: SignifyClient = _.app.get("signifyClient");
+  const client: SignifyClient = _.app.get("issuerClient");
 
   const url = `${await getOobi(
     client,

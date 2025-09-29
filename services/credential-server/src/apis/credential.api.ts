@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { Operation, Saider, Salter, Serder, SignifyClient } from "signify-ts";
-import { ACDC_SCHEMAS_ID, ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
+import {
+  ACDC_SCHEMAS_ID,
+  ISSUER_NAME,
+  LE_SCHEMA_SAID,
+  OOR_SCHEMA_SAID,
+} from "../consts";
 import { getRegistry, OP_TIMEOUT, waitAndGetDoneOp } from "../utils/utils";
 import { QviCredential } from "../utils/utils.types";
 
@@ -14,9 +19,7 @@ export async function issueAcdcCredential(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
-  const qviCredentialId = req.app.get("qviCredentialId");
-
+  const client: SignifyClient = req.app.get("issuerClient");
   const { schemaSaid, aid, attribute } = req.body;
 
   if (!ACDC_SCHEMAS_ID.some((schemaId) => schemaId === schemaSaid)) {
@@ -33,14 +36,36 @@ export async function issueAcdcCredential(
   let issueParams: any;
   let grantParams: any;
 
-  if (schemaSaid === LE_SCHEMA_SAID) {
-    const qviCredential: QviCredential = await client
-      .credentials()
-      .get(qviCredentialId);
+  if ([LE_SCHEMA_SAID, OOR_SCHEMA_SAID].includes(schemaSaid)) {
+    let e = {};
+    if (schemaSaid === LE_SCHEMA_SAID) {
+      const qviCredential: QviCredential = await client
+        .credentials()
+        .get(req.app.get("qviCredentialId"));
+      e = {
+        d: "",
+        qvi: {
+          n: qviCredential.sad.d,
+          s: qviCredential.sad.s,
+        },
+      };
+    } else if (schemaSaid === OOR_SCHEMA_SAID) {
+      const oorAuthCredential = await client
+        .credentials()
+        .get(req.app.get("oorAuthCredentialId"));
+      e = {
+        d: "",
+        auth: {
+          n: oorAuthCredential.sad.d,
+          s: oorAuthCredential.sad.s,
+          o: "I2I",
+        },
+      };
+    }
 
     issueParams = {
       ri: keriRegistryRegk,
-      s: LE_SCHEMA_SAID,
+      s: schemaSaid,
       a: {
         i: aid,
         ...attribute,
@@ -54,13 +79,7 @@ export async function issueAcdcCredential(
           l: "All information in a valid, unexpired, and non-revoked vLEI Credential, as defined in the associated Ecosystem Governance Framework, is accurate as of the date the validation process was complete. The vLEI Credential has been issued to the legal entity or person named in the vLEI Credential as the subject; and the qualified vLEI Issuer exercised reasonable care to perform the validation process set forth in the vLEI Ecosystem Governance Framework.",
         },
       })[1],
-      e: Saider.saidify({
-        d: "",
-        qvi: {
-          n: qviCredential.sad.d,
-          s: qviCredential.sad.s,
-        },
-      })[1],
+      e,
     };
 
     grantParams = {
@@ -122,7 +141,7 @@ export async function requestDisclosure(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
+  const client: SignifyClient = req.app.get("issuerClient");
   const { schemaSaid, aid, attributes } = req.body;
 
   const [apply, sigs] = await client.ipex().apply({
@@ -143,7 +162,7 @@ export async function contactCredentials(
   req: Request,
   res: Response
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
+  const client: SignifyClient = req.app.get("issuerClient");
   const { contactId } = req.query;
 
   const issuer = await client.identifiers().get(ISSUER_NAME);
@@ -165,7 +184,7 @@ export async function revokeCredential(
   req: Request,
   res: Response
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
+  const client: SignifyClient = req.app.get("issuerClient");
   const { credentialId, holder } = req.body;
 
   // Get the credential first
