@@ -4,6 +4,7 @@ import {
   calendarNumberOutline,
   keyOutline,
   pencilOutline,
+  personCircleOutline,
   refreshOutline,
   shareOutline,
   star,
@@ -309,7 +310,7 @@ const ProfileContent = ({
         >
           <CardDetailsItem
             info={`${cardData.id.substring(0, 5)}...${cardData.id.slice(-5)}`}
-            icon={keyOutline}
+            icon={personCircleOutline}
             testId="identifier-id"
             className="identifier-id"
             mask={false}

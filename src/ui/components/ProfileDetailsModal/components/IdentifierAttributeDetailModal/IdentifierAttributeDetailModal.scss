@@ -137,6 +137,8 @@
 
       ion-icon {
         margin-right: 0.25rem;
+        width: 0.875rem;
+        height: 0.875rem;
       }
 
       span {
@@ -148,7 +150,7 @@
 
     .bottom-text {
       text-align: center;
-      color: rgba(var(--ion-color-secondary-rgb), 0.5);
+      color: var(--ion-color-neutral-500);
       font-size: 0.875rem;
       line-height: 1.25rem;
       margin: 0.875rem 0 0;
