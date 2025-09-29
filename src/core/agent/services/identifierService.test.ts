@@ -1241,6 +1241,14 @@ describe("Single sig service of agent", () => {
   test("can update an identifier", async () => {
     const newDisplayName = "newDisplayName";
     const newTheme = 1;
+    
+    // Mock the identifier as a regular identifier (no groupMemberPre, no groupMetadata)
+    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
+      ...keriMetadataRecord,
+      groupMemberPre: undefined,
+      groupMetadata: undefined,
+    });
+    
     await identifierService.updateIdentifier(keriMetadataRecord.id, {
       displayName: newDisplayName,
       theme: newTheme,
@@ -1258,8 +1266,36 @@ describe("Single sig service of agent", () => {
     );
   });
 
-  test("can update a group identifier with group metadata", async () => {
+  test("can update a group identifier (uses simple format)", async () => {
     const newDisplayName = "newGroupDisplayName";
+    const newTheme = 2;
+    
+    // Mock the identifier as a group identifier (has groupMemberPre)
+    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
+      ...keriMetadataRecord,
+      groupMemberPre: "member-identifier-id",
+      groupMetadata: undefined,
+    });
+    
+    await identifierService.updateIdentifier(keriMetadataRecord.id, {
+      displayName: newDisplayName,
+      theme: newTheme,
+    });
+    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
+      name: `1.2.0.3:${newTheme}:${newDisplayName}`,
+    });
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      keriMetadataRecord.id,
+      {
+        displayName: newDisplayName,
+        theme: newTheme,
+        groupMetadata: undefined,
+      }
+    );
+  });
+
+  test("can update a member identifier with group metadata (uses complex format)", async () => {
+    const newDisplayName = "newMemberDisplayName";
     const newTheme = 2;
     const groupMetadata = {
       groupId: "test-group-123",
@@ -1267,7 +1303,14 @@ describe("Single sig service of agent", () => {
       groupCreated: true,
       userName: "testuser",
     };
-
+    
+    // Mock the identifier as a member identifier (has groupMetadata, no groupMemberPre)
+    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
+      ...keriMetadataRecord,
+      groupMemberPre: undefined,
+      groupMetadata: groupMetadata,
+    });
+    
     await identifierService.updateIdentifier(keriMetadataRecord.id, {
       displayName: newDisplayName,
       theme: newTheme,

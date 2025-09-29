@@ -524,8 +524,12 @@ class IdentifierService extends AgentService {
       "theme" | "displayName" | "groupMetadata"
     >
   ): Promise<void> {
+    const identifierMetadata = await this.identifierStorage.getIdentifierMetadata(identifier);
+    
     let name: string;
-    if (data.groupMetadata) {
+    if (identifierMetadata.groupMemberPre) {
+      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${data.displayName}`;
+    } else if (data.groupMetadata) {
       const initiatorFlag = data.groupMetadata.groupInitiator ? "1" : "0";
       const userNamePart = data.groupMetadata.userName;
       name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${data.groupMetadata.groupId}:${userNamePart}:${data.displayName}`;
