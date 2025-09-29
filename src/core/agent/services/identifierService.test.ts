@@ -1246,13 +1246,42 @@ describe("Single sig service of agent", () => {
       theme: newTheme,
     });
     expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
-      name: `${newTheme}:${newDisplayName}`,
+      name: `1.2.0.3:${newTheme}:${newDisplayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       keriMetadataRecord.id,
       {
         displayName: newDisplayName,
         theme: newTheme,
+        groupMetadata: undefined,
+      }
+    );
+  });
+
+  test("can update a group identifier with group metadata", async () => {
+    const newDisplayName = "newGroupDisplayName";
+    const newTheme = 2;
+    const groupMetadata = {
+      groupId: "test-group-123",
+      groupInitiator: true,
+      groupCreated: true,
+      userName: "testuser",
+    };
+
+    await identifierService.updateIdentifier(keriMetadataRecord.id, {
+      displayName: newDisplayName,
+      theme: newTheme,
+      groupMetadata,
+    });
+    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
+      name: `1.2.0.3:${newTheme}:1:${groupMetadata.groupId}:${groupMetadata.userName}:${newDisplayName}`,
+    });
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      keriMetadataRecord.id,
+      {
+        displayName: newDisplayName,
+        theme: newTheme,
+        groupMetadata,
       }
     );
   });
@@ -1312,7 +1341,10 @@ describe("Single sig service of agent", () => {
   });
 
   test("should call deleteNotificationRecordById when deleting identifier with notifications", async () => {
-    const mockDeleteNotificationRecordById = jest.spyOn(utils, "deleteNotificationRecordById");
+    const mockDeleteNotificationRecordById = jest.spyOn(
+      utils,
+      "deleteNotificationRecordById"
+    );
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       ...identifierMetadataRecord,
       groupMetadata: undefined,
@@ -1325,19 +1357,19 @@ describe("Single sig service of agent", () => {
       .fn()
       .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
     jest.spyOn(utils, "randomSalt").mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
-    
+
     // Mock notifications that need to be cleaned up
     const mockNotifications = [
       {
         id: "notification1",
         a: { r: NotificationRoute.ExnIpexApply },
-        receivingPre: identifierMetadataRecord.id
+        receivingPre: identifierMetadataRecord.id,
       },
       {
-        id: "notification2", 
+        id: "notification2",
         a: { r: NotificationRoute.ExnIpexGrant },
-        receivingPre: identifierMetadataRecord.id
-      }
+        receivingPre: identifierMetadataRecord.id,
+      },
     ];
     notificationStorage.findAllByQuery.mockResolvedValue(mockNotifications);
 

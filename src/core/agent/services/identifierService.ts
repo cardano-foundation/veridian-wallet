@@ -524,12 +524,22 @@ class IdentifierService extends AgentService {
       "theme" | "displayName" | "groupMetadata"
     >
   ): Promise<void> {
+    let name: string;
+    if (data.groupMetadata) {
+      const initiatorFlag = data.groupMetadata.groupInitiator ? "1" : "0";
+      const userNamePart = data.groupMetadata.userName;
+      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${data.groupMetadata.groupId}:${userNamePart}:${data.displayName}`;
+    } else {
+      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${data.displayName}`;
+    }
+
     await this.props.signifyClient.identifiers().update(identifier, {
-      name: `${data.theme}:${data.displayName}`,
+      name,
     });
     return this.identifierStorage.updateIdentifierMetadata(identifier, {
       theme: data.theme,
       displayName: data.displayName,
+      groupMetadata: data.groupMetadata,
     });
   }
 
