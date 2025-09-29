@@ -1242,7 +1242,6 @@ describe("Single sig service of agent", () => {
     const newDisplayName = "newDisplayName";
     const newTheme = 1;
     
-    // Mock the identifier as a regular identifier (no groupMemberPre, no groupMetadata)
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       ...keriMetadataRecord,
       groupMemberPre: undefined,
@@ -1270,7 +1269,6 @@ describe("Single sig service of agent", () => {
     const newDisplayName = "newGroupDisplayName";
     const newTheme = 2;
     
-    // Mock the identifier as a group identifier (has groupMemberPre)
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       ...keriMetadataRecord,
       groupMemberPre: "member-identifier-id",
@@ -1304,7 +1302,6 @@ describe("Single sig service of agent", () => {
       userName: "testuser",
     };
     
-    // Mock the identifier as a member identifier (has groupMetadata, no groupMemberPre)
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       ...keriMetadataRecord,
       groupMemberPre: undefined,
