@@ -36,6 +36,7 @@ import {
 import {
   CredentialsMatchingApply,
   LinkedGroupInfo,
+  SchemaEdge,
   SubmitIPEXResult,
 } from "./ipexCommunicationService.types";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
@@ -135,19 +136,10 @@ class IpexCommunicationService extends AgentService {
         grantExn.exn.rp
       )
     ).serviceEndpoints[0];
-    await this.connections.resolveOobi(
-      await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
-    );
 
-    const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {})
-      .map(
-        // Chained schemas, will be resolved in admit/multisigAdmit
-        (key) => grantExn.exn.e.acdc.e?.[key]?.s
-      )
-      .filter((schema) => !!schema);
-    allSchemaSaids.push(schemaSaid);
+    const schemaUrl = await this.getSchemaUrl(issuerOobi, grantExn.exn.i);
+    const schema = await this.recursiveSchemaResolve(schemaUrl, schemaSaid);
 
-    const schema = await this.props.signifyClient.schemas().get(schemaSaid);
     try {
       const credential = await this.saveAcdcMetadataRecord(
         holder,
@@ -183,8 +175,7 @@ class IpexCommunicationService extends AgentService {
     if (holder.groupMemberPre) {
       const { op: opMultisigAdmit, exnSaid } = await this.submitMultisigAdmit(
         holder.id,
-        grantExn,
-        allSchemaSaids
+        grantExn
       );
 
       op = opMultisigAdmit;
@@ -197,9 +188,7 @@ class IpexCommunicationService extends AgentService {
       const { op: opAdmit, exnSaid } = await this.admitIpex(
         grantNoteRecord.a.d as string,
         holder.id,
-        grantExn.exn.i,
-        issuerOobi,
-        allSchemaSaids
+        grantExn.exn.i
       );
 
       op = opAdmit;
@@ -480,16 +469,8 @@ class IpexCommunicationService extends AgentService {
   private async admitIpex(
     notificationD: string,
     holderAid: string,
-    issuerAid: string,
-    issuerOobi: string,
-    schemaSaids: string[]
+    issuerAid: string
   ): Promise<SubmitIPEXResult> {
-    for (const schemaSaid of schemaSaids) {
-      await this.connections.resolveOobi(
-        await this.getSchemaUrl(issuerOobi, issuerAid, schemaSaid)
-      );
-    }
-
     const dt = new Date().toISOString().replace("Z", "000+00:00");
     const [admit, sigs, aend] = await this.props.signifyClient.ipex().admit({
       senderName: holderAid,
@@ -561,11 +542,9 @@ class IpexCommunicationService extends AgentService {
     }
 
     await this.connections.resolveOobi(
-      await this.getSchemaUrl(
-        connection.serviceEndpoints[0],
-        connectionId,
-        schemaSaid
-      )
+      (await this.getSchemaUrl(connection.serviceEndpoints[0], connectionId)) +
+        schemaSaid,
+      true
     );
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
 
@@ -640,19 +619,20 @@ class IpexCommunicationService extends AgentService {
     const connectionId = grantExn.exn.i;
 
     const schemaSaid = grantExn.exn.e.acdc.s;
-    const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {})
-      .map((key) => grantExn.exn.e.acdc.e?.[key]?.s)
-      .filter((schema) => !!schema);
-    allSchemaSaids.push(schemaSaid);
+
+    const issuerOobi = (await this.connections.getConnectionById(connectionId))
+      .serviceEndpoints[0];
+    const schema = await this.recursiveSchemaResolve(
+      await this.getSchemaUrl(issuerOobi, connectionId),
+      schemaSaid
+    );
 
     const { op } = await this.submitMultisigAdmit(
       holder.id,
       grantExn,
-      allSchemaSaids,
       admitExn
     );
 
-    const schema = await this.props.signifyClient.schemas().get(schemaSaid);
     try {
       const credential = await this.saveAcdcMetadataRecord(
         holder,
@@ -1033,7 +1013,8 @@ class IpexCommunicationService extends AgentService {
             )
           ).serviceEndpoints[0];
           await this.connections.resolveOobi(
-            await this.getSchemaUrl(issuerOobi, exchange.exn.i, schemaSaid)
+            (await this.getSchemaUrl(issuerOobi, exchange.exn.i)) + schemaSaid,
+            true
           );
           return await this.props.signifyClient.schemas().get(schemaSaid);
         } else {
@@ -1064,8 +1045,7 @@ class IpexCommunicationService extends AgentService {
   private async submitMultisigAdmit(
     multisigId: string,
     grantExn: ExnMessage,
-    schemaSaids: string[],
-    admitExnToJoin?: Record<string, unknown>
+    admitExnToJoin?: any
   ): Promise<SubmitIPEXResult> {
     if (!this.props.signifyClient.manager) {
       throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
@@ -1074,22 +1054,6 @@ class IpexCommunicationService extends AgentService {
     let exn: Serder;
     let sigsMes: string[];
     let mend: string;
-
-    const issuerOobi = (
-      await this.connections.getConnectionById(
-        grantExn.exn.i,
-        false,
-        grantExn.exn.rp
-      )
-    ).serviceEndpoints[0];
-    await Promise.all(
-      schemaSaids.map(
-        async (schemaSaid) =>
-          await this.connections.resolveOobi(
-            await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
-          )
-      )
-    );
 
     const { ourIdentifier, multisigMembers } =
       await this.multisigService.getMultisigParticipants(multisigId);
@@ -1269,8 +1233,7 @@ class IpexCommunicationService extends AgentService {
 
   private async getSchemaUrl(
     agentOobi: string,
-    prefix: string,
-    said: string
+    prefix: string
   ): Promise<string> {
     // Indexer role indicates issuer site hosting OOBIs for e.g. schemas.
     // This can be improved by resolving the indexer OOBI and using KERIA to retrieve the /loc/scheme URL.
@@ -1285,7 +1248,26 @@ class IpexCommunicationService extends AgentService {
     ).text();
     const schemaBase = indexerOobiResult.split('"url":"')[1].split('"')[0];
 
-    return `${schemaBase}/oobi/${said}`;
+    return `${schemaBase}/oobi/`;
+  }
+
+  private async recursiveSchemaResolve(schemaUrl: string, schemaSaid: string) {
+    await this.connections.resolveOobi(schemaUrl + schemaSaid, true);
+
+    const schema = await this.props.signifyClient.schemas().get(schemaSaid);
+    const edgeBlock = schema.properties.e;
+    if (!edgeBlock) {
+      return;
+    }
+
+    const edges: Record<string, SchemaEdge> = edgeBlock.oneOf[1].properties;
+    for (const [key, value] of Object.entries(edges)) {
+      if (key === "d") continue;
+
+      await this.recursiveSchemaResolve(schemaUrl, value.properties.s.const!); // @TODO - foconnor: This could be parallelized.
+    }
+
+    return schema;
   }
 }
 

@@ -29,4 +29,28 @@ interface SubmitIPEXResult {
   exnSaid: string;
 }
 
-export type { CredentialsMatchingApply, LinkedGroupInfo, SubmitIPEXResult };
+interface SchemaEdge {
+  description: string;
+  type: string;
+  properties: {
+    n: {
+      description: string;
+      type: string;
+      const?: string;
+    };
+    s: {
+      description: string;
+      type: string;
+      const?: string;
+    };
+  };
+  additionalProperties: boolean;
+  required: string[];
+}
+
+export type {
+  CredentialsMatchingApply,
+  LinkedGroupInfo,
+  SubmitIPEXResult,
+  SchemaEdge,
+};
