@@ -32,10 +32,13 @@
           height: 5rem;
 
           & > img {
-            width: 80%;
-            height: 80%;
-            margin: 10%;
             border-radius: inherit;
+
+            &.citizen-portal-logo {
+              width: 80%;
+              height: 80%;
+              margin: 10%;
+            }
           }
         }
 
@@ -43,6 +46,18 @@
           .connect-incoming-request-user-logo {
             width: 3.5rem;
             height: 3.5rem;
+          }
+        }
+
+        .fallback-logo {
+          background-color: var(--ion-color-neutral-800);
+          display: var(--display-fallback);
+          justify-content: center;
+          align-items: center;
+
+          ion-icon {
+            width: 100%;
+            height: 100%;
           }
         }
       }

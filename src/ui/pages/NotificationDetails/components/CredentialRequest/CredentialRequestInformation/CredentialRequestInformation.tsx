@@ -1,4 +1,4 @@
-import { IonIcon, IonSpinner, IonText } from "@ionic/react";
+import { IonIcon, IonItem, IonSpinner, IonText } from "@ionic/react";
 import { chevronForward, warningOutline } from "ionicons/icons";
 import { useCallback, useState } from "react";
 import { Agent } from "../../../../../../core/agent/agent";
@@ -33,6 +33,8 @@ import { showError } from "../../../../../utils/error";
 import { CredentialRequestProps, MemberInfo } from "../CredentialRequest.types";
 import { LightCredentialDetailModal } from "../LightCredentialDetailModal";
 import "./CredentialRequestInformation.scss";
+import CitizenPortal from "../../../../../assets/images/citizen-portal.svg";
+import Socialbook from "../../../../../assets/images/socialbook.svg";
 
 const CredentialRequestInformation = ({
   pageId,
@@ -280,6 +282,36 @@ const CredentialRequestInformation = ({
       : "tabs.notifications.details.credential.request.information.title"
   )}`;
 
+  const logo = (() => {
+    if (connection?.label === "Citizen Portal") {
+      return (
+        <div className="citizen-portal-logo-container">
+          <img
+            src={CitizenPortal}
+            alt={connection?.label}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (connection?.label === "Socialbook") {
+      return (
+        <div className="socialbook-logo-container">
+          <img
+            src={Socialbook}
+            alt={connection?.label}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    return <FallbackIcon src={connection?.logo} />;
+  })();
+
   return (
     <>
       <ScrollablePageLayout
@@ -372,34 +404,49 @@ const CredentialRequestInformation = ({
               )}
             </>
           )}
-          <CardDetailsBlock
-            className="request-from"
-            title={`${i18n.t(
-              "tabs.notifications.details.credential.request.information.requestfrom"
-            )}`}
-          >
+          <CardDetailsBlock className="request-from">
+            <IonItem
+              lines="none"
+              className="request-from-label"
+            >
+              <IonText>
+                {i18n.t(
+                  "tabs.notifications.details.credential.request.information.requestfrom"
+                )}
+              </IonText>
+            </IonItem>
             <div className="request-from-content">
-              <FallbackIcon src={connection?.logo} />
+              {logo}
               <p>{connection?.label || i18n.t("tabs.connections.unknown")}</p>
             </div>
           </CardDetailsBlock>
-          <CardDetailsBlock
-            className="credential-request"
-            title={`${i18n.t(
-              "tabs.notifications.details.credential.request.information.requestedcredential"
-            )}`}
-          >
+          <CardDetailsBlock className="credential-request">
+            <IonItem
+              lines="none"
+              className="request-from-label"
+            >
+              <IonText>
+                {i18n.t(
+                  "tabs.notifications.details.credential.request.information.requestedcredential"
+                )}
+              </IonText>
+            </IonItem>
             <IonText className="requested-credential">
               {credentialRequest.schema.name}
             </IonText>
           </CardDetailsBlock>
           {JSON.stringify(credentialRequest.attributes) !== "{}" && (
-            <CardDetailsBlock
-              className="request-data"
-              title={i18n.t(
-                "tabs.notifications.details.credential.request.information.informationrequired"
-              )}
-            >
+            <CardDetailsBlock className="request-data">
+              <IonItem
+                lines="none"
+                className="request-from-label"
+              >
+                <IonText>
+                  {i18n.t(
+                    "tabs.notifications.details.credential.request.information.informationrequired"
+                  )}
+                </IonText>
+              </IonItem>
               <CardDetailsAttributes
                 data={credentialRequest.attributes as Record<string, string>}
                 itemProps={{

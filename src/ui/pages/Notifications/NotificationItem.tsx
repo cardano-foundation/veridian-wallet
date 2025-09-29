@@ -22,6 +22,8 @@ import { FallbackIcon } from "../../components/FallbackIcon";
 import { timeDifference } from "../../utils/formatters";
 import { NotificationItemProps } from "./Notification.types";
 import { Agent } from "../../../core/agent/agent";
+import CitizenPortal from "../../assets/images/citizen-portal.svg";
+import Socialbook from "../../assets/images/socialbook.svg";
 
 const NotificationItem = ({
   item,
@@ -33,28 +35,25 @@ const NotificationItem = ({
     getMultisigConnectionsCache
   ) as any[];
 
-  const connection = connectionsCache?.find(
-    (c) => c.id === item.connectionId
-  );
+  const connection = connectionsCache?.find((c) => c.id === item.connectionId);
 
   const unknownConnection = t("tabs.connections.unknown") ?? "Unknown";
 
   const initialConnectionName = connection?.label || unknownConnection;
 
   // Used for the one way scanning in the login process where we dont create a contact
-  const [connectionName, setConnectionName] = useState<string>(initialConnectionName);
+  const [connectionName, setConnectionName] = useState<string>(
+    initialConnectionName
+  );
 
   useEffect(() => {
     if (initialConnectionName === "Unknown") {
       const fetchConnection = async () => {
         try {
           // Get the contact created on the way scanning for login
-          const fetchedConnection = await Agent.agent.connections.getConnectionById(
-            item.connectionId
-          );
-          setConnectionName(
-            fetchedConnection.label || unknownConnection
-          );
+          const fetchedConnection =
+            await Agent.agent.connections.getConnectionById(item.connectionId);
+          setConnectionName(fetchedConnection.label || unknownConnection);
         } catch (error) {
           setConnectionName(unknownConnection);
         }
@@ -145,6 +144,42 @@ const NotificationItem = ({
     onOptionButtonClick(item);
   };
 
+  const logo = (() => {
+    if (connectionName === "Citizen Portal") {
+      return (
+        <div className="citizen-portal-logo-container">
+          <img
+            src={CitizenPortal}
+            alt={connectionName}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (connectionName === "Socialbook") {
+      return (
+        <div className="socialbook-logo-container">
+          <img
+            src={Socialbook}
+            alt={connectionName}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <FallbackIcon
+        alt="notifications-tab-item-logo"
+        className="notifications-tab-item-logo"
+        data-testid="notifications-tab-item-logo"
+      />
+    );
+  })();
+
   return (
     <IonItem
       onClick={() => onClick(item)}
@@ -152,11 +187,7 @@ const NotificationItem = ({
       data-testid={`notifications-tab-item-${item.id}`}
     >
       <div className="notification-logo">
-        <FallbackIcon
-          alt="notifications-tab-item-logo"
-          className="notifications-tab-item-logo"
-          data-testid="notifications-tab-item-logo"
-        />
+        {logo}
         <IonIcon
           src={referIcon(item)}
           size="small"
