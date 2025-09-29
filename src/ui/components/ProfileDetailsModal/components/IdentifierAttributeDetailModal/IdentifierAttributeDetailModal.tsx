@@ -40,7 +40,7 @@ const IdentifierAttributeDetailModal = ({
 
       if (!memberConnection?.label) {
         currentUserIndex = index;
-        name = data.displayName;
+        name = data.groupMetadata?.userName || "";
       }
 
       const rank = index >= 0 ? index % 5 : 0;
