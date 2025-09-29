@@ -1,0 +1,56 @@
+name: dependency-check-npm-audit
+
+on:
+  pull_request:
+    paths: &shared-trigger-paths
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/dependency-check-npm-audit.yaml'
+    types: [ opened, synchronize ]
+  push:
+    paths: *shared-trigger-paths
+    branches:
+      - main
+      - develop
+      - release/**
+
+env:
+  NODE_OPTIONS: "--max_old_space_size=8192"
+
+jobs:
+  depcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+          submodules: recursive
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: "package.json"
+
+    - name: Run npm audit
+      env:
+        AUDIT_CI_VERSION: latest
+      run: |
+       # We always save the report so it's uploaded to the Security tab
+       npx -y audit-ci@${AUDIT_CI_VERSION} --report --report-type full --config audit-ci.jsonc -o json > audit.json || true
+       # We run it again in text mode to have a better output in the logs and let it fail if there are vulnerabilities (criticity set in audit-ci.jsonc)
+       npx -y audit-ci@${AUDIT_CI_VERSION} --report --report-type full --config audit-ci.jsonc
+
+    - name: Convert npm audit results to SARIF
+      if: always()
+      run: |
+        npx npm-audit-sarif audit.json > audit.sarif.json
+        # potentially fix levels that are not recognized by GitHub
+        jq '(.runs[].results[] | select(.level != "none" and .level != "note" and .level != "warning" and .level != "error") | .level) |= "warning"' audit.sarif.json > fixed-audit.sarif.json
+        mv fixed-audit.sarif.json audit.sarif.json
+
+    - name: Upload SARIF file to GitHub Security tab
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: audit.sarif.json

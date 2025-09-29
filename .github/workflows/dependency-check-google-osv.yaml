@@ -1,0 +1,54 @@
+name: dependency-check-google-osv
+
+on:
+  push:
+    paths: &shared-trigger-paths
+      - 'package.json'
+      - 'package-lock.json'
+      - 'ios/**'
+      - 'android/**'
+      - '**/*.gradle'
+      - '**/Podfile*'
+      - '**/Package*.swift'
+      - '.github/dependency-check-google-osv.yaml'
+    branches:
+      - main
+      - develop
+      - 'releases/**'
+  pull_request:
+    types: [ opened, synchronize ]
+    paths: *shared-trigger-paths
+  workflow_dispatch:
+
+jobs:
+  set-gitignore-artifact:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        submodules: recursive
+
+    - name: Ignore services folder
+      run: |
+        echo 'services/*' >> .gitignore
+
+    - name: Upload .gitignore artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: gitignore-artifact
+        include-hidden-files: true
+        path: .gitignore
+
+  depcheck:
+    permissions:
+      actions: read
+      security-events: write
+      contents: read
+    needs: set-gitignore-artifact
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
+    with:
+      download-artifact: gitignore-artifact
+      scan-args: |-
+        --recursive
+        ./

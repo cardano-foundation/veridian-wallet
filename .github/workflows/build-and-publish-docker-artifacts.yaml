@@ -1,4 +1,4 @@
-name: Build and publish docker artifacts
+name: build-and-publish-docker-artifacts
 
 ###############################################################################
 # WARNING:
@@ -61,7 +61,7 @@ jobs:
       matrix: ${{fromJson(needs.set-matrix.outputs.matrix)}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -124,7 +124,12 @@ jobs:
           
           if [ "$TRIGGERING_REF" == "pr" ]
           then
-
+            # At this point cf-gha-baseline has already checked out the PR input and failed the pipeline, but leaving this here for extra safety in case of future changes
+            if [[ ! '${{ github.event.pull_request.head.repo.full_name }}' =~ ^[a-zA-Z0-9._/-]+$ ]] || [[ ! '${{ github.event.pull_request.head.ref }}' =~ ^[a-zA-Z0-9._/-]+$ ]];
+            then
+              echo "[!] Invalid PR branch or repo name (!= ^[a-zA-Z0-9._/-]+\$). Aborting for security reasons."
+              exit 1
+            fi
             if [ "$IS_PR_FROM_FORK" == "true" ]; then
               echo "External PR detected: fetching branch from $PR_HEAD_REPO"
               git fetch https://github.com/${PR_HEAD_REPO}.git "$PR_HEAD_REF"
