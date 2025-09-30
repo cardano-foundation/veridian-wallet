@@ -38,6 +38,7 @@ interface Credential {
 
 enum PresentationRequestStatus {
   Requested = "requested",
+  Presented = "presented",
 }
 
 interface PresentationRequestData {

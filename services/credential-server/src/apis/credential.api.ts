@@ -133,9 +133,14 @@ export async function requestDisclosure(
   });
   await client.ipex().submitApply(ISSUER_NAME, apply, sigs, [aid]);
 
+  const ipexApplySaid = apply.ked.d;
+
   res.status(200).send({
     success: true,
-    data: "Apply schema successfully",
+    data: {
+      message: "Apply schema successfully",
+      ipexApplySaid: ipexApplySaid,
+    },
   });
 }
 
@@ -220,4 +225,118 @@ export async function revokeCredential(
     success: true,
     data: "Revoke credential successfully",
   });
+}
+
+interface PresentationRequestResponse {
+  id: string;
+  connectionId: string;
+  discloserIdentifier: string;
+  schemaSaid: string;
+  attributes: any;
+  requestDate: number;
+  status: string;
+  ipexApplySaid: string;
+  connectionName: string;
+  credentialType: string;
+}
+
+export async function getPresentationRequests(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const client: SignifyClient = req.app.get("signifyClient");
+
+  const exchanges = await client.exchanges().list();
+  const applyExchanges = exchanges.filter(
+    (exchange) => exchange.exn.r === "/ipex/apply"
+  );
+  const offerExchanges = exchanges.filter(
+    (exchange) => exchange.exn.r === "/ipex/offer"
+  );
+  const presentationRequests: PresentationRequestResponse[] = [];
+
+  for (const exchange of applyExchanges) {
+    const contact = await client.contacts().get(exchange.exn.rp);
+    const existOfferExchange = offerExchanges.some(
+      (offer) =>
+        offer.exn.i === exchange.exn.rp && offer.exn.p === exchange.exn.p
+    );
+
+    const schema = await client.schemas().get(exchange.exn.a.s);
+    const presentationRequest: PresentationRequestResponse = {
+      id: exchange.exn.d,
+      connectionId: exchange.exn.rp,
+      discloserIdentifier: exchange.exn.rp,
+      schemaSaid: exchange.exn.a.s,
+      attributes: exchange.exn.a.a,
+      status: existOfferExchange ? "presented" : "requested",
+      ipexApplySaid: exchange.exn.p,
+      connectionName: contact.alias as string,
+      credentialType: schema.title as string,
+      requestDate: exchange.exn.dt,
+    };
+
+    presentationRequests.push(presentationRequest);
+  }
+
+  res.status(200).send({
+    success: true,
+    data: presentationRequests,
+  });
+}
+
+export async function verifyIpexPresentation(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const client: SignifyClient = req.app.get("signifyClient");
+  const { ipexApplySaid, discloserIdentifier } = req.body;
+
+  if (!ipexApplySaid || !discloserIdentifier) {
+    res.status(400).send({
+      success: false,
+      data: "Missing required parameters: ipexApplySaid and discloserIdentifier",
+    });
+    return;
+  }
+
+  try {
+    const exchanges = await client.exchanges().list();
+    const offerExchanges = exchanges.filter(
+      (exchange) => exchange.exn.r === "/ipex/offer"
+    );
+
+    // Find the matching offer exchange
+    const matchingOffer = offerExchanges.find(
+      (offer) =>
+        offer.exn.i === discloserIdentifier && offer.exn.p === ipexApplySaid
+    );
+
+    if (!matchingOffer) {
+      res.status(200).send({
+        success: true,
+        data: {
+          verified: false,
+        },
+      });
+      return;
+    }
+
+    // Get the full exchange details to extract credential SAD
+    const fullExchange = await client.exchanges().get(matchingOffer.exn.d);
+
+    res.status(200).send({
+      success: true,
+      data: {
+        verified: true,
+        credentialSAD: fullExchange.exn.e?.acdc,
+      },
+    });
+  } catch (error) {
+    console.error("Error verifying IPEX presentation:", error);
+    res.status(500).send({
+      success: false,
+      data: "Internal server error during verification",
+    });
+  }
 }

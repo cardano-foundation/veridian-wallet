@@ -7,16 +7,18 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppTable, useTable } from "../../components/AppTable";
 import { AppTableHeader } from "../../components/AppTable/AppTable.types";
 import { filter, FilterBar } from "../../components/FilterBar";
 import { FilterData } from "../../components/FilterBar/FilterBar.types";
 import { PageHeader } from "../../components/PageHeader";
 import { RequestPresentationModal } from "../../components/RequestPresentationModal";
+import { PresentationStatus } from "../../components/PresentationStatus";
 import { i18n } from "../../i18n";
-import { useAppSelector } from "../../store/hooks";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { PresentationRequestData } from "../../store/reducers/connectionsSlice.types";
+import { fetchPresentationRequests } from "../../store/reducers/connectionsSlice";
 import { formatDate, formatDateTime } from "../../utils/dateFormatter";
 import "./RequestPresentation.scss";
 
@@ -44,6 +46,7 @@ const headers: AppTableHeader<PresentationRequestData>[] = [
 ];
 
 export const RequestPresentation = () => {
+  const dispatch = useAppDispatch();
   const presentationRequests = useAppSelector(
     (state) => state.connections.presentationRequests
   );
@@ -60,7 +63,14 @@ export const RequestPresentation = () => {
     visibleRows,
   } = useTable(presentationRequests, "requestDate");
 
+  // Fetch presentation requests on component mount
+  useEffect(() => {
+    dispatch(fetchPresentationRequests());
+  }, [dispatch]);
+
   const handleClick = () => {
+    // Refresh presentation requests data when opening the modal
+    dispatch(fetchPresentationRequests());
     setOpenModal(true);
   };
 
@@ -158,11 +168,7 @@ export const RequestPresentation = () => {
                     </Tooltip>
                   </TableCell>
                   <TableCell align="left">
-                    <Box className={`label ${row.status}`}>
-                      {i18n.t(
-                        "pages.requestPresentation.table.status.requested"
-                      )}
-                    </Box>
+                    <PresentationStatus status={row.status} />
                   </TableCell>
                   <TableCell />
                 </TableRow>

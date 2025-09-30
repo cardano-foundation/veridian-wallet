@@ -21,6 +21,23 @@ const CredentialService = {
       data
     );
   },
+  verifyPresentation: async (
+    ipexApplySaid: string,
+    discloserIdentifier: string
+  ) => {
+    return httpInstance.post(
+      `${config.endpoint}${config.path.verifyIpexPresentation}`,
+      {
+        ipexApplySaid,
+        discloserIdentifier,
+      }
+    );
+  },
+  getPresentationRequests: async () => {
+    return httpInstance.get(
+      `${config.endpoint}${config.path.getPresentationRequests}`
+    );
+  },
 };
 
 export { CredentialService };
