@@ -277,26 +277,24 @@ async issueSocialMediaCredential(
   const edgeCredentials: { [key: string]: any } = {};
 
   if (exchange.exn.a.e) {
-    for (const edgeName in exchange.exn.a.e) {
-      const edgeObj = exchange.exn.a.e[edgeName];
-      if (edgeObj && edgeObj.d) {
-        const sourceSaid = edgeObj.d;
-        edgeCredentials[edgeName] = await this.props.signifyClient
-          .credentials()
-          .get(sourceSaid);
-      }
-    }
-
-    for (const edgeName in exchange.exn.a.e) {
-      const sourceCred = edgeCredentials[edgeName];
-      if (sourceCred) {
-        edges[edgeName] = {
-          n: sourceCred.sad.d,
-          s: sourceCred.sad.s
-        };
-      }
-    }
-  }
+        for (const edgeName in exchange.exn.a.e) {
+          const sourceSaid = exchange.exn.a.e[edgeName].d;
+          if (!sourceSaid) continue;
+    
+          edgeCredentials[edgeName] = await this.props.signifyClient
+            .credentials()
+            .get(sourceSaid);
+        }
+    
+        for (const edgeName in exchange.exn.a.e) {
+          const sourceCred = edgeCredentials[edgeName];
+          if (!sourceCred) continue;
+    
+          edges[edgeName] = {
+            n: sourceCred.sad.d,
+            s: sourceCred.sad.s,
+          };
+        }  }
 
   console.log("edges555");
   console.log(edges);
@@ -332,8 +330,8 @@ async issueSocialMediaCredential(
     .exchanges()
     .createExchangeMessage(
       hab,
-      ExchangeRoute.CoordinationCredentialsInfoResp,
-      { sads: JSON.stringify([newAcdc.sad]) },  // Solo los SADs
+      ExchangeRoute.CoordinationCredentialsIssueResp,
+      { sads: JSON.stringify([newAcdc.sad]) }, 
       [],
       exchange.exn.i,
       undefined,
@@ -347,6 +345,8 @@ async issueSocialMediaCredential(
       exchange.exn.i,
     ]);
 
+  console.log("hey3, sent to:");
+  console.log(exchange.exn.i);
   // Borrar notificación
   await deleteNotificationRecordById(
     this.props.signifyClient,
@@ -368,6 +368,8 @@ async issueSocialMediaCredential(
     notificationId: string,
     requestSaid: string
   ): Promise<void> {
+
+    console.log("shareCredentials");
     const noteRecord = await this.notificationStorage.findExpectedById(
       notificationId
     );
