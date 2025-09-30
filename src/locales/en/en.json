@@ -575,10 +575,12 @@
       },
       "signingkeysthreshold": {
         "title": "Required signers",
+        "member": "{{member}} members",
         "outof": "out of {{threshold}}"
       },
       "rotationthreshold": {
         "title": "Recovery signers",
+        "member": "{{member}} members",
         "outof": "out of {{threshold}}"
       },
       "button": {

@@ -274,7 +274,10 @@ const ProfileContent = ({
               testId="signing-threshold-block"
             >
               <CardDetailsContent
-                mainContent={`${cardData.kt}`}
+                mainContent={`${i18n.t(
+                  "profiledetails.group.signingkeysthreshold.member",
+                  { member: cardData.kt }
+                )}`}
                 subContent={`${i18n.t(
                   "profiledetails.group.signingkeysthreshold.outof",
                   { threshold: memberCount }
@@ -290,7 +293,10 @@ const ProfileContent = ({
               testId="rotate-threshold-block"
             >
               <CardDetailsContent
-                mainContent={`${cardData.nt}`}
+                mainContent={`${i18n.t(
+                  "profiledetails.group.rotationthreshold.member",
+                  { member: cardData.nt }
+                )}`}
                 subContent={`${i18n.t(
                   "profiledetails.group.rotationthreshold.outof",
                   { threshold: memberCount }
