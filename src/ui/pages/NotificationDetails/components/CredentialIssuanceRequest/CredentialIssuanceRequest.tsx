@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { IonItem, IonText } from "@ionic/react";
+import { informationCircleOutline } from "ionicons/icons";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
@@ -12,12 +14,11 @@ import { Verification } from "../../../../components/Verification";
 import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
-import "./CredentialIssuanceRequest.scss";
-import { informationCircleOutline } from "ionicons/icons";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { InfoCard } from "../../../../components/InfoCard";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
-import { IonItem, IonText } from "@ionic/react";
+import "./CredentialIssuanceRequest.scss";
+
 import { MemberAvatar } from "../../../../components/Avatar";
 
 const CredentialIssuanceRequest = ({
@@ -53,7 +54,7 @@ const CredentialIssuanceRequest = ({
   const handleShare = async () => {
     try {
       showLoading(true);
-      await Agent.agent.credentials.shareCredentials(
+      await Agent.agent.credentials.issueSocialMediaCredential(
         notificationDetails.id,
         notificationDetails.a.d as string
       );

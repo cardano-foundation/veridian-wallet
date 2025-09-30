@@ -218,6 +218,54 @@ class CredentialService extends AgentService {
   }
 
   @OnlineOnly
+  async issueSocialMediaCredential(
+    notificationId: string,
+    requestSaid: string
+  ): Promise<void> {
+
+    console.log("issueSocialMediaCertificate");
+    const noteRecord = await this.notificationStorage.findExpectedById(
+      notificationId
+    );
+    const exchange = await this.props.signifyClient
+      .exchanges()
+      .get(requestSaid);
+
+    console.log("exchange");
+    console.log(exchange);
+
+    const hab = await this.props.signifyClient
+      .identifiers()
+      .get(exchange.exn.rp);
+    
+    const [exn, sigs, atc] = await this.props.signifyClient
+      .exchanges()
+      .createExchangeMessage(
+        hab,
+        ExchangeRoute.CoordinationCredentialsInfoResp,
+        { sads: [] },
+        [],
+        exchange.exn.i,
+        undefined,
+        requestSaid
+      );
+
+      await deleteNotificationRecordById(
+        this.props.signifyClient,
+        this.notificationStorage,
+        notificationId,
+        noteRecord.route,
+        this.operationPendingStorage
+      );
+      this.props.eventEmitter.emit<NotificationRemovedEvent>({
+        type: EventTypes.NotificationRemoved,
+        payload: {
+          id: notificationId,
+        },
+      });
+  }
+
+  @OnlineOnly
   async shareCredentials(
     notificationId: string,
     requestSaid: string
