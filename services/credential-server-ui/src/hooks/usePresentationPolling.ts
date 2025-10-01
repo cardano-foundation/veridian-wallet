@@ -56,19 +56,11 @@ export const usePresentationPolling = () => {
   }, [requestedPresentations, dispatch]);
 
   useEffect(() => {
-    if (requestedPresentations.length > 0) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-
-      intervalRef.current = setInterval(pollAllRequested, 500);
-      pollAllRequested();
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
     }
+
+    intervalRef.current = setInterval(pollAllRequested, 500);
 
     return () => {
       if (intervalRef.current) {
@@ -76,7 +68,7 @@ export const usePresentationPolling = () => {
         intervalRef.current = null;
       }
     };
-  }, [requestedPresentations.length, pollAllRequested]);
+  }, [pollAllRequested]);
 
   useEffect(() => {
     return () => {
