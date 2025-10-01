@@ -7,7 +7,7 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AppTable, useTable } from "../../components/AppTable";
 import { AppTableHeader } from "../../components/AppTable/AppTable.types";
 import { filter, FilterBar } from "../../components/FilterBar";
@@ -15,8 +15,10 @@ import { FilterData } from "../../components/FilterBar/FilterBar.types";
 import { PageHeader } from "../../components/PageHeader";
 import { RequestPresentationModal } from "../../components/RequestPresentationModal";
 import { i18n } from "../../i18n";
-import { useAppSelector } from "../../store/hooks";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { PresentationRequestData } from "../../store/reducers/connectionsSlice.types";
+import { fetchPresentationRequests } from "../../store/reducers/connectionsSlice";
+import { usePresentationPolling } from "../../hooks/usePresentationPolling";
 import { formatDate, formatDateTime } from "../../utils/dateFormatter";
 import "./RequestPresentation.scss";
 
@@ -44,9 +46,11 @@ const headers: AppTableHeader<PresentationRequestData>[] = [
 ];
 
 export const RequestPresentation = () => {
+  const dispatch = useAppDispatch();
   const presentationRequests = useAppSelector(
     (state) => state.connections.presentationRequests
   );
+  const hasInitialized = useRef(false);
   const [openModal, setOpenModal] = useState(false);
 
   const {
@@ -58,7 +62,16 @@ export const RequestPresentation = () => {
     handleChangePage,
     handleChangeRowsPerPage,
     visibleRows,
-  } = useTable(presentationRequests, "requestDate");
+  } = useTable(presentationRequests, "requestDate", "desc");
+
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      dispatch(fetchPresentationRequests());
+    }
+  }, []);
+
+  usePresentationPolling();
 
   const handleClick = () => {
     setOpenModal(true);
@@ -159,9 +172,7 @@ export const RequestPresentation = () => {
                   </TableCell>
                   <TableCell align="left">
                     <Box className={`label ${row.status}`}>
-                      {i18n.t(
-                        "pages.requestPresentation.table.status.requested"
-                      )}
+                      {row.status[0].toUpperCase() + row.status.slice(1)}
                     </Box>
                   </TableCell>
                   <TableCell />

@@ -9,8 +9,7 @@ import { i18n } from "../../i18n";
 import { CredentialService } from "../../services";
 import { CredentialRequest } from "../../services/credential.types";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { savePresentationRequest } from "../../store/reducers/connectionsSlice";
-import { PresentationRequestStatus } from "../../store/reducers/connectionsSlice.types";
+import { fetchPresentationRequests } from "../../store/reducers/connectionsSlice";
 import { PopupModal } from "../PopupModal";
 import { InputAttribute } from "./InputAttribute";
 import "./RequestPresentationModal.scss";
@@ -131,18 +130,8 @@ const RequestPresentationModal = ({
         "success"
       );
 
-      dispatch(
-        savePresentationRequest({
-          id: String(Date.now),
-          connectionName:
-            connections.find((item) => item.id === selectedConnection)?.alias ||
-            "",
-          credentialType: credTemplateType,
-          attribute: Object.values(attributes)[0],
-          requestDate: Date.now(),
-          status: PresentationRequestStatus.Requested,
-        })
-      );
+      dispatch(fetchPresentationRequests());
+
       resetModal();
     } catch (e) {
       triggerToast(

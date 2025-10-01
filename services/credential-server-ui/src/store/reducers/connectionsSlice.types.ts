@@ -38,6 +38,7 @@ interface Credential {
 
 enum PresentationRequestStatus {
   Requested = "requested",
+  Presented = "presented",
 }
 
 interface PresentationRequestData {
@@ -47,6 +48,8 @@ interface PresentationRequestData {
   attribute: string;
   requestDate: number;
   status: PresentationRequestStatus;
+  ipexApplySaid: string;
+  discloserIdentifier: string;
 }
 
 export { PresentationRequestStatus };
