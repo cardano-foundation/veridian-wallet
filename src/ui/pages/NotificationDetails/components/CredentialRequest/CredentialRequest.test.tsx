@@ -6,7 +6,10 @@ import { Provider } from "react-redux";
 
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
-import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
+import {
+  connectionsForNotificationsValues,
+  connectionsFix,
+} from "../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../__fixtures__/credRequestFix";
 import { credsFixAcdc } from "../../../../__fixtures__/credsFix";
 import {
@@ -44,6 +47,9 @@ jest.mock("../../../../../core/agent/agent", () => ({
         getLinkedGroupFromIpexApply: () => getLinkedGroupFromIpexApplyMock(),
         joinMultisigOffer: jest.fn(),
         getOfferedCredentialSaid: jest.fn(),
+      },
+      connections: {
+        getConnectionById: jest.fn(() => Promise.resolve(connectionsFix[0])),
       },
     },
   },
