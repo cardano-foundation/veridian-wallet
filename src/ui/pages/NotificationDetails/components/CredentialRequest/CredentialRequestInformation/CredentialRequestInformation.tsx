@@ -89,6 +89,8 @@ const CredentialRequestInformation = ({
           setRequester("Citizen Portal");
         } else if (type === "socialmedia") {
           setRequester("Socialbook");
+        } else {
+          setRequester(connection.label || i18n.t("tabs.connections.unknown"));
         }
       } catch (error) {
         // eslint-disable-next-line no-console

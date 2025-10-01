@@ -64,6 +64,8 @@ const NotificationItem = ({
           setConnectionName("Citizen Portal");
         } else if (type === "socialmedia") {
           setConnectionName("Socialbook");
+        } else {
+          setConnectionName(connection.label || "Unknown");
         }
       } catch (error) {
         // eslint-disable-next-line no-console
