@@ -7,7 +7,6 @@ import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../__fixtures__/credRequestFix";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
 import { NotificationDetails } from "./NotificationDetails";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";

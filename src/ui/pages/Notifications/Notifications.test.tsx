@@ -7,7 +7,10 @@ import { MemoryRouter } from "react-router-dom";
 import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
-import { connectionsForNotificationsValues } from "../../__fixtures__/connectionsFix";
+import {
+  connectionsForNotificationsValues,
+  connectionsFix,
+} from "../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
@@ -17,18 +20,20 @@ import { NotificationItem } from "./NotificationItem";
 import { Notifications } from "./Notifications";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
-jest.mock("../../../core/configuration", () => ({
-  ...jest.requireActual("../../../core/configuration"),
-  ConfigurationService: {
-    env: {
-      features: {
-        notifications: {
-          fallbackIcon: false,
-        },
-      },
-    },
-  },
-}));
+jest.mock("@ionic/react", () => {
+  const actual = jest.requireActual("@ionic/react");
+  return {
+    ...actual,
+    IonAlert: (props: any) =>
+      props.isOpen ? (
+        <div data-testid={props["data-testid"]}>
+          {props.header}
+          {props.subHeader}
+          {props.message}
+        </div>
+      ) : null,
+  };
+});
 
 const readNotificationMock = jest.fn((id: string) => Promise.resolve(id));
 jest.mock("../../../core/agent/agent", () => ({
@@ -55,6 +60,7 @@ jest.mock("../../../core/agent/agent", () => ({
       },
       connections: {
         getConnectionShortDetailById: jest.fn(),
+        getConnectionById: jest.fn(() => Promise.resolve(connectionsFix[0])),
       },
     },
   },
@@ -336,8 +342,7 @@ describe("Notifications Tab", () => {
 
     const alerts = await findAllByTestId("alert-unknown-issuer");
     expect(alerts[0]).toBeInTheDocument();
-    expect(alerts[0]).toHaveAttribute(
-      "header",
+    expect(alerts[0]).toHaveTextContent(
       EN_TRANSLATIONS.tabs.notifications.tab.unknownissuer.text
     );
   });
