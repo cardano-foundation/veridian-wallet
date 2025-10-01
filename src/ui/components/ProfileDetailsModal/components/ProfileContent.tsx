@@ -187,6 +187,13 @@ const ProfileContent = ({
         <ListCard
           items={[
             {
+              label: i18n.t(
+                "profiledetails.identifierdetail.listoptions.onlinelogin"
+              ),
+              icon: logInOutline,
+              onClick: showLogin,
+            },
+            {
               label: i18n.t("profiledetails.identifierdetail.listoptions.dapp"),
               icon: appsOutline,
               onClick: showDapp,

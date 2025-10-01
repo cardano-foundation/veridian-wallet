@@ -303,7 +303,6 @@ async issueSocialMediaCredential(
 
   await waitAndGetDoneOp(this.props.signifyClient, issueOp.op, OP_TIMEOUT);
 
-  // Grant credential
   const newCredentialSaid = issueOp.acdc.ked.d;
   const newAcdc = await this.props.signifyClient
     .credentials()
@@ -311,7 +310,7 @@ async issueSocialMediaCredential(
 
   const datetime = new Date().toISOString().replace("Z", "000+00:00");
   const [grant, gsigs, gend] = await this.props.signifyClient.ipex().grant({
-      message: exchange.exn.a.a.oobiUrl, // `${exchange.exn.a.a.oobiUrl}/oobi/${exchange.exn.a.s}`
+      message: exchange.exn.a.a.oobiUrl,
       senderName: effectiveRp,
       recipient: childAid,
       acdc: new Serder(newAcdc.sad),
@@ -331,12 +330,17 @@ async issueSocialMediaCredential(
 
   await waitAndGetDoneOp(this.props.signifyClient, grantOp, OP_TIMEOUT);
 
+  const payload = {
+    d: "",
+    sads: JSON.stringify([newAcdc.sad])
+  }
+
   const [exn, sigs, atc] = await this.props.signifyClient
     .exchanges()
     .createExchangeMessage(
       hab,
       ExchangeRoute.CoordinationCredentialsIssueResp,
-      { sads: JSON.stringify([newAcdc.sad]) }, 
+      Saider.saidify(payload)[1], 
       [],
       exchange.exn.i,
       undefined,
@@ -349,7 +353,6 @@ async issueSocialMediaCredential(
       childAid,
     ]);
 
-  // Borrar notificación
   await deleteNotificationRecordById(
     this.props.signifyClient,
     this.notificationStorage,
