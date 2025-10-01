@@ -246,20 +246,40 @@ export async function getPresentationRequests(
 ): Promise<void> {
   const client: SignifyClient = req.app.get("signifyClient");
 
-  const exchanges = await client.exchanges().list();
+  let exchanges: any[] = [];
+  let skip = 0;
+  const limit = 100;
+
+  while (true) {
+    const exchangePage = await client.exchanges().list({ skip, limit });
+
+    if (!exchangePage || exchangePage.length === 0) {
+      break;
+    }
+
+    exchanges.push(...exchangePage);
+
+    if (exchangePage.length < limit) {
+      break;
+    }
+
+    skip += limit;
+  }
+
   const applyExchanges = exchanges.filter(
     (exchange) => exchange.exn.r === "/ipex/apply"
   );
   const offerExchanges = exchanges.filter(
     (exchange) => exchange.exn.r === "/ipex/offer"
   );
+
   const presentationRequests: PresentationRequestResponse[] = [];
 
   for (const exchange of applyExchanges) {
     const contact = await client.contacts().get(exchange.exn.rp);
     const existOfferExchange = offerExchanges.some(
       (offer) =>
-        offer.exn.i === exchange.exn.rp && offer.exn.p === exchange.exn.p
+        offer.exn.i === exchange.exn.rp && offer.exn.p === exchange.exn.d
     );
 
     const schema = await client.schemas().get(exchange.exn.a.s);
@@ -270,7 +290,7 @@ export async function getPresentationRequests(
       schemaSaid: exchange.exn.a.s,
       attributes: exchange.exn.a.a,
       status: existOfferExchange ? "presented" : "requested",
-      ipexApplySaid: exchange.exn.p,
+      ipexApplySaid: exchange.exn.i,
       connectionName: contact.alias as string,
       credentialType: schema.title as string,
       requestDate: exchange.exn.dt,
@@ -300,43 +320,37 @@ export async function verifyIpexPresentation(
     return;
   }
 
-  try {
-    const exchanges = await client.exchanges().list();
-    const offerExchanges = exchanges.filter(
-      (exchange) => exchange.exn.r === "/ipex/offer"
-    );
+  let exchanges: any[] = [];
+  let skip = 0;
+  const limit = 100;
 
-    // Find the matching offer exchange
-    const matchingOffer = offerExchanges.find(
-      (offer) =>
-        offer.exn.i === discloserIdentifier && offer.exn.p === ipexApplySaid
-    );
+  while (true) {
+    const exchangePage = await client.exchanges().list({ skip, limit });
 
-    if (!matchingOffer) {
-      res.status(200).send({
-        success: true,
-        data: {
-          verified: false,
-        },
-      });
-      return;
+    if (!exchangePage || exchangePage.length === 0) {
+      break;
     }
 
-    // Get the full exchange details to extract credential SAD
-    const fullExchange = await client.exchanges().get(matchingOffer.exn.d);
+    exchanges.push(...exchangePage);
 
-    res.status(200).send({
-      success: true,
-      data: {
-        verified: true,
-        credentialSAD: fullExchange.exn.e?.acdc,
-      },
-    });
-  } catch (error) {
-    console.error("Error verifying IPEX presentation:", error);
-    res.status(500).send({
-      success: false,
-      data: "Internal server error during verification",
-    });
+    if (exchangePage.length < limit) {
+      break;
+    }
+
+    skip += limit;
   }
+
+  const offerExchanges = exchanges.filter(
+    (exchange) => exchange.exn.r === "/ipex/offer"
+  );
+
+  const isOfferExist = offerExchanges.some(
+    (offer) =>
+      offer.exn.i === discloserIdentifier && offer.exn.rp === ipexApplySaid
+  );
+
+  res.status(200).send({
+    success: true,
+    data: { verified: isOfferExist },
+  });
 }
