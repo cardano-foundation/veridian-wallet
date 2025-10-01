@@ -7,7 +7,7 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AppTable, useTable } from "../../components/AppTable";
 import { AppTableHeader } from "../../components/AppTable/AppTable.types";
 import { filter, FilterBar } from "../../components/FilterBar";
@@ -51,6 +51,7 @@ export const RequestPresentation = () => {
   const presentationRequests = useAppSelector(
     (state) => state.connections.presentationRequests
   );
+  const hasInitialized = useRef(false);
   const [openModal, setOpenModal] = useState(false);
 
   const {
@@ -65,8 +66,11 @@ export const RequestPresentation = () => {
   } = useTable(presentationRequests, "requestDate", "desc");
 
   useEffect(() => {
-    dispatch(fetchPresentationRequests());
-  }, [dispatch]);
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      dispatch(fetchPresentationRequests());
+    }
+  }, []);
 
   usePresentationPolling();
 
