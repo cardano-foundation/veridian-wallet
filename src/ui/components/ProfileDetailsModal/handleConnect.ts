@@ -160,13 +160,14 @@ export async function signedFetch(
   return fetch(url, finalOptions);
 }
 
-
 function extractOobiAid(urlString: string): string | null {
   try {
     const parsedUrl = new URL(urlString);
     const pathname = parsedUrl.pathname;
-    const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
-    const oobiIndex = pathSegments.indexOf('oobi');
+    const pathSegments = pathname
+      .split("/")
+      .filter((segment) => segment.length > 0);
+    const oobiIndex = pathSegments.indexOf("oobi");
 
     if (oobiIndex !== -1 && pathSegments.length > oobiIndex + 1) {
       return pathSegments[oobiIndex + 1];
@@ -177,7 +178,6 @@ function extractOobiAid(urlString: string): string | null {
     return null;
   }
 }
-
 
 export const handleConnect = async ({
   content,
@@ -190,27 +190,21 @@ export const handleConnect = async ({
 
   try {
     const { sessionAid, backendApi, backendOobi } = JSON.parse(content);
-    
+
     const backendAid = extractOobiAid(backendOobi);
 
-    if (!backendAid){
+    if (!backendAid) {
       throw new Error("backendAid not found in backendOobi");
     }
-    await await Agent.agent.connections.deleteAllConnectionsForIdentifier(profileAid);
 
-    await Agent.agent.connections.oneWayScanningLogin(backendOobi, backendAid, backendApi, profileAid);
+    await Agent.agent.connections.oneWayScanningLogin(
+      backendOobi,
+      backendAid,
+      backendApi,
+      profileAid
+    );
 
     const requestPath = "/login";
-
-    /* TODO: fix verification of interaction event in backend
-    await signedInteractionFetch(profileAid, sessionAid, `${backendApi}${requestPath}`, {
-      method: "POST",
-       body: JSON.stringify({
-        sessionAid,
-        userAid: profileAid
-      })
-    });*/
-
     await signedFetch(profileAid, `${backendApi}${requestPath}`, {
       method: "POST",
       body: JSON.stringify({

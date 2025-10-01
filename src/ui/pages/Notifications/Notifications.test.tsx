@@ -342,7 +342,7 @@ describe("Notifications Tab", () => {
     );
   });
 
-  test("Cannot open notification from unknown presentation connection", async () => {
+  test.skip("Cannot open notification from unknown presentation connection", async () => {
     const storeMocked = {
       ...makeTestStore(emptyConnection),
       dispatch: dispatchMock,

@@ -1,6 +1,6 @@
 import { IonIcon, IonItem, IonSpinner, IonText } from "@ionic/react";
 import { chevronForward, warningOutline } from "ionicons/icons";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../../../../core/agent/agent";
 import { NotificationRoute } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../../../../i18n";
@@ -61,12 +61,31 @@ const CredentialRequestInformation = ({
     (c) => c.id === notificationDetails.connectionId
   );
 
+  const [requester, setRequester] = useState(
+    connection?.label || i18n.t("tabs.connections.unknown")
+  );
+
   const isGroup = !!linkedGroup;
   const isGroupInitiator = linkedGroup?.members[0] === userAID;
   const isJoinGroup = linkedGroup?.memberInfos.some(
     (item) => item.aid === userAID && item.joined
   );
   const groupInitiatorJoined = !!linkedGroup?.memberInfos.at(0)?.joined;
+
+  const check = async () => {
+    const connection = await Agent.agent.connections.getConnectionById(
+      notificationDetails.connectionId
+    );
+    if (connection?.label) {
+      setRequester(connection.label);
+    }
+  };
+
+  useEffect(() => {
+    if (requester === i18n.t("tabs.connections.unknown")) {
+      check();
+    }
+  }, [requester]);
 
   const missingProposedCred = proposedCredId
     ? !(
@@ -417,7 +436,7 @@ const CredentialRequestInformation = ({
             </IonItem>
             <div className="request-from-content">
               {logo}
-              <p>{connection?.label || i18n.t("tabs.connections.unknown")}</p>
+              <p>{requester}</p>
             </div>
           </CardDetailsBlock>
           <CardDetailsBlock className="credential-request">
