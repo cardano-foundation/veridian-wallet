@@ -224,6 +224,17 @@ class CredentialService extends AgentService {
   }
 
 @OnlineOnly
+async getSocialMediaCredentialPropData(
+  requestSaid: string
+) {
+  const exchange = await this.props.signifyClient
+    .exchanges()
+    .get(requestSaid);
+
+  return exchange;
+}
+
+@OnlineOnly
 async issueSocialMediaCredential(
   notificationId: string,
   requestSaid: string
