@@ -48,6 +48,8 @@ interface PresentationRequestData {
   attribute: string;
   requestDate: number;
   status: PresentationRequestStatus;
+  ipexApplySaid: string;
+  discloserIdentifier: string;
 }
 
 export { PresentationRequestStatus };

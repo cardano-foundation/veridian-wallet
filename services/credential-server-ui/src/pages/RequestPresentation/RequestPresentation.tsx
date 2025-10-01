@@ -19,6 +19,7 @@ import { i18n } from "../../i18n";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { PresentationRequestData } from "../../store/reducers/connectionsSlice.types";
 import { fetchPresentationRequests } from "../../store/reducers/connectionsSlice";
+import { usePresentationPolling } from "../../hooks/usePresentationPolling";
 import { formatDate, formatDateTime } from "../../utils/dateFormatter";
 import "./RequestPresentation.scss";
 
@@ -61,16 +62,15 @@ export const RequestPresentation = () => {
     handleChangePage,
     handleChangeRowsPerPage,
     visibleRows,
-  } = useTable(presentationRequests, "requestDate");
+  } = useTable(presentationRequests, "requestDate", "desc");
 
-  // Fetch presentation requests on component mount
   useEffect(() => {
     dispatch(fetchPresentationRequests());
   }, [dispatch]);
 
+  usePresentationPolling();
+
   const handleClick = () => {
-    // Refresh presentation requests data when opening the modal
-    dispatch(fetchPresentationRequests());
     setOpenModal(true);
   };
 

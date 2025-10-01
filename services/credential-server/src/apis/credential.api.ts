@@ -290,7 +290,7 @@ export async function getPresentationRequests(
       schemaSaid: exchange.exn.a.s,
       attributes: exchange.exn.a.a,
       status: existOfferExchange ? "presented" : "requested",
-      ipexApplySaid: exchange.exn.i,
+      ipexApplySaid: exchange.exn.d,
       connectionName: contact.alias as string,
       credentialType: schema.title as string,
       requestDate: exchange.exn.dt,
@@ -344,13 +344,13 @@ export async function verifyIpexPresentation(
     (exchange) => exchange.exn.r === "/ipex/offer"
   );
 
-  const isOfferExist = offerExchanges.some(
-    (offer) =>
-      offer.exn.i === discloserIdentifier && offer.exn.rp === ipexApplySaid
+  const offerExchange = offerExchanges.find(
+    (exchange) =>
+      exchange.exn.i === discloserIdentifier && exchange.exn.p === ipexApplySaid
   );
 
   res.status(200).send({
     success: true,
-    data: { verified: isOfferExist },
+    data: { verified: offerExchange ? true : false },
   });
 }

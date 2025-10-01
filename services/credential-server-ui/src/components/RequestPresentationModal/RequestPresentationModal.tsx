@@ -9,13 +9,8 @@ import { i18n } from "../../i18n";
 import { CredentialService } from "../../services";
 import { CredentialRequest } from "../../services/credential.types";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {
-  savePresentationRequest,
-  updatePresentationStatus,
-  fetchPresentationRequests,
-} from "../../store/reducers/connectionsSlice";
+import { savePresentationRequest } from "../../store/reducers/connectionsSlice";
 import { PresentationRequestStatus } from "../../store/reducers/connectionsSlice.types";
-import { usePresentationVerification } from "../../hooks/usePresentationVerification";
 import { PopupModal } from "../PopupModal";
 import { InputAttribute } from "./InputAttribute";
 import "./RequestPresentationModal.scss";
@@ -46,34 +41,10 @@ const RequestPresentationModal = ({
   >(connectionId);
   const [selectedCredTemplate, setSelectedCredTemplate] = useState<string>();
   const [attributes, setAttributes] = useState<Record<string, string>>({});
-  const [currentRequestId, setCurrentRequestId] = useState<string | null>(null);
-  const [ipexApplySaid, setIpexApplySaid] = useState<string | undefined>();
-  const [discloserIdentifier, setDiscloserIdentifier] = useState<
-    string | undefined
-  >();
 
   const schema = useSchemaDetail(selectedCredTemplate);
 
   const credTemplateType = selectedCredTemplate ? schema?.title : undefined;
-
-  usePresentationVerification({
-    ipexApplySaid,
-    discloserIdentifier,
-    enabled: !!currentRequestId,
-    onVerificationSuccess: () => {
-      if (currentRequestId) {
-        dispatch(
-          updatePresentationStatus({
-            id: currentRequestId,
-            status: PresentationRequestStatus.Presented,
-          })
-        );
-        setCurrentRequestId(null);
-        setIpexApplySaid(undefined);
-        setDiscloserIdentifier(undefined);
-      }
-    },
-  });
 
   const triggerToast = (message: string, variant: VariantType) => {
     enqueueSnackbar(message, {
@@ -160,12 +131,11 @@ const RequestPresentationModal = ({
         "success"
       );
 
-      const requestId = String(Date.now());
       const ipexApplySaid = response.data.data.ipexApplySaid;
 
       dispatch(
         savePresentationRequest({
-          id: requestId,
+          id: ipexApplySaid,
           connectionName:
             connections.find((item) => item.id === selectedConnection)?.alias ||
             "",
@@ -173,14 +143,10 @@ const RequestPresentationModal = ({
           attribute: Object.values(attributes)[0],
           requestDate: Date.now(),
           status: PresentationRequestStatus.Requested,
+          ipexApplySaid: ipexApplySaid,
+          discloserIdentifier: selectedConnection,
         })
       );
-
-      setCurrentRequestId(requestId);
-      setIpexApplySaid(ipexApplySaid);
-      setDiscloserIdentifier(selectedConnection);
-
-      dispatch(fetchPresentationRequests());
 
       resetModal();
     } catch (e) {
