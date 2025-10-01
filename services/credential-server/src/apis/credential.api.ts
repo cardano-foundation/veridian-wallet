@@ -263,7 +263,7 @@ export async function getPresentationRequests(
   req: Request,
   res: Response
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
+  const client: SignifyClient = req.app.get("issuerClient");
 
   let exchanges: any[] = [];
   let skip = 0;
@@ -328,7 +328,7 @@ export async function verifyIpexPresentation(
   req: Request,
   res: Response
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
+  const client: SignifyClient = req.app.get("issuerClient");
   const { ipexApplySaid, discloserIdentifier } = req.body;
 
   if (!ipexApplySaid || !discloserIdentifier) {
