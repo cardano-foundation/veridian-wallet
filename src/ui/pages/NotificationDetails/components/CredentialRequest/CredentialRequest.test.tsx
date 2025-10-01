@@ -6,16 +6,9 @@ import { Provider } from "react-redux";
 
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
-import {
-  connectionsForNotificationsValues,
-  connectionsFix,
-} from "../../../../__fixtures__/connectionsFix";
+import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../__fixtures__/credRequestFix";
-import { credsFixAcdc } from "../../../../__fixtures__/credsFix";
-import {
-  filteredIdentifierFix,
-  multisignIdentifierFix,
-} from "../../../../__fixtures__/filteredIdentifierFix";
+import { multisignIdentifierFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
 import { CredentialRequest } from "./CredentialRequest";
 import { makeTestStore } from "../../../../utils/makeTestStore";
@@ -49,7 +42,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
         getOfferedCredentialSaid: jest.fn(),
       },
       connections: {
-        getConnectionById: jest.fn(() => Promise.resolve(connectionsFix[0])),
+        getConnectionById: jest.fn().mockResolvedValue(undefined),
       },
     },
   },
