@@ -824,10 +824,21 @@ describe("Group profile details page", () => {
     expect(getByTestId("view-member")).toBeVisible();
 
     // Render Keys signing threshold
-    expect(getByTestId("rotate-signing-key")).toBeVisible();
+    expect(getByTestId("signing-threshold-block")).toBeVisible();
     expect(
       getAllByText(
         EN_TRANSLATIONS.profiledetails.group.signingkeysthreshold.outof.replace(
+          "{{threshold}}",
+          "4"
+        )
+      )[0]
+    ).toBeVisible();
+
+    // Render Keys rotate threshold
+    expect(getByTestId("rotate-threshold-block")).toBeVisible();
+    expect(
+      getAllByText(
+        EN_TRANSLATIONS.profiledetails.group.rotationthreshold.outof.replace(
           "{{threshold}}",
           "4"
         )
@@ -933,115 +944,6 @@ describe("Group profile details page", () => {
     });
   });
 
-  test("Open advanced detail", async () => {
-    const { getByText, getByTestId, getAllByText } = render(
-      <Provider store={storeMockedAidKeri}>
-        <ProfileDetailsModal
-          profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
-          pageId={pageId}
-          isOpen
-          setIsOpen={jest.fn}
-        />
-      </Provider>
-    );
-
-    expect(
-      getByTestId("identifier-card-detail-spinner-container")
-    ).toBeVisible();
-
-    await waitFor(() => {
-      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
-      getAllByText(identifierFix[2].displayName).forEach((item) => {
-        expect(item).toBeVisible();
-      });
-    });
-
-    fireEvent.click(
-      getByText(EN_TRANSLATIONS.profiledetails.identifierdetail.showadvanced)
-    );
-
-    // Render Sequence number
-    await waitFor(() => {
-      expect(getByTestId("sequence-number")).toBeInTheDocument();
-    });
-
-    // Render Last key rotation timestamp
-    expect(
-      getByText(
-        `Last key event: ${
-          formatShortDate(identifierFix[0].dt) +
-          " - " +
-          formatTimeToSec(identifierFix[0].dt)
-        } (${getUTCOffset(identifierFix[0].dt)})`
-      )
-    ).toBeInTheDocument();
-
-    // Render Last key rotation timestamp
-    expect(
-      getByText(
-        `Last key event: ${
-          formatShortDate(identifierFix[2].dt) +
-          " - " +
-          formatTimeToSec(identifierFix[2].dt)
-        } (${getUTCOffset(identifierFix[0].dt)})`
-      )
-    ).toBeInTheDocument();
-
-    expect(
-      getByText(
-        EN_TRANSLATIONS.profiledetails.detailsmodal.advanceddetail.viewkey.replace(
-          "{{keys}}",
-          "1"
-        )
-      )
-    ).toBeInTheDocument();
-    expect(
-      getByText(
-        EN_TRANSLATIONS.profiledetails.detailsmodal.advanceddetail.viewrotationkey.replace(
-          "{{keys}}",
-          "1"
-        )
-      )
-    ).toBeInTheDocument();
-
-    fireEvent(
-      getByTestId("key-list"),
-      new CustomEvent("ionChange", {
-        detail: { value: [AccordionKey.SIGNINGKEY] },
-      })
-    );
-
-    await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.profiledetails.detailsmodal.advanceddetail.hidekey.replace(
-            "{{keys}}",
-            "1"
-          )
-        )
-      ).toBeInTheDocument();
-    });
-
-    fireEvent(
-      getByTestId("key-list"),
-      new CustomEvent("ionChange", {
-        detail: { value: [AccordionKey.ROTATIONKEY] },
-      })
-    );
-
-    await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.profiledetails.detailsmodal.advanceddetail.hiderotationkey.replace(
-            "{{keys}}",
-            "1"
-          )
-        )
-      ).toBeInTheDocument();
-    });
-  });
-
   test("Open rotation threshold", async () => {
     const { getByText, getAllByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
@@ -1067,55 +969,7 @@ describe("Group profile details page", () => {
     });
 
     fireEvent.click(
-      getByText(
-        EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold.title
-      )
-    );
-
-    await waitFor(() => {
-      expect(
-        getByText(
-          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
-            .propexplain.title
-        )
-      ).toBeVisible();
-      expect(
-        getByText(
-          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
-            .propexplain.content
-        )
-      ).toBeVisible();
-    });
-  });
-
-  test("Open group member from rotation threshold", async () => {
-    const { getByText, getAllByText, getByTestId } = render(
-      <Provider store={storeMockedAidKeri}>
-        <ProfileDetailsModal
-          profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
-          pageId={pageId}
-          isOpen
-          setIsOpen={jest.fn}
-        />
-      </Provider>
-    );
-
-    expect(
-      getByTestId("identifier-card-detail-spinner-container")
-    ).toBeVisible();
-
-    await waitFor(() => {
-      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
-      getAllByText(identifierFix[2].displayName).forEach((item) => {
-        expect(item).toBeVisible();
-      });
-    });
-
-    fireEvent.click(
-      getByText(
-        EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold.title
-      )
+      getByText(EN_TRANSLATIONS.profiledetails.group.rotationthreshold.title)
     );
 
     await waitFor(() => {

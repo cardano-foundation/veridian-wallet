@@ -572,10 +572,17 @@
     "group": {
       "title": "Group information",
       "groupmembers": {
-        "title": "Group members"
+        "title": "Group members",
+        "editname": "Edit name"
       },
       "signingkeysthreshold": {
-        "title": "Signing threshold",
+        "title": "Required signers",
+        "member": "{{member}} members",
+        "outof": "out of {{threshold}}"
+      },
+      "rotationthreshold": {
+        "title": "Recovery signers",
+        "member": "{{member}} members",
         "outof": "out of {{threshold}}"
       },
       "button": {
@@ -603,6 +610,7 @@
       "share": "Share",
       "inner": {
         "label": "Display name",
+        "usernamelabel": "Username",
         "confirm": "Confirm"
       }
     },

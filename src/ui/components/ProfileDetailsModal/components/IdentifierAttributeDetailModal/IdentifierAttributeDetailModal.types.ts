@@ -19,6 +19,7 @@ interface IdentifierAttributeDetailModalProps {
   data: IdentifierDetails;
   view: DetailView;
   setViewType: (view: DetailView) => void;
+  openEdit?: () => void;
 }
 
 interface IdentifierIDDetailProps {
@@ -56,6 +57,7 @@ interface ListProps {
   bottomText?: string;
   fullText?: boolean;
   mask?: boolean;
+  onButtonClick?: () => void;
 }
 
 export type {

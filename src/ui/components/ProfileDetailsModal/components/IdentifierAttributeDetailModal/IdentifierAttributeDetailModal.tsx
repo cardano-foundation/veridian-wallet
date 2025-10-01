@@ -22,6 +22,7 @@ const IdentifierAttributeDetailModal = ({
   view,
   data,
   setViewType,
+  openEdit,
 }: IdentifierAttributeDetailModalProps) => {
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
 
@@ -39,7 +40,7 @@ const IdentifierAttributeDetailModal = ({
 
       if (!memberConnection?.label) {
         currentUserIndex = index;
-        name = data.displayName;
+        name = data.groupMetadata?.userName || "";
       }
 
       const rank = index >= 0 ? index % 5 : 0;
@@ -80,6 +81,7 @@ const IdentifierAttributeDetailModal = ({
             )}`}
             title={`${i18n.t(`profiledetails.detailsmodal.${view}.title`)}`}
             data={members || []}
+            onButtonClick={openEdit}
             mask
           />
         );
