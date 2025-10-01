@@ -338,6 +338,7 @@ class KeriaNotificationService extends AgentService {
     } else if (
       notif.a.r === NotificationRoute.ExnCoordinationCredentialsInfoReq
     ) {
+      console.log("ExnCoordinationCredentialsInfoReq7777")
       shouldCreateRecord = await this.processCoordinationCredentialsInfoReq(
         notif,
         exn

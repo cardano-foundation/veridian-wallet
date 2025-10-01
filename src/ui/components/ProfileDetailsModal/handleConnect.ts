@@ -184,6 +184,7 @@ export const handleConnect = async ({
   profileAid,
   dispatch,
 }: ConnectParams): Promise<void> => {
+  console.log("handleConnect");
   if (!profileAid) {
     throw new Error("Missing profileAid");
   }
@@ -210,6 +211,7 @@ export const handleConnect = async ({
       })
     });*/
 
+    console.log("signedFetch");
     await signedFetch(profileAid, `${backendApi}${requestPath}`, {
       method: "POST",
       body: JSON.stringify({
@@ -218,6 +220,7 @@ export const handleConnect = async ({
       }),
     });
 
+    console.log("heylogin33")
     dispatch(setToastMsg(ToastMsgType.LOGIN_SUCCESSFUL));
   } catch (error) {
     showError(

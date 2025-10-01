@@ -248,7 +248,7 @@ async issueSocialMediaCredential(
 
   const hab = await this.props.signifyClient
     .identifiers()
-    .get(effectiveRp);
+    .get(exchange.exn.rp);
 
   let registries = await this.props.signifyClient
     .registries()
@@ -306,12 +306,27 @@ async issueSocialMediaCredential(
   console.log(`${exchange.exn.a.a.oobiUrl}/oobi/${exchange.exn.a.s}`)
   await this.connections.resolveOobiSchema(`${exchange.exn.a.a.oobiUrl}/oobi/${exchange.exn.a.s}`);
 
+  const childAid = exchange.exn.a.a.i;
+  console.log("args13123")
+  console.log({
+    ri: registry.regk,
+    s: exchange.exn.a.s,
+    u: new Salter({}).qb64,
+    a: {
+      i: childAid,
+      u: new Salter({}).qb64,
+      ...exchange.exn.a.r,  
+    },
+    e: Saider.saidify(edges)[1],
+  });
+  console.log("childaid111");
+  console.log(childAid);
   const issueOp = await this.props.signifyClient.credentials().issue(effectiveRp, {
     ri: registry.regk,
     s: exchange.exn.a.s,
     u: new Salter({}).qb64,
     a: {
-      i: exchange.exn.a.a.i,
+      i: childAid,
       u: new Salter({}).qb64,
       ...exchange.exn.a.r,  
     },
@@ -320,12 +335,16 @@ async issueSocialMediaCredential(
 
   await waitAndGetDoneOp(this.props.signifyClient, issueOp.op, OP_TIMEOUT);
 
+
+
+  // Grant credential
   const newCredentialSaid = issueOp.acdc.ked.d;
   const newAcdc = await this.props.signifyClient
     .credentials()
     .get(newCredentialSaid);
 
-  console.log("hey11");
+  console.log("newCredentialSaid");
+  console.log(issueOp.acdc.ked);
   const [exn, sigs, atc] = await this.props.signifyClient
     .exchanges()
     .createExchangeMessage(
@@ -338,15 +357,17 @@ async issueSocialMediaCredential(
       requestSaid
     );
 
-  console.log("hey22");
+  console.log("exn");  
+  console.log(exn);  
+
   await this.props.signifyClient
     .exchanges()
     .sendFromEvents(hab.prefix, "credential_issue", exn, sigs, atc, [
-      exchange.exn.i,
+      childAid,
     ]);
 
   console.log("hey3, sent to:");
-  console.log(exchange.exn.i);
+  console.log(exchange.exn.rp);
   // Borrar notificación
   await deleteNotificationRecordById(
     this.props.signifyClient,
@@ -369,7 +390,7 @@ async issueSocialMediaCredential(
     requestSaid: string
   ): Promise<void> {
 
-    console.log("shareCredentials");
+    console.log("shareCredentials11111");
     const noteRecord = await this.notificationStorage.findExpectedById(
       notificationId
     );
