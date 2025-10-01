@@ -3,11 +3,13 @@
 This folder contains a Web Interface to interact with the [Credential Issuance Server](../credential-server)
 
 ## Features
+
     - Connect to a credential issuance server
     - Issue custom credentials
     - Request custom credentials
 
 ## Requirements
+
 - Node.js
 - npm
 
