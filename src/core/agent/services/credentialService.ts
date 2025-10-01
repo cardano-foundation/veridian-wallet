@@ -1,4 +1,4 @@
-import { Ilks, randomNonce, Saider, Salter } from "signify-ts";
+import { Ilks, randomNonce, Saider, Salter, Serder } from "signify-ts";
 import { AgentServicesProps } from "../agent.types";
 import { AgentService } from "./agentService";
 import { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
@@ -228,7 +228,6 @@ async issueSocialMediaCredential(
   notificationId: string,
   requestSaid: string
 ): Promise<void> {
-  console.log("issueSocialMediaCredential core");
   const noteRecord = await this.notificationStorage.findExpectedById(
     notificationId
   );
@@ -236,14 +235,10 @@ async issueSocialMediaCredential(
     .exchanges()
     .get(requestSaid);
 
-  console.log("exchange");
-  console.log(exchange);
-
   let effectiveRp = exchange.exn.rp;
   if (exchange.exn.rp.includes(':')) {
     const rpParts = exchange.exn.rp.split(':');
     effectiveRp = rpParts[rpParts.length - 1];
-    console.log(`Extracted identifier from rp: ${effectiveRp}`);
   }
 
   const hab = await this.props.signifyClient
@@ -254,8 +249,6 @@ async issueSocialMediaCredential(
     .registries()
     .list(effectiveRp);
   if (registries.length === 0) {
-    console.log("effectiveRp for create");
-    console.log(effectiveRp);
     const result = await this.props.signifyClient
       .registries()
       .create({ name: effectiveRp, registryName: "social-media-registry" });
@@ -269,9 +262,6 @@ async issueSocialMediaCredential(
     }
   }
   const registry = registries[0];
-
-  console.log("registry1111");
-  console.log(registry);
 
   const edges: { [key: string]: any } = { d: "" };
   const edgeCredentials: { [key: string]: any } = {};
@@ -296,31 +286,9 @@ async issueSocialMediaCredential(
           };
         }  }
 
-  console.log("edges555");
-  console.log(edges);
-
-  console.log("exchange.exn.a");
-  console.log(exchange.exn.a);
-  console.log(exchange.exn.a.a);
-  console.log("schema");
-  console.log(`${exchange.exn.a.a.oobiUrl}/oobi/${exchange.exn.a.s}`)
   await this.connections.resolveOobiSchema(`${exchange.exn.a.a.oobiUrl}/oobi/${exchange.exn.a.s}`);
 
   const childAid = exchange.exn.a.a.i;
-  console.log("args13123")
-  console.log({
-    ri: registry.regk,
-    s: exchange.exn.a.s,
-    u: new Salter({}).qb64,
-    a: {
-      i: childAid,
-      u: new Salter({}).qb64,
-      ...exchange.exn.a.r,  
-    },
-    e: Saider.saidify(edges)[1],
-  });
-  console.log("childaid111");
-  console.log(childAid);
   const issueOp = await this.props.signifyClient.credentials().issue(effectiveRp, {
     ri: registry.regk,
     s: exchange.exn.a.s,
@@ -335,16 +303,34 @@ async issueSocialMediaCredential(
 
   await waitAndGetDoneOp(this.props.signifyClient, issueOp.op, OP_TIMEOUT);
 
-
-
   // Grant credential
   const newCredentialSaid = issueOp.acdc.ked.d;
   const newAcdc = await this.props.signifyClient
     .credentials()
     .get(newCredentialSaid);
 
-  console.log("newCredentialSaid");
-  console.log(issueOp.acdc.ked);
+  const datetime = new Date().toISOString().replace("Z", "000+00:00");
+  const [grant, gsigs, gend] = await this.props.signifyClient.ipex().grant({
+      message: exchange.exn.a.a.oobiUrl, // `${exchange.exn.a.a.oobiUrl}/oobi/${exchange.exn.a.s}`
+      senderName: effectiveRp,
+      recipient: childAid,
+      acdc: new Serder(newAcdc.sad),
+      anc: new Serder(newAcdc.anc),
+      iss: new Serder(newAcdc.iss),
+      ancAttachment: newAcdc.ancAttachment,
+      datetime,
+  });
+
+  const grantOp = await this.props.signifyClient.ipex().submitGrant(
+      hab.name,
+      grant,
+      gsigs,
+      gend,
+      [childAid]
+  );
+
+  await waitAndGetDoneOp(this.props.signifyClient, grantOp, OP_TIMEOUT);
+
   const [exn, sigs, atc] = await this.props.signifyClient
     .exchanges()
     .createExchangeMessage(
@@ -357,17 +343,12 @@ async issueSocialMediaCredential(
       requestSaid
     );
 
-  console.log("exn");  
-  console.log(exn);  
-
   await this.props.signifyClient
     .exchanges()
     .sendFromEvents(hab.prefix, "credential_issue", exn, sigs, atc, [
       childAid,
     ]);
 
-  console.log("hey3, sent to:");
-  console.log(exchange.exn.rp);
   // Borrar notificación
   await deleteNotificationRecordById(
     this.props.signifyClient,
@@ -389,8 +370,6 @@ async issueSocialMediaCredential(
     notificationId: string,
     requestSaid: string
   ): Promise<void> {
-
-    console.log("shareCredentials11111");
     const noteRecord = await this.notificationStorage.findExpectedById(
       notificationId
     );

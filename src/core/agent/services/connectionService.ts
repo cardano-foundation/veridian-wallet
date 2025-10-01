@@ -799,12 +799,12 @@ async resolveOobiSchema(
         5000
       )) as Operation & { response: State };
 
-      if (!operation.done) {
+      if (!operation.done || (operation.done && operation.error)) {
         throw new Error(
           `${ConnectionService.FAILED_TO_RESOLVE_OOBI} [url: ${url}]`
         );
       }
-
+      
       if (operation.response.i) {
         // Excludes schemas
         const connectionId = operation.response.i;
