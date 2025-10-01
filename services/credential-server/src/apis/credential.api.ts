@@ -1,5 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { Operation, Saider, Salter, Serder, SignifyClient } from "signify-ts";
+import {
+  Contact,
+  Operation,
+  Saider,
+  Salter,
+  Serder,
+  SignifyClient,
+} from "signify-ts";
 import {
   ACDC_SCHEMAS_ID,
   ISSUER_NAME,
@@ -295,7 +302,13 @@ export async function getPresentationRequests(
   const presentationRequests: PresentationRequestResponse[] = [];
 
   for (const exchange of applyExchanges) {
-    const contact = await client.contacts().get(exchange.exn.rp);
+    let contact: Contact;
+    try {
+      contact = await client.contacts().get(exchange.exn.rp);
+    } catch (e) {
+      continue;
+    }
+
     const existOfferExchange = offerExchanges.some(
       (offer) =>
         offer.exn.i === exchange.exn.rp && offer.exn.p === exchange.exn.d
