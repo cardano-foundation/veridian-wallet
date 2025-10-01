@@ -1,6 +1,7 @@
 import { IonIcon, IonItem, IonSpinner, IonText } from "@ionic/react";
 import { chevronForward, warningOutline } from "ionicons/icons";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { RegularConnectionDetails } from "../../../../../../core/agent/agent.types";
 import { Agent } from "../../../../../../core/agent/agent";
 import { NotificationRoute } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../../../../i18n";
@@ -48,7 +49,9 @@ const CredentialRequestInformation = ({
   onReloadData,
 }: CredentialRequestProps) => {
   const dispatch = useAppDispatch();
-  const connectionsCache = useAppSelector(getConnectionsCache) as any[];
+  const connectionsCache = useAppSelector(
+    getConnectionsCache
+  ) as RegularConnectionDetails[];
   const credsCache = useAppSelector(getCredsCache);
   const archivedCredsCache = useAppSelector(getCredsArchivedCache);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
@@ -61,12 +64,47 @@ const CredentialRequestInformation = ({
     (c) => c.id === notificationDetails.connectionId
   );
 
+  const [requester, setRequester] = useState(
+    connection?.label || i18n.t("tabs.connections.unknown")
+  );
+
   const isGroup = !!linkedGroup;
   const isGroupInitiator = linkedGroup?.members[0] === userAID;
   const isJoinGroup = linkedGroup?.memberInfos.some(
     (item) => item.aid === userAID && item.joined
   );
   const groupInitiatorJoined = !!linkedGroup?.memberInfos.at(0)?.joined;
+
+  const check = useCallback(async () => {
+    const connection = await Agent.agent.connections.getConnectionById(
+      notificationDetails.connectionId
+    );
+
+    if (connection?.serviceEndpoints[0]) {
+      try {
+        const url = new URL(connection.serviceEndpoints[0]);
+        const typeParam = url.searchParams.get("type");
+        const type = typeParam;
+        if (type === "guardianship") {
+          setRequester("Citizen Portal");
+        } else if (type === "socialmedia") {
+          setRequester("Socialbook");
+        } else {
+          setRequester(connection.label || i18n.t("tabs.connections.unknown"));
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Error parsing URL:", error);
+        setRequester(connection.label || i18n.t("tabs.connections.unknown"));
+      }
+    }
+  }, [notificationDetails.connectionId]);
+
+  useEffect(() => {
+    if (requester === i18n.t("tabs.connections.unknown")) {
+      check();
+    }
+  }, [requester, check]);
 
   const missingProposedCred = proposedCredId
     ? !(
@@ -283,12 +321,11 @@ const CredentialRequestInformation = ({
   )}`;
 
   const logo = (() => {
-    if (connection?.label === "Citizen Portal") {
+    if (requester === "Citizen Portal") {
       return (
         <div className="citizen-portal-logo-container">
           <img
             src={CitizenPortal}
-            alt={connection?.label}
             className="card-logo"
             data-testid="card-logo"
           />
@@ -296,12 +333,11 @@ const CredentialRequestInformation = ({
       );
     }
 
-    if (connection?.label === "Socialbook") {
+    if (requester === "Socialbook") {
       return (
         <div className="socialbook-logo-container">
           <img
             src={Socialbook}
-            alt={connection?.label}
             className="card-logo"
             data-testid="card-logo"
           />
@@ -417,7 +453,7 @@ const CredentialRequestInformation = ({
             </IonItem>
             <div className="request-from-content">
               {logo}
-              <p>{connection?.label || i18n.t("tabs.connections.unknown")}</p>
+              <p>{requester}</p>
             </div>
           </CardDetailsBlock>
           <CardDetailsBlock className="credential-request">
