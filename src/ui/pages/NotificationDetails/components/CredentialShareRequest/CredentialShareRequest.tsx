@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
+import { RegularConnectionDetails } from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../store/reducers/profileCache";
@@ -13,6 +14,7 @@ import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
+import Socialbook from "../../../../assets/images/socialbook.svg";
 import { ResponsivePageLayout } from "../../../../components/layout/ResponsivePageLayout";
 import "./CredentialShareRequest.scss";
 
@@ -25,27 +27,43 @@ const CredentialShareRequest = ({
   const dispatch = useAppDispatch();
   const connections = useAppSelector(getConnectionsCache);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-    const connectionName = connections.find(
+  const connectionName = connections.find(
     (c) => c.id === notificationDetails.connectionId
   );
-  const [requester, setRequester] = useState(connectionName?.label || "Unknown");
+  const [requester, setRequester] = useState(
+    connectionName?.label || i18n.t("tabs.connections.unknown")
+  );
 
-  const logo = requester === "Citizen Portal" ? CitizenPortal : CitizenPortal; //TODO: Placeholder for different logos based on type
   const [loading, showLoading] = useState(false);
 
-  const check = async () => {
-    const connection = await Agent.agent.connections.getConnectionById(notificationDetails.connectionId);
-    if (connection?.label){
-      setRequester(connection.label)
-    }  
-  }
+  const check = useCallback(async () => {
+    const connection = await Agent.agent.connections.getConnectionById(
+      notificationDetails.connectionId
+    );
+
+    if (connection?.serviceEndpoints[0]) {
+      try {
+        const url = new URL(connection.serviceEndpoints[0]);
+        const typeParam = url.searchParams.get("type");
+        const type = typeParam;
+        if (type === "guardianship") {
+          setRequester("Citizen Portal");
+        } else if (type === "socialmedia") {
+          setRequester("Socialbook");
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Error parsing URL:", error);
+        setRequester(connection.label || i18n.t("tabs.connections.unknown"));
+      }
+    }
+  }, [notificationDetails.connectionId]);
 
   useEffect(() => {
-    if (requester === "Unknown"){
+    if (requester === i18n.t("tabs.connections.unknown")) {
       check();
     }
-  }, [requester]);
-
+  }, [requester, check]);
 
   const handleShare = async () => {
     try {
@@ -85,8 +103,7 @@ const CredentialShareRequest = ({
           <div className="credential-share-request-icons-row">
             <div className="credential-share-request-user-logo">
               <img
-                src={logo}
-                alt="Citizen Portal"
+                src={requester === "Socialbook" ? Socialbook : CitizenPortal}
               />
             </div>
           </div>
