@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { IonItem, IonText } from "@ionic/react";
+import { informationCircleOutline } from "ionicons/icons";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
@@ -12,13 +14,21 @@ import { Verification } from "../../../../components/Verification";
 import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
-import "./CredentialIssuanceRequest.scss";
-import { informationCircleOutline } from "ionicons/icons";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { InfoCard } from "../../../../components/InfoCard";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
-import { IonItem, IonText } from "@ionic/react";
+import "./CredentialIssuanceRequest.scss";
+
 import { MemberAvatar } from "../../../../components/Avatar";
+import { RegularConnectionDetails } from "../../../../../core/agent/agent.types";
+
+interface Restriction {
+  minAge: number;
+  maxAge: number;
+  screenTimeStart: string; 
+  screenTimeEnd: string; 
+}
+
 
 const CredentialIssuanceRequest = ({
   activeStatus,
@@ -27,33 +37,43 @@ const CredentialIssuanceRequest = ({
 }: NotificationDetailsProps) => {
   const pageId = "credential-issuance-request";
   const dispatch = useAppDispatch();
-  const connections = useAppSelector(getConnectionsCache);
+  const connectionsCache = useAppSelector(getConnectionsCache) as any[];
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-  const connectionName = connections.find(
-    (c) => c.id === notificationDetails.connectionId
-  );
+  const [loading, showLoading] = useState(false);
+  const [issuedToAid, setIssuedToAid] = useState("");
+  const [propDetails, setPropDetails] = useState<Restriction | undefined>(undefined);
+
+  const connectionName = connectionsCache?.find(
+    (c: RegularConnectionDetails) => c.contactId === issuedToAid
+  )?.label;
+
   const credential = {
     type: "Social Media Access",
     requester: "Citizen Portal",
-    issueTo: "Oliver Anderson",
+    // TODO: GET it dynamic from propDetails(missing prop)
+    issueTo: "Child",
   };
-  const profile = {
-    identity: {
-      id: "123",
-      firstName: "Oliver",
-      lastName: "Anderson",
-      email: "oliver.anderson123@gmail.com",
-      dob: "12/07/2012",
-      agerange: ["13", "16"],
-      curfew: ["08:00", "22:00"],
-    },
+  
+  const formatScreenTime = (isoString?: string) => {
+    if (!isoString) return '';
+    return new Date(isoString).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
   };
-  const [loading, showLoading] = useState(false);
+
+  useEffect(() => {
+    const getRequestDetails = async () => {
+      const data  = await Agent.agent.credentials.getSocialMediaCredentialPropData(
+        notificationDetails.a.d as string
+      );
+      setIssuedToAid(data?.exn.a.a.i);
+      setPropDetails(data?.exn.a.r);
+    }
+    getRequestDetails();
+  }, []);
 
   const handleShare = async () => {
     try {
       showLoading(true);
-      await Agent.agent.credentials.shareCredentials(
+      await Agent.agent.credentials.issueSocialMediaCredential(
         notificationDetails.id,
         notificationDetails.a.d as string
       );
@@ -122,10 +142,10 @@ const CredentialIssuanceRequest = ({
           </IonItem>
           <IonItem lines="none">
             <MemberAvatar
-              firstLetter={`${credential.issueTo.charAt(0)}`}
+              firstLetter={`${connectionName?.charAt(0)}`}
               rank={0}
             />
-            <IonText>{profile.identity.firstName}</IonText>
+            <IonText>{connectionName}</IonText>
           </IonItem>
         </CardDetailsBlock>
         <CardDetailsBlock>
@@ -143,63 +163,23 @@ const CredentialIssuanceRequest = ({
         <CardDetailsBlock>
           <IonItem lines="none">
             <IonText>
-              {i18n.t(
-                "tabs.notifications.details.credential.credentialissuance.credentialdetails.title"
-              )}
+              Credential Details
             </IonText>
           </IonItem>
           <IonItem lines="none">
             <IonText>
               <span>
-                {i18n.t(
-                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.name"
-                )}
-              </span>
-              &nbsp;
-              <span>
-                {profile.identity.firstName} {profile.identity.lastName}
-              </span>
-            </IonText>
-          </IonItem>
-          <IonItem lines="none">
-            <IonText>
-              <span>
-                {i18n.t(
-                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.email"
-                )}
-                &nbsp;
+                Age Range:
               </span>{" "}
-              <span>{profile.identity.email}</span>
+              <span>{`${propDetails?.minAge}-${propDetails?.maxAge}`}</span>
             </IonText>
           </IonItem>
           <IonItem lines="none">
             <IonText>
               <span>
-                {i18n.t(
-                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.dob"
-                )}
+                Screen Time:
               </span>{" "}
-              <span>{profile.identity.dob}</span>
-            </IonText>
-          </IonItem>
-          <IonItem lines="none">
-            <IonText>
-              <span>
-                {i18n.t(
-                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.agerange"
-                )}
-              </span>{" "}
-              <span>{`${profile.identity.agerange[0]}-${profile.identity.agerange[1]}`}</span>
-            </IonText>
-          </IonItem>
-          <IonItem lines="none">
-            <IonText>
-              <span>
-                {i18n.t(
-                  "tabs.notifications.details.credential.credentialissuance.credentialdetails.curfew"
-                )}
-              </span>{" "}
-              <span>{`${profile.identity.curfew[0]}-${profile.identity.curfew[1]}`}</span>
+              <span>{`${formatScreenTime(propDetails?.screenTimeStart)} - ${formatScreenTime(propDetails?.screenTimeEnd)}`}</span>
             </IonText>
           </IonItem>
         </CardDetailsBlock>

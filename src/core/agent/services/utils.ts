@@ -5,6 +5,8 @@ import { Agent } from "../agent";
 import { NotificationRoute } from "./keriaNotificationService.types";
 import { OperationPendingStorage } from "../records/operationPendingStorage";
 
+const OP_TIMEOUT = 30000;
+
 async function waitAndGetDoneOp(
   client: SignifyClient,
   op: Operation,
@@ -145,4 +147,5 @@ export {
   getCredentialShortDetails,
   randomSalt,
   isNetworkError,
+  OP_TIMEOUT
 };

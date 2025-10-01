@@ -42,7 +42,7 @@ import {
 } from "../records";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { AgentService } from "./agentService";
-import { OnlineOnly, randomSalt, waitAndGetDoneOp } from "./utils";
+import { OnlineOnly, OP_TIMEOUT, randomSalt, waitAndGetDoneOp } from "./utils";
 import { StorageMessage } from "../../storage/storage.types";
 import {
   ConnectionRemovedEvent,
@@ -741,6 +741,34 @@ class ConnectionService extends AgentService {
     }
   }
 
+async resolveOobiSchema(
+  url: string
+): Promise<Operation> {
+  const urlObj = new URL(url);
+  const alias = urlObj.searchParams.get("name") ?? randomSalt();
+  urlObj.searchParams.delete("name");
+  const strippedUrl = urlObj.toString();
+
+  const operation = (await waitAndGetDoneOp(
+    this.props.signifyClient,
+    await this.props.signifyClient.oobis().resolve(strippedUrl),
+    OP_TIMEOUT
+  )) as Operation & { response: State };
+  if (!operation.done) {
+    throw new Error( `${ConnectionService.FAILED_TO_RESOLVE_OOBI} [url: ${url}]`);
+  }
+  if (operation.response && operation.response.i) {
+    const connectionId = operation.response.i;
+    const createdAt = new Date((operation.response as State).dt);
+    await this.props.signifyClient.contacts().update(connectionId, {
+      alias,
+      createdAt,
+      oobi: url,
+    });
+  }
+  return operation;
+}
+
   @OnlineOnly
   async resolveOobi(
     url: string,
@@ -771,12 +799,12 @@ class ConnectionService extends AgentService {
         5000
       )) as Operation & { response: State };
 
-      if (!operation.done) {
+      if (!operation.done || (operation.done && operation.error)) {
         throw new Error(
           `${ConnectionService.FAILED_TO_RESOLVE_OOBI} [url: ${url}]`
         );
       }
-
+      
       if (operation.response.i) {
         // Excludes schemas
         const connectionId = operation.response.i;

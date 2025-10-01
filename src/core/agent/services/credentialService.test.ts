@@ -139,12 +139,25 @@ const operationPendingStorage = jest.mocked({
   findById: findOperationMock,
 });
 
+const connectionService = jest.mocked({
+  resolveOobi: jest.fn(),
+  getConnectionById: jest.fn().mockResolvedValue({
+    serviceEndpoints: [
+      "http://127.0.0.1:3902/oobi/EKSGUkKBfg5PG3nAvWZwY4pax2ZD-9LC7JpXeks7IKEj/agent/EKxIbNtsJytfgJjW_AkXV-XLTg_vSyPUMxuwkP7zbgbu",
+    ],
+    notes: [],
+    historyItems: [],
+  }),
+  shareIdentifier: jest.fn(),
+});
+
 const credentialService = new CredentialService(
   agentServicesProps,
   credentialStorage as any,
   notificationStorage as any,
   identifierStorage as any,
-  operationPendingStorage as any
+  operationPendingStorage as any,
+  connectionService as any,
 );
 
 const now = new Date();

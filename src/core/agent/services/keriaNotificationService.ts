@@ -342,6 +342,13 @@ class KeriaNotificationService extends AgentService {
         notif,
         exn
       );
+    } else if (
+      notif.a.r === NotificationRoute.ExnCoordinationCredentialsIssueProp
+    ) {
+      shouldCreateRecord = await this.processCoordinationCredentialsIssueReq(
+        notif,
+        exn
+      );
     }
 
     if (!shouldCreateRecord) {
@@ -933,6 +940,20 @@ class KeriaNotificationService extends AgentService {
       if (typeof payload.l.t === "string" && typeof payload.l.a === "string") {
         return true;
       }
+    }
+
+    await this.markNotification(notif.i);
+    return false;
+  }
+
+  private async processCoordinationCredentialsIssueReq(
+    notif: Notification,
+    exchange: ExnMessage
+  ): Promise<boolean> {
+
+    // TODO: different requirement?
+    if (exchange.exn.a.s) {
+      return true;
     }
 
     await this.markNotification(notif.i);

@@ -1,4 +1,4 @@
-import { Ilks } from "signify-ts";
+import { Ilks, randomNonce, Saider, Salter, Serder } from "signify-ts";
 import { AgentServicesProps } from "../agent.types";
 import { AgentService } from "./agentService";
 import { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
@@ -13,6 +13,8 @@ import {
   deleteNotificationRecordById,
   getCredentialShortDetails,
   OnlineOnly,
+  OP_TIMEOUT,
+  waitAndGetDoneOp,
 } from "./utils";
 import {
   CredentialStorage,
@@ -28,6 +30,7 @@ import {
 } from "../event.types";
 import { IdentifierType } from "./identifier.types";
 import { ExchangeRoute } from "./keriaNotificationService.types";
+import { ConnectionService } from "./connectionService";
 
 class CredentialService extends AgentService {
   static readonly CREDENTIAL_MISSING_METADATA_ERROR_MSG =
@@ -40,19 +43,22 @@ class CredentialService extends AgentService {
   protected readonly notificationStorage!: NotificationStorage;
   protected readonly identifierStorage!: IdentifierStorage;
   protected readonly operationPendingStorage: OperationPendingStorage;
+  protected readonly connections: ConnectionService;
 
   constructor(
     agentServiceProps: AgentServicesProps,
     credentialStorage: CredentialStorage,
     notificationStorage: NotificationStorage,
     identifierStorage: IdentifierStorage,
-    operationPendingStorage: OperationPendingStorage
+    operationPendingStorage: OperationPendingStorage,
+    connections: ConnectionService
   ) {
     super(agentServiceProps);
     this.credentialStorage = credentialStorage;
     this.notificationStorage = notificationStorage;
     this.identifierStorage = identifierStorage;
     this.operationPendingStorage = operationPendingStorage;
+     this.connections = connections;
   }
 
   onAcdcStateChanged(callback: (event: AcdcStateChangedEvent) => void) {
@@ -216,6 +222,162 @@ class CredentialService extends AgentService {
     }
     return metadata;
   }
+
+@OnlineOnly
+async getSocialMediaCredentialPropData(
+  requestSaid: string
+) {
+  const exchange = await this.props.signifyClient
+    .exchanges()
+    .get(requestSaid);
+
+  return exchange;
+}
+
+@OnlineOnly
+async issueSocialMediaCredential(
+  notificationId: string,
+  requestSaid: string
+): Promise<void> {
+  const noteRecord = await this.notificationStorage.findExpectedById(
+    notificationId
+  );
+  const exchange = await this.props.signifyClient
+    .exchanges()
+    .get(requestSaid);
+
+  let effectiveRp = exchange.exn.rp;
+  if (exchange.exn.rp.includes(':')) {
+    const rpParts = exchange.exn.rp.split(':');
+    effectiveRp = rpParts[rpParts.length - 1];
+  }
+
+  const hab = await this.props.signifyClient
+    .identifiers()
+    .get(exchange.exn.rp);
+
+  let registries = await this.props.signifyClient
+    .registries()
+    .list(effectiveRp);
+  if (registries.length === 0) {
+    const result = await this.props.signifyClient
+      .registries()
+      .create({ name: effectiveRp, registryName: "social-media-registry" });
+    await waitAndGetDoneOp(this.props.signifyClient, await result.op(), OP_TIMEOUT);  
+
+    registries = await this.props.signifyClient.registries().list(effectiveRp);
+    if (registries.length === 0) {
+      throw new Error(
+        `Failed to create or find registry for issuer ${effectiveRp}`
+      );
+    }
+  }
+  const registry = registries[0];
+
+  const edges: { [key: string]: any } = { d: "" };
+  const edgeCredentials: { [key: string]: any } = {};
+
+  if (exchange.exn.a.e) {
+        for (const edgeName in exchange.exn.a.e) {
+          const sourceSaid = exchange.exn.a.e[edgeName].d;
+          if (!sourceSaid) continue;
+    
+          edgeCredentials[edgeName] = await this.props.signifyClient
+            .credentials()
+            .get(sourceSaid);
+        }
+    
+        for (const edgeName in exchange.exn.a.e) {
+          const sourceCred = edgeCredentials[edgeName];
+          if (!sourceCred) continue;
+    
+          edges[edgeName] = {
+            n: sourceCred.sad.d,
+            s: sourceCred.sad.s,
+          };
+        }  }
+
+  await this.connections.resolveOobiSchema(`${exchange.exn.a.a.oobiUrl}/oobi/${exchange.exn.a.s}`);
+
+  const childAid = exchange.exn.a.a.i;
+  const issueOp = await this.props.signifyClient.credentials().issue(effectiveRp, {
+    ri: registry.regk,
+    s: exchange.exn.a.s,
+    u: new Salter({}).qb64,
+    a: {
+      i: childAid,
+      u: new Salter({}).qb64,
+      ...exchange.exn.a.r,  
+    },
+    e: Saider.saidify(edges)[1],
+  });
+
+  await waitAndGetDoneOp(this.props.signifyClient, issueOp.op, OP_TIMEOUT);
+
+  const newCredentialSaid = issueOp.acdc.ked.d;
+  const newAcdc = await this.props.signifyClient
+    .credentials()
+    .get(newCredentialSaid);
+
+  const datetime = new Date().toISOString().replace("Z", "000+00:00");
+  const [grant, gsigs, gend] = await this.props.signifyClient.ipex().grant({
+      message: exchange.exn.a.a.oobiUrl,
+      senderName: effectiveRp,
+      recipient: childAid,
+      acdc: new Serder(newAcdc.sad),
+      anc: new Serder(newAcdc.anc),
+      iss: new Serder(newAcdc.iss),
+      ancAttachment: newAcdc.ancAttachment,
+      datetime,
+  });
+
+  const grantOp = await this.props.signifyClient.ipex().submitGrant(
+      hab.name,
+      grant,
+      gsigs,
+      gend,
+      [childAid]
+  );
+
+  await waitAndGetDoneOp(this.props.signifyClient, grantOp, OP_TIMEOUT);
+
+  const payload = {
+    d: "",
+    sads: JSON.stringify([newAcdc.sad])
+  }
+
+  const [exn, sigs, atc] = await this.props.signifyClient
+    .exchanges()
+    .createExchangeMessage(
+      hab,
+      ExchangeRoute.CoordinationCredentialsIssueResp,
+      Saider.saidify(payload)[1], 
+      [],
+      exchange.exn.i,
+      undefined,
+      requestSaid
+    );
+
+  await this.props.signifyClient
+    .exchanges()
+    .sendFromEvents(hab.prefix, "credential_issue", exn, sigs, atc, [
+      childAid,
+    ]);
+
+  await deleteNotificationRecordById(
+    this.props.signifyClient,
+    this.notificationStorage,
+    notificationId,
+    noteRecord.route,
+    this.operationPendingStorage
+  );
+  this.props.eventEmitter.emit<NotificationRemovedEvent>({
+    type: EventTypes.NotificationRemoved,
+    payload: {
+      id: notificationId,
+    },
+  });
+}
 
   @OnlineOnly
   async shareCredentials(

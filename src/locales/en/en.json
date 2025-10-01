@@ -932,6 +932,7 @@
           "exnipexapplyproposed": "<strong>{{initiator}}</strong> has proposed a credential for the <strong>{{connection}}’s</strong> request",
           "sign": "<strong>Signing request</strong> for <strong>{{connection}}</strong>",
           "share": "<strong>Share credentials</strong> for <strong>{{connection}}</strong>",
+          "issuecredential": "<strong>{{connection}}</strong> wants you to issue a credential",
           "signeventinfo": "<strong>Signing event information</strong>",
           "connectinstructions": "<strong>Check your email for instructions on how to connect with {{connection}}</strong>"
         }

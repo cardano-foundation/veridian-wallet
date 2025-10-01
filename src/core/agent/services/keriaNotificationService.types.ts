@@ -13,6 +13,7 @@ enum NotificationRoute {
   LocalAcdcRevoked = "/local/acdc/revoked",
   LocalSingletonConnectInstructions = "/local/singleton/connectinstructions",
   ExnCoordinationCredentialsInfoReq = "/exn/coordination/credentials/info/req",
+  ExnCoordinationCredentialsIssueProp= "/exn/coordination/credentials/issue/prop",
 }
 
 enum ExchangeRoute {
@@ -22,6 +23,7 @@ enum ExchangeRoute {
   IpexAgree = "/ipex/agree",
   IpexOffer = "/ipex/offer",
   CoordinationCredentialsInfoResp = "/coordination/credentials/info/resp",
+  CoordinationCredentialsIssueResp = "/coordination/credentials/issue/resp",
   RemoteSignRef = "/remotesign/ixn/ref",
 }
 

@@ -52,6 +52,8 @@ const NotificationDetails = () => {
       [NotificationRoute.RemoteSignReq]: RemoteSignRequest,
       [NotificationRoute.ExnCoordinationCredentialsInfoReq]:
         CredentialShareRequest,
+      [NotificationRoute.ExnCoordinationCredentialsIssueProp]:
+        CredentialIssuanceRequest,
       [NotificationRoute.HumanReadableMessage]: RemoteMessage,
       [NotificationRoute.LocalSingletonConnectInstructions]:
         RemoteConnectInstructions,

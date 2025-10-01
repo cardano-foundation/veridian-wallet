@@ -130,6 +130,10 @@ const NotificationItem = ({
         return t("tabs.notifications.tab.labels.share", {
           connection: connectionName,
         });
+      case NotificationRoute.ExnCoordinationCredentialsIssueProp:
+        return t("tabs.notifications.tab.labels.issuecredential", {
+          connection: connectionName,
+        });
       case NotificationRoute.HumanReadableMessage:
         return item.a.m as string;
       case NotificationRoute.LocalSingletonConnectInstructions:
