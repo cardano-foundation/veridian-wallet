@@ -153,7 +153,6 @@ export async function resolveOobi(
   client: SignifyClient,
   url: string
 ): Promise<Operation> {
-  console.log("Resolving OOBI:", url);
   const urlObj = new URL(url);
   const alias = urlObj.searchParams.get("name") ?? randomSalt();
   urlObj.searchParams.delete("name");

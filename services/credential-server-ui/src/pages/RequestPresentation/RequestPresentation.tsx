@@ -14,7 +14,6 @@ import { filter, FilterBar } from "../../components/FilterBar";
 import { FilterData } from "../../components/FilterBar/FilterBar.types";
 import { PageHeader } from "../../components/PageHeader";
 import { RequestPresentationModal } from "../../components/RequestPresentationModal";
-import { PresentationStatus } from "../../components/PresentationStatus";
 import { i18n } from "../../i18n";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { PresentationRequestData } from "../../store/reducers/connectionsSlice.types";
@@ -172,7 +171,9 @@ export const RequestPresentation = () => {
                     </Tooltip>
                   </TableCell>
                   <TableCell align="left">
-                    <PresentationStatus status={row.status} />
+                    <Box className={`label ${row.status}`}>
+                      {row.status[0].toUpperCase() + row.status.slice(1)}
+                    </Box>
                   </TableCell>
                   <TableCell />
                 </TableRow>

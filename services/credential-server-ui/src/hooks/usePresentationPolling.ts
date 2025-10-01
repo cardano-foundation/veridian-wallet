@@ -60,7 +60,7 @@ export const usePresentationPolling = () => {
       clearInterval(intervalRef.current);
     }
 
-    intervalRef.current = setInterval(pollAllRequested, 500);
+    intervalRef.current = setInterval(pollAllRequested, 750);
 
     return () => {
       if (intervalRef.current) {
