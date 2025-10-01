@@ -43,6 +43,9 @@ jest.mock("../../../core/agent/agent", () => ({
           })
         ),
       },
+      connections: {
+        getConnectionById: jest.fn().mockResolvedValue(undefined),
+      },
     },
   },
 }));

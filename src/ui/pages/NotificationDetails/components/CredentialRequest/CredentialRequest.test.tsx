@@ -45,6 +45,9 @@ jest.mock("../../../../../core/agent/agent", () => ({
         joinMultisigOffer: jest.fn(),
         getOfferedCredentialSaid: jest.fn(),
       },
+      connections: {
+        getConnectionById: jest.fn().mockResolvedValue(undefined),
+      },
     },
   },
 }));
