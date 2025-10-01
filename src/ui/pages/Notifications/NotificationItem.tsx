@@ -7,8 +7,13 @@ import {
   idCardOutline,
   personCircleOutline,
 } from "ionicons/icons";
-import { MouseEvent, useState, useEffect } from "react";
+import { MouseEvent, useCallback, useState, useEffect } from "react";
 import { Trans } from "react-i18next";
+import { Agent } from "../../../core/agent/agent";
+import {
+  MultisigConnectionDetails,
+  RegularConnectionDetails,
+} from "../../../core/agent/agent.types";
 import {
   KeriaNotification,
   NotificationRoute,
@@ -21,7 +26,6 @@ import {
 import { FallbackIcon } from "../../components/FallbackIcon";
 import { timeDifference } from "../../utils/formatters";
 import { NotificationItemProps } from "./Notification.types";
-import { Agent } from "../../../core/agent/agent";
 import CitizenPortal from "../../assets/images/citizen-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
 
@@ -33,7 +37,7 @@ const NotificationItem = ({
   const connectionsCache = useAppSelector(getConnectionsCache);
   const multisigConnectionsCache = useAppSelector(
     getMultisigConnectionsCache
-  ) as any[];
+  ) as MultisigConnectionDetails[];
 
   const connection = connectionsCache?.find((c) => c.id === item.connectionId);
 
@@ -46,21 +50,36 @@ const NotificationItem = ({
     initialConnectionName
   );
 
-  useEffect(() => {
-    if (initialConnectionName === "Unknown") {
-      const fetchConnection = async () => {
-        try {
-          // Get the contact created on the way scanning for login
-          const fetchedConnection =
-            await Agent.agent.connections.getConnectionById(item.connectionId);
-          setConnectionName(fetchedConnection.label || unknownConnection);
-        } catch (error) {
-          setConnectionName(unknownConnection);
+  const check = useCallback(async () => {
+    const connection = await Agent.agent.connections.getConnectionById(
+      item.connectionId
+    );
+
+    if (connection?.serviceEndpoints[0]) {
+      try {
+        const url = new URL(connection.serviceEndpoints[0]);
+        const typeParam = url.searchParams.get("type");
+        const type = typeParam;
+        if (type === "guardianship") {
+          setConnectionName("Citizen Portal");
+        } else if (type === "socialmedia") {
+          setConnectionName("Socialbook");
+        } else {
+          setConnectionName(connection.label || "Unknown");
         }
-      };
-      fetchConnection();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Error parsing URL:", error);
+        setConnectionName(connection.label || "Unknown");
+      }
     }
-  }, [item.connectionId, connection?.label]);
+  }, [item.connectionId]);
+
+  useEffect(() => {
+    if (connectionName === "Unknown") {
+      check();
+    }
+  }, [connectionName, check]);
 
   const notificationLabelText = (() => {
     switch (item.a.r) {

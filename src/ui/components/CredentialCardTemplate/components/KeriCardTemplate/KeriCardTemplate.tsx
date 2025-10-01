@@ -3,7 +3,6 @@ import { hourglassOutline } from "ionicons/icons";
 import { useState } from "react";
 import { CredentialStatus } from "../../../../../core/agent/services/credentialService.types";
 import { i18n } from "../../../../../i18n";
-import ACDCLogo from "../../../../../ui/assets/images/keri-acdc.svg";
 import { formatShortDate } from "../../../../utils/formatters";
 import { Alert } from "../../../Alert";
 import { useCardOffsetTop } from "../../../IdentifierCardTemplate";
@@ -12,6 +11,14 @@ import "./KeriCardTemplate.scss";
 import { CardTheme } from "../../../CardTheme";
 import { useAppSelector } from "../../../../../store/hooks";
 import { getConnectionsCache } from "../../../../../store/reducers/profileCache";
+import { IpexCommunicationService } from "../../../../../core/agent/services";
+import ACDCLogo from "../../../../../ui/assets/images/keri-acdc.svg";
+import SediLogo from "../../../../../ui/assets/images/sedi-logo-dark.svg";
+import GuardianshpLogo from "../../../../../ui/assets/images/guardianship-logo-light.svg";
+import CitizenPortalLogo from "../../../../../ui/assets/images/citizen-portal-dark.svg";
+import BackgroundGuardianship from "../../../../assets/images/guardianship-bg.png";
+import BackgroundBirthCertificate from "../../../../assets/images/birth-certificate-bg.png";
+import BackgroundSocialMedia from "../../../../assets/images/social-media-bg.png";
 
 const KeriCardTemplate = ({
   name = "default",
@@ -23,7 +30,6 @@ const KeriCardTemplate = ({
 }: CredentialCardTemplateProps) => {
   const connections = useAppSelector(getConnectionsCache) as any[];
   const { getCardOffsetTop, cardRef } = useCardOffsetTop();
-
   const [alertIsOpen, setAlertIsOpen] = useState(false);
 
   const CredentialCardTemplateStyles = {
@@ -43,6 +49,35 @@ const KeriCardTemplate = ({
 
   const connection = connections.find((c) => c.id === cardData.connectionId);
 
+  const getSchemaMatch = () => {
+    switch (cardData.schema) {
+      case IpexCommunicationService.SCHEMA_SAID_GUARDIANSHIP:
+        return {
+          className: "guardianship",
+          logo: GuardianshpLogo,
+          background: <img src={BackgroundGuardianship} />,
+        };
+      case IpexCommunicationService.SCHEMA_SAID_BIRTH_CERTIFICATE:
+        return {
+          className: "birth-certificate",
+          logo: SediLogo,
+          background: <img src={BackgroundBirthCertificate} />,
+        };
+      case IpexCommunicationService.SCHEMA_SAID_SOCIAL_MEDIA:
+        return {
+          className: "social-media",
+          logo: CitizenPortalLogo,
+          background: <img src={BackgroundSocialMedia} />,
+        };
+      default:
+        return {
+          className: "default",
+          logo: ACDCLogo,
+          background: <CardTheme />,
+        };
+    }
+  };
+
   return (
     <div
       ref={cardRef}
@@ -56,14 +91,17 @@ const KeriCardTemplate = ({
       onClick={() => handleCardClick()}
       style={CredentialCardTemplateStyles}
     >
-      <div className="cred-keri-bg">
-        <CardTheme />
-      </div>
-      <div className={`keri-card-template-inner ${cardData.status}`}>
+      <div className="cred-keri-bg">{getSchemaMatch().background}</div>
+      <div
+        className={`keri-card-template-inner ${cardData.status} ${
+          getSchemaMatch().className
+        }`}
+      >
         <div className="card-header">
           <span className="card-logo">
             <img
-              src={ACDCLogo}
+              src={getSchemaMatch().logo}
+              className={getSchemaMatch().className}
               alt="card-logo"
             />
           </span>

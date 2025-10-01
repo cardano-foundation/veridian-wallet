@@ -3,7 +3,10 @@ import { Provider } from "react-redux";
 
 import { TabsRoutePath } from "../../../../routes/paths";
 import { notificationsFix } from "../../../__fixtures__/notificationsFix";
-import { connectionsForNotificationsValues } from "../../../__fixtures__/connectionsFix";
+import {
+  connectionsForNotificationsValues,
+  connectionsFix,
+} from "../../../__fixtures__/connectionsFix";
 import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { EarlierNotification } from "./EarlierNotification";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
@@ -31,6 +34,9 @@ jest.mock("../../../../core/agent/agent", () => ({
             label: "CF Credential Issuance",
           },
         }),
+      },
+      connections: {
+        getConnectionById: jest.fn(() => Promise.resolve(connectionsFix[0])),
       },
     },
   },

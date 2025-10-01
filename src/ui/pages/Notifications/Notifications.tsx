@@ -120,8 +120,13 @@ const Notifications = () => {
     if (item.a.r === NotificationRoute.ExnIpexApply) {
       const conn = connectionsCache.find((c) => c.id === item.connectionId);
       if (!conn?.label) {
-        setOpenUnknownPresentConnectionAlert(true);
-        return;
+        const connection = await Agent.agent.connections.getConnectionById(
+          item.connectionId
+        );
+        if (!connection?.label) {
+          setOpenUnknownPresentConnectionAlert(true);
+          return;
+        }
       }
     }
 
