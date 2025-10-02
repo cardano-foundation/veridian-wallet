@@ -14,6 +14,7 @@ import { filter, FilterBar } from "../../components/FilterBar";
 import { FilterData } from "../../components/FilterBar/FilterBar.types";
 import { PageHeader } from "../../components/PageHeader";
 import { RequestPresentationModal } from "../../components/RequestPresentationModal";
+import { PresentationDetailModal } from "../../components/PresentationDetailModal";
 import { AttributeDisplay } from "./components/AttributeDisplay";
 import { i18n } from "../../i18n";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
@@ -53,6 +54,9 @@ export const RequestPresentation = () => {
   );
   const hasInitialized = useRef(false);
   const [openModal, setOpenModal] = useState(false);
+  const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [selectedPresentation, setSelectedPresentation] =
+    useState<PresentationRequestData | null>(null);
 
   const {
     order,
@@ -76,6 +80,11 @@ export const RequestPresentation = () => {
 
   const handleClick = () => {
     setOpenModal(true);
+  };
+
+  const handleRowClick = (row: PresentationRequestData) => {
+    setSelectedPresentation(row);
+    setOpenDetailModal(true);
   };
 
   const [filterData, setFilterData] = useState<FilterData>({
@@ -129,6 +138,8 @@ export const RequestPresentation = () => {
                   tabIndex={-1}
                   key={row.id}
                   className="table-row"
+                  onClick={() => handleRowClick(row)}
+                  sx={{ cursor: "pointer" }}
                 >
                   <TableCell
                     component="th"
@@ -200,6 +211,14 @@ export const RequestPresentation = () => {
         onClose={() => {
           setOpenModal(false);
         }}
+      />
+      <PresentationDetailModal
+        open={openDetailModal}
+        onClose={() => {
+          setOpenDetailModal(false);
+          setSelectedPresentation(null);
+        }}
+        data={selectedPresentation}
       />
     </>
   );

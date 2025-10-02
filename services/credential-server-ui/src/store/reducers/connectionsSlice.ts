@@ -69,13 +69,20 @@ const connectionsSlice = createSlice({
     },
     updatePresentationStatus: (
       state,
-      action: PayloadAction<{ id: string; status: PresentationRequestStatus }>
+      action: PayloadAction<{
+        id: string;
+        status: PresentationRequestStatus;
+        acdcCredential?: any;
+      }>
     ) => {
       const request = state.presentationRequests.find(
         (req) => req.id === action.payload.id
       );
       if (request) {
         request.status = action.payload.status;
+        if (action.payload.acdcCredential) {
+          request.acdcCredential = action.payload.acdcCredential;
+        }
       }
     },
   },

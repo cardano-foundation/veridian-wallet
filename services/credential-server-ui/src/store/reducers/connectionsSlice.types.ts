@@ -50,6 +50,8 @@ interface PresentationRequestData {
   status: PresentationRequestStatus;
   ipexApplySaid: string;
   discloserIdentifier: string;
+  schemaSaid: string;
+  acdcCredential?: any;
 }
 
 export { PresentationRequestStatus };

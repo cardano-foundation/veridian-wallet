@@ -30,12 +30,20 @@ export const usePresentationPolling = () => {
         );
 
         if (response.data.success && response.data.data.verified) {
-          dispatch(
-            updatePresentationStatus({
-              id: request.id,
-              status: PresentationRequestStatus.Presented,
-            })
-          );
+          const updateData: {
+            id: string;
+            status: PresentationRequestStatus;
+            acdcCredential?: any;
+          } = {
+            id: request.id,
+            status: PresentationRequestStatus.Presented,
+          };
+
+          if (response.data.data.acdcCredential) {
+            updateData.acdcCredential = response.data.data.acdcCredential;
+          }
+
+          dispatch(updatePresentationStatus(updateData));
         }
       } catch (error) {
         errorCountRef.current += 1;

@@ -264,6 +264,7 @@ interface PresentationRequestResponse {
   ipexApplySaid: string;
   connectionName: string;
   credentialType: string;
+  acdcCredential?: any;
 }
 
 export async function getPresentationRequests(
@@ -309,7 +310,7 @@ export async function getPresentationRequests(
       continue;
     }
 
-    const existOfferExchange = offerExchanges.some(
+    const offerExchange = offerExchanges.find(
       (offer) =>
         offer.exn.i === exchange.exn.rp && offer.exn.p === exchange.exn.d
     );
@@ -321,11 +322,12 @@ export async function getPresentationRequests(
       discloserIdentifier: exchange.exn.rp,
       schemaSaid: exchange.exn.a.s,
       attributes: exchange.exn.a.a,
-      status: existOfferExchange ? "presented" : "requested",
+      status: offerExchange ? "presented" : "requested",
       ipexApplySaid: exchange.exn.d,
       connectionName: contact.alias as string,
       credentialType: schema.title as string,
       requestDate: exchange.exn.dt,
+      acdcCredential: offerExchange ? offerExchange.exn.e.acdc : null,
     };
 
     presentationRequests.push(presentationRequest);
@@ -383,6 +385,8 @@ export async function verifyIpexPresentation(
 
   res.status(200).send({
     success: true,
-    data: { verified: offerExchange ? true : false },
+    data: offerExchange
+      ? { verified: true, acdcCredential: offerExchange.exn.e.acdc }
+      : { verified: false },
   });
 }
