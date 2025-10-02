@@ -63,6 +63,24 @@
           margin-right: 0.5rem;
           max-height: 1.375rem;
         }
+
+        .birth-certificate,
+        .social-media,
+        .guardianship {
+          max-height: 2.5rem;
+          max-width: 2.5rem;
+        }
+      }
+    }
+
+    &.guardianship .card-text {
+      color: var(--ion-color-neutral-100);
+    }
+
+    &.birth-certificate,
+    &.social-media {
+      .card-text {
+        color: var(--ion-color-neutral-900);
       }
     }
 

@@ -3,6 +3,9 @@ import { CredentialShortDetails } from "../../../core/agent/services/credentialS
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { IpexCommunicationService } from "../../../core/agent/services/ipexCommunicationService";
 import BackgroundRome from "../../assets/images/rome-bg.png";
+import BackgroundGuardianship from "../../assets/images/guardianship-bg.png";
+import BackgroundBirthCertificate from "../../assets/images/birth-certificate-bg.png";
+import BackgroundSocialMedia from "../../assets/images/social-media-bg.png";
 import { CardType } from "../../globals/types";
 import { formatShortDate } from "../../utils/formatters";
 import { getTheme } from "../../utils/theme";
@@ -45,20 +48,48 @@ const CardList = ({
       if (cardTypes === CardType.CREDENTIALS) {
         const card = data as CredentialShortDetails;
 
-        return card.schema == IpexCommunicationService.SCHEMA_SAID_ROME_DEMO ? (
-          <img
-            src={BackgroundRome}
-            alt="rome"
-            className="card-logo"
-            data-testid="card-logo"
-          />
-        ) : (
-          <CardTheme
-            className="card-logo"
-            layout={0}
-            color={0}
-          />
-        );
+        switch (card.schema) {
+          case IpexCommunicationService.SCHEMA_SAID_ROME_DEMO:
+            return (
+              <img
+                className="card-logo"
+                data-testid="card-logo"
+                src={BackgroundRome}
+              />
+            );
+          case IpexCommunicationService.SCHEMA_SAID_GUARDIANSHIP:
+            return (
+              <img
+                className="card-logo"
+                data-testid="card-logo"
+                src={BackgroundGuardianship}
+              />
+            );
+          case IpexCommunicationService.SCHEMA_SAID_BIRTH_CERTIFICATE:
+            return (
+              <img
+                className="card-logo"
+                data-testid="card-logo"
+                src={BackgroundBirthCertificate}
+              />
+            );
+          case IpexCommunicationService.SCHEMA_SAID_SOCIAL_MEDIA:
+            return (
+              <img
+                className="card-logo"
+                data-testid="card-logo"
+                src={BackgroundSocialMedia}
+              />
+            );
+          default:
+            return (
+              <CardTheme
+                className="card-logo"
+                layout={0}
+                color={0}
+              />
+            );
+        }
       }
 
       return (
