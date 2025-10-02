@@ -385,9 +385,14 @@ class CredentialService extends AgentService {
       .exchanges()
       .get(requestSaid);
 
-    const credentials = await this.props.signifyClient.credentials().list({
-      filter: { "-s": exchange.exn.a.s },
-    });
+    const credentials: KeriaCredential[] = [];
+
+    for (const schema of exchange.exn.a.s) {
+      const result = await this.props.signifyClient.credentials().list({
+        filter: { "-s": schema },
+      });
+      credentials.push(...result);
+    }
 
     const hab = await this.props.signifyClient
       .identifiers()
