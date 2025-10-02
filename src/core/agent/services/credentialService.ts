@@ -1,4 +1,4 @@
-import { Ilks, randomNonce, Saider, Salter, Serder } from "signify-ts";
+import { Ilks, Saider, Salter, Serder } from "signify-ts";
 import { AgentServicesProps } from "../agent.types";
 import { AgentService } from "./agentService";
 import { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
@@ -224,7 +224,7 @@ class CredentialService extends AgentService {
   }
 
   @OnlineOnly
-  async getSocialMediaCredentialPropData(requestSaid: string) {
+  async getExchangeMsg(requestSaid: string) {
     const exchange = await this.props.signifyClient
       .exchanges()
       .get(requestSaid);
@@ -233,7 +233,7 @@ class CredentialService extends AgentService {
   }
 
   @OnlineOnly
-  async issueSocialMediaCredential(
+  async issueCredentialFromRequest(
     notificationId: string,
     requestSaid: string
   ): Promise<void> {

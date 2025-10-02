@@ -57,10 +57,9 @@ const CredentialIssuanceRequest = ({
 
   useEffect(() => {
     const getRequestDetails = async () => {
-      const data =
-        await Agent.agent.credentials.getSocialMediaCredentialPropData(
-          notificationDetails.a.d as string
-        );
+      const data = await Agent.agent.credentials.getExchangeMsg(
+        notificationDetails.a.d as string
+      );
       setIssuedToAid(data?.exn.a.a.i);
       setPropDetails(data?.exn.a.r);
     };
@@ -70,7 +69,7 @@ const CredentialIssuanceRequest = ({
   const handleShare = async () => {
     try {
       showLoading(true);
-      await Agent.agent.credentials.issueSocialMediaCredential(
+      await Agent.agent.credentials.issueCredentialFromRequest(
         notificationDetails.id,
         notificationDetails.a.d as string
       );
