@@ -133,7 +133,9 @@ class IpexCommunicationService extends AgentService {
       )
     ).serviceEndpoints[0];
     // Workaround to have the shema url of social media credential
-    const schemaUrlToResolve = grantExn.exn.a.m ? `${grantExn.exn.a.m}/oobi/${schemaSaid}` : await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
+    const schemaUrlToResolve = grantExn.exn.a.m
+      ? `${grantExn.exn.a.m}/oobi/${schemaSaid}`
+      : await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid);
     await this.connections.resolveOobi(schemaUrlToResolve);
 
     const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {})
@@ -487,7 +489,9 @@ class IpexCommunicationService extends AgentService {
     baseSchemaUrl?: string
   ): Promise<SubmitIPEXResult> {
     for (const schemaSaid of schemaSaids) {
-      const schemaUrl= baseSchemaUrl ? `${baseSchemaUrl}/oobi/${schemaSaid}` : await this.getSchemaUrl(issuerOobi, issuerAid, schemaSaid);
+      const schemaUrl = baseSchemaUrl
+        ? `${baseSchemaUrl}/oobi/${schemaSaid}`
+        : await this.getSchemaUrl(issuerOobi, issuerAid, schemaSaid);
       await this.connections.resolveOobi(schemaUrl);
     }
 
@@ -551,12 +555,13 @@ class IpexCommunicationService extends AgentService {
       schemaSaid = previousExchange.exn.e.acdc.s;
     }
 
-
-    const schemaUrl = message.exn.a.m ? `${message.exn.a.m}/oobi/${schemaSaid}` : await this.getSchemaUrl(
-        connection.serviceEndpoints[0],
-        connectionId,
-        schemaSaid
-      );
+    const schemaUrl = message.exn.a.m
+      ? `${message.exn.a.m}/oobi/${schemaSaid}`
+      : await this.getSchemaUrl(
+          connection.serviceEndpoints[0],
+          connectionId,
+          schemaSaid
+        );
     await this.connections.resolveOobi(schemaUrl);
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
 
@@ -999,7 +1004,7 @@ class IpexCommunicationService extends AgentService {
       .state(exchange.exn.e.acdc.ri, exchange.exn.e.acdc.d);
 
     const schemaSaid = exchange.exn.e.acdc.s;
-   
+
     const schema = await this.props.signifyClient
       .schemas()
       .get(schemaSaid)
@@ -1014,7 +1019,9 @@ class IpexCommunicationService extends AgentService {
             )
           ).serviceEndpoints[0];
           // Workaround to have the shema url of social media credential
-          const schemaUrlToResolve = exchange.exn.a.m ? exchange.exn.a.m : await this.getSchemaUrl(issuerOobi, exchange.exn.i, schemaSaid)
+          const schemaUrlToResolve = exchange.exn.a.m
+            ? `${exchange.exn.a.m}/oobi/${schemaSaid}`
+            : await this.getSchemaUrl(issuerOobi, exchange.exn.i, schemaSaid);
           await this.connections.resolveOobi(schemaUrlToResolve);
           return await this.props.signifyClient.schemas().get(schemaSaid);
         } else {
