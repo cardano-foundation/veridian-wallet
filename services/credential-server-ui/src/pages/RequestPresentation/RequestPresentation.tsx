@@ -14,6 +14,7 @@ import { filter, FilterBar } from "../../components/FilterBar";
 import { FilterData } from "../../components/FilterBar/FilterBar.types";
 import { PageHeader } from "../../components/PageHeader";
 import { RequestPresentationModal } from "../../components/RequestPresentationModal";
+import { AttributeDisplay } from "./components/AttributeDisplay";
 import { i18n } from "../../i18n";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { PresentationRequestData } from "../../store/reducers/connectionsSlice.types";
@@ -32,7 +33,7 @@ const headers: AppTableHeader<PresentationRequestData>[] = [
     label: i18n.t("pages.requestPresentation.table.credential"),
   },
   {
-    id: "attribute",
+    id: "attributes",
     label: i18n.t("pages.requestPresentation.table.attribute"),
   },
   {
@@ -151,13 +152,14 @@ export const RequestPresentation = () => {
                       <span>{row.credentialType}</span>
                     </Tooltip>
                   </TableCell>
-                  <TableCell align="left">
-                    <Tooltip
-                      title={row.attribute}
-                      placement="top"
-                    >
-                      <span>{row.attribute}</span>
-                    </Tooltip>
+                  <TableCell
+                    align="left"
+                    width={50}
+                  >
+                    <AttributeDisplay
+                      data={row}
+                      maxLength={25}
+                    />
                   </TableCell>
                   <TableCell
                     component="th"

@@ -103,10 +103,9 @@ const connectionsSlice = createSlice({
       })
       .addCase(fetchPresentationRequests.fulfilled, (state, action) => {
         const payload = action.payload.map((request: any) => {
-          const firstKey = Object.keys(request.attributes)[0];
           return {
             ...request,
-            attribute: firstKey ? request.attributes[firstKey] : "",
+            attributes: request.attributes,
           };
         });
 
