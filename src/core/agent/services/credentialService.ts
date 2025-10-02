@@ -293,7 +293,7 @@ class CredentialService extends AgentService {
       }
     }
 
-    await this.connections.resolveOobiSchema(
+    await this.connections.resolveOobi(
       `${exchange.exn.a.a.oobiUrl}/oobi/${exchange.exn.a.s}`
     );
 
