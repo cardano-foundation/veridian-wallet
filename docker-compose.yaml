@@ -3,7 +3,7 @@ services:
   keria:
     container_name: idw-keria
     restart: unless-stopped
-    image: cardanofoundation/cf-idw-keria:build-sedidemo-4af74c3-GHRUN18196527834
+    image: cardanofoundation/cf-idw-keria:build-sedidemo-3146311-GHRUN18197638202
     environment:
       - KERI_AGENT_CORS=true
       - ALLOW_INTRODUCTIONS=true
