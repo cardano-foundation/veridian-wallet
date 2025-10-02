@@ -44,7 +44,7 @@ jobs:
       security-events: write
       contents: read
     needs: set-gitignore-artifact
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@e92b5d07338d4f0ba0981dffed17c48976ca4730" # v2.2.3
     with:
       download-artifact: gitignore-artifact
       scan-args: |-
