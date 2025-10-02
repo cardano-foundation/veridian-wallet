@@ -61,18 +61,18 @@ jobs:
       matrix: ${{fromJson(needs.set-matrix.outputs.matrix)}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
 
       - name: Setup qemu for arm builds
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
         if: matrix.platform == 'linux/arm64'
         with:
           platforms: arm64
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -231,7 +231,7 @@ jobs:
             fi
           fi
 
-      - uses: cloudposse/github-action-matrix-outputs-write@v1
+      - uses: cloudposse/github-action-matrix-outputs-write@ed06cf3a6bf23b8dce36d1cf0d63123885bb8375 # v1.0.0
         id: out
         with:
           matrix-step-name: ${{ github.job }}
@@ -249,7 +249,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
 
       # Manually doing this instead of using the cloudposse/read action as it seems there is some issue with it
       - name: read-matrix-artifacts
@@ -261,12 +261,12 @@ jobs:
           echo DOCKER_IMAGES_TARGETS=${DOCKER_IMAGES_TARGETS} | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -314,16 +314,16 @@ jobs:
       - merge-multi-platform-manifests
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@main
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Dispatch successful build event to private repo
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-dispatch-event@main
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-dispatch-event@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
         with:
           EVENT_TYPE: "${{ github.event_name }}-${{ steps.cf-gha-baseline.outputs.TRIGGERING_REF }}-${{ steps.cf-gha-baseline.outputs.BRANCH_NAME }}"
           GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_PAT }}
