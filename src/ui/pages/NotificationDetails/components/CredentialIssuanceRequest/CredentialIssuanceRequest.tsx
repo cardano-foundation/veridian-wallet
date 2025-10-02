@@ -22,14 +22,6 @@ import "./CredentialIssuanceRequest.scss";
 import { MemberAvatar } from "../../../../components/Avatar";
 import { RegularConnectionDetails } from "../../../../../core/agent/agent.types";
 
-interface Restriction {
-  minAge: number;
-  maxAge: number;
-  screenTimeStart: string; 
-  screenTimeEnd: string; 
-}
-
-
 const CredentialIssuanceRequest = ({
   activeStatus,
   handleBack,
@@ -41,7 +33,9 @@ const CredentialIssuanceRequest = ({
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [loading, showLoading] = useState(false);
   const [issuedToAid, setIssuedToAid] = useState("");
-  const [propDetails, setPropDetails] = useState<Restriction | undefined>(undefined);
+  const [propDetails, setPropDetails] = useState<
+    Record<string, unknown> | undefined
+  >(undefined);
 
   const connectionName = connectionsCache?.find(
     (c: RegularConnectionDetails) => c.contactId === issuedToAid
@@ -50,23 +44,26 @@ const CredentialIssuanceRequest = ({
   const credential = {
     type: "Social Media Access",
     requester: "Citizen Portal",
-    // TODO: GET it dynamic from propDetails(missing prop)
-    issueTo: "Child",
   };
-  
-  const formatScreenTime = (isoString?: string) => {
-    if (!isoString) return '';
-    return new Date(isoString).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+
+  const formatScreenTime = (value: unknown) => {
+    if (typeof value !== "string") return "";
+    return new Date(value).toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   useEffect(() => {
     const getRequestDetails = async () => {
-      const data  = await Agent.agent.credentials.getSocialMediaCredentialPropData(
-        notificationDetails.a.d as string
-      );
+      const data =
+        await Agent.agent.credentials.getSocialMediaCredentialPropData(
+          notificationDetails.a.d as string
+        );
       setIssuedToAid(data?.exn.a.a.i);
       setPropDetails(data?.exn.a.r);
-    }
+    };
     getRequestDetails();
   }, []);
 
@@ -77,7 +74,7 @@ const CredentialIssuanceRequest = ({
         notificationDetails.id,
         notificationDetails.a.d as string
       );
-      dispatch(setToastMsg(ToastMsgType.CREDENTIAL_SHARE_SUCCESS));
+      dispatch(setToastMsg(ToastMsgType.CREDENTIAL_ISSUE_SUCCESS));
       handleBack();
     } catch (e) {
       showError("Failed to share", e, dispatch);
@@ -162,26 +159,31 @@ const CredentialIssuanceRequest = ({
         </CardDetailsBlock>
         <CardDetailsBlock>
           <IonItem lines="none">
-            <IonText>
-              Credential Details
-            </IonText>
+            <IonText>Credential Details</IonText>
           </IonItem>
-          <IonItem lines="none">
-            <IonText>
-              <span>
-                Age Range:
-              </span>{" "}
-              <span>{`${propDetails?.minAge}-${propDetails?.maxAge}`}</span>
-            </IonText>
-          </IonItem>
-          <IonItem lines="none">
-            <IonText>
-              <span>
-                Screen Time:
-              </span>{" "}
-              <span>{`${formatScreenTime(propDetails?.screenTimeStart)} - ${formatScreenTime(propDetails?.screenTimeEnd)}`}</span>
-            </IonText>
-          </IonItem>
+          {propDetails &&
+            Object.entries(propDetails).map(([key, value]) => (
+              <IonItem
+                lines="none"
+                key={key}
+              >
+                <IonText>
+                  <span>
+                    {key?.charAt(0).toUpperCase() +
+                      key
+                        ?.slice(1)
+                        .replace(/([A-Z])/g, " $1")
+                        .trim()}
+                    :
+                  </span>{" "}
+                  <span>
+                    {typeof value === "string" && key?.includes("screenTime")
+                      ? formatScreenTime(value)
+                      : String(value)}
+                  </span>
+                </IonText>
+              </IonItem>
+            ))}
         </CardDetailsBlock>
       </ScrollablePageLayout>
       <Spinner

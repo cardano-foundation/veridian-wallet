@@ -1026,8 +1026,7 @@
               "name": "Name:",
               "email": "Email:",
               "dob": "D.O.B.:",
-              "agerange": "Conversation age range:",
-              "curfew": "Curfew hours:"
+              "agerange": "Conversation age range:"
             },
             "button": {
               "accept": "Issue credential",
@@ -1487,6 +1486,7 @@
     "duplicategroupiderror": "Group already exists",
     "groupmetadatanotfounderror": "Group metadata is missing. Please try again.",
     "credentialsharesuccess": "Shared successfully.",
+    "credentialissuesuccess": "Issued successfully.",
     "loginsuccessful": "Login successful",
     "unabletoaccepterror": "Unable to accept",
     "acceptsuccess": "Accepted Successfully"
