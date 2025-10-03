@@ -45,11 +45,13 @@ interface PresentationRequestData {
   id: string;
   connectionName: string;
   credentialType: string;
-  attribute: string;
+  attributes: Record<string, string>;
   requestDate: number;
   status: PresentationRequestStatus;
   ipexApplySaid: string;
   discloserIdentifier: string;
+  schemaSaid: string;
+  acdcCredential?: any;
 }
 
 export { PresentationRequestStatus };

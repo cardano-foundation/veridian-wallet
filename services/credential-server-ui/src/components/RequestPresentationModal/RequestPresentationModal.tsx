@@ -8,8 +8,8 @@ import { useSchemaDetail } from "../../hooks/SchemaDetail";
 import { i18n } from "../../i18n";
 import { CredentialService } from "../../services";
 import { CredentialRequest } from "../../services/credential.types";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchPresentationRequests } from "../../store/reducers/connectionsSlice";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
+import { savePresentationRequest } from "../../store/reducers/connectionsSlice";
 import { PopupModal } from "../PopupModal";
 import { InputAttribute } from "./InputAttribute";
 import "./RequestPresentationModal.scss";
@@ -20,6 +20,7 @@ import {
 } from "./RequestPresentationModal.types";
 import { Review } from "./Review";
 import { SelectList } from "./SelectList";
+import { PresentationRequestStatus } from "../../store/reducers/connectionsSlice.types";
 
 const RESET_TIMEOUT = 1000;
 
@@ -124,13 +125,32 @@ const RequestPresentationModal = ({
 
     try {
       setLoading(true);
-      await CredentialService.requestPresentation(data);
+      const response = await CredentialService.requestPresentation(data);
+      // Add new request to Redux for demo purposes
+      if (response.data.success && response.data.ipexApplySaid) {
+        dispatch(
+          savePresentationRequest({
+            id: response.data.ipexApplySaid,
+            connectionName:
+              connections.find((item) => item.id === selectedConnection)
+                ?.alias || "",
+            credentialType: credTemplateType,
+            attributes: attributeData,
+            requestDate: Date.now(),
+            status: PresentationRequestStatus.Requested,
+            ipexApplySaid: response.data.ipexApplySaid,
+            schemaSaid: selectedCredTemplate,
+            discloserIdentifier: selectedConnection,
+          })
+        );
+      }
+
       triggerToast(
         i18n.t("pages.requestPresentation.modal.messages.success"),
         "success"
       );
 
-      dispatch(fetchPresentationRequests());
+      // dispatch(fetchPresentationRequests());
 
       resetModal();
     } catch (e) {

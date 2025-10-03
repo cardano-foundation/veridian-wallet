@@ -69,13 +69,20 @@ const connectionsSlice = createSlice({
     },
     updatePresentationStatus: (
       state,
-      action: PayloadAction<{ id: string; status: PresentationRequestStatus }>
+      action: PayloadAction<{
+        id: string;
+        status: PresentationRequestStatus;
+        acdcCredential?: any;
+      }>
     ) => {
       const request = state.presentationRequests.find(
         (req) => req.id === action.payload.id
       );
       if (request) {
         request.status = action.payload.status;
+        if (action.payload.acdcCredential) {
+          request.acdcCredential = action.payload.acdcCredential;
+        }
       }
     },
   },
@@ -103,10 +110,9 @@ const connectionsSlice = createSlice({
       })
       .addCase(fetchPresentationRequests.fulfilled, (state, action) => {
         const payload = action.payload.map((request: any) => {
-          const firstKey = Object.keys(request.attributes)[0];
           return {
             ...request,
-            attribute: firstKey ? request.attributes[firstKey] : "",
+            attributes: request.attributes,
           };
         });
 

@@ -34,6 +34,7 @@ export const usePresentationPolling = () => {
             updatePresentationStatus({
               id: request.id,
               status: PresentationRequestStatus.Presented,
+              acdcCredential: response.data.data.acdcCredential,
             })
           );
         }

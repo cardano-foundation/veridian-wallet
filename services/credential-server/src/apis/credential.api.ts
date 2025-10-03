@@ -163,10 +163,8 @@ export async function requestDisclosure(
 
   res.status(200).send({
     success: true,
-    data: {
-      message: "Apply schema successfully",
-      ipexApplySaid: ipexApplySaid,
-    },
+    message: "Apply schema successfully",
+    ipexApplySaid: ipexApplySaid,
   });
 }
 
@@ -264,6 +262,7 @@ interface PresentationRequestResponse {
   ipexApplySaid: string;
   connectionName: string;
   credentialType: string;
+  acdcCredential?: any;
 }
 
 export async function getPresentationRequests(
@@ -309,7 +308,7 @@ export async function getPresentationRequests(
       continue;
     }
 
-    const existOfferExchange = offerExchanges.some(
+    const offerExchange = offerExchanges.find(
       (offer) =>
         offer.exn.i === exchange.exn.rp && offer.exn.p === exchange.exn.d
     );
@@ -321,11 +320,12 @@ export async function getPresentationRequests(
       discloserIdentifier: exchange.exn.rp,
       schemaSaid: exchange.exn.a.s,
       attributes: exchange.exn.a.a,
-      status: existOfferExchange ? "presented" : "requested",
+      status: offerExchange ? "presented" : "requested",
       ipexApplySaid: exchange.exn.d,
       connectionName: contact.alias as string,
       credentialType: schema.title as string,
       requestDate: exchange.exn.dt,
+      acdcCredential: offerExchange ? offerExchange.exn.e.acdc : null,
     };
 
     presentationRequests.push(presentationRequest);
@@ -352,25 +352,9 @@ export async function verifyIpexPresentation(
     return;
   }
 
-  let exchanges: any[] = [];
-  let skip = 0;
-  const limit = 100;
-
-  while (true) {
-    const exchangePage = await client.exchanges().list({ skip, limit });
-
-    if (!exchangePage || exchangePage.length === 0) {
-      break;
-    }
-
-    exchanges.push(...exchangePage);
-
-    if (exchangePage.length < limit) {
-      break;
-    }
-
-    skip += limit;
-  }
+  const exchanges = await client
+    .exchanges()
+    .list({ filter: { "-p": ipexApplySaid } });
 
   const offerExchanges = exchanges.filter(
     (exchange) => exchange.exn.r === "/ipex/offer"
@@ -383,6 +367,31 @@ export async function verifyIpexPresentation(
 
   res.status(200).send({
     success: true,
-    data: { verified: offerExchange ? true : false },
+    data: offerExchange
+      ? { verified: true, acdcCredential: offerExchange.exn.e.acdc }
+      : { verified: false },
+  });
+}
+
+export async function getCredential(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const client: SignifyClient = req.app.get("issuerClient");
+  const { credentialId } = req.params;
+
+  if (!credentialId) {
+    res.status(400).send({
+      success: false,
+      data: "Missing credential ID",
+    });
+    return;
+  }
+
+  const credential = await client.credentials().get(credentialId);
+
+  res.status(200).send({
+    success: true,
+    credential,
   });
 }

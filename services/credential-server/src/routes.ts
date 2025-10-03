@@ -7,6 +7,7 @@ import {
   revokeCredential,
   verifyIpexPresentation,
   getPresentationRequests,
+  getCredential,
 } from "./apis/credential.api";
 import { keriOobiApi } from "./apis/invitation.api";
 import { resolveOobi } from "./apis/oobi.api";
@@ -26,4 +27,5 @@ router.post(config.path.requestDisclosure, requestDisclosure);
 router.post(config.path.revokeCredential, revokeCredential);
 router.post(config.path.verifyIpexPresentation, verifyIpexPresentation);
 router.get(config.path.getPresentationRequests, getPresentationRequests);
+router.get(config.path.getCredential, getCredential);
 router.delete(config.path.deleteContact, deleteContact);
