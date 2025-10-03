@@ -21,6 +21,7 @@ import {
   waitAndGetDoneOp,
 } from "./utils/utils";
 
+
 async function getSignifyClient(bran: string): Promise<SignifyClient> {
   const client = new SignifyClient(
     config.keria.url,
