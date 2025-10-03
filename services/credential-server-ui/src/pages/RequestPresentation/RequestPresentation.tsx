@@ -48,11 +48,11 @@ const headers: AppTableHeader<PresentationRequestData>[] = [
 ];
 
 export const RequestPresentation = () => {
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const presentationRequests = useAppSelector(
     (state) => state.connections.presentationRequests
   );
-  const hasInitialized = useRef(false);
+  // const hasInitialized = useRef(false);
   const [openModal, setOpenModal] = useState(false);
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [selectedPresentation, setSelectedPresentation] =
@@ -69,12 +69,12 @@ export const RequestPresentation = () => {
     visibleRows,
   } = useTable(presentationRequests, "requestDate", "desc");
 
-  useEffect(() => {
-    if (!hasInitialized.current) {
-      hasInitialized.current = true;
-      dispatch(fetchPresentationRequests());
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!hasInitialized.current) {
+  //     hasInitialized.current = true;
+  //     dispatch(fetchPresentationRequests());
+  //   }
+  // }, []);
 
   usePresentationPolling();
 

@@ -163,10 +163,8 @@ export async function requestDisclosure(
 
   res.status(200).send({
     success: true,
-    data: {
-      message: "Apply schema successfully",
-      ipexApplySaid: ipexApplySaid,
-    },
+    message: "Apply schema successfully",
+    ipexApplySaid: ipexApplySaid,
   });
 }
 
