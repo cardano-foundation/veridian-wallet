@@ -9,10 +9,7 @@ import { i18n } from "../../i18n";
 import { CredentialService } from "../../services";
 import { CredentialRequest } from "../../services/credential.types";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import {
-  fetchPresentationRequests,
-  savePresentationRequest,
-} from "../../store/reducers/connectionsSlice";
+import { savePresentationRequest } from "../../store/reducers/connectionsSlice";
 import { PopupModal } from "../PopupModal";
 import { InputAttribute } from "./InputAttribute";
 import "./RequestPresentationModal.scss";

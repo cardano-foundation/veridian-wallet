@@ -7,7 +7,7 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { AppTable, useTable } from "../../components/AppTable";
 import { AppTableHeader } from "../../components/AppTable/AppTable.types";
 import { filter, FilterBar } from "../../components/FilterBar";
@@ -17,9 +17,8 @@ import { RequestPresentationModal } from "../../components/RequestPresentationMo
 import { PresentationDetailModal } from "../../components/PresentationDetailModal";
 import { AttributeDisplay } from "./components/AttributeDisplay";
 import { i18n } from "../../i18n";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
+import { useAppSelector } from "../../store/hooks";
 import { PresentationRequestData } from "../../store/reducers/connectionsSlice.types";
-import { fetchPresentationRequests } from "../../store/reducers/connectionsSlice";
 import { usePresentationPolling } from "../../hooks/usePresentationPolling";
 import { formatDate, formatDateTime } from "../../utils/dateFormatter";
 import "./RequestPresentation.scss";
