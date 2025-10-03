@@ -22,6 +22,7 @@ export const config = {
     resolveOobi: "/resolveOobi",
     requestDisclosure: "/requestDisclosure",
     revokeCredential: "/revokeCredential",
+    getCredential: "/credentials/:credentialId",
     verifyIpexPresentation: "/verifyIpexPresentation",
     getPresentationRequests: "/getPresentationRequests",
     deleteContact: "/deleteContact",

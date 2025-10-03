@@ -7,6 +7,7 @@ import {
   SchemaInfo,
 } from "./PresentationDetailModal.types";
 import { SchemaService } from "../../services/schemas";
+import { CredentialService } from "../../services/credential";
 import CredentialBG from "../../assets/credential-bg.svg";
 import "./PresentationDetailModal.scss";
 
@@ -31,7 +32,16 @@ const PresentationDetailModal = ({
 
     setLoading(true);
     try {
-      const schemaResponse = await SchemaService.getSchema(data.schemaSaid);
+      // Use Promise.all for faster loading as suggested by iFergal
+      const promises = [SchemaService.getSchema(data.schemaSaid)];
+
+      // Add credential status fetch if presented
+      if (data.status === "presented" && data.acdcCredential?.d) {
+        promises.push(CredentialService.getCredential(data.acdcCredential.d));
+      }
+
+      const [schemaResponse, credentialResponse] = await Promise.all(promises);
+
       if (schemaResponse.status === 200) {
         setSchemaInfo({
           title: schemaResponse.data.title,
@@ -42,7 +52,10 @@ const PresentationDetailModal = ({
 
       if (data.status === "presented") {
         setCredentialStatus({
-          status: "issued",
+          status:
+            credentialResponse.data.credential.status.s === "0"
+              ? "issued"
+              : "revoked",
           issuer: data.discloserIdentifier,
           holder: data.connectionName,
           issuanceDate: new Date(data.requestDate).toLocaleDateString("en-GB", {
@@ -63,11 +76,19 @@ const PresentationDetailModal = ({
   const renderPresentedContent = () => {
     if (!data || !schemaInfo || !credentialStatus) return null;
 
-    const credAttributes = Object.keys(data.attributes).map((key) => {
+    // Use acdcCredential.a for presented attributes as suggested by iFergal
+    // Skip over .i, .dt, .u and ignore those, display the rest
+    const credentialAttributes = data.acdcCredential?.a || {};
+    const filteredAttributes = Object.keys(credentialAttributes).filter(
+      (key) => !["i", "dt", "u", "d"].includes(key)
+    );
+
+    const credAttributes = filteredAttributes.map((key) => {
       const inputLabelText = key.replace(/([a-z])([A-Z])/g, "$1 $2");
       return {
         key: key,
         label: `${inputLabelText.at(0)?.toUpperCase()}${inputLabelText.slice(1)}`,
+        value: credentialAttributes[key],
       };
     });
 
@@ -177,8 +198,7 @@ const PresentationDetailModal = ({
                   variant="body2"
                   component="span"
                 >
-                  <strong>{credAttribute.label}:</strong>{" "}
-                  {data.attributes[credAttribute.key]}
+                  <strong>{credAttribute.label}:</strong> {credAttribute.value}
                 </Typography>
               </Box>
             ))}
@@ -196,6 +216,7 @@ const PresentationDetailModal = ({
       return {
         key: key,
         label: `${inputLabelText.at(0)?.toUpperCase()}${inputLabelText.slice(1)}`,
+        value: data.attributes[key],
       };
     });
 
@@ -255,8 +276,7 @@ const PresentationDetailModal = ({
                   variant="body2"
                   component="span"
                 >
-                  <strong>{credAttribute.label}:</strong>{" "}
-                  {data.attributes[credAttribute.key]}
+                  <strong>{credAttribute.label}:</strong> {credAttribute.value}
                 </Typography>
               </Box>
             ))}

@@ -38,6 +38,9 @@ const CredentialService = {
       `${config.endpoint}${config.path.getPresentationRequests}`
     );
   },
+  getCredential: async (credentialId: string) => {
+    return httpInstance.get(`${config.endpoint}/credentials/${credentialId}`);
+  },
 };
 
 export { CredentialService };

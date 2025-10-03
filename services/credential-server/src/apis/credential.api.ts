@@ -390,3 +390,26 @@ export async function verifyIpexPresentation(
       : { verified: false },
   });
 }
+
+export async function getCredential(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const client: SignifyClient = req.app.get("issuerClient");
+  const { credentialId } = req.params;
+
+  if (!credentialId) {
+    res.status(400).send({
+      success: false,
+      data: "Missing credential ID",
+    });
+    return;
+  }
+
+  const credential = await client.credentials().get(credentialId);
+
+  res.status(200).send({
+    success: true,
+    credential,
+  });
+}
