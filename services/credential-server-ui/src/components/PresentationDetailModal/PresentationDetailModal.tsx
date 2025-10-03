@@ -173,7 +173,7 @@ const PresentationDetailModal = ({
             className="content"
             variant="body2"
           >
-            {new Date(data.requestDate).toLocaleDateString("en-GB", {
+            {new Date(data.acdcCredential.a.dt).toLocaleDateString("en-GB", {
               day: "numeric",
               month: "long",
               year: "numeric",
@@ -181,7 +181,7 @@ const PresentationDetailModal = ({
           </Typography>
         </Box>
 
-        <Box sx={{ textAlign: "left", marginBottom: "1.5rem" }}>
+        <Box sx={{ textAlign: "left" }}>
           <Typography variant="subtitle1">Attributes</Typography>
           <Box
             component="ul"
@@ -191,7 +191,6 @@ const PresentationDetailModal = ({
               <Box
                 component="li"
                 key={credAttribute.key}
-                sx={{ marginBottom: "0.5rem" }}
               >
                 <Typography
                   className="content"
@@ -259,7 +258,7 @@ const PresentationDetailModal = ({
           </Typography>
         </Box>
 
-        <Box sx={{ textAlign: "left", marginBottom: "1.5rem" }}>
+        <Box sx={{ textAlign: "left" }}>
           <Typography variant="subtitle1">Attributes</Typography>
           <Box
             component="ul"
@@ -269,7 +268,6 @@ const PresentationDetailModal = ({
               <Box
                 component="li"
                 key={credAttribute.key}
-                sx={{ marginBottom: "0.5rem" }}
               >
                 <Typography
                   className="content"

@@ -166,10 +166,7 @@ export const RequestPresentation = () => {
                     align="left"
                     width={50}
                   >
-                    <AttributeDisplay
-                      data={row}
-                      maxLength={25}
-                    />
+                    <AttributeDisplay data={row} />
                   </TableCell>
                   <TableCell
                     component="th"

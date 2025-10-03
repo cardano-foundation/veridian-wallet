@@ -18,10 +18,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: [
-      "vite-plugin-node-polyfills/shims/buffer",
-      "vite-plugin-node-polyfills/shims/global",
-      "vite-plugin-node-polyfills/shims/process",
-    ],
+    exclude: ["vite-plugin-node-polyfills"],
   },
 });
