@@ -352,25 +352,9 @@ export async function verifyIpexPresentation(
     return;
   }
 
-  let exchanges: any[] = [];
-  let skip = 0;
-  const limit = 100;
-
-  while (true) {
-    const exchangePage = await client.exchanges().list({ skip, limit });
-
-    if (!exchangePage || exchangePage.length === 0) {
-      break;
-    }
-
-    exchanges.push(...exchangePage);
-
-    if (exchangePage.length < limit) {
-      break;
-    }
-
-    skip += limit;
-  }
+  const exchanges = await client
+    .exchanges()
+    .list({ filter: { "-p": ipexApplySaid } });
 
   const offerExchanges = exchanges.filter(
     (exchange) => exchange.exn.r === "/ipex/offer"
