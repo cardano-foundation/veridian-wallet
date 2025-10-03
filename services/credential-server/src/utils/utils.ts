@@ -4,13 +4,21 @@ import path from "path";
 import {
   Operation,
   randomPasscode,
+  Saider,
   Salter,
   Serder,
   SignifyClient,
   State,
 } from "signify-ts";
 import { config } from "../config";
-import { ISSUER_NAME, QVI_NAME, QVI_SCHEMA_SAID } from "../consts";
+import {
+  ISSUER_NAME,
+  GLEIF_NAME,
+  QVI_SCHEMA_SAID,
+  LE_NAME,
+  LE_SCHEMA_SAID,
+  OOR_AUTH_SCHEMA_SAID,
+} from "../consts";
 import { BranFileContent } from "./utils.types";
 import { EndRole } from "../server.types";
 
@@ -35,14 +43,23 @@ export async function loadBrans(): Promise<BranFileContent> {
   if (existsSync(bransFilePath)) {
     bransFileContent = await readFile(bransFilePath, "utf8");
     const data = JSON.parse(bransFileContent);
+
     if (data.bran && data.issuerBran) {
+      // Patch
+      if (!data.leBran) {
+        const newContent = { ...data, leBran: randomPasscode() };
+        await writeFile(bransFilePath, JSON.stringify(newContent));
+        return newContent;
+      }
+
       return data;
     }
   }
 
   const bran = randomPasscode();
   const issuerBran = randomPasscode();
-  const newContent = { bran, issuerBran };
+  const leBran = randomPasscode();
+  const newContent = { bran, issuerBran, leBran };
   await writeFile(bransFilePath, JSON.stringify(newContent));
   return newContent;
 }
@@ -65,41 +82,57 @@ export async function waitAndGetDoneOp(
 }
 
 export async function createQVICredential(
-  client: SignifyClient,
-  clientIssuer: SignifyClient,
-  keriIssuerRegistryRegk: string
+  issuerClient: SignifyClient,
+  holderClient: SignifyClient
 ): Promise<string> {
-  const issuerAid = await clientIssuer.identifiers().get(QVI_NAME);
-  const holderAid = await client.identifiers().get(ISSUER_NAME);
+  const issuerAid = await issuerClient.identifiers().get(GLEIF_NAME);
+  const holderAid = await holderClient.identifiers().get(ISSUER_NAME);
 
-  const issuerAidOobi = await getOobi(clientIssuer, issuerAid.name);
-  const holderAidOobi = await getOobi(client, holderAid.name);
+  const issued = await issuerClient
+    .credentials()
+    .list({
+      filter: {
+        "-i": issuerAid.prefix,
+        "-s": QVI_SCHEMA_SAID,
+        "-a-i": holderAid.prefix,
+      },
+    });
+  if (issued.length) return issued[0].sad.d;
 
-  await resolveOobi(client, issuerAidOobi);
-  await resolveOobi(clientIssuer, holderAidOobi);
+  const issuerAidOobi = await getOobi(issuerClient, issuerAid.name);
+  const holderAidOobi = await getOobi(holderClient, holderAid.name);
+
+  await resolveOobi(holderClient, issuerAidOobi);
+  await resolveOobi(issuerClient, holderAidOobi);
 
   await resolveOobi(
-    clientIssuer,
+    issuerClient,
+    `${config.oobiEndpoint}/oobi/${QVI_SCHEMA_SAID}`
+  );
+  await resolveOobi(
+    holderClient,
     `${config.oobiEndpoint}/oobi/${QVI_SCHEMA_SAID}`
   );
 
   const vcdata = {
     LEI: "5493001KJTIIGC8Y1R17",
   };
-  const result = await clientIssuer.credentials().issue(issuerAid.name, {
-    ri: keriIssuerRegistryRegk,
+  const result = await issuerClient.credentials().issue(issuerAid.name, {
+    ri: await getRegistry(issuerClient, GLEIF_NAME),
     s: QVI_SCHEMA_SAID,
     a: {
       i: holderAid.prefix,
       ...vcdata,
     },
   });
-  await waitAndGetDoneOp(clientIssuer, result.op, OP_TIMEOUT);
-  const issuerCredential = await clientIssuer
+
+  await waitAndGetDoneOp(issuerClient, result.op, OP_TIMEOUT);
+  const issuerCredential = await issuerClient
     .credentials()
     .get(result.acdc.ked.d);
+
   const datetime = new Date().toISOString().replace("Z", "000+00:00");
-  const [grant, gsigs, gend] = await clientIssuer.ipex().grant({
+  const [grant, gsigs, gend] = await issuerClient.ipex().grant({
     senderName: issuerAid.name,
     recipient: holderAid.prefix,
     acdc: new Serder(issuerCredential.sad),
@@ -108,45 +141,230 @@ export async function createQVICredential(
     ancAttachment: issuerCredential.ancAttachment,
     datetime,
   });
-  const smg: Operation = await clientIssuer
+  const smg: Operation = await issuerClient
     .ipex()
     .submitGrant(issuerAid.name, grant, gsigs, gend, [holderAid.prefix]);
-  await waitAndGetDoneOp(clientIssuer, smg, OP_TIMEOUT);
+  await waitAndGetDoneOp(issuerClient, smg, OP_TIMEOUT);
   const qviCredentialId = result.acdc.ked.d;
 
-  // wait for notification
-  const getHolderNotifications = async () => {
-    let holderNotifications = await client.notifications().list();
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
-    while (!holderNotifications.total) {
-      holderNotifications = await client.notifications().list();
-      await new Promise((resolve) => setTimeout(resolve, 250));
-    }
-
-    return holderNotifications;
-  };
-
-  const grantNotification = (await getHolderNotifications()).notes[0];
-
-  // resolve schema
-  await resolveOobi(client, `${config.oobiEndpoint}/oobi/${QVI_SCHEMA_SAID}`);
-
-  // holder IPEX admit
-  const [admit, sigs, aend] = await client.ipex().admit({
+  const [admit, sigs, aend] = await holderClient.ipex().admit({
     senderName: holderAid.name,
     message: "",
-    grantSaid: grantNotification.a.d!,
+    grantSaid: grant.ked.d,
     recipient: issuerAid.prefix,
     datetime: new Date().toISOString().replace("Z", "000+00:00"),
   });
-  const op: Operation = await client
+  const op: Operation = await holderClient
     .ipex()
     .submitAdmit(holderAid.name, admit, sigs, aend, [issuerAid.prefix]);
-  await waitAndGetDoneOp(client, op, OP_TIMEOUT);
-
-  await client.notifications().delete(grantNotification.i);
+  await waitAndGetDoneOp(holderClient, op, OP_TIMEOUT);
 
   return qviCredentialId;
+}
+
+export async function createLECredential(
+  issuerClient: SignifyClient,
+  holderClient: SignifyClient,
+  qviCredentialId: string
+): Promise<string> {
+  const issuerAid = await issuerClient.identifiers().get(ISSUER_NAME);
+  const holderAid = await holderClient.identifiers().get(LE_NAME);
+
+  const issued = await issuerClient
+    .credentials()
+    .list({
+      filter: {
+        "-i": issuerAid.prefix,
+        "-s": LE_SCHEMA_SAID,
+        "-a-i": holderAid.prefix,
+      },
+    });
+  if (issued.length) return issued[0].sad.d;
+
+  const issuerAidOobi = await getOobi(issuerClient, issuerAid.name);
+  const holderAidOobi = await getOobi(holderClient, holderAid.name);
+
+  await resolveOobi(issuerClient, holderAidOobi);
+  await resolveOobi(holderClient, issuerAidOobi);
+
+  await resolveOobi(
+    issuerClient,
+    `${config.oobiEndpoint}/oobi/${LE_SCHEMA_SAID}`
+  );
+  await resolveOobi(
+    holderClient,
+    `${config.oobiEndpoint}/oobi/${LE_SCHEMA_SAID}`
+  );
+
+  const vcdata = {
+    LEI: "5493001KJTIIGC8Y1R17",
+  };
+  const result = await issuerClient.credentials().issue(issuerAid.name, {
+    ri: await getRegistry(issuerClient, ISSUER_NAME),
+    s: LE_SCHEMA_SAID,
+    a: {
+      i: holderAid.prefix,
+      ...vcdata,
+    },
+    r: Saider.saidify({
+      d: "",
+      usageDisclaimer: {
+        l: "Usage of a valid, unexpired, and non-revoked vLEI Credential, as defined in the associated Ecosystem Governance Framework, does not assert that the Legal Entity is trustworthy, honest, reputable in its business dealings, safe to do business with, or compliant with any laws or that an implied or expressly intended purpose will be fulfilled.",
+      },
+      issuanceDisclaimer: {
+        l: "All information in a valid, unexpired, and non-revoked vLEI Credential, as defined in the associated Ecosystem Governance Framework, is accurate as of the date the validation process was complete. The vLEI Credential has been issued to the legal entity or person named in the vLEI Credential as the subject; and the qualified vLEI Issuer exercised reasonable care to perform the validation process set forth in the vLEI Ecosystem Governance Framework.",
+      },
+    })[1],
+    e: Saider.saidify({
+      d: "",
+      qvi: {
+        n: qviCredentialId,
+        s: QVI_SCHEMA_SAID,
+      },
+    })[1],
+  });
+
+  await waitAndGetDoneOp(issuerClient, result.op, OP_TIMEOUT);
+  const issuerCredential = await issuerClient
+    .credentials()
+    .get(result.acdc.ked.d);
+
+  const datetime = new Date().toISOString().replace("Z", "000+00:00");
+  const [grant, gsigs, gend] = await issuerClient.ipex().grant({
+    senderName: issuerAid.name,
+    recipient: holderAid.prefix,
+    acdc: new Serder(issuerCredential.sad),
+    anc: new Serder(issuerCredential.anc),
+    iss: new Serder(issuerCredential.iss),
+    ancAttachment: issuerCredential.ancAttachment,
+    datetime,
+  });
+  const smg: Operation = await issuerClient
+    .ipex()
+    .submitGrant(issuerAid.name, grant, gsigs, gend, [holderAid.prefix]);
+  await waitAndGetDoneOp(issuerClient, smg, OP_TIMEOUT);
+  const leCredentialId = result.acdc.ked.d;
+
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const [admit, sigs, aend] = await holderClient.ipex().admit({
+    senderName: holderAid.name,
+    message: "",
+    grantSaid: grant.ked.d,
+    recipient: issuerAid.prefix,
+    datetime: new Date().toISOString().replace("Z", "000+00:00"),
+  });
+  const op: Operation = await holderClient
+    .ipex()
+    .submitAdmit(holderAid.name, admit, sigs, aend, [issuerAid.prefix]);
+  await waitAndGetDoneOp(holderClient, op, OP_TIMEOUT);
+
+  return leCredentialId;
+}
+
+export async function createOORAuthCredential(
+  issuerClient: SignifyClient,
+  holderClient: SignifyClient,
+  leCredentialId: string
+): Promise<string> {
+  const issuerAid = await issuerClient.identifiers().get(LE_NAME);
+  const holderAid = await holderClient.identifiers().get(ISSUER_NAME);
+
+  const issued = await issuerClient
+    .credentials()
+    .list({
+      filter: {
+        "-i": issuerAid.prefix,
+        "-s": OOR_AUTH_SCHEMA_SAID,
+        "-a-i": holderAid.prefix,
+      },
+    });
+  if (issued.length) return issued[0].sad.d;
+
+  const issuerAidOobi = await getOobi(issuerClient, issuerAid.name);
+  const holderAidOobi = await getOobi(holderClient, holderAid.name);
+
+  await resolveOobi(issuerClient, holderAidOobi);
+  await resolveOobi(holderClient, issuerAidOobi);
+
+  await resolveOobi(
+    issuerClient,
+    `${config.oobiEndpoint}/oobi/${OOR_AUTH_SCHEMA_SAID}`
+  );
+  await resolveOobi(
+    holderClient,
+    `${config.oobiEndpoint}/oobi/${OOR_AUTH_SCHEMA_SAID}`
+  );
+
+  const vcdata = {
+    LEI: "5493001KJTIIGC8Y1R17",
+    AID: "aidhere",
+    personLegalName: "John Doe",
+    officialRole: "HR Manager",
+  };
+  const result = await issuerClient.credentials().issue(issuerAid.name, {
+    ri: await getRegistry(issuerClient, LE_NAME),
+    s: OOR_AUTH_SCHEMA_SAID,
+    a: {
+      i: holderAid.prefix,
+      ...vcdata,
+    },
+    r: Saider.saidify({
+      d: "",
+      usageDisclaimer: {
+        l: "Usage of a valid, unexpired, and non-revoked vLEI Credential, as defined in the associated Ecosystem Governance Framework, does not assert that the Legal Entity is trustworthy, honest, reputable in its business dealings, safe to do business with, or compliant with any laws or that an implied or expressly intended purpose will be fulfilled.",
+      },
+      issuanceDisclaimer: {
+        l: "All information in a valid, unexpired, and non-revoked vLEI Credential, as defined in the associated Ecosystem Governance Framework, is accurate as of the date the validation process was complete. The vLEI Credential has been issued to the legal entity or person named in the vLEI Credential as the subject; and the qualified vLEI Issuer exercised reasonable care to perform the validation process set forth in the vLEI Ecosystem Governance Framework.",
+      },
+    })[1],
+    e: Saider.saidify({
+      d: "",
+      le: {
+        n: leCredentialId,
+        s: LE_SCHEMA_SAID,
+      },
+    })[1],
+  });
+
+  await waitAndGetDoneOp(issuerClient, result.op, OP_TIMEOUT);
+  const issuerCredential = await issuerClient
+    .credentials()
+    .get(result.acdc.ked.d);
+
+  const datetime = new Date().toISOString().replace("Z", "000+00:00");
+  const [grant, gsigs, gend] = await issuerClient.ipex().grant({
+    senderName: issuerAid.name,
+    recipient: holderAid.prefix,
+    acdc: new Serder(issuerCredential.sad),
+    anc: new Serder(issuerCredential.anc),
+    iss: new Serder(issuerCredential.iss),
+    ancAttachment: issuerCredential.ancAttachment,
+    datetime,
+  });
+  const smg: Operation = await issuerClient
+    .ipex()
+    .submitGrant(issuerAid.name, grant, gsigs, gend, [holderAid.prefix]);
+  await waitAndGetDoneOp(issuerClient, smg, OP_TIMEOUT);
+  const oorAuthCredentialId = result.acdc.ked.d;
+
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const [admit, sigs, aend] = await holderClient.ipex().admit({
+    senderName: holderAid.name,
+    message: "",
+    grantSaid: grant.ked.d,
+    recipient: issuerAid.prefix,
+    datetime: new Date().toISOString().replace("Z", "000+00:00"),
+  });
+  const op: Operation = await holderClient
+    .ipex()
+    .submitAdmit(holderAid.name, admit, sigs, aend, [issuerAid.prefix]);
+  await waitAndGetDoneOp(holderClient, op, OP_TIMEOUT);
+
+  return oorAuthCredentialId;
 }
 
 export async function resolveOobi(
