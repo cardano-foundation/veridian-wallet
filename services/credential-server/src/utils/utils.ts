@@ -87,6 +87,8 @@ export async function createQVICredential(
 ): Promise<string> {
   const issuerAid = await issuerClient.identifiers().get(GLEIF_NAME);
   const holderAid = await holderClient.identifiers().get(ISSUER_NAME);
+  console.log(`QVI issuance - issuer: ${issuerAid.prefix}`);
+  console.log(`QVI issuance - holder: ${holderAid.prefix}`);
 
   const issued = await issuerClient
     .credentials()
@@ -99,6 +101,7 @@ export async function createQVICredential(
     });
   if (issued.length) {
     console.log(`Pre-existing QVI credential ${issued[0].sad.d}`);
+    console.log(`Debug: ${JSON.stringify(issued[0].sad)}`);
     return issued[0].sad.d;
   }
 
@@ -175,6 +178,8 @@ export async function createLECredential(
 ): Promise<string> {
   const issuerAid = await issuerClient.identifiers().get(ISSUER_NAME);
   const holderAid = await holderClient.identifiers().get(LE_NAME);
+  console.log(`LE issuance - issuer: ${issuerAid.prefix}`);
+  console.log(`LE issuance - holder: ${holderAid.prefix}`);
 
   const issued = await issuerClient
     .credentials()
