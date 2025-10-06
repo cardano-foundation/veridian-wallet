@@ -75,7 +75,7 @@ export async function waitAndGetDoneOp(
     op = await client.operations().get(op.name);
     await new Promise((resolve) => setTimeout(resolve, interval));
   }
-  if (!op.done) {
+  if (!op.done || (op.done && op.error)) {
     throw new Error(`Operation not completing: ${JSON.stringify(op, null, 2)}`);
   }
   return op;
@@ -381,7 +381,8 @@ export async function resolveOobi(
     await client.oobis().resolve(strippedUrl),
     OP_TIMEOUT
   )) as Operation & { response: State };
-  if (!operation.done) {
+  if (!operation.done || (operation.done && operation.error)) {
+    console.log(`OOBI resolution failed: ${JSON.stringify(operation, null, 2)}`);
     throw new Error(FAILED_TO_RESOLVE_OOBI);
   }
   if (operation.response && operation.response.i) {
