@@ -66,7 +66,7 @@ class IpexCommunicationService extends AgentService {
   static readonly SCHEMA_SAID_BIRTH_CERTIFICATE =
     "EDayhD6ONnXsz3GhsgdbuJIQv3PI7t6If-r3WAoMWM1_";
   static readonly SCHEMA_SAID_SOCIAL_MEDIA =
-    "EDnaDqbuiKCHglGdvWVJz0ONKqebgLh9wtP_NR5UwIvG";
+    "EIcshHh7M2BvDyA04iI13yWowAk7JBd5-9se1M0inUgM";
   static readonly SCHEMA_SAID_GUARDIANSHIP =
     "EJoWpJfMES-3Th0V8IwOEgIov4--k0SvwJ2eI5eWyJbM";
 
