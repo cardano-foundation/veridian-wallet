@@ -97,7 +97,10 @@ export async function createQVICredential(
         "-a-i": holderAid.prefix,
       },
     });
-  if (issued.length) return issued[0].sad.d;
+  if (issued.length) {
+    console.log(`Pre-existing QVI credential ${issued[0].sad.d}`);
+    return issued[0].sad.d;
+  }
 
   const issuerAidOobi = await getOobi(issuerClient, issuerAid.name);
   const holderAidOobi = await getOobi(holderClient, holderAid.name);
@@ -161,6 +164,7 @@ export async function createQVICredential(
     .submitAdmit(holderAid.name, admit, sigs, aend, [issuerAid.prefix]);
   await waitAndGetDoneOp(holderClient, op, OP_TIMEOUT);
 
+  console.log(`QVI credential ${qviCredentialId} issued`);
   return qviCredentialId;
 }
 
@@ -181,7 +185,10 @@ export async function createLECredential(
         "-a-i": holderAid.prefix,
       },
     });
-  if (issued.length) return issued[0].sad.d;
+  if (issued.length) {
+    console.log(`Pre-existing LE credential ${issued[0].sad.d}`);
+    return issued[0].sad.d;
+  }
 
   const issuerAidOobi = await getOobi(issuerClient, issuerAid.name);
   const holderAidOobi = await getOobi(holderClient, holderAid.name);
@@ -261,6 +268,7 @@ export async function createLECredential(
     .submitAdmit(holderAid.name, admit, sigs, aend, [issuerAid.prefix]);
   await waitAndGetDoneOp(holderClient, op, OP_TIMEOUT);
 
+  console.log(`LE credential ${leCredentialId} issued`);
   return leCredentialId;
 }
 
@@ -281,7 +289,10 @@ export async function createOORAuthCredential(
         "-a-i": holderAid.prefix,
       },
     });
-  if (issued.length) return issued[0].sad.d;
+  if (issued.length) {
+    console.log(`Pre-existing OOR-AUTH credential ${issued[0].sad.d}`);
+    return issued[0].sad.d;
+  }
 
   const issuerAidOobi = await getOobi(issuerClient, issuerAid.name);
   const holderAidOobi = await getOobi(holderClient, holderAid.name);
@@ -363,7 +374,8 @@ export async function createOORAuthCredential(
     .ipex()
     .submitAdmit(holderAid.name, admit, sigs, aend, [issuerAid.prefix]);
   await waitAndGetDoneOp(holderClient, op, OP_TIMEOUT);
-
+  
+  console.log(`OOR-AUTH credential ${oorAuthCredentialId} issued`);
   return oorAuthCredentialId;
 }
 
