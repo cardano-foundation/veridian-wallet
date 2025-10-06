@@ -25,16 +25,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
-      with:
-        submodules: recursive
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
     - name: Ignore services folder
       run: |
         echo 'services/*' >> .gitignore
 
     - name: Upload .gitignore artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: gitignore-artifact
         include-hidden-files: true
@@ -46,7 +44,7 @@ jobs:
       security-events: write
       contents: read
     needs: set-gitignore-artifact
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.2.2"
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@e92b5d07338d4f0ba0981dffed17c48976ca4730" # v2.2.3
     with:
       download-artifact: gitignore-artifact
       scan-args: |-
