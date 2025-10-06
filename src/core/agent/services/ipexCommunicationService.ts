@@ -1257,7 +1257,7 @@ class IpexCommunicationService extends AgentService {
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
     const edgeBlock = schema.properties.e;
     if (!edgeBlock) {
-      return;
+      return schema;
     }
 
     const edges: Record<string, SchemaEdge> = edgeBlock.oneOf[1].properties;
