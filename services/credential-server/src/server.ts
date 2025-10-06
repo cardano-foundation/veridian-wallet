@@ -122,28 +122,19 @@ async function initializeCredentials(
   const qviCredentialId = await createQVICredential(
     gleifClient,
     issuerClient
-  ).catch((e) => {
-    console.error(e);
-    return "";
-  });
+  );
 
   const leCredentialId = await createLECredential(
     issuerClient,
     leClient,
     qviCredentialId
-  ).catch((e) => {
-    console.error(e);
-    return "";
-  });
+  );
 
   const oorAuthCredentialId = await createOORAuthCredential(
     leClient,
     issuerClient,
     leCredentialId
-  ).catch((e) => {
-    console.error(e);
-    return "";
-  });
+  );
 
   const pollingService = new PollingService(issuerClient);
   pollingService.start();

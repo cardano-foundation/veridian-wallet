@@ -87,23 +87,21 @@ export async function createQVICredential(
 ): Promise<string> {
   const issuerAid = await issuerClient.identifiers().get(GLEIF_NAME);
   const holderAid = await holderClient.identifiers().get(ISSUER_NAME);
-  console.log(`QVI issuance - issuer: ${issuerAid.prefix}`);
-  console.log(`QVI issuance - holder: ${holderAid.prefix}`);
 
-  const issued = await issuerClient
-    .credentials()
-    .list({
-      filter: {
-        "-i": issuerAid.prefix,
-        "-s": QVI_SCHEMA_SAID,
-        "-a-i": holderAid.prefix,
-      },
-    });
-  if (issued.length) {
-    console.log(`Pre-existing QVI credential ${issued[0].sad.d}`);
-    console.log(`Debug: ${JSON.stringify(issued[0].sad)}`);
-    return issued[0].sad.d;
-  }
+  // @TODO - This optimization requires further work to make sure the IPEX flow was completed.
+  // const issued = await issuerClient
+  //   .credentials()
+  //   .list({
+  //     filter: {
+  //       "-i": issuerAid.prefix,
+  //       "-s": QVI_SCHEMA_SAID,
+  //       "-a-i": holderAid.prefix,
+  //     },
+  //   });
+  // if (issued.length) {
+  //   console.log(`Pre-existing QVI credential ${issued[0].sad.d}`);
+  //   return issued[0].sad.d;
+  // }
 
   const issuerAidOobi = await getOobi(issuerClient, issuerAid.name);
   const holderAidOobi = await getOobi(holderClient, holderAid.name);
@@ -178,22 +176,21 @@ export async function createLECredential(
 ): Promise<string> {
   const issuerAid = await issuerClient.identifiers().get(ISSUER_NAME);
   const holderAid = await holderClient.identifiers().get(LE_NAME);
-  console.log(`LE issuance - issuer: ${issuerAid.prefix}`);
-  console.log(`LE issuance - holder: ${holderAid.prefix}`);
 
-  const issued = await issuerClient
-    .credentials()
-    .list({
-      filter: {
-        "-i": issuerAid.prefix,
-        "-s": LE_SCHEMA_SAID,
-        "-a-i": holderAid.prefix,
-      },
-    });
-  if (issued.length) {
-    console.log(`Pre-existing LE credential ${issued[0].sad.d}`);
-    return issued[0].sad.d;
-  }
+  // @TODO - This optimization requires further work to make sure the IPEX flow was completed.
+  // const issued = await issuerClient
+  //   .credentials()
+  //   .list({
+  //     filter: {
+  //       "-i": issuerAid.prefix,
+  //       "-s": LE_SCHEMA_SAID,
+  //       "-a-i": holderAid.prefix,
+  //     },
+  //   });
+  // if (issued.length) {
+  //   console.log(`Pre-existing LE credential ${issued[0].sad.d}`);
+  //   return issued[0].sad.d;
+  // }
 
   const issuerAidOobi = await getOobi(issuerClient, issuerAid.name);
   const holderAidOobi = await getOobi(holderClient, holderAid.name);
@@ -285,19 +282,20 @@ export async function createOORAuthCredential(
   const issuerAid = await issuerClient.identifiers().get(LE_NAME);
   const holderAid = await holderClient.identifiers().get(ISSUER_NAME);
 
-  const issued = await issuerClient
-    .credentials()
-    .list({
-      filter: {
-        "-i": issuerAid.prefix,
-        "-s": OOR_AUTH_SCHEMA_SAID,
-        "-a-i": holderAid.prefix,
-      },
-    });
-  if (issued.length) {
-    console.log(`Pre-existing OOR-AUTH credential ${issued[0].sad.d}`);
-    return issued[0].sad.d;
-  }
+  // @TODO - This optimization requires further work to make sure the IPEX flow was completed.
+  // const issued = await issuerClient
+  //   .credentials()
+  //   .list({
+  //     filter: {
+  //       "-i": issuerAid.prefix,
+  //       "-s": OOR_AUTH_SCHEMA_SAID,
+  //       "-a-i": holderAid.prefix,
+  //     },
+  //   });
+  // if (issued.length) {
+  //   console.log(`Pre-existing OOR-AUTH credential ${issued[0].sad.d}`);
+  //   return issued[0].sad.d;
+  // }
 
   const issuerAidOobi = await getOobi(issuerClient, issuerAid.name);
   const holderAidOobi = await getOobi(holderClient, holderAid.name);
