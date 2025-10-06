@@ -269,29 +269,7 @@ class CredentialService extends AgentService {
     }
     const registry = registries[0];
 
-    const edges: { [key: string]: any } = { d: "" };
-    const edgeCredentials: { [key: string]: any } = {};
-
-    if (exchange.exn.a.e) {
-      for (const edgeName in exchange.exn.a.e) {
-        const sourceSaid = exchange.exn.a.e[edgeName].d;
-        if (!sourceSaid) continue;
-
-        edgeCredentials[edgeName] = await this.props.signifyClient
-          .credentials()
-          .get(sourceSaid);
-      }
-
-      for (const edgeName in exchange.exn.a.e) {
-        const sourceCred = edgeCredentials[edgeName];
-        if (!sourceCred) continue;
-
-        edges[edgeName] = {
-          n: sourceCred.sad.d,
-          s: sourceCred.sad.s,
-        };
-      }
-    }
+    const edges = exchange.exn.a.e;
 
     await this.connections.resolveOobi(
       `${exchange.exn.a.a.oobiUrl}/oobi/${exchange.exn.a.s}`
