@@ -950,7 +950,6 @@ class KeriaNotificationService extends AgentService {
     notif: Notification,
     exchange: ExnMessage
   ): Promise<boolean> {
-
     // TODO: different requirement?
     if (exchange.exn.a.s) {
       return true;
@@ -964,7 +963,6 @@ class KeriaNotificationService extends AgentService {
     notif: Notification,
     exchange: ExnMessage
   ): Promise<boolean> {
-
     if (exchange.exn.a.s) {
       return true;
     }
@@ -1306,7 +1304,7 @@ class KeriaNotificationService extends AgentService {
               .get((operation.response as State).i)
               .catch(() => undefined);
 
-            if (!keriaContact) {
+            if (!keriaContact || !keriaContact.version) {
               const contact = await this.contactStorage.findById(
                 connectionPairRecord.contactId
               );
