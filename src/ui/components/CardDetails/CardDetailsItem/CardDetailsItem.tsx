@@ -7,6 +7,7 @@ import { CardDetailsItemProps } from "./CardDetailsItem.types";
 import { writeToClipboard } from "../../../utils/clipboard";
 import "./CardDetailsItem.scss";
 import { combineClassNames } from "../../../utils/style";
+import { getUTCOffset } from "../../../utils/formatters";
 
 const CardDetailsItem = ({
   info,
@@ -40,6 +41,22 @@ const CardDetailsItem = ({
   const copy = () => {
     writeToClipboard(String(copyContent ?? info ?? ""));
     dispatch(setToastMsg(ToastMsgType.COPIED_TO_CLIPBOARD));
+  };
+
+  const formatScreenTime = (value: unknown) => {
+    if (typeof value !== "string") return "";
+
+    const parts = value.split(" - ");
+    if (parts.length !== 2) return "";
+
+    const timeAndOffset = parts[1];
+    const timeOffsetParts = timeAndOffset.split(" (UTC ");
+    if (timeOffsetParts.length !== 2) return "";
+
+    const timePart = timeOffsetParts[0];
+    const offsetPart = timeOffsetParts[1].replace(")", "");
+
+    return `${timePart.slice(0, 5)} (UTC${offsetPart})`;
   };
 
   return (
@@ -81,7 +98,11 @@ const CardDetailsItem = ({
               {keyValue}
             </IonText>
           )}
-          <span data-testid={testId && `${testId}-text-value`}>{info}</span>
+          <span data-testid={testId && `${testId}-text-value`}>
+            {typeof info === "string" && keyValue?.includes("screen Time")
+              ? formatScreenTime(info)
+              : info}
+          </span>
         </IonText>
         {copyButton && (
           <IonButton
