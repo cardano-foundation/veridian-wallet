@@ -101,14 +101,10 @@ const EditProfile = ({
         displayName: newDisplayName,
       };
 
-      if (isGroup) {
-        // TODO: Update member user name
-      } else {
-        await Agent.agent.identifiers.updateIdentifier(cardData.id, {
-          displayName: newDisplayName,
-          theme: currentIdentifier.identity.theme,
-        });
-      }
+      await Agent.agent.identifiers.updateIdentifier(cardData.id, {
+        displayName: newDisplayName,
+        theme: currentIdentifier.identity.theme,
+      });
 
       setCardData({
         ...cardData,
