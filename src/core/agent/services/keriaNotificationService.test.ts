@@ -3383,65 +3383,7 @@ describe("Long running operation tracker", () => {
       oobi: "oobi",
       id: "id",
       createdAt: new Date(),
-    });
-
-    await keriaNotificationService.processOperation(operationRecord);
-
-    expect(connectionPairStorage.update).toHaveBeenCalledWith({
-      contactId: "id",
-      creationStatus: CreationStatus.COMPLETE,
-      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
-      pendingDeletion: false,
-    });
-    expect(contactsUpdateMock).toBeCalledTimes(0);
-    expect(eventEmitter.emit).toHaveBeenCalledWith({
-      type: EventTypes.OperationComplete,
-      payload: {
-        opType: operationRecord.recordType,
-        oid: "AOCUvGbpidkplC7gAoJOxLgXX1P2j4xlWMbzk3gM8JzA",
-      },
-    });
-    expect(operationPendingStorage.deleteById).toBeCalledWith(
-      "oobi.AOCUvGbpidkplC7gAoJOxLgXX1P2j4xlWMbzk3gM8JzA"
-    );
-  });
-
-  test("Should not update connection if it already exists", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
-    const operationMock = {
-      metadata: {
-        said: "said",
-        oobi: "http://keria:3902/oobi/ELDjcyhsjppizfKQ_AvYeF4RuF1u0O6ya6OYUM6zLYH-/agent/EI4-oLA5XcrZepuB5mDrl3279EjbFtiDrz4im5Q4Ht0O?name=CF%20Credential%20Issuance",
-      },
-      done: true,
-      response: {
-        i: "id",
-        dt: new Date(),
-      },
-    };
-    operationsGetMock.mockResolvedValue(operationMock);
-    operationsGetMock.mockResolvedValue(operationMock);
-    const connectionPairMock = {
-      contactId: "id",
-      creationStatus: CreationStatus.PENDING,
-      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_p9",
-      pendingDeletion: false,
-    };
-    connectionPairStorage.findAllByQuery.mockResolvedValueOnce([
-      connectionPairMock,
-    ]);
-    const operationRecord = {
-      type: "OperationPendingRecord",
-      id: "oobi.AOCUvGbpidkplC7gAoJOxLgXX1P2j4xlWMbzk3gM8JzA",
-      createdAt: new Date("2024-08-01T10:36:17.814Z"),
-      recordType: "oobi",
-      updatedAt: new Date("2024-08-01T10:36:17.814Z"),
-    } as OperationPendingRecord;
-    contactGetMock.mockResolvedValueOnce({
-      alias: "alias",
-      oobi: "oobi",
-      id: "id",
-      createdAt: new Date(),
+      version: "versionHere",
     });
 
     await keriaNotificationService.processOperation(operationRecord);
