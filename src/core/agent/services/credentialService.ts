@@ -244,26 +244,26 @@ class CredentialService extends AgentService {
       .exchanges()
       .get(requestSaid);
 
-    const sender = exchange.exn.rp;
+    const receiver = exchange.exn.rp;
     const hab = await this.props.signifyClient
       .identifiers()
       .get(exchange.exn.rp);
 
-    let registries = await this.props.signifyClient.registries().list(sender);
+    let registries = await this.props.signifyClient.registries().list(receiver);
     if (registries.length === 0) {
       const result = await this.props.signifyClient
         .registries()
-        .create({ name: sender, registryName: "social-media-registry" });
+        .create({ name: receiver, registryName: "social-media-registry" });
       await waitAndGetDoneOp(
         this.props.signifyClient,
         await result.op(),
         OP_TIMEOUT
       );
 
-      registries = await this.props.signifyClient.registries().list(sender);
+      registries = await this.props.signifyClient.registries().list(receiver);
       if (registries.length === 0) {
         throw new Error(
-          `Failed to create or find registry for issuer ${sender}`
+          `Failed to create or find registry for issuer ${receiver}`
         );
       }
     }
@@ -276,17 +276,19 @@ class CredentialService extends AgentService {
     );
 
     const childAid = exchange.exn.a.a.i;
-    const issueOp = await this.props.signifyClient.credentials().issue(sender, {
-      ri: registry.regk,
-      s: exchange.exn.a.s,
-      u: new Salter({}).qb64,
-      a: {
-        i: childAid,
+    const issueOp = await this.props.signifyClient
+      .credentials()
+      .issue(receiver, {
+        ri: registry.regk,
+        s: exchange.exn.a.s,
         u: new Salter({}).qb64,
-        ...exchange.exn.a.r,
-      },
-      e: Saider.saidify(edges)[1],
-    });
+        a: {
+          i: childAid,
+          u: new Salter({}).qb64,
+          ...exchange.exn.a.r,
+        },
+        e: Saider.saidify(edges)[1],
+      });
 
     await waitAndGetDoneOp(this.props.signifyClient, issueOp.op, OP_TIMEOUT);
 
@@ -298,7 +300,7 @@ class CredentialService extends AgentService {
     const datetime = new Date().toISOString().replace("Z", "000+00:00");
     const [grant, gsigs, gend] = await this.props.signifyClient.ipex().grant({
       message: exchange.exn.a.a.oobiUrl,
-      senderName: sender,
+      senderName: receiver,
       recipient: childAid,
       acdc: new Serder(newAcdc.sad),
       anc: new Serder(newAcdc.anc),
@@ -315,7 +317,7 @@ class CredentialService extends AgentService {
 
     const payload = {
       d: "",
-      sads: JSON.stringify([newAcdc.sad]),
+      sads: JSON.stringify([newAcdc]),
     };
 
     const [exn, sigs, atc] = await this.props.signifyClient
@@ -333,7 +335,7 @@ class CredentialService extends AgentService {
     await this.props.signifyClient
       .exchanges()
       .sendFromEvents(hab.prefix, "credential_issue", exn, sigs, atc, [
-        childAid,
+        exchange.exn.i,
       ]);
 
     await deleteNotificationRecordById(
