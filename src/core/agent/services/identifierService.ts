@@ -529,10 +529,33 @@ class IdentifierService extends AgentService {
 
     let name: string;
     if (identifierMetadata.groupMemberPre) {
-      // gHab
       name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${data.displayName}`;
+
+      const memberMetadata = await this.identifierStorage.getIdentifierMetadata(
+        identifierMetadata.groupMemberPre
+      );
+      if (memberMetadata.groupMetadata) {
+        const initiatorFlag = memberMetadata.groupMetadata.groupInitiator
+          ? "1"
+          : "0";
+        const userNamePart = memberMetadata.groupMetadata.userName;
+        const memberName = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${memberMetadata.groupMetadata.groupId}:${userNamePart}:${data.displayName}`;
+
+        await this.props.signifyClient
+          .identifiers()
+          .update(identifierMetadata.groupMemberPre, {
+            name: memberName,
+          });
+        await this.identifierStorage.updateIdentifierMetadata(
+          identifierMetadata.groupMemberPre,
+          {
+            theme: data.theme,
+            displayName: data.displayName,
+            groupMetadata: data.groupMetadata,
+          }
+        );
+      }
     } else if (data.groupMetadata) {
-      // mHab
       const initiatorFlag = data.groupMetadata.groupInitiator ? "1" : "0";
       const userNamePart = data.groupMetadata.userName;
       name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${data.groupMetadata.groupId}:${userNamePart}:${data.displayName}`;
