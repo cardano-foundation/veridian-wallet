@@ -28,7 +28,7 @@ const Review = ({
     <Box className="review-stage">
       <Box sx={{ textAlign: "left", marginBottom: "1.5rem" }}>
         <Typography variant="subtitle1">
-          {i18n.t("pages.credentialDetails.issueCredential.review.credential")}
+          {i18n.t("pages.requestPresentation.modal.review.credential")}
         </Typography>
         <Box
           sx={{
@@ -53,7 +53,7 @@ const Review = ({
       </Box>
       <Box sx={{ textAlign: "left", marginBottom: "1.5rem" }}>
         <Typography variant="subtitle1">
-          {i18n.t("pages.credentialDetails.issueCredential.review.issueTo")}
+          {i18n.t("pages.requestPresentation.modal.review.requestFrom")}
         </Typography>
         <Typography
           className="content"
