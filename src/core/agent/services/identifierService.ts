@@ -68,8 +68,9 @@ class IdentifierService extends AgentService {
     "Group metadata data in identifier  does not exist";
   static readonly CANNOT_FIND_EXISTING_IDENTIFIER_BY_SEARCH =
     "Identifier name taken on KERIA, but cannot be found when iterating over identifier list";
-  static readonly INVALID_MEMBER_IDENTIFIER =
-    "Member identifier is not a valid member identifier (missing groupMetadata)";
+  // @TODO - foconnor: When we refactor this, only member identifiers will have groupMetadata
+  static readonly INVALID_GROUP_IDENTIFIER =
+    "Identifier is not a valid group or group member identifier (missing groupMetadata)";
   static readonly DELETED_IDENTIFIER_THEME = "XX";
 
   protected readonly identifierStorage: IdentifierStorage;
@@ -528,7 +529,7 @@ class IdentifierService extends AgentService {
       );
       if (!memberMetadata.groupMetadata) {
         throw new Error(
-          `${IdentifierService.INVALID_MEMBER_IDENTIFIER}: ${identifierMetadata.groupMemberPre}`
+          `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifierMetadata.groupMemberPre}`
         );
       }
 
@@ -575,13 +576,19 @@ class IdentifierService extends AgentService {
     const identifierMetadata =
       await this.identifierStorage.getIdentifierMetadata(identifier);
 
+    if (!identifierMetadata.groupMetadata) {
+      throw new Error(
+        `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifierMetadata.groupMemberPre}`
+      );
+    }
+
     if (identifierMetadata.groupMemberPre) {
       const memberMetadata = await this.identifierStorage.getIdentifierMetadata(
         identifierMetadata.groupMemberPre
       );
       if (!memberMetadata.groupMetadata) {
         throw new Error(
-          `${IdentifierService.INVALID_MEMBER_IDENTIFIER}: ${identifierMetadata.groupMemberPre}`
+          `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifierMetadata.groupMemberPre}`
         );
       }
 
@@ -595,15 +602,19 @@ class IdentifierService extends AgentService {
           name: memberName,
         });
 
-      const groupMetadata: GroupMetadata = {
+      const memberGroupMetadata: GroupMetadata = {
         ...memberMetadata.groupMetadata,
         userName: username,
       };
       await this.identifierStorage.updateIdentifierMetadata(
         identifierMetadata.groupMemberPre,
-        { groupMetadata }
+        { groupMetadata: memberGroupMetadata }
       );
 
+      const groupMetadata: GroupMetadata = {
+        ...identifierMetadata.groupMetadata,
+        userName: username,
+      };
       return this.identifierStorage.updateIdentifierMetadata(identifier, {
         groupMetadata,
       });
@@ -611,7 +622,7 @@ class IdentifierService extends AgentService {
 
     if (!identifierMetadata.groupMetadata) {
       throw new Error(
-        `${IdentifierService.INVALID_MEMBER_IDENTIFIER}: ${identifier}`
+        `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifier}`
       );
     }
 
