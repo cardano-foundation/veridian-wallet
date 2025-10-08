@@ -1,6 +1,9 @@
 @mixin expand-group {
   .nested-list-item {
-    padding: 0.5rem 0;
+    > *:not(:last-child) {
+      margin: 0;
+      padding: 0;
+    }
 
     &:last-of-type {
       padding-bottom: 0;
@@ -9,7 +12,6 @@
     ion-item {
       display: flex;
       align-items: center;
-      height: 1.5rem;
 
       &::part(native) {
         padding: 0.75rem 0;
@@ -17,7 +19,7 @@
     }
 
     &:not(.container-nested-list-item) {
-      padding-left: 1.5rem;
+      padding-left: 1.8rem;
     }
   }
 
