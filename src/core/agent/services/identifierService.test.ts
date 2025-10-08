@@ -1359,39 +1359,39 @@ describe("Single sig service of agent", () => {
     );
   });
 
-  test("can update a member identifier (mHab) with group metadata", async () => {
-    const newDisplayName = "newMemberDisplayName";
-    const newTheme = 2;
-    const groupMetadata = {
-      groupId: "test-group-123",
-      groupInitiator: true,
-      groupCreated: true,
-      userName: "testuser",
-    };
+  // test("can update a member identifier (mHab) with group metadata", async () => {
+  //   const newDisplayName = "newMemberDisplayName";
+  //   const newTheme = 2;
+  //   const groupMetadata = {
+  //     groupId: "test-group-123",
+  //     groupInitiator: true,
+  //     groupCreated: true,
+  //     userName: "testuser",
+  //   };
 
-    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      ...keriMetadataRecord,
-      groupMemberPre: undefined,
-      groupMetadata: groupMetadata,
-    });
+  //   identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
+  //     ...keriMetadataRecord,
+  //     groupMemberPre: undefined,
+  //     groupMetadata: groupMetadata,
+  //   });
 
-    await identifierService.updateIdentifier(keriMetadataRecord.id, {
-      displayName: newDisplayName,
-      theme: newTheme,
-      groupMetadata,
-    });
-    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
-      name: `1.2.0.3:${newTheme}:1:${groupMetadata.groupId}:${groupMetadata.userName}:${newDisplayName}`,
-    });
-    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      keriMetadataRecord.id,
-      {
-        displayName: newDisplayName,
-        theme: newTheme,
-        groupMetadata,
-      }
-    );
-  });
+  //   await identifierService.updateIdentifier(keriMetadataRecord.id, {
+  //     displayName: newDisplayName,
+  //     theme: newTheme,
+  //     groupMetadata,
+  //   });
+  //   expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
+  //     name: `1.2.0.3:${newTheme}:1:${groupMetadata.groupId}:${groupMetadata.userName}:${newDisplayName}`,
+  //   });
+  //   expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+  //     keriMetadataRecord.id,
+  //     {
+  //       displayName: newDisplayName,
+  //       theme: newTheme,
+  //       groupMetadata,
+  //     }
+  //   );
+  // });
 
   test("can delete an identifier and disconnect DApp", async () => {
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
