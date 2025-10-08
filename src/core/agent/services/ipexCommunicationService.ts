@@ -64,11 +64,11 @@ class IpexCommunicationService extends AgentService {
   static readonly SCHEMA_SAID_ROME_DEMO =
     "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt";
   static readonly SCHEMA_SAID_BIRTH_CERTIFICATE =
-    "EDayhD6ONnXsz3GhsgdbuJIQv3PI7t6If-r3WAoMWM1_";
+    "EIQIGLr3lh0M8_3xYYDpOTww3zvniB1mpX5T2IcDV62Z";
   static readonly SCHEMA_SAID_SOCIAL_MEDIA =
-    "EIcshHh7M2BvDyA04iI13yWowAk7JBd5-9se1M0inUgM";
+    "ENZJI9MThT4ACrmIDu7lT2l8p7wY1pNNyaZssJJrZl27";
   static readonly SCHEMA_SAID_GUARDIANSHIP =
-    "EJoWpJfMES-3Th0V8IwOEgIov4--k0SvwJ2eI5eWyJbM";
+    "EAHPkkNQbIUEXCA-JgBBRCIpcJkdtsIFqsP555ICKiJk";
 
   protected readonly identifierStorage: IdentifierStorage;
   protected readonly credentialStorage: CredentialStorage;
