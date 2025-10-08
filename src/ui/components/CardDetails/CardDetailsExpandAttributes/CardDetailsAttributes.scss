@@ -22,16 +22,6 @@
       padding-left: 1.8rem;
     }
   }
-
-  @media screen and (min-width: 250px) and (max-width: 370px) {
-    .nested-list-item {
-      padding: 0.4rem 0;
-
-      ion-item {
-        height: 1.2rem;
-      }
-    }
-  }
 }
 
 .expand-attributes {
