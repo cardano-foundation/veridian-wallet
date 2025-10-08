@@ -177,7 +177,8 @@ const CredentialIssuanceRequest = ({
                     :
                   </span>{" "}
                   <span>
-                    {typeof value === "string" && key?.includes("screenTime")
+                    {typeof value === "string" &&
+                    ["accessStartTime", "accessEndTime"].includes(key)
                       ? formatScreenTime(value)
                       : String(value)}
                   </span>

@@ -99,7 +99,9 @@ const CardDetailsItem = ({
             </IonText>
           )}
           <span data-testid={testId && `${testId}-text-value`}>
-            {typeof info === "string" && keyValue?.includes("screen Time")
+            {typeof info === "string" &&
+            keyValue &&
+            ["access Start Time:", "access End Time:"].includes(keyValue)
               ? formatScreenTime(info)
               : info}
           </span>
