@@ -3,6 +3,8 @@ import { Keyboard } from "@capacitor/keyboard";
 import { IonModal, IonSpinner } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
+import { IdentifierMetadataRecordProps } from "../../../core/agent/records";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
@@ -30,6 +32,7 @@ const EditProfile = ({
   setModalIsOpen,
   cardData,
   setCardData,
+  editType = "name",
 }: EditProfileProps) => {
   const pageId = "edit-identifier";
   const isGroup = !!cardData.groupMemberPre;
@@ -39,7 +42,9 @@ const EditProfile = ({
   const [isLoading, setLoading] = useState(false);
 
   const [newDisplayName, setNewDisplayName] = useState(
-    isGroup ? cardData.groupMetadata?.userName || "" : cardData.displayName
+    editType === "userName"
+      ? cardData.groupMetadata?.userName || ""
+      : cardData.displayName
   );
   const [keyboardIsOpen, setKeyboardIsOpen] = useState(false);
 
@@ -75,9 +80,11 @@ const EditProfile = ({
 
   useEffect(() => {
     setNewDisplayName(
-      isGroup ? cardData.groupMetadata?.userName || "" : cardData.displayName
+      editType === "userName"
+        ? cardData.groupMetadata?.userName || ""
+        : cardData.displayName
     );
-  }, [isGroup, cardData.displayName, cardData.groupMetadata?.userName]);
+  }, [editType, cardData.displayName, cardData.groupMetadata?.userName]);
 
   const handleSubmit = async () => {
     try {
@@ -96,19 +103,35 @@ const EditProfile = ({
         throw new Error(`${IDENTIFIER_NOT_EXIST} ${cardData.id}`);
       }
 
-      const updatedIdentifier = {
-        ...currentIdentifier.identity,
-        displayName: newDisplayName,
+      const params: Pick<
+        IdentifierMetadataRecordProps,
+        "theme" | "displayName" | "groupMetadata"
+      > = {
+        displayName: cardData.displayName,
+        theme: currentIdentifier.identity.theme,
       };
 
-      await Agent.agent.identifiers.updateIdentifier(cardData.id, {
-        displayName: newDisplayName,
-        theme: currentIdentifier.identity.theme,
-      });
+      if (editType === "name") {
+        params.displayName = newDisplayName;
+      } else if (isGroup && cardData.groupMetadata) {
+        params.groupMetadata = {
+          ...cardData.groupMetadata,
+          userName: newDisplayName,
+        };
+      }
+
+      await Agent.agent.identifiers.updateIdentifier(cardData.id, params);
+
+      const updatedIdentifier: IdentifierShortDetails = {
+        ...currentIdentifier.identity,
+        displayName: params.displayName,
+        groupMetadata: params.groupMetadata,
+      };
 
       setCardData({
         ...cardData,
-        displayName: newDisplayName,
+        displayName: params.displayName,
+        groupMetadata: params.groupMetadata,
       });
 
       handleCancel();
@@ -173,7 +196,7 @@ const EditProfile = ({
           <CustomInput
             dataTestId="edit-name-input"
             title={`${
-              isGroup
+              editType === "userName"
                 ? i18n.t("profiledetails.options.inner.usernamelabel")
                 : i18n.t("profiledetails.options.inner.label")
             }`}
