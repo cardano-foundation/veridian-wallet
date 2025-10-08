@@ -21,6 +21,7 @@ import "./CredentialIssuanceRequest.scss";
 
 import { MemberAvatar } from "../../../../components/Avatar";
 import { RegularConnectionDetails } from "../../../../../core/agent/agent.types";
+import { getUTCOffset } from "../../../../utils/formatters";
 
 const CredentialIssuanceRequest = ({
   activeStatus,
@@ -48,11 +49,11 @@ const CredentialIssuanceRequest = ({
 
   const formatScreenTime = (value: unknown) => {
     if (typeof value !== "string") return "";
-    return new Date(value).toLocaleTimeString("en-US", {
+    return `${new Date(value).toLocaleTimeString("en-US", {
       hour12: false,
       hour: "2-digit",
       minute: "2-digit",
-    });
+    })} (${getUTCOffset(new Date(value))})`;
   };
 
   useEffect(() => {
