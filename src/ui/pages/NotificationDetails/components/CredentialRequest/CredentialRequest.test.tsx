@@ -8,15 +8,17 @@ import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../__fixtures__/credRequestFix";
-import { credsFixAcdc } from "../../../../__fixtures__/credsFix";
-import {
-  filteredIdentifierFix,
-  multisignIdentifierFix,
-} from "../../../../__fixtures__/filteredIdentifierFix";
+import { multisignIdentifierFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
+import { revokedCredsFix } from "../../../../__fixtures__/filteredCredsFix";
 import { CredentialRequest } from "./CredentialRequest";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
+
+const getIpexApplyDetailsMock = jest.fn(() => Promise.resolve(credRequestFix));
+const getLinkedGroupFromIpexApplyMock = jest.fn();
+const offerAcdcFromApplyMock = jest.fn();
+const dispatchMock = jest.fn();
 
 jest.mock("@ionic/react", () => {
   const actual = jest.requireActual("@ionic/react");
@@ -33,9 +35,6 @@ jest.mock("@ionic/react", () => {
   };
 });
 
-const getIpexApplyDetailsMock = jest.fn(() => Promise.resolve(credRequestFix));
-const getLinkedGroupFromIpexApplyMock = jest.fn();
-
 jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
@@ -44,12 +43,14 @@ jest.mock("../../../../../core/agent/agent", () => ({
         getLinkedGroupFromIpexApply: () => getLinkedGroupFromIpexApplyMock(),
         joinMultisigOffer: jest.fn(),
         getOfferedCredentialSaid: jest.fn(),
+        offerAcdcFromApply: (...args: any[]) => offerAcdcFromApplyMock(...args),
+      },
+      auth: {
+        verifySecret: jest.fn().mockResolvedValue(true),
       },
     },
   },
 }));
-
-const dispatchMock = jest.fn();
 
 const initialState = {
   stateCache: {
@@ -192,6 +193,185 @@ describe("Credential request", () => {
     expect(alert).toHaveTextContent(
       EN_TRANSLATIONS.tabs.notifications.details.credential.request.alert.text
     );
+  });
+
+  test("Auto-submit when only one suitable credential exists", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    const history = createMemoryHistory();
+
+    getIpexApplyDetailsMock.mockImplementation(() =>
+      Promise.resolve({
+        ...credRequestFix,
+        credentials: [credRequestFix.credentials[0]],
+      })
+    );
+
+    const { getByText, getByTestId, queryByTestId } = render(
+      <Provider store={storeMocked}>
+        <IonReactMemoryRouter history={history}>
+          <CredentialRequest
+            pageId="notification-details"
+            activeStatus
+            handleBack={jest.fn()}
+            notificationDetails={notificationsFix[4]}
+          />
+        </IonReactMemoryRouter>
+      </Provider>
+    );
+
+    expect(getByTestId("credential-request-spinner-container")).toBeVisible();
+
+    await waitFor(() => {
+      expect(queryByTestId("credential-request-spinner-container")).toBe(null);
+
+      expect(
+        getByText(
+          EN_TRANSLATIONS.tabs.notifications.details.credential.request
+            .information.title
+        )
+      ).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("primary-button-notification-details"));
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("verify-passcode")).toBeVisible();
+    });
+  });
+
+  test("Do not auto-submit when multiple suitable credentials exist", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    const history = createMemoryHistory();
+
+    getIpexApplyDetailsMock.mockImplementation(() =>
+      Promise.resolve(credRequestFix)
+    );
+
+    const { getByText, getByTestId, queryByTestId } = render(
+      <Provider store={storeMocked}>
+        <IonReactMemoryRouter history={history}>
+          <CredentialRequest
+            pageId="notification-details"
+            activeStatus
+            handleBack={jest.fn()}
+            notificationDetails={notificationsFix[4]}
+          />
+        </IonReactMemoryRouter>
+      </Provider>
+    );
+
+    expect(getByTestId("credential-request-spinner-container")).toBeVisible();
+
+    await waitFor(() => {
+      expect(queryByTestId("credential-request-spinner-container")).toBe(null);
+
+      expect(
+        getByText(
+          EN_TRANSLATIONS.tabs.notifications.details.credential.request
+            .information.title
+        )
+      ).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("primary-button-notification-details"));
+    });
+
+    await waitFor(() => {
+      expect(
+        getByText(
+          EN_TRANSLATIONS.tabs.notifications.details.credential.request
+            .choosecredential.title
+        )
+      ).toBeVisible();
+    });
+
+    expect(offerAcdcFromApplyMock).not.toHaveBeenCalled();
+  });
+
+  test("Auto-submit when only one suitable credential exists after filtering out revoked", async () => {
+    const stateWithRevokedCreds = {
+      ...initialState,
+      profilesCache: {
+        ...initialState.profilesCache,
+        profiles: {
+          ...initialState.profilesCache.profiles,
+          EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB: {
+            ...initialState.profilesCache.profiles[
+              "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB"
+            ],
+            credentials: revokedCredsFix,
+          } as any,
+        },
+      },
+    };
+
+    const storeMocked = {
+      ...makeTestStore(stateWithRevokedCreds as any),
+      dispatch: dispatchMock,
+    };
+
+    const history = createMemoryHistory();
+
+    getIpexApplyDetailsMock.mockImplementation(() =>
+      Promise.resolve({
+        ...credRequestFix,
+        credentials: [
+          credRequestFix.credentials[0],
+          {
+            connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
+            acdc: {
+              ...credRequestFix.credentials[1].acdc,
+              d: "EBgG1lhkxiv_UQ8IiF2G4j5HQlnT5K5XZy_zRFg_EGCS",
+            },
+          },
+        ],
+      })
+    );
+
+    const { getByText, getByTestId, queryByTestId } = render(
+      <Provider store={storeMocked}>
+        <IonReactMemoryRouter history={history}>
+          <CredentialRequest
+            pageId="notification-details"
+            activeStatus
+            handleBack={jest.fn()}
+            notificationDetails={notificationsFix[4]}
+          />
+        </IonReactMemoryRouter>
+      </Provider>
+    );
+
+    expect(getByTestId("credential-request-spinner-container")).toBeVisible();
+
+    await waitFor(() => {
+      expect(queryByTestId("credential-request-spinner-container")).toBe(null);
+
+      expect(
+        getByText(
+          EN_TRANSLATIONS.tabs.notifications.details.credential.request
+            .information.title
+        )
+      ).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("primary-button-notification-details"));
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("verify-passcode")).toBeVisible();
+    });
   });
 });
 
