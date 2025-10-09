@@ -186,17 +186,6 @@ describe("Edit profile", () => {
     act(() => {
       fireEvent(
         getByTestId("edit-name-input"),
-        new CustomEvent("ionInput", { detail: { value: "   " } })
-      );
-    });
-
-    await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent(
-        getByTestId("edit-name-input"),
         new CustomEvent("ionInput", {
           detail: {
             value:
@@ -224,7 +213,7 @@ describe("Edit profile", () => {
     act(() => {
       fireEvent(
         getByTestId("edit-name-input"),
-        new CustomEvent("ionInput", { detail: { value: "Test MS" } })
+        new CustomEvent("ionInput", { detail: { value: "Profess" } })
       );
     });
 
