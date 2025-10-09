@@ -1383,6 +1383,8 @@
     "identifierrequested": "Profile request pending",
     "identifiercreated": "Profile pending",
     "identifierupdated": "Profile created",
+    "identifiernameupdated": "Profile name updated",
+    "identifierusernameupdated": "Name updated",
     "identifierdeleted": "Profile successfully deleted",
     "credentialdeleted": "Credential deleted successfully",
     "credentialsdeleted": "Credentials deleted successfully",

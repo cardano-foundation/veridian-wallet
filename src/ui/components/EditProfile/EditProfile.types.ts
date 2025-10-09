@@ -5,6 +5,7 @@ interface EditProfileProps {
   setModalIsOpen: (value: boolean) => void;
   cardData: IdentifierDetails;
   setCardData: (data: IdentifierDetails) => void;
+  editType?: "name" | "userName";
 }
 
 export type { EditProfileProps };
