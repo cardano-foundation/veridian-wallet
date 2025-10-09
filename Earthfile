@@ -13,7 +13,7 @@ ARG --global TARGET_PLATFORM=""
 ARG --global PUSH=false
 
 ARG --global KERIA_DOCKER_IMAGE_REPO=weboftrust/keria
-ARG --global KERIA_DOCKER_IMAGE_TAG=0.2.0-rc1
+ARG --global KERIA_DOCKER_IMAGE_TAG=0.2.0-dev7
 ARG --global KERIA_GIT_REPO_URL="https://github.com/cardano-foundation/keria.git"
 ARG --global KERIA_GIT_REF=4ceca51e0bf59ccedc0ab234cc5e937cb75a4ed6 # feat/verifyCredential
 
