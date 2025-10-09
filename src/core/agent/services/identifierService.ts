@@ -6,6 +6,7 @@ import {
   IdentifierShortDetails,
   RemoteSignRequest,
 } from "./identifier.types";
+import type { GroupMetadata } from "./identifier.types";
 import {
   CreationStatus,
   AgentServicesProps,
@@ -67,6 +68,9 @@ class IdentifierService extends AgentService {
     "Group metadata data in identifier  does not exist";
   static readonly CANNOT_FIND_EXISTING_IDENTIFIER_BY_SEARCH =
     "Identifier name taken on KERIA, but cannot be found when iterating over identifier list";
+  // @TODO - foconnor: When we refactor this, only member identifiers will have groupMetadata
+  static readonly INVALID_GROUP_IDENTIFIER =
+    "Identifier is not a valid group or group member identifier (missing groupMetadata)";
   static readonly DELETED_IDENTIFIER_THEME = "XX";
 
   protected readonly identifierStorage: IdentifierStorage;
@@ -495,15 +499,6 @@ class IdentifierService extends AgentService {
     });
   }
 
-  private async deleteGroupLinkedConnections(groupId: string): Promise<void> {
-    const connections = await this.connections.getMultisigLinkedContacts(
-      groupId
-    );
-    for (const connection of connections) {
-      await this.connections.deleteMultisigConnectionById(connection.id);
-    }
-  }
-
   async deleteStaleLocalIdentifier(identifier: string): Promise<void> {
     const connectedDApp =
       PeerConnection.peerConnection.getConnectedDAppAddress();
@@ -517,12 +512,10 @@ class IdentifierService extends AgentService {
     await this.identifierStorage.deleteIdentifierMetadata(identifier);
   }
 
+  @OnlineOnly
   async updateIdentifier(
     identifier: string,
-    data: Pick<
-      IdentifierMetadataRecordProps,
-      "theme" | "displayName" | "groupMetadata"
-    >
+    data: Pick<IdentifierMetadataRecordProps, "theme" | "displayName">
   ): Promise<void> {
     const identifierMetadata =
       await this.identifierStorage.getIdentifierMetadata(identifier);
@@ -534,31 +527,34 @@ class IdentifierService extends AgentService {
       const memberMetadata = await this.identifierStorage.getIdentifierMetadata(
         identifierMetadata.groupMemberPre
       );
-      if (memberMetadata.groupMetadata) {
-        const initiatorFlag = memberMetadata.groupMetadata.groupInitiator
-          ? "1"
-          : "0";
-        const userNamePart = memberMetadata.groupMetadata.userName;
-        const memberName = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${memberMetadata.groupMetadata.groupId}:${userNamePart}:${data.displayName}`;
-
-        await this.props.signifyClient
-          .identifiers()
-          .update(identifierMetadata.groupMemberPre, {
-            name: memberName,
-          });
-        await this.identifierStorage.updateIdentifierMetadata(
-          identifierMetadata.groupMemberPre,
-          {
-            theme: data.theme,
-            displayName: data.displayName,
-            groupMetadata: data.groupMetadata,
-          }
+      if (!memberMetadata.groupMetadata) {
+        throw new Error(
+          `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifierMetadata.groupMemberPre}`
         );
       }
-    } else if (data.groupMetadata) {
-      const initiatorFlag = data.groupMetadata.groupInitiator ? "1" : "0";
-      const userNamePart = data.groupMetadata.userName;
-      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${data.groupMetadata.groupId}:${userNamePart}:${data.displayName}`;
+
+      const initiatorFlag = memberMetadata.groupMetadata.groupInitiator
+        ? "1"
+        : "0";
+      const memberName = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${memberMetadata.groupMetadata.groupId}:${memberMetadata.groupMetadata.userName}:${data.displayName}`;
+
+      await this.props.signifyClient
+        .identifiers()
+        .update(identifierMetadata.groupMemberPre, {
+          name: memberName,
+        });
+      await this.identifierStorage.updateIdentifierMetadata(
+        identifierMetadata.groupMemberPre,
+        {
+          theme: data.theme,
+          displayName: data.displayName,
+        }
+      );
+    } else if (identifierMetadata.groupMetadata) {
+      const initiatorFlag = identifierMetadata.groupMetadata.groupInitiator
+        ? "1"
+        : "0";
+      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${identifierMetadata.groupMetadata.groupId}:${identifierMetadata.groupMetadata.userName}:${data.displayName}`;
     } else {
       name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${data.displayName}`;
     }
@@ -569,7 +565,83 @@ class IdentifierService extends AgentService {
     return this.identifierStorage.updateIdentifierMetadata(identifier, {
       theme: data.theme,
       displayName: data.displayName,
-      groupMetadata: data.groupMetadata,
+    });
+  }
+
+  @OnlineOnly
+  async updateGroupUsername(
+    identifier: string,
+    username: string
+  ): Promise<void> {
+    const identifierMetadata =
+      await this.identifierStorage.getIdentifierMetadata(identifier);
+
+    if (!identifierMetadata.groupMetadata) {
+      throw new Error(
+        `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifierMetadata.groupMemberPre}`
+      );
+    }
+
+    if (identifierMetadata.groupMemberPre) {
+      const memberMetadata = await this.identifierStorage.getIdentifierMetadata(
+        identifierMetadata.groupMemberPre
+      );
+      if (!memberMetadata.groupMetadata) {
+        throw new Error(
+          `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifierMetadata.groupMemberPre}`
+        );
+      }
+
+      const initiatorFlag = memberMetadata.groupMetadata.groupInitiator
+        ? "1"
+        : "0";
+      const memberName = `${LATEST_IDENTIFIER_VERSION}:${identifierMetadata.theme}:${initiatorFlag}:${memberMetadata.groupMetadata.groupId}:${username}:${identifierMetadata.displayName}`;
+      await this.props.signifyClient
+        .identifiers()
+        .update(identifierMetadata.groupMemberPre, {
+          name: memberName,
+        });
+
+      const memberGroupMetadata: GroupMetadata = {
+        ...memberMetadata.groupMetadata,
+        userName: username,
+      };
+      await this.identifierStorage.updateIdentifierMetadata(
+        identifierMetadata.groupMemberPre,
+        { groupMetadata: memberGroupMetadata }
+      );
+
+      const groupMetadata: GroupMetadata = {
+        ...identifierMetadata.groupMetadata,
+        userName: username,
+      };
+      return this.identifierStorage.updateIdentifierMetadata(identifier, {
+        groupMetadata,
+      });
+    }
+
+    if (!identifierMetadata.groupMetadata) {
+      throw new Error(
+        `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifier}`
+      );
+    }
+
+    // Otherwise, we are updating the username for a partially created group
+    const initiatorFlag = identifierMetadata.groupMetadata.groupInitiator
+      ? "1"
+      : "0";
+    const name = `${LATEST_IDENTIFIER_VERSION}:${identifierMetadata.theme}:${initiatorFlag}:${identifierMetadata.groupMetadata.groupId}:${username}:${identifierMetadata.displayName}`;
+
+    await this.props.signifyClient.identifiers().update(identifier, {
+      name,
+    });
+
+    const groupMetadata: GroupMetadata = {
+      ...identifierMetadata.groupMetadata,
+      userName: username,
+    };
+    return this.identifierStorage.updateIdentifierMetadata(identifier, {
+      groupMetadata,
     });
   }
 
