@@ -29,6 +29,8 @@ enum ToastMsgType {
   UNABLE_CREATE_GROUP_ERROR = "unablecreategrouperror",
   DELEGATED_IDENTIFIER_CREATED = "delegatedidentifiercreated",
   IDENTIFIER_UPDATED = "identifierUpdated",
+  IDENTIFIER_NAME_UPDATED = "identifierNameUpdated",
+  IDENTIFIER_USERNAME_UPDATED = "identifierUsernameUpdated",
   IDENTIFIER_DELETED = "identifierDeleted",
   CREDENTIAL_DELETED = "credentialDeleted",
   CREDENTIAL_RESTORED = "credentialRestored",

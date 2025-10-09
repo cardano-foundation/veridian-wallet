@@ -113,14 +113,18 @@ const EditProfile = ({
 
       if (editType === "name") {
         params.displayName = newDisplayName;
+        await Agent.agent.identifiers.updateIdentifier(cardData.id, params);
       } else if (isGroup && cardData.groupMetadata) {
         params.groupMetadata = {
           ...cardData.groupMetadata,
           userName: newDisplayName,
         };
-      }
 
-      await Agent.agent.identifiers.updateIdentifier(cardData.id, params);
+        await Agent.agent.identifiers.updateGroupUsername(
+          cardData.id,
+          newDisplayName
+        );
+      }
 
       const updatedIdentifier: IdentifierShortDetails = {
         ...currentIdentifier.identity,
@@ -136,7 +140,13 @@ const EditProfile = ({
 
       handleCancel();
       dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
-      dispatch(setToastMsg(ToastMsgType.IDENTIFIER_UPDATED));
+      dispatch(
+        setToastMsg(
+          editType === "userName"
+            ? ToastMsgType.IDENTIFIER_USERNAME_UPDATED
+            : ToastMsgType.IDENTIFIER_NAME_UPDATED
+        )
+      );
     } catch (e) {
       if ((e as Error).message === DUPLICATE_NAME) {
         setDuplicateName(true);
