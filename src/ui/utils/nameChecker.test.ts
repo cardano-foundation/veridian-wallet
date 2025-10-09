@@ -2,7 +2,7 @@ import { nameChecker } from "./nameChecker";
 
 describe("nameChecker", () => {
   it("should return true if name contains valid characters", () => {
-    const name = "Name 1_-";
+    const name = "Name1_-";
     expect(nameChecker.isValidCharacters(name)).toBe(true);
   });
   it("should return true if name length is greater than 1 and less than 32", () => {

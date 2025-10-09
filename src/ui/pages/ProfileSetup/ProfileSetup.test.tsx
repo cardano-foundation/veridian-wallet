@@ -343,22 +343,12 @@ describe("Profile setup", () => {
         fireEvent(
           getByTestId("profile-user-name"),
           new CustomEvent("ionInput", {
-            detail: { value: "   " },
-          })
-        );
-      });
-
-      await waitFor(() => {
-        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
-      });
-
-      act(() => {
-        fireEvent(
-          getByTestId("profile-user-name"),
-          new CustomEvent("ionInput", {
             detail: {
               value:
-                "Duke Duke Duke Duke  Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke",
+                "Duke Duke Duke Duke  Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke".replaceAll(
+                  " ",
+                  ""
+                ),
             },
           })
         );
@@ -641,19 +631,6 @@ describe("Profile setup", () => {
           getByTestId("profile-group-name"),
           new CustomEvent("ionInput", {
             detail: { value: "" },
-          })
-        );
-      });
-
-      await waitFor(() => {
-        expect(getByText(EN_TRANSLATIONS.nameerror.onlyspace)).toBeVisible();
-      });
-
-      act(() => {
-        fireEvent(
-          getByTestId("profile-group-name"),
-          new CustomEvent("ionInput", {
-            detail: { value: "   " },
           })
         );
       });

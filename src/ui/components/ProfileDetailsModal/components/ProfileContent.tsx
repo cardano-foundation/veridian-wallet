@@ -74,6 +74,7 @@ const ProfileContent = ({
   const [viewType, setViewType] = useState(DetailView.AdvancedDetail);
   const [shareIsOpen, setShareIsOpen] = useState(false);
   const [editorOptionsIsOpen, setEditorIsOpen] = useState(false);
+  const [editUserName, setEditUserName] = useState(false);
   const [connectdApp, setConnectdApp] = useState(false);
 
   const openShareModal = () => {
@@ -120,6 +121,13 @@ const ProfileContent = ({
     setConnectdApp(true);
   };
   const openEditModal = () => setEditorIsOpen(true);
+
+  const openEditUserName = () => setEditUserName(true);
+
+  const closeEditModal = (value: boolean) => {
+    setEditorIsOpen(value);
+    setEditUserName(value);
+  };
 
   return (
     <>
@@ -273,7 +281,7 @@ const ProfileContent = ({
                   shape="round"
                   className="edit-username-button"
                   data-testid="edit-username-button"
-                  onClick={openEditModal}
+                  onClick={openEditUserName}
                 >
                   <p>{i18n.t("profiledetails.group.groupmembers.editname")}</p>
                   <IonIcon icon={pencilOutline} />
@@ -424,7 +432,7 @@ const ProfileContent = ({
         view={viewType}
         setViewType={setViewType}
         data={cardData}
-        openEdit={openEditModal}
+        openEdit={openEditUserName}
       />
       <ShareConnection
         isOpen={shareIsOpen}
@@ -432,10 +440,11 @@ const ProfileContent = ({
         oobi={oobi}
       />
       <EditProfile
-        modalIsOpen={editorOptionsIsOpen}
-        setModalIsOpen={setEditorIsOpen}
+        modalIsOpen={editorOptionsIsOpen || editUserName}
+        setModalIsOpen={closeEditModal}
         setCardData={setCardData}
         cardData={cardData}
+        editType={editUserName ? "userName" : "name"}
       />
       <ConnectdApp
         isOpen={connectdApp}

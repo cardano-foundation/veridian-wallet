@@ -1,7 +1,7 @@
 import { i18n } from "../../i18n";
 
 const nameRequirements = {
-  validCharactersPattern: /^[a-zA-Z0-9-_\s]+$/,
+  validCharactersPattern: /^[a-zA-Z0-9-_]+$/,
   lengthPattern: /^.{1,32}$/,
   onlySpacePattern: /^\s+$/,
 };
