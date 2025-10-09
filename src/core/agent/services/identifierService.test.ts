@@ -1319,7 +1319,39 @@ describe("Single sig service of agent", () => {
     );
   });
 
-  test("can update a group identifier (gHab) when member has no groupMetadata", async () => {
+  test("can update a member identifier (mHab) with existing group metadata", async () => {
+    const newDisplayName = "newMemberDisplayName";
+    const newTheme = 2;
+    const groupMetadata = {
+      groupId: "test-group-123",
+      groupInitiator: true,
+      groupCreated: true,
+      userName: "testuser",
+    };
+
+    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
+      ...keriMetadataRecord,
+      groupMemberPre: undefined,
+      groupMetadata: groupMetadata,
+    });
+
+    await identifierService.updateIdentifier(keriMetadataRecord.id, {
+      displayName: newDisplayName,
+      theme: newTheme,
+    });
+    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
+      name: `1.2.0.3:${newTheme}:1:${groupMetadata.groupId}:${groupMetadata.userName}:${newDisplayName}`,
+    });
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      keriMetadataRecord.id,
+      {
+        displayName: newDisplayName,
+        theme: newTheme,
+      }
+    );
+  });
+
+  test("should throw error when updating gHab with member that has no groupMetadata", async () => {
     const newDisplayName = "newGroupDisplayName";
     const newTheme = 2;
 
@@ -1338,60 +1370,156 @@ describe("Single sig service of agent", () => {
       })
       .mockResolvedValueOnce(memberMetadataWithoutGroup);
 
-    await identifierService.updateIdentifier(keriMetadataRecord.id, {
-      displayName: newDisplayName,
-      theme: newTheme,
+    await expect(
+      identifierService.updateIdentifier(keriMetadataRecord.id, {
+        displayName: newDisplayName,
+        theme: newTheme,
+      })
+    ).rejects.toThrow(
+      `${IdentifierService.INVALID_GROUP_IDENTIFIER}: member-identifier-id`
+    );
+  });
+
+  test("can update group username for gHab with mHab", async () => {
+    const newUsername = "newusername";
+    const groupMetadata = {
+      groupId: "test-group-123",
+      groupInitiator: true,
+      groupCreated: true,
+      userName: "oldusername",
+    };
+    const memberMetadata = {
+      ...keriMetadataRecord,
+      id: "member-identifier-id",
+      groupMetadata: {
+        ...groupMetadata,
+        groupInitiator: false,
+      },
+    };
+
+    identifierStorage.getIdentifierMetadata = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ...keriMetadataRecord,
+        groupMemberPre: "member-identifier-id",
+        groupMetadata: groupMetadata,
+        theme: 2,
+        displayName: "Group Name",
+      })
+      .mockResolvedValueOnce(memberMetadata);
+
+    await identifierService.updateGroupUsername(
+      keriMetadataRecord.id,
+      newUsername
+    );
+
+    expect(updateIdentifierMock).toBeCalledWith("member-identifier-id", {
+      name: `1.2.0.3:2:0:${groupMetadata.groupId}:${newUsername}:Group Name`,
     });
-
-    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
-      name: `1.2.0.3:${newTheme}:${newDisplayName}`,
-    });
-
-    expect(updateIdentifierMock).toBeCalledTimes(1);
-
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      "member-identifier-id",
+      {
+        groupMetadata: {
+          ...memberMetadata.groupMetadata,
+          userName: newUsername,
+        },
+      }
+    );
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       keriMetadataRecord.id,
       {
-        displayName: newDisplayName,
-        theme: newTheme,
-        groupMetadata: undefined,
+        groupMetadata: {
+          ...groupMetadata,
+          userName: newUsername,
+        },
       }
     );
   });
 
-  // test("can update a member identifier (mHab) with group metadata", async () => {
-  //   const newDisplayName = "newMemberDisplayName";
-  //   const newTheme = 2;
-  //   const groupMetadata = {
-  //     groupId: "test-group-123",
-  //     groupInitiator: true,
-  //     groupCreated: true,
-  //     userName: "testuser",
-  //   };
+  test("can update group username for partial group (no mHab)", async () => {
+    const newUsername = "newusername";
+    const groupMetadata = {
+      groupId: "test-group-123",
+      groupInitiator: true,
+      groupCreated: false,
+      userName: "oldusername",
+    };
 
-  //   identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-  //     ...keriMetadataRecord,
-  //     groupMemberPre: undefined,
-  //     groupMetadata: groupMetadata,
-  //   });
+    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
+      ...keriMetadataRecord,
+      groupMemberPre: undefined,
+      groupMetadata: groupMetadata,
+      theme: 1,
+      displayName: "Partial Group",
+    });
 
-  //   await identifierService.updateIdentifier(keriMetadataRecord.id, {
-  //     displayName: newDisplayName,
-  //     theme: newTheme,
-  //     groupMetadata,
-  //   });
-  //   expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
-  //     name: `1.2.0.3:${newTheme}:1:${groupMetadata.groupId}:${groupMetadata.userName}:${newDisplayName}`,
-  //   });
-  //   expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-  //     keriMetadataRecord.id,
-  //     {
-  //       displayName: newDisplayName,
-  //       theme: newTheme,
-  //       groupMetadata,
-  //     }
-  //   );
-  // });
+    await identifierService.updateGroupUsername(
+      keriMetadataRecord.id,
+      newUsername
+    );
+
+    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
+      name: `1.2.0.3:1:1:${groupMetadata.groupId}:${newUsername}:Partial Group`,
+    });
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      keriMetadataRecord.id,
+      {
+        groupMetadata: {
+          ...groupMetadata,
+          userName: newUsername,
+        },
+      }
+    );
+  });
+
+  test("should throw error when updating username for identifier without groupMetadata", async () => {
+    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
+      ...keriMetadataRecord,
+      groupMemberPre: undefined,
+      groupMetadata: undefined,
+    });
+
+    await expect(
+      identifierService.updateGroupUsername(
+        keriMetadataRecord.id,
+        "newusername"
+      )
+    ).rejects.toThrow(
+      `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${keriMetadataRecord.groupMemberPre}`
+    );
+  });
+
+  test("should throw error when updating username for gHab with member that has no groupMetadata", async () => {
+    const groupMetadata = {
+      groupId: "test-group-123",
+      groupInitiator: true,
+      groupCreated: true,
+      userName: "oldusername",
+    };
+    const memberMetadataWithoutGroup = {
+      ...keriMetadataRecord,
+      id: "member-identifier-id",
+      groupMetadata: undefined,
+    };
+
+    identifierStorage.getIdentifierMetadata = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ...keriMetadataRecord,
+        groupMemberPre: "member-identifier-id",
+        groupMetadata: groupMetadata,
+      })
+      .mockResolvedValueOnce(memberMetadataWithoutGroup);
+
+    await expect(
+      identifierService.updateGroupUsername(
+        keriMetadataRecord.id,
+        "newusername"
+      )
+    ).rejects.toThrow(
+      `${IdentifierService.INVALID_GROUP_IDENTIFIER}: member-identifier-id`
+    );
+  });
 
   test("can delete an identifier and disconnect DApp", async () => {
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
