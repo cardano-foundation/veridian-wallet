@@ -2,9 +2,11 @@
   display: flex;
   flex-direction: column;
 
-  span {
-    margin-bottom: 1.25rem;
+  > *:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
 
+  span {
     &.clamp {
       white-space: nowrap;
       text-overflow: ellipsis;

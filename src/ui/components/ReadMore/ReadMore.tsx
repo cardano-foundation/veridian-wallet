@@ -1,9 +1,15 @@
 import { IonButton } from "@ionic/react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { i18n } from "../../../i18n";
 import "./ReadMore.scss";
 
-const ReadMore = ({ content }: { content: string }) => {
+const ReadMore = ({
+  content,
+  children,
+}: {
+  content: string;
+  children?: React.ReactNode;
+}) => {
   const [isReadMore, setIsReadMore] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<HTMLSpanElement | null>(null);
@@ -36,6 +42,7 @@ const ReadMore = ({ content }: { content: string }) => {
       >
         {content}
       </span>
+      {children}
       {isOverflowing && (
         <IonButton
           onClick={toggleReadMore}
