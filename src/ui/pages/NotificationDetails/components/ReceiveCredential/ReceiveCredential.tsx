@@ -50,6 +50,8 @@ import { getTheme } from "../../../../utils/theme";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./ReceiveCredential.scss";
 import { Avatar } from "../../../../components/Avatar";
+import Mary from "../../../../assets/images/Mary.jpg";
+import Oliver from "../../../../assets/images/Oliver.jpg";
 
 const ANIMATION_DELAY = 2600;
 
@@ -373,10 +375,24 @@ const ReceiveCredential = ({
         <div className="request-animation-center">
           <div className="request-icons-row">
             <div className="request-user-logo">
-              <IonIcon
-                icon={personCircleOutline}
-                color="light"
-              />
+              {profile?.identity.displayName === "Mary" ? (
+                <img
+                  src={Mary}
+                  alt="Mary"
+                  className="user-avatar-image"
+                />
+              ) : profile?.identity.displayName === "Oliver" ? (
+                <img
+                  src={Oliver}
+                  alt="Oliver"
+                  className="user-avatar-image"
+                />
+              ) : (
+                <IonIcon
+                  icon={personCircleOutline}
+                  color="light"
+                />
+              )}
             </div>
             <div className="request-swap-logo">
               <span>
@@ -389,10 +405,26 @@ const ReceiveCredential = ({
               </span>
             </div>
             <div className="request-provider-logo">
-              <FallbackIcon
-                data-testid="credential-request-provider-logo"
-                alt="request-provider-logo"
-              />
+              {connection === "Mary" ? (
+                <img
+                  src={Mary}
+                  alt="Mary"
+                  className="provider-avatar-image"
+                  data-testid="credential-request-provider-logo"
+                />
+              ) : connection === "Oliver" ? (
+                <img
+                  src={Oliver}
+                  alt="Oliver"
+                  className="provider-avatar-image"
+                  data-testid="credential-request-provider-logo"
+                />
+              ) : (
+                <FallbackIcon
+                  data-testid="credential-request-provider-logo"
+                  alt="request-provider-logo"
+                />
+              )}
             </div>
           </div>
           <div className="request-info-row">
@@ -481,7 +513,15 @@ const ReceiveCredential = ({
                 className="related-identifier"
                 data-testid="related-identifier-detail"
               >
-                <Avatar id={profile.identity.id} />
+                <Avatar
+                  id={
+                    profile.identity.displayName === "Mary"
+                      ? "100"
+                      : profile.identity.displayName === "Oliver"
+                      ? "101"
+                      : profile.identity.id
+                  }
+                />
                 <IonText className="identifier-name">
                   {profile.identity.displayName}
                 </IonText>

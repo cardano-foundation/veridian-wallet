@@ -11,6 +11,8 @@ import "./CardList.scss";
 import { CardItemProps, CardListProps } from "./CardList.types";
 import CitizenPortal from "../../assets/images/citizen-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
+import Mary from "../../assets/images/Mary.jpg";
+import Oliver from "../../assets/images/Oliver.jpg";
 
 const CardInfo = <T extends object = object>({
   index,
@@ -48,6 +50,28 @@ const CardInfo = <T extends object = object>({
             data-testid="card-logo"
           />
         </div>
+      );
+    }
+
+    if (card.title === "Mary") {
+      return (
+        <img
+          src={Mary}
+          alt={card.title}
+          className="card-logo"
+          data-testid="card-logo"
+        />
+      );
+    }
+
+    if (card.title === "Oliver") {
+      return (
+        <img
+          src={Oliver}
+          alt={card.title}
+          className="card-logo"
+          data-testid="card-logo"
+        />
       );
     }
 

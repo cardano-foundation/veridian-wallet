@@ -132,7 +132,15 @@ const ProfileContent = ({
   return (
     <>
       <div className="profile-info">
-        <Avatar id={cardData.id} />
+        <Avatar
+          id={
+            cardData.displayName === "Mary"
+              ? "100"
+              : cardData.displayName === "Oliver"
+              ? "101"
+              : cardData.id
+          }
+        />
         <IonGrid>
           <IonRow className="profile-info-row">
             <ProfileInformation
@@ -242,7 +250,13 @@ const ProfileContent = ({
                           firstLetter={
                             item.name.at(0)?.toLocaleUpperCase() || ""
                           }
-                          rank={item.rank}
+                          rank={
+                            item.name === "Mary"
+                              ? 100
+                              : item.name === "Oliver"
+                              ? 101
+                              : item.rank
+                          }
                         />
                       }
                       className="member"

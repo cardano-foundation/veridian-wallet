@@ -358,7 +358,15 @@ const ProfileDetailsModule = ({
                   <PageHeader
                     title={defaultName}
                     additionalButtons={
-                      <Avatar id={defaultProfile?.identity.id || ""} />
+                      <Avatar
+                        id={
+                          defaultProfile?.identity.displayName === "Mary"
+                            ? "100"
+                            : defaultProfile?.identity.displayName === "Oliver"
+                            ? "101"
+                            : defaultProfile?.identity.id || ""
+                        }
+                      />
                     }
                   />
                 }

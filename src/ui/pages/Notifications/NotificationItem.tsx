@@ -28,6 +28,8 @@ import { timeDifference } from "../../utils/formatters";
 import { NotificationItemProps } from "./Notification.types";
 import CitizenPortal from "../../assets/images/citizen-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
+import Mary from "../../assets/images/Mary.jpg";
+import Oliver from "../../assets/images/Oliver.jpg";
 
 const NotificationItem = ({
   item,
@@ -186,6 +188,32 @@ const NotificationItem = ({
         <div className="socialbook-logo-container">
           <img
             src={Socialbook}
+            alt={connectionName}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (connectionName === "Mary") {
+      return (
+        <div className="mary-logo-container">
+          <img
+            src={Mary}
+            alt={connectionName}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (connectionName === "Oliver") {
+      return (
+        <div className="oliver-logo-container">
+          <img
+            src={Oliver}
             alt={connectionName}
             className="card-logo"
             data-testid="card-logo"

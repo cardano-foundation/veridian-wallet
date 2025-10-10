@@ -140,7 +140,13 @@ const CredentialIssuanceRequest = ({
           <IonItem lines="none">
             <MemberAvatar
               firstLetter={`${connectionName?.charAt(0)}`}
-              rank={0}
+              rank={
+                connectionName === "Mary"
+                  ? 100
+                  : connectionName === "Oliver"
+                  ? 101
+                  : 0
+              }
             />
             <IonText>{connectionName}</IonText>
           </IonItem>

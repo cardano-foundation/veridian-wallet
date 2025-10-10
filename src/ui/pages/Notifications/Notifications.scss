@@ -108,6 +108,14 @@
             border-radius: inherit;
           }
 
+          .mary-logo-container img,
+          .oliver-logo-container img {
+            border-radius: inherit;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
           .notification-ref-icon {
             position: absolute;
             bottom: 0.115rem;
@@ -128,7 +136,9 @@
 
         .notifications-tab-item-logo,
         .citizen-portal-logo-container,
-        .socialbook-logo-container {
+        .socialbook-logo-container,
+        .mary-logo-container,
+        .oliver-logo-container {
           border-radius: 3rem;
           width: 3rem;
           height: 3rem;
@@ -138,7 +148,9 @@
         @media screen and (min-width: 250px) and (max-width: 370px) {
           .notifications-tab-item-logo,
           .citizen-portal-logo-container,
-          .socialbook-logo-container {
+          .socialbook-logo-container,
+          .mary-logo-container,
+          .oliver-logo-container {
             border-radius: 2.4rem;
             width: 2.4rem;
             height: 2.4rem;

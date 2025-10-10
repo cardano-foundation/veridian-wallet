@@ -60,7 +60,15 @@ const RelatedProfile = ({ identifierId }: IssuedIdentifierProps) => {
             className="related-identifier"
             data-testid="related-identifier-detail"
           >
-            <Avatar id={profile.identity.id} />
+            <Avatar
+              id={
+                profile.identity.displayName === "Mary"
+                  ? "100"
+                  : profile.identity.displayName === "Oliver"
+                  ? "101"
+                  : profile.identity.id
+              }
+            />
             <IonText
               className="identifier-name"
               data-testid="related-identifier-name"
