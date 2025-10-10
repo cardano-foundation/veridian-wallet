@@ -37,7 +37,6 @@ const MemberAvatar = ({
 const Avatar = ({ id, handleAvatarClick }: AvatarProps) => {
   const profiles = useAppSelector(getProfiles) || {};
   const getAvatarContent = (id: string) => {
-    // Handle special cases for Mary and Oliver
     if (id === "100") {
       return { firstLetter: "", rank: 100, imageSource: Mary };
     }
