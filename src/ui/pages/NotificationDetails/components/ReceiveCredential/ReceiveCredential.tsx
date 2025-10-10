@@ -52,6 +52,9 @@ import "./ReceiveCredential.scss";
 import { Avatar } from "../../../../components/Avatar";
 import Mary from "../../../../assets/images/Mary.jpg";
 import Oliver from "../../../../assets/images/Oliver.jpg";
+import VitalRecordsAdmin from "../../../../assets/images/vital-records-admin.png";
+import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
+import Socialbook from "../../../../assets/images/socialbook.svg";
 
 const ANIMATION_DELAY = 2600;
 
@@ -416,6 +419,27 @@ const ReceiveCredential = ({
                 <img
                   src={Oliver}
                   alt="Oliver"
+                  className="provider-avatar-image"
+                  data-testid="credential-request-provider-logo"
+                />
+              ) : connection === "Vital Records Admin" ? (
+                <img
+                  src={VitalRecordsAdmin}
+                  alt="Vital Records Admin"
+                  className="provider-avatar-image"
+                  data-testid="credential-request-provider-logo"
+                />
+              ) : connection === "Citizen Portal" ? (
+                <img
+                  src={CitizenPortal}
+                  alt="Citizen Portal"
+                  className="provider-avatar-image"
+                  data-testid="credential-request-provider-logo"
+                />
+              ) : connection === "Socialbook" ? (
+                <img
+                  src={Socialbook}
+                  alt="Socialbook"
                   className="provider-avatar-image"
                   data-testid="credential-request-provider-logo"
                 />

@@ -13,6 +13,7 @@ import CitizenPortal from "../../assets/images/citizen-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
 import Mary from "../../assets/images/Mary.jpg";
 import Oliver from "../../assets/images/Oliver.jpg";
+import VitalRecordsAdmin from "../../assets/images/vital-records-admin.png";
 
 const CardInfo = <T extends object = object>({
   index,
@@ -68,6 +69,17 @@ const CardInfo = <T extends object = object>({
       return (
         <img
           src={Oliver}
+          alt={card.title}
+          className="card-logo"
+          data-testid="card-logo"
+        />
+      );
+    }
+
+    if (card.title === "Vital Records Admin") {
+      return (
+        <img
+          src={VitalRecordsAdmin}
           alt={card.title}
           className="card-logo"
           data-testid="card-logo"
