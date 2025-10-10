@@ -48,6 +48,7 @@ import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { Profiles } from "../Profiles";
+import { ProfileStateModal } from "./components/ProfileStateModal";
 import "./Credentials.scss";
 import { CredentialsFilters, StartAnimationSource } from "./Credentials.types";
 
@@ -391,6 +392,7 @@ const Credentials = () => {
         archivedCredentialsIsOpen={archivedCredentialsIsOpen}
         setArchivedCredentialsIsOpen={handleArchivedCredentialsDisplayChange}
       />
+      <ProfileStateModal onOpenProfiles={() => setOpenProfiles(true)} />
     </>
   );
 };

@@ -254,7 +254,6 @@ export const ProfileSetup = ({
       store: { stateCache },
       state: {
         isSetupProfile: false,
-        isGroup: profileType === ProfileType.Group,
         id,
       },
     });
