@@ -6,6 +6,7 @@ interface ProfileDetailsModalProps {
   onClose?: (animation?: boolean) => void;
   hardwareBackButtonConfig?: HardwareBackButtonConfig;
   restrictedOptions?: boolean;
+  showProfiles?: (value: boolean) => void;
 }
 
 interface IdentifierDetailModalProps

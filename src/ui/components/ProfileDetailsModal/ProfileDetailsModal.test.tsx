@@ -205,6 +205,7 @@ describe("Individual profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -247,6 +248,7 @@ describe("Individual profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -291,6 +293,7 @@ describe("Individual profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -325,6 +328,7 @@ describe("Individual profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -359,6 +363,7 @@ describe("Individual profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -411,6 +416,7 @@ describe("Individual profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -463,6 +469,7 @@ describe("Individual profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -487,6 +494,7 @@ describe("Individual profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -538,6 +546,7 @@ describe("Individual profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -640,6 +649,7 @@ describe("Individual profile details page", () => {
           isOpen
           setIsOpen={jest.fn}
           restrictedOptions={true}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -804,6 +814,7 @@ describe("Group profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -863,6 +874,7 @@ describe("Group profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -910,6 +922,7 @@ describe("Group profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -953,6 +966,7 @@ describe("Group profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1024,6 +1038,7 @@ describe("Group profile details page", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1090,6 +1105,7 @@ describe("Checking the profile details page when information is missing from the
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1099,9 +1115,12 @@ describe("Checking the profile details page when information is missing from the
       ).toBeVisible();
 
       expect(
-        getByText(EN_TRANSLATIONS.profiledetails.clouderror, {
-          normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
-        })
+        getByText(
+          EN_TRANSLATIONS.profiledetails.loadprofileerror.missingoncloud,
+          {
+            normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+          }
+        )
       ).toBeVisible();
     });
 
@@ -1174,6 +1193,7 @@ describe("Set default profile when delete profile", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1263,6 +1283,7 @@ describe("Set default profile when delete profile", () => {
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1356,6 +1377,7 @@ describe("Set default profile when delete profile", () => {
             pageId={pageId}
             isOpen
             setIsOpen={jest.fn}
+            showProfiles={jest.fn}
           />
         </Provider>
       );

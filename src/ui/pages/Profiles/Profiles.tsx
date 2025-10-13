@@ -5,7 +5,7 @@ import {
   personCircleOutline,
   settingsOutline,
 } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
@@ -65,6 +65,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const [openProfileDetail, setOpenProfileDetail] = useState(false);
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
   const [isJoinGroupMode, setIsJoinGroupMode] = useState(false);
+  const isOpenFromDetail = useRef(false);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -98,6 +99,9 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       await updateDefaultProfile(profile.id);
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
+      if (isOpenFromDetail.current) {
+        setOpenProfileDetail(false);
+      }
     } catch (e) {
       showError(
         "Unable to switch profile",
@@ -147,7 +151,11 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       defaultProfile?.identity.groupMemberPre &&
       defaultProfile?.identity.creationStatus === CreationStatus.COMPLETE;
 
-    return isGroupProfile && !isCreatedGroup;
+    return (
+      (isGroupProfile && !isCreatedGroup) ||
+      defaultProfile?.identity.creationStatus === CreationStatus.FAILED ||
+      defaultProfile?.identity.creationStatus === CreationStatus.PENDING
+    );
   };
 
   return (
@@ -224,7 +232,9 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         <ProfileSetup
           onClose={(cancel) => {
             handleCloseSetupProfile();
-            if (!cancel) setIsOpen(false);
+            if (!cancel) {
+              setIsOpen(false);
+            }
           }}
           joinGroupMode={isJoinGroupMode}
           displayOnModal
@@ -235,6 +245,10 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         isOpen={openProfileDetail}
         setIsOpen={setOpenProfileDetail}
         profileId={defaultProfile?.identity.id || ""}
+        showProfiles={(value) => {
+          setIsOpen(value);
+          isOpenFromDetail.current = value;
+        }}
       />
     </>
   );

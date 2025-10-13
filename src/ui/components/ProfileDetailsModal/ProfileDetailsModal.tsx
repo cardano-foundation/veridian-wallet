@@ -45,6 +45,7 @@ const ProfileDetailsModule = ({
   pageId,
   hardwareBackButtonConfig,
   restrictedOptions,
+  showProfiles,
 }: ProfileDetailsModalProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
@@ -89,6 +90,7 @@ const ProfileDetailsModule = ({
         error instanceof Error &&
         error.message.includes(Agent.MISSING_DATA_ON_KERIA)
       ) {
+        showProfiles?.(false);
         setCloudError(true);
       } else {
         handleDone?.(false);
@@ -170,11 +172,16 @@ const ProfileDetailsModule = ({
             <PageHeader
               title={defaultName}
               additionalButtons={
-                <Avatar id={defaultProfile?.identity.id || ""} />
+                <Avatar
+                  id={defaultProfile?.identity.id || ""}
+                  handleAvatarClick={() => showProfiles?.(true)}
+                />
               }
             />
           }
-          content={`${i18n.t("profiledetails.clouderror")}`}
+          content={`${i18n.t(
+            "profiledetails.loadprofileerror.missingoncloud"
+          )}`}
         >
           <PageFooter
             pageId={pageId}

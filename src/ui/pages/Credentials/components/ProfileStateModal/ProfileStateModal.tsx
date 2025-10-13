@@ -1,15 +1,12 @@
 import { IonModal } from "@ionic/react";
 import { warningOutline } from "ionicons/icons";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import { CreationStatus } from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch } from "../../../../../store/hooks";
 import { removeProfile } from "../../../../../store/reducers/profileCache";
-import {
-  setToastMsg,
-  showGlobalLoading,
-} from "../../../../../store/reducers/stateCache";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
 import { Avatar } from "../../../../components/Avatar";
 import { InfoCard } from "../../../../components/InfoCard";
@@ -22,6 +19,8 @@ import { useProfile } from "../../../../hooks/useProfile";
 import { showError } from "../../../../utils/error";
 import "./ProfileStateModal.scss";
 import { ProfileStateModalProps } from "./ProfileStateModal.types";
+import { Spinner } from "../../../../components/Spinner";
+import { SpinnerConverage } from "../../../../components/Spinner/Spinner.type";
 
 const WAITING_TIME = 5000;
 
@@ -35,51 +34,83 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
   const dispatch = useAppDispatch();
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
+  const [isMissingOnCloud, setMissingOnCloud] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [hiddenContent, setHiddenContent] = useState(false);
+
+  const getDetails = useCallback(async () => {
+    if (!currentProfile?.identity.id) return;
+
+    try {
+      setIsOpen(true);
+      setHiddenContent(true);
+      await Agent.agent.identifiers.getIdentifier(currentProfile.identity.id);
+      setIsOpen(false);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes(Agent.MISSING_DATA_ON_KERIA)
+      ) {
+        setIsOpen(true);
+        setMissingOnCloud(true);
+      } else {
+        showError("Unable to get identifier details", error, dispatch);
+        setIsOpen(false);
+      }
+    } finally {
+      setHiddenContent(false);
+    }
+  }, [currentProfile?.identity.id, dispatch]);
 
   useEffect(() => {
     if (
-      !currentProfile ||
-      currentProfile.identity.creationStatus === CreationStatus.COMPLETE
+      !currentProfile?.identity?.creationStatus ||
+      !currentProfile?.identity.createdAtUTC
     ) {
       setIsOpen(false);
       return;
     }
 
-    const identity = currentProfile.identity;
+    const creationStatus = currentProfile?.identity.creationStatus;
+    const groupMemberPre = currentProfile?.identity.groupMemberPre;
+    const createdAtUTC = currentProfile?.identity.createdAtUTC;
 
-    if (identity.creationStatus === CreationStatus.FAILED) {
+    if (creationStatus === CreationStatus.FAILED) {
       setIsOpen(true);
+      setHiddenContent(false);
       return;
     }
 
-    if (
-      identity.creationStatus === CreationStatus.PENDING &&
-      !identity.groupMemberPre
-    ) {
-      const createdTime = new Date(identity.createdAtUTC).getTime();
+    if (creationStatus === CreationStatus.PENDING && !groupMemberPre) {
+      const createdTime = new Date(createdAtUTC).getTime();
       const now = Date.now();
 
       const remainTime = createdTime + WAITING_TIME - now;
 
+      setIsOpen(true);
       if (remainTime > 0) {
-        dispatch(showGlobalLoading(true));
+        setHiddenContent(true);
+
         const timer = setTimeout(() => {
-          if (identity.creationStatus === CreationStatus.PENDING) {
-            dispatch(showGlobalLoading(false));
-            setIsOpen(true);
+          if (creationStatus === CreationStatus.PENDING) {
+            setHiddenContent(false);
           }
         }, remainTime);
 
         return () => {
-          dispatch(showGlobalLoading(false));
           clearTimeout(timer);
         };
       }
-
-      setIsOpen(true);
     }
-  }, [currentProfile, dispatch]);
+
+    getDetails();
+  }, [
+    currentProfile?.identity?.creationStatus,
+    currentProfile?.identity?.groupMemberPre,
+    currentProfile?.identity?.createdAtUTC,
+    dispatch,
+    getDetails,
+  ]);
 
   const type = useMemo(() => {
     if (currentProfile?.identity.creationStatus === CreationStatus.PENDING)
@@ -92,6 +123,9 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
       return i18n.t("profiledetails.loadprofileerror.pending");
     if (currentProfile?.identity.creationStatus === CreationStatus.FAILED)
       return i18n.t("profiledetails.loadprofileerror.nowitness");
+    if (isMissingOnCloud) {
+      return i18n.t("profiledetails.loadprofileerror.missingoncloud");
+    }
     return "";
   };
 
@@ -110,7 +144,11 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
     try {
       setVerifyIsOpen(false);
       const profileId = currentProfile.identity.id;
-      await Agent.agent.identifiers.markIdentifierPendingDelete(profileId);
+      if (isMissingOnCloud) {
+        await Agent.agent.identifiers.deleteStaleLocalIdentifier(profileId);
+      } else {
+        await Agent.agent.identifiers.markIdentifierPendingDelete(profileId);
+      }
       await setRecentProfileAsDefault();
       dispatch(removeProfile(profileId || ""));
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
@@ -129,6 +167,7 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
       <IonModal
         className="profile-state-modal"
         isOpen={isOpen}
+        animated={false}
       >
         <ResponsivePageLayout
           pageId={pageId}
@@ -146,16 +185,24 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
           activeStatus={true}
           customClass="profile-state"
         >
-          <InfoCard
-            className={type}
-            danger={type === "error"}
-            content={getMessage()}
-            icon={type === "warning" ? warningOutline : ""}
-          />
-          <PageFooter
-            pageId={pageId}
-            deleteButtonText={`${i18n.t("profiledetails.delete.button")}`}
-            deleteButtonAction={deleteButtonAction}
+          {!hiddenContent && (
+            <>
+              <InfoCard
+                className={type}
+                danger={type === "error"}
+                content={getMessage()}
+                icon={type === "warning" ? warningOutline : ""}
+              />
+              <PageFooter
+                pageId={pageId}
+                deleteButtonText={`${i18n.t("profiledetails.delete.button")}`}
+                deleteButtonAction={deleteButtonAction}
+              />
+            </>
+          )}
+          <Spinner
+            show={hiddenContent}
+            coverage={SpinnerConverage.Screen}
           />
         </ResponsivePageLayout>
       </IonModal>
