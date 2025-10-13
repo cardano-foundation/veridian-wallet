@@ -29,6 +29,7 @@ interface IdentifierDetailModalProps
 const QR_CODE_TYPES = {
   GUARDIANSHIP: "guardianship",
   SOCIALMEDIA: "socialmedia",
+  KERIBLOX: "keriblox",
 } as const;
 
 const ERROR_MESSAGES = {

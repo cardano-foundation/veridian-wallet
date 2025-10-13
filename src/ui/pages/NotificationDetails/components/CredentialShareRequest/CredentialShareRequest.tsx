@@ -15,6 +15,7 @@ import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
 import Socialbook from "../../../../assets/images/socialbook.svg";
+import KeribloxLogo from "../../../../assets/images/Keriblox-logo.png";
 import { ResponsivePageLayout } from "../../../../components/layout/ResponsivePageLayout";
 import "./CredentialShareRequest.scss";
 
@@ -50,6 +51,8 @@ const CredentialShareRequest = ({
           setRequester("Citizen Portal");
         } else if (type === "socialmedia") {
           setRequester("Socialbook");
+        } else if (type === "keriblox") {
+          setRequester("Keriblox");
         } else {
           setRequester(connection.label || i18n.t("tabs.connections.unknown"));
         }
@@ -60,6 +63,16 @@ const CredentialShareRequest = ({
       }
     }
   }, [notificationDetails.connectionId]);
+
+  let logoToRender = "";
+
+  if (requester === "Citizen Portal") {
+    logoToRender = CitizenPortal;
+  } else if (requester === "Socialbook") {
+    logoToRender = Socialbook;
+  } else if (requester === "Keriblox") {
+    logoToRender = KeribloxLogo;
+  }
 
   useEffect(() => {
     if (requester === i18n.t("tabs.connections.unknown")) {
@@ -104,9 +117,7 @@ const CredentialShareRequest = ({
         <div className="credential-share-request-center">
           <div className="credential-share-request-icons-row">
             <div className="credential-share-request-user-logo">
-              <img
-                src={requester === "Socialbook" ? Socialbook : CitizenPortal}
-              />
+              <img src={logoToRender} />
             </div>
           </div>
           <p className="credential-share-request-message">

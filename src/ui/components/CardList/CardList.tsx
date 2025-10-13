@@ -11,6 +11,7 @@ import "./CardList.scss";
 import { CardItemProps, CardListProps } from "./CardList.types";
 import CitizenPortal from "../../assets/images/citizen-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
+import KeribloxLogo from "../../assets/images/Keriblox-logo.png";
 
 const CardInfo = <T extends object = object>({
   index,
@@ -43,6 +44,18 @@ const CardInfo = <T extends object = object>({
         <div className="socialbook-logo-container">
           <img
             src={Socialbook}
+            alt={card.title}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+    if (card.title === "Keriblox") {
+      return (
+        <div className="socialbook-logo-container">
+          <img
+            src={KeribloxLogo}
             alt={card.title}
             className="card-logo"
             data-testid="card-logo"

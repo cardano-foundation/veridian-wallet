@@ -28,6 +28,7 @@ import { timeDifference } from "../../utils/formatters";
 import { NotificationItemProps } from "./Notification.types";
 import CitizenPortal from "../../assets/images/citizen-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
+import KeribloxLogo from "../../assets/images/Keriblox-logo.png";
 
 const NotificationItem = ({
   item,
@@ -64,6 +65,8 @@ const NotificationItem = ({
           setConnectionName("Citizen Portal");
         } else if (type === "socialmedia") {
           setConnectionName("Socialbook");
+        } else if (type === "keriblox") {
+          setConnectionName("Keriblox");
         } else {
           setConnectionName(connection.label || "Unknown");
         }
@@ -186,6 +189,19 @@ const NotificationItem = ({
         <div className="socialbook-logo-container">
           <img
             src={Socialbook}
+            alt={connectionName}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (connectionName === "Keriblox") {
+      return (
+        <div className="socialbook-logo-container">
+          <img
+            src={KeribloxLogo}
             alt={connectionName}
             className="card-logo"
             data-testid="card-logo"
