@@ -66,7 +66,15 @@ const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
       data-testid={`profiles-list-item-${id}`}
     >
       <div className="profiles-list-item-avatar">
-        <Avatar id={id} />
+        <Avatar
+          id={
+            displayName === "Mary"
+              ? "100"
+              : displayName === "Oliver"
+              ? "101"
+              : id
+          }
+        />
       </div>
       <span className="profiles-list-item-inner">
         <div className="profiles-list-item-name">{displayName}</div>

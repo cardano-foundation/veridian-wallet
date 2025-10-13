@@ -267,7 +267,13 @@ const Credentials = () => {
   }) => {
     return (
       <Avatar
-        id={currentProfile?.identity.id || ""}
+        id={
+          currentProfile?.identity.displayName === "Mary"
+            ? "100"
+            : currentProfile?.identity.displayName === "Oliver"
+            ? "101"
+            : currentProfile?.identity.id || ""
+        }
         handleAvatarClick={handleAvatarClick}
       />
     );

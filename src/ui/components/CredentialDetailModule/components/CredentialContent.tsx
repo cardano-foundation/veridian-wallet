@@ -34,6 +34,11 @@ import { MemberAcceptStatus } from "./MultisigMember.types";
 import { getProfiles } from "../../../../store/reducers/profileCache";
 import { Avatar } from "../../Avatar";
 import { openBrowserLink } from "../../../utils/openBrowserLink";
+import CitizenPortal from "../../../assets/images/citizen-portal.svg";
+import Socialbook from "../../../assets/images/socialbook.svg";
+import Mary from "../../../assets/images/Mary.jpg";
+import Oliver from "../../../assets/images/Oliver.jpg";
+import VitalRecordsAdmin from "../../../assets/images/vital-records-admin.png";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
 const DOCUMENTATION_LINK = "https://secure.utah.gov/vitalrecords/index.html";
@@ -62,7 +67,15 @@ const RelatedProfile = ({ identifierId }: IssuedIdentifierProps) => {
             className="related-identifier"
             data-testid="related-identifier-detail"
           >
-            <Avatar id={profile.identity.id} />
+            <Avatar
+              id={
+                profile.identity.displayName === "Mary"
+                  ? "100"
+                  : profile.identity.displayName === "Oliver"
+                  ? "101"
+                  : profile.identity.id
+              }
+            />
             <IonText
               className="identifier-name"
               data-testid="related-identifier-name"
@@ -92,6 +105,29 @@ const Issuer = ({
 
   const closeAlert = () => setShowMissingIssuerModal(false);
 
+  const logo = (() => {
+    if (connectionShortDetails?.label === "Citizen Portal") {
+      return CitizenPortal;
+    }
+
+    if (connectionShortDetails?.label === "Socialbook") {
+      return Socialbook;
+    }
+
+    if (connectionShortDetails?.label === "Mary") {
+      return Mary;
+    }
+
+    if (connectionShortDetails?.label === "Oliver") {
+      return Oliver;
+    }
+
+    if (connectionShortDetails?.label === "Vital Records Admin") {
+      return VitalRecordsAdmin;
+    }
+    return connectionShortDetails?.logo;
+  })();
+
   return (
     <>
       <CardBlock
@@ -105,7 +141,12 @@ const Issuer = ({
               ? connectionShortDetails.label
               : i18n.t("tabs.connections.unknown")
           }
-          startSlot={<FallbackIcon />}
+          startSlot={
+            <FallbackIcon
+              src={logo}
+              alt="connection-logo"
+            />
+          }
           className="member"
           testId={"credential-details-issuer"}
         />

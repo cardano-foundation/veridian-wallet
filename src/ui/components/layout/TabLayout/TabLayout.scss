@@ -43,8 +43,10 @@
         margin-left: 0.5rem;
       }
 
-      &::part(native) {
-        padding: 0.5rem;
+      &:not(.avatar-button.custom-image) {
+        &::part(native) {
+          padding: 0.5rem;
+        }
       }
     }
 

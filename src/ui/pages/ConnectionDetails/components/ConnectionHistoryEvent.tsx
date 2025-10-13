@@ -12,6 +12,11 @@ import {
   formatTimeToSec,
   getUTCOffset,
 } from "../../../utils/formatters";
+import CitizenPortal from "../../../assets/images/citizen-portal.svg";
+import Socialbook from "../../../assets/images/socialbook.svg";
+import Mary from "../../../assets/images/Mary.jpg";
+import Oliver from "../../../assets/images/Oliver.jpg";
+import VitalRecordsAdmin from "../../../assets/images/vital-records-admin.png";
 
 const ConnectionHistoryEvent = ({
   index,
@@ -22,6 +27,30 @@ const ConnectionHistoryEvent = ({
   historyItem?: ConnectionHistoryItem;
   connectionDetails?: ConnectionDetails;
 }) => {
+  const logo = (() => {
+    if (connectionDetails?.label === "Citizen Portal") {
+      return CitizenPortal;
+    }
+
+    if (connectionDetails?.label === "Socialbook") {
+      return Socialbook;
+    }
+
+    if (connectionDetails?.label === "Mary") {
+      return Mary;
+    }
+
+    if (connectionDetails?.label === "Oliver") {
+      return Oliver;
+    }
+
+    if (connectionDetails?.label === "Vital Records Admin") {
+      return VitalRecordsAdmin;
+    }
+
+    return connectionDetails?.logo;
+  })();
+
   return historyItem ? (
     <div
       className="connection-details-history-event"
@@ -31,13 +60,13 @@ const ConnectionHistoryEvent = ({
       <div className="connection-details-logo">
         {historyItem.type ===
         ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT ? (
-            <FallbackIcon
-              src={connectionDetails?.logo}
-              alt="connection-logo"
-            />
-          ) : (
-            <CardTheme />
-          )}
+          <FallbackIcon
+            src={logo}
+            alt="connection-logo"
+          />
+        ) : (
+          <CardTheme />
+        )}
       </div>
       <p className="connection-details-history-event-info">
         <span className="connection-details-history-text">
@@ -84,7 +113,7 @@ const ConnectionHistoryEvent = ({
     >
       <div className="connection-details-logo">
         <FallbackIcon
-          src={connectionDetails?.logo}
+          src={logo}
           alt="connection-logo"
         />
       </div>

@@ -10,10 +10,7 @@ import {
 import { MouseEvent, useCallback, useState, useEffect } from "react";
 import { Trans } from "react-i18next";
 import { Agent } from "../../../core/agent/agent";
-import {
-  MultisigConnectionDetails,
-  RegularConnectionDetails,
-} from "../../../core/agent/agent.types";
+import { MultisigConnectionDetails } from "../../../core/agent/agent.types";
 import {
   KeriaNotification,
   NotificationRoute,
@@ -28,6 +25,9 @@ import { timeDifference } from "../../utils/formatters";
 import { NotificationItemProps } from "./Notification.types";
 import CitizenPortal from "../../assets/images/citizen-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
+import Mary from "../../assets/images/Mary.jpg";
+import Oliver from "../../assets/images/Oliver.jpg";
+import VitalRecordsAdmin from "../../assets/images/vital-records-admin.png";
 import KeribloxLogo from "../../assets/images/Keriblox-logo.png";
 
 const NotificationItem = ({
@@ -197,6 +197,44 @@ const NotificationItem = ({
       );
     }
 
+    if (connectionName === "Mary") {
+      return (
+        <div className="mary-logo-container">
+          <img
+            src={Mary}
+            alt={connectionName}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (connectionName === "Oliver") {
+      return (
+        <div className="oliver-logo-container">
+          <img
+            src={Oliver}
+            alt={connectionName}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (connectionName === "Vital Records Admin") {
+      return (
+        <div className="vital-records-admin-logo-container">
+          <img
+            src={VitalRecordsAdmin}
+            alt={connectionName}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
     if (connectionName === "Keriblox") {
       return (
         <div className="socialbook-logo-container">
