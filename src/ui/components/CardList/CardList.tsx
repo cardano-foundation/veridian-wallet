@@ -14,6 +14,7 @@ import Socialbook from "../../assets/images/socialbook.svg";
 import Mary from "../../assets/images/Mary.jpg";
 import Oliver from "../../assets/images/Oliver.jpg";
 import VitalRecordsAdmin from "../../assets/images/vital-records-admin.png";
+import KeribloxLogo from "../../assets/images/Keriblox-logo.png";
 
 const CardInfo = <T extends object = object>({
   index,
@@ -46,6 +47,18 @@ const CardInfo = <T extends object = object>({
         <div className="socialbook-logo-container">
           <img
             src={Socialbook}
+            alt={card.title}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+    if (card.title === "Keriblox") {
+      return (
+        <div className="socialbook-logo-container">
+          <img
+            src={KeribloxLogo}
             alt={card.title}
             className="card-logo"
             data-testid="card-logo"

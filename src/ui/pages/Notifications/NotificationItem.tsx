@@ -28,6 +28,7 @@ import Socialbook from "../../assets/images/socialbook.svg";
 import Mary from "../../assets/images/Mary.jpg";
 import Oliver from "../../assets/images/Oliver.jpg";
 import VitalRecordsAdmin from "../../assets/images/vital-records-admin.png";
+import KeribloxLogo from "../../assets/images/Keriblox-logo.png";
 
 const NotificationItem = ({
   item,
@@ -64,6 +65,8 @@ const NotificationItem = ({
           setConnectionName("Citizen Portal");
         } else if (type === "socialmedia") {
           setConnectionName("Socialbook");
+        } else if (type === "keriblox") {
+          setConnectionName("Keriblox");
         } else {
           setConnectionName(connection.label || "Unknown");
         }
@@ -225,6 +228,18 @@ const NotificationItem = ({
         <div className="vital-records-admin-logo-container">
           <img
             src={VitalRecordsAdmin}
+            alt={connectionName}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+    if (connectionName === "Keriblox") {
+      return (
+        <div className="socialbook-logo-container">
+          <img
+            src={KeribloxLogo}
             alt={connectionName}
             className="card-logo"
             data-testid="card-logo"

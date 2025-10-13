@@ -33,8 +33,10 @@ import { MultisigMember } from "./MultisigMember";
 import { MemberAcceptStatus } from "./MultisigMember.types";
 import { getProfiles } from "../../../../store/reducers/profileCache";
 import { Avatar } from "../../Avatar";
+import { openBrowserLink } from "../../../utils/openBrowserLink";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
+const DOCUMENTATION_LINK = "https://secure.utah.gov/vitalrecords/index.html";
 
 const RelatedProfile = ({ identifierId }: IssuedIdentifierProps) => {
   const profiles = useAppSelector(getProfiles);
@@ -174,7 +176,13 @@ const CredentialContent = ({
         flatBorder={FlatBorderType.TOP}
         testId="readmore-block"
       >
-        <ReadMore content={cardData.s.description} />
+        <ReadMore content={cardData.s.description}>
+          {cardData.s.title === "Birth Certificate" && (
+            <u onClick={() => openBrowserLink(DOCUMENTATION_LINK)}>
+              {DOCUMENTATION_LINK}
+            </u>
+          )}
+        </ReadMore>
       </CardBlock>
       {joinedCredRequestMembers && joinedCredRequestMembers.length > 0 && (
         <CardDetailsBlock

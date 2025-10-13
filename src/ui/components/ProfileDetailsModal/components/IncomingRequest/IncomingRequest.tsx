@@ -1,15 +1,16 @@
+import { IonIcon } from "@ionic/react";
+import { personCircleOutline } from "ionicons/icons";
+import { useEffect, useState } from "react";
 import { i18n } from "../../../../../i18n";
 import { ResponsivePageLayout } from "../../../layout/ResponsivePageLayout";
 import { PageFooter } from "../../../PageFooter";
 import { PageHeader } from "../../../PageHeader";
 import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
 import Socialbook from "../../../../assets/images/socialbook.svg";
-import "./IncomingRequest.scss";
+import KeribloxIcon from "../../../../assets/images/Keriblox-logo.png";
 import { IncomingRequestProps } from "./IncomingRequest.types";
-import { useEffect, useState } from "react";
 import { QR_CODE_TYPES } from "../../ProfileDetailsModal.types";
-import { IonIcon } from "@ionic/react";
-import { personCircleOutline } from "ionicons/icons";
+import "./IncomingRequest.scss";
 
 const IncomingRequest = ({
   setShowConfirmation,
@@ -36,6 +37,9 @@ const IncomingRequest = ({
       } else if (type === QR_CODE_TYPES.SOCIALMEDIA) {
         setRequester("Socialbook");
         setLogo(Socialbook);
+      } else if (type === QR_CODE_TYPES.KERIBLOX) {
+        setRequester("Keriblox");
+        setLogo(KeribloxIcon);
       }
     }
   }, [type]);
