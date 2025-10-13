@@ -34,6 +34,11 @@ import { MemberAcceptStatus } from "./MultisigMember.types";
 import { getProfiles } from "../../../../store/reducers/profileCache";
 import { Avatar } from "../../Avatar";
 import { openBrowserLink } from "../../../utils/openBrowserLink";
+import CitizenPortal from "../../../assets/images/citizen-portal.svg";
+import Socialbook from "../../../assets/images/socialbook.svg";
+import Mary from "../../../assets/images/Mary.jpg";
+import Oliver from "../../../assets/images/Oliver.jpg";
+import VitalRecordsAdmin from "../../../assets/images/vital-records-admin.png";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
 const DOCUMENTATION_LINK = "https://secure.utah.gov/vitalrecords/index.html";
@@ -100,6 +105,29 @@ const Issuer = ({
 
   const closeAlert = () => setShowMissingIssuerModal(false);
 
+  const logo = (() => {
+    if (connectionShortDetails?.label === "Citizen Portal") {
+      return CitizenPortal;
+    }
+
+    if (connectionShortDetails?.label === "Socialbook") {
+      return Socialbook;
+    }
+
+    if (connectionShortDetails?.label === "Mary") {
+      return Mary;
+    }
+
+    if (connectionShortDetails?.label === "Oliver") {
+      return Oliver;
+    }
+
+    if (connectionShortDetails?.label === "Vital Records Admin") {
+      return VitalRecordsAdmin;
+    }
+    return connectionShortDetails?.logo;
+  })();
+
   return (
     <>
       <CardBlock
@@ -107,32 +135,21 @@ const Issuer = ({
         onClick={openConnection}
         testId="issuer"
       >
-        <IonItem
-          lines="none"
-          className="credential-details-issuer"
-          data-testid="credential-details-issuer"
-        >
-          {connectionShortDetails?.label === "Mary" ||
-          connectionShortDetails?.label === "Oliver" ? (
-            <Avatar
-              id={
-                connectionShortDetails.label === "Mary"
-                  ? "100"
-                  : connectionShortDetails.label === "Oliver"
-                  ? "101"
-                  : connectionShortDetails.id
-              }
+        <CardDetailsItem
+          info={
+            connectionShortDetails
+              ? connectionShortDetails.label
+              : i18n.t("tabs.connections.unknown")
+          }
+          startSlot={
+            <FallbackIcon
+              src={logo}
+              alt="connection-logo"
             />
-          ) : (
-            <FallbackIcon />
-          )}
-          <IonText
-            className="identifier-name"
-            data-testid="credential-details-issuer-name"
-          >
-            {connectionShortDetails?.label}
-          </IonText>
-        </IonItem>
+          }
+          className="member"
+          testId={"credential-details-issuer"}
+        />
       </CardBlock>
       <Alert
         dataTestId="cred-missing-issuer-alert"
