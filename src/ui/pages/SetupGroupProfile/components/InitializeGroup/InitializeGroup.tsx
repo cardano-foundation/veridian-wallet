@@ -99,13 +99,18 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       return;
     } else {
       setLoading(true);
+
       try {
+        if (!state.signer.recoverySigners || !state.signer.requiredSigners) {
+          throw new Error("Invalid threshold value");
+        }
+
         const mutilsigId = await Agent.agent.multiSigs.createGroup(
           ourIdentifier,
           state.selectedConnections as MultisigConnectionDetails[],
           {
-            rotationThreshold: state.signer.recoverySigners || 0,
-            signingThreshold: state.signer.requiredSigners || 0,
+            rotationThreshold: state.signer.recoverySigners,
+            signingThreshold: state.signer.requiredSigners,
           }
         );
         dispatch(setToastMsg(ToastMsgType.GROUP_REQUEST_SEND));
