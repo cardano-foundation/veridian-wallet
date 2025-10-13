@@ -2,7 +2,7 @@ import { FallbackIcon } from "../../../components/FallbackIcon";
 import { formatShortDate } from "../../../utils/formatters";
 import "./ConnectionDetailsHeader.scss";
 import { ConnectionDetailsHeaderProps } from "./ConnectionDetailsHeader.types";
-import CitizenPortal from "../../../assets/images/citizen-portal.svg";
+import MyFamilyPortal from "../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../assets/images/socialbook.svg";
 import Mary from "../../../assets/images/Mary.jpg";
 import Oliver from "../../../assets/images/Oliver.jpg";
@@ -14,11 +14,11 @@ const ConnectionDetailsHeader = ({
   date,
 }: ConnectionDetailsHeaderProps) => {
   const customLogo = (() => {
-    if (label === "Citizen Portal") {
+    if (label === "MyFamily Portal") {
       return (
-        <div className="citizen-portal-logo-container">
+        <div className="myfamily-portal-logo-container">
           <img
-            src={CitizenPortal}
+            src={MyFamilyPortal}
             alt={label}
             className="card-logo"
             data-testid="card-logo"

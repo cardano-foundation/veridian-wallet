@@ -53,7 +53,7 @@ import { Avatar } from "../../../../components/Avatar";
 import Mary from "../../../../assets/images/Mary.jpg";
 import Oliver from "../../../../assets/images/Oliver.jpg";
 import VitalRecordsAdmin from "../../../../assets/images/vital-records-admin.png";
-import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
+import MyFamilyPortal from "../../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../../assets/images/socialbook.svg";
 
 const ANIMATION_DELAY = 2600;
@@ -429,10 +429,10 @@ const ReceiveCredential = ({
                   className="provider-avatar-image"
                   data-testid="credential-request-provider-logo"
                 />
-              ) : connection === "Citizen Portal" ? (
+              ) : connection === "MyFamily Portal" ? (
                 <img
-                  src={CitizenPortal}
-                  alt="Citizen Portal"
+                  src={MyFamilyPortal}
+                  alt="MyFamily Portal"
                   className="provider-avatar-image"
                   data-testid="credential-request-provider-logo"
                 />

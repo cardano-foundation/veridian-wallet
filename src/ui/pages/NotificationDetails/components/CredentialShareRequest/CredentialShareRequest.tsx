@@ -13,7 +13,7 @@ import { Verification } from "../../../../components/Verification";
 import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
-import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
+import MyFamilyPortal from "../../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../../assets/images/socialbook.svg";
 import KeribloxLogo from "../../../../assets/images/Keriblox-logo.png";
 import { ResponsivePageLayout } from "../../../../components/layout/ResponsivePageLayout";
@@ -48,7 +48,7 @@ const CredentialShareRequest = ({
         const typeParam = url.searchParams.get("type");
         const type = typeParam;
         if (type === "guardianship") {
-          setRequester("Citizen Portal");
+          setRequester("MyFamily Portal");
         } else if (type === "socialmedia") {
           setRequester("Socialbook");
         } else if (type === "keriblox") {
@@ -66,8 +66,8 @@ const CredentialShareRequest = ({
 
   let logoToRender = "";
 
-  if (requester === "Citizen Portal") {
-    logoToRender = CitizenPortal;
+  if (requester === "MyFamily Portal") {
+    logoToRender = MyFamilyPortal;
   } else if (requester === "Socialbook") {
     logoToRender = Socialbook;
   } else if (requester === "Keriblox") {

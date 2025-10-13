@@ -34,7 +34,7 @@ import { MemberAcceptStatus } from "./MultisigMember.types";
 import { getProfiles } from "../../../../store/reducers/profileCache";
 import { Avatar } from "../../Avatar";
 import { openBrowserLink } from "../../../utils/openBrowserLink";
-import CitizenPortal from "../../../assets/images/citizen-portal.svg";
+import MyFamilyPortal from "../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../assets/images/socialbook.svg";
 import Mary from "../../../assets/images/Mary.jpg";
 import Oliver from "../../../assets/images/Oliver.jpg";
@@ -106,8 +106,8 @@ const Issuer = ({
   const closeAlert = () => setShowMissingIssuerModal(false);
 
   const logo = (() => {
-    if (connectionShortDetails?.label === "Citizen Portal") {
-      return CitizenPortal;
+    if (connectionShortDetails?.label === "MyFamily Portal") {
+      return MyFamilyPortal;
     }
 
     if (connectionShortDetails?.label === "Socialbook") {

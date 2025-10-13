@@ -15,7 +15,7 @@ import { IpexCommunicationService } from "../../../../../core/agent/services";
 import ACDCLogo from "../../../../../ui/assets/images/keri-acdc.svg";
 import SediLogo from "../../../../../ui/assets/images/sedi-logo-dark.svg";
 import GuardianshpLogo from "../../../../../ui/assets/images/guardianship-logo-light.svg";
-import CitizenPortalLogo from "../../../../../ui/assets/images/citizen-portal-dark.svg";
+import CitizenPortalLogo from "../../../../../ui/assets/images/myfamily-portal-dark.svg";
 import BackgroundGuardianship from "../../../../assets/images/guardianship-bg.png";
 import BackgroundBirthCertificate from "../../../../assets/images/birth-certificate-bg.png";
 import BackgroundSocialMedia from "../../../../assets/images/social-media-bg.png";

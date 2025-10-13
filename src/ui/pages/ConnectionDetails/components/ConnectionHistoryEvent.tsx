@@ -12,7 +12,7 @@ import {
   formatTimeToSec,
   getUTCOffset,
 } from "../../../utils/formatters";
-import CitizenPortal from "../../../assets/images/citizen-portal.svg";
+import MyFamilyPortal from "../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../assets/images/socialbook.svg";
 import Mary from "../../../assets/images/Mary.jpg";
 import Oliver from "../../../assets/images/Oliver.jpg";
@@ -28,8 +28,8 @@ const ConnectionHistoryEvent = ({
   connectionDetails?: ConnectionDetails;
 }) => {
   const logo = (() => {
-    if (connectionDetails?.label === "Citizen Portal") {
-      return CitizenPortal;
+    if (connectionDetails?.label === "MyFamily Portal") {
+      return MyFamilyPortal;
     }
 
     if (connectionDetails?.label === "Socialbook") {

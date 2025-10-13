@@ -89,13 +89,8 @@
         .notification-logo {
           position: relative;
 
-          .citizen-portal-logo-container {
-            background-color: var(--ion-color-primary-700);
-
+          .myfamily-portal-logo-container {
             & > img {
-              width: 80%;
-              height: 80%;
-              margin: 10%;
               border-radius: inherit;
             }
 
@@ -136,7 +131,7 @@
         }
 
         .notifications-tab-item-logo,
-        .citizen-portal-logo-container,
+        .myfamily-portal-logo-container,
         .socialbook-logo-container,
         .mary-logo-container,
         .oliver-logo-container,
@@ -149,7 +144,7 @@
 
         @media screen and (min-width: 250px) and (max-width: 370px) {
           .notifications-tab-item-logo,
-          .citizen-portal-logo-container,
+          .myfamily-portal-logo-container,
           .socialbook-logo-container,
           .mary-logo-container,
           .oliver-logo-container,

@@ -9,7 +9,7 @@ import { personCircleOutline } from "ionicons/icons";
 import { combineClassNames } from "../../utils/style";
 import "./CardList.scss";
 import { CardItemProps, CardListProps } from "./CardList.types";
-import CitizenPortal from "../../assets/images/citizen-portal.svg";
+import MyFamilyPortal from "../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
 import Mary from "../../assets/images/Mary.jpg";
 import Oliver from "../../assets/images/Oliver.jpg";
@@ -29,11 +29,11 @@ const CardInfo = <T extends object = object>({
   });
 
   const cardImg = (() => {
-    if (card.title === "Citizen Portal") {
+    if (card.title === "MyFamily Portal") {
       return (
-        <div className="citizen-portal-logo-container">
+        <div className="myfamily-portal-logo-container">
           <img
-            src={CitizenPortal}
+            src={MyFamilyPortal}
             alt={card.title}
             className="card-logo"
             data-testid="card-logo"
