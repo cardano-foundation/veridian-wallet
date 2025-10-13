@@ -35,6 +35,7 @@ import { CredentialRequestProps, MemberInfo } from "../CredentialRequest.types";
 import { LightCredentialDetailModal } from "../LightCredentialDetailModal";
 import "./CredentialRequestInformation.scss";
 import CitizenPortal from "../../../../../assets/images/citizen-portal.svg";
+import KeribloxLogo from "../../../../../assets/images/Keriblox-logo.png";
 import Socialbook from "../../../../../assets/images/socialbook.svg";
 
 const CredentialRequestInformation = ({
@@ -89,6 +90,8 @@ const CredentialRequestInformation = ({
           setRequester("Citizen Portal");
         } else if (type === "socialmedia") {
           setRequester("Socialbook");
+        } else if (type === "keriblox") {
+          setRequester("Keriblox");
         } else {
           setRequester(connection.label || i18n.t("tabs.connections.unknown"));
         }
@@ -338,6 +341,18 @@ const CredentialRequestInformation = ({
         <div className="socialbook-logo-container">
           <img
             src={Socialbook}
+            className="card-logo"
+            data-testid="card-logo"
+          />
+        </div>
+      );
+    }
+
+    if (requester === "Keriblox") {
+      return (
+        <div className="socialbook-logo-container">
+          <img
+            src={KeribloxLogo}
             className="card-logo"
             data-testid="card-logo"
           />
