@@ -422,10 +422,10 @@ const ReceiveCredential = ({
                   className="provider-avatar-image"
                   data-testid="credential-request-provider-logo"
                 />
-              ) : connection === "Vital Records Admin" ? (
+              ) : connection === "State of Utah" ? (
                 <img
                   src={VitalRecordsAdmin}
-                  alt="Vital Records Admin"
+                  alt="State of Utah"
                   className="provider-avatar-image"
                   data-testid="credential-request-provider-logo"
                 />
