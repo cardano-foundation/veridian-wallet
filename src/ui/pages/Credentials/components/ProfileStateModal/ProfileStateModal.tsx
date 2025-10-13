@@ -88,6 +88,7 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
       const remainTime = createdTime + WAITING_TIME - now;
 
       setIsOpen(true);
+
       if (remainTime > 0) {
         setHiddenContent(true);
 
@@ -101,6 +102,8 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
           clearTimeout(timer);
         };
       }
+
+      return;
     }
 
     getDetails();
