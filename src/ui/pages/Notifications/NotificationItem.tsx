@@ -23,7 +23,7 @@ import {
 import { FallbackIcon } from "../../components/FallbackIcon";
 import { timeDifference } from "../../utils/formatters";
 import { NotificationItemProps } from "./Notification.types";
-import CitizenPortal from "../../assets/images/citizen-portal.svg";
+import MyFamilyPortal from "../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
 import Mary from "../../assets/images/Mary.jpg";
 import Oliver from "../../assets/images/Oliver.jpg";
@@ -62,7 +62,7 @@ const NotificationItem = ({
         const typeParam = url.searchParams.get("type");
         const type = typeParam;
         if (type === "guardianship") {
-          setConnectionName("Citizen Portal");
+          setConnectionName("MyFamily Portal");
         } else if (type === "socialmedia") {
           setConnectionName("Socialbook");
         } else if (type === "keriblox") {
@@ -171,11 +171,11 @@ const NotificationItem = ({
   };
 
   const logo = (() => {
-    if (connectionName === "Citizen Portal") {
+    if (connectionName === "MyFamily Portal") {
       return (
-        <div className="citizen-portal-logo-container">
+        <div className="myfamily-portal-logo-container">
           <img
-            src={CitizenPortal}
+            src={MyFamilyPortal}
             alt={connectionName}
             className="card-logo"
             data-testid="card-logo"

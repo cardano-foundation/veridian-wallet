@@ -5,7 +5,7 @@ import { i18n } from "../../../../../i18n";
 import { ResponsivePageLayout } from "../../../layout/ResponsivePageLayout";
 import { PageFooter } from "../../../PageFooter";
 import { PageHeader } from "../../../PageHeader";
-import CitizenPortal from "../../../../assets/images/citizen-portal.svg";
+import MyFamilyPortal from "../../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../../assets/images/socialbook.svg";
 import KeribloxIcon from "../../../../assets/images/Keriblox-logo.png";
 import { IncomingRequestProps } from "./IncomingRequest.types";
@@ -32,8 +32,8 @@ const IncomingRequest = ({
   useEffect(() => {
     if (Object.values(QR_CODE_TYPES).includes(type as any)) {
       if (type === QR_CODE_TYPES.GUARDIANSHIP) {
-        setRequester("Citizen Portal");
-        setLogo(CitizenPortal);
+        setRequester("MyFamily Portal");
+        setLogo(MyFamilyPortal);
       } else if (type === QR_CODE_TYPES.SOCIALMEDIA) {
         setRequester("Socialbook");
         setLogo(Socialbook);
@@ -78,8 +78,8 @@ const IncomingRequest = ({
               <img
                 src={logo}
                 className={
-                  logo === CitizenPortal
-                    ? "citizen-portal-logo"
+                  logo === MyFamilyPortal
+                    ? "myfamily-portal-logo"
                     : "socialbook-logo"
                 }
                 alt="Requester Logo"

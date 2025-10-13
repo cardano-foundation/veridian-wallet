@@ -44,7 +44,7 @@ const CredentialIssuanceRequest = ({
 
   const credential = {
     type: "Social Media Access",
-    requester: "Citizen Portal",
+    requester: "MyFamily Portal",
   };
 
   const formatScreenTime = (value: unknown) => {

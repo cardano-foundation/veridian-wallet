@@ -34,7 +34,7 @@ import { showError } from "../../../../../utils/error";
 import { CredentialRequestProps, MemberInfo } from "../CredentialRequest.types";
 import { LightCredentialDetailModal } from "../LightCredentialDetailModal";
 import "./CredentialRequestInformation.scss";
-import CitizenPortal from "../../../../../assets/images/citizen-portal.svg";
+import MyFamilyPortal from "../../../../../assets/images/myfamily-portal.svg";
 import KeribloxLogo from "../../../../../assets/images/Keriblox-logo.png";
 import Socialbook from "../../../../../assets/images/socialbook.svg";
 
@@ -87,7 +87,7 @@ const CredentialRequestInformation = ({
         const typeParam = url.searchParams.get("type");
         const type = typeParam;
         if (type === "guardianship") {
-          setRequester("Citizen Portal");
+          setRequester("MyFamily Portal");
         } else if (type === "socialmedia") {
           setRequester("Socialbook");
         } else if (type === "keriblox") {
@@ -324,11 +324,11 @@ const CredentialRequestInformation = ({
   )}`;
 
   const logo = (() => {
-    if (requester === "Citizen Portal") {
+    if (requester === "MyFamily Portal") {
       return (
-        <div className="citizen-portal-logo-container">
+        <div className="myfamily-portal-logo-container">
           <img
-            src={CitizenPortal}
+            src={MyFamilyPortal}
             className="card-logo"
             data-testid="card-logo"
           />
