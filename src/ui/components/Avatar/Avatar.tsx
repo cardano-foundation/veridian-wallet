@@ -12,18 +12,21 @@ const MemberAvatar = ({
   rank,
   imageSource,
 }: MemberAvatarProps) => {
+  const finalImageSource =
+    imageSource || (rank === 100 ? Mary : rank === 101 ? Oliver : undefined);
+
   return (
     <IonButton
       shape="round"
       className={`avatar-button rank-${rank}${
         !handleClick ? " no-ripple" : ""
-      }${imageSource ? " custom-image" : ""}`}
+      }${finalImageSource ? " custom-image" : ""}`}
       data-testid="avatar-button"
       onClick={handleClick}
     >
-      {imageSource ? (
+      {finalImageSource ? (
         <img
-          src={imageSource}
+          src={finalImageSource}
           alt="Avatar"
           className="avatar-image"
         />

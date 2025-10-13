@@ -14,11 +14,20 @@
     margin: 0.5rem 0 0;
   }
 
-  .connection-details-logo .fallback-logo {
+  .connection-details-logo .fallback-logo,
+  .citizen-portal-logo-container,
+  .socialbook-logo-container,
+  .mary-logo-container,
+  .oliver-logo-container,
+  .vital-records-admin-logo-container {
     width: 5.5rem;
     height: 5.5rem;
     border-radius: 2.75rem;
     margin-bottom: 1rem;
+
+    img {
+      border-radius: 2.75rem;
+    }
   }
 
   @media screen and (min-width: 250px) and (max-width: 370px) {
@@ -26,7 +35,12 @@
       margin-bottom: 0.6rem;
     }
 
-    .connection-details-logo .fallback-logo {
+    .connection-details-logo .fallback-logo,
+    .citizen-portal-logo-container,
+    .socialbook-logo-container,
+    .mary-logo-container,
+    .oliver-logo-container,
+    .vital-records-admin-logo-container {
       width: 4rem;
       height: 4rem;
       border-radius: 2.75rem;

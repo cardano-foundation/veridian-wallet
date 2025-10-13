@@ -105,16 +105,32 @@ const Issuer = ({
         onClick={openConnection}
         testId="issuer"
       >
-        <CardDetailsItem
-          info={
-            connectionShortDetails
-              ? connectionShortDetails.label
-              : i18n.t("tabs.connections.unknown")
-          }
-          startSlot={<FallbackIcon />}
-          className="member"
-          testId={"credential-details-issuer"}
-        />
+        <IonItem
+          lines="none"
+          className="credential-details-issuer"
+          data-testid="credential-details-issuer"
+        >
+          {connectionShortDetails?.label === "Mary" ||
+          connectionShortDetails?.label === "Oliver" ? (
+            <Avatar
+              id={
+                connectionShortDetails.label === "Mary"
+                  ? "100"
+                  : connectionShortDetails.label === "Oliver"
+                  ? "101"
+                  : connectionShortDetails.id
+              }
+            />
+          ) : (
+            <FallbackIcon />
+          )}
+          <IonText
+            className="identifier-name"
+            data-testid="credential-details-issuer-name"
+          >
+            {connectionShortDetails?.label}
+          </IonText>
+        </IonItem>
       </CardBlock>
       <Alert
         dataTestId="cred-missing-issuer-alert"
