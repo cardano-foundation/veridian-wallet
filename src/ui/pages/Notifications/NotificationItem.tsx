@@ -223,7 +223,7 @@ const NotificationItem = ({
       );
     }
 
-    if (connectionName === "Vital Records Admin") {
+    if (connectionName === "State of Utah") {
       return (
         <div className="vital-records-admin-logo-container">
           <img

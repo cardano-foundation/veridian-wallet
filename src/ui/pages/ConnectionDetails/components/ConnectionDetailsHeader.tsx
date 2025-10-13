@@ -66,7 +66,7 @@ const ConnectionDetailsHeader = ({
       );
     }
 
-    if (label === "Vital Records Admin") {
+    if (label === "State of Utah") {
       return (
         <div className="vital-records-admin-logo-container">
           <img

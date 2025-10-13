@@ -122,7 +122,7 @@ const Issuer = ({
       return Oliver;
     }
 
-    if (connectionShortDetails?.label === "Vital Records Admin") {
+    if (connectionShortDetails?.label === "State of Utah") {
       return VitalRecordsAdmin;
     }
     return connectionShortDetails?.logo;

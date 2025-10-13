@@ -89,7 +89,7 @@ const CardInfo = <T extends object = object>({
       );
     }
 
-    if (card.title === "Vital Records Admin") {
+    if (card.title === "State of Utah") {
       return (
         <img
           src={VitalRecordsAdmin}

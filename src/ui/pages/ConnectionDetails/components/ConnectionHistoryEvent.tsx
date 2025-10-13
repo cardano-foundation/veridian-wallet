@@ -44,7 +44,7 @@ const ConnectionHistoryEvent = ({
       return Oliver;
     }
 
-    if (connectionDetails?.label === "Vital Records Admin") {
+    if (connectionDetails?.label === "State of Utah") {
       return VitalRecordsAdmin;
     }
 
