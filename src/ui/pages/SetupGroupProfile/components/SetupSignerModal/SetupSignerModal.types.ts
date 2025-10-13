@@ -1,14 +1,14 @@
 interface SignerData {
-  requiredSigners: number;
-  recoverySigners: number;
+  requiredSigners: number | null;
+  recoverySigners: number | null;
 }
 
 interface SignerInputProps {
   label: string;
   name: keyof SignerData;
-  value: number;
+  value: number | null;
   maxValue: number;
-  onChange: (name: keyof SignerData, value: number) => void;
+  onChange: (name: keyof SignerData, value: number | null) => void;
 }
 
 interface SetupSignerModalProps {

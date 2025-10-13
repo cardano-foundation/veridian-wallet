@@ -104,8 +104,8 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
           ourIdentifier,
           state.selectedConnections as MultisigConnectionDetails[],
           {
-            rotationThreshold: state.signer.recoverySigners,
-            signingThreshold: state.signer.requiredSigners,
+            rotationThreshold: state.signer.recoverySigners || 0,
+            signingThreshold: state.signer.requiredSigners || 0,
           }
         );
         dispatch(setToastMsg(ToastMsgType.GROUP_REQUEST_SEND));
