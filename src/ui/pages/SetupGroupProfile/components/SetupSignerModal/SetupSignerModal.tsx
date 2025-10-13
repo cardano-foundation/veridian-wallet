@@ -23,12 +23,16 @@ const SignerInput = ({
   onChange,
   maxValue,
 }: SignerInputProps) => {
+  const [touched, setTouched] = useState(false);
+
   const errorMessage = (() => {
-    if (value < 1) {
+    if (!touched) return;
+
+    if (Number(value) < 1) {
       return "setupgroupprofile.initgroup.setsigner.error.min";
     }
 
-    if (value > maxValue) {
+    if (Number(value) > maxValue) {
       return "setupgroupprofile.initgroup.setsigner.error.max";
     }
 
@@ -36,11 +40,11 @@ const SignerInput = ({
   })();
 
   const decreaseButtonClass = combineClassNames("decrease-threshold-button", {
-    inactive: value <= 1,
+    inactive: Number(value) <= 1,
   });
 
   const increaseButtonClass = combineClassNames("increase-threshold-button", {
-    inactive: maxValue <= value,
+    inactive: maxValue <= Number(value),
   });
 
   const handleClickChange = (name: keyof SignerData, value: number) => {
@@ -50,8 +54,9 @@ const SignerInput = ({
   };
 
   const handleChangeValue = (name: keyof SignerData, value: string) => {
-    const numberValue = value ? Number(value) : 0;
-    if (isNaN(numberValue)) return;
+    const numberValue = value !== "" ? Number(value) : null;
+
+    if (numberValue !== null && isNaN(numberValue)) return;
 
     onChange(name, numberValue);
   };
@@ -62,17 +67,22 @@ const SignerInput = ({
         title={label}
         className="signer-threshold"
         dataTestId={`threshold-${name}`}
-        value={`${value}`}
+        value={`${value === null ? "" : value}`}
         onChangeInput={(value) => handleChangeValue(name, value)}
-        type="number"
+        inputMode="numeric"
         error={!!errorMessage}
+        onChangeFocus={(focus) => {
+          if (!focus) {
+            setTouched(true);
+          }
+        }}
         endAction={
           <div className="signer-threshold-controls">
             <IonButton
               shape="round"
               className={decreaseButtonClass}
               data-testid={`${name}-decrease-threshold-button`}
-              onClick={() => handleClickChange(name, value - 1)}
+              onClick={() => handleClickChange(name, Number(value) - 1)}
             >
               <IonIcon
                 slot="icon-only"
@@ -84,7 +94,7 @@ const SignerInput = ({
               shape="round"
               className={increaseButtonClass}
               data-testid={`${name}-increase-threshold-button`}
-              onClick={() => handleClickChange(name, value + 1)}
+              onClick={() => handleClickChange(name, Number(value) + 1)}
             >
               <IonIcon
                 slot="icon-only"
@@ -108,8 +118,8 @@ export const SetupSignerModal = ({
   onSubmit,
 }: SetupSignerModalProps) => {
   const [data, setData] = useState<SignerData>({
-    recoverySigners: 1,
-    requiredSigners: connectionsLength,
+    recoverySigners: null,
+    requiredSigners: null,
   });
 
   const handleClose = () => {
@@ -122,8 +132,8 @@ export const SetupSignerModal = ({
   };
 
   const isValidData = useCallback(
-    (signer: number) => {
-      return signer >= 1 && signer <= connectionsLength;
+    (signer: number | null) => {
+      return signer !== null && signer >= 1 && signer <= connectionsLength;
     },
     [connectionsLength]
   );
@@ -131,18 +141,19 @@ export const SetupSignerModal = ({
   useEffect(() => {
     if (
       isOpen &&
-      isValidData(currentValue.recoverySigners) &&
-      isValidData(currentValue.requiredSigners)
+      isValidData(Number(currentValue.recoverySigners)) &&
+      isValidData(Number(currentValue.requiredSigners))
     )
       setData({ ...currentValue });
   }, [isOpen, currentValue, isValidData]);
 
-  const setField = (name: keyof SignerData, value: number) => {
+  const setField = (name: keyof SignerData, value: number | null) => {
     setData((values) => ({
       ...values,
       [name]: value,
     }));
   };
+
   return (
     <IonModal
       isOpen={isOpen}
@@ -170,8 +181,8 @@ export const SetupSignerModal = ({
             )}`}
             primaryButtonAction={handleSubmit}
             primaryButtonDisabled={
-              !isValidData(data.recoverySigners) ||
-              !isValidData(data.requiredSigners)
+              !isValidData(Number(data.recoverySigners)) ||
+              !isValidData(Number(data.requiredSigners))
             }
           />
         }

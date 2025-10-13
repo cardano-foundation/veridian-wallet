@@ -116,9 +116,11 @@ describe("Setup signer modal", () => {
       </Provider>
     );
 
+    fireEvent.focus(getByTestId("threshold-recoverySigners"));
     fireEvent.change(getByTestId("threshold-recoverySigners"), {
       target: { value: "3" },
     });
+    fireEvent.blur(getByTestId("threshold-recoverySigners"));
 
     await waitFor(() => {
       expect(
@@ -167,9 +169,11 @@ describe("Setup signer modal", () => {
       ).toBeNull();
     });
 
+    fireEvent.focus(getByTestId("threshold-requiredSigners"));
     fireEvent.change(getByTestId("threshold-requiredSigners"), {
       target: { value: "3" },
     });
+    fireEvent.blur(getByTestId("threshold-requiredSigners"));
 
     await waitFor(() => {
       expect(

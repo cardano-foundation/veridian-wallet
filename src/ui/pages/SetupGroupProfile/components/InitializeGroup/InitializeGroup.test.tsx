@@ -161,8 +161,8 @@ describe("Init group", () => {
       expect(setStateMock).toBeCalledWith({
         ...state,
         signer: {
-          recoverySigners: 1,
-          requiredSigners: 4,
+          recoverySigners: null,
+          requiredSigners: null,
         },
       });
     });
