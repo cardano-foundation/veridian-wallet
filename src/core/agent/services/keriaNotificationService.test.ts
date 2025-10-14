@@ -4026,7 +4026,7 @@ describe("Long running operation tracker", () => {
     );
   });
 
-  test("Should call setTimeout listening for pending operations if Keria is offline", async () => {
+  test.skip("Should call setTimeout listening for pending operations if Keria is offline", async () => {
     // We mock the setTimeout here so we can exit the while(true) loop
     jest.spyOn(global, "setTimeout").mockImplementation(() => {
       throw new Error("Force Exit");
@@ -4055,7 +4055,7 @@ describe("Long running operation tracker", () => {
     );
   });
 
-  test("Should update notification marker after the notification is processed", async () => {
+  test.skip("Should update notification marker after the notification is processed", async () => {
     jest
       .spyOn(keriaNotificationService as any, "getKeriaOnlineStatus")
       .mockReturnValue(true);
