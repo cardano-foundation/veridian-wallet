@@ -182,11 +182,16 @@ describe("Notifications Tab", () => {
   });
 
   test("Renders empty Notifications Tab", () => {
+    const history = createMemoryHistory();
+    history.push(TabsRoutePath.CREDENTIALS);
     const { getByTestId, getByText, queryByTestId } = render(
       <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.NOTIFICATIONS]}>
+        <IonReactMemoryRouter
+          history={history}
+          initialEntries={[TabsRoutePath.NOTIFICATIONS]}
+        >
           <Notifications />
-        </MemoryRouter>
+        </IonReactMemoryRouter>
       </Provider>
     );
 
@@ -212,11 +217,16 @@ describe("Notifications Tab", () => {
       ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
+    const history = createMemoryHistory();
+    history.push(TabsRoutePath.CREDENTIALS);
     const { getByTestId, getByText } = render(
       <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.NOTIFICATIONS]}>
+        <IonReactMemoryRouter
+          history={history}
+          initialEntries={[TabsRoutePath.NOTIFICATIONS]}
+        >
           <Notifications />
-        </MemoryRouter>
+        </IonReactMemoryRouter>
       </Provider>
     );
 

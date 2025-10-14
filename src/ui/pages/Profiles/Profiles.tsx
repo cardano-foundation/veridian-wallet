@@ -5,12 +5,11 @@ import {
   personCircleOutline,
   settingsOutline,
 } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
-import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getProfiles } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
@@ -24,9 +23,9 @@ import { useAppIonRouter } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
 import { ProfileSetup } from "../ProfileSetup";
+import { ProfileItem } from "./components/ProfileItem";
 import "./Profiles.scss";
 import { OptionButtonProps, ProfilesProps } from "./Profiles.types";
-import { ProfileItem } from "./components/ProfileItem";
 
 const OptionButton = ({ icon, text, action, disabled }: OptionButtonProps) => {
   return (
@@ -66,6 +65,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const [openProfileDetail, setOpenProfileDetail] = useState(false);
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
   const [isJoinGroupMode, setIsJoinGroupMode] = useState(false);
+  const isOpenFromDetail = useRef(false);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -99,20 +99,9 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       await updateDefaultProfile(profile.id);
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
       handleClose();
-
-      const isGroupProfile = !!(
-        profile.groupMemberPre || profile.groupMetadata
-      );
-
-      const isCreatedGroup =
-        profile.groupMemberPre &&
-        profile.creationStatus === CreationStatus.COMPLETE;
-
-      ionHistory.push(
-        !isGroupProfile || isCreatedGroup
-          ? TabsRoutePath.CREDENTIALS
-          : RoutePath.GROUP_PROFILE_SETUP.replace(":id", profile.id)
-      );
+      if (isOpenFromDetail.current) {
+        setOpenProfileDetail(false);
+      }
     } catch (e) {
       showError(
         "Unable to switch profile",
@@ -128,7 +117,29 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       setIsJoinGroupMode(false);
       setOpenSetupProfile(true);
     }
-  }, [defaultProfile, profileList.length]);
+
+    const isGroup =
+      !!defaultProfile?.identity.groupMetadata ||
+      !!defaultProfile?.identity.groupMemberPre;
+    const isCreated =
+      defaultProfile?.identity.creationStatus === CreationStatus.COMPLETE &&
+      !!defaultProfile?.identity.groupMemberPre;
+    const isPendingOrFailedOnKeria =
+      defaultProfile &&
+      [CreationStatus.PENDING, CreationStatus.FAILED].includes(
+        defaultProfile?.identity.creationStatus
+      ) &&
+      !defaultProfile?.identity.groupMemberPre;
+
+    if (isGroup && !isPendingOrFailedOnKeria && !isCreated) {
+      ionHistory.push(
+        RoutePath.GROUP_PROFILE_SETUP.replace(
+          ":id",
+          defaultProfile?.identity.id
+        )
+      );
+    }
+  }, [defaultProfile, ionHistory, profileList.length]);
 
   const isDisableManageProfile = () => {
     const isGroupProfile = !!(
@@ -140,7 +151,11 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       defaultProfile?.identity.groupMemberPre &&
       defaultProfile?.identity.creationStatus === CreationStatus.COMPLETE;
 
-    return isGroupProfile && !isCreatedGroup;
+    return (
+      (isGroupProfile && !isCreatedGroup) ||
+      defaultProfile?.identity.creationStatus === CreationStatus.FAILED ||
+      defaultProfile?.identity.creationStatus === CreationStatus.PENDING
+    );
   };
 
   return (
@@ -217,7 +232,9 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         <ProfileSetup
           onClose={(cancel) => {
             handleCloseSetupProfile();
-            if (!cancel) setIsOpen(false);
+            if (!cancel) {
+              setIsOpen(false);
+            }
           }}
           joinGroupMode={isJoinGroupMode}
           displayOnModal
@@ -228,7 +245,10 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         isOpen={openProfileDetail}
         setIsOpen={setOpenProfileDetail}
         profileId={defaultProfile?.identity.id || ""}
-        onConnectionComplete={() => setIsOpen(false)}
+        showProfiles={(value) => {
+          setIsOpen(value);
+          isOpenFromDetail.current = value;
+        }}
       />
     </>
   );

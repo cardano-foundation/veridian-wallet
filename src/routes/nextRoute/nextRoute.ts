@@ -1,4 +1,5 @@
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
+import { CreationStatus } from "../../core/agent/agent.types";
 import { RootState } from "../../store";
 import {
   clearSeedPhraseCache,
@@ -11,7 +12,6 @@ import {
 } from "../../store/reducers/stateCache";
 import { RoutePath, TabsRoutePath } from "../paths";
 import { DataProps, NextRoute, StoreState } from "./nextRoute.types";
-import { CreationStatus } from "../../core/agent/agent.types";
 
 const getNextRootRoute = (data: DataProps) => {
   const authentication = data.store.stateCache.authentication;
@@ -51,13 +51,18 @@ const getNextRootRoute = (data: DataProps) => {
 
     const profile = currentProfile.identity;
     const isGroupProfile = !!(profile.groupMemberPre || profile.groupMetadata);
+    // We have 2 phrase group profile is pending: after create and after accept to join group
+    // This flag use to check group profile is pending after create
+    const isPendingAfterCreate =
+      profile.creationStatus === CreationStatus.PENDING &&
+      !profile.groupMemberPre;
 
     const isCreatedGroup =
       profile.groupMemberPre &&
       profile.creationStatus === CreationStatus.COMPLETE;
 
     path =
-      isGroupProfile && !isCreatedGroup
+      isGroupProfile && !isCreatedGroup && !isPendingAfterCreate
         ? RoutePath.GROUP_PROFILE_SETUP.replace(
             ":id",
             currentProfile.identity.id
@@ -190,13 +195,7 @@ const getNextCreatePasswordRoute = (data: DataProps) => {
   return { pathname: RoutePath.GENERATE_SEED_PHRASE };
 };
 
-const getNextProfileSetupRoute = (data: DataProps) => {
-  if (data.state?.isGroup) {
-    return {
-      pathname: RoutePath.GROUP_PROFILE_SETUP.replace(":id", data.state?.id),
-    };
-  }
-
+const getNextProfileSetupRoute = () => {
   return { pathname: TabsRoutePath.CREDENTIALS };
 };
 
@@ -276,7 +275,7 @@ const nextRoute: Record<string, NextRoute> = {
     updateRedux: [updateStoreAfterCreatePassword],
   },
   [RoutePath.PROFILE_SETUP]: {
-    nextPath: (data: DataProps) => getNextProfileSetupRoute(data),
+    nextPath: () => getNextProfileSetupRoute(),
     updateRedux: [updateStoreAfterSetupProfile],
   },
   [TabsRoutePath.CREDENTIAL_DETAILS]: {

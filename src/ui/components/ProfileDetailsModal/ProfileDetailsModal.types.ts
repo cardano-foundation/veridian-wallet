@@ -7,6 +7,7 @@ interface ProfileDetailsModalProps {
   onConnectionComplete?: () => void;
   hardwareBackButtonConfig?: HardwareBackButtonConfig;
   restrictedOptions?: boolean;
+  showProfiles?: (value: boolean) => void;
 }
 
 interface ProfileDetailsModuleProps extends ProfileDetailsModalProps {

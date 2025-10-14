@@ -17,8 +17,8 @@ const initialState: GroupInfomation = {
   stage: Stage.SetupConnection,
   displayNameValue: "",
   signer: {
-    requiredSigners: 0,
-    recoverySigners: 0,
+    requiredSigners: null,
+    recoverySigners: null,
   },
   scannedConections: [],
   selectedConnections: [],
@@ -88,8 +88,8 @@ const SetupGroupProfile = () => {
       stage: isPendingState ? Stage.Pending : Stage.SetupConnection,
       displayNameValue: currentProfile.identity.displayName,
       signer: {
-        requiredSigners: 0,
-        recoverySigners: 0,
+        requiredSigners: null,
+        recoverySigners: null,
       },
       scannedConections: currentProfile.multisigConnections,
       selectedConnections: currentProfile.multisigConnections,

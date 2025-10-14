@@ -144,6 +144,7 @@ export const useProfile = () => {
     defaultName: defaultProfile?.identity?.displayName,
     defaultProfile,
     profileHistories,
+    profiles,
     updateDefaultProfile,
     setRecentProfileAsDefault,
     getRecentDefaultProfile,

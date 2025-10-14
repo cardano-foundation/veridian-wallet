@@ -55,7 +55,8 @@ const DELAY_TO_CLOSE_MODAL = 300;
 const useProfileData = (
   profileId: string | undefined,
   handleDone: ((success: boolean) => void) | undefined,
-  dispatch: any
+  dispatch: any,
+  showProfiles?: (value: boolean) => void
 ) => {
   const [profile, setProfile] = useState<IdentifierDetailsCore | undefined>();
   const [oobi, setOobi] = useState("");
@@ -89,6 +90,7 @@ const useProfileData = (
         error instanceof Error &&
         error.message.includes(Agent.MISSING_DATA_ON_KERIA)
       ) {
+        showProfiles?.(false);
         setCloudError(true);
       } else {
         handleDone?.(false);
@@ -99,7 +101,7 @@ const useProfileData = (
         );
       }
     }
-  }, [profileId, handleDone, dispatch]);
+  }, [profileId, handleDone, dispatch, showProfiles]);
 
   useOnlineStatusEffect(getDetails);
   useOnlineStatusEffect(fetchOobi);
@@ -205,6 +207,7 @@ const ProfileDetailsModule = ({
   onScanFinish,
   onConnectionComplete,
   beforeConnectionComplete,
+  showProfiles,
 }: ProfileDetailsModuleProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
@@ -220,7 +223,8 @@ const ProfileDetailsModule = ({
   const { profile, setProfile, oobi, cloudError, getDetails } = useProfileData(
     profileId,
     handleDone,
-    dispatch
+    dispatch,
+    showProfiles
   );
 
   const {
@@ -366,11 +370,14 @@ const ProfileDetailsModule = ({
                             ? "101"
                             : defaultProfile?.identity.id || ""
                         }
+                        handleAvatarClick={() => showProfiles?.(true)}
                       />
                     }
                   />
                 }
-                content={`${i18n.t("profiledetails.clouderror")}`}
+                content={`${i18n.t(
+                  "profiledetails.loadprofileerror.missingoncloud"
+                )}`}
               >
                 <PageFooter
                   pageId={pageId}

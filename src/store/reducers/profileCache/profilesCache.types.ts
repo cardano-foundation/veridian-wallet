@@ -46,6 +46,7 @@ interface ProfileCache {
   pendingDAppConnection?: DAppConnection | null;
   isConnectingToDApp?: boolean;
   showDAppConnect?: boolean;
+  showProfileState?: boolean;
 }
 
 export type { Profile, ProfileCache, DAppConnection, MultiSigGroup };

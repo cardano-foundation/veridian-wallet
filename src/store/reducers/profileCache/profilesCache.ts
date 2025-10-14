@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Agent } from "../../../core/agent/agent";
 import {
   MiscRecordId,
   MultisigConnectionDetails,
   RegularConnectionDetails,
 } from "../../../core/agent/agent.types";
+import { BasicRecord } from "../../../core/agent/records";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
@@ -14,8 +16,6 @@ import {
   Profile,
   ProfileCache,
 } from "./profilesCache.types";
-import { Agent } from "../../../core/agent/agent";
-import { BasicRecord } from "../../../core/agent/records";
 
 // Shared empty arrays — return these to keep selector return references stable
 const DefaultArrayValue = {
@@ -31,6 +31,7 @@ const initialState: ProfileCache = {
   profiles: {},
   recentProfiles: [],
   multiSigGroup: undefined,
+  showProfileState: false,
 };
 
 export const profilesCacheSlice = createSlice({
@@ -428,6 +429,9 @@ export const profilesCacheSlice = createSlice({
     ) => {
       state.missingAliasUrl = action.payload;
     },
+    setShowProfileState: (state, action: PayloadAction<boolean>) => {
+      state.showProfileState = action.payload;
+    },
   },
 });
 
@@ -494,6 +498,7 @@ export const {
   setIsConnectingToDApp,
   showDAppConnect,
   clearDAppConnection,
+  setShowProfileState,
 } = profilesCacheSlice.actions;
 
 const getProfiles = (state: RootState) => state.profilesCache.profiles;
@@ -524,6 +529,9 @@ const getMissingAliasConnection = (state: RootState) =>
 
 const getCredsCache = (state: RootState) =>
   getCurrentProfile(state)?.credentials || DefaultArrayValue.Credentials;
+
+const getShowProfileState = (state: RootState) =>
+  state.profilesCache.showProfileState;
 
 const getPeerConnections = (state: RootState) => {
   const currentProfile = getCurrentProfile(state);
@@ -576,4 +584,5 @@ export {
   getRecentProfiles,
   getScanGroupId,
   getShowDAppConnect,
+  getShowProfileState,
 };

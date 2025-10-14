@@ -19,6 +19,17 @@ type TextFieldTypes =
   | "month"
   | "datetime-local";
 
+type InputMode =
+  | "none"
+  | "text"
+  | "tel"
+  | "url"
+  | "email"
+  | "numeric"
+  | "decimal"
+  | "search"
+  | undefined;
+
 interface CustomInputProps {
   dataTestId: string;
   title?: string;
@@ -36,6 +47,7 @@ interface CustomInputProps {
   labelAction?: ReactNode;
   endAction?: ReactNode;
   type?: TextFieldTypes;
+  inputMode?: InputMode;
 }
 
 export type { CustomInputProps };
