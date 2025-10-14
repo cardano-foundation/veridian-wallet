@@ -4,27 +4,31 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import { CreationStatus } from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
-import { useAppDispatch } from "../../../../../store/hooks";
-import { removeProfile } from "../../../../../store/reducers/profileCache";
+import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
+import {
+  getShowProfileState,
+  removeProfile,
+  setShowProfileState,
+} from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
+import { ToastMsgType } from "../../../../globals/types";
+import { useProfile } from "../../../../hooks/useProfile";
+import { Profiles } from "../../../Profiles";
+import { showError } from "../../../../utils/error";
 import { Alert } from "../../../../components/Alert";
 import { Avatar } from "../../../../components/Avatar";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ResponsivePageLayout } from "../../../../components/layout/ResponsivePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
-import { Verification } from "../../../../components/Verification";
-import { ToastMsgType } from "../../../../globals/types";
-import { useProfile } from "../../../../hooks/useProfile";
-import { showError } from "../../../../utils/error";
-import "./ProfileStateModal.scss";
-import { ProfileStateModalProps } from "./ProfileStateModal.types";
 import { Spinner } from "../../../../components/Spinner";
 import { SpinnerConverage } from "../../../../components/Spinner/Spinner.type";
+import { Verification } from "../../../../components/Verification";
+import "./ProfileStateModal.scss";
 
 const WAITING_TIME = 5000;
 
-const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
+const ProfileStateModal = () => {
   const pageId = "profile-state-page";
   const {
     setRecentProfileAsDefault,
@@ -35,8 +39,16 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [isMissingOnCloud, setMissingOnCloud] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [hiddenContent, setHiddenContent] = useState(false);
+  const [hiddenContent, setHiddenContent] = useState(true);
+  const [isOpenProfiles, setOpenProfiles] = useState(false);
+  const isOpen = useAppSelector(getShowProfileState);
+
+  const setIsOpen = useCallback(
+    (value: boolean) => {
+      dispatch(setShowProfileState(value));
+    },
+    [dispatch]
+  );
 
   const getDetails = useCallback(async () => {
     if (!currentProfile?.identity.id) return;
@@ -60,7 +72,7 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
     } finally {
       setHiddenContent(false);
     }
-  }, [currentProfile?.identity.id, dispatch]);
+  }, [currentProfile?.identity.id, dispatch, setIsOpen]);
 
   useEffect(() => {
     if (
@@ -103,6 +115,7 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
         };
       }
 
+      setHiddenContent(false);
       return;
     }
 
@@ -113,6 +126,7 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
     currentProfile?.identity?.createdAtUTC,
     dispatch,
     getDetails,
+    setIsOpen,
   ]);
 
   const type = useMemo(() => {
@@ -170,6 +184,7 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
       <IonModal
         className="profile-state-modal"
         isOpen={isOpen}
+        onDidDismiss={() => setIsOpen(false)}
         animated={false}
       >
         <ResponsivePageLayout
@@ -180,7 +195,7 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
               additionalButtons={
                 <Avatar
                   id={currentProfile?.identity.id || ""}
-                  handleAvatarClick={onOpenProfiles}
+                  handleAvatarClick={() => setOpenProfiles(true)}
                 />
               }
             />
@@ -224,6 +239,10 @@ const ProfileStateModal = ({ onOpenProfiles }: ProfileStateModalProps) => {
         verifyIsOpen={verifyIsOpen}
         setVerifyIsOpen={setVerifyIsOpen}
         onVerify={handleDelete}
+      />
+      <Profiles
+        isOpen={isOpenProfiles}
+        setIsOpen={setOpenProfiles}
       />
     </>
   );

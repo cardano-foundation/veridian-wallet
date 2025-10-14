@@ -38,6 +38,7 @@ import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types"
 import { FilteredItemsPlaceholder } from "../../components/FilteredItemsPlaceholder";
 import { TabLayout } from "../../components/layout/TabLayout";
 import { ListHeader } from "../../components/ListHeader";
+import { ProfileStateModal } from "./components/ProfileStateModal";
 import { RemovePendingAlert } from "../../components/RemovePendingAlert";
 import {
   CardList as CredentialCardList,
@@ -48,7 +49,6 @@ import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { Profiles } from "../Profiles";
-import { ProfileStateModal } from "./components/ProfileStateModal";
 import "./Credentials.scss";
 import { CredentialsFilters, StartAnimationSource } from "./Credentials.types";
 
@@ -392,7 +392,7 @@ const Credentials = () => {
         archivedCredentialsIsOpen={archivedCredentialsIsOpen}
         setArchivedCredentialsIsOpen={handleArchivedCredentialsDisplayChange}
       />
-      <ProfileStateModal onOpenProfiles={() => setOpenProfiles(true)} />
+      <ProfileStateModal />
     </>
   );
 };

@@ -1,5 +1,6 @@
 interface ProfileStateModalProps {
-  onOpenProfiles: () => void;
+  isOpen?: boolean;
+  setIsOpen?: (value: boolean) => void;
 }
 
 export type { ProfileStateModalProps };

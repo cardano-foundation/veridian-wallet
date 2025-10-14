@@ -699,9 +699,8 @@ describe("Creds Tab", () => {
     test("Show pending profile issue", async () => {
       const storeMocked = {
         ...makeTestStore(initialStatePendingEmpty),
-        dispatch: dispatchMock,
       };
-      const { getByText, getByTestId } = render(
+      const { getByText } = render(
         <IonReactMemoryRouter
           history={history}
           initialEntries={[TabsRoutePath.CREDENTIALS]}
@@ -745,6 +744,7 @@ describe("Creds Tab", () => {
             },
           },
           defaultProfile: filteredIdentifierFix[0].id,
+          showProfileState: true,
         },
         viewTypeCache: {
           identifier: {
@@ -763,7 +763,6 @@ describe("Creds Tab", () => {
 
       const storeMocked = {
         ...makeTestStore(initialStateErrorEmpty),
-        dispatch: dispatchMock,
       };
       const { getByText } = render(
         <IonReactMemoryRouter
@@ -786,7 +785,6 @@ describe("Creds Tab", () => {
     test("Show missing on cloud error", async () => {
       const storeMocked = {
         ...makeTestStore(initialStateEmpty),
-        dispatch: dispatchMock,
       };
 
       jest
