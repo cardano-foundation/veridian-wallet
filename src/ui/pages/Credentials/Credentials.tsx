@@ -38,7 +38,6 @@ import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types"
 import { FilteredItemsPlaceholder } from "../../components/FilteredItemsPlaceholder";
 import { TabLayout } from "../../components/layout/TabLayout";
 import { ListHeader } from "../../components/ListHeader";
-import { ProfileStateModal } from "./components/ProfileStateModal";
 import { RemovePendingAlert } from "../../components/RemovePendingAlert";
 import {
   CardList as CredentialCardList,
@@ -392,7 +391,6 @@ const Credentials = () => {
         archivedCredentialsIsOpen={archivedCredentialsIsOpen}
         setArchivedCredentialsIsOpen={handleArchivedCredentialsDisplayChange}
       />
-      <ProfileStateModal />
     </>
   );
 };
