@@ -31,6 +31,8 @@ enum ToastMsgType {
   IDENTIFIER_UPDATED = "identifierUpdated",
   IDENTIFIER_NAME_UPDATED = "identifierNameUpdated",
   IDENTIFIER_USERNAME_UPDATED = "identifierUsernameUpdated",
+  GROUP_UPDATED = "groupnameupdate",
+  GROUP_UPDATED_FAIL = "groupnameupdateerror",
   IDENTIFIER_DELETED = "identifierDeleted",
   CREDENTIAL_DELETED = "credentialDeleted",
   CREDENTIAL_RESTORED = "credentialRestored",

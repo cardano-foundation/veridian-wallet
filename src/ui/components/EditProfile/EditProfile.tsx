@@ -143,7 +143,9 @@ const EditProfile = ({
       dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
       dispatch(
         setToastMsg(
-          editType === "userName"
+          isGroup
+            ? ToastMsgType.GROUP_UPDATED
+            : editType === "userName"
             ? ToastMsgType.IDENTIFIER_USERNAME_UPDATED
             : ToastMsgType.IDENTIFIER_NAME_UPDATED
         )
@@ -158,7 +160,9 @@ const EditProfile = ({
         "Unable to edit identifier",
         e,
         dispatch,
-        ToastMsgType.UNABLE_EDIT_IDENTIFIER
+        isGroup && editType !== "userName"
+          ? ToastMsgType.GROUP_UPDATED_FAIL
+          : ToastMsgType.UNABLE_EDIT_IDENTIFIER
       );
     } finally {
       setLoading(false);
