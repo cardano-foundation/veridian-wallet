@@ -113,6 +113,7 @@ const EditProfile = ({
 
       if (editType === "name") {
         params.displayName = newDisplayName;
+        params.groupMetadata = cardData.groupMetadata;
         await Agent.agent.identifiers.updateIdentifier(cardData.id, params);
       } else if (isGroup && cardData.groupMetadata) {
         params.groupMetadata = {
@@ -186,7 +187,11 @@ const EditProfile = ({
             closeButton={true}
             closeButtonAction={handleCancel}
             closeButtonLabel={`${i18n.t("profiledetails.options.cancel")}`}
-            title={`${i18n.t("profiledetails.options.edit")}`}
+            title={
+              isGroup && editType !== "userName"
+                ? `${i18n.t("profiledetails.options.editGroup")}`
+                : `${i18n.t("profiledetails.options.edit")}`
+            }
           />
         }
         pageId={pageId}
@@ -208,6 +213,8 @@ const EditProfile = ({
             title={`${
               editType === "userName"
                 ? i18n.t("profiledetails.options.inner.usernamelabel")
+                : isGroup
+                ? i18n.t("profiledetails.options.inner.groupLabel")
                 : i18n.t("profiledetails.options.inner.label")
             }`}
             hiddenInput={false}
