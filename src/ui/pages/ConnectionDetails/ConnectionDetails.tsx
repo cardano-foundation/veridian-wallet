@@ -13,14 +13,12 @@ import "./ConnectionDetails.scss";
 
 import { Agent } from "../../../core/agent/agent";
 import {
-  ConnectionDetails as ConnectionData,
   ConnectionHistoryItem,
   ConnectionNoteDetails,
-  RegularConnectionDetails,
   RegularConnectionDetailsFull,
 } from "../../../core/agent/agent.types";
 import { RoutePath } from "../../../routes";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { useAppDispatch } from "../../../store/hooks";
 import { removeConnectionCache } from "../../../store/reducers/profileCache";
 import {
   setCurrentOperation,

@@ -26,6 +26,7 @@ import { setCurrentRoute } from "../../../../store/reducers/stateCache";
 import { Connections } from "../../../pages/Connections";
 import { Credentials } from "../../../pages/Credentials";
 import { Notifications } from "../../../pages/Notifications";
+import { ProfileStateModal } from "../../../pages/Credentials/components/ProfileStateModal";
 import "./TabsMenu.scss";
 
 const tabsRoutes = [
@@ -112,6 +113,7 @@ const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
           );
         })}
       </IonTabBar>
+      <ProfileStateModal />
     </IonTabs>
   );
 };

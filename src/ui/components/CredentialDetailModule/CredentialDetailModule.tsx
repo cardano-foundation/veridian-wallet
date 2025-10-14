@@ -3,9 +3,8 @@ import { ellipsisVertical, heart, heartOutline } from "ionicons/icons";
 import { useCallback, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
-  ConnectionShortDetails,
-  RegularConnectionDetails,
   MiscRecordId,
+  RegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
 import {

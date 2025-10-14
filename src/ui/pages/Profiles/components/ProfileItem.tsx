@@ -55,9 +55,10 @@ const ProfileItem = ({ identifier, onClick }: ProfileItemsProps) => {
   const isMemberPending = !groupMetadata?.groupInitiator && !hasJoinGroupNoti;
 
   const pending =
-    isGroupMember &&
-    !identifierCreated &&
-    (isInitiatorPending || isMemberPending);
+    (!isGroupMember && identifier.creationStatus === CreationStatus.PENDING) ||
+    (isGroupMember &&
+      !identifierCreated &&
+      (isInitiatorPending || isMemberPending));
 
   return (
     <div

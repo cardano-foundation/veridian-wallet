@@ -64,6 +64,7 @@ describe("Profile cache", () => {
     profiles: {},
     recentProfiles: [],
     multiSigGroup: undefined,
+    showProfileState: false,
   };
 
   it("should return the initial state", () => {
