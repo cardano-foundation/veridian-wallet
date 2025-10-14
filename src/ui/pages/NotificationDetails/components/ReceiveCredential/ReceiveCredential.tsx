@@ -52,7 +52,7 @@ import "./ReceiveCredential.scss";
 import { Avatar } from "../../../../components/Avatar";
 import Mary from "../../../../assets/images/Mary.jpg";
 import Oliver from "../../../../assets/images/Oliver.jpg";
-import VitalRecordsAdmin from "../../../../assets/images/vital-records-admin.png";
+import StateOfUtah from "../../../../assets/images/state-of-utah.png";
 import MyFamilyPortal from "../../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../../assets/images/socialbook.svg";
 
@@ -424,7 +424,7 @@ const ReceiveCredential = ({
                 />
               ) : connection === "State of Utah" ? (
                 <img
-                  src={VitalRecordsAdmin}
+                  src={StateOfUtah}
                   alt="State of Utah"
                   className="provider-avatar-image"
                   data-testid="credential-request-provider-logo"

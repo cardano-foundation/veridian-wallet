@@ -13,7 +13,7 @@ import MyFamilyPortal from "../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../assets/images/socialbook.svg";
 import Mary from "../../assets/images/Mary.jpg";
 import Oliver from "../../assets/images/Oliver.jpg";
-import VitalRecordsAdmin from "../../assets/images/vital-records-admin.png";
+import StateOfUtah from "../../assets/images/state-of-utah.png";
 import KeribloxLogo from "../../assets/images/Keriblox-logo.png";
 
 const CardInfo = <T extends object = object>({
@@ -92,7 +92,7 @@ const CardInfo = <T extends object = object>({
     if (card.title === "State of Utah") {
       return (
         <img
-          src={VitalRecordsAdmin}
+          src={StateOfUtah}
           alt={card.title}
           className="card-logo"
           data-testid="card-logo"

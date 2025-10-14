@@ -16,7 +16,7 @@ import MyFamilyPortal from "../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../assets/images/socialbook.svg";
 import Mary from "../../../assets/images/Mary.jpg";
 import Oliver from "../../../assets/images/Oliver.jpg";
-import VitalRecordsAdmin from "../../../assets/images/vital-records-admin.png";
+import StateOfUtah from "../../../assets/images/state-of-utah.png";
 
 const ConnectionHistoryEvent = ({
   index,
@@ -45,7 +45,7 @@ const ConnectionHistoryEvent = ({
     }
 
     if (connectionDetails?.label === "State of Utah") {
-      return VitalRecordsAdmin;
+      return StateOfUtah;
     }
 
     return connectionDetails?.logo;
