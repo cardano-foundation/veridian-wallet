@@ -14,7 +14,7 @@ export interface HabNameParts {
 export function parseHabName(name: string): HabNameParts {
   const parts = name.split(":");
 
-  if (name.startsWith("1.2.0.3:")) {
+  if (name.startsWith("1.2.0.2:")) {
     if (parts.length !== 3 && parts.length !== 6) {
       throw new Error(
         "Invalid new format name: Expected 3 or 6 parts separated by colons (version:theme:displayName or version:theme:groupInitiator:groupId:userName:displayName)."
@@ -111,8 +111,8 @@ export function parseHabName(name: string): HabNameParts {
   };
 }
 
-export function formatToV1_2_0_3(parts: HabNameParts): string {
-  const version = "1.2.0.3";
+export function formatToV1_2_0_2(parts: HabNameParts): string {
+  const version = "1.2.0.2";
   const themePart = parts.theme || ""; // Ensure theme is not undefined
   const displayNamePart = parts.displayName || ""; // Ensure display name is not undefined
 
