@@ -47,6 +47,7 @@ import { CredentialOptions } from "../CredentialOptions";
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import { PageFooter } from "../PageFooter";
 import { PageHeader } from "../PageHeader";
+import { SideSlider } from "../SideSlider";
 import { Verification } from "../Verification";
 import { CredentialContent } from "./components/CredentialContent";
 import "./CredentialDetailModule.scss";
@@ -425,14 +426,20 @@ const CredentialDetailModule = ({
   const resetOperation = () =>
     dispatch(setCurrentOperation(OperationType.IDLE));
 
-  return openConnectionlModal && connectionShortDetails ? (
-    <ConnectionDetails
-      connectionShortDetails={connectionShortDetails}
-      handleCloseConnectionModal={() => setOpenConnectionlModal(false)}
-      restrictedOptions={true}
-    />
-  ) : (
+  return (
     <>
+      <SideSlider
+        isOpen={openConnectionlModal && !!connectionShortDetails}
+        renderAsModal
+      >
+        {connectionShortDetails && (
+          <ConnectionDetails
+            connectionShortDetails={connectionShortDetails}
+            handleCloseConnectionModal={() => setOpenConnectionlModal(false)}
+            restrictedOptions={true}
+          />
+        )}
+      </SideSlider>
       {cloudError ? (
         <CloudError
           pageId={pageId}
