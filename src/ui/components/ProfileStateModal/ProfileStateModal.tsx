@@ -1,30 +1,32 @@
 import { IonModal } from "@ionic/react";
 import { warningOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Agent } from "../../../../../core/agent/agent";
-import { CreationStatus } from "../../../../../core/agent/agent.types";
-import { i18n } from "../../../../../i18n";
-import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
+import { useHistory } from "react-router-dom";
+import { Agent } from "../../../core/agent/agent";
+import { CreationStatus } from "../../../core/agent/agent.types";
+import { i18n } from "../../../i18n";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getShowProfileState,
   removeProfile,
   setShowProfileState,
-} from "../../../../../store/reducers/profileCache";
-import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../../../globals/types";
-import { useProfile } from "../../../../hooks/useProfile";
-import { Profiles } from "../../../Profiles";
-import { showError } from "../../../../utils/error";
-import { Alert } from "../../../../components/Alert";
-import { Avatar } from "../../../../components/Avatar";
-import { InfoCard } from "../../../../components/InfoCard";
-import { ResponsivePageLayout } from "../../../../components/layout/ResponsivePageLayout";
-import { PageFooter } from "../../../../components/PageFooter";
-import { PageHeader } from "../../../../components/PageHeader";
-import { Spinner } from "../../../../components/Spinner";
-import { SpinnerConverage } from "../../../../components/Spinner/Spinner.type";
-import { Verification } from "../../../../components/Verification";
+} from "../../../store/reducers/profileCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
+import { Alert } from "../Alert";
+import { Avatar } from "../Avatar";
+import { InfoCard } from "../InfoCard";
+import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
+import { PageFooter } from "../PageFooter";
+import { PageHeader } from "../PageHeader";
+import { Spinner } from "../Spinner";
+import { SpinnerConverage } from "../Spinner/Spinner.type";
+import { Verification } from "../Verification";
+import { ToastMsgType } from "../../globals/types";
+import { useProfile } from "../../hooks/useProfile";
+import { showError } from "../../utils/error";
+import { Profiles } from "../../pages/Profiles";
 import "./ProfileStateModal.scss";
+import { RoutePath } from "../../../routes";
 
 const WAITING_TIME = 5000;
 
@@ -42,6 +44,7 @@ const ProfileStateModal = () => {
   const [hiddenContent, setHiddenContent] = useState(true);
   const [isOpenProfiles, setOpenProfiles] = useState(false);
   const isOpen = useAppSelector(getShowProfileState);
+  const history = useHistory();
 
   const setIsOpen = useCallback(
     (value: boolean) => {
@@ -77,7 +80,8 @@ const ProfileStateModal = () => {
   useEffect(() => {
     if (
       !currentProfile?.identity?.creationStatus ||
-      !currentProfile?.identity.createdAtUTC
+      !currentProfile?.identity.createdAtUTC ||
+      history.location.pathname.includes(RoutePath.PROFILE_SETUP)
     ) {
       setIsOpen(false);
       return;
@@ -121,12 +125,13 @@ const ProfileStateModal = () => {
 
     getDetails();
   }, [
-    currentProfile?.identity?.creationStatus,
-    currentProfile?.identity?.groupMemberPre,
-    currentProfile?.identity?.createdAtUTC,
+    currentProfile?.identity.creationStatus,
+    currentProfile?.identity.groupMemberPre,
+    currentProfile?.identity.createdAtUTC,
     dispatch,
     getDetails,
     setIsOpen,
+    history.location.pathname,
   ]);
 
   const type = useMemo(() => {
@@ -240,10 +245,12 @@ const ProfileStateModal = () => {
         setVerifyIsOpen={setVerifyIsOpen}
         onVerify={handleDelete}
       />
-      <Profiles
-        isOpen={isOpenProfiles}
-        setIsOpen={setOpenProfiles}
-      />
+      {isOpenProfiles && (
+        <Profiles
+          isOpen={isOpenProfiles}
+          setIsOpen={setOpenProfiles}
+        />
+      )}
     </>
   );
 };

@@ -47,6 +47,7 @@ import "./App.scss";
 import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
 import { getShowProfileState } from "../store/reducers/profileCache";
+import { ProfileStateModal } from "./components/ProfileStateModal";
 
 setupIonicReact();
 
@@ -100,6 +101,7 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
             >
               <Routes />
             </div>
+            <ProfileStateModal />
             <LockPage />
           </IonReactRouter>
           <AppOffline />

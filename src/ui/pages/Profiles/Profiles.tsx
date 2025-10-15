@@ -168,6 +168,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       >
         <ScrollablePageLayout
           pageId={componentId}
+          activeStatus={isOpen}
           header={
             <PageHeader
               closeButton={true}

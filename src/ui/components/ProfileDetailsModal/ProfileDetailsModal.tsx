@@ -34,19 +34,16 @@ import { Verification } from "../Verification";
 import { ProfileContent } from "./components/ProfileContent";
 import { RotateKeyModal } from "./components/RotateKeyModal";
 import "./ProfileDetailsModal.scss";
-import {
-  IdentifierDetailModalProps,
-  ProfileDetailsModalProps,
-} from "./ProfileDetailsModal.types";
+import { IdentifierDetailModalProps } from "./ProfileDetailsModal.types";
 
-const ProfileDetailsModule = ({
+const ProfileDetailsModal = ({
   profileId,
-  onClose: handleDone,
   pageId,
-  hardwareBackButtonConfig,
   restrictedOptions,
   showProfiles,
-}: ProfileDetailsModalProps) => {
+  isOpen,
+  setIsOpen,
+}: IdentifierDetailModalProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
   const biometrics = useAppSelector(getBiometricsCache);
@@ -62,9 +59,13 @@ const ProfileDetailsModule = ({
   const { setRecentProfileAsDefault, defaultProfile, defaultName } =
     useProfile();
 
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
   const fetchOobi = useCallback(async () => {
     try {
-      if (!profile?.id) return;
+      if (!profile?.id || !isOpen) return;
 
       const oobiValue = await Agent.agent.connections.getOobi(`${profile.id}`, {
         alias: profile.displayName,
@@ -75,10 +76,10 @@ const ProfileDetailsModule = ({
     } catch (e) {
       showError("Unable to fetch oobi", e, dispatch);
     }
-  }, [profile?.id, profile?.displayName, dispatch]);
+  }, [profile?.id, profile?.displayName, dispatch, isOpen]);
 
   const getDetails = useCallback(async () => {
-    if (!profileId) return;
+    if (!profileId || !isOpen) return;
 
     try {
       const cardDetailsResult = await Agent.agent.identifiers.getIdentifier(
@@ -93,11 +94,11 @@ const ProfileDetailsModule = ({
         showProfiles?.(false);
         setCloudError(true);
       } else {
-        handleDone?.(false);
+        handleClose();
         showError("Unable to get identifier details", error, dispatch);
       }
     }
-  }, [profileId, handleDone, dispatch]);
+  }, [profileId, dispatch, isOpen]);
 
   useOnlineStatusEffect(getDetails);
   useOnlineStatusEffect(fetchOobi);
@@ -107,7 +108,7 @@ const ProfileDetailsModule = ({
   });
 
   const handleDelete = async () => {
-    handleDone?.(false);
+    handleClose();
     setHidden(true);
 
     try {
@@ -159,75 +160,91 @@ const ProfileDetailsModule = ({
     setOpenRotateKeyModal(true);
   }, []);
 
+  const hardwareBackButtonConfig = useMemo(
+    () => ({
+      prevent: false,
+      priority: BackEventPriorityType.Modal,
+    }),
+    []
+  );
+
   const pageClasses = combineClassNames("profile-details-module", {
     "ion-hide": hidden,
   });
 
   return (
     <>
-      {cloudError ? (
-        <CloudError
-          pageId={pageId}
-          header={
-            <PageHeader
-              title={defaultName}
-              additionalButtons={
-                <Avatar
-                  id={defaultProfile?.identity.id || ""}
-                  handleAvatarClick={() => showProfiles?.(true)}
-                />
-              }
-            />
-          }
-          content={`${i18n.t(
-            "profiledetails.loadprofileerror.missingoncloud"
-          )}`}
-        >
-          <PageFooter
+      <SideSlider
+        isOpen={isOpen}
+        renderAsModal
+      >
+        {cloudError ? (
+          <CloudError
             pageId={pageId}
-            deleteButtonText={`${i18n.t("profiledetails.delete.button")}`}
-            deleteButtonAction={deleteButtonAction}
-          />
-        </CloudError>
-      ) : (
-        <ScrollablePageLayout
-          pageId={pageId}
-          customClass={pageClasses}
-          header={
-            <PageHeader
-              backButton={true}
-              onBack={handleDone}
-              title={profile?.displayName}
-              hardwareBackButtonConfig={hardwareBackButtonConfig}
-            />
-          }
-        >
-          {profile ? (
-            <div className="card-details-content">
-              <ProfileContent
-                onRotateKey={openRotateModal}
-                cardData={profile as IdentifierDetailsCore}
-                oobi={oobi}
-                setCardData={setProfile}
+            header={
+              <PageHeader
+                title={defaultName}
+                additionalButtons={
+                  <Avatar
+                    id={defaultProfile?.identity.id || ""}
+                    handleAvatarClick={() => showProfiles?.(true)}
+                  />
+                }
               />
-              {!restrictedOptions && (
-                <PageFooter
-                  pageId={pageId}
-                  deleteButtonText={`${i18n.t("profiledetails.delete.button")}`}
-                  deleteButtonAction={deleteButtonAction}
+            }
+            content={`${i18n.t(
+              "profiledetails.loadprofileerror.missingoncloud"
+            )}`}
+          >
+            <PageFooter
+              pageId={pageId}
+              deleteButtonText={`${i18n.t("profiledetails.delete.button")}`}
+              deleteButtonAction={deleteButtonAction}
+            />
+          </CloudError>
+        ) : (
+          <ScrollablePageLayout
+            pageId={pageId}
+            customClass={pageClasses}
+            activeStatus={isOpen}
+            header={
+              <PageHeader
+                backButton={true}
+                onBack={handleClose}
+                title={profile?.displayName}
+                hardwareBackButtonConfig={hardwareBackButtonConfig}
+              />
+            }
+          >
+            {profile ? (
+              <div className="card-details-content">
+                <ProfileContent
+                  onRotateKey={openRotateModal}
+                  cardData={profile as IdentifierDetailsCore}
+                  oobi={oobi}
+                  setCardData={setProfile}
                 />
-              )}
-            </div>
-          ) : (
-            <div
-              className="identifier-card-detail-spinner-container"
-              data-testid="identifier-card-detail-spinner-container"
-            >
-              <IonSpinner name="circular" />
-            </div>
-          )}
-        </ScrollablePageLayout>
-      )}
+                {!restrictedOptions && (
+                  <PageFooter
+                    pageId={pageId}
+                    deleteButtonText={`${i18n.t(
+                      "profiledetails.delete.button"
+                    )}`}
+                    deleteButtonAction={deleteButtonAction}
+                  />
+                )}
+              </div>
+            ) : (
+              <div
+                className="identifier-card-detail-spinner-container"
+                data-testid="identifier-card-detail-spinner-container"
+              >
+                <IonSpinner name="circular" />
+              </div>
+            )}
+          </ScrollablePageLayout>
+        )}
+      </SideSlider>
       <Alert
         isOpen={alertIsOpen}
         setIsOpen={setAlertIsOpen}
@@ -258,44 +275,6 @@ const ProfileDetailsModule = ({
         onVerify={handleDelete}
       />
     </>
-  );
-};
-
-const ProfileDetailsModal = ({
-  isOpen,
-  setIsOpen,
-  onClose,
-  ...props
-}: IdentifierDetailModalProps) => {
-  const handleClose = useCallback(() => {
-    setIsOpen(false);
-  }, [setIsOpen]);
-
-  const handleBack = useCallback(() => {
-    handleClose();
-    onClose?.();
-  }, [handleClose, onClose]);
-
-  const hardwareBackButtonConfig = useMemo(
-    () => ({
-      prevent: false,
-      priority: BackEventPriorityType.Modal,
-    }),
-    []
-  );
-
-  return (
-    <SideSlider
-      isOpen={isOpen}
-      renderAsModal
-    >
-      <ProfileDetailsModule
-        {...props}
-        onClose={handleBack}
-        hardwareBackButtonConfig={hardwareBackButtonConfig}
-        restrictedOptions={props.restrictedOptions}
-      />
-    </SideSlider>
   );
 };
 
