@@ -1,12 +1,29 @@
+import { IonReactMemoryRouter } from "@ionic/react-router";
 import { render } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
-import { IonReactMemoryRouter } from "@ionic/react-router";
-import { TabsMenu, TabsRoutePath, tabsRoutes } from "./TabsMenu";
-import { notificationsFix } from "../../../__fixtures__/notificationsFix";
-import { makeTestStore } from "../../../utils/makeTestStore";
-import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { filteredIdentifierFix } from "../../../__fixtures__/filteredIdentifierFix";
+import { notificationsFix } from "../../../__fixtures__/notificationsFix";
+import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
+import { makeTestStore } from "../../../utils/makeTestStore";
+import { TabsMenu, TabsRoutePath, tabsRoutes } from "./TabsMenu";
+
+jest.mock("../../../../core/agent/agent", () => ({
+  Agent: {
+    MISSING_DATA_ON_KERIA: "MISSING_DATA_ON_KERIA",
+    agent: {
+      identifiers: {
+        getIdentifier: jest.fn(),
+      },
+    },
+  },
+}));
+
+jest.mock("@ionic/react", () => ({
+  ...jest.requireActual("@ionic/react"),
+  IonModal: ({ children, isOpen, ...props }: any) =>
+    isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
+}));
 
 describe("Tab menu", () => {
   const initialState = {

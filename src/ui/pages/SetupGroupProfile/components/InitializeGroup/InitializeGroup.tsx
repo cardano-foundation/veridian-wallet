@@ -99,7 +99,12 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       return;
     } else {
       setLoading(true);
+
       try {
+        if (!state.signer.recoverySigners || !state.signer.requiredSigners) {
+          throw new Error("Invalid threshold value");
+        }
+
         const mutilsigId = await Agent.agent.multiSigs.createGroup(
           ourIdentifier,
           state.selectedConnections as MultisigConnectionDetails[],

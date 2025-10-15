@@ -38,7 +38,7 @@ import MyFamilyPortal from "../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../assets/images/socialbook.svg";
 import Mary from "../../../assets/images/Mary.jpg";
 import Oliver from "../../../assets/images/Oliver.jpg";
-import VitalRecordsAdmin from "../../../assets/images/vital-records-admin.png";
+import StateOfUtah from "../../../assets/images/state-of-utah.png";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
 const DOCUMENTATION_LINK = "https://secure.utah.gov/vitalrecords/index.html";
@@ -123,7 +123,7 @@ const Issuer = ({
     }
 
     if (connectionShortDetails?.label === "State of Utah") {
-      return VitalRecordsAdmin;
+      return StateOfUtah;
     }
     return connectionShortDetails?.logo;
   })();

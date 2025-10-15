@@ -614,7 +614,15 @@
         "confirm": "Confirm"
       }
     },
-    "clouderror": "We couldn’t locate this profile in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this profile, tap “Delete profile” to remove it.",
+    "loadprofileerror": {
+      "pending": "Your profile is pending and may still complete. If you no longer require this profile, tap “Delete profile” to remove it.",
+      "missingoncloud": "We couldn’t locate this profile in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this profile, tap “Delete profile” to remove it.",
+      "nowitness": "There was an issue creating this profile. Please contact your cloud provider for more information. To remove it from your pending list, tap “Delete profile”.",
+      "button": {
+        "delete": "Delete Profile",
+        "retry": "Retry"
+      }
+    },
     "detailsmodal": {
       "you": "You",
       "button": {

@@ -46,14 +46,100 @@ import "./styles/style.scss";
 import "./App.scss";
 import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
+import { getShowProfileState } from "../store/reducers/profileCache";
+import { ProfileStateModal } from "./components/ProfileStateModal";
 
 setupIonicReact();
 
-const App = () => {
+const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
+  const [showScan, setShowScan] = useState(false);
+  const currentOperation = useAppSelector(getCurrentOperation);
+  const showProfileState = useAppSelector(getShowProfileState);
+
+  useEffect(() => {
+    setShowScan(
+      [
+        OperationType.SCAN_CONNECTION,
+        OperationType.SCAN_WALLET_CONNECTION,
+        OperationType.SCAN_SSI_BOOT_URL,
+        OperationType.SCAN_SSI_CONNECT_URL,
+      ].includes(currentOperation)
+    );
+  }, [currentOperation]);
+
+  switch (initPhase) {
+    case InitializationPhase.PHASE_ZERO:
+      return <LoadingPage />;
+    case InitializationPhase.PHASE_ONE:
+      return (
+        <>
+          <LoadingPage type={LoadingType.Splash} />
+          <LockPage />
+        </>
+      );
+    case InitializationPhase.PHASE_TWO:
+      return (
+        <>
+          <IonReactRouter>
+            {showScan ? (
+              <FullPageScanner
+                showScan={showScan}
+                setShowScan={setShowScan}
+              />
+            ) : (
+              <div
+                className="app-spinner-container"
+                data-testid="app-spinner-container"
+              >
+                <IonSpinner name="circular" />
+              </div>
+            )}
+            <div
+              className={`app-router ${
+                showScan || showProfileState ? "ion-hide" : ""
+              }`}
+            >
+              <Routes />
+            </div>
+            <ProfileStateModal />
+            <LockPage />
+          </IonReactRouter>
+          <AppOffline />
+        </>
+      );
+  }
+};
+
+const AppContent = ({
+  isFreeRASPInitialized,
+}: {
+  isFreeRASPInitialized: boolean;
+}) => {
   const initializationPhase = useAppSelector(getInitializationPhase);
   const globalLoading = useAppSelector(getGlobalLoading);
-  const currentOperation = useAppSelector(getCurrentOperation);
-  const [showScan, setShowScan] = useState(false);
+
+  if (Capacitor.isNativePlatform() && !isFreeRASPInitialized) {
+    return <LoadingPage />;
+  }
+
+  return (
+    <>
+      <AppWrapper>
+        <StrictMode>
+          <InitPhase initPhase={initializationPhase} />
+          <InputRequest />
+          <SidePage />
+          <GenericError />
+          <NoWitnessAlert />
+          <ToastStack />
+          {globalLoading && <LoadingPage fullPage />}
+        </StrictMode>
+      </AppWrapper>
+    </>
+  );
+};
+
+const App = () => {
   const [isCompatible, setIsCompatible] = useState(true);
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [isFreeRASPInitialized, setIsFreeRASPInitialized] = useState(false);
@@ -110,17 +196,6 @@ const App = () => {
       window.removeEventListener("error", handleUnknownError);
     };
   }, [dispatch]);
-
-  useEffect(() => {
-    setShowScan(
-      [
-        OperationType.SCAN_CONNECTION,
-        OperationType.SCAN_WALLET_CONNECTION,
-        OperationType.SCAN_SSI_BOOT_URL,
-        OperationType.SCAN_SSI_CONNECT_URL,
-      ].includes(currentOperation)
-    );
-  }, [currentOperation]);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
@@ -206,67 +281,6 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  const renderContentByInitPhase = (initPhase: InitializationPhase) => {
-    switch (initPhase) {
-      case InitializationPhase.PHASE_ZERO:
-        return <LoadingPage />;
-      case InitializationPhase.PHASE_ONE:
-        return (
-          <>
-            <LoadingPage type={LoadingType.Splash} />
-            <LockPage />
-          </>
-        );
-      case InitializationPhase.PHASE_TWO:
-        return (
-          <>
-            <IonReactRouter>
-              {showScan ? (
-                <FullPageScanner
-                  showScan={showScan}
-                  setShowScan={setShowScan}
-                />
-              ) : (
-                <div
-                  className="app-spinner-container"
-                  data-testid="app-spinner-container"
-                >
-                  <IonSpinner name="circular" />
-                </div>
-              )}
-              <div className={`app-router ${showScan ? "ion-hide" : ""}`}>
-                <Routes />
-              </div>
-              <LockPage />
-            </IonReactRouter>
-            <AppOffline />
-          </>
-        );
-    }
-  };
-
-  const renderApp = () => {
-    if (Capacitor.isNativePlatform() && !isFreeRASPInitialized) {
-      return <LoadingPage />;
-    }
-
-    return (
-      <>
-        <AppWrapper>
-          <StrictMode>
-            {renderContentByInitPhase(initializationPhase)}
-            <InputRequest />
-            <SidePage />
-            <GenericError />
-            <NoWitnessAlert />
-            <ToastStack />
-            {globalLoading && <LoadingPage fullPage />}
-          </StrictMode>
-        </AppWrapper>
-      </>
-    );
-  };
-
   if (!isCompatible) {
     return <SystemCompatibilityAlert deviceInfo={deviceInfo} />;
   }
@@ -283,7 +297,11 @@ const App = () => {
     );
   }
 
-  return <IonApp>{renderApp()}</IonApp>;
+  return (
+    <IonApp>
+      <AppContent isFreeRASPInitialized={isFreeRASPInitialized} />
+    </IonApp>
+  );
 };
 
 export { App };

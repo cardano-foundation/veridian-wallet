@@ -85,7 +85,6 @@ const filteredIdentifierFix: IdentifierShortDetails[] = [
     createdAtUTC: "2024-03-07T11:54:56.886Z",
     theme: 0,
     creationStatus: CreationStatus.PENDING,
-    groupMemberPre: "123",
   },
   {
     displayName: "GID 1",

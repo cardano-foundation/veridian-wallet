@@ -7,6 +7,8 @@ interface ProfileDetailsModalProps {
   onConnectionComplete?: () => void;
   hardwareBackButtonConfig?: HardwareBackButtonConfig;
   restrictedOptions?: boolean;
+  showProfiles?: (value: boolean) => void;
+  isOpen: boolean;
 }
 
 interface ProfileDetailsModuleProps extends ProfileDetailsModalProps {
@@ -22,7 +24,6 @@ interface ProfileDetailsModuleProps extends ProfileDetailsModalProps {
 
 interface IdentifierDetailModalProps
   extends Omit<ProfileDetailsModalProps, "navAnimation"> {
-  isOpen: boolean;
   setIsOpen: (value: boolean) => void;
 }
 
@@ -51,11 +52,11 @@ const MODAL_STATES = {
 
 type ModalState = (typeof MODAL_STATES)[keyof typeof MODAL_STATES];
 
-export { QR_CODE_TYPES, ERROR_MESSAGES, MODAL_STATES };
+export { ERROR_MESSAGES, MODAL_STATES, QR_CODE_TYPES };
 
 export type {
   IdentifierDetailModalProps,
+  ModalState,
   ProfileDetailsModalProps,
   ProfileDetailsModuleProps,
-  ModalState,
 };

@@ -6,7 +6,7 @@ import MyFamilyPortal from "../../../assets/images/myfamily-portal.svg";
 import Socialbook from "../../../assets/images/socialbook.svg";
 import Mary from "../../../assets/images/Mary.jpg";
 import Oliver from "../../../assets/images/Oliver.jpg";
-import VitalRecordsAdmin from "../../../assets/images/vital-records-admin.png";
+import StateOfUtah from "../../../assets/images/state-of-utah.png";
 
 const ConnectionDetailsHeader = ({
   logo,
@@ -68,9 +68,9 @@ const ConnectionDetailsHeader = ({
 
     if (label === "State of Utah") {
       return (
-        <div className="vital-records-admin-logo-container">
+        <div className="state-of-utah-logo-container">
           <img
-            src={VitalRecordsAdmin}
+            src={StateOfUtah}
             alt={label}
             className="card-logo"
             data-testid="card-logo"

@@ -15,6 +15,7 @@ import {
   getProfiles,
   setGroupProfileCache,
   setIndividualFirstCreate,
+  setShowProfileState,
 } from "../../../store/reducers/profileCache";
 import {
   getStateCache,
@@ -254,7 +255,6 @@ export const ProfileSetup = ({
       store: { stateCache },
       state: {
         isSetupProfile: false,
-        isGroup: profileType === ProfileType.Group,
         id,
       },
     });
@@ -269,6 +269,7 @@ export const ProfileSetup = ({
     );
 
     ionRouter.push(nextPath.pathname);
+    dispatch(setShowProfileState(true));
   };
 
   const handleOpenScan = () => {
@@ -483,6 +484,7 @@ export const ProfileSetup = ({
         <ResponsivePageLayout
           pageId={pageId}
           customClass={"scan"}
+          activeStatus={isScanOpen}
           header={
             <PageHeader
               closeButton={!!back}
@@ -507,6 +509,7 @@ export const ProfileSetup = ({
         <ResponsivePageLayout
           pageId={pageId}
           customClass={step}
+          activeStatus={true}
           header={
             step !== SetupProfileStep.FinishSetup ? (
               <PageHeader

@@ -1,7 +1,9 @@
 .cloud-error {
   .responsive-page-content {
     .info-card {
-      margin-top: 1.5rem;
+      p {
+        white-space: pre-line;
+      }
     }
 
     .page-footer {

@@ -1,20 +1,30 @@
+import { IonReactMemoryRouter } from "@ionic/react-router";
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  getDefaultNormalizer,
+  render,
+  waitFor,
+} from "@testing-library/react";
+import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
+import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { setCredsCache } from "../../../store/reducers/profileCache";
 import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { setCredentialsFilters } from "../../../store/reducers/viewTypeCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
-import { pendingCredFixs } from "../../__fixtures__/credsFix";
 import {
   filteredCredsFix,
   pendingCredFix,
 } from "../../__fixtures__/filteredCredsFix";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import {
+  failedFilteredIdentifierMapFix,
+  filteredIdentifierFix,
+} from "../../__fixtures__/filteredIdentifierFix";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
@@ -26,6 +36,7 @@ const archiveIdentifierMock = jest.fn();
 const markCredentialPendingDeletionMock = jest.fn();
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
+    MISSING_DATA_ON_KERIA: "MISSING_DATA_ON_KERIA",
     agent: {
       credentials: {
         getCredentialDetailsById: jest.fn(),
@@ -34,6 +45,9 @@ jest.mock("../../../core/agent/agent", () => ({
         getCredentials: jest.fn(() => Promise.resolve([])),
         markCredentialPendingDeletion: () =>
           markCredentialPendingDeletionMock(),
+      },
+      identifiers: {
+        getIdentifier: jest.fn(),
       },
       basicStorage: {
         findById: jest.fn(),
@@ -53,7 +67,7 @@ jest.mock("@ionic/react", () => ({
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
 }));
 
-const initialStateEmpty = {
+const initialStatePendingEmpty = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
@@ -83,22 +97,43 @@ const initialStateEmpty = {
   },
 };
 
-const initialStateFull = {
+const initialStateEmpty = {
   stateCache: {
     routes: [TabsRoutePath.CREDENTIALS],
     authentication: {
-      defaultProfile: filteredIdentifierFix[0].id,
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
     },
-    currentProfile: {
-      identity: filteredIdentifierFix[0],
-      connections: [],
-      multisigConnections: [],
-      peerConnections: [],
-      credentials: [],
-      archivedCredentials: [],
+    isOnline: true,
+  },
+  seedPhraseCache: {},
+  profilesCache: {
+    ...profileCacheFixData,
+    defaultProfile: filteredIdentifierFix[1].id,
+  },
+  viewTypeCache: {
+    identifier: {
+      viewType: null,
+      favouriteIndex: 0,
+    },
+    credential: {
+      viewType: null,
+      favouriteIndex: 0,
+    },
+  },
+  biometricsCache: {
+    enabled: false,
+  },
+};
+
+const initialStateFull = {
+  stateCache: {
+    routes: [TabsRoutePath.CREDENTIALS],
+    authentication: {
+      loggedIn: true,
+      time: Date.now(),
+      passcodeIsSet: true,
     },
   },
   seedPhraseCache: {},
@@ -185,6 +220,9 @@ describe("Creds Tab", () => {
     };
   });
 
+  const history = createMemoryHistory();
+  history.push(TabsRoutePath.CREDENTIALS);
+
   it("Renders favourites in Creds", async () => {
     const storeMocked = {
       ...makeTestStore(initialStateFull),
@@ -211,15 +249,18 @@ describe("Creds Tab", () => {
 
   test("Renders Creds Tab", async () => {
     const storeMocked = {
-      ...makeTestStore(initialStateEmpty),
+      ...makeTestStore(initialStatePendingEmpty),
       dispatch: dispatchMock,
     };
     const { getByText, getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
+      <IonReactMemoryRouter
+        history={history}
+        initialEntries={[TabsRoutePath.CREDENTIALS]}
+      >
         <Provider store={storeMocked}>
           <Credentials />
         </Provider>
-      </MemoryRouter>
+      </IonReactMemoryRouter>
     );
 
     expect(getByTestId("credentials-tab")).toBeInTheDocument();
@@ -237,12 +278,16 @@ describe("Creds Tab", () => {
       dispatch: dispatchMock,
     };
     const { getByText, getByTestId } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
+      <IonReactMemoryRouter
+        history={history}
+        initialEntries={[TabsRoutePath.CREDENTIALS]}
+      >
         <Provider store={storeMocked}>
           <Credentials />
         </Provider>
-      </MemoryRouter>
+      </IonReactMemoryRouter>
     );
+
     await waitFor(() => {
       expect(
         getByTestId("archive-button-container").classList.contains("hidden")
@@ -262,15 +307,18 @@ describe("Creds Tab", () => {
 
   test("Renders Creds Card placeholder", async () => {
     const storeMocked = {
-      ...makeTestStore(initialStateEmpty),
+      ...makeTestStore(initialStatePendingEmpty),
       dispatch: dispatchMock,
     };
     const { getByTestId, getByText } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
+      <IonReactMemoryRouter
+        history={history}
+        initialEntries={[TabsRoutePath.CREDENTIALS]}
+      >
         <Provider store={storeMocked}>
           <Credentials />
         </Provider>
-      </MemoryRouter>
+      </IonReactMemoryRouter>
     );
     await waitFor(() => {
       expect(
@@ -340,15 +388,18 @@ describe("Creds Tab", () => {
   });
 
   test("Toggle Creds Filters show Individual", async () => {
-    const store = makeTestStore(initialStateEmpty);
+    const store = makeTestStore(initialStatePendingEmpty);
     store.dispatch(setCredsCache([filteredCredsFix[0]]));
 
     const { getByTestId, getByText, queryByText } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
+      <IonReactMemoryRouter
+        history={history}
+        initialEntries={[TabsRoutePath.CREDENTIALS]}
+      >
         <Provider store={store}>
           <Credentials />
         </Provider>
-      </MemoryRouter>
+      </IonReactMemoryRouter>
     );
     await waitFor(() => {
       expect(

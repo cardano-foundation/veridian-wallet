@@ -23,6 +23,7 @@ const CustomInput = ({
   className,
   labelAction,
   endAction,
+  inputMode,
   type = "text",
 }: CustomInputProps) => {
   const [hidden, setHidden] = useState(hiddenInput);
@@ -88,6 +89,7 @@ const CustomInput = ({
           onIonBlur={() => handleFocus(false)}
           onKeyDown={hideKeyboard}
           value={value}
+          inputMode={inputMode}
         />
         {hiddenInput && (
           <IonButton

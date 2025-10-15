@@ -6,7 +6,6 @@ import {
   getDefaultNormalizer,
   render,
   waitFor,
-  findByTestId,
 } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -16,10 +15,7 @@ import { ConfigurationService } from "../../../core/configuration";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { updateRecentProfiles } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
-import {
-  filteredIdentifierFix,
-  filteredIdentifierMapFix,
-} from "../../__fixtures__/filteredIdentifierFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { ToastMsgType } from "../../globals/types";
@@ -31,7 +27,6 @@ import {
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { TabsRoutePath } from "../navigation/TabsMenu";
-import { AccordionKey } from "./components/IdentifierAttributeDetailModal/IdentifierAttributeDetailModal.types";
 import { ProfileDetailsModal } from "./ProfileDetailsModal";
 
 Object.defineProperty(window, "matchMedia", {
@@ -201,10 +196,10 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -243,10 +238,10 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -287,10 +282,10 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -321,10 +316,10 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -355,10 +350,10 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -407,10 +402,10 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -459,10 +454,10 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -483,10 +478,10 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -534,10 +529,10 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -635,11 +630,11 @@ describe("Individual profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
           restrictedOptions={true}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -800,10 +795,10 @@ describe("Group profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -859,10 +854,10 @@ describe("Group profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -906,10 +901,10 @@ describe("Group profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -949,10 +944,10 @@ describe("Group profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1020,10 +1015,10 @@ describe("Group profile details page", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1086,10 +1081,10 @@ describe("Checking the profile details page when information is missing from the
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1099,9 +1094,12 @@ describe("Checking the profile details page when information is missing from the
       ).toBeVisible();
 
       expect(
-        getByText(EN_TRANSLATIONS.profiledetails.clouderror, {
-          normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
-        })
+        getByText(
+          EN_TRANSLATIONS.profiledetails.loadprofileerror.missingoncloud,
+          {
+            normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+          }
+        )
       ).toBeVisible();
     });
 
@@ -1170,10 +1168,10 @@ describe("Set default profile when delete profile", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId={filteredIdentifierFix[0].id}
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1259,10 +1257,10 @@ describe("Set default profile when delete profile", () => {
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
           profileId={filteredIdentifierFix[0].id}
-          onClose={jest.fn()}
           pageId={pageId}
           isOpen
           setIsOpen={jest.fn}
+          showProfiles={jest.fn}
         />
       </Provider>
     );
@@ -1352,10 +1350,10 @@ describe("Set default profile when delete profile", () => {
         <Provider store={storeMockedAidKeri}>
           <ProfileDetailsModal
             profileId={filteredIdentifierFix[0].id}
-            onClose={jest.fn()}
             pageId={pageId}
             isOpen
             setIsOpen={jest.fn}
+            showProfiles={jest.fn}
           />
         </Provider>
       );
