@@ -1,6 +1,6 @@
 import { IonSpinner, useIonViewWillEnter } from "@ionic/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { syncOutline } from "ionicons/icons";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { IdentifierDetails as IdentifierDetailsCore } from "../../../core/agent/services/identifier.types";
@@ -27,28 +27,28 @@ import { combineClassNames } from "../../utils/style";
 import { Alert } from "../Alert";
 import { Avatar } from "../Avatar";
 import { CloudError } from "../CloudError";
+import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import { PageFooter } from "../PageFooter";
 import { PageHeader } from "../PageHeader";
+import { Scan } from "../Scan";
+import { useCameraDirection } from "../Scan/hook/useCameraDirection";
+import { ScanRef } from "../Scan/Scan.types";
 import { SideSlider } from "../SideSlider";
 import { Verification } from "../Verification";
+import { IncomingRequest } from "./components/IncomingRequest";
 import { ProfileContent } from "./components/ProfileContent";
 import { RotateKeyModal } from "./components/RotateKeyModal";
+import { handleConnect } from "./handleConnect";
 import "./ProfileDetailsModal.scss";
 import {
-  IdentifierDetailModalProps,
-  ProfileDetailsModuleProps,
-  QR_CODE_TYPES,
   ERROR_MESSAGES,
+  IdentifierDetailModalProps,
   MODAL_STATES,
   ModalState,
+  ProfileDetailsModuleProps,
+  QR_CODE_TYPES,
 } from "./ProfileDetailsModal.types";
-import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
-import { ScanRef } from "../Scan/Scan.types";
-import { useCameraDirection } from "../Scan/hook/useCameraDirection";
-import { Scan } from "../Scan";
-import { handleConnect } from "./handleConnect";
-import { IncomingRequest } from "./components/IncomingRequest";
 
 const DELAY_TO_CLOSE_MODAL = 300;
 
@@ -56,6 +56,7 @@ const useProfileData = (
   profileId: string | undefined,
   handleDone: ((success: boolean) => void) | undefined,
   dispatch: any,
+  isOpen: boolean,
   showProfiles?: (value: boolean) => void
 ) => {
   const [profile, setProfile] = useState<IdentifierDetailsCore | undefined>();
@@ -64,7 +65,7 @@ const useProfileData = (
 
   const fetchOobi = useCallback(async () => {
     try {
-      if (!profile?.id) return;
+      if (!profile?.id || !isOpen) return;
 
       const oobiValue = await Agent.agent.connections.getOobi(`${profile.id}`, {
         alias: profile.displayName,
@@ -75,10 +76,10 @@ const useProfileData = (
     } catch (e) {
       showError(ERROR_MESSAGES.UNABLE_TO_FETCH_OOBI, e, dispatch);
     }
-  }, [profile?.id, profile?.displayName, dispatch]);
+  }, [profile?.id, profile?.displayName, dispatch, isOpen]);
 
   const getDetails = useCallback(async () => {
-    if (!profileId) return;
+    if (!profileId || !isOpen) return;
 
     try {
       const cardDetailsResult = await Agent.agent.identifiers.getIdentifier(
@@ -204,6 +205,7 @@ const ProfileDetailsModule = ({
   restrictedOptions,
   confirmConnection,
   scannedValue,
+  isOpen,
   onScanFinish,
   onConnectionComplete,
   beforeConnectionComplete,
@@ -224,6 +226,7 @@ const ProfileDetailsModule = ({
     profileId,
     handleDone,
     dispatch,
+    isOpen,
     showProfiles
   );
 
@@ -332,6 +335,7 @@ const ProfileDetailsModule = ({
               <ResponsivePageLayout
                 pageId={pageId}
                 customClass={"scan"}
+                activeStatus={isOpen}
                 header={
                   <PageHeader
                     closeButton={true}
@@ -393,6 +397,7 @@ const ProfileDetailsModule = ({
               <ScrollablePageLayout
                 pageId={pageId}
                 customClass={pageClasses}
+                activeStatus={isOpen}
                 header={
                   <PageHeader
                     backButton={true}
@@ -567,6 +572,7 @@ const ProfileDetailsModal = ({
           {...props}
           onClose={handleBack}
           setIsOpen={setIsOpen}
+          isOpen={isOpen}
           hardwareBackButtonConfig={hardwareBackButtonConfig}
           restrictedOptions={props.restrictedOptions}
           setShowConfirmation={setShowConfirmation}
