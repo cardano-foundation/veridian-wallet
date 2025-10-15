@@ -30,17 +30,16 @@ import { CardBlock, FlatBorderType } from "../../CardDetails/CardDetailsBlock";
 import { CardDetailsItem } from "../../CardDetails/CardDetailsItem";
 import { ConnectdApp } from "../../ConnectdApp";
 import { EditProfile } from "../../EditProfile";
-import { ListHeader } from "../../ListHeader";
-import { ShareConnection } from "../../ShareConnection";
 import { ListCard } from "../../ListCard/ListCard";
 import { ListItem } from "../../ListCard/ListItem";
+import { ListHeader } from "../../ListHeader";
+import { ShareConnection } from "../../ShareConnection";
 import { IdentifierAttributeDetailModal } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal";
 import { DetailView } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal.types";
 import {
   ProfileContentProps,
   ProfileInformationProps,
 } from "./ProfileContent.types";
-import { combineClassNames } from "../../../utils/style";
 
 const DISPLAY_MEMBERS = 3;
 
@@ -148,30 +147,29 @@ const ProfileContent = ({
         </IonGrid>
       </div>
       <div className="profile-details-split-section actions">
-        {!isMultiSig && (
-          <IonButton
-            expand="block"
-            shape="round"
-            className="profile-button"
-            onClick={openEditModal}
-            data-testid="edit-button"
-          >
-            <IonIcon
-              slot="icon-only"
-              size="small"
-              icon={pencilOutline}
-              color="primary"
-            />
-            <span>{i18n.t("profiledetails.options.edit")}</span>
-          </IonButton>
-        )}
         <IonButton
           expand="block"
           shape="round"
-          className={combineClassNames(
-            "profile-button",
-            isMultiSig ? "full-width" : ""
-          )}
+          className="profile-button"
+          onClick={openEditModal}
+          data-testid="edit-button"
+        >
+          <IonIcon
+            slot="icon-only"
+            size="small"
+            icon={pencilOutline}
+            color="primary"
+          />
+          <span>
+            {isMultiSig
+              ? i18n.t("profiledetails.options.editGroup")
+              : i18n.t("profiledetails.options.edit")}
+          </span>
+        </IonButton>
+        <IonButton
+          expand="block"
+          shape="round"
+          className="profile-button"
           onClick={openShareModal}
           data-testid="share-button"
         >
