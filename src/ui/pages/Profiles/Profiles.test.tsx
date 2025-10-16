@@ -83,7 +83,7 @@ describe("Profiles", () => {
 
   test("Render profile", async () => {
     const setIsOpenMock = jest.fn();
-    const { getByText } = render(
+    const { getByText, getAllByText } = render(
       <Provider store={storeMocked}>
         <Profiles
           isOpen
@@ -96,7 +96,9 @@ describe("Profiles", () => {
       expect(getByText(EN_TRANSLATIONS.profiles.title)).toBeInTheDocument();
     });
 
-    expect(getByText(EN_TRANSLATIONS.profiles.cancel)).toBeInTheDocument();
+    expect(
+      getAllByText(EN_TRANSLATIONS.profiles.cancel)[0]
+    ).toBeInTheDocument();
     expect(getByText(EN_TRANSLATIONS.profiles.options.add)).toBeInTheDocument();
     expect(
       getByText(EN_TRANSLATIONS.profiles.options.join)
@@ -108,7 +110,7 @@ describe("Profiles", () => {
       getByText(EN_TRANSLATIONS.profiles.options.settings)
     ).toBeInTheDocument();
 
-    fireEvent.click(getByText(EN_TRANSLATIONS.profiles.cancel));
+    fireEvent.click(getAllByText(EN_TRANSLATIONS.profiles.cancel)[0]);
 
     await waitFor(() => {
       expect(setIsOpenMock).toBeCalled();

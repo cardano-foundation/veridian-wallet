@@ -189,7 +189,6 @@ const ProfileStateModal = () => {
       <IonModal
         className="profile-state-modal"
         isOpen={isOpen}
-        onDidDismiss={() => setIsOpen(false)}
         animated={false}
       >
         <ResponsivePageLayout
@@ -214,7 +213,7 @@ const ProfileStateModal = () => {
                 className={type}
                 danger={type === "error"}
                 content={getMessage()}
-                icon={type === "warning" ? warningOutline : ""}
+                icon={type === "warning" ? warningOutline : undefined}
               />
               <PageFooter
                 pageId={pageId}
