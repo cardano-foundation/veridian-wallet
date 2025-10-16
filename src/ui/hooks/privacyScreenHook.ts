@@ -4,8 +4,7 @@ import { useCallback } from "react";
 
 const usePrivacyScreen = () => {
   const enablePrivacy = useCallback(async () => {
-    if (!Capacitor.isNativePlatform()) return;
-    return PrivacyScreen.enable();
+    return;
   }, []);
 
   const disablePrivacy = useCallback(async () => {
