@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CredentialStatus } from "../../../../../core/agent/services/credentialService.types";
 import { i18n } from "../../../../../i18n";
 import ACDCLogo from "../../../../../ui/assets/images/keri-acdc.svg";
-import { formatShortDate } from "../../../../utils/formatters";
+import { ellipsisText, formatShortDate } from "../../../../utils/formatters";
 import { Alert } from "../../../Alert";
 import { useCardOffsetTop } from "../../../IdentifierCardTemplate";
 import { CredentialCardTemplateProps } from "../../CredentialCardTemplate.types";
@@ -42,6 +42,10 @@ const KeriCardTemplate = ({
   };
 
   const connection = connections.find((c) => c.id === cardData.connectionId);
+  const cartType =
+    cardData.credentialType.length <= 32
+      ? cardData.credentialType
+      : ellipsisText(cardData.credentialType, 29);
 
   return (
     <div
@@ -76,9 +80,7 @@ const KeriCardTemplate = ({
               <span>{CredentialStatus.PENDING}</span>
             </IonChip>
           ) : (
-            <span className="credential-type card-text">
-              {cardData.credentialType}
-            </span>
+            <span className="credential-type card-text">{cartType}</span>
           )}
         </div>
         <div className="card-footer">
