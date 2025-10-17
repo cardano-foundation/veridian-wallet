@@ -558,8 +558,11 @@ class IpexCommunicationService extends AgentService {
     let key;
     switch (historyType) {
       case ConnectionHistoryType.CREDENTIAL_REVOKED:
+        if (!message.exn.e.acdc) {
+          throw new Error("CREDENTIAL_REVOKED message must have e.acdc");
+        }
         prefix = KeriaContactKeyPrefix.HISTORY_REVOKE;
-        key = message.exn.e.acdc?.d;
+        key = message.exn.e.acdc.d;
         break;
       case ConnectionHistoryType.CREDENTIAL_ISSUANCE:
       case ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT:
@@ -726,6 +729,8 @@ class IpexCommunicationService extends AgentService {
       throw new Error(IpexCommunicationService.NO_CURRENT_IPEX_MSG_TO_JOIN);
     }
 
+    // Extract grant exn - type is complex nested structure from Signify
+    // @TODO: Improve typing when Signify-TS provides better types for nested exn structures
     const grantExn = multiSigExn.exn.e.exn as unknown as {
       i: string;
       p: string;
