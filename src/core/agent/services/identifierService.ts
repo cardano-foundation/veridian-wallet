@@ -230,6 +230,10 @@ class IdentifierService extends AgentService {
     metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">,
     backgroundTask = false
   ): Promise<CreateIdentifierResult> {
+    if (!this.props.signifyClient.agent) {
+      throw new Error("Agent not initialized");
+    }
+
     const { toad, witnesses } = await this.getAvailableWitnesses();
 
     if (!UI_THEMES.includes(metadata.theme)) {
@@ -303,9 +307,6 @@ class IdentifierService extends AgentService {
       .identifiers()
       .get(identifier)) as HabState;
 
-    if (!this.props.signifyClient.agent) {
-      throw new Error("Agent not initialized");
-    }
     const addRoleOperation = await this.props.signifyClient
       .identifiers()
       .addEndRole(identifier, "agent", this.props.signifyClient.agent.pre);
