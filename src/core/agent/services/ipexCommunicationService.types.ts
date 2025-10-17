@@ -9,6 +9,7 @@ interface CredentialsMatchingApply {
   };
   credentials: {
     connectionId: string;
+    // @TODO: Use narrower ACDC type from Patrick's types for KERIA/Signify when available
     acdc: Record<string, unknown>;
   }[];
   attributes: JSONObject;

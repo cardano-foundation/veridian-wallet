@@ -772,8 +772,12 @@ class IpexCommunicationService extends AgentService {
     notificationSaid: string,
     acdcDetail: CredentialMetadataRecordProps,
     discloseePrefix: string,
-    offerExnToJoin?: { ked: unknown }
+    offerExnToJoin?: unknown
   ): Promise<SubmitIPEXResult> {
+    if (!this.props.signifyClient.manager) {
+      throw new Error("Signify client manager not initialized");
+    }
+
     let exn: Serder;
     let sigsMes: string[];
     let mend: string;
@@ -795,9 +799,6 @@ class IpexCommunicationService extends AgentService {
     if (offerExnToJoin) {
       const [, ked] = Saider.saidify(offerExnToJoin);
       const offer = new Serder(ked);
-      if (!this.props.signifyClient.manager) {
-        throw new Error("Signify client manager not initialized");
-      }
       const keeper = this.props.signifyClient.manager.get(gHab);
       const sigs = await keeper.sign(b(new Serder(offerExnToJoin).raw));
 
@@ -888,6 +889,10 @@ class IpexCommunicationService extends AgentService {
     },
     grantToJoin?: GrantToJoinMultisigExnPayload
   ): Promise<SubmitIPEXResult> {
+    if (!this.props.signifyClient.manager) {
+      throw new Error("Signify client manager not initialized");
+    }
+
     let exn: Serder;
     let sigsMes: string[];
     let mend: string;
@@ -907,9 +912,6 @@ class IpexCommunicationService extends AgentService {
       const { grantExn, atc } = grantToJoin;
       const [, ked] = Saider.saidify(grantExn);
       const grant = new Serder(ked);
-      if (!this.props.signifyClient.manager) {
-        throw new Error("Signify client manager not initialized");
-      }
       const keeper = this.props.signifyClient.manager.get(gHab);
       const sigs = await keeper.sign(b(new Serder(grantExn).raw));
       const mstateNew = gHab["state"];
@@ -1046,6 +1048,10 @@ class IpexCommunicationService extends AgentService {
     schemaSaids: string[],
     admitExnToJoin?: { ked: unknown }
   ): Promise<SubmitIPEXResult> {
+    if (!this.props.signifyClient.manager) {
+      throw new Error("Signify client manager not initialized");
+    }
+
     let exn: Serder;
     let sigsMes: string[];
     let mend: string;
@@ -1080,9 +1086,6 @@ class IpexCommunicationService extends AgentService {
     if (admitExnToJoin) {
       const [, ked] = Saider.saidify(admitExnToJoin);
       const admit = new Serder(ked);
-      if (!this.props.signifyClient.manager) {
-        throw new Error("Signify client manager not initialized");
-      }
       const keeper = this.props.signifyClient.manager.get(gHab);
       const sigs = await keeper.sign(b(new Serder(admitExnToJoin).raw));
 
