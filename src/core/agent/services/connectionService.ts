@@ -316,17 +316,24 @@ class ConnectionService extends AgentService {
       status = ConnectionStatus.FAILED;
     }
 
-    return {
+    const baseDetails = {
       id: record.id,
       label: record.alias,
       createdAtUTC: record.createdAt.toISOString(),
       status,
       oobi: record.oobi,
       contactId: record.id,
-      ...(record.groupId
-        ? { groupId: record.groupId }
-        : { identifier: record.identifier || "" }),
     };
+
+    if (record.groupId !== undefined) {
+      return { ...baseDetails, groupId: record.groupId };
+    }
+
+    if (!record.identifier) {
+      throw new Error(`Regular contact must have identifier: ${record.id}`);
+    }
+
+    return { ...baseDetails, identifier: record.identifier };
   }
 
   async getConnectionById(
