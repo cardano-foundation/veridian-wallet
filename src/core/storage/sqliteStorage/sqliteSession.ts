@@ -132,10 +132,6 @@ class SqliteSession {
       return;
     }
 
-    if (!Agent.isOnline) {
-      await this.ensureKeriaConnection();
-    }
-
     const cloudMigrationManager = new CloudMigrationManager(
       Agent.agent.client,
       this.getCloudVersion.bind(this),
@@ -168,13 +164,6 @@ class SqliteSession {
       MiscRecordId.KERIA_CONNECT_URL
     );
     return !!connectUrlRecord?.content?.url;
-  }
-
-  private async ensureKeriaConnection(): Promise<void> {
-    const connectUrlRecord = await this.basicStorageService.findById(
-      MiscRecordId.KERIA_CONNECT_URL
-    );
-    await Agent.agent.start(connectUrlRecord?.content?.url as string);
   }
 }
 
