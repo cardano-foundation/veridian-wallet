@@ -1270,7 +1270,9 @@ class KeriaNotificationService extends AgentService {
                 connectionPairRecord.contactId
               );
               if (!contact) {
-                continue;
+                throw new Error(
+                  `Contact not found for connection pair: ${connectionPairRecord.contactId}`
+                );
               }
 
               await this.props.signifyClient
