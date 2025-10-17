@@ -258,18 +258,22 @@ class ConnectionService extends AgentService {
       }
       const contact = contactRecordMap.get(connectionPair.contactId);
 
-      if (contact?.alias && contact?.oobi) {
-        connections.push({
-          id: connectionPair.contactId,
-          alias: contact.alias,
-          createdAt: connectionPair.createdAt,
-          oobi: contact.oobi,
-          groupId: contact.groupId,
-          creationStatus: connectionPair.creationStatus,
-          pendingDeletion: connectionPair.pendingDeletion,
-          identifier: connectionPair.identifier, // Include identifier from connection pair
-        });
+      if (!contact) {
+        throw new Error(
+          `Contact missing from map for contactId: ${connectionPair.contactId}`
+        );
       }
+
+      connections.push({
+        id: connectionPair.contactId,
+        alias: contact.alias,
+        createdAt: connectionPair.createdAt,
+        oobi: contact.oobi,
+        groupId: contact.groupId,
+        creationStatus: connectionPair.creationStatus,
+        pendingDeletion: connectionPair.pendingDeletion,
+        identifier: connectionPair.identifier, // Include identifier from connection pair
+      });
     }
 
     return connections.map((connection) =>
