@@ -9,6 +9,7 @@ import {
   Siger,
 } from "signify-ts";
 import type { ExnMessage, AgentServicesProps } from "../agent.types";
+import { SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED } from "../agent.types";
 import type { KeriaNotification } from "./keriaNotificationService.types";
 import type { IpexGrantMultiSigExn } from "./multiSig.types";
 import { ExchangeRoute } from "./keriaNotificationService.types";
@@ -775,7 +776,7 @@ class IpexCommunicationService extends AgentService {
     offerExnToJoin?: unknown
   ): Promise<SubmitIPEXResult> {
     if (!this.props.signifyClient.manager) {
-      throw new Error("Signify client manager not initialized");
+      throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
     }
 
     let exn: Serder;
@@ -890,7 +891,7 @@ class IpexCommunicationService extends AgentService {
     grantToJoin?: GrantToJoinMultisigExnPayload
   ): Promise<SubmitIPEXResult> {
     if (!this.props.signifyClient.manager) {
-      throw new Error("Signify client manager not initialized");
+      throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
     }
 
     let exn: Serder;
@@ -1049,7 +1050,7 @@ class IpexCommunicationService extends AgentService {
     admitExnToJoin?: { ked: unknown }
   ): Promise<SubmitIPEXResult> {
     if (!this.props.signifyClient.manager) {
-      throw new Error("Signify client manager not initialized");
+      throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
     }
 
     let exn: Serder;

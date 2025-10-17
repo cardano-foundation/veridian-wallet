@@ -264,6 +264,10 @@ export const OOBI_AGENT_ONLY_RE =
 export const DOOBI_RE = /^\/oobi\/(?<said>[^/]+)$/i;
 export const WOOBI_RE = /^\/\.well-known\/keri\/oobi\/(?<cid>[^/]+)$/;
 
+// Common error messages
+export const SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED =
+  "Signify client manager not initialized";
+
 export {
   ConnectionStatus,
   MiscRecordId,
