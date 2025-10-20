@@ -12,7 +12,6 @@ import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getIndividualFirstCreateSetting,
-  getProfiles,
   setGroupProfileCache,
   setIndividualFirstCreate,
   setShowProfileState,
@@ -53,9 +52,8 @@ export const ProfileSetup = ({
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
   const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
-  const profiles = useAppSelector(getProfiles);
   const dispatch = useAppDispatch();
-  const { updateDefaultProfile, defaultProfile } = useProfile();
+  const { updateDefaultProfile, defaultProfile, profiles } = useProfile();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
   const [profileType, setProfileType] = useState(ProfileType.Individual);
   const [userName, setUserName] = useState("");
@@ -115,15 +113,31 @@ export const ProfileSetup = ({
     onClose?.(true);
   };
 
+  const validateInput = (value: string) => {
+    const isGroup = profileType === ProfileType.Group;
+    if (
+      Object.values(profiles).some(
+        (item) => item.identity.displayName === value
+      ) &&
+      isGroup
+    ) {
+      return `${i18n.t("nameerror.duplicatename")}`;
+    }
+
+    return isGroup && step === SetupProfileStep.GroupSetupStart
+      ? nameChecker.getError(groupName)
+      : nameChecker.getError(userName);
+  };
+
   const createIdentifier = async () => {
-    const error = nameChecker.getError(userName);
+    const isGroup = profileType === ProfileType.Group;
+    const error = isGroup ? validateInput(groupName) : validateInput(userName);
 
     if (error) {
       dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
       return;
     }
 
-    const isGroup = profileType === ProfileType.Group;
     const metadata: CreateIdentifierInputs = {
       displayName: isGroup ? groupName : userName,
       theme: 0,
@@ -421,7 +435,13 @@ export const ProfileSetup = ({
           <SetupProfile
             userName={userName}
             onChangeUserName={setUserName}
-            isGroupProfile={true}
+            isGroupProfile={profileType == ProfileType.Group}
+            isLoading={isLoading}
+            errorMessage={
+              ProfileType.Individual === profileType
+                ? validateInput(userName)
+                : undefined
+            }
           />
         );
       case SetupProfileStep.GroupSetupStart:
@@ -431,6 +451,7 @@ export const ProfileSetup = ({
             onChangeGroupName={setGroupName}
             onClickEvent={handleOpenScan}
             setupProfileStep={step}
+            errorMessage={validateInput(groupName)}
           />
         );
       case SetupProfileStep.GroupSetupConfirm:

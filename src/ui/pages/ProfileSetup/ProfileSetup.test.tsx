@@ -254,7 +254,11 @@ describe("Profile setup", () => {
       });
 
       // accept the current rendered subtitle text (shorter phrasing)
-      expect(getByText(/Add a name for other members/i)).toBeVisible();
+      expect(
+        getByText(
+          EN_TRANSLATIONS.setupprofile.profilesetup.description.individual
+        )
+      ).toBeVisible();
 
       expect(
         getByText(EN_TRANSLATIONS.setupprofile.profilesetup.form.input)
@@ -644,8 +648,7 @@ describe("Profile setup", () => {
           getByTestId("profile-group-name"),
           new CustomEvent("ionInput", {
             detail: {
-              value:
-                "Duke Duke Duke Duke  Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke Duke",
+              value: "zvticdqbrptfcxaetdhsiwkbcppcbrhj1",
             },
           })
         );
