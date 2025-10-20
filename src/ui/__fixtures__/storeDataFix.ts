@@ -108,10 +108,6 @@ export const storeStateFixData: RootState = {
   biometricsCache: {
     enabled: false,
   },
-  ssiAgentCache: {
-    bootUrl: "",
-    connectUrl: "",
-  },
   profilesCache: {
     ...profileCacheFixData,
   },

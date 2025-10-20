@@ -32,7 +32,7 @@ const mockInitDatabase = jest.fn();
 const getAvailableWitnessesMock = jest.fn();
 const setBackgroundColorMock = jest.fn();
 
-jest.mock("../core/agent/agent", () => ({ 
+jest.mock("../core/agent/agent", () => ({
   Agent: {
     agent: {
       devPreload: jest.fn(),
@@ -198,7 +198,9 @@ jest.mock("@capacitor-community/privacy-screen", () => ({
 
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {
-    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
+    isAvailable: jest.fn(() =>
+      Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })
+    ),
     verifyIdentity: jest.fn(() => Promise.resolve()),
     getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
     setCredentials: jest.fn(() => Promise.resolve()),
@@ -223,22 +225,24 @@ jest.mock("@capgo/capacitor-native-biometric", () => ({
 }));
 
 jest.mock("../ui/hooks/useBiometricsHook", () => {
-  const actualCapgoBiometric = jest.requireActual("@capgo/capacitor-native-biometric");
+  const actualCapgoBiometric = jest.requireActual(
+    "@capgo/capacitor-native-biometric"
+  );
   return {
     useBiometricAuth: jest.fn(() => ({
       biometricInfo: {
-        isAvailable: false, 
+        isAvailable: false,
         biometryType: actualCapgoBiometric.BiometryType.NONE,
       },
       setupBiometrics: jest.fn(),
       handleBiometricAuth: jest.fn(),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: null
+      lockoutEndTime: null,
     })),
-    BIOMETRIC_SERVER_KEY: actualCapgoBiometric.BIOMETRIC_SERVER_KEY, 
-    BiometricAuthOutcome: actualCapgoBiometric.BiometricAuthOutcome, 
-    BiometryError: actualCapgoBiometric.BiometryError, 
+    BIOMETRIC_SERVER_KEY: actualCapgoBiometric.BIOMETRIC_SERVER_KEY,
+    BiometricAuthOutcome: actualCapgoBiometric.BiometricAuthOutcome,
+    BiometryError: actualCapgoBiometric.BiometryError,
   };
 });
 
@@ -292,10 +296,6 @@ const initialState = {
   biometricsCache: {
     enabled: false,
   },
-  ssiAgentCache: {
-    bootUrl: "",
-    connectUrl: "",
-  },
 };
 
 const storeMocked = {
@@ -333,7 +333,7 @@ describe("App", () => {
       handleBiometricAuth: jest.fn(),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: null
+      lockoutEndTime: null,
     });
   });
 
@@ -593,10 +593,6 @@ describe("Witness availability", () => {
       biometricsCache: {
         enabled: false,
       },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
-      },
     };
 
     const storeMocked = {
@@ -669,10 +665,6 @@ describe("Witness availability", () => {
       },
       biometricsCache: {
         enabled: false,
-      },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
       },
     };
 
@@ -920,10 +912,6 @@ describe("System threat alert", () => {
       },
       biometricsCache: {
         enabled: false,
-      },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
       },
     };
 
