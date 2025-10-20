@@ -113,13 +113,13 @@ export const ProfileSetup = ({
     onClose?.(true);
   };
 
-  const validateInput = (value: string) => {
+  const errorMessage = (() => {
     const isGroup = profileType === ProfileType.Group;
     if (
       Object.values(profiles).some(
-        (item) => item.identity.displayName === value
+        (item) => item.identity.displayName === userName
       ) &&
-      isGroup
+      !isGroup
     ) {
       return `${i18n.t("nameerror.duplicatename")}`;
     }
@@ -127,13 +127,12 @@ export const ProfileSetup = ({
     return isGroup && step === SetupProfileStep.GroupSetupStart
       ? nameChecker.getError(groupName)
       : nameChecker.getError(userName);
-  };
+  })();
 
   const createIdentifier = async () => {
     const isGroup = profileType === ProfileType.Group;
-    const error = isGroup ? validateInput(groupName) : validateInput(userName);
 
-    if (error) {
+    if (errorMessage) {
       dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
       return;
     }
@@ -437,11 +436,7 @@ export const ProfileSetup = ({
             onChangeUserName={setUserName}
             isGroupProfile={profileType == ProfileType.Group}
             isLoading={isLoading}
-            errorMessage={
-              ProfileType.Individual === profileType
-                ? validateInput(userName)
-                : undefined
-            }
+            errorMessage={errorMessage}
           />
         );
       case SetupProfileStep.GroupSetupStart:
@@ -451,7 +446,7 @@ export const ProfileSetup = ({
             onChangeGroupName={setGroupName}
             onClickEvent={handleOpenScan}
             setupProfileStep={step}
-            errorMessage={validateInput(groupName)}
+            errorMessage={errorMessage}
           />
         );
       case SetupProfileStep.GroupSetupConfirm:
@@ -547,8 +542,8 @@ export const ProfileSetup = ({
             primaryButtonText={getButtonText()}
             primaryButtonAction={handleChangeStep}
             primaryButtonDisabled={
-              (SetupProfileStep.GroupSetupStart === step && !groupName) ||
-              (SetupProfileStep.SetupProfile === step && !userName) ||
+              (SetupProfileStep.GroupSetupStart === step && !!errorMessage) ||
+              (SetupProfileStep.SetupProfile === step && !!errorMessage) ||
               isLoading
             }
             pageId={pageId}
