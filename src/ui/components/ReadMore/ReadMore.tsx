@@ -14,7 +14,6 @@ const ReadMore = ({ content }: { content: string }) => {
   };
 
   useEffect(() => {
-    // Reset check flag when content changes
     checkedRef.current = false;
     setIsOverflowing(false);
 
@@ -22,21 +21,14 @@ const ReadMore = ({ content }: { content: string }) => {
       const el = textRef.current;
       if (!el || checkedRef.current) return;
 
-      // Force reflow to ensure layout is complete
       void el.offsetHeight;
 
       const styles = getComputedStyle(el);
       const lineHeight = parseFloat(styles.lineHeight);
-
-      // If line-height is "normal" or NaN, calculate it from font-size
       const actualLineHeight = isNaN(lineHeight)
         ? parseFloat(styles.fontSize) * 1.2
         : lineHeight;
-
       const maxHeight = actualLineHeight * 2;
-
-      // For -webkit-line-clamp, compare scrollHeight with actual rendered height
-      // Add small tolerance for sub-pixel rendering differences
       const tolerance = 2;
       const hasOverflow = el.scrollHeight > maxHeight + tolerance;
 
@@ -49,10 +41,8 @@ const ReadMore = ({ content }: { content: string }) => {
     let timeoutId: NodeJS.Timeout;
     let resizeObserver: ResizeObserver | null = null;
 
-    // Use ResizeObserver as the primary detection method
     if (textRef.current && typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver((entries) => {
-        // Only check after the element has settled (not during initial rapid changes)
         if (timeoutId) clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           checkOverflow();
@@ -62,7 +52,6 @@ const ReadMore = ({ content }: { content: string }) => {
       resizeObserver.observe(textRef.current);
     }
 
-    // Fallback checks for browsers without ResizeObserver or slow font loading
     const timer1 = setTimeout(checkOverflow, 100);
     const timer2 = setTimeout(checkOverflow, 300);
 
