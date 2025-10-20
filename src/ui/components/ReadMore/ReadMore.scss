@@ -3,8 +3,6 @@
   flex-direction: column;
 
   span {
-    margin-bottom: 1.25rem;
-
     &.clamp {
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -23,6 +21,7 @@
 
   ion-button {
     margin: 0;
+    margin-top: 1.25rem;
     border-radius: 0.5rem;
     --background: var(--ion-color-neutral-300);
     --background-activated: var(--ion-color-neutral-400);
