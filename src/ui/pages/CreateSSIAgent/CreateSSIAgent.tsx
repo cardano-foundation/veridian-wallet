@@ -389,6 +389,7 @@ const CreateSSIAgent = () => {
           <SSIScan
             setCurrentPage={setCurrentPage}
             onScanFinish={handleSSI}
+            isLoading={loading}
           />
         );
       case CurrentPage.AdvancedSetting:
@@ -410,7 +411,7 @@ const CreateSSIAgent = () => {
       {renderContent()}
       {loading && (
         <div
-          className="ssi-spinner-container"
+          className="ssi-spinner-container max-zindex"
           data-testid="ssi-spinner-container"
         >
           <IonSpinner name="circular" />

@@ -11,6 +11,7 @@
 
     .open-ssi-documentation-button {
       width: 100%;
+      border-radius: 0.5rem;
     }
 
     .second-page-paragraph {
@@ -71,6 +72,10 @@
 }
 
 .ssi-agent-scan-input-modal.responsive-modal {
+  &.loading {
+    z-index: -1 !important;
+  }
+
   .buttons-last-slot {
     min-width: auto !important;
 
@@ -165,7 +170,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 101;
+  z-index: 9999999;
   background: rgba(var(--ion-color-neutral-700-rgb), 0.2);
   backdrop-filter: blur(0.25rem);
 }

@@ -1,5 +1,5 @@
 import { repeatOutline } from "ionicons/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { i18n } from "../../../../i18n";
 import { CustomInput } from "../../../components/CustomInput";
 import { ErrorMessage } from "../../../components/ErrorMessage";
@@ -9,6 +9,7 @@ import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { Scan } from "../../../components/Scan";
 import { useCameraDirection } from "../../../components/Scanner/hook/useCameraDirection";
+import { combineClassNames } from "../../../utils/style";
 import { isValidHttpUrl } from "../../../utils/urlChecker";
 import { CurrentPage, SSIScanProps } from "../CreateSSIAgent.types";
 
@@ -26,13 +27,19 @@ const InputError = ({
   );
 };
 
-const SSIScan = ({ setCurrentPage, onScanFinish }: SSIScanProps) => {
+const SSIScan = ({ setCurrentPage, onScanFinish, isLoading }: SSIScanProps) => {
   const pageId = "ssi-agent-scan";
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
     useCameraDirection();
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [touched, setTouched] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      setOpen(false);
+    };
+  }, []);
 
   const closeInputManualValue = () => setOpen(false);
   const [pastedValue, setPastedValue] = useState("");
@@ -88,8 +95,10 @@ const SSIScan = ({ setCurrentPage, onScanFinish }: SSIScanProps) => {
       <OptionModal
         modalIsOpen={isOpen}
         componentId={pageId + "-input-modal"}
-        customClasses={pageId + "-input-modal"}
-        onDismiss={closeInputManualValue}
+        customClasses={combineClassNames(
+          pageId + "-input-modal",
+          isLoading ? "loading" : undefined
+        )}
         header={{
           closeButton: true,
           closeButtonAction: closeInputManualValue,

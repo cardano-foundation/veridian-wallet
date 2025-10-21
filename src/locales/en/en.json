@@ -405,7 +405,7 @@
       "bottomdescription": "If you’re ready and understand, please click the “Proceed to scan” button. This will open a scanner where you scan the QR code or manually enter the URL.",
       "buttons": {
         "connected": "Get connected",
-        "onboardingdocumentation": "Onboarding documentation",
+        "onboardingdocumentation": "Visit our website",
         "recoverydocumentation": "Recovery documentation"
       }
     },
