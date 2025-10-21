@@ -18,9 +18,11 @@ PODS:
   - CapacitorCordova (7.2.0)
   - CapacitorDevice (7.0.0):
     - Capacitor
-  - CapacitorFreerasp (1.10.0):
+  - CapacitorFreerasp (2.2.2):
     - Capacitor
   - CapacitorKeyboard (7.0.0):
+    - Capacitor
+  - CapacitorLocalNotifications (7.0.3):
     - Capacitor
   - CapacitorMlkitBarcodeScanning (7.0.0):
     - Capacitor
@@ -108,6 +110,7 @@ DEPENDENCIES:
   - "CapacitorDevice (from `../../node_modules/@capacitor/device`)"
   - CapacitorFreerasp (from `../../node_modules/capacitor-freerasp`)
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
+  - "CapacitorLocalNotifications (from `../../node_modules/@capacitor/local-notifications`)"
   - "CapacitorMlkitBarcodeScanning (from `../../node_modules/@capacitor-mlkit/barcode-scanning`)"
   - CapacitorNativeSettings (from `../../node_modules/capacitor-native-settings`)
   - CapacitorPluginSafeArea (from `../../node_modules/capacitor-plugin-safe-area`)
@@ -158,6 +161,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/capacitor-freerasp"
   CapacitorKeyboard:
     :path: "../../node_modules/@capacitor/keyboard"
+  CapacitorLocalNotifications:
+    :path: "../../node_modules/@capacitor/local-notifications"
   CapacitorMlkitBarcodeScanning:
     :path: "../../node_modules/@capacitor-mlkit/barcode-scanning"
   CapacitorNativeSettings:
@@ -187,8 +192,9 @@ SPEC CHECKSUMS:
   CapacitorCommunityTapJacking: 96d1d28a7e2bd4c4d22eb0af0f1cd6eefa419a9f
   CapacitorCordova: 5967b9ba03915ef1d585469d6e31f31dc49be96f
   CapacitorDevice: 069faf433b3a99c3d5f0e500fbe634f60a8c6a84
-  CapacitorFreerasp: 4477326ed8cd7049ed556aa16aabf4fd400926d0
+  CapacitorFreerasp: 357a2143f48caa566c6b30ef3c23b49e0ac28b77
   CapacitorKeyboard: 4db71e694e7afb5d7c0be09b05495c19f7d6c914
+  CapacitorLocalNotifications: 0811aef56ab2e5f7f9ae72f47d3473ab50c29038
   CapacitorMlkitBarcodeScanning: db64496b3e8f41be79e3ef81bfd1bb430adcb0ca
   CapacitorNativeSettings: bef37b3c7e2184da7416a3f162c71de19fd27593
   CapacitorPluginSafeArea: 22031c3436269ca80fac90ec2c94bc7c1e59a81d
@@ -213,6 +219,6 @@ SPEC CHECKSUMS:
   SQLCipher: 77fbe633cd84db04b07876dd50766b4924b57d61
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
 
-PODFILE CHECKSUM: 85928aa0ef380c252549dd2ce154d89edd8d1c9e
+PODFILE CHECKSUM: cd800a946aa7fdbcd965311ba62a2a0bac5e05ec
 
 COCOAPODS: 1.16.2
