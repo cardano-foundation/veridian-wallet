@@ -5,7 +5,7 @@ const DOUBLE_TAP_DELAY = 300;
 
 // Links
 const SUPPORT_EMAIL = "mailto:support@veridian.id";
-const WALLET_LINK = "https://www.veridian.id";
+const WEBSITE_LINK = "https://www.veridian.id";
 const DOCUMENTATION_LINK = "https://docs.veridian.id/";
 const ONBOARDING_DOCUMENTATION_LINK = "https://docs.veridian.id/onboarding";
 const RECOVERY_DOCUMENTATION_LINK = "https://docs.veridian.id/recovery";
@@ -18,7 +18,7 @@ const WEBVIEW_MIN_VERSION = 79;
 const IOS_MIN_VERSION = 18;
 
 export {
-  WALLET_LINK,
+  WEBSITE_LINK,
   DISPLAY_NAME_LENGTH,
   SEED_PHRASE_SUGGESTIONS,
   MAX_FAVOURITES,

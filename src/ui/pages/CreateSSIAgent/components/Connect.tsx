@@ -10,7 +10,7 @@ import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { SwitchOnboardingModeModal } from "../../../components/SwitchOnboardingModeModal";
 import { OnboardingMode } from "../../../components/SwitchOnboardingModeModal/SwitchOnboardingModeModal.types";
-import { DOCUMENTATION_LINK } from "../../../globals/constants";
+import { WEBSITE_LINK } from "../../../globals/constants";
 import { openBrowserLink } from "../../../utils/openBrowserLink";
 import { ConnectProps } from "../CreateSSIAgent.types";
 
@@ -22,7 +22,7 @@ const Connect = ({ onConnect }: ConnectProps) => {
   const isRecoveryMode = authentication.recoveryWalletProgress;
 
   const handleOpenUrl = () => {
-    openBrowserLink(DOCUMENTATION_LINK);
+    openBrowserLink(WEBSITE_LINK);
   };
 
   const mode = isRecoveryMode ? OnboardingMode.Create : OnboardingMode.Recovery;
