@@ -11,10 +11,13 @@
 
     .open-ssi-documentation-button {
       width: 100%;
-      border-radius: 0.5rem;
       --padding-top: 0.5rem;
       --padding-bottom: 0.5rem;
       height: 1.5rem;
+
+      &::part(native) {
+        border-radius: 0.5rem;
+      }
     }
 
     .second-page-paragraph {
