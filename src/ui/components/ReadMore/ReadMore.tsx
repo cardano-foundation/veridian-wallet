@@ -7,21 +7,62 @@ const ReadMore = ({ content }: { content: string }) => {
   const [isReadMore, setIsReadMore] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<HTMLSpanElement | null>(null);
+  const checkedRef = useRef(false);
 
   const toggleReadMore = () => {
     setIsReadMore(!isReadMore);
   };
 
   useEffect(() => {
-    const el = textRef.current;
-    if (el) {
-      const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
-      const maxHeight = lineHeight * 2;
+    checkedRef.current = false;
+    setIsOverflowing(false);
 
-      if (el.scrollHeight > maxHeight + 1) {
+    const checkOverflow = () => {
+      const el = textRef.current;
+      if (!el || checkedRef.current) return;
+
+      void el.offsetHeight;
+
+      const styles = getComputedStyle(el);
+      const lineHeight = parseFloat(styles.lineHeight);
+      const actualLineHeight = isNaN(lineHeight)
+        ? parseFloat(styles.fontSize) * 1.2
+        : lineHeight;
+      const maxHeight = actualLineHeight * 2;
+      const tolerance = 2;
+      const hasOverflow = el.scrollHeight > maxHeight + tolerance;
+
+      if (hasOverflow) {
         setIsOverflowing(true);
+        checkedRef.current = true;
       }
+    };
+
+    let timeoutId: NodeJS.Timeout;
+    let resizeObserver: ResizeObserver | null = null;
+
+    if (textRef.current && typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver((entries) => {
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          checkOverflow();
+        }, 50);
+      });
+
+      resizeObserver.observe(textRef.current);
     }
+
+    const timer1 = setTimeout(checkOverflow, 100);
+    const timer2 = setTimeout(checkOverflow, 300);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      if (timeoutId) clearTimeout(timeoutId);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
   }, [content]);
 
   return (
