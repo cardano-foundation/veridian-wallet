@@ -152,13 +152,13 @@ describe("NotificationService", () => {
     });
   });
 
-  describe("clearDeliveredNotifications", () => {
+  describe("clearAllDeliveredNotifications", () => {
     it("should clear all delivered notifications", async () => {
       (
         LocalNotifications.removeAllDeliveredNotifications as jest.Mock
       ).mockResolvedValue({});
 
-      await notificationService.clearDeliveredNotifications();
+      await notificationService.clearAllDeliveredNotifications();
 
       expect(
         LocalNotifications.removeAllDeliveredNotifications
@@ -173,7 +173,7 @@ describe("NotificationService", () => {
 
       // Should not throw, just log error
       await expect(
-        notificationService.clearDeliveredNotifications()
+        notificationService.clearAllDeliveredNotifications()
       ).resolves.toBeUndefined();
     });
   });

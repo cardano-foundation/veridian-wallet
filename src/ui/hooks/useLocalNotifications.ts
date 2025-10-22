@@ -1,10 +1,12 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { useAppIonRouter } from "./appIonRouterHook";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import {
   getCurrentProfile,
   setCurrentProfile,
   getProfiles,
+  getConnectionsCache,
+  getMultisigConnectionsCache,
 } from "../../store/reducers/profileCache";
 import { setToastMsg } from "../../store/reducers/stateCache";
 import { notificationService } from "../../core/services/notificationService";
@@ -14,9 +16,10 @@ import { ToastMsgType } from "../globals/types";
 export const useLocalNotifications = () => {
   const allProfiles = useAppSelector(getProfiles);
   const currentProfile = useAppSelector(getCurrentProfile);
+  const connectionsCache = useAppSelector(getConnectionsCache);
+  const multisigConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const dispatch = useAppDispatch();
   const ionRouter = useAppIonRouter();
-  const shownNotificationsRef = useRef<Set<string>>(new Set());
 
   const currentProfileId = currentProfile?.identity.id || "";
 
@@ -27,34 +30,39 @@ export const useLocalNotifications = () => {
       );
 
       if (notificationProfile) {
+        const profileConnections = notificationProfile.connections || [];
+        const profileMultisigConnections =
+          notificationProfile.multisigConnections || [];
+
         notificationService.showLocalNotification(
           notification,
           currentProfileId,
-          notificationProfile.identity.displayName
+          notificationProfile.identity.displayName,
+          {
+            connectionsCache: profileConnections,
+            multisigConnectionsCache: profileMultisigConnections,
+          }
         );
-        shownNotificationsRef.current.add(notification.id);
       }
     },
     [allProfiles, currentProfileId]
   );
 
-  const cleanupShownNotifications = useCallback(() => {
-    const allCurrentNotificationIds = new Set<string>();
+  const cleanupShownNotifications = useCallback(async () => {
+    const allCurrentNotificationIds: string[] = [];
     if (allProfiles) {
       Object.values(allProfiles).forEach((profile) => {
         if (profile.notifications) {
           profile.notifications.forEach((notification) => {
-            allCurrentNotificationIds.add(notification.id);
+            allCurrentNotificationIds.push(notification.id);
           });
         }
       });
     }
 
-    shownNotificationsRef.current.forEach((id) => {
-      if (!allCurrentNotificationIds.has(id)) {
-        shownNotificationsRef.current.delete(id);
-      }
-    });
+    await notificationService.cleanupShownNotifications(
+      allCurrentNotificationIds
+    );
   }, [allProfiles]);
 
   const getUnreadNotificationsFromOtherProfiles =
@@ -68,9 +76,7 @@ export const useLocalNotifications = () => {
             profile.notifications
           ) {
             const unreadFromProfile = profile.notifications.filter(
-              (notification) =>
-                !notification.read &&
-                !shownNotificationsRef.current.has(notification.id)
+              (notification) => !notification.read
             );
             unreadNotifications.push(...unreadFromProfile);
           }
@@ -95,13 +101,17 @@ export const useLocalNotifications = () => {
   }, [dispatch, ionRouter]);
 
   useEffect(() => {
-    const allUnreadNotifications = getUnreadNotificationsFromOtherProfiles();
+    const processNotifications = async () => {
+      const allUnreadNotifications = getUnreadNotificationsFromOtherProfiles();
 
-    allUnreadNotifications.forEach((notification) => {
-      displayNotification(notification);
-    });
+      allUnreadNotifications.forEach((notification) => {
+        displayNotification(notification);
+      });
 
-    cleanupShownNotifications();
+      await cleanupShownNotifications();
+    };
+
+    processNotifications();
   }, [
     allProfiles,
     currentProfile,
@@ -112,9 +122,7 @@ export const useLocalNotifications = () => {
 
   return {
     showNotification: (notification: KeriaNotification) => {
-      if (!shownNotificationsRef.current.has(notification.id)) {
-        displayNotification(notification);
-      }
+      displayNotification(notification);
     },
     requestPermissions: () => notificationService.requestPermissions(),
   };

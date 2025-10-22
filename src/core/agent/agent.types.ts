@@ -81,6 +81,7 @@ enum MiscRecordId {
   BIOMETRICS_SETUP = "biometrics-setup",
   PROFILE_HISTORIES = "profile-histories",
   PENDING_JOIN_GROUP_METADATA = "pending-join-group-metadata",
+  SHOWN_NOTIFICATIONS = "shown-notifications",
 }
 
 type ConnectionNoteDetails = {

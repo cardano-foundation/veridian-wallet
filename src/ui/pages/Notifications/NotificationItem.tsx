@@ -1,5 +1,4 @@
 import { IonIcon, IonItem, IonLabel } from "@ionic/react";
-import { t } from "i18next";
 import {
   documentOutline,
   ellipsisHorizontal,
@@ -13,6 +12,7 @@ import {
   KeriaNotification,
   NotificationRoute,
 } from "../../../core/agent/services/keriaNotificationService.types";
+import { getNotificationDisplayText } from "../../../core/services/notificationUtils";
 import { useAppSelector } from "../../../store/hooks";
 import {
   getConnectionsCache,
@@ -27,71 +27,18 @@ const NotificationItem = ({
   onClick,
   onOptionButtonClick,
 }: NotificationItemProps) => {
-  const connectionsCache = useAppSelector(getConnectionsCache) as any[];
+  const connectionsCache = useAppSelector(getConnectionsCache) as Array<{
+    id: string;
+    label: string;
+  }>;
   const multisigConnectionsCache = useAppSelector(
     getMultisigConnectionsCache
-  ) as any[];
+  ) as Array<{ id: string; label: string }>;
 
-  const notificationLabelText = (() => {
-    const connection = connectionsCache?.find(
-      (c) => c.id === item.connectionId
-    );
-    const connectionName = connection?.label;
-
-    switch (item.a.r) {
-      case NotificationRoute.ExnIpexGrant:
-        return t("tabs.notifications.tab.labels.exnipexgrant", {
-          connection: connectionName || t("tabs.connections.unknown"),
-        });
-      case NotificationRoute.MultiSigIcp:
-        return t("tabs.notifications.tab.labels.multisigicp", {
-          connection:
-            multisigConnectionsCache?.find((c) => c.id === item.connectionId)
-              ?.label || t("tabs.connections.unknown"),
-        });
-      case NotificationRoute.ExnIpexApply: {
-        if (
-          item.groupReplied &&
-          !item.groupInitiator &&
-          item.groupInitiatorPre
-        ) {
-          const initiator = item.groupInitiatorPre
-            ? multisigConnectionsCache.find(
-                (c) => c.id === item.groupInitiatorPre
-              )?.label || t("tabs.connections.unknown")
-            : t("tabs.connections.unknown");
-          return t("tabs.notifications.tab.labels.exnipexapplyproposed", {
-            connection: connectionName || t("tabs.connections.unknown"),
-            initiator,
-          });
-        }
-
-        return t("tabs.notifications.tab.labels.exnipexapply", {
-          connection: connectionName || t("tabs.connections.unknown"),
-        });
-      }
-      case NotificationRoute.LocalAcdcRevoked:
-        return t("tabs.notifications.tab.labels.exnipexgrantrevoke", {
-          credential: item.a.credentialTitle,
-        });
-      case NotificationRoute.MultiSigExn:
-        return t("tabs.notifications.tab.labels.multisigexn", {
-          connection: connectionName || t("tabs.connections.unknown"),
-        });
-      case NotificationRoute.RemoteSignReq:
-        return t("tabs.notifications.tab.labels.sign", {
-          connection: connectionName || t("tabs.connections.unknown"),
-        });
-      case NotificationRoute.HumanReadableMessage:
-        return item.a.m as string;
-      case NotificationRoute.LocalSingletonConnectInstructions:
-        return t("tabs.notifications.tab.labels.connectinstructions", {
-          connection: item.a.name || t("tabs.connections.unknown"),
-        });
-      default:
-        return "";
-    }
-  })();
+  const notificationLabelText = getNotificationDisplayText(item, {
+    connectionsCache,
+    multisigConnectionsCache,
+  });
 
   const referIcon = (item: KeriaNotification) => {
     switch (item.a.r) {
