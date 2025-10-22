@@ -5,8 +5,6 @@ import {
   getCurrentProfile,
   setCurrentProfile,
   getProfiles,
-  getConnectionsCache,
-  getMultisigConnectionsCache,
 } from "../../store/reducers/profileCache";
 import { setToastMsg } from "../../store/reducers/stateCache";
 import { notificationService } from "../../core/services/notificationService";
@@ -16,8 +14,6 @@ import { ToastMsgType } from "../globals/types";
 export const useLocalNotifications = () => {
   const allProfiles = useAppSelector(getProfiles);
   const currentProfile = useAppSelector(getCurrentProfile);
-  const connectionsCache = useAppSelector(getConnectionsCache);
-  const multisigConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const dispatch = useAppDispatch();
   const ionRouter = useAppIonRouter();
 
@@ -102,6 +98,10 @@ export const useLocalNotifications = () => {
 
   useEffect(() => {
     const processNotifications = async () => {
+      if (notificationService.hasPendingColdStart()) {
+        return;
+      }
+
       const allUnreadNotifications = getUnreadNotificationsFromOtherProfiles();
 
       allUnreadNotifications.forEach((notification) => {

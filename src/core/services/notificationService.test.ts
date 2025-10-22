@@ -2,7 +2,6 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import { notificationService } from "./notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 
-// Mock Capacitor plugins
 jest.mock("@capacitor/local-notifications", () => ({
   LocalNotifications: {
     requestPermissions: jest.fn(),
@@ -19,7 +18,6 @@ jest.mock("@capacitor/app", () => ({
   },
 }));
 
-// Mock React Router
 jest.mock("react-router-dom", () => ({
   useHistory: jest.fn(() => ({
     push: jest.fn(),
@@ -34,8 +32,6 @@ jest.mock("react-router-dom", () => ({
 describe("NotificationService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // Reset the singleton instance
     (notificationService as any).history = null;
   });
 
@@ -119,7 +115,6 @@ describe("NotificationService", () => {
       const error = new Error("Scheduling error");
       (LocalNotifications.schedule as jest.Mock).mockRejectedValue(error);
 
-      // Should not throw, just log error
       await expect(
         notificationService.scheduleNotification(payload)
       ).resolves.toBeUndefined();
@@ -171,7 +166,6 @@ describe("NotificationService", () => {
         LocalNotifications.removeAllDeliveredNotifications as jest.Mock
       ).mockRejectedValue(error);
 
-      // Should not throw, just log error
       await expect(
         notificationService.clearAllDeliveredNotifications()
       ).resolves.toBeUndefined();
@@ -193,7 +187,6 @@ describe("NotificationService", () => {
       const error = new Error("Cancel error");
       (LocalNotifications.cancel as jest.Mock).mockRejectedValue(error);
 
-      // Should not throw, just log error
       await expect(
         notificationService.cancelNotification("1")
       ).resolves.toBeUndefined();
@@ -296,7 +289,6 @@ describe("NotificationService", () => {
       mockNavigator = jest.fn();
       notificationService.setNavigator(mockNavigator);
 
-      // Mock window.location.hash for fallback
       Object.defineProperty(window, "location", {
         value: { hash: "" },
         writable: true,
@@ -311,10 +303,8 @@ describe("NotificationService", () => {
         },
       };
 
-      // Access private method for testing
       (notificationService as any).handleNotificationTap(notification);
 
-      // Wait for the setTimeout to complete (500ms delay)
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
@@ -328,7 +318,6 @@ describe("NotificationService", () => {
 
       (notificationService as any).handleNotificationTap(notification);
 
-      // Wait for the setTimeout to complete (500ms delay)
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
@@ -344,7 +333,6 @@ describe("NotificationService", () => {
 
       (notificationService as any).handleNotificationTap(notification);
 
-      // Wait for the setTimeout to complete (500ms delay)
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");

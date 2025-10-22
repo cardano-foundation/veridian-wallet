@@ -47,6 +47,8 @@ class NotificationService {
     profileId: string;
     notificationId: string;
   } | null = null;
+  private isColdStartProcessing = false;
+  private targetProfileIdForColdStart: string | null = null;
   private readonly NAVIGATION_DELAY_MS = 500;
   private readonly COLD_START_DELAY_MS = 1000;
   private readonly DEBOUNCE_DELAY_MS = 100;
@@ -55,7 +57,6 @@ class NotificationService {
   constructor() {
     this.initialize();
     this.startQueueProcessor();
-    this.checkInitialAppLaunch();
   }
 
   setProfileSwitcher(profileSwitcher: (profileId: string) => void) {
@@ -71,7 +72,6 @@ class NotificationService {
   private async initialize() {
     this.permissionsGranted = await this.requestPermissions();
 
-    // Create notification channel for Android
     await this.createNotificationChannel();
 
     LocalNotifications.addListener(
@@ -80,12 +80,6 @@ class NotificationService {
         this.handleNotificationTap(event.notification);
       }
     );
-
-    App.addListener("appStateChange", (state) => {
-      if (state.isActive) {
-        this.checkAppLaunchFromNotification();
-      }
-    });
   }
 
   private async createNotificationChannel(): Promise<void> {
@@ -151,6 +145,10 @@ class NotificationService {
   ): Promise<void> {
     const isAppActive = await this.isAppInForeground();
     if (!isAppActive) {
+      return;
+    }
+
+    if (this.isColdStartProcessing) {
       return;
     }
 
@@ -226,6 +224,7 @@ class NotificationService {
     await this.removeShownNotification(notificationId);
 
     if (profileId && this.profileSwitcher) {
+      this.targetProfileIdForColdStart = profileId;
       this.profileSwitcher(profileId);
     }
 
@@ -242,77 +241,6 @@ class NotificationService {
         window.location.hash = TabsRoutePath.NOTIFICATIONS;
       }
     }, this.NAVIGATION_DELAY_MS);
-  }
-
-  private async checkAppLaunchFromNotification(): Promise<void> {
-    if (this.pendingColdStartNotification) {
-      return;
-    }
-
-    try {
-      const launchUrl = await App.getLaunchUrl();
-      if (launchUrl && launchUrl.url) {
-        const notificationData = this.parseNotificationUrl(launchUrl.url);
-        if (notificationData) {
-          await this.handleColdStartNotification(notificationData);
-        }
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.warn("Failed to check app launch URL:", error);
-    }
-  }
-
-  private parseNotificationUrl(
-    url: string
-  ): { profileId: string; notificationId: string } | null {
-    try {
-      const urlObj = new URL(url);
-      const profileId = urlObj.searchParams.get("profileId");
-      const notificationId = urlObj.searchParams.get("notificationId");
-
-      return profileId && notificationId ? { profileId, notificationId } : null;
-    } catch (error) {
-      return null;
-    }
-  }
-
-  private async handleColdStartNotification(data: {
-    profileId: string;
-    notificationId: string;
-  }): Promise<void> {
-    await this.waitForAppInitialization();
-
-    if (this.profileSwitcher) {
-      this.profileSwitcher(data.profileId);
-    }
-
-    setTimeout(() => {
-      if (this.navigator) {
-        try {
-          this.navigator(TabsRoutePath.NOTIFICATIONS);
-        } catch (error) {
-          this.updateMetricsOnError("Cold start navigation failed");
-          showError("Failed to navigate via navigator", error);
-          window.location.hash = TabsRoutePath.NOTIFICATIONS;
-        }
-      } else {
-        window.location.hash = TabsRoutePath.NOTIFICATIONS;
-      }
-    }, this.COLD_START_DELAY_MS);
-  }
-
-  private async waitForAppInitialization(): Promise<void> {
-    return new Promise((resolve) => {
-      const checkInitialized = () => {
-        if (this.profileSwitcher && this.navigator) {
-          resolve();
-        } else {
-          setTimeout(checkInitialized, 100);
-        }
-      };
-      checkInitialized();
-    });
   }
 
   async clearAllDeliveredNotifications(): Promise<void> {
@@ -544,22 +472,6 @@ class NotificationService {
     }
   }
 
-  private async checkInitialAppLaunch(): Promise<void> {
-    try {
-      const launchUrl = await App.getLaunchUrl();
-      if (launchUrl && launchUrl.url) {
-        const notificationData = this.parseNotificationUrl(launchUrl.url);
-        if (notificationData) {
-          this.pendingColdStartNotification = notificationData;
-          this.processPendingColdStartNotification();
-        }
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.warn("Failed to check initial app launch URL:", error);
-    }
-  }
-
   private processPendingColdStartNotification(): void {
     if (
       this.pendingColdStartNotification &&
@@ -568,6 +480,14 @@ class NotificationService {
     ) {
       const data = this.pendingColdStartNotification;
       this.pendingColdStartNotification = null;
+
+      this.removeShownNotification(data.notificationId).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "Failed to remove shown notification during cold start:",
+          error
+        );
+      });
 
       if (this.profileSwitcher) {
         this.profileSwitcher(data.profileId);
@@ -585,8 +505,26 @@ class NotificationService {
         } else {
           window.location.hash = TabsRoutePath.NOTIFICATIONS;
         }
+
+        setTimeout(() => {
+          this.isColdStartProcessing = false;
+        }, 500);
       }, this.COLD_START_DELAY_MS);
     }
+  }
+
+  hasPendingColdStart(): boolean {
+    return (
+      this.isColdStartProcessing || this.pendingColdStartNotification !== null
+    );
+  }
+
+  getTargetProfileIdForColdStart(): string | null {
+    return this.targetProfileIdForColdStart;
+  }
+
+  clearTargetProfileIdForColdStart(): void {
+    this.targetProfileIdForColdStart = null;
   }
 }
 

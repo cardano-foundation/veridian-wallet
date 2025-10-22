@@ -19,6 +19,7 @@ import { IdentifierService } from "../../../core/agent/services";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
+import { notificationService } from "../../../core/services/notificationService";
 import {
   PeerConnectedEvent,
   PeerConnectionBrokenEvent,
@@ -279,7 +280,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   useEffect(() => {
     initApp();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forceInitApp]);
 
   useEffect(() => {
@@ -331,7 +331,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (recoveryCompleteNoInterruption) {
       loadDb();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recoveryCompleteNoInterruption]);
 
   useEffect(() => {
@@ -366,7 +365,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (authentication.ssiAgentUrl && !authentication.firstAppLaunch) {
       startAgent();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authentication.ssiAgentUrl, authentication.firstAppLaunch]);
 
   const loadDatabase = async () => {
@@ -385,7 +383,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();
 
-      // TODO: load current profile after load database
       const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
         MiscRecordId.DEFAULT_PROFILE
       );
@@ -463,7 +460,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
           updateProfileHistories(newProfileHistories);
         } else {
           if (storedIdentifiers.length > 0) {
-            // If we have no default profile set, we will set the oldest identifier as default.
             const oldest = storedIdentifiers
               .slice()
               .sort((prev, next) =>
@@ -483,7 +479,17 @@ const AppWrapper = (props: { children: ReactNode }) => {
       }
 
       dispatch(setProfiles(profiles));
-      dispatch(setCurrentProfile(currentProfileAid));
+
+      let finalProfileAid = currentProfileAid;
+      const targetProfileId =
+        notificationService.getTargetProfileIdForColdStart();
+      if (targetProfileId && profiles[targetProfileId]) {
+        finalProfileAid = targetProfileId;
+        notificationService.clearTargetProfileIdForColdStart();
+      }
+
+      dispatch(setCurrentProfile(finalProfileAid));
+
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(
         setConnectionsCache(allConnections as RegularConnectionDetails[])
@@ -493,8 +499,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
           allMultisigConnections as MultisigConnectionDetails[]
         )
       );
-
-      // TODO: set current profile data
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
     }
