@@ -3,36 +3,51 @@ import { LocalFileStrategy } from "./strategies/LocalFileStrategy";
 import { RemoteSigNozStrategy } from "./strategies/RemoteSigNozStrategy";
 import { HybridStrategy } from "./strategies/HybridStrategy";
 import { ConsoleStrategy } from "./strategies/ConsoleStrategy";
+import { loggingConfig } from "./LoggingConfig";
+
+const logLevelOrder: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+};
 
 class Logger {
   private static instance: Logger;
   private strategies: ILogger[];
+  private minimumLogLevel: LogLevel;
 
-  private constructor(strategies: ILogger[]) {
+  private constructor(strategies: ILogger[], minimumLogLevel: LogLevel) {
     this.strategies = strategies;
+    this.minimumLogLevel = minimumLogLevel;
   }
 
-  static getInstance(): Logger {
+  static getInstance(
+    localStrategyFactory: () => LocalFileStrategy = () => new LocalFileStrategy(),
+    remoteStrategyFactory: (otlpEndpoint: string) => RemoteSigNozStrategy = (otlpEndpoint) => new RemoteSigNozStrategy(otlpEndpoint)
+  ): Logger {
     if (!Logger.instance) {
       const activeStrategies: ILogger[] = [];
 
-      const consoleEnabled = process.env.LOGGING_CONSOLE_ENABLED === "true";
-      const localEnabled = process.env.LOGGING_LOCAL_ENABLED === "true";
-      const remoteEnabled = process.env.LOGGING_REMOTE_ENABLED === "true";
-      const signozOtlpEndpoint = process.env.SIGNOZ_OTLP_ENDPOINT || "https://signoz-server:4318/v1/logs";
+      if (loggingConfig.mode === "off") {
+        Logger.instance = new Logger(activeStrategies, "error"); // Set minimumLogLevel to error, but activeStrategies is empty
+        return Logger.instance;
+      }
 
-      if (consoleEnabled) {
+      const minimumLogLevel = logLevelOrder[loggingConfig.mode] !== undefined ? loggingConfig.mode : "info";
+
+      if (loggingConfig.consoleEnabled) {
         activeStrategies.push(new ConsoleStrategy());
       }
 
       let localStrategy: LocalFileStrategy | undefined;
-      if (localEnabled) {
-        localStrategy = new LocalFileStrategy();
+      if (loggingConfig.localEnabled) {
+        localStrategy = localStrategyFactory();
       }
 
       let remoteStrategy: RemoteSigNozStrategy | undefined;
-      if (remoteEnabled) {
-        remoteStrategy = new RemoteSigNozStrategy(signozOtlpEndpoint);
+      if (loggingConfig.remoteEnabled) {
+        remoteStrategy = remoteStrategyFactory(loggingConfig.signozOtlpEndpoint);
       }
 
       if (localStrategy && remoteStrategy) {
@@ -43,12 +58,17 @@ class Logger {
         activeStrategies.push(remoteStrategy);
       }
 
-      Logger.instance = new Logger(activeStrategies);
+      Logger.instance = new Logger(activeStrategies, minimumLogLevel);
     }
     return Logger.instance;
   }
 
   async log(level: LogLevel, message: string, context?: Record<string, unknown>) {
+    // Always log errors, regardless of the minimumLogLevel
+    if (level !== "error" && logLevelOrder[level] < logLevelOrder[this.minimumLogLevel]) {
+      return; // Do not log if the level is below the minimum and it"s not an error
+    }
+
     for (const strategy of this.strategies) {
       await strategy.log(level, message, context);
     }
