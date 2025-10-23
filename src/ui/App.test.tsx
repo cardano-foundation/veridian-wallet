@@ -161,7 +161,7 @@ jest.mock("@capacitor/local-notifications", () => ({
 
 jest.mock("@capacitor/app", () => ({
   App: {
-    addListener: jest.fn(),
+    addListener: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
     getState: jest.fn(() => Promise.resolve({ isActive: true })),
   },
 }));
