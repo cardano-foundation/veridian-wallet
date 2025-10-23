@@ -32,7 +32,7 @@ const mockInitDatabase = jest.fn();
 const getAvailableWitnessesMock = jest.fn();
 const setBackgroundColorMock = jest.fn();
 
-jest.mock("../core/agent/agent", () => ({ 
+jest.mock("../core/agent/agent", () => ({
   Agent: {
     agent: {
       devPreload: jest.fn(),
@@ -148,6 +148,24 @@ jest.mock("@capacitor/status-bar", () => ({
   },
 }));
 
+jest.mock("@capacitor/local-notifications", () => ({
+  LocalNotifications: {
+    requestPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    schedule: jest.fn(),
+    addListener: jest.fn(),
+    removeAllDeliveredNotifications: jest.fn(),
+    cancel: jest.fn(),
+    createChannel: jest.fn(),
+  },
+}));
+
+jest.mock("@capacitor/app", () => ({
+  App: {
+    addListener: jest.fn(),
+    getState: jest.fn(() => Promise.resolve({ isActive: true })),
+  },
+}));
+
 const lockScreenOrientationMock = jest.fn();
 jest.mock("@capacitor/screen-orientation", () => ({
   ...jest.requireActual("@capacitor/status-bar"),
@@ -170,6 +188,7 @@ jest.mock("@capacitor/core", () => {
     ...jest.requireActual("@capacitor/core"),
     Capacitor: {
       isNativePlatform: () => isNativeMock(),
+      getPlatform: jest.fn(() => "web"),
     },
   };
 });
@@ -198,7 +217,9 @@ jest.mock("@capacitor-community/privacy-screen", () => ({
 
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {
-    isAvailable: jest.fn(() => Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })),
+    isAvailable: jest.fn(() =>
+      Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })
+    ),
     verifyIdentity: jest.fn(() => Promise.resolve()),
     getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
     setCredentials: jest.fn(() => Promise.resolve()),
@@ -223,22 +244,24 @@ jest.mock("@capgo/capacitor-native-biometric", () => ({
 }));
 
 jest.mock("../ui/hooks/useBiometricsHook", () => {
-  const actualCapgoBiometric = jest.requireActual("@capgo/capacitor-native-biometric");
+  const actualCapgoBiometric = jest.requireActual(
+    "@capgo/capacitor-native-biometric"
+  );
   return {
     useBiometricAuth: jest.fn(() => ({
       biometricInfo: {
-        isAvailable: false, 
+        isAvailable: false,
         biometryType: actualCapgoBiometric.BiometryType.NONE,
       },
       setupBiometrics: jest.fn(),
       handleBiometricAuth: jest.fn(),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: null
+      lockoutEndTime: null,
     })),
-    BIOMETRIC_SERVER_KEY: actualCapgoBiometric.BIOMETRIC_SERVER_KEY, 
-    BiometricAuthOutcome: actualCapgoBiometric.BiometricAuthOutcome, 
-    BiometryError: actualCapgoBiometric.BiometryError, 
+    BIOMETRIC_SERVER_KEY: actualCapgoBiometric.BIOMETRIC_SERVER_KEY,
+    BiometricAuthOutcome: actualCapgoBiometric.BiometricAuthOutcome,
+    BiometryError: actualCapgoBiometric.BiometryError,
   };
 });
 
@@ -333,7 +356,7 @@ describe("App", () => {
       handleBiometricAuth: jest.fn(),
       checkBiometrics: jest.fn(),
       remainingLockoutSeconds: 30,
-      lockoutEndTime: null
+      lockoutEndTime: null,
     });
   });
 

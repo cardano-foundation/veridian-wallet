@@ -18,6 +18,24 @@ export const useLocalNotifications = () => {
   const ionRouter = useAppIonRouter();
 
   const currentProfileId = currentProfile?.identity.id || "";
+  const NOTIFICATION_PROCESS_DELAY_MS = 100;
+  const DEBUG_LOGGING_ENABLED =
+    typeof process !== "undefined" &&
+    process.env &&
+    process.env.NODE_ENV !== "production";
+
+  const logDebug = useCallback(
+    (message: string, details?: Record<string, unknown>) => {
+      if (!DEBUG_LOGGING_ENABLED) {
+        return;
+      }
+
+      const payload = details ? [details] : [];
+      // eslint-disable-next-line no-console
+      console.log(`[useLocalNotifications] ${message}`, ...payload);
+    },
+    [DEBUG_LOGGING_ENABLED]
+  );
 
   const displayNotification = useCallback(
     (notification: KeriaNotification) => {
@@ -98,26 +116,60 @@ export const useLocalNotifications = () => {
 
   useEffect(() => {
     const processNotifications = async () => {
-      if (notificationService.hasPendingColdStart()) {
+      const hasPendingColdStart = notificationService.hasPendingColdStart();
+
+      if (hasPendingColdStart) {
+        logDebug("Skipping notification processing - cold start pending");
         return;
       }
 
-      const allUnreadNotifications = getUnreadNotificationsFromOtherProfiles();
+      if (currentProfile && allProfiles[currentProfile.identity.id]) {
+        const currentProfileNotifications =
+          allProfiles[currentProfile.identity.id].notifications || [];
+        logDebug("Marking current profile notifications as shown", {
+          currentProfileId: currentProfile.identity.id,
+          notificationCount: currentProfileNotifications.length,
+        });
+        for (const notification of currentProfileNotifications) {
+          const isAlreadyShown = await notificationService.isNotificationShown(
+            notification.id
+          );
+          if (!isAlreadyShown) {
+            await notificationService.markAsShown(notification.id);
+          }
+        }
+      }
 
-      allUnreadNotifications.forEach((notification) => {
-        displayNotification(notification);
+      const allUnreadNotifications = getUnreadNotificationsFromOtherProfiles();
+      logDebug("Processing unread notifications from other profiles", {
+        unreadCount: allUnreadNotifications.length,
       });
 
+      for (const notification of allUnreadNotifications) {
+        const isAlreadyShown = await notificationService.isNotificationShown(
+          notification.id
+        );
+        if (!isAlreadyShown) {
+          displayNotification(notification);
+        }
+      }
+
       await cleanupShownNotifications();
+      logDebug("Completed notification processing");
     };
 
-    processNotifications();
+    const timeoutId = setTimeout(() => {
+      processNotifications();
+    }, NOTIFICATION_PROCESS_DELAY_MS);
+
+    return () => clearTimeout(timeoutId);
   }, [
     allProfiles,
     currentProfile,
     displayNotification,
     getUnreadNotificationsFromOtherProfiles,
     cleanupShownNotifications,
+    logDebug,
   ]);
 
   return {

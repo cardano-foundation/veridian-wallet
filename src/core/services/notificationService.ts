@@ -1,4 +1,18 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
+import { Capacitor } from "@capacitor/core";
+
+enum NotificationLogContext {
+  ColdStart = "ColdStart",
+  WarmTap = "WarmTap",
+  Scheduling = "Scheduling",
+  Queue = "Queue",
+}
+
+enum NotificationLogSeverity {
+  Debug = "DEBUG",
+  Warn = "WARN",
+  Error = "ERROR",
+}
 import { App } from "@capacitor/app";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 import { TabsRoutePath } from "../../routes/paths";
@@ -53,10 +67,35 @@ class NotificationService {
   private readonly COLD_START_DELAY_MS = 1000;
   private readonly DEBOUNCE_DELAY_MS = 100;
   private readonly QUEUE_PROCESS_INTERVAL_MS = 1000;
+  private readonly COLD_START_PROCESSING_CLEAR_DELAY_MS = 10000;
+  private readonly DEBUG_LOGGING_ENABLED =
+    typeof process !== "undefined" &&
+    process.env &&
+    process.env.NODE_ENV !== "production";
 
   constructor() {
     this.initialize();
     this.startQueueProcessor();
+  }
+
+  private debugLog(
+    message: string,
+    options?: {
+      details?: Record<string, unknown>;
+      context?: NotificationLogContext;
+      severity?: NotificationLogSeverity;
+    }
+  ): void {
+    if (!this.DEBUG_LOGGING_ENABLED) {
+      return;
+    }
+
+    const context = options?.context ? `[${options.context}] ` : "";
+    const severity = options?.severity || NotificationLogSeverity.Debug;
+    const prefix = `[NotificationService] ${severity} ${context}${message}`;
+    const payload = options?.details ? [options.details] : [];
+    // eslint-disable-next-line no-console
+    console.log(prefix, ...payload);
   }
 
   setProfileSwitcher(profileSwitcher: (profileId: string) => void) {
@@ -83,6 +122,14 @@ class NotificationService {
   }
 
   private async createNotificationChannel(): Promise<void> {
+    const platform = Capacitor.getPlatform();
+    if (platform !== "android") {
+      this.debugLog("Skipping notification channel creation", {
+        details: { platform },
+      });
+      return;
+    }
+
     try {
       await LocalNotifications.createChannel({
         id: "veridian-notifications",
@@ -95,7 +142,17 @@ class NotificationService {
         lightColor: "#4630EB",
         vibration: true,
       });
+      this.debugLog("Notification channel created", {
+        details: { platform },
+      });
     } catch (error) {
+      this.debugLog("Failed to create notification channel", {
+        details: {
+          platform,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        severity: NotificationLogSeverity.Warn,
+      });
       // eslint-disable-next-line no-console
       console.warn("Failed to create notification channel:", error);
     }
@@ -126,6 +183,12 @@ class NotificationService {
   async scheduleNotification(payload: NotificationPayload): Promise<void> {
     if (!this.permissionsGranted) {
       this.updateMetricsOnError("Permissions not granted");
+      this.debugLog("Queue rejected - permissions not granted", {
+        details: {
+          notificationId: payload.notificationId,
+        },
+        context: NotificationLogContext.Queue,
+      });
       return;
     }
 
@@ -135,20 +198,51 @@ class NotificationService {
     };
 
     this.notificationQueue.push(queuedNotification);
+    this.debugLog("Notification enqueued", {
+      context: NotificationLogContext.Queue,
+      details: {
+        notificationId: payload.notificationId,
+        queueLength: this.notificationQueue.length,
+      },
+    });
   }
 
   async showLocalNotification(
     keriaNotification: KeriaNotification,
-    _currentProfileId: string,
+    currentProfileId: string,
     profileDisplayName: string,
     context?: NotificationContext
   ): Promise<void> {
     const isAppActive = await this.isAppInForeground();
     if (!isAppActive) {
+      this.debugLog("Skipping display - app inactive", {
+        context: NotificationLogContext.Scheduling,
+        details: {
+          notificationId: keriaNotification.id,
+        },
+      });
       return;
     }
 
     if (this.isColdStartProcessing) {
+      this.debugLog("Skipping display - cold start processing", {
+        context: NotificationLogContext.ColdStart,
+        details: {
+          notificationId: keriaNotification.id,
+        },
+      });
+      return;
+    }
+
+    if (keriaNotification.receivingPre === currentProfileId) {
+      this.debugLog("Suppressing current profile notification", {
+        context: NotificationLogContext.Scheduling,
+        details: {
+          notificationId: keriaNotification.id,
+          profileId: currentProfileId,
+        },
+      });
+      await this.markNotificationAsShown(keriaNotification.id);
       return;
     }
 
@@ -157,6 +251,12 @@ class NotificationService {
     );
 
     if (alreadyShown) {
+      this.debugLog("Skipping already shown notification", {
+        context: NotificationLogContext.Scheduling,
+        details: {
+          notificationId: keriaNotification.id,
+        },
+      });
       return;
     }
 
@@ -167,6 +267,13 @@ class NotificationService {
     );
 
     if (payload) {
+      this.debugLog("Queueing notification for display", {
+        context: NotificationLogContext.Scheduling,
+        details: {
+          notificationId: keriaNotification.id,
+          targetProfileId: keriaNotification.receivingPre,
+        },
+      });
       await this.scheduleNotification(payload);
       await this.markNotificationAsShown(keriaNotification.id);
     }
@@ -204,6 +311,14 @@ class NotificationService {
 
   private handleNotificationTap(notification: LocalNotification): void {
     this.metrics.totalTapped++;
+    this.debugLog("Notification tap received", {
+      context: NotificationLogContext.WarmTap,
+      details: {
+        notificationId: notification.id,
+        hasProfileSwitcher: Boolean(this.profileSwitcher),
+        hasNavigator: Boolean(this.navigator),
+      },
+    });
     this.debouncedProcessNotificationTap(notification);
   }
 
@@ -220,11 +335,24 @@ class NotificationService {
     const extra = notification.extra || {};
     const profileId = extra.profileId;
 
-    const notificationId = notification.id.toString();
-    await this.removeShownNotification(notificationId);
+    this.isColdStartProcessing = true;
+    this.debugLog("Processing notification tap", {
+      context: NotificationLogContext.WarmTap,
+      details: {
+        notificationId: notification.id,
+        profileId,
+      },
+    });
 
     if (profileId && this.profileSwitcher) {
       this.targetProfileIdForColdStart = profileId;
+      this.debugLog("Profile switch requested from tap", {
+        context: NotificationLogContext.WarmTap,
+        details: {
+          notificationId: notification.id,
+          targetProfileId: profileId,
+        },
+      });
       this.profileSwitcher(profileId);
     }
 
@@ -240,6 +368,16 @@ class NotificationService {
       } else {
         window.location.hash = TabsRoutePath.NOTIFICATIONS;
       }
+
+      setTimeout(() => {
+        this.isColdStartProcessing = false;
+        this.debugLog("Cold start processing cleared", {
+          context: NotificationLogContext.WarmTap,
+          details: {
+            notificationId: notification.id,
+          },
+        });
+      }, this.COLD_START_PROCESSING_CLEAR_DELAY_MS);
     }, this.NAVIGATION_DELAY_MS);
   }
 
@@ -316,6 +454,14 @@ class NotificationService {
       });
 
       this.metrics.totalScheduled++;
+      this.debugLog("Notification scheduled immediately", {
+        context: NotificationLogContext.Queue,
+        details: {
+          notificationId: payload.notificationId,
+          profileId: payload.profileId,
+          queueLength: this.notificationQueue.length,
+        },
+      });
     } catch (error) {
       this.updateMetricsOnError("Failed to schedule notification");
       throw error;
@@ -410,6 +556,19 @@ class NotificationService {
     const shownNotifications = await this.getShownNotifications();
     shownNotifications.add(notificationId);
     await this.saveShownNotifications(shownNotifications);
+    this.debugLog("Notification marked as shown", {
+      context: NotificationLogContext.Scheduling,
+      details: { notificationId },
+    });
+
+    if (!isNaN(Number(notificationId))) {
+      try {
+        await this.cancelNotification(notificationId);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to cancel notification:", error);
+      }
+    }
   }
 
   private async isNotificationAlreadyShown(
@@ -437,10 +596,12 @@ class NotificationService {
     return false;
   }
 
-  private async removeShownNotification(notificationId: string): Promise<void> {
-    const shownNotifications = await this.getShownNotifications();
-    shownNotifications.delete(notificationId);
-    await this.saveShownNotifications(shownNotifications);
+  async isNotificationShown(notificationId: string): Promise<boolean> {
+    return this.isNotificationAlreadyShown(notificationId);
+  }
+
+  async markAsShown(notificationId: string): Promise<void> {
+    return this.markNotificationAsShown(notificationId);
   }
 
   async clearShownNotifications(): Promise<void> {
@@ -459,16 +620,25 @@ class NotificationService {
     const shownNotifications = await this.getShownNotifications();
     const currentIds = new Set(currentNotificationIds);
     let hasChanges = false;
+    const removed: string[] = [];
 
     for (const notificationId of shownNotifications) {
       if (!currentIds.has(notificationId)) {
         shownNotifications.delete(notificationId);
         hasChanges = true;
+        removed.push(notificationId);
       }
     }
 
     if (hasChanges) {
       await this.saveShownNotifications(shownNotifications);
+      this.debugLog("Cleaned up shown notifications", {
+        context: NotificationLogContext.Queue,
+        details: {
+          removedCount: removed.length,
+          removedIds: removed,
+        },
+      });
     }
   }
 
@@ -480,13 +650,12 @@ class NotificationService {
     ) {
       const data = this.pendingColdStartNotification;
       this.pendingColdStartNotification = null;
-
-      this.removeShownNotification(data.notificationId).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "Failed to remove shown notification during cold start:",
-          error
-        );
+      this.debugLog("Processing pending cold start notification", {
+        context: NotificationLogContext.ColdStart,
+        details: {
+          notificationId: data.notificationId,
+          profileId: data.profileId,
+        },
       });
 
       if (this.profileSwitcher) {
@@ -508,6 +677,12 @@ class NotificationService {
 
         setTimeout(() => {
           this.isColdStartProcessing = false;
+          this.debugLog("Cold start processing cleared", {
+            context: NotificationLogContext.ColdStart,
+            details: {
+              notificationId: data.notificationId,
+            },
+          });
         }, 500);
       }, this.COLD_START_DELAY_MS);
     }
