@@ -18,7 +18,6 @@ jest.mock("../../store/reducers/seedPhraseCache", () => ({
 type BackRouteStore = Pick<
   RootState,
   | "seedPhraseCache"
-  | "ssiAgentCache"
   | "stateCache"
   | "profilesCache"
   | "viewTypeCache"
@@ -34,11 +33,6 @@ describe("getBackRoute", () => {
         seedPhrase: "",
         bran: "",
       },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
-      },
-
       stateCache: {
         isOnline: true,
         initializationPhase: InitializationPhase.PHASE_TWO,
@@ -168,10 +162,6 @@ describe("getPreviousRoute", () => {
       seedPhraseCache: {
         seedPhrase: "",
         bran: "",
-      },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
       },
       profilesCache: {
         profiles: {},

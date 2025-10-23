@@ -26,12 +26,10 @@ import {
   setPendingDAppConnection,
   showDAppConnect,
 } from "../../../store/reducers/profileCache";
-import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
 import {
   getAuthentication,
   getCurrentOperation,
   getToastMsgs,
-  setCurrentOperation,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import { OperationType, ToastMsgType } from "../../globals/types";
@@ -148,8 +146,6 @@ const Scanner = forwardRef(
             [
               OperationType.SCAN_CONNECTION,
               OperationType.SCAN_WALLET_CONNECTION,
-              OperationType.SCAN_SSI_BOOT_URL,
-              OperationType.SCAN_SSI_CONNECT_URL,
             ].includes(currentOperation));
 
         if (isScanning && !isRequestPending) {
@@ -224,35 +220,11 @@ const Scanner = forwardRef(
       }
     };
 
-    const handleSSIScan = (content: string) => {
-      if (OperationType.SCAN_SSI_BOOT_URL === currentOperation) {
-        dispatch(setBootUrl(content));
-      }
-
-      if (OperationType.SCAN_SSI_CONNECT_URL === currentOperation) {
-        dispatch(setConnectUrl(content));
-      }
-
-      dispatch(setCurrentOperation(OperationType.IDLE));
-      handleReset && handleReset();
-    };
-
     const processValue = async (content: string) => {
       await stopScan();
 
       if (currentOperation === OperationType.SCAN_WALLET_CONNECTION) {
         handleConnectWallet(content);
-        isHandlingQR.current = false;
-        return;
-      }
-
-      if (
-        [
-          OperationType.SCAN_SSI_BOOT_URL,
-          OperationType.SCAN_SSI_CONNECT_URL,
-        ].includes(currentOperation)
-      ) {
-        handleSSIScan(content);
         isHandlingQR.current = false;
         return;
       }
@@ -276,9 +248,6 @@ const Scanner = forwardRef(
               secondaryButtonText={`${i18n.t("tabs.scan.pastemeerkatid")}`}
             />
           );
-        case OperationType.SCAN_SSI_BOOT_URL:
-        case OperationType.SCAN_SSI_CONNECT_URL:
-          return <div></div>;
         default:
           return (
             <PageFooter

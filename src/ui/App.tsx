@@ -17,6 +17,7 @@ import { i18n } from "../i18n";
 import { Routes } from "../routes";
 import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { getShowProfileState } from "../store/reducers/profileCache";
 import {
   getCurrentOperation,
   getGlobalLoading,
@@ -28,6 +29,7 @@ import { AppWrapper } from "./components/AppWrapper";
 import { ToastStack } from "./components/CustomToast/ToastStack";
 import { GenericError, NoWitnessAlert } from "./components/Error";
 import { InputRequest } from "./components/InputRequest";
+import { ProfileStateModal } from "./components/ProfileStateModal";
 import { SidePage } from "./components/SidePage";
 import {
   ANDROID_MIN_VERSION,
@@ -46,8 +48,6 @@ import "./styles/style.scss";
 import "./App.scss";
 import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
-import { getShowProfileState } from "../store/reducers/profileCache";
-import { ProfileStateModal } from "./components/ProfileStateModal";
 
 setupIonicReact();
 
@@ -61,8 +61,6 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
       [
         OperationType.SCAN_CONNECTION,
         OperationType.SCAN_WALLET_CONNECTION,
-        OperationType.SCAN_SSI_BOOT_URL,
-        OperationType.SCAN_SSI_CONNECT_URL,
       ].includes(currentOperation)
     );
   }, [currentOperation]);
