@@ -1,7 +1,7 @@
+import { Salter } from "signify-ts";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ILogger, LogLevel, ParsedLogEntry } from "../ILogger";
 import { loggingConfig } from "../LoggingConfig";
-import { Salter } from "signify-ts";
 
 export class LocalFileStrategy implements ILogger {
   private logFile = loggingConfig.offlineLogFileName;
@@ -32,7 +32,7 @@ export class LocalFileStrategy implements ILogger {
       if (typeof fileContent !== "string") {
         fileContent = await (fileContent as Blob).text();
       }
-      return fileContent.split('\n').filter(Boolean).map(line => JSON.parse(line) as ParsedLogEntry);
+      return fileContent.split("\n").filter(Boolean).map(line => JSON.parse(line) as ParsedLogEntry);
     } catch {
       return [];
     }
@@ -41,13 +41,13 @@ export class LocalFileStrategy implements ILogger {
   async clearLogs() {
     await Filesystem.writeFile({
       path: this.logFile,
-      data: '',
+      data: "",
       directory: Directory.Data
     });
   }
 
   async writeLogs(logEntries: ParsedLogEntry[]) {
-    const data = logEntries.map(entry => JSON.stringify(entry)).join('\n') + (logEntries.length > 0 ? '\n' : '');
+    const data = logEntries.map(entry => JSON.stringify(entry)).join("\n") + (logEntries.length > 0 ? "\n" : "");
     await Filesystem.writeFile({
       path: this.logFile,
       data: data,

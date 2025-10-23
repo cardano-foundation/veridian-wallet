@@ -12,7 +12,7 @@ const logLevelOrder: Record<LogLevel, number> = {
   error: 3,
 };
 
-class Logger {
+export class Logger {
   private static instance: Logger;
   private strategies: ILogger[];
   private minimumLogLevel: LogLevel;

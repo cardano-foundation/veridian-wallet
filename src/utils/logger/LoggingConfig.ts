@@ -12,7 +12,7 @@ interface ILoggingConfig {
   retryDelayMs: number;
 }
 
-class LoggingConfig implements ILoggingConfig {
+export class LoggingConfig implements ILoggingConfig {
   public readonly mode: LogLevel | 'off';
   public readonly consoleEnabled: boolean;
   public readonly localEnabled: boolean;
@@ -30,9 +30,12 @@ class LoggingConfig implements ILoggingConfig {
     this.remoteEnabled = process.env.LOGGING_REMOTE_ENABLED === "true";
     this.signozOtlpEndpoint = process.env.SIGNOZ_OTLP_ENDPOINT || "https://signoz-server:4318/v1/logs";
     this.offlineLogFileName = process.env.OFFLINE_LOG_FILE_NAME || "offline-logs.txt";
-    this.batchSize = parseInt(process.env.LOGGING_BATCH_SIZE || "50", 10);
-    this.maxSyncRetries = parseInt(process.env.LOGGING_MAX_SYNC_RETRIES || "3", 10);
-    this.retryDelayMs = parseInt(process.env.LOGGING_RETRY_DELAY_MS || "5000", 10);
+    const parsedBatchSize = parseInt(process.env.LOGGING_BATCH_SIZE || "50", 10);
+    this.batchSize = isNaN(parsedBatchSize) ? 50 : parsedBatchSize;
+    const parsedMaxSyncRetries = parseInt(process.env.LOGGING_MAX_SYNC_RETRIES || "3", 10);
+    this.maxSyncRetries = isNaN(parsedMaxSyncRetries) ? 3 : parsedMaxSyncRetries;
+    const parsedRetryDelayMs = parseInt(process.env.LOGGING_RETRY_DELAY_MS || "5000", 10);
+    this.retryDelayMs = isNaN(parsedRetryDelayMs) ? 5000 : parsedRetryDelayMs;
 
     // Override individual enables if mode is 'off'
     if (this.mode === 'off') {
