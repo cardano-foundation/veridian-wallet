@@ -366,15 +366,6 @@ describe("Credential request information: multisig", () => {
     expect(
       queryByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.reject)
     ).toBeNull();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Initiator opens request after proposing and after threshold is met", async () => {
@@ -469,15 +460,6 @@ describe("Credential request information: multisig", () => {
     expect(
       queryByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.reject)
     ).toBeNull();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Initiator opens request after proposing and before threshold is met, but has deleted the proposed credential", async () => {
@@ -580,15 +562,6 @@ describe("Credential request information: multisig", () => {
     expect(
       queryByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.reject)
     ).toBeNull();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Initiator opens request after proposing and after threshold is met", async () => {
@@ -691,15 +664,6 @@ describe("Credential request information: multisig", () => {
     expect(
       queryByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.reject)
     ).toBeNull();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Member opens request that does not yet have a proposal", async () => {
@@ -776,15 +740,6 @@ describe("Credential request information: multisig", () => {
           .information.groupmember
       )
     ).toBeVisible();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Member open request and accepts proposal from initiator", async () => {

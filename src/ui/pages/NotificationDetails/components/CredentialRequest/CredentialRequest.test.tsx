@@ -420,7 +420,7 @@ describe("Credential request: Multisig", () => {
     getLinkedGroupFromIpexApplyMock.mockImplementation(() =>
       Promise.resolve({
         linkedRequest: {
-          accepted: true,
+          accepted: false,
           current: "",
           previous: undefined,
         },
