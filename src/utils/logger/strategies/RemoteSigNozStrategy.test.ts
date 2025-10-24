@@ -1,150 +1,134 @@
-import { Salter } from "signify-ts";
-import { RemoteSigNozStrategy } from "./RemoteSigNozStrategy";
-import { LogLevel, ParsedLogEntry } from "../ILogger";
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import { LoggerProvider, BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
+import { RemoteSigNozStrategy } from './RemoteSigNozStrategy';
+import { LogLevel, ParsedLogEntry } from '../ILogger';
+import { SeverityNumber, AnyValueMap } from '@opentelemetry/api-logs';
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
+import { resourceFromAttributes, defaultResource } from '@opentelemetry/resources';
 
-// Mock signify-ts Salter
-jest.mock("signify-ts", () => ({
-  Salter: jest.fn().mockImplementation(() => ({
-    qb64: "mocked-salter-id",
-  })),
+// Mock the OTel classes
+jest.mock('@opentelemetry/exporter-logs-otlp-http');
+jest.mock('@opentelemetry/sdk-logs');
+jest.mock('@opentelemetry/resources', () => ({
+  ...jest.requireActual('@opentelemetry/resources'),
+  defaultResource: jest.fn().mockReturnValue({
+    merge: jest.fn().mockReturnThis(),
+  }),
+  resourceFromAttributes: jest.fn((attributes) => ({ attributes })),
 }));
+jest.mock('@opentelemetry/semantic-conventions');
 
-describe("RemoteSigNozStrategy", () => {
-  let remoteSigNozStrategy: RemoteSigNozStrategy;
-  const otlpEndpoint = "http://mock-otlp-endpoint.com/v1/logs";
-  let mockFetch: jest.Mock;
+describe('RemoteSigNozStrategy', () => {
+  let strategy: RemoteSigNozStrategy;
+  const mockOtlpEndpoint = 'http://test-endpoint.com/v1/logs';
+
+  let mockLogger: {
+    emit: jest.Mock;
+  };
+  let mockLoggerProvider: {
+    getLogger: jest.Mock;
+    forceFlush: jest.Mock;
+  };
 
   beforeEach(() => {
-    mockFetch = jest.fn(() => Promise.resolve({ ok: true }));
-    global.fetch = mockFetch;
+    jest.clearAllMocks();
 
-    remoteSigNozStrategy = new RemoteSigNozStrategy(otlpEndpoint);
+    // Setup mocks for OTel classes
+    mockLogger = {
+      emit: jest.fn(),
+    };
+    mockLoggerProvider = {
+      getLogger: jest.fn().mockReturnValue(mockLogger),
+      forceFlush: jest.fn().mockResolvedValue(undefined),
+    } as any;
 
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date("2023-01-01T12:00:00.000Z"));
+    (LoggerProvider as jest.Mock).mockImplementation(() => mockLoggerProvider);
+    (OTLPLogExporter as jest.Mock).mockClear();
+    (BatchLogRecordProcessor as jest.Mock).mockClear();
+
+    strategy = new RemoteSigNozStrategy(mockOtlpEndpoint);
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
-    jest.restoreAllMocks();
+  it('should initialize the OTLPLogExporter and LoggerProvider correctly', () => {
+    expect(OTLPLogExporter).toHaveBeenCalledWith({
+      url: mockOtlpEndpoint,
+      headers: {
+        'signoz-ingestion-key': '<your-ingestion-key>',
+      },
+    });
+    
+    expect(LoggerProvider).toHaveBeenCalledWith(
+      expect.objectContaining({
+        processors: [expect.any(BatchLogRecordProcessor)],
+      })
+    );
+    expect(defaultResource).toHaveBeenCalled();
+    expect(resourceFromAttributes).toHaveBeenCalled();
   });
 
-  describe("log", () => {
-    it("should call logBatch with a single ParsedLogEntry", async () => {
-      const level: LogLevel = "info";
-      const message = "Test message";
-      const context = { key: "value" };
-
-      await remoteSigNozStrategy.log(level, message, context);
-
-      const expectedLogEntry: ParsedLogEntry = {
-        id: "mocked-salter-id",
-        ts: "2023-01-01T12:00:00.000Z",
-        level,
-        message,
-        context,
-      };
-
-      expect(Salter).toHaveBeenCalledTimes(1);
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-      const fetchArgs = mockFetch.mock.calls[0];
-      expect(fetchArgs[0]).toBe(otlpEndpoint);
-      const body = JSON.parse(fetchArgs[1].body);
-      expect(body.resourceLogs[0].scopeLogs[0].logRecords[0]).toEqual({
-        timeUnixNano: new Date(expectedLogEntry.ts).getTime() * 1e6,
-        severityText: expectedLogEntry.level.toUpperCase(),
-        body: { stringValue: expectedLogEntry.message },
-        attributes: [{ key: "key", value: { stringValue: "value" } }],
-      });
-    });
-
-    it("should handle log without context", async () => {
-      const level: LogLevel = "debug";
-      const message = "Debug message";
-
-      await remoteSigNozStrategy.log(level, message);
-
-      const expectedLogEntry: ParsedLogEntry = {
-        id: "mocked-salter-id",
-        ts: "2023-01-01T12:00:00.000Z",
-        level,
-        message,
-        context: undefined,
-      };
-
-      expect(Salter).toHaveBeenCalledTimes(1);
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-      const fetchArgs = mockFetch.mock.calls[0];
-      const body = JSON.parse(fetchArgs[1].body);
-      expect(body.resourceLogs[0].scopeLogs[0].logRecords[0]).toEqual({
-        timeUnixNano: new Date(expectedLogEntry.ts).getTime() * 1e6,
-        severityText: expectedLogEntry.level.toUpperCase(),
-        body: { stringValue: expectedLogEntry.message },
-        attributes: [], // No context, so attributes should be empty
-      });
-    });
+  it('logBatch should do nothing for empty log entries', async () => {
+    await strategy.logBatch([]);
+    expect(mockLoggerProvider.getLogger).not.toHaveBeenCalled();
   });
 
-  describe("logBatch", () => {
-    it("should not call fetch if logEntries is empty", async () => {
-      await remoteSigNozStrategy.logBatch([]);
-      expect(mockFetch).not.toHaveBeenCalled();
-    });
+  it('logBatch should transform and emit log entries', async () => {
+    const logEntries: ParsedLogEntry[] = [
+      {
+        id: '1',
+        ts: new Date().toISOString(),
+        level: 'info',
+        message: 'Info message',
+        context: { userId: 'user1' },
+      },
+      {
+        id: '2',
+        ts: new Date().toISOString(),
+        level: 'error',
+        message: 'Error message',
+        context: { error: 'stacktrace' },
+      },
+    ];
 
-    it("should call fetch with the correct payload for multiple log entries", async () => {
-      const logEntry1: ParsedLogEntry = {
-        id: "uuid-1",
-        ts: "2023-01-01T10:00:00.000Z",
-        level: "info",
-        message: "Log 1",
-        context: { user: "test1" },
-      };
-      const logEntry2: ParsedLogEntry = {
-        id: "uuid-2",
-        ts: "2023-01-01T11:00:00.000Z",
-        level: "warn",
-        message: "Log 2",
-        context: { user: "test2", status: "pending" },
-      };
-      const logEntries = [logEntry1, logEntry2];
+    await strategy.logBatch(logEntries);
 
-      await remoteSigNozStrategy.logBatch(logEntries);
+    expect(mockLoggerProvider.getLogger).toHaveBeenCalledWith('veridian-wallet-logger');
+    expect(mockLogger.emit).toHaveBeenCalledTimes(2);
 
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-      const fetchArgs = mockFetch.mock.calls[0];
-      expect(fetchArgs[0]).toBe(otlpEndpoint);
-      const body = JSON.parse(fetchArgs[1].body);
+    // Check first log entry
+    expect(mockLogger.emit).toHaveBeenCalledWith(expect.objectContaining({
+      severityNumber: SeverityNumber.INFO,
+      severityText: 'info',
+      body: 'Info message',
+      attributes: { userId: 'user1' },
+    }));
 
-      expect(body.resourceLogs[0].scopeLogs[0].logRecords).toHaveLength(2);
-      expect(body.resourceLogs[0].scopeLogs[0].logRecords[0]).toEqual({
-        timeUnixNano: new Date(logEntry1.ts).getTime() * 1e6,
-        severityText: logEntry1.level.toUpperCase(),
-        body: { stringValue: logEntry1.message },
-        attributes: [{ key: "user", value: { stringValue: "test1" } }],
-      });
-      expect(body.resourceLogs[0].scopeLogs[0].logRecords[1]).toEqual({
-        timeUnixNano: new Date(logEntry2.ts).getTime() * 1e6,
-        severityText: logEntry2.level.toUpperCase(),
-        body: { stringValue: logEntry2.message },
-        attributes: [
-          { key: "user", value: { stringValue: "test2" } },
-          { key: "status", value: { stringValue: "pending" } },
-        ],
-      });
-    });
+    // Check second log entry
+    expect(mockLogger.emit).toHaveBeenCalledWith(expect.objectContaining({
+      severityNumber: SeverityNumber.ERROR,
+      severityText: 'error',
+      body: 'Error message',
+      attributes: { error: 'stacktrace' },
+    }));
+  });
 
-    it("should handle fetch errors gracefully", async () => {
-      mockFetch.mockRejectedValueOnce(new Error("Network error"));
+  it('logBatch should call forceFlush after emitting logs', async () => {
+    const logEntries: ParsedLogEntry[] = [
+      {
+        id: '1',
+        ts: new Date().toISOString(),
+        level: 'info',
+        message: 'Info message',
+      },
+    ];
 
-      // Expect the promise to resolve, not reject, as the strategy handles the error internally
-      await expect(remoteSigNozStrategy.logBatch([{
-        id: "uuid",
-        ts: "2023-01-01T12:00:00.000Z",
-        level: "error",
-        message: "Error log",
-      }])).resolves.not.toThrow();
+    await strategy.logBatch(logEntries);
 
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-    });
+    expect(mockLogger.emit).toHaveBeenCalledTimes(1);
+    expect(mockLoggerProvider.forceFlush).toHaveBeenCalledTimes(1);
+  });
+
+  it('log method should be a no-op and resolve immediately', async () => {
+    await expect(strategy.log('info', 'test')).resolves.toBeUndefined();
+    expect(mockLoggerProvider.getLogger).not.toHaveBeenCalled();
   });
 });
