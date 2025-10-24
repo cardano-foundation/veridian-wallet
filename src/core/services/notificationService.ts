@@ -1,5 +1,6 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
 
 enum NotificationLogContext {
   ColdStart = "ColdStart",
@@ -13,7 +14,12 @@ enum NotificationLogSeverity {
   Warn = "WARN",
   Error = "ERROR",
 }
-import { App } from "@capacitor/app";
+
+enum ColdStartState {
+  IDLE = "IDLE",
+  PROCESSING = "PROCESSING",
+  READY = "READY",
+}
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 import { TabsRoutePath } from "../../routes/paths";
 import { showError } from "../../ui/utils/error";
@@ -61,13 +67,12 @@ class NotificationService {
     profileId: string;
     notificationId: string;
   } | null = null;
-  private isColdStartProcessing = false;
+  private coldStartState: ColdStartState = ColdStartState.IDLE;
   private targetProfileIdForColdStart: string | null = null;
   private readonly NAVIGATION_DELAY_MS = 500;
   private readonly COLD_START_DELAY_MS = 1000;
   private readonly DEBOUNCE_DELAY_MS = 100;
   private readonly QUEUE_PROCESS_INTERVAL_MS = 1000;
-  private readonly COLD_START_PROCESSING_CLEAR_DELAY_MS = 10000;
   private readonly DEBUG_LOGGING_ENABLED =
     typeof process !== "undefined" &&
     process.env &&
@@ -224,7 +229,7 @@ class NotificationService {
       return;
     }
 
-    if (this.isColdStartProcessing) {
+    if (this.coldStartState === ColdStartState.PROCESSING) {
       this.debugLog("Skipping display - cold start processing", {
         context: NotificationLogContext.ColdStart,
         details: {
@@ -335,7 +340,7 @@ class NotificationService {
     const extra = notification.extra || {};
     const profileId = extra.profileId;
 
-    this.isColdStartProcessing = true;
+    this.coldStartState = ColdStartState.PROCESSING;
     this.debugLog("Processing notification tap", {
       context: NotificationLogContext.WarmTap,
       details: {
@@ -368,16 +373,6 @@ class NotificationService {
       } else {
         window.location.hash = TabsRoutePath.NOTIFICATIONS;
       }
-
-      setTimeout(() => {
-        this.isColdStartProcessing = false;
-        this.debugLog("Cold start processing cleared", {
-          context: NotificationLogContext.WarmTap,
-          details: {
-            notificationId: notification.id,
-          },
-        });
-      }, this.COLD_START_PROCESSING_CLEAR_DELAY_MS);
     }, this.NAVIGATION_DELAY_MS);
   }
 
@@ -674,23 +669,21 @@ class NotificationService {
         } else {
           window.location.hash = TabsRoutePath.NOTIFICATIONS;
         }
-
-        setTimeout(() => {
-          this.isColdStartProcessing = false;
-          this.debugLog("Cold start processing cleared", {
-            context: NotificationLogContext.ColdStart,
-            details: {
-              notificationId: data.notificationId,
-            },
-          });
-        }, 500);
       }, this.COLD_START_DELAY_MS);
     }
   }
 
+  completeColdStart(): void {
+    this.coldStartState = ColdStartState.READY;
+    this.debugLog("Cold start completed", {
+      context: NotificationLogContext.ColdStart,
+    });
+  }
+
   hasPendingColdStart(): boolean {
     return (
-      this.isColdStartProcessing || this.pendingColdStartNotification !== null
+      this.coldStartState === ColdStartState.PROCESSING ||
+      this.pendingColdStartNotification !== null
     );
   }
 

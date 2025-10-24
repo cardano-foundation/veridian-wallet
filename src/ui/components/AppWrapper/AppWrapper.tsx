@@ -499,6 +499,8 @@ const AppWrapper = (props: { children: ReactNode }) => {
           allMultisigConnections as MultisigConnectionDetails[]
         )
       );
+
+      notificationService.completeColdStart();
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
     }

@@ -70,7 +70,7 @@ describe("NotificationService", () => {
     (notificationService as any).history = null;
     (notificationService as any).permissionsGranted = true;
     (notificationService as any).notificationQueue = [];
-    (notificationService as any).isColdStartProcessing = false;
+    (notificationService as any).coldStartState = "IDLE";
 
     mockBasicStorage.findById.mockResolvedValue(null);
     mockBasicStorage.save.mockResolvedValue({} as any);
@@ -426,18 +426,18 @@ describe("NotificationService", () => {
       mockNavigator = jest.fn();
       notificationService.setProfileSwitcher(mockProfileSwitcher);
       notificationService.setNavigator(mockNavigator);
-      (notificationService as any).isColdStartProcessing = false;
+      (notificationService as any).coldStartState = "IDLE";
       (notificationService as any).pendingColdStartNotification = null;
       (notificationService as any).targetProfileIdForColdStart = null;
     });
 
     it("should detect cold start state", () => {
-      (notificationService as any).isColdStartProcessing = true;
+      (notificationService as any).coldStartState = "PROCESSING";
       expect(notificationService.hasPendingColdStart()).toBe(true);
     });
 
     it("should return false when not in cold start", () => {
-      (notificationService as any).isColdStartProcessing = false;
+      (notificationService as any).coldStartState = "IDLE";
       expect(notificationService.hasPendingColdStart()).toBe(false);
     });
 
@@ -472,7 +472,7 @@ describe("NotificationService", () => {
       expect(stored).toBeNull();
     });
 
-    it("should set cold start processing flag for 10 seconds", async () => {
+    it("should enter processing state and complete on signal", async () => {
       jest.useFakeTimers();
 
       const notification = {
@@ -489,11 +489,7 @@ describe("NotificationService", () => {
 
       expect(notificationService.hasPendingColdStart()).toBe(true);
 
-      jest.advanceTimersByTime(5000);
-      expect(notificationService.hasPendingColdStart()).toBe(true);
-
-      jest.advanceTimersByTime(500);
-      jest.advanceTimersByTime(5000);
+      notificationService.completeColdStart();
 
       expect(notificationService.hasPendingColdStart()).toBe(false);
 
@@ -501,7 +497,7 @@ describe("NotificationService", () => {
     });
 
     it("should trigger cold start processing when app state changes", () => {
-      (notificationService as any).isColdStartProcessing = true;
+      (notificationService as any).coldStartState = "PROCESSING";
       (notificationService as any).pendingColdStartNotification = {
         profileId: "profile-123",
         notificationId: "notif-1",
@@ -513,7 +509,7 @@ describe("NotificationService", () => {
     });
 
     it("should not process when no pending cold start", () => {
-      (notificationService as any).isColdStartProcessing = false;
+      (notificationService as any).coldStartState = "IDLE";
       (notificationService as any).pendingColdStartNotification = null;
 
       (notificationService as any).processPendingColdStartNotification();
@@ -660,7 +656,7 @@ describe("NotificationService", () => {
       mockNavigator = jest.fn();
       notificationService.setProfileSwitcher(mockProfileSwitcher);
       notificationService.setNavigator(mockNavigator);
-      (notificationService as any).isColdStartProcessing = false;
+      (notificationService as any).coldStartState = "IDLE";
       savedNotifications = [];
 
       mockBasicStorage.save.mockImplementation(async (record: any) => {
@@ -746,12 +742,6 @@ describe("NotificationService", () => {
 
     it("should use correct queue process interval", () => {
       expect((notificationService as any).QUEUE_PROCESS_INTERVAL_MS).toBe(1000);
-    });
-
-    it("should use correct cold start processing clear delay", () => {
-      expect(
-        (notificationService as any).COLD_START_PROCESSING_CLEAR_DELAY_MS
-      ).toBe(10000);
     });
   });
 });
