@@ -94,6 +94,7 @@ import {
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
 import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
+import { logSyncService } from "../../../core/services/LogSyncService";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -305,6 +306,19 @@ const AppWrapper = (props: { children: ReactNode }) => {
         Agent.agent.keriaNotifications.stopPolling();
       }
     }
+  }, [authentication.loggedIn, initializationPhase]);
+
+  useEffect(() => {
+    if (initializationPhase === InitializationPhase.PHASE_TWO) {
+      if (authentication.loggedIn) {
+        logSyncService.start();
+      } else {
+        logSyncService.stop();
+      }
+    }
+    return () => {
+      logSyncService.stop();
+    };
   }, [authentication.loggedIn, initializationPhase]);
 
   useEffect(() => {

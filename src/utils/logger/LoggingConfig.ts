@@ -1,7 +1,7 @@
 import { LogLevel } from "./ILogger";
 
 interface ILoggingConfig {
-  mode: LogLevel | 'off';
+  mode: LogLevel | "off";
   consoleEnabled: boolean;
   localEnabled: boolean;
   remoteEnabled: boolean;
@@ -13,7 +13,7 @@ interface ILoggingConfig {
 }
 
 export class LoggingConfig implements ILoggingConfig {
-  public readonly mode: LogLevel | 'off';
+  public readonly mode: LogLevel | "off";
   public readonly consoleEnabled: boolean;
   public readonly localEnabled: boolean;
   public readonly remoteEnabled: boolean;
@@ -24,7 +24,7 @@ export class LoggingConfig implements ILoggingConfig {
   public readonly retryDelayMs: number;
 
   constructor() {
-    this.mode = (process.env.LOGGING_MODE as LogLevel | 'off') || "info";
+    this.mode = (process.env.LOGGING_MODE as LogLevel | "off") || "info";
     this.consoleEnabled = process.env.LOGGING_CONSOLE_ENABLED === "true";
     this.localEnabled = process.env.LOGGING_LOCAL_ENABLED === "true";
     this.remoteEnabled = process.env.LOGGING_REMOTE_ENABLED === "true";
@@ -37,8 +37,8 @@ export class LoggingConfig implements ILoggingConfig {
     const parsedRetryDelayMs = parseInt(process.env.LOGGING_RETRY_DELAY_MS || "5000", 10);
     this.retryDelayMs = isNaN(parsedRetryDelayMs) ? 5000 : parsedRetryDelayMs;
 
-    // Override individual enables if mode is 'off'
-    if (this.mode === 'off') {
+    // Override individual enables if mode is "off"
+    if (this.mode === "off") {
       this.consoleEnabled = false;
       this.localEnabled = false;
       this.remoteEnabled = false;

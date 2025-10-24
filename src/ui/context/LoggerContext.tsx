@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { logger } from "../utils/logger/Logger";
+import { logger } from "../../utils/logger/Logger";
 
 const LoggerContext = createContext(logger);
 export const useLogger = () => useContext(LoggerContext);

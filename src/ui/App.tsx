@@ -41,7 +41,7 @@ import { LoadingType } from "./pages/LoadingPage/LoadingPage.types";
 import { LockPage } from "./pages/LockPage/LockPage";
 import SystemCompatibilityAlert from "./pages/SystemCompatibilityAlert/SystemCompatibilityAlert";
 import { SystemThreatAlert } from "./pages/SystemThreatAlert/SystemThreatAlert";
-import { useSigNozLogSync } from "../hooks/useSigNozLogSync";
+
 import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
 import { getShowProfileState } from "../store/reducers/profileCache";
@@ -141,7 +141,7 @@ const AppContent = ({
 };
 
 const App = () => {
-  useSigNozLogSync();
+  
   const [isCompatible, setIsCompatible] = useState(true);
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [isFreeRASPInitialized, setIsFreeRASPInitialized] = useState(false);
