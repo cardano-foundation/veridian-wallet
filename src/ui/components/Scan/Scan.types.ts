@@ -1,5 +1,4 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
-
 interface ScanProps {
   cameraDirection?: LensFacing;
   onCheckPermissionFinish?: (permission: boolean) => void;
@@ -7,6 +6,7 @@ interface ScanProps {
   componentId?: string;
   customTranslateKey?: string;
   displayOnModal?: boolean;
+  hiddenDefaultPasteValueButton?: boolean;
 }
 
 interface ScanRef {

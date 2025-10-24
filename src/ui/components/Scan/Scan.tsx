@@ -40,6 +40,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       onFinishScan,
       customTranslateKey,
       displayOnModal,
+      hiddenDefaultPasteValueButton = false,
     }: ScanProps,
     ref
   ) => {
@@ -240,14 +241,16 @@ const Scan = forwardRef<ScanRef, ScanProps>(
                     : getTranslateText("scan.permissionalert")}
                 </span>
               </IonRow>
-              <IonButton
-                shape="round"
-                className="paste-content-button primary-button"
-                data-testid="paste-content-button"
-                onClick={() => setPasteModalIsOpen(true)}
-              >
-                {getTranslateText("scan.pastecontentbutton")}
-              </IonButton>
+              {!hiddenDefaultPasteValueButton && (
+                <IonButton
+                  shape="round"
+                  className="paste-content-button primary-button"
+                  data-testid="paste-content-button"
+                  onClick={() => setPasteModalIsOpen(true)}
+                >
+                  {getTranslateText("scan.pastecontentbutton")}
+                </IonButton>
+              )}
             </>
           ) : (
             <div

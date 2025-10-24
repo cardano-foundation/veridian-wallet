@@ -315,10 +315,6 @@ const initialState = {
   biometricsCache: {
     enabled: false,
   },
-  ssiAgentCache: {
-    bootUrl: "",
-    connectUrl: "",
-  },
 };
 
 const storeMocked = {
@@ -616,10 +612,6 @@ describe("Witness availability", () => {
       biometricsCache: {
         enabled: false,
       },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
-      },
     };
 
     const storeMocked = {
@@ -692,10 +684,6 @@ describe("Witness availability", () => {
       },
       biometricsCache: {
         enabled: false,
-      },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
       },
     };
 
@@ -943,10 +931,6 @@ describe("System threat alert", () => {
       },
       biometricsCache: {
         enabled: false,
-      },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
       },
     };
 

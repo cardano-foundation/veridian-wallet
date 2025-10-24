@@ -398,23 +398,48 @@
     }
   },
   "ssiagent": {
-    "title": "Enter your SSI agent details",
-    "description": "To continue, please enter the SSI agent boot and connect URLs (in your email or from your command line).",
-    "verifydescription": "To continue, please enter the SSI agent connect URL (in your email or from your command line).",
-    "button": {
-      "info": "Get more information",
-      "validate": "Validate",
-      "onboardingdocumentation": "Onboarding documentation",
-      "recoverydocumentation": "Recovery documentation"
+    "connect": {
+      "title": "Connect to Veridian",
+      "description": "Veridian Wallet requires connecting to a Cloud Agent. As part of the onboarding process, you need to scan a QR code which establishes a secure connection.",
+      "seconddescription": "For more information and to assist with this process, visit our website.",
+      "bottomdescription": "If you’re ready and understand, please click the “Proceed to scan” button. This will open a scanner where you scan the QR code or manually enter the URL.",
+      "buttons": {
+        "connected": "Get connected",
+        "onboardingdocumentation": "Visit our website",
+        "recoverydocumentation": "Recovery documentation"
+      }
     },
-    "input": {
-      "boot": {
-        "label": "Boot URL",
-        "placeholder": "Paste or scan your boot URL"
+    "scanssi": {
+      "cancel": "Cancel",
+      "scan": {
+        "button": {
+          "entermanual": "Enter manually",
+          "advancedsetup": "Advanced setup"
+        },
+        "modal": {
+          "title": "Enter manually",
+          "cancel": "Cancel",
+          "confirm": "Confirm",
+          "placeholder": "Enter connection URL"
+        }
+      }
+    },
+    "advancedsetup": {
+      "title": "Advanced setup",
+      "description": "To connect, please enter the SSI agent boot and connect URLs (in your email or from your command line).",
+      "buttons": {
+        "connect": "Connect",
+        "cancel": "Cancel"
       },
-      "connect": {
-        "label": "Connect URL",
-        "placeholder": "Paste or scan your connect URL"
+      "input": {
+        "boot": {
+          "label": "Boot URL",
+          "placeholder": "Paste or scan your boot URL"
+        },
+        "connect": {
+          "label": "Connect URL",
+          "placeholder": "Paste or scan your connect URL"
+        }
       }
     },
     "error": {
@@ -1462,7 +1487,11 @@
     "duplicategroupiderror": "Group already exists",
     "groupmetadatanotfounderror": "Group metadata is missing. Please try again.",
     "unabletoaccepterror": "Unable to accept",
-    "acceptsuccess": "Accepted Successfully"
+    "acceptsuccess": "Accepted Successfully",
+    "connecturldiscovererror": "Failed to discovery connect url",
+    "findconnecturlerror": "Connect URL not found",
+    "invalidbooturlerror": "Invalid boot url",
+    "invalidconnecturlerror": "Invalid connect url"
   },
   "request": {
     "sign": {
@@ -1659,7 +1688,8 @@
     "inputmodal": {
       "cancel": "Cancel",
       "confirm": "Confirm",
-      "pastecontents": "Paste contents"
+      "pastecontents": "Paste contents",
+      "placeholder": "Paste connection URL"
     }
   },
   "shareprofile": {
@@ -1672,17 +1702,6 @@
       "title": "Share profile",
       "description": "To connect, share your profile by showing your QR code, sending the link, or using another method.",
       "button": "Share"
-    },
-    "scan": {
-      "title": "Align the QR code within the frame to scan",
-      "permissionalert": "Enable the camera in your device settings to start scanning",
-      "cameraunavailable": "We're unable to access your camera.",
-      "pastecontentbutton": "Paste contents",
-      "inputmodal": {
-        "cancel": "Cancel",
-        "confirm": "Confirm",
-        "pastecontents": "Paste contents"
-      }
     }
   }
 }
