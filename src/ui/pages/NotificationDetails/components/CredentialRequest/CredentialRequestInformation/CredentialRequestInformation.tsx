@@ -197,6 +197,8 @@ const CredentialRequestInformation = ({
     if (isGroupInitiator) {
       return groupInitiatorJoined
         ? i18n.t("tabs.notifications.details.buttons.ok")
+        : suitableCredentialsCount === 1
+        ? i18n.t("tabs.notifications.details.buttons.presentcredential")
         : i18n.t("tabs.notifications.details.buttons.choosecredential");
     }
 
