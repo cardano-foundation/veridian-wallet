@@ -993,7 +993,7 @@
               "threshold": "Signing threshold",
               "thresholdcontent": "out of {{members}}",
               "alert": {
-                "textdecline": "Are you sure you want to decline this credential request? You won't be able to change your decision later."
+                "textdecline": "Are you sure you want to decline this credential presentation request? You won't be able to change your decision later."
               },
               "groupmember": "Group members",
               "joinedmembers": "Joined members",
