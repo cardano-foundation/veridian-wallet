@@ -8,12 +8,16 @@ import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../__fixtures__/credRequestFix";
+import {
+  filteredCredsFix,
+  revokedCredsFix,
+} from "../../../../__fixtures__/filteredCredsFix";
 import { multisignIdentifierFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
-import { revokedCredsFix } from "../../../../__fixtures__/filteredCredsFix";
-import { CredentialRequest } from "./CredentialRequest";
-import { makeTestStore } from "../../../../utils/makeTestStore";
 import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
+import { makeTestStore } from "../../../../utils/makeTestStore";
+import { passcodeFiller } from "../../../../utils/passcodeFiller";
+import { CredentialRequest } from "./CredentialRequest";
 
 const getIpexApplyDetailsMock = jest.fn(() => Promise.resolve(credRequestFix));
 const getLinkedGroupFromIpexApplyMock = jest.fn();
@@ -32,6 +36,8 @@ jest.mock("@ionic/react", () => {
           {props.message}
         </div>
       ) : null,
+    IonModal: ({ children, isOpen, ...props }: any) =>
+      isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
   };
 });
 
@@ -104,7 +110,7 @@ describe("Credential request", () => {
 
     const history = createMemoryHistory();
 
-    const { getByText, getByTestId, queryByTestId } = render(
+    const { getByText, getByTestId, queryByTestId, getAllByText } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter history={history}>
           <CredentialRequest
@@ -121,13 +127,7 @@ describe("Credential request", () => {
 
     await waitFor(() => {
       expect(queryByTestId("credential-request-spinner-container")).toBe(null);
-
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.notifications.details.credential.request
-            .information.title
-        )
-      ).toBeVisible();
+      expect(getByTestId("primary-button-multi-sign")).toBeVisible();
     });
 
     act(() => {
@@ -136,10 +136,10 @@ describe("Credential request", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
+        getAllByText(
           EN_TRANSLATIONS.tabs.notifications.details.credential.request
             .choosecredential.title
-        )
+        )[0]
       ).toBeVisible();
     });
   });
@@ -257,7 +257,7 @@ describe("Credential request", () => {
       Promise.resolve(credRequestFix)
     );
 
-    const { getByText, getByTestId, queryByTestId } = render(
+    const { getByText, getByTestId, queryByTestId, getAllByText } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter history={history}>
           <CredentialRequest
@@ -275,12 +275,7 @@ describe("Credential request", () => {
     await waitFor(() => {
       expect(queryByTestId("credential-request-spinner-container")).toBe(null);
 
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.notifications.details.credential.request
-            .information.title
-        )
-      ).toBeVisible();
+      expect(getByTestId("primary-button-notification-details")).toBeVisible();
     });
 
     act(() => {
@@ -289,10 +284,10 @@ describe("Credential request", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
+        getAllByText(
           EN_TRANSLATIONS.tabs.notifications.details.credential.request
             .choosecredential.title
-        )
+        )[0]
       ).toBeVisible();
     });
 
@@ -398,7 +393,6 @@ describe("Credential request: Multisig", () => {
           },
           connections: [],
           multisigConnections: [
-            { id: "member-1", label: "Member 1" },
             { id: "member-2", label: "Member 2" },
             { id: "member-3", label: "Member 3" },
             { id: "member-4", label: "Member 4" },
@@ -461,13 +455,6 @@ describe("Credential request: Multisig", () => {
 
     await waitFor(() => {
       expect(queryByTestId("credential-request-spinner-container")).toBe(null);
-
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.notifications.details.credential.request
-            .information.title
-        )
-      ).toBeVisible();
     });
 
     expect(
@@ -483,7 +470,7 @@ describe("Credential request: Multisig", () => {
       )
     ).toBeVisible();
     expect(getByText("5")).toBeVisible();
-    expect(getAllByText("Member 1")[0]).toBeVisible();
+    expect(getAllByText("test")[0]).toBeVisible();
     expect(getAllByText("Member 2")[0]).toBeVisible();
 
     act(() => {
@@ -492,11 +479,100 @@ describe("Credential request: Multisig", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
+        getAllByText(
           EN_TRANSLATIONS.tabs.notifications.details.credential.request
             .choosecredential.title
-        )
+        )[0]
       ).toBeVisible();
+    });
+  });
+
+  test("Submit", async () => {
+    getIpexApplyDetailsMock.mockImplementation(() =>
+      Promise.resolve({
+        ...credRequestFix,
+        credentials: [credRequestFix.credentials[0]],
+      })
+    );
+
+    const initialState = {
+      stateCache: {
+        routes: [TabsRoutePath.NOTIFICATIONS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+        },
+        isOnline: true,
+      },
+      profilesCache: {
+        ...profileCacheFixData,
+        profiles: {
+          ...(profileCacheFixData.profiles || {}),
+          id: {
+            identity: {
+              ...filteredCredsFix[0],
+              id: "id",
+            },
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [filteredCredsFix[0]],
+            archivedCredentials: [],
+            notifications: [],
+          },
+        },
+        defaultProfile: "id",
+      },
+      biometricsCache: {
+        enabled: false,
+      },
+    };
+
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    const history = createMemoryHistory();
+
+    const { getByText, getByTestId, queryByTestId, getAllByText } = render(
+      <Provider store={storeMocked}>
+        <IonReactMemoryRouter history={history}>
+          <CredentialRequest
+            pageId="multi-sign"
+            activeStatus
+            handleBack={jest.fn()}
+            notificationDetails={notificationsFix[4]}
+          />
+        </IonReactMemoryRouter>
+      </Provider>
+    );
+
+    expect(getByTestId("credential-request-spinner-container")).toBeVisible();
+
+    await waitFor(() => {
+      expect(queryByTestId("credential-request-spinner-container")).toBe(null);
+    });
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.buttons.presentcredential
+      )
+    ).toBeVisible();
+
+    act(() => {
+      fireEvent.click(getByTestId("primary-button-multi-sign"));
+    });
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
+    });
+
+    passcodeFiller(getByText, getByTestId, "193212");
+
+    await waitFor(() => {
+      expect(offerAcdcFromApplyMock).toBeCalled();
     });
   });
 });

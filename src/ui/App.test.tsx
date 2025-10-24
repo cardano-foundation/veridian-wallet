@@ -871,7 +871,6 @@ describe("System threat alert", () => {
         routes: [{ path: TabsRoutePath.ROOT }],
         authentication: {
           loggedIn: true,
-          userName: "",
           time: Date.now(),
           passcodeIsSet: true,
           seedPhraseIsSet: true,

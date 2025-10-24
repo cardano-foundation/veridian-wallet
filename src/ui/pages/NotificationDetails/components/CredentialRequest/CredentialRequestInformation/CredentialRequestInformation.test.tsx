@@ -4,17 +4,16 @@ import { Provider } from "react-redux";
 
 import EN_TRANSLATIONS from "../../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../../routes/paths";
-import { connectionsForNotificationsValues } from "../../../../../__fixtures__/connectionsFix";
+import { InitializationPhase } from "../../../../../../store/reducers/stateCache/stateCache.types";
 import { credRequestFix } from "../../../../../__fixtures__/credRequestFix";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
+import { filteredCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
 import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
 import { profileCacheFixData } from "../../../../../__fixtures__/storeDataFix";
+import { OperationType } from "../../../../../globals/types";
 import { makeTestStore } from "../../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
-import { filteredCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
-import { OperationType } from "../../../../../globals/types";
-import { InitializationPhase } from "../../../../../../store/reducers/stateCache/stateCache.types";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -59,7 +58,6 @@ const initialState = {
     routes: [{ path: TabsRoutePath.NOTIFICATIONS }],
     authentication: {
       loggedIn: true,
-      userName: "",
       time: Date.now(),
       passcodeIsSet: true,
       seedPhraseIsSet: true,

@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
 import { IdentifierDetails } from "../../../../../core/agent/services/identifier.types";
+import { Member } from "../../../MemberList/MemberList.type";
 
 enum DetailView {
   GroupMember = "groupmember",
@@ -44,16 +44,9 @@ interface AdvancedProps {
   currentUserIndex: number;
 }
 
-interface ListItem {
-  image?: string;
-  title: string;
-  isCurrentUser?: boolean;
-  avatar?: ReactNode;
-}
-
 interface ListProps {
   title: string;
-  data: ListItem[];
+  data: Member[];
   bottomText?: string;
   fullText?: boolean;
   mask?: boolean;
@@ -61,14 +54,13 @@ interface ListProps {
 }
 
 export type {
+  AdvancedProps,
+  CreatedTimestampProps,
   IdentifierAttributeDetailModalProps,
   IdentifierIDDetailProps,
-  SigningThresholdProps,
-  CreatedTimestampProps,
-  SenquenceNumberProps,
   ListProps,
-  ListItem,
-  AdvancedProps,
+  SenquenceNumberProps,
+  SigningThresholdProps,
 };
 
-export { DetailView, AccordionKey };
+export { AccordionKey, DetailView };
