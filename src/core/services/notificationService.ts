@@ -1,25 +1,6 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
-
-enum NotificationLogContext {
-  ColdStart = "ColdStart",
-  WarmTap = "WarmTap",
-  Scheduling = "Scheduling",
-  Queue = "Queue",
-}
-
-enum NotificationLogSeverity {
-  Debug = "DEBUG",
-  Warn = "WARN",
-  Error = "ERROR",
-}
-
-enum ColdStartState {
-  IDLE = "IDLE",
-  PROCESSING = "PROCESSING",
-  READY = "READY",
-}
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 import { TabsRoutePath } from "../../routes/paths";
 import { showError } from "../../ui/utils/error";
@@ -29,6 +10,12 @@ import {
   NotificationContext,
   getNotificationDisplayTextForPush,
 } from "./notificationUtils";
+
+enum ColdStartState {
+  IDLE = "IDLE",
+  PROCESSING = "PROCESSING",
+  READY = "READY",
+}
 
 interface NotificationMetrics {
   totalScheduled: number;
@@ -58,7 +45,8 @@ interface LocalNotification {
 
 class NotificationService {
   private profileSwitcher: ((profileId: string) => void) | null = null;
-  private navigator: ((path: string) => void) | null = null;
+  private navigator: ((path: string, notificationId?: string) => void) | null =
+    null;
   private metrics: NotificationMetrics = { totalScheduled: 0, totalTapped: 0 };
   private notificationQueue: QueuedNotification[] = [];
   private processingQueue = false;
@@ -69,38 +57,16 @@ class NotificationService {
   } | null = null;
   private coldStartState: ColdStartState = ColdStartState.IDLE;
   private targetProfileIdForColdStart: string | null = null;
+  private warmTargetProfileId: string | null = null;
+  private profileSwitchInProgress = false;
   private readonly NAVIGATION_DELAY_MS = 500;
   private readonly COLD_START_DELAY_MS = 1000;
   private readonly DEBOUNCE_DELAY_MS = 100;
   private readonly QUEUE_PROCESS_INTERVAL_MS = 1000;
-  private readonly DEBUG_LOGGING_ENABLED =
-    typeof process !== "undefined" &&
-    process.env &&
-    process.env.NODE_ENV !== "production";
 
   constructor() {
     this.initialize();
     this.startQueueProcessor();
-  }
-
-  private debugLog(
-    message: string,
-    options?: {
-      details?: Record<string, unknown>;
-      context?: NotificationLogContext;
-      severity?: NotificationLogSeverity;
-    }
-  ): void {
-    if (!this.DEBUG_LOGGING_ENABLED) {
-      return;
-    }
-
-    const context = options?.context ? `[${options.context}] ` : "";
-    const severity = options?.severity || NotificationLogSeverity.Debug;
-    const prefix = `[NotificationService] ${severity} ${context}${message}`;
-    const payload = options?.details ? [options.details] : [];
-    // eslint-disable-next-line no-console
-    console.log(prefix, ...payload);
   }
 
   setProfileSwitcher(profileSwitcher: (profileId: string) => void) {
@@ -108,7 +74,7 @@ class NotificationService {
     this.processPendingColdStartNotification();
   }
 
-  setNavigator(navigator: (path: string) => void) {
+  setNavigator(navigator: (path: string, notificationId?: string) => void) {
     this.navigator = navigator;
     this.processPendingColdStartNotification();
   }
@@ -129,9 +95,6 @@ class NotificationService {
   private async createNotificationChannel(): Promise<void> {
     const platform = Capacitor.getPlatform();
     if (platform !== "android") {
-      this.debugLog("Skipping notification channel creation", {
-        details: { platform },
-      });
       return;
     }
 
@@ -147,19 +110,8 @@ class NotificationService {
         lightColor: "#4630EB",
         vibration: true,
       });
-      this.debugLog("Notification channel created", {
-        details: { platform },
-      });
     } catch (error) {
-      this.debugLog("Failed to create notification channel", {
-        details: {
-          platform,
-          error: error instanceof Error ? error.message : String(error),
-        },
-        severity: NotificationLogSeverity.Warn,
-      });
-      // eslint-disable-next-line no-console
-      console.warn("Failed to create notification channel:", error);
+      this.updateMetricsOnError("Failed to create notification channel");
     }
   }
 
@@ -188,12 +140,6 @@ class NotificationService {
   async scheduleNotification(payload: NotificationPayload): Promise<void> {
     if (!this.permissionsGranted) {
       this.updateMetricsOnError("Permissions not granted");
-      this.debugLog("Queue rejected - permissions not granted", {
-        details: {
-          notificationId: payload.notificationId,
-        },
-        context: NotificationLogContext.Queue,
-      });
       return;
     }
 
@@ -203,13 +149,6 @@ class NotificationService {
     };
 
     this.notificationQueue.push(queuedNotification);
-    this.debugLog("Notification enqueued", {
-      context: NotificationLogContext.Queue,
-      details: {
-        notificationId: payload.notificationId,
-        queueLength: this.notificationQueue.length,
-      },
-    });
   }
 
   async showLocalNotification(
@@ -220,33 +159,14 @@ class NotificationService {
   ): Promise<void> {
     const isAppActive = await this.isAppInForeground();
     if (!isAppActive) {
-      this.debugLog("Skipping display - app inactive", {
-        context: NotificationLogContext.Scheduling,
-        details: {
-          notificationId: keriaNotification.id,
-        },
-      });
       return;
     }
 
     if (this.coldStartState === ColdStartState.PROCESSING) {
-      this.debugLog("Skipping display - cold start processing", {
-        context: NotificationLogContext.ColdStart,
-        details: {
-          notificationId: keriaNotification.id,
-        },
-      });
       return;
     }
 
     if (keriaNotification.receivingPre === currentProfileId) {
-      this.debugLog("Suppressing current profile notification", {
-        context: NotificationLogContext.Scheduling,
-        details: {
-          notificationId: keriaNotification.id,
-          profileId: currentProfileId,
-        },
-      });
       await this.markNotificationAsShown(keriaNotification.id);
       return;
     }
@@ -256,12 +176,6 @@ class NotificationService {
     );
 
     if (alreadyShown) {
-      this.debugLog("Skipping already shown notification", {
-        context: NotificationLogContext.Scheduling,
-        details: {
-          notificationId: keriaNotification.id,
-        },
-      });
       return;
     }
 
@@ -272,13 +186,6 @@ class NotificationService {
     );
 
     if (payload) {
-      this.debugLog("Queueing notification for display", {
-        context: NotificationLogContext.Scheduling,
-        details: {
-          notificationId: keriaNotification.id,
-          targetProfileId: keriaNotification.receivingPre,
-        },
-      });
       await this.scheduleNotification(payload);
       await this.markNotificationAsShown(keriaNotification.id);
     }
@@ -316,14 +223,6 @@ class NotificationService {
 
   private handleNotificationTap(notification: LocalNotification): void {
     this.metrics.totalTapped++;
-    this.debugLog("Notification tap received", {
-      context: NotificationLogContext.WarmTap,
-      details: {
-        notificationId: notification.id,
-        hasProfileSwitcher: Boolean(this.profileSwitcher),
-        hasNavigator: Boolean(this.navigator),
-      },
-    });
     this.debouncedProcessNotificationTap(notification);
   }
 
@@ -340,31 +239,34 @@ class NotificationService {
     const extra = notification.extra || {};
     const profileId = extra.profileId;
 
-    this.coldStartState = ColdStartState.PROCESSING;
-    this.debugLog("Processing notification tap", {
-      context: NotificationLogContext.WarmTap,
-      details: {
-        notificationId: notification.id,
-        profileId,
-      },
-    });
+    const handlersReady =
+      Boolean(this.profileSwitcher) && Boolean(this.navigator);
+
+    if (!handlersReady) {
+      if (profileId) {
+        this.targetProfileIdForColdStart = profileId;
+      }
+      this.coldStartState = ColdStartState.PROCESSING;
+      this.pendingColdStartNotification = {
+        profileId: profileId || "",
+        notificationId: String(notification.id),
+      };
+      return;
+    }
+
+    this.profileSwitchInProgress = true;
+    this.warmTargetProfileId = profileId || null;
+    this.targetProfileIdForColdStart = null;
 
     if (profileId && this.profileSwitcher) {
-      this.targetProfileIdForColdStart = profileId;
-      this.debugLog("Profile switch requested from tap", {
-        context: NotificationLogContext.WarmTap,
-        details: {
-          notificationId: notification.id,
-          targetProfileId: profileId,
-        },
-      });
       this.profileSwitcher(profileId);
+      this.clearDeliveredNotificationsForProfile(profileId);
     }
 
     setTimeout(() => {
       if (this.navigator) {
         try {
-          this.navigator(TabsRoutePath.NOTIFICATIONS);
+          this.navigator(TabsRoutePath.NOTIFICATIONS, String(notification.id));
         } catch (error) {
           this.updateMetricsOnError("Navigation failed");
           showError("Failed to navigate via navigator", error);
@@ -449,17 +351,28 @@ class NotificationService {
       });
 
       this.metrics.totalScheduled++;
-      this.debugLog("Notification scheduled immediately", {
-        context: NotificationLogContext.Queue,
-        details: {
-          notificationId: payload.notificationId,
-          profileId: payload.profileId,
-          queueLength: this.notificationQueue.length,
-        },
-      });
     } catch (error) {
       this.updateMetricsOnError("Failed to schedule notification");
       throw error;
+    }
+  }
+
+  async clearDeliveredNotificationsForProfile(
+    profileId: string
+  ): Promise<void> {
+    try {
+      const delivered = await LocalNotifications.getDeliveredNotifications();
+      const toCancel = delivered.notifications
+        .filter((n) => n.extra?.profileId === profileId)
+        .map((n) => ({ id: n.id }));
+
+      if (toCancel.length > 0) {
+        await LocalNotifications.cancel({ notifications: toCancel });
+      }
+    } catch (error) {
+      this.updateMetricsOnError(
+        "Failed to clear delivered notifications for profile"
+      );
     }
   }
 
@@ -551,10 +464,6 @@ class NotificationService {
     const shownNotifications = await this.getShownNotifications();
     shownNotifications.add(notificationId);
     await this.saveShownNotifications(shownNotifications);
-    this.debugLog("Notification marked as shown", {
-      context: NotificationLogContext.Scheduling,
-      details: { notificationId },
-    });
 
     if (!isNaN(Number(notificationId))) {
       try {
@@ -612,6 +521,10 @@ class NotificationService {
   async cleanupShownNotifications(
     currentNotificationIds: string[]
   ): Promise<void> {
+    if (currentNotificationIds.length === 0) {
+      return;
+    }
+
     const shownNotifications = await this.getShownNotifications();
     const currentIds = new Set(currentNotificationIds);
     let hasChanges = false;
@@ -627,13 +540,6 @@ class NotificationService {
 
     if (hasChanges) {
       await this.saveShownNotifications(shownNotifications);
-      this.debugLog("Cleaned up shown notifications", {
-        context: NotificationLogContext.Queue,
-        details: {
-          removedCount: removed.length,
-          removedIds: removed,
-        },
-      });
     }
   }
 
@@ -645,22 +551,16 @@ class NotificationService {
     ) {
       const data = this.pendingColdStartNotification;
       this.pendingColdStartNotification = null;
-      this.debugLog("Processing pending cold start notification", {
-        context: NotificationLogContext.ColdStart,
-        details: {
-          notificationId: data.notificationId,
-          profileId: data.profileId,
-        },
-      });
 
-      if (this.profileSwitcher) {
+      if (this.profileSwitcher && data.profileId) {
         this.profileSwitcher(data.profileId);
+        this.clearDeliveredNotificationsForProfile(data.profileId);
       }
 
       setTimeout(() => {
         if (this.navigator) {
           try {
-            this.navigator(TabsRoutePath.NOTIFICATIONS);
+            this.navigator(TabsRoutePath.NOTIFICATIONS, data.notificationId);
           } catch (error) {
             this.updateMetricsOnError("Cold start navigation failed");
             showError("Failed to navigate via navigator", error);
@@ -675,9 +575,6 @@ class NotificationService {
 
   completeColdStart(): void {
     this.coldStartState = ColdStartState.READY;
-    this.debugLog("Cold start completed", {
-      context: NotificationLogContext.ColdStart,
-    });
   }
 
   hasPendingColdStart(): boolean {
@@ -687,12 +584,29 @@ class NotificationService {
     );
   }
 
+  setColdStartHandled(): void {
+    this.coldStartState = ColdStartState.IDLE;
+  }
+
   getTargetProfileIdForColdStart(): string | null {
     return this.targetProfileIdForColdStart;
   }
 
   clearTargetProfileIdForColdStart(): void {
     this.targetProfileIdForColdStart = null;
+  }
+
+  isProfileSwitchInProgress(): boolean {
+    return this.profileSwitchInProgress;
+  }
+
+  getTargetProfileIdForWarmSwitch(): string | null {
+    return this.warmTargetProfileId;
+  }
+
+  setProfileSwitchComplete(): void {
+    this.profileSwitchInProgress = false;
+    this.warmTargetProfileId = null;
   }
 }
 

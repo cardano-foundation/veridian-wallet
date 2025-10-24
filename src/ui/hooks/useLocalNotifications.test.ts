@@ -17,6 +17,8 @@ jest.mock("../../core/services/notificationService", () => ({
     isNotificationShown: jest.fn(),
     markAsShown: jest.fn(),
     cleanupShownNotifications: jest.fn(),
+    isProfileSwitchInProgress: jest.fn(),
+    getTargetProfileIdForWarmSwitch: jest.fn(),
   },
 }));
 
@@ -45,6 +47,8 @@ describe("useLocalNotifications", () => {
   const mockIsNotificationShown = jest.fn();
   const mockMarkAsShown = jest.fn();
   const mockCleanupShownNotifications = jest.fn();
+  const mockIsProfileSwitchInProgress = jest.fn();
+  const mockGetTargetProfileIdForWarmSwitch = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -77,9 +81,15 @@ describe("useLocalNotifications", () => {
     mockNotificationService.markAsShown = mockMarkAsShown;
     mockNotificationService.cleanupShownNotifications =
       mockCleanupShownNotifications;
+    mockNotificationService.isProfileSwitchInProgress =
+      mockIsProfileSwitchInProgress;
+    mockNotificationService.getTargetProfileIdForWarmSwitch =
+      mockGetTargetProfileIdForWarmSwitch;
 
     mockHasPendingColdStart.mockReturnValue(false);
     mockIsNotificationShown.mockResolvedValue(false);
+    mockIsProfileSwitchInProgress.mockReturnValue(false);
+    mockGetTargetProfileIdForWarmSwitch.mockReturnValue(undefined);
   });
 
   it("should return showNotification and requestPermissions functions", () => {

@@ -11,6 +11,10 @@ jest.mock("@capacitor/local-notifications", () => ({
     addListener: jest.fn(),
     removeAllDeliveredNotifications: jest.fn(),
     cancel: jest.fn(),
+    getPending: jest.fn(() => Promise.resolve({ notifications: [] })),
+    getDeliveredNotifications: jest.fn(() =>
+      Promise.resolve({ notifications: [] })
+    ),
   },
 }));
 
@@ -234,6 +238,111 @@ describe("NotificationService", () => {
     });
   });
 
+  describe("cleanupShownNotifications", () => {
+    it("should skip cleanup when no current notification ids", async () => {
+      const saveSpy = jest.spyOn(
+        notificationService as any,
+        "saveShownNotifications"
+      );
+
+      await notificationService.cleanupShownNotifications([]);
+
+      expect(saveSpy).not.toHaveBeenCalled();
+      saveSpy.mockRestore();
+    });
+
+    it("should remove stale shown notifications", async () => {
+      const shownIds = ["stale-id", "active-id"];
+      mockBasicStorage.findById.mockResolvedValueOnce({
+        content: { notificationIds: shownIds },
+      } as any);
+
+      mockBasicStorage.save.mockResolvedValueOnce({} as any);
+
+      await notificationService.cleanupShownNotifications(["active-id"]);
+
+      expect(mockBasicStorage.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.SHOWN_NOTIFICATIONS,
+          content: { notificationIds: ["active-id"] },
+        })
+      );
+    });
+  });
+
+  describe("marking notifications", () => {
+    it("should persist notification id and cancel local notification", async () => {
+      mockBasicStorage.findById.mockResolvedValueOnce({
+        content: { notificationIds: [] },
+      } as any);
+
+      mockBasicStorage.save.mockResolvedValueOnce({} as any);
+      (LocalNotifications.cancel as jest.Mock).mockResolvedValue({});
+
+      await notificationService.markAsShown("42");
+
+      expect(mockBasicStorage.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.SHOWN_NOTIFICATIONS,
+          content: { notificationIds: ["42"] },
+        })
+      );
+      expect(LocalNotifications.cancel).toHaveBeenCalledWith({
+        notifications: [{ id: 42 }],
+      });
+    });
+
+    it("should report notification as shown when already stored", async () => {
+      mockBasicStorage.findById.mockResolvedValueOnce({
+        content: { notificationIds: ["abc"] },
+      } as any);
+
+      const result = await notificationService.isNotificationShown("abc");
+
+      expect(result).toBe(true);
+    });
+
+    it("should detect shown notifications from delivered list", async () => {
+      mockBasicStorage.findById.mockResolvedValueOnce(null as any);
+      (
+        LocalNotifications.getDeliveredNotifications as jest.Mock
+      ).mockResolvedValueOnce({
+        notifications: [{ id: 7 }],
+      });
+
+      const result = await notificationService.isNotificationShown("7");
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe("pending cold start processing", () => {
+    it("should process pending notification when handlers set", () => {
+      jest.useFakeTimers();
+
+      const navigator = jest.fn();
+      const profileSwitcher = jest.fn();
+
+      notificationService.setNavigator(navigator);
+      notificationService.setProfileSwitcher(profileSwitcher);
+
+      (notificationService as any).pendingColdStartNotification = {
+        profileId: "profile-1",
+        notificationId: "notif-1",
+      };
+
+      (notificationService as any).processPendingColdStartNotification();
+
+      expect(profileSwitcher).toHaveBeenCalledWith("profile-1");
+
+      jest.advanceTimersByTime(1000);
+
+      expect(navigator).toHaveBeenCalledWith("/tabs/notifications");
+
+      jest.useRealTimers();
+    });
+  });
+
   describe("private methods via showLocalNotification", () => {
     const mockCacheData = {
       connectionsCache: [{ id: "conn-123", label: "Test Connection" }],
@@ -346,10 +455,13 @@ describe("NotificationService", () => {
 
   describe("notification tap handling", () => {
     let mockNavigator: jest.Mock;
+    let mockProfileSwitcher: jest.Mock;
 
     beforeEach(() => {
       mockNavigator = jest.fn();
+      mockProfileSwitcher = jest.fn();
       notificationService.setNavigator(mockNavigator);
+      notificationService.setProfileSwitcher(mockProfileSwitcher);
 
       Object.defineProperty(window, "location", {
         value: { hash: "" },
@@ -452,6 +564,9 @@ describe("NotificationService", () => {
         },
       };
 
+      (notificationService as any).navigator = null;
+      (notificationService as any).profileSwitcher = null;
+
       (notificationService as any).processNotificationTap(
         notification,
         false,
@@ -460,6 +575,11 @@ describe("NotificationService", () => {
 
       const stored = notificationService.getTargetProfileIdForColdStart();
       expect(stored).toBe("profile-123");
+      const pending = (notificationService as any).pendingColdStartNotification;
+      expect(pending).toEqual({
+        profileId: "profile-123",
+        notificationId: "1",
+      });
 
       jest.useRealTimers();
     });
@@ -483,11 +603,17 @@ describe("NotificationService", () => {
         },
       };
 
+      (notificationService as any).navigator = null;
+      (notificationService as any).profileSwitcher = null;
+
       (notificationService as any).handleNotificationTap(notification);
 
       jest.advanceTimersByTime(100);
 
       expect(notificationService.hasPendingColdStart()).toBe(true);
+
+      notificationService.setProfileSwitcher(mockProfileSwitcher);
+      notificationService.setNavigator(mockNavigator);
 
       notificationService.completeColdStart();
 
@@ -724,6 +850,91 @@ describe("NotificationService", () => {
         currentProfileNotificationId
       );
       expect(isShown).toBe(true);
+    });
+  });
+
+  describe("warm app profile switch", () => {
+    let mockProfileSwitcher: jest.Mock;
+    let mockNavigator: jest.Mock;
+
+    beforeEach(() => {
+      mockProfileSwitcher = jest.fn();
+      mockNavigator = jest.fn();
+      notificationService.setProfileSwitcher(mockProfileSwitcher);
+      notificationService.setNavigator(mockNavigator);
+      (notificationService as any).profileSwitchInProgress = false;
+    });
+
+    it("should detect profile switch in progress", () => {
+      (notificationService as any).profileSwitchInProgress = true;
+      expect(notificationService.isProfileSwitchInProgress()).toBe(true);
+    });
+
+    it("should return false when no profile switch", () => {
+      (notificationService as any).profileSwitchInProgress = false;
+      expect(notificationService.isProfileSwitchInProgress()).toBe(false);
+    });
+
+    it("should set profile switch complete", () => {
+      (notificationService as any).profileSwitchInProgress = true;
+      (notificationService as any).warmTargetProfileId = "profile-bob";
+      notificationService.setProfileSwitchComplete();
+      expect(notificationService.isProfileSwitchInProgress()).toBe(false);
+      expect(notificationService.getTargetProfileIdForWarmSwitch()).toBeNull();
+    });
+
+    it("should set profile switch in progress when processing tap", async () => {
+      jest.useFakeTimers();
+
+      const notification = {
+        id: 1,
+        extra: {
+          profileId: "profile-bob",
+          notificationId: "notif-1",
+        },
+      };
+
+      (notificationService as any).processNotificationTap(notification);
+
+      expect(notificationService.isProfileSwitchInProgress()).toBe(true);
+      expect(notificationService.getTargetProfileIdForWarmSwitch()).toBe(
+        "profile-bob"
+      );
+
+      jest.advanceTimersByTime(100);
+      jest.advanceTimersByTime(500);
+
+      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
+
+      notificationService.setProfileSwitchComplete();
+      expect(notificationService.isProfileSwitchInProgress()).toBe(false);
+      expect(notificationService.getTargetProfileIdForWarmSwitch()).toBeNull();
+
+      jest.useRealTimers();
+    });
+
+    it("should batch notifications after profile switch", async () => {
+      jest.useFakeTimers();
+
+      const notification = {
+        id: 1,
+        extra: {
+          profileId: "profile-bob",
+          notificationId: "notif-1",
+        },
+      };
+
+      (notificationService as any).processNotificationTap(notification);
+
+      expect(notificationService.isProfileSwitchInProgress()).toBe(true);
+
+      jest.advanceTimersByTime(500);
+
+      notificationService.setProfileSwitchComplete();
+
+      expect(notificationService.isProfileSwitchInProgress()).toBe(false);
+
+      jest.useRealTimers();
     });
   });
 

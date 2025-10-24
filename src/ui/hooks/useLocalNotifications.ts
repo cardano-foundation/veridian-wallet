@@ -1,5 +1,4 @@
 import { useEffect, useCallback } from "react";
-import { useAppIonRouter } from "./appIonRouterHook";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import {
   getCurrentProfile,
@@ -15,30 +14,16 @@ export const useLocalNotifications = () => {
   const allProfiles = useAppSelector(getProfiles);
   const currentProfile = useAppSelector(getCurrentProfile);
   const dispatch = useAppDispatch();
-  const ionRouter = useAppIonRouter();
 
   const currentProfileId = currentProfile?.identity.id || "";
   const NOTIFICATION_PROCESS_DELAY_MS = 100;
-  const DEBUG_LOGGING_ENABLED =
-    typeof process !== "undefined" &&
-    process.env &&
-    process.env.NODE_ENV !== "production";
-
-  const logDebug = useCallback(
-    (message: string, details?: Record<string, unknown>) => {
-      if (!DEBUG_LOGGING_ENABLED) {
-        return;
-      }
-
-      const payload = details ? [details] : [];
-      // eslint-disable-next-line no-console
-      console.log(`[useLocalNotifications] ${message}`, ...payload);
-    },
-    [DEBUG_LOGGING_ENABLED]
-  );
 
   const displayNotification = useCallback(
     (notification: KeriaNotification) => {
+      if (!allProfiles) {
+        return;
+      }
+
       const notificationProfile = Object.values(allProfiles).find(
         (profile) => profile.identity?.id === notification.receivingPre
       );
@@ -106,30 +91,60 @@ export const useLocalNotifications = () => {
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
     });
 
-    notificationService.setNavigator((path: string) => {
-      window.history.pushState(null, "", path);
-      window.dispatchEvent(
-        new CustomEvent("notificationNavigation", { detail: { path } })
-      );
-    });
-  }, [dispatch, ionRouter]);
+    notificationService.setNavigator(
+      (path: string, notificationId?: string) => {
+        if (notificationId) {
+          notificationService.markAsShown(notificationId);
+        }
+        window.history.pushState(null, "", path);
+        window.dispatchEvent(
+          new CustomEvent("notificationNavigation", { detail: { path } })
+        );
+      }
+    );
+  }, [dispatch]);
 
   useEffect(() => {
     const processNotifications = async () => {
+      if (
+        !currentProfile ||
+        !allProfiles ||
+        !allProfiles[currentProfile.identity.id]
+      ) {
+        return;
+      }
+
       const hasPendingColdStart = notificationService.hasPendingColdStart();
 
       if (hasPendingColdStart) {
-        logDebug("Skipping notification processing - cold start pending");
-        return;
+        const targetProfileId =
+          notificationService.getTargetProfileIdForColdStart();
+        if (targetProfileId && currentProfile.identity.id !== targetProfileId) {
+          return;
+        }
+      }
+
+      if (notificationService.isProfileSwitchInProgress()) {
+        const targetProfileId =
+          notificationService.getTargetProfileIdForWarmSwitch();
+        const currentProfileIdValue = currentProfile?.identity?.id;
+
+        if (
+          targetProfileId &&
+          currentProfileIdValue &&
+          currentProfileIdValue === targetProfileId
+        ) {
+          notificationService.setProfileSwitchComplete();
+        } else if (!targetProfileId) {
+          notificationService.setProfileSwitchComplete();
+        } else {
+          return;
+        }
       }
 
       if (currentProfile && allProfiles[currentProfile.identity.id]) {
         const currentProfileNotifications =
           allProfiles[currentProfile.identity.id].notifications || [];
-        logDebug("Marking current profile notifications as shown", {
-          currentProfileId: currentProfile.identity.id,
-          notificationCount: currentProfileNotifications.length,
-        });
         for (const notification of currentProfileNotifications) {
           const isAlreadyShown = await notificationService.isNotificationShown(
             notification.id
@@ -141,9 +156,6 @@ export const useLocalNotifications = () => {
       }
 
       const allUnreadNotifications = getUnreadNotificationsFromOtherProfiles();
-      logDebug("Processing unread notifications from other profiles", {
-        unreadCount: allUnreadNotifications.length,
-      });
 
       for (const notification of allUnreadNotifications) {
         const isAlreadyShown = await notificationService.isNotificationShown(
@@ -155,7 +167,9 @@ export const useLocalNotifications = () => {
       }
 
       await cleanupShownNotifications();
-      logDebug("Completed notification processing");
+      if (notificationService.isProfileSwitchInProgress()) {
+        notificationService.setProfileSwitchComplete();
+      }
     };
 
     const timeoutId = setTimeout(() => {
@@ -169,7 +183,6 @@ export const useLocalNotifications = () => {
     displayNotification,
     getUnreadNotificationsFromOtherProfiles,
     cleanupShownNotifications,
-    logDebug,
   ]);
 
   return {
