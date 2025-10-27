@@ -82,10 +82,6 @@ describe("NextRoute", () => {
       biometricsCache: {
         enabled: false,
       },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
-      },
     };
     data = {
       store: storeMock,
@@ -327,10 +323,6 @@ describe("getNextRoute", () => {
     },
     biometricsCache: {
       enabled: false,
-    },
-    ssiAgentCache: {
-      bootUrl: "",
-      connectUrl: "",
     },
   };
   const state = {};

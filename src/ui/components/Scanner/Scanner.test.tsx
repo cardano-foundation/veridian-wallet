@@ -7,23 +7,14 @@ import { IonInput } from "@ionic/react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import { OobiType } from "../../../core/agent/agent.types";
 import EN_Translation from "../../../locales/en/en.json";
-import { setGroupProfileCache } from "../../../store/reducers/profileCache";
-import { setBootUrl, setConnectUrl } from "../../../store/reducers/ssiAgent";
-import {
-  setCurrentOperation,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
-import { connectionsFix } from "../../__fixtures__/connectionsFix";
-import { identifierFix } from "../../__fixtures__/identifierFix";
+import { setToastMsg } from "../../../store/reducers/stateCache";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { Scanner } from "./Scanner";
-import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
-import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 
 jest.mock("../../../core/configuration", () => ({
   ...jest.requireActual("../../../core/configuration"),
@@ -368,136 +359,6 @@ describe("Scanner", () => {
       expect(
         getByText(EN_Translation.setupgroupprofile.scan.pastecontents)
       ).toBeVisible();
-    });
-  });
-
-  test("Scan SSI boot url", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.SCAN],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        currentOperation: OperationType.SCAN_SSI_BOOT_URL,
-        toastMsgs: [],
-      },
-      profilesCache: profileCacheFixData,
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const handleReset = jest.fn();
-
-    connectByOobiUrlMock.mockImplementation(() => {
-      return {
-        type: OobiType.NORMAL,
-      };
-    });
-
-    addListener.mockImplementation(
-      (
-        eventName: string,
-        listenerFunc: (result: BarcodesScannedEvent) => void
-      ) => {
-        setTimeout(() => {
-          listenerFunc({
-            barcodes,
-          });
-        }, 100);
-
-        return {
-          remove: jest.fn(),
-        };
-      }
-    );
-
-    render(
-      <Provider store={storeMocked}>
-        <Scanner
-          setIsValueCaptured={setIsValueCaptured}
-          handleReset={handleReset}
-        />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(
-        setBootUrl(
-          "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org/oobi?groupId=72e2f089cef6"
-        )
-      );
-    });
-  });
-
-  test("Scan SSI connect url", async () => {
-    const initialState = {
-      stateCache: {
-        routes: [TabsRoutePath.SCAN],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        currentOperation: OperationType.SCAN_SSI_CONNECT_URL,
-        toastMsgs: [],
-      },
-      profilesCache: {
-        ...profileCacheFixData,
-      },
-    };
-
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-
-    const handleReset = jest.fn();
-
-    connectByOobiUrlMock.mockImplementation(() => {
-      return {
-        type: OobiType.NORMAL,
-      };
-    });
-
-    addListener.mockImplementation(
-      (
-        eventName: string,
-        listenerFunc: (result: BarcodesScannedEvent) => void
-      ) => {
-        setTimeout(() => {
-          listenerFunc({
-            barcodes,
-          });
-        }, 100);
-
-        return {
-          remove: jest.fn(),
-        };
-      }
-    );
-
-    render(
-      <Provider store={storeMocked}>
-        <Scanner
-          setIsValueCaptured={setIsValueCaptured}
-          handleReset={handleReset}
-        />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(
-        setConnectUrl(
-          "http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org/oobi?groupId=72e2f089cef6"
-        )
-      );
     });
   });
 

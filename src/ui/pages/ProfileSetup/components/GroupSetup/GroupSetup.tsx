@@ -5,7 +5,6 @@ import { i18n } from "../../../../../i18n";
 import { MemberAvatar } from "../../../../components/Avatar";
 import { CustomInput } from "../../../../components/CustomInput";
 import { ErrorMessage } from "../../../../components/ErrorMessage";
-import { nameChecker } from "../../../../utils/nameChecker";
 import { SetupProfileStep } from "../../ProfileSetup.types";
 import "./GroupSetup.scss";
 import { SetupGroupProps } from "./GroupSetup.types";
@@ -15,11 +14,10 @@ const GroupSetup = ({
   onChangeGroupName,
   onClickEvent,
   setupProfileStep,
+  errorMessage,
 }: SetupGroupProps) => {
   const [inputChange, setInputChange] = useState(false);
-  const errorMessage = inputChange
-    ? nameChecker.getError(groupName)
-    : undefined;
+  const displayError = inputChange ? errorMessage : undefined;
 
   return (
     <IonContent className="group-setup">
@@ -39,9 +37,9 @@ const GroupSetup = ({
               setInputChange(true);
             }}
             dataTestId="profile-group-name"
-            error={!!errorMessage}
+            error={!!displayError}
           />
-          <ErrorMessage message={errorMessage} />
+          <ErrorMessage message={displayError} />
           <div className="line-text">
             {i18n.t("setupprofile.groupsetupstart.form.or")}
           </div>

@@ -15,8 +15,6 @@ enum OperationType {
   SCAN_CONNECTION = "scanConnection",
   MULTI_SIG_INITIATOR_INIT = "multiSigInitiatorInit",
   SCAN_WALLET_CONNECTION = "scanWalletConnection",
-  SCAN_SSI_BOOT_URL = "scanSSIBootUrl",
-  SCAN_SSI_CONNECT_URL = "scanSSIConnectUrl",
   OPEN_WALLET_CONNECTION_DETAIL = "openWalletConnection",
   OPEN_MULTISIG_IDENTIFIER = "openMultisignIdentifier",
 }
@@ -93,6 +91,11 @@ enum ToastMsgType {
   GROUP_METADATA_NOT_FOUND_ERROR = "groupmetadatanotfounderror",
   UNABLE_TO_ACCEPT = "unabletoaccepterror",
   ACCEPT_SUCCESS = "acceptsuccess",
+  CONNECT_URL_DISCOVER_ERROR = "connecturldiscovererror",
+  FIND_CONNECT_URL_ERROR = "findconnecturlerror",
+  INVALID_BOOT_URL = "invalidbooturlerror",
+  MISMATCH_ERROR = "mismatcherror",
+  INVALID_CONNECT_URL = "invalidconnecturlerror",
 }
 
 const PASSCODE_MAPPING = {

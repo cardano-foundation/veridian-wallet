@@ -1,3 +1,120 @@
+.ssi-agent-summary {
+  &.scrollable-page-layout .scrollable-page-content {
+    & .title {
+      margin: 1rem 0 1.5rem;
+      text-align: center;
+    }
+
+    & > * {
+      margin: 0;
+    }
+
+    .open-ssi-documentation-button {
+      width: 100%;
+      --padding-top: 0.5rem;
+      --padding-bottom: 0.5rem;
+      height: 1.5rem;
+
+      &::part(native) {
+        border-radius: 0.5rem;
+      }
+    }
+
+    .second-page-paragraph {
+      margin: 1rem 0;
+    }
+
+    .third-page-paragraph {
+      margin-top: 2.25rem;
+    }
+  }
+
+  & > .page-footer {
+    margin-bottom: 1rem;
+  }
+
+  .page-header {
+    ion-toolbar {
+      --background: transparent;
+    }
+  }
+}
+
+.scan-active {
+  .ssi-agent-scan {
+    background: transparent !important;
+  }
+}
+
+.ssi-agent-scan {
+  padding: 0 1.25rem;
+
+  .close-button-label > h4 {
+    color: var(--ion-color-neutral-200) !important;
+  }
+
+  & > .responsive-page-content {
+    justify-content: space-between;
+
+    & > * {
+      margin: 0;
+    }
+
+    .page-footer {
+      margin-bottom: 1rem;
+    }
+
+    & .page-footer {
+      .primary-button {
+        --background: var(--ion-color-neutral-700);
+        --color: var(--ion-color-neutral-200);
+      }
+
+      .tertiary-button {
+        --color: var(--ion-color-neutral-200);
+      }
+    }
+  }
+}
+
+.ssi-agent-scan-input-modal.responsive-modal {
+  &.loading {
+    z-index: -1 !important;
+  }
+
+  .buttons-last-slot {
+    min-width: auto !important;
+
+    .action-button-label > p {
+      color: var(--ion-color-primary-700) !important;
+    }
+  }
+
+  & .responsive-modal-content {
+    & > * {
+      margin-bottom: 0;
+    }
+
+    .error-message {
+      margin: 0.5rem 0 0;
+      text-align: left;
+
+      .text-fadein {
+        margin: 0;
+      }
+    }
+
+    .ssi-error-placeholder {
+      margin-top: 0.5rem;
+      height: 1.375rem;
+
+      @media screen and (min-width: 250px) and (max-width: 370px) {
+        height: 1rem;
+      }
+    }
+  }
+}
+
 .create-ssi-agent {
   .ssi-error-placeholder {
     height: 1.375rem;
@@ -8,15 +125,9 @@
   }
 
   &.scrollable-page-layout .scrollable-page-content {
-    .content-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: calc(100vh - (4rem + var(--ion-safe-area-top)));
-
-      & .title {
-        margin-top: 1rem;
-      }
+    .page-paragraph {
+      margin: 0.75rem 0 1.75rem;
+      text-align: center;
     }
 
     & > * {
@@ -26,10 +137,10 @@
     & > ion-item {
       margin-top: 0;
     }
+  }
 
-    & > .page-footer {
-      margin-top: 1rem;
-    }
+  .page-footer {
+    margin-bottom: 1rem;
   }
 
   .error-message-placeholder {
@@ -65,7 +176,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 101;
+  z-index: 9999999;
   background: rgba(var(--ion-color-neutral-700-rgb), 0.2);
   backdrop-filter: blur(0.25rem);
 }

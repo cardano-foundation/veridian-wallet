@@ -6,7 +6,7 @@ interface ResponsiveModalProps {
   customClasses?: string;
   children?: ReactNode;
   backdropDismiss?: boolean;
-  onDismiss: () => void;
+  onDismiss?: () => void;
 }
 
 export type { ResponsiveModalProps };

@@ -3,7 +3,6 @@ import { useState } from "react";
 import { i18n } from "../../../../../i18n";
 import { CustomInput } from "../../../../components/CustomInput";
 import { ErrorMessage } from "../../../../components/ErrorMessage";
-import { nameChecker } from "../../../../utils/nameChecker";
 import "./SetupProfile.scss";
 import { SetupProfileProps } from "./SetupProfile.types";
 
@@ -11,9 +10,11 @@ const SetupProfile = ({
   userName,
   onChangeUserName,
   isGroupProfile,
+  errorMessage,
+  isLoading,
 }: SetupProfileProps) => {
   const [inputChange, setInputChange] = useState(false);
-  const errorMessage = inputChange ? nameChecker.getError(userName) : undefined;
+  const displayError = inputChange && !isLoading ? errorMessage : undefined;
 
   return (
     <IonContent className="setup-profile">
@@ -31,9 +32,9 @@ const SetupProfile = ({
           setInputChange(true);
         }}
         dataTestId="profile-user-name"
-        error={!!errorMessage}
+        error={!!displayError}
       />
-      <ErrorMessage message={errorMessage} />
+      <ErrorMessage message={displayError} />
     </IonContent>
   );
 };
