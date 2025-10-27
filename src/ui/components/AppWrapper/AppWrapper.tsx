@@ -116,6 +116,7 @@ const connectionStateChangedHandler = async (
       })
     );
     dispatch(setToastMsg(ToastMsgType.CONNECTION_REQUEST_PENDING));
+    logger.debug("Connection request pending:", { connectionId: event.payload.connectionId, identifier: event.payload.identifier });
   } else {
     // @TODO - foconnor: Should be able to just update Redux without fetching from DB.
     const connectionRecordId = event.payload.connectionId;
@@ -130,6 +131,7 @@ const connectionStateChangedHandler = async (
       );
     dispatch(updateOrAddConnectionCache(connectionDetails));
     dispatch(setToastMsg(ToastMsgType.NEW_CONNECTION_ADDED));
+    logger.debug("Connection updated:", { connectionId: connectionDetails.id, label: connectionDetails.label });
   }
 };
 
@@ -140,11 +142,13 @@ const acdcChangeHandler = async (
   if (event.payload.status === CredentialStatus.PENDING) {
     dispatch(setToastMsg(ToastMsgType.CREDENTIAL_REQUEST_PENDING));
     dispatch(updateOrAddCredsCache(event.payload.credential));
+    logger.debug("Credential request pending:", { credentialId: event.payload.credential.id });
   } else if (event.payload.status === CredentialStatus.REVOKED) {
     dispatch(updateOrAddCredsCache(event.payload.credential));
   } else {
     dispatch(updateOrAddCredsCache(event.payload.credential));
     dispatch(setToastMsg(ToastMsgType.NEW_CREDENTIAL_ADDED));
+    logger.debug("New credential added:", { credentialId: event.payload.credential.id, schemaId: event.payload.credential.schema });
   }
 };
 
@@ -176,6 +180,7 @@ const peerConnectRequestSignChangeHandler = async (
         type: IncomingRequestType.PEER_CONNECT_SIGN,
       })
     );
+    logger.debug("Queueing peer connect sign request:", { dAppAddress: connectedDAppAddress, identifier: event.payload.identifier });
   }
 };
 
@@ -226,6 +231,7 @@ const peerConnectionBrokenChangeHandler = async (
   event: PeerConnectionBrokenEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
+  logger.debug("Peer connection broken event received.", { event });
   dispatch(setConnectedDApp(null));
   dispatch(setIsConnectingToDApp(false));
   dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
@@ -248,6 +254,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
   const setOnlineStatus = useCallback(
     (value: boolean) => {
       dispatch(setIsOnline(value));
+      logger.debug("Online status changed:", { isOnline: value });
     },
     [dispatch]
   );
@@ -290,6 +297,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
     const tapjack = async () => {
       if ((await Device.getInfo()).platform === "android") {
         await TapJacking.preventOverlays();
+        logger.debug("TapJacking prevention applied for Android.");
       }
     };
     tapjack();
@@ -298,8 +306,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
   useEffect(() => {
     if (authentication.loggedIn) {
       dispatch(setPauseQueueIncomingRequest(!isOnline));
+      logger.debug("Incoming request queue pause state set:", { paused: !isOnline, loggedIn: authentication.loggedIn });
     } else {
       dispatch(setPauseQueueIncomingRequest(true));
+      logger.debug("Incoming request queue paused: user not logged in.");
     }
   }, [isOnline, authentication.loggedIn, dispatch]);
 
@@ -307,8 +317,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (initializationPhase === InitializationPhase.PHASE_TWO) {
       if (authentication.loggedIn) {
         Agent.agent.keriaNotifications.startPolling();
+        logger.debug("Keria notifications polling started.");
       } else {
         Agent.agent.keriaNotifications.stopPolling();
+        logger.debug("Keria notifications polling stopped.");
       }
     }
   }, [authentication.loggedIn, initializationPhase]);
@@ -317,12 +329,15 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (initializationPhase === InitializationPhase.PHASE_TWO) {
       if (authentication.loggedIn) {
         logSyncService.start();
+        logger.debug("Log synchronization service started.");
       } else {
         logSyncService.stop();
+        logger.debug("Log synchronization service stopped.");
       }
     }
     return () => {
       logSyncService.stop();
+      logger.debug("Log synchronization service stopped on unmount.");
     };
   }, [authentication.loggedIn, initializationPhase]);
 
@@ -516,7 +531,9 @@ const AppWrapper = (props: { children: ReactNode }) => {
     } catch (e) {
       logger.error("Failed to load database data:", formatErrorContext(e));
       showError("Failed to load database data", e, dispatch);
+      return;
     }
+    logger.info("Database loaded.");
   };
 
   const loadCacheBasicStorage = async () => {
@@ -686,6 +703,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
         })
       );
 
+      logger.info("Cache loaded.");
       return {
         keriaConnectUrlRecord,
       };
@@ -786,6 +804,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
           : InitializationPhase.PHASE_TWO
       )
     );
+    logger.info("Wallet initialized.");
   };
 
   const recoverAndLoadDb = async () => {

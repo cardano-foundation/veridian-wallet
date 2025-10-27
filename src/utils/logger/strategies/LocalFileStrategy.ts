@@ -1,5 +1,4 @@
-import { Salter } from "signify-ts";
-import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { ILogger, ParsedLogEntry } from "../ILogger";
 import { loggingConfig } from "../LoggingConfig";
 
@@ -12,7 +11,8 @@ export class LocalFileStrategy implements ILogger {
     await Filesystem.appendFile({
       path: this.logFile,
       data: entry,
-      directory: Directory.Data
+      directory: Directory.Data,
+      encoding: Encoding.UTF8
     });
   }
 
@@ -36,7 +36,8 @@ export class LocalFileStrategy implements ILogger {
     await Filesystem.writeFile({
       path: this.logFile,
       data: "",
-      directory: Directory.Data
+      directory: Directory.Data,
+      encoding: Encoding.UTF8
     });
   }
 
@@ -45,7 +46,8 @@ export class LocalFileStrategy implements ILogger {
     await Filesystem.writeFile({
       path: this.logFile,
       data: data,
-      directory: Directory.Data
+      directory: Directory.Data,
+      encoding: Encoding.UTF8
     });
   }
 }

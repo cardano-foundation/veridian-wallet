@@ -5,26 +5,28 @@ export class ConsoleStrategy implements ILogger {
     const { level, message, context, ts } = logEntry;
     const logMessage = `[${ts}] [${level.toUpperCase()}] ${message}`;
 
+    const args = context !== undefined ? [logMessage, context] : [logMessage];
+
     switch (level) {
       case "debug":
         // eslint-disable-next-line no-console
-        console.debug(logMessage, context);
+        console.debug(...args);
         break;
       case "info":
         // eslint-disable-next-line no-console
-        console.info(logMessage, context);
+        console.info(...args);
         break;
       case "warn":
         // eslint-disable-next-line no-console
-        console.warn(logMessage, context);
+        console.warn(...args);
         break;
       case "error":
         // eslint-disable-next-line no-console
-        console.error(logMessage, context);
+        console.error(...args);
         break;
       default:
         // eslint-disable-next-line no-console
-        console.log(logMessage, context);
+        console.log(...args);
     }
   }
 }

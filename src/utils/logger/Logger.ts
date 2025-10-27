@@ -60,9 +60,9 @@ export class Logger {
         activeStrategies.push(cloudLogger);
       }
 
-      Logger.instance = new Logger(activeStrategies, minimumLogLevel);
-    }
-    return Logger.instance;
+          Logger.instance = new Logger(activeStrategies, minimumLogLevel);
+        }
+        return Logger.instance;
   }
 
   async log(level: LogLevel, message: string, context?: Record<string, unknown>) {
