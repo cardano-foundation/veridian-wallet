@@ -1,6 +1,6 @@
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { LoggerProvider, BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
-import { RemoteSigNozStrategy } from './RemoteSigNozStrategy';
+import { SigNozProvider } from './SigNozProvider';
 import { ParsedLogEntry } from '../ILogger';
 import { SeverityNumber, AnyValueMap } from '@opentelemetry/api-logs';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
@@ -18,8 +18,8 @@ jest.mock('@opentelemetry/resources', () => ({
 }));
 jest.mock('@opentelemetry/semantic-conventions');
 
-describe('RemoteSigNozStrategy', () => {
-  let strategy: RemoteSigNozStrategy;
+describe('SigNozProvider', () => {
+  let strategy: SigNozProvider;
   const mockOtlpEndpoint = 'http://test-endpoint.com/v1/logs';
 
   let mockLogger: {
@@ -46,7 +46,7 @@ describe('RemoteSigNozStrategy', () => {
     (OTLPLogExporter as jest.Mock).mockClear();
     (BatchLogRecordProcessor as jest.Mock).mockClear();
 
-    strategy = new RemoteSigNozStrategy(mockOtlpEndpoint);
+    strategy = new SigNozProvider(mockOtlpEndpoint);
   });
 
   it('should initialize the OTLPLogExporter and LoggerProvider correctly', () => {

@@ -18,14 +18,19 @@ import {
 } from "../../../store/reducers/stateCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
-import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
 import { TabsRoutePath } from "../../components/navigation/TabsMenu";
-import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { CredentialDetails } from "./CredentialDetails";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 
 const path = TabsRoutePath.CREDENTIALS + "/" + credsFixAcdc[0].id;
+
+jest.mock("signify-ts", () => ({
+  ...jest.requireActual("signify-ts"),
+  Salter: jest.fn(() => ({
+    qb64: "qb64",
+  })),
+}));
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {

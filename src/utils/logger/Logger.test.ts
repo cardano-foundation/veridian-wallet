@@ -1,6 +1,6 @@
 import { Logger } from "./Logger";
 import { LocalFileStrategy } from "./strategies/LocalFileStrategy";
-import { RemoteSigNozStrategy } from "./strategies/RemoteSigNozStrategy";
+import { SigNozProvider } from "./providers/SigNozProvider";
 import { HybridStrategy } from "./strategies/HybridStrategy";
 import { ConsoleStrategy } from "./strategies/ConsoleStrategy";
 import { loggingConfig } from "./LoggingConfig";
@@ -14,7 +14,7 @@ jest.mock("signify-ts", () => ({
 
 // Mock the strategies
 jest.mock("./strategies/LocalFileStrategy");
-jest.mock("./strategies/RemoteSigNozStrategy");
+jest.mock("./providers/SigNozProvider");
 jest.mock("./strategies/HybridStrategy");
 jest.mock("./strategies/ConsoleStrategy");
 
@@ -77,13 +77,13 @@ describe("Logger", () => {
       expect((LocalFileStrategy as jest.Mock).mock.instances[0]).toBeInstanceOf(LocalFileStrategy);
     });
 
-    it("should enable RemoteSigNozStrategy when remoteEnabled is true", () => {
+    it("should enable SigNozProvider when remoteEnabled is true", () => {
       (loggingConfig as any).mode = "info";
       (loggingConfig as any).remoteEnabled = true;
       const logger = Logger.getInstance();
       expect((logger as any).strategies).toHaveLength(1);
-      expect(RemoteSigNozStrategy).toHaveBeenCalledTimes(1);
-      expect((RemoteSigNozStrategy as jest.Mock).mock.instances[0]).toBeInstanceOf(RemoteSigNozStrategy);
+      expect(SigNozProvider).toHaveBeenCalledTimes(1);
+      expect((SigNozProvider as jest.Mock).mock.instances[0]).toBeInstanceOf(SigNozProvider);
     });
 
     it("should enable HybridStrategy when both localEnabled and remoteEnabled are true", () => {
@@ -95,7 +95,7 @@ describe("Logger", () => {
       expect(HybridStrategy).toHaveBeenCalledTimes(1);
       expect((HybridStrategy as jest.Mock).mock.instances[0]).toBeInstanceOf(HybridStrategy);
       expect(LocalFileStrategy).toHaveBeenCalledTimes(1);
-      expect(RemoteSigNozStrategy).toHaveBeenCalledTimes(1);
+      expect(SigNozProvider).toHaveBeenCalledTimes(1);
     });
 
     it("should set minimumLogLevel based on loggingConfig.mode", () => {

@@ -1,6 +1,6 @@
 import { ILogger, LogLevel, ParsedLogEntry } from "./ILogger";
 import { LocalFileStrategy } from "./strategies/LocalFileStrategy";
-import { RemoteSigNozStrategy } from "./strategies/RemoteSigNozStrategy";
+import { SigNozProvider } from "./providers/SigNozProvider";
 import { HybridStrategy } from "./strategies/HybridStrategy";
 import { ConsoleStrategy } from "./strategies/ConsoleStrategy";
 import { loggingConfig } from "./LoggingConfig";
@@ -26,7 +26,7 @@ export class Logger {
 
   static getInstance(
     localStrategyFactory: () => LocalFileStrategy = () => new LocalFileStrategy(),
-    cloudLoggerFactory: (otlpEndpoint: string) => ICloudLogger = (otlpEndpoint) => new RemoteSigNozStrategy(otlpEndpoint)
+    cloudLoggerFactory: (otlpEndpoint: string) => ICloudLogger = (otlpEndpoint) => new SigNozProvider(otlpEndpoint)
   ): Logger {
     if (!Logger.instance) {
       const activeStrategies: ILogger[] = [];

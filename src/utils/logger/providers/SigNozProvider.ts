@@ -4,9 +4,9 @@ import { defaultResource, resourceFromAttributes } from "@opentelemetry/resource
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from "@opentelemetry/semantic-conventions";
 import { SeverityNumber, AnyValueMap } from "@opentelemetry/api-logs";
 import { LogLevel, ParsedLogEntry } from "../ILogger";
-import { CloudLoggingAdapter } from "./CloudLoggingAdapter";
+import { CloudLoggingAdapter } from "../strategies/CloudLoggingAdapter";
 
-export class RemoteSigNozStrategy extends CloudLoggingAdapter {
+export class SigNozProvider extends CloudLoggingAdapter {
   private loggerProvider: LoggerProvider;
   private exporter: OTLPLogExporter;
 

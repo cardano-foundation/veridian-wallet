@@ -3,7 +3,7 @@ import { LogSyncService } from "./LogSyncService";
 import { loggingConfig } from "../../utils/logger/LoggingConfig";
 import { logger } from "../../utils/logger/Logger";
 import { LocalFileStrategy } from "../../utils/logger/strategies/LocalFileStrategy";
-import { RemoteSigNozStrategy } from "../../utils/logger/strategies/RemoteSigNozStrategy";
+import { SigNozProvider } from "../../utils/logger/providers/SigNozProvider";
 
 // Mock capacitor network with a factory function
 jest.mock("@capacitor/network", () => ({
@@ -15,7 +15,7 @@ jest.mock("@capacitor/network", () => ({
 
 jest.mock("../../utils/logger/Logger");
 jest.mock("../../utils/logger/strategies/LocalFileStrategy");
-jest.mock("../../utils/logger/strategies/RemoteSigNozStrategy");
+jest.mock("../../utils/logger/providers/SigNozProvider");
 jest.mock("../../utils/logger/LoggingConfig");
 
 // Cast the mocked loggingConfig to a mutable type for testing
@@ -29,7 +29,7 @@ const mutableLoggingConfig = loggingConfig as {
 
 describe("LogSyncService", () => {
   let mockLocalStrategy: jest.Mocked<LocalFileStrategy>;
-  let mockRemoteStrategy: jest.Mocked<RemoteSigNozStrategy>;
+  let mockRemoteStrategy: jest.Mocked<SigNozProvider>;
   let logSyncService: LogSyncService;
   let mockDelay: jest.Mock;
 
@@ -63,7 +63,7 @@ describe("LogSyncService", () => {
     (Network.addListener as jest.Mock).mockResolvedValue({ remove: jest.fn() });
 
     (LocalFileStrategy as jest.Mock).mockImplementation(() => mockLocalStrategy);
-    (RemoteSigNozStrategy as jest.Mock).mockImplementation(() => mockRemoteStrategy);
+    (SigNozProvider as jest.Mock).mockImplementation(() => mockRemoteStrategy);
 
     logSyncService = new LogSyncService(
       () => mockLocalStrategy as any,

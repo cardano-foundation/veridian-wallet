@@ -1,7 +1,7 @@
 import { Network } from "@capacitor/network";
 import { PluginListenerHandle } from "@capacitor/core";
 import { LocalFileStrategy } from "../../utils/logger/strategies/LocalFileStrategy";
-import { RemoteSigNozStrategy } from "../../utils/logger/strategies/RemoteSigNozStrategy";
+import { SigNozProvider } from "../../utils/logger/providers/SigNozProvider";
 import { ParsedLogEntry } from "../../utils/logger/ILogger";
 import { loggingConfig } from "../../utils/logger/LoggingConfig";
 import { logger } from "../../utils/logger/Logger";
@@ -9,12 +9,12 @@ import { logger } from "../../utils/logger/Logger";
 export class LogSyncService {
   private listener: PluginListenerHandle | undefined;
   private localStrategyFactory: () => LocalFileStrategy;
-  private remoteStrategyFactory: (otlpEndpoint: string) => RemoteSigNozStrategy;
+  private remoteStrategyFactory: (otlpEndpoint: string) => SigNozProvider;
   private delay: (ms: number) => Promise<void>;
 
   constructor(
     localStrategyFactory: () => LocalFileStrategy = () => new LocalFileStrategy(),
-    remoteStrategyFactory: (otlpEndpoint: string) => RemoteSigNozStrategy = (otlpEndpoint) => new RemoteSigNozStrategy(otlpEndpoint),
+    remoteStrategyFactory: (otlpEndpoint: string) => SigNozProvider = (otlpEndpoint) => new SigNozProvider(otlpEndpoint),
     delay: (ms: number) => Promise<void> = (ms) => new Promise(resolve => setTimeout(resolve, ms))
   ) {
     this.localStrategyFactory = localStrategyFactory;
