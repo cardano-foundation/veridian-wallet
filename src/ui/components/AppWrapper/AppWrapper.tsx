@@ -95,6 +95,8 @@ import {
 import { useActivityTimer } from "./hooks/useActivityTimer";
 import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
 import { logSyncService } from "../../../core/services/LogSyncService";
+import { logger } from "../../../utils/logger/Logger";
+import { formatErrorContext } from "../../../utils/logger/loggerUtils";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -198,6 +200,7 @@ const peerConnectedChangeHandler = async (
     dispatch(setIsConnectingToDApp(false));
     dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
   } catch (error) {
+    logger.error("Error handling peer connected event:", formatErrorContext(error));
     dispatch(setIsConnectingToDApp(false));
   }
 };
@@ -265,9 +268,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
           ))
       ) {
         dispatch(showNoWitnessAlert(true));
+        logger.warn("Witness check failed: Insufficient or misconfigured agent witnesses.", formatErrorContext(e));
         return;
       }
 
+      logger.error("Unexpected error during witness check:", formatErrorContext(e));
       throw e;
     }
   }, [authentication.ssiAgentIsSet, dispatch, isOnline]);
@@ -370,6 +375,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
               recoverAndLoadDb();
             });
         } else {
+          logger.error("Error starting agent:", formatErrorContext(e));
           throw e;
         }
       }
@@ -508,6 +514,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
       // TODO: set current profile data
     } catch (e) {
+      logger.error("Failed to load database data:", formatErrorContext(e));
       showError("Failed to load database data", e, dispatch);
     }
   };
@@ -683,6 +690,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
         keriaConnectUrlRecord,
       };
     } catch (e) {
+      logger.error("Failed to load cache data:", formatErrorContext(e));
       showError("Failed to load cache data", e, dispatch);
       throw e;
     }
