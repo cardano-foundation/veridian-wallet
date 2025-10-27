@@ -1,83 +1,79 @@
 import { HybridStrategy } from "./HybridStrategy";
-import { ILogger, LogLevel } from "../ILogger";
+import { ILogger, ParsedLogEntry } from "../ILogger";
+import { ICloudLogger } from "../ICloudLogger";
 
 describe("HybridStrategy", () => {
   let mockLocalLogger: jest.Mocked<ILogger>;
-  let mockRemoteLogger: jest.Mocked<ILogger>;
+  let mockCloudLogger: jest.Mocked<ICloudLogger>;
 
   beforeEach(() => {
     mockLocalLogger = {
       log: jest.fn(),
     };
-    mockRemoteLogger = {
+    mockCloudLogger = {
       log: jest.fn(),
+      logBatch: jest.fn(),
+      flush: jest.fn(),
     };
   });
 
-  it("should log to remote logger if available and successful", async () => {
-    const strategy = new HybridStrategy(mockLocalLogger, mockRemoteLogger);
-    const level: LogLevel = "info";
-    const message = "Test message";
-    const context = { key: "value" };
+  const logEntry: ParsedLogEntry = {
+    id: "test-id",
+    ts: "2023-01-01T12:00:00.000Z",
+    level: "info",
+    message: "Test message",
+    context: { key: "value" },
+  };
 
-    await strategy.log(level, message, context);
+  it("should log to cloud logger if available and successful", async () => {
+    const strategy = new HybridStrategy(mockLocalLogger, mockCloudLogger);
 
-    expect(mockRemoteLogger.log).toHaveBeenCalledTimes(1);
-    expect(mockRemoteLogger.log).toHaveBeenCalledWith(level, message, context);
+    await strategy.log(logEntry);
+
+    expect(mockCloudLogger.log).toHaveBeenCalledTimes(1);
+    expect(mockCloudLogger.log).toHaveBeenCalledWith(logEntry);
     expect(mockLocalLogger.log).not.toHaveBeenCalled();
   });
 
-  it("should log to local logger if remote logger is available but fails", async () => {
-    mockRemoteLogger.log.mockRejectedValueOnce(new Error("Remote failed"));
-    const strategy = new HybridStrategy(mockLocalLogger, mockRemoteLogger);
-    const level: LogLevel = "error";
-    const message = "Test message";
-    const context = { key: "value" };
+  it("should log to local logger if cloud logger is available but fails", async () => {
+    mockCloudLogger.log.mockRejectedValueOnce(new Error("Cloud failed"));
+    const strategy = new HybridStrategy(mockLocalLogger, mockCloudLogger);
 
-    await strategy.log(level, message, context);
+    await strategy.log(logEntry);
 
-    expect(mockRemoteLogger.log).toHaveBeenCalledTimes(1);
-    expect(mockRemoteLogger.log).toHaveBeenCalledWith(level, message, context);
+    expect(mockCloudLogger.log).toHaveBeenCalledTimes(1);
+    expect(mockCloudLogger.log).toHaveBeenCalledWith(logEntry);
     expect(mockLocalLogger.log).toHaveBeenCalledTimes(1);
-    expect(mockLocalLogger.log).toHaveBeenCalledWith(level, message, context);
+    expect(mockLocalLogger.log).toHaveBeenCalledWith(logEntry);
   });
 
-  it("should log to local logger if remote logger is not available", async () => {
+  it("should log to local logger if cloud logger is not available", async () => {
     const strategy = new HybridStrategy(mockLocalLogger, undefined);
-    const level: LogLevel = "warn";
-    const message = "Test message";
-    const context = { key: "value" };
 
-    await strategy.log(level, message, context);
+    await strategy.log(logEntry);
 
-    expect(mockRemoteLogger.log).not.toHaveBeenCalled();
+    expect(mockCloudLogger.log).not.toHaveBeenCalled();
     expect(mockLocalLogger.log).toHaveBeenCalledTimes(1);
-    expect(mockLocalLogger.log).toHaveBeenCalledWith(level, message, context);
+    expect(mockLocalLogger.log).toHaveBeenCalledWith(logEntry);
   });
 
-  it("should not log if neither local nor remote logger is available", async () => {
+  it("should not log if neither local nor cloud logger is available", async () => {
     const strategy = new HybridStrategy(undefined, undefined);
-    const level: LogLevel = "debug";
-    const message = "Test message";
-    const context = { key: "value" };
 
-    await strategy.log(level, message, context);
+    await strategy.log(logEntry);
 
-    expect(mockRemoteLogger.log).not.toHaveBeenCalled();
+    expect(mockCloudLogger.log).not.toHaveBeenCalled();
     expect(mockLocalLogger.log).not.toHaveBeenCalled();
   });
 
-  it("should not log to local if remote fails but local is not available", async () => {
-    mockRemoteLogger.log.mockRejectedValueOnce(new Error("Remote failed"));
-    const strategy = new HybridStrategy(undefined, mockRemoteLogger);
-    const level: LogLevel = "error";
-    const message = "Test message";
-    const context = { key: "value" };
+  it("should not log to local if cloud fails but local is not available", async () => {
+    mockCloudLogger.log.mockRejectedValueOnce(new Error("Cloud failed"));
+    const strategy = new HybridStrategy(undefined, mockCloudLogger);
 
-    await strategy.log(level, message, context);
+    await strategy.log(logEntry);
 
-    expect(mockRemoteLogger.log).toHaveBeenCalledTimes(1);
-    expect(mockRemoteLogger.log).toHaveBeenCalledWith(level, message, context);
+    expect(mockCloudLogger.log).toHaveBeenCalledTimes(1);
+    expect(mockCloudLogger.log).toHaveBeenCalledWith(logEntry);
     expect(mockLocalLogger.log).not.toHaveBeenCalled();
   });
 });

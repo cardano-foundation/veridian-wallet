@@ -1,9 +1,9 @@
-import { ILogger, LogLevel } from "../ILogger";
+import { ILogger, ParsedLogEntry } from "../ILogger";
 
 export class ConsoleStrategy implements ILogger {
-  async log(level: LogLevel, message: string, context?: Record<string, unknown>) {
-    const timestamp = new Date().toISOString();
-    const logMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+  async log(logEntry: ParsedLogEntry) {
+    const { level, message, context, ts } = logEntry;
+    const logMessage = `[${ts}] [${level.toUpperCase()}] ${message}`;
 
     switch (level) {
       case "debug":

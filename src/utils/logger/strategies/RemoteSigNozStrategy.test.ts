@@ -1,7 +1,7 @@
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { LoggerProvider, BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { RemoteSigNozStrategy } from './RemoteSigNozStrategy';
-import { LogLevel, ParsedLogEntry } from '../ILogger';
+import { ParsedLogEntry } from '../ILogger';
 import { SeverityNumber, AnyValueMap } from '@opentelemetry/api-logs';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { resourceFromAttributes, defaultResource } from '@opentelemetry/resources';
@@ -127,8 +127,31 @@ describe('RemoteSigNozStrategy', () => {
     expect(mockLoggerProvider.forceFlush).toHaveBeenCalledTimes(1);
   });
 
-  it('log method should be a no-op and resolve immediately', async () => {
-    await expect(strategy.log('info', 'test')).resolves.toBeUndefined();
-    expect(mockLoggerProvider.getLogger).not.toHaveBeenCalled();
+  it('log should queue the log entry and flush should call logBatch', async () => {
+    const logEntry: ParsedLogEntry = {
+      id: '1',
+      ts: new Date().toISOString(),
+      level: 'info',
+      message: 'Info message',
+      context: { userId: 'user1' },
+    };
+
+    // Mock logBatch to track calls
+    const logBatchSpy = jest.spyOn(strategy, 'logBatch');
+
+    await strategy.log(logEntry);
+
+    // Expect log entry to be in the queue
+    expect((strategy as any).logQueue).toEqual([logEntry]);
+
+    // Manually flush the strategy
+    await strategy.flush();
+
+    // Expect logBatch to have been called with the queued entry
+    expect(logBatchSpy).toHaveBeenCalledTimes(1);
+    expect(logBatchSpy).toHaveBeenCalledWith([logEntry]);
+
+    // Expect the queue to be empty after flush
+    expect((strategy as any).logQueue).toEqual([]);
   });
 });

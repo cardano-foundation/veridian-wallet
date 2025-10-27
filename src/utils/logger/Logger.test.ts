@@ -5,6 +5,13 @@ import { HybridStrategy } from "./strategies/HybridStrategy";
 import { ConsoleStrategy } from "./strategies/ConsoleStrategy";
 import { loggingConfig } from "./LoggingConfig";
 
+jest.mock("signify-ts", () => ({
+  ...jest.requireActual("signify-ts"),
+  Salter: jest.fn(() => ({
+    qb64: "qb64",
+  })),
+}));
+
 // Mock the strategies
 jest.mock("./strategies/LocalFileStrategy");
 jest.mock("./strategies/RemoteSigNozStrategy");
@@ -129,7 +136,13 @@ describe("Logger", () => {
       const message = "Test message";
       const context = { key: "value" };
       await loggerInstance.log("info", message, context);
-      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith("info", message, context);
+      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith({
+        id: expect.any(String),
+        ts: expect.any(String),
+        level: "info",
+        message,
+        context,
+      });
     });
 
     it("should not log messages below minimumLogLevel", async () => {
@@ -149,7 +162,13 @@ describe("Logger", () => {
       // The loggerInstance and mockConsoleStrategyInstance are already set up in beforeEach
 
       await loggerInstance.log("error", "Error message");
-      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith("error", "Error message", undefined);
+      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith({
+        id: expect.any(String),
+        ts: expect.any(String),
+        level: "error",
+        message: "Error message",
+        context: undefined,
+      });
     });
   });
 
@@ -170,28 +189,52 @@ describe("Logger", () => {
       const message = "Debug message";
       const context = { debug: true };
       await loggerInstance.debug(message, context);
-      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith("debug", message, context);
+      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith({
+        id: expect.any(String),
+        ts: expect.any(String),
+        level: "debug",
+        message,
+        context,
+      });
     });
 
     it("info should call log with info level", async () => {
       const message = "Info message";
       const context = { info: true };
       await loggerInstance.info(message, context);
-      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith("info", message, context);
+      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith({
+        id: expect.any(String),
+        ts: expect.any(String),
+        level: "info",
+        message,
+        context,
+      });
     });
 
     it("warn should call log with warn level", async () => {
       const message = "Warn message";
       const context = { warn: true };
       await loggerInstance.warn(message, context);
-      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith("warn", message, context);
+      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith({
+        id: expect.any(String),
+        ts: expect.any(String),
+        level: "warn",
+        message,
+        context,
+      });
     });
 
     it("error should call log with error level", async () => {
       const message = "Error message";
       const context = { error: true };
       await loggerInstance.error(message, context);
-      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith("error", message, context);
+      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith({
+        id: expect.any(String),
+        ts: expect.any(String),
+        level: "error",
+        message,
+        context,
+      });
     });
   });
 });

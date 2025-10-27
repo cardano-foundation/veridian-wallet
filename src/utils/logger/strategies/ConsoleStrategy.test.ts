@@ -1,5 +1,5 @@
 import { ConsoleStrategy } from "./ConsoleStrategy";
-import { LogLevel } from "../ILogger";
+import { LogLevel, ParsedLogEntry } from "../ILogger";
 
 describe("ConsoleStrategy", () => {
   let consoleStrategy: ConsoleStrategy;
@@ -38,55 +38,80 @@ describe("ConsoleStrategy", () => {
   const expectedTimestamp = "2023-01-01T12:00:00.000Z";
 
   it("should call console.debug for debug level", async () => {
-    const level: LogLevel = "debug";
-    const message = "Debug message";
-    const context = { key: "value" };
-    await consoleStrategy.log(level, message, context);
+    const logEntry: ParsedLogEntry = {
+      id: "test-id",
+      ts: expectedTimestamp,
+      level: "debug",
+      message: "Debug message",
+      context: { key: "value" },
+    };
+    await consoleStrategy.log(logEntry);
     expect(mockConsoleDebug).toHaveBeenCalledTimes(1);
-    expect(mockConsoleDebug).toHaveBeenCalledWith(`[${expectedTimestamp}] [DEBUG] ${message}`, context);
+    expect(mockConsoleDebug).toHaveBeenCalledWith(`[${expectedTimestamp}] [DEBUG] ${logEntry.message}`, logEntry.context);
   });
 
   it("should call console.info for info level", async () => {
-    const level: LogLevel = "info";
-    const message = "Info message";
-    const context = { key: "value" };
-    await consoleStrategy.log(level, message, context);
+    const logEntry: ParsedLogEntry = {
+      id: "test-id",
+      ts: expectedTimestamp,
+      level: "info",
+      message: "Info message",
+      context: { key: "value" },
+    };
+    await consoleStrategy.log(logEntry);
     expect(mockConsoleInfo).toHaveBeenCalledTimes(1);
-    expect(mockConsoleInfo).toHaveBeenCalledWith(`[${expectedTimestamp}] [INFO] ${message}`, context);
+    expect(mockConsoleInfo).toHaveBeenCalledWith(`[${expectedTimestamp}] [INFO] ${logEntry.message}`, logEntry.context);
   });
 
   it("should call console.warn for warn level", async () => {
-    const level: LogLevel = "warn";
-    const message = "Warn message";
-    const context = { key: "value" };
-    await consoleStrategy.log(level, message, context);
+    const logEntry: ParsedLogEntry = {
+      id: "test-id",
+      ts: expectedTimestamp,
+      level: "warn",
+      message: "Warn message",
+      context: { key: "value" },
+    };
+    await consoleStrategy.log(logEntry);
     expect(mockConsoleWarn).toHaveBeenCalledTimes(1);
-    expect(mockConsoleWarn).toHaveBeenCalledWith(`[${expectedTimestamp}] [WARN] ${message}`, context);
+    expect(mockConsoleWarn).toHaveBeenCalledWith(`[${expectedTimestamp}] [WARN] ${logEntry.message}`, logEntry.context);
   });
 
   it("should call console.error for error level", async () => {
-    const level: LogLevel = "error";
-    const message = "Error message";
-    const context = { key: "value" };
-    await consoleStrategy.log(level, message, context);
+    const logEntry: ParsedLogEntry = {
+      id: "test-id",
+      ts: expectedTimestamp,
+      level: "error",
+      message: "Error message",
+      context: { key: "value" },
+    };
+    await consoleStrategy.log(logEntry);
     expect(mockConsoleError).toHaveBeenCalledTimes(1);
-    expect(mockConsoleError).toHaveBeenCalledWith(`[${expectedTimestamp}] [ERROR] ${message}`, context);
+    expect(mockConsoleError).toHaveBeenCalledWith(`[${expectedTimestamp}] [ERROR] ${logEntry.message}`, logEntry.context);
   });
 
   it("should call console.log for an unknown level (default case)", async () => {
-    const level = "unknown" as LogLevel; // Test default case
-    const message = "Unknown level message";
-    const context = { key: "value" };
-    await consoleStrategy.log(level, message, context);
+    const logEntry: ParsedLogEntry = {
+      id: "test-id",
+      ts: expectedTimestamp,
+      level: "unknown" as LogLevel, // Test default case
+      message: "Unknown level message",
+      context: { key: "value" },
+    };
+    await consoleStrategy.log(logEntry);
     expect(mockConsoleLog).toHaveBeenCalledTimes(1);
-    expect(mockConsoleLog).toHaveBeenCalledWith(`[${expectedTimestamp}] [UNKNOWN] ${message}`, context);
+    expect(mockConsoleLog).toHaveBeenCalledWith(`[${expectedTimestamp}] [UNKNOWN] ${logEntry.message}`, logEntry.context);
   });
 
   it("should handle context being undefined", async () => {
-    const level: LogLevel = "info";
-    const message = "Message without context";
-    await consoleStrategy.log(level, message, undefined);
+    const logEntry: ParsedLogEntry = {
+      id: "test-id",
+      ts: expectedTimestamp,
+      level: "info",
+      message: "Message without context",
+      context: undefined,
+    };
+    await consoleStrategy.log(logEntry);
     expect(mockConsoleInfo).toHaveBeenCalledTimes(1);
-    expect(mockConsoleInfo).toHaveBeenCalledWith(`[${expectedTimestamp}] [INFO] ${message}`, undefined);
+    expect(mockConsoleInfo).toHaveBeenCalledWith(`[${expectedTimestamp}] [INFO] ${logEntry.message}`, undefined);
   });
 });

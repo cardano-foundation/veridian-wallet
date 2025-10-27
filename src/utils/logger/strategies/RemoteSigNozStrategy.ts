@@ -3,12 +3,15 @@ import { LoggerProvider, BatchLogRecordProcessor } from "@opentelemetry/sdk-logs
 import { defaultResource, resourceFromAttributes } from "@opentelemetry/resources";
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from "@opentelemetry/semantic-conventions";
 import { SeverityNumber, AnyValueMap } from "@opentelemetry/api-logs";
-import { ILogger, LogLevel, ParsedLogEntry } from "../ILogger";
-export class RemoteSigNozStrategy implements ILogger {
+import { LogLevel, ParsedLogEntry } from "../ILogger";
+import { CloudLoggingAdapter } from "./CloudLoggingAdapter";
+
+export class RemoteSigNozStrategy extends CloudLoggingAdapter {
   private loggerProvider: LoggerProvider;
   private exporter: OTLPLogExporter;
 
   constructor(otlpEndpoint: string) {
+    super();
     const resource = defaultResource().merge(
       resourceFromAttributes({
         [ATTR_SERVICE_NAME]: "<service_name>",
@@ -46,12 +49,7 @@ export class RemoteSigNozStrategy implements ILogger {
     }
   }
 
-  async log(level: LogLevel, message: string, context?: Record<string, unknown>) {
-    // This strategy is batch-only, log method is a no-op for this implementation.
-    return Promise.resolve();
-  }
-
-  async logBatch(logEntries: ParsedLogEntry[]) {
+  async logBatch(logEntries: ParsedLogEntry[]): Promise<void> {
     if (logEntries.length === 0) {
       return;
     }

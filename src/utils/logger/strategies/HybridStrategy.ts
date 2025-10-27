@@ -1,19 +1,20 @@
-import { ILogger, LogLevel } from "../ILogger";
+import { ILogger, ParsedLogEntry } from "../ILogger";
+import { ICloudLogger } from "../ICloudLogger";
 
 export class HybridStrategy implements ILogger {
-  constructor(private local?: ILogger, private remote?: ILogger) {}
+  constructor(private local?: ILogger, private cloud?: ICloudLogger) {}
 
-  async log(level: LogLevel, message: string, context?: Record<string, unknown>) {
-    if (this.remote) {
+  async log(logEntry: ParsedLogEntry) {
+    if (this.cloud) {
       try {
-        await this.remote.log(level, message, context);
+        await this.cloud.log(logEntry);
       } catch {
         if (this.local) {
-          await this.local.log(level, message, context);
+          await this.local.log(logEntry);
         }
       }
     } else if (this.local) {
-      await this.local.log(level, message, context);
+      await this.local.log(logEntry);
     }
   }
 }

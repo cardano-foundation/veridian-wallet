@@ -1,6 +1,5 @@
-import { Salter } from "signify-ts";
 import { Filesystem, Directory } from "@capacitor/filesystem";
-import { LogLevel, ParsedLogEntry } from "../ILogger";
+import { ParsedLogEntry } from "../ILogger";
 import { loggingConfig } from "../LoggingConfig";
 import { LocalFileStrategy } from "./LocalFileStrategy";
 
@@ -14,13 +13,6 @@ jest.mock("@capacitor/filesystem", () => ({
   Directory: {
     Data: "DATA",
   },
-}));
-
-// Mock signify-ts Salter
-jest.mock("signify-ts", () => ({
-  Salter: jest.fn().mockImplementation(() => ({
-    qb64: "mocked-salter-id",
-  })),
 }));
 
 describe("LocalFileStrategy", () => {
@@ -50,20 +42,20 @@ describe("LocalFileStrategy", () => {
     global.Blob = originalBlob;
   });
 
+  const expectedTimestamp = "2023-01-01T12:00:00.000Z";
+
   describe("log", () => {
     it("should append a log entry to the file", async () => {
-      const level: LogLevel = "info";
-      const message = "Test message";
-      const context = { key: "value" };
-      const expectedEntry = JSON.stringify({
-        id: "mocked-salter-id",
-        ts: "2023-01-01T12:00:00.000Z",
-        level,
-        message,
-        context,
-      }) + "\n";
+      const logEntry: ParsedLogEntry = {
+        id: "test-id",
+        ts: expectedTimestamp,
+        level: "info",
+        message: "Test message",
+        context: { key: "value" },
+      };
+      const expectedEntry = JSON.stringify(logEntry) + "\n";
 
-      await localFileStrategy.log(level, message, context);
+      await localFileStrategy.log(logEntry);
 
       expect(Filesystem.appendFile).toHaveBeenCalledTimes(1);
       expect(Filesystem.appendFile).toHaveBeenCalledWith({
@@ -73,12 +65,34 @@ describe("LocalFileStrategy", () => {
       });
     });
 
-    it("should generate a new ID for each log entry", async () => {
-      await localFileStrategy.log("info", "Message 1");
-      await localFileStrategy.log("info", "Message 2");
+    it("should append multiple log entries to the file", async () => {
+      const logEntry1: ParsedLogEntry = {
+        id: "test-id-1",
+        ts: expectedTimestamp,
+        level: "info",
+        message: "Message 1",
+      };
+      const logEntry2: ParsedLogEntry = {
+        id: "test-id-2",
+        ts: expectedTimestamp,
+        level: "info",
+        message: "Message 2",
+      };
 
-      expect(Salter).toHaveBeenCalledTimes(2);
+      await localFileStrategy.log(logEntry1);
+      await localFileStrategy.log(logEntry2);
+
       expect(Filesystem.appendFile).toHaveBeenCalledTimes(2);
+      expect(Filesystem.appendFile).toHaveBeenCalledWith({
+        path: mockLogFileName,
+        data: JSON.stringify(logEntry1) + "\n",
+        directory: Directory.Data,
+      });
+      expect(Filesystem.appendFile).toHaveBeenCalledWith({
+        path: mockLogFileName,
+        data: JSON.stringify(logEntry2) + "\n",
+        directory: Directory.Data,
+      });
     });
   });
 

@@ -1,19 +1,13 @@
 import { Salter } from "signify-ts";
 import { Filesystem, Directory } from "@capacitor/filesystem";
-import { ILogger, LogLevel, ParsedLogEntry } from "../ILogger";
+import { ILogger, ParsedLogEntry } from "../ILogger";
 import { loggingConfig } from "../LoggingConfig";
 
 export class LocalFileStrategy implements ILogger {
   private logFile = loggingConfig.offlineLogFileName;
 
-  async log(level: LogLevel, message: string, context?: Record<string, unknown>) {
-    const entry = JSON.stringify({
-      id: new Salter({}).qb64,
-      ts: new Date().toISOString(),
-      level,
-      message,
-      context
-    }) + "\n";
+  async log(logEntry: ParsedLogEntry) {
+    const entry = JSON.stringify(logEntry) + "\n";
 
     await Filesystem.appendFile({
       path: this.logFile,

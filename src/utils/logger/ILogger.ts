@@ -1,5 +1,5 @@
 export interface ILogger {
-  log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<void>;
+  log(logEntry: ParsedLogEntry): Promise<void>;
 }
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
