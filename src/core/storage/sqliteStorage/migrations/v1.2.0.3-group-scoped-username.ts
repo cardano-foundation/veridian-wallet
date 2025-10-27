@@ -1,4 +1,5 @@
 import { SQLiteDBConnection } from "@capacitor-community/sqlite";
+import { logger } from "../../../../utils/logger/Logger";
 import { MigrationType, LocalMigration } from "./migrations.types";
 import { createInsertItemTagsStatements } from "./migrationUtils";
 
@@ -8,8 +9,7 @@ export const MIGRATION_V1203: LocalMigration = {
   version: migrationVersion,
   type: MigrationType.TS,
   migrationStatements: async (session: SQLiteDBConnection) => {
-    // eslint-disable-next-line no-console
-    console.log(`Starting local migration for v${migrationVersion}...`);
+    logger.info(`Starting local migration for v${migrationVersion}...`);
     const statements = [];
 
     const queryResult = await session.query(
@@ -18,12 +18,10 @@ export const MIGRATION_V1203: LocalMigration = {
     );
 
     const identifiers = queryResult.values || [];
-    // eslint-disable-next-line no-console
-    console.log(`Found ${identifiers.length} identifiers to process locally.`);
+    logger.info(`Found ${identifiers.length} identifiers to process locally.`);
 
     for (const identifier of identifiers) {
-      // eslint-disable-next-line no-console
-      console.log(
+      logger.info(
         `[v${migrationVersion}] Processing local identifier ID: ${identifier.id}`
       );
 
@@ -49,8 +47,7 @@ export const MIGRATION_V1203: LocalMigration = {
       });
       statements.push(...createInsertItemTagsStatements(recordValue));
     }
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       `Local migration for v${migrationVersion} complete. Generated ${statements.length} update statements.`
     );
     return statements;

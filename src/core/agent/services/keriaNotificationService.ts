@@ -1,3 +1,5 @@
+import { logger } from "../../../utils/logger/Logger";
+import { formatErrorContext } from "../../../utils/logger/loggerUtils";
 import { Ilks, Saider, State } from "signify-ts";
 import { AgentService } from "./agentService";
 import {
@@ -126,8 +128,7 @@ class KeriaNotificationService extends AgentService {
     try {
       await this._pollNotifications();
     } catch (error) {
-      /* eslint-disable no-console */
-      console.error("Error at pollNotifications", error);
+      logger.error("Error at pollNotifications", formatErrorContext(error));
       setTimeout(
         this.pollNotifications,
         KeriaNotificationService.POLL_KERIA_INTERVAL
@@ -221,8 +222,7 @@ class KeriaNotificationService extends AgentService {
         try {
           await this.processNotification(notif);
         } catch (error) {
-          /* eslint-disable no-console */
-          console.error(`Error when processing notification ${notif.i}`, error);
+          logger.error(`Error when processing notification ${notif.i}`, formatErrorContext(error));
 
           const failedNotifications = await this.basicStorage.findById(
             MiscRecordId.FAILED_NOTIFICATIONS
@@ -414,13 +414,10 @@ class KeriaNotificationService extends AgentService {
             })
           );
         } catch (error) {
-          /* eslint-disable no-console */
-          console.warn(
-            `Error when retrying notification ${notification.i} [attempts: ${
-              attempts + 1
-            }]`,
-            error
-          );
+                    logger.warn(
+                      `Error when retrying notification ${notification.i} [attempts: ${attempts + 1}]`,
+                      formatErrorContext(error)
+                    );
 
           failedNotifications[notificationId] = {
             ...notificationData,
@@ -1074,7 +1071,7 @@ class KeriaNotificationService extends AgentService {
     try {
       await this._pollLongOperations();
     } catch (error) {
-      console.error("Error at pollLongOperations", error);
+      logger.error("Error at pollLongOperations", formatErrorContext(error));
       setTimeout(
         this.pollLongOperations,
         KeriaNotificationService.POLL_KERIA_INTERVAL
@@ -1097,7 +1094,7 @@ class KeriaNotificationService extends AgentService {
         try {
           await this.processOperation(pendingOperation);
         } catch (error) {
-          console.error("Error when process a operation", error);
+          logger.error("Error when process a operation", formatErrorContext(error));
         }
       }
 

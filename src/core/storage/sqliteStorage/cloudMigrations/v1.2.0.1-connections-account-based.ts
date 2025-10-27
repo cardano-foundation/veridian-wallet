@@ -1,11 +1,11 @@
 import { SignifyClient } from "signify-ts";
+import { logger } from "../../../../utils/logger/Logger";
 import { CloudMigration } from "./cloudMigrations.types";
 
 export const CLOUD_V1201: CloudMigration = {
   version: "1.2.0.1",
   cloudMigrationStatements: async (signifyClient: SignifyClient) => {
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       "Starting cloud KERIA migration: Converting connections to account-based model"
     );
 
@@ -38,8 +38,7 @@ export const CLOUD_V1201: CloudMigration = {
 
     for (const contact of contacts) {
       if (contact["version"] === "1.2.0") {
-        // eslint-disable-next-line no-console
-        console.log(
+        logger.info(
           `Contact ${contact.id} is already migrated from v1.2.0, skipping migration`
         );
         continue;
@@ -161,8 +160,7 @@ export const CLOUD_V1201: CloudMigration = {
       await signifyClient.contacts().update(contact.id, contactUpdates);
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       `Cloud migration completed: ${contacts.length} connections migrated to account-based model`
     );
   },

@@ -147,6 +147,17 @@ jest.mock("@capacitor/app", () => ({
   },
 }));
 
+jest.mock('@capacitor/filesystem', () => ({
+  Filesystem: {
+    appendFile: jest.fn(),
+    readFile: jest.fn().mockResolvedValue({ data: '' }),
+    writeFile: jest.fn(),
+  },
+  Directory: {
+    Data: 'DATA',
+  },
+}));
+
 jest.mock("../../hooks/useBiometricsHook", () => ({
   useBiometricAuth: jest.fn(),
   BIOMETRIC_SERVER_KEY: "org.cardanofoundation.idw.biometrics.key",

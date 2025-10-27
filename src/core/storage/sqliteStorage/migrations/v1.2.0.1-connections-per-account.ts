@@ -1,4 +1,5 @@
 import { MigrationType, TsMigration } from "./migrations.types";
+import { logger } from "../../../../utils/logger/Logger";
 import {
   createInsertItemTagsStatements,
   createInsertItemStatement,
@@ -22,7 +23,7 @@ export const DATA_V1201: TsMigration = {
       );
 
     if (!identifiers || identifiers.length === 0) {
-      console.log(
+      logger.info(
         "No identifiers found in local database, deleting all connections"
       );
       return [
@@ -73,7 +74,7 @@ export const DATA_V1201: TsMigration = {
 
       if (!connectionData.sharedIdentifier) {
         if (!connectionData.groupId) {
-          console.log("No groupId found for connection, skipping migration");
+          logger.info("No groupId found for connection, skipping migration");
           continue;
         }
 

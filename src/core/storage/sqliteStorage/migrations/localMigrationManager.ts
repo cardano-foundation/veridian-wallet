@@ -1,4 +1,5 @@
 import { SQLiteDBConnection } from "@capacitor-community/sqlite";
+import { logger } from "../../../../utils/logger/Logger";
 import { versionCompare } from "../utils";
 import { LocalMigration, MigrationType } from "./migrations.types";
 import { LOCAL_MIGRATIONS } from "./index";
@@ -12,8 +13,7 @@ export class LocalMigrationManager {
    * @returns Promise<void>
    */
   async executeLocalMigrations(currentVersion: string): Promise<void> {
-    // eslint-disable-next-line no-console
-    console.log("Starting local migration execution...");
+    logger.info("Starting local migration execution...");
 
     const orderedMigrations = LOCAL_MIGRATIONS.sort((a, b) =>
       versionCompare(a.version, b.version)
@@ -25,8 +25,7 @@ export class LocalMigrationManager {
     );
 
     if (pendingMigrations.length === 0) {
-      // eslint-disable-next-line no-console
-      console.log(
+      logger.info(
         `No local migrations needed. Current version: ${currentVersion}`
       );
       return;
@@ -34,14 +33,12 @@ export class LocalMigrationManager {
 
     const targetVersion =
       pendingMigrations[pendingMigrations.length - 1].version;
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       `Starting local migration from version ${currentVersion} to ${targetVersion}...`
     );
 
     for (const migration of pendingMigrations) {
-      // eslint-disable-next-line no-console
-      console.log(`Executing local migration: ${migration.version}`);
+      logger.info(`Executing local migration: ${migration.version}`);
 
       const migrationStatements = await this.executeLocalMigration(migration);
 
@@ -55,12 +52,10 @@ export class LocalMigrationManager {
         await this.session.executeTransaction(migrationStatements);
       }
 
-      // eslint-disable-next-line no-console
-      console.log(`Completed local migration: ${migration.version}`);
+      logger.info(`Completed local migration: ${migration.version}`);
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       `Local migration completed. Updated from version ${currentVersion} to ${targetVersion}`
     );
   }

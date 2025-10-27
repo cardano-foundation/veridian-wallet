@@ -1,20 +1,24 @@
 import { setToastMsg, showGenericError } from "../../store/reducers/stateCache";
 import { ToastMsgType } from "../globals/types";
 import { showError } from "./error";
+import { logger } from "../../utils/logger/Logger";
+
+jest.mock("../../utils/logger/Logger", () => ({
+  logger: {
+    error: jest.fn(),
+  },
+}));
 
 describe("Show error", () => {
-  const errorLogMock = jest.fn();
   const dispatch = jest.fn();
 
   beforeEach(() => {
-    jest.spyOn(global.console, "error").mockImplementation(() => {
-      errorLogMock();
-    });
+    jest.clearAllMocks();
   });
 
   it("Show common error", () => {
     showError("class1", {}, dispatch);
-    expect(errorLogMock).toBeCalled();
+    expect(logger.error).toBeCalled();
     expect(dispatch).toBeCalledWith(showGenericError(true));
   });
 
@@ -22,6 +26,7 @@ describe("Show error", () => {
     const dispatchMock = jest.fn();
     showError("class1", {}, dispatchMock, ToastMsgType.UNKNOWN_ERROR);
 
-    expect(errorLogMock).toBeCalled();
+    expect(logger.error).toBeCalled();
+    expect(dispatchMock).toBeCalledWith(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
   });
 });
