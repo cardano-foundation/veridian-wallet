@@ -280,6 +280,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   useEffect(() => {
     initApp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forceInitApp]);
 
   useEffect(() => {
@@ -331,6 +332,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (recoveryCompleteNoInterruption) {
       loadDb();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recoveryCompleteNoInterruption]);
 
   useEffect(() => {
@@ -365,6 +367,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (authentication.ssiAgentUrl && !authentication.firstAppLaunch) {
       startAgent();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authentication.ssiAgentUrl, authentication.firstAppLaunch]);
 
   const loadDatabase = async () => {
