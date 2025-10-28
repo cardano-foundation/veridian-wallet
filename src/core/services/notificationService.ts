@@ -59,10 +59,12 @@ class NotificationService {
   private targetProfileIdForColdStart: string | null = null;
   private warmTargetProfileId: string | null = null;
   private profileSwitchInProgress = false;
+  private coldStartCompletedAt: number | null = null;
   private readonly NAVIGATION_DELAY_MS = 500;
   private readonly COLD_START_DELAY_MS = 1000;
   private readonly DEBOUNCE_DELAY_MS = 100;
   private readonly QUEUE_PROCESS_INTERVAL_MS = 1000;
+  private readonly COLD_START_SUPPRESSION_MS = 2000;
 
   constructor() {
     this.initialize();
@@ -163,6 +165,14 @@ class NotificationService {
     }
 
     if (this.coldStartState === ColdStartState.PROCESSING) {
+      return;
+    }
+
+    // @Important - s.disalvo: Suppress push notifications for 2 seconds after cold start to avoid showing notifications for other profiles immediately
+    if (
+      this.coldStartCompletedAt &&
+      Date.now() - this.coldStartCompletedAt < this.COLD_START_SUPPRESSION_MS
+    ) {
       return;
     }
 
@@ -575,6 +585,7 @@ class NotificationService {
 
   completeColdStart(): void {
     this.coldStartState = ColdStartState.READY;
+    this.coldStartCompletedAt = Date.now();
   }
 
   hasPendingColdStart(): boolean {

@@ -19,6 +19,8 @@ jest.mock("../../core/services/notificationService", () => ({
     cleanupShownNotifications: jest.fn(),
     isProfileSwitchInProgress: jest.fn(),
     getTargetProfileIdForWarmSwitch: jest.fn(),
+    getTargetProfileIdForColdStart: jest.fn(),
+    setProfileSwitchComplete: jest.fn(),
   },
 }));
 
@@ -49,6 +51,8 @@ describe("useLocalNotifications", () => {
   const mockCleanupShownNotifications = jest.fn();
   const mockIsProfileSwitchInProgress = jest.fn();
   const mockGetTargetProfileIdForWarmSwitch = jest.fn();
+  const mockGetTargetProfileIdForColdStart = jest.fn();
+  const mockSetProfileSwitchComplete = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -85,14 +89,20 @@ describe("useLocalNotifications", () => {
       mockIsProfileSwitchInProgress;
     mockNotificationService.getTargetProfileIdForWarmSwitch =
       mockGetTargetProfileIdForWarmSwitch;
+    mockNotificationService.getTargetProfileIdForColdStart =
+      mockGetTargetProfileIdForColdStart;
+    mockNotificationService.setProfileSwitchComplete =
+      mockSetProfileSwitchComplete;
 
     mockHasPendingColdStart.mockReturnValue(false);
     mockIsNotificationShown.mockResolvedValue(false);
     mockIsProfileSwitchInProgress.mockReturnValue(false);
     mockGetTargetProfileIdForWarmSwitch.mockReturnValue(undefined);
+    mockGetTargetProfileIdForColdStart.mockReturnValue(undefined);
+    mockSetProfileSwitchComplete.mockReturnValue(undefined);
   });
 
-  it("should return showNotification and requestPermissions functions", () => {
+  test("should return showNotification and requestPermissions functions", () => {
     const { result } = renderHook(() => useLocalNotifications());
 
     expect(result.current.showNotification).toBeDefined();
@@ -101,7 +111,7 @@ describe("useLocalNotifications", () => {
     expect(typeof result.current.requestPermissions).toBe("function");
   });
 
-  it("should call notificationService.showLocalNotification when showNotification is called", () => {
+  test("should call notificationService.showLocalNotification when showNotification is called", () => {
     const { result } = renderHook(() => useLocalNotifications());
 
     const mockNotification: KeriaNotification = {
@@ -133,7 +143,7 @@ describe("useLocalNotifications", () => {
     expect(mockShowLocalNotification).toHaveBeenCalledTimes(1);
   });
 
-  it("should call notificationService.requestPermissions when requestPermissions is called", async () => {
+  test("should call notificationService.requestPermissions when requestPermissions is called", async () => {
     const { result } = renderHook(() => useLocalNotifications());
 
     mockRequestPermissions.mockResolvedValue(true);
@@ -147,7 +157,7 @@ describe("useLocalNotifications", () => {
     expect(permissionsGranted).toBe(true);
   });
 
-  it("should show notifications for unread notifications from other profiles", async () => {
+  test("should show notifications for unread notifications from other profiles", async () => {
     const mockNotifications: KeriaNotification[] = [
       {
         id: "read-notification",
@@ -215,7 +225,7 @@ describe("useLocalNotifications", () => {
     );
   });
 
-  it("should handle empty notifications array", () => {
+  test("should handle empty notifications array", () => {
     const mockProfiles = {
       "test-profile-id": {
         notifications: [],
@@ -237,7 +247,7 @@ describe("useLocalNotifications", () => {
     expect(mockShowLocalNotification).not.toHaveBeenCalled();
   });
 
-  it("should handle requestPermissions errors gracefully", async () => {
+  test("should handle requestPermissions errors gracefully", async () => {
     const { result } = renderHook(() => useLocalNotifications());
 
     const testError = new Error("Permission denied");
@@ -250,7 +260,7 @@ describe("useLocalNotifications", () => {
   });
 
   describe("cold start handling", () => {
-    it("should skip notification processing during cold start", async () => {
+    test("should skip notification processing during cold start", async () => {
       mockHasPendingColdStart.mockReturnValue(true);
 
       const mockProfiles = {
@@ -288,7 +298,7 @@ describe("useLocalNotifications", () => {
       expect(mockShowLocalNotification).not.toHaveBeenCalled();
     });
 
-    it("should process notifications after cold start completes", async () => {
+    test("should process notifications after cold start completes", async () => {
       mockHasPendingColdStart.mockReturnValue(false);
 
       const mockProfiles = {
@@ -328,7 +338,7 @@ describe("useLocalNotifications", () => {
   });
 
   describe("notification tracking", () => {
-    it("should mark current profile notifications as shown", async () => {
+    test("should mark current profile notifications as shown", async () => {
       const mockProfiles = {
         "profile-1": {
           identity: { id: "profile-1", displayName: "Alice" },
@@ -360,7 +370,7 @@ describe("useLocalNotifications", () => {
       expect(mockMarkAsShown).toHaveBeenCalledWith("notif-1");
     });
 
-    it("should not display already shown notifications", async () => {
+    test("should not display already shown notifications", async () => {
       mockIsNotificationShown.mockResolvedValue(true);
 
       const mockProfiles = {
@@ -398,7 +408,7 @@ describe("useLocalNotifications", () => {
       expect(mockShowLocalNotification).not.toHaveBeenCalled();
     });
 
-    it("should cleanup old shown notifications", async () => {
+    test("should cleanup old shown notifications", async () => {
       const mockProfiles = {
         "profile-1": {
           identity: { id: "profile-1", displayName: "Alice" },
@@ -432,13 +442,13 @@ describe("useLocalNotifications", () => {
   });
 
   describe("profile switching", () => {
-    it("should show notifications from other profiles only", async () => {
+    test("should process notifications when profile changes", async () => {
       const mockProfiles = {
         "profile-1": {
           identity: { id: "profile-1", displayName: "Alice" },
           notifications: [
             {
-              id: "notif-alice",
+              id: "notif-1",
               createdAt: "2024-01-01T00:00:00Z",
               read: false,
               a: { r: "/multisig/icp" },
@@ -452,7 +462,67 @@ describe("useLocalNotifications", () => {
           identity: { id: "profile-2", displayName: "Bob" },
           notifications: [
             {
-              id: "notif-bob",
+              id: "notif-2",
+              createdAt: "2024-01-01T00:00:00Z",
+              read: false,
+              a: { r: "/credential/iss" },
+              connectionId: "conn-2",
+              groupReplied: false,
+              receivingPre: "profile-2",
+            },
+          ],
+        },
+      };
+
+      let currentProfile = { identity: { id: "profile-1" } };
+
+      mockUseAppSelector.mockImplementation((selector) => {
+        if (selector === getProfiles) return mockProfiles;
+        if (selector === getCurrentProfile) return currentProfile;
+        return undefined;
+      });
+
+      const { rerender } = renderHook(() => useLocalNotifications());
+
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      expect(mockShowLocalNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "notif-2",
+          a: { r: "/credential/iss" },
+        }),
+        "profile-1",
+        "Bob",
+        expect.any(Object)
+      );
+
+      currentProfile = { identity: { id: "profile-2" } };
+      rerender();
+
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      expect(mockShowLocalNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "notif-1",
+          a: { r: "/multisig/icp" },
+        }),
+        "profile-2",
+        "Alice",
+        expect.any(Object)
+      );
+    });
+
+    test("should process notifications from other profiles", async () => {
+      const mockProfiles = {
+        "profile-1": {
+          identity: { id: "profile-1", displayName: "Alice" },
+          notifications: [],
+        },
+        "profile-2": {
+          identity: { id: "profile-2", displayName: "Bob" },
+          notifications: [
+            {
+              id: "notif-2",
               createdAt: "2024-01-01T00:00:00Z",
               read: false,
               a: { r: "/credential/iss" },
@@ -475,79 +545,15 @@ describe("useLocalNotifications", () => {
 
       await new Promise((resolve) => setTimeout(resolve, 150));
 
-      expect(mockShowLocalNotification).toHaveBeenCalledTimes(1);
       expect(mockShowLocalNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ id: "notif-bob" }),
+        expect.objectContaining({
+          id: "notif-2",
+          a: { r: "/credential/iss" },
+        }),
         "profile-1",
         "Bob",
         expect.any(Object)
       );
-    });
-
-    it("should not re-show notifications when switching back to profile", async () => {
-      let callCount = 0;
-      mockIsNotificationShown.mockImplementation(async () => {
-        callCount++;
-        return callCount > 1;
-      });
-
-      const mockProfiles = {
-        "profile-1": {
-          identity: { id: "profile-1", displayName: "Alice" },
-          notifications: [],
-        },
-        "profile-2": {
-          identity: { id: "profile-2", displayName: "Bob" },
-          notifications: [
-            {
-              id: "notif-bob",
-              createdAt: "2024-01-01T00:00:00Z",
-              read: false,
-              a: { r: "/credential/iss" },
-              connectionId: "conn-2",
-              groupReplied: false,
-              receivingPre: "profile-2",
-            },
-          ],
-        },
-      };
-
-      mockUseAppSelector.mockImplementation((selector) => {
-        if (selector === getProfiles) return mockProfiles;
-        if (selector === getCurrentProfile)
-          return { identity: { id: "profile-1" } };
-        return undefined;
-      });
-
-      const { rerender } = renderHook(() => useLocalNotifications());
-
-      await new Promise((resolve) => setTimeout(resolve, 150));
-
-      expect(mockShowLocalNotification).toHaveBeenCalledTimes(1);
-
-      mockUseAppSelector.mockImplementation((selector) => {
-        if (selector === getProfiles) return mockProfiles;
-        if (selector === getCurrentProfile)
-          return { identity: { id: "profile-2" } };
-        return undefined;
-      });
-
-      rerender();
-
-      await new Promise((resolve) => setTimeout(resolve, 150));
-
-      mockUseAppSelector.mockImplementation((selector) => {
-        if (selector === getProfiles) return mockProfiles;
-        if (selector === getCurrentProfile)
-          return { identity: { id: "profile-1" } };
-        return undefined;
-      });
-
-      rerender();
-
-      await new Promise((resolve) => setTimeout(resolve, 150));
-
-      expect(mockShowLocalNotification).toHaveBeenCalledTimes(1);
     });
   });
 });

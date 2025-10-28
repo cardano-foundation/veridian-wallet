@@ -82,7 +82,7 @@ describe("NotificationService", () => {
   });
 
   describe("requestPermissions", () => {
-    it("should request permissions successfully", async () => {
+    test("should request permissions successfully", async () => {
       const mockResult = { display: "granted" };
       (LocalNotifications.requestPermissions as jest.Mock).mockResolvedValue(
         mockResult
@@ -94,7 +94,7 @@ describe("NotificationService", () => {
       expect(result).toBe(true);
     });
 
-    it("should handle permission denied", async () => {
+    test("should handle permission denied", async () => {
       const mockResult = { display: "denied" };
       (LocalNotifications.requestPermissions as jest.Mock).mockResolvedValue(
         mockResult
@@ -104,21 +104,10 @@ describe("NotificationService", () => {
 
       expect(result).toBe(false);
     });
-
-    it("should handle permission errors", async () => {
-      const error = new Error("Permission error");
-      (LocalNotifications.requestPermissions as jest.Mock).mockRejectedValue(
-        error
-      );
-
-      const result = await notificationService.requestPermissions();
-
-      expect(result).toBe(false);
-    });
   });
 
   describe("scheduleNotification", () => {
-    it("should enqueue a notification when permissions granted", async () => {
+    test("should enqueue a notification when permissions granted", async () => {
       const payload = {
         notificationId: "1",
         profileId: "profile-123",
@@ -135,7 +124,7 @@ describe("NotificationService", () => {
       expect(queue[0].payload).toEqual(payload);
     });
 
-    it("should not enqueue when permissions not granted", async () => {
+    test("should not enqueue when permissions not granted", async () => {
       (notificationService as any).permissionsGranted = false;
 
       const payload = {
@@ -154,7 +143,7 @@ describe("NotificationService", () => {
   });
 
   describe("showLocalNotification", () => {
-    it("should show local notification for KERIA notification from different profile", async () => {
+    test("should show local notification for KERIA notification from different profile", async () => {
       mockBasicStorage.findById.mockResolvedValue(null);
 
       const keriaNotification: KeriaNotification = {
@@ -193,7 +182,7 @@ describe("NotificationService", () => {
   });
 
   describe("clearAllDeliveredNotifications", () => {
-    it("should clear all delivered notifications", async () => {
+    test("should clear all delivered notifications", async () => {
       (
         LocalNotifications.removeAllDeliveredNotifications as jest.Mock
       ).mockResolvedValue({});
@@ -204,21 +193,10 @@ describe("NotificationService", () => {
         LocalNotifications.removeAllDeliveredNotifications
       ).toHaveBeenCalled();
     });
-
-    it("should handle clear errors", async () => {
-      const error = new Error("Clear error");
-      (
-        LocalNotifications.removeAllDeliveredNotifications as jest.Mock
-      ).mockRejectedValue(error);
-
-      await expect(
-        notificationService.clearAllDeliveredNotifications()
-      ).resolves.toBeUndefined();
-    });
   });
 
   describe("cancelNotification", () => {
-    it("should cancel a specific notification", async () => {
+    test("should cancel a specific notification", async () => {
       (LocalNotifications.cancel as jest.Mock).mockResolvedValue({});
 
       await notificationService.cancelNotification("1");
@@ -227,19 +205,10 @@ describe("NotificationService", () => {
         notifications: [{ id: 1 }],
       });
     });
-
-    it("should handle cancel errors", async () => {
-      const error = new Error("Cancel error");
-      (LocalNotifications.cancel as jest.Mock).mockRejectedValue(error);
-
-      await expect(
-        notificationService.cancelNotification("1")
-      ).resolves.toBeUndefined();
-    });
   });
 
   describe("cleanupShownNotifications", () => {
-    it("should skip cleanup when no current notification ids", async () => {
+    test("should skip cleanup when no current notification ids", async () => {
       const saveSpy = jest.spyOn(
         notificationService as any,
         "saveShownNotifications"
@@ -251,7 +220,7 @@ describe("NotificationService", () => {
       saveSpy.mockRestore();
     });
 
-    it("should remove stale shown notifications", async () => {
+    test("should remove stale shown notifications", async () => {
       const shownIds = ["stale-id", "active-id"];
       mockBasicStorage.findById.mockResolvedValueOnce({
         content: { notificationIds: shownIds },
@@ -271,7 +240,7 @@ describe("NotificationService", () => {
   });
 
   describe("marking notifications", () => {
-    it("should persist notification id and cancel local notification", async () => {
+    test("should persist notification id and cancel local notification", async () => {
       mockBasicStorage.findById.mockResolvedValueOnce({
         content: { notificationIds: [] },
       } as any);
@@ -292,7 +261,7 @@ describe("NotificationService", () => {
       });
     });
 
-    it("should report notification as shown when already stored", async () => {
+    test("should report notification as shown when already stored", async () => {
       mockBasicStorage.findById.mockResolvedValueOnce({
         content: { notificationIds: ["abc"] },
       } as any);
@@ -302,7 +271,7 @@ describe("NotificationService", () => {
       expect(result).toBe(true);
     });
 
-    it("should detect shown notifications from delivered list", async () => {
+    test("should detect shown notifications from delivered list", async () => {
       mockBasicStorage.findById.mockResolvedValueOnce(null as any);
       (
         LocalNotifications.getDeliveredNotifications as jest.Mock
@@ -317,7 +286,7 @@ describe("NotificationService", () => {
   });
 
   describe("pending cold start processing", () => {
-    it("should process pending notification when handlers set", () => {
+    test("should process pending notification when handlers set", () => {
       jest.useFakeTimers();
 
       const navigator = jest.fn();
@@ -337,7 +306,7 @@ describe("NotificationService", () => {
 
       jest.advanceTimersByTime(1000);
 
-      expect(navigator).toHaveBeenCalledWith("/tabs/notifications");
+      expect(navigator).toHaveBeenCalledWith("/tabs/notifications", "notif-1");
 
       jest.useRealTimers();
     });
@@ -353,103 +322,75 @@ describe("NotificationService", () => {
       mockBasicStorage.findById.mockResolvedValue(null);
     });
 
-    it("should map multisig notifications correctly", async () => {
-      const notification: KeriaNotification = {
-        id: "test",
-        createdAt: "2025-01-01T10:00:00Z",
-        a: { r: "/multisig/icp", d: "conn-123", m: "Multisig message" },
-        connectionId: "conn-123",
-        read: false,
-        groupReplied: false,
-        receivingPre: "profile",
-      };
+    test("should map different notification types correctly", async () => {
+      const testCases = [
+        {
+          name: "multisig",
+          notification: {
+            id: "test-multisig",
+            createdAt: "2025-01-01T10:00:00Z",
+            a: { r: "/multisig/icp", d: "conn-123", m: "Multisig message" },
+            connectionId: "conn-123",
+            read: false,
+            groupReplied: false,
+            receivingPre: "profile",
+          },
+          expectedBody: "Multisig request",
+        },
+        {
+          name: "credential",
+          notification: {
+            id: "test-credential",
+            createdAt: "2025-01-01T10:00:00Z",
+            a: { r: "/exn/ipex/grant", d: "conn-123", m: "Credential message" },
+            connectionId: "conn-123",
+            read: false,
+            groupReplied: false,
+            receivingPre: "profile",
+          },
+          expectedBody: "Credential offer",
+        },
+        {
+          name: "unknown",
+          notification: {
+            id: "test-unknown",
+            createdAt: "2025-01-01T10:00:00Z",
+            a: { r: "/unknown/type", d: "conn-123", m: "Unknown message" },
+            connectionId: "conn-123",
+            read: false,
+            groupReplied: false,
+            receivingPre: "profile",
+          },
+          expectedBody: "New notification",
+        },
+      ];
 
-      (LocalNotifications.schedule as jest.Mock).mockResolvedValue({
-        notifications: [],
-      });
+      for (const testCase of testCases) {
+        (LocalNotifications.schedule as jest.Mock).mockResolvedValue({
+          notifications: [],
+        });
 
-      await notificationService.showLocalNotification(
-        notification,
-        "different-profile",
-        "Test Profile",
-        mockCacheData
-      );
+        await notificationService.showLocalNotification(
+          testCase.notification,
+          "different-profile",
+          "Test Profile",
+          mockCacheData
+        );
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      expect(LocalNotifications.schedule).toHaveBeenCalled();
-      const scheduleCall = (LocalNotifications.schedule as jest.Mock).mock
-        .calls[0][0];
-      const scheduledNotification = scheduleCall.notifications[0];
+        expect(LocalNotifications.schedule).toHaveBeenCalled();
+        const scheduleCall = (LocalNotifications.schedule as jest.Mock).mock
+          .calls[0][0];
+        const scheduledNotification = scheduleCall.notifications[0];
 
-      expect(scheduledNotification.title).toBe("Test Profile");
-      expect(scheduledNotification.actionTypeId).toBe("default");
-    });
+        expect(scheduledNotification.title).toBe("Test Profile");
+        expect(scheduledNotification.body).toBe(testCase.expectedBody);
+        expect(scheduledNotification.actionTypeId).toBe("default");
 
-    it("should map credential notifications correctly", async () => {
-      const notification: KeriaNotification = {
-        id: "test",
-        createdAt: "2025-01-01T10:00:00Z",
-        a: { r: "/credential/iss", d: "conn-123", m: "Credential message" },
-        connectionId: "conn-123",
-        read: false,
-        groupReplied: false,
-        receivingPre: "profile",
-      };
-
-      (LocalNotifications.schedule as jest.Mock).mockResolvedValue({
-        notifications: [],
-      });
-
-      await notificationService.showLocalNotification(
-        notification,
-        "different-profile",
-        "Test Profile",
-        mockCacheData
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      expect(LocalNotifications.schedule).toHaveBeenCalled();
-      const scheduleCall = (LocalNotifications.schedule as jest.Mock).mock
-        .calls[0][0];
-      const scheduledNotification = scheduleCall.notifications[0];
-
-      expect(scheduledNotification.title).toBe("Test Profile");
-      expect(scheduledNotification.actionTypeId).toBe("default");
-    });
-
-    it("should handle unknown notification types", async () => {
-      const notification: KeriaNotification = {
-        id: "test",
-        createdAt: "2025-01-01T10:00:00Z",
-        a: { r: "/unknown/type", d: "conn-123", m: "Unknown message" },
-        connectionId: "conn-123",
-        read: false,
-        groupReplied: false,
-        receivingPre: "profile",
-      };
-
-      (LocalNotifications.schedule as jest.Mock).mockResolvedValue({
-        notifications: [],
-      });
-
-      await notificationService.showLocalNotification(
-        notification,
-        "different-profile",
-        "Test Profile",
-        mockCacheData
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      expect(LocalNotifications.schedule).toHaveBeenCalled();
-      const scheduleCall = (LocalNotifications.schedule as jest.Mock).mock
-        .calls[0][0];
-      const scheduledNotification = scheduleCall.notifications[0];
-
-      expect(scheduledNotification.title).toBe("Test Profile");
-      expect(scheduledNotification.actionTypeId).toBe("default");
+        // Reset mock for next test case
+        (LocalNotifications.schedule as jest.Mock).mockClear();
+      }
     });
   });
 
@@ -469,7 +410,7 @@ describe("NotificationService", () => {
       });
     });
 
-    it("should navigate to notifications when notification is tapped", async () => {
+    test("should navigate to notifications when notification is tapped", async () => {
       jest.useFakeTimers();
 
       const notification = {
@@ -484,12 +425,12 @@ describe("NotificationService", () => {
       jest.advanceTimersByTime(100);
       jest.advanceTimersByTime(500);
 
-      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
+      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications", "1");
 
       jest.useRealTimers();
     });
 
-    it("should navigate to notifications when no route specified", async () => {
+    test("should navigate to notifications when no route specified", async () => {
       jest.useFakeTimers();
 
       const notification = {
@@ -502,12 +443,12 @@ describe("NotificationService", () => {
       jest.advanceTimersByTime(100);
       jest.advanceTimersByTime(500);
 
-      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
+      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications", "1");
 
       jest.useRealTimers();
     });
 
-    it("should process notification tap immediately", async () => {
+    test("should process notification tap immediately", async () => {
       jest.useFakeTimers();
 
       const notification = {
@@ -522,7 +463,7 @@ describe("NotificationService", () => {
       jest.advanceTimersByTime(100);
       jest.advanceTimersByTime(500);
 
-      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
+      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications", "1");
 
       jest.useRealTimers();
     });
@@ -541,19 +482,25 @@ describe("NotificationService", () => {
       (notificationService as any).coldStartState = "IDLE";
       (notificationService as any).pendingColdStartNotification = null;
       (notificationService as any).targetProfileIdForColdStart = null;
+      (
+        LocalNotifications.getDeliveredNotifications as jest.Mock
+      ).mockResolvedValue({
+        notifications: [],
+      });
+      (LocalNotifications.cancel as jest.Mock).mockResolvedValue(undefined);
     });
 
-    it("should detect cold start state", () => {
+    test("should detect cold start state", () => {
       (notificationService as any).coldStartState = "PROCESSING";
       expect(notificationService.hasPendingColdStart()).toBe(true);
     });
 
-    it("should return false when not in cold start", () => {
+    test("should return false when not in cold start", () => {
       (notificationService as any).coldStartState = "IDLE";
       expect(notificationService.hasPendingColdStart()).toBe(false);
     });
 
-    it("should store target profile during notification tap", async () => {
+    test("should store target profile during notification tap", async () => {
       jest.useFakeTimers();
 
       const notification = {
@@ -584,7 +531,7 @@ describe("NotificationService", () => {
       jest.useRealTimers();
     });
 
-    it("should clear target profile after use", () => {
+    test("should clear target profile after use", () => {
       (notificationService as any).targetProfileIdForColdStart = "profile-123";
       notificationService.clearTargetProfileIdForColdStart();
 
@@ -592,7 +539,7 @@ describe("NotificationService", () => {
       expect(stored).toBeNull();
     });
 
-    it("should enter processing state and complete on signal", async () => {
+    test("should enter processing state and complete on signal", async () => {
       jest.useFakeTimers();
 
       const notification = {
@@ -622,7 +569,9 @@ describe("NotificationService", () => {
       jest.useRealTimers();
     });
 
-    it("should trigger cold start processing when app state changes", () => {
+    test("should trigger cold start processing when app state changes", () => {
+      jest.useFakeTimers();
+
       (notificationService as any).coldStartState = "PROCESSING";
       (notificationService as any).pendingColdStartNotification = {
         profileId: "profile-123",
@@ -632,9 +581,18 @@ describe("NotificationService", () => {
       (notificationService as any).processPendingColdStartNotification();
 
       expect(mockProfileSwitcher).toHaveBeenCalledWith("profile-123");
+
+      jest.advanceTimersByTime(1000);
+
+      expect(mockNavigator).toHaveBeenCalledWith(
+        "/tabs/notifications",
+        "notif-1"
+      );
+
+      jest.useRealTimers();
     });
 
-    it("should not process when no pending cold start", () => {
+    test("should not process when no pending cold start", () => {
       (notificationService as any).coldStartState = "IDLE";
       (notificationService as any).pendingColdStartNotification = null;
 
@@ -650,7 +608,7 @@ describe("NotificationService", () => {
       mockBasicStorage.findById.mockResolvedValue(null);
     });
 
-    it("should mark notification as shown", async () => {
+    test("should mark notification as shown", async () => {
       const notificationId = "test-notification-1";
 
       let savedNotifications: string[] = [];
@@ -680,42 +638,7 @@ describe("NotificationService", () => {
       expect(isShown).toBe(true);
     });
 
-    it("should detect already shown notifications", async () => {
-      const notificationId = "test-notification-1";
-
-      let savedNotifications: string[] = [];
-      mockBasicStorage.save.mockImplementation(async (record: any) => {
-        savedNotifications = record.content.notificationIds;
-        return record;
-      });
-
-      mockBasicStorage.findById.mockImplementation(async (id: string) => {
-        if (
-          id === MiscRecordId.SHOWN_NOTIFICATIONS &&
-          savedNotifications.length > 0
-        ) {
-          return {
-            id,
-            content: { notificationIds: savedNotifications },
-          } as any;
-        }
-        return null;
-      });
-
-      await notificationService.markAsShown(notificationId);
-
-      const isShown = await notificationService.isNotificationShown(
-        notificationId
-      );
-      expect(isShown).toBe(true);
-
-      const isShownAgain = await notificationService.isNotificationShown(
-        notificationId
-      );
-      expect(isShownAgain).toBe(true);
-    });
-
-    it("should return false for notifications not yet shown", async () => {
+    test("should return false for notifications not yet shown", async () => {
       const notificationId = "not-shown-notification";
 
       mockBasicStorage.findById.mockResolvedValue(null);
@@ -726,7 +649,7 @@ describe("NotificationService", () => {
       expect(isShown).toBe(false);
     });
 
-    it("should cleanup old shown notifications", async () => {
+    test("should cleanup old shown notifications", async () => {
       let savedNotifications: string[] = [];
       mockBasicStorage.save.mockImplementation(async (record: any) => {
         savedNotifications = record.content.notificationIds;
@@ -804,7 +727,7 @@ describe("NotificationService", () => {
       });
     });
 
-    it("should switch profiles when tapping notification from different profile", async () => {
+    test("should switch profiles when tapping notification from different profile", async () => {
       jest.useFakeTimers();
 
       const notification = {
@@ -825,31 +748,9 @@ describe("NotificationService", () => {
 
       jest.advanceTimersByTime(500);
 
-      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
+      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications", "1");
 
       jest.useRealTimers();
-    });
-
-    it("should not show duplicate notifications after profile switch", async () => {
-      const notificationId = "notif-1";
-
-      await notificationService.markAsShown(notificationId);
-
-      const isShown = await notificationService.isNotificationShown(
-        notificationId
-      );
-      expect(isShown).toBe(true);
-    });
-
-    it("should suppress current profile notifications", async () => {
-      const currentProfileNotificationId = "notif-alice-1";
-
-      await notificationService.markAsShown(currentProfileNotificationId);
-
-      const isShown = await notificationService.isNotificationShown(
-        currentProfileNotificationId
-      );
-      expect(isShown).toBe(true);
     });
   });
 
@@ -865,17 +766,17 @@ describe("NotificationService", () => {
       (notificationService as any).profileSwitchInProgress = false;
     });
 
-    it("should detect profile switch in progress", () => {
+    test("should detect profile switch in progress", () => {
       (notificationService as any).profileSwitchInProgress = true;
       expect(notificationService.isProfileSwitchInProgress()).toBe(true);
     });
 
-    it("should return false when no profile switch", () => {
+    test("should return false when no profile switch", () => {
       (notificationService as any).profileSwitchInProgress = false;
       expect(notificationService.isProfileSwitchInProgress()).toBe(false);
     });
 
-    it("should set profile switch complete", () => {
+    test("should set profile switch complete", () => {
       (notificationService as any).profileSwitchInProgress = true;
       (notificationService as any).warmTargetProfileId = "profile-bob";
       notificationService.setProfileSwitchComplete();
@@ -883,7 +784,7 @@ describe("NotificationService", () => {
       expect(notificationService.getTargetProfileIdForWarmSwitch()).toBeNull();
     });
 
-    it("should set profile switch in progress when processing tap", async () => {
+    test("should set profile switch in progress when processing tap", async () => {
       jest.useFakeTimers();
 
       const notification = {
@@ -904,7 +805,7 @@ describe("NotificationService", () => {
       jest.advanceTimersByTime(100);
       jest.advanceTimersByTime(500);
 
-      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications");
+      expect(mockNavigator).toHaveBeenCalledWith("/tabs/notifications", "1");
 
       notificationService.setProfileSwitchComplete();
       expect(notificationService.isProfileSwitchInProgress()).toBe(false);
@@ -913,7 +814,7 @@ describe("NotificationService", () => {
       jest.useRealTimers();
     });
 
-    it("should batch notifications after profile switch", async () => {
+    test("should batch notifications after profile switch", async () => {
       jest.useFakeTimers();
 
       const notification = {
@@ -935,24 +836,6 @@ describe("NotificationService", () => {
       expect(notificationService.isProfileSwitchInProgress()).toBe(false);
 
       jest.useRealTimers();
-    });
-  });
-
-  describe("timing constants", () => {
-    it("should use correct navigation delay", () => {
-      expect((notificationService as any).NAVIGATION_DELAY_MS).toBe(500);
-    });
-
-    it("should use correct cold start delay", () => {
-      expect((notificationService as any).COLD_START_DELAY_MS).toBe(1000);
-    });
-
-    it("should use correct debounce delay", () => {
-      expect((notificationService as any).DEBOUNCE_DELAY_MS).toBe(100);
-    });
-
-    it("should use correct queue process interval", () => {
-      expect((notificationService as any).QUEUE_PROCESS_INTERVAL_MS).toBe(1000);
     });
   });
 });

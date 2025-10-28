@@ -89,6 +89,7 @@ export const useLocalNotifications = () => {
     notificationService.setProfileSwitcher((profileId: string) => {
       dispatch(setCurrentProfile(profileId));
       dispatch(setToastMsg(ToastMsgType.PROFILE_SWITCHED));
+      notificationService.clearDeliveredNotificationsForProfile(profileId);
     });
 
     notificationService.setNavigator(
