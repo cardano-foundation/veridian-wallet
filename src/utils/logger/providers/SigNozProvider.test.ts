@@ -21,6 +21,7 @@ jest.mock('@opentelemetry/semantic-conventions');
 describe('SigNozProvider', () => {
   let strategy: SigNozProvider;
   const mockOtlpEndpoint = 'http://test-endpoint.com/v1/logs';
+  const mockIngestionKey = 'test-ingestion-key';
 
   let mockLogger: {
     emit: jest.Mock;
@@ -46,19 +47,14 @@ describe('SigNozProvider', () => {
     (OTLPLogExporter as jest.Mock).mockClear();
     (BatchLogRecordProcessor as jest.Mock).mockClear();
 
-    strategy = new SigNozProvider(mockOtlpEndpoint);
+    strategy = new SigNozProvider(mockOtlpEndpoint, mockIngestionKey);
   });
 
   it('should initialize the OTLPLogExporter and LoggerProvider correctly', () => {
-    const originalIngestionKey = process.env.SIGNOZ_INGESTION_KEY;
-    process.env.SIGNOZ_INGESTION_KEY = '<your-ingestion-key>';
-
-    strategy = new SigNozProvider(mockOtlpEndpoint);
-
     expect(OTLPLogExporter).toHaveBeenCalledWith({
       url: mockOtlpEndpoint,
       headers: {
-        'signoz-ingestion-key': '<your-ingestion-key>',
+        'signoz-ingestion-key': mockIngestionKey,
       },
     });
     
@@ -69,8 +65,6 @@ describe('SigNozProvider', () => {
     );
     expect(defaultResource).toHaveBeenCalled();
     expect(resourceFromAttributes).toHaveBeenCalled();
-
-    process.env.SIGNOZ_INGESTION_KEY = originalIngestionKey;
   });
 
   it('logBatch should do nothing for empty log entries', async () => {

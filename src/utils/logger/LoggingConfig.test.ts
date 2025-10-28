@@ -15,6 +15,7 @@ describe('LoggingConfig', () => {
     delete process.env.LOGGING_BATCH_SIZE;
     delete process.env.LOGGING_MAX_SYNC_RETRIES;
     delete process.env.LOGGING_RETRY_DELAY_MS;
+    delete process.env.SIGNOZ_INGESTION_KEY;
   });
 
   afterAll(() => {
@@ -44,6 +45,7 @@ describe('LoggingConfig', () => {
     process.env.LOGGING_BATCH_SIZE = '100';
     process.env.LOGGING_MAX_SYNC_RETRIES = '5';
     process.env.LOGGING_RETRY_DELAY_MS = '10000';
+    process.env.SIGNOZ_INGESTION_KEY = 'test-key';
 
     const config = new LoggingConfig();
     expect(config.mode).toBe('debug');

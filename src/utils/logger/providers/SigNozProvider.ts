@@ -10,7 +10,7 @@ export class SigNozProvider extends CloudLoggingAdapter {
   private loggerProvider: LoggerProvider;
   private exporter: OTLPLogExporter;
 
-  constructor(otlpEndpoint: string) {
+  constructor(otlpEndpoint: string, ingestionKey: string) {
     super();
     const resource = defaultResource().merge(
       resourceFromAttributes({
@@ -22,7 +22,7 @@ export class SigNozProvider extends CloudLoggingAdapter {
     this.exporter = new OTLPLogExporter({
         url: otlpEndpoint,
         headers: {
-            "signoz-ingestion-key": process.env.SIGNOZ_INGESTION_KEY || "",
+            "signoz-ingestion-key": ingestionKey,
           },
     });
 

@@ -9,12 +9,13 @@ import { logger } from "../../utils/logger/Logger";
 export class LogSyncService {
   private listener: PluginListenerHandle | undefined;
   private localStrategyFactory: () => LocalFileStrategy;
-  private remoteStrategyFactory: (otlpEndpoint: string) => SigNozProvider;
+  private remoteStrategyFactory: (otlpEndpoint: string, ingestionKey: string) => SigNozProvider;
   private delay: (ms: number) => Promise<void>;
 
   constructor(
     localStrategyFactory: () => LocalFileStrategy = () => new LocalFileStrategy(),
-    remoteStrategyFactory: (otlpEndpoint: string) => SigNozProvider = (otlpEndpoint) => new SigNozProvider(otlpEndpoint),
+    remoteStrategyFactory: (otlpEndpoint: string, ingestionKey: string) => SigNozProvider = 
+      (otlpEndpoint, ingestionKey) => new SigNozProvider(otlpEndpoint, ingestionKey),
     delay: (ms: number) => Promise<void> = (ms) => new Promise(resolve => setTimeout(resolve, ms))
   ) {
     this.localStrategyFactory = localStrategyFactory;
@@ -47,7 +48,7 @@ export class LogSyncService {
     for (let attempt = 1; attempt <= loggingConfig.maxSyncRetries; attempt++) {
       try {
         const local = this.localStrategyFactory();
-        const remote = this.remoteStrategyFactory(loggingConfig.signozOtlpEndpoint);
+        const remote = this.remoteStrategyFactory(loggingConfig.signozOtlpEndpoint, loggingConfig.signozIngestionKey);
         const pending: ParsedLogEntry[] = await local.readLogs();
         const successfullySentLogIds = new Set<string>();
 

@@ -26,7 +26,8 @@ export class Logger {
 
   static getInstance(
     localStrategyFactory: () => LocalFileStrategy = () => new LocalFileStrategy(),
-    cloudLoggerFactory: (otlpEndpoint: string) => ICloudLogger = (otlpEndpoint) => new SigNozProvider(otlpEndpoint)
+    cloudLoggerFactory: (otlpEndpoint: string, ingestionKey: string) => ICloudLogger = 
+      (otlpEndpoint, ingestionKey) => new SigNozProvider(otlpEndpoint, ingestionKey)
   ): Logger {
     if (!Logger.instance) {
       const activeStrategies: ILogger[] = [];
@@ -49,7 +50,7 @@ export class Logger {
 
       let cloudLogger: ICloudLogger | undefined;
       if (loggingConfig.remoteEnabled) {
-        cloudLogger = cloudLoggerFactory(loggingConfig.signozOtlpEndpoint);
+        cloudLogger = cloudLoggerFactory(loggingConfig.signozOtlpEndpoint, loggingConfig.signozIngestionKey);
       }
 
       if (localStrategy && cloudLogger) {

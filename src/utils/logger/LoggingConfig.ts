@@ -6,6 +6,7 @@ interface ILoggingConfig {
   localEnabled: boolean;
   remoteEnabled: boolean;
   signozOtlpEndpoint: string;
+  signozIngestionKey: string;
   offlineLogFileName: string;
   batchSize: number;
   maxSyncRetries: number;
@@ -18,6 +19,7 @@ export class LoggingConfig implements ILoggingConfig {
   public readonly localEnabled: boolean;
   public readonly remoteEnabled: boolean;
   public readonly signozOtlpEndpoint: string;
+  public readonly signozIngestionKey: string;
   public readonly offlineLogFileName: string;
   public readonly batchSize: number;
   public readonly maxSyncRetries: number;
@@ -29,6 +31,7 @@ export class LoggingConfig implements ILoggingConfig {
     this.localEnabled = process.env.LOGGING_LOCAL_ENABLED === "true";
     this.remoteEnabled = process.env.LOGGING_REMOTE_ENABLED === "true";
     this.signozOtlpEndpoint = process.env.SIGNOZ_OTLP_ENDPOINT || "https://signoz-server:4318/v1/logs";
+    this.signozIngestionKey = process.env.SIGNOZ_INGESTION_KEY || "";
     this.offlineLogFileName = process.env.OFFLINE_LOG_FILE_NAME || "offline-logs.txt";
     const parsedBatchSize = parseInt(process.env.LOGGING_BATCH_SIZE || "50", 10);
     this.batchSize = isNaN(parsedBatchSize) ? 50 : parsedBatchSize;
@@ -42,6 +45,10 @@ export class LoggingConfig implements ILoggingConfig {
       this.consoleEnabled = false;
       this.localEnabled = false;
       this.remoteEnabled = false;
+    }
+
+    if (this.remoteEnabled && !this.signozIngestionKey?.length) {
+      throw new Error("SIGNOZ_INGESTION_KEY is required when remote logging is enabled.");
     }
   }
 }
