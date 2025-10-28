@@ -28,9 +28,9 @@ describe('LoggingConfig', () => {
     expect(config.consoleEnabled).toBe(false);
     expect(config.localEnabled).toBe(false);
     expect(config.remoteEnabled).toBe(false);
-    expect(config.signozOtlpEndpoint).toBe('https://signoz-server:4318/v1/logs');
+    expect(config.signozOtlpEndpoint).toBeUndefined();
     expect(config.offlineLogFileName).toBe('offline-logs.txt');
-    expect(config.batchSize).toBe(50);
+    expect(config.batchSize).toBe(5);
     expect(config.maxSyncRetries).toBe(3);
     expect(config.retryDelayMs).toBe(5000);
   });
@@ -78,7 +78,7 @@ describe('LoggingConfig', () => {
     process.env.LOGGING_RETRY_DELAY_MS = 'def';
 
     const config = new LoggingConfig();
-    expect(config.batchSize).toBe(50); // Should fall back to default
+    expect(config.batchSize).toBe(5); // Should fall back to default
     expect(config.maxSyncRetries).toBe(3); // Should fall back to default
     expect(config.retryDelayMs).toBe(5000); // Should fall back to default
   });

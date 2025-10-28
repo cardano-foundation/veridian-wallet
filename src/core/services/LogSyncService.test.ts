@@ -25,6 +25,8 @@ const mutableLoggingConfig = loggingConfig as {
   maxSyncRetries: number;
   retryDelayMs: number;
   batchSize: number;
+  signozOtlpEndpoint: string;
+  signozIngestionKey: string;
 };
 
 describe("LogSyncService", () => {
@@ -47,6 +49,8 @@ describe("LogSyncService", () => {
     mutableLoggingConfig.maxSyncRetries = 3;
     mutableLoggingConfig.retryDelayMs = 1000;
     mutableLoggingConfig.batchSize = 50;
+    mutableLoggingConfig.signozOtlpEndpoint = "http://test-endpoint";
+    mutableLoggingConfig.signozIngestionKey = "test-key";
 
     mockLocalStrategy = {
       readLogs: jest.fn(),

@@ -26,6 +26,7 @@ jest.mock("./LoggingConfig", () => ({
     localEnabled: false,
     remoteEnabled: false,
     signozOtlpEndpoint: "http://localhost:4318/v1/logs",
+    signozIngestionKey: "test-key",
   },
 }));
 
@@ -42,6 +43,7 @@ describe("Logger", () => {
     (loggingConfig as any).localEnabled = false;
     (loggingConfig as any).remoteEnabled = false;
     (loggingConfig as any).signozOtlpEndpoint = "http://localhost:4318/v1/logs";
+    (loggingConfig as any).signozIngestionKey = "test-key";
   });
 
   it("should return a singleton instance", () => {

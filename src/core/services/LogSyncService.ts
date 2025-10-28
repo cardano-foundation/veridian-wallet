@@ -47,26 +47,28 @@ export class LogSyncService {
 
     for (let attempt = 1; attempt <= loggingConfig.maxSyncRetries; attempt++) {
       try {
-        const local = this.localStrategyFactory();
-        const remote = this.remoteStrategyFactory(loggingConfig.signozOtlpEndpoint, loggingConfig.signozIngestionKey);
-        const pending: ParsedLogEntry[] = await local.readLogs();
-        const successfullySentLogIds = new Set<string>();
-
-        if (pending.length === 0) {
+        if (loggingConfig.signozOtlpEndpoint && loggingConfig.signozIngestionKey) {
+          const local = this.localStrategyFactory();
+          const remote = this.remoteStrategyFactory(loggingConfig.signozOtlpEndpoint, loggingConfig.signozIngestionKey);
+          const pending: ParsedLogEntry[] = await local.readLogs();
+          const successfullySentLogIds = new Set<string>();
+  
+          if (pending.length === 0) {
+            return;
+          }
+  
+          for (let i = 0; i < pending.length; i += loggingConfig.batchSize) {
+            const batch = pending.slice(i, i + loggingConfig.batchSize);
+            await remote.logBatch(batch);
+            batch.forEach(log => successfullySentLogIds.add(log.id));
+          }
+  
+          if (successfullySentLogIds.size > 0) {
+            const remainingLogs = pending.filter(log => !successfullySentLogIds.has(log.id));
+            await local.writeLogs(remainingLogs);
+          }
           return;
         }
-
-        for (let i = 0; i < pending.length; i += loggingConfig.batchSize) {
-          const batch = pending.slice(i, i + loggingConfig.batchSize);
-          await remote.logBatch(batch);
-          batch.forEach(log => successfullySentLogIds.add(log.id));
-        }
-
-        if (successfullySentLogIds.size > 0) {
-          const remainingLogs = pending.filter(log => !successfullySentLogIds.has(log.id));
-          await local.writeLogs(remainingLogs);
-        }
-        return;
       } catch (error) {
         logger.error(`Log sync attempt ${attempt} failed:`, { error, attempt });
         if (attempt < loggingConfig.maxSyncRetries) {

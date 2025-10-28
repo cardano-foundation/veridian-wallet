@@ -50,7 +50,9 @@ export class Logger {
 
       let cloudLogger: ICloudLogger | undefined;
       if (loggingConfig.remoteEnabled) {
-        cloudLogger = cloudLoggerFactory(loggingConfig.signozOtlpEndpoint, loggingConfig.signozIngestionKey);
+        if (loggingConfig.signozOtlpEndpoint && loggingConfig.signozIngestionKey) {
+          cloudLogger = cloudLoggerFactory(loggingConfig.signozOtlpEndpoint, loggingConfig.signozIngestionKey);
+        }
       }
 
       if (localStrategy && cloudLogger) {
