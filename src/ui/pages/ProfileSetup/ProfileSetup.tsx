@@ -137,7 +137,7 @@ export const ProfileSetup = ({
           ? false // Ensure joiner is not the initiator
           : true,
         groupCreated: false,
-        userName: userName,
+        proposedUsername: userName,
         initiatorName: stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
           ? stateCache.pendingJoinGroupMetadata?.initiatorName || undefined
           : userName, // Set initiatorName to userName for the initiator
@@ -335,7 +335,8 @@ export const ProfileSetup = ({
         Object.values(profiles).some(
           (profile) =>
             profile.identity.id === scanGroupId ||
-            profile.identity.groupMetadata?.groupId === scanGroupId
+            (profile.identity.groupId ??
+              profile.identity.groupMetadata?.groupId) === scanGroupId
         )
       ) {
         handleCloseScan();

@@ -123,6 +123,12 @@ const ProfileStateModal = () => {
       return;
     }
 
+    if (creationStatus === CreationStatus.PENDING && groupMemberPre) {
+      setIsOpen(true);
+      setHiddenContent(false);
+      return;
+    }
+
     getDetails();
   }, [
     currentProfile?.identity.creationStatus,

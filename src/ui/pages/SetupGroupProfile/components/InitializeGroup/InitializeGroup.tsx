@@ -61,7 +61,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
     });
 
     members.unshift({
-      name: profile?.identity.groupMetadata?.userName || "",
+      name: profile?.identity.groupMetadata?.proposedUsername || "",
       isCurrentUser: true,
     });
 
@@ -69,7 +69,10 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       ...member,
       rank: index >= 0 ? index % 5 : 0,
     }));
-  }, [profile?.identity.groupMetadata?.userName, state.selectedConnections]);
+  }, [
+    profile?.identity.groupMetadata?.proposedUsername,
+    state.selectedConnections,
+  ]);
 
   const openSignerModal = () => setOpenSigners(true);
 

@@ -19,6 +19,7 @@ describe("transformGroupIdentifier", () => {
       b: ["BIe_q0F4EkYPEne6jUnSV1exxOYeGf_AMSMvegpF4XQP"],
       di: "test",
       groupMemberPre: "ELUXM-ajSu0o1qyFvss-3QQfkj3DOke9aHNwt72Byi9y",
+      groupId: "test-group-id",
       members: [
         "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYBu",
         "EFZ-hSogn3-wXEahBbIW_oXYxAV_vH8eEhX6BwQHsYB2",
@@ -32,13 +33,10 @@ describe("transformGroupIdentifier", () => {
         createdAtUTC: "2024-03-07T11:54:56.886Z",
         theme: 0,
         creationStatus: CreationStatus.COMPLETE,
-        groupMetadata: {
-          groupId: "test",
-          groupInitiator: true,
-          groupCreated: false,
-          userName: "",
-        },
+        groupMetadata: undefined,
         groupMemberPre: "ELUXM-ajSu0o1qyFvss-3QQfkj3DOke9aHNwt72Byi9y",
+        groupUsername: "",
+        groupId: "test-group-id",
       },
     };
 
@@ -72,6 +70,8 @@ describe("transformGroupIdentifier", () => {
         creationStatus: CreationStatus.COMPLETE,
         groupMetadata: undefined,
         groupMemberPre: undefined,
+        groupUsername: undefined,
+        groupId: undefined,
       },
     };
 

@@ -12,7 +12,7 @@ const failedMultisignIdentifierFix: IdentifierShortDetails[] = [
       groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
       groupCreated: false,
       groupInitiator: false,
-      userName: "test",
+      proposedUsername: "test",
     },
   },
 ];
@@ -28,7 +28,7 @@ const multisignIdentifierFix: IdentifierShortDetails[] = [
       groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
       groupCreated: false,
       groupInitiator: true,
-      userName: "test",
+      proposedUsername: "test",
     },
   },
 ];
@@ -44,7 +44,7 @@ const pendingMemberIdentifierFix: IdentifierShortDetails[] = [
       groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
       groupCreated: false,
       groupInitiator: false,
-      userName: "test",
+      proposedUsername: "test",
     },
   },
 ];
@@ -56,12 +56,8 @@ const pendingGroupIdentifierFix: IdentifierShortDetails = {
   theme: 0,
   creationStatus: CreationStatus.PENDING,
   groupMemberPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
-  groupMetadata: {
-    groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
-    groupCreated: false,
-    groupInitiator: false,
-    userName: "test",
-  },
+  groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
+  groupUsername: "test",
 };
 
 const filteredIdentifierFix: IdentifierShortDetails[] = [
@@ -93,6 +89,8 @@ const filteredIdentifierFix: IdentifierShortDetails[] = [
     theme: 0,
     creationStatus: CreationStatus.COMPLETE,
     groupMemberPre: "EHzi_GBx0jIgd3G0Qqcjg3ZaLJ6d84wp6q0qUvC_iOQ4",
+    groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
+    groupUsername: "GID 1",
   },
   {
     displayName: "Profess",

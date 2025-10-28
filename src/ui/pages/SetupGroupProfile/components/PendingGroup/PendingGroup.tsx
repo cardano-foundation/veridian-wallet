@@ -106,7 +106,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     });
 
     members.unshift({
-      name: identity?.groupMetadata?.userName || "",
+      name: identity?.groupMetadata?.proposedUsername || "",
       isCurrentUser: true,
       accepted:
         groupDetails?.members.find(
@@ -120,7 +120,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     }));
   }, [
     state.selectedConnections,
-    identity?.groupMetadata?.userName,
+    identity?.groupMetadata?.proposedUsername,
     identity?.groupMemberPre,
     groupDetails?.members,
     isPendingMember,
@@ -257,7 +257,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
         customClass="pending-group"
         header={
           <PageHeader
-            title={identity?.groupMetadata?.userName}
+            title={identity?.groupMetadata?.proposedUsername}
             additionalButtons={
               identity?.id && (
                 <Avatar

@@ -27,11 +27,14 @@ const IdentifierSelectorModal = ({
     const result = identifiers
       ? identifiers
       : Object.values(profiles)
-        .filter(
-          (item) => item.identity.creationStatus === CreationStatus.COMPLETE
-        )
-        .filter((item) => !item.identity.groupMetadata?.groupId)
-        .map((item) => item.identity);
+          .filter(
+            (item) => item.identity.creationStatus === CreationStatus.COMPLETE
+          )
+          .filter(
+            (item) =>
+              !(item.identity.groupId ?? item.identity.groupMetadata?.groupId)
+          )
+          .map((item) => item.identity);
 
     return result.map(
       (identifier): CardItem<IdentifierShortDetails> => ({

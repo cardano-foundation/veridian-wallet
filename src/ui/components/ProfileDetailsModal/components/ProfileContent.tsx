@@ -95,7 +95,10 @@ const ProfileContent = ({
       let name = memberConnection?.label || member;
 
       if (!memberConnection?.label) {
-        name = cardData.groupMetadata?.userName || "";
+        name =
+          cardData.groupUsername ||
+          cardData.groupMetadata?.proposedUsername ||
+          "";
       }
 
       const rank = index >= 0 ? index % 5 : 0;

@@ -10,7 +10,7 @@ interface GroupMetadata {
   groupId: string;
   groupInitiator: boolean;
   groupCreated: boolean;
-  userName: string;
+  proposedUsername: string;
   initiatorName?: string;
 }
 
@@ -28,6 +28,8 @@ interface IdentifierShortDetails {
   creationStatus: CreationStatus;
   groupMetadata?: GroupMetadata;
   groupMemberPre?: string;
+  groupUsername?: string;
+  groupId?: string;
 }
 
 interface IdentifierDetails extends IdentifierShortDetails {

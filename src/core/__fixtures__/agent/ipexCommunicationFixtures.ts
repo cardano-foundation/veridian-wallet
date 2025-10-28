@@ -514,7 +514,7 @@ const multisigParticipantsProps = {
       groupId: "group-id",
       groupInitiator: true,
       groupCreated: true,
-      userName: "IdentifierName2",
+      proposedUsername: "IdentifierName2",
     },
   },
   multisigMembers: {

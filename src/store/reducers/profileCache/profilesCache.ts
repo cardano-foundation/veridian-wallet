@@ -67,8 +67,10 @@ export const profilesCacheSlice = createSlice({
       if (existedProfile) {
         existedProfile.identity = action.payload;
       } else {
+        const incomingGroupId =
+          action.payload.groupId ?? action.payload.groupMetadata?.groupId;
         const multisigConnections =
-          action.payload.groupMetadata?.groupId === state.multiSigGroup?.groupId
+          incomingGroupId && incomingGroupId === state.multiSigGroup?.groupId
             ? (state.multiSigGroup?.connections as MultisigConnectionDetails[])
             : [];
 
@@ -334,7 +336,8 @@ export const profilesCacheSlice = createSlice({
 
         // For multisig connections, filter by groupId since all group members should see all connections
         // Check if this profile has group metadata to determine if it should have multisig connections
-        const profileGroupId = profile.identity?.groupMetadata?.groupId;
+        const profileGroupId =
+          profile.identity?.groupId ?? profile.identity?.groupMetadata?.groupId;
 
         if (profileGroupId) {
           profile.multisigConnections = allMultisig

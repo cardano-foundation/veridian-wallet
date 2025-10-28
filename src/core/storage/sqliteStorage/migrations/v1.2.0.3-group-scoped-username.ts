@@ -32,7 +32,7 @@ export const MIGRATION_V1203: LocalMigration = {
 
       recordValue = {
         ...recordValue,
-        groupMetadata: { ...groupMetadata, userName: "" },
+        groupMetadata: { ...groupMetadata, proposedUsername: "" },
       };
 
       statements.push({

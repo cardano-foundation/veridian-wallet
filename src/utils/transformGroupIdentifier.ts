@@ -17,15 +17,12 @@ export function transformGroupIdentifier(
       createdAtUTC: input.createdAtUTC,
       theme: input.theme,
       creationStatus: input.creationStatus,
-      groupMetadata: input.di
-        ? {
-          groupId: input.di,
-          groupInitiator: true,
-          groupCreated: false,
-          userName: "",
-        }
-        : undefined,
+      groupMetadata: input.groupMemberPre ? undefined : input.groupMetadata,
       groupMemberPre: input.groupMemberPre,
+      groupUsername: input.groupUsername ?? (input.di ? "" : undefined),
+      groupId: input.groupMemberPre
+        ? input.groupId
+        : input.groupMetadata?.groupId,
     },
   };
 

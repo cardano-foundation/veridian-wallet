@@ -582,7 +582,7 @@ describe("Profile setup", () => {
             groupMetadata: expect.objectContaining({
               groupInitiator: true,
               groupCreated: false,
-              userName: "testUser",
+              proposedUsername: "testUser",
               initiatorName: "testUser",
               groupId: expect.any(String),
             }),
@@ -966,7 +966,7 @@ describe("Profile setup: use as modal", () => {
                 groupId: "0AAPHBnxoGK4tDuL4g87Eo9D",
                 groupCreated: false,
                 groupInitiator: false,
-                userName: "test",
+                proposedUsername: "test",
               },
             },
             connections: [],

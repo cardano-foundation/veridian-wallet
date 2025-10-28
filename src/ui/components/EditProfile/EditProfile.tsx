@@ -41,10 +41,13 @@ const EditProfile = ({
   const currentIdentifier = profiles[cardData.id];
   const [isLoading, setLoading] = useState(false);
 
+  const getCurrentUsername = () =>
+    cardData.groupMemberPre
+      ? cardData.groupUsername || ""
+      : cardData.groupMetadata?.proposedUsername || "";
+
   const [newDisplayName, setNewDisplayName] = useState(
-    editType === "userName"
-      ? cardData.groupMetadata?.userName || ""
-      : cardData.displayName
+    editType === "userName" ? getCurrentUsername() : cardData.displayName
   );
   const [keyboardIsOpen, setKeyboardIsOpen] = useState(false);
 
@@ -73,18 +76,25 @@ const EditProfile = ({
     setModalIsOpen(false);
   };
 
+  const baselineValue =
+    editType === "userName" ? getCurrentUsername() : cardData.displayName;
+
   const verifyDisplayName =
     newDisplayName.length > 0 &&
     newDisplayName.length <= DISPLAY_NAME_LENGTH &&
-    newDisplayName.trim() !== cardData.displayName.trim();
+    newDisplayName.trim() !== baselineValue.trim();
 
   useEffect(() => {
     setNewDisplayName(
-      editType === "userName"
-        ? cardData.groupMetadata?.userName || ""
-        : cardData.displayName
+      editType === "userName" ? getCurrentUsername() : cardData.displayName
     );
-  }, [editType, cardData.displayName, cardData.groupMetadata?.userName]);
+  }, [
+    editType,
+    cardData.displayName,
+    cardData.groupMetadata?.proposedUsername,
+    cardData.groupUsername,
+    cardData.groupMemberPre,
+  ]);
 
   const handleSubmit = async () => {
     try {
@@ -115,11 +125,15 @@ const EditProfile = ({
         params.displayName = newDisplayName;
         params.groupMetadata = cardData.groupMetadata;
         await Agent.agent.identifiers.updateIdentifier(cardData.id, params);
-      } else if (isGroup && cardData.groupMetadata) {
-        params.groupMetadata = {
-          ...cardData.groupMetadata,
-          userName: newDisplayName,
-        };
+      } else if (editType === "userName") {
+        if (!isGroup && cardData.groupMetadata) {
+          params.groupMetadata = {
+            ...cardData.groupMetadata,
+            proposedUsername: newDisplayName,
+          };
+        } else {
+          params.groupMetadata = cardData.groupMetadata;
+        }
 
         await Agent.agent.identifiers.updateGroupUsername(
           cardData.id,
@@ -131,12 +145,20 @@ const EditProfile = ({
         ...currentIdentifier.identity,
         displayName: params.displayName,
         groupMetadata: params.groupMetadata,
+        groupUsername:
+          editType === "userName" && isGroup
+            ? newDisplayName
+            : currentIdentifier.identity.groupUsername,
       };
 
       setCardData({
         ...cardData,
         displayName: params.displayName,
         groupMetadata: params.groupMetadata,
+        groupUsername:
+          editType === "userName" && isGroup
+            ? newDisplayName
+            : cardData.groupUsername,
       });
 
       handleCancel();

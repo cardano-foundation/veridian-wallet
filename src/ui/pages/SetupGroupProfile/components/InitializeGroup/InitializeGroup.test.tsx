@@ -58,7 +58,7 @@ const initiatorGroupProfile = {
     groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
     groupCreated: false,
     groupInitiator: true,
-    userName: "Initiator",
+    proposedUsername: "Initiator",
   },
 };
 

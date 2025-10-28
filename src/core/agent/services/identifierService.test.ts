@@ -168,7 +168,7 @@ const groupMetadata = {
   groupId: "group-id",
   groupInitiator: true,
   groupCreated: false,
-  userName: "testUser",
+  proposedUsername: "testUser",
 };
 
 const keriMetadataRecordProps = {
@@ -296,6 +296,9 @@ describe("Single sig service of agent", () => {
         theme: 0,
         creationStatus: CreationStatus.COMPLETE,
         groupMetadata,
+        groupMemberPre: undefined,
+        groupUsername: "testUser",
+        groupId: "group-id",
       },
     ]);
   });
@@ -311,6 +314,18 @@ describe("Single sig service of agent", () => {
         groupMetadata: undefined,
       }),
     ]);
+    identifierStorage.getIdentifierMetadata = jest
+      .fn()
+      .mockImplementation(async (identifierId: string) => {
+        if (identifierId === "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5InX") {
+          return new IdentifierMetadataRecord({
+            ...keriMetadataRecordProps,
+            id: identifierId,
+            groupMetadata,
+          });
+        }
+        return keriMetadataRecord;
+      });
     expect(await identifierService.getIdentifiers(false)).toStrictEqual([
       {
         id: keriMetadataRecord.id,
@@ -319,6 +334,9 @@ describe("Single sig service of agent", () => {
         theme: 0,
         creationStatus: CreationStatus.COMPLETE,
         groupMetadata,
+        groupMemberPre: undefined,
+        groupUsername: "testUser",
+        groupId: "group-id",
       },
       {
         id: "EIZ-n_hHHY5ERGTzvpXYBkB6_yBAM4RXcjQG3-JykFvT",
@@ -328,8 +346,11 @@ describe("Single sig service of agent", () => {
         creationStatus: CreationStatus.COMPLETE,
         groupMemberPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5InX",
         groupMetadata: undefined,
+        groupUsername: "testUser",
+        groupId: "group-id",
       },
     ]);
+    identifierStorage.getIdentifierMetadata = jest.fn();
   });
 
   test("can get all identifiers without error if there are none", async () => {
@@ -397,6 +418,8 @@ describe("Single sig service of agent", () => {
       theme: 0,
       groupMetadata: keriMetadataRecord.groupMetadata,
       groupMemberPre: keriMetadataRecord.groupMemberPre,
+      groupUsername: "testUser",
+      groupId: "group-id",
       ...identifierStateKeria.state,
       creationStatus: CreationStatus.COMPLETE,
       members: undefined,
@@ -420,6 +443,8 @@ describe("Single sig service of agent", () => {
       theme: 0,
       groupMetadata: keriMetadataRecord.groupMetadata,
       groupMemberPre: keriMetadataRecord.groupMemberPre,
+      groupUsername: "testUser",
+      groupId: "group-id",
       ...identifierStateKeria.state,
       creationStatus: CreationStatus.COMPLETE,
       members: [
@@ -598,7 +623,7 @@ describe("Single sig service of agent", () => {
         groupCreated: false,
         groupInitiator: true,
         groupId: "DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd",
-        userName: "testUser",
+        proposedUsername: "testUser",
       },
     });
 
@@ -641,7 +666,7 @@ describe("Single sig service of agent", () => {
             groupCreated: false,
             groupInitiator: true,
             groupId: "DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd",
-            userName: "testUser",
+            proposedUsername: "testUser",
           },
         },
       },
@@ -703,7 +728,7 @@ describe("Single sig service of agent", () => {
         groupCreated: false,
         groupInitiator: false,
         groupId: "DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd",
-        userName: "testUser",
+        proposedUsername: "testUser",
       },
     });
 
@@ -746,7 +771,7 @@ describe("Single sig service of agent", () => {
             groupCreated: false,
             groupInitiator: false,
             groupId: "DCF6b0c5aVm_26_sCTgLB4An6oUxEM5pVDDLqxxXDxHd",
-            userName: "testUser",
+            proposedUsername: "testUser",
           },
         },
       },
@@ -1276,7 +1301,7 @@ describe("Single sig service of agent", () => {
         groupId: "test-group-123",
         groupInitiator: false,
         groupCreated: true,
-        userName: "testuser",
+        proposedUsername: "testuser",
       },
     };
 
@@ -1299,7 +1324,7 @@ describe("Single sig service of agent", () => {
     });
 
     expect(updateIdentifierMock).toBeCalledWith("member-identifier-id", {
-      name: `1.2.0.3:${newTheme}:0:${memberMetadata.groupMetadata.groupId}:${memberMetadata.groupMetadata.userName}:${newDisplayName}`,
+      name: `1.2.0.3:${newTheme}:0:${memberMetadata.groupMetadata.groupId}:${memberMetadata.groupMetadata.proposedUsername}:${newDisplayName}`,
     });
 
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
@@ -1326,7 +1351,7 @@ describe("Single sig service of agent", () => {
       groupId: "test-group-123",
       groupInitiator: true,
       groupCreated: true,
-      userName: "testuser",
+      proposedUsername: "testuser",
     };
 
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
@@ -1340,7 +1365,7 @@ describe("Single sig service of agent", () => {
       theme: newTheme,
     });
     expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
-      name: `1.2.0.3:${newTheme}:1:${groupMetadata.groupId}:${groupMetadata.userName}:${newDisplayName}`,
+      name: `1.2.0.3:${newTheme}:1:${groupMetadata.groupId}:${groupMetadata.proposedUsername}:${newDisplayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       keriMetadataRecord.id,
@@ -1386,7 +1411,7 @@ describe("Single sig service of agent", () => {
       groupId: "test-group-123",
       groupInitiator: true,
       groupCreated: true,
-      userName: "oldusername",
+      proposedUsername: "oldusername",
     };
     const memberMetadata = {
       ...keriMetadataRecord,
@@ -1421,17 +1446,14 @@ describe("Single sig service of agent", () => {
       {
         groupMetadata: {
           ...memberMetadata.groupMetadata,
-          userName: newUsername,
+          proposedUsername: newUsername,
         },
       }
     );
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       keriMetadataRecord.id,
       {
-        groupMetadata: {
-          ...groupMetadata,
-          userName: newUsername,
-        },
+        groupMetadata: undefined,
       }
     );
   });
@@ -1442,7 +1464,7 @@ describe("Single sig service of agent", () => {
       groupId: "test-group-123",
       groupInitiator: true,
       groupCreated: false,
-      userName: "oldusername",
+      proposedUsername: "oldusername",
     };
 
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
@@ -1466,7 +1488,7 @@ describe("Single sig service of agent", () => {
       {
         groupMetadata: {
           ...groupMetadata,
-          userName: newUsername,
+          proposedUsername: newUsername,
         },
       }
     );
@@ -1485,7 +1507,7 @@ describe("Single sig service of agent", () => {
         "newusername"
       )
     ).rejects.toThrow(
-      `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${keriMetadataRecord.groupMemberPre}`
+      `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${keriMetadataRecord.id}`
     );
   });
 
@@ -1494,7 +1516,7 @@ describe("Single sig service of agent", () => {
       groupId: "test-group-123",
       groupInitiator: true,
       groupCreated: true,
-      userName: "oldusername",
+      proposedUsername: "oldusername",
     };
     const memberMetadataWithoutGroup = {
       ...keriMetadataRecord,
@@ -1738,7 +1760,7 @@ describe("Single sig service of agent", () => {
         groupId: "group1",
         groupCreated: false,
         groupInitiator: true,
-        userName: "user1",
+        proposedUsername: "user1",
       },
       creationStatus: CreationStatus.COMPLETE,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -1766,7 +1788,7 @@ describe("Single sig service of agent", () => {
         groupId: "group3",
         groupCreated: false,
         groupInitiator: false,
-        userName: "user3",
+        proposedUsername: "user3",
       },
       creationStatus: CreationStatus.COMPLETE,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -1780,7 +1802,7 @@ describe("Single sig service of agent", () => {
           groupId: "group1",
           groupCreated: true,
           groupInitiator: true,
-          userName: "user1",
+          proposedUsername: "user1",
         },
       }
     );
@@ -1802,7 +1824,7 @@ describe("Single sig service of agent", () => {
           groupId: "group3",
           groupCreated: true,
           groupInitiator: false,
-          userName: "user3",
+          proposedUsername: "user3",
         },
       }
     );
@@ -1926,7 +1948,7 @@ describe("Single sig service of agent", () => {
           groupId: "group1",
           groupCreated: true,
           groupInitiator: true,
-          userName: "user1",
+          proposedUsername: "user1",
         },
       }
     );
@@ -2022,7 +2044,7 @@ describe("Single sig service of agent", () => {
         groupCreated: false,
         groupId: "group1",
         groupInitiator: true,
-        userName: "user1",
+        proposedUsername: "user1",
       },
       id: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
       isDeleted: false,
@@ -2047,7 +2069,7 @@ describe("Single sig service of agent", () => {
           groupId: "group1",
           groupCreated: true,
           groupInitiator: true,
-          userName: "user1",
+          proposedUsername: "user1",
         },
       }
     );
@@ -2167,7 +2189,7 @@ describe("Single sig service of agent", () => {
         groupId: "group1",
         groupCreated: false,
         groupInitiator: true,
-        userName: "user1",
+        proposedUsername: "user1",
       },
       creationStatus: CreationStatus.FAILED,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -2192,7 +2214,7 @@ describe("Single sig service of agent", () => {
           groupId: "group1",
           groupCreated: true,
           groupInitiator: true,
-          userName: "user1",
+          proposedUsername: "user1",
         },
       }
     );
@@ -2369,7 +2391,7 @@ describe("Single sig service of agent", () => {
           groupCreated: false,
           groupId: "ED4KeyyTKFj72B008OTGgDCrFo6y7B2B73kfyzu5Inx",
           groupInitiator: true,
-          userName: "memberOne",
+          proposedUsername: "memberOne",
         },
       },
       true
@@ -2382,7 +2404,7 @@ describe("Single sig service of agent", () => {
           groupCreated: false,
           groupId: "ED4KeyyTKFj",
           groupInitiator: true,
-          userName: "memberOne",
+          proposedUsername: "memberOne",
         },
       },
       true
@@ -2395,7 +2417,7 @@ describe("Single sig service of agent", () => {
           groupCreated: false,
           groupId: "ED4KeyyTKFj",
           groupInitiator: false,
-          userName: "memberTwo",
+          proposedUsername: "memberTwo",
         },
       },
       true
