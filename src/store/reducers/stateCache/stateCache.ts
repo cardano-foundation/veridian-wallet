@@ -20,7 +20,6 @@ const initialState: StateCacheProps = {
   routes: [],
   authentication: {
     loggedIn: false,
-    userName: "",
     time: 0,
     passcodeIsSet: false,
     seedPhraseIsSet: false,

@@ -1,5 +1,5 @@
 import { IonButton, IonIcon } from "@ionic/react";
-import { pencilOutline, star, warningOutline } from "ionicons/icons";
+import { pencilOutline, warningOutline } from "ionicons/icons";
 import { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
@@ -8,6 +8,7 @@ import {
   MultisigConnectionDetails,
 } from "../../../../../core/agent/agent.types";
 import { i18n } from "../../../../../i18n";
+import { RoutePath } from "../../../../../routes";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { getCurrentProfile } from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
@@ -16,10 +17,14 @@ import { MemberAvatar } from "../../../../components/Avatar";
 import {
   CardBlock,
   CardDetailsContent,
-  CardDetailsItem,
   FlatBorderType,
 } from "../../../../components/CardDetails";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
+import { MemberList } from "../../../../components/MemberList";
+import {
+  Member,
+  MemberAcceptStatus,
+} from "../../../../components/MemberList/MemberList.type";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
 import { Spinner } from "../../../../components/Spinner";
@@ -31,7 +36,6 @@ import { SetupMemberModal } from "../SetupMemberModal/SetupMemberModal";
 import { SetupSignerModal } from "../SetupSignerModal";
 import { SignerData } from "../SetupSignerModal/SetupSignerModal.types";
 import "./InitializeGroup.scss";
-import { RoutePath } from "../../../../../routes";
 
 const InitializeGroup = ({ state, setState }: StageProps) => {
   const dispatch = useAppDispatch();
@@ -51,23 +55,30 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   };
 
   const members = useMemo(() => {
-    const members = state.selectedConnections?.map((member) => {
+    const members = state.selectedConnections?.map((member): Member => {
       const name = member?.label || "";
 
       return {
         name,
         isCurrentUser: false,
+        status: MemberAcceptStatus.None,
       };
     });
 
     members.unshift({
       name: profile?.identity.groupMetadata?.userName || "",
       isCurrentUser: true,
+      status: MemberAcceptStatus.None,
     });
 
     return members.map((member, index) => ({
       ...member,
-      rank: index >= 0 ? index % 5 : 0,
+      avatar: (
+        <MemberAvatar
+          firstLetter={member.name.at(0)?.toLocaleUpperCase() || ""}
+          rank={index >= 0 ? index % 5 : 0}
+        />
+      ),
     }));
   }, [profile?.identity.groupMetadata?.userName, state.selectedConnections]);
 
@@ -152,8 +163,8 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
               "setupgroupprofile.initgroup.button.sendrequest"
             )}`}
             primaryButtonDisabled={
-              state.signer.recoverySigners === 0 ||
-              state.signer.requiredSigners === 0
+              (state.signer.recoverySigners || 0) === 0 ||
+              (state.signer.requiredSigners || 0) === 0
             }
             tertiaryButtonAction={openCloseAlert}
             tertiaryButtonText={`${i18n.t(
@@ -184,35 +195,15 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
             setOpenEditMembers(true);
           }}
         >
-          {members.map((item, index) => {
-            return (
-              <CardDetailsItem
-                key={index}
-                info={item.name}
-                startSlot={
-                  <MemberAvatar
-                    firstLetter={item.name.at(0)?.toLocaleUpperCase() || ""}
-                    rank={item.rank}
-                  />
-                }
-                className="member"
-                testId={`group-member-${index}`}
-                endSlot={
-                  item.isCurrentUser && (
-                    <div className="user-label">
-                      <IonIcon icon={star} />
-                      <span>{i18n.t("profiledetails.detailsmodal.you")}</span>
-                    </div>
-                  )
-                }
-              />
-            );
-          })}
-          <p className="bottom-text">
-            {i18n.t(`setupgroupprofile.initgroup.numberofmember`, {
-              members: members?.length || 0,
-            })}
-          </p>
+          <MemberList
+            members={members}
+            bottomText={`${i18n.t(
+              `setupgroupprofile.initgroup.numberofmember`,
+              {
+                members: members?.length || 0,
+              }
+            )}`}
+          />
         </CardBlock>
         {state.signer.recoverySigners === 0 ||
         state.signer.requiredSigners === 0 ? (
@@ -254,7 +245,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
                 mainContent={`${i18n.t(
                   `setupgroupprofile.initgroup.setsigner.members`,
                   {
-                    members: state.signer.requiredSigners,
+                    members: state.signer.requiredSigners || 0,
                   }
                 )}`}
               />
@@ -272,7 +263,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
                 mainContent={`${i18n.t(
                   `setupgroupprofile.initgroup.setsigner.members`,
                   {
-                    members: state.signer.recoverySigners,
+                    members: state.signer.recoverySigners || 0,
                   }
                 )}`}
               />

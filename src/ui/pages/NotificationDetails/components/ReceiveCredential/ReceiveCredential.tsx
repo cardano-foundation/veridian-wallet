@@ -18,13 +18,13 @@ import { NotificationRoute } from "../../../../../core/agent/services/keriaNotif
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
+  deleteNotificationById,
   getConnectionsCache,
   getMultisigConnectionsCache,
-  deleteNotificationById,
   getProfiles,
 } from "../../../../../store/reducers/profileCache";
-import { getAuthentication } from "../../../../../store/reducers/stateCache";
 import { Alert, Alert as AlertDecline } from "../../../../components/Alert";
+import { Avatar } from "../../../../components/Avatar";
 import { CardDetailsBlock } from "../../../../components/CardDetails";
 import { CredentialDetailModal } from "../../../../components/CredentialDetailModule";
 import {
@@ -46,10 +46,8 @@ import {
 } from "../../../../hooks";
 import { showError } from "../../../../utils/error";
 import { combineClassNames } from "../../../../utils/style";
-import { getTheme } from "../../../../utils/theme";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./ReceiveCredential.scss";
-import { Avatar } from "../../../../components/Avatar";
 
 const ANIMATION_DELAY = 2600;
 
@@ -60,11 +58,8 @@ const ReceiveCredential = ({
   handleBack,
 }: NotificationDetailsProps) => {
   const dispatch = useAppDispatch();
-  const userName = useAppSelector(getAuthentication)?.userName;
-  const connectionsCache = useAppSelector(getConnectionsCache) as any[];
-  const multisignConnectionsCache = useAppSelector(
-    getMultisigConnectionsCache
-  ) as any[];
+  const connectionsCache = useAppSelector(getConnectionsCache);
+  const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [initiateAnimation, setInitiateAnimation] = useState(false);
@@ -271,7 +266,7 @@ const ReceiveCredential = ({
     let name = memberConnection?.label || member;
 
     if (!memberConnection?.label) {
-      name = userName;
+      name = profile?.identity.groupMetadata?.userName || "";
     }
 
     return {
@@ -310,8 +305,6 @@ const ReceiveCredential = ({
     maxThreshold || isRevoked || displayInitiatorNotAcceptedAlert
       ? undefined
       : `${i18n.t("tabs.notifications.details.buttons.decline")}`;
-
-  const theme = getTheme(profile?.identity.theme || 0);
 
   const closeDeclineAlert = () => setAlertDeclineIsOpen(false);
 

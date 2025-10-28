@@ -1,14 +1,15 @@
-import { KeriaNotification } from "../../../../../core/agent/services/keriaNotificationService.types";
 import {
   CredentialsMatchingApply,
   LinkedGroupInfo,
 } from "../../../../../core/agent/services/ipexCommunicationService.types";
+import { KeriaNotification } from "../../../../../core/agent/services/keriaNotificationService.types";
 import { BackReason } from "../../../../components/CredentialDetailModule/CredentialDetailModule.types";
 
 interface MemberInfo {
   aid: string;
   name: string;
   joined: boolean;
+  isCurrentUser?: boolean;
 }
 
 type LinkedGroup = LinkedGroupInfo & {
@@ -25,17 +26,18 @@ interface CredentialRequestProps {
   onAccept: () => void;
   onBack: () => void;
   onReloadData?: () => Promise<void>;
+  suitableCredentialsCount?: number;
 }
 
 interface ChooseCredentialProps {
   pageId: string;
   activeStatus: boolean;
   credentialRequest: CredentialsMatchingApply;
-  notificationDetails: KeriaNotification;
   linkedGroup: LinkedGroup | null;
   reloadData: () => void;
   onBack: () => void;
-  onClose: () => void;
+  onSubmit: (credential: RequestCredential) => void;
+  notificationDetails: KeriaNotification;
 }
 
 interface ACDC {
@@ -84,13 +86,13 @@ interface MembersModalProps {
 }
 
 export type {
-  MembersModalProps,
+  ACDC,
+  ChooseCredentialProps,
+  CredentialRequestProps,
   JoinedMemberProps,
   LightCredentialDetailModalProps,
-  CredentialRequestProps,
-  ChooseCredentialProps,
-  RequestCredential,
-  ACDC,
   LinkedGroup,
   MemberInfo,
+  MembersModalProps,
+  RequestCredential,
 };

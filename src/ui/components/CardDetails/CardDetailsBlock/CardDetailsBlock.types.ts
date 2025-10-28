@@ -24,6 +24,7 @@ interface CardBlockProps {
   copyContent?: string;
   icon?: string;
   endSlotIcon?: string;
+  showIcon?: boolean;
 }
 
 export type { CardDetailsBlockProps, CardBlockProps };
