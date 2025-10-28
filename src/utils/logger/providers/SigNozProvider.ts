@@ -14,7 +14,7 @@ export class SigNozProvider extends CloudLoggingAdapter {
     super();
     const resource = defaultResource().merge(
       resourceFromAttributes({
-        [ATTR_SERVICE_NAME]: "<service_name>",
+        [ATTR_SERVICE_NAME]: "veridian-wallet",
         [ATTR_SERVICE_VERSION]: "1.2.0",
       })
     );
@@ -22,7 +22,7 @@ export class SigNozProvider extends CloudLoggingAdapter {
     this.exporter = new OTLPLogExporter({
         url: otlpEndpoint,
         headers: {
-            "signoz-ingestion-key": "<your-ingestion-key>",
+            "signoz-ingestion-key": process.env.SIGNOZ_INGESTION_KEY || "",
           },
     });
 

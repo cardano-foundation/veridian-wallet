@@ -112,6 +112,6 @@ describe("ConsoleStrategy", () => {
     };
     await consoleStrategy.log(logEntry);
     expect(mockConsoleInfo).toHaveBeenCalledTimes(1);
-    expect(mockConsoleInfo).toHaveBeenCalledWith(`[${expectedTimestamp}] [INFO] ${logEntry.message}`, undefined);
+    expect(mockConsoleInfo).toHaveBeenCalledWith(`[${expectedTimestamp}] [INFO] ${logEntry.message}`);
   });
 });

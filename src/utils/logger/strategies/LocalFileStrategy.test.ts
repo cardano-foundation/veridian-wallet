@@ -1,7 +1,14 @@
-import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { ParsedLogEntry } from "../ILogger";
 import { loggingConfig } from "../LoggingConfig";
 import { LocalFileStrategy } from "./LocalFileStrategy";
+
+jest.mock("signify-ts", () => ({
+  ...jest.requireActual("signify-ts"),
+  Salter: jest.fn(() => ({
+    qb64: "qb64",
+  })),
+}));
 
 // Mock @capacitor/filesystem
 jest.mock("@capacitor/filesystem", () => ({
@@ -9,9 +16,13 @@ jest.mock("@capacitor/filesystem", () => ({
     appendFile: jest.fn(),
     readFile: jest.fn(),
     writeFile: jest.fn(),
+    getUri: jest.fn().mockResolvedValue({ uri: "file:///test-uri" }),
   },
   Directory: {
     Data: "DATA",
+  },
+  Encoding: {
+    UTF8: "utf8",
   },
 }));
 
@@ -62,6 +73,7 @@ describe("LocalFileStrategy", () => {
         path: mockLogFileName,
         data: expectedEntry,
         directory: Directory.Data,
+        encoding: Encoding.UTF8,
       });
     });
 
@@ -87,11 +99,13 @@ describe("LocalFileStrategy", () => {
         path: mockLogFileName,
         data: JSON.stringify(logEntry1) + "\n",
         directory: Directory.Data,
+        encoding: Encoding.UTF8,
       });
       expect(Filesystem.appendFile).toHaveBeenCalledWith({
         path: mockLogFileName,
         data: JSON.stringify(logEntry2) + "\n",
         directory: Directory.Data,
+        encoding: Encoding.UTF8,
       });
     });
   });
@@ -164,6 +178,7 @@ describe("LocalFileStrategy", () => {
         path: mockLogFileName,
         data: "",
         directory: Directory.Data,
+        encoding: Encoding.UTF8,
       });
     });
   });
@@ -193,6 +208,7 @@ describe("LocalFileStrategy", () => {
         path: mockLogFileName,
         data: expectedData,
         directory: Directory.Data,
+        encoding: Encoding.UTF8,
       });
     });
 
@@ -204,6 +220,7 @@ describe("LocalFileStrategy", () => {
         path: mockLogFileName,
         data: "",
         directory: Directory.Data,
+        encoding: Encoding.UTF8,
       });
     });
   });

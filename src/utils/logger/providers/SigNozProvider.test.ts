@@ -50,6 +50,11 @@ describe('SigNozProvider', () => {
   });
 
   it('should initialize the OTLPLogExporter and LoggerProvider correctly', () => {
+    const originalIngestionKey = process.env.SIGNOZ_INGESTION_KEY;
+    process.env.SIGNOZ_INGESTION_KEY = '<your-ingestion-key>';
+
+    strategy = new SigNozProvider(mockOtlpEndpoint);
+
     expect(OTLPLogExporter).toHaveBeenCalledWith({
       url: mockOtlpEndpoint,
       headers: {
@@ -64,6 +69,8 @@ describe('SigNozProvider', () => {
     );
     expect(defaultResource).toHaveBeenCalled();
     expect(resourceFromAttributes).toHaveBeenCalled();
+
+    process.env.SIGNOZ_INGESTION_KEY = originalIngestionKey;
   });
 
   it('logBatch should do nothing for empty log entries', async () => {

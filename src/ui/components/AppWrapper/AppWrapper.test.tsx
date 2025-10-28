@@ -68,6 +68,13 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 
+jest.mock("signify-ts", () => ({
+  ...jest.requireActual("signify-ts"),
+  Salter: jest.fn(() => ({
+    qb64: "qb64",
+  })),
+}));
+
 jest.mock("../../../core/agent/agent", () => {
   const mockPeerConnectionPairRecordPlainObject = {
     id: "dApp-address:identifier",
