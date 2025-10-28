@@ -86,10 +86,6 @@
       display: flex;
       align-items: center;
 
-      &::part(native) {
-        margin: 0.75rem 0;
-      }
-
       &:first-child {
         margin-top: 0.625rem;
       }
@@ -120,40 +116,6 @@
           width: auto;
         }
       }
-    }
-
-    .user-label {
-      padding: 0.25rem 0.5rem;
-      background: var(--ion-color-card-theme-one);
-      border-radius: 0.25rem;
-      display: flex;
-      align-items: center;
-      margin-left: 0.5rem;
-      color: var(--ion-color-neutral-100);
-
-      &.hidden {
-        visibility: hidden;
-      }
-
-      ion-icon {
-        margin-right: 0.25rem;
-        width: 0.875rem;
-        height: 0.875rem;
-      }
-
-      span {
-        font-weight: 400;
-        font-size: 0.75rem;
-        line-height: 1rem;
-      }
-    }
-
-    .bottom-text {
-      text-align: center;
-      color: var(--ion-color-neutral-500);
-      font-size: 0.875rem;
-      line-height: 1.25rem;
-      margin: 0.875rem 0 0;
     }
   }
 

@@ -15,8 +15,9 @@ const filterProfileData = (
   allMultisigConnections: MultisigConnectionDetails[],
   allPeerConnections: DAppConnection[],
   allNotifications: KeriaNotification[],
-  profileId: string
+  profile: IdentifierShortDetails
 ) => {
+  const profileId = profile.id;
   const profileIdentifier = identifiers[profileId];
   const profileCreds = allCreds.filter(
     (cred) => cred.identifierId === profileId
@@ -28,7 +29,8 @@ const filterProfileData = (
     (conn) => conn.identifier === profileId
   );
   const profileMultisigConnections = allMultisigConnections.filter(
-    (conn) => "groupId" in conn && conn.contactId === profileId
+    (conn) =>
+      "groupId" in conn && conn.groupId === profile.groupMetadata?.groupId
   );
   const profilePeerConnections = allPeerConnections.filter(
     (conn) => conn.selectedAid === profileId

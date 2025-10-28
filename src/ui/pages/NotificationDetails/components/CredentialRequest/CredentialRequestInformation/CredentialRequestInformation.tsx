@@ -1,36 +1,43 @@
-import { IonIcon, IonSpinner, IonText } from "@ionic/react";
-import { chevronForward, warningOutline } from "ionicons/icons";
-import { useCallback, useState } from "react";
+import { IonSpinner } from "@ionic/react";
+import { checkmarkCircleOutline, warningOutline } from "ionicons/icons";
+import { useCallback, useMemo, useState } from "react";
 import { Agent } from "../../../../../../core/agent/agent";
 import { NotificationRoute } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../../store/hooks";
 import {
-  getConnectionsCache,
   deleteNotificationById,
+  getConnectionsCache,
   getCredsArchivedCache,
   getCredsCache,
 } from "../../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../../store/reducers/stateCache";
-import { Alert as AlertDecline } from "../../../../../components/Alert";
+import { Alert, Alert as AlertDecline } from "../../../../../components/Alert";
 import {
+  CardBlock,
   CardDetailsAttributes,
-  CardDetailsBlock,
+  CardDetailsContent,
+  CardDetailsItem,
 } from "../../../../../components/CardDetails";
-import {
-  MemberAcceptStatus,
-  MultisigMember,
-} from "../../../../../components/CredentialDetailModule/components";
+import { CardTheme } from "../../../../../components/CardTheme";
 import { FallbackIcon } from "../../../../../components/FallbackIcon";
 import { InfoCard } from "../../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../../components/layout/ScrollablePageLayout";
+import { MemberList } from "../../../../../components/MemberList/MemberList";
+import {
+  Member,
+  MemberAcceptStatus,
+} from "../../../../../components/MemberList/MemberList.type";
 import { PageFooter } from "../../../../../components/PageFooter";
 import { PageHeader } from "../../../../../components/PageHeader";
+import { SideSlider } from "../../../../../components/SideSlider";
 import { Verification } from "../../../../../components/Verification";
 import { ToastMsgType } from "../../../../../globals/types";
 import { useOnlineStatusEffect } from "../../../../../hooks";
 import { showError } from "../../../../../utils/error";
-import { CredentialRequestProps, MemberInfo } from "../CredentialRequest.types";
+import { combineClassNames } from "../../../../../utils/style";
+import { ConnectionDetails } from "../../../../ConnectionDetails";
+import { CredentialRequestProps } from "../CredentialRequest.types";
 import { LightCredentialDetailModal } from "../LightCredentialDetailModal";
 import "./CredentialRequestInformation.scss";
 
@@ -41,12 +48,13 @@ const CredentialRequestInformation = ({
   credentialRequest,
   linkedGroup,
   userAID,
+  suitableCredentialsCount = 0,
   onBack,
   onAccept,
   onReloadData,
 }: CredentialRequestProps) => {
   const dispatch = useAppDispatch();
-  const connectionsCache = useAppSelector(getConnectionsCache) as any[];
+  const connectionsCache = useAppSelector(getConnectionsCache);
   const credsCache = useAppSelector(getCredsCache);
   const archivedCredsCache = useAppSelector(getCredsArchivedCache);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
@@ -54,6 +62,8 @@ const CredentialRequestInformation = ({
   const [proposedCredId, setProposedCredId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
+  const [showMissingIssuerModal, setShowMissingIssuerModal] = useState(false);
+  const [showConnection, setShowConnection] = useState(false);
 
   const connection = connectionsCache?.find(
     (c) => c.id === notificationDetails.connectionId
@@ -65,6 +75,9 @@ const CredentialRequestInformation = ({
     (item) => item.aid === userAID && item.joined
   );
   const groupInitiatorJoined = !!linkedGroup?.memberInfos.at(0)?.joined;
+  const isMemberPendingState =
+    !isGroupInitiator && !groupInitiatorJoined && isGroup;
+  const isInitiatorJoined = isGroupInitiator && groupInitiatorJoined;
 
   const missingProposedCred = proposedCredId
     ? !(
@@ -82,6 +95,7 @@ const CredentialRequestInformation = ({
       const id = await Agent.agent.ipexCommunications.getOfferedCredentialSaid(
         linkedGroup.linkedRequest.current
       );
+
       setProposedCredId(id);
     } catch (error) {
       showError("Unable to get choosen cred", error, dispatch);
@@ -122,21 +136,6 @@ const CredentialRequestInformation = ({
       );
     }
   };
-
-  const getStatus = useCallback(
-    (member: MemberInfo): MemberAcceptStatus => {
-      if (member.joined) {
-        return MemberAcceptStatus.Accepted;
-      }
-
-      if (!groupInitiatorJoined) {
-        return MemberAcceptStatus.None;
-      }
-
-      return MemberAcceptStatus.Waiting;
-    },
-    [groupInitiatorJoined]
-  );
 
   const reachedThreshold =
     linkedGroup &&
@@ -198,6 +197,8 @@ const CredentialRequestInformation = ({
     if (isGroupInitiator) {
       return groupInitiatorJoined
         ? i18n.t("tabs.notifications.details.buttons.ok")
+        : suitableCredentialsCount === 1
+        ? i18n.t("tabs.notifications.details.buttons.presentcredential")
         : i18n.t("tabs.notifications.details.buttons.choosecredential");
     }
 
@@ -210,10 +211,18 @@ const CredentialRequestInformation = ({
       return i18n.t("tabs.notifications.details.buttons.accept");
     }
 
-    return i18n.t("tabs.notifications.details.buttons.ok");
+    if (isGroup) {
+      return i18n.t("tabs.notifications.details.buttons.ok");
+    }
+
+    return suitableCredentialsCount > 1
+      ? i18n.t("tabs.notifications.details.buttons.choosecredential")
+      : i18n.t("tabs.notifications.details.buttons.presentcredential");
   })();
 
   const memberDeclineButtonText = (() => {
+    if (!isGroup) return i18n.t("tabs.notifications.details.buttons.decline");
+
     return isGroupInitiator ||
       (!isGroupInitiator && !groupInitiatorJoined) ||
       isJoinGroup ||
@@ -280,6 +289,32 @@ const CredentialRequestInformation = ({
       : "tabs.notifications.details.credential.request.information.title"
   )}`;
 
+  const displayMember = useMemo(() => {
+    const members = linkedGroup?.memberInfos || [];
+    const hasAcceptedMember = members.some((item) => item.joined);
+
+    return members.map((item): Member => {
+      return {
+        name: item.name,
+        status: !hasAcceptedMember
+          ? MemberAcceptStatus.None
+          : item.joined
+          ? MemberAcceptStatus.Accepted
+          : MemberAcceptStatus.Waiting,
+        isCurrentUser: !!item.isCurrentUser,
+      };
+    });
+  }, [linkedGroup?.memberInfos]);
+
+  const openConnection = () => {
+    if (!connection) {
+      setShowMissingIssuerModal(true);
+      return;
+    }
+
+    setShowConnection(true);
+  };
+
   return (
     <>
       <ScrollablePageLayout
@@ -297,66 +332,77 @@ const CredentialRequestInformation = ({
           />
         }
         footer={
-          <PageFooter
-            pageId={pageId}
-            customClass="credential-request-footer"
-            primaryButtonText={primaryButtonText}
-            primaryButtonAction={handleAcceptClick}
-            declineButtonText={
-              groupInitiatorDeclineButtonText || memberDeclineButtonText
-            }
-            declineButtonAction={decline}
-          />
+          !(isMemberPendingState || isInitiatorJoined) && (
+            <PageFooter
+              pageId={pageId}
+              customClass="credential-request-footer"
+              primaryButtonText={primaryButtonText}
+              primaryButtonAction={handleAcceptClick}
+              declineButtonText={
+                groupInitiatorDeclineButtonText || memberDeclineButtonText
+              }
+              declineButtonAction={decline}
+            />
+          )
         }
       >
         <div className="credential-content">
           {headerAlertMessage && (
             <InfoCard
-              className="alert"
+              className={combineClassNames(
+                "alert",
+                reachedThreshold ? "success" : undefined
+              )}
               content={headerAlertMessage}
+              icon={reachedThreshold ? checkmarkCircleOutline : undefined}
             />
           )}
+          {!isGroup && (
+            <p className="credential-request-description">
+              {i18n.t(
+                "tabs.notifications.details.credential.request.information.description"
+              )}
+            </p>
+          )}
           {!isGroupInitiator && groupInitiatorJoined && (
-            <CardDetailsBlock
-              className="request-from"
+            <CardBlock
               title={`${i18n.t(
                 "tabs.notifications.details.credential.request.information.proposalfrom"
               )}`}
+              className="request-from"
+              showIcon
             >
-              <div className="request-from-content">
-                <FallbackIcon />
-                <p>
-                  {linkedGroup?.memberInfos.at(0)?.name ||
-                    i18n.t("tabs.connections.unknown")}
-                </p>
-              </div>
-            </CardDetailsBlock>
+              <CardDetailsItem
+                info={
+                  linkedGroup?.memberInfos.at(0)?.name ||
+                  i18n.t("tabs.connections.unknown")
+                }
+                startSlot={<FallbackIcon />}
+                className="request-from-content"
+              />
+            </CardBlock>
           )}
           {linkedGroup?.linkedRequest.current && (
             <>
-              <CardDetailsBlock
-                dataTestId="proposed-cred"
+              <CardBlock
+                testId="proposed-cred-card"
                 onClick={showProvidedCred}
-                className={`proposed-cred ${
+                className={`${
                   missingProposedCred ? "missing-proposed-cred" : ""
                 }`}
                 title={`${i18n.t(
                   "tabs.notifications.details.credential.request.information.proposedcred"
                 )}`}
               >
-                <div className="request-from-content">
-                  <FallbackIcon />
-                  <p>
-                    {credentialRequest.schema.name ||
-                      i18n.t("tabs.connections.unknown")}
-                  </p>
-                </div>
-                {missingProposedCred ? (
-                  <></>
-                ) : (
-                  <IonIcon icon={chevronForward} />
-                )}
-              </CardDetailsBlock>
+                <CardDetailsItem
+                  info={
+                    credentialRequest.schema.name ||
+                    i18n.t("tabs.connections.unknown")
+                  }
+                  startSlot={<CardTheme className="card-theme" />}
+                  className="proposed-cred"
+                />
+              </CardBlock>
               {missingProposedCred ? (
                 <InfoCard
                   content={i18n.t(
@@ -372,30 +418,33 @@ const CredentialRequestInformation = ({
               )}
             </>
           )}
-          <CardDetailsBlock
-            className="request-from"
-            title={`${i18n.t(
-              "tabs.notifications.details.credential.request.information.requestfrom"
-            )}`}
+          <div
+            className={combineClassNames(
+              "request-infor",
+              isGroup && isGroupInitiator ? "reverse" : undefined
+            )}
           >
-            <div className="request-from-content">
-              <FallbackIcon src={connection?.logo} />
-              <p>{connection?.label || i18n.t("tabs.connections.unknown")}</p>
-            </div>
-          </CardDetailsBlock>
-          <CardDetailsBlock
-            className="credential-request"
-            title={`${i18n.t(
-              "tabs.notifications.details.credential.request.information.requestedcredential"
-            )}`}
-          >
-            <IonText className="requested-credential">
-              {credentialRequest.schema.name}
-            </IonText>
-          </CardDetailsBlock>
+            <CardBlock
+              title={`${i18n.t(
+                "tabs.notifications.details.credential.request.information.requestfrom"
+              )}`}
+              onClick={isGroup ? openConnection : undefined}
+            >
+              <CardDetailsItem
+                info={connection?.label || i18n.t("tabs.connections.unknown")}
+                startSlot={<FallbackIcon src={connection?.logo} />}
+              />
+            </CardBlock>
+            <CardBlock
+              title={`${i18n.t(
+                "tabs.notifications.details.credential.request.information.requestedcredential"
+              )}`}
+            >
+              <CardDetailsItem info={credentialRequest.schema.name} />
+            </CardBlock>
+          </div>
           {JSON.stringify(credentialRequest.attributes) !== "{}" && (
-            <CardDetailsBlock
-              className="request-data"
+            <CardBlock
               title={i18n.t(
                 "tabs.notifications.details.credential.request.information.informationrequired"
               )}
@@ -409,36 +458,38 @@ const CredentialRequestInformation = ({
                   className: "credential-info-item",
                 }}
               />
-            </CardDetailsBlock>
+            </CardBlock>
           )}
           {linkedGroup && (
             <>
-              <CardDetailsBlock
-                className="credential-request"
+              <CardBlock
                 title={`${i18n.t(
                   "tabs.notifications.details.credential.request.information.threshold"
                 )}`}
               >
-                <div className="threshold">
-                  <IonText className="requested-credential">
-                    {linkedGroup.threshold.signingThreshold}
-                  </IonText>
-                </div>
-              </CardDetailsBlock>
-              <CardDetailsBlock
-                className="group-members"
+                <CardDetailsContent
+                  mainContent={`${linkedGroup.threshold.signingThreshold || 0}`}
+                  subContent={`${i18n.t(
+                    `tabs.notifications.details.credential.request.information.thresholdcontent`,
+                    {
+                      members: linkedGroup.members.length || 0,
+                    }
+                  )}`}
+                />
+              </CardBlock>
+              <CardBlock
                 title={i18n.t(
                   "tabs.notifications.details.credential.request.information.groupmember"
                 )}
               >
-                {linkedGroup.memberInfos.map((member) => (
-                  <MultisigMember
-                    key={member.aid}
-                    name={member.name}
-                    status={getStatus(member)}
-                  />
-                ))}
-              </CardDetailsBlock>
+                <MemberList
+                  members={displayMember}
+                  bottomText={`${i18n.t(
+                    `profiledetails.detailsmodal.groupmember.bottomtext`,
+                    { members: linkedGroup.members.length || 0 }
+                  )}`}
+                />
+              </CardBlock>
             </>
           )}
         </div>
@@ -481,6 +532,29 @@ const CredentialRequestInformation = ({
           <IonSpinner name="circular" />
         </div>
       )}
+      <Alert
+        dataTestId="cred-missing-issuer-alert"
+        headerText={i18n.t("tabs.credentials.details.alert.missingissuer.text")}
+        confirmButtonText={`${i18n.t(
+          "tabs.credentials.details.alert.missingissuer.confirm"
+        )}`}
+        isOpen={showMissingIssuerModal}
+        setIsOpen={setShowMissingIssuerModal}
+        actionConfirm={closeAlert}
+        actionDismiss={closeAlert}
+      />
+      <SideSlider
+        isOpen={showConnection && !!connection}
+        renderAsModal
+      >
+        {connection && (
+          <ConnectionDetails
+            connectionShortDetails={connection}
+            handleCloseConnectionModal={() => setShowConnection(false)}
+            restrictedOptions={true}
+          />
+        )}
+      </SideSlider>
     </>
   );
 };

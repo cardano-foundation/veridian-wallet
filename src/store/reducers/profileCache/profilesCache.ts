@@ -216,7 +216,11 @@ export const profilesCacheSlice = createSlice({
       const defaultProfile = state.profiles[state.defaultProfile];
       if (!defaultProfile) return;
 
-      defaultProfile.archivedCredentials = action.payload;
+      const profileCredArchived = action.payload.filter(
+        (item) => item.identifierId === defaultProfile.identity.id
+      );
+
+      defaultProfile.archivedCredentials = profileCredArchived;
     },
     updateOrAddConnectionCache: (
       state,

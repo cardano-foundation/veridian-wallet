@@ -4,17 +4,16 @@ import { Provider } from "react-redux";
 
 import EN_TRANSLATIONS from "../../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../../routes/paths";
-import { connectionsForNotificationsValues } from "../../../../../__fixtures__/connectionsFix";
+import { InitializationPhase } from "../../../../../../store/reducers/stateCache/stateCache.types";
 import { credRequestFix } from "../../../../../__fixtures__/credRequestFix";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
+import { filteredCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
 import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
 import { profileCacheFixData } from "../../../../../__fixtures__/storeDataFix";
+import { OperationType } from "../../../../../globals/types";
 import { makeTestStore } from "../../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
-import { filteredCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
-import { OperationType } from "../../../../../globals/types";
-import { InitializationPhase } from "../../../../../../store/reducers/stateCache/stateCache.types";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -59,7 +58,6 @@ const initialState = {
     routes: [{ path: TabsRoutePath.NOTIFICATIONS }],
     authentication: {
       loggedIn: true,
-      userName: "",
       time: Date.now(),
       passcodeIsSet: true,
       seedPhraseIsSet: true,
@@ -368,15 +366,6 @@ describe("Credential request information: multisig", () => {
     expect(
       queryByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.reject)
     ).toBeNull();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Initiator opens request after proposing and after threshold is met", async () => {
@@ -471,15 +460,6 @@ describe("Credential request information: multisig", () => {
     expect(
       queryByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.reject)
     ).toBeNull();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Initiator opens request after proposing and before threshold is met, but has deleted the proposed credential", async () => {
@@ -582,15 +562,6 @@ describe("Credential request information: multisig", () => {
     expect(
       queryByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.reject)
     ).toBeNull();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Initiator opens request after proposing and after threshold is met", async () => {
@@ -693,15 +664,6 @@ describe("Credential request information: multisig", () => {
     expect(
       queryByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.reject)
     ).toBeNull();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Member opens request that does not yet have a proposal", async () => {
@@ -778,15 +740,6 @@ describe("Credential request information: multisig", () => {
           .information.groupmember
       )
     ).toBeVisible();
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-multi-sign"));
-    });
-
-    expect(back).toBeCalled();
   });
 
   test("Member open request and accepts proposal from initiator", async () => {

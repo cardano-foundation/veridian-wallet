@@ -1,8 +1,8 @@
 import { TapJacking } from "@capacitor-community/tap-jacking";
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { Device } from "@capacitor/device";
-import { ReactNode, useCallback, useEffect, useState } from "react";
 import { NativeBiometric } from "@capgo/capacitor-native-biometric";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
@@ -31,22 +31,22 @@ import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { setEnableBiometricsCache } from "../../../store/reducers/biometricsCache";
 import {
-  setConnectionsCache,
-  setMultisigConnectionsCache,
-  updateOrAddConnectionCache,
   DAppConnection,
+  getConnectedDApp,
   Profile,
+  setConnectedDApp,
+  setConnectionsCache,
   setCredsArchivedCache,
   setCurrentProfile,
   setIndividualFirstCreate,
+  setIsConnectingToDApp,
+  setMultisigConnectionsCache,
+  setPendingDAppConnection,
   setProfiles,
+  updateOrAddConnectionCache,
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
   updateRecentProfiles,
-  getConnectedDApp,
-  setConnectedDApp,
-  setPendingDAppConnection,
-  setIsConnectingToDApp,
 } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
@@ -80,6 +80,7 @@ import {
 } from "../../../store/reducers/viewTypeCache";
 import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
 import { OperationType, ToastMsgType } from "../../globals/types";
+import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
 import { useLocalNotifications } from "../../hooks/useLocalNotifications";
 import { useProfile } from "../../hooks/useProfile";
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
@@ -95,7 +96,6 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
-import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -425,7 +425,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
             allMultisigConnections as MultisigConnectionDetails[],
             storedPeerConnections,
             notifications,
-            identifier.id
+            identifier
           );
 
           acc[identifier.id] = {

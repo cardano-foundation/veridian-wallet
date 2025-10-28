@@ -971,6 +971,7 @@
           "back": "Back",
           "choosecredential": "Choose credential",
           "providecredential": "Provide credential",
+          "presentcredential": "Present Credential",
           "addcred": "Add Credential",
           "done": "Done",
           "ok": "Ok",
@@ -985,19 +986,21 @@
             },
             "information": {
               "title": "Credential request",
+              "description": "You have received a request to present a credential",
               "proposalfrom": "Proposal from",
               "proposedcred": "Proposed credential",
               "requestfrom": "Request from",
               "requestedcredential": "Requested credential",
               "informationrequired": "Information required",
-              "threshold": "Threshold",
+              "threshold": "Signing threshold",
+              "thresholdcontent": "out of {{members}}",
               "alert": {
-                "textdecline": "Are you sure you want to decline this credential request? You won't be able to change your decision later."
+                "textdecline": "Are you sure you want to decline this credential presentation request? You won't be able to change your decision later."
               },
               "groupmember": "Group members",
               "joinedmembers": "Joined members",
               "reachthreshold": "The threshold has been met, and your group has agreed to your proposed credential presentation.",
-              "initiatorselectcred": "As the group initiator, you'll select the credential to present. Once chosen, the rest of the group will be notified and asked to approve or decline the selection.",
+              "initiatorselectcred": "The group has been asked to provide a credential. Please review the request and choose to accept or decline it.",
               "initiatorselectedcred": "You've already proposed a credential for this request. It will be sent once the group’s threshold is met.",
               "memberreviewcred": "The group initiator has proposed a credential to present for a recent request. Please review the proposal and choose to accept or reject it.",
               "memberwaitingproposal": "The group initiator will propose a credential to present. Once chosen, the you and the rest of the group will be notified and asked to approve or decline the selection.",
