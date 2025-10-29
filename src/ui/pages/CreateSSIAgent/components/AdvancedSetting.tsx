@@ -187,7 +187,7 @@ const AdvancedSetting = ({
         {i18n.t(
           isRecoveryMode
             ? "ssiagent.advancedsetup.description.connect"
-            : "ssiagent.advancedsetup.description.bootconnect"
+            : "ssiagent.advancedsetup.description.connectboot"
         )}
       </p>
       {!isRecoveryMode && (

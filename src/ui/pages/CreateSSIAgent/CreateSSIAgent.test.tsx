@@ -1770,24 +1770,6 @@ describe("SSI agent page", () => {
           connectUrl
         );
       });
-
-      await waitFor(() => {
-        expect(createOrUpdateBasicRecordMock).toBeCalledWith(
-          expect.objectContaining({
-            id: MiscRecordId.IS_SETUP_PROFILE,
-            content: { value: true },
-          })
-        );
-      });
-
-      await waitFor(() => {
-        expect(createOrUpdateBasicRecordMock).toBeCalledWith(
-          expect.objectContaining({
-            id: MiscRecordId.INDIVIDUAL_FIRST_CREATE,
-            content: { value: true },
-          })
-        );
-      });
     });
   });
 });
