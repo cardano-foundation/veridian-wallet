@@ -18,7 +18,6 @@ export class LocalFileStrategy implements ILogger {
       // eslint-disable-next-line no-console
       console.info(`Full path to local log file: ${result.uri}`);
     }).catch((e) => {
-      // If an error occurs here, we'll fall back to console.error.
       // eslint-disable-next-line no-console
       console.error(`Error getting URI for log file:`, e);
     });

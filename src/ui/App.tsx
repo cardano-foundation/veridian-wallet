@@ -22,6 +22,7 @@ import {
   getCurrentOperation,
   getGlobalLoading,
   getInitializationPhase,
+  showGenericError,
 } from "../store/reducers/stateCache";
 import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
 import { AppOffline } from "./components/AppOffline";
@@ -149,6 +150,13 @@ const App = () => {
 
   const [threatsDetected, setThreatsDetected] = useState<ThreatCheck[]>([]);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      dispatch(showGenericError(true));
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [dispatch]);
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;

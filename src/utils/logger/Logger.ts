@@ -6,6 +6,7 @@ import { ConsoleStrategy } from "./strategies/ConsoleStrategy";
 import { loggingConfig } from "./LoggingConfig";
 import { ICloudLogger } from "./ICloudLogger";
 import { Salter } from "signify-ts";
+import { logSyncService, SyncMode } from "../../core/services/LogSyncService";
 
 const logLevelOrder: Record<LogLevel, number> = {
   debug: 0,
@@ -48,8 +49,12 @@ export class Logger {
         localStrategy = localStrategyFactory();
       }
 
+      // Only add remote strategies if remote logging is enabled AND LogSyncService is in Auto mode
+      // Or if local logging is disabled, but remote is enabled (to ensure logs are sent at all)
       let cloudLogger: ICloudLogger | undefined;
-      if (loggingConfig.remoteEnabled) {
+      const shouldAddRemoteStrategy = loggingConfig.remoteEnabled && logSyncService.syncMode === SyncMode.Auto;
+
+      if (shouldAddRemoteStrategy) {
         if (loggingConfig.signozOtlpEndpoint && loggingConfig.signozIngestionKey) {
           cloudLogger = cloudLoggerFactory(loggingConfig.signozOtlpEndpoint, loggingConfig.signozIngestionKey);
         }
@@ -63,12 +68,12 @@ export class Logger {
         activeStrategies.push(cloudLogger);
       }
 
-          Logger.instance = new Logger(activeStrategies, minimumLogLevel);
-        }
-        return Logger.instance;
+      Logger.instance = new Logger(activeStrategies, minimumLogLevel);
+    }
+    return Logger.instance;
   }
 
-  async log(level: LogLevel, message: string, context?: Record<string, unknown>) {
+  async log(level: LogLevel, message: string, context?: Record<string, unknown>, consoleOnly = false) {
     if (level !== "error" && logLevelOrder[level] < logLevelOrder[this.minimumLogLevel]) {
       return;
     }
@@ -79,17 +84,24 @@ export class Logger {
       level,
       message,
       context,
+      consoleOnly,
     };
 
     for (const strategy of this.strategies) {
-      await strategy.log(logEntry);
+      if (consoleOnly) {
+        if (strategy instanceof ConsoleStrategy) {
+          await strategy.log(logEntry);
+        }
+      } else {
+        await strategy.log(logEntry);
+      }
     }
   }
 
-  debug(msg: string, ctx?: Record<string, unknown>) { return this.log("debug", msg, ctx); }
-  info(msg: string, ctx?: Record<string, unknown>) { return this.log("info", msg, ctx); }
-  warn(msg: string, ctx?: Record<string, unknown>) { return this.log("warn", msg, ctx); }
-  error(msg: string, ctx?: Record<string, unknown>) { return this.log("error", msg, ctx); }
+  debug(msg: string, ctx?: Record<string, unknown>, consoleOnly?: boolean) { return this.log("debug", msg, ctx, consoleOnly); }
+  info(msg: string, ctx?: Record<string, unknown>, consoleOnly?: boolean) { return this.log("info", msg, ctx, consoleOnly); }
+  warn(msg: string, ctx?: Record<string, unknown>, consoleOnly?: boolean) { return this.log("warn", msg, ctx, consoleOnly); }
+  error(msg: string, ctx?: Record<string, unknown>, consoleOnly?: boolean) { return this.log("error", msg, ctx, consoleOnly); }
 }
 
 export const logger = Logger.getInstance();

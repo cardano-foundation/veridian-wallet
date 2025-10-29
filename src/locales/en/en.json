@@ -1557,7 +1557,10 @@
   },
   "genericerror": {
     "text": "Something went wrong. Please try again.",
-    "button": "OK"
+    "button": "OK",
+    "sharelogsbutton": "Share information",
+    "logstext": "Something went wrong. To help us understand and fix the issue, you can share diagnostic information with our team. This information doesn’t include personal data.",
+    "dismissbutton": "Dismiss"
   },
   "nowitnesserror": {
     "text": "Your SSI agent is misconfigured. For additional information, contact your SSI Cloud Agent provider.",

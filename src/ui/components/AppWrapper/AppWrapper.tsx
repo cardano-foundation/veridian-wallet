@@ -94,7 +94,7 @@ import {
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
 import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
-import { logSyncService } from "../../../core/services/LogSyncService";
+import { logSyncService, SyncMode } from "../../../core/services/LogSyncService";
 import { logger } from "../../../utils/logger/Logger";
 import { formatErrorContext } from "../../../utils/logger/loggerUtils";
 
@@ -328,8 +328,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
   useEffect(() => {
     if (initializationPhase === InitializationPhase.PHASE_TWO) {
       if (authentication.loggedIn) {
-        logSyncService.start();
-        logger.debug("Log synchronization service started.");
+        if (logSyncService.syncMode === SyncMode.Auto) {
+          logSyncService.start();
+          logger.debug("Log synchronization service started.");
+        }
       } else {
         logSyncService.stop();
         logger.debug("Log synchronization service stopped.");
@@ -337,7 +339,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
     }
     return () => {
       logSyncService.stop();
-      logger.debug("Log synchronization service stopped on unmount.");
     };
   }, [authentication.loggedIn, initializationPhase]);
 
@@ -703,7 +704,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
         })
       );
 
-      logger.info("Cache loaded.");
+      logger.debug("Cache loaded.");
       return {
         keriaConnectUrlRecord,
       };
@@ -804,7 +805,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
           : InitializationPhase.PHASE_TWO
       )
     );
-    logger.info("Wallet initialized.");
+    logger.debug("Wallet initialized.");
   };
 
   const recoverAndLoadDb = async () => {

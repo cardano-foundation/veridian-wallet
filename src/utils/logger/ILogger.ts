@@ -10,4 +10,5 @@ export interface ParsedLogEntry {
   level: LogLevel;
   message: string;
   context?: Record<string, unknown>;
+  consoleOnly?: boolean;
 }
