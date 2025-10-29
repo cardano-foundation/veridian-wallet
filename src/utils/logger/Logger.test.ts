@@ -4,6 +4,7 @@ import { SigNozProvider } from "./providers/SigNozProvider";
 import { HybridStrategy } from "./strategies/HybridStrategy";
 import { ConsoleStrategy } from "./strategies/ConsoleStrategy";
 import { loggingConfig } from "./LoggingConfig";
+import { SyncMode } from "../../core/services/LogSyncService";
 
 jest.mock("signify-ts", () => ({
   ...jest.requireActual("signify-ts"),
@@ -30,6 +31,17 @@ jest.mock("./LoggingConfig", () => ({
   },
 }));
 
+// Mock logSyncService
+jest.mock("../../core/services/LogSyncService", () => ({
+  logSyncService: {
+    syncMode: "auto", // Default to Auto for Logger tests unless specified otherwise
+  },
+  SyncMode: {
+    Auto: "auto",
+    Manual: "manual",
+  },
+}));
+
 describe("Logger", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -44,6 +56,9 @@ describe("Logger", () => {
     (loggingConfig as any).remoteEnabled = false;
     (loggingConfig as any).signozOtlpEndpoint = "http://localhost:4318/v1/logs";
     (loggingConfig as any).signozIngestionKey = "test-key";
+
+    // Reset logSyncService.syncMode to default for tests
+    (require("../../core/services/LogSyncService").logSyncService.syncMode as SyncMode) = SyncMode.Auto;
   });
 
   it("should return a singleton instance", () => {
@@ -79,25 +94,49 @@ describe("Logger", () => {
       expect((LocalFileStrategy as jest.Mock).mock.instances[0]).toBeInstanceOf(LocalFileStrategy);
     });
 
-    it("should enable SigNozProvider when remoteEnabled is true", () => {
+    it("should enable SigNozProvider when remoteEnabled is true and syncMode is Auto", () => {
       (loggingConfig as any).mode = "info";
       (loggingConfig as any).remoteEnabled = true;
+      (require("../../core/services/LogSyncService").logSyncService.syncMode as SyncMode) = SyncMode.Auto;
       const logger = Logger.getInstance();
       expect((logger as any).strategies).toHaveLength(1);
       expect(SigNozProvider).toHaveBeenCalledTimes(1);
       expect((SigNozProvider as jest.Mock).mock.instances[0]).toBeInstanceOf(SigNozProvider);
     });
 
-    it("should enable HybridStrategy when both localEnabled and remoteEnabled are true", () => {
+    it("should not enable SigNozProvider when remoteEnabled is true and syncMode is Manual", () => {
+      (loggingConfig as any).mode = "info";
+      (loggingConfig as any).remoteEnabled = true;
+      (require("../../core/services/LogSyncService").logSyncService.syncMode as SyncMode) = SyncMode.Manual;
+      const logger = Logger.getInstance();
+      expect((logger as any).strategies).toHaveLength(0);
+      expect(SigNozProvider).not.toHaveBeenCalled();
+    });
+
+    it("should enable HybridStrategy when both localEnabled and remoteEnabled are true and syncMode is Auto", () => {
       (loggingConfig as any).mode = "info";
       (loggingConfig as any).localEnabled = true;
       (loggingConfig as any).remoteEnabled = true;
+      (require("../../core/services/LogSyncService").logSyncService.syncMode as SyncMode) = SyncMode.Auto;
       const logger = Logger.getInstance();
       expect((logger as any).strategies).toHaveLength(1);
       expect(HybridStrategy).toHaveBeenCalledTimes(1);
       expect((HybridStrategy as jest.Mock).mock.instances[0]).toBeInstanceOf(HybridStrategy);
       expect(LocalFileStrategy).toHaveBeenCalledTimes(1);
       expect(SigNozProvider).toHaveBeenCalledTimes(1);
+    });
+
+    it("should enable LocalFileStrategy only when both localEnabled and remoteEnabled are true and syncMode is Manual", () => {
+      (loggingConfig as any).mode = "info";
+      (loggingConfig as any).localEnabled = true;
+      (loggingConfig as any).remoteEnabled = true;
+      (require("../../core/services/LogSyncService").logSyncService.syncMode as SyncMode) = SyncMode.Manual;
+      const logger = Logger.getInstance();
+      expect((logger as any).strategies).toHaveLength(1);
+      expect(LocalFileStrategy).toHaveBeenCalledTimes(1);
+      expect(HybridStrategy).not.toHaveBeenCalled();
+      expect(SigNozProvider).not.toHaveBeenCalled();
+      expect((logger as any).strategies[0]).toBeInstanceOf(LocalFileStrategy);
     });
 
     it("should set minimumLogLevel based on loggingConfig.mode", () => {
@@ -144,6 +183,7 @@ describe("Logger", () => {
         level: "info",
         message,
         context,
+        consoleOnly: false,
       });
     });
 
@@ -170,7 +210,35 @@ describe("Logger", () => {
         level: "error",
         message: "Error message",
         context: undefined,
+        consoleOnly: false,
       });
+    });
+
+    it("should only log to console when consoleOnly is true", async () => {
+      const message = "Console only message";
+      const context = { special: true };
+      (loggingConfig as any).localEnabled = true;
+      (loggingConfig as any).remoteEnabled = true;
+      (require("../../core/services/LogSyncService").logSyncService.syncMode as SyncMode) = SyncMode.Auto;
+      (Logger as any).instance = undefined;
+      loggerInstance = Logger.getInstance();
+
+      const mockLocalStrategyInstance = (LocalFileStrategy as jest.Mock).mock.instances[(LocalFileStrategy as jest.Mock).mock.instances.length - 1] as jest.Mocked<LocalFileStrategy>;
+      const mockSigNozProviderInstance = (SigNozProvider as jest.Mock).mock.instances[(SigNozProvider as jest.Mock).mock.instances.length - 1] as jest.Mocked<SigNozProvider>;
+      mockConsoleStrategyInstance = (ConsoleStrategy as jest.Mock).mock.instances[(ConsoleStrategy as jest.Mock).mock.instances.length - 1] as jest.Mocked<ConsoleStrategy>;
+
+      await loggerInstance.log("info", message, context, true);
+
+      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith({
+        id: expect.any(String),
+        ts: expect.any(String),
+        level: "info",
+        message,
+        context,
+        consoleOnly: true,
+      });
+      expect(mockLocalStrategyInstance.log).not.toHaveBeenCalled();
+      expect(mockSigNozProviderInstance.log).not.toHaveBeenCalled();
     });
   });
 
@@ -197,6 +265,7 @@ describe("Logger", () => {
         level: "debug",
         message,
         context,
+        consoleOnly: false,
       });
     });
 
@@ -210,6 +279,7 @@ describe("Logger", () => {
         level: "info",
         message,
         context,
+        consoleOnly: false,
       });
     });
 
@@ -223,6 +293,7 @@ describe("Logger", () => {
         level: "warn",
         message,
         context,
+        consoleOnly: false,
       });
     });
 
@@ -236,6 +307,20 @@ describe("Logger", () => {
         level: "error",
         message,
         context,
+        consoleOnly: false,
+      });
+    });
+
+    it("debug should call log with debug level and consoleOnly true", async () => {
+      const message = "Debug console only message";
+      await loggerInstance.debug(message, undefined, true);
+      expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith({
+        id: expect.any(String),
+        ts: expect.any(String),
+        level: "debug",
+        message,
+        context: undefined,
+        consoleOnly: true,
       });
     });
   });

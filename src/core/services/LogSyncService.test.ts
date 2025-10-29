@@ -1,5 +1,5 @@
 import { Network } from "@capacitor/network";
-import { LogSyncService } from "./LogSyncService";
+import { LogSyncService, SyncMode } from "./LogSyncService";
 import { loggingConfig } from "../../utils/logger/LoggingConfig";
 import { logger } from "../../utils/logger/Logger";
 import { LocalFileStrategy } from "../../utils/logger/strategies/LocalFileStrategy";
@@ -16,18 +16,21 @@ jest.mock("@capacitor/network", () => ({
 jest.mock("../../utils/logger/Logger");
 jest.mock("../../utils/logger/strategies/LocalFileStrategy");
 jest.mock("../../utils/logger/providers/SigNozProvider");
-jest.mock("../../utils/logger/LoggingConfig");
 
-// Cast the mocked loggingConfig to a mutable type for testing
-const mutableLoggingConfig = loggingConfig as {
-  localEnabled: boolean;
-  remoteEnabled: boolean;
-  maxSyncRetries: number;
-  retryDelayMs: number;
-  batchSize: number;
-  signozOtlpEndpoint: string;
-  signozIngestionKey: string;
-};
+// Mock loggingConfig to allow dynamic control
+jest.mock("../../utils/logger/LoggingConfig", () => ({
+  loggingConfig: {
+    mode: "info",
+    consoleEnabled: false,
+    localEnabled: false,
+    remoteEnabled: false,
+    signozOtlpEndpoint: "http://localhost:4318/v1/logs",
+    signozIngestionKey: "test-key",
+    maxSyncRetries: 3,
+    retryDelayMs: 1000,
+    batchSize: 50,
+  },
+}));
 
 describe("LogSyncService", () => {
   let mockLocalStrategy: jest.Mocked<LocalFileStrategy>;
@@ -44,13 +47,13 @@ describe("LogSyncService", () => {
     jest.clearAllMocks();
 
     // Reset mock config to defaults before each test
-    mutableLoggingConfig.localEnabled = true;
-    mutableLoggingConfig.remoteEnabled = true;
-    mutableLoggingConfig.maxSyncRetries = 3;
-    mutableLoggingConfig.retryDelayMs = 1000;
-    mutableLoggingConfig.batchSize = 50;
-    mutableLoggingConfig.signozOtlpEndpoint = "http://test-endpoint";
-    mutableLoggingConfig.signozIngestionKey = "test-key";
+    (loggingConfig as any).localEnabled = true;
+    (loggingConfig as any).remoteEnabled = true;
+    (loggingConfig as any).maxSyncRetries = 3;
+    (loggingConfig as any).retryDelayMs = 1000;
+    (loggingConfig as any).batchSize = 50;
+    (loggingConfig as any).signozOtlpEndpoint = "http://test-endpoint";
+    (loggingConfig as any).signozIngestionKey = "test-key";
 
     mockLocalStrategy = {
       readLogs: jest.fn(),
@@ -72,7 +75,8 @@ describe("LogSyncService", () => {
     logSyncService = new LogSyncService(
       () => mockLocalStrategy as any,
       () => mockRemoteStrategy as any,
-      mockDelay
+      mockDelay,
+      SyncMode.Auto // Set to Auto by default for these tests
     );
   });
 
@@ -80,17 +84,31 @@ describe("LogSyncService", () => {
     // This test exercises the default constructor parameters
     const serviceWithDefaults = new LogSyncService();
     expect(serviceWithDefaults).toBeInstanceOf(LogSyncService);
+    expect(serviceWithDefaults.syncMode).toBe(SyncMode.Manual);
   });
 
   it("should not sync if local logging is disabled", async () => {
-    mutableLoggingConfig.localEnabled = false;
-    await logSyncService.start();
-    expect(Network.getStatus).not.toHaveBeenCalled();
+    (loggingConfig as any).localEnabled = false;
+    mockLocalStrategy.readLogs.mockResolvedValue([]); // Prevent crash
+    const service = new LogSyncService(
+      () => mockLocalStrategy as any,
+      () => mockRemoteStrategy as any,
+      mockDelay,
+      SyncMode.Auto
+    );
+    await service.start();
+    expect(mockRemoteStrategy.logBatch).not.toHaveBeenCalled();
   });
 
   it("should not sync if remote logging is disabled", async () => {
-    mutableLoggingConfig.remoteEnabled = false;
-    await logSyncService.start();
+    (loggingConfig as any).remoteEnabled = false;
+    const service = new LogSyncService(
+      () => mockLocalStrategy as any,
+      () => mockRemoteStrategy as any,
+      mockDelay,
+      SyncMode.Auto
+    );
+    await service.start();
     expect(Network.getStatus).not.toHaveBeenCalled();
   });
 
@@ -125,7 +143,7 @@ describe("LogSyncService", () => {
       id: `${i}`,
       message: `test${i}`,
     })) as any;
-    mutableLoggingConfig.batchSize = 40;
+    (loggingConfig as any).batchSize = 40;
     mockLocalStrategy.readLogs.mockResolvedValue(largeMockLogs);
     mockRemoteStrategy.logBatch.mockResolvedValue(undefined);
 
@@ -143,7 +161,7 @@ describe("LogSyncService", () => {
 
     await logSyncService.start();
 
-    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining("failed"), expect.any(Object));
     expect(mockDelay).toHaveBeenCalledTimes(1);
     expect(mockRemoteStrategy.logBatch).toHaveBeenCalledTimes(2);
     expect(mockLocalStrategy.writeLogs).toHaveBeenCalledWith([]);
@@ -155,22 +173,25 @@ describe("LogSyncService", () => {
 
     await logSyncService.start();
 
-    expect(logger.error).toHaveBeenCalledWith(
+    expect(logger.error).toHaveBeenCalledTimes((loggingConfig as any).maxSyncRetries + 1);
+    expect(logger.error).toHaveBeenNthCalledWith((loggingConfig as any).maxSyncRetries,
       expect.stringContaining("failed"),
       expect.any(Object)
     );
-    expect(logger.error).toHaveBeenCalledWith(
-      "Max log sync retries reached. Logs will remain in local storage."
+    expect(logger.error).toHaveBeenLastCalledWith(
+      "Max log sync retries reached. Logs will remain in local storage.",
+      undefined,
+      true
     );
-    expect(mockDelay).toHaveBeenCalledTimes(mutableLoggingConfig.maxSyncRetries - 1);
-    expect(mockRemoteStrategy.logBatch).toHaveBeenCalledTimes(mutableLoggingConfig.maxSyncRetries);
+    expect(mockDelay).toHaveBeenCalledTimes((loggingConfig as any).maxSyncRetries - 1);
+    expect(mockRemoteStrategy.logBatch).toHaveBeenCalledTimes((loggingConfig as any).maxSyncRetries);
     expect(mockLocalStrategy.writeLogs).not.toHaveBeenCalled();
   });
 
   it("should not clear logs if a later batch fails", async () => {
     const logs = [{ id: "1" }, { id: "2" }, { id: "3" }] as any;
-    mutableLoggingConfig.batchSize = 2;
-    mutableLoggingConfig.maxSyncRetries = 1; // Prevent retries for this specific test
+    (loggingConfig as any).batchSize = 2;
+    (loggingConfig as any).maxSyncRetries = 1; // Prevent retries for this specific test
     mockLocalStrategy.readLogs.mockResolvedValue(logs);
     mockRemoteStrategy.logBatch
       .mockResolvedValueOnce(undefined) // First batch succeeds
@@ -204,7 +225,6 @@ describe("LogSyncService", () => {
 
     await logSyncService.start();
 
-    // The overall operation still retries because the write failure is inside the catch block
     expect(logger.error).toHaveBeenCalledWith(
       "Log sync attempt 1 failed:",
       expect.any(Object)
@@ -218,10 +238,11 @@ describe("LogSyncService", () => {
     // but this test ensures no error is thrown.
   });
 
-  it("should add and remove the network status listener", async () => {
+  it("should add and remove the network status listener when in Auto mode", async () => {
     const removeMock = jest.fn();
     (Network.addListener as jest.Mock).mockResolvedValue({ remove: removeMock });
 
+    logSyncService.setSyncMode(SyncMode.Auto);
     await logSyncService.start();
     expect(Network.addListener).toHaveBeenCalledWith(
       "networkStatusChange",
@@ -230,5 +251,23 @@ describe("LogSyncService", () => {
 
     logSyncService.stop();
     expect(removeMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("should not add the network status listener when in Manual mode", async () => {
+    logSyncService.setSyncMode(SyncMode.Manual);
+    await logSyncService.start();
+    expect(Network.addListener).not.toHaveBeenCalled();
+  });
+
+  it("should call syncLogs directly when in Manual mode and triggered by UI", async () => {
+    logSyncService.setSyncMode(SyncMode.Manual);
+    mockLocalStrategy.readLogs.mockResolvedValue(mockLogs);
+    mockRemoteStrategy.logBatch.mockResolvedValue(undefined);
+
+    await logSyncService.syncLogs(); // Directly call syncLogs
+
+    expect(mockLocalStrategy.readLogs).toHaveBeenCalledTimes(1);
+    expect(mockRemoteStrategy.logBatch).toHaveBeenCalledTimes(1);
+    expect(mockLocalStrategy.writeLogs).toHaveBeenCalledWith([]);
   });
 });

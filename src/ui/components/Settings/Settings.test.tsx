@@ -25,6 +25,31 @@ import {
   useBiometricAuth,
 } from "../../hooks/useBiometricsHook";
 
+jest.mock("@capacitor/core", () => ({
+  Plugins: {
+    Network: {
+      addListener: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+      getStatus: jest.fn(() => Promise.resolve({ connected: true, connectionType: 'wifi' })),
+    },
+  },
+  registerPlugin: jest.fn((name) => {
+    if (name === 'Network') {
+      return {
+        addListener: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+        getStatus: jest.fn(() => Promise.resolve({ connected: true, connectionType: 'wifi' })),
+      };
+    }
+    return {};
+  }),
+}));
+
+jest.mock("@capacitor/network", () => ({
+  Network: {
+    addListener: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+    getStatus: jest.fn(() => Promise.resolve({ connected: true, connectionType: 'wifi' })),
+  },
+}));
+
 jest.mock("../../../store/utils", () => ({
   CLEAR_STORE_ACTIONS: [],
 }));
