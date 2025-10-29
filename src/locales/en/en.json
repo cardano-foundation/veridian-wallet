@@ -426,7 +426,10 @@
     },
     "advancedsetup": {
       "title": "Advanced setup",
-      "description": "To connect, please enter the SSI agent boot and connect URLs (in your email or from your command line).",
+      "description": {
+        "connectboot":  "To connect, please enter the SSI agent boot and connect URLs (in your email or from your command line).",
+        "connect": "To connect, please enter the SSI agent connect URL (in your email or from your command line)."
+      },
       "buttons": {
         "connect": "Connect",
         "cancel": "Cancel"

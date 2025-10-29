@@ -372,12 +372,16 @@ const CreateSSIAgent = () => {
     }
   };
 
-  const handleSSI = async (mainUrl: string, connectUrl?: string) => {
+  const handleSSI = async (mainUrl?: string, connectUrl?: string) => {
     if (stateCache.authentication.recoveryWalletProgress) {
-      return await handleRecoveryWallet(mainUrl);
-    } else {
-      if (currentPage == CurrentPage.AdvancedSetting && !connectUrl) return;
+      if (currentPage == CurrentPage.Scan && mainUrl) {
+        return await handleRecoveryWallet(mainUrl);
+      }
 
+      if (!connectUrl) return;
+      return await handleRecoveryWallet(connectUrl);
+    } else {
+      if (!mainUrl) return;
       return await handleCreateSSI(mainUrl, connectUrl);
     }
   };

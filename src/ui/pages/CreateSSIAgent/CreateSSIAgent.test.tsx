@@ -778,7 +778,9 @@ describe("SSI agent page", () => {
       });
 
       expect(
-        getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.description)
+        getByText(
+          EN_TRANSLATIONS.ssiagent.advancedsetup.description.connectboot
+        )
       ).toBeVisible();
 
       expect(
@@ -1367,6 +1369,424 @@ describe("SSI agent page", () => {
         expect(
           queryByText(EN_TRANSLATIONS.tabs.credentials.tab.title)
         ).toBeNull();
+      });
+    });
+  });
+
+  describe("Advanced settings: Recovery", () => {
+    const initialState = {
+      stateCache: {
+        routes: [],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          recoveryWalletProgress: true,
+        },
+      },
+      seedPhraseCache: {
+        seedPhrase: "seedphrase seedphrase",
+      },
+    };
+
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    async function inputValue(
+      getByTestId: RenderResult["getByTestId"],
+      connect?: string
+    ) {
+      act(() => {
+        fireEvent(
+          getByTestId("connect-url-input"),
+          new CustomEvent("ionInput", {
+            detail: {
+              value: connect,
+            },
+          })
+        );
+      });
+
+      await waitFor(() => {
+        expect(
+          (getByTestId("connect-url-input") as HTMLInputElement).value
+        ).toBe(connect);
+      });
+    }
+
+    test("Render", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      const history = createMemoryHistory();
+
+      const { getByText, getByTestId } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+        ).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.title)
+        ).toBeVisible();
+      });
+
+      expect(
+        getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.description.connect)
+      ).toBeVisible();
+
+      expect(
+        getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.input.connect.label)
+      ).toBeVisible();
+
+      expect(
+        getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.buttons.connect)
+      ).toBeVisible();
+    });
+
+    test("Show an error when the input contains invalid url", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      const history = createMemoryHistory();
+
+      const { getByText, getByTestId, getAllByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+        ).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.title)
+        ).toBeVisible();
+      });
+
+      expect(
+        getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.input.connect.label)
+      ).toBeVisible();
+
+      act(() => {
+        fireEvent(
+          getByTestId("connect-url-input"),
+          new CustomEvent("ionInput", { detail: { value: "11111" } })
+        );
+      });
+
+      await waitFor(() => {
+        expect(
+          (getByTestId("connect-url-input") as HTMLInputElement).value
+        ).toBe("11111");
+      });
+
+      act(() => {
+        fireEvent(
+          getByTestId("connect-url-input"),
+          new CustomEvent("ionFocus")
+        );
+      });
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.error.invalidconnecturl)
+        ).toBeVisible();
+      });
+    });
+
+    test("Show an error when the connect url is invalid", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      recoverKeriaAgentMock.mockImplementation(() =>
+        Promise.reject(new Error(Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT))
+      );
+
+      const history = createMemoryHistory();
+
+      const { getByText, getByTestId } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+        ).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.title)
+        ).toBeVisible();
+      });
+
+      expect(
+        getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.input.connect.label)
+      ).toBeVisible();
+
+      await inputValue(
+        getByTestId,
+        "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org"
+      );
+
+      act(() => {
+        fireEvent.click(getByTestId("primary-button-create-ssi-agent"));
+      });
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.error.invalidconnecturl)
+        ).toBeVisible();
+      });
+    });
+
+    test("Network error", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      recoverKeriaAgentMock.mockImplementation(() =>
+        Promise.reject(new Error(Agent.KERIA_BOOT_FAILED_BAD_NETWORK))
+      );
+
+      const history = createMemoryHistory();
+
+      const { getByText, getByTestId } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+        ).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.title)
+        ).toBeVisible();
+      });
+
+      expect(
+        getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.input.connect.label)
+      ).toBeVisible();
+
+      await inputValue(
+        getByTestId,
+        "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org"
+      );
+
+      act(() => {
+        fireEvent.click(getByTestId("primary-button-create-ssi-agent"));
+      });
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.error.unknownissue)
+        ).toBeVisible();
+      });
+    });
+
+    test("Connect success", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      const history = createMemoryHistory();
+      history.push(RoutePath.SSI_AGENT);
+
+      recoverKeriaAgentMock.mockImplementation(() => Promise.resolve());
+
+      const { getByText, getByTestId, queryByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <Route
+              component={CreateSSIAgent}
+              path={RoutePath.SSI_AGENT}
+            />
+            <Route
+              component={ProfileSetup}
+              path={RoutePath.PROFILE_SETUP}
+            />
+            <Route
+              component={Credentials}
+              path={TabsRoutePath.CREDENTIALS}
+            />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(getByText(EN_TRANSLATIONS.ssiagent.connect.title)).toBeVisible();
+      });
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+        ).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.title)
+        ).toBeVisible();
+      });
+
+      expect(
+        getByText(EN_TRANSLATIONS.ssiagent.advancedsetup.input.connect.label)
+      ).toBeVisible();
+
+      await inputValue(
+        getByTestId,
+        "https://dev.keria.cf-keripy.metadata.dev.cf-deployments.org"
+      );
+
+      act(() => {
+        fireEvent.click(getByTestId("primary-button-create-ssi-agent"));
+      });
+
+      await waitFor(() => {
+        expect(recoverKeriaAgentMock).toBeCalledWith(
+          initialState.seedPhraseCache.seedPhrase.split(" "),
+          connectUrl
+        );
+      });
+
+      await waitFor(() => {
+        expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+          expect.objectContaining({
+            id: MiscRecordId.IS_SETUP_PROFILE,
+            content: { value: true },
+          })
+        );
+      });
+
+      await waitFor(() => {
+        expect(createOrUpdateBasicRecordMock).toBeCalledWith(
+          expect.objectContaining({
+            id: MiscRecordId.INDIVIDUAL_FIRST_CREATE,
+            content: { value: true },
+          })
+        );
       });
     });
   });

@@ -60,7 +60,6 @@ const AdvancedSetting = ({
   const unknownError = errors.unknownError;
   const isInvalidBootUrl = errors.isInvalidBootUrl;
   const isInvalidConnectUrl = errors.isInvalidConnectUrl;
-
   const isRecoveryMode = stateCache.authentication.recoveryWalletProgress;
 
   const setConnectUrl = (connectUrl?: string) => {
@@ -153,8 +152,6 @@ const AdvancedSetting = ({
   })();
 
   const handleConnect = () => {
-    if (!ssiAgent.bootUrl || !ssiAgent.connectUrl) return;
-
     onSubmitForm(ssiAgent.bootUrl, ssiAgent.connectUrl);
   };
 
@@ -189,8 +186,8 @@ const AdvancedSetting = ({
       >
         {i18n.t(
           isRecoveryMode
-            ? "ssiagent.advancedsetup.description"
-            : "ssiagent.advancedsetup.description"
+            ? "ssiagent.advancedsetup.description.connect"
+            : "ssiagent.advancedsetup.description.bootconnect"
         )}
       </p>
       {!isRecoveryMode && (
