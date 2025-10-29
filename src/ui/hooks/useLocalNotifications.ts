@@ -185,11 +185,4 @@ export const useLocalNotifications = () => {
     getUnreadNotificationsFromOtherProfiles,
     cleanupShownNotifications,
   ]);
-
-  return {
-    showNotification: (notification: KeriaNotification) => {
-      displayNotification(notification);
-    },
-    requestPermissions: () => notificationService.requestPermissions(),
-  };
 };

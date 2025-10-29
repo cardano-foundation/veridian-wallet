@@ -38,6 +38,7 @@ jest.mock("../agent/agent", () => ({
         findById: jest.fn(),
         save: jest.fn(),
         deleteById: jest.fn(),
+        createOrUpdateBasicRecord: jest.fn(),
       },
     },
   },
@@ -79,6 +80,7 @@ describe("NotificationService", () => {
     mockBasicStorage.findById.mockResolvedValue(null);
     mockBasicStorage.save.mockResolvedValue({} as any);
     mockBasicStorage.deleteById.mockResolvedValue();
+    mockBasicStorage.createOrUpdateBasicRecord.mockResolvedValue();
   });
 
   describe("requestPermissions", () => {
@@ -111,17 +113,25 @@ describe("NotificationService", () => {
       const payload = {
         notificationId: "1",
         profileId: "profile-123",
-        type: "general" as const,
         title: "Test Notification",
         body: "Test body",
-        route: "/test",
+        timestamp: Date.now(),
       };
+
+      // Mock the processing to prevent actual scheduling
+      const processSpy = jest.spyOn(
+        notificationService as any,
+        "processNotificationQueue"
+      );
+      processSpy.mockResolvedValue(undefined);
 
       await notificationService.scheduleNotification(payload);
 
       const queue = (notificationService as any).notificationQueue;
       expect(queue.length).toBe(1);
-      expect(queue[0].payload).toEqual(payload);
+      expect(queue[0]).toEqual(payload);
+
+      processSpy.mockRestore();
     });
 
     test("should not enqueue when permissions not granted", async () => {
@@ -130,9 +140,9 @@ describe("NotificationService", () => {
       const payload = {
         notificationId: "1",
         profileId: "profile-123",
-        type: "general" as const,
         title: "Test Notification",
         body: "Test body",
+        timestamp: Date.now(),
       };
 
       await notificationService.scheduleNotification(payload);
@@ -181,20 +191,6 @@ describe("NotificationService", () => {
     });
   });
 
-  describe("clearAllDeliveredNotifications", () => {
-    test("should clear all delivered notifications", async () => {
-      (
-        LocalNotifications.removeAllDeliveredNotifications as jest.Mock
-      ).mockResolvedValue({});
-
-      await notificationService.clearAllDeliveredNotifications();
-
-      expect(
-        LocalNotifications.removeAllDeliveredNotifications
-      ).toHaveBeenCalled();
-    });
-  });
-
   describe("cancelNotification", () => {
     test("should cancel a specific notification", async () => {
       (LocalNotifications.cancel as jest.Mock).mockResolvedValue({});
@@ -230,7 +226,7 @@ describe("NotificationService", () => {
 
       await notificationService.cleanupShownNotifications(["active-id"]);
 
-      expect(mockBasicStorage.save).toHaveBeenCalledWith(
+      expect(mockBasicStorage.createOrUpdateBasicRecord).toHaveBeenCalledWith(
         expect.objectContaining({
           id: MiscRecordId.SHOWN_NOTIFICATIONS,
           content: { notificationIds: ["active-id"] },
@@ -250,7 +246,7 @@ describe("NotificationService", () => {
 
       await notificationService.markAsShown("42");
 
-      expect(mockBasicStorage.save).toHaveBeenCalledWith(
+      expect(mockBasicStorage.createOrUpdateBasicRecord).toHaveBeenCalledWith(
         expect.objectContaining({
           id: MiscRecordId.SHOWN_NOTIFICATIONS,
           content: { notificationIds: ["42"] },
@@ -420,7 +416,9 @@ describe("NotificationService", () => {
         },
       };
 
-      (notificationService as any).handleNotificationTap(notification);
+      (notificationService as any).debouncedProcessNotificationTap(
+        notification
+      );
 
       jest.advanceTimersByTime(100);
       jest.advanceTimersByTime(500);
@@ -438,7 +436,9 @@ describe("NotificationService", () => {
         extra: {},
       };
 
-      (notificationService as any).handleNotificationTap(notification);
+      (notificationService as any).debouncedProcessNotificationTap(
+        notification
+      );
 
       jest.advanceTimersByTime(100);
       jest.advanceTimersByTime(500);
@@ -458,8 +458,9 @@ describe("NotificationService", () => {
         },
       };
 
-      (notificationService as any).handleNotificationTap(notification);
-
+      (notificationService as any).debouncedProcessNotificationTap(
+        notification
+      );
       jest.advanceTimersByTime(100);
       jest.advanceTimersByTime(500);
 
@@ -553,7 +554,9 @@ describe("NotificationService", () => {
       (notificationService as any).navigator = null;
       (notificationService as any).profileSwitcher = null;
 
-      (notificationService as any).handleNotificationTap(notification);
+      (notificationService as any).debouncedProcessNotificationTap(
+        notification
+      );
 
       jest.advanceTimersByTime(100);
 
@@ -612,10 +615,11 @@ describe("NotificationService", () => {
       const notificationId = "test-notification-1";
 
       let savedNotifications: string[] = [];
-      mockBasicStorage.save.mockImplementation(async (record: any) => {
-        savedNotifications = record.content.notificationIds;
-        return record;
-      });
+      mockBasicStorage.createOrUpdateBasicRecord.mockImplementation(
+        async (record: any) => {
+          savedNotifications = record.content.notificationIds;
+        }
+      );
 
       mockBasicStorage.findById.mockImplementation(async (id: string) => {
         if (
@@ -651,10 +655,11 @@ describe("NotificationService", () => {
 
     test("should cleanup old shown notifications", async () => {
       let savedNotifications: string[] = [];
-      mockBasicStorage.save.mockImplementation(async (record: any) => {
-        savedNotifications = record.content.notificationIds;
-        return record;
-      });
+      mockBasicStorage.createOrUpdateBasicRecord.mockImplementation(
+        async (record: any) => {
+          savedNotifications = record.content.notificationIds;
+        }
+      );
 
       mockBasicStorage.findById.mockImplementation(async (id: string) => {
         if (
@@ -708,10 +713,12 @@ describe("NotificationService", () => {
       (notificationService as any).coldStartState = "IDLE";
       savedNotifications = [];
 
-      mockBasicStorage.save.mockImplementation(async (record: any) => {
-        savedNotifications = record.content.notificationIds;
-        return record;
-      });
+      mockBasicStorage.createOrUpdateBasicRecord.mockImplementation(
+        async (record: any) => {
+          savedNotifications = record.content.notificationIds;
+          return record;
+        }
+      );
 
       mockBasicStorage.findById.mockImplementation(async (id: string) => {
         if (

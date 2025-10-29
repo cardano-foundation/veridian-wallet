@@ -102,59 +102,18 @@ describe("useLocalNotifications", () => {
     mockSetProfileSwitchComplete.mockReturnValue(undefined);
   });
 
-  test("should return showNotification and requestPermissions functions", () => {
-    const { result } = renderHook(() => useLocalNotifications());
+  test("should set up notification service callbacks", () => {
+    const mockDispatch = jest.fn();
+    mockUseAppDispatch.mockReturnValue(mockDispatch);
 
-    expect(result.current.showNotification).toBeDefined();
-    expect(typeof result.current.showNotification).toBe("function");
-    expect(result.current.requestPermissions).toBeDefined();
-    expect(typeof result.current.requestPermissions).toBe("function");
-  });
+    renderHook(() => useLocalNotifications());
 
-  test("should call notificationService.showLocalNotification when showNotification is called", () => {
-    const { result } = renderHook(() => useLocalNotifications());
-
-    const mockNotification: KeriaNotification = {
-      id: "test-notification-id",
-      createdAt: "2024-01-01T00:00:00Z",
-      read: true,
-      a: {
-        r: "/notification/route",
-        m: "Test notification message",
-      },
-      connectionId: "test-connection-id",
-      groupReplied: false,
-      receivingPre: "test-receiving-pre",
-    };
-
-    act(() => {
-      result.current.showNotification(mockNotification);
-    });
-
-    expect(mockShowLocalNotification).toHaveBeenCalledWith(
-      mockNotification,
-      "test-profile-id",
-      "Test Profile",
-      expect.objectContaining({
-        connectionsCache: expect.any(Array),
-        multisigConnectionsCache: expect.any(Array),
-      })
+    expect(mockNotificationService.setProfileSwitcher).toHaveBeenCalledWith(
+      expect.any(Function)
     );
-    expect(mockShowLocalNotification).toHaveBeenCalledTimes(1);
-  });
-
-  test("should call notificationService.requestPermissions when requestPermissions is called", async () => {
-    const { result } = renderHook(() => useLocalNotifications());
-
-    mockRequestPermissions.mockResolvedValue(true);
-
-    let permissionsGranted;
-    await act(async () => {
-      permissionsGranted = await result.current.requestPermissions();
-    });
-
-    expect(mockRequestPermissions).toHaveBeenCalledTimes(1);
-    expect(permissionsGranted).toBe(true);
+    expect(mockNotificationService.setNavigator).toHaveBeenCalledWith(
+      expect.any(Function)
+    );
   });
 
   test("should show notifications for unread notifications from other profiles", async () => {
@@ -245,18 +204,6 @@ describe("useLocalNotifications", () => {
     renderHook(() => useLocalNotifications());
 
     expect(mockShowLocalNotification).not.toHaveBeenCalled();
-  });
-
-  test("should handle requestPermissions errors gracefully", async () => {
-    const { result } = renderHook(() => useLocalNotifications());
-
-    const testError = new Error("Permission denied");
-    mockRequestPermissions.mockRejectedValue(testError);
-
-    await expect(result.current.requestPermissions()).rejects.toThrow(
-      "Permission denied"
-    );
-    expect(mockRequestPermissions).toHaveBeenCalledTimes(1);
   });
 
   describe("cold start handling", () => {

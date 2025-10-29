@@ -6,49 +6,22 @@ import { TabsRoutePath } from "../../routes/paths";
 import { showError } from "../../ui/utils/error";
 import { Agent } from "../agent/agent";
 import { MiscRecordId } from "../agent/agent.types";
+import { BasicRecord } from "../agent/records";
 import {
   NotificationContext,
   getNotificationDisplayTextForPush,
 } from "./notificationUtils";
-
-enum ColdStartState {
-  IDLE = "IDLE",
-  PROCESSING = "PROCESSING",
-  READY = "READY",
-}
-
-interface NotificationMetrics {
-  totalScheduled: number;
-  totalTapped: number;
-  lastError?: string;
-}
-
-interface QueuedNotification {
-  payload: NotificationPayload;
-  timestamp: number;
-}
-
-export interface NotificationPayload {
-  notificationId: string;
-  profileId: string;
-  title: string;
-  body: string;
-}
-
-interface LocalNotification {
-  id: number;
-  extra?: {
-    profileId?: string;
-    [key: string]: unknown;
-  };
-}
+import {
+  ColdStartState,
+  NotificationPayload,
+  LocalNotification,
+} from "./notificationService.types";
 
 class NotificationService {
   private profileSwitcher: ((profileId: string) => void) | null = null;
   private navigator: ((path: string, notificationId?: string) => void) | null =
     null;
-  private metrics: NotificationMetrics = { totalScheduled: 0, totalTapped: 0 };
-  private notificationQueue: QueuedNotification[] = [];
+  private notificationQueue: NotificationPayload[] = [];
   private processingQueue = false;
   private permissionsGranted = false;
   private pendingColdStartNotification: {
@@ -63,12 +36,10 @@ class NotificationService {
   private readonly NAVIGATION_DELAY_MS = 500;
   private readonly COLD_START_DELAY_MS = 1000;
   private readonly DEBOUNCE_DELAY_MS = 100;
-  private readonly QUEUE_PROCESS_INTERVAL_MS = 1000;
   private readonly COLD_START_SUPPRESSION_MS = 2000;
 
   constructor() {
     this.initialize();
-    this.startQueueProcessor();
   }
 
   setProfileSwitcher(profileSwitcher: (profileId: string) => void) {
@@ -89,7 +60,9 @@ class NotificationService {
     LocalNotifications.addListener(
       "localNotificationActionPerformed",
       (event) => {
-        this.handleNotificationTap(event.notification);
+        this.debouncedProcessNotificationTap(
+          event.notification as LocalNotification
+        );
       }
     );
   }
@@ -113,7 +86,7 @@ class NotificationService {
         vibration: true,
       });
     } catch (error) {
-      this.updateMetricsOnError("Failed to create notification channel");
+      showError("Failed to create notification channel", error);
     }
   }
 
@@ -124,33 +97,40 @@ class NotificationService {
 
       return this.permissionsGranted;
     } catch (error) {
-      this.updateMetricsOnError("Failed to request permissions");
       showError("Failed to request notification permissions", error);
       return false;
     }
   }
 
-  private async isAppInForeground(): Promise<boolean> {
-    try {
-      const state = await App.getState();
-      return state.isActive;
-    } catch (error) {
-      return true;
-    }
-  }
-
   async scheduleNotification(payload: NotificationPayload): Promise<void> {
     if (!this.permissionsGranted) {
-      this.updateMetricsOnError("Permissions not granted");
       return;
     }
 
-    const queuedNotification: QueuedNotification = {
-      payload,
-      timestamp: Date.now(),
-    };
+    const existingIndex = this.notificationQueue.findIndex(
+      (queued) => queued.notificationId === payload.notificationId
+    );
 
-    this.notificationQueue.push(queuedNotification);
+    if (existingIndex !== -1) {
+      if (
+        this.notificationQueue[existingIndex].timestamp !== payload.timestamp
+      ) {
+        this.notificationQueue[existingIndex] = payload;
+      }
+      return;
+    }
+
+    const insertIndex = this.notificationQueue.findIndex(
+      (queued) => queued.timestamp > payload.timestamp
+    );
+
+    if (insertIndex === -1) {
+      this.notificationQueue.push(payload);
+    } else {
+      this.notificationQueue.splice(insertIndex, 0, payload);
+    }
+
+    this.processNotificationQueue();
   }
 
   async showLocalNotification(
@@ -159,9 +139,13 @@ class NotificationService {
     profileDisplayName: string,
     context?: NotificationContext
   ): Promise<void> {
-    const isAppActive = await this.isAppInForeground();
-    if (!isAppActive) {
-      return;
+    try {
+      const state = await App.getState();
+      if (!state.isActive) {
+        return;
+      }
+    } catch (error) {
+      showError("Can't determine app state", error);
     }
 
     if (this.coldStartState === ColdStartState.PROCESSING) {
@@ -189,51 +173,18 @@ class NotificationService {
       return;
     }
 
-    const payload = this.mapKeriaNotificationToPayload(
-      keriaNotification,
-      profileDisplayName,
-      context
-    );
+    const payload: NotificationPayload = {
+      notificationId: keriaNotification.id,
+      profileId: keriaNotification.receivingPre,
+      title: profileDisplayName,
+      body: getNotificationDisplayTextForPush(keriaNotification, context),
+      timestamp: new Date(keriaNotification.createdAt).getTime(),
+    };
 
     if (payload) {
       await this.scheduleNotification(payload);
       await this.markNotificationAsShown(keriaNotification.id);
     }
-  }
-
-  private mapKeriaNotificationToPayload(
-    notification: KeriaNotification,
-    profileDisplayName: string,
-    context?: NotificationContext
-  ): NotificationPayload | null {
-    const title = this.getNotificationTitle(notification, profileDisplayName);
-    const body = this.getNotificationBody(notification, context);
-
-    return {
-      notificationId: notification.id,
-      profileId: notification.receivingPre,
-      title,
-      body,
-    };
-  }
-
-  private getNotificationTitle(
-    _notification: KeriaNotification,
-    profileDisplayName: string
-  ): string {
-    return profileDisplayName;
-  }
-
-  private getNotificationBody(
-    notification: KeriaNotification,
-    context?: NotificationContext
-  ): string {
-    return getNotificationDisplayTextForPush(notification, context);
-  }
-
-  private handleNotificationTap(notification: LocalNotification): void {
-    this.metrics.totalTapped++;
-    this.debouncedProcessNotificationTap(notification);
   }
 
   private debouncedProcessNotificationTap = this.debounce(
@@ -246,7 +197,7 @@ class NotificationService {
   private async processNotificationTap(
     notification: LocalNotification
   ): Promise<void> {
-    const extra = notification.extra || {};
+    const extra = notification.extra;
     const profileId = extra.profileId;
 
     const handlersReady =
@@ -278,7 +229,6 @@ class NotificationService {
         try {
           this.navigator(TabsRoutePath.NOTIFICATIONS, String(notification.id));
         } catch (error) {
-          this.updateMetricsOnError("Navigation failed");
           showError("Failed to navigate via navigator", error);
           window.location.hash = TabsRoutePath.NOTIFICATIONS;
         }
@@ -288,30 +238,14 @@ class NotificationService {
     }, this.NAVIGATION_DELAY_MS);
   }
 
-  async clearAllDeliveredNotifications(): Promise<void> {
-    try {
-      await LocalNotifications.removeAllDeliveredNotifications();
-    } catch (error) {
-      this.updateMetricsOnError("Failed to clear notifications");
-      showError("Failed to clear delivered notifications", error);
-    }
-  }
-
   async cancelNotification(notificationId: string): Promise<void> {
     try {
       await LocalNotifications.cancel({
         notifications: [{ id: parseInt(notificationId) }],
       });
     } catch (error) {
-      this.updateMetricsOnError("Failed to cancel notification");
       showError("Failed to cancel notification", error);
     }
-  }
-
-  private startQueueProcessor(): void {
-    setInterval(() => {
-      this.processNotificationQueue();
-    }, this.QUEUE_PROCESS_INTERVAL_MS);
   }
 
   private async processNotificationQueue(): Promise<void> {
@@ -322,12 +256,14 @@ class NotificationService {
     this.processingQueue = true;
 
     try {
-      const queuedNotification = this.notificationQueue.shift();
-      if (queuedNotification) {
-        await this.scheduleNotificationImmediately(queuedNotification.payload);
+      while (this.notificationQueue.length > 0) {
+        const payload = this.notificationQueue.shift();
+        if (payload) {
+          await this.scheduleNotificationImmediately(payload);
+        }
       }
     } catch (error) {
-      this.updateMetricsOnError("Queue processing failed");
+      showError("Queue processing failed", error);
     } finally {
       this.processingQueue = false;
     }
@@ -353,17 +289,12 @@ class NotificationService {
             largeIcon: "res://drawable/notification_icon",
             smallIcon: "res://drawable/notification_small",
             iconColor: "#4630EB",
-            ongoing: false,
-            autoCancel: true,
             channelId: "veridian-notifications",
           },
         ],
       });
-
-      this.metrics.totalScheduled++;
     } catch (error) {
-      this.updateMetricsOnError("Failed to schedule notification");
-      throw error;
+      showError("Failed to schedule notification", error);
     }
   }
 
@@ -373,21 +304,15 @@ class NotificationService {
     try {
       const delivered = await LocalNotifications.getDeliveredNotifications();
       const toCancel = delivered.notifications
-        .filter((n) => n.extra?.profileId === profileId)
+        .filter((n) => n.extra.profileId === profileId)
         .map((n) => ({ id: n.id }));
 
       if (toCancel.length > 0) {
         await LocalNotifications.cancel({ notifications: toCancel });
       }
     } catch (error) {
-      this.updateMetricsOnError(
-        "Failed to clear delivered notifications for profile"
-      );
+      showError("Failed to clear delivered notifications for profile", error);
     }
-  }
-
-  private updateMetricsOnError(error: string): void {
-    this.metrics.lastError = error;
   }
 
   private debounce<T extends unknown[]>(
@@ -401,16 +326,11 @@ class NotificationService {
     };
   }
 
-  getMetrics(): NotificationMetrics {
-    return { ...this.metrics };
-  }
-
   async getActiveNotifications(): Promise<LocalNotification[]> {
     try {
       const result = await LocalNotifications.getPending();
-      return result.notifications;
+      return result.notifications as LocalNotification[];
     } catch (error) {
-      this.updateMetricsOnError("Failed to get active notifications");
       return [];
     }
   }
@@ -418,9 +338,8 @@ class NotificationService {
   async getDeliveredNotifications(): Promise<LocalNotification[]> {
     try {
       const result = await LocalNotifications.getDeliveredNotifications();
-      return result.notifications;
+      return result.notifications as LocalNotification[];
     } catch (error) {
-      this.updateMetricsOnError("Failed to get delivered notifications");
       return [];
     }
   }
@@ -439,35 +358,35 @@ class NotificationService {
   }
 
   private async getShownNotifications(): Promise<Set<string>> {
-    try {
-      const shownRecord = await Agent.agent.basicStorage.findById(
-        MiscRecordId.SHOWN_NOTIFICATIONS
-      );
-      if (shownRecord && shownRecord.content.notificationIds) {
-        const notificationIds = shownRecord.content.notificationIds as string[];
+    const shownRecord = await Agent.agent.basicStorage.findById(
+      MiscRecordId.SHOWN_NOTIFICATIONS
+    );
+
+    if (shownRecord?.content?.notificationIds) {
+      const notificationIds = shownRecord.content.notificationIds;
+      if (
+        Array.isArray(notificationIds) &&
+        notificationIds.every((id) => typeof id === "string")
+      ) {
         return new Set<string>(notificationIds);
       }
-      return new Set<string>();
-    } catch (error) {
-      return new Set<string>();
     }
+
+    return new Set<string>();
   }
 
   private async saveShownNotifications(
     shownNotifications: Set<string>
   ): Promise<void> {
-    try {
-      const arrayToSave = Array.from(shownNotifications);
+    const arrayToSave = Array.from(shownNotifications);
 
-      const content = { notificationIds: arrayToSave };
-      await Agent.agent.basicStorage.save({
-        id: MiscRecordId.SHOWN_NOTIFICATIONS,
-        content,
-        tags: { type: "shown_notifications" },
-      });
-    } catch (error) {
-      this.updateMetricsOnError("Failed to save shown notifications");
-    }
+    const record = new BasicRecord({
+      id: MiscRecordId.SHOWN_NOTIFICATIONS,
+      content: { notificationIds: arrayToSave },
+      tags: { type: "shown_notifications" },
+    });
+
+    await Agent.agent.basicStorage.createOrUpdateBasicRecord(record);
   }
 
   private async markNotificationAsShown(notificationId: string): Promise<void> {
@@ -475,14 +394,7 @@ class NotificationService {
     shownNotifications.add(notificationId);
     await this.saveShownNotifications(shownNotifications);
 
-    if (!isNaN(Number(notificationId))) {
-      try {
-        await this.cancelNotification(notificationId);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn("Failed to cancel notification:", error);
-      }
-    }
+    await this.cancelNotification(notificationId);
   }
 
   private async isNotificationAlreadyShown(
@@ -503,8 +415,7 @@ class NotificationService {
         return true;
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.warn("Failed to check delivered notifications:", error);
+      showError("Failed to check delivered notifications:", error);
     }
 
     return false;
@@ -524,7 +435,7 @@ class NotificationService {
         MiscRecordId.SHOWN_NOTIFICATIONS
       );
     } catch (error) {
-      this.updateMetricsOnError("Failed to clear shown notifications");
+      showError("Failed to clear shown notifications", error);
     }
   }
 
@@ -572,7 +483,6 @@ class NotificationService {
           try {
             this.navigator(TabsRoutePath.NOTIFICATIONS, data.notificationId);
           } catch (error) {
-            this.updateMetricsOnError("Cold start navigation failed");
             showError("Failed to navigate via navigator", error);
             window.location.hash = TabsRoutePath.NOTIFICATIONS;
           }
