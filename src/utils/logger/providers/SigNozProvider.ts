@@ -66,7 +66,12 @@ export class SigNozProvider extends CloudLoggingAdapter {
         });
     }
 
-    await this.loggerProvider.forceFlush();
+    try {
+      await this.loggerProvider.forceFlush();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("SigNozProvider: forceFlush failed:", error);
+    }
   }
 
   private sanitizeAttributes(context: Record<string, unknown> | undefined): AnyValueMap {
