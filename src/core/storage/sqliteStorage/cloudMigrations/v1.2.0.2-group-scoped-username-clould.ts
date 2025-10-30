@@ -1,10 +1,11 @@
-import { formatToV1_2_0_3, parseHabName } from "../../../utils/habName";
+
+import { formatToV1_2_0_2, parseHabName } from "../../../utils/habName";
 import { logger } from "../../../../utils/logger/Logger";
 import { CloudMigration } from "./cloudMigrations.types";
 
-const migrationVersion = "1.2.0.3";
+const migrationVersion = "1.2.0.2";
 
-export const CLOUD_V1203: CloudMigration = {
+export const CLOUD_V1202: CloudMigration = {
   version: migrationVersion,
   cloudMigrationStatements: async (signifyClient) => {
     logger.info(`Starting cloud migration for v${migrationVersion}...`);
@@ -48,7 +49,7 @@ export const CLOUD_V1203: CloudMigration = {
           `[v${migrationVersion}] Updating cloud identifier: ${currentName} (${identifier.prefix})`
         );
 
-        const newName = formatToV1_2_0_3({
+        const newName = formatToV1_2_0_2({
           ...parts,
           groupMetadata: parts.groupMetadata,
         });

@@ -1,8 +1,8 @@
 import { TapJacking } from "@capacitor-community/tap-jacking";
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { Device } from "@capacitor/device";
-import { ReactNode, useCallback, useEffect, useState } from "react";
 import { NativeBiometric } from "@capgo/capacitor-native-biometric";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
@@ -30,22 +30,19 @@ import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { setEnableBiometricsCache } from "../../../store/reducers/biometricsCache";
 import {
-  setConnectionsCache,
-  setMultisigConnectionsCache,
-  updateOrAddConnectionCache,
   DAppConnection,
+  getConnectedDApp,
   Profile,
-  setCredsArchivedCache,
+  setConnectedDApp,
   setCurrentProfile,
   setIndividualFirstCreate,
+  setIsConnectingToDApp,
+  setPendingDAppConnection,
   setProfiles,
+  updateOrAddConnectionCache,
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
   updateRecentProfiles,
-  getConnectedDApp,
-  setConnectedDApp,
-  setPendingDAppConnection,
-  setIsConnectingToDApp,
 } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
@@ -79,6 +76,7 @@ import {
 } from "../../../store/reducers/viewTypeCache";
 import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
 import { OperationType, ToastMsgType } from "../../globals/types";
+import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
 import { useProfile } from "../../hooks/useProfile";
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
 import { showError } from "../../utils/error";
@@ -93,7 +91,6 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
-import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
 import { logSyncService, SyncMode } from "../../../core/services/LogSyncService";
 import { logger } from "../../../utils/logger/Logger";
 import { formatErrorContext } from "../../../utils/logger/loggerUtils";
@@ -462,7 +459,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
             allMultisigConnections as MultisigConnectionDetails[],
             storedPeerConnections,
             notifications,
-            identifier.id
+            identifier
           );
 
           acc[identifier.id] = {
@@ -518,17 +515,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
       dispatch(setProfiles(profiles));
       dispatch(setCurrentProfile(currentProfileAid));
-      dispatch(setCredsArchivedCache(credsArchivedCache));
-      dispatch(
-        setConnectionsCache(allConnections as RegularConnectionDetails[])
-      );
-      dispatch(
-        setMultisigConnectionsCache(
-          allMultisigConnections as MultisigConnectionDetails[]
-        )
-      );
-
-      // TODO: set current profile data
     } catch (e) {
       logger.error("Failed to load database data:", formatErrorContext(e));
       showError("Failed to load database data", e, dispatch);

@@ -3,9 +3,9 @@ import { logger } from "../../../../utils/logger/Logger";
 import { MigrationType, LocalMigration } from "./migrations.types";
 import { createInsertItemTagsStatements } from "./migrationUtils";
 
-const migrationVersion = "1.2.0.3";
+const migrationVersion = "1.2.0.2";
 
-export const MIGRATION_V1203: LocalMigration = {
+export const DATA_V1202: LocalMigration = {
   version: migrationVersion,
   type: MigrationType.TS,
   migrationStatements: async (session: SQLiteDBConnection) => {

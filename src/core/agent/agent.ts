@@ -353,8 +353,8 @@ class Agent {
   }
 
   async syncWithKeria() {
-    await this.connections.syncKeriaContacts();
     await this.identifiers.syncKeriaIdentifiers();
+    await this.connections.syncKeriaContacts();
     await this.credentials.syncKeriaCredentials();
 
     await this.basicStorage.createOrUpdateBasicRecord(

@@ -1,14 +1,10 @@
 import { IonButton, IonIcon } from "@ionic/react";
-import { pencilOutline, star } from "ionicons/icons";
+import { pencilOutline } from "ionicons/icons";
 import { i18n } from "../../../../../i18n";
-import {
-  CardBlock,
-  CardDetailsItem,
-  FlatBorderType,
-} from "../../../CardDetails";
+import { CardBlock, FlatBorderType } from "../../../CardDetails";
 import { ListHeader } from "../../../ListHeader";
+import { MemberList } from "../../../MemberList";
 import { ListProps } from "./IdentifierAttributeDetailModal.types";
-import { FallbackIcon } from "../../../FallbackIcon";
 
 const List = ({
   data,
@@ -41,30 +37,12 @@ const List = ({
         className="list-item"
         flatBorder={FlatBorderType.TOP}
       >
-        {data.map((item, index) => {
-          return (
-            <CardDetailsItem
-              key={index}
-              info={item.title}
-              startSlot={
-                item.avatar ? item.avatar : <FallbackIcon src={item.image} />
-              }
-              className="member"
-              testId={`group-member-${item.title}`}
-              mask={mask}
-              fullText={fullText}
-              endSlot={
-                item.isCurrentUser && (
-                  <div className="user-label">
-                    <IonIcon icon={star} />
-                    <span>{i18n.t("profiledetails.detailsmodal.you")}</span>
-                  </div>
-                )
-              }
-            />
-          );
-        })}
-        <p className="bottom-text">{bottomText}</p>
+        <MemberList
+          members={data}
+          bottomText={bottomText}
+          mask={mask}
+          fullText={fullText}
+        />
       </CardBlock>
     </>
   );

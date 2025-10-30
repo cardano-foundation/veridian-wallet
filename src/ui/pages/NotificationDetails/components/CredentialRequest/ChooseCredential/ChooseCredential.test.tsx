@@ -1,28 +1,28 @@
 const verifySecretMock = jest.fn().mockResolvedValue(true);
 
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import { fireEvent, render, waitFor, act } from "@testing-library/react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
-import { KeriaNotification } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { CredentialStatus } from "../../../../../../core/agent/services/credentialService.types";
+import { KeriaNotification } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { KeyStoreKeys, SecureStorage } from "../../../../../../core/storage";
 import EN_TRANSLATIONS from "../../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../../routes/paths";
 import { connectionsForNotificationsValues } from "../../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../../__fixtures__/credRequestFix";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
+import { revokedCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
 import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
+import { profileCacheFixData } from "../../../../../__fixtures__/storeDataFix";
 import {
   formatShortDate,
   formatTimeToSec,
 } from "../../../../../utils/formatters";
+import { makeTestStore } from "../../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { ACDC } from "../CredentialRequest.types";
 import { ChooseCredential } from "./ChooseCredential";
-import { makeTestStore } from "../../../../../utils/makeTestStore";
-import { profileCacheFixData } from "../../../../../__fixtures__/storeDataFix";
-import { revokedCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
 
 const deleteNotificationMock = jest.fn((id: string) => Promise.resolve(id));
 const offerAcdcFromApplyMock = jest.fn(
@@ -130,6 +130,7 @@ describe("Credential request - choose request", () => {
 
     const history = createMemoryHistory();
 
+    const onSubmitFn = jest.fn();
     const { getByText, getByTestId, getAllByText } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter history={history}>
@@ -137,9 +138,9 @@ describe("Credential request - choose request", () => {
             pageId="multi-sign"
             activeStatus
             onBack={jest.fn()}
-            onClose={jest.fn()}
-            notificationDetails={notificationsFix[4]}
+            onSubmit={onSubmitFn}
             credentialRequest={credRequestFix}
+            notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
             linkedGroup={null}
           />
@@ -149,10 +150,10 @@ describe("Credential request - choose request", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
+        getAllByText(
           EN_TRANSLATIONS.tabs.notifications.details.credential.request
             .choosecredential.title
-        )
+        )[0]
       ).toBeVisible();
     });
 
@@ -214,16 +215,17 @@ describe("Credential request - choose request", () => {
 
     const history = createMemoryHistory();
 
-    const { getByText, getByTestId } = render(
+    const onSubmitFn = jest.fn();
+    const { getAllByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter history={history}>
           <ChooseCredential
             pageId="multi-sign"
             activeStatus
             onBack={jest.fn()}
-            onClose={jest.fn()}
-            notificationDetails={notificationsFix[4]}
+            onSubmit={onSubmitFn}
             credentialRequest={credRequestFix}
+            notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
             linkedGroup={null}
           />
@@ -233,10 +235,10 @@ describe("Credential request - choose request", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
+        getAllByText(
           EN_TRANSLATIONS.tabs.notifications.details.credential.request
             .choosecredential.title
-        )
+        )[0]
       ).toBeVisible();
     });
 
@@ -278,7 +280,8 @@ describe("Credential request - choose request", () => {
     const history = createMemoryHistory();
     history.push(path);
 
-    const { getByText, getByTestId } = render(
+    const onSubmitFn = jest.fn();
+    const { getAllByText, getByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter
           initialEntries={[path]}
@@ -288,9 +291,9 @@ describe("Credential request - choose request", () => {
             pageId="multi-sign"
             activeStatus
             onBack={jest.fn()}
-            onClose={jest.fn()}
-            notificationDetails={notificationsFix[4]}
+            onSubmit={onSubmitFn}
             credentialRequest={credRequestFix}
+            notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
             linkedGroup={null}
           />
@@ -300,10 +303,10 @@ describe("Credential request - choose request", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
+        getAllByText(
           EN_TRANSLATIONS.tabs.notifications.details.credential.request
             .choosecredential.title
-        )
+        )[0]
       ).toBeVisible();
     });
 
@@ -414,7 +417,8 @@ describe("Credential request - choose request", () => {
     const history = createMemoryHistory();
     history.push(path);
 
-    const { getByText, getByTestId } = render(
+    const onSubmitFn = jest.fn();
+    const { getAllByText, getByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter
           initialEntries={[path]}
@@ -424,9 +428,9 @@ describe("Credential request - choose request", () => {
             pageId="multi-sign"
             activeStatus
             onBack={jest.fn()}
-            onClose={jest.fn()}
-            notificationDetails={notificationsFix[4]}
+            onSubmit={onSubmitFn}
             credentialRequest={credRequestFix}
+            notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
             linkedGroup={null}
           />
@@ -436,10 +440,10 @@ describe("Credential request - choose request", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
+        getAllByText(
           EN_TRANSLATIONS.tabs.notifications.details.credential.request
             .choosecredential.title
-        )
+        )[0]
       ).toBeVisible();
     });
 
@@ -478,14 +482,7 @@ describe("Credential request - choose request", () => {
       );
     });
 
-    await waitFor(() => {
-      expect(getByTestId("credential-request-spinner-container")).toBeVisible();
-    });
-
-    expect(offerAcdcFromApplyMock).toBeCalledWith(
-      notificationsFix[4].id,
-      credRequestFix.credentials[0].acdc
-    );
+    expect(onSubmitFn).toBeCalledWith(credRequestFix.credentials[0]);
   });
 });
 
@@ -534,16 +531,17 @@ describe("Credential request - choose request", () => {
 
     const history = createMemoryHistory();
 
-    const { getByText, getByTestId } = render(
+    const onSubmitFn = jest.fn();
+    const { getAllByText, getByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter history={history}>
           <ChooseCredential
             pageId="multi-sign"
             activeStatus
             onBack={jest.fn()}
-            onClose={jest.fn()}
-            notificationDetails={notificationsFix[4]}
+            onSubmit={onSubmitFn}
             credentialRequest={credMock}
+            notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
             linkedGroup={null}
           />
@@ -553,10 +551,10 @@ describe("Credential request - choose request", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
+        getAllByText(
           EN_TRANSLATIONS.tabs.notifications.details.credential.request
             .choosecredential.title
-        )
+        )[0]
       ).toBeVisible();
     });
 
