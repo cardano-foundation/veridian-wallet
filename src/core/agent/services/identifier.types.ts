@@ -29,7 +29,6 @@ interface IdentifierShortDetails {
   groupMetadata?: GroupMetadata;
   groupMemberPre?: string;
   groupUsername?: string;
-  groupId?: string;
 }
 
 interface IdentifierDetails extends IdentifierShortDetails {

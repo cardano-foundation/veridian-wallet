@@ -335,8 +335,7 @@ export const ProfileSetup = ({
         Object.values(profiles).some(
           (profile) =>
             profile.identity.id === scanGroupId ||
-            (profile.identity.groupId ??
-              profile.identity.groupMetadata?.groupId) === scanGroupId
+            profile.identity.groupMetadata?.groupId === scanGroupId
         )
       ) {
         handleCloseScan();

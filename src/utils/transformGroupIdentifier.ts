@@ -20,9 +20,6 @@ export function transformGroupIdentifier(
       groupMetadata: input.groupMemberPre ? undefined : input.groupMetadata,
       groupMemberPre: input.groupMemberPre,
       groupUsername: input.groupUsername ?? (input.di ? "" : undefined),
-      groupId: input.groupMemberPre
-        ? input.groupId
-        : input.groupMetadata?.groupId,
     },
   };
 

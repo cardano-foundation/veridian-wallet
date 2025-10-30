@@ -118,29 +118,6 @@ class IdentifierService extends AgentService {
       : await this.identifierStorage.getIdentifierRecords();
 
     for (const metadata of records) {
-      let groupUsername = metadata.groupMetadata?.proposedUsername ?? undefined;
-      let groupId = metadata.groupMetadata?.groupId;
-
-      if (metadata.groupMemberPre) {
-        try {
-          const memberMetadata =
-            await this.identifierStorage.getIdentifierMetadata(
-              metadata.groupMemberPre
-            );
-          groupUsername =
-            memberMetadata.groupMetadata?.proposedUsername ?? groupUsername;
-          groupId = memberMetadata.groupMetadata?.groupId ?? groupId;
-        } catch (error) {
-          if (
-            !(error instanceof Error) ||
-            error.message !==
-              IdentifierStorage.IDENTIFIER_METADATA_RECORD_MISSING
-          ) {
-            throw error;
-          }
-        }
-      }
-
       const groupMetadata = metadata.groupMemberPre
         ? undefined
         : metadata.groupMetadata;
@@ -153,8 +130,7 @@ class IdentifierService extends AgentService {
         creationStatus: metadata.creationStatus ?? false,
         groupMetadata,
         groupMemberPre: metadata.groupMemberPre,
-        groupUsername,
-        groupId,
+        groupUsername: metadata.groupUsername,
       });
     }
     return identifiers;
@@ -193,28 +169,6 @@ class IdentifierService extends AgentService {
       ).signing.map((member: { aid: string }) => member.aid);
     }
 
-    let groupUsername = metadata.groupMetadata?.proposedUsername ?? undefined;
-    let groupId = metadata.groupMetadata?.groupId;
-
-    if (metadata.groupMemberPre) {
-      try {
-        const memberMetadata =
-          await this.identifierStorage.getIdentifierMetadata(
-            metadata.groupMemberPre
-          );
-        groupUsername =
-          memberMetadata.groupMetadata?.proposedUsername ?? groupUsername;
-        groupId = memberMetadata.groupMetadata?.groupId ?? groupId;
-      } catch (error) {
-        if (
-          !(error instanceof Error) ||
-          error.message !== IdentifierStorage.IDENTIFIER_METADATA_RECORD_MISSING
-        ) {
-          throw error;
-        }
-      }
-    }
-
     const groupMetadata = metadata.groupMemberPre
       ? undefined
       : metadata.groupMetadata;
@@ -227,8 +181,7 @@ class IdentifierService extends AgentService {
       groupMemberPre: metadata.groupMemberPre,
       creationStatus: metadata.creationStatus,
       groupMetadata,
-      groupUsername,
-      groupId,
+      groupUsername: metadata.groupUsername,
       s: hab.state.s,
       dt: hab.state.dt,
       kt: hab.state.kt,
@@ -659,6 +612,7 @@ class IdentifierService extends AgentService {
       );
 
       return this.identifierStorage.updateIdentifierMetadata(identifier, {
+        groupUsername: username,
         groupMetadata: undefined,
       });
     }

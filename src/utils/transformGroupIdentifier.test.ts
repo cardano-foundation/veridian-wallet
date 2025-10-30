@@ -36,7 +36,6 @@ describe("transformGroupIdentifier", () => {
         groupMetadata: undefined,
         groupMemberPre: "ELUXM-ajSu0o1qyFvss-3QQfkj3DOke9aHNwt72Byi9y",
         groupUsername: "",
-        groupId: "test-group-id",
       },
     };
 
@@ -71,7 +70,6 @@ describe("transformGroupIdentifier", () => {
         groupMetadata: undefined,
         groupMemberPre: undefined,
         groupUsername: undefined,
-        groupId: undefined,
       },
     };
 

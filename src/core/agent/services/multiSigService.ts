@@ -194,6 +194,7 @@ class MultiSigService extends AgentService {
         theme: mHabRecord.theme,
         creationStatus,
         groupMemberPre: memberPrefix,
+        groupUsername: mHabRecord.groupMetadata.proposedUsername,
         createdAt: new Date(multisigDetail.icp_dt),
       });
     } catch (error) {
@@ -224,9 +225,7 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: memberPrefix,
           createdAtUTC: multisigDetail.icp_dt,
-          groupMetadata: undefined,
           groupUsername: mHabRecord.groupMetadata.proposedUsername,
-          groupId: mHabRecord.groupMetadata.groupId,
         },
       },
     });
@@ -569,6 +568,7 @@ class MultiSigService extends AgentService {
         theme: mHabRecord.theme,
         creationStatus,
         groupMemberPre: mHabRecord.id,
+        groupUsername: mHabRecord.groupMetadata.proposedUsername,
         createdAt: new Date(multisigDetail.icp_dt),
       });
     } catch (error) {
@@ -599,9 +599,7 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: mHabRecord.id,
           createdAtUTC: multisigDetail.icp_dt,
-          groupMetadata: undefined,
           groupUsername: mHabRecord.groupMetadata.proposedUsername,
-          groupId: mHabRecord.groupMetadata.groupId,
         },
       },
     });

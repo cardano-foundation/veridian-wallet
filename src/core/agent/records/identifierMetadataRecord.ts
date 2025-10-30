@@ -17,6 +17,7 @@ interface IdentifierMetadataRecordProps {
   theme: number;
   groupMemberPre?: string;
   groupMetadata?: GroupMetadata;
+  groupUsername?: string;
   pendingDeletion?: boolean;
   sxlt?: string;
   tags?: Tags;
@@ -30,6 +31,7 @@ class IdentifierMetadataRecord extends BaseRecord {
   pendingDeletion!: boolean;
   groupMemberPre?: string;
   groupMetadata?: GroupMetadata;
+  groupUsername?: string;
   sxlt?: string;
 
   static readonly type = "IdentifierMetadataRecord";
@@ -47,6 +49,7 @@ class IdentifierMetadataRecord extends BaseRecord {
       this.isDeleted = props.isDeleted ?? false;
       this.groupMetadata = props.groupMetadata;
       this.groupMemberPre = props.groupMemberPre;
+      this.groupUsername = props.groupUsername;
       this.pendingDeletion = props.pendingDeletion ?? false;
       this.sxlt = props.sxlt;
       this._tags = props.tags ?? {};

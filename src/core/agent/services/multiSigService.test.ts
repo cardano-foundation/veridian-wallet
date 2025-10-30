@@ -508,9 +508,7 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberPrefix,
           theme: 0,
-          groupMetadata: undefined,
           groupUsername: "testUser",
-          groupId: "groupid",
         },
       },
     });
@@ -699,9 +697,7 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberPrefix,
           theme: 0,
-          groupMetadata: undefined,
           groupUsername: "testUser",
-          groupId: "groupid",
         },
       },
     });
@@ -824,9 +820,7 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberPrefix,
           theme: 0,
-          groupMetadata: undefined,
           groupUsername: "testUser",
-          groupId: "groupid",
         },
       },
     });
@@ -999,9 +993,7 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberMetadataRecord.id,
           theme: 0,
-          groupMetadata: undefined,
           groupUsername: "testUser",
-          groupId: "groupid",
         },
       },
     });
@@ -1133,9 +1125,7 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberMetadataRecord.id,
           theme: 0,
-          groupMetadata: undefined,
           groupUsername: "testUser",
-          groupId: "groupid",
         },
       },
     });
@@ -1246,9 +1236,7 @@ describe("Creation of multi-sig", () => {
           createdAtUTC: "2024-08-10T07:23:54.839894+00:00",
           groupMemberPre: memberMetadataRecord.id,
           theme: 0,
-          groupMetadata: undefined,
           groupUsername: "testUser",
-          groupId: "groupid",
         },
       },
     });
@@ -1583,7 +1571,9 @@ describe("Creation of multi-sig", () => {
             theme: 0,
             groupMetadata: {
               groupId: "test-group-id",
+              groupInitiator: true,
               groupCreated: false,
+              proposedUsername: "testUser",
             },
           },
         ]),

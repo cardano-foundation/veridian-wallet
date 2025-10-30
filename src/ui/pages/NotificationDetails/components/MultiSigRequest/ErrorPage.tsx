@@ -44,8 +44,7 @@ const ErrorPage = ({
         : undefined;
 
     const identifier = Object.values(profiles).find((item) => {
-      const profileGroupId =
-        item.identity.groupId ?? item.identity.groupMetadata?.groupId;
+      const profileGroupId = item.identity.groupMetadata?.groupId;
       return profileGroupId === multiSignGroupId;
     });
 

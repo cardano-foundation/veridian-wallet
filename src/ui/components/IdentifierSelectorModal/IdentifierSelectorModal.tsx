@@ -30,10 +30,7 @@ const IdentifierSelectorModal = ({
           .filter(
             (item) => item.identity.creationStatus === CreationStatus.COMPLETE
           )
-          .filter(
-            (item) =>
-              !(item.identity.groupId ?? item.identity.groupMetadata?.groupId)
-          )
+          .filter((item) => !item.identity.groupMetadata?.groupId)
           .map((item) => item.identity);
 
     return result.map(

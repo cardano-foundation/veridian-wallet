@@ -178,6 +178,7 @@ const keriMetadataRecordProps = {
   theme: 0,
   creationStatus: CreationStatus.COMPLETE,
   groupMetadata,
+  groupUsername: "testUser",
   sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
 };
 
@@ -298,7 +299,6 @@ describe("Single sig service of agent", () => {
         groupMetadata,
         groupMemberPre: undefined,
         groupUsername: "testUser",
-        groupId: "group-id",
       },
     ]);
   });
@@ -312,6 +312,7 @@ describe("Single sig service of agent", () => {
         displayName: "group",
         groupMemberPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5InX",
         groupMetadata: undefined,
+        groupUsername: "testUser",
       }),
     ]);
     identifierStorage.getIdentifierMetadata = jest
@@ -336,7 +337,6 @@ describe("Single sig service of agent", () => {
         groupMetadata,
         groupMemberPre: undefined,
         groupUsername: "testUser",
-        groupId: "group-id",
       },
       {
         id: "EIZ-n_hHHY5ERGTzvpXYBkB6_yBAM4RXcjQG3-JykFvT",
@@ -347,7 +347,6 @@ describe("Single sig service of agent", () => {
         groupMemberPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5InX",
         groupMetadata: undefined,
         groupUsername: "testUser",
-        groupId: "group-id",
       },
     ]);
     identifierStorage.getIdentifierMetadata = jest.fn();
@@ -419,7 +418,6 @@ describe("Single sig service of agent", () => {
       groupMetadata: keriMetadataRecord.groupMetadata,
       groupMemberPre: keriMetadataRecord.groupMemberPre,
       groupUsername: "testUser",
-      groupId: "group-id",
       ...identifierStateKeria.state,
       creationStatus: CreationStatus.COMPLETE,
       members: undefined,
@@ -444,7 +442,6 @@ describe("Single sig service of agent", () => {
       groupMetadata: keriMetadataRecord.groupMetadata,
       groupMemberPre: keriMetadataRecord.groupMemberPre,
       groupUsername: "testUser",
-      groupId: "group-id",
       ...identifierStateKeria.state,
       creationStatus: CreationStatus.COMPLETE,
       members: [
@@ -1453,6 +1450,7 @@ describe("Single sig service of agent", () => {
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       keriMetadataRecord.id,
       {
+        groupUsername: newUsername,
         groupMetadata: undefined,
       }
     );
