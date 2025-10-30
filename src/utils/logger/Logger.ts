@@ -50,7 +50,6 @@ export class Logger {
       }
 
       // Only add remote strategies if remote logging is enabled AND LogSyncService is in Auto mode
-      // Or if local logging is disabled, but remote is enabled (to ensure logs are sent at all)
       let cloudLogger: ICloudLogger | undefined;
       const shouldAddRemoteStrategy = loggingConfig.remoteEnabled && logSyncService.syncMode === SyncMode.Auto;
 
