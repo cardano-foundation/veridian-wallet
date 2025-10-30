@@ -113,56 +113,65 @@ const EditProfile = ({
         throw new Error(`${IDENTIFIER_NOT_EXIST} ${cardData.id}`);
       }
 
-      const params: Pick<
-        IdentifierMetadataRecordProps,
-        "theme" | "displayName" | "groupMetadata"
-      > = {
-        displayName: cardData.displayName,
-        theme: currentIdentifier.identity.theme,
-      };
-
       if (editType === "name") {
-        params.displayName = newDisplayName;
-        params.groupMetadata = cardData.groupMetadata;
+        const params: Pick<
+          IdentifierMetadataRecordProps,
+          "theme" | "displayName" | "groupMetadata"
+        > = {
+          displayName: newDisplayName,
+          theme: currentIdentifier.identity.theme,
+          groupMetadata: cardData.groupMetadata,
+        };
         await Agent.agent.identifiers.updateIdentifier(cardData.id, params);
-      } else if (editType === "userName") {
-        if (!isGroup && cardData.groupMetadata) {
-          params.groupMetadata = {
-            ...cardData.groupMetadata,
-            proposedUsername: newDisplayName,
-          };
-        } else {
-          params.groupMetadata = cardData.groupMetadata;
-        }
 
+        const updatedIdentifier: IdentifierShortDetails = {
+          ...currentIdentifier.identity,
+          displayName: params.displayName,
+          groupMetadata: params.groupMetadata,
+        };
+
+        setCardData({
+          ...cardData,
+          displayName: params.displayName,
+          groupMetadata: params.groupMetadata,
+        });
+        dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
+      } else if (editType === "userName") {
         await Agent.agent.identifiers.updateGroupUsername(
           cardData.id,
           newDisplayName
         );
-      }
 
-      const updatedIdentifier: IdentifierShortDetails = {
-        ...currentIdentifier.identity,
-        displayName: params.displayName,
-        groupMetadata: params.groupMetadata,
-        groupUsername:
-          editType === "userName" && isGroup
+        // Update local state with new username
+        const updatedIdentifier: IdentifierShortDetails = {
+          ...currentIdentifier.identity,
+          groupUsername: isGroup
             ? newDisplayName
             : currentIdentifier.identity.groupUsername,
-      };
+          groupMetadata:
+            !isGroup && cardData.groupMetadata
+              ? {
+                  ...cardData.groupMetadata,
+                  proposedUsername: newDisplayName,
+                }
+              : currentIdentifier.identity.groupMetadata,
+        };
 
-      setCardData({
-        ...cardData,
-        displayName: params.displayName,
-        groupMetadata: params.groupMetadata,
-        groupUsername:
-          editType === "userName" && isGroup
-            ? newDisplayName
-            : cardData.groupUsername,
-      });
+        setCardData({
+          ...cardData,
+          groupUsername: isGroup ? newDisplayName : cardData.groupUsername,
+          groupMetadata:
+            !isGroup && cardData.groupMetadata
+              ? {
+                  ...cardData.groupMetadata,
+                  proposedUsername: newDisplayName,
+                }
+              : cardData.groupMetadata,
+        });
+        dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
+      }
 
       handleCancel();
-      dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
       dispatch(
         setToastMsg(
           isGroup
