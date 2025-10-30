@@ -223,10 +223,27 @@ const CreateSSIAgent = () => {
     [dispatch, identifiers]
   );
 
-  const handleRecoveryWallet = async (connectUrl: string) => {
+  const getConnectUrl = async (bootUrl: string) => {
+    try {
+      return await Agent.agent.discoverConnectUrl(bootUrl);
+    } catch (e) {
+      const message = (e as Error).message;
+
+      if (
+        message.startsWith(Agent.CONNECT_URL_DISCOVERY_FAILED) ||
+        message.startsWith(Agent.CONNECT_URL_NOT_FOUND)
+      ) {
+        return bootUrl;
+      }
+
+      return null;
+    }
+  };
+
+  const handleRecoveryWallet = async (bootUrl: string) => {
     setLoading(true);
     try {
-      if (!connectUrl) {
+      if (!bootUrl) {
         throw new Error(SSI_URLS_EMPTY);
       }
 
@@ -234,11 +251,17 @@ const CreateSSIAgent = () => {
         throw new Error(SEED_PHRASE_EMPTY);
       }
 
-      const validConnectUrl = removeLastSlash(connectUrl.trim());
+      const validBootUrl = removeLastSlash(bootUrl.trim());
+
+      const connectUrl = await getConnectUrl(validBootUrl);
+
+      if (!connectUrl) {
+        throw new Error(Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT);
+      }
 
       await Agent.agent.recoverKeriaAgent(
         seedPhraseCache.seedPhrase.split(" "),
-        validConnectUrl
+        connectUrl
       );
 
       dispatch(setRecoveryCompleteNoInterruption());
