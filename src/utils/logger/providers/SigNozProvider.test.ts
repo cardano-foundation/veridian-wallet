@@ -1,27 +1,27 @@
-import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
-import { LoggerProvider, BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
-import { SigNozProvider } from './SigNozProvider';
-import { ParsedLogEntry } from '../ILogger';
-import { SeverityNumber, AnyValueMap } from '@opentelemetry/api-logs';
-import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
-import { resourceFromAttributes, defaultResource } from '@opentelemetry/resources';
+import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
+import { LoggerProvider, BatchLogRecordProcessor } from "@opentelemetry/sdk-logs";
+import { SigNozProvider } from "./SigNozProvider";
+import { ParsedLogEntry } from "../ILogger";
+import { SeverityNumber, AnyValueMap } from "@opentelemetry/api-logs";
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from "@opentelemetry/semantic-conventions";
+import { resourceFromAttributes, defaultResource } from "@opentelemetry/resources";
 
 // Mock the OTel classes
-jest.mock('@opentelemetry/exporter-logs-otlp-http');
-jest.mock('@opentelemetry/sdk-logs');
-jest.mock('@opentelemetry/resources', () => ({
-  ...jest.requireActual('@opentelemetry/resources'),
+jest.mock("@opentelemetry/exporter-logs-otlp-http");
+jest.mock("@opentelemetry/sdk-logs");
+jest.mock("@opentelemetry/resources", () => ({
+  ...jest.requireActual("@opentelemetry/resources"),
   defaultResource: jest.fn().mockReturnValue({
     merge: jest.fn().mockReturnThis(),
   }),
   resourceFromAttributes: jest.fn((attributes) => ({ attributes })),
 }));
-jest.mock('@opentelemetry/semantic-conventions');
+jest.mock("@opentelemetry/semantic-conventions");
 
-describe('SigNozProvider', () => {
+describe("SigNozProvider", () => {
   let strategy: SigNozProvider;
-  const mockOtlpEndpoint = 'http://test-endpoint.com/v1/logs';
-  const mockIngestionKey = 'test-ingestion-key';
+  const mockOtlpEndpoint = "http://test-endpoint.com/v1/logs";
+  const mockIngestionKey = "test-ingestion-key";
 
   let mockLogger: {
     emit: jest.Mock;
@@ -50,11 +50,11 @@ describe('SigNozProvider', () => {
     strategy = new SigNozProvider(mockOtlpEndpoint, mockIngestionKey);
   });
 
-  it('should initialize the OTLPLogExporter and LoggerProvider correctly', () => {
+  test("should initialize the OTLPLogExporter and LoggerProvider correctly", () => {
     expect(OTLPLogExporter).toHaveBeenCalledWith({
       url: mockOtlpEndpoint,
       headers: {
-        'signoz-ingestion-key': mockIngestionKey,
+        "signoz-ingestion-key": mockIngestionKey,
       },
     });
     
@@ -67,58 +67,58 @@ describe('SigNozProvider', () => {
     expect(resourceFromAttributes).toHaveBeenCalled();
   });
 
-  it('logBatch should do nothing for empty log entries', async () => {
+  test("logBatch should do nothing for empty log entries", async () => {
     await strategy.logBatch([]);
     expect(mockLoggerProvider.getLogger).not.toHaveBeenCalled();
   });
 
-  it('logBatch should transform and emit log entries', async () => {
+  test("logBatch should transform and emit log entries", async () => {
     const logEntries: ParsedLogEntry[] = [
       {
-        id: '1',
+        id: "1",
         ts: new Date().toISOString(),
-        level: 'info',
-        message: 'Info message',
-        context: { userId: 'user1' },
+        level: "info",
+        message: "Info message",
+        context: { userId: "user1" },
       },
       {
-        id: '2',
+        id: "2",
         ts: new Date().toISOString(),
-        level: 'error',
-        message: 'Error message',
-        context: { error: 'stacktrace' },
+        level: "error",
+        message: "Error message",
+        context: { error: "stacktrace" },
       },
     ];
 
     await strategy.logBatch(logEntries);
 
-    expect(mockLoggerProvider.getLogger).toHaveBeenCalledWith('veridian-wallet-logger');
+    expect(mockLoggerProvider.getLogger).toHaveBeenCalledWith("veridian-wallet-logger");
     expect(mockLogger.emit).toHaveBeenCalledTimes(2);
 
     // Check first log entry
     expect(mockLogger.emit).toHaveBeenCalledWith(expect.objectContaining({
       severityNumber: SeverityNumber.INFO,
-      severityText: 'info',
-      body: 'Info message',
-      attributes: { userId: 'user1' },
+      severityText: "info",
+      body: "Info message",
+      attributes: { userId: "user1" },
     }));
 
     // Check second log entry
     expect(mockLogger.emit).toHaveBeenCalledWith(expect.objectContaining({
       severityNumber: SeverityNumber.ERROR,
-      severityText: 'error',
-      body: 'Error message',
-      attributes: { error: 'stacktrace' },
+      severityText: "error",
+      body: "Error message",
+      attributes: { error: "stacktrace" },
     }));
   });
 
-  it('logBatch should call forceFlush after emitting logs', async () => {
+  test("logBatch should call forceFlush after emitting logs", async () => {
     const logEntries: ParsedLogEntry[] = [
       {
-        id: '1',
+        id: "1",
         ts: new Date().toISOString(),
-        level: 'info',
-        message: 'Info message',
+        level: "info",
+        message: "Info message",
       },
     ];
 
@@ -128,17 +128,17 @@ describe('SigNozProvider', () => {
     expect(mockLoggerProvider.forceFlush).toHaveBeenCalledTimes(1);
   });
 
-  it('log should queue the log entry and flush should call logBatch', async () => {
+  test("log should queue the log entry and flush should call logBatch", async () => {
     const logEntry: ParsedLogEntry = {
-      id: '1',
+      id: "1",
       ts: new Date().toISOString(),
-      level: 'info',
-      message: 'Info message',
-      context: { userId: 'user1' },
+      level: "info",
+      message: "Info message",
+      context: { userId: "user1" },
     };
 
     // Mock logBatch to track calls
-    const logBatchSpy = jest.spyOn(strategy, 'logBatch');
+    const logBatchSpy = jest.spyOn(strategy, "logBatch");
 
     await strategy.log(logEntry);
 

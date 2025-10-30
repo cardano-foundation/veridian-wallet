@@ -37,7 +37,7 @@ describe("ConsoleStrategy", () => {
 
   const expectedTimestamp = "2023-01-01T12:00:00.000Z";
 
-  it("should call console.debug for debug level", async () => {
+  test("should call console.debug for debug level", async () => {
     const logEntry: ParsedLogEntry = {
       id: "test-id",
       ts: expectedTimestamp,
@@ -50,7 +50,7 @@ describe("ConsoleStrategy", () => {
     expect(mockConsoleDebug).toHaveBeenCalledWith(`[${expectedTimestamp}] [DEBUG] ${logEntry.message}`, logEntry.context);
   });
 
-  it("should call console.info for info level", async () => {
+  test("should call console.info for info level", async () => {
     const logEntry: ParsedLogEntry = {
       id: "test-id",
       ts: expectedTimestamp,
@@ -63,7 +63,7 @@ describe("ConsoleStrategy", () => {
     expect(mockConsoleInfo).toHaveBeenCalledWith(`[${expectedTimestamp}] [INFO] ${logEntry.message}`, logEntry.context);
   });
 
-  it("should call console.warn for warn level", async () => {
+  test("should call console.warn for warn level", async () => {
     const logEntry: ParsedLogEntry = {
       id: "test-id",
       ts: expectedTimestamp,
@@ -76,7 +76,7 @@ describe("ConsoleStrategy", () => {
     expect(mockConsoleWarn).toHaveBeenCalledWith(`[${expectedTimestamp}] [WARN] ${logEntry.message}`, logEntry.context);
   });
 
-  it("should call console.error for error level", async () => {
+  test("should call console.error for error level", async () => {
     const logEntry: ParsedLogEntry = {
       id: "test-id",
       ts: expectedTimestamp,
@@ -89,7 +89,7 @@ describe("ConsoleStrategy", () => {
     expect(mockConsoleError).toHaveBeenCalledWith(`[${expectedTimestamp}] [ERROR] ${logEntry.message}`, logEntry.context);
   });
 
-  it("should call console.log for an unknown level (default case)", async () => {
+  test("should call console.log for an unknown level (default case)", async () => {
     const logEntry: ParsedLogEntry = {
       id: "test-id",
       ts: expectedTimestamp,
@@ -102,7 +102,7 @@ describe("ConsoleStrategy", () => {
     expect(mockConsoleLog).toHaveBeenCalledWith(`[${expectedTimestamp}] [UNKNOWN] ${logEntry.message}`, logEntry.context);
   });
 
-  it("should handle context being undefined", async () => {
+  test("should handle context being undefined", async () => {
     const logEntry: ParsedLogEntry = {
       id: "test-id",
       ts: expectedTimestamp,

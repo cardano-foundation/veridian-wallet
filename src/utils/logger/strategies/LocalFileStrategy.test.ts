@@ -56,7 +56,7 @@ describe("LocalFileStrategy", () => {
   const expectedTimestamp = "2023-01-01T12:00:00.000Z";
 
   describe("log", () => {
-    it("should append a log entry to the file", async () => {
+    test("should append a log entry to the file", async () => {
       const logEntry: ParsedLogEntry = {
         id: "test-id",
         ts: expectedTimestamp,
@@ -77,7 +77,7 @@ describe("LocalFileStrategy", () => {
       });
     });
 
-    it("should append multiple log entries to the file", async () => {
+    test("should append multiple log entries to the file", async () => {
       const logEntry1: ParsedLogEntry = {
         id: "test-id-1",
         ts: expectedTimestamp,
@@ -111,7 +111,7 @@ describe("LocalFileStrategy", () => {
   });
 
   describe("readLogs", () => {
-    it("should return an empty array if the log file does not exist", async () => {
+    test("should return an empty array if the log file does not exist", async () => {
       (Filesystem.readFile as jest.Mock).mockRejectedValueOnce(new Error("File not found"));
 
       const logs = await localFileStrategy.readLogs();
@@ -120,7 +120,7 @@ describe("LocalFileStrategy", () => {
       expect(logs).toEqual([]);
     });
 
-    it("should read and parse log entries from the file", async () => {
+    test("should read and parse log entries from the file", async () => {
       const logEntry1: ParsedLogEntry = {
         id: "id-1",
         ts: "2023-01-01T10:00:00.000Z",
@@ -144,7 +144,7 @@ describe("LocalFileStrategy", () => {
       expect(logs).toEqual([logEntry1, logEntry2]);
     });
 
-    it("should handle file content as Blob", async () => {
+    test("should handle file content as Blob", async () => {
       const logEntry: ParsedLogEntry = {
         id: "id-blob",
         ts: "2023-01-01T12:00:00.000Z",
@@ -170,7 +170,7 @@ describe("LocalFileStrategy", () => {
   });
 
   describe("clearLogs", () => {
-    it("should clear the log file", async () => {
+    test("should clear the log file", async () => {
       await localFileStrategy.clearLogs();
 
       expect(Filesystem.writeFile).toHaveBeenCalledTimes(1);
@@ -184,7 +184,7 @@ describe("LocalFileStrategy", () => {
   });
 
   describe("writeLogs", () => {
-    it("should write log entries to the file", async () => {
+    test("should write log entries to the file", async () => {
       const logEntry1: ParsedLogEntry = {
         id: "id-1",
         ts: "2023-01-01T10:00:00.000Z",
@@ -212,7 +212,7 @@ describe("LocalFileStrategy", () => {
       });
     });
 
-    it("should write an empty string if no log entries are provided", async () => {
+    test("should write an empty string if no log entries are provided", async () => {
       await localFileStrategy.writeLogs([]);
 
       expect(Filesystem.writeFile).toHaveBeenCalledTimes(1);

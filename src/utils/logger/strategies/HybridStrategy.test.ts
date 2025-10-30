@@ -25,7 +25,7 @@ describe("HybridStrategy", () => {
     context: { key: "value" },
   };
 
-  it("should log to cloud logger if available and successful", async () => {
+  test("should log to cloud logger if available and successful", async () => {
     const strategy = new HybridStrategy(mockLocalLogger, mockCloudLogger);
 
     await strategy.log(logEntry);
@@ -35,7 +35,7 @@ describe("HybridStrategy", () => {
     expect(mockLocalLogger.log).not.toHaveBeenCalled();
   });
 
-  it("should log to local logger if cloud logger is available but fails", async () => {
+  test("should log to local logger if cloud logger is available but fails", async () => {
     mockCloudLogger.log.mockRejectedValueOnce(new Error("Cloud failed"));
     const strategy = new HybridStrategy(mockLocalLogger, mockCloudLogger);
 
@@ -47,7 +47,7 @@ describe("HybridStrategy", () => {
     expect(mockLocalLogger.log).toHaveBeenCalledWith(logEntry);
   });
 
-  it("should log to local logger if cloud logger is not available", async () => {
+  test("should log to local logger if cloud logger is not available", async () => {
     const strategy = new HybridStrategy(mockLocalLogger, undefined);
 
     await strategy.log(logEntry);
@@ -57,7 +57,7 @@ describe("HybridStrategy", () => {
     expect(mockLocalLogger.log).toHaveBeenCalledWith(logEntry);
   });
 
-  it("should not log if neither local nor cloud logger is available", async () => {
+  test("should not log if neither local nor cloud logger is available", async () => {
     const strategy = new HybridStrategy(undefined, undefined);
 
     await strategy.log(logEntry);
@@ -66,7 +66,7 @@ describe("HybridStrategy", () => {
     expect(mockLocalLogger.log).not.toHaveBeenCalled();
   });
 
-  it("should not log to local if cloud fails but local is not available", async () => {
+  test("should not log to local if cloud fails but local is not available", async () => {
     mockCloudLogger.log.mockRejectedValueOnce(new Error("Cloud failed"));
     const strategy = new HybridStrategy(undefined, mockCloudLogger);
 

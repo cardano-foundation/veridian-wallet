@@ -61,14 +61,14 @@ describe("Logger", () => {
     (require("../../core/services/LogSyncService").logSyncService.syncMode as SyncMode) = SyncMode.Auto;
   });
 
-  it("should return a singleton instance", () => {
+  test("should return a singleton instance", () => {
     const logger1 = Logger.getInstance();
     const logger2 = Logger.getInstance();
     expect(logger1).toBe(logger2);
   });
 
   describe("getInstance with different logging configurations", () => {
-    it("should return a logger with no active strategies when mode is off", () => {
+    test("should return a logger with no active strategies when mode is off", () => {
       (loggingConfig as any).mode = "off";
       (loggingConfig as any).consoleEnabled = true; // Should be ignored
       const logger = Logger.getInstance();
@@ -76,7 +76,7 @@ describe("Logger", () => {
       expect((logger as any).minimumLogLevel).toBe("error");
     });
 
-    it("should enable ConsoleStrategy when consoleEnabled is true", () => {
+    test("should enable ConsoleStrategy when consoleEnabled is true", () => {
       (loggingConfig as any).mode = "info";
       (loggingConfig as any).consoleEnabled = true;
       const logger = Logger.getInstance();
@@ -85,7 +85,7 @@ describe("Logger", () => {
       expect((ConsoleStrategy as jest.Mock).mock.instances[0]).toBeInstanceOf(ConsoleStrategy);
     });
 
-    it("should enable LocalFileStrategy when localEnabled is true", () => {
+    test("should enable LocalFileStrategy when localEnabled is true", () => {
       (loggingConfig as any).mode = "info";
       (loggingConfig as any).localEnabled = true;
       const logger = Logger.getInstance();
@@ -94,7 +94,7 @@ describe("Logger", () => {
       expect((LocalFileStrategy as jest.Mock).mock.instances[0]).toBeInstanceOf(LocalFileStrategy);
     });
 
-    it("should enable SigNozProvider when remoteEnabled is true and syncMode is Auto", () => {
+    test("should enable SigNozProvider when remoteEnabled is true and syncMode is Auto", () => {
       (loggingConfig as any).mode = "info";
       (loggingConfig as any).remoteEnabled = true;
       (require("../../core/services/LogSyncService").logSyncService.syncMode as SyncMode) = SyncMode.Auto;
@@ -104,7 +104,7 @@ describe("Logger", () => {
       expect((SigNozProvider as jest.Mock).mock.instances[0]).toBeInstanceOf(SigNozProvider);
     });
 
-    it("should not enable SigNozProvider when remoteEnabled is true and syncMode is Manual", () => {
+    test("should not enable SigNozProvider when remoteEnabled is true and syncMode is Manual", () => {
       (loggingConfig as any).mode = "info";
       (loggingConfig as any).remoteEnabled = true;
       (require("../../core/services/LogSyncService").logSyncService.syncMode as SyncMode) = SyncMode.Manual;
@@ -113,7 +113,7 @@ describe("Logger", () => {
       expect(SigNozProvider).not.toHaveBeenCalled();
     });
 
-    it("should enable HybridStrategy when both localEnabled and remoteEnabled are true and syncMode is Auto", () => {
+    test("should enable HybridStrategy when both localEnabled and remoteEnabled are true and syncMode is Auto", () => {
       (loggingConfig as any).mode = "info";
       (loggingConfig as any).localEnabled = true;
       (loggingConfig as any).remoteEnabled = true;
@@ -126,7 +126,7 @@ describe("Logger", () => {
       expect(SigNozProvider).toHaveBeenCalledTimes(1);
     });
 
-    it("should enable LocalFileStrategy only when both localEnabled and remoteEnabled are true and syncMode is Manual", () => {
+    test("should enable LocalFileStrategy only when both localEnabled and remoteEnabled are true and syncMode is Manual", () => {
       (loggingConfig as any).mode = "info";
       (loggingConfig as any).localEnabled = true;
       (loggingConfig as any).remoteEnabled = true;
@@ -139,7 +139,7 @@ describe("Logger", () => {
       expect((logger as any).strategies[0]).toBeInstanceOf(LocalFileStrategy);
     });
 
-    it("should set minimumLogLevel based on loggingConfig.mode", () => {
+    test("should set minimumLogLevel based on loggingConfig.mode", () => {
       (loggingConfig as any).mode = "debug";
       const logger = Logger.getInstance();
       expect((logger as any).minimumLogLevel).toBe("debug");
@@ -152,7 +152,7 @@ describe("Logger", () => {
       expect((logger2 as any).minimumLogLevel).toBe("warn");
     });
 
-    it("should default minimumLogLevel to info if loggingConfig.mode is invalid", () => {
+    test("should default minimumLogLevel to info if loggingConfig.mode is invalid", () => {
       (loggingConfig as any).mode = "invalid_mode";
       const logger = Logger.getInstance();
       expect((logger as any).minimumLogLevel).toBe("info");
@@ -173,7 +173,7 @@ describe("Logger", () => {
       mockConsoleStrategyInstance = (ConsoleStrategy as jest.Mock).mock.instances[(ConsoleStrategy as jest.Mock).mock.instances.length - 1] as jest.Mocked<ConsoleStrategy>;
     });
 
-    it("should call log on all active strategies", async () => {
+    test("should call log on all active strategies", async () => {
       const message = "Test message";
       const context = { key: "value" };
       await loggerInstance.log("info", message, context);
@@ -187,7 +187,7 @@ describe("Logger", () => {
       });
     });
 
-    it("should not log messages below minimumLogLevel", async () => {
+    test("should not log messages below minimumLogLevel", async () => {
       (loggingConfig as any).mode = "warn"; // Set mode to warn for this test
       (loggingConfig as any).consoleEnabled = true; // Ensure console is enabled for this test
       // Re-get instance to apply new config
@@ -199,7 +199,7 @@ describe("Logger", () => {
       expect(mockConsoleStrategyInstance.log).not.toHaveBeenCalled();
     });
 
-    it("should always log error messages regardless of minimumLogLevel", async () => {
+    test("should always log error messages regardless of minimumLogLevel", async () => {
       (loggingConfig as any).mode = "warn"; // Set mode to warn for this test
       // The loggerInstance and mockConsoleStrategyInstance are already set up in beforeEach
 
@@ -214,7 +214,7 @@ describe("Logger", () => {
       });
     });
 
-    it("should only log to console when consoleOnly is true", async () => {
+    test("should only log to console when consoleOnly is true", async () => {
       const message = "Console only message";
       const context = { special: true };
       (loggingConfig as any).localEnabled = true;
@@ -255,7 +255,7 @@ describe("Logger", () => {
       mockConsoleStrategyInstance = (ConsoleStrategy as jest.Mock).mock.instances[0] as jest.Mocked<ConsoleStrategy>;
     });
 
-    it("debug should call log with debug level", async () => {
+    test("debug should call log with debug level", async () => {
       const message = "Debug message";
       const context = { debug: true };
       await loggerInstance.debug(message, context);
@@ -269,7 +269,7 @@ describe("Logger", () => {
       });
     });
 
-    it("info should call log with info level", async () => {
+    test("info should call log with info level", async () => {
       const message = "Info message";
       const context = { info: true };
       await loggerInstance.info(message, context);
@@ -283,7 +283,7 @@ describe("Logger", () => {
       });
     });
 
-    it("warn should call log with warn level", async () => {
+    test("warn should call log with warn level", async () => {
       const message = "Warn message";
       const context = { warn: true };
       await loggerInstance.warn(message, context);
@@ -297,7 +297,7 @@ describe("Logger", () => {
       });
     });
 
-    it("error should call log with error level", async () => {
+    test("error should call log with error level", async () => {
       const message = "Error message";
       const context = { error: true };
       await loggerInstance.error(message, context);
@@ -311,7 +311,7 @@ describe("Logger", () => {
       });
     });
 
-    it("debug should call log with debug level and consoleOnly true", async () => {
+    test("debug should call log with debug level and consoleOnly true", async () => {
       const message = "Debug console only message";
       await loggerInstance.debug(message, undefined, true);
       expect(mockConsoleStrategyInstance.log).toHaveBeenCalledWith({

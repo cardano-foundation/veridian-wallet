@@ -1,6 +1,6 @@
 import { LoggingConfig } from "./LoggingConfig";
 
-describe('LoggingConfig', () => {
+describe("LoggingConfig", () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -22,60 +22,60 @@ describe('LoggingConfig', () => {
     process.env = originalEnv; // Restore original env
   });
 
-  it('should load default values when no environment variables are set', () => {
+  test("should load default values when no environment variables are set", () => {
     const config = new LoggingConfig();
-    expect(config.mode).toBe('info');
+    expect(config.mode).toBe("info");
     expect(config.consoleEnabled).toBe(false);
     expect(config.localEnabled).toBe(false);
     expect(config.remoteEnabled).toBe(false);
     expect(config.signozOtlpEndpoint).toBeUndefined();
-    expect(config.offlineLogFileName).toBe('offline-logs.txt');
+    expect(config.offlineLogFileName).toBe("offline-logs.txt");
     expect(config.batchSize).toBe(5);
     expect(config.maxSyncRetries).toBe(3);
     expect(config.retryDelayMs).toBe(5000);
   });
 
-  it('should load values from environment variables', () => {
-    process.env.LOGGING_MODE = 'debug';
-    process.env.LOGGING_CONSOLE_ENABLED = 'true';
-    process.env.LOGGING_LOCAL_ENABLED = 'true';
-    process.env.LOGGING_REMOTE_ENABLED = 'true';
-    process.env.SIGNOZ_OTLP_ENDPOINT = 'http://custom-signoz:4318/v1/logs';
-    process.env.OFFLINE_LOG_FILE_NAME = 'custom-logs.txt';
-    process.env.LOGGING_BATCH_SIZE = '100';
-    process.env.LOGGING_MAX_SYNC_RETRIES = '5';
-    process.env.LOGGING_RETRY_DELAY_MS = '10000';
-    process.env.SIGNOZ_INGESTION_KEY = 'test-key';
+  test("should load values from environment variables", () => {
+    process.env.LOGGING_MODE = "debug";
+    process.env.LOGGING_CONSOLE_ENABLED = "true";
+    process.env.LOGGING_LOCAL_ENABLED = "true";
+    process.env.LOGGING_REMOTE_ENABLED = "true";
+    process.env.SIGNOZ_OTLP_ENDPOINT = "http://custom-signoz:4318/v1/logs";
+    process.env.OFFLINE_LOG_FILE_NAME = "custom-logs.txt";
+    process.env.LOGGING_BATCH_SIZE = "100";
+    process.env.LOGGING_MAX_SYNC_RETRIES = "5";
+    process.env.LOGGING_RETRY_DELAY_MS = "10000";
+    process.env.SIGNOZ_INGESTION_KEY = "test-key";
 
     const config = new LoggingConfig();
-    expect(config.mode).toBe('debug');
+    expect(config.mode).toBe("debug");
     expect(config.consoleEnabled).toBe(true);
     expect(config.localEnabled).toBe(true);
     expect(config.remoteEnabled).toBe(true);
-    expect(config.signozOtlpEndpoint).toBe('http://custom-signoz:4318/v1/logs');
-    expect(config.offlineLogFileName).toBe('custom-logs.txt');
+    expect(config.signozOtlpEndpoint).toBe("http://custom-signoz:4318/v1/logs");
+    expect(config.offlineLogFileName).toBe("custom-logs.txt");
     expect(config.batchSize).toBe(100);
     expect(config.maxSyncRetries).toBe(5);
     expect(config.retryDelayMs).toBe(10000);
   });
 
-  it('should disable all enables if LOGGING_MODE is off', () => {
-    process.env.LOGGING_MODE = 'off';
-    process.env.LOGGING_CONSOLE_ENABLED = 'true';
-    process.env.LOGGING_LOCAL_ENABLED = 'true';
-    process.env.LOGGING_REMOTE_ENABLED = 'true';
+  test("should disable all enables if LOGGING_MODE is off", () => {
+    process.env.LOGGING_MODE = "off";
+    process.env.LOGGING_CONSOLE_ENABLED = "true";
+    process.env.LOGGING_LOCAL_ENABLED = "true";
+    process.env.LOGGING_REMOTE_ENABLED = "true";
 
     const config = new LoggingConfig();
-    expect(config.mode).toBe('off');
+    expect(config.mode).toBe("off");
     expect(config.consoleEnabled).toBe(false);
     expect(config.localEnabled).toBe(false);
     expect(config.remoteEnabled).toBe(false);
   });
 
-  it('should handle invalid numeric environment variables gracefully', () => {
-    process.env.LOGGING_BATCH_SIZE = 'abc';
-    process.env.LOGGING_MAX_SYNC_RETRIES = 'xyz';
-    process.env.LOGGING_RETRY_DELAY_MS = 'def';
+  test("should handle invalid numeric environment variables gracefully", () => {
+    process.env.LOGGING_BATCH_SIZE = "abc";
+    process.env.LOGGING_MAX_SYNC_RETRIES = "xyz";
+    process.env.LOGGING_RETRY_DELAY_MS = "def";
 
     const config = new LoggingConfig();
     expect(config.batchSize).toBe(5); // Should fall back to default

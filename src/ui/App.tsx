@@ -151,6 +151,7 @@ const App = () => {
   const [threatsDetected, setThreatsDetected] = useState<ThreatCheck[]>([]);
   const dispatch = useAppDispatch();
 
+  // TODO: @jimcase - remove demo error trigger
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch(showGenericError(true));
