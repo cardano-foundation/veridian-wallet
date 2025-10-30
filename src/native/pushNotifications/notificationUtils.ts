@@ -2,7 +2,7 @@ import { t } from "i18next";
 import {
   KeriaNotification,
   NotificationRoute,
-} from "../agent/services/keriaNotificationService.types";
+} from "../../core/agent/services/keriaNotificationService.types";
 
 export interface NotificationContext {
   connectionsCache?: Array<{ id: string; label: string }>;

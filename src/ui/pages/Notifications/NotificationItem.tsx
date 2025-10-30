@@ -12,7 +12,7 @@ import {
   KeriaNotification,
   NotificationRoute,
 } from "../../../core/agent/services/keriaNotificationService.types";
-import { getNotificationDisplayText } from "../../../core/services/notificationUtils";
+import { getNotificationDisplayText } from "../../../native/pushNotifications/notificationUtils";
 import { useAppSelector } from "../../../store/hooks";
 import {
   getConnectionsCache,

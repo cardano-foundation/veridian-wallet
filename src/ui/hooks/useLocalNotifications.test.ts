@@ -7,7 +7,7 @@ jest.mock("../../store/hooks", () => ({
   useAppDispatch: jest.fn(),
 }));
 
-jest.mock("../../core/services/notificationService", () => ({
+jest.mock("../../native/pushNotifications/notificationService", () => ({
   notificationService: {
     showLocalNotification: jest.fn(),
     requestPermissions: jest.fn(),
@@ -25,7 +25,7 @@ jest.mock("../../core/services/notificationService", () => ({
 }));
 
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { notificationService } from "../../core/services/notificationService";
+import { notificationService } from "../../native/pushNotifications/notificationService";
 import {
   getNotificationsCache,
   getCurrentProfile,

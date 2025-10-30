@@ -1,12 +1,12 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { notificationService } from "./notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
-import { Agent } from "../agent/agent";
-import { MiscRecordId } from "../agent/agent.types";
+import { Agent } from "../../core/agent/agent";
+import { MiscRecordId } from "../../core/agent/agent.types";
 
 jest.mock("@capacitor/local-notifications", () => ({
   LocalNotifications: {
-    requestPermissions: jest.fn(),
+    requestPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
     schedule: jest.fn(),
     addListener: jest.fn(),
     removeAllDeliveredNotifications: jest.fn(),
@@ -15,6 +15,8 @@ jest.mock("@capacitor/local-notifications", () => ({
     getDeliveredNotifications: jest.fn(() =>
       Promise.resolve({ notifications: [] })
     ),
+    checkPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    createChannel: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -31,7 +33,7 @@ jest.mock("@capacitor/core", () => ({
   },
 }));
 
-jest.mock("../agent/agent", () => ({
+jest.mock("../../core/agent/agent", () => ({
   Agent: {
     agent: {
       basicStorage: {
@@ -118,7 +120,6 @@ describe("NotificationService", () => {
         timestamp: Date.now(),
       };
 
-      // Mock the processing to prevent actual scheduling
       const processSpy = jest.spyOn(
         notificationService as any,
         "processNotificationQueue"
@@ -384,7 +385,6 @@ describe("NotificationService", () => {
         expect(scheduledNotification.body).toBe(testCase.expectedBody);
         expect(scheduledNotification.actionTypeId).toBe("default");
 
-        // Reset mock for next test case
         (LocalNotifications.schedule as jest.Mock).mockClear();
       }
     });

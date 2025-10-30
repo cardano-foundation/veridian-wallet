@@ -6,7 +6,7 @@ import {
   getProfiles,
 } from "../../store/reducers/profileCache";
 import { setToastMsg } from "../../store/reducers/stateCache";
-import { notificationService } from "../../core/services/notificationService";
+import { notificationService } from "../../native/pushNotifications/notificationService";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 import { ToastMsgType } from "../globals/types";
 

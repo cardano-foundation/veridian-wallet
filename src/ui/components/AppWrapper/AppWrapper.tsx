@@ -19,7 +19,7 @@ import { IdentifierService } from "../../../core/agent/services";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
-import { notificationService } from "../../../core/services/notificationService";
+import { notificationService } from "../../../native/pushNotifications/notificationService";
 import {
   PeerConnectedEvent,
   PeerConnectionBrokenEvent,

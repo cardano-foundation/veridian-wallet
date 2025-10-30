@@ -4,9 +4,9 @@ import { App } from "@capacitor/app";
 import { KeriaNotification } from "../../core/agent/services/keriaNotificationService.types";
 import { TabsRoutePath } from "../../routes/paths";
 import { showError } from "../../ui/utils/error";
-import { Agent } from "../agent/agent";
-import { MiscRecordId } from "../agent/agent.types";
-import { BasicRecord } from "../agent/records";
+import { Agent } from "../../core/agent/agent";
+import { MiscRecordId } from "../../core/agent/agent.types";
+import { BasicRecord } from "../../core/agent/records";
 import {
   NotificationContext,
   getNotificationDisplayTextForPush,
