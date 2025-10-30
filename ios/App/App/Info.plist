@@ -46,6 +46,8 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string
     >This app uses Face ID to secure your data and provide faster access.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>We will send you notifications, alerts, and important updates.</string>
 	<key>UIFileSharingEnabled</key>
 	<true />
 	<key>UILaunchStoryboardName</key>
