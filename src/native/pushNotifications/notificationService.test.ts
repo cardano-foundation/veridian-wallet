@@ -145,7 +145,6 @@ describe("NotificationService", () => {
 
       const scheduleCall = (LocalNotifications.schedule as jest.Mock).mock
         .calls[0][0];
-      // Hash function should generate consistent numeric ID
       expect(typeof scheduleCall.notifications[0].id).toBe("number");
       expect(scheduleCall.notifications[0].id).toBeGreaterThan(0);
     });
@@ -206,7 +205,6 @@ describe("NotificationService", () => {
 
       await (notificationService as any).handleNotificationTap(notification);
 
-      // Should queue, not throw
       expect((notificationService as any).pendingNotification).toEqual(
         notification
       );
@@ -226,7 +224,6 @@ describe("NotificationService", () => {
 
       await (notificationService as any).handleNotificationTap(notification);
 
-      // Should queue, not throw
       expect((notificationService as any).pendingNotification).toEqual(
         notification
       );
@@ -243,7 +240,6 @@ describe("NotificationService", () => {
 
       await (notificationService as any).handleNotificationTap(notification);
 
-      // Should queue, not throw
       expect((notificationService as any).pendingNotification).toEqual(
         notification
       );
@@ -378,7 +374,6 @@ describe("NotificationService", () => {
         },
       };
 
-      // Queue a notification by calling handleNotificationTap without handlers
       (notificationService as any).profileSwitcher = null;
       (notificationService as any).navigator = null;
       await (notificationService as any).handleNotificationTap(notification);
@@ -387,7 +382,6 @@ describe("NotificationService", () => {
         notification
       );
 
-      // Set up mocks for processing
       const mockProfileSwitcher = jest.fn();
       const mockNavigator = jest.fn();
       (
@@ -396,17 +390,14 @@ describe("NotificationService", () => {
         notifications: [],
       });
 
-      // Set profile switcher - should not process yet (navigator still missing)
       notificationService.setProfileSwitcher(mockProfileSwitcher);
       expect((notificationService as any).pendingNotification).toEqual(
         notification
       );
       expect(mockProfileSwitcher).not.toHaveBeenCalled();
 
-      // Set navigator - should now process the pending notification
       notificationService.setNavigator(mockNavigator);
 
-      // Wait for async processing
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect((notificationService as any).pendingNotification).toBeNull();
