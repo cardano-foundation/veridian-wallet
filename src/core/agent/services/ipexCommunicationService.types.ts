@@ -2,6 +2,8 @@ import { Operation } from "signify-ts";
 import { LinkedRequest } from "../records/notificationRecord.types";
 import { JSONObject } from "../agent.types";
 import { MultisigThresholds } from "./identifier.types";
+import { ACDC } from "./credentialService.types";
+
 interface CredentialsMatchingApply {
   schema: {
     name: string;
@@ -9,8 +11,7 @@ interface CredentialsMatchingApply {
   };
   credentials: {
     connectionId: string;
-    // @TODO: Use narrower ACDC type from Patrick's types for KERIA/Signify when available
-    acdc: Record<string, unknown>;
+    acdc: ACDC;
   }[];
   attributes: JSONObject;
   identifier: string;

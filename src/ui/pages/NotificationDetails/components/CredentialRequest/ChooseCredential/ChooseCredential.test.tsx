@@ -4,7 +4,10 @@ import { IonReactMemoryRouter } from "@ionic/react-router";
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
-import { CredentialStatus } from "../../../../../../core/agent/services/credentialService.types";
+import {
+  ACDC,
+  CredentialStatus,
+} from "../../../../../../core/agent/services/credentialService.types";
 import { KeriaNotification } from "../../../../../../core/agent/services/keriaNotificationService.types";
 import { KeyStoreKeys, SecureStorage } from "../../../../../../core/storage";
 import EN_TRANSLATIONS from "../../../../../../locales/en/en.json";
@@ -21,7 +24,6 @@ import {
 } from "../../../../../utils/formatters";
 import { makeTestStore } from "../../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
-import { ACDC } from "../CredentialRequest.types";
 import { ChooseCredential } from "./ChooseCredential";
 
 const deleteNotificationMock = jest.fn((id: string) => Promise.resolve(id));
