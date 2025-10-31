@@ -1,3 +1,4 @@
+import { Tags } from "../../storage.types";
 import { MigrationType, TsMigration } from "./migrations.types";
 import {
   createInsertItemTagsStatements,
@@ -67,7 +68,7 @@ export const DATA_V1201: TsMigration = {
         identifier: string;
         creationStatus: string;
         pendingDeletion: boolean;
-        tags: Record<string, unknown>;
+        tags: Tags;
         type: string;
       }> = [];
 
