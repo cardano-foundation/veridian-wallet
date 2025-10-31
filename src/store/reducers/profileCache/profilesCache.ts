@@ -468,6 +468,62 @@ export const addGroupProfileAsync =
     );
   };
 
+export const handleNotificationReceived =
+  (notification: KeriaNotification) =>
+  async (_dispatch: AppDispatch, getState: () => RootState) => {
+    const state = getState();
+    const currentProfile = getCurrentProfile(state);
+    const currentProfileId = currentProfile?.identity.id;
+
+    if (!currentProfileId || notification.receivingPre === currentProfileId) {
+      return;
+    }
+
+    const targetProfile =
+      state.profilesCache.profiles[notification.receivingPre];
+    if (!targetProfile) {
+      return;
+    }
+
+    const notificationServiceModule = await import(
+      "../../../native/pushNotifications/notificationService"
+    );
+    const notificationService = notificationServiceModule.notificationService;
+
+    const { getNotificationDisplayTextForPush } = await import(
+      "../../../native/pushNotifications/notificationUtils"
+    );
+
+    const notificationContext = {
+      connectionsCache: targetProfile.connections.map(
+        (c: RegularConnectionDetails) => ({
+          id: c.id,
+          label: c.label,
+        })
+      ),
+      multisigConnectionsCache: targetProfile.multisigConnections.map(
+        (c: MultisigConnectionDetails) => ({
+          id: c.id,
+          label: c.label,
+        })
+      ),
+    };
+
+    const notificationBody = getNotificationDisplayTextForPush(
+      notification,
+      notificationContext
+    );
+
+    const profileDisplayName = targetProfile.identity.displayName;
+
+    await notificationService.schedulePushNotification({
+      title: profileDisplayName,
+      body: notificationBody,
+      profileId: notification.receivingPre,
+      notificationId: notification.id,
+    });
+  };
+
 export const {
   setProfiles,
   clearProfiles,

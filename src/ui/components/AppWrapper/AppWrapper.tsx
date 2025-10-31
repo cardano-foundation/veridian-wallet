@@ -81,7 +81,6 @@ import {
 import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
 import { OperationType, ToastMsgType } from "../../globals/types";
 import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
-import { useLocalNotifications } from "../../hooks/useLocalNotifications";
 import { useProfile } from "../../hooks/useProfile";
 import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
 import { showError } from "../../utils/error";
@@ -241,7 +240,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
   const forceInitApp = useAppSelector(getForceInitApp);
   const [isAlertPeerBrokenOpen, setIsAlertPeerBrokenOpen] = useState(false);
   const { getRecentDefaultProfile, updateProfileHistories } = useProfile();
-  useLocalNotifications();
   useActivityTimer();
 
   const setOnlineStatus = useCallback(
@@ -483,15 +481,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
       dispatch(setProfiles(profiles));
 
-      let finalProfileAid = currentProfileAid;
-      const targetProfileId =
-        notificationService.getTargetProfileIdForColdStart();
-      if (targetProfileId && profiles[targetProfileId]) {
-        finalProfileAid = targetProfileId;
-        notificationService.clearTargetProfileIdForColdStart();
-      }
-
-      dispatch(setCurrentProfile(finalProfileAid));
+      dispatch(setCurrentProfile(currentProfileAid));
 
       dispatch(setCredsArchivedCache(credsArchivedCache));
       dispatch(
@@ -502,8 +492,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
           allMultisigConnections as MultisigConnectionDetails[]
         )
       );
-
-      notificationService.completeColdStart();
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
     }
@@ -686,6 +674,21 @@ const AppWrapper = (props: { children: ReactNode }) => {
   };
 
   const setupEventServiceCallbacks = () => {
+    notificationService.setProfileSwitcher((profileId: string) => {
+      dispatch(setCurrentProfile(profileId));
+    });
+
+    notificationService.setNavigator(
+      (path: string, notificationId?: string) => {
+        window.history.pushState(null, "", path);
+        window.dispatchEvent(
+          new CustomEvent("notificationNavigation", {
+            detail: { path, notificationId },
+          })
+        );
+      }
+    );
+
     Agent.agent.onKeriaStatusStateChanged((event) => {
       setOnlineStatus(event.payload.isOnline);
     });

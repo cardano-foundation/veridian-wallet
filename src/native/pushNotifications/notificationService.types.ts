@@ -1,15 +1,8 @@
-enum ColdStartState {
-  IDLE = "IDLE",
-  PROCESSING = "PROCESSING",
-  READY = "READY",
-}
-
 interface NotificationPayload {
   notificationId: string;
   profileId: string;
   title: string;
   body: string;
-  timestamp: number;
 }
 
 interface LocalNotification {
@@ -19,7 +12,5 @@ interface LocalNotification {
     [key: string]: unknown;
   };
 }
-
-export { ColdStartState };
 
 export type { NotificationPayload, LocalNotification };

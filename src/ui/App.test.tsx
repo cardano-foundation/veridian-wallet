@@ -1,3 +1,19 @@
+jest.mock("@capacitor/local-notifications", () => ({
+  LocalNotifications: {
+    requestPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    schedule: jest.fn(),
+    addListener: jest.fn(),
+    removeAllListeners: jest.fn(),
+    cancel: jest.fn(),
+    getPending: jest.fn(() => Promise.resolve({ notifications: [] })),
+    getDeliveredNotifications: jest.fn(() =>
+      Promise.resolve({ notifications: [] })
+    ),
+    checkPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    createChannel: jest.fn(() => Promise.resolve()),
+  },
+}));
+
 import { Style, StyleOptions } from "@capacitor/status-bar";
 import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { act, render, waitFor } from "@testing-library/react";
@@ -153,9 +169,15 @@ jest.mock("@capacitor/local-notifications", () => ({
     requestPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
     schedule: jest.fn(),
     addListener: jest.fn(),
+    removeAllListeners: jest.fn(),
     removeAllDeliveredNotifications: jest.fn(),
     cancel: jest.fn(),
-    createChannel: jest.fn(),
+    getPending: jest.fn(() => Promise.resolve({ notifications: [] })),
+    getDeliveredNotifications: jest.fn(() =>
+      Promise.resolve({ notifications: [] })
+    ),
+    checkPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    createChannel: jest.fn(() => Promise.resolve()),
   },
 }));
 
