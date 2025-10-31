@@ -125,7 +125,7 @@ interface ExnMessageA {
 
 // Define types for the 'e' property in ExnMessage
 interface ExnMessageE {
-  acdc: {
+  acdc?: {
     d: string;
     i: string;
     s: string;
@@ -174,6 +174,13 @@ type ExnMessage = {
     exn?: string;
   };
 };
+
+// Type guard to check if ExnMessageE has acdc
+function exnHasAcdc(
+  e: ExnMessageE
+): e is ExnMessageE & { acdc: NonNullable<ExnMessageE["acdc"]> } {
+  return e.acdc !== undefined && e.acdc !== null;
+}
 
 type ConnectionNoteProps = Pick<ConnectionNoteDetails, "title" | "message">;
 
@@ -269,6 +276,7 @@ export {
   CreationStatus,
   isRegularConnectionDetails,
   isMultisigConnectionDetails,
+  exnHasAcdc,
 };
 
 export type {

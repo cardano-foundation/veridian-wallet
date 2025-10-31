@@ -5,6 +5,7 @@ import {
   ConnectionStatus,
   MiscRecordId,
   CreationStatus,
+  exnHasAcdc,
 } from "../agent.types";
 import {
   KeriaNotificationMarker,
@@ -524,6 +525,10 @@ class KeriaNotificationService extends AgentService {
     exchange: ExnMessage
   ): Promise<boolean> {
     // Only consider issuances for now
+    // Type narrowing: IpexGrant route must have e.acdc
+    if (!exnHasAcdc(exchange.exn.e)) {
+      throw new Error(`IpexGrant notification must have e.acdc: ${notif.i}`);
+    }
 
     const ourIdentifier = await this.identifierStorage
       .getIdentifierMetadata(exchange.exn.e.acdc.a.i)
