@@ -110,6 +110,8 @@ interface RemoteSignRequest {
   payload: JSONObject;
 }
 
+export { IdentifierType };
+
 export type {
   IdentifierShortDetails,
   IdentifierDetails,
@@ -117,10 +119,6 @@ export type {
   CreateIdentifierInputs,
   CreateIdentifierResult,
   MultisigThresholds,
-};
-
-export { IdentifierType };
-export type {
   GroupMetadata,
   QueuedIdentifierCreation,
   QueuedGroupProps,

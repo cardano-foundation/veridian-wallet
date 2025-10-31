@@ -805,9 +805,10 @@ class MultiSigService extends AgentService {
           throw new Error(MultiSigService.GROUP_DATA_MISSING_FOR_INITIATOR);
         }
 
+        const groupData = queued.data.group;
         const threshold = queued.threshold;
         await this.createGroup(
-          queued.data.group.mhab.prefix,
+          groupData.mhab.prefix,
           queued.groupConnections as MultisigConnectionDetails[],
           threshold,
           true
