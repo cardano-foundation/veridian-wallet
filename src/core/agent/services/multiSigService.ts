@@ -310,7 +310,28 @@ class MultiSigService extends AgentService {
         rstates: states,
       });
 
-    queued.push({ name: groupName, data: inceptionData, ...queuedProps });
+    // Build properly typed queued item based on discriminated union
+    if (queuedProps.initiator) {
+      // Ensure group data exists for initiator
+      if (!inceptionData.group) {
+        throw new Error(MultiSigService.GROUP_DATA_MISSING_FOR_INITIATOR);
+      }
+      queued.push({
+        initiator: true,
+        name: groupName,
+        data: inceptionData as CreateIdentifierBody & { group: HabState },
+        groupConnections: queuedProps.groupConnections,
+        threshold: queuedProps.threshold,
+      });
+    } else {
+      queued.push({
+        initiator: false,
+        name: groupName,
+        data: inceptionData,
+        notificationId: queuedProps.notificationId,
+        notificationSaid: queuedProps.notificationSaid,
+      });
+    }
 
     await this.basicStorage.createOrUpdateBasicRecord(
       new BasicRecord({
@@ -801,15 +822,11 @@ class MultiSigService extends AgentService {
     for (const queued of pendingGroupsRecord.content
       .queued as QueuedGroupCreation[]) {
       if (queued.initiator) {
-        if (!queued.data.group) {
-          throw new Error(MultiSigService.GROUP_DATA_MISSING_FOR_INITIATOR);
-        }
-
-        const groupData = queued.data.group;
+        // TypeScript guarantees queued.data.group exists when initiator is true
         const threshold = queued.threshold;
         await this.createGroup(
-          groupData.mhab.prefix,
-          queued.groupConnections as MultisigConnectionDetails[],
+          queued.data.group.mhab.prefix,
+          queued.groupConnections,
           threshold,
           true
         );

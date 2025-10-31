@@ -1,4 +1,4 @@
-import { CreateIdentifierBody } from "signify-ts";
+import { CreateIdentifierBody, HabState } from "signify-ts";
 import {
   MultisigConnectionDetails,
   CreationStatus,
@@ -61,15 +61,33 @@ enum IdentifierType {
   Group = "group",
 }
 
-type QueuedIdentifierCreation = {
-  name: string;
-  data: CreateIdentifierBody;
-};
-
 interface MultisigThresholds {
   signingThreshold: number;
   rotationThreshold: number;
 }
+
+// Discriminated union with proper type safety for group data
+type QueuedGroupCreation =
+  | {
+      initiator: true;
+      name: string;
+      data: CreateIdentifierBody & { group: HabState };
+      groupConnections: MultisigConnectionDetails[];
+      threshold: number | MultisigThresholds;
+    }
+  | {
+      initiator: false;
+      name: string;
+      data: CreateIdentifierBody;
+      notificationId: string;
+      notificationSaid: string;
+    };
+
+// Legacy type for backward compatibility if needed elsewhere
+type QueuedIdentifierCreation = {
+  name: string;
+  data: CreateIdentifierBody;
+};
 
 type QueuedGroupProps =
   | {
@@ -82,8 +100,6 @@ type QueuedGroupProps =
       notificationId: string;
       notificationSaid: string;
     };
-
-type QueuedGroupCreation = QueuedIdentifierCreation & QueuedGroupProps;
 
 interface GroupParticipants {
   ourIdentifier: IdentifierMetadataRecord;
