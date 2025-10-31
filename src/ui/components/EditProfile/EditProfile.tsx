@@ -116,57 +116,38 @@ const EditProfile = ({
       if (editType === "name") {
         const params: Pick<
           IdentifierMetadataRecordProps,
-          "theme" | "displayName" | "groupMetadata"
+          "theme" | "displayName"
         > = {
           displayName: newDisplayName,
           theme: currentIdentifier.identity.theme,
-          groupMetadata: cardData.groupMetadata,
         };
         await Agent.agent.identifiers.updateIdentifier(cardData.id, params);
 
         const updatedIdentifier: IdentifierShortDetails = {
           ...currentIdentifier.identity,
           displayName: params.displayName,
-          groupMetadata: params.groupMetadata,
         };
 
         setCardData({
           ...cardData,
           displayName: params.displayName,
-          groupMetadata: params.groupMetadata,
         });
         dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
       } else if (editType === "userName") {
+        // UI only allows editing username for fully created groups (with members)
         await Agent.agent.identifiers.updateGroupUsername(
           cardData.id,
           newDisplayName
         );
 
-        // Update local state with new username
         const updatedIdentifier: IdentifierShortDetails = {
           ...currentIdentifier.identity,
-          groupUsername: isGroup
-            ? newDisplayName
-            : currentIdentifier.identity.groupUsername,
-          groupMetadata:
-            !isGroup && cardData.groupMetadata
-              ? {
-                  ...cardData.groupMetadata,
-                  proposedUsername: newDisplayName,
-                }
-              : currentIdentifier.identity.groupMetadata,
+          groupUsername: newDisplayName,
         };
 
         setCardData({
           ...cardData,
-          groupUsername: isGroup ? newDisplayName : cardData.groupUsername,
-          groupMetadata:
-            !isGroup && cardData.groupMetadata
-              ? {
-                  ...cardData.groupMetadata,
-                  proposedUsername: newDisplayName,
-                }
-              : cardData.groupMetadata,
+          groupUsername: newDisplayName,
         });
         dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
       }
