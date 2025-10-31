@@ -822,18 +822,27 @@ class MultiSigService extends AgentService {
     for (const queued of pendingGroupsRecord.content
       .queued as QueuedGroupCreation[]) {
       if (queued.initiator) {
-        // TypeScript guarantees queued.data.group exists when initiator is true
-        const threshold = queued.threshold;
+        // TypeScript narrows to initiator variant
+        const initiatorQueued = queued as Extract<
+          QueuedGroupCreation,
+          { initiator: true }
+        >;
+        const threshold = initiatorQueued.threshold;
         await this.createGroup(
-          queued.data.group.mhab.prefix,
-          queued.groupConnections,
+          initiatorQueued.data.group.mhab.prefix,
+          initiatorQueued.groupConnections,
           threshold,
           true
         );
       } else {
+        // TypeScript narrows to join variant
+        const joinQueued = queued as Extract<
+          QueuedGroupCreation,
+          { initiator: false }
+        >;
         await this.joinGroup(
-          queued.notificationId,
-          queued.notificationSaid,
+          joinQueued.notificationId,
+          joinQueued.notificationSaid,
           true
         );
       }
