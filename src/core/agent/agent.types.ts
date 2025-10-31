@@ -120,10 +120,7 @@ interface ExnMessageA {
   };
   d?: string;
   r?: string;
-  exn?: {
-    r: string;
-    p: string;
-  };
+  exn?: unknown;
 }
 
 // Define types for the 'e' property in ExnMessage
@@ -152,10 +149,7 @@ interface ExnMessageE {
   icp: {
     i: string;
   };
-  exn: {
-    r: string;
-    p: string;
-  };
+  exn: unknown;
   [key: string]: unknown;
 }
 

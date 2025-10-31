@@ -48,6 +48,20 @@ import { ConnectionHistoryType, ExnMessage } from "./connectionService.types";
 import { NotificationAttempts } from "../records/notificationRecord.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { IdentifierService } from "./identifierService";
+
+// Type guard for exchange data with route information
+function isExnWithRoute(
+  exn: unknown
+): exn is { r: string; p: string; [key: string]: unknown } {
+  return (
+    typeof exn === "object" &&
+    exn !== null &&
+    "r" in exn &&
+    "p" in exn &&
+    typeof (exn as { r: unknown }).r === "string" &&
+    typeof (exn as { p: unknown }).p === "string"
+  );
+}
 import { ConnectionService } from "./connectionService";
 import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
@@ -716,6 +730,12 @@ class KeriaNotificationService extends AgentService {
     exchange: ExnMessage
   ): Promise<false> {
     const exnData = exchange.exn.e?.exn;
+
+    if (!isExnWithRoute(exnData)) {
+      throw new Error(
+        `Invalid exn data structure in processMultiSigExnNotification: ${notif.i}`
+      );
+    }
 
     switch (exnData.r) {
       case ExchangeRoute.IpexAdmit: {
