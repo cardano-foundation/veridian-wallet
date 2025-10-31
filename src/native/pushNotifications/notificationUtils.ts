@@ -55,10 +55,6 @@ export const getNotificationDisplayText = (
       return t("tabs.notifications.tab.labels.exnipexgrantrevoke", {
         credential: (item.a as { credentialTitle?: string }).credentialTitle,
       });
-    case NotificationRoute.MultiSigExn:
-      return t("tabs.notifications.tab.labels.multisigexn", {
-        connection: connectionName || t("tabs.connections.unknown"),
-      });
     case NotificationRoute.RemoteSignReq:
       return t("tabs.notifications.tab.labels.sign", {
         connection: connectionName || t("tabs.connections.unknown"),
