@@ -125,12 +125,20 @@ describe("Manage password", () => {
     });
 
     await waitFor(() => {
-      expect(
-        queryByText(
-          TRANSLATIONS.settings.sections.security.managepassword.page.alert
-            .enablemessage
+      // find the visible alert element (some alert overlays may be present but hidden)
+      const alerts = Array.from(
+        document.querySelectorAll(
+          '[data-testid="alert-cancel-enable-password"]'
         )
-      ).toBeVisible();
+      ) as HTMLElement[];
+      const openAlert = alerts.find(
+        (a) => a.getAttribute("is-open") === "true"
+      );
+      expect(openAlert).toBeDefined();
+      expect(openAlert?.textContent).toContain(
+        TRANSLATIONS.settings.sections.security.managepassword.page.alert
+          .enablemessage
+      );
     });
 
     await waitFor(() => {

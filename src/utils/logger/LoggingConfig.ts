@@ -11,6 +11,7 @@ interface ILoggingConfig {
   batchSize: number;
   maxSyncRetries: number;
   retryDelayMs: number;
+  maxLogFileSize: number;
 }
 
 export class LoggingConfig implements ILoggingConfig {
@@ -24,6 +25,7 @@ export class LoggingConfig implements ILoggingConfig {
   public readonly batchSize: number;
   public readonly maxSyncRetries: number;
   public readonly retryDelayMs: number;
+  public readonly maxLogFileSize: number;
 
   constructor() {
     this.mode = (process.env.LOGGING_MODE as LogLevel | "off") || "info";
@@ -37,6 +39,9 @@ export class LoggingConfig implements ILoggingConfig {
     this.maxSyncRetries = isNaN(parsedMaxSyncRetries) ? 3 : parsedMaxSyncRetries;
     const parsedRetryDelayMs = parseInt(process.env.LOGGING_RETRY_DELAY_MS || "5000", 10);
     this.retryDelayMs = isNaN(parsedRetryDelayMs) ? 5000 : parsedRetryDelayMs;
+    const parsedMaxLogFileSize = parseInt(process.env.LOGGING_MAX_FILE_SIZE || String(5 * 1024 * 1024), 10);
+    this.maxLogFileSize = isNaN(parsedMaxLogFileSize) ? (5 * 1024 * 1024) : parsedMaxLogFileSize;
+
 
     // Override individual enables if mode is "off"
     if (this.mode === "off") {

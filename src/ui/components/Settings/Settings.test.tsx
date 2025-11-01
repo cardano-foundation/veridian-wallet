@@ -177,6 +177,10 @@ jest.mock('@capacitor/filesystem', () => ({
     appendFile: jest.fn(),
     readFile: jest.fn().mockResolvedValue({ data: '' }),
     writeFile: jest.fn(),
+    getUri: jest.fn(async ({ path, directory }) => {
+      const fullPath = `${directory}/${path}`;
+      return { uri: `mock://${fullPath}` };
+    }),
   },
   Directory: {
     Data: 'DATA',
