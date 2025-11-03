@@ -2,7 +2,6 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { biometricsCacheSlice } from "./reducers/biometricsCache";
 import { profilesCacheSlice } from "./reducers/profileCache";
 import { seedPhraseCacheSlice } from "./reducers/seedPhraseCache";
-import { ssiAgentSlice } from "./reducers/ssiAgent";
 import { stateCacheSlice } from "./reducers/stateCache";
 import { viewTypeCacheSlice } from "./reducers/viewTypeCache";
 
@@ -11,7 +10,6 @@ export const rootReducer = combineReducers({
   seedPhraseCache: seedPhraseCacheSlice.reducer,
   viewTypeCache: viewTypeCacheSlice.reducer,
   biometricsCache: biometricsCacheSlice.reducer,
-  ssiAgentCache: ssiAgentSlice.reducer,
   profilesCache: profilesCacheSlice.reducer,
 });
 
@@ -30,5 +28,5 @@ const store = configureStore({
 type RootState = ReturnType<typeof store.getState>;
 type AppDispatch = typeof store.dispatch;
 
-export type { AppDispatch, RootState };
 export { store };
+export type { AppDispatch, RootState };

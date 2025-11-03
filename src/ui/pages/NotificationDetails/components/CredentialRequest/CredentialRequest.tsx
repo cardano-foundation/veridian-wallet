@@ -1,36 +1,34 @@
 import { IonSpinner } from "@ionic/react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
-import { IdentifierType } from "../../../../../core/agent/services/identifier.types";
+import type { CredentialMetadataRecordProps } from "../../../../../core/agent/records/credentialMetadataRecord.types";
 import { CredentialStatus } from "../../../../../core/agent/services/credentialService.types";
+import { IdentifierType } from "../../../../../core/agent/services/identifier.types";
 import { CredentialsMatchingApply } from "../../../../../core/agent/services/ipexCommunicationService.types";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
+  deleteNotificationById,
+  getCredsCache,
+  getCurrentProfile,
   getMultisigConnectionsCache,
   getProfiles,
-  getCredsCache,
-  deleteNotificationById,
 } from "../../../../../store/reducers/profileCache";
-import {
-  getAuthentication,
-  setToastMsg,
-} from "../../../../../store/reducers/stateCache";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
+import { Verification } from "../../../../components/Verification";
+import { ToastMsgType } from "../../../../globals/types";
 import { useOnlineStatusEffect } from "../../../../hooks";
 import { showError } from "../../../../utils/error";
-import { ToastMsgType } from "../../../../globals/types";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import { ChooseCredential } from "./ChooseCredential";
 import "./CredentialRequest.scss";
 import {
+  ACDC,
   LinkedGroup,
   RequestCredential,
-  ACDC,
 } from "./CredentialRequest.types";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
-import type { CredentialMetadataRecordProps } from "../../../../../core/agent/records/credentialMetadataRecord.types";
-import { Verification } from "../../../../components/Verification";
 
 const CredentialRequest = ({
   pageId,
@@ -41,13 +39,11 @@ const CredentialRequest = ({
   const dispatch = useAppDispatch();
   const profiles = useAppSelector(getProfiles);
   const credsCache = useAppSelector(getCredsCache);
-  const multisignConnectionsCache = useAppSelector(
-    getMultisigConnectionsCache
-  ) as any[];
-  const userName = useAppSelector(getAuthentication)?.userName;
+  const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const [requestStage, setRequestStage] = useState(0);
   const [credentialRequest, setCredentialRequest] =
     useState<CredentialsMatchingApply | null>();
+  const currentProfile = useAppSelector(getCurrentProfile);
 
   const [linkedGroup, setLinkedGroup] = useState<LinkedGroup | null>(null);
   const [isOpenAlert, setIsOpenAlert] = useState(false);
@@ -62,9 +58,9 @@ const CredentialRequest = ({
       (linkedGroup.linkedRequest.accepted ? 1 : 0) >=
       Number(linkedGroup.threshold.signingThreshold);
 
-  const userAID = !credentialRequest
+  const userAID = !credentialRequest?.identifier
     ? null
-    : profiles[credentialRequest.identifier!]?.identity.groupMemberPre || null;
+    : profiles[credentialRequest.identifier]?.identity.groupMemberPre || null;
 
   const getMultisigInfo = useCallback(async () => {
     const linkedGroup =
@@ -79,8 +75,9 @@ const CredentialRequest = ({
       if (!memberConnection) {
         return {
           aid: member,
-          name: userName,
+          name: currentProfile?.identity.groupMetadata?.userName || "",
           joined: linkedGroup.linkedRequest.accepted,
+          isCurrentUser: true,
         };
       }
 
@@ -88,6 +85,7 @@ const CredentialRequest = ({
         aid: member,
         name: memberConnection.label || member,
         joined: linkedGroup.othersJoined.includes(member),
+        isCurrentUser: false,
       };
     });
 
@@ -95,7 +93,11 @@ const CredentialRequest = ({
       ...linkedGroup,
       memberInfos,
     });
-  }, [multisignConnectionsCache, notificationDetails.id, userName]);
+  }, [
+    currentProfile?.identity.groupMetadata?.userName,
+    multisignConnectionsCache,
+    notificationDetails.id,
+  ]);
 
   const getCrendetialRequest = useCallback(async () => {
     try {
@@ -124,7 +126,7 @@ const CredentialRequest = ({
   useOnlineStatusEffect(getCrendetialRequest);
 
   // Function to get suitable credentials (similar to ChooseCredential logic)
-  const getSuitableCredentials = useCallback(() => {
+  const suitableCredentials = useMemo(() => {
     if (!credentialRequest) return [];
 
     const revokedCredsCache = credsCache.filter(
@@ -147,7 +149,7 @@ const CredentialRequest = ({
   }, [credentialRequest, credsCache]);
 
   // Function to automatically submit a credential
-  const handleAutoSubmitCredential = useCallback(
+  const handleSubmitCredential = useCallback(
     async (credential: RequestCredential) => {
       try {
         setLoading(true);
@@ -188,8 +190,6 @@ const CredentialRequest = ({
       setIsOpenAlert(true);
       return;
     }
-
-    const suitableCredentials = getSuitableCredentials();
 
     if (suitableCredentials.length === 1) {
       setSuitableCredential(suitableCredentials[0]);
@@ -232,6 +232,7 @@ const CredentialRequest = ({
           onBack={handleBack}
           userAID={userAID}
           onReloadData={getCrendetialRequest}
+          suitableCredentialsCount={suitableCredentials.length}
         />
       ) : (
         <ChooseCredential
@@ -241,8 +242,8 @@ const CredentialRequest = ({
           notificationDetails={notificationDetails}
           linkedGroup={linkedGroup}
           onBack={backToStageOne}
-          onClose={handleBack}
           reloadData={getCrendetialRequest}
+          onSubmit={handleSubmitCredential}
         />
       )}
       {loading && (
@@ -270,7 +271,7 @@ const CredentialRequest = ({
         verifyIsOpen={verifyIsOpen}
         setVerifyIsOpen={setVerifyIsOpen}
         onVerify={() =>
-          suitableCredential && handleAutoSubmitCredential(suitableCredential)
+          suitableCredential && handleSubmitCredential(suitableCredential)
         }
       />
     </div>

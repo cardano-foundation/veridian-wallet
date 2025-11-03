@@ -1,10 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { biometricsCacheSlice } from "../../store/reducers/biometricsCache";
+import { profilesCacheSlice } from "../../store/reducers/profileCache";
 import { seedPhraseCacheSlice } from "../../store/reducers/seedPhraseCache";
-import { ssiAgentSlice } from "../../store/reducers/ssiAgent";
 import { stateCacheSlice } from "../../store/reducers/stateCache";
 import { viewTypeCacheSlice } from "../../store/reducers/viewTypeCache";
-import { profilesCacheSlice } from "../../store/reducers/profileCache";
 
 export function makeTestStore(preloadedState?: any) {
   const transformedPreloaded = preloadedState
@@ -32,7 +31,6 @@ export function makeTestStore(preloadedState?: any) {
       seedPhraseCache: seedPhraseCacheSlice.reducer,
       viewTypeCache: viewTypeCacheSlice.reducer,
       biometricsCache: biometricsCacheSlice.reducer,
-      ssiAgentCache: ssiAgentSlice.reducer,
       profilesCache: profilesCacheSlice.reducer,
     },
     preloadedState: transformedPreloaded,

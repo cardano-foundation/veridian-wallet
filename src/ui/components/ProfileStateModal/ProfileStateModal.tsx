@@ -1,10 +1,11 @@
 import { IonModal } from "@ionic/react";
 import { warningOutline } from "ionicons/icons";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
+import { RoutePath } from "../../../routes";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getShowProfileState,
@@ -12,6 +13,10 @@ import {
   setShowProfileState,
 } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
+import { ToastMsgType } from "../../globals/types";
+import { useProfile } from "../../hooks/useProfile";
+import { Profiles } from "../../pages/Profiles";
+import { showError } from "../../utils/error";
 import { Alert } from "../Alert";
 import { Avatar } from "../Avatar";
 import { InfoCard } from "../InfoCard";
@@ -21,12 +26,7 @@ import { PageHeader } from "../PageHeader";
 import { Spinner } from "../Spinner";
 import { SpinnerConverage } from "../Spinner/Spinner.type";
 import { Verification } from "../Verification";
-import { ToastMsgType } from "../../globals/types";
-import { useProfile } from "../../hooks/useProfile";
-import { showError } from "../../utils/error";
-import { Profiles } from "../../pages/Profiles";
 import "./ProfileStateModal.scss";
-import { RoutePath } from "../../../routes";
 
 const WAITING_TIME = 5000;
 
@@ -45,6 +45,7 @@ const ProfileStateModal = () => {
   const [isOpenProfiles, setOpenProfiles] = useState(false);
   const isOpen = useAppSelector(getShowProfileState);
   const history = useHistory();
+  const checkedProfileId = useRef<string | undefined>();
 
   const setIsOpen = useCallback(
     (value: boolean) => {
@@ -54,7 +55,11 @@ const ProfileStateModal = () => {
   );
 
   const getDetails = useCallback(async () => {
-    if (!currentProfile?.identity.id) return;
+    if (
+      !currentProfile?.identity.id ||
+      currentProfile.identity.creationStatus === CreationStatus.PENDING
+    )
+      return;
 
     try {
       setIsOpen(true);
@@ -75,18 +80,25 @@ const ProfileStateModal = () => {
     } finally {
       setHiddenContent(false);
     }
-  }, [currentProfile?.identity.id, dispatch, setIsOpen]);
+  }, [
+    currentProfile?.identity.creationStatus,
+    currentProfile?.identity.id,
+    dispatch,
+    setIsOpen,
+  ]);
 
   useEffect(() => {
     if (
-      !currentProfile?.identity?.creationStatus ||
+      !currentProfile?.identity.creationStatus ||
       !currentProfile?.identity.createdAtUTC ||
-      history.location.pathname.includes(RoutePath.PROFILE_SETUP)
+      history.location.pathname.includes(RoutePath.PROFILE_SETUP) ||
+      checkedProfileId.current === currentProfile?.identity.id
     ) {
       setIsOpen(false);
       return;
     }
 
+    checkedProfileId.current = currentProfile?.identity.id;
     const creationStatus = currentProfile?.identity.creationStatus;
     const groupMemberPre = currentProfile?.identity.groupMemberPre;
     const createdAtUTC = currentProfile?.identity.createdAtUTC;
@@ -131,6 +143,7 @@ const ProfileStateModal = () => {
 
     getDetails();
   }, [
+    currentProfile?.identity.id,
     currentProfile?.identity.creationStatus,
     currentProfile?.identity.groupMemberPre,
     currentProfile?.identity.createdAtUTC,

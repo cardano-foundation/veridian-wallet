@@ -5,6 +5,7 @@ interface SetupGroupProps {
   groupName: string;
   onClickEvent: () => void;
   setupProfileStep: SetupProfileStep;
+  errorMessage?: string;
 }
 
 export type { SetupGroupProps };

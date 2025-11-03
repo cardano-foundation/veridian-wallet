@@ -1,12 +1,5 @@
 import { IonButton, IonIcon } from "@ionic/react";
-import {
-  checkmarkOutline,
-  exitOutline,
-  hourglassOutline,
-  refreshOutline,
-  star,
-  warningOutline,
-} from "ionicons/icons";
+import { exitOutline, refreshOutline, warningOutline } from "ionicons/icons";
 import { useCallback, useMemo, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import { MultiSigIcpRequestDetails } from "../../../../../core/agent/services/identifier.types";
@@ -28,6 +21,11 @@ import {
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { ListHeader } from "../../../../components/ListHeader";
+import { MemberList } from "../../../../components/MemberList";
+import {
+  Member,
+  MemberAcceptStatus,
+} from "../../../../components/MemberList/MemberList.type";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
 import { Spinner } from "../../../../components/Spinner";
@@ -37,7 +35,6 @@ import { ToastMsgType } from "../../../../globals/types";
 import { useAppIonRouter, useOnlineStatusEffect } from "../../../../hooks";
 import { useProfile } from "../../../../hooks/useProfile";
 import { showError } from "../../../../utils/error";
-import { combineClassNames } from "../../../../utils/style";
 import { Profiles } from "../../../Profiles";
 import { StageProps } from "../../SetupGroupProfile.types";
 import "./PendingGroup.scss";
@@ -79,7 +76,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   };
 
   const members = useMemo(() => {
-    const members = state.selectedConnections?.map((connection) => {
+    const members = state.selectedConnections?.map((connection): Member => {
       const name = connection?.label || "";
 
       let hasAccepted = false;
@@ -101,22 +98,30 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       return {
         name,
         isCurrentUser: false,
-        accepted: hasAccepted,
+        status: hasAccepted
+          ? MemberAcceptStatus.Accepted
+          : MemberAcceptStatus.Waiting,
       };
     });
 
     members.unshift({
       name: identity?.groupMetadata?.proposedUsername || "",
       isCurrentUser: true,
-      accepted:
-        groupDetails?.members.find(
-          (item) => item.aid === identity?.groupMemberPre
-        )?.hasAccepted || false,
+      status: groupDetails?.members.find(
+        (item) => item.aid === identity?.groupMemberPre
+      )?.hasAccepted
+        ? MemberAcceptStatus.Accepted
+        : MemberAcceptStatus.Waiting,
     });
 
     return members.map((member, index) => ({
       ...member,
-      rank: index >= 0 ? index % 5 : 0,
+      avatar: (
+        <MemberAvatar
+          firstLetter={member.name.at(0)?.toLocaleUpperCase() || ""}
+          rank={index >= 0 ? index % 5 : 0}
+        />
+      ),
     }));
   }, [
     state.selectedConnections,
@@ -319,49 +324,15 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
           endSlotIcon={refreshOutline}
           onClick={fetchGroupDetails}
         >
-          {members.map((item, index) => {
-            return (
-              <CardDetailsItem
-                key={index}
-                info={item.name}
-                startSlot={
-                  <MemberAvatar
-                    firstLetter={item.name.at(0)?.toLocaleUpperCase() || ""}
-                    rank={item.rank}
-                  />
-                }
-                className="member"
-                testId={`group-member-${index}`}
-                endSlot={
-                  <>
-                    {item.isCurrentUser && (
-                      <div className="user-label">
-                        <IonIcon icon={star} />
-                        <span>{i18n.t("profiledetails.detailsmodal.you")}</span>
-                      </div>
-                    )}
-                    <div
-                      className={combineClassNames(
-                        "status",
-                        item.accepted ? "accepted" : ""
-                      )}
-                    >
-                      <IonIcon
-                        icon={
-                          item.accepted ? checkmarkOutline : hourglassOutline
-                        }
-                      />
-                    </div>
-                  </>
-                }
-              />
-            );
-          })}
-          <p className="bottom-text">
-            {i18n.t(`setupgroupprofile.initgroup.numberofmember`, {
-              members: members?.length || 0,
-            })}
-          </p>
+          <MemberList
+            members={members}
+            bottomText={`${i18n.t(
+              `setupgroupprofile.initgroup.numberofmember`,
+              {
+                members: members?.length || 0,
+              }
+            )}`}
+          />
         </CardBlock>
         <CardBlock
           flatBorder={FlatBorderType.BOT}

@@ -1,4 +1,4 @@
-import { parseHabName, formatToV1_2_0_3 } from "./habName";
+import { parseHabName, formatToV1_2_0_2 } from "./habName";
 
 describe("habName", () => {
   describe("parseHabName", () => {
@@ -69,12 +69,12 @@ describe("habName", () => {
       expect(result).toEqual(expect.objectContaining(expected));
     });
 
-    // Tests for new format names (1.2.0.3:theme:groupInitiator:groupId:proposedUsername:displayName)
+    // Tests for new format names (1.2.0.2:theme:groupInitiator:groupId:userName:displayName)
     test.each([
       {
-        name: "1.2.0.3:XX:1:groupId789:user123:MyNewGroup",
+        name: "1.2.0.2:XX:1:groupId789:user123:MyNewGroup",
         expected: {
-          version: "1.2.0.3",
+          version: "1.2.0.2",
           displayName: "MyNewGroup",
           theme: "XX",
           groupMetadata: {
@@ -85,9 +85,9 @@ describe("habName", () => {
         },
       },
       {
-        name: "1.2.0.3:XX:1:gr@up!d:us$er%name:Group Name",
+        name: "1.2.0.2:XX:1:gr@up!d:us$er%name:Group Name",
         expected: {
-          version: "1.2.0.3",
+          version: "1.2.0.2",
           displayName: "Group Name",
           theme: "XX",
           groupMetadata: {
@@ -98,9 +98,9 @@ describe("habName", () => {
         },
       },
       {
-        name: "1.2.0.3:XX:1:group-with-hyphens:user123:MyNewGroup",
+        name: "1.2.0.2:XX:1:group-with-hyphens:user123:MyNewGroup",
         expected: {
-          version: "1.2.0.3",
+          version: "1.2.0.2",
           displayName: "MyNewGroup",
           theme: "XX",
           groupMetadata: {
@@ -111,9 +111,9 @@ describe("habName", () => {
         },
       },
       {
-        name: "1.2.0.3:XX:MyNewWallet", // Non-group member in new format
+        name: "1.2.0.2:XX:MyNewWallet", // Non-group member in new format
         expected: {
-          version: "1.2.0.3",
+          version: "1.2.0.2",
           displayName: "MyNewWallet",
           theme: "XX",
         },
@@ -136,7 +136,7 @@ describe("habName", () => {
           "Invalid old format name: Expected 2 or 3 parts separated by colons (theme:groupPart:displayName or theme:displayName)",
       },
       {
-        name: "1.2.0.3:XX:1:groupId789:user123", // Invalid number of parts for new format (5 parts)
+        name: "1.2.0.2:XX:1:groupId789:user123", // Invalid number of parts for new format (5 parts)
         errorMessage:
           "Invalid new format name: Expected 3 or 6 parts separated by colons (version:theme:displayName or version:theme:groupInitiator:groupId:proposedUsername:displayName).",
       },
@@ -153,7 +153,7 @@ describe("habName", () => {
         errorMessage: "Invalid old format name: groupId cannot be empty.",
       },
       {
-        name: "1.2.0.3:XX:1::user123:MyGroup", // Empty groupId for new format
+        name: "1.2.0.2:XX:1::user123:MyGroup", // Empty groupId for new format
         errorMessage: "Invalid new format name: groupId cannot be empty.",
       },
     ])(
@@ -171,7 +171,7 @@ describe("habName", () => {
           displayName: "FormattedWallet",
           theme: "XX",
         },
-        expected: "1.2.0.3:XX:FormattedWallet", // Non-group member format
+        expected: "1.2.0.2:XX:FormattedWallet", // Non-group member format
       },
       {
         parts: {
@@ -183,40 +183,40 @@ describe("habName", () => {
             proposedUsername: "formattedUser",
           },
         },
-        expected: "1.2.0.3:XX:1:groupXYZ:formattedUser:FormattedGroup",
+        expected: "1.2.0.2:XX:1:groupXYZ:formattedUser:FormattedGroup",
       },
       {
         parts: {
           displayName: "",
           theme: "XX",
         },
-        expected: "1.2.0.3:XX:",
+        expected: "1.2.0.2:XX:",
       },
       {
         parts: {
           displayName: "Group !@#$%^&*()",
           theme: "XX",
         },
-        expected: "1.2.0.3:XX:Group !@#$%^&*()",
+        expected: "1.2.0.2:XX:Group !@#$%^&*()",
       },
       {
         parts: {
           displayName: "Group 🚀",
           theme: "XX",
         },
-        expected: "1.2.0.3:XX:Group 🚀",
+        expected: "1.2.0.2:XX:Group 🚀",
       },
       {
         parts: {
           displayName: "Display:Name:With:Colons",
           theme: "XX",
         },
-        expected: "1.2.0.3:XX:Display:Name:With:Colons",
+        expected: "1.2.0.2:XX:Display:Name:With:Colons",
       },
     ])(
-      "should format hab name parts correctly to v1.2.0.3 format: %s",
+      "should format hab name parts correctly to v1.2.0.2 format: %s",
       ({ parts, expected }) => {
-        const result = formatToV1_2_0_3(parts);
+        const result = formatToV1_2_0_2(parts);
         expect(result).toBe(expected);
       }
     );

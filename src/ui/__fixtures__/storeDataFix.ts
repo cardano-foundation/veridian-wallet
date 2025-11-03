@@ -69,7 +69,6 @@ export const storeStateFixData: RootState = {
     routes: [],
     authentication: {
       loggedIn: false,
-      userName: "",
       time: 0,
       passcodeIsSet: false,
       seedPhraseIsSet: false,
@@ -107,10 +106,6 @@ export const storeStateFixData: RootState = {
   },
   biometricsCache: {
     enabled: false,
-  },
-  ssiAgentCache: {
-    bootUrl: "",
-    connectUrl: "",
   },
   profilesCache: {
     ...profileCacheFixData,

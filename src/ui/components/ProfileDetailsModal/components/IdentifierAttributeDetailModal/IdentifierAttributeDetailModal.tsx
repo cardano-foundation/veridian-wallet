@@ -15,6 +15,10 @@ import {
 import { List } from "./List";
 import { RotationThreshold } from "./RotationThreshold";
 import { SigningThreshold } from "./SigningThreshold";
+import {
+  Member,
+  MemberAcceptStatus,
+} from "../../../MemberList/MemberList.type";
 
 const IdentifierAttributeDetailModal = ({
   isOpen,
@@ -32,7 +36,7 @@ const IdentifierAttributeDetailModal = ({
 
   const renderContent = () => {
     let currentUserIndex = 0;
-    const members = data.members?.map((member, index) => {
+    const members = data.members?.map((member, index): Member => {
       const memberConnection = multisignConnectionsCache.find(
         (c) => c.id === member
       );
@@ -46,7 +50,7 @@ const IdentifierAttributeDetailModal = ({
       const rank = index >= 0 ? index % 5 : 0;
 
       return {
-        title: name,
+        name: name,
         isCurrentUser: !memberConnection?.label,
         avatar: (
           <MemberAvatar
@@ -54,6 +58,7 @@ const IdentifierAttributeDetailModal = ({
             rank={rank}
           />
         ),
+        status: MemberAcceptStatus.None,
       };
     });
 

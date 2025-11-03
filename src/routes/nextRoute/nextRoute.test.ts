@@ -33,7 +33,6 @@ describe("NextRoute", () => {
         routes: [],
         authentication: {
           loggedIn: false,
-          userName: "",
           time: 0,
           passcodeIsSet: false,
           seedPhraseIsSet: false,
@@ -82,10 +81,6 @@ describe("NextRoute", () => {
       biometricsCache: {
         enabled: false,
       },
-      ssiAgentCache: {
-        bootUrl: "",
-        connectUrl: "",
-      },
     };
     data = {
       store: storeMock,
@@ -126,7 +121,6 @@ describe("NextRoute", () => {
           routes: [],
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,
@@ -161,7 +155,6 @@ describe("NextRoute", () => {
           routes: [],
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,
@@ -197,7 +190,6 @@ describe("NextRoute", () => {
           routes: [],
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: true,
@@ -283,7 +275,6 @@ describe("getNextRoute", () => {
       routes: [],
       authentication: {
         loggedIn: false,
-        userName: "",
         time: 0,
         passcodeIsSet: true,
         seedPhraseIsSet: false,
@@ -327,10 +318,6 @@ describe("getNextRoute", () => {
     },
     biometricsCache: {
       enabled: false,
-    },
-    ssiAgentCache: {
-      bootUrl: "",
-      connectUrl: "",
     },
   };
   const state = {};
@@ -388,7 +375,6 @@ describe("getNextRoute", () => {
           routes: [],
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,
@@ -422,7 +408,6 @@ describe("getNextRoute", () => {
           routes: [],
           authentication: {
             loggedIn: false,
-            userName: "",
             time: 0,
             passcodeIsSet: true,
             seedPhraseIsSet: false,

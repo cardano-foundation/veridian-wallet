@@ -6,7 +6,13 @@ const verifySecretMock = jest.fn();
 import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { IonReactRouter } from "@ionic/react-router";
 import { configureStore } from "@reduxjs/toolkit";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -16,7 +22,10 @@ import { rootReducer } from "../../../store";
 import { InitializationPhase } from "../../../store/reducers/stateCache/stateCache.types";
 import { RoutePath } from "../../../routes";
 import { OperationType } from "../../globals/types";
-import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
+import {
+  useBiometricAuth,
+  BiometricAuthOutcome,
+} from "../../hooks/useBiometricsHook";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { SetPasscode } from "../SetPasscode";
@@ -228,7 +237,10 @@ describe("Lock Page", () => {
         <MemoryRouter initialEntries={[RoutePath.ROOT]}>
           <IonReactRouter>
             <LockPage />
-            <Route path={RoutePath.SET_PASSCODE} component={SetPasscode} />
+            <Route
+              path={RoutePath.SET_PASSCODE}
+              component={SetPasscode}
+            />
           </IonReactRouter>
         </MemoryRouter>
       </Provider>
@@ -263,7 +275,10 @@ describe("Lock Page", () => {
         <MemoryRouter initialEntries={[RoutePath.ROOT]}>
           <IonReactRouter>
             <LockPage />
-            <Route path={RoutePath.SET_PASSCODE} component={SetPasscode} />
+            <Route
+              path={RoutePath.SET_PASSCODE}
+              component={SetPasscode}
+            />
           </IonReactRouter>
         </MemoryRouter>
       </Provider>
@@ -295,7 +310,6 @@ describe("Lock Page", () => {
           passcodeIsSet: true,
           seedPhraseIsSet: true,
           loginAttempt: { attempts: 0, lockedUntil: Date.now() },
-          userName: "",
           passwordIsSet: false,
           passwordIsSkipped: false,
           ssiAgentIsSet: false,
@@ -380,7 +394,7 @@ describe("Lock Page", () => {
       expect(queryByTestId("lock-page")).not.toBeInTheDocument();
     });
   });
-  
+
   test("should display temporary lockout message when biometrics fails with TEMPORARY_LOCKOUT", async () => {
     // Override the useBiometricAuth mock for this specific test case
     (useBiometricAuth as jest.Mock).mockImplementation(() => ({
@@ -391,7 +405,9 @@ describe("Lock Page", () => {
         biometryType: BiometryType.FINGERPRINT,
       },
       // Ensure the handleBiometricAuth mock resolves with the lockout outcome
-      handleBiometricAuth: jest.fn().mockResolvedValue(BiometricAuthOutcome.TEMPORARY_LOCKOUT),
+      handleBiometricAuth: jest
+        .fn()
+        .mockResolvedValue(BiometricAuthOutcome.TEMPORARY_LOCKOUT),
       setBiometricsIsEnabled: jest.fn(),
       setupBiometrics: jest.fn(),
       checkBiometrics: jest.fn(),
@@ -429,7 +445,9 @@ describe("Lock Page", () => {
         hasCredentials: false,
         biometryType: BiometryType.FINGERPRINT,
       },
-      handleBiometricAuth: jest.fn().mockResolvedValue(BiometricAuthOutcome.PERMANENT_LOCKOUT),
+      handleBiometricAuth: jest
+        .fn()
+        .mockResolvedValue(BiometricAuthOutcome.PERMANENT_LOCKOUT),
       setBiometricsIsEnabled: jest.fn(),
       setupBiometrics: jest.fn(),
       checkBiometrics: jest.fn(),

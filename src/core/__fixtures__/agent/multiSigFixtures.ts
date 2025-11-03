@@ -861,7 +861,7 @@ const linkedContacts = [
 ];
 
 const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
-  name: "1.2.0.3:0:Identifier 2",
+  name: "1.2.0.2:0:Identifier 2",
   data: inceptionDataFix,
   initiator: true,
   groupConnections: linkedContacts,

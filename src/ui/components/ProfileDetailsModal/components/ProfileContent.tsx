@@ -7,7 +7,6 @@ import {
   personCircleOutline,
   refreshOutline,
   shareOutline,
-  star,
 } from "ionicons/icons";
 import { useCallback, useState } from "react";
 import { i18n } from "../../../../i18n";
@@ -33,6 +32,8 @@ import { EditProfile } from "../../EditProfile";
 import { ListCard } from "../../ListCard/ListCard";
 import { ListItem } from "../../ListCard/ListItem";
 import { ListHeader } from "../../ListHeader";
+import { MemberList } from "../../MemberList";
+import { Member, MemberAcceptStatus } from "../../MemberList/MemberList.type";
 import { ShareConnection } from "../../ShareConnection";
 import { IdentifierAttributeDetailModal } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal";
 import { DetailView } from "./IdentifierAttributeDetailModal/IdentifierAttributeDetailModal.types";
@@ -88,7 +89,7 @@ const ProfileContent = ({
     cardData.groupMemberPre || profiles[cardData.id]?.identity.groupMemberPre;
 
   const members = cardData.members
-    ?.map((member, index) => {
+    ?.map((member, index): Member => {
       const memberConnection = multisignConnectionsCache.find(
         (c) => c.id === member
       );
@@ -105,8 +106,14 @@ const ProfileContent = ({
 
       return {
         name,
-        rank,
+        avatar: (
+          <MemberAvatar
+            firstLetter={name.at(0)?.toLocaleUpperCase() || ""}
+            rank={rank}
+          />
+        ),
         isCurrentUser: !memberConnection?.label,
+        status: MemberAcceptStatus.None,
       };
     })
     .slice(0, DISPLAY_MEMBERS);
@@ -219,34 +226,7 @@ const ProfileContent = ({
                 className="group-members"
                 flatBorder={FlatBorderType.BOT}
               >
-                {members.map((item, index) => {
-                  return (
-                    <CardDetailsItem
-                      key={index}
-                      info={item.name}
-                      startSlot={
-                        <MemberAvatar
-                          firstLetter={
-                            item.name.at(0)?.toLocaleUpperCase() || ""
-                          }
-                          rank={item.rank}
-                        />
-                      }
-                      className="member"
-                      testId={`group-member-${index}`}
-                      endSlot={
-                        item.isCurrentUser && (
-                          <div className="user-label">
-                            <IonIcon icon={star} />
-                            <span>
-                              {i18n.t("profiledetails.detailsmodal.you")}
-                            </span>
-                          </div>
-                        )
-                      }
-                    />
-                  );
-                })}
+                <MemberList members={members} />
                 {members.length < memberCount && (
                   <IonButton
                     className="view-more-members"
