@@ -104,6 +104,7 @@ const SSIScan = ({ setCurrentPage, onScanFinish, isLoading }: SSIScanProps) => {
           pageId + "-input-modal",
           isLoading ? "loading" : undefined
         )}
+        onDismiss={closeInputManualValue}
         header={{
           closeButton: true,
           closeButtonAction: closeInputManualValue,

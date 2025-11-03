@@ -87,6 +87,8 @@
   }
 
   & .responsive-modal-content {
+    padding-bottom: var(--ion-safe-area-bottom);
+
     & > * {
       margin-bottom: 0;
     }
