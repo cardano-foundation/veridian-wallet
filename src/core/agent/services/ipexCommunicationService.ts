@@ -43,7 +43,7 @@ import { MultiSigService } from "./multiSigService";
 import {
   GrantToJoinMultisigExnPayload,
   MultiSigRoute,
-  isIpexGrantMultiSigExn,
+  isMultiSigExn,
 } from "./multiSig.types";
 import { AcdcStateChangedEvent, EventTypes } from "../event.types";
 import { ConnectionService } from "./connectionService";
@@ -747,7 +747,7 @@ class IpexCommunicationService extends AgentService {
     }
 
     // Type narrowing: Validate multiSigExn structure first
-    if (!isIpexGrantMultiSigExn(multiSigExn)) {
+    if (!isMultiSigExn(multiSigExn)) {
       throw new Error(
         "Invalid multisig exchange structure for joinMultisigGrant: missing required fields"
       );

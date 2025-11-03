@@ -114,8 +114,8 @@ interface IpexGrantMultiSigExn {
   };
 }
 
-// Type guard for IpexGrantMultiSigExn
-function isIpexGrantMultiSigExn(obj: unknown): obj is IpexGrantMultiSigExn {
+// Type guard for multisig exchange messages
+function isMultiSigExn(obj: unknown): obj is IpexGrantMultiSigExn {
   if (typeof obj !== "object" || obj === null) return false;
 
   const candidate = obj as {
@@ -191,7 +191,7 @@ interface GroupInformation {
   members: GroupMemberInfo[];
 }
 
-export { MultiSigRoute, isIpexGrantMultiSigExn };
+export { MultiSigRoute, isMultiSigExn };
 
 export type {
   RotationMultiSigExnMessage,
