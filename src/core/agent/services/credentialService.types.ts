@@ -20,6 +20,7 @@ interface ACDC {
     dt: string;
     [key: string]: unknown;
   };
+  [key: string]: unknown;
 }
 
 interface ACDCDetails

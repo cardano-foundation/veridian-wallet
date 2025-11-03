@@ -1332,21 +1332,20 @@ describe("Offer ACDC individual actions", () => {
     });
     markNotificationMock.mockResolvedValueOnce({ status: "done" });
 
-    const credentialProps: CredentialMetadataRecordProps = {
-      id: "credential-id",
-      issuanceDate: "2024-01-01T00:00:00.000Z",
-      credentialType: "Test Credential",
-      status: CredentialStatus.CONFIRMED,
-      connectionId: "connection-id",
-      schema: "schema-said",
-      identifierId: "identifier-id",
-      identifierType: IdentifierType.Individual,
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      isArchived: false,
-      pendingDeletion: false,
+    const acdcData = {
+      v: "ACDC10JSON000197_",
+      d: "credential-id",
+      i: "issuer-aid",
+      ri: "registry-aid",
+      s: "schema-said",
+      a: {
+        d: "attribute-said",
+        i: "holder-aid",
+        dt: "2024-01-01T00:00:00.000Z",
+      },
     };
 
-    await ipexCommunicationService.offerAcdcFromApply(id, credentialProps);
+    await ipexCommunicationService.offerAcdcFromApply(id, acdcData);
 
     expect(operationPendingStorage.save).toBeCalledWith({
       id: "opName",
@@ -1355,7 +1354,7 @@ describe("Offer ACDC individual actions", () => {
     expect(ipexOfferMock).toBeCalledWith({
       senderName: "abc123",
       recipient: "i",
-      acdc: new Serder(credentialProps),
+      acdc: new Serder(acdcData),
       applySaid: "d",
     });
     expect(ipexSubmitOfferMock).toBeCalledWith(
@@ -1388,22 +1387,21 @@ describe("Offer ACDC individual actions", () => {
     eventEmitter.emit = jest.fn();
     notificationStorage.findById.mockResolvedValueOnce(null);
 
-    const credentialProps: CredentialMetadataRecordProps = {
-      id: "credential-id",
-      issuanceDate: "2024-01-01T00:00:00.000Z",
-      credentialType: "Test Credential",
-      status: CredentialStatus.CONFIRMED,
-      connectionId: "connection-id",
-      schema: "schema-said",
-      identifierId: "identifier-id",
-      identifierType: IdentifierType.Individual,
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      isArchived: false,
-      pendingDeletion: false,
+    const acdcData = {
+      v: "ACDC10JSON000197_",
+      d: "credential-id",
+      i: "issuer-aid",
+      ri: "registry-aid",
+      s: "schema-said",
+      a: {
+        d: "attribute-said",
+        i: "holder-aid",
+        dt: "2024-01-01T00:00:00.000Z",
+      },
     };
 
     await expect(
-      ipexCommunicationService.offerAcdcFromApply(id, credentialProps)
+      ipexCommunicationService.offerAcdcFromApply(id, acdcData)
     ).rejects.toThrowError(
       `${IpexCommunicationService.NOTIFICATION_NOT_FOUND} ${id}`
     );
@@ -1462,26 +1460,25 @@ describe("Offer ACDC group actions", () => {
       recordType: OperationPendingRecordType.ExchangeOfferCredential,
     });
 
-    const credentialProps: CredentialMetadataRecordProps = {
-      id: "credential-id",
-      issuanceDate: "2024-01-01T00:00:00.000Z",
-      credentialType: "Test Credential",
-      status: CredentialStatus.CONFIRMED,
-      connectionId: "connection-id",
-      schema: "schema-said",
-      identifierId: "identifier-id",
-      identifierType: IdentifierType.Group,
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      isArchived: false,
-      pendingDeletion: false,
+    const acdcData = {
+      v: "ACDC10JSON000197_",
+      d: "credential-id",
+      i: "issuer-aid",
+      ri: "registry-aid",
+      s: "schema-said",
+      a: {
+        d: "attribute-said",
+        i: "holder-aid",
+        dt: "2024-01-01T00:00:00.000Z",
+      },
     };
 
-    await ipexCommunicationService.offerAcdcFromApply(id, credentialProps);
+    await ipexCommunicationService.offerAcdcFromApply(id, acdcData);
 
     expect(ipexOfferMock).toBeCalledWith({
       senderName: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
       recipient: "ECS7jn05fIP_JK1Ub4E6hPviRKEdC55QhxZToxDIHo_E",
-      acdc: new Serder(credentialProps),
+      acdc: new Serder(acdcData),
       applySaid: "EIDUavcmyHBseNZAdAHR3SF8QMfX1kSJ3Ct0OqS0-HCW",
       message: "",
       datetime: expect.any(String),
@@ -1525,22 +1522,21 @@ describe("Offer ACDC group actions", () => {
     };
     notificationStorage.findById.mockResolvedValue(applyNoteRecord);
 
-    const credentialProps: CredentialMetadataRecordProps = {
-      id: "credential-id",
-      issuanceDate: "2024-01-01T00:00:00.000Z",
-      credentialType: "Test Credential",
-      status: CredentialStatus.CONFIRMED,
-      connectionId: "connection-id",
-      schema: "schema-said",
-      identifierId: "identifier-id",
-      identifierType: IdentifierType.Individual,
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      isArchived: false,
-      pendingDeletion: false,
+    const acdcData = {
+      v: "ACDC10JSON000197_",
+      d: "credential-id",
+      i: "issuer-aid",
+      ri: "registry-aid",
+      s: "schema-said",
+      a: {
+        d: "attribute-said",
+        i: "holder-aid",
+        dt: "2024-01-01T00:00:00.000Z",
+      },
     };
 
     await expect(
-      ipexCommunicationService.offerAcdcFromApply("id", credentialProps)
+      ipexCommunicationService.offerAcdcFromApply("id", acdcData)
     ).rejects.toThrowError(IpexCommunicationService.IPEX_ALREADY_REPLIED);
 
     expect(ipexOfferMock).not.toBeCalled();
@@ -2539,22 +2535,21 @@ describe("IPEX communication service of agent", () => {
       receivingPre: "EGR7Jm38EcsXRIidKDZBYDm_xox6eapfU1tqxdAUzkFA",
     };
 
-    const credentialProps: CredentialMetadataRecordProps = {
-      id: "credential-id",
-      issuanceDate: "2024-01-01T00:00:00.000Z",
-      credentialType: "Test Credential",
-      status: CredentialStatus.CONFIRMED,
-      connectionId: "connection-id",
-      schema: "schema-said",
-      identifierId: "identifier-id",
-      identifierType: IdentifierType.Individual,
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      isArchived: false,
-      pendingDeletion: false,
+    const acdcData = {
+      v: "ACDC10JSON000197_",
+      d: "credential-id",
+      i: "issuer-aid",
+      ri: "registry-aid",
+      s: "schema-said",
+      a: {
+        d: "attribute-said",
+        i: "holder-aid",
+        dt: "2024-01-01T00:00:00.000Z",
+      },
     };
 
     await expect(
-      ipexCommunicationService.offerAcdcFromApply(noti.id, credentialProps)
+      ipexCommunicationService.offerAcdcFromApply(noti.id, acdcData)
     ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
     await expect(
       ipexCommunicationService.grantAcdcFromAgree(noti.a.d)

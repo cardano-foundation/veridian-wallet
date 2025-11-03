@@ -149,20 +149,9 @@ const CredentialRequest = ({
       try {
         setLoading(true);
 
-        // Get full credential metadata from cache using credential ID
-        const credentialMetadata = credsCache.find(
-          (cred) => cred.id === credential.acdc.d
-        );
-
-        if (!credentialMetadata) {
-          throw new Error(
-            `Credential metadata not found for ID: ${credential.acdc.d}`
-          );
-        }
-
         await Agent.agent.ipexCommunications.offerAcdcFromApply(
           notificationDetails.id,
-          credentialMetadata
+          credential.acdc
         );
 
         if (!linkedGroup) {
@@ -183,7 +172,7 @@ const CredentialRequest = ({
         setLoading(false);
       }
     },
-    [notificationDetails.id, linkedGroup, dispatch, handleBack, credsCache]
+    [notificationDetails.id, linkedGroup, dispatch, handleBack]
   );
 
   const changeToStageTwo = () => {

@@ -220,7 +220,7 @@ class IpexCommunicationService extends AgentService {
   @OnlineOnly
   async offerAcdcFromApply(
     notificationId: string,
-    acdc: CredentialMetadataRecordProps
+    acdc: Record<string, unknown>
   ): Promise<void> {
     const applyNoteRecord = await this.notificationStorage.findById(
       notificationId
@@ -791,7 +791,7 @@ class IpexCommunicationService extends AgentService {
   private async submitMultisigOffer(
     multisigId: string,
     notificationSaid: string,
-    acdcDetail: CredentialMetadataRecordProps,
+    acdcDetail: Record<string, unknown>,
     discloseePrefix: string,
     offerExnToJoin?: unknown
   ): Promise<SubmitIPEXResult> {
