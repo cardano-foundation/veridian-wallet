@@ -310,17 +310,20 @@ class MultiSigService extends AgentService {
         rstates: states,
       });
 
-    // Build properly typed queued item based on discriminated union
-    // Both initiators and joiners will have group data when creating a multisig
+    // Type guard: Ensure group data exists for multisig creation
     if (!inceptionData.group) {
       throw new Error(MultiSigService.GROUP_DATA_MISSING_FOR_INITIATOR);
     }
+    // After this check, TypeScript knows inceptionData has group property
+    const inceptionDataWithGroup = inceptionData as CreateIdentifierBody & {
+      group: HabState;
+    };
 
     if (queuedProps.initiator) {
       queued.push({
         initiator: true,
         name: groupName,
-        data: inceptionData as CreateIdentifierBody & { group: HabState },
+        data: inceptionDataWithGroup,
         groupConnections: queuedProps.groupConnections,
         threshold: queuedProps.threshold,
       });
@@ -328,7 +331,7 @@ class MultiSigService extends AgentService {
       queued.push({
         initiator: false,
         name: groupName,
-        data: inceptionData as CreateIdentifierBody & { group: HabState },
+        data: inceptionDataWithGroup,
         notificationId: queuedProps.notificationId,
         notificationSaid: queuedProps.notificationSaid,
       });
@@ -823,27 +826,19 @@ class MultiSigService extends AgentService {
     for (const queued of pendingGroupsRecord.content
       .queued as QueuedGroupCreation[]) {
       if (queued.initiator) {
-        // TypeScript narrows to initiator variant
-        const initiatorQueued = queued as Extract<
-          QueuedGroupCreation,
-          { initiator: true }
-        >;
-        const threshold = initiatorQueued.threshold;
+        // TypeScript automatically narrows to initiator variant
+        const threshold = queued.threshold;
         await this.createGroup(
-          initiatorQueued.data.group.mhab.prefix,
-          initiatorQueued.groupConnections,
+          queued.data.group.mhab.prefix,
+          queued.groupConnections,
           threshold,
           true
         );
       } else {
-        // TypeScript narrows to join variant
-        const joinQueued = queued as Extract<
-          QueuedGroupCreation,
-          { initiator: false }
-        >;
+        // TypeScript automatically narrows to join variant
         await this.joinGroup(
-          joinQueued.notificationId,
-          joinQueued.notificationSaid,
+          queued.notificationId,
+          queued.notificationSaid,
           true
         );
       }
