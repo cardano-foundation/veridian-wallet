@@ -873,7 +873,7 @@ const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
 
 const queuedJoin: QueuedGroupCreation & { initiator: false } = {
   name: "0:testUser",
-  data: inceptionDataFix,
+  data: inceptionDataFix as CreateIdentifierBody & { group: HabState },
   initiator: false,
   notificationId: "notification-id",
   notificationSaid: "notification-said",

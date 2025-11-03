@@ -311,11 +311,12 @@ class MultiSigService extends AgentService {
       });
 
     // Build properly typed queued item based on discriminated union
+    // Both initiators and joiners will have group data when creating a multisig
+    if (!inceptionData.group) {
+      throw new Error(MultiSigService.GROUP_DATA_MISSING_FOR_INITIATOR);
+    }
+
     if (queuedProps.initiator) {
-      // Ensure group data exists for initiator
-      if (!inceptionData.group) {
-        throw new Error(MultiSigService.GROUP_DATA_MISSING_FOR_INITIATOR);
-      }
       queued.push({
         initiator: true,
         name: groupName,
@@ -327,7 +328,7 @@ class MultiSigService extends AgentService {
       queued.push({
         initiator: false,
         name: groupName,
-        data: inceptionData,
+        data: inceptionData as CreateIdentifierBody & { group: HabState },
         notificationId: queuedProps.notificationId,
         notificationSaid: queuedProps.notificationSaid,
       });

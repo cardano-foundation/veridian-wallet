@@ -67,6 +67,7 @@ interface MultisigThresholds {
 }
 
 // Discriminated union with proper type safety for group data
+// Both initiator and joiner have group data when creating/joining a multisig
 type QueuedGroupCreation =
   | {
       initiator: true;
@@ -78,17 +79,12 @@ type QueuedGroupCreation =
   | {
       initiator: false;
       name: string;
-      data: CreateIdentifierBody;
+      data: CreateIdentifierBody & { group: HabState };
       notificationId: string;
       notificationSaid: string;
     };
 
-// Legacy type for backward compatibility if needed elsewhere
-type QueuedIdentifierCreation = {
-  name: string;
-  data: CreateIdentifierBody;
-};
-
+// Helper type used in multiSigService for generating inception data
 type QueuedGroupProps =
   | {
       initiator: true;
@@ -136,7 +132,6 @@ export type {
   CreateIdentifierResult,
   MultisigThresholds,
   GroupMetadata,
-  QueuedIdentifierCreation,
   QueuedGroupProps,
   QueuedGroupCreation,
   GroupParticipants,
