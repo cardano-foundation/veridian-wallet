@@ -793,7 +793,7 @@ class IpexCommunicationService extends AgentService {
     notificationSaid: string,
     acdcDetail: Record<string, unknown>,
     discloseePrefix: string,
-    offerExnToJoin?: unknown
+    offerExnToJoin?: Record<string, unknown>
   ): Promise<SubmitIPEXResult> {
     if (!this.props.signifyClient.manager) {
       throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
