@@ -11,12 +11,7 @@ enum RequestType {
 // String enums as some of these map to i18n values (if relevant)
 enum OperationType {
   IDLE = "idle",
-  DELETE_CONNECTION = "deleteConnection",
   SCAN_CONNECTION = "scanConnection",
-  MULTI_SIG_INITIATOR_INIT = "multiSigInitiatorInit",
-  SCAN_WALLET_CONNECTION = "scanWalletConnection",
-  OPEN_WALLET_CONNECTION_DETAIL = "openWalletConnection",
-  OPEN_MULTISIG_IDENTIFIER = "openMultisignIdentifier",
 }
 
 enum ToastMsgType {

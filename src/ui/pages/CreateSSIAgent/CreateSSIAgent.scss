@@ -165,6 +165,43 @@
       --background: transparent;
     }
   }
+
+  &.ssi-scan {
+    background: var(--ion-color-neutral-700);
+    padding: 0;
+
+    .scrollable-page-content {
+      position: static;
+    }
+
+    ::part(scroll) {
+      position: static;
+    }
+
+    .page-header {
+      ion-toolbar {
+        --background: transparent;
+      }
+
+      padding: 0 1.25rem;
+      .close-button-label > h4 {
+        color: var(--ion-color-neutral-200) !important;
+      }
+    }
+
+    .container {
+      padding: 0 1.25rem;
+      background: transparent;
+    }
+
+    @media screen and (min-width: 250px) and (max-width: 370px) {
+      .scan {
+        ion-row:first-child {
+          margin-top: 5rem;
+        }
+      }
+    }
+  }
 }
 
 .ssi-spinner-container {

@@ -177,6 +177,7 @@ const ProfileDetailsModal = ({
       <SideSlider
         isOpen={isOpen}
         renderAsModal
+        className="profile-detail-modal"
       >
         {cloudError ? (
           <CloudError

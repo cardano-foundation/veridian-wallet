@@ -5,9 +5,9 @@ import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerCo
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { RootState } from "../../../../../store";
 import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
+import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 import { WalletConnect } from "./WalletConnect";
-import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 
 jest.mock("../../../../../core/configuration", () => ({
   ...jest.requireActual("../../../../../core/configuration"),
@@ -54,10 +54,7 @@ describe("Wallet Connect Request", () => {
   test("Renders content ", async () => {
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <WalletConnect
-          open
-          setOpenPage={jest.fn()}
-        />
+        <WalletConnect close={jest.fn()} />
       </Provider>
     );
 
@@ -75,13 +72,10 @@ describe("Wallet Connect Request", () => {
   });
 
   test("Click to acccept button", async () => {
-    const setOpenPage = jest.fn();
+    const close = jest.fn();
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <WalletConnect
-          open
-          setOpenPage={setOpenPage}
-        />
+        <WalletConnect close={close} />
       </Provider>
     );
 
@@ -95,18 +89,15 @@ describe("Wallet Connect Request", () => {
     });
 
     await waitFor(() => {
-      expect(setOpenPage).toBeCalled();
+      expect(close).toBeCalled();
     });
   });
 
   test("Click to decline button", async () => {
-    const setOpenPage = jest.fn();
+    const close = jest.fn();
     const { getByText, queryByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <WalletConnect
-          open
-          setOpenPage={setOpenPage}
-        />
+        <WalletConnect close={close} />
       </Provider>
     );
 
@@ -133,17 +124,14 @@ describe("Wallet Connect Request", () => {
     });
 
     await waitFor(() => {
-      expect(setOpenPage).toBeCalled();
+      expect(close).toBeCalled();
     });
   });
 
   test("Close modal", async () => {
     const { getByTestId, getByText, queryByTestId } = render(
       <Provider store={storeMocked}>
-        <WalletConnect
-          open={true}
-          setOpenPage={jest.fn()}
-        />
+        <WalletConnect close={jest.fn()} />
       </Provider>
     );
 

@@ -33,7 +33,6 @@ const ConnectionOptions = ({
       label: i18n.t("tabs.connections.details.options.labels.delete"),
       onClick: () => {
         handleDelete();
-        dispatch(setCurrentOperation(OperationType.DELETE_CONNECTION));
       },
       testId: "delete-button-connection-options",
     });

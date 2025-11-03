@@ -172,7 +172,6 @@ const ConnectionDetails = ({
 
   const deleteButtonAction = () => {
     setAlertDeleteConnectionIsOpen(true);
-    dispatch(setCurrentOperation(OperationType.DELETE_CONNECTION));
   };
 
   const handleAuthentication = () => {

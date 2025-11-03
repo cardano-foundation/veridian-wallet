@@ -146,6 +146,8 @@ jest.mock("../../../core/agent/agent", () => ({
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
+  isPlatform: () => true,
+  getPlatforms: () => getPlatformMock(),
   IonModal: ({ children, ...props }: any) => {
     const testId = props["data-testid"];
     return props.isOpen ? <div data-testid={testId}>{children}</div> : null;
