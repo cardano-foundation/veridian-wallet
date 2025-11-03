@@ -329,11 +329,7 @@ class ConnectionService extends AgentService {
       return { ...baseDetails, groupId: record.groupId };
     }
 
-    if (!record.identifier) {
-      throw new Error(`Regular contact must have identifier: ${record.id}`);
-    }
-
-    return { ...baseDetails, identifier: record.identifier };
+    return { ...baseDetails, identifier: record.identifier || "" };
   }
 
   async getConnectionById(
