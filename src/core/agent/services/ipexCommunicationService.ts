@@ -27,6 +27,7 @@ import {
 import type { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
 import { AgentService } from "./agentService";
 import { getCredentialShortDetails, OnlineOnly } from "./utils";
+import type { ACDC } from "./credentialService.types";
 import {
   CredentialStatus,
   ACDCDetails,
@@ -218,10 +219,7 @@ class IpexCommunicationService extends AgentService {
   }
 
   @OnlineOnly
-  async offerAcdcFromApply(
-    notificationId: string,
-    acdc: Record<string, unknown>
-  ): Promise<void> {
+  async offerAcdcFromApply(notificationId: string, acdc: ACDC): Promise<void> {
     const applyNoteRecord = await this.notificationStorage.findById(
       notificationId
     );
@@ -791,7 +789,7 @@ class IpexCommunicationService extends AgentService {
   private async submitMultisigOffer(
     multisigId: string,
     notificationSaid: string,
-    acdcDetail: Record<string, unknown>,
+    acdcDetail: ACDC,
     discloseePrefix: string,
     offerExnToJoin?: Record<string, unknown>
   ): Promise<SubmitIPEXResult> {
