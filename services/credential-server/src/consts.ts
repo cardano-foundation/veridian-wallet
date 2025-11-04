@@ -17,8 +17,6 @@ export const FISHING_HUNTING_LICENSE =
   "EFVZujklqUEubsyY9PRgBRMf39HgHzCPo3Ii_-xhkOlF";
 export const ROME_OFFSITE = "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt";
 export const REEVE = "EG9587oc7lSUJGS7mtTkpmRUnJ8F5Ji79-e_pY4jt3Ik";
-export const CARDANO_METADATA_SIGNER =
-  "ED_GbUPpS8ZJEY-u8OB3QVe9C_CAFBdSimS5KxclkgWT";
 
 export const ACDC_SCHEMAS_ID = [
   QVI_SCHEMA_SAID,
@@ -29,7 +27,6 @@ export const ACDC_SCHEMAS_ID = [
   FISHING_HUNTING_LICENSE,
   ROME_OFFSITE,
   REEVE,
-  CARDANO_METADATA_SIGNER,
 ];
 
 export const ACDC_SCHEMAS = [
@@ -64,9 +61,5 @@ export const ACDC_SCHEMAS = [
   {
     id: REEVE,
     name: "Reeve",
-  },
-  {
-    id: CARDANO_METADATA_SIGNER,
-    name: "vLEI Cardano Metadata Signer",
   },
 ];
