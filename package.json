@@ -92,7 +92,7 @@
     "@wdio/spec-reporter": "^9.12.6",
     "@wdio/types": "^9.12.6",
     "allure-commandline": "^2.33.0",
-    "appium": "^2.17.1",
+    "appium": "^3.0.1",
     "appium-chromedriver": "^7.0.16",
     "appium-chromium-driver": "^1.5.1",
     "appium-safari-driver": "^3.5.23",
