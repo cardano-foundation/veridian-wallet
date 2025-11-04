@@ -17,9 +17,38 @@ class NotificationService {
     null;
   private permissionsGranted = false;
   private pendingNotification: LocalNotification | null = null;
+  private initialized = false;
 
-  constructor() {
-    this.initialize();
+  async initialize(): Promise<void> {
+    if (this.initialized) return;
+
+    if (!this.isNativeEnvironment()) {
+      return;
+    }
+
+    LocalNotifications.removeAllListeners();
+
+    const result = await LocalNotifications.requestPermissions();
+    this.permissionsGranted = result.display === "granted";
+    await this.createNotificationChannel();
+
+    LocalNotifications.addListener(
+      "localNotificationActionPerformed",
+      (event) => {
+        this.handleNotificationTap(event.notification as LocalNotification);
+      }
+    );
+
+    this.initialized = true;
+  }
+
+  private isNativeEnvironment(): boolean {
+    try {
+      const platform = Capacitor.getPlatform();
+      return platform === "ios" || platform === "android";
+    } catch {
+      return false;
+    }
   }
 
   setProfileSwitcher(profileSwitcher: (profileId: string) => void) {
@@ -38,20 +67,6 @@ class NotificationService {
       this.pendingNotification = null;
       await this.handleNotificationTap(notification);
     }
-  }
-
-  private async initialize() {
-    LocalNotifications.removeAllListeners();
-
-    this.permissionsGranted = await this.requestPermissions();
-    await this.createNotificationChannel();
-
-    LocalNotifications.addListener(
-      "localNotificationActionPerformed",
-      (event) => {
-        this.handleNotificationTap(event.notification as LocalNotification);
-      }
-    );
   }
 
   private async createNotificationChannel(): Promise<void> {

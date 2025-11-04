@@ -674,8 +674,15 @@ const AppWrapper = (props: { children: ReactNode }) => {
   };
 
   const setupEventServiceCallbacks = () => {
-    notificationService.setProfileSwitcher((profileId: string) => {
+    notificationService.initialize();
+    notificationService.setProfileSwitcher(async (profileId: string) => {
       dispatch(setCurrentProfile(profileId));
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.DEFAULT_PROFILE,
+          content: { defaultProfile: profileId },
+        })
+      );
     });
 
     notificationService.setNavigator(

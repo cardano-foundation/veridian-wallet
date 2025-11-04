@@ -1,43 +1,43 @@
 PODS:
-  - Capacitor (7.2.0):
+  - Capacitor (7.4.4):
     - CapacitorCordova
-  - CapacitorApp (7.0.0):
+  - CapacitorApp (7.1.0):
     - Capacitor
-  - CapacitorBrowser (7.0.0):
+  - CapacitorBrowser (7.0.2):
     - Capacitor
-  - CapacitorClipboard (7.0.0):
+  - CapacitorClipboard (7.0.2):
     - Capacitor
   - CapacitorCommunityPrivacyScreen (6.0.0):
     - Capacitor
-  - CapacitorCommunitySqlite (7.0.0):
+  - CapacitorCommunitySqlite (7.0.2):
     - Capacitor
     - SQLCipher
     - ZIPFoundation
-  - CapacitorCommunityTapJacking (7.0.0):
+  - CapacitorCommunityTapJacking (7.1.0):
     - Capacitor
-  - CapacitorCordova (7.2.0)
-  - CapacitorDevice (7.0.0):
+  - CapacitorCordova (7.4.4)
+  - CapacitorDevice (7.0.2):
     - Capacitor
   - CapacitorFreerasp (2.2.2):
     - Capacitor
-  - CapacitorKeyboard (7.0.0):
+  - CapacitorKeyboard (7.0.3):
     - Capacitor
   - CapacitorLocalNotifications (7.0.3):
     - Capacitor
-  - CapacitorMlkitBarcodeScanning (7.0.0):
+  - CapacitorMlkitBarcodeScanning (7.3.0):
     - Capacitor
     - GoogleMLKit/BarcodeScanning (= 7.0.0)
-  - CapacitorNativeSettings (7.0.1):
+  - CapacitorNativeSettings (7.0.2):
     - Capacitor
-  - CapacitorPluginSafeArea (4.0.0):
+  - CapacitorPluginSafeArea (4.0.2):
     - Capacitor
-  - CapacitorScreenOrientation (7.0.0):
+  - CapacitorScreenOrientation (7.0.2):
     - Capacitor
-  - CapacitorShare (7.0.0):
+  - CapacitorShare (7.0.2):
     - Capacitor
-  - CapacitorSplashScreen (7.0.0):
+  - CapacitorSplashScreen (7.0.3):
     - Capacitor
-  - CapacitorStatusBar (7.0.0):
+  - CapacitorStatusBar (7.0.3):
     - Capacitor
   - CapgoCapacitorNativeBiometric (0.0.1):
     - Capacitor
@@ -183,25 +183,25 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@evva/capacitor-secure-storage-plugin"
 
 SPEC CHECKSUMS:
-  Capacitor: 03bc7cbdde6a629a8b910a9d7d78c3cc7ed09ea7
-  CapacitorApp: 9cb31064a6c6bb2b1438583733a7bf45557fc1da
-  CapacitorBrowser: 55c21db47416dcc8fc3b623e18fd7d09acb26081
-  CapacitorClipboard: 007d79cd6c104002b274546d13873526ca20beb7
+  Capacitor: 358dd1c3fdd71d969547b17e159fd8a7736cb45f
+  CapacitorApp: 26587c2ce485d88ddb39adb21cac64f8e481afe3
+  CapacitorBrowser: 22541e48442de44dc629c214388290d6eecc6ae9
+  CapacitorClipboard: 7e227702976d4435a5a40df54f65e154d0dfc1f3
   CapacitorCommunityPrivacyScreen: 682470c41cce325d7a85b95907887919d4694066
-  CapacitorCommunitySqlite: b11e556cf5d149f9e0b6fbbb47959a6cd718c3d0
-  CapacitorCommunityTapJacking: 96d1d28a7e2bd4c4d22eb0af0f1cd6eefa419a9f
-  CapacitorCordova: 5967b9ba03915ef1d585469d6e31f31dc49be96f
-  CapacitorDevice: 069faf433b3a99c3d5f0e500fbe634f60a8c6a84
+  CapacitorCommunitySqlite: a57c58e1c37f4bc250ef01e66b0055cb6ddd775e
+  CapacitorCommunityTapJacking: 9bd7ea023ae9f95f9a700355eb9a6b8d583d9bb6
+  CapacitorCordova: bf648a636f3c153f652d312ae145fb508b6ffced
+  CapacitorDevice: 81ae78d5d1942707caad79276badd458bf6ec603
   CapacitorFreerasp: 357a2143f48caa566c6b30ef3c23b49e0ac28b77
-  CapacitorKeyboard: 4db71e694e7afb5d7c0be09b05495c19f7d6c914
+  CapacitorKeyboard: 62f36104f26d53d8b3a2a43f2a69fe714f1777d5
   CapacitorLocalNotifications: 0811aef56ab2e5f7f9ae72f47d3473ab50c29038
-  CapacitorMlkitBarcodeScanning: db64496b3e8f41be79e3ef81bfd1bb430adcb0ca
-  CapacitorNativeSettings: bef37b3c7e2184da7416a3f162c71de19fd27593
-  CapacitorPluginSafeArea: 22031c3436269ca80fac90ec2c94bc7c1e59a81d
-  CapacitorScreenOrientation: 45e36e1121cdba1634eb12077c5e99391055116f
-  CapacitorShare: d94c53d7656f1ce8f6712ae8d19ab0c18a69259f
-  CapacitorSplashScreen: 7e7a0a1113833032f196b3af6fa437baccacf5bc
-  CapacitorStatusBar: a8c4c83ed2e973bdafb979e80e4b00d027832cb7
+  CapacitorMlkitBarcodeScanning: 05b2dfc7a70099f6d4594365c521534d79a17b1d
+  CapacitorNativeSettings: 3cd2e2ef431fe471674f381609cfb29154ddfcfa
+  CapacitorPluginSafeArea: d6b696287c91ab0e790d01213124a3cdba97dc43
+  CapacitorScreenOrientation: e0d5b9ef293b269b8f93373355d5b276f50fabea
+  CapacitorShare: be166411fa995ead2d39b104aa0aae56d8615c66
+  CapacitorSplashScreen: e388b8e0ed0e982a9d3a40417f478e7a018a8763
+  CapacitorStatusBar: 0659ddc7b1713764a05831463d215b177a15d054
   CapgoCapacitorNativeBiometric: be4ceeff38739d9c0f59b8c41456a3b01cfeddf0
   EvvaCapacitorSecureStoragePlugin: 43df44513abd5295a63f8e8813e9b5b7159dbfe0
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
