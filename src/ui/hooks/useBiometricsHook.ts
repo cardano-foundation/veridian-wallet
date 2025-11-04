@@ -1,5 +1,6 @@
 import {
   AvailableResult,
+  AuthenticationStrength,
   BiometricAuthError,
   BiometryType,
   NativeBiometric,
@@ -67,7 +68,7 @@ const isBiometricPluginError = (
 const useBiometricAuth = (isLockPage = false) => {
   const [biometricInfo, setBiometricInfo] = useState<AvailableResult>({
     isAvailable: false,
-    biometryType: BiometryType.NONE,
+    authenticationStrength: AuthenticationStrength.NONE,
   });
   const [lockoutEndTime, setLockoutEndTime] = useState<number>();
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(0);
@@ -76,7 +77,10 @@ const useBiometricAuth = (isLockPage = false) => {
 
   const checkBiometrics = async () => {
     if (!Capacitor.isNativePlatform()) {
-      const result = { isAvailable: false, biometryType: BiometryType.NONE };
+      const result = {
+        isAvailable: false,
+        authenticationStrength: AuthenticationStrength.NONE,
+      };
       setBiometricInfo(result);
       return result;
     }
