@@ -9,6 +9,8 @@ import { BasicRecord } from "../../../core/agent/records";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
+import { notificationService } from "../../../native/pushNotifications/notificationService";
+import { getNotificationDisplayTextForPush } from "../../../native/pushNotifications/notificationUtils";
 import { AppDispatch, RootState } from "../../index";
 import {
   DAppConnection,
@@ -484,15 +486,6 @@ export const handleNotificationReceived =
     if (!targetProfile) {
       return;
     }
-
-    const notificationServiceModule = await import(
-      "../../../native/pushNotifications/notificationService"
-    );
-    const notificationService = notificationServiceModule.notificationService;
-
-    const { getNotificationDisplayTextForPush } = await import(
-      "../../../native/pushNotifications/notificationUtils"
-    );
 
     const notificationContext = {
       connectionsCache: targetProfile.connections.map(
