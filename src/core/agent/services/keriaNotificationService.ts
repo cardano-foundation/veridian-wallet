@@ -320,8 +320,13 @@ class KeriaNotificationService extends AgentService {
     }
 
     const exn = await this.props.signifyClient.exchanges().get(notif.a.d);
+    if (await this.outboundExchange(exn)) {
+      await this.markNotification(notif.i);
+      return;
+    }
+
     const deletedCheckResult = await this.identifierDeleted(notif, exn);
-    if ((await this.outboundExchange(exn)) || deletedCheckResult.deleted) {
+    if (deletedCheckResult.deleted) {
       await this.markNotification(notif.i);
       return;
     }
