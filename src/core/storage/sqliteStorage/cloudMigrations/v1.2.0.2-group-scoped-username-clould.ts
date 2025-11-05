@@ -1,9 +1,9 @@
-import { formatToV1_2_0_3, parseHabName } from "../../../utils/habName";
+import { formatToV1_2_0_2, parseHabName } from "../../../utils/habName";
 import { CloudMigration } from "./cloudMigrations.types";
 
-const migrationVersion = "1.2.0.3";
+const migrationVersion = "1.2.0.2";
 
-export const CLOUD_V1203: CloudMigration = {
+export const CLOUD_V1202: CloudMigration = {
   version: migrationVersion,
   cloudMigrationStatements: async (signifyClient) => {
     // eslint-disable-next-line no-console
@@ -51,7 +51,7 @@ export const CLOUD_V1203: CloudMigration = {
           `[v${migrationVersion}] Updating cloud identifier: ${currentName} (${identifier.prefix})`
         );
 
-        const newName = formatToV1_2_0_3({
+        const newName = formatToV1_2_0_2({
           ...parts,
           groupMetadata: parts.groupMetadata,
         });

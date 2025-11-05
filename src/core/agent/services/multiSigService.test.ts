@@ -378,7 +378,7 @@ describe("Creation of multi-sig", () => {
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            { ...queuedIdentifier, name: "1.2.0.3:0:different identifier" },
+            { ...queuedIdentifier, name: "1.2.0.2:0:different identifier" },
           ],
         },
       })
@@ -390,12 +390,12 @@ describe("Creation of multi-sig", () => {
           queued: [
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:0:different identifier",
+              name: "1.2.0.2:0:different identifier",
               threshold: { signingThreshold: 2, rotationThreshold: 1 },
             },
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:0:Identifier 2",
+              name: "1.2.0.2:0:Identifier 2",
               threshold: { signingThreshold: 2, rotationThreshold: 1 },
             },
           ],
@@ -423,7 +423,7 @@ describe("Creation of multi-sig", () => {
 
     expectAllWitnessIntroductions();
     expect(identifierCreateIcpDataMock).toBeCalledWith(
-      "1.2.0.3:0:Identifier 2",
+      "1.2.0.2:0:Identifier 2",
       {
         algo: "group",
         mhab: getMemberIdentifierResponse,
@@ -446,10 +446,10 @@ describe("Creation of multi-sig", () => {
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            { ...queuedIdentifier, name: "1.2.0.3:0:different identifier" },
+            { ...queuedIdentifier, name: "1.2.0.2:0:different identifier" },
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:0:Identifier 2",
+              name: "1.2.0.2:0:Identifier 2",
             },
           ],
         },
@@ -526,7 +526,7 @@ describe("Creation of multi-sig", () => {
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            { ...queuedIdentifier, name: "1.2.0.3:0:different identifier" },
+            { ...queuedIdentifier, name: "1.2.0.2:0:different identifier" },
           ],
         },
       })
@@ -624,7 +624,7 @@ describe("Creation of multi-sig", () => {
           queued: [
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:0:Identifier 2",
+              name: "1.2.0.2:0:Identifier 2",
             },
           ],
         },
@@ -744,7 +744,7 @@ describe("Creation of multi-sig", () => {
           queued: [
             {
               ...queuedIdentifier,
-              name: "1.2.0.3:0:Identifier 2",
+              name: "1.2.0.2:0:Identifier 2",
             },
           ],
         },
@@ -898,7 +898,7 @@ describe("Creation of multi-sig", () => {
       new BasicRecord({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [{ ...queuedJoin, name: "1.2.0.3:0:different identifier" }],
+          queued: [{ ...queuedJoin, name: "1.2.0.2:0:different identifier" }],
         },
       })
     );
@@ -907,8 +907,8 @@ describe("Creation of multi-sig", () => {
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
           queued: [
-            { ...queuedJoin, name: "1.2.0.3:0:different identifier" },
-            { ...queuedJoin, name: "1.2.0.3:0:Identifier 2" },
+            { ...queuedJoin, name: "1.2.0.2:0:different identifier" },
+            { ...queuedJoin, name: "1.2.0.2:0:Identifier 2" },
           ],
         },
       })
@@ -930,7 +930,7 @@ describe("Creation of multi-sig", () => {
     await multiSigService.joinGroup("id", "d");
 
     expect(identifierCreateIcpDataMock).toBeCalledWith(
-      "1.2.0.3:0:Identifier 2",
+      "1.2.0.2:0:Identifier 2",
       {
         algo: "group",
         mhab: getMemberIdentifierResponse,
@@ -1027,7 +1027,7 @@ describe("Creation of multi-sig", () => {
       expect.objectContaining({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [{ ...queuedJoin, name: "1.2.0.3:0:different identifier" }],
+          queued: [{ ...queuedJoin, name: "1.2.0.2:0:different identifier" }],
         },
       })
     );
@@ -1082,7 +1082,7 @@ describe("Creation of multi-sig", () => {
       new BasicRecord({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [{ ...queuedJoin, name: "1.2.0.3:0:Identifier 2" }],
+          queued: [{ ...queuedJoin, name: "1.2.0.2:0:Identifier 2" }],
         },
       })
     );
@@ -1185,7 +1185,7 @@ describe("Creation of multi-sig", () => {
       new BasicRecord({
         id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
         content: {
-          queued: [{ ...queuedJoin, name: "1.2.0.3:0:Identifier 2" }],
+          queued: [{ ...queuedJoin, name: "1.2.0.2:0:Identifier 2" }],
         },
       })
     );

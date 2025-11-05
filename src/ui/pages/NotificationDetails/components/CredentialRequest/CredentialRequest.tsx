@@ -1,7 +1,6 @@
 import { IonSpinner } from "@ionic/react";
 import { useCallback, useMemo, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
-import type { CredentialMetadataRecordProps } from "../../../../../core/agent/records/credentialMetadataRecord.types";
 import { CredentialStatus } from "../../../../../core/agent/services/credentialService.types";
 import { IdentifierType } from "../../../../../core/agent/services/identifier.types";
 import { CredentialsMatchingApply } from "../../../../../core/agent/services/ipexCommunicationService.types";
@@ -23,11 +22,7 @@ import { showError } from "../../../../utils/error";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import { ChooseCredential } from "./ChooseCredential";
 import "./CredentialRequest.scss";
-import {
-  ACDC,
-  LinkedGroup,
-  RequestCredential,
-} from "./CredentialRequest.types";
+import { LinkedGroup, RequestCredential } from "./CredentialRequest.types";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
 
 const CredentialRequest = ({
@@ -136,7 +131,7 @@ const CredentialRequest = ({
     const mappedCredentials = credentialRequest.credentials.map(
       (cred): RequestCredential => ({
         connectionId: cred.connectionId,
-        acdc: cred.acdc as unknown as ACDC,
+        acdc: cred.acdc,
       })
     );
 
@@ -156,7 +151,7 @@ const CredentialRequest = ({
 
         await Agent.agent.ipexCommunications.offerAcdcFromApply(
           notificationDetails.id,
-          credential.acdc as unknown as CredentialMetadataRecordProps
+          credential.acdc
         );
 
         if (!linkedGroup) {

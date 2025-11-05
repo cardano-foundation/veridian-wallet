@@ -13,6 +13,7 @@ import { SqliteStorage } from "./sqliteStorage";
 import { BasicRecord } from "../../agent/records/basicRecord";
 import { Agent } from "../../agent/agent";
 import { MiscRecordId } from "../../agent/agent.types";
+import { OnlineOnly } from "../../agent/services/utils";
 
 class SqliteSession {
   static readonly VERSION_DATABASE_KEY = "VERSION_DATABASE_KEY";
@@ -122,16 +123,13 @@ class SqliteSession {
    * Executes cloud migrations when connecting to KERIA
    * Should be called on normal startup or recovery when KERIA connection is established
    */
+  @OnlineOnly
   async executeCloudMigrationsOnConnection(): Promise<void> {
     const isKeriaConfigured = await this.isKeriaConfigured();
     if (!isKeriaConfigured) {
       // eslint-disable-next-line no-console
       console.log("Skipping cloud migrations - KERIA not configured");
       return;
-    }
-
-    if (!Agent.isOnline) {
-      await this.temporaryKeriaConnection();
     }
 
     const cloudMigrationManager = new CloudMigrationManager(
@@ -166,13 +164,6 @@ class SqliteSession {
       MiscRecordId.KERIA_CONNECT_URL
     );
     return !!connectUrlRecord?.content?.url;
-  }
-
-  private async temporaryKeriaConnection(): Promise<void> {
-    const connectUrlRecord = await this.basicStorageService.findById(
-      MiscRecordId.KERIA_CONNECT_URL
-    );
-    await Agent.agent.start(connectUrlRecord?.content?.url as string);
   }
 }
 

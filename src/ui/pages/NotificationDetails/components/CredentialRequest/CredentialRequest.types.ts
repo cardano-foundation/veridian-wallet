@@ -4,6 +4,7 @@ import {
 } from "../../../../../core/agent/services/ipexCommunicationService.types";
 import { KeriaNotification } from "../../../../../core/agent/services/keriaNotificationService.types";
 import { BackReason } from "../../../../components/CredentialDetailModule/CredentialDetailModule.types";
+import { ACDC } from "../../../../../core/agent/services/credentialService.types";
 
 interface MemberInfo {
   aid: string;
@@ -40,22 +41,6 @@ interface ChooseCredentialProps {
   notificationDetails: KeriaNotification;
 }
 
-interface ACDC {
-  v: string;
-  d: string;
-  i: string;
-  ri: string;
-  s: string;
-  a: Attendee;
-}
-
-interface Attendee {
-  d: string;
-  i: string;
-  dt: Date;
-  attendeeName: string;
-}
-
 interface RequestCredential {
   connectionId: string;
   acdc: ACDC;
@@ -86,7 +71,6 @@ interface MembersModalProps {
 }
 
 export type {
-  ACDC,
   ChooseCredentialProps,
   CredentialRequestProps,
   JoinedMemberProps,

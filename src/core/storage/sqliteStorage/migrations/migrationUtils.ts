@@ -1,3 +1,5 @@
+import { Tags } from "../../storage.types";
+
 /**
  * Utility functions for migrations
  */
@@ -9,7 +11,7 @@
  */
 export function createInsertItemTagsStatements(itemRecord: {
   id: string;
-  tags?: Record<string, unknown>;
+  tags?: Tags;
 }): { statement: string; values?: unknown[] }[] {
   const statements: { statement: string; values?: unknown[] }[] = [];
   const statement =
