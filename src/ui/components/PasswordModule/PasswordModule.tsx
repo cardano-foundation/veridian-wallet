@@ -1,16 +1,15 @@
 import { IonIcon } from "@ionic/react";
 import { informationCircleOutline } from "ionicons/icons";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { useSelector } from "react-redux";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
 import { AuthService } from "../../../core/agent/services";
 import { KeyStoreKeys } from "../../../core/storage";
 import { i18n } from "../../../i18n";
-import { useAppDispatch } from "../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getStateCache,
+  getAuthentication,
   setAuthentication,
 } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
@@ -29,13 +28,7 @@ import { PasswordMeter } from "./components/PasswordMeter";
 import { SymbolModal } from "./components/SymbolModal";
 
 const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
-  (
-    { title, description, testId, onCreateSuccess, onValidationChange },
-    ref
-  ) => {
-    const dispatch = useAppDispatch();
-    const stateCache = useSelector(getStateCache);
-    const authentication = stateCache.authentication;
+  ({ title, description, testId, onValidationChange }, ref) => {
     const [createPasswordValue, setCreatePasswordValue] = useState("");
     const [confirmPasswordValue, setConfirmPasswordValue] = useState("");
     const [confirmPasswordFocus, setConfirmPasswordFocus] = useState(false);
@@ -43,6 +36,8 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
     const [hintValue, setHintValue] = useState("");
     const [alertExistingIsOpen, setAlertExistingIsOpen] = useState(false);
     const [isOpenSymbol, setIsOpenSymbol] = useState(false);
+    const dispatch = useAppDispatch();
+    const authentication = useAppSelector(getAuthentication);
 
     const createPasswordValueMatching =
       createPasswordValue.length > 0 &&
@@ -74,6 +69,80 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
 
     useImperativeHandle(ref, () => ({
       clearState: handleClearState,
+      savePassword: async () => {
+        if (authentication.passwordIsSet) {
+          try {
+            if (
+              await Agent.agent.auth.verifySecret(
+                KeyStoreKeys.APP_OP_PASSWORD,
+                createPasswordValue
+              )
+            ) {
+              setAlertExistingIsOpen(true);
+              return;
+            }
+          } catch (error) {
+            if (
+              error instanceof Error &&
+              error.message.startsWith(AuthService.SECRET_NOT_STORED)
+            ) {
+              showError(
+                "Unable to get current password",
+                new Error("Unable to get current password"),
+                dispatch
+              );
+              return;
+            }
+            throw error;
+          }
+        }
+
+        await Agent.agent.auth.storeSecret(
+          KeyStoreKeys.APP_OP_PASSWORD,
+          createPasswordValue
+        );
+
+        if (authentication.passwordIsSkipped) {
+          await Agent.agent.basicStorage.deleteById(
+            MiscRecordId.APP_PASSWORD_SKIPPED
+          );
+        }
+
+        dispatch(
+          setAuthentication({
+            ...authentication,
+            passwordIsSet: true,
+            passwordIsSkipped: false,
+          })
+        );
+        if (hintValue) {
+          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+            new BasicRecord({
+              id: MiscRecordId.OP_PASS_HINT,
+              content: { value: hintValue },
+            })
+          );
+        } else {
+          try {
+            const previousHint = (
+              await Agent.agent.basicStorage.findById(MiscRecordId.OP_PASS_HINT)
+            )?.content?.value;
+
+            if (previousHint) {
+              await Agent.agent.basicStorage.deleteById(
+                MiscRecordId.OP_PASS_HINT
+              );
+            }
+          } catch (e) {
+            showError(
+              "Unable to delete password hint",
+              e,
+              dispatch,
+              ToastMsgType.UNABLE_DELETE_PASSWORD_HINT
+            );
+          }
+        }
+      },
     }));
 
     useEffect(() => {

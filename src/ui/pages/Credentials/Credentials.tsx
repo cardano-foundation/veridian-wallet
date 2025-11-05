@@ -43,7 +43,7 @@ import {
   CardList as CredentialCardList,
   SwitchCardView,
 } from "../../components/SwitchCardView";
-import { CardType, ToastMsgType } from "../../globals/types";
+import { ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
@@ -305,7 +305,6 @@ const Credentials = () => {
                 <CardSlider
                   title={`${i18n.t("tabs.credentials.tab.favourites")}`}
                   name="favs"
-                  cardType={CardType.CREDENTIALS}
                   cardsData={sortedFavouriteCredentials}
                   onShowCardDetails={() => handleShowNavAnimation("favourite")}
                 />
@@ -314,7 +313,6 @@ const Credentials = () => {
             {!!confirmedCreds.length && (
               <SwitchCardView
                 className="credentials-tab-content-block credential-cards"
-                cardTypes={CardType.CREDENTIALS}
                 cardsData={
                   selectedFilter === CredentialsFilters.All
                     ? confirmedCreds
@@ -358,7 +356,6 @@ const Credentials = () => {
                 />
                 <CredentialCardList
                   cardsData={pendingCreds}
-                  cardTypes={CardType.CREDENTIALS}
                   testId="pending-creds-list"
                   onCardClick={(cred) => {
                     setDeletePendingItem(cred as CredentialShortDetails);

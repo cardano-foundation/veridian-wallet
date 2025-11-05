@@ -1,13 +1,25 @@
-import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
+import { AuthService } from "../../../core/agent/services";
+import { KeyStoreKeys } from "../../../core/storage";
 import { i18n } from "../../../i18n";
 import { useAppDispatch } from "../../../store/hooks";
 import { setEnableBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
+import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
+import {
+  BiometricAuthOutcome,
+  useBiometricAuth,
+} from "../../hooks/useBiometricsHook";
+import { showError } from "../../utils/error";
+import {
+  isConsecutive,
+  isRepeat,
+  isReverseConsecutive,
+} from "../../utils/passcodeChecker";
 import { Alert } from "../Alert";
 import { ErrorMessage, MESSAGE_MILLISECONDS } from "../ErrorMessage";
 import { PageFooter } from "../PageFooter";
@@ -17,15 +29,6 @@ import {
   CreatePasscodeModuleProps,
   CreatePasscodeModuleRef,
 } from "./CreatePasscodeModule.types";
-import { showError } from "../../utils/error";
-import { KeyStoreKeys } from "../../../core/storage";
-import { AuthService } from "../../../core/agent/services";
-import {
-  isConsecutive,
-  isRepeat,
-  isReverseConsecutive,
-} from "../../utils/passcodeChecker";
-import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
 
 const CreatePasscodeModule = forwardRef<
   CreatePasscodeModuleRef,
@@ -53,7 +56,6 @@ const CreatePasscodeModule = forwardRef<
     const [originalPassCode, setOriginalPassCode] = useState("");
     const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
     const { handleBiometricAuth, biometricInfo } = useBiometricAuth();
-    
 
     const setupBiometricsHeaderText = i18n.t("biometry.setupbiometryheader");
 
@@ -77,10 +79,7 @@ const CreatePasscodeModule = forwardRef<
         setPasscode(passcode + digit);
         if (originalPassCode !== "" && passcode.length === 5) {
           if (originalPassCode === passcode + digit) {
-            if (
-              biometricInfo.isAvailable &&
-              !changePasscodeMode
-            ) {
+            if (biometricInfo.isAvailable && !changePasscodeMode) {
               setShowSetupBiometricsAlert(true);
             } else {
               await handlePassAuth();
@@ -91,7 +90,8 @@ const CreatePasscodeModule = forwardRef<
     };
 
     const processBiometrics = async () => {
-      let biometricOutcome: BiometricAuthOutcome = BiometricAuthOutcome.GENERIC_ERROR;
+      let biometricOutcome: BiometricAuthOutcome =
+        BiometricAuthOutcome.GENERIC_ERROR;
       try {
         await disablePrivacy();
         biometricOutcome = await handleBiometricAuth();
@@ -114,7 +114,11 @@ const CreatePasscodeModule = forwardRef<
       } else if (biometricOutcome === BiometricAuthOutcome.USER_CANCELLED) {
         setShowCancelBiometricsAlert(true);
       } else {
-        showError(i18n.t("biometry.errors.toggleFailed"), new Error("Biometrics authentication failed"), dispatch);
+        showError(
+          i18n.t("biometry.errors.toggleFailed"),
+          new Error("Biometrics authentication failed"),
+          dispatch
+        );
       }
     };
 

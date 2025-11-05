@@ -3,15 +3,15 @@ import { hourglassOutline } from "ionicons/icons";
 import { useState } from "react";
 import { CredentialStatus } from "../../../../../core/agent/services/credentialService.types";
 import { i18n } from "../../../../../i18n";
+import { useAppSelector } from "../../../../../store/hooks";
+import { getConnectionsCache } from "../../../../../store/reducers/profileCache";
 import ACDCLogo from "../../../../../ui/assets/images/keri-acdc.svg";
 import { ellipsisText, formatShortDate } from "../../../../utils/formatters";
 import { Alert } from "../../../Alert";
-import { useCardOffsetTop } from "../../../IdentifierCardTemplate";
-import { CredentialCardTemplateProps } from "../../CredentialCardTemplate.types";
-import "./KeriCardTemplate.scss";
 import { CardTheme } from "../../../CardTheme";
-import { useAppSelector } from "../../../../../store/hooks";
-import { getConnectionsCache } from "../../../../../store/reducers/profileCache";
+import { CredentialCardTemplateProps } from "../../CredentialCardTemplate.types";
+import { useCardOffsetTop } from "../../hook/cardOffsetTopHook";
+import "./KeriCardTemplate.scss";
 
 const KeriCardTemplate = ({
   name = "default",
@@ -21,7 +21,7 @@ const KeriCardTemplate = ({
   onHandleShowCardDetails,
   pickedCard,
 }: CredentialCardTemplateProps) => {
-  const connections = useAppSelector(getConnectionsCache) as any[];
+  const connections = useAppSelector(getConnectionsCache);
   const { getCardOffsetTop, cardRef } = useCardOffsetTop();
 
   const [alertIsOpen, setAlertIsOpen] = useState(false);

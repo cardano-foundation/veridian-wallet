@@ -20,10 +20,7 @@ import {
 import { RoutePath } from "../../../routes";
 import { useAppDispatch } from "../../../store/hooks";
 import { removeConnectionCache } from "../../../store/reducers/profileCache";
-import {
-  setCurrentOperation,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import { Alert as AlertDeleteConnection } from "../../components/Alert";
 import { CardDetailsBlock } from "../../components/CardDetails";
 import { CloudError } from "../../components/CloudError";
@@ -32,7 +29,7 @@ import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
 import { Verification } from "../../components/Verification";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
-import { OperationType, ToastMsgType } from "../../globals/types";
+import { ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { ConnectionDetailsProps } from "./ConnectionDetails.types";
@@ -137,7 +134,6 @@ const ConnectionDetails = ({
           ToastMsgType.DELETE_CONNECTION_FAIL
         );
       }
-      dispatch(setCurrentOperation(OperationType.IDLE));
     }
     deleteConnection();
   };
@@ -182,8 +178,7 @@ const ConnectionDetails = ({
     setModalIsOpen(true);
   };
 
-  const cancelDeleteConnection = () =>
-    dispatch(setCurrentOperation(OperationType.IDLE));
+  const cancelDeleteConnection = () => setAlertDeleteConnectionIsOpen(false);
 
   return (
     <>

@@ -43,8 +43,6 @@ const NotificationItem = ({
         return fingerPrintOutline;
       case NotificationRoute.RemoteSignReq:
         return documentOutline;
-      case NotificationRoute.LocalSingletonConnectInstructions:
-        return personCircleOutline;
       default:
         return idCardOutline;
     }

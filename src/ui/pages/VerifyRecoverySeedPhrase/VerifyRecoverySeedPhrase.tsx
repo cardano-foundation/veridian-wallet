@@ -26,9 +26,6 @@ const VerifyRecoverySeedPhrase = () => {
   const handleNavigate = () => {
     const data: DataProps = {
       store: { stateCache },
-      state: {
-        currentOperation: stateCache.currentOperation,
-      },
     };
 
     const { nextPath, updateRedux } = getNextRoute(

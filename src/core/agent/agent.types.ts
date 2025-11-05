@@ -77,7 +77,6 @@ enum MiscRecordId {
   IDENTIFIERS_PENDING_CREATION = "identifiers-pending-creation",
   MULTISIG_IDENTIFIERS_PENDING_CREATION = "multisig-identifiers-pending-creation",
   IS_SETUP_PROFILE = "is-setup-profile",
-  INDIVIDUAL_FIRST_CREATE = "individual-first-create",
   BIOMETRICS_SETUP = "biometrics-setup",
   PROFILE_HISTORIES = "profile-histories",
   PENDING_JOIN_GROUP_METADATA = "pending-join-group-metadata",

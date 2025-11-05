@@ -1015,17 +1015,6 @@ class KeriaNotificationService extends AgentService {
       throw new Error(KeriaNotificationService.SINGLETON_ROUTE_REQUIRED);
     }
 
-    // Only create once. If deleted by the user, it can be created again, but generally other logic prevents that.
-    if (
-      (
-        await this.notificationStorage.findAllByQuery({
-          route: NotificationRoute.LocalSingletonConnectInstructions,
-        })
-      ).length > 0
-    ) {
-      return;
-    }
-
     const notification: NotificationRecordStorageProps = {
       id: randomSalt(),
       createdAt: new Date(),

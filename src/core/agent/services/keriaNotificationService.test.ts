@@ -2113,39 +2113,6 @@ describe("Signify notification service of agent", () => {
     expect(notificationStorage.save).not.toBeCalled();
   });
 
-  test("Can create a singleton notification", async () => {
-    notificationStorage.findAllByQuery.mockResolvedValue([]);
-    await keriaNotificationService.createSingletonNotification(
-      NotificationRoute.LocalSingletonConnectInstructions
-    );
-    expect(notificationStorage.save).toBeCalledWith(
-      expect.objectContaining({
-        route: NotificationRoute.LocalSingletonConnectInstructions,
-        read: false,
-        connectionId: KeriaNotificationService.SINGLETON_PRE,
-        receivingPre: KeriaNotificationService.SINGLETON_PRE,
-        a: { r: NotificationRoute.LocalSingletonConnectInstructions },
-      })
-    );
-  });
-
-  test("Can create a singleton notification with more attributes", async () => {
-    notificationStorage.findAllByQuery.mockResolvedValue([]);
-    await keriaNotificationService.createSingletonNotification(
-      NotificationRoute.LocalSingletonConnectInstructions,
-      { field: 1 }
-    );
-    expect(notificationStorage.save).toBeCalledWith(
-      expect.objectContaining({
-        route: NotificationRoute.LocalSingletonConnectInstructions,
-        read: false,
-        connectionId: KeriaNotificationService.SINGLETON_PRE,
-        receivingPre: KeriaNotificationService.SINGLETON_PRE,
-        a: { r: NotificationRoute.LocalSingletonConnectInstructions, field: 1 },
-      })
-    );
-  });
-
   test("Singleton notifications must have a singleton route", async () => {
     expect(
       keriaNotificationService.createSingletonNotification(
@@ -2157,19 +2124,6 @@ describe("Signify notification service of agent", () => {
         NotificationRoute.LocalAcdcRevoked
       )
     ).rejects.toThrowError(KeriaNotificationService.SINGLETON_ROUTE_REQUIRED);
-    expect(notificationStorage.save).not.toBeCalled();
-  });
-
-  test("Skip creation if singleton already exists", async () => {
-    notificationStorage.findAllByQuery.mockResolvedValue([
-      {
-        id: "id",
-        route: NotificationRoute.LocalSingletonConnectInstructions,
-      },
-    ]);
-    await keriaNotificationService.createSingletonNotification(
-      NotificationRoute.LocalSingletonConnectInstructions
-    );
     expect(notificationStorage.save).not.toBeCalled();
   });
 });

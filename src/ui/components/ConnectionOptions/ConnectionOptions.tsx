@@ -1,10 +1,7 @@
 import { pencilOutline, trashOutline } from "ionicons/icons";
 import { i18n } from "../../../i18n";
-import { ConnectionOptionsProps } from "./ConnectionOptions.types";
-import { setCurrentOperation } from "../../../store/reducers/stateCache";
-import { OperationType } from "../../globals/types";
-import { useAppDispatch } from "../../../store/hooks";
 import { OptionItem, OptionModal } from "../OptionsModal";
+import { ConnectionOptionsProps } from "./ConnectionOptions.types";
 
 const ConnectionOptions = ({
   optionsIsOpen,
@@ -13,8 +10,6 @@ const ConnectionOptions = ({
   handleDelete,
   restrictedOptions,
 }: ConnectionOptionsProps) => {
-  const dispatch = useAppDispatch();
-
   const options: OptionItem[] = [
     {
       icon: pencilOutline,

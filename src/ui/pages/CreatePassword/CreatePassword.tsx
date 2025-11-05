@@ -1,3 +1,5 @@
+import { IonIcon } from "@ionic/react";
+import { lockClosedOutline } from "ionicons/icons";
 import { useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -6,25 +8,19 @@ import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  getStateCache,
-  setCurrentOperation,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
+import { getStateCache, setToastMsg } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { Alert } from "../../components/Alert";
+import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
 import { PasswordModule } from "../../components/PasswordModule";
 import { PasswordModuleRef } from "../../components/PasswordModule/PasswordModule.types";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
-import { OperationType, ToastMsgType } from "../../globals/types";
+import { ToastMsgType } from "../../globals/types";
 import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import "./CreatePassword.scss";
 import { CreatePasswordProps } from "./CreatePassword.types";
-import { PageFooter } from "../../components/PageFooter";
-import { IonIcon } from "@ionic/react";
-import { lockClosedOutline } from "ionicons/icons";
 
 const CreatePassword = ({
   handleClear,
@@ -39,7 +35,7 @@ const CreatePassword = ({
   const [alertCancelIsOpen, setAlertCancelIsOpen] = useState(false);
   const isOnboarding = stateCache.routes[0]?.path === RoutePath.CREATE_PASSWORD;
   const [step, setStep] = useState(isOnboarding ? 0 : 1);
-  const [validated, setValidated] = useState(false);
+  const [validPassword, setValidPassword] = useState(false);
 
   const handleContinue = async (skipped: boolean) => {
     if (skipped) {
@@ -53,6 +49,8 @@ const CreatePassword = ({
         .catch((e) => {
           showError("Unable to skip set password", e, dispatch);
         });
+    } else {
+      await passwordModuleRef.current?.savePassword();
     }
 
     if (!isOnboarding) {
@@ -80,7 +78,6 @@ const CreatePassword = ({
         dispatch,
         updateRedux
       );
-      dispatch(setCurrentOperation(OperationType.IDLE));
       ionRouter.push(nextPath.pathname, "forward", "push");
     }
   };
@@ -136,7 +133,7 @@ const CreatePassword = ({
               isOnboarding ? `${i18n.t("createpassword.title")}` : undefined
             }
             description={`${i18n.t("createpassword.description")}`}
-            onCreateSuccess={handleContinue}
+            onValidationChange={setValidPassword}
           />
         )}
         {step === 0 ? (
@@ -155,7 +152,7 @@ const CreatePassword = ({
             pageId={pageId}
             primaryButtonText={`${i18n.t("createpassword.button.continue")}`}
             primaryButtonAction={() => handleContinue(false)}
-            primaryButtonDisabled={!validated}
+            primaryButtonDisabled={!validPassword}
           />
         )}
       </ResponsivePageLayout>

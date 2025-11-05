@@ -11,7 +11,6 @@ import { useAppIonRouter } from "../../hooks";
 import { CredentialRequest } from "./components/CredentialRequest";
 import { MultiSigRequest } from "./components/MultiSigRequest";
 import { ReceiveCredential } from "./components/ReceiveCredential";
-import { RemoteConnectInstructions } from "./components/RemoteConnectInstructions";
 import { RemoteMessage } from "./components/RemoteMessage";
 import { RemoteSignRequest } from "./components/RemoteSignRequest";
 
@@ -49,8 +48,6 @@ const NotificationDetails = () => {
       [NotificationRoute.MultiSigExn]: ReceiveCredential,
       [NotificationRoute.RemoteSignReq]: RemoteSignRequest,
       [NotificationRoute.HumanReadableMessage]: RemoteMessage,
-      [NotificationRoute.LocalSingletonConnectInstructions]:
-        RemoteConnectInstructions,
       [NotificationRoute.MultiSigRpy]: null,
       [NotificationRoute.ExnIpexOffer]: null,
       [NotificationRoute.ExnIpexAgree]: null,

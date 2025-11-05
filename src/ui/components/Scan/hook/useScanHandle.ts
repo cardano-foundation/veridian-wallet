@@ -10,7 +10,6 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import {
   getConnectionsCache,
   getCurrentProfile,
-  getProfiles,
   setMissingAliasConnection,
   setOpenConnectionId,
 } from "../../../../store/reducers/profileCache";
@@ -30,7 +29,6 @@ const useScanHandle = () => {
   const dispatch = useAppDispatch();
   const defaultIdentifier = useAppSelector(getCurrentProfile)?.identity.id;
   const connections = useAppSelector(getConnectionsCache);
-  const allProfiles = useAppSelector(getProfiles);
 
   const handleDuplicateConnectionError = useCallback(
     async (

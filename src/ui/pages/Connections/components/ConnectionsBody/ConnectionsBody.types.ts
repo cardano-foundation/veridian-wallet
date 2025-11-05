@@ -24,6 +24,6 @@ interface SearchConnectionContentProps {
 
 export type {
   ConnectionsBodyProps,
-  SearchConnectionListProps,
   SearchConnectionContentProps,
+  SearchConnectionListProps,
 };

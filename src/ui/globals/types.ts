@@ -1,17 +1,6 @@
-enum CardType {
-  CREDENTIALS = "credentials",
-  IDENTIFIERS = "identifiers",
-}
-
 enum RequestType {
   CONNECTION = "Connection",
   CREDENTIAL = "Credential",
-}
-
-// String enums as some of these map to i18n values (if relevant)
-enum OperationType {
-  IDLE = "idle",
-  SCAN_CONNECTION = "scanConnection",
 }
 
 enum ToastMsgType {
@@ -118,11 +107,4 @@ enum BackEventPriorityType {
   Tab = 101,
 }
 
-export {
-  BackEventPriorityType,
-  CardType,
-  OperationType,
-  PASSCODE_MAPPING,
-  RequestType,
-  ToastMsgType,
-};
+export { BackEventPriorityType, PASSCODE_MAPPING, RequestType, ToastMsgType };
