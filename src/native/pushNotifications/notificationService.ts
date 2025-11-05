@@ -11,6 +11,13 @@ const PRIMARY_COLOR =
     .getPropertyValue("--ion-color-primary-700")
     .trim() || "#0056b3";
 
+const NOTIFICATION_DEFAULTS = {
+  largeIcon: "res://drawable/notification_icon",
+  smallIcon: "res://drawable/notification_small",
+  iconColor: PRIMARY_COLOR,
+  channelId: "veridian-notifications",
+} as const;
+
 const CHANNEL_CONFIG = {
   id: "veridian-notifications",
   name: "Veridian Notifications",
@@ -77,9 +84,8 @@ class NotificationService {
 
   private async processPendingNotification() {
     if (this.pendingNotification && this.profileSwitcher) {
-      const notification = this.pendingNotification;
+      await this.handleNotificationTap(this.pendingNotification);
       this.pendingNotification = null;
-      await this.handleNotificationTap(notification);
     }
   }
 
@@ -128,10 +134,7 @@ class NotificationService {
             notificationId: payload.notificationId,
             launchUrl,
           },
-          largeIcon: "res://drawable/notification_icon",
-          smallIcon: "res://drawable/notification_small",
-          iconColor: PRIMARY_COLOR,
-          channelId: "veridian-notifications",
+          ...NOTIFICATION_DEFAULTS,
         },
       ],
     };
@@ -165,11 +168,6 @@ class NotificationService {
     if (toCancel.length > 0) {
       await LocalNotifications.cancel({ notifications: toCancel });
     }
-  }
-
-  async getActiveNotifications(): Promise<LocalNotification[]> {
-    const result = await LocalNotifications.getPending();
-    return result.notifications as LocalNotification[];
   }
 
   async getDeliveredNotifications(): Promise<LocalNotification[]> {

@@ -30,7 +30,6 @@ describe("NotificationService", () => {
     jest.clearAllMocks();
     (notificationService as any).permissionsGranted = true;
     (notificationService as any).profileSwitcher = null;
-    (notificationService as any).navigator = null;
   });
 
   describe("requestPermissions", () => {
@@ -220,10 +219,11 @@ describe("NotificationService", () => {
       expect(mockDispatchEvent).not.toHaveBeenCalled();
     });
 
-    test("should queue notification if profileId missing", async () => {
+    test("should queue notification if profileSwitcher not set", async () => {
       const notification = {
         id: 1,
         extra: {
+          profileId: "profile-abc",
           notificationId: "notif-123",
         },
       };
@@ -269,23 +269,6 @@ describe("NotificationService", () => {
       );
 
       expect(LocalNotifications.cancel).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("getActiveNotifications", () => {
-    test("should return pending notifications", async () => {
-      const mockNotifications = [
-        { id: 1, extra: {} },
-        { id: 2, extra: {} },
-      ];
-      (LocalNotifications.getPending as jest.Mock).mockResolvedValue({
-        notifications: mockNotifications,
-      });
-
-      const result = await notificationService.getActiveNotifications();
-
-      expect(result).toEqual(mockNotifications);
-      expect(LocalNotifications.getPending).toHaveBeenCalled();
     });
   });
 

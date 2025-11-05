@@ -488,18 +488,8 @@ export const handleNotificationReceived =
     }
 
     const notificationContext = {
-      connectionsCache: targetProfile.connections.map(
-        (c: RegularConnectionDetails) => ({
-          id: c.id,
-          label: c.label,
-        })
-      ),
-      multisigConnectionsCache: targetProfile.multisigConnections.map(
-        (c: MultisigConnectionDetails) => ({
-          id: c.id,
-          label: c.label,
-        })
-      ),
+      connectionsCache: targetProfile.connections,
+      multisigConnectionsCache: targetProfile.multisigConnections,
     };
 
     const notificationBody = getNotificationDisplayTextForPush(

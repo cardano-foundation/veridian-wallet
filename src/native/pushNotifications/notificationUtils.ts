@@ -3,10 +3,14 @@ import {
   KeriaNotification,
   NotificationRoute,
 } from "../../core/agent/services/keriaNotificationService.types";
+import {
+  MultisigConnectionDetails,
+  RegularConnectionDetails,
+} from "../../core/agent/agent.types";
 
 export interface NotificationContext {
-  connectionsCache: Array<{ id: string; label: string }>;
-  multisigConnectionsCache: Array<{ id: string; label: string }>;
+  connectionsCache: RegularConnectionDetails[];
+  multisigConnectionsCache: MultisigConnectionDetails[];
 }
 
 const stripHtmlTags = (text: string): string => {
