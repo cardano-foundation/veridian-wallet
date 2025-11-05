@@ -375,6 +375,20 @@ export const profilesCacheSlice = createSlice({
       targetProfile.multisigConnections = [...existing, mapped];
     },
 
+    setProfileMultisigConnections: (
+      state,
+      action: PayloadAction<{
+        profileId: string;
+        connections: MultisigConnectionDetails[];
+      }>
+    ) => {
+      const { profileId, connections } = action.payload;
+      const targetProfile = state.profiles[profileId];
+      if (targetProfile) {
+        targetProfile.multisigConnections = connections;
+      }
+    },
+
     // Wallet Connection Actions
     setConnectedDApp: (state, action: PayloadAction<DAppConnection | null>) => {
       // Store in global state for cross-profile access
@@ -488,6 +502,7 @@ export const {
   updateOrAddConnectionCache,
   removeConnectionCache,
   updateOrAddMultisigConnectionCache,
+  setProfileMultisigConnections,
   setOpenConnectionId,
   setMissingAliasConnection,
   setConnectedDApp,
