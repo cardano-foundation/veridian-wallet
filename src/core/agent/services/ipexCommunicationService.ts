@@ -9,8 +9,11 @@ import {
   Siger,
 } from "signify-ts";
 import type { ExnMessage, AgentServicesProps } from "../agent.types";
+import {
+  exnHasAcdc,
+  SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED,
+} from "../agent.types";
 import type { KeriaNotification } from "./keriaNotificationService.types";
-import type { IpexGrantMultiSigExn } from "./multiSig.types";
 import { ExchangeRoute } from "./keriaNotificationService.types";
 import {
   CredentialStorage,
@@ -24,6 +27,7 @@ import {
 import type { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
 import { AgentService } from "./agentService";
 import { getCredentialShortDetails, OnlineOnly } from "./utils";
+import type { ACDC } from "./credentialService.types";
 import {
   CredentialStatus,
   ACDCDetails,
@@ -36,7 +40,11 @@ import {
 } from "./ipexCommunicationService.types";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { MultiSigService } from "./multiSigService";
-import { GrantToJoinMultisigExnPayload, MultiSigRoute } from "./multiSig.types";
+import {
+  GrantToJoinMultisigExnPayload,
+  MultiSigRoute,
+  isMultiSigExn,
+} from "./multiSig.types";
 import { AcdcStateChangedEvent, EventTypes } from "../event.types";
 import { ConnectionService } from "./connectionService";
 import { IdentifierType } from "./identifier.types";
@@ -211,10 +219,7 @@ class IpexCommunicationService extends AgentService {
   }
 
   @OnlineOnly
-  async offerAcdcFromApply(
-    notificationId: string,
-    acdc: CredentialMetadataRecordProps
-  ): Promise<void> {
+  async offerAcdcFromApply(notificationId: string, acdc: ACDC): Promise<void> {
     const applyNoteRecord = await this.notificationStorage.findById(
       notificationId
     );
@@ -531,7 +536,11 @@ class IpexCommunicationService extends AgentService {
     }
 
     let schemaSaid;
-    if (message.exn.r === ExchangeRoute.IpexGrant && message.exn.e.acdc) {
+    // Type narrowing: IpexGrant route requires acdc
+    if (
+      message.exn.r === ExchangeRoute.IpexGrant &&
+      exnHasAcdc(message.exn.e)
+    ) {
       schemaSaid = message.exn.e.acdc.s;
     } else if (message.exn.r === ExchangeRoute.IpexApply) {
       schemaSaid = message.exn.a.s;
@@ -542,6 +551,12 @@ class IpexCommunicationService extends AgentService {
       const previousExchange = await this.props.signifyClient
         .exchanges()
         .get(message.exn.p);
+      // Type narrowing: IpexAgree and IpexAdmit routes require acdc in previous exchange
+      if (!exnHasAcdc(previousExchange.exn.e)) {
+        throw new Error(
+          `${message.exn.r} message's previous exchange must have e.acdc`
+        );
+      }
       schemaSaid = previousExchange.exn.e.acdc.s;
     }
 
@@ -558,8 +573,13 @@ class IpexCommunicationService extends AgentService {
     let key;
     switch (historyType) {
       case ConnectionHistoryType.CREDENTIAL_REVOKED:
+        // Type narrowing: CREDENTIAL_REVOKED messages must have acdc
+        if (!exnHasAcdc(message.exn.e)) {
+          throw new Error("CREDENTIAL_REVOKED message must have e.acdc");
+        }
         prefix = KeriaContactKeyPrefix.HISTORY_REVOKE;
-        key = message.exn.e.acdc?.d;
+        // TypeScript now knows message.exn.e.acdc exists
+        key = message.exn.e.acdc.d;
         break;
       case ConnectionHistoryType.CREDENTIAL_ISSUANCE:
       case ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT:
@@ -726,11 +746,15 @@ class IpexCommunicationService extends AgentService {
       throw new Error(IpexCommunicationService.NO_CURRENT_IPEX_MSG_TO_JOIN);
     }
 
-    const grantExn = multiSigExn.exn.e.exn as unknown as {
-      i: string;
-      p: string;
-      e: { acdc: { i: string; d: string; s: string } };
-    };
+    // Type narrowing: Validate multiSigExn structure first
+    if (!isMultiSigExn(multiSigExn)) {
+      throw new Error(
+        "Invalid multisig exchange structure for joinMultisigGrant: missing required fields"
+      );
+    }
+
+    // After type narrowing, TypeScript knows the structure is correct
+    const grantExn = multiSigExn.exn.e.exn;
 
     // Create the credential structure expected by submitMultisigGrant
     const credentialData = {
@@ -745,8 +769,8 @@ class IpexCommunicationService extends AgentService {
       grantExn.p,
       credentialData,
       {
-        grantExn: multiSigExn.exn.e.exn as unknown as IpexGrantMultiSigExn,
-        atc: multiSigExn.pathed.exn as string,
+        grantExn: multiSigExn.exn.e.exn,
+        atc: multiSigExn.pathed.exn,
       }
     );
 
@@ -765,10 +789,14 @@ class IpexCommunicationService extends AgentService {
   private async submitMultisigOffer(
     multisigId: string,
     notificationSaid: string,
-    acdcDetail: CredentialMetadataRecordProps,
+    acdcDetail: ACDC,
     discloseePrefix: string,
-    offerExnToJoin?: { ked: unknown }
+    offerExnToJoin?: Record<string, unknown>
   ): Promise<SubmitIPEXResult> {
+    if (!this.props.signifyClient.manager) {
+      throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
+    }
+
     let exn: Serder;
     let sigsMes: string[];
     let mend: string;
@@ -790,9 +818,6 @@ class IpexCommunicationService extends AgentService {
     if (offerExnToJoin) {
       const [, ked] = Saider.saidify(offerExnToJoin);
       const offer = new Serder(ked);
-      if (!this.props.signifyClient.manager) {
-        throw new Error("Signify client manager not initialized");
-      }
       const keeper = this.props.signifyClient.manager.get(gHab);
       const sigs = await keeper.sign(b(new Serder(offerExnToJoin).raw));
 
@@ -883,6 +908,10 @@ class IpexCommunicationService extends AgentService {
     },
     grantToJoin?: GrantToJoinMultisigExnPayload
   ): Promise<SubmitIPEXResult> {
+    if (!this.props.signifyClient.manager) {
+      throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
+    }
+
     let exn: Serder;
     let sigsMes: string[];
     let mend: string;
@@ -902,9 +931,6 @@ class IpexCommunicationService extends AgentService {
       const { grantExn, atc } = grantToJoin;
       const [, ked] = Saider.saidify(grantExn);
       const grant = new Serder(ked);
-      if (!this.props.signifyClient.manager) {
-        throw new Error("Signify client manager not initialized");
-      }
       const keeper = this.props.signifyClient.manager.get(gHab);
       const sigs = await keeper.sign(b(new Serder(grantExn).raw));
       const mstateNew = gHab["state"];
@@ -1039,8 +1065,12 @@ class IpexCommunicationService extends AgentService {
     multisigId: string,
     grantExn: ExnMessage,
     schemaSaids: string[],
-    admitExnToJoin?: { ked: unknown }
+    admitExnToJoin?: Record<string, unknown>
   ): Promise<SubmitIPEXResult> {
+    if (!this.props.signifyClient.manager) {
+      throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
+    }
+
     let exn: Serder;
     let sigsMes: string[];
     let mend: string;
@@ -1075,9 +1105,6 @@ class IpexCommunicationService extends AgentService {
     if (admitExnToJoin) {
       const [, ked] = Saider.saidify(admitExnToJoin);
       const admit = new Serder(ked);
-      if (!this.props.signifyClient.manager) {
-        throw new Error("Signify client manager not initialized");
-      }
       const keeper = this.props.signifyClient.manager.get(gHab);
       const sigs = await keeper.sign(b(new Serder(admitExnToJoin).raw));
 

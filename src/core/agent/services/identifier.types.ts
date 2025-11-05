@@ -1,4 +1,4 @@
-import { CreateIdentifierBody } from "signify-ts";
+import { CreateIdentifierBody, HabState } from "signify-ts";
 import {
   MultisigConnectionDetails,
   CreationStatus,
@@ -62,16 +62,35 @@ enum IdentifierType {
   Group = "group",
 }
 
-type QueuedIdentifierCreation = {
-  name: string;
-  data: CreateIdentifierBody;
-};
-
 interface MultisigThresholds {
   signingThreshold: number;
   rotationThreshold: number;
 }
 
+type QueuedGroupCreation =
+  | {
+      initiator: true;
+      name: string;
+      data: CreateIdentifierBody & { group: HabState };
+      groupConnections: MultisigConnectionDetails[];
+      threshold: number | MultisigThresholds;
+    }
+  | {
+      initiator: false;
+      name: string;
+      data: CreateIdentifierBody & { group: HabState };
+      notificationId: string;
+      notificationSaid: string;
+    };
+
+// Type guard to check if CreateIdentifierBody has group data
+function isGroupInceptionData(
+  data: CreateIdentifierBody
+): data is CreateIdentifierBody & { group: HabState } {
+  return data.group !== undefined;
+}
+
+// Helper type used in multiSigService for generating inception data
 type QueuedGroupProps =
   | {
       initiator: true;
@@ -83,8 +102,6 @@ type QueuedGroupProps =
       notificationId: string;
       notificationSaid: string;
     };
-
-type QueuedGroupCreation = QueuedIdentifierCreation & QueuedGroupProps;
 
 interface GroupParticipants {
   ourIdentifier: IdentifierMetadataRecord;
@@ -111,6 +128,8 @@ interface RemoteSignRequest {
   payload: JSONObject;
 }
 
+export { IdentifierType, isGroupInceptionData };
+
 export type {
   IdentifierShortDetails,
   IdentifierDetails,
@@ -118,12 +137,7 @@ export type {
   CreateIdentifierInputs,
   CreateIdentifierResult,
   MultisigThresholds,
-};
-
-export { IdentifierType };
-export type {
   GroupMetadata,
-  QueuedIdentifierCreation,
   QueuedGroupProps,
   QueuedGroupCreation,
   GroupParticipants,

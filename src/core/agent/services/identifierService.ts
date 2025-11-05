@@ -236,6 +236,10 @@ class IdentifierService extends AgentService {
     metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">,
     backgroundTask = false
   ): Promise<CreateIdentifierResult> {
+    if (!this.props.signifyClient.agent) {
+      throw new Error("Agent not initialized");
+    }
+
     const { toad, witnesses } = await this.getAvailableWitnesses();
 
     if (!UI_THEMES.includes(metadata.theme)) {
@@ -309,9 +313,6 @@ class IdentifierService extends AgentService {
       .identifiers()
       .get(identifier)) as HabState;
 
-    if (!this.props.signifyClient.agent) {
-      throw new Error("Agent not initialized");
-    }
     const addRoleOperation = await this.props.signifyClient
       .identifiers()
       .addEndRole(identifier, "agent", this.props.signifyClient.agent.pre);
@@ -655,16 +656,7 @@ class IdentifierService extends AgentService {
   }
 
   async syncKeriaIdentifiers(): Promise<void> {
-    const cloudIdentifiers: Array<{
-      prefix: string;
-      name: string;
-      group?: {
-        mhab: {
-          name: string;
-          prefix: string;
-        };
-      };
-    }> = [];
+    const cloudIdentifiers: HabState[] = [];
     let returned = -1;
     let iteration = 0;
 
@@ -680,8 +672,10 @@ class IdentifierService extends AgentService {
 
     const localIdentifiers = await this.identifierStorage.getAllIdentifiers();
 
-    const unSyncedDataWithGroup = [];
-    const unSyncedDataWithoutGroup = [];
+    const unSyncedDataWithGroup: (HabState & {
+      group: NonNullable<HabState["group"]>;
+    })[] = [];
+    const unSyncedDataWithoutGroup: HabState[] = [];
     for (const identifier of cloudIdentifiers) {
       if (localIdentifiers.find((item) => item.id === identifier.prefix)) {
         continue;
@@ -690,7 +684,9 @@ class IdentifierService extends AgentService {
       if (identifier.group === undefined) {
         unSyncedDataWithoutGroup.push(identifier);
       } else {
-        unSyncedDataWithGroup.push(identifier);
+        unSyncedDataWithGroup.push(
+          identifier as HabState & { group: NonNullable<HabState["group"]> }
+        );
       }
     }
 
@@ -759,9 +755,6 @@ class IdentifierService extends AgentService {
         .identifiers()
         .get(identifier.prefix)) as HabState;
 
-      if (!identifier.group) {
-        throw new Error("Group identifier missing group data");
-      }
       const nameToParse = identifier.name.startsWith(
         IdentifierService.DELETED_IDENTIFIER_THEME
       )

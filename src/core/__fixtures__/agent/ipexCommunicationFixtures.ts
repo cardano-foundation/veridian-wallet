@@ -431,7 +431,9 @@ const multisigExnGrant = {
       d: "EE8_Xc0ZUh_sUJLtmBpVSEr-RFS2mRUIpFyL-pmvtPvx",
     },
   },
-  pathed: {},
+  pathed: {
+    exn: "d",
+  },
 };
 
 const credentialRecord = {

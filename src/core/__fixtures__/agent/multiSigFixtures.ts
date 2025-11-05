@@ -1,4 +1,4 @@
-import { CreateIdentifierBody, Tier } from "signify-ts";
+import { CreateIdentifierBody, HabState, Tier } from "signify-ts";
 import { ConnectionStatus, CreationStatus } from "../../agent/agent.types";
 import {
   IdentifierMetadataRecord,
@@ -862,7 +862,7 @@ const linkedContacts = [
 
 const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
   name: "1.2.0.2:0:Identifier 2",
-  data: inceptionDataFix,
+  data: inceptionDataFix as CreateIdentifierBody & { group: HabState },
   initiator: true,
   groupConnections: linkedContacts,
   threshold: {
@@ -873,7 +873,7 @@ const queuedIdentifier: QueuedGroupCreation & { initiator: true } = {
 
 const queuedJoin: QueuedGroupCreation & { initiator: false } = {
   name: "0:testUser",
-  data: inceptionDataFix,
+  data: inceptionDataFix as CreateIdentifierBody & { group: HabState },
   initiator: false,
   notificationId: "notification-id",
   notificationSaid: "notification-said",
