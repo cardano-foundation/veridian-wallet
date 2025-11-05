@@ -11,10 +11,20 @@ const PRIMARY_COLOR =
     .getPropertyValue("--ion-color-primary-700")
     .trim() || "#0056b3";
 
+const CHANNEL_CONFIG = {
+  id: "veridian-notifications",
+  name: "Veridian Notifications",
+  description: "Notifications for credential and connection updates",
+  sound: "default" as const,
+  importance: 5 as const,
+  visibility: 1 as const,
+  lights: true,
+  lightColor: PRIMARY_COLOR,
+  vibration: true,
+};
+
 class NotificationService {
   private profileSwitcher: ((profileId: string) => void) | null = null;
-  private navigator: ((path: string, notificationId?: string) => void) | null =
-    null;
   private permissionsGranted = false;
   private pendingNotification: LocalNotification | null = null;
   private initialized = false;
@@ -56,13 +66,17 @@ class NotificationService {
     this.processPendingNotification();
   }
 
-  setNavigator(navigator: (path: string, notificationId?: string) => void) {
-    this.navigator = navigator;
-    this.processPendingNotification();
+  private navigateToPath(path: string): void {
+    window.history.pushState(null, "", path);
+    window.dispatchEvent(
+      new CustomEvent("notificationNavigation", {
+        detail: { path },
+      })
+    );
   }
 
   private async processPendingNotification() {
-    if (this.pendingNotification && this.profileSwitcher && this.navigator) {
+    if (this.pendingNotification && this.profileSwitcher) {
       const notification = this.pendingNotification;
       this.pendingNotification = null;
       await this.handleNotificationTap(notification);
@@ -75,17 +89,7 @@ class NotificationService {
       return;
     }
 
-    await LocalNotifications.createChannel({
-      id: "veridian-notifications",
-      name: "Veridian Notifications",
-      description: "Notifications for credential and connection updates",
-      sound: "default",
-      importance: 5,
-      visibility: 1,
-      lights: true,
-      lightColor: PRIMARY_COLOR,
-      vibration: true,
-    });
+    await LocalNotifications.createChannel(CHANNEL_CONFIG);
   }
 
   async requestPermissions(): Promise<boolean> {
@@ -138,30 +142,24 @@ class NotificationService {
   private async handleNotificationTap(
     notification: LocalNotification
   ): Promise<void> {
-    const { profileId, notificationId } = notification.extra;
+    const { profileId } = notification.extra;
 
-    if (!profileId || !this.profileSwitcher || !this.navigator) {
+    if (!this.profileSwitcher) {
       this.pendingNotification = notification;
       return;
     }
 
     this.profileSwitcher(profileId as string);
     await this.clearDeliveredNotificationsForProfile(profileId as string);
-    this.navigator(TabsRoutePath.NOTIFICATIONS, notificationId as string);
-  }
-
-  async cancelNotification(notificationId: string): Promise<void> {
-    await LocalNotifications.cancel({
-      notifications: [{ id: parseInt(notificationId) }],
-    });
+    this.navigateToPath(TabsRoutePath.NOTIFICATIONS);
   }
 
   async clearDeliveredNotificationsForProfile(
     profileId: string
   ): Promise<void> {
-    const delivered = await LocalNotifications.getDeliveredNotifications();
-    const toCancel = delivered.notifications
-      .filter((n) => n.extra?.profileId === profileId)
+    const delivered = await this.getDeliveredNotifications();
+    const toCancel = delivered
+      .filter((n) => n.extra.profileId === profileId)
       .map((n) => ({ id: n.id }));
 
     if (toCancel.length > 0) {
@@ -179,6 +177,7 @@ class NotificationService {
     return result.notifications as LocalNotification[];
   }
 
+  // TODO: Implement permissions
   async arePermissionsGranted(): Promise<boolean> {
     const result = await LocalNotifications.checkPermissions();
     const granted = result.display === "granted";

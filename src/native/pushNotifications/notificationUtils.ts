@@ -5,8 +5,8 @@ import {
 } from "../../core/agent/services/keriaNotificationService.types";
 
 export interface NotificationContext {
-  connectionsCache?: Array<{ id: string; label: string }>;
-  multisigConnectionsCache?: Array<{ id: string; label: string }>;
+  connectionsCache: Array<{ id: string; label: string }>;
+  multisigConnectionsCache: Array<{ id: string; label: string }>;
 }
 
 const stripHtmlTags = (text: string): string => {
@@ -15,10 +15,9 @@ const stripHtmlTags = (text: string): string => {
 
 export const getNotificationDisplayText = (
   item: KeriaNotification,
-  context?: NotificationContext
+  context: NotificationContext
 ): string => {
-  const { connectionsCache = [], multisigConnectionsCache = [] } =
-    context || {};
+  const { connectionsCache, multisigConnectionsCache } = context;
 
   const connection = connectionsCache.find((c) => c.id === item.connectionId);
   const connectionName = connection?.label;
@@ -53,18 +52,17 @@ export const getNotificationDisplayText = (
     }
     case NotificationRoute.LocalAcdcRevoked:
       return t("tabs.notifications.tab.labels.exnipexgrantrevoke", {
-        credential: (item.a as { credentialTitle?: string }).credentialTitle,
+        credential: item.a.credentialTitle as string,
       });
     case NotificationRoute.RemoteSignReq:
       return t("tabs.notifications.tab.labels.sign", {
         connection: connectionName || t("tabs.connections.unknown"),
       });
     case NotificationRoute.HumanReadableMessage:
-      return (item.a as { m: string }).m;
+      return item.a.m as string;
     case NotificationRoute.LocalSingletonConnectInstructions:
       return t("tabs.notifications.tab.labels.connectinstructions", {
-        connection:
-          (item.a as { name?: string }).name || t("tabs.connections.unknown"),
+        connection: (item.a.name as string) || t("tabs.connections.unknown"),
       });
     default:
       return t("tabs.notifications.tab.labels.fallback");
@@ -73,7 +71,7 @@ export const getNotificationDisplayText = (
 
 export const getNotificationDisplayTextForPush = (
   item: KeriaNotification,
-  context?: NotificationContext
+  context: NotificationContext
 ): string => {
   const htmlText = getNotificationDisplayText(item, context);
   return stripHtmlTags(htmlText);

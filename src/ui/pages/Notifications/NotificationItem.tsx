@@ -27,14 +27,8 @@ const NotificationItem = ({
   onClick,
   onOptionButtonClick,
 }: NotificationItemProps) => {
-  const connectionsCache = useAppSelector(getConnectionsCache) as Array<{
-    id: string;
-    label: string;
-  }>;
-  const multisigConnectionsCache = useAppSelector(
-    getMultisigConnectionsCache
-  ) as Array<{ id: string; label: string }>;
-
+  const connectionsCache = useAppSelector(getConnectionsCache);
+  const multisigConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const notificationLabelText = getNotificationDisplayText(item, {
     connectionsCache,
     multisigConnectionsCache,

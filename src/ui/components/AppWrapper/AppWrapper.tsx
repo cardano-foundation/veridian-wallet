@@ -35,12 +35,9 @@ import {
   getConnectedDApp,
   Profile,
   setConnectedDApp,
-  setConnectionsCache,
-  setCredsArchivedCache,
   setCurrentProfile,
   setIndividualFirstCreate,
   setIsConnectingToDApp,
-  setMultisigConnectionsCache,
   setPendingDAppConnection,
   setProfiles,
   updateOrAddConnectionCache,
@@ -482,16 +479,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setProfiles(profiles));
 
       dispatch(setCurrentProfile(currentProfileAid));
-
-      dispatch(setCredsArchivedCache(credsArchivedCache));
-      dispatch(
-        setConnectionsCache(allConnections as RegularConnectionDetails[])
-      );
-      dispatch(
-        setMultisigConnectionsCache(
-          allMultisigConnections as MultisigConnectionDetails[]
-        )
-      );
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
     }
@@ -684,17 +671,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
         })
       );
     });
-
-    notificationService.setNavigator(
-      (path: string, notificationId?: string) => {
-        window.history.pushState(null, "", path);
-        window.dispatchEvent(
-          new CustomEvent("notificationNavigation", {
-            detail: { path, notificationId },
-          })
-        );
-      }
-    );
 
     Agent.agent.onKeriaStatusStateChanged((event) => {
       setOnlineStatus(event.payload.isOnline);

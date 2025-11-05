@@ -152,13 +152,19 @@ describe("NotificationService", () => {
 
   describe("handleNotificationTap", () => {
     let mockProfileSwitcher: jest.Mock;
-    let mockNavigator: jest.Mock;
+    let mockPushState: jest.SpyInstance;
+    let mockDispatchEvent: jest.SpyInstance;
 
     beforeEach(() => {
       mockProfileSwitcher = jest.fn();
-      mockNavigator = jest.fn();
+      mockPushState = jest.spyOn(window.history, "pushState");
+      mockDispatchEvent = jest.spyOn(window, "dispatchEvent");
       (notificationService as any).profileSwitcher = mockProfileSwitcher;
-      (notificationService as any).navigator = mockNavigator;
+    });
+
+    afterEach(() => {
+      mockPushState.mockRestore();
+      mockDispatchEvent.mockRestore();
     });
 
     test("should switch profile and navigate on tap", async () => {
@@ -186,10 +192,12 @@ describe("NotificationService", () => {
       expect(LocalNotifications.cancel).toHaveBeenCalledWith({
         notifications: [{ id: 1 }, { id: 2 }],
       });
-      expect(mockNavigator).toHaveBeenCalledWith(
-        TabsRoutePath.NOTIFICATIONS,
-        "notif-123"
+      expect(mockPushState).toHaveBeenCalledWith(
+        null,
+        "",
+        TabsRoutePath.NOTIFICATIONS
       );
+      expect(mockDispatchEvent).toHaveBeenCalled();
     });
 
     test("should queue notification if profileSwitcher not set", async () => {
@@ -208,26 +216,8 @@ describe("NotificationService", () => {
       expect((notificationService as any).pendingNotification).toEqual(
         notification
       );
-      expect(mockNavigator).not.toHaveBeenCalled();
-    });
-
-    test("should queue notification if navigator not set", async () => {
-      (notificationService as any).navigator = null;
-
-      const notification = {
-        id: 1,
-        extra: {
-          profileId: "profile-abc",
-          notificationId: "notif-123",
-        },
-      };
-
-      await (notificationService as any).handleNotificationTap(notification);
-
-      expect((notificationService as any).pendingNotification).toEqual(
-        notification
-      );
-      expect(mockProfileSwitcher).not.toHaveBeenCalled();
+      expect(mockPushState).not.toHaveBeenCalled();
+      expect(mockDispatchEvent).not.toHaveBeenCalled();
     });
 
     test("should queue notification if profileId missing", async () => {
@@ -279,16 +269,6 @@ describe("NotificationService", () => {
       );
 
       expect(LocalNotifications.cancel).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("cancelNotification", () => {
-    test("should cancel specific notification by ID", async () => {
-      await notificationService.cancelNotification("12345");
-
-      expect(LocalNotifications.cancel).toHaveBeenCalledWith({
-        notifications: [{ id: 12345 }],
-      });
     });
   });
 
@@ -352,20 +332,14 @@ describe("NotificationService", () => {
     });
   });
 
-  describe("setProfileSwitcher and setNavigator", () => {
+  describe("setProfileSwitcher", () => {
     test("should set profile switcher callback", () => {
       const mockCallback = jest.fn();
       notificationService.setProfileSwitcher(mockCallback);
       expect((notificationService as any).profileSwitcher).toBe(mockCallback);
     });
 
-    test("should set navigator callback", () => {
-      const mockCallback = jest.fn();
-      notificationService.setNavigator(mockCallback);
-      expect((notificationService as any).navigator).toBe(mockCallback);
-    });
-
-    test("should process pending notification when both handlers are set", async () => {
+    test("should process pending notification when profile switcher is set", async () => {
       const notification = {
         id: 1,
         extra: {
@@ -375,7 +349,6 @@ describe("NotificationService", () => {
       };
 
       (notificationService as any).profileSwitcher = null;
-      (notificationService as any).navigator = null;
       await (notificationService as any).handleNotificationTap(notification);
 
       expect((notificationService as any).pendingNotification).toEqual(
@@ -383,7 +356,8 @@ describe("NotificationService", () => {
       );
 
       const mockProfileSwitcher = jest.fn();
-      const mockNavigator = jest.fn();
+      const mockPushState = jest.spyOn(window.history, "pushState");
+      const mockDispatchEvent = jest.spyOn(window, "dispatchEvent");
       (
         LocalNotifications.getDeliveredNotifications as jest.Mock
       ).mockResolvedValue({
@@ -391,21 +365,20 @@ describe("NotificationService", () => {
       });
 
       notificationService.setProfileSwitcher(mockProfileSwitcher);
-      expect((notificationService as any).pendingNotification).toEqual(
-        notification
-      );
-      expect(mockProfileSwitcher).not.toHaveBeenCalled();
-
-      notificationService.setNavigator(mockNavigator);
 
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect((notificationService as any).pendingNotification).toBeNull();
       expect(mockProfileSwitcher).toHaveBeenCalledWith("profile-abc");
-      expect(mockNavigator).toHaveBeenCalledWith(
-        TabsRoutePath.NOTIFICATIONS,
-        "notif-123"
+      expect(mockPushState).toHaveBeenCalledWith(
+        null,
+        "",
+        TabsRoutePath.NOTIFICATIONS
       );
+      expect(mockDispatchEvent).toHaveBeenCalled();
+
+      mockPushState.mockRestore();
+      mockDispatchEvent.mockRestore();
     });
   });
 });

@@ -40,20 +40,20 @@ const Routes = () => {
   }, [routes, nextPath.pathname, dispatch]);
 
   useEffect(() => {
-    const handleNotificationNavigation = (event: CustomEvent) => {
-      const { path } = event.detail;
+    const handleNotificationNavigation = (event: Event) => {
+      const { path } = (event as CustomEvent).detail;
       ionRouter.push(path);
     };
 
     window.addEventListener(
       "notificationNavigation",
-      handleNotificationNavigation as EventListener
+      handleNotificationNavigation
     );
 
     return () => {
       window.removeEventListener(
         "notificationNavigation",
-        handleNotificationNavigation as EventListener
+        handleNotificationNavigation
       );
     };
   }, [ionRouter]);
