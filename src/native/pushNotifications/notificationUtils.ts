@@ -56,17 +56,17 @@ export const getNotificationDisplayText = (
     }
     case NotificationRoute.LocalAcdcRevoked:
       return t("tabs.notifications.tab.labels.exnipexgrantrevoke", {
-        credential: item.a.credentialTitle as string,
+        credential: item.a.credentialTitle || "",
       });
     case NotificationRoute.RemoteSignReq:
       return t("tabs.notifications.tab.labels.sign", {
         connection: connectionName || t("tabs.connections.unknown"),
       });
     case NotificationRoute.HumanReadableMessage:
-      return item.a.m as string;
+      return typeof item.a.m === "string" ? item.a.m : "";
     case NotificationRoute.LocalSingletonConnectInstructions:
       return t("tabs.notifications.tab.labels.connectinstructions", {
-        connection: (item.a.name as string) || t("tabs.connections.unknown"),
+        connection: item.a.name || t("tabs.connections.unknown"),
       });
     default:
       return t("tabs.notifications.tab.labels.fallback");

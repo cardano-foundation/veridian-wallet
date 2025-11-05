@@ -185,7 +185,13 @@ describe("NotificationService", () => {
       });
       (LocalNotifications.cancel as jest.Mock).mockResolvedValue(undefined);
 
+      const clearSpy = jest.spyOn(
+        notificationService as any,
+        "clearDeliveredNotificationsForProfile"
+      );
+
       await (notificationService as any).handleNotificationTap(notification);
+      await clearSpy.mock.results[0].value;
 
       expect(mockProfileSwitcher).toHaveBeenCalledWith("profile-abc");
       expect(LocalNotifications.cancel).toHaveBeenCalledWith({
@@ -347,9 +353,14 @@ describe("NotificationService", () => {
         notifications: [],
       });
 
+      const clearSpy = jest.spyOn(
+        notificationService as any,
+        "clearDeliveredNotificationsForProfile"
+      );
+
       notificationService.setProfileSwitcher(mockProfileSwitcher);
 
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await clearSpy.mock.results[0].value;
 
       expect((notificationService as any).pendingNotification).toBeNull();
       expect(mockProfileSwitcher).toHaveBeenCalledWith("profile-abc");
