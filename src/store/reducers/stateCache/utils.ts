@@ -28,9 +28,16 @@ const filterProfileData = (
   const profileConnections = allConnections.filter(
     (conn) => conn.identifier === profileId
   );
+
+  // For gHab (group identifier), get groupId from mHab; for mHab/pending, use own groupMetadata
+  let groupIdToFilter = profile.groupMetadata?.groupId;
+  if (profile.groupMemberPre && identifiers[profile.groupMemberPre]) {
+    groupIdToFilter =
+      identifiers[profile.groupMemberPre].groupMetadata?.groupId;
+  }
+
   const profileMultisigConnections = allMultisigConnections.filter(
-    (conn) =>
-      "groupId" in conn && conn.groupId === profile.groupMetadata?.groupId
+    (conn) => "groupId" in conn && conn.groupId === groupIdToFilter
   );
   const profilePeerConnections = allPeerConnections.filter(
     (conn) => conn.selectedAid === profileId

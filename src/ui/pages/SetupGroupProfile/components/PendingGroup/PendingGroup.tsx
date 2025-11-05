@@ -61,8 +61,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     null
   );
 
-  const isMember = !identity?.groupMetadata?.groupInitiator;
-  const isPendingMember = isMember && initGroupNotification;
+  const isPendingMember = !!initGroupNotification;
 
   const rotationThreshold = isPendingMember
     ? multisigIcpDetails?.rotationThreshold
@@ -105,7 +104,10 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     });
 
     members.unshift({
-      name: identity?.groupMetadata?.proposedUsername || "",
+      name:
+        identity?.groupUsername ||
+        identity?.groupMetadata?.proposedUsername ||
+        "",
       isCurrentUser: true,
       status: groupDetails?.members.find(
         (item) => item.aid === identity?.groupMemberPre
@@ -114,7 +116,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
         : MemberAcceptStatus.Waiting,
     });
 
-    return members.map((member, index) => ({
+    const mapped = members.map((member, index) => ({
       ...member,
       avatar: (
         <MemberAvatar
@@ -123,6 +125,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
         />
       ),
     }));
+    return mapped;
   }, [
     state.selectedConnections,
     identity?.groupMetadata?.proposedUsername,
@@ -175,28 +178,27 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   };
 
   const getInceptionStatus = useCallback(async () => {
-    if (!identity?.id || !identity?.groupMetadata) return;
+    // We can fetch inception status using gHab id even if groupMetadata is not stored on gHab
+    if (!identity?.id) return;
 
     try {
       setLoading(true);
       const details = await Agent.agent.multiSigs.getInceptionStatus(
         identity.id
       );
-
       setGroupDetails(details);
     } catch (e) {
       showError("Unable to load group: ", e, dispatch);
     } finally {
       setLoading(false);
     }
-  }, [dispatch, identity?.groupMetadata, identity?.id]);
+  }, [dispatch, identity?.id]);
 
   const fetchMultisigDetails = useCallback(async () => {
     if (!initGroupNotification) return;
     const details = await Agent.agent.multiSigs.getMultisigIcpDetails(
       initGroupNotification.a.d as string
     );
-
     setMultisigIcpDetails(details);
   }, [initGroupNotification]);
 
@@ -207,7 +209,6 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       await fetchMultisigDetails();
       return;
     }
-
     await getInceptionStatus();
   }, [
     fetchMultisigDetails,
@@ -262,7 +263,10 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
         customClass="pending-group"
         header={
           <PageHeader
-            title={identity?.groupMetadata?.proposedUsername}
+            title={
+              identity?.groupUsername ||
+              identity?.groupMetadata?.proposedUsername
+            }
             additionalButtons={
               identity?.id && (
                 <Avatar
