@@ -41,7 +41,11 @@ const Routes = () => {
 
   useEffect(() => {
     const handleNotificationNavigation = (event: Event) => {
-      const { path } = (event as CustomEvent).detail;
+      if (!(event instanceof CustomEvent))
+        throw new Error(
+          "handleNotificationNavigation expects events of type CustomEvent only"
+        );
+      const { path } = event.detail;
       ionRouter.push(path);
     };
 
