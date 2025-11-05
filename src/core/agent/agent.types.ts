@@ -120,15 +120,12 @@ interface ExnMessageA {
   };
   d?: string;
   r?: string;
-  exn?: {
-    r: string;
-    p: string;
-  };
+  exn?: unknown;
 }
 
 // Define types for the 'e' property in ExnMessage
 interface ExnMessageE {
-  acdc: {
+  acdc?: {
     d: string;
     i: string;
     s: string;
@@ -152,10 +149,7 @@ interface ExnMessageE {
   icp: {
     i: string;
   };
-  exn: {
-    r: string;
-    p: string;
-  };
+  exn: unknown;
   [key: string]: unknown;
 }
 
@@ -180,6 +174,13 @@ type ExnMessage = {
     exn?: string;
   };
 };
+
+// Type guard to check if ExnMessageE has acdc
+function exnHasAcdc(
+  e: ExnMessageE
+): e is ExnMessageE & { acdc: NonNullable<ExnMessageE["acdc"]> } {
+  return e.acdc !== undefined && e.acdc !== null;
+}
 
 type ConnectionNoteProps = Pick<ConnectionNoteDetails, "title" | "message">;
 
@@ -264,6 +265,10 @@ export const OOBI_AGENT_ONLY_RE =
 export const DOOBI_RE = /^\/oobi\/(?<said>[^/]+)$/i;
 export const WOOBI_RE = /^\/\.well-known\/keri\/oobi\/(?<cid>[^/]+)$/;
 
+// Common error messages
+export const SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED =
+  "Signify client manager not initialized";
+
 export {
   ConnectionStatus,
   MiscRecordId,
@@ -271,6 +276,7 @@ export {
   CreationStatus,
   isRegularConnectionDetails,
   isMultisigConnectionDetails,
+  exnHasAcdc,
 };
 
 export type {

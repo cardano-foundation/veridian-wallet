@@ -15,6 +15,7 @@ import {
   AgentServicesProps,
   MiscRecordId,
   CreationStatus,
+  SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED,
 } from "../agent.types";
 import { NotificationRoute } from "./keriaNotificationService.types";
 import type {
@@ -35,6 +36,7 @@ import {
   MultiSigIcpRequestDetails,
   QueuedGroupCreation,
   QueuedGroupProps,
+  isGroupInceptionData,
 } from "./identifier.types";
 import type { MultisigThresholds } from "./identifier.types";
 import {
@@ -77,6 +79,8 @@ class MultiSigService extends AgentService {
     "Cannot retry creating group identifier if retry data is missing from the DB";
   static readonly MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND =
     "Cannot find inception exchange message for multisigId";
+  static readonly GROUP_DATA_MISSING_FOR_INITIATOR =
+    "Group data missing for initiator";
 
   protected readonly identifierStorage: IdentifierStorage;
   protected readonly operationPendingStorage: OperationPendingStorage;
@@ -307,7 +311,27 @@ class MultiSigService extends AgentService {
         rstates: states,
       });
 
-    queued.push({ name: groupName, data: inceptionData, ...queuedProps });
+    if (!isGroupInceptionData(inceptionData)) {
+      throw new Error(MultiSigService.GROUP_DATA_MISSING_FOR_INITIATOR);
+    }
+
+    if (queuedProps.initiator) {
+      queued.push({
+        initiator: true,
+        name: groupName,
+        data: inceptionData,
+        groupConnections: queuedProps.groupConnections,
+        threshold: queuedProps.threshold,
+      });
+    } else {
+      queued.push({
+        initiator: false,
+        name: groupName,
+        data: inceptionData,
+        notificationId: queuedProps.notificationId,
+        notificationSaid: queuedProps.notificationSaid,
+      });
+    }
 
     await this.basicStorage.createOrUpdateBasicRecord(
       new BasicRecord({
@@ -370,10 +394,11 @@ class MultiSigService extends AgentService {
     mHab: HabState,
     groupConnections: ConnectionShortDetails[]
   ): Promise<void> {
-    const { witnesses } = await this.identifiers.getAvailableWitnesses();
     if (!this.props.signifyClient.manager) {
-      throw new Error("Signify client manager not initialized");
+      throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
     }
+
+    const { witnesses } = await this.identifiers.getAvailableWitnesses();
     const keeper = this.props.signifyClient.manager.get(mHab);
 
     for (const witness of witnesses) {
@@ -797,14 +822,10 @@ class MultiSigService extends AgentService {
     for (const queued of pendingGroupsRecord.content
       .queued as QueuedGroupCreation[]) {
       if (queued.initiator) {
-        if (!queued.data.group) {
-          throw new Error("Group data missing for initiator");
-        }
-
         const threshold = queued.threshold;
         await this.createGroup(
           queued.data.group.mhab.prefix,
-          queued.groupConnections as MultisigConnectionDetails[],
+          queued.groupConnections,
           threshold,
           true
         );

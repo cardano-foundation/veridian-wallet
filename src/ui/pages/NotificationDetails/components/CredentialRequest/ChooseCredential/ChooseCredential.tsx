@@ -33,7 +33,6 @@ import {
   formatShortDate,
   formatTimeToSec,
 } from "../../../../../utils/formatters";
-import type { ACDC } from "../CredentialRequest.types";
 import {
   ChooseCredentialProps,
   RequestCredential,
@@ -65,18 +64,17 @@ const ChooseCredential = ({
 
   const mappedCredentials = credentialRequest.credentials.map(
     (cred): CardItem<RequestCredential> => {
-      const acdc = cred.acdc as unknown as ACDC;
       const connection =
         connections?.find((c) => c.id === cred.connectionId)?.label ||
         i18n.t("tabs.connections.unknown").toString();
 
       return {
-        id: acdc.d,
+        id: cred.acdc.d,
         title: connection,
-        subtitle: `${formatShortDate(String(acdc.a.dt))} - ${formatTimeToSec(
-          String(acdc.a.dt)
-        )}`,
-        data: { connectionId: cred.connectionId, acdc },
+        subtitle: `${formatShortDate(
+          String(cred.acdc.a.dt)
+        )} - ${formatTimeToSec(String(cred.acdc.a.dt))}`,
+        data: { connectionId: cred.connectionId, acdc: cred.acdc },
       };
     }
   );
