@@ -72,7 +72,7 @@ class Agent {
   static readonly BUFFER_ALLOC_SIZE = 3;
   static readonly DEFAULT_RECONNECT_INTERVAL = 1000;
 
-  private static instance: Agent;
+  private static instance: Agent | undefined;
   private agentServicesProps!: AgentServicesProps;
   private signifyClient!: SignifyClient;
 
@@ -620,7 +620,7 @@ class Agent {
   }
 
   @OnlineOnly
-  async deleteAccount() {
+  async deleteWallet() {
     const connectedDApp =
       PeerConnection.peerConnection.getConnectedDAppAddress();
     if (connectedDApp !== "") {
@@ -684,6 +684,7 @@ class Agent {
     await this.storageSession.wipe(walletId);
     await SecureStorage.wipe();
     this.markAgentStatus(false);
+    Agent.instance = undefined;
   }
 
   /**

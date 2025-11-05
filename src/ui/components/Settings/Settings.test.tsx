@@ -661,12 +661,12 @@ describe("Settings page", () => {
     );
 
     fireEvent.click(
-      getByText(EN_TRANSLATIONS.settings.sections.deleteaccount.button)
+      getByText(EN_TRANSLATIONS.settings.sections.deletewallet.button)
     );
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.settings.sections.deleteaccount.alert.title)
+        getByText(EN_TRANSLATIONS.settings.sections.deletewallet.alert.title)
       );
     });
 

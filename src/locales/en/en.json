@@ -542,11 +542,11 @@
         },
         "version": "App Version"
       },
-      "deleteaccount": {
+      "deletewallet": {
         "button": "Delete wallet",
         "alert": {
-          "title": "This will delete all wallet data. You can restore your account anytime with your secret recovery phrase.",
-          "confirm": "Delete account",
+          "title": "This will delete all wallet data. You can restore your wallet anytime with your secret recovery phrase.",
+          "confirm": "Delete wallet",
           "cancel": "Cancel"
         }
       }

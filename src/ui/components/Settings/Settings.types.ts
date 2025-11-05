@@ -35,7 +35,7 @@ enum OptionIndex {
   Term,
   Contact,
   Version,
-  DeleteAccount,
+  DeleteWallet,
 }
 
 export type { SettingsProps, OptionProps, SettingsListProps };

@@ -253,10 +253,10 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     }
   };
 
-  const deleteAccount = async () => {
+  const deleteWallet = async () => {
     try {
       dispatch(showGlobalLoading(true));
-      await Agent.agent.deleteAccount();
+      await Agent.agent.deleteWallet();
       CLEAR_STORE_ACTIONS.forEach((action) => dispatch(action()));
       dispatch(setToastMsg(ToastMsgType.DELETE_ACCOUNT_SUCCESS));
       history.push(RoutePath.ONBOARDING);
@@ -283,8 +283,8 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         setChangePinIsOpen(true);
         break;
       }
-      case OptionIndex.DeleteAccount:
-        deleteAccount();
+      case OptionIndex.DeleteWallet:
+        deleteWallet();
         break;
       default:
         return;
@@ -296,15 +296,14 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     setOpenBiometricAlert(false);
   };
 
-  const openDeleteAccountAlert = () => {
-    setOption(OptionIndex.DeleteAccount);
+  const openDeleteWalletAlert = () => {
+    setOption(OptionIndex.DeleteWallet);
     setOpenDeleteAlert(true);
   };
 
   const closeDeleteAlert = () => {
     setOpenDeleteAlert(false);
   };
-
   return (
     <>
       <InfoCard
@@ -354,8 +353,8 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         testId="settings-support-items"
       />
       <PageFooter
-        deleteButtonAction={openDeleteAccountAlert}
-        deleteButtonText={`${i18n.t("settings.sections.deleteaccount.button")}`}
+        deleteButtonAction={openDeleteWalletAlert}
+        deleteButtonText={`${i18n.t("settings.sections.deletewallet.button")}`}
       />
       <ChangePin
         isOpen={changePinIsOpen}

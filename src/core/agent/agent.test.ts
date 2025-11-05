@@ -702,7 +702,7 @@ describe("Agent setup and wiping", () => {
     getAllConnectionsMock.mockResolvedValue([{ id: "connection-id" }]);
     getAllNotificationsMock.mockResolvedValue([{ id: "note-id" }]);
 
-    await Agent.agent.deleteAccount();
+    await agent.deleteWallet();
 
     expect(PeerConnection.peerConnection.disconnectDApp).not.toBeCalled();
     expect(stopPollingMock).toBeCalled();
@@ -725,7 +725,7 @@ describe("Agent setup and wiping", () => {
     getAllConnectionsMock.mockResolvedValue([]);
     getAllNotificationsMock.mockResolvedValue([]);
 
-    await agent.deleteAccount();
+    await agent.deleteWallet();
 
     expect(PeerConnection.peerConnection.disconnectDApp).toBeCalledWith(
       "meerkat-id",
@@ -746,5 +746,12 @@ describe("Agent setup and wiping", () => {
     expect(wipeSessionMock).toBeCalledWith("idw");
     expect(SecureStorage.wipe).toBeCalled();
     expect((agent as any).markAgentStatus).toBeCalledWith(false);
+  });
+
+  test("deleting wallet resets agent instance", async () => {
+    const firstInstance = Agent.agent;
+    await firstInstance.deleteWallet();
+    const secondInstance = Agent.agent;
+    expect(firstInstance).not.toBe(secondInstance);
   });
 });
