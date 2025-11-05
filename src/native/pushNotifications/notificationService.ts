@@ -153,8 +153,8 @@ class NotificationService {
     }
 
     this.profileSwitcher(profileId as string);
-    await this.clearDeliveredNotificationsForProfile(profileId as string);
     this.navigateToPath(TabsRoutePath.NOTIFICATIONS);
+    this.clearDeliveredNotificationsForProfile(profileId as string);
   }
 
   async clearDeliveredNotificationsForProfile(
