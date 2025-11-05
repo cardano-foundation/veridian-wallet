@@ -36,6 +36,7 @@ import {
   MultiSigIcpRequestDetails,
   QueuedGroupCreation,
   QueuedGroupProps,
+  isGroupInceptionData,
 } from "./identifier.types";
 import type { MultisigThresholds } from "./identifier.types";
 import {
@@ -310,20 +311,15 @@ class MultiSigService extends AgentService {
         rstates: states,
       });
 
-    // Type guard: Ensure group data exists for multisig creation
-    if (!inceptionData.group) {
+    if (!isGroupInceptionData(inceptionData)) {
       throw new Error(MultiSigService.GROUP_DATA_MISSING_FOR_INITIATOR);
     }
-    // After this check, TypeScript knows inceptionData has group property
-    const inceptionDataWithGroup = inceptionData as CreateIdentifierBody & {
-      group: HabState;
-    };
 
     if (queuedProps.initiator) {
       queued.push({
         initiator: true,
         name: groupName,
-        data: inceptionDataWithGroup,
+        data: inceptionData,
         groupConnections: queuedProps.groupConnections,
         threshold: queuedProps.threshold,
       });
@@ -331,7 +327,7 @@ class MultiSigService extends AgentService {
       queued.push({
         initiator: false,
         name: groupName,
-        data: inceptionDataWithGroup,
+        data: inceptionData,
         notificationId: queuedProps.notificationId,
         notificationSaid: queuedProps.notificationSaid,
       });
@@ -826,7 +822,6 @@ class MultiSigService extends AgentService {
     for (const queued of pendingGroupsRecord.content
       .queued as QueuedGroupCreation[]) {
       if (queued.initiator) {
-        // TypeScript automatically narrows to initiator variant
         const threshold = queued.threshold;
         await this.createGroup(
           queued.data.group.mhab.prefix,
@@ -835,7 +830,6 @@ class MultiSigService extends AgentService {
           true
         );
       } else {
-        // TypeScript automatically narrows to join variant
         await this.joinGroup(
           queued.notificationId,
           queued.notificationSaid,

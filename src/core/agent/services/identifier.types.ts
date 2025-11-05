@@ -66,8 +66,6 @@ interface MultisigThresholds {
   rotationThreshold: number;
 }
 
-// Discriminated union with proper type safety for group data
-// Both initiator and joiner have group data when creating/joining a multisig
 type QueuedGroupCreation =
   | {
       initiator: true;
@@ -83,6 +81,13 @@ type QueuedGroupCreation =
       notificationId: string;
       notificationSaid: string;
     };
+
+// Type guard to check if CreateIdentifierBody has group data
+function isGroupInceptionData(
+  data: CreateIdentifierBody
+): data is CreateIdentifierBody & { group: HabState } {
+  return data.group !== undefined;
+}
 
 // Helper type used in multiSigService for generating inception data
 type QueuedGroupProps =
@@ -122,7 +127,7 @@ interface RemoteSignRequest {
   payload: JSONObject;
 }
 
-export { IdentifierType };
+export { IdentifierType, isGroupInceptionData };
 
 export type {
   IdentifierShortDetails,
