@@ -7,7 +7,6 @@ import { MemoryRouter, Route } from "react-router-dom";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { store } from "../../../store";
-import { OperationType } from "../../globals/types";
 import { CreatePassword } from "../CreatePassword";
 import { SetPasscode } from "../SetPasscode";
 import { Onboarding } from "./index";
@@ -122,7 +121,6 @@ describe("Onboarding Page", () => {
           passwordIsSet: false,
           finishSetupBiometrics: true,
         },
-        currentOperation: OperationType.IDLE,
       },
       seedPhraseCache: {
         seedPhrase: "",

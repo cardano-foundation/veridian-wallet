@@ -75,7 +75,6 @@ const initialState = {
     initializationPhase: InitializationPhase.PHASE_ONE,
     recoveryCompleteNoInterruption: false,
     isOnline: true,
-    currentOperation: OperationType.IDLE,
     queueIncomingRequest: {
       isPaused: false,
       isProcessing: false,

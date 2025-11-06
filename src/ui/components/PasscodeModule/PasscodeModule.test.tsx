@@ -1,11 +1,10 @@
 import { fireEvent, render } from "@testing-library/react";
 import { Provider } from "react-redux";
 
-import { PasscodeModule } from "./PasscodeModule";
-import { StoreMockedProps } from "../../pages/LockPage/LockPage.test";
 import { RoutePath } from "../../../routes";
-import { OperationType } from "../../globals/types";
+import { StoreMockedProps } from "../../pages/LockPage/LockPage.test";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { PasscodeModule } from "./PasscodeModule";
 
 const initialState = {
   stateCache: {
@@ -20,7 +19,6 @@ const initialState = {
         lockedUntil: Date.now(),
       },
     },
-    currentOperation: OperationType.IDLE,
   },
   seedPhraseCache: {
     seedPhrase: "",

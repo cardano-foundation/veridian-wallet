@@ -1,6 +1,5 @@
 import { RootState } from "../../store";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
-import { OperationType } from "../../ui/globals/types";
 import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
 import { DataProps } from "../nextRoute/nextRoute.types";
 import { calcPreviousRoute, getBackRoute, getPreviousRoute } from "./backRoute";
@@ -54,7 +53,6 @@ describe("getBackRoute", () => {
           },
           firstAppLaunch: false,
         },
-        currentOperation: OperationType.IDLE,
         queueIncomingRequest: {
           isProcessing: false,
           queues: [],
@@ -192,7 +190,6 @@ describe("getPreviousRoute", () => {
           },
           firstAppLaunch: false,
         },
-        currentOperation: OperationType.IDLE,
         queueIncomingRequest: {
           isProcessing: false,
           queues: [],

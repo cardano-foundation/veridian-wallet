@@ -6,12 +6,8 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 
-import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
-import { KeyStoreKeys } from "../../../core/storage";
 import TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
-import { OperationType } from "../../globals/types";
 import { StoreMockedProps } from "../../pages/LockPage/LockPage.test";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
@@ -30,7 +26,6 @@ const initialState = {
         lockedUntil: Date.now(),
       },
     },
-    currentOperation: OperationType.IDLE,
   },
   seedPhraseCache: {
     seedPhrase: "",
@@ -159,7 +154,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
     );
@@ -178,7 +172,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
     );
@@ -289,7 +282,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
     );
@@ -322,7 +314,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
     );
@@ -370,7 +361,6 @@ describe("Password Module", () => {
             lockedUntil: Date.now(),
           },
         },
-        currentOperation: OperationType.IDLE,
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -387,7 +377,6 @@ describe("Password Module", () => {
           title="Password Module"
           description="Description"
           testId="password-module"
-          onCreateSuccess={onCreateSuccesMock}
         />
       </Provider>
     );

@@ -16,19 +16,6 @@ jest.mock("../../../store/reducers/stateCache", () => ({
   updateCurrentProfile: jest.fn(),
 }));
 
-jest.mock("../../../core/configuration", () => ({
-  ...jest.requireActual("../../../core/configuration"),
-  ConfigurationService: {
-    env: {
-      features: {
-        notifications: {
-          fallbackIcon: false,
-        },
-      },
-    },
-  },
-}));
-
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {

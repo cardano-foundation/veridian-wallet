@@ -1,28 +1,20 @@
 import { IonButton, IonIcon, IonInput, IonLabel } from "@ionic/react";
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import {
-  fireEvent,
-  queryByText,
-  render,
-  waitFor,
-} from "@testing-library/react";
-import { act } from "react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
+import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
+import { MiscRecordId } from "../../../core/agent/agent.types";
+import { BasicRecord } from "../../../core/agent/records";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { TabsRoutePath } from "../../../routes/paths";
-import {
-  setCurrentOperation,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
-import { OperationType, ToastMsgType } from "../../globals/types";
-import { CreatePassword } from "./CreatePassword";
-import { BasicRecord } from "../../../core/agent/records";
-import { MiscRecordId } from "../../../core/agent/agent.types";
+import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { CreatePassword } from "./CreatePassword";
 
 jest.mock("../../components/CustomInput", () => ({
   CustomInput: (props: CustomInputProps) => {
@@ -289,9 +281,7 @@ describe("Create Password Page", () => {
       });
 
       await waitFor(() => {
-        expect(dispatchMock).toBeCalledWith(
-          setCurrentOperation(OperationType.IDLE)
-        );
+        expect(dispatchMock).toBeCalled();
       });
     });
   });

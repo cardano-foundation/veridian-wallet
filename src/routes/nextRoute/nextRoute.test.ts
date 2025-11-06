@@ -1,8 +1,5 @@
-import { CreationStatus } from "../../core/agent/agent.types";
-import { RootState } from "../../store";
 import { setAuthentication } from "../../store/reducers/stateCache";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
-import { OperationType } from "../../ui/globals/types";
 import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
 import { RoutePath } from "../index";
 import { TabsRoutePath } from "../paths";
@@ -49,7 +46,6 @@ describe("NextRoute", () => {
           finishSetupBiometrics: false,
         },
         toastMsgs: [],
-        currentOperation: OperationType.IDLE,
         queueIncomingRequest: {
           isProcessing: false,
           queues: [],
@@ -129,7 +125,6 @@ describe("NextRoute", () => {
             ssiAgentIsUrl: "",
             finishSetupBiometrics: true,
           },
-          currentOperation: OperationType.IDLE,
           queueIncomingRequest: {
             isProcessing: false,
             queues: [],
@@ -164,7 +159,6 @@ describe("NextRoute", () => {
             ssiAgentUrl: "http://keria.com",
             finishSetupBiometrics: true,
           },
-          currentOperation: OperationType.IDLE,
           queueIncomingRequest: {
             isProcessing: false,
             queues: [],
@@ -199,7 +193,6 @@ describe("NextRoute", () => {
             ssiAgentUrl: "",
             finishSetupBiometrics: true,
           },
-          currentOperation: OperationType.IDLE,
           queueIncomingRequest: {
             isProcessing: false,
             queues: [],
@@ -291,7 +284,6 @@ describe("getNextRoute", () => {
         finishSetupBiometrics: false,
       },
       toastMsgs: [],
-      currentOperation: OperationType.IDLE,
       queueIncomingRequest: {
         isProcessing: false,
         queues: [],
@@ -384,7 +376,6 @@ describe("getNextRoute", () => {
             ssiAgentUrl: "http://keria.com",
             finishSetupBiometrics: true,
           },
-          currentOperation: OperationType.IDLE,
           queueIncomingRequest: {
             isProcessing: false,
             queues: [],
@@ -417,7 +408,6 @@ describe("getNextRoute", () => {
             ssiAgentUrl: "http://keria.com",
             finishSetupBiometrics: true,
           },
-          currentOperation: OperationType.IDLE,
           queueIncomingRequest: {
             isProcessing: false,
             queues: [],

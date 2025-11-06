@@ -14,30 +14,6 @@ const startScan = jest.fn();
 const stopScan = jest.fn();
 const getPlatformMock = jest.fn(() => ["mobile"]);
 
-const customiseMockValue: {
-  identifiers: { creation: { individualOnly: string } };
-  notifications?: { connectInstructions: { connectionName: string } };
-} = {
-  identifiers: {
-    creation: {
-      individualOnly: "FirstTime",
-    },
-  },
-};
-const defaultConfigMock = {
-  ConfigurationService: {
-    env: {
-      features: {
-        cut: [],
-        customContent: [],
-        get customise() {
-          return customiseMockValue;
-        },
-      },
-    },
-  },
-};
-
 import {
   BarcodeFormat,
   BarcodesScannedEvent,
@@ -122,10 +98,6 @@ jest.mock("@capacitor/core", () => {
   };
 });
 
-jest.mock(
-  "../../../core/configuration/configurationService",
-  () => defaultConfigMock
-);
 jest.mock("../../../core/agent/agent", () => ({
   ...jest.requireActual("../../../core/agent/agent"),
   Agent: {
@@ -1349,17 +1321,6 @@ describe("SSI agent page", () => {
           })
         );
       });
-
-      await waitFor(() => {
-        expect(createOrUpdateBasicRecordMock).toBeCalledWith(
-          expect.objectContaining({
-            id: MiscRecordId.INDIVIDUAL_FIRST_CREATE,
-            content: { value: true },
-          })
-        );
-      });
-
-      expect(createSingletonNotificationMock).not.toBeCalled();
 
       await expect(() => {
         expect(

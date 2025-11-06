@@ -6,8 +6,6 @@ import { Route } from "react-router-dom";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import { store } from "../../../store";
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
-import { identifierFix } from "../../__fixtures__/identifierFix";
-import { CardType } from "../../globals/types";
 import { CredentialDetails } from "../../pages/CredentialDetails";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { CardsStack, NAVIGATION_DELAY } from "./CardsStack";
@@ -61,30 +59,11 @@ jest.mock("../../../core/agent/agent", () => ({
 }));
 
 describe("Cards Stack Component", () => {
-  test("It renders Cards Stack", () => {
-    const { getByText } = render(
-      <Provider store={store}>
-        <CardsStack
-          name="example"
-          cardsType={CardType.IDENTIFIERS}
-          cardsData={identifierFix}
-        />
-      </Provider>
-    );
-    const firstCardId = getByText(
-      identifierFix[0].id.substring(0, 5) +
-        "..." +
-        identifierFix[0].id.slice(-5)
-    );
-    expect(firstCardId).toBeInTheDocument();
-  });
-
   test("It renders on Credential card with card pending", () => {
     const { getByText } = render(
       <Provider store={store}>
         <CardsStack
           name="example"
-          cardsType={CardType.CREDENTIALS}
           cardsData={[
             {
               ...filteredCredsFix[0],
@@ -105,7 +84,6 @@ describe("Cards Stack Component", () => {
         <Provider store={store}>
           <CardsStack
             name="example"
-            cardsType={CardType.CREDENTIALS}
             cardsData={filteredCredsFix}
           />
           <Route

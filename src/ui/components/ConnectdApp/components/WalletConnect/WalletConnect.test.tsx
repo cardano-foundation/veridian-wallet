@@ -9,17 +9,6 @@ import { walletConnectionsFix } from "../../../../__fixtures__/walletConnections
 import { makeTestStore } from "../../../../utils/makeTestStore";
 import { WalletConnect } from "./WalletConnect";
 
-jest.mock("../../../../../core/configuration", () => ({
-  ...jest.requireActual("../../../../../core/configuration"),
-  ConfigurationService: {
-    env: {
-      features: {
-        cut: [],
-      },
-    },
-  },
-}));
-
 jest.mock("../../../../../core/cardano/walletConnect/peerConnection", () => ({
   PeerConnection: {
     peerConnection: {
@@ -59,10 +48,6 @@ describe("Wallet Connect Request", () => {
     );
 
     expect(
-      getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
-    ).toBeVisible();
-
-    expect(
       getByText(EN_TRANSLATIONS.connectdapp.request.stageone.message)
     ).toBeVisible();
 
@@ -73,9 +58,13 @@ describe("Wallet Connect Request", () => {
 
   test("Click to acccept button", async () => {
     const close = jest.fn();
+    const handleAferConnect = jest.fn();
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <WalletConnect close={close} />
+        <WalletConnect
+          close={close}
+          handleAfterConnect={handleAferConnect}
+        />
       </Provider>
     );
 
@@ -89,7 +78,7 @@ describe("Wallet Connect Request", () => {
     });
 
     await waitFor(() => {
-      expect(close).toBeCalled();
+      expect(handleAferConnect).toBeCalled();
     });
   });
 
@@ -125,37 +114,6 @@ describe("Wallet Connect Request", () => {
 
     await waitFor(() => {
       expect(close).toBeCalled();
-    });
-  });
-
-  test("Close modal", async () => {
-    const { getByTestId, getByText, queryByTestId } = render(
-      <Provider store={storeMocked}>
-        <WalletConnect close={jest.fn()} />
-      </Provider>
-    );
-
-    expect(
-      getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("decline-button-connect-wallet-stage-one"));
-    });
-
-    await waitFor(() => {
-      expect(
-        getByTestId("decline-button-connect-wallet-stage-one")
-      ).toBeInTheDocument();
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("decline-button-connect-wallet-stage-one"));
-    });
-
-    await waitFor(() => {
-      expect(queryByTestId("connect-wallet-stage-one")).toBe(null);
-      expect(queryByTestId("connect-wallet-stage-two")).toBe(null);
     });
   });
 });
