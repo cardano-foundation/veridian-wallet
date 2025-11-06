@@ -18,6 +18,7 @@ import {
   Profile,
   ProfileCache,
 } from "./profilesCache.types";
+import { showError } from "../../../ui/utils/error";
 
 // Shared empty arrays — return these to keep selector return references stable
 const DefaultArrayValue = {
@@ -499,12 +500,17 @@ export const handleNotificationReceived =
 
     const profileDisplayName = targetProfile.identity.displayName;
 
-    await notificationService.schedulePushNotification({
-      title: profileDisplayName,
-      body: notificationBody,
-      profileId: notification.receivingPre,
-      notificationId: notification.id,
-    });
+    try {
+      await notificationService.schedulePushNotification({
+        title: profileDisplayName,
+        body: notificationBody,
+        profileId: notification.receivingPre,
+        notificationId: notification.id,
+      });
+    } catch (error) {
+      // Keeping this for debugging purposes
+      showError("Failed to schedule push notification:", error);
+    }
   };
 
 export const {

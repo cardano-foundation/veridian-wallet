@@ -1,10 +1,11 @@
-import { LocalNotifications } from "@capacitor/local-notifications";
+import {
+  LocalNotifications,
+  LocalNotificationSchema,
+} from "@capacitor/local-notifications";
 import { Capacitor } from "@capacitor/core";
 import { TabsRoutePath } from "../../routes/paths";
-import {
-  NotificationPayload,
-  LocalNotification,
-} from "./notificationService.types";
+import { NotificationPayload } from "./notificationService.types";
+import { showError } from "../../ui/utils/error";
 
 const PRIMARY_COLOR =
   getComputedStyle(document.documentElement)
@@ -33,7 +34,7 @@ const CHANNEL_CONFIG = {
 class NotificationService {
   private profileSwitcher: ((profileId: string) => void) | null = null;
   private permissionsGranted = false;
-  private pendingNotification: LocalNotification | null = null;
+  private pendingNotification: LocalNotificationSchema | null = null;
   private initialized = false;
 
   async initialize(): Promise<void> {
@@ -52,7 +53,7 @@ class NotificationService {
     LocalNotifications.addListener(
       "localNotificationActionPerformed",
       (event) => {
-        this.handleNotificationTap(event.notification as LocalNotification);
+        this.handleNotificationTap(event.notification);
       }
     );
 
@@ -143,8 +144,14 @@ class NotificationService {
   }
 
   private async handleNotificationTap(
-    notification: LocalNotification
+    notification: LocalNotificationSchema
   ): Promise<void> {
+    if (!notification.extra) {
+      // Keeping this for debugging purposes
+      showError("Notification missing extra data:", notification);
+      return;
+    }
+
     const { profileId } = notification.extra;
 
     if (!this.profileSwitcher) {
@@ -154,25 +161,11 @@ class NotificationService {
 
     this.profileSwitcher(profileId as string);
     this.navigateToPath(TabsRoutePath.NOTIFICATIONS);
-    this.clearDeliveredNotificationsForProfile(profileId as string);
   }
 
-  async clearDeliveredNotificationsForProfile(
-    profileId: string
-  ): Promise<void> {
-    const delivered = await this.getDeliveredNotifications();
-    const toCancel = delivered
-      .filter((n) => n.extra.profileId === profileId)
-      .map((n) => ({ id: n.id }));
-
-    if (toCancel.length > 0) {
-      await LocalNotifications.cancel({ notifications: toCancel });
-    }
-  }
-
-  async getDeliveredNotifications(): Promise<LocalNotification[]> {
+  async getDeliveredNotifications(): Promise<LocalNotificationSchema[]> {
     const result = await LocalNotifications.getDeliveredNotifications();
-    return result.notifications as LocalNotification[];
+    return result.notifications;
   }
 
   // TODO: Implement permissions
