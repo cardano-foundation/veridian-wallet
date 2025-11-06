@@ -3,7 +3,7 @@ import { LoginAttempts } from "../../../core/agent/services/auth.types";
 import { PeerConnectSigningEvent } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { OperationType, ToastMsgType } from "../../../ui/globals/types";
 import { DAppConnection } from "../profileCache";
-import { ConnectionShortDetails } from "../../../core/agent/agent.types";
+import { MultisigConnectionDetails } from "../../../core/agent/agent.types";
 
 interface PayloadData<T = any> {
   [key: string]: T;
@@ -57,7 +57,7 @@ interface PendingJoinGroupMetadata {
   groupId: string;
   groupName: string;
   initiatorName: string | null;
-  connection: ConnectionShortDetails;
+  connection: MultisigConnectionDetails;
 }
 
 interface StateCacheProps {

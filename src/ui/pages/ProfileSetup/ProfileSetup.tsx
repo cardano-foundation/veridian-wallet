@@ -376,7 +376,7 @@ export const ProfileSetup = ({
         () => dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR))
       );
 
-      if (!invitation) return;
+      if (!invitation || invitation.type !== "MULTI_SIG_INITIATOR") return;
 
       // Update Redux state with all metadata, including initiatorName
       const pendingJoinData = {

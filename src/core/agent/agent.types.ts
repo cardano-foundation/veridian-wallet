@@ -234,7 +234,7 @@ type OobiScan =
   | {
       type: OobiType.MULTI_SIG_INITIATOR;
       groupId: string;
-      connection: ConnectionShortDetails;
+      connection: MultisigConnectionDetails;
     };
 
 interface AgentServicesProps {

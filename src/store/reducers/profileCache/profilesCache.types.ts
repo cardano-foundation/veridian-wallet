@@ -1,5 +1,4 @@
 import {
-  ConnectionShortDetails,
   MultisigConnectionDetails,
   RegularConnectionDetails,
 } from "../../../core/agent/agent.types";
@@ -9,7 +8,7 @@ import { KeriaNotification } from "../../../core/agent/services/keriaNotificatio
 
 interface MultiSigGroup {
   groupId: string;
-  connections: ConnectionShortDetails[];
+  connections: MultisigConnectionDetails[];
 }
 
 interface DAppConnection {

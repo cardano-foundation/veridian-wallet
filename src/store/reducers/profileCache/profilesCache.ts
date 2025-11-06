@@ -72,21 +72,11 @@ export const profilesCacheSlice = createSlice({
       const groupId = action.payload.groupMetadata?.groupId;
       const cachedConnections: MultisigConnectionDetails[] =
         groupId && state.multiSigGroup?.groupId === groupId
-          ? state.multiSigGroup.connections.map((connection) => {
-              const connectionWithGroup =
-                connection as MultisigConnectionDetails;
-              return {
-                id: connection.id,
-                label: connection.label,
-                createdAtUTC: connection.createdAtUTC,
-                status: connection.status,
-                logo: connection.logo,
-                oobi: connection.oobi,
-                contactId: connection.contactId || connection.id,
-                groupId,
-                hasAccepted: connectionWithGroup.hasAccepted,
-              } as MultisigConnectionDetails;
-            })
+          ? state.multiSigGroup.connections.map((connection) => ({
+              ...connection,
+              contactId: connection.contactId || connection.id,
+              groupId,
+            }))
           : [];
 
       state.profiles[action.payload.id] = {
