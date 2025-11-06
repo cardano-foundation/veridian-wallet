@@ -25,6 +25,10 @@ jest.mock("@capacitor/core", () => ({
   },
 }));
 
+jest.mock("../../ui/utils/error", () => ({
+  showError: jest.fn(),
+}));
+
 describe("NotificationService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
