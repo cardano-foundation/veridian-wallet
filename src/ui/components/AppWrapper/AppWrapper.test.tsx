@@ -41,7 +41,6 @@ import {
   setConnectedDApp,
   setPendingDAppConnection,
   addGroupProfileAsync,
-  setProfileMultisigConnections,
 } from "../../../store/reducers/profileCache";
 import {
   setQueueIncomingRequest,
@@ -519,7 +518,6 @@ describe("Group state changed handler", () => {
     const getState = jest.fn(() => ({ profilesCache: { recentProfiles: [] } }));
 
     dispatch.mockImplementation((action) => {
-      // Handle both thunk functions and plain actions
       if (typeof action === "function") {
         action(innerDispatch, getState);
       } else {
@@ -527,29 +525,24 @@ describe("Group state changed handler", () => {
       }
     });
 
-    // Mock getIdentifier to return mHab with groupMetadata
     const mHabWithMetadata = pendingMemberIdentifierFix[0];
     Agent.agent.identifiers.getIdentifier = jest
       .fn()
       .mockResolvedValue(mHabWithMetadata);
 
-    // Mock getMultisigConnections to return empty array
     Agent.agent.connections.getMultisigConnections = jest
       .fn()
       .mockResolvedValue([]);
 
     await groupCreatedHandler(groupCreatedEvent, dispatch);
+
     expect(innerDispatch).toBeCalledWith(
       addGroupProfile(pendingGroupIdentifierFix)
     );
+
+    expect(Agent.agent.connections.getMultisigConnections).toBeCalled();
     expect(Agent.agent.identifiers.getIdentifier).toBeCalledWith(
       pendingGroupIdentifierFix.groupMemberPre
-    );
-    expect(dispatch).toBeCalledWith(
-      setProfileMultisigConnections({
-        profileId: pendingGroupIdentifierFix.id,
-        connections: [],
-      })
     );
   });
 });

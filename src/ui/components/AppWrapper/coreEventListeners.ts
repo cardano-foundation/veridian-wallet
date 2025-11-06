@@ -2,7 +2,6 @@ import { Agent } from "../../../core/agent/agent";
 import {
   CreationStatus,
   isRegularConnectionDetails,
-  MultisigConnectionDetails,
 } from "../../../core/agent/agent.types";
 import {
   EventTypes,
@@ -18,7 +17,6 @@ import {
   addNotification,
   addOrUpdateProfileIdentity,
   deleteNotificationById,
-  setProfileMultisigConnections,
   updateOrAddConnectionCache,
   updateProfileCreationStatus,
 } from "../../../store/reducers/profileCache";
@@ -100,30 +98,6 @@ const groupCreatedHandler = async (
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
   await dispatch(addGroupProfileAsync(event.payload.group));
-
-  // Refresh multisig connections cache after group is created
-  // This ensures member names are displayed correctly without page refresh
-  const allConnections = await Agent.agent.connections.getMultisigConnections();
-  const multisigConnections = allConnections as MultisigConnectionDetails[];
-
-  const mHabId = event.payload.group.groupMemberPre;
-  if (mHabId) {
-    const mHab = await Agent.agent.identifiers.getIdentifier(mHabId);
-    const groupId = mHab?.groupMetadata?.groupId;
-
-    if (groupId) {
-      const groupConnections = multisigConnections.filter(
-        (conn) => conn.groupId === groupId
-      );
-
-      dispatch(
-        setProfileMultisigConnections({
-          profileId: event.payload.group.id,
-          connections: groupConnections,
-        })
-      );
-    }
-  }
 };
 
 export {

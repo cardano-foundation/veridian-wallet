@@ -449,6 +449,29 @@ export const profilesCacheSlice = createSlice({
 export const addGroupProfileAsync =
   (group: IdentifierShortDetails) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
+    const mHabId = group.groupMemberPre;
+    if (mHabId) {
+      const allConnections =
+        await Agent.agent.connections.getMultisigConnections();
+      const multisigConnections = allConnections as MultisigConnectionDetails[];
+
+      const mHab = await Agent.agent.identifiers.getIdentifier(mHabId);
+      const groupId = mHab?.groupMetadata?.groupId;
+
+      if (groupId) {
+        const groupConnections = multisigConnections.filter(
+          (conn) => conn.groupId === groupId
+        );
+
+        dispatch(
+          setProfileMultisigConnections({
+            profileId: mHabId,
+            connections: groupConnections,
+          })
+        );
+      }
+    }
+
     dispatch(addGroupProfile(group));
 
     await Agent.agent.basicStorage.createOrUpdateBasicRecord(
