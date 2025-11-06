@@ -178,7 +178,6 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   };
 
   const getInceptionStatus = useCallback(async () => {
-    // We can fetch inception status using gHab id even if groupMetadata is not stored on gHab
     if (!identity?.id) return;
 
     try {
