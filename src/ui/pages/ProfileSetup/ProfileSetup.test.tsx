@@ -28,7 +28,7 @@ import { CustomInputProps } from "../../components/CustomInput/CustomInput.types
 import { makeTestStore } from "../../utils/makeTestStore";
 import { ProfileSetup } from "./ProfileSetup";
 import {
-  ConnectionShortDetails,
+  MultisigConnectionDetails,
   ConnectionStatus,
   CreationStatus,
   OobiType,
@@ -42,19 +42,21 @@ jest.mock("signify-ts", () => ({
   })),
 }));
 
-const connection: ConnectionShortDetails = {
+const multisigConnection: MultisigConnectionDetails = {
   id: "ebfeb1ebc6f1c276ef71212ec20",
   label: "Cambridge University",
   createdAtUTC: "2017-01-14T19:23:24Z",
   status: ConnectionStatus.CONFIRMED,
   groupId: "0AAPHBnxoGK4tDuL4g87Eo9D",
   contactId: "conn-id-1",
+  oobi: "http://keria:3902/oobi/test",
 };
 
 const connectByOobiUrlMock = jest.fn((...arg: unknown[]): Promise<unknown> => {
   return Promise.resolve({
-    type: OobiType.NORMAL,
-    connection,
+    type: OobiType.MULTI_SIG_INITIATOR,
+    groupId: "0AAPHBnxoGK4tDuL4g87Eo9D",
+    connection: multisigConnection,
   });
 });
 jest.mock("../../../core/agent/agent", () => ({
