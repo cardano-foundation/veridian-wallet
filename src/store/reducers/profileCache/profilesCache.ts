@@ -66,17 +66,40 @@ export const profilesCacheSlice = createSlice({
       const existedProfile = state.profiles[action.payload.id];
       if (existedProfile) {
         existedProfile.identity = action.payload;
-      } else {
-        state.profiles[action.payload.id] = {
-          identity: action.payload,
-          connections: [],
-          multisigConnections: [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        };
+        return;
       }
+
+      const groupId = action.payload.groupMetadata?.groupId;
+      const cachedConnections: MultisigConnectionDetails[] =
+        groupId && state.multiSigGroup?.groupId === groupId
+          ? state.multiSigGroup.connections.map((connection) => {
+              const connectionWithGroup =
+                connection as MultisigConnectionDetails;
+              return {
+                id: connection.id,
+                label: connection.label,
+                createdAtUTC: connection.createdAtUTC,
+                status: connection.status,
+                logo: connection.logo,
+                oobi: connection.oobi,
+                contactId: connection.contactId || connection.id,
+                groupId,
+                hasAccepted: connectionWithGroup.hasAccepted,
+              } as MultisigConnectionDetails;
+            })
+          : [];
+
+      state.profiles[action.payload.id] = {
+        identity: action.payload,
+        connections: [],
+        multisigConnections: cachedConnections,
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+        notifications: [],
+      };
+
+      state.multiSigGroup = undefined;
     },
     addGroupProfile: (state, action: PayloadAction<IdentifierShortDetails>) => {
       if (!action.payload.groupMemberPre) {
@@ -375,20 +398,6 @@ export const profilesCacheSlice = createSlice({
       targetProfile.multisigConnections = [...existing, mapped];
     },
 
-    setProfileMultisigConnections: (
-      state,
-      action: PayloadAction<{
-        profileId: string;
-        connections: MultisigConnectionDetails[];
-      }>
-    ) => {
-      const { profileId, connections } = action.payload;
-      const targetProfile = state.profiles[profileId];
-      if (targetProfile) {
-        targetProfile.multisigConnections = connections;
-      }
-    },
-
     // Wallet Connection Actions
     setConnectedDApp: (state, action: PayloadAction<DAppConnection | null>) => {
       // Store in global state for cross-profile access
@@ -449,29 +458,6 @@ export const profilesCacheSlice = createSlice({
 export const addGroupProfileAsync =
   (group: IdentifierShortDetails) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
-    const mHabId = group.groupMemberPre;
-    if (mHabId) {
-      const allConnections =
-        await Agent.agent.connections.getMultisigConnections();
-      const multisigConnections = allConnections as MultisigConnectionDetails[];
-
-      const mHab = await Agent.agent.identifiers.getIdentifier(mHabId);
-      const groupId = mHab?.groupMetadata?.groupId;
-
-      if (groupId) {
-        const groupConnections = multisigConnections.filter(
-          (conn) => conn.groupId === groupId
-        );
-
-        dispatch(
-          setProfileMultisigConnections({
-            profileId: mHabId,
-            connections: groupConnections,
-          })
-        );
-      }
-    }
-
     dispatch(addGroupProfile(group));
 
     await Agent.agent.basicStorage.createOrUpdateBasicRecord(
@@ -525,7 +511,6 @@ export const {
   updateOrAddConnectionCache,
   removeConnectionCache,
   updateOrAddMultisigConnectionCache,
-  setProfileMultisigConnections,
   setOpenConnectionId,
   setMissingAliasConnection,
   setConnectedDApp,

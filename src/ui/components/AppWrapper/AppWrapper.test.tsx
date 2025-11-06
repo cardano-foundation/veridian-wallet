@@ -525,14 +525,8 @@ describe("Group state changed handler", () => {
       }
     });
 
-    const mHabWithMetadata = pendingMemberIdentifierFix[0];
-    Agent.agent.identifiers.getIdentifier = jest
-      .fn()
-      .mockResolvedValue(mHabWithMetadata);
-
-    Agent.agent.connections.getMultisigConnections = jest
-      .fn()
-      .mockResolvedValue([]);
+    Agent.agent.identifiers.getIdentifier = jest.fn();
+    Agent.agent.connections.getMultisigConnections = jest.fn();
 
     await groupCreatedHandler(groupCreatedEvent, dispatch);
 
@@ -540,10 +534,8 @@ describe("Group state changed handler", () => {
       addGroupProfile(pendingGroupIdentifierFix)
     );
 
-    expect(Agent.agent.connections.getMultisigConnections).toBeCalled();
-    expect(Agent.agent.identifiers.getIdentifier).toBeCalledWith(
-      pendingGroupIdentifierFix.groupMemberPre
-    );
+    expect(Agent.agent.connections.getMultisigConnections).not.toBeCalled();
+    expect(Agent.agent.identifiers.getIdentifier).not.toBeCalled();
   });
 });
 
