@@ -17,4 +17,7 @@ export default defineConfig({
       usePolling: true,
     },
   },
+  optimizeDeps: {
+    exclude: ["vite-plugin-node-polyfills"],
+  },
 });

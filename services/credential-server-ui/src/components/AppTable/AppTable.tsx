@@ -27,6 +27,7 @@ const AppTable = <T extends AppTableBaseData = AppTableBaseData>({
 
   const emptyRows = Array.from({ length: rowPerPage - rows.length }).fill(0);
 
+  
   return (
     <TableContainer className="app-table">
       <Table
