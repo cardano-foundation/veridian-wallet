@@ -192,14 +192,13 @@ class MultiSigService extends AgentService {
       .get(multisigId as string)) as HabState;
 
     try {
-      // @TODO: groupMetadata is only intended for the mHab - for now, it's copied to gHab so the UI has access to the group name. groupCreated is always kept as false in gHab so it does not disappear from the list of userFacing identifiers - this approach should be tidied up.
       await this.identifierStorage.createIdentifierMetadataRecord({
         id: multisigId,
         displayName: mHabRecord.displayName,
         theme: mHabRecord.theme,
         creationStatus,
         groupMemberPre: memberPrefix,
-        groupMetadata: mHabRecord.groupMetadata,
+        groupUsername: mHabRecord.groupMetadata.proposedUsername,
         createdAt: new Date(multisigDetail.icp_dt),
       });
     } catch (error) {
@@ -230,7 +229,7 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: memberPrefix,
           createdAtUTC: multisigDetail.icp_dt,
-          groupMetadata: mHabRecord.groupMetadata,
+          groupUsername: mHabRecord.groupMetadata.proposedUsername,
         },
       },
     });
@@ -594,7 +593,7 @@ class MultiSigService extends AgentService {
         theme: mHabRecord.theme,
         creationStatus,
         groupMemberPre: mHabRecord.id,
-        groupMetadata: mHabRecord.groupMetadata,
+        groupUsername: mHabRecord.groupMetadata.proposedUsername,
         createdAt: new Date(multisigDetail.icp_dt),
       });
     } catch (error) {
@@ -625,7 +624,7 @@ class MultiSigService extends AgentService {
           creationStatus,
           groupMemberPre: mHabRecord.id,
           createdAtUTC: multisigDetail.icp_dt,
-          groupMetadata: mHabRecord.groupMetadata,
+          groupUsername: mHabRecord.groupMetadata.proposedUsername,
         },
       },
     });

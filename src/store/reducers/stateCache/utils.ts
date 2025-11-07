@@ -28,9 +28,13 @@ const filterProfileData = (
   const profileConnections = allConnections.filter(
     (conn) => conn.identifier === profileId
   );
+
+  const groupIdToFilter = profile.groupMemberPre
+    ? identifiers[profile.groupMemberPre]?.groupMetadata?.groupId
+    : profile.groupMetadata?.groupId;
+
   const profileMultisigConnections = allMultisigConnections.filter(
-    (conn) =>
-      "groupId" in conn && conn.groupId === profile.groupMetadata?.groupId
+    (conn) => "groupId" in conn && conn.groupId === groupIdToFilter
   );
   const profilePeerConnections = allPeerConnections.filter(
     (conn) => conn.selectedAid === profileId

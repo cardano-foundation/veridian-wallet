@@ -149,12 +149,10 @@ describe("Manage password", () => {
     });
 
     await waitFor(() => {
-      expect(
-        queryByText(
-          TRANSLATIONS.settings.sections.security.managepassword.page.alert
-            .enablemessage
-        )
-      ).toBeNull();
+      const openAlert = document.querySelector(
+        '[data-testid="alert-cancel-enable-password"][is-open="true"]'
+      );
+      expect(openAlert).toBeNull();
     });
 
     await waitFor(() => {
@@ -219,12 +217,10 @@ describe("Manage password", () => {
     });
 
     await waitFor(() => {
-      expect(
-        queryByText(
-          TRANSLATIONS.settings.sections.security.managepassword.page.alert
-            .enablemessage
-        )
-      ).toBeNull();
+      const openAlert = document.querySelector(
+        '[data-testid="alert-cancel-enable-password"][is-open="true"]'
+      );
+      expect(openAlert).toBeNull();
     });
 
     await waitFor(() => {
@@ -300,12 +296,10 @@ describe("Manage password", () => {
     });
 
     await waitFor(() => {
-      expect(
-        queryByText(
-          TRANSLATIONS.settings.sections.security.managepassword.page.alert
-            .disablemessage
-        )
-      ).toBeNull();
+      const openAlert = document.querySelector(
+        '[data-testid="alert-cancel"][is-open="true"]'
+      );
+      expect(openAlert).toBeNull();
     });
 
     await waitFor(() => {

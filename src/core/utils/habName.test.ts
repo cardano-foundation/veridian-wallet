@@ -12,7 +12,7 @@ describe("habName", () => {
           groupMetadata: {
             groupInitiator: true,
             groupId: "groupId123",
-            userName: "",
+            proposedUsername: "",
           },
         },
       },
@@ -24,7 +24,7 @@ describe("habName", () => {
           groupMetadata: {
             groupInitiator: false,
             groupId: "groupId456",
-            userName: "",
+            proposedUsername: "",
           },
         },
       },
@@ -36,7 +36,7 @@ describe("habName", () => {
           groupMetadata: {
             groupInitiator: true,
             groupId: "gr@up!d",
-            userName: "",
+            proposedUsername: "",
           },
         },
       },
@@ -48,7 +48,7 @@ describe("habName", () => {
           groupMetadata: {
             groupInitiator: true,
             groupId: "group-with-hyphens",
-            userName: "",
+            proposedUsername: "",
           },
         },
       },
@@ -60,7 +60,7 @@ describe("habName", () => {
           groupMetadata: {
             groupInitiator: true,
             groupId: "group-id-extra",
-            userName: "",
+            proposedUsername: "",
           },
         },
       },
@@ -80,7 +80,7 @@ describe("habName", () => {
           groupMetadata: {
             groupInitiator: true,
             groupId: "groupId789",
-            userName: "user123",
+            proposedUsername: "user123",
           },
         },
       },
@@ -93,7 +93,7 @@ describe("habName", () => {
           groupMetadata: {
             groupInitiator: true,
             groupId: "gr@up!d",
-            userName: "us$er%name",
+            proposedUsername: "us$er%name",
           },
         },
       },
@@ -106,7 +106,7 @@ describe("habName", () => {
           groupMetadata: {
             groupInitiator: true,
             groupId: "group-with-hyphens",
-            userName: "user123",
+            proposedUsername: "user123",
           },
         },
       },
@@ -138,7 +138,7 @@ describe("habName", () => {
       {
         name: "1.2.0.2:XX:1:groupId789:user123", // Invalid number of parts for new format (5 parts)
         errorMessage:
-          "Invalid new format name: Expected 3 or 6 parts separated by colons (version:theme:displayName or version:theme:groupInitiator:groupId:userName:displayName).",
+          "Invalid new format name: Expected 3 or 6 parts separated by colons (version:theme:displayName or version:theme:groupInitiator:groupId:proposedUsername:displayName).",
       },
       {
         name: "03:1-group-id:", // Missing display name for old format
@@ -180,7 +180,7 @@ describe("habName", () => {
           groupMetadata: {
             groupId: "groupXYZ",
             groupInitiator: true,
-            userName: "formattedUser",
+            proposedUsername: "formattedUser",
           },
         },
         expected: "1.2.0.2:XX:1:groupXYZ:formattedUser:FormattedGroup",

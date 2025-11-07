@@ -49,7 +49,7 @@ const SetupConnections = ({ setState }: StageProps) => {
   const scanRef = useRef<ScanRef>(null);
 
   const groupId = profile?.groupMetadata?.groupId;
-  const userName = profile?.groupMetadata?.userName;
+  const proposedUsername = profile?.groupMetadata?.proposedUsername;
   const { resolveGroupConnection } = useScanHandle();
   const groupConnections = useAppSelector(getMultisigConnectionsCache);
   const [multiSigGroup, setMultiSigGroup] = useState<
@@ -87,7 +87,7 @@ const SetupConnections = ({ setState }: StageProps) => {
   const fetchOobi = useCallback(async () => {
     if (
       !groupId ||
-      !userName ||
+      !proposedUsername ||
       !profile?.displayName ||
       profile?.creationStatus === CreationStatus.PENDING ||
       (profile.creationStatus === CreationStatus.COMPLETE &&
@@ -97,7 +97,7 @@ const SetupConnections = ({ setState }: StageProps) => {
 
     try {
       const oobiValue = await Agent.agent.connections.getOobi(profile.id, {
-        alias: userName,
+        alias: proposedUsername,
         groupId: groupId,
         groupName: profile?.displayName,
       });
@@ -109,7 +109,7 @@ const SetupConnections = ({ setState }: StageProps) => {
     }
   }, [
     groupId,
-    userName,
+    proposedUsername,
     profile?.displayName,
     profile?.creationStatus,
     profile?.groupMemberPre,
@@ -174,7 +174,7 @@ const SetupConnections = ({ setState }: StageProps) => {
           <PageHeader
             title={
               tab === Tab.SetupMembers
-                ? profile?.groupMetadata?.userName
+                ? profile?.groupMetadata?.proposedUsername
                 : undefined
             }
             actionButton={isScanTab && supportMultiCamera}

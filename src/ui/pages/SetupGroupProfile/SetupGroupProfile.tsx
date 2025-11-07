@@ -34,7 +34,7 @@ const initialState: GroupInfomation = {
     groupId: "",
     groupInitiator: false, // Default to false for joiners
     groupCreated: false,
-    userName: "",
+    proposedUsername: "",
     initiatorName: "",
   },
 };

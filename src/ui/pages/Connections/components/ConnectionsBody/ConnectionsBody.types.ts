@@ -1,7 +1,4 @@
-import {
-  ConnectionShortDetails,
-  RegularConnectionDetails,
-} from "../../../../../core/agent/agent.types";
+import { RegularConnectionDetails } from "../../../../../core/agent/agent.types";
 import { MappedConnections } from "../../Connections.types";
 
 interface ConnectionsBodyProps {

@@ -97,7 +97,7 @@ const groupCreatedHandler = async (
   event: GroupCreatedEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
-  dispatch(addGroupProfileAsync(event.payload.group));
+  await dispatch(addGroupProfileAsync(event.payload.group));
 };
 
 export {

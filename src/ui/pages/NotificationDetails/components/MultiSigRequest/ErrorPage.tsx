@@ -43,9 +43,10 @@ const ErrorPage = ({
         ? connection.groupId
         : undefined;
 
-    const identifier = Object.values(profiles).find(
-      (item) => item.identity.groupMetadata?.groupId === multiSignGroupId
-    );
+    const identifier = Object.values(profiles).find((item) => {
+      const profileGroupId = item.identity.groupMetadata?.groupId;
+      return profileGroupId === multiSignGroupId;
+    });
 
     if (identifier) {
       setResumeMultiSig(identifier.identity);

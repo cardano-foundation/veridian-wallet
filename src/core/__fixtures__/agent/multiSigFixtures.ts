@@ -17,7 +17,7 @@ const memberMetadataRecordProps: IdentifierMetadataRecordProps = {
     groupId: "groupid",
     groupInitiator: true,
     groupCreated: false,
-    userName: "testUser",
+    proposedUsername: "testUser",
   },
 };
 
@@ -119,7 +119,7 @@ const memberIdentifierRecord = {
     groupId: "08f22dee-8cb0-4d65-8600-a82bbc3f6fd7",
     groupInitiator: true,
     groupCreated: true,
-    userName: "testUser",
+    proposedUsername: "testUser",
   },
   updatedAt: new Date("2024-06-28T03:55:04.260Z"),
 } as IdentifierMetadataRecordProps;

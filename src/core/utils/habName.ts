@@ -4,20 +4,20 @@ export interface HabNameParts {
   groupMetadata?: {
     groupInitiator: boolean;
     groupId: string;
-    userName: string;
+    proposedUsername: string;
   };
   theme: string;
 }
 
 // Old format: theme:groupInitiator-groupId:displayName or  theme:displayName
-// New format: version:theme:groupInitiator:groupId:userName:displayName or version:theme:displayName
+// New format: version:theme:groupInitiator:groupId:proposedUsername:displayName or version:theme:displayName
 export function parseHabName(name: string): HabNameParts {
   const parts = name.split(":");
 
   if (name.startsWith("1.2.0.2:")) {
     if (parts.length !== 3 && parts.length !== 6) {
       throw new Error(
-        "Invalid new format name: Expected 3 or 6 parts separated by colons (version:theme:displayName or version:theme:groupInitiator:groupId:userName:displayName)."
+        "Invalid new format name: Expected 3 or 6 parts separated by colons (version:theme:displayName or version:theme:groupInitiator:groupId:proposedUsername:displayName)."
       );
     }
 
@@ -34,7 +34,7 @@ export function parseHabName(name: string): HabNameParts {
 
     const groupInitiatorStr = parts[2];
     const groupId = parts[3];
-    const userName = parts[4];
+    const proposedUsername = parts[4];
     const displayName = parts[5];
 
     if (groupInitiatorStr !== "1" && groupInitiatorStr !== "0") {
@@ -45,8 +45,10 @@ export function parseHabName(name: string): HabNameParts {
     if (!groupId || groupId.trim() === "") {
       throw new Error("Invalid new format name: groupId cannot be empty.");
     }
-    if (!userName) {
-      throw new Error("Invalid new format name: userName cannot be null.");
+    if (!proposedUsername) {
+      throw new Error(
+        "Invalid new format name: proposedUsername cannot be null."
+      );
     }
 
     return {
@@ -56,7 +58,7 @@ export function parseHabName(name: string): HabNameParts {
       groupMetadata: {
         groupInitiator: groupInitiatorStr === "1",
         groupId,
-        userName,
+        proposedUsername,
       },
     };
   }
@@ -106,7 +108,7 @@ export function parseHabName(name: string): HabNameParts {
     groupMetadata: {
       groupInitiator: groupInitiatorStr === "1",
       groupId,
-      userName: "",
+      proposedUsername: "",
     },
   };
 }
@@ -119,8 +121,8 @@ export function formatToV1_2_0_2(parts: HabNameParts): string {
   if (parts.groupMetadata) {
     const groupInitiatorStr = parts.groupMetadata.groupInitiator ? "1" : "0";
     const groupIdPart = parts.groupMetadata.groupId || "";
-    const userNamePart = parts.groupMetadata.userName || "";
-    return `${version}:${themePart}:${groupInitiatorStr}:${groupIdPart}:${userNamePart}:${displayNamePart}`;
+    const proposedUsernamePart = parts.groupMetadata.proposedUsername || "";
+    return `${version}:${themePart}:${groupInitiatorStr}:${groupIdPart}:${proposedUsernamePart}:${displayNamePart}`;
   } else {
     return `${version}:${themePart}:${displayNamePart}`;
   }

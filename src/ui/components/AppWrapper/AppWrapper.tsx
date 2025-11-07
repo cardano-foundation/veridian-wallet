@@ -374,6 +374,8 @@ const AppWrapper = (props: { children: ReactNode }) => {
         true
       );
       const storedIdentifiers = await Agent.agent.identifiers.getIdentifiers();
+      const allIdentifiersIncludingMember =
+        await Agent.agent.identifiers.getIdentifiers(false);
       const storedPeerConnections =
         await Agent.agent.peerConnectionPair.getAllPeerConnectionAccount();
 
@@ -397,7 +399,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
         dispatch(updateRecentProfiles(profileHistories));
       }
 
-      const identifiersDict = storedIdentifiers.reduce(
+      const identifiersDict = allIdentifiersIncludingMember.reduce(
         (acc: Record<string, IdentifierShortDetails>, identifier) => {
           acc[identifier.id] = identifier;
           return acc;

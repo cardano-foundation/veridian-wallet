@@ -70,6 +70,7 @@ class IdentifierStorage {
         | "creationStatus"
         | "isDeleted"
         | "groupMetadata"
+        | "groupUsername"
         | "pendingDeletion"
       >
     >
@@ -85,6 +86,8 @@ class IdentifierStorage {
       identifierMetadataRecord.isDeleted = metadata.isDeleted;
     if (metadata.groupMetadata !== undefined)
       identifierMetadataRecord.groupMetadata = metadata.groupMetadata;
+    if (metadata.groupUsername !== undefined)
+      identifierMetadataRecord.groupUsername = metadata.groupUsername;
     if (metadata.pendingDeletion !== undefined)
       identifierMetadataRecord.pendingDeletion = metadata.pendingDeletion;
     await this.storageService.update(identifierMetadataRecord);
