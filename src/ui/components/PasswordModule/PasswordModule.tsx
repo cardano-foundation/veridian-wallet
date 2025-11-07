@@ -67,83 +67,89 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
       handleClearState();
     };
 
-    useImperativeHandle(ref, () => ({
-      clearState: handleClearState,
-      savePassword: async () => {
-        if (authentication.passwordIsSet) {
-          try {
-            if (
-              await Agent.agent.auth.verifySecret(
-                KeyStoreKeys.APP_OP_PASSWORD,
-                createPasswordValue
-              )
-            ) {
-              setAlertExistingIsOpen(true);
-              return;
+    useImperativeHandle(
+      ref,
+      () => ({
+        clearState: handleClearState,
+        savePassword: async () => {
+          if (authentication.passwordIsSet) {
+            try {
+              if (
+                await Agent.agent.auth.verifySecret(
+                  KeyStoreKeys.APP_OP_PASSWORD,
+                  createPasswordValue
+                )
+              ) {
+                setAlertExistingIsOpen(true);
+                return;
+              }
+            } catch (error) {
+              if (
+                error instanceof Error &&
+                error.message.startsWith(AuthService.SECRET_NOT_STORED)
+              ) {
+                showError(
+                  "Unable to get current password",
+                  new Error("Unable to get current password"),
+                  dispatch
+                );
+                return;
+              }
+              throw error;
             }
-          } catch (error) {
-            if (
-              error instanceof Error &&
-              error.message.startsWith(AuthService.SECRET_NOT_STORED)
-            ) {
-              showError(
-                "Unable to get current password",
-                new Error("Unable to get current password"),
-                dispatch
-              );
-              return;
-            }
-            throw error;
           }
-        }
 
-        await Agent.agent.auth.storeSecret(
-          KeyStoreKeys.APP_OP_PASSWORD,
-          createPasswordValue
-        );
-
-        if (authentication.passwordIsSkipped) {
-          await Agent.agent.basicStorage.deleteById(
-            MiscRecordId.APP_PASSWORD_SKIPPED
+          await Agent.agent.auth.storeSecret(
+            KeyStoreKeys.APP_OP_PASSWORD,
+            createPasswordValue
           );
-        }
 
-        dispatch(
-          setAuthentication({
-            ...authentication,
-            passwordIsSet: true,
-            passwordIsSkipped: false,
-          })
-        );
-        if (hintValue) {
-          await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.OP_PASS_HINT,
-              content: { value: hintValue },
-            })
-          );
-        } else {
-          try {
-            const previousHint = (
-              await Agent.agent.basicStorage.findById(MiscRecordId.OP_PASS_HINT)
-            )?.content?.value;
-
-            if (previousHint) {
-              await Agent.agent.basicStorage.deleteById(
-                MiscRecordId.OP_PASS_HINT
-              );
-            }
-          } catch (e) {
-            showError(
-              "Unable to delete password hint",
-              e,
-              dispatch,
-              ToastMsgType.UNABLE_DELETE_PASSWORD_HINT
+          if (authentication.passwordIsSkipped) {
+            await Agent.agent.basicStorage.deleteById(
+              MiscRecordId.APP_PASSWORD_SKIPPED
             );
           }
-        }
-      },
-    }));
+
+          dispatch(
+            setAuthentication({
+              ...authentication,
+              passwordIsSet: true,
+              passwordIsSkipped: false,
+            })
+          );
+          if (hintValue) {
+            await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+              new BasicRecord({
+                id: MiscRecordId.OP_PASS_HINT,
+                content: { value: hintValue },
+              })
+            );
+          } else {
+            try {
+              const previousHint = (
+                await Agent.agent.basicStorage.findById(
+                  MiscRecordId.OP_PASS_HINT
+                )
+              )?.content?.value;
+
+              if (previousHint) {
+                await Agent.agent.basicStorage.deleteById(
+                  MiscRecordId.OP_PASS_HINT
+                );
+              }
+            } catch (e) {
+              showError(
+                "Unable to delete password hint",
+                e,
+                dispatch,
+                ToastMsgType.UNABLE_DELETE_PASSWORD_HINT
+              );
+            }
+          }
+        },
+      }),
+      [authentication, createPasswordValue, dispatch, hintValue]
+    );
 
     useEffect(() => {
       onValidationChange?.(validated);
