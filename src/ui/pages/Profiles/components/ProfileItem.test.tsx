@@ -118,7 +118,7 @@ describe("ProfileItem", () => {
         groupId: "id",
         groupInitiator: true,
         groupCreated: false,
-        userName: "initiator",
+        proposedUsername: "initiator",
       },
     };
     const onClickMock = jest.fn();
@@ -146,7 +146,7 @@ describe("ProfileItem", () => {
         groupId: "id",
         groupInitiator: true,
         groupCreated: false,
-        userName: "initiator",
+        proposedUsername: "initiator",
       },
     };
     const onClickMock = jest.fn();

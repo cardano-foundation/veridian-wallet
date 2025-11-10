@@ -182,7 +182,8 @@ describe("Profiles", () => {
     const setIsOpenMock = jest.fn();
     const pendingIdentifier = filteredIdentifierFix.find(
       (idObj) =>
-        idObj.creationStatus === CreationStatus.PENDING && !!idObj.groupMetadata
+        idObj.creationStatus === CreationStatus.PENDING &&
+        (!!idObj.groupMetadata || !!idObj.groupMemberPre)
     );
     if (!pendingIdentifier) {
       throw new Error(

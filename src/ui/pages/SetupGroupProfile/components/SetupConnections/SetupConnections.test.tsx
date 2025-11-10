@@ -87,7 +87,7 @@ const initiatorGroupProfile = {
     groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
     groupCreated: false,
     groupInitiator: true,
-    userName: "Initiator",
+    proposedUsername: "Initiator",
   },
 };
 jest.mock("react-router-dom", () => ({
@@ -204,7 +204,7 @@ describe("Setup Connection", () => {
         time: Date.now(),
         passcodeIsSet: true,
         passwordIsSet: false,
-        userName: "Duke",
+        proposedUsername: "Duke",
       },
       isOnline: true,
     },
@@ -301,7 +301,7 @@ describe("Setup Connection", () => {
     const calledArgs = getOobiMock.mock.calls[0];
     expect(calledArgs[0]).toEqual(stage1State.newIdentifier.id);
     expect(calledArgs[1]).toEqual({
-      alias: initiatorGroupProfile.groupMetadata.userName,
+      alias: initiatorGroupProfile.groupMetadata.proposedUsername,
       groupId: initiatorGroupProfile.groupMetadata.groupId,
       groupName: initiatorGroupProfile.displayName,
     });
@@ -328,7 +328,7 @@ describe("Setup Connection", () => {
       getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.subtitle)
     ).toBeVisible();
     expect(
-      getByText(initiatorGroupProfile.groupMetadata.userName)
+      getByText(initiatorGroupProfile.groupMetadata.proposedUsername)
     ).toBeVisible();
     expect(getByTestId("avatar-button")).toBeVisible();
 

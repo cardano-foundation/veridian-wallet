@@ -91,6 +91,24 @@ describe("Identifier storage test", () => {
     expect(storageService.update).toBeCalled();
   });
 
+  test("Should update identifier groupUsername", async () => {
+    const identifierWithGroupUsername = new IdentifierMetadataRecord({
+      ...identifierMetadataRecordProps,
+      groupUsername: "oldUsername",
+    });
+    storageService.findById.mockResolvedValue(identifierWithGroupUsername);
+
+    await identifierStorage.updateIdentifierMetadata(
+      identifierMetadataRecord.id,
+      {
+        groupUsername: "newUsername",
+      }
+    );
+
+    expect(identifierWithGroupUsername.groupUsername).toBe("newUsername");
+    expect(storageService.update).toBeCalledWith(identifierWithGroupUsername);
+  });
+
   test("Should get all identifier pending deletion", async () => {
     storageService.findAllByQuery.mockResolvedValue([
       {

@@ -150,7 +150,7 @@ export const ProfileSetup = ({
           ? false // Ensure joiner is not the initiator
           : true,
         groupCreated: false,
-        userName: userName,
+        proposedUsername: userName,
         initiatorName: stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup
           ? stateCache.pendingJoinGroupMetadata?.initiatorName || undefined
           : userName, // Set initiatorName to userName for the initiator
@@ -376,7 +376,7 @@ export const ProfileSetup = ({
         () => dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR))
       );
 
-      if (!invitation) return;
+      if (!invitation || invitation.type !== "MULTI_SIG_INITIATOR") return;
 
       // Update Redux state with all metadata, including initiatorName
       const pendingJoinData = {

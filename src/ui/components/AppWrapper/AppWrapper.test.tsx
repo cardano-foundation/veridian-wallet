@@ -50,6 +50,7 @@ import { IncomingRequestType } from "../../../store/reducers/stateCache/stateCac
 import {
   pendingGroupIdentifierFix,
   pendingIdentifierFix,
+  pendingMemberIdentifierFix,
 } from "../../__fixtures__/filteredIdentifierFix";
 import { ToastMsgType } from "../../globals/types";
 import {
@@ -97,6 +98,7 @@ jest.mock("../../../core/agent/agent", () => {
         },
         identifiers: {
           getIdentifiers: jest.fn().mockResolvedValue([]),
+          getIdentifier: jest.fn().mockResolvedValue(null),
           syncKeriaIdentifiers: jest.fn(),
           onIdentifierAdded: jest.fn(),
           getAvailableWitnesses: jest.fn(),
@@ -515,14 +517,25 @@ describe("Group state changed handler", () => {
     const innerDispatch = jest.fn();
     const getState = jest.fn(() => ({ profilesCache: { recentProfiles: [] } }));
 
-    dispatch.mockImplementation((func) => {
-      func(innerDispatch, getState);
+    dispatch.mockImplementation((action) => {
+      if (typeof action === "function") {
+        action(innerDispatch, getState);
+      } else {
+        innerDispatch(action);
+      }
     });
 
+    Agent.agent.identifiers.getIdentifier = jest.fn();
+    Agent.agent.connections.getMultisigConnections = jest.fn();
+
     await groupCreatedHandler(groupCreatedEvent, dispatch);
+
     expect(innerDispatch).toBeCalledWith(
       addGroupProfile(pendingGroupIdentifierFix)
     );
+
+    expect(Agent.agent.connections.getMultisigConnections).not.toBeCalled();
+    expect(Agent.agent.identifiers.getIdentifier).not.toBeCalled();
   });
 });
 

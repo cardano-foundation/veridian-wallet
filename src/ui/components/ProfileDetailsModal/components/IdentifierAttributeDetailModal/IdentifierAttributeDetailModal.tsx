@@ -40,18 +40,19 @@ const IdentifierAttributeDetailModal = ({
       const memberConnection = multisignConnectionsCache.find(
         (c) => c.id === member
       );
-      let name = memberConnection?.label || member;
+      const isCurrent = member === data.groupMemberPre;
+      const displayNameCandidate = isCurrent
+        ? data.groupUsername || data.groupMetadata?.proposedUsername || ""
+        : member;
 
-      if (!memberConnection?.label) {
-        currentUserIndex = index;
-        name = data.groupMetadata?.userName || "";
-      }
+      const name = memberConnection?.label || displayNameCandidate;
+      if (isCurrent) currentUserIndex = index;
 
       const rank = index >= 0 ? index % 5 : 0;
 
       return {
-        name: name,
-        isCurrentUser: !memberConnection?.label,
+        name,
+        isCurrentUser: isCurrent,
         avatar: (
           <MemberAvatar
             firstLetter={name.at(0)?.toLocaleUpperCase() || ""}

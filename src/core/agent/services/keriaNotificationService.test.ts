@@ -165,7 +165,7 @@ const notificationStorage = jest.mocked({
   findById: jest.fn(),
   findExpectedById: jest.fn().mockResolvedValue({
     id: "test-notification",
-    a: { r: NotificationRoute.ExnIpexGrant }
+    a: { r: NotificationRoute.ExnIpexGrant },
   }),
   findAllByQuery: jest.fn(),
   getAll: jest.fn(),
@@ -477,13 +477,13 @@ describe("Signify notification service of agent", () => {
     notificationStorage.deleteById = jest.fn();
     notificationStorage.findExpectedById = jest.fn().mockResolvedValue({
       id: "uuid",
-      a: { r: NotificationRoute.ExnIpexGrant }
+      a: { r: NotificationRoute.ExnIpexGrant },
     });
     const mockOperationPendingStorage = {
       findAllByQuery: jest.fn(),
       deleteById: jest.fn(),
     } as any;
-    
+
     await deleteNotificationRecordById(
       agentServicesProps.signifyClient,
       notificationStorage,
@@ -503,13 +503,13 @@ describe("Signify notification service of agent", () => {
     notificationStorage.deleteById = jest.fn();
     notificationStorage.findExpectedById = jest.fn().mockResolvedValue({
       id: "uuid",
-      a: { r: NotificationRoute.LocalAcdcRevoked }
+      a: { r: NotificationRoute.LocalAcdcRevoked },
     });
     const mockOperationPendingStorage = {
       findAllByQuery: jest.fn(),
       deleteById: jest.fn(),
     } as any;
-    
+
     await deleteNotificationRecordById(
       agentServicesProps.signifyClient,
       notificationStorage,
@@ -2201,7 +2201,7 @@ describe("Group IPEX presentation", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
-          userName: "",
+          proposedUsername: "",
         },
       },
       multisigMembers: {
@@ -3975,7 +3975,7 @@ describe("Long running operation tracker", () => {
           groupId: "group-id",
           groupInitiator: true,
           groupCreated: true,
-          userName: "",
+          proposedUsername: "",
         },
       },
       multisigMembers: {

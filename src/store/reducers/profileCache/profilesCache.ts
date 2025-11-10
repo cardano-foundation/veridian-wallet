@@ -66,24 +66,30 @@ export const profilesCacheSlice = createSlice({
       const existedProfile = state.profiles[action.payload.id];
       if (existedProfile) {
         existedProfile.identity = action.payload;
-      } else {
-        const multisigConnections =
-          action.payload.groupMetadata?.groupId === state.multiSigGroup?.groupId
-            ? (state.multiSigGroup?.connections as MultisigConnectionDetails[])
-            : [];
-
-        state.profiles[action.payload.id] = {
-          identity: action.payload,
-          connections: [],
-          multisigConnections: multisigConnections || [],
-          peerConnections: [],
-          credentials: [],
-          archivedCredentials: [],
-          notifications: [],
-        };
-
-        state.multiSigGroup = undefined;
+        return;
       }
+
+      const groupId = action.payload.groupMetadata?.groupId;
+      const cachedConnections: MultisigConnectionDetails[] =
+        groupId && state.multiSigGroup?.groupId === groupId
+          ? state.multiSigGroup.connections.map((connection) => ({
+              ...connection,
+              contactId: connection.contactId || connection.id,
+              groupId,
+            }))
+          : [];
+
+      state.profiles[action.payload.id] = {
+        identity: action.payload,
+        connections: [],
+        multisigConnections: cachedConnections,
+        peerConnections: [],
+        credentials: [],
+        archivedCredentials: [],
+        notifications: [],
+      };
+
+      state.multiSigGroup = undefined;
     },
     addGroupProfile: (state, action: PayloadAction<IdentifierShortDetails>) => {
       if (!action.payload.groupMemberPre) {

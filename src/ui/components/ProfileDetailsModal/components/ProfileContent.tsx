@@ -93,11 +93,14 @@ const ProfileContent = ({
       const memberConnection = multisignConnectionsCache.find(
         (c) => c.id === member
       );
-      let name = memberConnection?.label || member;
-
-      if (!memberConnection?.label) {
-        name = cardData.groupMetadata?.userName || "";
-      }
+      const isCurrent = member === cardData.groupMemberPre;
+      const name =
+        memberConnection?.label ||
+        (isCurrent
+          ? cardData.groupUsername ||
+            cardData.groupMetadata?.proposedUsername ||
+            ""
+          : member);
 
       const rank = index >= 0 ? index % 5 : 0;
 
@@ -109,7 +112,7 @@ const ProfileContent = ({
             rank={rank}
           />
         ),
-        isCurrentUser: !memberConnection?.label,
+        isCurrentUser: isCurrent,
         status: MemberAcceptStatus.None,
       };
     })

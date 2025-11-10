@@ -2,7 +2,6 @@ import { IonButton, IonIcon, useIonViewWillEnter } from "@ionic/react";
 import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
-  ConnectionShortDetails,
   RegularConnectionDetails,
   ConnectionStatus,
 } from "../../../core/agent/agent.types";
@@ -10,7 +9,6 @@ import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getConnectionsCache,
   getOpenConnectionId,
   removeConnectionCache,
   setOpenConnectionId,

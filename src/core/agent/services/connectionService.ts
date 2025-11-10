@@ -164,24 +164,23 @@ class ConnectionService extends AgentService {
       sharedIdentifier,
     };
 
-    const connection: ConnectionShortDetails = {
-      id: connectionId,
-      createdAtUTC: connectionDate,
-      oobi: url,
-      status: ConnectionStatus.PENDING,
-      label: alias,
-      contactId: connectionId,
-      ...(groupId ? { groupId } : { identifier: sharedIdentifier ?? "" }),
-    };
-
     if (multiSigInvite) {
       const oobiResult = (await this.resolveOobi(url)) as {
         op: Operation & { response: State };
         connection: Contact;
         alias: string;
       };
-      connection.id = oobiResult.op.response.i;
-      connection.status = ConnectionStatus.CONFIRMED;
+
+      const multisigConnection: MultisigConnectionDetails = {
+        id: oobiResult.op.response.i,
+        createdAtUTC: new Date(oobiResult.op.response.dt).toISOString(),
+        oobi: url,
+        status: ConnectionStatus.CONFIRMED,
+        label: alias,
+        contactId: oobiResult.op.response.i,
+        groupId,
+      };
+
       connectionMetadata.creationStatus = CreationStatus.COMPLETE;
       connectionMetadata.createdAtUTC = oobiResult.op.response.dt;
       connectionMetadata.status = ConnectionStatus.CONFIRMED;
@@ -209,10 +208,20 @@ class ConnectionService extends AgentService {
         return {
           type: OobiType.MULTI_SIG_INITIATOR,
           groupId,
-          connection,
+          connection: multisigConnection,
         };
       }
     }
+
+    const connection: ConnectionShortDetails = {
+      id: connectionId,
+      createdAtUTC: connectionDate,
+      oobi: url,
+      status: ConnectionStatus.PENDING,
+      label: alias,
+      contactId: connectionId,
+      ...(groupId ? { groupId } : { identifier: sharedIdentifier ?? "" }),
+    };
 
     await this.createConnectionMetadata(connectionId, connectionMetadata);
 

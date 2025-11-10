@@ -117,20 +117,21 @@ class IdentifierService extends AgentService {
       ? await this.identifierStorage.getUserFacingIdentifierRecords()
       : await this.identifierStorage.getIdentifierRecords();
 
-    for (let i = 0; i < records.length; i++) {
-      const metadata = records[i];
-      const identifier: IdentifierShortDetails = {
+    for (const metadata of records) {
+      const groupMetadata = metadata.groupMemberPre
+        ? undefined
+        : metadata.groupMetadata;
+
+      identifiers.push({
         displayName: metadata.displayName,
         id: metadata.id,
         createdAtUTC: metadata.createdAt.toISOString(),
         theme: metadata.theme,
         creationStatus: metadata.creationStatus ?? false,
-        groupMetadata: metadata.groupMetadata,
-      };
-      if (metadata.groupMemberPre) {
-        identifier.groupMemberPre = metadata.groupMemberPre;
-      }
-      identifiers.push(identifier);
+        groupMetadata,
+        groupMemberPre: metadata.groupMemberPre,
+        groupUsername: metadata.groupUsername,
+      });
     }
     return identifiers;
   }
@@ -168,6 +169,10 @@ class IdentifierService extends AgentService {
       ).signing.map((member: { aid: string }) => member.aid);
     }
 
+    const groupMetadata = metadata.groupMemberPre
+      ? undefined
+      : metadata.groupMetadata;
+
     return {
       id: hab.prefix,
       displayName: metadata.displayName,
@@ -175,7 +180,8 @@ class IdentifierService extends AgentService {
       theme: metadata.theme,
       groupMemberPre: metadata.groupMemberPre,
       creationStatus: metadata.creationStatus,
-      groupMetadata: metadata.groupMetadata,
+      groupMetadata,
+      groupUsername: metadata.groupUsername,
       s: hab.state.s,
       dt: hab.state.dt,
       kt: hab.state.kt,
@@ -212,7 +218,7 @@ class IdentifierService extends AgentService {
             groupId: parsed.groupMetadata.groupId,
             groupCreated: false,
             groupInitiator: parsed.groupMetadata.groupInitiator,
-            userName: parsed.groupMetadata.userName,
+            proposedUsername: parsed.groupMetadata.proposedUsername,
           },
         };
       } else {
@@ -243,8 +249,8 @@ class IdentifierService extends AgentService {
     let name: string;
     if (metadata.groupMetadata) {
       const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
-      const userNamePart = metadata.groupMetadata.userName;
-      name = `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${userNamePart}:${metadata.displayName}`;
+      const proposedUsernamePart = metadata.groupMetadata.proposedUsername;
+      name = `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${proposedUsernamePart}:${metadata.displayName}`;
     } else {
       name = `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${metadata.displayName}`;
     }
@@ -537,7 +543,7 @@ class IdentifierService extends AgentService {
       const initiatorFlag = memberMetadata.groupMetadata.groupInitiator
         ? "1"
         : "0";
-      const memberName = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${memberMetadata.groupMetadata.groupId}:${memberMetadata.groupMetadata.userName}:${data.displayName}`;
+      const memberName = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${memberMetadata.groupMetadata.groupId}:${memberMetadata.groupMetadata.proposedUsername}:${data.displayName}`;
 
       await this.props.signifyClient
         .identifiers()
@@ -555,7 +561,7 @@ class IdentifierService extends AgentService {
       const initiatorFlag = identifierMetadata.groupMetadata.groupInitiator
         ? "1"
         : "0";
-      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${identifierMetadata.groupMetadata.groupId}:${identifierMetadata.groupMetadata.userName}:${data.displayName}`;
+      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${identifierMetadata.groupMetadata.groupId}:${identifierMetadata.groupMetadata.proposedUsername}:${data.displayName}`;
     } else {
       name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${data.displayName}`;
     }
@@ -576,12 +582,6 @@ class IdentifierService extends AgentService {
   ): Promise<void> {
     const identifierMetadata =
       await this.identifierStorage.getIdentifierMetadata(identifier);
-
-    if (!identifierMetadata.groupMetadata) {
-      throw new Error(
-        `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifierMetadata.groupMemberPre}`
-      );
-    }
 
     if (identifierMetadata.groupMemberPre) {
       const memberMetadata = await this.identifierStorage.getIdentifierMetadata(
@@ -605,19 +605,16 @@ class IdentifierService extends AgentService {
 
       const memberGroupMetadata: GroupMetadata = {
         ...memberMetadata.groupMetadata,
-        userName: username,
+        proposedUsername: username,
       };
       await this.identifierStorage.updateIdentifierMetadata(
         identifierMetadata.groupMemberPre,
         { groupMetadata: memberGroupMetadata }
       );
 
-      const groupMetadata: GroupMetadata = {
-        ...identifierMetadata.groupMetadata,
-        userName: username,
-      };
       return this.identifierStorage.updateIdentifierMetadata(identifier, {
-        groupMetadata,
+        groupUsername: username,
+        groupMetadata: undefined,
       });
     }
 
@@ -639,7 +636,7 @@ class IdentifierService extends AgentService {
 
     const groupMetadata: GroupMetadata = {
       ...identifierMetadata.groupMetadata,
-      userName: username,
+      proposedUsername: username,
     };
     return this.identifierStorage.updateIdentifierMetadata(identifier, {
       groupMetadata,

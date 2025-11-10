@@ -79,7 +79,7 @@ const initiatorGroupProfile = {
     groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
     groupCreated: false,
     groupInitiator: true,
-    userName: "Initiator",
+    proposedUsername: "Initiator",
   },
 };
 
@@ -89,7 +89,7 @@ const memberGroupProfile = {
     groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
     groupCreated: false,
     groupInitiator: false,
-    userName: "Initiator",
+    proposedUsername: "Initiator",
   },
 };
 jest.mock("react-router-dom", () => ({
@@ -135,7 +135,7 @@ describe("Pending group", () => {
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: false,
-          userName: "Duke",
+          proposedUsername: "Duke",
         },
         isOnline: true,
       },
@@ -266,7 +266,7 @@ describe("Pending group", () => {
           time: Date.now(),
           passcodeIsSet: true,
           passwordIsSet: false,
-          userName: "Duke",
+          proposedUsername: "Duke",
         },
         isOnline: true,
       },
@@ -300,7 +300,7 @@ describe("Pending group", () => {
               groupId: "0AC8fs5EqOSKRNgjimwxdokY",
               groupInitiator: false,
               groupCreated: false,
-              userName: "QALZ",
+              proposedUsername: "QALZ",
               initiatorName: "ALZM",
             },
           },
