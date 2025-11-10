@@ -5,6 +5,8 @@ import { Agent } from "../agent";
 import { ConfigurationService } from "../../configuration";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { CredentialStatus } from "./credentialService.types";
+import { CredentialMetadataRecord } from "../records/credentialMetadataRecord";
+import { IdentifierType } from "./identifier.types";
 import { EventTypes } from "../event.types";
 import {
   applyForPresentingExnMessage,
@@ -50,7 +52,6 @@ import { MultiSigRoute } from "./multiSig.types";
 import { NotificationRecord } from "../records";
 import { StorageMessage } from "../../storage/storage.types";
 import { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
-import { IdentifierType } from "./identifier.types";
 
 const notificationStorage = jest.mocked({
   open: jest.fn(),
@@ -351,9 +352,14 @@ describe("Receive individual ACDC actions", () => {
       id: "identifierId",
     });
     schemaGetMock.mockResolvedValue(QVISchema);
-    credentialStorage.getCredentialMetadata = jest.fn().mockResolvedValue({
-      id: "id",
-    });
+    credentialStorage.getCredentialMetadata = jest.fn().mockResolvedValue(
+      new CredentialMetadataRecord({
+        ...credentialRecordProps,
+        identifierId: "identifierId",
+        identifierType: IdentifierType.Individual,
+        createdAt: new Date(credentialRecordProps.issuanceDate),
+      })
+    );
     eventEmitter.emit = jest.fn();
     saveOperationPendingMock.mockResolvedValue({
       id: "opName",
@@ -385,12 +391,16 @@ describe("Receive individual ACDC actions", () => {
     expect(eventEmitter.emit).toHaveBeenCalledWith({
       type: EventTypes.AcdcStateChanged,
       payload: {
-        credential: {
-          ...credentialRecordProps,
+        credential: expect.objectContaining({
+          id: credentialRecordProps.id,
+          status: CredentialStatus.PENDING,
+          credentialType: credentialRecordProps.credentialType,
+          issuanceDate: credentialRecordProps.issuanceDate,
           identifierId: "identifierId",
           identifierType: "individual",
-          isArchived: undefined,
-        },
+          schema: credentialRecordProps.schema,
+          connectionId: credentialRecordProps.connectionId,
+        }),
         status: CredentialStatus.PENDING,
       },
     });
@@ -473,7 +483,11 @@ describe("Receive individual ACDC actions", () => {
       identifierType: "individual",
       createdAt: new Date(credentialRecordProps.issuanceDate),
     });
-    expect(eventEmitter.emit).not.toBeCalled();
+    expect(eventEmitter.emit).toHaveBeenCalledTimes(1);
+    const emittedEvent = (eventEmitter.emit as jest.Mock).mock.calls[0][0];
+    expect(emittedEvent.type).toBe(EventTypes.AcdcStateChanged);
+    expect(emittedEvent.payload.status).toBe(CredentialStatus.PENDING);
+    expect(emittedEvent.payload.credential?.id).toBeDefined();
     expect(ipexAdmitMock).toBeCalledWith({
       datetime: expect.any(String),
       message: "",
