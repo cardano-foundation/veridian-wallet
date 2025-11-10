@@ -1,95 +1,77 @@
-.verify-recovery-seed-phrase {
-  .page-header {
-    ion-toolbar {
-      --background: transparent;
+.recovery-seed-phrase-module {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: calc(100vh - (4.5rem + var(--ion-safe-area-top)));
+
+  .paragraph-top {
+    padding-inline: 1rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .suggestions-feature {
+    .suggest-error {
+      font-size: 1rem;
+      line-height: 1.115rem;
+      color: var(--ion-color-neutral-800);
+      text-align: center;
+      font-weight: 400;
+    }
+
+    .suggestions-title {
+      margin: 1.5rem 0 0.75rem;
+      padding-left: 0.75rem;
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 1.5rem;
+    }
+
+    .seed-phrase-module {
+      background: var(--ion-color-neutral-200);
+      border: none;
     }
   }
 
-  .scrollable-page-content {
-    .title {
-      text-align: center;
-      margin: 0.75rem;
+  .page-footer {
+    margin-top: auto !important;
+  }
+
+  .clear-button {
+    display: flex;
+    height: 2.5rem;
+    width: fit-content;
+    margin: 1.25rem auto 1rem;
+
+    &::part(native) {
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem 0.5rem 0.75rem;
     }
 
-    .paragraph-top {
-      padding-inline: 1rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .content-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: calc(100vh - (4.5rem + var(--ion-safe-area-top)));
-
-      .suggest-error {
-        font-size: 1rem;
-        line-height: 1.115rem;
-        color: var(--ion-color-neutral-800);
-        text-align: center;
-        font-weight: 400;
-      }
-
-      .suggestion-title {
-        margin: 1.5rem 0 0.75rem;
-        font-size: 1rem;
-        font-weight: 600;
-        line-height: 1.5rem;
-      }
-    }
-
-    .seed-phrase-module:nth-of-type(1) {
-      background: var(--ion-color-neutral-200);
-    }
-
-    .seed-phrase-module:nth-of-type(2) {
-      border: none;
-    }
-
-    .page-footer {
-      margin-top: auto !important;
-    }
-
-    .clear-button {
-      display: flex;
-      height: auto;
-      width: fit-content;
-      margin: 1.25rem auto 1rem;
-
-      &::part(native) {
-        padding: 0.5rem 1rem;
-      }
-
-      ion-icon {
-        width: 1.5rem;
-        height: 1.5rem;
-      }
+    ion-icon {
+      width: 1.5rem;
+      height: 1.5rem;
     }
   }
 
   @media screen and (min-width: 250px) and (max-width: 370px) {
-    &.scrollable-page-layout {
-      padding: 0 0.9rem;
+    .paragraph-top {
+      margin: 0.2rem 0;
+      padding-inline: 0.5rem;
+    }
 
-      .scrollable-page-content {
-        & > * {
-          margin: 0;
-        }
+    .suggestions-feature .suggestions-title {
+      margin: 1.2rem 0 0.5rem;
+      padding-left: 0.5rem;
+      font-size: 0.8rem;
+    }
 
-        .clear-button {
-          margin: 0.75rem auto;
-        }
+    .clear-button {
+      margin: 0.75rem auto;
+    }
 
-        & > .paragraph-top {
-          margin: 0.2rem 0;
-          padding-inline: 0.5rem;
-        }
-
-        .page-footer {
-          margin-bottom: 0.5rem;
-        }
-      }
+    .page-footer {
+      margin-bottom: 0.5rem;
     }
   }
 }
