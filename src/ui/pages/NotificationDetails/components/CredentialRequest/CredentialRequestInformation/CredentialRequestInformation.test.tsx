@@ -10,7 +10,6 @@ import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
 import { filteredCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
 import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
 import { profileCacheFixData } from "../../../../../__fixtures__/storeDataFix";
-import { OperationType } from "../../../../../globals/types";
 import { makeTestStore } from "../../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../../utils/passcodeFiller";
 import { CredentialRequestInformation } from "./CredentialRequestInformation";
