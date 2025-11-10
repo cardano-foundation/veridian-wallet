@@ -278,6 +278,10 @@ class CredentialService extends AgentService {
       throw new Error(CredentialService.CREDENTIAL_MISSING_METADATA_ERROR_MSG);
     }
 
+    // @TODO: The credential will only become available after the IPEX ADMIT has completed for a valid ACDC.
+    // It may never complete in cases like the GRANT message containing an invalid ACDC,
+    // so we should re-evaluate how to make this more robust in KERIA.
+    // For now `ensureCredentialAvailable` will make sure it stays in pending, which is OK for now.
     if (status === CredentialStatus.CONFIRMED) {
       await this.ensureCredentialAvailable(metadata.id);
     }
