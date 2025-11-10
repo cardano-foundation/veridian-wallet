@@ -28,6 +28,10 @@ class CredentialService extends AgentService {
   static readonly CREDENTIAL_NOT_ARCHIVED = "Credential was not archived";
   static readonly CREDENTIAL_NOT_FOUND =
     "Credential with given SAID not found on KERIA";
+  static readonly CREDENTIAL_NOT_READY_ON_KERIA =
+    "Credential not yet available on KERIA";
+  private static readonly CREDENTIAL_FETCH_MAX_RETRIES = 3;
+  private static readonly CREDENTIAL_FETCH_RETRY_DELAY_MS = 2000;
 
   protected readonly credentialStorage: CredentialStorage;
   protected readonly notificationStorage!: NotificationStorage;
@@ -274,6 +278,10 @@ class CredentialService extends AgentService {
       throw new Error(CredentialService.CREDENTIAL_MISSING_METADATA_ERROR_MSG);
     }
 
+    if (status === CredentialStatus.CONFIRMED) {
+      await this.ensureCredentialAvailable(metadata.id);
+    }
+
     metadata.status = status;
     await this.credentialStorage.updateCredentialMetadata(
       metadata.id,
@@ -287,6 +295,40 @@ class CredentialService extends AgentService {
         credential: getCredentialShortDetails(metadata),
       },
     });
+  }
+
+  private async ensureCredentialAvailable(credentialId: string): Promise<void> {
+    let lastStatusMessage = "";
+    for (
+      let attempt = 1;
+      attempt <= CredentialService.CREDENTIAL_FETCH_MAX_RETRIES;
+      attempt++
+    ) {
+      try {
+        await this.props.signifyClient.credentials().get(credentialId);
+        return;
+      } catch (error) {
+        if (error instanceof Error) {
+          const statusMessage = error.message.split(" - ")[1] ?? "";
+          if (/^(404|5\d{2})/i.test(statusMessage)) {
+            lastStatusMessage = statusMessage;
+            if (attempt < CredentialService.CREDENTIAL_FETCH_MAX_RETRIES) {
+              await new Promise((resolve) =>
+                setTimeout(
+                  resolve,
+                  CredentialService.CREDENTIAL_FETCH_RETRY_DELAY_MS
+                )
+              );
+              continue;
+            }
+            throw new Error(
+              `${CredentialService.CREDENTIAL_NOT_READY_ON_KERIA} (${lastStatusMessage})`
+            );
+          }
+        }
+        throw error;
+      }
+    }
   }
 }
 

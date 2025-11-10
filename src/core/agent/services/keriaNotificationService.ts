@@ -1363,21 +1363,36 @@ class KeriaNotificationService extends AgentService {
               });
             }
 
-            await this.credentialService
-              .markAcdc(credentialId, CredentialStatus.CONFIRMED)
-              .catch((error) => {
-                // In case user deleted pending credential in UI
+            try {
+              await this.credentialService.markAcdc(
+                credentialId,
+                CredentialStatus.CONFIRMED
+              );
+            } catch (error) {
+              if (error instanceof Error) {
                 if (
-                  !(
-                    error instanceof Error &&
-                    error.message.startsWith(
-                      CredentialService.CREDENTIAL_MISSING_METADATA_ERROR_MSG
-                    )
+                  error.message.startsWith(
+                    CredentialService.CREDENTIAL_NOT_READY_ON_KERIA
                   )
                 ) {
+                  return;
+                }
+
+                if (
+                  error.message.startsWith(
+                    CredentialService.CREDENTIAL_MISSING_METADATA_ERROR_MSG
+                  )
+                ) {
+                  // Credential metadata was removed locally (e.g. user deleted pending credential)
+                  // Continue processing to clean up notifications/history.
+                  // eslint-disable-next-line no-empty
+                } else {
                   throw error;
                 }
-              });
+              } else {
+                throw error;
+              }
+            }
 
             await this.ipexCommunications.createLinkedIpexMessageRecord(
               grantExchange,
