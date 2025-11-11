@@ -161,7 +161,6 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
 }));
 
 const openSettingMock = jest.fn(() => Promise.resolve(true));
-const deleteAccount = jest.fn();
 jest.mock("capacitor-native-settings", () => ({
   NativeSettings: {
     open: jest.fn(),
@@ -182,7 +181,7 @@ jest.mock("../../../core/agent/agent", () => ({
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
       },
-      deleteAccount: () => deleteAccount(),
+      deleteWallet: jest.fn(),
       getMnemonic: jest.fn().mockResolvedValue("some test mnemonic"),
     },
   },
@@ -679,7 +678,7 @@ describe("Settings page", () => {
     await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(deleteAccount).toBeCalled();
+      expect(Agent.agent.deleteWallet).toBeCalled();
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.DELETE_ACCOUNT_SUCCESS)
       );

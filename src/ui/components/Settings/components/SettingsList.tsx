@@ -381,12 +381,12 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         isOpen={openDeleteAlert}
         setIsOpen={setOpenDeleteAlert}
         dataTestId="delete-account-alert"
-        headerText={i18n.t("settings.sections.deleteaccount.alert.title")}
+        headerText={i18n.t("settings.sections.deletewallet.alert.title")}
         confirmButtonText={`${i18n.t(
-          "settings.sections.deleteaccount.alert.confirm"
+          "settings.sections.deletewallet.alert.confirm"
         )}`}
         cancelButtonText={`${i18n.t(
-          "settings.sections.deleteaccount.alert.cancel"
+          "settings.sections.deletewallet.alert.cancel"
         )}`}
         actionConfirm={openVerify}
         actionCancel={closeDeleteAlert}
