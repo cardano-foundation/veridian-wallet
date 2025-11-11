@@ -267,6 +267,7 @@ class CredentialService extends AgentService {
     }
   }
 
+  @OnlineOnly
   async markAcdc(
     credentialId: string,
     status: CredentialStatus.CONFIRMED | CredentialStatus.REVOKED
@@ -314,7 +315,7 @@ class CredentialService extends AgentService {
       } catch (error) {
         if (error instanceof Error) {
           const statusMessage = error.message.split(" - ")[1] ?? "";
-          if (/^(404|5\d{2})/i.test(statusMessage)) {
+          if (/^404/i.test(statusMessage)) {
             lastStatusMessage = statusMessage;
             if (attempt < CredentialService.CREDENTIAL_FETCH_MAX_RETRIES) {
               await new Promise((resolve) =>
