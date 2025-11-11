@@ -713,37 +713,49 @@ const AppWrapper = (props: { children: ReactNode }) => {
   };
 
   const initApp = async () => {
-    await Agent.agent.setupLocalDependencies();
+    const agent = Agent.agent;
 
-    // Keystore wiped after re-installs so iOS is consistent with Android.
-    const initState = await Agent.agent.basicStorage.findById(
-      MiscRecordId.APP_ALREADY_INIT
-    );
+    if (!agent.dependenciesInitialized) {
+      await agent.setupLocalDependencies();
+      // Keystore wiped after re-installs so iOS is consistent with Android.
+      const initState = await agent.basicStorage.findById(
+        MiscRecordId.APP_ALREADY_INIT
+      );
 
-    if (!initState) {
-      await SecureStorage.wipe();
-      const platforms = (await Device.getInfo()).platform;
-      if (platforms.includes("ios") || platforms.includes("android")) {
-        await NativeBiometric.deleteCredentials({
-          server: BIOMETRIC_SERVER_KEY,
-        });
+      if (!initState) {
+        await SecureStorage.wipe();
+        const platforms = (await Device.getInfo()).platform;
+        if (platforms.includes("ios") || platforms.includes("android")) {
+          await NativeBiometric.deleteCredentials({
+            server: BIOMETRIC_SERVER_KEY,
+          });
+        }
       }
+
+      // This will skip the onboarding screen with dev mode.
+      if (process.env.DEV_SKIP_ONBOARDING === "true") {
+        await agent.devPreload();
+      }
+      await loadCacheBasicStorage();
+      agent.dependenciesInitialized = true;
     }
 
-    // This will skip the onboarding screen with dev mode.
-    if (process.env.DEV_SKIP_ONBOARDING === "true") {
-      await Agent.agent.devPreload();
+    if (!agent.eventListenersSetup) {
+      setupEventServiceCallbacks();
+      agent.eventListenersSetup = true;
     }
 
-    const { keriaConnectUrlRecord } = await loadCacheBasicStorage();
+    if (!agent.isPolling) {
+      // Begin background polling of KERIA or local DB items
+      // If we are still onboarding or in offline mode, won't call KERIA until online
+      agent.keriaNotifications.pollNotifications();
+      agent.keriaNotifications.pollLongOperations();
+      agent.isPolling = true;
+    }
 
-    // Ensure online/offline callback setup before connecting to KERIA
-    setupEventServiceCallbacks();
-
-    // Begin background polling of KERIA or local DB items
-    // If we are still onboarding or in offline mode, won't call KERIA until online
-    Agent.agent.keriaNotifications.pollNotifications();
-    Agent.agent.keriaNotifications.pollLongOperations();
+    const keriaConnectUrlRecord = await Agent.agent.basicStorage.findById(
+      MiscRecordId.KERIA_CONNECT_URL
+    );
 
     dispatch(
       setInitializationPhase(

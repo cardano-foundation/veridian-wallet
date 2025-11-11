@@ -96,6 +96,9 @@ class Agent {
   private authService!: AuthService;
 
   static isOnline = false;
+  public dependenciesInitialized = false;
+  public eventListenersSetup = false;
+  public isPolling = false;
 
   get identifiers() {
     if (!this.identifierService) {
