@@ -4166,7 +4166,7 @@ describe("Long running operation tracker", () => {
 
     expect(operationsGetMock).not.toBeCalled();
     expect(setTimeout).toHaveBeenCalledWith(
-      keriaNotificationService.pollLongOperations,
+      expect.any(Function),
       KeriaNotificationService.POLL_KERIA_INTERVAL
     );
   });
@@ -4227,9 +4227,107 @@ describe("Long running operation tracker", () => {
 
     expect(basicStorage.createOrUpdateBasicRecord).toBeCalledTimes(2);
     expect(setTimeout).toHaveBeenCalledWith(
-      keriaNotificationService.pollNotifications,
+      expect.any(Function),
       KeriaNotificationService.POLL_KERIA_INTERVAL
     );
+  });
+
+  test("Should preserve this context when restarting pollNotifications after error", async () => {
+    jest.spyOn(console, "error").mockImplementation();
+
+    let callCount = 0;
+    let capturedCallback: any = null;
+
+    // Mock setTimeout to capture the callback
+    const originalSetTimeout = global.setTimeout;
+    global.setTimeout = jest.fn((callback: any, delay: number) => {
+      if (
+        delay === KeriaNotificationService.POLL_KERIA_INTERVAL &&
+        callCount === 1
+      ) {
+        capturedCallback = callback;
+        return 123 as any;
+      }
+      return originalSetTimeout(callback, 0) as any;
+    }) as any;
+
+    jest
+      .spyOn(keriaNotificationService as any, "_pollNotifications")
+      .mockImplementation(async () => {
+        callCount++;
+        if (callCount === 1) {
+          throw new Error("Test error");
+        }
+        // On second call, verify we can access instance methods (not undefined)
+        expect(typeof keriaNotificationService.processNotification).toBe(
+          "function"
+        );
+        expect(typeof keriaNotificationService.processOperation).toBe(
+          "function"
+        );
+      });
+
+    await keriaNotificationService.pollNotifications();
+
+    expect(callCount).toBe(1);
+    expect(capturedCallback).not.toBeNull();
+
+    // Execute the captured callback to verify it has correct context
+    if (capturedCallback) {
+      await capturedCallback();
+      expect(callCount).toBe(2);
+    }
+
+    global.setTimeout = originalSetTimeout;
+  });
+
+  test("Should preserve this context when restarting pollLongOperations after error", async () => {
+    jest.spyOn(console, "error").mockImplementation();
+
+    let callCount = 0;
+    let capturedCallback: any = null;
+
+    // Mock setTimeout to capture the callback
+    const originalSetTimeout = global.setTimeout;
+    global.setTimeout = jest.fn((callback: any, delay: number) => {
+      if (
+        delay === KeriaNotificationService.POLL_KERIA_INTERVAL &&
+        callCount === 1
+      ) {
+        capturedCallback = callback;
+        return 123 as any;
+      }
+      return originalSetTimeout(callback, 0) as any;
+    }) as any;
+
+    jest
+      .spyOn(keriaNotificationService as any, "_pollLongOperations")
+      .mockImplementation(async () => {
+        callCount++;
+        if (callCount === 1) {
+          throw new Error("Test error");
+        }
+        // On second call, verify we can access instance methods (not undefined)
+        expect(typeof keriaNotificationService.processNotification).toBe(
+          "function"
+        );
+        expect(typeof keriaNotificationService.processOperation).toBe(
+          "function"
+        );
+      });
+
+    await keriaNotificationService.pollLongOperations();
+
+    expect(callCount).toBe(1);
+    expect(capturedCallback).not.toBeNull();
+
+    // Execute the captured callback to verify it has correct context
+    if (capturedCallback) {
+      await capturedCallback();
+      expect(callCount).toBe(2);
+    }
+
+    global.setTimeout = originalSetTimeout;
   });
 
   test("Should register callback for NotificationAdded event", () => {
