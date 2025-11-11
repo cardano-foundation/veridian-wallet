@@ -4233,10 +4233,12 @@ describe("Long running operation tracker", () => {
   });
 
   test("Should preserve this context when restarting pollNotifications after error", async () => {
+    /* eslint-disable no-console */
     jest.spyOn(console, "error").mockImplementation();
 
     let callCount = 0;
     let capturedCallback: any = null;
+    let contextValid = false;
 
     // Mock setTimeout to capture the callback
     const originalSetTimeout = global.setTimeout;
@@ -4258,34 +4260,39 @@ describe("Long running operation tracker", () => {
         if (callCount === 1) {
           throw new Error("Test error");
         }
-        // On second call, verify we can access instance methods (not undefined)
-        expect(typeof keriaNotificationService.processNotification).toBe(
-          "function"
-        );
-        expect(typeof keriaNotificationService.processOperation).toBe(
-          "function"
-        );
+        // On second call, check if we can access instance methods (verify 'this' context)
+        contextValid =
+          typeof keriaNotificationService.processNotification === "function" &&
+          typeof keriaNotificationService.processOperation === "function";
       });
 
     await keriaNotificationService.pollNotifications();
 
     expect(callCount).toBe(1);
+    expect(console.error).toHaveBeenCalledWith(
+      "Error at pollNotifications",
+      expect.any(Error)
+    );
     expect(capturedCallback).not.toBeNull();
 
     // Execute the captured callback to verify it has correct context
     if (capturedCallback) {
       await capturedCallback();
       expect(callCount).toBe(2);
+      expect(contextValid).toBe(true);
     }
 
     global.setTimeout = originalSetTimeout;
+    /* eslint-enable no-console */
   });
 
   test("Should preserve this context when restarting pollLongOperations after error", async () => {
+    /* eslint-disable no-console */
     jest.spyOn(console, "error").mockImplementation();
 
     let callCount = 0;
     let capturedCallback: any = null;
+    let contextValid = false;
 
     // Mock setTimeout to capture the callback
     const originalSetTimeout = global.setTimeout;
@@ -4307,27 +4314,30 @@ describe("Long running operation tracker", () => {
         if (callCount === 1) {
           throw new Error("Test error");
         }
-        // On second call, verify we can access instance methods (not undefined)
-        expect(typeof keriaNotificationService.processNotification).toBe(
-          "function"
-        );
-        expect(typeof keriaNotificationService.processOperation).toBe(
-          "function"
-        );
+        // On second call, check if we can access instance methods (verify 'this' context)
+        contextValid =
+          typeof keriaNotificationService.processNotification === "function" &&
+          typeof keriaNotificationService.processOperation === "function";
       });
 
     await keriaNotificationService.pollLongOperations();
 
     expect(callCount).toBe(1);
+    expect(console.error).toHaveBeenCalledWith(
+      "Error at pollLongOperations",
+      expect.any(Error)
+    );
     expect(capturedCallback).not.toBeNull();
 
     // Execute the captured callback to verify it has correct context
     if (capturedCallback) {
       await capturedCallback();
       expect(callCount).toBe(2);
+      expect(contextValid).toBe(true);
     }
 
     global.setTimeout = originalSetTimeout;
+    /* eslint-enable no-console */
   });
 
   test("Should register callback for NotificationAdded event", () => {
