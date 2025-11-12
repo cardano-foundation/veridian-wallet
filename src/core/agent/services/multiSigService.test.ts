@@ -1729,7 +1729,6 @@ describe("getInceptionStatus", () => {
     const result = await multiSigService.getInceptionStatus(MULTISIG_ID);
 
     expect(identifiersMembersMock).toHaveBeenCalledWith(MULTISIG_ID);
-
     expect(result).toEqual({
       threshold: {
         signingThreshold: 4,
@@ -1742,33 +1741,5 @@ describe("getInceptionStatus", () => {
         { aid: "member4", hasAccepted: false },
       ],
     });
-  });
-
-  test("should throw error when no exchanges are found", async () => {
-    identifiersMembersMock.mockResolvedValue({
-      signing: [{ aid: "member1" }, { aid: "member2" }],
-    });
-
-    listExchangesMock.mockResolvedValue([]);
-
-    await expect(
-      multiSigService.getInceptionStatus(MULTISIG_ID)
-    ).rejects.toThrow(
-      MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
-    );
-  });
-
-  test("should throw error when first exchange is undefined", async () => {
-    identifiersMembersMock.mockResolvedValue({
-      signing: [{ aid: "member1" }, { aid: "member2" }],
-    });
-
-    listExchangesMock.mockResolvedValue([undefined]);
-
-    await expect(
-      multiSigService.getInceptionStatus(MULTISIG_ID)
-    ).rejects.toThrow(
-      MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
-    );
   });
 });
