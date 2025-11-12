@@ -23,6 +23,7 @@ import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
 import { getCurrentProfile } from "../store/reducers/profileCache";
+import { PUSH_NOTIFICATION_EVENT_LISTENER_TYPE } from "../native/pushNotifications/notificationService";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
@@ -50,13 +51,13 @@ const Routes = () => {
     };
 
     window.addEventListener(
-      "notificationNavigation",
+      PUSH_NOTIFICATION_EVENT_LISTENER_TYPE,
       handleNotificationNavigation
     );
 
     return () => {
       window.removeEventListener(
-        "notificationNavigation",
+        PUSH_NOTIFICATION_EVENT_LISTENER_TYPE,
         handleNotificationNavigation
       );
     };

@@ -11,16 +11,17 @@ const PRIMARY_COLOR =
   getComputedStyle(document.documentElement)
     .getPropertyValue("--ion-color-primary-700")
     .trim() || "#0056b3";
-
+const PUSH_NOTIFICATIONS_ANDROID_CHANNEL_ID = "veridian-notifications";
+const PUSH_NOTIFICATION_EVENT_LISTENER_TYPE = "notificationNavigation";
 const NOTIFICATION_DEFAULTS = {
   largeIcon: "res://drawable/notification_icon",
   smallIcon: "res://drawable/notification_small",
   iconColor: PRIMARY_COLOR,
-  channelId: "veridian-notifications",
+  channelId: PUSH_NOTIFICATIONS_ANDROID_CHANNEL_ID,
 } as const;
 
 const CHANNEL_CONFIG = {
-  id: "veridian-notifications",
+  id: PUSH_NOTIFICATIONS_ANDROID_CHANNEL_ID,
   name: "Veridian Notifications",
   description: "Notifications for credential and connection updates",
   sound: "default" as const,
@@ -77,7 +78,7 @@ class NotificationService {
   private navigateToPath(path: string): void {
     window.history.pushState(null, "", path);
     window.dispatchEvent(
-      new CustomEvent("notificationNavigation", {
+      new CustomEvent(PUSH_NOTIFICATION_EVENT_LISTENER_TYPE, {
         detail: { path },
       })
     );
@@ -146,7 +147,7 @@ class NotificationService {
   private async handleNotificationTap(
     notification: LocalNotificationSchema
   ): Promise<void> {
-    if (!notification.extra) {
+    if (!notification.extra || typeof notification.extra.profile !== "string") {
       // Keeping this for debugging purposes
       showError("Notification missing extra data:", notification);
       return;
@@ -163,11 +164,6 @@ class NotificationService {
     this.navigateToPath(TabsRoutePath.NOTIFICATIONS);
   }
 
-  async getDeliveredNotifications(): Promise<LocalNotificationSchema[]> {
-    const result = await LocalNotifications.getDeliveredNotifications();
-    return result.notifications;
-  }
-
   // TODO: Implement permissions
   async arePermissionsGranted(): Promise<boolean> {
     const result = await LocalNotifications.checkPermissions();
@@ -178,4 +174,4 @@ class NotificationService {
 }
 
 export const notificationService = new NotificationService();
-export { NotificationService };
+export { NotificationService, PUSH_NOTIFICATION_EVENT_LISTENER_TYPE };

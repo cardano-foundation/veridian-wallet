@@ -174,6 +174,7 @@ describe("NotificationService", () => {
       const notification = {
         id: 1,
         extra: {
+          profile: "profile-abc",
           profileId: "profile-abc",
           notificationId: "notif-123",
         },
@@ -196,6 +197,7 @@ describe("NotificationService", () => {
       const notification = {
         id: 1,
         extra: {
+          profile: "profile-abc",
           profileId: "profile-abc",
           notificationId: "notif-123",
         },
@@ -214,6 +216,7 @@ describe("NotificationService", () => {
       const notification = {
         id: 1,
         extra: {
+          profile: "profile-abc",
           profileId: "profile-abc",
           notificationId: "notif-123",
         },
@@ -224,25 +227,6 @@ describe("NotificationService", () => {
       expect((notificationService as any).pendingNotification).toEqual(
         notification
       );
-    });
-  });
-
-  describe("getDeliveredNotifications", () => {
-    test("should return delivered notifications", async () => {
-      const mockNotifications = [
-        { id: 1, extra: {} },
-        { id: 2, extra: {} },
-      ];
-      (
-        LocalNotifications.getDeliveredNotifications as jest.Mock
-      ).mockResolvedValue({
-        notifications: mockNotifications,
-      });
-
-      const result = await notificationService.getDeliveredNotifications();
-
-      expect(result).toEqual(mockNotifications);
-      expect(LocalNotifications.getDeliveredNotifications).toHaveBeenCalled();
     });
   });
 
@@ -281,6 +265,7 @@ describe("NotificationService", () => {
       const notification = {
         id: 1,
         extra: {
+          profile: "profile-abc",
           profileId: "profile-abc",
           notificationId: "notif-123",
         },
