@@ -1,121 +1,169 @@
-import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+import {
+  Filesystem,
+  Directory,
+  Encoding,
+  FileInfo,
+  ReaddirResult,
+} from "@capacitor/filesystem";
 import { ILogger, ParsedLogEntry } from "../ILogger";
 import { loggingConfig } from "../LoggingConfig";
 
 export class LocalFileStrategy implements ILogger {
-  private logFile = loggingConfig.offlineLogFileName;
+  private lastCleanupDate: string | null = null;
+  private readonly logFilePrefix = "offline-logs-";
+  private readonly logFileSuffix = ".txt";
 
   constructor() {
-    // Log the file name
     // eslint-disable-next-line no-console
-    console.debug(`LocalFileStrategy initialized. Log file name: ${this.logFile}`);
-
-    // Log the full path using console.info
-    Filesystem.getUri({
-      directory: Directory.Data,
-      path: this.logFile,
-    }).then((result) => {
-      // eslint-disable-next-line no-console
-      console.info(`Full path to local log file: ${result.uri}`);
-    }).catch((e) => {
-      // eslint-disable-next-line no-console
-      console.error(`Error getting URI for log file:`, e);
-    });
-
-    // To view the file content: 
-    // - iOS: Open Terminal and run `cat "<result.uri>"` (replace with actual URI logged above)
-    // - Android: Use Android Studio > View > Tool Windows > Device File Explorer > /data/data/org.cardanofoundation.idw/files/local-logs.txt
+    console.debug(
+      `LocalFileStrategy initialized. Log retention: ${loggingConfig.logRetentionDays} days.`
+    );
   }
 
-  async log(logEntry: ParsedLogEntry) {
-    // This implementation assumes `loggingConfig.maxLogFileSize` is defined in bytes.
+  private getLogFileName(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${this.logFilePrefix}${year}-${month}-${day}${this.logFileSuffix}`;
+  }
 
-    const newEntryString = JSON.stringify(logEntry) + "\n";
-    // Using string length as a proxy for byte size in UTF8 is a reasonable approximation.
-    const newEntrySize = newEntryString.length;
-
-    let currentSize = 0;
+  private async cleanupOldLogFiles(): Promise<void> {
     try {
-      const fileStat = await Filesystem.stat({
-        path: this.logFile,
-        directory: Directory.Data
+      const result: ReaddirResult = await Filesystem.readdir({
+        path: "",
+        directory: Directory.Data,
       });
-      currentSize = fileStat.size;
+
+      const logFiles = result.files.filter((file: FileInfo | string) =>
+        (typeof file === "string" ? file : file.name).startsWith(
+          this.logFilePrefix
+        )
+      );
+
+      const retentionDate = new Date();
+      retentionDate.setDate(
+        retentionDate.getDate() - (loggingConfig.logRetentionDays - 1)
+      );
+      // Set time to beginning of the day for accurate comparison
+      retentionDate.setHours(0, 0, 0, 0);
+
+      for (const file of logFiles) {
+        const fileName = typeof file === "string" ? file : file.name;
+        const datePart = fileName.substring(
+          this.logFilePrefix.length,
+          fileName.length - this.logFileSuffix.length
+        );
+        const fileDate = new Date(datePart);
+
+        if (fileDate < retentionDate) {
+          await Filesystem.deleteFile({
+            path: fileName,
+            directory: Directory.Data,
+          });
+        }
+      }
     } catch (e) {
-      // File likely doesn't exist yet, which is fine. currentSize remains 0.
+      // eslint-disable-next-line no-console
+      console.error("Error during log file cleanup:", e);
+    }
+  }
+
+  async log(logEntry: ParsedLogEntry): Promise<void> {
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+
+    if (this.lastCleanupDate !== todayStr) {
+      await this.cleanupOldLogFiles();
+      this.lastCleanupDate = todayStr;
     }
 
-    // Check if rotation is needed
-    if (currentSize + newEntrySize <= loggingConfig.maxLogFileSize) {
-      // If not over the limit, just append and finish.
+    const logFileName = this.getLogFileName(today);
+    const newEntryString = JSON.stringify(logEntry) + "\n";
+
+    try {
       await Filesystem.appendFile({
-        path: this.logFile,
+        path: logFileName,
         data: newEntryString,
         directory: Directory.Data,
-        encoding: Encoding.UTF8
+        encoding: Encoding.UTF8,
       });
-      return;
+    } catch (e) {
+      // If append fails, it might be because the file doesn't exist. Try writing it.
+      // This is a fallback, as appendFile should create the file.
+      await Filesystem.writeFile({
+        path: logFileName,
+        data: newEntryString,
+        directory: Directory.Data,
+        encoding: Encoding.UTF8,
+      });
     }
-
-    // If limit is exceeded, perform precise rotation.
-    const bytesToFree = currentSize + newEntrySize - loggingConfig.maxLogFileSize;
-    const allLogs = await this.readLogs();
-
-    let freedBytes = 0;
-    let logsToRemoveCount = 0;
-
-    // Iterate through old logs to find how many to remove.
-    for (const oldLog of allLogs) {
-      if (freedBytes >= bytesToFree) {
-        break;
-      }
-      const oldLogString = JSON.stringify(oldLog) + "\n";
-      freedBytes += oldLogString.length; // Approximation
-      logsToRemoveCount++;
-    }
-
-    // Remove the oldest logs.
-    const remainingLogs = allLogs.slice(logsToRemoveCount);
-
-    // Add the new log.
-    remainingLogs.push(logEntry);
-
-    // Write the result back to the file.
-    await this.writeLogs(remainingLogs);
   }
 
-  async readLogs(): Promise<ParsedLogEntry[]> {
+  private async getAllLogFiles(): Promise<FileInfo[]> {
     try {
-      const file = await Filesystem.readFile({
-        path: this.logFile,
-        directory: Directory.Data
+      const result: ReaddirResult = await Filesystem.readdir({
+        path: "",
+        directory: Directory.Data,
       });
-      let fileContent = file.data;
-      if (typeof fileContent !== "string") {
-        fileContent = await (fileContent as Blob).text();
-      }
-      return fileContent.split("\n").filter(Boolean).map(line => JSON.parse(line) as ParsedLogEntry);
+
+      const fileInfos: FileInfo[] = result.files.map((f) =>
+        typeof f === "string"
+          ? {
+              name: f,
+              path: f,
+              size: 0,
+              ctime: 0,
+              mtime: 0,
+              uri: "",
+              type: "file",
+            }
+          : f
+      );
+
+      return fileInfos
+        .filter((file) => file.name.startsWith(this.logFilePrefix))
+        .sort((a, b) => a.name.localeCompare(b.name)); // Sort chronologically by name
     } catch {
       return [];
     }
   }
 
-  async clearLogs() {
-    await Filesystem.writeFile({
-      path: this.logFile,
-      data: "",
-      directory: Directory.Data,
-      encoding: Encoding.UTF8
-    });
+  async readLogs(): Promise<ParsedLogEntry[]> {
+    const logFiles = await this.getAllLogFiles();
+    let allLogs: ParsedLogEntry[] = [];
+
+    for (const fileInfo of logFiles) {
+      try {
+        const file = await Filesystem.readFile({
+          path: fileInfo.name,
+          directory: Directory.Data,
+          encoding: Encoding.UTF8,
+        });
+        const fileContent = file.data as string;
+        if (fileContent) {
+          const logsFromFile = fileContent
+            .split("\n")
+            .filter(Boolean)
+            .map((line) => JSON.parse(line) as ParsedLogEntry);
+          allLogs = allLogs.concat(logsFromFile);
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(`Error reading log file: ${fileInfo.name}`, e);
+      }
+    }
+    // Sort logs by timestamp to ensure chronological order
+    allLogs.sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
+    return allLogs;
   }
 
-  async writeLogs(logEntries: ParsedLogEntry[]) {
-    const data = logEntries.map(entry => JSON.stringify(entry)).join("\n") + (logEntries.length > 0 ? "\n" : "");
-    await Filesystem.writeFile({
-      path: this.logFile,
-      data: data,
-      directory: Directory.Data,
-      encoding: Encoding.UTF8
-    });
+  async clearLogs(): Promise<void> {
+    const logFiles = await this.getAllLogFiles();
+    for (const fileInfo of logFiles) {
+      await Filesystem.deleteFile({
+        path: fileInfo.name,
+        directory: Directory.Data,
+      });
+    }
   }
 }
