@@ -38,6 +38,7 @@ import {
   LinkedGroupInfo,
   EdgeSection,
   SubmitIPEXResult,
+  EdgeNode,
 } from "./ipexCommunicationService.types";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { MultiSigService } from "./multiSigService";
@@ -1279,28 +1280,30 @@ class IpexCommunicationService extends AgentService {
     const resolutions = [];
     for (const key of Object.keys(edgeSectionProperties)) {
       if (["d", "u", "o", "w"].includes(key)) continue;
-      const value = edgeSectionProperties[key];
 
-      const edgeProperties =
-        "oneOf" in value ? value.oneOf[1].properties : value.properties;
-
-      if (!("n" in edgeProperties)) {
-        throw new Error(
-          IpexCommunicationService.EDGE_GROUP_SCHEMA_RESOLUTION_UNSUPPORTED
-        );
-      }
-
-      if (!edgeProperties.s.const) {
-        throw new Error(IpexCommunicationService.MISSING_SUB_SCHEMA_REFERENCE);
-      }
-
-      resolutions.push(
-        this.recursiveSchemaResolve(schemaUrl, edgeProperties.s.const)
-      );
+      const edgeSchemaSaid = this.extractEdgeSchema(edgeSectionProperties[key]);
+      resolutions.push(this.recursiveSchemaResolve(schemaUrl, edgeSchemaSaid));
     }
 
     await Promise.all(resolutions);
     return schema;
+  }
+
+  private extractEdgeSchema(edge: EdgeNode): string {
+    const edgeProperties =
+      "oneOf" in edge ? edge.oneOf[1].properties : edge.properties;
+
+    if (!("n" in edgeProperties)) {
+      throw new Error(
+        IpexCommunicationService.EDGE_GROUP_SCHEMA_RESOLUTION_UNSUPPORTED
+      );
+    }
+
+    if (!edgeProperties.s.const) {
+      throw new Error(IpexCommunicationService.MISSING_SUB_SCHEMA_REFERENCE);
+    }
+
+    return edgeProperties.s.const;
   }
 }
 
