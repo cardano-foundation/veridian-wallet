@@ -147,7 +147,10 @@ class NotificationService {
   private async handleNotificationTap(
     notification: LocalNotificationSchema
   ): Promise<void> {
-    if (!notification.extra || typeof notification.extra.profile !== "string") {
+    if (
+      !notification.extra ||
+      typeof notification.extra.profileId !== "string"
+    ) {
       // Keeping this for debugging purposes
       showError("Notification missing extra data:", notification);
       return;

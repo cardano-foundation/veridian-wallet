@@ -174,7 +174,6 @@ describe("NotificationService", () => {
       const notification = {
         id: 1,
         extra: {
-          profile: "profile-abc",
           profileId: "profile-abc",
           notificationId: "notif-123",
         },
@@ -197,7 +196,6 @@ describe("NotificationService", () => {
       const notification = {
         id: 1,
         extra: {
-          profile: "profile-abc",
           profileId: "profile-abc",
           notificationId: "notif-123",
         },
@@ -216,7 +214,6 @@ describe("NotificationService", () => {
       const notification = {
         id: 1,
         extra: {
-          profile: "profile-abc",
           profileId: "profile-abc",
           notificationId: "notif-123",
         },
@@ -265,7 +262,6 @@ describe("NotificationService", () => {
       const notification = {
         id: 1,
         extra: {
-          profile: "profile-abc",
           profileId: "profile-abc",
           notificationId: "notif-123",
         },
