@@ -36,7 +36,7 @@ import {
 import {
   CredentialsMatchingApply,
   LinkedGroupInfo,
-  SchemaEdge,
+  EdgeSection,
   SubmitIPEXResult,
 } from "./ipexCommunicationService.types";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
@@ -70,6 +70,10 @@ class IpexCommunicationService extends AgentService {
   static readonly NO_CURRENT_IPEX_MSG_TO_JOIN =
     "Cannot join IPEX message as there is no current exn to join from the group leader";
   static readonly INVALID_HISTORY_TYPE = "Invalid history type";
+  static readonly EDGE_GROUP_SCHEMA_RESOLUTION_UNSUPPORTED =
+    "Recursive schema resolution for edge groups is not yet supported";
+  static readonly MISSING_SUB_SCHEMA_REFERENCE =
+    "Edge does not explicitly reference schema SAID of far node, which is currently unsupported";
 
   static readonly SCHEMA_SAID_ROME_DEMO =
     "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt";
@@ -620,8 +624,13 @@ class IpexCommunicationService extends AgentService {
 
     const schemaSaid = grantExn.exn.e.acdc.s;
 
-    const issuerOobi = (await this.connections.getConnectionById(connectionId))
-      .serviceEndpoints[0];
+    const issuerOobi = (
+      await this.connections.getConnectionById(
+        connectionId,
+        false,
+        grantExn.exn.rp
+      )
+    ).serviceEndpoints[0];
     const schema = await this.recursiveSchemaResolve(
       await this.getSchemaUrl(issuerOobi, connectionId),
       schemaSaid
@@ -1251,22 +1260,46 @@ class IpexCommunicationService extends AgentService {
     return `${schemaBase}/oobi/`;
   }
 
-  private async recursiveSchemaResolve(schemaUrl: string, schemaSaid: string) {
+  // Public method for ease of testing given many variations in schemas
+  async recursiveSchemaResolve(schemaUrl: string, schemaSaid: string) {
     await this.connections.resolveOobi(schemaUrl + schemaSaid, true);
 
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
-    const edgeBlock = schema.properties.e;
-    if (!edgeBlock) {
+    const edgeSection: EdgeSection | undefined = schema.properties.e;
+    if (!edgeSection) {
       return schema;
     }
 
-    const edges: Record<string, SchemaEdge> = edgeBlock.oneOf[1].properties;
-    for (const [key, value] of Object.entries(edges)) {
-      if (key === "d") continue;
+    // Edge block may be saidified
+    const edgeSectionProperties =
+      "oneOf" in edgeSection
+        ? edgeSection.oneOf[1].properties
+        : edgeSection.properties;
 
-      await this.recursiveSchemaResolve(schemaUrl, value.properties.s.const!); // @TODO - foconnor: This could be parallelized.
+    const resolutions = [];
+    for (const key of Object.keys(edgeSectionProperties)) {
+      if (["d", "u", "o", "w"].includes(key)) continue;
+      const value = edgeSectionProperties[key];
+
+      const edgeProperties =
+        "oneOf" in value ? value.oneOf[1].properties : value.properties;
+
+      if (!("n" in edgeProperties)) {
+        throw new Error(
+          IpexCommunicationService.EDGE_GROUP_SCHEMA_RESOLUTION_UNSUPPORTED
+        );
+      }
+
+      if (!edgeProperties.s.const) {
+        throw new Error(IpexCommunicationService.MISSING_SUB_SCHEMA_REFERENCE);
+      }
+
+      resolutions.push(
+        this.recursiveSchemaResolve(schemaUrl, edgeProperties.s.const)
+      );
     }
 
+    await Promise.all(resolutions);
     return schema;
   }
 }

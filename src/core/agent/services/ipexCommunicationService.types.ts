@@ -29,7 +29,7 @@ interface SubmitIPEXResult {
   exnSaid: string;
 }
 
-interface SchemaEdge {
+type EdgeNodeDetail = {
   description: string;
   type: string;
   properties: {
@@ -46,11 +46,48 @@ interface SchemaEdge {
   };
   additionalProperties: boolean;
   required: string[];
-}
+};
+
+type EdgeNode =
+  | EdgeNodeDetail
+  | {
+      oneOf: [{ description: string; type: string }, EdgeNodeDetail];
+    };
+
+type EdgeSectionDetail = {
+  description: string;
+  type: string;
+  required: string[];
+  properties: {
+    d?: {
+      description: string;
+      type: string;
+    };
+    u?: {
+      description: string;
+      type: string;
+    };
+    o?: {
+      description: string;
+      type: string;
+    };
+    w?: {
+      description: string;
+      type: string;
+    };
+  } & Record<Exclude<string, "d" | "u" | "o" | "w">, EdgeNode>;
+};
+
+type EdgeSection =
+  | EdgeSectionDetail
+  | {
+      oneOf: [{ description: string; type: string }, EdgeSectionDetail];
+    };
 
 export type {
   CredentialsMatchingApply,
   LinkedGroupInfo,
   SubmitIPEXResult,
-  SchemaEdge,
+  EdgeNode,
+  EdgeSection,
 };
