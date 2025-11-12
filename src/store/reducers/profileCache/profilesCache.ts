@@ -9,6 +9,8 @@ import { BasicRecord } from "../../../core/agent/records";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
+import { notificationService } from "../../../native/pushNotifications/notificationService";
+import { getNotificationDisplayTextForPush } from "../../../native/pushNotifications/notificationUtils";
 import { AppDispatch, RootState } from "../../index";
 import {
   DAppConnection,
@@ -16,6 +18,7 @@ import {
   Profile,
   ProfileCache,
 } from "./profilesCache.types";
+import { showError } from "../../../ui/utils/error";
 
 // Shared empty arrays — return these to keep selector return references stable
 const DefaultArrayValue = {
@@ -472,6 +475,48 @@ export const addGroupProfileAsync =
         content: { value: replaceHistories },
       })
     );
+  };
+
+export const handleNotificationReceived =
+  (notification: KeriaNotification) =>
+  async (_dispatch: AppDispatch, getState: () => RootState) => {
+    const state = getState();
+    const currentProfile = getCurrentProfile(state);
+    const currentProfileId = currentProfile?.identity.id;
+
+    if (!currentProfileId || notification.receivingPre === currentProfileId) {
+      return;
+    }
+
+    const targetProfile =
+      state.profilesCache.profiles[notification.receivingPre];
+    if (!targetProfile) {
+      return;
+    }
+
+    const notificationContext = {
+      connectionsCache: targetProfile.connections,
+      multisigConnectionsCache: targetProfile.multisigConnections,
+    };
+
+    const notificationBody = getNotificationDisplayTextForPush(
+      notification,
+      notificationContext
+    );
+
+    const profileDisplayName = targetProfile.identity.displayName;
+
+    try {
+      await notificationService.schedulePushNotification({
+        title: profileDisplayName,
+        body: notificationBody,
+        profileId: notification.receivingPre,
+        notificationId: notification.id,
+      });
+    } catch (error) {
+      // Keeping this for debugging purposes
+      showError("Failed to schedule push notification:", error);
+    }
   };
 
 export const {

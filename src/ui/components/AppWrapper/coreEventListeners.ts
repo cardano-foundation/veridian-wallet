@@ -17,6 +17,7 @@ import {
   addNotification,
   addOrUpdateProfileIdentity,
   deleteNotificationById,
+  handleNotificationReceived,
   updateOrAddConnectionCache,
   updateProfileCreationStatus,
 } from "../../../store/reducers/profileCache";
@@ -30,6 +31,7 @@ const notificationStateChanged = (
   switch (event.type) {
     case EventTypes.NotificationAdded:
       dispatch(addNotification(event.payload.note));
+      dispatch(handleNotificationReceived(event.payload.note));
       break;
     case EventTypes.NotificationRemoved:
       dispatch(deleteNotificationById(event.payload.id));

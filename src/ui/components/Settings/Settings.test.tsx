@@ -54,12 +54,31 @@ jest.mock("@capacitor/browser", () => ({
   },
 }));
 
-jest.mock("@capacitor/core", () => ({
-  Capacitor: {
-    isNativePlatform: jest.fn(() => true),
-    getPlatform: jest.fn(() => "web"),
-  },
-}));
+jest.mock("@capacitor/core", () => {
+  const actual = jest.requireActual("@capacitor/core");
+  return {
+    ...actual,
+    Capacitor: {
+      isNativePlatform: jest.fn(() => true),
+      getPlatform: jest.fn(() => "web"),
+    },
+    registerPlugin: jest.fn(() => ({
+      requestPermissions: jest.fn(() =>
+        Promise.resolve({ display: "granted" })
+      ),
+      schedule: jest.fn(() => Promise.resolve()),
+      addListener: jest.fn(() => Promise.resolve()),
+      removeAllListeners: jest.fn(() => Promise.resolve()),
+      cancel: jest.fn(() => Promise.resolve()),
+      getPending: jest.fn(() => Promise.resolve({ notifications: [] })),
+      getDeliveredNotifications: jest.fn(() =>
+        Promise.resolve({ notifications: [] })
+      ),
+      checkPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+      createChannel: jest.fn(() => Promise.resolve()),
+    })),
+  };
+});
 
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {

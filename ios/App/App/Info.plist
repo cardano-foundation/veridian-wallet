@@ -18,6 +18,17 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>org.cardanofoundation.idw</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>veridian</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -33,6 +44,8 @@
 	<string>The app enables the scanning of various barcodes.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>This app uses Face ID to secure your data and provide faster access.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>We will send you notifications, alerts, and important updates.</string>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
