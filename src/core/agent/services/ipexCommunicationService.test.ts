@@ -2620,7 +2620,12 @@ describe("IPEX communication service of agent", () => {
   });
 
   test("Can get acdc detail", async () => {
-    getExchangeMock.mockReturnValueOnce(grantForIssuanceExnMessage);
+    const grantWithOobiUrl = JSON.parse(
+      JSON.stringify(grantForIssuanceExnMessage)
+    ) as typeof grantForIssuanceExnMessage;
+    (grantWithOobiUrl.exn.a as { oobiUrl?: string }).oobiUrl =
+      "https://issuer.example/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu";
+    getExchangeMock.mockReturnValueOnce(grantWithOobiUrl);
     schemaGetMock.mockResolvedValue(QVISchema);
     credentialStateMock.mockResolvedValueOnce(credentialStateIssued);
 
@@ -2651,10 +2656,17 @@ describe("IPEX communication service of agent", () => {
   });
 
   test("Can get acdc detail when the schema has not been resolved", async () => {
-    getExchangeMock.mockReturnValueOnce(grantForIssuanceExnMessage);
+    connections.resolveOobi.mockClear();
+    const grantWithOobiUrl = JSON.parse(
+      JSON.stringify(grantForIssuanceExnMessage)
+    ) as typeof grantForIssuanceExnMessage;
+    (grantWithOobiUrl.exn.a as { oobiUrl?: string }).oobiUrl =
+      "https://issuer.example/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu";
+    getExchangeMock.mockReturnValueOnce(grantWithOobiUrl);
     credentialStateMock.mockResolvedValueOnce(credentialStateIssued);
     const error404 = new Error("Not Found - 404");
     schemaGetMock.mockRejectedValueOnce(error404);
+    schemaGetMock.mockResolvedValueOnce(QVISchema);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValueOnce(memberIdentifierRecord);
@@ -2680,7 +2692,33 @@ describe("IPEX communication service of agent", () => {
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
     expect(connections.resolveOobi).toBeCalledWith(
-      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu"
+      "https://issuer.example/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu"
+    );
+  });
+
+  test("Falls back to schema discovery when oobiUrl is missing on grant", async () => {
+    const grantWithoutOobiUrl = JSON.parse(
+      JSON.stringify(grantForIssuanceExnMessage)
+    ) as typeof grantForIssuanceExnMessage;
+    delete (grantWithoutOobiUrl.exn.a as { oobiUrl?: string }).oobiUrl;
+    connections.resolveOobi.mockClear();
+
+    getExchangeMock.mockReturnValueOnce(grantWithoutOobiUrl);
+    credentialStateMock.mockResolvedValueOnce(credentialStateIssued);
+    const error404 = new Error("Not Found - 404");
+    schemaGetMock.mockRejectedValueOnce(error404);
+    schemaGetMock.mockResolvedValueOnce(QVISchema);
+    identifierStorage.getIdentifierMetadata = jest
+      .fn()
+      .mockResolvedValueOnce(memberIdentifierRecord);
+
+    await ipexCommunicationService.getAcdcFromIpexGrant(
+      grantWithoutOobiUrl.exn.d
+    );
+
+    const schemaSaid = grantWithoutOobiUrl.exn.e.acdc.s;
+    expect(connections.resolveOobi).toBeCalledWith(
+      `http://127.0.0.1:3001/oobi/${schemaSaid}`
     );
   });
 

@@ -35,6 +35,8 @@ const grantForIssuanceExnMessage = {
       m: "",
       i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
       gid: "gid",
+      oobiUrl:
+        "https://issuer.example/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
     },
     e: {
       acdc: {
@@ -258,6 +260,13 @@ const multisigExnGrant = {
         i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
         r: ExchangeRoute.IpexGrant,
         p: "EAe_JgQ636ic-k34aUQMjDFPp6Zd350gEsQA6HePBU5W",
+        a: {
+          i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
+          m: "",
+          gid: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
+          oobiUrl:
+            "https://issuer.example/oobi/EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao",
+        },
         e: {
           acdc: {
             i: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",

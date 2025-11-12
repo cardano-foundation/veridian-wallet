@@ -128,6 +128,7 @@ class IpexCommunicationService extends AgentService {
     }
 
     const schemaSaid = grantExn.exn.e.acdc.s;
+    const schemaOobiUrl = this.getGrantSchemaOobiUrl(grantExn, schemaSaid);
     const issuerOobi = (
       await this.connections.getConnectionById(
         grantExn.exn.i,
@@ -136,7 +137,12 @@ class IpexCommunicationService extends AgentService {
       )
     ).serviceEndpoints[0];
     await this.connections.resolveOobi(
-      await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
+      await this.getSchemaUrl(
+        issuerOobi,
+        grantExn.exn.i,
+        schemaSaid,
+        schemaOobiUrl
+      )
     );
 
     const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {})
@@ -199,7 +205,8 @@ class IpexCommunicationService extends AgentService {
         holder.id,
         grantExn.exn.i,
         issuerOobi,
-        allSchemaSaids
+        allSchemaSaids,
+        grantExn
       );
 
       op = opAdmit;
@@ -482,11 +489,17 @@ class IpexCommunicationService extends AgentService {
     holderAid: string,
     issuerAid: string,
     issuerOobi: string,
-    schemaSaids: string[]
+    schemaSaids: string[],
+    grantExn: ExnMessage
   ): Promise<SubmitIPEXResult> {
     for (const schemaSaid of schemaSaids) {
       await this.connections.resolveOobi(
-        await this.getSchemaUrl(issuerOobi, issuerAid, schemaSaid)
+        await this.getSchemaUrl(
+          issuerOobi,
+          issuerAid,
+          schemaSaid,
+          this.getGrantSchemaOobiUrl(grantExn, schemaSaid)
+        )
       );
     }
 
@@ -560,11 +573,16 @@ class IpexCommunicationService extends AgentService {
       schemaSaid = previousExchange.exn.e.acdc.s;
     }
 
+    const schemaOobiUrlOverride =
+      message.exn.r === ExchangeRoute.IpexGrant
+        ? this.getGrantSchemaOobiUrl(message, schemaSaid)
+        : undefined;
     await this.connections.resolveOobi(
       await this.getSchemaUrl(
         connection.serviceEndpoints[0],
         connectionId,
-        schemaSaid
+        schemaSaid,
+        schemaOobiUrlOverride
       )
     );
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
@@ -1019,6 +1037,7 @@ class IpexCommunicationService extends AgentService {
       .state(exchange.exn.e.acdc.ri, exchange.exn.e.acdc.d);
 
     const schemaSaid = exchange.exn.e.acdc.s;
+    const schemaOobiUrl = this.getGrantSchemaOobiUrl(exchange, schemaSaid);
     const schema = await this.props.signifyClient
       .schemas()
       .get(schemaSaid)
@@ -1033,7 +1052,12 @@ class IpexCommunicationService extends AgentService {
             )
           ).serviceEndpoints[0];
           await this.connections.resolveOobi(
-            await this.getSchemaUrl(issuerOobi, exchange.exn.i, schemaSaid)
+            await this.getSchemaUrl(
+              issuerOobi,
+              exchange.exn.i,
+              schemaSaid,
+              schemaOobiUrl
+            )
           );
           return await this.props.signifyClient.schemas().get(schemaSaid);
         } else {
@@ -1086,7 +1110,12 @@ class IpexCommunicationService extends AgentService {
       schemaSaids.map(
         async (schemaSaid) =>
           await this.connections.resolveOobi(
-            await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
+            await this.getSchemaUrl(
+              issuerOobi,
+              grantExn.exn.i,
+              schemaSaid,
+              this.getGrantSchemaOobiUrl(grantExn, schemaSaid)
+            )
           )
       )
     );
@@ -1270,8 +1299,12 @@ class IpexCommunicationService extends AgentService {
   private async getSchemaUrl(
     agentOobi: string,
     prefix: string,
-    said: string
+    said: string,
+    schemaOobiUrl?: string
   ): Promise<string> {
+    if (schemaOobiUrl) {
+      return schemaOobiUrl;
+    }
     // Indexer role indicates issuer site hosting OOBIs for e.g. schemas.
     // This can be improved by resolving the indexer OOBI and using KERIA to retrieve the /loc/scheme URL.
     // For now this works, and doesn't impose security risks since schemas are secured by their SAID.
@@ -1286,6 +1319,44 @@ class IpexCommunicationService extends AgentService {
     const schemaBase = indexerOobiResult.split('"url":"')[1].split('"')[0];
 
     return `${schemaBase}/oobi/${said}`;
+  }
+
+  private getGrantSchemaOobiUrl(
+    grantExn: ExnMessage,
+    schemaSaid: string
+  ): string | undefined {
+    const rawUrl = grantExn.exn.a?.oobiUrl;
+    if (typeof rawUrl !== "string") {
+      return undefined;
+    }
+
+    const trimmedUrl = rawUrl.trim();
+    if (!trimmedUrl) {
+      return undefined;
+    }
+
+    return this.formatSchemaOobiUrl(trimmedUrl, schemaSaid);
+  }
+
+  private formatSchemaOobiUrl(rawUrl: string, schemaSaid: string): string {
+    const replacements: Array<[RegExp, string]> = [
+      [/\{\{?said\}?\}/gi, schemaSaid],
+      [/\{schemaSaid\}/gi, schemaSaid],
+      [/%s/g, schemaSaid],
+      [/:said/gi, schemaSaid],
+    ];
+
+    for (const [pattern, value] of replacements) {
+      if (pattern.test(rawUrl)) {
+        return rawUrl.replace(pattern, value);
+      }
+    }
+
+    if (rawUrl.includes(schemaSaid)) {
+      return rawUrl;
+    }
+
+    return rawUrl;
   }
 }
 

@@ -109,6 +109,7 @@ interface ExnMessageA {
   i?: string;
   s?: string;
   a?: Record<string, unknown>;
+  oobiUrl?: string;
   smids: string[];
   gid: string;
   t?: string;
