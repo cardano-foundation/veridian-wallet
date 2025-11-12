@@ -70,7 +70,7 @@ const CredentialRequest = ({
       if (!memberConnection) {
         return {
           aid: member,
-          name: currentProfile?.identity.groupMetadata?.proposedUsername || "",
+          name: currentProfile?.identity.groupUsername || "",
           joined: linkedGroup.linkedRequest.accepted,
           isCurrentUser: true,
         };
@@ -89,7 +89,7 @@ const CredentialRequest = ({
       memberInfos,
     });
   }, [
-    currentProfile?.identity.groupMetadata?.proposedUsername,
+    currentProfile?.identity.groupUsername,
     multisignConnectionsCache,
     notificationDetails.id,
   ]);
