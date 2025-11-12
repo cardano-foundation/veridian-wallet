@@ -163,7 +163,7 @@ class NotificationService {
       return;
     }
 
-    this.profileSwitcher(profileId as string);
+    this.profileSwitcher(profileId);
     this.navigateToPath(TabsRoutePath.NOTIFICATIONS);
   }
 
