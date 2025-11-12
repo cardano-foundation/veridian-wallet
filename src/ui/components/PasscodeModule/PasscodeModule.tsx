@@ -1,7 +1,8 @@
 import { IonButton, IonCol, IonGrid, IonIcon, IonRow } from "@ionic/react";
 import { backspaceSharp, fingerPrintSharp } from "ionicons/icons";
 import { useSelector } from "react-redux";
-import { BiometryType } from "@capgo/capacitor-native-biometric";
+import { AuthenticationStrength } from "@capgo/capacitor-native-biometric";
+import { Capacitor } from "@capacitor/core";
 import { PasscodeModuleProps } from "./PasscodeModule.types";
 import "./PasscodeModule.scss";
 import { PASSCODE_MAPPING } from "../../globals/types";
@@ -40,10 +41,11 @@ const PasscodeModule = ({
   const getBiometricIcon = () => {
     if (!biometricInfo) return null;
 
+    // On iOS, if authentication strength is STRONG, assume Face ID (modern iOS devices)
+    // On Android, use fingerprint icon
     if (
-      [BiometryType.FACE_ID].includes(
-        biometricInfo?.biometryType
-      )
+      Capacitor.getPlatform() === "ios" &&
+      biometricInfo.authenticationStrength === AuthenticationStrength.STRONG
     ) {
       return (
         <img
@@ -92,15 +94,15 @@ const PasscodeModule = ({
                     {handleBiometricButtonClick &&
                     biometricsCache.enabled &&
                     biometricInfo?.isAvailable ? (
-                        <IonButton
-                          data-testid="passcode-button-#"
-                          className="passcode-module-number-button"
-                          disabled={hasError}
-                          onClick={() => handleBiometricButton()}
-                        >
-                          {getBiometricIcon()}
-                        </IonButton>
-                      ) : null}
+                      <IonButton
+                        data-testid="passcode-button-#"
+                        className="passcode-module-number-button"
+                        disabled={hasError}
+                        onClick={() => handleBiometricButton()}
+                      >
+                        {getBiometricIcon()}
+                      </IonButton>
+                    ) : null}
                   </IonCol>
                 )}
 
