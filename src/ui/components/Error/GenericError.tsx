@@ -7,21 +7,34 @@ import {
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../Alert";
 import { CommonErrorAlertProps } from "./Error.types";
+import { loggingConfig } from "../../../utils/logger/LoggingConfig";
+import { logSyncService } from "../../../core/services/LogSyncService";
 
 const CommonErrorAlert = ({
   isOpen,
   setIsOpen,
-  actionConfirm,
   dataTestId,
 }: CommonErrorAlertProps) => {
+
+  const closeError = () => {
+    setIsOpen(false);
+  };
+
+  const handleShareLogs = async () => {
+    await logSyncService.syncLogs();
+    closeError();
+  };
+  
   return (
     <Alert
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       dataTestId={dataTestId}
-      headerText={i18n.t("genericerror.text")}
-      confirmButtonText={`${i18n.t("genericerror.button")}`}
-      actionConfirm={actionConfirm}
+      headerText={loggingConfig.remoteEnabled ? i18n.t("genericerror.logstext") as string : i18n.t("genericerror.text") as string}      
+      confirmButtonText={loggingConfig.remoteEnabled ? i18n.t("genericerror.sharelogsbutton") as string : `${i18n.t("genericerror.button")}`}
+      actionConfirm={loggingConfig.remoteEnabled ? handleShareLogs : closeError}
+      secondaryConfirmButtonText={loggingConfig.remoteEnabled ? i18n.t("genericerror.dismissbutton") as string : undefined}
+      actionSecondaryConfirm={loggingConfig.remoteEnabled ? closeError : undefined}
       className="app-error-alert"
     />
   );

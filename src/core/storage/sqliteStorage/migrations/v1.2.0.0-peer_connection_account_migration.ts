@@ -1,3 +1,4 @@
+import { logger } from "../../../../utils/logger/Logger";
 import { MigrationType, TsMigration } from "./migrations.types";
 import {
   createInsertItemTagsStatements,
@@ -8,8 +9,7 @@ export const DATA_V1200: TsMigration = {
   type: MigrationType.TS,
   version: "1.2.0.0",
   migrationStatements: async (session) => {
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       "Running migration v1.2.0.0: Peer Connection Account Migration"
     );
 
@@ -19,8 +19,7 @@ export const DATA_V1200: TsMigration = {
       ["IdentifierMetadataRecord"]
     );
 
-    // eslint-disable-next-line no-console
-    console.log(`Found ${identifierResult.values?.length ?? 0} identifiers.`);
+    logger.info(`Found ${identifierResult.values?.length ?? 0} identifiers.`);
 
     if (!identifierResult.values || identifierResult.values.length === 0) {
       return [
@@ -39,8 +38,7 @@ export const DATA_V1200: TsMigration = {
       ["PeerConnectionMetadataRecord"]
     );
 
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       `Found ${
         peerConnectionResult.values?.length ?? 0
       } peer connections to migrate.`
@@ -61,8 +59,7 @@ export const DATA_V1200: TsMigration = {
     const statements: { statement: string; values?: unknown[] }[] = [];
 
     for (const peerConnection of peerConnections) {
-      // eslint-disable-next-line no-console
-      console.log(`Processing peer connection: ${peerConnection.id}`);
+      logger.info(`Processing peer connection: ${peerConnection.id}`);
       const peerConnectionData = JSON.parse(peerConnection.value);
 
       let selectedAidForNewRecord: string | undefined = undefined;
@@ -88,21 +85,18 @@ export const DATA_V1200: TsMigration = {
           tags: peerConnectionData.tags,
         };
 
-        // eslint-disable-next-line no-console
-        console.log(`    - New record ID: ${newRecordId}`);
+        logger.info(`    - New record ID: ${newRecordId}`);
         statements.push(createInsertItemStatement(newRecordValue));
         statements.push(...createInsertItemTagsStatements(newRecordValue));
       } else {
-        // eslint-disable-next-line no-console
-        console.log(
+        logger.info(
           `  - No valid identifier found for peer connection: ${peerConnection.id}.`
         );
       }
 
       // Delete original PeerConnectionMetadataRecord from items
       // This delete should happen regardless of whether a new record was created or not.
-      // eslint-disable-next-line no-console
-      console.log(
+      logger.info(
         `  - Scheduling deletion for old peer connection record: ${peerConnection.id}`
       );
       statements.push({
@@ -111,8 +105,7 @@ export const DATA_V1200: TsMigration = {
       });
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       `Migration v1.2.0.0 generated ${statements.length} SQL statements.`
     );
     return statements;

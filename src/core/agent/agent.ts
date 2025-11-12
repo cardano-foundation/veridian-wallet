@@ -1,3 +1,4 @@
+import { logger } from "../../utils/logger/Logger";
 import { Capacitor } from "@capacitor/core";
 import {
   randomPasscode,
@@ -289,8 +290,7 @@ class Agent {
       );
       this.agentServicesProps.signifyClient = this.signifyClient;
       const bootResult = await this.signifyClient.boot().catch((e) => {
-        /* eslint-disable no-console */
-        console.error(e);
+        logger.error(e);
         if (e.message === "Failed to fetch") {
           throw new Error(Agent.KERIA_BOOT_FAILED_BAD_NETWORK, {
             cause: e,
@@ -302,8 +302,7 @@ class Agent {
       });
 
       if (!bootResult.ok && bootResult.status !== 409) {
-        /* eslint-disable no-console */
-        console.warn(
+        logger.warn(
           `Unexpected KERIA boot status returned: ${bootResult.status} ${bootResult.statusText}`
         );
         throw new Error(Agent.KERIA_BOOT_FAILED);

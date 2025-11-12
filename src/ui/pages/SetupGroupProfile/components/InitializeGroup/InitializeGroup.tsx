@@ -1,5 +1,6 @@
 import { IonButton, IonIcon } from "@ionic/react";
-import { pencilOutline, warningOutline } from "ionicons/icons";
+import { useLogger } from "../../../../context/LoggerContext";
+import { pencilOutline, star, warningOutline } from "ionicons/icons";
 import { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
@@ -45,6 +46,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   const [openEditMembers, setOpenEditMembers] = useState(false);
   const [loading, setLoading] = useState(false);
   const history = useHistory();
+  const logger = useLogger();
 
   const profile = useAppSelector(getCurrentProfile);
 
@@ -106,8 +108,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   const createMultisigIdentifier = async () => {
     const { ourIdentifier } = state;
     if (!ourIdentifier) {
-      // eslint-disable-next-line no-console
-      console.warn(
+      logger.warn(
         "Attempting to create multi-sig without a corresponding normal AID to manage local keys"
       );
       return;

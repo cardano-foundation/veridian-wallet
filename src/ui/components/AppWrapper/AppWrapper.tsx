@@ -91,6 +91,9 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
+import { logSyncService, SyncMode } from "../../../core/services/LogSyncService";
+import { logger } from "../../../utils/logger/Logger";
+import { formatErrorContext } from "../../../utils/logger/loggerUtils";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -110,6 +113,7 @@ const connectionStateChangedHandler = async (
       })
     );
     dispatch(setToastMsg(ToastMsgType.CONNECTION_REQUEST_PENDING));
+    logger.debug("Connection request pending:", { connectionId: event.payload.connectionId, identifier: event.payload.identifier });
   } else {
     // @TODO - foconnor: Should be able to just update Redux without fetching from DB.
     const connectionRecordId = event.payload.connectionId;
@@ -124,6 +128,7 @@ const connectionStateChangedHandler = async (
       );
     dispatch(updateOrAddConnectionCache(connectionDetails));
     dispatch(setToastMsg(ToastMsgType.NEW_CONNECTION_ADDED));
+    logger.debug("Connection updated:", { connectionId: connectionDetails.id, label: connectionDetails.label });
   }
 };
 
@@ -134,11 +139,13 @@ const acdcChangeHandler = async (
   if (event.payload.status === CredentialStatus.PENDING) {
     dispatch(setToastMsg(ToastMsgType.CREDENTIAL_REQUEST_PENDING));
     dispatch(updateOrAddCredsCache(event.payload.credential));
+    logger.debug("Credential request pending:", { credentialId: event.payload.credential.id });
   } else if (event.payload.status === CredentialStatus.REVOKED) {
     dispatch(updateOrAddCredsCache(event.payload.credential));
   } else {
     dispatch(updateOrAddCredsCache(event.payload.credential));
     dispatch(setToastMsg(ToastMsgType.NEW_CREDENTIAL_ADDED));
+    logger.debug("New credential added:", { credentialId: event.payload.credential.id, schemaId: event.payload.credential.schema });
   }
 };
 
@@ -170,6 +177,7 @@ const peerConnectRequestSignChangeHandler = async (
         type: IncomingRequestType.PEER_CONNECT_SIGN,
       })
     );
+    logger.debug("Queueing peer connect sign request:", { dAppAddress: connectedDAppAddress, identifier: event.payload.identifier });
   }
 };
 
@@ -194,6 +202,7 @@ const peerConnectedChangeHandler = async (
     dispatch(setIsConnectingToDApp(false));
     dispatch(setToastMsg(ToastMsgType.CONNECT_WALLET_SUCCESS));
   } catch (error) {
+    logger.error("Error handling peer connected event:", formatErrorContext(error));
     dispatch(setIsConnectingToDApp(false));
   }
 };
@@ -219,6 +228,7 @@ const peerConnectionBrokenChangeHandler = async (
   event: PeerConnectionBrokenEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
+  logger.debug("Peer connection broken event received.", { event });
   dispatch(setConnectedDApp(null));
   dispatch(setIsConnectingToDApp(false));
   dispatch(setToastMsg(ToastMsgType.DISCONNECT_WALLET_SUCCESS));
@@ -241,6 +251,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
   const setOnlineStatus = useCallback(
     (value: boolean) => {
       dispatch(setIsOnline(value));
+      logger.debug("Online status changed:", { isOnline: value });
     },
     [dispatch]
   );
@@ -261,9 +272,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
           ))
       ) {
         dispatch(showNoWitnessAlert(true));
+        logger.warn("Witness check failed: Insufficient or misconfigured agent witnesses.", formatErrorContext(e));
         return;
       }
 
+      logger.error("Unexpected error during witness check:", formatErrorContext(e));
       throw e;
     }
   }, [authentication.ssiAgentIsSet, dispatch, isOnline]);
@@ -281,6 +294,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
     const tapjack = async () => {
       if ((await Device.getInfo()).platform === "android") {
         await TapJacking.preventOverlays();
+        logger.debug("TapJacking prevention applied for Android.");
       }
     };
     tapjack();
@@ -289,8 +303,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
   useEffect(() => {
     if (authentication.loggedIn) {
       dispatch(setPauseQueueIncomingRequest(!isOnline));
+      logger.debug("Incoming request queue pause state set:", { paused: !isOnline, loggedIn: authentication.loggedIn });
     } else {
       dispatch(setPauseQueueIncomingRequest(true));
+      logger.debug("Incoming request queue paused: user not logged in.");
     }
   }, [isOnline, authentication.loggedIn, dispatch]);
 
@@ -298,10 +314,29 @@ const AppWrapper = (props: { children: ReactNode }) => {
     if (initializationPhase === InitializationPhase.PHASE_TWO) {
       if (authentication.loggedIn) {
         Agent.agent.keriaNotifications.startPolling();
+        logger.debug("Keria notifications polling started.");
       } else {
         Agent.agent.keriaNotifications.stopPolling();
+        logger.debug("Keria notifications polling stopped.");
       }
     }
+  }, [authentication.loggedIn, initializationPhase]);
+
+  useEffect(() => {
+    if (initializationPhase === InitializationPhase.PHASE_TWO) {
+      if (authentication.loggedIn) {
+        if (logSyncService.syncMode === SyncMode.Auto) {
+          logSyncService.start();
+          logger.debug("Log synchronization service started.");
+        }
+      } else {
+        logSyncService.stop();
+        logger.debug("Log synchronization service stopped.");
+      }
+    }
+    return () => {
+      logSyncService.stop();
+    };
   }, [authentication.loggedIn, initializationPhase]);
 
   useEffect(() => {
@@ -353,6 +388,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
               recoverAndLoadDb();
             });
         } else {
+          logger.error("Error starting agent:", formatErrorContext(e));
           throw e;
         }
       }
@@ -482,8 +518,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setProfiles(profiles));
       dispatch(setCurrentProfile(currentProfileAid));
     } catch (e) {
+      logger.error("Failed to load database data:", formatErrorContext(e));
       showError("Failed to load database data", e, dispatch);
+      return;
     }
+    logger.info("Database loaded.");
   };
 
   const loadCacheBasicStorage = async () => {
@@ -653,10 +692,12 @@ const AppWrapper = (props: { children: ReactNode }) => {
         })
       );
 
+      logger.debug("Cache loaded.");
       return {
         keriaConnectUrlRecord,
       };
     } catch (e) {
+      logger.error("Failed to load cache data:", formatErrorContext(e));
       showError("Failed to load cache data", e, dispatch);
       throw e;
     }
@@ -764,6 +805,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
           : InitializationPhase.PHASE_TWO
       )
     );
+    logger.debug("Wallet initialized.");
   };
 
   const recoverAndLoadDb = async () => {

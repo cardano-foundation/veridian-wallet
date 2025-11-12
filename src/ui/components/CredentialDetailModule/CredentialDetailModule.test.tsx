@@ -1,3 +1,9 @@
+jest.mock("signify-ts", () => ({
+  ...jest.requireActual("signify-ts"),
+  Salter: jest.fn(() => ({
+    qb64: "qb64",
+  })),
+}));
 const getConnectionShortDetailByIdMock = jest.fn().mockResolvedValue([]);
 const getConnectionByIdMock = jest.fn();
 

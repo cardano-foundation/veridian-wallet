@@ -22,6 +22,7 @@ import {
   getCurrentOperation,
   getGlobalLoading,
   getInitializationPhase,
+  showGenericError,
 } from "../store/reducers/stateCache";
 import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
 import { AppOffline } from "./components/AppOffline";
@@ -43,11 +44,11 @@ import { LoadingType } from "./pages/LoadingPage/LoadingPage.types";
 import { LockPage } from "./pages/LockPage/LockPage";
 import SystemCompatibilityAlert from "./pages/SystemCompatibilityAlert/SystemCompatibilityAlert";
 import { SystemThreatAlert } from "./pages/SystemThreatAlert/SystemThreatAlert";
+import { showError } from "./utils/error";
+import { compareVersion } from "./utils/version";
 import "./styles/ionic.scss";
 import "./styles/style.scss";
 import "./App.scss";
-import { showError } from "./utils/error";
-import { compareVersion } from "./utils/version";
 
 setupIonicReact();
 
@@ -138,6 +139,7 @@ const AppContent = ({
 };
 
 const App = () => {
+  
   const [isCompatible, setIsCompatible] = useState(true);
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [isFreeRASPInitialized, setIsFreeRASPInitialized] = useState(false);
@@ -148,6 +150,14 @@ const App = () => {
 
   const [threatsDetected, setThreatsDetected] = useState<ThreatCheck[]>([]);
   const dispatch = useAppDispatch();
+
+  // TODO: @jimcase - remove demo error trigger
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      dispatch(showGenericError(true));
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [dispatch]);
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;

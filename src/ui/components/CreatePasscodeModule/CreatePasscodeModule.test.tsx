@@ -15,7 +15,11 @@ import { store } from "../../../store";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { CreatePasscodeModule } from "./CreatePasscodeModule";
 import { makeTestStore } from "../../utils/makeTestStore";
-import { BiometricAuthOutcome, BiometryError, useBiometricAuth } from "../../hooks/useBiometricsHook";
+import {
+  BiometricAuthOutcome,
+  BiometryError,
+  useBiometricAuth,
+} from "../../hooks/useBiometricsHook";
 
 const isRepeativeMock = jest.fn(() => false);
 const isConsecutiveMock = jest.fn(() => false);
@@ -44,12 +48,14 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
-const handleBiometricAuthMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
+const handleBiometricAuthMock = jest.fn(() =>
+  Promise.resolve(BiometricAuthOutcome.SUCCESS)
+);
 
 jest.mock("../../hooks/useBiometricsHook", () => {
   const actual = jest.requireActual("../../hooks/useBiometricsHook");
   return {
-    ...actual, 
+    ...actual,
     useBiometricAuth: jest.fn(),
   };
 });
@@ -94,11 +100,13 @@ describe("SetPasscode Page", () => {
     isReverseConsecutiveMock.mockImplementation(() => false);
     isConsecutiveMock.mockImplementation(() => false);
     isRepeativeMock.mockImplementation(() => false);
-    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
+    handleBiometricAuthMock.mockImplementation(() =>
+      Promise.resolve(BiometricAuthOutcome.SUCCESS)
+    );
     (useBiometricAuth as jest.Mock).mockReturnValue({
       biometricsIsEnabled: false,
-      biometricInfo: { 
-        isAvailable: true, 
+      biometricInfo: {
+        isAvailable: true,
         hasCredentials: false,
         biometryType: BiometryType.FINGERPRINT,
       },
@@ -369,9 +377,10 @@ describe("SetPasscode Page", () => {
         isAvailable: true,
         hasCredentials: false,
         biometryType: BiometryType.FACE_ID,
-  
       },
-      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
+      handleBiometricAuth: jest.fn(() =>
+        Promise.resolve(BiometricAuthOutcome.SUCCESS)
+      ),
       setBiometricsIsEnabled: jest.fn(),
     });
     getPlatformsMock.mockImplementation(() => ["ios"]);
@@ -451,11 +460,15 @@ describe("SetPasscode Page", () => {
           biometricInfo: {
             isAvailable: true,
             hasCredentials: false,
-            biometryType: actual.BiometryType.FACE_ID, 
-      
+            biometryType: actual.BiometryType.FACE_ID,
           },
           handleBiometricAuth: jest.fn(() =>
-            Promise.resolve(new actual.BiometryError("", actual.BiometricAuthError.USER_CANCEL)) 
+            Promise.resolve(
+              new actual.BiometryError(
+                "",
+                actual.BiometricAuthError.USER_CANCEL
+              )
+            )
           ),
           setBiometricsIsEnabled: jest.fn(),
         })),
@@ -498,7 +511,7 @@ describe("SetPasscode Page", () => {
       ).toBeInTheDocument();
     });
 
-    passcodeFiller(getByText, getByTestId, "193212");
+    await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() =>
       expect(

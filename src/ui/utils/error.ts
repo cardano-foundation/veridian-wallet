@@ -1,3 +1,5 @@
+import { logger } from "../../utils/logger/Logger";
+import { formatErrorContext } from "../../utils/logger/loggerUtils";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
 import { setToastMsg, showGenericError } from "../../store/reducers/stateCache";
@@ -10,8 +12,7 @@ const showError = (
   dispatch?: ThunkDispatch<RootState, undefined, AnyAction>,
   toastMessage?: ToastMsgType
 ) => {
-  // eslint-disable-next-line no-console
-  console.error(`${message}:`, error);
+  logger.error(`${message}:`, formatErrorContext(error));
 
   if (!dispatch) return;
 

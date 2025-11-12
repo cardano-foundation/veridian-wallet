@@ -24,6 +24,13 @@ import { makeTestStore } from "./utils/makeTestStore";
 import { filteredIdentifierFix } from "./__fixtures__/filteredIdentifierFix";
 import { useBiometricAuth } from "../ui/hooks/useBiometricsHook";
 
+jest.mock("signify-ts", () => ({
+  ...jest.requireActual("signify-ts"),
+  Salter: jest.fn(() => ({
+    qb64: "qb64",
+  })),
+}));
+
 jest.mock("capacitor-freerasp", () => ({
   startFreeRASP: jest.fn(),
 }));

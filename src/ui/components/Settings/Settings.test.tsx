@@ -25,6 +25,31 @@ import {
   useBiometricAuth,
 } from "../../hooks/useBiometricsHook";
 
+jest.mock("@capacitor/core", () => ({
+  Plugins: {
+    Network: {
+      addListener: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+      getStatus: jest.fn(() => Promise.resolve({ connected: true, connectionType: 'wifi' })),
+    },
+  },
+  registerPlugin: jest.fn((name) => {
+    if (name === 'Network') {
+      return {
+        addListener: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+        getStatus: jest.fn(() => Promise.resolve({ connected: true, connectionType: 'wifi' })),
+      };
+    }
+    return {};
+  }),
+}));
+
+jest.mock("@capacitor/network", () => ({
+  Network: {
+    addListener: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+    getStatus: jest.fn(() => Promise.resolve({ connected: true, connectionType: 'wifi' })),
+  },
+}));
+
 jest.mock("../../../store/utils", () => ({
   CLEAR_STORE_ACTIONS: [],
 }));
@@ -144,6 +169,21 @@ jest.mock("@capacitor/app", () => ({
     getLaunchUrl: jest.fn(),
     getState: jest.fn(),
     minimizeApp: jest.fn(),
+  },
+}));
+
+jest.mock('@capacitor/filesystem', () => ({
+  Filesystem: {
+    appendFile: jest.fn(),
+    readFile: jest.fn().mockResolvedValue({ data: '' }),
+    writeFile: jest.fn(),
+    getUri: jest.fn(async ({ path, directory }) => {
+      const fullPath = `${directory}/${path}`;
+      return { uri: `mock://${fullPath}` };
+    }),
+  },
+  Directory: {
+    Data: 'DATA',
   },
 }));
 

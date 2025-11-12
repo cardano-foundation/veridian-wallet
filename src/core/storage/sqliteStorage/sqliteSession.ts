@@ -1,10 +1,7 @@
-import {
-  CapacitorSQLite,
-  SQLiteConnection,
-  SQLiteDBConnection,
-} from "@capacitor-community/sqlite";
+import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from "@capacitor-community/sqlite";
 import { Capacitor } from "@capacitor/core";
 import { randomPasscode } from "signify-ts";
+import { logger } from "../../../utils/logger/Logger";
 import { LocalMigrationManager } from "./migrations/localMigrationManager";
 import { CloudMigrationManager } from "./cloudMigrations/cloudMigrationManager";
 import { KeyStoreKeys, SecureStorage } from "../secureStorage";
@@ -127,8 +124,7 @@ class SqliteSession {
   async executeCloudMigrationsOnConnection(): Promise<void> {
     const isKeriaConfigured = await this.isKeriaConfigured();
     if (!isKeriaConfigured) {
-      // eslint-disable-next-line no-console
-      console.log("Skipping cloud migrations - KERIA not configured");
+      logger.info("Skipping cloud migrations - KERIA not configured");
       return;
     }
 

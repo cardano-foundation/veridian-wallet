@@ -1,4 +1,6 @@
+
 import { formatToV1_2_0_2, parseHabName } from "../../../utils/habName";
+import { logger } from "../../../../utils/logger/Logger";
 import { CloudMigration } from "./cloudMigrations.types";
 
 const migrationVersion = "1.2.0.2";
@@ -6,8 +8,7 @@ const migrationVersion = "1.2.0.2";
 export const CLOUD_V1202: CloudMigration = {
   version: migrationVersion,
   cloudMigrationStatements: async (signifyClient) => {
-    // eslint-disable-next-line no-console
-    console.log(`Starting cloud migration for v${migrationVersion}...`);
+    logger.info(`Starting cloud migration for v${migrationVersion}...`);
     const pageSize = 24;
     let returned = -1;
     let iteration = 0;
@@ -23,8 +24,7 @@ export const CLOUD_V1202: CloudMigration = {
 
       const batchToProcess = result.aids;
       returned = batchToProcess.length;
-      // eslint-disable-next-line no-console
-      console.log(
+      logger.info(
         `[v${migrationVersion}] Cloud migration: Fetched ${returned} identifiers in page ${iteration}.`
       );
 
@@ -39,15 +39,13 @@ export const CLOUD_V1202: CloudMigration = {
         }
 
         if (parts.version === migrationVersion) {
-          // eslint-disable-next-line no-console
-          console.log(
+          logger.info(
             `[v${migrationVersion}] Identifier ${currentName} is already on version ${migrationVersion}. Skipping.`
           );
           continue;
         }
 
-        // eslint-disable-next-line no-console
-        console.log(
+        logger.info(
           `[v${migrationVersion}] Updating cloud identifier: ${currentName} (${identifier.prefix})`
         );
 
@@ -62,8 +60,7 @@ export const CLOUD_V1202: CloudMigration = {
       }
       iteration += 1;
     }
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       `Cloud migration for v${migrationVersion} complete. Updated ${totalProcessed} identifiers.`
     );
   },

@@ -1,4 +1,6 @@
 import { SignifyClient } from "signify-ts";
+import { logger } from "../../../../utils/logger/Logger";
+import { formatErrorContext } from "../../../../utils/logger/loggerUtils";
 import { versionCompare } from "../utils";
 import { CLOUD_MIGRATIONS } from "./index";
 
@@ -18,8 +20,7 @@ export class CloudMigrationManager {
   async executeCloudMigrations(): Promise<void> {
     const currentVersion = await this.getCloudVersion();
 
-    // eslint-disable-next-line no-console
-    console.log("Starting cloud migration execution...");
+    logger.info("Starting cloud migration execution...");
 
     const orderedMigrations = CLOUD_MIGRATIONS.sort((a, b) =>
       versionCompare(a.version, b.version)
@@ -31,8 +32,7 @@ export class CloudMigrationManager {
     });
 
     if (pendingMigrations.length === 0) {
-      // eslint-disable-next-line no-console
-      console.log(
+      logger.info(
         `No cloud migrations needed. Current cloud version: ${currentVersion}`
       );
       return;
@@ -40,14 +40,12 @@ export class CloudMigrationManager {
 
     const targetVersion =
       pendingMigrations[pendingMigrations.length - 1].version;
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       `Starting cloud migration from version ${currentVersion} to ${targetVersion}...`
     );
 
     for (const migration of pendingMigrations) {
-      // eslint-disable-next-line no-console
-      console.log(`Executing cloud migration: ${migration.version}`);
+      logger.info(`Executing cloud migration: ${migration.version}`);
 
       try {
         await migration.cloudMigrationStatements(this.signifyClient);
@@ -55,20 +53,17 @@ export class CloudMigrationManager {
         // Update cloud version after successful migration
         await this.setCloudVersion(migration.version);
 
-        // eslint-disable-next-line no-console
-        console.log(`Completed cloud migration: ${migration.version}`);
+        logger.info(`Completed cloud migration: ${migration.version}`);
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(
+        logger.error(
           `Failed to execute cloud migration ${migration.version}:`,
-          error
+          formatErrorContext(error)
         );
         throw error;
       }
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
+    logger.info(
       `Cloud migration completed. Updated from version ${currentVersion} to ${targetVersion}`
     );
   }

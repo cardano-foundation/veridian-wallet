@@ -1,3 +1,9 @@
+jest.mock("signify-ts", () => ({
+  ...jest.requireActual("signify-ts"),
+  Salter: jest.fn(() => ({
+    qb64: "qb64",
+  })),
+}));
 const bootAndConnectMock = jest.fn();
 const recoverKeriaAgentMock = jest.fn(() => Promise.resolve());
 const basicStorageDeleteMock = jest.fn(() => Promise.resolve());
