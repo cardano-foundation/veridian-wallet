@@ -1,6 +1,5 @@
 import { setAuthentication } from "../../store/reducers/stateCache";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
-import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
 import { RoutePath } from "../index";
 import { TabsRoutePath } from "../paths";
 import {
@@ -71,7 +70,6 @@ describe("NextRoute", () => {
           viewType: null,
           favouriteIndex: 0,
           favourites: [],
-          filters: CredentialsFilters.All,
         },
       },
       biometricsCache: {
@@ -305,7 +303,6 @@ describe("getNextRoute", () => {
         viewType: null,
         favouriteIndex: 0,
         favourites: [],
-        filters: CredentialsFilters.All,
       },
     },
     biometricsCache: {

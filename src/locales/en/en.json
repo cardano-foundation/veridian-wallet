@@ -768,10 +768,7 @@
         "favourites": "Favourites",
         "allcreds": "All credentials",
         "filters": {
-          "all": "All",
-          "individual": "Individual",
-          "group": "Group",
-          "placeholder": "You currently have no {{ type }} credentials."
+          "placeholder": "You currently have no all credentials."
         },
         "pendingcred": "Pending credentials",
         "deletepending": {

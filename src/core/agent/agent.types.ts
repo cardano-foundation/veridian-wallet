@@ -64,7 +64,6 @@ enum MiscRecordId {
   APP_BIOMETRY = "app-biometry",
   KERIA_NOTIFICATION_MARKER = "keria-notification-marker",
   APP_CRED_VIEW_TYPE = "app-cred-view-type",
-  APP_CRED_SELECTED_FILTER = "app-cred-selected-filter",
   KERIA_CONNECT_URL = "keria-connect-url",
   KERIA_BOOT_URL = "keria-boot-url",
   APP_CRED_FAVOURITE_INDEX = "cred-favourite-index",

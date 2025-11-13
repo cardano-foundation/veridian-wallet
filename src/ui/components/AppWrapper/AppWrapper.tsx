@@ -42,7 +42,7 @@ import {
   updateOrAddConnectionCache,
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
-  updateRecentProfiles
+  updateRecentProfiles,
 } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
@@ -69,7 +69,6 @@ import {
 import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
   setCredentialFavouriteIndex,
-  setCredentialsFilters,
   setCredentialViewTypeCache,
   setFavouritesCredsCache,
 } from "../../../store/reducers/viewTypeCache";
@@ -77,7 +76,6 @@ import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewT
 import { ToastMsgType } from "../../globals/types";
 import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
 import { useProfile } from "../../hooks/useProfile";
-import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
 import { showError } from "../../utils/error";
 import { Alert } from "../Alert";
 import { CardListViewType } from "../SwitchCardView";
@@ -486,8 +484,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let credentialsSelectedFilter: CredentialsFilters =
-        CredentialsFilters.All;
       const passcodeIsSet = await SecureStorage.keyExists(
         KeyStoreKeys.APP_PASSCODE
       );
@@ -527,17 +523,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
             credViewType.content.viewType as CardListViewType
           )
         );
-      }
-
-      const credentialsFilters = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_CRED_SELECTED_FILTER
-      );
-      if (credentialsFilters) {
-        credentialsSelectedFilter = credentialsFilters.content
-          .filter as CredentialsFilters;
-      }
-      if (credentialsSelectedFilter) {
-        dispatch(setCredentialsFilters(credentialsSelectedFilter));
       }
 
       const appBiometrics = await Agent.agent.basicStorage.findById(
@@ -807,6 +792,5 @@ export {
   peerConnectedChangeHandler,
   peerConnectionBrokenChangeHandler,
   peerConnectRequestSignChangeHandler,
-  peerDisconnectedChangeHandler
+  peerDisconnectedChangeHandler,
 };
-

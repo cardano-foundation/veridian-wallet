@@ -2,13 +2,10 @@ import { IonButton, IonLabel, useIonViewWillEnter } from "@ionic/react";
 import { t } from "i18next";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
-import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
 import {
   CredentialShortDetails,
   CredentialStatus,
 } from "../../../core/agent/services/credentialService.types";
-import { IdentifierType } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -23,18 +20,12 @@ import {
   setCurrentRoute,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
-import {
-  getCredentialsFilters,
-  getFavouritesCredsCache,
-  setCredentialsFilters,
-} from "../../../store/reducers/viewTypeCache";
+import { getFavouritesCredsCache } from "../../../store/reducers/viewTypeCache";
 import { ArchivedCredentials } from "../../components/ArchivedCredentials";
 import { Avatar } from "../../components/Avatar";
 import { AvatarProps } from "../../components/Avatar/Avatar.types";
 import { CardSlider } from "../../components/CardSlider";
 import { CardsPlaceholder } from "../../components/CardsPlaceholder";
-import { FilterChip } from "../../components/FilterChip/FilterChip";
-import { AllowedChipFilter } from "../../components/FilterChip/FilterChip.types";
 import { FilteredItemsPlaceholder } from "../../components/FilteredItemsPlaceholder";
 import { TabLayout } from "../../components/layout/TabLayout";
 import { ListHeader } from "../../components/ListHeader";
@@ -49,7 +40,7 @@ import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { Profiles } from "../Profiles";
 import "./Credentials.scss";
-import { CredentialsFilters, StartAnimationSource } from "./Credentials.types";
+import { StartAnimationSource } from "./Credentials.types";
 
 const CLEAR_STATE_DELAY = 1000;
 
@@ -58,7 +49,6 @@ const Credentials = () => {
   const dispatch = useAppDispatch();
   const credsCache = useAppSelector(getCredsCache);
   const archivedCreds = useAppSelector(getCredsArchivedCache);
-  const credentialsFiltersCache = useAppSelector(getCredentialsFilters);
   const favouriteCredentialsCache = useAppSelector(getFavouritesCredsCache);
   const [archivedCredentialsIsOpen, setArchivedCredentialsIsOpen] =
     useState(false);
@@ -70,13 +60,6 @@ const Credentials = () => {
   const [deletedPendingItem, setDeletePendingItem] =
     useState<CredentialShortDetails | null>(null);
   const [openDeletePendingAlert, setOpenDeletePendingAlert] = useState(false);
-  const [individualCredentials, setIndividualCredentials] = useState<
-    CredentialShortDetails[]
-  >([]);
-  const [groupCredentials, setGroupCredentials] = useState<
-    CredentialShortDetails[]
-  >([]);
-  const selectedFilter = credentialsFiltersCache ?? CredentialsFilters.All;
   const currentProfile = useAppSelector(getCurrentProfile);
 
   const profileCreds = useMemo(
@@ -127,16 +110,6 @@ const Credentials = () => {
 
   useEffect(() => {
     setShowPlaceholder(confirmedCreds.length + pendingCreds.length === 0);
-    setIndividualCredentials(
-      confirmedCreds.filter(
-        (cred) => cred.identifierType !== IdentifierType.Group
-      )
-    );
-    setGroupCredentials(
-      confirmedCreds.filter(
-        (cred) => cred.identifierType !== IdentifierType.Individual
-      )
-    );
   }, [confirmedCreds, credsCache, pendingCreds.length]);
 
   useOnlineStatusEffect(fetchArchivedCreds);
@@ -226,36 +199,6 @@ const Credentials = () => {
     }
   };
 
-  const filterOptions = [
-    {
-      filter: CredentialsFilters.All,
-      label: i18n.t("tabs.credentials.tab.filters.all"),
-    },
-    {
-      filter: CredentialsFilters.Individual,
-      label: i18n.t("tabs.credentials.tab.filters.individual"),
-    },
-    {
-      filter: CredentialsFilters.Group,
-      label: i18n.t("tabs.credentials.tab.filters.group"),
-    },
-  ];
-
-  const handleSelectFilter = (filter: AllowedChipFilter) => {
-    Agent.agent.basicStorage
-      .createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.APP_CRED_SELECTED_FILTER,
-          content: {
-            filter: filter,
-          },
-        })
-      )
-      .then(() => {
-        dispatch(setCredentialsFilters(filter as CredentialsFilters));
-      });
-  };
-
   const handleAvatarClick = () => {
     setOpenProfiles(true);
   };
@@ -313,36 +256,14 @@ const Credentials = () => {
             {!!confirmedCreds.length && (
               <SwitchCardView
                 className="credentials-tab-content-block credential-cards"
-                cardsData={
-                  selectedFilter === CredentialsFilters.All
-                    ? confirmedCreds
-                    : selectedFilter === CredentialsFilters.Individual
-                    ? individualCredentials
-                    : groupCredentials
-                }
+                cardsData={confirmedCreds}
                 onShowCardDetails={() => handleShowNavAnimation("cards")}
                 title={`${i18n.t("tabs.credentials.tab.allcreds")}`}
                 name="allcreds"
-                filters={
-                  <div className="credentials-tab-chips">
-                    {filterOptions.map((option) => (
-                      <FilterChip
-                        key={option.filter}
-                        filter={option.filter}
-                        label={option.label}
-                        isActive={option.filter === selectedFilter}
-                        onClick={handleSelectFilter}
-                      />
-                    ))}
-                  </div>
-                }
                 placeholder={
                   <FilteredItemsPlaceholder
                     placeholderText={t(
-                      "tabs.credentials.tab.filters.placeholder",
-                      {
-                        type: selectedFilter,
-                      }
+                      "tabs.credentials.tab.filters.placeholder"
                     )}
                     testId={pageId}
                   />

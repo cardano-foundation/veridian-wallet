@@ -1,6 +1,5 @@
 import { RootState } from "../../store";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
-import { CredentialsFilters } from "../../ui/pages/Credentials/Credentials.types";
 import { DataProps } from "../nextRoute/nextRoute.types";
 import { calcPreviousRoute, getBackRoute, getPreviousRoute } from "./backRoute";
 
@@ -75,7 +74,6 @@ describe("getBackRoute", () => {
           viewType: null,
           favouriteIndex: 0,
           favourites: [],
-          filters: CredentialsFilters.All,
         },
       },
       biometricsCache: {
@@ -203,7 +201,6 @@ describe("getPreviousRoute", () => {
           viewType: null,
           favouriteIndex: 0,
           favourites: [],
-          filters: CredentialsFilters.All,
         },
       },
       biometricsCache: {
