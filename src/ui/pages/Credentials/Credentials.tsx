@@ -1,5 +1,4 @@
 import { IonButton, IonLabel, useIonViewWillEnter } from "@ionic/react";
-import { t } from "i18next";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
@@ -26,7 +25,6 @@ import { Avatar } from "../../components/Avatar";
 import { AvatarProps } from "../../components/Avatar/Avatar.types";
 import { CardSlider } from "../../components/CardSlider";
 import { CardsPlaceholder } from "../../components/CardsPlaceholder";
-import { FilteredItemsPlaceholder } from "../../components/FilteredItemsPlaceholder";
 import { TabLayout } from "../../components/layout/TabLayout";
 import { ListHeader } from "../../components/ListHeader";
 import { RemovePendingAlert } from "../../components/RemovePendingAlert";
@@ -260,14 +258,6 @@ const Credentials = () => {
                 onShowCardDetails={() => handleShowNavAnimation("cards")}
                 title={`${i18n.t("tabs.credentials.tab.allcreds")}`}
                 name="allcreds"
-                placeholder={
-                  <FilteredItemsPlaceholder
-                    placeholderText={t(
-                      "tabs.credentials.tab.filters.placeholder"
-                    )}
-                    testId={pageId}
-                  />
-                }
               />
             )}
             {!!pendingCreds.length && (

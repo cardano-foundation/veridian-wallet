@@ -767,9 +767,6 @@
         "viewarchived": "Archived & Revoked",
         "favourites": "Favourites",
         "allcreds": "All credentials",
-        "filters": {
-          "placeholder": "You currently have no all credentials."
-        },
         "pendingcred": "Pending credentials",
         "deletepending": {
           "title": "Credential options",

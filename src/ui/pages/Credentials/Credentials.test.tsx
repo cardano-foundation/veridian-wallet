@@ -403,14 +403,6 @@ describe("Creds Tab", () => {
 
     await waitFor(() => {
       expect(queryByText(filteredCredsFix[0].credentialType)).toBeNull();
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.credentials.tab.filters.placeholder.replace(
-            "{{ type }}",
-            "all"
-          )
-        )
-      ).toBeVisible();
     });
   });
 
@@ -444,14 +436,6 @@ describe("Creds Tab", () => {
 
     await waitFor(() => {
       expect(queryByText(filteredCredsFix[3].credentialType)).toBeNull();
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.credentials.tab.filters.placeholder.replace(
-            "{{ type }}",
-            "all"
-          )
-        )
-      ).toBeVisible();
     });
 
     act(() => {
