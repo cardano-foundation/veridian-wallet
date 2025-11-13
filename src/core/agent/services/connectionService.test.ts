@@ -1214,7 +1214,7 @@ describe("Connection service of agent", () => {
     const id = "id";
     const KeriOobi = await connectionService.getOobi(id);
     expect(KeriOobi).toEqual(
-      `${oobiPrefix}oobi/EEGLKCqm1pENLuh9BW9EsbBxGnP0Pk8NMJ7_48Y_C3-6?name=t1`
+      `${oobiPrefix}oobi/EEGLKCqm1pENLuh9BW9EsbBxGnP0Pk8NMJ7_48Y_C3-6/agent?name=t1`
     );
   });
 
