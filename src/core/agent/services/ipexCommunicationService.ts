@@ -1285,7 +1285,7 @@ class IpexCommunicationService extends AgentService {
       resolutions.push(this.recursiveSchemaResolve(schemaUrl, edgeSchemaSaid));
     }
 
-    await Promise.allSettled(resolutions);
+    await Promise.all(resolutions);
     return schema;
   }
 
