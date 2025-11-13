@@ -66,16 +66,12 @@ class IpexCommunicationService extends AgentService {
   static readonly SCHEMA_NOT_FOUND = "Schema not found";
   static readonly IPEX_ALREADY_REPLIED =
     "IPEX message has already been responded to or proposed to group";
-  static readonly CREDENTIAL_NOT_AVAILABLE =
-    "Credential is not yet available from the issuer. Please try again shortly.";
   static readonly NO_CURRENT_IPEX_MSG_TO_JOIN =
     "Cannot join IPEX message as there is no current exn to join from the group leader";
   static readonly INVALID_HISTORY_TYPE = "Invalid history type";
 
   static readonly SCHEMA_SAID_ROME_DEMO =
     "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt";
-  private static readonly CREDENTIAL_FETCH_MAX_ATTEMPTS = 3;
-  private static readonly CREDENTIAL_FETCH_RETRY_DELAY_MS = 2000;
 
   protected readonly identifierStorage: IdentifierStorage;
   protected readonly credentialStorage: CredentialStorage;
@@ -188,7 +184,6 @@ class IpexCommunicationService extends AgentService {
     }
 
     // Only save metadata and emit event after admit operation has been submitted successfully
-    await this.fetchCredentialWithRetry(grantExn.exn.e.acdc.d);
     let credential: CredentialMetadataRecord;
     try {
       credential = await this.saveAcdcMetadataRecord(
@@ -209,14 +204,6 @@ class IpexCommunicationService extends AgentService {
           )
         )
       ) {
-        if (
-          error instanceof Error &&
-          error.message.startsWith(
-            IpexCommunicationService.CREDENTIAL_NOT_AVAILABLE
-          )
-        ) {
-          throw error;
-        }
         throw error;
       }
       // If credential already exists, fetch it for the event emission
@@ -504,44 +491,6 @@ class IpexCommunicationService extends AgentService {
     return await this.credentialStorage.saveCredentialMetadataRecord(
       credentialDetails
     );
-  }
-
-  private async fetchCredentialWithRetry(credentialId: string): Promise<any> {
-    let lastStatusMessage = "";
-    for (
-      let attempt = 1;
-      attempt <= IpexCommunicationService.CREDENTIAL_FETCH_MAX_ATTEMPTS;
-      attempt++
-    ) {
-      try {
-        const credential = await this.props.signifyClient
-          .credentials()
-          .get(credentialId);
-        return credential;
-      } catch (error) {
-        if (error instanceof Error) {
-          const statusMessage = error.message.split(" - ")[1] ?? "";
-          if (/^(404|5\d{2})/i.test(statusMessage)) {
-            lastStatusMessage = statusMessage;
-            if (
-              attempt < IpexCommunicationService.CREDENTIAL_FETCH_MAX_ATTEMPTS
-            ) {
-              await new Promise((resolve) =>
-                setTimeout(
-                  resolve,
-                  IpexCommunicationService.CREDENTIAL_FETCH_RETRY_DELAY_MS
-                )
-              );
-              continue;
-            }
-            throw new Error(
-              `${IpexCommunicationService.CREDENTIAL_NOT_AVAILABLE} (${lastStatusMessage})`
-            );
-          }
-        }
-        throw error;
-      }
-    }
   }
 
   private async admitIpex(

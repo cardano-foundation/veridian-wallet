@@ -435,61 +435,6 @@ describe("Receive individual ACDC actions", () => {
     );
   });
 
-  test("Should throw if credential is not yet available on KERIA before saving metadata", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
-    const id = "uuid";
-    notificationStorage.findById = jest.fn().mockResolvedValue({
-      type: "NotificationRecord",
-      id,
-      createdAt: DATETIME,
-      a: {
-        r: NotificationRoute.ExnIpexGrant,
-        d: "EIDUavcmyHBseNZAdAHR3SF8QMfX1kSJ3Ct0OqS0-HCW",
-      },
-      route: NotificationRoute.ExnIpexGrant,
-      read: true,
-      linkedRequest: { accepted: false },
-      connectionId: "EEFjBBDcUM2IWpNF7OclCme_bE76yKE3hzULLzTOFE8E",
-      updatedAt: DATETIME,
-    });
-    getExchangeMock = jest.fn().mockReturnValue(grantForIssuanceExnMessage);
-    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      id: "identifierId",
-    });
-    schemaGetMock.mockResolvedValue(QVISchema);
-    const fetchCredentialSpy = jest
-      .spyOn(ipexCommunicationService as any, "fetchCredentialWithRetry")
-      .mockRejectedValueOnce(
-        new Error(`${IpexCommunicationService.CREDENTIAL_NOT_AVAILABLE} (503)`)
-      );
-    credentialStorage.saveCredentialMetadataRecord = jest.fn();
-    eventEmitter.emit = jest.fn();
-    saveOperationPendingMock.mockResolvedValue({
-      id: "opName",
-      recordType: OperationPendingRecordType.ExchangeReceiveCredential,
-    });
-    ipexAdmitMock.mockResolvedValue([
-      { ked: { d: "admit-said" } },
-      "sigs",
-      "aend",
-    ]);
-    markNotificationMock.mockResolvedValueOnce({ status: "done" });
-
-    await expect(
-      ipexCommunicationService.admitAcdcFromGrant(id)
-    ).rejects.toThrow(
-      `${IpexCommunicationService.CREDENTIAL_NOT_AVAILABLE} (503)`
-    );
-
-    expect(fetchCredentialSpy).toHaveBeenCalledWith(
-      grantForIssuanceExnMessage.exn.e.acdc.d
-    );
-    expect(credentialStorage.saveCredentialMetadataRecord).not.toBeCalled();
-    expect(operationPendingStorage.save).not.toBeCalled();
-    expect(eventEmitter.emit).not.toBeCalled();
-    fetchCredentialSpy.mockRestore();
-  });
-
   test("Can accept ACDC from individual identifier even if already exists (idempotent)", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const id = "uuid";
