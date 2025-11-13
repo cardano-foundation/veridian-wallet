@@ -197,7 +197,7 @@ describe("Notifications Tab", () => {
       getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.all)
     ).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.identifiers)
+      getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.connections)
     ).toBeInTheDocument();
     expect(
       getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.credentials)
@@ -466,7 +466,6 @@ describe("Notifications Tab", () => {
     };
 
     const mockOnClick = jest.fn();
-    const mockOptionClick = jest.fn();
     const customConnectionName = "Test Connection";
 
     const { getByTestId } = render(
@@ -503,7 +502,6 @@ describe("Notifications Tab", () => {
         <NotificationItem
           item={item}
           onClick={mockOnClick}
-          onOptionButtonClick={mockOptionClick}
           data-testid="notification-item-test"
         />
       </Provider>

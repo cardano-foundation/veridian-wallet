@@ -915,7 +915,7 @@
         "empty": "No notifications",
         "chips": {
           "all": "All",
-          "identifiers": "Identifiers",
+          "connections": "Connections",
           "credentials": "Credentials"
         },
         "unknownissuer": {
@@ -936,19 +936,6 @@
             }
           }
         },
-        "optionmodal": {
-          "title": "Notification options",
-          "done": "Done",
-          "showdetail": "Show details",
-          "markasread": "Mark as read",
-          "markasunread": "Mark as unread",
-          "delete": "Delete notification",
-          "deletealert": {
-            "text": "Deleting this notification cannot be undone. Once deleted you will no longer be able to require any actions required from this notification.",
-            "accept": "Delete",
-            "cancel": "Cancel"
-          }
-        },
         "labels": {
           "exnipexgrant": "<strong>{{connection}}</strong> wants to issue you a credential",
           "multisigicp": "<strong>{{connection}}</strong> is requesting to create a group identifier with you",
@@ -959,6 +946,16 @@
           "signeventinfo": "<strong>Signing event information</strong>",
           "connectinstructions": "<strong>Check your email for instructions on how to connect with {{connection}}</strong>",
           "fallback": "You have a new notification"
+        },
+        "notificationitem": {
+          "read": "Read",
+          "unread": "Unread",
+          "delete": "Delete",
+          "deletealert": {
+            "text": "This will delete the selected notifications from your wallet permanently",
+            "accept": "Delete",
+            "cancel": "Cancel"
+          }
         }
       },
       "details": {
