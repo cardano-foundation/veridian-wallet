@@ -2112,20 +2112,6 @@ describe("Signify notification service of agent", () => {
     expect(markNotificationMock).toBeCalledWith(notificationMultisigIcpProp.i);
     expect(notificationStorage.save).not.toBeCalled();
   });
-
-  test("Singleton notifications must have a singleton route", async () => {
-    expect(
-      keriaNotificationService.createSingletonNotification(
-        NotificationRoute.ExnIpexAgree
-      )
-    ).rejects.toThrowError(KeriaNotificationService.SINGLETON_ROUTE_REQUIRED);
-    expect(
-      keriaNotificationService.createSingletonNotification(
-        NotificationRoute.LocalAcdcRevoked
-      )
-    ).rejects.toThrowError(KeriaNotificationService.SINGLETON_ROUTE_REQUIRED);
-    expect(notificationStorage.save).not.toBeCalled();
-  });
 });
 
 // @TODO - foconnor: Move remaining IPEX tests

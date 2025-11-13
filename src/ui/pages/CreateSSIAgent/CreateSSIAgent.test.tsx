@@ -109,9 +109,6 @@ jest.mock("../../../core/agent/agent", () => ({
         deleteById: basicStorageDeleteMock,
         createOrUpdateBasicRecord: createOrUpdateBasicRecordMock,
       },
-      keriaNotifications: {
-        createSingletonNotification: createSingletonNotificationMock,
-      },
     },
   },
 }));

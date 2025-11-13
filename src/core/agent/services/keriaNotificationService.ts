@@ -1006,40 +1006,6 @@ class KeriaNotificationService extends AgentService {
     };
   }
 
-  async createSingletonNotification(
-    route: NotificationRoute,
-    a = {}
-  ): Promise<KeriaNotification | undefined> {
-    // These notifications are generally only created once, one per local notification route.
-    if (!/^\/local\/singleton/.test(route)) {
-      throw new Error(KeriaNotificationService.SINGLETON_ROUTE_REQUIRED);
-    }
-
-    const notification: NotificationRecordStorageProps = {
-      id: randomSalt(),
-      createdAt: new Date(),
-      a: {
-        ...a,
-        r: route,
-      },
-      read: false,
-      route,
-      connectionId: KeriaNotificationService.SINGLETON_PRE,
-      receivingPre: KeriaNotificationService.SINGLETON_PRE,
-    };
-
-    await this.notificationStorage.save(notification);
-    return {
-      id: notification.id,
-      createdAt: notification.createdAt.toISOString(),
-      a: notification.a,
-      connectionId: notification.connectionId,
-      read: notification.read,
-      groupReplied: false,
-      receivingPre: notification.receivingPre,
-    };
-  }
-
   async readNotification(notificationId: string): Promise<void> {
     const notificationRecord = await this.notificationStorage.findById(
       notificationId
