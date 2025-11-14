@@ -141,19 +141,10 @@ class IpexCommunicationService extends AgentService {
         grantExn.exn.rp
       )
     ).serviceEndpoints[0];
-    await this.connections.resolveOobi(
-      await this.getSchemaUrl(issuerOobi, grantExn.exn.i, schemaSaid)
-    );
 
-    const allSchemaSaids = Object.keys(grantExn.exn.e.acdc?.e || {})
-      .map(
-        // Chained schemas, will be resolved in admit/multisigAdmit
-        (key) => grantExn.exn.e.acdc.e?.[key]?.s
-      )
-      .filter((schema) => !!schema);
-    allSchemaSaids.push(schemaSaid);
+    const schemaUrl = await this.getSchemaUrl(issuerOobi, grantExn.exn.i);
+    const schema = await this.recursiveSchemaResolve(schemaUrl, schemaSaid);
 
-    const schema = await this.props.signifyClient.schemas().get(schemaSaid);
     try {
       const credential = await this.saveAcdcMetadataRecord(
         holder,
@@ -186,26 +177,26 @@ class IpexCommunicationService extends AgentService {
     }
 
     let op: Operation;
-    let exnSaid: string;
     if (holder.groupMemberPre) {
-      const result = await this.submitMultisigAdmit(holder.id, grantExn);
+      const { op: opMultisigAdmit, exnSaid } = await this.submitMultisigAdmit(
+        holder.id,
+        grantExn
+      );
 
-      op = result.op;
-      exnSaid = result.exnSaid;
+      op = opMultisigAdmit;
       grantNoteRecord.linkedRequest = {
         ...grantNoteRecord.linkedRequest,
         accepted: true,
         current: exnSaid,
       };
     } else {
-      const result = await this.admitIpex(
+      const { op: opAdmit, exnSaid } = await this.admitIpex(
         grantNoteRecord.a.d as string,
         holder.id,
         grantExn.exn.i
       );
 
-      op = result.op;
-      exnSaid = result.exnSaid;
+      op = opAdmit;
       grantNoteRecord.linkedRequest = {
         ...grantNoteRecord.linkedRequest,
         accepted: true,
@@ -214,55 +205,11 @@ class IpexCommunicationService extends AgentService {
       grantNoteRecord.hidden = true;
     }
 
-    // Only save metadata and emit event after admit operation has been submitted successfully
-    let credential: CredentialMetadataRecord;
-    try {
-      credential = await this.saveAcdcMetadataRecord(
-        holder,
-        grantExn.exn.e.acdc.d,
-        grantExn.exn.e.acdc.a.dt,
-        schema.title,
-        grantExn.exn.i,
-        schemaSaid
-      );
-    } catch (error) {
-      // Ignore this as we might have failed before we deleted the notification and need to retry in the UI
-      if (
-        !(
-          error instanceof Error &&
-          error.message.startsWith(
-            StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG
-          )
-        )
-      ) {
-        throw error;
-      }
-      // If credential already exists, fetch it for the event emission
-      const existingCredential =
-        await this.credentialStorage.getCredentialMetadata(
-          grantExn.exn.e.acdc.d
-        );
-      if (!existingCredential) {
-        throw new Error(
-          `${IpexCommunicationService.CREDENTIAL_NOT_FOUND} with id ${grantExn.exn.e.acdc.d}`
-        );
-      }
-      credential = existingCredential;
-    }
-
     await this.operationPendingStorage.save({
       id: op.name,
       recordType: OperationPendingRecordType.ExchangeReceiveCredential,
     });
     await this.notificationStorage.update(grantNoteRecord);
-
-    this.props.eventEmitter.emit<AcdcStateChangedEvent>({
-      type: EventTypes.AcdcStateChanged,
-      payload: {
-        credential: getCredentialShortDetails(credential),
-        status: CredentialStatus.PENDING,
-      },
-    });
   }
 
   @OnlineOnly
