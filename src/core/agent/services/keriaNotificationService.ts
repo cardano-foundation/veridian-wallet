@@ -72,7 +72,6 @@ class KeriaNotificationService extends AgentService {
     "Out of order notification received, unable to process right now";
   static readonly DUPLICATE_ISSUANCE =
     "Duplicate IPEX grant message for same credential, may be out-of-order TEL updates for revocation";
-  static readonly CONTACT_NOT_FOUND = "Contact not found for connection pair";
   static readonly SINGLETON_ROUTE_REQUIRED = "singleton";
   static readonly SINGLETON_PRE = "singleton_pre"; // Dummy prefix to re-use within singleton notifications where unused (better than setting to optional, as weakens rest of code)
 
