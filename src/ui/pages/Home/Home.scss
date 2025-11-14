@@ -1,0 +1,52 @@
+.home-tab {
+  .header-wrapper,
+  .home-tab-content {
+    padding-inline: 1.25rem;
+  }
+
+  .home-tab-content {
+    margin-top: 1.5rem;
+
+    .tile {
+      margin-bottom: 0.75rem;
+    }
+
+    .home-tab-split-section {
+      margin: 0 !important;
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+
+      .tile {
+        width: 50%;
+
+        &:first-child {
+          margin-right: 0.75rem;
+        }
+      }
+    }
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .header-wrapper,
+    .home-tab-content {
+      padding-inline: 0.9rem;
+    }
+
+    .home-tab-content {
+      margin: 1.2rem 0;
+
+      .home-tab-split-section {
+        flex-direction: column;
+
+        .tile {
+          width: auto;
+
+          &:first-child {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+}

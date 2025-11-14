@@ -1,5 +1,4 @@
 .tab-layout {
-  padding-inline: 1.25rem;
   background: var(--ion-color-neutral-200);
 
   &.hidden {
@@ -77,7 +76,6 @@
   }
 
   @media screen and (min-width: 250px) and (max-width: 370px) {
-    padding-inline: 0.9rem;
     font-size: 0.8rem;
 
     ion-header ion-toolbar {

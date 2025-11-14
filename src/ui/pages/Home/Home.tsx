@@ -1,10 +1,15 @@
 import { useState } from "react";
+import { chevronForwardOutline } from "ionicons/icons";
 import { i18n } from "../../../i18n";
 import { useAppSelector } from "../../../store/hooks";
 import { getCurrentProfile } from "../../../store/reducers/profileCache";
 import { Avatar } from "../../components/Avatar";
 import { TabLayout } from "../../components/layout/TabLayout";
 import { Profiles } from "../Profiles";
+import { Tile } from "../../components/Tile";
+import ScanIcon from "../../assets/images/scan-icon.svg";
+import CardanoLogo from "../../assets/images/cardano-logo.svg";
+import "./Home.scss";
 
 const Home = () => {
   const pageId = "home-tab";
@@ -34,7 +39,30 @@ const Home = () => {
         })}`}
         additionalButtons={<AdditionalButtons />}
       >
-        Home
+        <div className="home-tab-content">
+          <Tile
+            icon={ScanIcon}
+            title="Scan to login"
+            text="Sign in to apps, games, social media, banking, and other services"
+          />
+          <Tile
+            icon={CardanoLogo}
+            title="Cardano Connect"
+            text="Use your Veridian wallet to access Cardano applications online"
+          />
+          <div className="home-tab-split-section">
+            <Tile
+              icon={chevronForwardOutline}
+              title="Add connection"
+              text="Establish a new connection"
+            />
+            <Tile
+              icon={chevronForwardOutline}
+              title="Rotate key"
+              text="Boost security by rotating your key"
+            />
+          </div>
+        </div>
       </TabLayout>
       <Profiles
         isOpen={openProfiles}
