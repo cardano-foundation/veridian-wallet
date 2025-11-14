@@ -266,7 +266,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@27ed10ed269f89d937edb58ceff0076e1d73bfd9 # main at 14/11/2025
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -317,8 +317,8 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
         id: cf-gha-baseline
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@27ed10ed269f89d937edb58ceff0076e1d73bfd9 # main at 14/11/2025
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
