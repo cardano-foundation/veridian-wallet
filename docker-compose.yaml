@@ -3,7 +3,7 @@ services:
   keria:
     container_name: idw-keria
     restart: unless-stopped
-    image: cardanofoundation/cf-idw-keria:1.2.0-PR1422-a748a80-GHRUN19302301544
+    image: ghcr.io/cardano-foundation/veridian-wallet/cf-idw-keria:PR1430
     environment:
       - KERI_AGENT_CORS=true
       - ALLOW_INTRODUCTIONS=true
