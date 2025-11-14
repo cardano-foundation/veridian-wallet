@@ -9,7 +9,7 @@ import {
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { SafeArea } from "capacitor-plugin-safe-area";
+
 import { StrictMode, useEffect, useState } from "react";
 import { ConfigurationService } from "../core/configuration";
 import { SecureStorage } from "../core/storage";
@@ -207,14 +207,8 @@ const App = () => {
       }
 
       if (platforms.includes("android")) {
-        SafeArea.getSafeAreaInsets().then((insets) => {
-          Object.entries(insets.insets).forEach(([key, value]) => {
-            document.body.style.setProperty(
-              `--ion-safe-area-${key}`,
-              `${value}px`
-            );
-          });
-        });
+        // SafeArea plugin removed, insets are now handled natively by Capacitor with edge-to-edge.
+        // CSS variables --ion-safe-area-* are automatically populated.
       }
 
       return () => {
