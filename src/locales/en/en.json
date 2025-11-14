@@ -756,9 +756,9 @@
     }
   },
   "tabs": {
-    "identifiers": {
-      "layout": {
-        "created": "CREATED"
+    "home": {
+      "tab": {
+        "title": "Hi, {{name}}"
       }
     },
     "credentials": {
@@ -890,19 +890,6 @@
           }
         }
       }
-    },
-    "scan": {
-      "tab": {
-        "title": "Align the QR code within the frame to scan",
-        "permissionalert": "Enable the camera in your device settings to start scanning",
-        "cameraunavailable": "We're unable to access your camera.",
-        "missingidentifier": {
-          "title": "To establish a connection you will need to create an identifier",
-          "create": "Create identifier",
-          "cancel": "Cancel"
-        }
-      },
-      "pastemeerkatid": "Paste Peer ID"
     },
     "notifications": {
       "tab": {
