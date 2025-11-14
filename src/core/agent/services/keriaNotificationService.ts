@@ -1307,9 +1307,7 @@ class KeriaNotificationService extends AgentService {
                 version: LATEST_CONTACT_VERSION,
                 alias: contact.alias,
                 oobi: contact.oobi,
-                [`${connectionPairRecord.identifier}:createdAt`]: new Date(
-                  (operation.response as State).dt
-                ),
+                [`${connectionPairRecord.identifier}:createdAt`]: new Date(),
               });
 
             await this.connectionPairStorage.update(connectionPairRecord);

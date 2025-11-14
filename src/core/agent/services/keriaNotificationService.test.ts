@@ -290,6 +290,11 @@ const DATETIME = new Date();
 describe("Signify notification service of agent", () => {
   beforeAll(async () => {
     await ready();
+    jest.useFakeTimers();
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
   });
 
   beforeEach(() => {
@@ -405,7 +410,6 @@ describe("Signify notification service of agent", () => {
       .fn()
       .mockReturnValue({ id: "id", createdAt: new Date(), content: {} });
     groupGetRequestMock.mockResolvedValue([{ exn: { a: { gid: "id" } } }]);
-    jest.useFakeTimers();
     admitMock.mockResolvedValue([{}, ["sigs"], "end"]);
     submitAdmitMock.mockResolvedValueOnce({
       name: "name",
@@ -2817,11 +2821,15 @@ describe("Remote signing", () => {
 describe("Failed notifications", () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    jest.useFakeTimers();
     identifiersGetMock.mockResolvedValueOnce(hab);
   });
 
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   test("Should create a new failed notification to basic record if processNotification throws any error", async () => {
-    jest.useFakeTimers();
     jest
       .spyOn(keriaNotificationService as any, "getKeriaOnlineStatus")
       .mockReturnValue(true);
@@ -3018,7 +3026,6 @@ describe("Failed notifications", () => {
   });
 
   test("Should retry failed notifications if more than 1 minute have passed", async () => {
-    jest.useFakeTimers();
     jest.spyOn(keriaNotificationService, "retryFailedNotifications");
     jest
       .spyOn(keriaNotificationService as any, "getKeriaOnlineStatus")
@@ -3078,6 +3085,14 @@ describe("Failed notifications", () => {
 });
 
 describe("Long running operation tracker", () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   beforeEach(() => {
     jest.resetAllMocks();
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
