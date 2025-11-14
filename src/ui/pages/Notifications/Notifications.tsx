@@ -11,7 +11,6 @@ import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getCurrentProfile,
-  getNotificationsCache,
   markNotificationAsRead,
   getConnectionsCache,
 } from "../../../store/reducers/profileCache";
@@ -38,7 +37,6 @@ const Notifications = () => {
   const dispatch = useAppDispatch();
   const history = useHistory();
   const connectionsCache = useAppSelector(getConnectionsCache);
-  const notificationsCache = useAppSelector(getNotificationsCache);
   const currentProfile = useAppSelector(getCurrentProfile);
   const profileNotifications: KeriaNotification[] =
     (currentProfile?.notifications as KeriaNotification[]) ?? [];

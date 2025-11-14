@@ -1,3 +1,19 @@
+jest.mock("@capacitor/local-notifications", () => ({
+  LocalNotifications: {
+    requestPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    schedule: jest.fn(),
+    addListener: jest.fn(),
+    removeAllListeners: jest.fn(),
+    cancel: jest.fn(),
+    getPending: jest.fn(() => Promise.resolve({ notifications: [] })),
+    getDeliveredNotifications: jest.fn(() =>
+      Promise.resolve({ notifications: [] })
+    ),
+    checkPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    createChannel: jest.fn(() => Promise.resolve()),
+  },
+}));
+
 import { Style, StyleOptions } from "@capacitor/status-bar";
 import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { act, render, waitFor } from "@testing-library/react";
@@ -148,6 +164,30 @@ jest.mock("@capacitor/status-bar", () => ({
   },
 }));
 
+jest.mock("@capacitor/local-notifications", () => ({
+  LocalNotifications: {
+    requestPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    schedule: jest.fn(),
+    addListener: jest.fn(),
+    removeAllListeners: jest.fn(),
+    removeAllDeliveredNotifications: jest.fn(),
+    cancel: jest.fn(),
+    getPending: jest.fn(() => Promise.resolve({ notifications: [] })),
+    getDeliveredNotifications: jest.fn(() =>
+      Promise.resolve({ notifications: [] })
+    ),
+    checkPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    createChannel: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+jest.mock("@capacitor/app", () => ({
+  App: {
+    addListener: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+    getState: jest.fn(() => Promise.resolve({ isActive: true })),
+  },
+}));
+
 const lockScreenOrientationMock = jest.fn();
 jest.mock("@capacitor/screen-orientation", () => ({
   ...jest.requireActual("@capacitor/status-bar"),
@@ -170,6 +210,7 @@ jest.mock("@capacitor/core", () => {
     ...jest.requireActual("@capacitor/core"),
     Capacitor: {
       isNativePlatform: () => isNativeMock(),
+      getPlatform: jest.fn(() => "web"),
     },
   };
 });

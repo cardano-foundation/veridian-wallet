@@ -132,6 +132,8 @@ const ProfileDetailsModal = ({
         dispatch,
         ToastMsgType.DELETE_IDENTIFIER_FAIL
       );
+    } finally {
+      setHidden(false);
     }
   };
 

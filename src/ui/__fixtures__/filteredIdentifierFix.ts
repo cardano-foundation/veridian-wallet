@@ -30,6 +30,7 @@ const multisignIdentifierFix: IdentifierShortDetails[] = [
       groupInitiator: true,
       proposedUsername: "test",
     },
+    groupUsername: "test",
   },
 ];
 

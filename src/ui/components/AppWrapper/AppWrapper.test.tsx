@@ -1,5 +1,21 @@
 const getConnectionShortDetailByIdMock = jest.fn();
 
+jest.mock("@capacitor/local-notifications", () => ({
+  LocalNotifications: {
+    requestPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    schedule: jest.fn(),
+    addListener: jest.fn(),
+    removeAllListeners: jest.fn(),
+    cancel: jest.fn(),
+    getPending: jest.fn(() => Promise.resolve({ notifications: [] })),
+    getDeliveredNotifications: jest.fn(() =>
+      Promise.resolve({ notifications: [] })
+    ),
+    checkPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+    createChannel: jest.fn(() => Promise.resolve()),
+  },
+}));
+
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { Agent } from "../../../core/agent/agent";

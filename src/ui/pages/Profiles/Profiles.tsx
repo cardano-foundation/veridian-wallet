@@ -113,7 +113,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   useEffect(() => {
-    if (!defaultProfile || profileList.length === 0) {
+    if (!defaultProfile) {
       setIsJoinGroupMode(false);
       setOpenSetupProfile(true);
     }
@@ -139,7 +139,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         )
       );
     }
-  }, [defaultProfile, ionHistory, profileList.length]);
+  }, [defaultProfile, ionHistory]);
 
   const isDisableManageProfile = () => {
     const isGroupProfile = !!(

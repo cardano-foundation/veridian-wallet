@@ -1,4 +1,4 @@
-import { IonRouterOutlet } from "@ionic/react";
+import { IonRouterOutlet, useIonRouter } from "@ionic/react";
 import { useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -23,12 +23,14 @@ import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
 import { getCurrentProfile } from "../store/reducers/profileCache";
+import { PUSH_NOTIFICATION_EVENT_LISTENER_TYPE } from "../native/pushNotifications/notificationService";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
   const currentProfile = useAppSelector(getCurrentProfile);
   const dispatch = useAppDispatch();
   const routes = useAppSelector(getRoutes);
+  const ionRouter = useIonRouter();
 
   const { nextPath } = getNextRoute(RoutePath.ROOT, {
     store: { stateCache, currentProfile },
@@ -37,6 +39,29 @@ const Routes = () => {
   useEffect(() => {
     if (!routes.length) dispatch(setCurrentRoute({ path: nextPath.pathname }));
   }, [routes, nextPath.pathname, dispatch]);
+
+  useEffect(() => {
+    const handleNotificationNavigation = (event: Event) => {
+      if (!(event instanceof CustomEvent))
+        throw new Error(
+          "handleNotificationNavigation expects events of type CustomEvent only"
+        );
+      const { path } = event.detail;
+      ionRouter.push(path);
+    };
+
+    window.addEventListener(
+      PUSH_NOTIFICATION_EVENT_LISTENER_TYPE,
+      handleNotificationNavigation
+    );
+
+    return () => {
+      window.removeEventListener(
+        PUSH_NOTIFICATION_EVENT_LISTENER_TYPE,
+        handleNotificationNavigation
+      );
+    };
+  }, [ionRouter]);
 
   return (
     <IonRouterOutlet animated={false}>

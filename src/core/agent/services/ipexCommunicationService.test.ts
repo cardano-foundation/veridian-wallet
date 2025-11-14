@@ -35,6 +35,13 @@ import {
   credentialStateIssued,
   credentialStateRevoked,
   admitForIssuanceExnMessage,
+  schemaNoEdges,
+  schemaWithEdge,
+  schemaWithSaidifiedEdgeSection,
+  schemaWithMultipleEdges,
+  schemaWithASaidifiedEdge,
+  schemaWithEdgeGroup,
+  schemaWithEdgeWithoutSchemaSaid,
 } from "../../__fixtures__/agent/ipexCommunicationFixtures";
 import { NotificationRoute } from "./keriaNotificationService.types";
 import {
@@ -49,8 +56,6 @@ import {
 import { MultiSigRoute } from "./multiSig.types";
 import { NotificationRecord } from "../records";
 import { StorageMessage } from "../../storage/storage.types";
-import { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
-import { IdentifierType } from "./identifier.types";
 
 const notificationStorage = jest.mocked({
   open: jest.fn(),
@@ -312,7 +317,7 @@ beforeAll(() => {
   originalFetch = global.fetch;
   global.fetch = jest.fn().mockResolvedValue({
     text: () =>
-      '{"v":"KERI10JSON00012b_","t":"icp","d":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"0","kt":"1","k":["DGKzvhMMz2_MYhXyV5lGso_akvBYpGnOG5fTD299IsmO"],"nt":"1","n":["EBhg4MS4f4GZpuNZxk1D4mln9sv9l30rbtsk17AVOEmh"],"bt":"0","b":[],"c":[],"a":[]}-VAn-AABAADt-Cs8HoN9KBS5Kk23JCAaJzOl1InvbZ4FT0AQ0muKe6pSr8QvUJNNFTUImZg8XtBFqT75AY184rX3mKPKKgYI-EAB0AAAAAAAAAAAAAAAAAAAAAAA1AAG2025-01-21T13c24c58d219360p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"1","p":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","a":[{"i":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l","s":"0","d":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l"}]}-VAn-AABAADGIyEdPqQ4wJw6KWgFOF3guadzJYWTzy9EjDbxqnBEBmUIiGquNZvNtk--gDOYcOf_EsgIsmfZ8jwIvP0xICgL-EAB0AAAAAAAAAAAAAAAAAAAAAAB1AAG2025-01-21T13c24c59d693615p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"2","p":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","a":[{"i":"EMcWk38kBLvGdKH2b93HMujB_Xx5-ugwD-vrQJVVIJIl","s":"0","d":"EIlV2FfP39_0EOLUKDi2_ljF9FMty8OCp9myBepidVij"}]}-VAn-AABAACDrd4dm-E3OT2IlRwu4A3M7OzLkOgsoYi2-FPfS9Tmwr3awoCP2R-718qVHHUPNCb0MsnzQ2rTqVnNEw0QLWUB-EAB0AAAAAAAAAAAAAAAAAAAAAAC1AAG2025-01-21T13c47c06d452176p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"3","p":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","a":[{"i":"EDR-8z0CviOyrntUK3pyabMTiIuKn0AXGhQvD0C12gkX","s":"0","d":"EGCPj1fDEsyLgRAXwDoD9qrX6lJkwxXfBx0XNoDHtMLl"}]}-VAn-AABAAD6qIPXPrbqhKNPDRuU91_-EzQi01V53f1RFw0AV1sMe4JBjQmOdIwn4-FW88Lo-oht6e7C7sObbgk3-aJbQS4H-EAB0AAAAAAAAAAAAAAAAAAAAAAD1AAG2025-01-21T14c03c51d890362p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"4","p":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","a":[{"i":"EGsSqpbkJ-0SQnhyS-1FxNChZ7p1NV6yTXPPHIdyvjkZ","s":"0","d":"EMNJNkHlDqyrOHWbafUGPpHVrvvj5VbrCZML_ZgXk-Rk"}]}-VAn-AABAAAVj_8Zldpds_naKbRyuIOef3RKABaF23AHjkEKfc_Gb2j1559uY6NA8BV6ZmCKQU1_mpJbLbtaBMes-Oub2yUL-EAB0AAAAAAAAAAAAAAAAAAAAAAE1AAG2025-01-21T14c11c23d141088p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EC0Gh5X0JGSEkhUllR5sINwapxeAzYoKOWwP9UU7KdLn","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"5","p":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","a":[{"i":"ENMi3aqTIgCSuXROeMywH7VFuUD1-ubK3EMlumKkRkc7","s":"0","d":"EKdvQCM1oSTgjcPezvOw2YanOe8Wdi6wkbViE6vHpEjg"}]}-VAn-AABAABAaL6bwARu41XPQHGnHXuxmvPrIPP8vkghXhQbOTd07xdRZ5X2_kjMXu4UsHNyQcR7mNOht0kPeUPmafGx23EP-EAB0AAAAAAAAAAAAAAAAAAAAAAF1AAG2025-01-21T14c14c51d268032p00c00{"v":"KERI10JSON00012b_","t":"icp","d":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"0","kt":"1","k":["DGKzvhMMz2_MYhXyV5lGso_akvBYpGnOG5fTD299IsmO"],"nt":"1","n":["EBhg4MS4f4GZpuNZxk1D4mln9sv9l30rbtsk17AVOEmh"],"bt":"0","b":[],"c":[],"a":[]}-VAn-AABAADt-Cs8HoN9KBS5Kk23JCAaJzOl1InvbZ4FT0AQ0muKe6pSr8QvUJNNFTUImZg8XtBFqT75AY184rX3mKPKKgYI-EAB0AAAAAAAAAAAAAAAAAAAAAAA1AAG2025-01-21T13c24c58d219360p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"1","p":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","a":[{"i":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l","s":"0","d":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l"}]}-VAn-AABAADGIyEdPqQ4wJw6KWgFOF3guadzJYWTzy9EjDbxqnBEBmUIiGquNZvNtk--gDOYcOf_EsgIsmfZ8jwIvP0xICgL-EAB0AAAAAAAAAAAAAAAAAAAAAAB1AAG2025-01-21T13c24c59d693615p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"2","p":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","a":[{"i":"EMcWk38kBLvGdKH2b93HMujB_Xx5-ugwD-vrQJVVIJIl","s":"0","d":"EIlV2FfP39_0EOLUKDi2_ljF9FMty8OCp9myBepidVij"}]}-VAn-AABAACDrd4dm-E3OT2IlRwu4A3M7OzLkOgsoYi2-FPfS9Tmwr3awoCP2R-718qVHHUPNCb0MsnzQ2rTqVnNEw0QLWUB-EAB0AAAAAAAAAAAAAAAAAAAAAAC1AAG2025-01-21T13c47c06d452176p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"3","p":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","a":[{"i":"EDR-8z0CviOyrntUK3pyabMTiIuKn0AXGhQvD0C12gkX","s":"0","d":"EGCPj1fDEsyLgRAXwDoD9qrX6lJkwxXfBx0XNoDHtMLl"}]}-VAn-AABAAD6qIPXPrbqhKNPDRuU91_-EzQi01V53f1RFw0AV1sMe4JBjQmOdIwn4-FW88Lo-oht6e7C7sObbgk3-aJbQS4H-EAB0AAAAAAAAAAAAAAAAAAAAAAD1AAG2025-01-21T14c03c51d890362p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"4","p":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","a":[{"i":"EGsSqpbkJ-0SQnhyS-1FxNChZ7p1NV6yTXPPHIdyvjkZ","s":"0","d":"EMNJNkHlDqyrOHWbafUGPpHVrvvj5VbrCZML_ZgXk-Rk"}]}-VAn-AABAAAVj_8Zldpds_naKbRyuIOef3RKABaF23AHjkEKfc_Gb2j1559uY6NA8BV6ZmCKQU1_mpJbLbtaBMes-Oub2yUL-EAB0AAAAAAAAAAAAAAAAAAAAAAE1AAG2025-01-21T14c11c23d141088p00c00{"v":"KERI10JSON0000f9_","t":"rpy","d":"ELrQF_D6YFL_2SU7RbDOrTYRtGj0v_GlOmi-YWVyChol","dt":"2025-01-21T13:24:59.001000+00:00","r":"/loc/scheme","a":{"eid":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","url":"http://127.0.0.1:3001","scheme":"http"}}-VA0-FABEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--80AAAAAAAAAAAAAAAAAAAAAAAEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8-AABAAA8QzT_XDXtB_5bK8P-dVrCZIlQ69WniFPWkGmGthK683v1E2ymGA7RlkXogXtIEHekVjdl0Tg5r6lr5aREjxcL{"v":"KERI10JSON000113_","t":"rpy","d":"EA5z8Q3g-llvOK86bvE1QAceLb7g0FzcY9INn4Ch0Hu5","dt":"2025-01-21T13:24:58.660000+00:00","r":"/end/role/add","a":{"cid":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","role":"indexer","eid":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8"}}-VA0-FABEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--80AAAAAAAAAAAAAAAAAAAAAAAEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8-AABAADCsrTysi5_3hhzgP9VUyilJIPE8x-8Yi-lNtyB28tbc0a_S3igdY_v0yLg14tTzOyQn9sv3rGZEt4ZKb4-xl8D',
+      '{"v":"KERI10JSON00012b_","t":"icp","d":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"0","kt":"1","k":["DGKzvhMMz2_MYhXyV5lGso_akvBYpGnOG5fTD299IsmO"],"nt":"1","n":["EBhg4MS4f4GZpuNZxk1D4mln9sv9l30rbtsk17AVOEmh"],"bt":"0","b":[],"c":[],"a":[]}-VAn-AABAADt-Cs8HoN9KBS5Kk23JCAaJzOl1InvbZ4FT0AQ0muKe6pSr8QvUJNNFTUImZg8XtBFqT75AY184rX3mKPKKgYI-EAB0AAAAAAAAAAAAAAAAAAAAAAA1AAG2025-01-21T13c24c58d219360p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"1","p":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","a":[{"i":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l","s":"0","d":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l"}]}-VAn-AABAADGIyEdPqQ4wJw6KWgFOF3guadzJYWTzy9EjDbxqnBEBmUIiGquNZvNtk--gDOYcOf_EsgIsmfZ8jwIvP0xICgL-EAB0AAAAAAAAAAAAAAAAAAAAAAB1AAG2025-01-21T13c24c59d693615p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"2","p":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","a":[{"i":"EMcWk38kBLvGdKH2b93HMujB_Xx5-ugwD-vrQJVVIJIl","s":"0","d":"EIlV2FfP39_0EOLUKDi2_ljF9FMty8OCp9myBepidVij"}]}-VAn-AABAACDrd4dm-E3OT2IlRwu4A3M7OzLkOgsoYi2-FPfS9Tmwr3awoCP2R-718qVHHUPNCb0MsnzQ2rTqVnNEw0QLWUB-EAB0AAAAAAAAAAAAAAAAAAAAAAC1AAG2025-01-21T13c47c06d452176p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"3","p":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","a":[{"i":"EDR-8z0CviOyrntUK3pyabMTiIuKn0AXGhQvD0C12gkX","s":"0","d":"EGCPj1fDEsyLgRAXwDoD9qrX6lJkwxXfBx0XNoDHtMLl"}]}-VAn-AABAAD6qIPXPrbqhKNPDRuU91_-EzQi01V53f1RFw0AV1sMe4JBjQmOdIwn4-FW88Lo-oht6e7C7sObbgk3-aJbQS4H-EAB0AAAAAAAAAAAAAAAAAAAAAAD1AAG2025-01-21T14c03c51d890362p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"4","p":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","a":[{"i":"EGsSqpbkJ-0SQnhyS-1FxNChZ7p1NV6yTXPPHIdyvjkZ","s":"0","d":"EMNJNkHlDqyrOHWbafUGPpHVrvvj5VbrCZML_ZgXk-Rk"}]}-VAn-AABAAAVj_8Zldpds_naKbRyuIOef3RKABaF23AHjkEKfc_Gb2j1559uY6NA8BV6ZmCKQU1_mpJbLbtaBMes-Oub2yUL-EAB0AAAAAAAAAAAAAAAAAAAAAAE1AAG2025-01-21T14c11c23d141088p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EC0Gh5X0JGSEkhUllR5sINwapxeAzYoKOWwP9UU7KdLn","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"5","p":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","a":[{"i":"ENMi3aqTIgCSuXROeMywH7VFuUD1-ubK3EMlumKkRkc7","s":"0","d":"EKdvQCM1oSTgjcPezvOw2YanOe8Wdi6wkbViE6vHpEjg"}]}-VAn-AABAABAaL6bwARu41XPQHGnHXuxmvPrIPP8vkghXhQbOTd07xdRZ5X2_kjMXu4UsHNyQcR7mNOht0kPeUPmafGx23EP-EAB0AAAAAAAAAAAAAAAAAAAAAAF1AAG2025-01-21T14c14c51d268032p00c00{"v":"KERI10JSON00012b_","t":"icp","d":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"0","kt":"1","k":["DGKzvhMMz2_MYhXyV5lGso_akvBYpGnOG5fTD299IsmO"],"nt":"1","n":["EBhg4MS4f4GZpuNZxk1D4mln9sv9l30rbtsk17AVOEmh"],"bt":"0","b":[],"c":[],"a":[]}-VAn-AABAADt-Cs8HoN9KBS5Kk23JCAaJzOl1InvbZ4FT0AQ0muKe6pSr8QvUJNNFTUImZg8XtBFqT75AY184rX3mKPKKgYI-EAB0AAAAAAAAAAAAAAAAAAAAAAA1AAG2025-01-21T13c24c58d219360p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"1","p":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","a":[{"i":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l","s":"0","d":"EHm5kvOMHAdKkLBYazkUG54cyusm8d6SODrnJ2ZOP9-l"}]}-VAn-AABAADGIyEdPqQ4wJw6KWgFOF3guadzJYWTzy9EjDbxqnBEBmUIiGquNZvNtk--gDOYcOf_EsgIsmfZ8jwIvP0xICgL-EAB0AAAAAAAAAAAAAAAAAAAAAAB1AAG2025-01-21T13c24c59d693615p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"2","p":"EE_oRQa2Lq6g9C4jItfGPa9BMFsnmSPgS8_oB747-KHL","a":[{"i":"EMcWk38kBLvGdKH2b93HMujB_Xx5-ugwD-vrQJVVIJIl","s":"0","d":"EIlV2FfP39_0EOLUKDi2_ljF9FMty8OCp9myBepidVij"}]}-VAn-AABAACDrd4dm-E3OT2IlRwu4A3M7OzLkOgsoYi2-FPfS9Tmwr3awoCP2R-718qVHHUPNCb0MsnzQ2rTqVnNEw0QLWUB-EAB0AAAAAAAAAAAAAAAAAAAAAAC1AAG2025-01-21T13c47c06d452176p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"3","p":"EHfvjSm2o673Ps3dPy6FI_80OjvJicpwZG6FMQoARllG","a":[{"i":"EDR-8z0CviOyrntUK3pyabMTiIuKn0AXGhQvD0C12gkX","s":"0","d":"EGCPj1fDEsyLgRAXwDoD9qrX6lJkwxXfBx0XNoDHtMLl"}]}-VAn-AABAAD6qIPXPrbqhKNPDRuU91_-EzQi01V53f1RFw0AV1sMe4JBjQmOdIwn4-FW88Lo-oht6e7C7sObbgk3-aJbQS4H-EAB0AAAAAAAAAAAAAAAAAAAAAAD1AAG2025-01-21T14c03c51d890362p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"4","p":"EJRetyFJqp1yRs3hbleyAnqE3VqQQC2o4L3JDhIL0j2S","a":[{"i":"EGsSqpbkJ-0SQnhyS-1FxNChZ7p1NV6yTXPPHIdyvjkZ","s":"0","d":"EMNJNkHlDqyrOHWbafUGPpHVrvvj5VbrCZML_ZgXk-Rk"}]}-VAn-AABAAAVj_8Zldpds_naKbRyuIOef3RKABaF23AHjkEKfc_Gb2j1559uY6NA8BV6ZmCKQU1_mpJbLbtaBMes-Oub2yUL-EAB0AAAAAAAAAAAAAAAAAAAAAAE1AAG2025-01-21T14c11c23d141088p00c00{"v":"KERI10JSON00013a_","t":"ixn","d":"EC0Gh5X0JGSEkhUllR5sINwapxeAzYoKOWwP9UU7KdLn","i":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","s":"5","p":"EBVYE7oXrSUvo2wNSTzXOK28SMEg6v_qrh2s_8Jk7Jdx","a":[{"i":"ENMi3aqTIgCSuXROeMywH7VFuUD1-ubK3EMlumKkRkc7","s":"0","d":"EKdvQCM1oSTgjcPezvOw2YanOe8Wdi6wkbViE6vHpEjg"}]}-VAn-AABAABAaL6bwARu41XPQHGnHXuxmvPrIPP8vkghXhQbOTd07xdRZ5X2_kjMXu4UsHNyQcR7mNOht0kPeUPmafGx23EP-EAB0AAAAAAAAAAAAAAAAAAAAAAF1AAG2025-01-21T14c14c51d268032p00c00{"v":"KERI10JSON0000f9_","t":"rpy","d":"ELrQF_D6YFL_2SU7RbDOrTYRtGj0v_GlOmi-YWVyChol","dt":"2025-01-21T13:24:59.001000+00:00","r":"/loc/scheme","a":{"eid":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","url":"http://127.0.0.1:3001","scheme":"http"}}-VA0-FABEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--80AAAAAAAAAAAAAAAAAAAAAAAEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8-AABAAA8QzT_XDXtB_5bK8P-dVrCZIlQ69WniFPWkGmGthK683v1E2ymGA7RlkXogXtIEHekVjdl0Tg5r6lr5aREjxcL{"v":"KERI10JSON000113_","t":"rpy","d":"EA5z8Q3g-llvOK86bvE1QAceLb7g0FzcY9INn4Ch0Hu5","dt":"2025-01-21T13:24:58.660000+00:00","r":"/end/role/add","a":{"cid":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8","role":"indexer","eid":"EKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8"}}-VA0-FABEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--80AAAAAAAAAAAAAAAAAAAAAAAEKxN8WjtIewcbCp_cGih5Dd42PJ-IZ8KTPbc5Xx5q--8-AABAADCsrTysi5_3hhzgP9VUyilJIPE8x-8Yi-lNtyB28tbc0a_S3igdY_v0yLg14tTzOyQn9sv3rGZEt4ZKb4-xl8D',
   }) as jest.Mock;
 });
 
@@ -350,7 +355,9 @@ describe("Receive individual ACDC actions", () => {
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       id: "identifierId",
     });
-    schemaGetMock.mockResolvedValue(QVISchema);
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithEdge)
+      .mockResolvedValue(schemaNoEdges);
     credentialStorage.getCredentialMetadata = jest.fn().mockResolvedValue({
       id: "id",
     });
@@ -381,6 +388,7 @@ describe("Receive individual ACDC actions", () => {
       identifierId: "identifierId",
       identifierType: "individual",
       createdAt: new Date(credentialRecordProps.issuanceDate),
+      credentialType: schemaWithEdge.title,
     });
     expect(eventEmitter.emit).toHaveBeenCalledWith({
       type: EventTypes.AcdcStateChanged,
@@ -423,6 +431,14 @@ describe("Receive individual ACDC actions", () => {
         hidden: true,
       })
     );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://127.0.0.1:3001/oobi/farEdgeSchemaSaid",
+      true
+    ); // Ensures we are calling recursiveSchemaResolve as it's public
   });
 
   test("Can accept ACDC from individual identifier even if already exists (idempotent)", async () => {
@@ -844,6 +860,9 @@ describe("Receive group ACDC actions", () => {
         identifierType: "group",
         createdAt: new Date(credentialRecordProps.issuanceDate),
       });
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithEdge)
+      .mockResolvedValue(schemaNoEdges);
 
     await ipexCommunicationService.joinMultisigAdmit("id");
 
@@ -853,7 +872,6 @@ describe("Receive group ACDC actions", () => {
       false,
       grantForIssuanceExnMessage.exn.rp
     );
-
     expect(getManagerMock).toBeCalledWith(gHab);
     expect(ipexSubmitAdmitMock).toBeCalledWith(
       "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
@@ -870,6 +888,7 @@ describe("Receive group ACDC actions", () => {
       identifierId: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
       identifierType: "group",
       createdAt: new Date(credentialRecordProps.issuanceDate),
+      credentialType: "Schema with edge",
     });
     expect(eventEmitter.emit).toHaveBeenCalledWith({
       type: EventTypes.AcdcStateChanged,
@@ -898,6 +917,14 @@ describe("Receive group ACDC actions", () => {
       recordType: OperationPendingRecordType.ExchangeReceiveCredential,
     });
     expect(notificationStorage.deleteById).not.toBeCalled();
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://127.0.0.1:3001/oobi/farEdgeSchemaSaid",
+      true
+    ); // Ensures we are calling recursiveSchemaResolve as it's public
   });
 
   test("Can join group admit of an ACDC even if ACDC already exists (idempotent)", async () => {
@@ -2275,6 +2302,169 @@ describe("Grant ACDC group actions", () => {
   });
 });
 
+describe("Chained ACDC schema resolution", () => {
+  test("Can resolve non-chained ACDC schema", async () => {
+    schemaGetMock.mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaNoEdges);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(1);
+  });
+
+  test("Can resolve chained ACDC schema with a non-saidified edge section", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithEdge)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithEdge);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(2);
+  });
+
+  test("Can resolve chained ACDC schema with a saidified edge section", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithSaidifiedEdgeSection)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithSaidifiedEdgeSection);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSchemaSaidSaidifiedEdgeSection",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(2);
+  });
+
+  test("Can resolve chained ACDC schema with more than a depth of 2", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithEdge)
+      .mockResolvedValueOnce(schemaWithSaidifiedEdgeSection)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithEdge);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSchemaSaidSaidifiedEdgeSection",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(3);
+  });
+
+  test("Can resolve a schema with multiple edges", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithMultipleEdges)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithMultipleEdges);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeASchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeBSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(3);
+  });
+
+  test("Can resolve a schema with a saidified edge", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithASaidifiedEdge)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithASaidifiedEdge);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSaidifiedSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(2);
+  });
+
+  test("Cannot resolve schemas with edge groups", async () => {
+    schemaGetMock.mockResolvedValue(schemaWithEdgeGroup);
+    await expect(
+      ipexCommunicationService.recursiveSchemaResolve(
+        "http://issuerendpoint.com/oobi/",
+        "schemaSaid"
+      )
+    ).rejects.toThrowError(
+      IpexCommunicationService.EDGE_GROUP_SCHEMA_RESOLUTION_UNSUPPORTED
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).not.toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSaidifiedSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(1);
+  });
+
+  test("Cannot resolve edge schemas that do not specify the schema SAID", async () => {
+    schemaGetMock.mockResolvedValue(schemaWithEdgeWithoutSchemaSaid);
+    await expect(
+      ipexCommunicationService.recursiveSchemaResolve(
+        "http://issuerendpoint.com/oobi/",
+        "schemaSaid"
+      )
+    ).rejects.toThrowError(
+      IpexCommunicationService.MISSING_SUB_SCHEMA_REFERENCE
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(1);
+  });
+});
+
 // @TODO - foconnor: Split into individual describes and tidy up.
 describe("IPEX communication service of agent", () => {
   beforeAll(async () => {
@@ -2620,12 +2810,7 @@ describe("IPEX communication service of agent", () => {
   });
 
   test("Can get acdc detail", async () => {
-    const grantWithOobiUrl = JSON.parse(
-      JSON.stringify(grantForIssuanceExnMessage)
-    ) as typeof grantForIssuanceExnMessage;
-    (grantWithOobiUrl.exn.a as { oobiUrl?: string }).oobiUrl =
-      "https://issuer.example/oobi";
-    getExchangeMock.mockReturnValueOnce(grantWithOobiUrl);
+    getExchangeMock.mockReturnValueOnce(grantForIssuanceExnMessage);
     schemaGetMock.mockResolvedValue(QVISchema);
     credentialStateMock.mockResolvedValueOnce(credentialStateIssued);
 
@@ -2647,7 +2832,11 @@ describe("IPEX communication service of agent", () => {
         dt: "2024-07-30T04:19:55.348000+00:00",
         attendeeName: "ccc",
       },
-      s: QVISchema,
+      s: {
+        title: QVISchema.title,
+        description: QVISchema.description,
+        version: QVISchema.version,
+      },
       lastStatus: { s: "0", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
       identifierId: grantForIssuanceExnMessage.exn.rp,
@@ -2656,17 +2845,10 @@ describe("IPEX communication service of agent", () => {
   });
 
   test("Can get acdc detail when the schema has not been resolved", async () => {
-    connections.resolveOobi.mockClear();
-    const grantWithOobiUrl = JSON.parse(
-      JSON.stringify(grantForIssuanceExnMessage)
-    ) as typeof grantForIssuanceExnMessage;
-    (grantWithOobiUrl.exn.a as { oobiUrl?: string }).oobiUrl =
-      "https://issuer.example/oobi";
-    getExchangeMock.mockReturnValueOnce(grantWithOobiUrl);
+    getExchangeMock.mockReturnValueOnce(grantForIssuanceExnMessage);
     credentialStateMock.mockResolvedValueOnce(credentialStateIssued);
     const error404 = new Error("Not Found - 404");
     schemaGetMock.mockRejectedValueOnce(error404);
-    schemaGetMock.mockResolvedValueOnce(QVISchema);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValueOnce(memberIdentifierRecord);
@@ -2685,40 +2867,19 @@ describe("IPEX communication service of agent", () => {
         dt: "2024-07-30T04:19:55.348000+00:00",
         attendeeName: "ccc",
       },
-      s: QVISchema,
+      s: {
+        title: QVISchema.title,
+        description: QVISchema.description,
+        version: QVISchema.version,
+      },
       lastStatus: { s: "0", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
       identifierId: grantForIssuanceExnMessage.exn.rp,
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
     expect(connections.resolveOobi).toBeCalledWith(
-      "https://issuer.example/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu"
-    );
-  });
-
-  test("Falls back to schema discovery when oobiUrl is missing on grant", async () => {
-    const grantWithoutOobiUrl = JSON.parse(
-      JSON.stringify(grantForIssuanceExnMessage)
-    ) as typeof grantForIssuanceExnMessage;
-    delete (grantWithoutOobiUrl.exn.a as { oobiUrl?: string }).oobiUrl;
-    connections.resolveOobi.mockClear();
-
-    getExchangeMock.mockReturnValueOnce(grantWithoutOobiUrl);
-    credentialStateMock.mockResolvedValueOnce(credentialStateIssued);
-    const error404 = new Error("Not Found - 404");
-    schemaGetMock.mockRejectedValueOnce(error404);
-    schemaGetMock.mockResolvedValueOnce(QVISchema);
-    identifierStorage.getIdentifierMetadata = jest
-      .fn()
-      .mockResolvedValueOnce(memberIdentifierRecord);
-
-    await ipexCommunicationService.getAcdcFromIpexGrant(
-      grantWithoutOobiUrl.exn.d
-    );
-
-    const schemaSaid = grantWithoutOobiUrl.exn.e.acdc.s;
-    expect(connections.resolveOobi).toBeCalledWith(
-      `http://127.0.0.1:3001/oobi/${schemaSaid}`
+      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+      true
     );
   });
 
@@ -2757,7 +2918,11 @@ describe("IPEX communication service of agent", () => {
         dt: "2024-07-30T04:19:55.348000+00:00",
         attendeeName: "ccc",
       },
-      s: QVISchema,
+      s: {
+        title: QVISchema.title,
+        description: QVISchema.description,
+        version: QVISchema.version,
+      },
       lastStatus: { s: "1", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
       identifierId: grantForIssuanceExnMessage.exn.rp,

@@ -19,6 +19,7 @@ import { IdentifierService } from "../../../core/agent/services";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
+import { notificationService } from "../../../native/pushNotifications/notificationService";
 import {
   PeerConnectedEvent,
   PeerConnectionBrokenEvent,
@@ -382,7 +383,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const notifications =
         await Agent.agent.keriaNotifications.getNotifications();
 
-      // TODO: load current profile after load database
       const appDefaultProfileRecord = await Agent.agent.basicStorage.findById(
         MiscRecordId.DEFAULT_PROFILE
       );
@@ -460,7 +460,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
           updateProfileHistories(newProfileHistories);
         } else {
           if (storedIdentifiers.length > 0) {
-            // If we have no default profile set, we will set the oldest identifier as default.
             const oldest = storedIdentifiers
               .slice()
               .sort((prev, next) =>
@@ -480,6 +479,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       }
 
       dispatch(setProfiles(profiles));
+
       dispatch(setCurrentProfile(currentProfileAid));
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
@@ -663,6 +663,17 @@ const AppWrapper = (props: { children: ReactNode }) => {
   };
 
   const setupEventServiceCallbacks = () => {
+    notificationService.initialize();
+    notificationService.setProfileSwitcher(async (profileId: string) => {
+      dispatch(setCurrentProfile(profileId));
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.DEFAULT_PROFILE,
+          content: { defaultProfile: profileId },
+        })
+      );
+    });
+
     Agent.agent.onKeriaStatusStateChanged((event) => {
       setOnlineStatus(event.payload.isOnline);
     });
