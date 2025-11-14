@@ -3267,6 +3267,7 @@ describe("Long running operation tracker", () => {
   });
 
   test("Can handle connection completion (OOBI resolution) for multiple profiles at once", async () => {
+    const oobiResolutionTime = Date.now();
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const operationMock = {
       metadata: {
@@ -3276,7 +3277,7 @@ describe("Long running operation tracker", () => {
       done: true,
       response: {
         i: "id",
-        dt: new Date(),
+        dt: new Date(oobiResolutionTime),
       },
     };
     operationsGetMock.mockResolvedValue(operationMock);
@@ -3308,6 +3309,7 @@ describe("Long running operation tracker", () => {
     } as OperationPendingRecord;
     contactGetMock.mockResolvedValueOnce(null);
 
+    jest.advanceTimersByTime(500);
     await keriaNotificationService.processOperation(operationRecord);
 
     expect(connectionService.shareIdentifier).toBeCalledWith(
@@ -3335,15 +3337,17 @@ describe("Long running operation tracker", () => {
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt":
-        operationMock.response.dt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt": new Date(
+        oobiResolutionTime + 500
+      ),
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
-        operationMock.response.dt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt": new Date(
+        oobiResolutionTime + 500
+      ),
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(2);
@@ -3376,6 +3380,7 @@ describe("Long running operation tracker", () => {
   });
 
   test("Should skip connection completion logic for already completed connection pairs", async () => {
+    const oobiResolutionTime = Date.now();
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const operationMock = {
       metadata: {
@@ -3385,7 +3390,7 @@ describe("Long running operation tracker", () => {
       done: true,
       response: {
         i: "id",
-        dt: new Date(),
+        dt: new Date(oobiResolutionTime),
       },
     };
     operationsGetMock.mockResolvedValue(operationMock);
@@ -3422,6 +3427,7 @@ describe("Long running operation tracker", () => {
       createdAt: new Date(),
     });
 
+    jest.advanceTimersByTime(500);
     await keriaNotificationService.processOperation(operationRecord);
 
     expect(connectionService.shareIdentifier).toBeCalledWith(
@@ -3439,8 +3445,9 @@ describe("Long running operation tracker", () => {
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
-        operationMock.response.dt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt": new Date(
+        oobiResolutionTime + 500
+      ),
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(1);
