@@ -1234,6 +1234,18 @@ class KeriaNotificationService extends AgentService {
 
           for (const connectionPairRecord of connectionPairRecords) {
             if (
+              connectionPairRecord.creationStatus === CreationStatus.COMPLETE
+            ) {
+              continue;
+            }
+
+            connectionPairRecord.creationStatus = CreationStatus.COMPLETE;
+
+            const contact = await this.contactStorage.findExpectedById(
+              connectionPairRecord.contactId
+            );
+
+            if (
               connectionPairRecord.identifier &&
               !connectionPairRecord.pendingDeletion
             ) {
@@ -1243,37 +1255,16 @@ class KeriaNotificationService extends AgentService {
               );
             }
 
-            connectionPairRecord.creationStatus = CreationStatus.COMPLETE;
-
-            const keriaContact = await this.props.signifyClient
+            await this.props.signifyClient
               .contacts()
-              .get((operation.response as State).i)
-              .catch(() => undefined);
-
-            if (!keriaContact) {
-              const contact = await this.contactStorage.findById(
-                connectionPairRecord.contactId
-              );
-              if (!contact) {
-                throw new Error(
-                  `Contact not found for connection pair: ${connectionPairRecord.contactId}`
-                );
-              }
-
-              await this.props.signifyClient
-                .contacts()
-                .update((operation.response as State).i, {
-                  version: LATEST_CONTACT_VERSION,
-                  alias: contact.alias,
-                  [`${connectionPairRecord.identifier}:createdAt`]: new Date(
-                    (operation.response as State).dt
-                  ),
-                  oobi: contact.oobi,
-                });
-            }
+              .update((operation.response as State).i, {
+                version: LATEST_CONTACT_VERSION,
+                alias: contact.alias,
+                oobi: contact.oobi,
+                [`${connectionPairRecord.identifier}:createdAt`]: new Date(),
+              });
 
             await this.connectionPairStorage.update(connectionPairRecord);
-
             this.props.eventEmitter.emit<ConnectionStateChangedEvent>({
               type: EventTypes.ConnectionStateChanged,
               payload: {
