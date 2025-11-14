@@ -1378,15 +1378,13 @@ class KeriaNotificationService extends AgentService {
                   return;
                 }
 
+                // Ignore case where metadata was removed locally (e.g. user deleted pending credential)
+                // and continue processing to clean up notifications/history.
                 if (
-                  error.message.startsWith(
+                  !error.message.startsWith(
                     CredentialService.CREDENTIAL_MISSING_METADATA_ERROR_MSG
                   )
                 ) {
-                  // Credential metadata was removed locally (e.g. user deleted pending credential)
-                  // Continue processing to clean up notifications/history.
-                  // eslint-disable-next-line no-empty
-                } else {
                   throw error;
                 }
               } else {
