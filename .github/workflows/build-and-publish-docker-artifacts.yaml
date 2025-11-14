@@ -72,7 +72,7 @@ jobs:
           platforms: arm64
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@27ed10ed269f89d937edb58ceff0076e1d73bfd9 # main at 14/11/2025
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
