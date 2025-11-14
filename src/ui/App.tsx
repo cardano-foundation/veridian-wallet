@@ -19,7 +19,6 @@ import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { getShowProfileState } from "../store/reducers/profileCache";
 import {
-  getCurrentOperation,
   getGlobalLoading,
   getInitializationPhase,
 } from "../store/reducers/stateCache";
@@ -36,8 +35,6 @@ import {
   IOS_MIN_VERSION,
   WEBVIEW_MIN_VERSION,
 } from "./globals/constants";
-import { OperationType } from "./globals/types";
-import { FullPageScanner } from "./pages/FullPageScanner";
 import { LoadingPage } from "./pages/LoadingPage/LoadingPage";
 import { LoadingType } from "./pages/LoadingPage/LoadingPage.types";
 import { LockPage } from "./pages/LockPage/LockPage";
@@ -52,18 +49,7 @@ import { compareVersion } from "./utils/version";
 setupIonicReact();
 
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
-  const [showScan, setShowScan] = useState(false);
-  const currentOperation = useAppSelector(getCurrentOperation);
   const showProfileState = useAppSelector(getShowProfileState);
-
-  useEffect(() => {
-    setShowScan(
-      [
-        OperationType.SCAN_CONNECTION,
-        OperationType.SCAN_WALLET_CONNECTION,
-      ].includes(currentOperation)
-    );
-  }, [currentOperation]);
 
   switch (initPhase) {
     case InitializationPhase.PHASE_ZERO:
@@ -79,24 +65,13 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
       return (
         <>
           <IonReactRouter>
-            {showScan ? (
-              <FullPageScanner
-                showScan={showScan}
-                setShowScan={setShowScan}
-              />
-            ) : (
-              <div
-                className="app-spinner-container"
-                data-testid="app-spinner-container"
-              >
-                <IonSpinner name="circular" />
-              </div>
-            )}
             <div
-              className={`app-router ${
-                showScan || showProfileState ? "ion-hide" : ""
-              }`}
+              className="app-spinner-container"
+              data-testid="app-spinner-container"
             >
+              <IonSpinner name="circular" />
+            </div>
+            <div className={`app-router ${showProfileState ? "ion-hide" : ""}`}>
               <Routes />
             </div>
             <ProfileStateModal />

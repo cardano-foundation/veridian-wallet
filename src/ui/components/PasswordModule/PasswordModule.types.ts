@@ -11,12 +11,12 @@ interface PasswordModuleProps {
   testId: string;
   title?: string;
   description?: string;
-  onCreateSuccess: (skipped: boolean) => void;
   onValidationChange?: (validated: boolean) => void;
 }
 
 interface PasswordModuleRef {
   clearState: () => void;
+  savePassword: () => Promise<void>;
 }
 
 export type {

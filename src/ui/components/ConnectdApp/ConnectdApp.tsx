@@ -1,47 +1,40 @@
-import {
-  IonButton,
-  IonCheckbox,
-  IonChip,
-  IonIcon,
-  IonItemOption,
-} from "@ionic/react";
-import { addOutline, arrowBackOutline, hourglassOutline } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { IonButton, IonIcon } from "@ionic/react";
+import { addOutline, arrowBackOutline, repeatOutline } from "ionicons/icons";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getCurrentOperation,
-  getToastMsgs,
-  setCurrentOperation,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
-import {
   getConnectedDApp,
+  getPeerConnections,
   getPendingDAppConnection,
   setConnectedDApp,
-  setPendingDAppConnection,
-  getPeerConnections,
   setPeerConnections,
+  setPendingDAppConnection,
 } from "../../../store/reducers/profileCache";
+import { getToastMsgs, setToastMsg } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
-import { CardList } from "../../components/CardList";
-import { CardsPlaceholder } from "../../components/CardsPlaceholder";
-import { ANIMATION_DURATION } from "../../components/SideSlider/SideSlider.types";
 import { Verification } from "../../components/Verification";
-import { OperationType, ToastMsgType } from "../../globals/types";
+import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
+import { combineClassNames } from "../../utils/style";
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import { PageHeader } from "../PageHeader";
+import { Scan } from "../Scan";
+import { useCameraDirection } from "../Scan/hook/useCameraDirection";
+import { ScanRef } from "../Scan/Scan.types";
 import { SideSlider } from "../SideSlider";
 import { ConfirmConnectModal } from "./components/ConfirmConnectModal";
+import { Connections } from "./components/Connections";
+import { WalletConnect } from "./components/WalletConnect";
 import "./ConnectdApp.scss";
 import {
   ActionInfo,
   ActionType,
   ConnectdAppProps,
   DAppConnection,
+  Step,
 } from "./ConnectdApp.types";
 
 const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
@@ -50,29 +43,24 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
   const pendingConnection = useAppSelector(getPendingDAppConnection);
   const connections = useAppSelector(getPeerConnections);
   const connectedDApp = useAppSelector(getConnectedDApp);
-  const currentOperation = useAppSelector(getCurrentOperation);
   const pageId = "connect-dapp";
   const [actionInfo, setActionInfo] = useState<ActionInfo>({
     type: ActionType.None,
   });
-  const [openExistConenctedWalletAlert, setOpenExistConnectedWalletAlert] =
+
+  const [step, setStep] = useState(Step.Connections);
+  const showScan = step === Step.Scan;
+
+  const [openExistConnectedWalletAlert, setOpenExistConnectedWalletAlert] =
     useState<boolean>(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState<boolean>(false);
   const [openConfirmConnectModal, setOpenConfirmConnectModal] =
     useState<boolean>(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-
-  const displayConnection = connections.map((connection) => {
-    const dAppName = connection.name ? connection.name : connection.meerkatId;
-    return {
-      id: connection.meerkatId,
-      title: dAppName,
-      url: connection.url,
-      subtitle: connection.url,
-      image: connection.iconB64,
-      data: connection,
-    };
-  });
+  const { cameraDirection, changeCameraDirection, supportMultiCamera } =
+    useCameraDirection();
+  const [enableCameraDirection, setEnableCameraDirection] = useState(false);
+  const scanRef = useRef<ScanRef>(null);
 
   const handleOpenVerify = () => {
     setVerifyIsOpen(true);
@@ -148,6 +136,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
     if (!actionInfo.data) return;
     const isConnectedItem =
       actionInfo.data.meerkatId === connectedDApp?.meerkatId;
+
     if (isConnectedItem) {
       disconnectWallet();
       return;
@@ -159,6 +148,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
     }
 
     dispatch(setPendingDAppConnection(actionInfo.data));
+    setStep(Step.Confirm);
   };
 
   const handleAfterVerify = () => {
@@ -178,7 +168,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
       return;
     }
 
-    dispatch(setCurrentOperation(OperationType.SCAN_WALLET_CONNECTION));
+    setStep(Step.Scan);
   };
 
   const handleCloseExistConnectedWallet = () => {
@@ -193,7 +183,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
     if (actionInfo.type === ActionType.Connect && actionInfo.data) {
       dispatch(setPendingDAppConnection(actionInfo.data));
     } else {
-      dispatch(setCurrentOperation(OperationType.SCAN_WALLET_CONNECTION));
+      setStep(Step.Scan);
     }
     handleCloseExistConnectedWallet();
   };
@@ -215,110 +205,126 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
     }
   }, [connectedDApp, toastMsgs, pendingConnection, openConfirmConnectModal]);
 
-  useEffect(() => {
+  const handleClose = () => {
+    if (showScan) {
+      setStep(Step.Connections);
+      return;
+    }
+
+    if (step == Step.Confirm) {
+      setStep(Step.Scan);
+      return;
+    }
+
+    setIsOpen(false);
+  };
+
+  const handleConnectWallet = async (id: string) => {
+    if (/^b[1-9A-HJ-NP-Za-km-z]{33}/.test(id)) {
+      dispatch(setToastMsg(ToastMsgType.PEER_ID_SUCCESS));
+      dispatch(
+        setPendingDAppConnection({
+          meerkatId: id,
+        })
+      );
+      setStep(Step.Confirm);
+    } else {
+      dispatch(setToastMsg(ToastMsgType.PEER_ID_ERROR));
+    }
+  };
+
+  const title = useMemo(() => {
+    if (step == Step.Confirm)
+      return `${i18n.t("connectdapp.request.stageone.title")}`;
+
+    if (step == Step.Connections) return `${i18n.t("connectdapp.title")}`;
+
+    return undefined;
+  }, [step]);
+
+  const handleAfterConnect = () => {
     if (!pendingConnection) return;
 
-    if (
-      OperationType.OPEN_WALLET_CONNECTION_DETAIL === currentOperation &&
-      pendingConnection
-    ) {
-      dispatch(setCurrentOperation(OperationType.IDLE));
-      setTimeout(() => {
-        handleOpenConfirmConnectModal(pendingConnection);
-      }, ANIMATION_DURATION);
+    setStep(Step.Connections);
+    handleOpenConfirmConnectModal(pendingConnection);
+  };
+
+  const getContent = () => {
+    switch (step) {
+      case Step.Scan:
+        return (
+          <Scan
+            onFinishScan={handleConnectWallet}
+            cameraDirection={cameraDirection}
+            onCheckPermissionFinish={setEnableCameraDirection}
+            ref={scanRef}
+            displayOnModal
+          />
+        );
+      case Step.Confirm:
+        return (
+          <WalletConnect
+            handleAfterConnect={handleAfterConnect}
+            close={setStep}
+          />
+        );
+      default:
+        return (
+          <Connections
+            pageId={pageId}
+            handleDelete={handleOpenDeleteAlert}
+            onCardClick={handleOpenConfirmConnectModal}
+            handleScanQR={handleScanQR}
+          />
+        );
     }
-  }, [currentOperation, dispatch, pendingConnection]);
+  };
+
+  const classes = combineClassNames({
+    "connect-dapp-scan": step === Step.Scan,
+  });
 
   return (
     <>
       <SideSlider
         renderAsModal
         isOpen={isOpen}
+        className="connect-dapp-modal"
       >
         <ScrollablePageLayout
           pageId={pageId}
           activeStatus={isOpen}
+          customClass={classes}
           header={
             <PageHeader
               closeButton
-              closeButtonAction={() => setIsOpen(false)}
+              closeButtonAction={handleClose}
               closeButtonIcon={arrowBackOutline}
-              title={`${i18n.t("connectdapp.title")}`}
+              title={title}
               additionalButtons={
-                <IonButton
-                  shape="round"
-                  className="connect-wallet-button"
-                  data-testid="menu-add-connection-button"
-                  onClick={handleScanQR}
-                >
-                  <IonIcon
-                    slot="icon-only"
-                    icon={addOutline}
-                    color="primary"
-                  />
-                </IonButton>
+                showScan ? undefined : (
+                  <IonButton
+                    shape="round"
+                    className="connect-wallet-button"
+                    data-testid="menu-add-connection-button"
+                    onClick={handleScanQR}
+                  >
+                    <IonIcon
+                      slot="icon-only"
+                      icon={addOutline}
+                      color="primary"
+                    />
+                  </IonButton>
+                )
               }
+              actionButton={showScan && supportMultiCamera}
+              actionButtonIcon={showScan ? repeatOutline : undefined}
+              actionButtonAction={showScan ? changeCameraDirection : undefined}
+              actionButtonDisabled={showScan && !enableCameraDirection}
             />
           }
         >
-          <div className="connect-wallet-container">
-            {connections.length > 0 ? (
-              <>
-                <h2 className="connect-wallet-title">
-                  {i18n.t("connectdapp.connectionhistory.title")}
-                </h2>
-                <CardList
-                  data={displayConnection}
-                  onCardClick={handleOpenConfirmConnectModal}
-                  onRenderCardAction={(data) => {
-                    return (
-                      <IonItemOption
-                        color="danger"
-                        data-testid={`delete-connections-${data.meerkatId}`}
-                        onClick={() => {
-                          handleOpenDeleteAlert(data);
-                        }}
-                      >
-                        {i18n.t("connectdapp.connectionhistory.action.delete")}
-                      </IonItemOption>
-                    );
-                  }}
-                  onRenderEndSlot={(data) => {
-                    if (data.meerkatId === pendingConnection?.meerkatId) {
-                      return (
-                        <IonChip className="connection-pending">
-                          <IonIcon
-                            icon={hourglassOutline}
-                            color="primary"
-                          ></IonIcon>
-                        </IonChip>
-                      );
-                    }
-
-                    if (data.meerkatId !== connectedDApp?.meerkatId)
-                      return null;
-
-                    return (
-                      <IonCheckbox
-                        checked={true}
-                        aria-label=""
-                        className="checkbox"
-                        data-testid="connected-wallet-check-mark"
-                      />
-                    );
-                  }}
-                />
-              </>
-            ) : (
-              <div className="placeholder-container">
-                <CardsPlaceholder
-                  buttonLabel={`${i18n.t("connectdapp.connectbtn")}`}
-                  buttonAction={handleScanQR}
-                  testId={pageId}
-                />
-              </div>
-            )}
-          </div>
+          {getContent()}
         </ScrollablePageLayout>
       </SideSlider>
       <ConfirmConnectModal
@@ -345,7 +351,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
         actionDismiss={closeDeleteAlert}
       />
       <Alert
-        isOpen={openExistConenctedWalletAlert}
+        isOpen={openExistConnectedWalletAlert}
         setIsOpen={setOpenExistConnectedWalletAlert}
         dataTestId="alert-disconnect-wallet"
         headerText={i18n.t("connectdapp.disconnectbeforecreatealert.message")}

@@ -113,9 +113,6 @@ const VerifySeedPhrase = () => {
   const handleNavigate = () => {
     const data: DataProps = {
       store: { stateCache },
-      state: {
-        currentOperation: stateCache.currentOperation,
-      },
     };
     const { nextPath, updateRedux } = getNextRoute(
       RoutePath.VERIFY_SEED_PHRASE,

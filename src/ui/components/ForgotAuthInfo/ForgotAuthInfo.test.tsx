@@ -22,6 +22,8 @@ const verifySeedPhraseFnc = jest.fn();
 const createOrUpdateBasicStore = jest.fn((arg: unknown) =>
   Promise.resolve(arg)
 );
+const verifySecret = jest.fn().mockResolvedValue(false);
+
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
@@ -34,7 +36,7 @@ jest.mock("../../../core/agent/agent", () => ({
           createOrUpdateBasicStore(arg),
       },
       auth: {
-        verifySecret: jest.fn().mockResolvedValue(false),
+        verifySecret: () => verifySecret(),
         storeSecret: jest.fn(),
       },
     },
@@ -75,7 +77,7 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
     biometricInfo: {
       isAvailable: true,
       hasCredentials: false,
-      biometryType: BiometryType.FINGERPRINT
+      biometryType: BiometryType.FINGERPRINT,
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
     setBiometricsIsEnabled: jest.fn(),
@@ -216,6 +218,7 @@ describe("Forgot Password Page", () => {
         loggedIn: true,
         time: Date.now(),
         passcodeIsSet: true,
+        passwordIsSet: true,
         recoveryWalletProgress: true,
       },
     },
@@ -306,6 +309,31 @@ describe("Forgot Password Page", () => {
       expect(
         getByText(EN_TRANSLATIONS.forgotauth.newpassword.description)
       ).toBeVisible();
+      expect(
+        getByText(EN_TRANSLATIONS.createpassword.button.continue)
+      ).toBeVisible();
+    });
+
+    const input = getByTestId("create-password-input");
+    const confirmInput = getByTestId("confirm-password-input");
+    const hintInput = getByTestId("create-hint-input");
+
+    act(() => {
+      fireEvent.change(input, { target: { value: "Passssssssss1@" } });
+      fireEvent.change(confirmInput, { target: { value: "Passssssssss1@" } });
+      fireEvent.change(hintInput, {
+        target: { value: "Password is Passssssssss1@" },
+      });
+    });
+
+    await waitFor(() => {
+      expect((input as HTMLInputElement).value).toBe("Passssssssss1@");
+    });
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.createpassword.button.continue));
+
+    await waitFor(() => {
+      expect(verifySecret).toBeCalled();
     });
   });
 });

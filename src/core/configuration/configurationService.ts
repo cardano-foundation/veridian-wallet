@@ -1,8 +1,4 @@
-import {
-  Configuration,
-  IndividualOnlyMode,
-  OptionalFeature,
-} from "./configurationService.types";
+import { Configuration } from "./configurationService.types";
 // eslint-disable-next-line no-undef
 
 const environment = process.env.ENVIRONMENT || "local";
@@ -86,47 +82,6 @@ class ConfigurationService {
 
     if (typeof rasp.enabled !== "boolean") {
       return this.invalid("rasp.enabled must be a boolean value");
-    }
-
-    const { features } = data;
-    if (typeof features !== "object") {
-      return this.invalid("features must be an object");
-    }
-
-    const { cut, customise } = features;
-    if (!Array.isArray(cut)) {
-      return this.invalid("features.cut must be a array");
-    }
-
-    for (const feature of cut) {
-      if (!Object.values(OptionalFeature).includes(feature)) {
-        return this.invalid("Invalid features.cut value");
-      }
-    }
-
-    if (customise) {
-      const { identifiers, notifications } = customise;
-      if (identifiers?.creation?.individualOnly) {
-        if (
-          !Object.values(IndividualOnlyMode).includes(
-            identifiers.creation.individualOnly
-          )
-        ) {
-          return this.invalid(
-            "Invalid features.customise.identifiers.creation value"
-          );
-        }
-      }
-
-      if (notifications?.connectInstructions) {
-        if (
-          typeof notifications?.connectInstructions.connectionName !== "string"
-        ) {
-          return this.invalid(
-            "Invalid customise.notifications.connectinstructions.connectionName value"
-          );
-        }
-      }
     }
 
     return { success: true };

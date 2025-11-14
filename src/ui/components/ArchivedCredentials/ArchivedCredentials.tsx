@@ -26,15 +26,12 @@ import {
   setCredsCache,
   setNotificationsCache,
 } from "../../../store/reducers/profileCache";
-import {
-  setCurrentOperation,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import {
   Alert as AlertDelete,
   Alert as AlertRestore,
 } from "../../components/Alert";
-import { OperationType, ToastMsgType } from "../../globals/types";
+import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { CredentialDetailModal } from "../CredentialDetailModule";
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
@@ -235,7 +232,6 @@ const ArchivedCredentialsContainer = forwardRef<
 
   const handleCancelAction = () => {
     !activeList && setSelectedCredentials([]);
-    dispatch(setCurrentOperation(OperationType.IDLE));
   };
 
   const handlePageClose = () =>
@@ -415,8 +411,8 @@ const ArchivedCredentialsContainer = forwardRef<
                 {selectedCredentials.length === 1
                   ? i18n.t("tabs.credentials.archived.oneselected")
                   : t("tabs.credentials.archived.manyselected", {
-                    amount: selectedCredentials.length,
-                  })}
+                      amount: selectedCredentials.length,
+                    })}
               </div>
               <IonButtons slot="end">
                 <IonButton

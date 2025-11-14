@@ -11,9 +11,7 @@ import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getIndividualFirstCreateSetting,
   setGroupProfileCache,
-  setIndividualFirstCreate,
   setShowProfileState,
 } from "../../../store/reducers/profileCache";
 import {
@@ -51,7 +49,6 @@ export const ProfileSetup = ({
 }: ProfileSetupProps) => {
   const pageId = "profile-setup";
   const stateCache = useAppSelector(getStateCache);
-  const individualFirstCreate = useAppSelector(getIndividualFirstCreateSetting);
   const dispatch = useAppDispatch();
   const { updateDefaultProfile, defaultProfile, profiles } = useProfile();
   const [step, setStep] = useState(SetupProfileStep.SetupType);
@@ -176,24 +173,6 @@ export const ProfileSetup = ({
       const { identifier } = await Agent.agent.identifiers.createIdentifier(
         metadata
       );
-
-      if (individualFirstCreate) {
-        try {
-          await Agent.agent.basicStorage.deleteById(
-            MiscRecordId.INDIVIDUAL_FIRST_CREATE
-          );
-        } catch (cleanupErr) {
-          const msg = (cleanupErr as Error)?.message || "";
-          if (
-            !msg.includes("Record does not exist") &&
-            !msg.toLowerCase().includes("not found")
-          ) {
-            showError("Failed to delete INDIVIDUAL_FIRST_CREATE:", cleanupErr);
-          }
-        } finally {
-          dispatch(setIndividualFirstCreate(false));
-        }
-      }
 
       try {
         await Agent.agent.basicStorage.deleteById(

@@ -2,53 +2,46 @@
   width: 100%;
   height: 100%;
   background: var(--ion-color-neutral-200);
+  height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 0 !important;
 
-  & .page-header {
-    ion-toolbar {
-      --background: transparent;
-    }
-  }
+  .request-animation-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
-  .responsive-page-content {
-    --buttons-height: 7.5rem;
-    justify-content: space-between;
-    height: 100%;
-
-    .request-animation-center {
-      flex: 1;
+    .request-icons-row {
       display: flex;
-      flex-direction: column;
       justify-content: center;
+      margin-bottom: 1.5rem;
 
-      .request-icons-row {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 1.5rem;
+      .request-user-logo {
+        border-radius: 5rem;
+        background-color: var(--ion-color-neutral-700);
+        width: 4.875rem;
+        height: 4.875rem;
 
+        & > ion-icon {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      @media screen and (min-width: 250px) and (max-width: 370px) {
         .request-user-logo {
-          border-radius: 5rem;
-          background-color: var(--ion-color-neutral-700);
-          width: 4.875rem;
-          height: 4.875rem;
-
-          & > ion-icon {
-            width: 100%;
-            height: 100%;
-          }
-        }
-
-        @media screen and (min-width: 250px) and (max-width: 370px) {
-          .request-user-logo {
-            width: 3.5rem;
-            height: 3.5rem;
-          }
+          width: 3.5rem;
+          height: 3.5rem;
         }
       }
+    }
 
-      .wallet-connect-message {
-        text-align: center;
-        margin: 0;
-      }
+    .wallet-connect-message {
+      text-align: center;
+      margin: 0;
     }
   }
 }

@@ -8,10 +8,10 @@ import { OptionModal } from "../../../components/OptionsModal";
 import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { Scan } from "../../../components/Scan";
-import { useCameraDirection } from "../../../components/Scanner/hook/useCameraDirection";
 import { combineClassNames } from "../../../utils/style";
 import { isValidHttpUrl } from "../../../utils/urlChecker";
 import { CurrentPage, SSIScanProps } from "../CreateSSIAgent.types";
+import { useCameraDirection } from "../../../components/Scan/hook/useCameraDirection";
 
 const InputError = ({
   showError,

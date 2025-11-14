@@ -25,7 +25,6 @@ import {
 } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
-  setCurrentOperation,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import {
@@ -35,7 +34,7 @@ import {
 } from "../../../store/reducers/viewTypeCache";
 import "../../components/CardDetails/CardDetails.scss";
 import { MAX_FAVOURITES } from "../../globals/constants";
-import { OperationType, ToastMsgType } from "../../globals/types";
+import { ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { ConnectionDetails } from "../../pages/ConnectionDetails";
 import { showError } from "../../utils/error";
@@ -423,8 +422,8 @@ const CredentialDetailModule = ({
     setAlertRestoreIsOpen(true);
   };
 
-  const resetOperation = () =>
-    dispatch(setCurrentOperation(OperationType.IDLE));
+  const closeRestoreAlert = () => setAlertRestoreIsOpen(false);
+  const closeDeleteAlert = () => setAlertDeleteArchiveIsOpen(false);
 
   return (
     <>
@@ -557,8 +556,8 @@ const CredentialDetailModule = ({
             : "tabs.credentials.details.alert.archive.cancel"
         )}`}
         actionConfirm={handleAuthentication}
-        actionCancel={resetOperation}
-        actionDismiss={resetOperation}
+        actionCancel={closeDeleteAlert}
+        actionDismiss={closeDeleteAlert}
       />
       <AlertRestore
         isOpen={alertRestoreIsOpen}
@@ -572,8 +571,8 @@ const CredentialDetailModule = ({
           "tabs.credentials.details.alert.restore.cancel"
         )}`}
         actionConfirm={handleRestoreCredential}
-        actionCancel={resetOperation}
-        actionDismiss={resetOperation}
+        actionCancel={closeRestoreAlert}
+        actionDismiss={closeRestoreAlert}
       />
       <Verification
         verifyIsOpen={verifyIsOpen}

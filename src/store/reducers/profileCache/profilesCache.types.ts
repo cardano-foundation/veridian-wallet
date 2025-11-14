@@ -38,7 +38,6 @@ interface ProfileCache {
   recentProfiles: string[];
   multiSigGroup: MultiSigGroup | undefined;
   scanGroupId?: string;
-  individualFirstCreate?: boolean;
   openConnectionId?: string;
   missingAliasUrl?: { url: string; identifier?: string };
   connectedDApp?: DAppConnection | null;
@@ -48,4 +47,4 @@ interface ProfileCache {
   showProfileState?: boolean;
 }
 
-export type { Profile, ProfileCache, DAppConnection, MultiSigGroup };
+export type { DAppConnection, MultiSigGroup, Profile, ProfileCache };

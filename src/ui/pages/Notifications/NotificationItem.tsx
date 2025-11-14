@@ -10,7 +10,6 @@ import {
   documentOutline,
   fingerPrintOutline,
   idCardOutline,
-  personCircleOutline,
   mailOpenOutline,
   mailUnreadOutline,
   trashOutline,
@@ -56,8 +55,6 @@ const NotificationItem = ({ item, onClick }: NotificationItemProps) => {
         return fingerPrintOutline;
       case NotificationRoute.RemoteSignReq:
         return documentOutline;
-      case NotificationRoute.LocalSingletonConnectInstructions:
-        return personCircleOutline;
       default:
         return idCardOutline;
     }

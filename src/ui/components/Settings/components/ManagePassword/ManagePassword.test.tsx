@@ -7,11 +7,10 @@ import { Agent } from "../../../../../core/agent/agent";
 import { BasicRecord } from "../../../../../core/agent/records";
 import TRANSLATIONS from "../../../../../locales/en/en.json";
 import { RoutePath } from "../../../../../routes";
-import { OperationType } from "../../../../globals/types";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { CustomInputProps } from "../../../CustomInput/CustomInput.types";
 import { ManagePassword } from "./ManagePassword";
-import { makeTestStore } from "../../../../utils/makeTestStore";
 
 const deletePasswordMock = jest.fn();
 
@@ -82,7 +81,6 @@ const initialState = {
       passcodeIsSet: true,
       seedPhraseIsSet: false,
     },
-    currentOperation: OperationType.IDLE,
   },
 };
 
@@ -257,7 +255,6 @@ describe("Manage password", () => {
           passwordIsSet: true,
           seedPhraseIsSet: false,
         },
-        currentOperation: OperationType.IDLE,
       },
     };
 
@@ -344,7 +341,6 @@ describe("Manage password", () => {
           passwordIsSet: true,
           seedPhraseIsSet: false,
         },
-        currentOperation: OperationType.IDLE,
       },
     };
 

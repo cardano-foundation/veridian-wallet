@@ -2,7 +2,7 @@ import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Salter } from "signify-ts";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
-import { OperationType, ToastMsgType } from "../../../ui/globals/types";
+import { ToastMsgType } from "../../../ui/globals/types";
 import { RootState } from "../../index";
 import {
   AuthenticationCacheProps,
@@ -34,7 +34,6 @@ const initialState: StateCacheProps = {
     },
     firstAppLaunch: true,
   },
-  currentOperation: OperationType.IDLE,
   queueIncomingRequest: {
     isProcessing: false,
     queues: [],
@@ -101,9 +100,6 @@ const stateCacheSlice = createSlice({
       action: PayloadAction<AuthenticationCacheProps>
     ) => {
       state.authentication = action.payload;
-    },
-    setCurrentOperation: (state, action: PayloadAction<OperationType>) => {
-      state.currentOperation = action.payload;
     },
     setToastMsg: (state, action: PayloadAction<ToastMsgType>) => {
       if (
@@ -209,7 +205,6 @@ const {
   login,
   logout,
   setAuthentication,
-  setCurrentOperation,
   setToastMsg,
   dequeueIncomingRequest,
   setQueueIncomingRequest,
@@ -237,8 +232,6 @@ const getRoutes = (state: RootState) => state.stateCache.routes;
 const getCurrentRoute = (state: RootState) =>
   state.stateCache.routes.length ? state.stateCache.routes[0] : undefined;
 const getAuthentication = (state: RootState) => state.stateCache.authentication;
-const getCurrentOperation = (state: RootState) =>
-  state.stateCache.currentOperation;
 const getToastMsgs = (state: RootState) => state.stateCache.toastMsgs;
 const getQueueIncomingRequest = (state: RootState) =>
   state.stateCache.queueIncomingRequest;
@@ -271,7 +264,6 @@ export {
   enqueueIncomingRequest,
   getAuthentication,
   getCameraDirection,
-  getCurrentOperation,
   getCurrentRoute,
   getFirstAppLaunch,
   getForceInitApp,
@@ -297,15 +289,14 @@ export {
   resetAllRoutes,
   setAuthentication,
   setCameraDirection,
-  setCurrentOperation,
   setCurrentRoute,
   setFirstAppLaunchComplete,
   setInitializationPhase,
   setIsOnline,
-  setPendingJoinGroupMetadata,
   setIsSetupProfile,
   setLoginAttempt,
   setPauseQueueIncomingRequest,
+  setPendingJoinGroupMetadata,
   setQueueIncomingRequest,
   setRecoveryCompleteNoInterruption,
   setToastMsg,

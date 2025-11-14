@@ -2,11 +2,9 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
-import { setCurrentOperation } from "../../../store/reducers/stateCache";
-import { OperationType } from "../../globals/types";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { ConnectionOptions } from "./ConnectionOptions";
-import { makeTestStore } from "../../utils/makeTestStore";
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -67,9 +65,6 @@ describe("Connection Options modal", () => {
     });
 
     expect(optionDeleteMock).toBeCalledTimes(1);
-    expect(dispatchMock).toBeCalledWith(
-      setCurrentOperation(OperationType.DELETE_CONNECTION)
-    );
   });
 
   test("can exclude restricted options in certain flows", async () => {

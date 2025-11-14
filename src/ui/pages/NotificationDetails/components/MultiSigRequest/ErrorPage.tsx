@@ -2,6 +2,7 @@ import { IonText } from "@ionic/react";
 import { alertCircleOutline } from "ionicons/icons";
 import { useState } from "react";
 import { Trans } from "react-i18next";
+import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../../../../core/agent/services/identifier.types";
 import { i18n } from "../../../../../i18n";
 import { useAppSelector } from "../../../../../store/hooks";
@@ -17,22 +18,18 @@ import { PageHeader } from "../../../../components/PageHeader";
 import { SUPPORT_EMAIL } from "../../../../globals/constants";
 import "./ErrorPage.scss";
 import { ErrorPageProps } from "./ErrorPage.types";
-import { isMultisigConnectionDetails } from "../../../../../core/agent/agent.types";
 
 const ErrorPage = ({
   pageId,
   activeStatus,
   handleBack,
   notificationDetails,
-  onFinishSetup,
 }: ErrorPageProps) => {
   const profiles = useAppSelector(getProfiles);
-  const connectionsCache = useAppSelector(getMultisigConnectionsCache) as any[];
-  const [resumeMultiSig, setResumeMultiSig] =
-    useState<IdentifierShortDetails | null>(null);
+  const connectionsCache = useAppSelector(getMultisigConnectionsCache);
+  const [, setResumeMultiSig] = useState<IdentifierShortDetails | null>(null);
 
-  const [createIdentifierModalIsOpen, setCreateIdentifierModalIsOpen] =
-    useState(false);
+  const [, setCreateIdentifierModalIsOpen] = useState(false);
 
   const actionAccept = () => {
     const connection = connectionsCache.find(
@@ -52,11 +49,6 @@ const ErrorPage = ({
       setResumeMultiSig(identifier.identity);
       setCreateIdentifierModalIsOpen(true);
     }
-  };
-
-  const handleCloseCreateIdentifier = () => {
-    setCreateIdentifierModalIsOpen(false);
-    onFinishSetup();
   };
 
   const HandleEmail = () => {
