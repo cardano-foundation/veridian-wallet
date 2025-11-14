@@ -3,16 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
-import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
-import { ConfigurationService } from "../../../core/configuration";
-import { IndividualOnlyMode } from "../../../core/configuration/configurationService.types";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  addNotification,
   getProfiles,
-  setIndividualFirstCreate,
   updateCurrentProfile,
 } from "../../../store/reducers/profileCache";
 import { getSeedPhraseCache } from "../../../store/reducers/seedPhraseCache";
@@ -54,9 +49,6 @@ const CreateSSIAgent = () => {
 
   const isRecoveryMode = stateCache.authentication.recoveryWalletProgress;
   const isOnline = stateCache.isOnline;
-  const isIndividualOnlyFirstCreateMode =
-    ConfigurationService.env.features.customise?.identifiers?.creation
-      ?.individualOnly === IndividualOnlyMode.FirstTime;
 
   const setSSIError = (values: Partial<SSIError>) => {
     setError((errors) => ({
@@ -162,24 +154,6 @@ const CreateSSIAgent = () => {
     async (mustSetupProfile: boolean) => {
       try {
         if (mustSetupProfile) {
-          if (
-            ConfigurationService.env.features.customise?.notifications
-              ?.connectInstructions
-          ) {
-            const connectNotification =
-              await Agent.agent.keriaNotifications.createSingletonNotification(
-                NotificationRoute.LocalSingletonConnectInstructions,
-                {
-                  name: ConfigurationService.env.features.customise
-                    ?.notifications.connectInstructions.connectionName,
-                }
-              );
-
-            if (connectNotification) {
-              dispatch(addNotification(connectNotification));
-            }
-          }
-
           await Agent.agent.basicStorage.createOrUpdateBasicRecord(
             new BasicRecord({
               id: MiscRecordId.IS_SETUP_PROFILE,
@@ -326,19 +300,6 @@ const CreateSSIAgent = () => {
       }
 
       await updateIsSetupProfile(true);
-
-      if (isIndividualOnlyFirstCreateMode) {
-        await Agent.agent.basicStorage
-          .createOrUpdateBasicRecord(
-            new BasicRecord({
-              id: MiscRecordId.INDIVIDUAL_FIRST_CREATE,
-              content: { value: true },
-            })
-          )
-          .then(() =>
-            dispatch(setIndividualFirstCreate(isIndividualOnlyFirstCreateMode))
-          );
-      }
 
       const { nextPath, updateRedux } = getNextRoute(RoutePath.SSI_AGENT, {
         store: { stateCache },

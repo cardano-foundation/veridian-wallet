@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { ConnectionStatus } from "../../../core/agent/agent.types";
 import { PeerConnectionEventTypes } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { RoutePath } from "../../../routes";
-import { OperationType } from "../../../ui/globals/types";
 import { RootState } from "../../index";
 import {
   AuthenticationCacheProps,
@@ -9,19 +9,17 @@ import {
   dequeueIncomingRequest,
   enqueueIncomingRequest,
   getAuthentication,
-  getCurrentOperation,
   getCurrentRoute,
   getStateCache,
   initialState,
   login,
   logout,
   setAuthentication,
-  setCurrentOperation,
   setCurrentRoute,
   setIsOnline,
   setPauseQueueIncomingRequest,
-  setQueueIncomingRequest,
   setPendingJoinGroupMetadata,
+  setQueueIncomingRequest,
   showGenericError,
   StateCacheProps,
   stateCacheSlice,
@@ -31,8 +29,6 @@ import {
   IncomingRequestType,
   PeerConnectSigningEventRequest,
 } from "./stateCache.types";
-import { connectionDetailsFix } from "../../../ui/__fixtures__/credsFix";
-import { ConnectionStatus } from "../../../core/agent/agent.types";
 
 const signingRequest: PeerConnectSigningEventRequest = {
   type: IncomingRequestType.PEER_CONNECT_SIGN,
@@ -130,19 +126,6 @@ describe("State Cache", () => {
     const nextState = stateCacheSlice.reducer(initialState, action);
     expect(nextState.authentication.loggedIn).toEqual(true);
     expect(nextState).not.toBe(initialState);
-  });
-
-  test("should set the currentOperation cache", () => {
-    const op = OperationType.SCAN_CONNECTION;
-    const action = setCurrentOperation(op);
-    const nextState = stateCacheSlice.reducer(initialState, action);
-
-    expect(nextState.currentOperation).toEqual(op);
-    expect(nextState).not.toBe(initialState);
-
-    const rootState = { stateCache: nextState } as RootState;
-    expect(getCurrentOperation(rootState)).toEqual(nextState.currentOperation);
-    expect(getStateCache(rootState)).toEqual(nextState);
   });
 
   test("should queue incoming request", () => {

@@ -1,26 +1,13 @@
 import { render } from "@testing-library/react";
 import { Provider } from "react-redux";
 
-import { TabsRoutePath } from "../../../../routes/paths";
-import { notificationsFix } from "../../../__fixtures__/notificationsFix";
-import { connectionsForNotificationsValues } from "../../../__fixtures__/connectionsFix";
-import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
-import { EarlierNotification } from "./EarlierNotification";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
+import { TabsRoutePath } from "../../../../routes/paths";
+import { connectionsForNotificationsValues } from "../../../__fixtures__/connectionsFix";
+import { notificationsFix } from "../../../__fixtures__/notificationsFix";
+import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../../utils/makeTestStore";
-
-jest.mock("../../../../core/configuration", () => ({
-  ...jest.requireActual("../../../../core/configuration"),
-  ConfigurationService: {
-    env: {
-      features: {
-        notifications: {
-          fallbackIcon: false,
-        },
-      },
-    },
-  },
-}));
+import { EarlierNotification } from "./EarlierNotification";
 
 jest.mock("../../../../core/agent/agent", () => ({
   Agent: {

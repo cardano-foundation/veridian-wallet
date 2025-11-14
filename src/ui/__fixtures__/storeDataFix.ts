@@ -1,8 +1,6 @@
 import { RootState } from "../../store";
 import { Profile, ProfileCache } from "../../store/reducers/profileCache";
 import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
-import { OperationType } from "../globals/types";
-import { CredentialsFilters } from "../pages/Credentials/Credentials.types";
 import { filteredArchivedCredsFix, filteredCredsFix } from "./filteredCredsFix";
 import { filteredIdentifierFix } from "./filteredIdentifierFix";
 import { notificationsFix } from "./notificationsFix";
@@ -83,7 +81,6 @@ export const storeStateFixData: RootState = {
       },
       firstAppLaunch: false,
     },
-    currentOperation: OperationType.IDLE,
     queueIncomingRequest: {
       isProcessing: false,
       queues: [],
@@ -101,7 +98,6 @@ export const storeStateFixData: RootState = {
       viewType: null,
       favouriteIndex: 0,
       favourites: [],
-      filters: CredentialsFilters.All,
     },
   },
   biometricsCache: {

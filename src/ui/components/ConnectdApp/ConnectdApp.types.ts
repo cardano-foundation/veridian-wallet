@@ -17,6 +17,12 @@ enum ActionType {
   None = "none",
 }
 
-export { ActionType };
+enum Step {
+  Connections,
+  Scan,
+  Confirm,
+}
+
+export { ActionType, Step };
 
 export type { ActionInfo, ConnectdAppProps, DAppConnection };

@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
-import { CardType } from "../../globals/types";
 
 enum CardListViewType {
   Stack,
@@ -10,8 +9,7 @@ enum CardListViewType {
 
 interface SwitchCardViewProps {
   title: string;
-  cardsData: IdentifierShortDetails[] | CredentialShortDetails[];
-  cardTypes: CardType;
+  cardsData: CredentialShortDetails[];
   hideHeader?: boolean;
   name: string;
   onShowCardDetails?: () => void;
@@ -21,11 +19,10 @@ interface SwitchCardViewProps {
 }
 
 interface CardListProps {
-  cardsData: IdentifierShortDetails[] | CredentialShortDetails[];
-  cardTypes: CardType;
+  cardsData: CredentialShortDetails[];
   testId?: string;
   onCardClick?: (card: IdentifierShortDetails | CredentialShortDetails) => void;
 }
 
-export type { SwitchCardViewProps, CardListProps };
 export { CardListViewType };
+export type { CardListProps, SwitchCardViewProps };

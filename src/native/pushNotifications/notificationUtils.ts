@@ -64,10 +64,6 @@ export const getNotificationDisplayText = (
       });
     case NotificationRoute.HumanReadableMessage:
       return typeof item.a.m === "string" ? item.a.m : "";
-    case NotificationRoute.LocalSingletonConnectInstructions:
-      return t("tabs.notifications.tab.labels.connectinstructions", {
-        connection: item.a.name || t("tabs.connections.unknown"),
-      });
     default:
       return t("tabs.notifications.tab.labels.fallback");
   }

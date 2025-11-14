@@ -9,16 +9,11 @@ import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { removeProfile } from "../../../store/reducers/profileCache";
 import {
   getAuthentication,
-  setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
 import "../../components/CardDetails/CardDetails.scss";
-import {
-  BackEventPriorityType,
-  OperationType,
-  ToastMsgType,
-} from "../../globals/types";
+import { BackEventPriorityType, ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
@@ -156,7 +151,7 @@ const ProfileDetailsModal = ({
     setVerifyIsOpen(true);
   };
 
-  const cancelDelete = () => dispatch(setCurrentOperation(OperationType.IDLE));
+  const cancelDelete = () => setAlertIsOpen(false);
 
   const openRotateModal = useCallback(() => {
     setOpenRotateKeyModal(true);
@@ -179,6 +174,7 @@ const ProfileDetailsModal = ({
       <SideSlider
         isOpen={isOpen}
         renderAsModal
+        className="profile-detail-modal"
       >
         {cloudError ? (
           <CloudError

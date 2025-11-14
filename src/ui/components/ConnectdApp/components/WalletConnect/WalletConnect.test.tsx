@@ -5,20 +5,9 @@ import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerCo
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { RootState } from "../../../../../store";
 import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
+import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 import { WalletConnect } from "./WalletConnect";
-import { walletConnectionsFix } from "../../../../__fixtures__/walletConnectionsFix";
-
-jest.mock("../../../../../core/configuration", () => ({
-  ...jest.requireActual("../../../../../core/configuration"),
-  ConfigurationService: {
-    env: {
-      features: {
-        cut: [],
-      },
-    },
-  },
-}));
 
 jest.mock("../../../../../core/cardano/walletConnect/peerConnection", () => ({
   PeerConnection: {
@@ -54,16 +43,9 @@ describe("Wallet Connect Request", () => {
   test("Renders content ", async () => {
     const { getByText } = render(
       <Provider store={storeMocked}>
-        <WalletConnect
-          open
-          setOpenPage={jest.fn()}
-        />
+        <WalletConnect close={jest.fn()} />
       </Provider>
     );
-
-    expect(
-      getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
-    ).toBeVisible();
 
     expect(
       getByText(EN_TRANSLATIONS.connectdapp.request.stageone.message)
@@ -75,12 +57,13 @@ describe("Wallet Connect Request", () => {
   });
 
   test("Click to acccept button", async () => {
-    const setOpenPage = jest.fn();
+    const close = jest.fn();
+    const handleAferConnect = jest.fn();
     const { getByText } = render(
       <Provider store={storeMocked}>
         <WalletConnect
-          open
-          setOpenPage={setOpenPage}
+          close={close}
+          handleAfterConnect={handleAferConnect}
         />
       </Provider>
     );
@@ -95,18 +78,15 @@ describe("Wallet Connect Request", () => {
     });
 
     await waitFor(() => {
-      expect(setOpenPage).toBeCalled();
+      expect(handleAferConnect).toBeCalled();
     });
   });
 
   test("Click to decline button", async () => {
-    const setOpenPage = jest.fn();
+    const close = jest.fn();
     const { getByText, queryByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <WalletConnect
-          open
-          setOpenPage={setOpenPage}
-        />
+        <WalletConnect close={close} />
       </Provider>
     );
 
@@ -133,41 +113,7 @@ describe("Wallet Connect Request", () => {
     });
 
     await waitFor(() => {
-      expect(setOpenPage).toBeCalled();
-    });
-  });
-
-  test("Close modal", async () => {
-    const { getByTestId, getByText, queryByTestId } = render(
-      <Provider store={storeMocked}>
-        <WalletConnect
-          open={true}
-          setOpenPage={jest.fn()}
-        />
-      </Provider>
-    );
-
-    expect(
-      getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
-    ).toBeVisible();
-
-    act(() => {
-      fireEvent.click(getByTestId("decline-button-connect-wallet-stage-one"));
-    });
-
-    await waitFor(() => {
-      expect(
-        getByTestId("decline-button-connect-wallet-stage-one")
-      ).toBeInTheDocument();
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("decline-button-connect-wallet-stage-one"));
-    });
-
-    await waitFor(() => {
-      expect(queryByTestId("connect-wallet-stage-one")).toBe(null);
-      expect(queryByTestId("connect-wallet-stage-two")).toBe(null);
+      expect(close).toBeCalled();
     });
   });
 });

@@ -1,9 +1,9 @@
 import { LensFacing } from "@capacitor-mlkit/barcode-scanning";
+import { MultisigConnectionDetails } from "../../../core/agent/agent.types";
 import { LoginAttempts } from "../../../core/agent/services/auth.types";
 import { PeerConnectSigningEvent } from "../../../core/cardano/walletConnect/peerConnection.types";
-import { OperationType, ToastMsgType } from "../../../ui/globals/types";
+import { ToastMsgType } from "../../../ui/globals/types";
 import { DAppConnection } from "../profileCache";
-import { MultisigConnectionDetails } from "../../../core/agent/agent.types";
 
 interface PayloadData<T = any> {
   [key: string]: T;
@@ -66,7 +66,6 @@ interface StateCacheProps {
   isOnline: boolean;
   routes: CurrentRouteCacheProps[];
   authentication: AuthenticationCacheProps;
-  currentOperation: OperationType;
   queueIncomingRequest: QueueProps<IncomingRequestProps>;
   cameraDirection?: LensFacing;
   showGenericError?: boolean;
@@ -86,14 +85,15 @@ enum InitializationPhase {
 
 export { IncomingRequestType, InitializationPhase };
 
-export type {
-  AuthenticationCacheProps,
-  CurrentRouteCacheProps,
-  IncomingRequestProps,
-  PayloadData,
-  PeerConnectSigningEventRequest,
-  PendingJoinGroupMetadata,
-  QueueProps,
-  StateCacheProps,
-  ToastStackItem,
-};
+  export type {
+    AuthenticationCacheProps,
+    CurrentRouteCacheProps,
+    IncomingRequestProps,
+    PayloadData,
+    PeerConnectSigningEventRequest,
+    PendingJoinGroupMetadata,
+    QueueProps,
+    StateCacheProps,
+    ToastStackItem
+  };
+

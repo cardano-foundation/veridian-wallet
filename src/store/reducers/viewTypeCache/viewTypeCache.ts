@@ -1,18 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CardListViewType } from "../../../ui/components/SwitchCardView";
 import { RootState } from "../../index";
-import {
-  CredentialsFilters,
-  FavouriteCredential,
-  ViewTypeCacheProps,
-} from "./viewTypeCache.types";
+import { FavouriteCredential, ViewTypeCacheProps } from "./viewTypeCache.types";
 
 const initialState: ViewTypeCacheProps = {
   credential: {
     viewType: null,
     favouriteIndex: 0,
     favourites: [],
-    filters: CredentialsFilters.All,
   },
 };
 
@@ -53,12 +48,6 @@ const viewTypeCacheSlice = createSlice({
         (fav) => fav.id !== action.payload
       );
     },
-    setCredentialsFilters: (
-      state,
-      action: PayloadAction<CredentialsFilters>
-    ) => {
-      state.credential.filters = action.payload;
-    },
     clearViewTypeCache: () => initialState,
   },
 });
@@ -67,7 +56,6 @@ export const {
   setCredentialFavouriteIndex,
   setCredentialViewTypeCache,
   clearViewTypeCache,
-  setCredentialsFilters,
   setFavouritesCredsCache,
   addFavouritesCredsCache,
   removeFavouritesCredsCache,
@@ -79,12 +67,8 @@ const getCredentialFavouriteIndex = (state: RootState) =>
   state.viewTypeCache.credential.favouriteIndex;
 const getFavouritesCredsCache = (state: RootState) =>
   state.viewTypeCache.credential.favourites;
-const getCredentialsFilters = (state: RootState) =>
-  state.viewTypeCache.credential.filters;
-
 export {
   getCredentialFavouriteIndex,
-  getCredentialsFilters,
   getCredentialViewTypeCache,
   getFavouritesCredsCache,
   initialState,

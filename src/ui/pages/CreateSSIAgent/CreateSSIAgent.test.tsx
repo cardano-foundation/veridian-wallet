@@ -2,7 +2,6 @@ const bootAndConnectMock = jest.fn();
 const recoverKeriaAgentMock = jest.fn(() => Promise.resolve());
 const basicStorageDeleteMock = jest.fn(() => Promise.resolve());
 const createOrUpdateBasicRecordMock = jest.fn(() => Promise.resolve());
-const createSingletonNotificationMock = jest.fn();
 const browserMock = jest.fn();
 const checkPermisson = jest.fn(() =>
   Promise.resolve({
@@ -13,30 +12,6 @@ const requestPermission = jest.fn();
 const startScan = jest.fn();
 const stopScan = jest.fn();
 const getPlatformMock = jest.fn(() => ["mobile"]);
-
-const customiseMockValue: {
-  identifiers: { creation: { individualOnly: string } };
-  notifications?: { connectInstructions: { connectionName: string } };
-} = {
-  identifiers: {
-    creation: {
-      individualOnly: "FirstTime",
-    },
-  },
-};
-const defaultConfigMock = {
-  ConfigurationService: {
-    env: {
-      features: {
-        cut: [],
-        customContent: [],
-        get customise() {
-          return customiseMockValue;
-        },
-      },
-    },
-  },
-};
 
 import {
   BarcodeFormat,
@@ -122,10 +97,6 @@ jest.mock("@capacitor/core", () => {
   };
 });
 
-jest.mock(
-  "../../../core/configuration/configurationService",
-  () => defaultConfigMock
-);
 jest.mock("../../../core/agent/agent", () => ({
   ...jest.requireActual("../../../core/agent/agent"),
   Agent: {
@@ -137,15 +108,14 @@ jest.mock("../../../core/agent/agent", () => ({
         deleteById: basicStorageDeleteMock,
         createOrUpdateBasicRecord: createOrUpdateBasicRecordMock,
       },
-      keriaNotifications: {
-        createSingletonNotification: createSingletonNotificationMock,
-      },
     },
   },
 }));
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
+  isPlatform: () => true,
+  getPlatforms: () => getPlatformMock(),
   IonModal: ({ children, ...props }: any) => {
     const testId = props["data-testid"];
     return props.isOpen ? <div data-testid={testId}>{children}</div> : null;
@@ -1347,17 +1317,6 @@ describe("SSI agent page", () => {
           })
         );
       });
-
-      await waitFor(() => {
-        expect(createOrUpdateBasicRecordMock).toBeCalledWith(
-          expect.objectContaining({
-            id: MiscRecordId.INDIVIDUAL_FIRST_CREATE,
-            content: { value: true },
-          })
-        );
-      });
-
-      expect(createSingletonNotificationMock).not.toBeCalled();
 
       await expect(() => {
         expect(

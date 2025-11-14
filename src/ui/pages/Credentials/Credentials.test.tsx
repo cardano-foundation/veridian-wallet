@@ -1,35 +1,24 @@
 import { IonReactMemoryRouter } from "@ionic/react-router";
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import {
-  fireEvent,
-  getDefaultNormalizer,
-  render,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-import { Agent } from "../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { setCredsCache } from "../../../store/reducers/profileCache";
 import { setCurrentRoute } from "../../../store/reducers/stateCache";
-import { setCredentialsFilters } from "../../../store/reducers/viewTypeCache";
 import { connectionsFix } from "../../__fixtures__/connectionsFix";
 import {
   filteredCredsFix,
   pendingCredFix,
 } from "../../__fixtures__/filteredCredsFix";
-import {
-  failedFilteredIdentifierMapFix,
-  filteredIdentifierFix,
-} from "../../__fixtures__/filteredIdentifierFix";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Credentials } from "./Credentials";
-import { CredentialsFilters } from "./Credentials.types";
 
 const deleteIdentifierMock = jest.fn();
 const archiveIdentifierMock = jest.fn();
@@ -370,128 +359,6 @@ describe("Creds Tab", () => {
       expect(
         getByTestId("archive-button-container").classList.contains("visible")
       ).toBeTruthy();
-    });
-
-    const allFilterBtn = getByTestId("all-filter-btn");
-    const individualFilterBtn = getByTestId("individual-filter-btn");
-    const groupFilterBtn = getByTestId("group-filter-btn");
-
-    expect(allFilterBtn).toHaveTextContent(
-      EN_TRANSLATIONS.tabs.credentials.tab.filters.all
-    );
-    expect(individualFilterBtn).toHaveTextContent(
-      EN_TRANSLATIONS.tabs.credentials.tab.filters.individual
-    );
-    expect(groupFilterBtn).toHaveTextContent(
-      EN_TRANSLATIONS.tabs.credentials.tab.filters.group
-    );
-  });
-
-  test("Toggle Creds Filters show Individual", async () => {
-    const store = makeTestStore(initialStatePendingEmpty);
-    store.dispatch(setCredsCache([filteredCredsFix[0]]));
-
-    const { getByTestId, getByText, queryByText } = render(
-      <IonReactMemoryRouter
-        history={history}
-        initialEntries={[TabsRoutePath.CREDENTIALS]}
-      >
-        <Provider store={store}>
-          <Credentials />
-        </Provider>
-      </IonReactMemoryRouter>
-    );
-    await waitFor(() => {
-      expect(
-        getByTestId("archive-button-container").classList.contains("hidden")
-      ).toBeTruthy();
-    });
-
-    const allFilterBtn = getByTestId("all-filter-btn");
-    const individualFilterBtn = getByTestId("individual-filter-btn");
-    const groupFilterBtn = getByTestId("group-filter-btn");
-
-    expect(allFilterBtn).toHaveClass("selected");
-
-    await waitFor(() => {
-      expect(getByText(filteredCredsFix[0].credentialType)).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(individualFilterBtn);
-    });
-
-    await waitFor(() => {
-      expect(getByText(filteredCredsFix[0].credentialType)).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(groupFilterBtn);
-    });
-
-    await waitFor(() => {
-      expect(queryByText(filteredCredsFix[0].credentialType)).toBeNull();
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.credentials.tab.filters.placeholder.replace(
-            "{{ type }}",
-            CredentialsFilters.Group
-          )
-        )
-      ).toBeVisible();
-    });
-  });
-
-  test("Toggle Creds Filters show Group", async () => {
-    const store = makeTestStore(initialStateFull);
-    store.dispatch(setCredsCache([filteredCredsFix[3]]));
-    store.dispatch(setCredentialsFilters(CredentialsFilters.All));
-
-    const { getByTestId, getByText, queryByText } = render(
-      <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
-        <Provider store={store}>
-          <Credentials />
-        </Provider>
-      </MemoryRouter>
-    );
-    await waitFor(() => {
-      expect(
-        getByTestId("archive-button-container").classList.contains("visible")
-      ).toBeTruthy();
-    });
-
-    const allFilterBtn = getByTestId("all-filter-btn");
-    const individualFilterBtn = getByTestId("individual-filter-btn");
-    const groupFilterBtn = getByTestId("group-filter-btn");
-
-    expect(allFilterBtn).toHaveClass("selected");
-
-    await waitFor(() => {
-      expect(getByText(filteredCredsFix[3].credentialType)).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(individualFilterBtn);
-    });
-
-    await waitFor(() => {
-      expect(queryByText(filteredCredsFix[3].credentialType)).toBeNull();
-      expect(
-        getByText(
-          EN_TRANSLATIONS.tabs.credentials.tab.filters.placeholder.replace(
-            "{{ type }}",
-            CredentialsFilters.Individual
-          )
-        )
-      ).toBeVisible();
-    });
-
-    act(() => {
-      fireEvent.click(groupFilterBtn);
-    });
-
-    await waitFor(() => {
-      expect(getByText(filteredCredsFix[3].credentialType)).toBeVisible();
     });
   });
 

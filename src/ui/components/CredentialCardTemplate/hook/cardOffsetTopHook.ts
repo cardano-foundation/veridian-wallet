@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { useScreenSize } from "../../hooks";
+import { useScreenSize } from "../../../hooks";
 
 const useCardOffsetTop = () => {
   const cardRef = useRef<HTMLDivElement>(null);

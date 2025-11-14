@@ -2,20 +2,19 @@ import { IonButton, IonIcon, useIonViewWillEnter } from "@ionic/react";
 import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
-  RegularConnectionDetails,
   ConnectionStatus,
+  RegularConnectionDetails
 } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
+  getCurrentProfile,
   getOpenConnectionId,
   removeConnectionCache,
   setOpenConnectionId,
-  getCurrentProfile,
 } from "../../../store/reducers/profileCache";
 import {
-  setCurrentOperation,
   setCurrentRoute,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
@@ -26,7 +25,7 @@ import { CardsPlaceholder } from "../../components/CardsPlaceholder";
 import { TabLayout } from "../../components/layout/TabLayout";
 import { RemovePendingAlert } from "../../components/RemovePendingAlert";
 import { ShareProfile } from "../../components/ShareProfile";
-import { OperationType, ToastMsgType } from "../../globals/types";
+import { ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
@@ -56,10 +55,11 @@ const Connections = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
   const currentProfile = useAppSelector(getCurrentProfile);
-  const profileConnections: RegularConnectionDetails[] =
-    (currentProfile?.connections as RegularConnectionDetails[]) ?? [];
+  const profileConnections =
+    currentProfile?.connections as RegularConnectionDetails[];
 
-  const showPlaceholder = profileConnections.length === 0;
+  const showPlaceholder =
+    !!profileConnections && profileConnections?.length === 0;
 
   useIonViewWillEnter(() => {
     dispatch(setCurrentRoute({ path: TabsRoutePath.CONNECTIONS }));
@@ -85,7 +85,7 @@ const Connections = () => {
     };
 
     fetchConnectionDetails();
-  }, [dispatch, openDetailId]);
+  }, [dispatch, openDetailId, profileConnections]);
 
   useEffect(() => {
     const connections = profileConnections;
@@ -186,7 +186,6 @@ const Connections = () => {
         ToastMsgType.DELETE_CONNECTION_FAIL
       );
     }
-    dispatch(setCurrentOperation(OperationType.IDLE));
   };
 
   const handleConnectModal = () => {

@@ -36,7 +36,6 @@ import {
   Profile,
   setConnectedDApp,
   setCurrentProfile,
-  setIndividualFirstCreate,
   setIsConnectingToDApp,
   setPendingDAppConnection,
   setProfiles,
@@ -53,7 +52,6 @@ import {
   getRecoveryCompleteNoInterruption,
   setAuthentication,
   setCameraDirection,
-  setCurrentOperation,
   setInitializationPhase,
   setIsOnline,
   setIsSetupProfile,
@@ -71,15 +69,13 @@ import {
 import { filterProfileData } from "../../../store/reducers/stateCache/utils";
 import {
   setCredentialFavouriteIndex,
-  setCredentialsFilters,
   setCredentialViewTypeCache,
   setFavouritesCredsCache,
 } from "../../../store/reducers/viewTypeCache";
 import { FavouriteCredential } from "../../../store/reducers/viewTypeCache/viewTypeCache.types";
-import { OperationType, ToastMsgType } from "../../globals/types";
+import { ToastMsgType } from "../../globals/types";
 import { BIOMETRIC_SERVER_KEY } from "../../hooks/useBiometricsHook";
 import { useProfile } from "../../hooks/useProfile";
-import { CredentialsFilters } from "../../pages/Credentials/Credentials.types";
 import { showError } from "../../utils/error";
 import { Alert } from "../Alert";
 import { CardListViewType } from "../SwitchCardView";
@@ -488,8 +484,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   const loadCacheBasicStorage = async () => {
     try {
-      let credentialsSelectedFilter: CredentialsFilters =
-        CredentialsFilters.All;
       const passcodeIsSet = await SecureStorage.keyExists(
         KeyStoreKeys.APP_PASSCODE
       );
@@ -529,17 +523,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
             credViewType.content.viewType as CardListViewType
           )
         );
-      }
-
-      const credentialsFilters = await Agent.agent.basicStorage.findById(
-        MiscRecordId.APP_CRED_SELECTED_FILTER
-      );
-      if (credentialsFilters) {
-        credentialsSelectedFilter = credentialsFilters.content
-          .filter as CredentialsFilters;
-      }
-      if (credentialsSelectedFilter) {
-        dispatch(setCredentialsFilters(credentialsSelectedFilter));
       }
 
       const appBiometrics = await Agent.agent.basicStorage.findById(
@@ -586,18 +569,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       );
 
       const loginAttempt = await Agent.agent.auth.getLoginAttempts();
-
-      const individualFirstCreate = await Agent.agent.basicStorage.findById(
-        MiscRecordId.INDIVIDUAL_FIRST_CREATE
-      );
-
-      if (individualFirstCreate) {
-        dispatch(
-          setIndividualFirstCreate(
-            individualFirstCreate.content.value as boolean
-          )
-        );
-      }
 
       const finishSetupBiometrics = await Agent.agent.basicStorage.findById(
         MiscRecordId.BIOMETRICS_SETUP
@@ -807,8 +778,8 @@ const AppWrapper = (props: { children: ReactNode }) => {
         confirmButtonText={`${i18n.t(
           "connectdapp.connectionbrokenalert.confirm"
         )}`}
-        actionConfirm={() => dispatch(setCurrentOperation(OperationType.IDLE))}
-        actionDismiss={() => dispatch(setCurrentOperation(OperationType.IDLE))}
+        actionConfirm={() => setIsAlertPeerBrokenOpen(false)}
+        actionDismiss={() => setIsAlertPeerBrokenOpen(false)}
       />
     </>
   );

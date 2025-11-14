@@ -21,7 +21,7 @@ import "./InputRequest.scss";
 
 const InputRequest = () => {
   const dispatch = useAppDispatch();
-  const connections = useAppSelector(getConnectionsCache) as any[];
+  const connections = useAppSelector(getConnectionsCache);
   const missingAliasConnection = useAppSelector(getMissingAliasConnection);
   const missingAliasUrl = missingAliasConnection?.url;
 

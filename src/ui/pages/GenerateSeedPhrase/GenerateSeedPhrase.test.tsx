@@ -6,7 +6,6 @@ import { Router } from "react-router-dom";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { store } from "../../../store";
-import { OperationType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { GenerateSeedPhrase } from "./GenerateSeedPhrase";
 
@@ -32,7 +31,6 @@ interface StoreMocked {
       passcodeIsSet: boolean;
       seedPhraseIsSet?: boolean;
     };
-    currentOperation: OperationType;
   };
   seedPhraseCache: {
     seedPhrase: string;
@@ -205,7 +203,6 @@ describe("Generate Seed Phrase screen from Onboarding", () => {
           time: Date.now(),
           passcodeIsSet: true,
         },
-        currentOperation: OperationType.IDLE,
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -240,7 +237,6 @@ describe("Generate Seed Phrase screen from Onboarding", () => {
           time: Date.now(),
           passcodeIsSet: true,
         },
-        currentOperation: OperationType.IDLE,
       },
       seedPhraseCache: {
         seedPhrase: "",
@@ -276,7 +272,6 @@ describe("Generate Seed Phrase screen from Onboarding", () => {
           time: Date.now(),
           passcodeIsSet: true,
         },
-        currentOperation: OperationType.IDLE,
       },
       seedPhraseCache: {
         seedPhrase: "",

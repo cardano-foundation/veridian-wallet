@@ -4,7 +4,6 @@ import {
   ellipsisHorizontal,
   fingerPrintOutline,
   idCardOutline,
-  personCircleOutline,
 } from "ionicons/icons";
 import { MouseEvent } from "react";
 import { Trans } from "react-i18next";
@@ -43,8 +42,6 @@ const NotificationItem = ({
         return fingerPrintOutline;
       case NotificationRoute.RemoteSignReq:
         return documentOutline;
-      case NotificationRoute.LocalSingletonConnectInstructions:
-        return personCircleOutline;
       default:
         return idCardOutline;
     }
