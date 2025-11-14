@@ -16,6 +16,7 @@ enum RoutePath {
 
 enum TabsRoutePath {
   ROOT = "/tabs",
+  HOME = "/tabs/home",
   CREDENTIALS = "/tabs/credentials",
   CONNECTIONS = "/tabs/connections",
   NOTIFICATIONS = "/tabs/notifications",

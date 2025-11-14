@@ -249,6 +249,7 @@
   },
   "tabsmenu": {
     "label": {
+      "home": "Home",
       "creds": "Credentials",
       "connections": "Connections",
       "notifications": "Notifications"
