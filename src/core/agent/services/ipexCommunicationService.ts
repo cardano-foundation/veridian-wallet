@@ -584,7 +584,7 @@ class IpexCommunicationService extends AgentService {
     };
 
     await this.props.signifyClient.contacts().update(connectionId, {
-      [`${prefix}${key}`]: JSON.stringify(historyItem),
+      [`${identifier}:${prefix}${key}`]: JSON.stringify(historyItem),
     });
   }
 
