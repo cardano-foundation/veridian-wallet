@@ -268,6 +268,185 @@ const QVISchema = {
   title: "Qualified vLEI Issuer Credential",
   description: "Qualified vLEI Issuer Credential",
   version: "1.0",
+  properties: {},
+};
+
+const schemaNoEdges = {
+  title: "Schema no edges",
+  description: "An ACDC schema that has no edges",
+  version: "1.0",
+  properties: {},
+};
+
+const schemaWithEdge = {
+  title: "Schema with edge",
+  description: "An ACDC schema with an edge in an unsadified edge section",
+  version: "1.0",
+  properties: {
+    e: {
+      properties: {
+        d: { description: "Edge Section SAID", type: "string" },
+        u: { description: "Edge Section UUID", type: "string" },
+        o: { description: "Edge Section M-ary Operator", type: "string" },
+        w: { description: "Edge Section Weight", type: "number" },
+        edge: {
+          properties: {
+            n: { const: "farEdgeSaid" },
+            s: { const: "farEdgeSchemaSaid" },
+          },
+        },
+      },
+    },
+  },
+};
+
+const schemaWithSaidifiedEdgeSection = {
+  title: "Schema with saidified edge section",
+  description: "An ACDC schema with an edge in a saidified edge section",
+  version: "1.0",
+  properties: {
+    e: {
+      oneOf: [
+        { description: "Edge Section SAID", type: "string" },
+        {
+          properties: {
+            d: { description: "Edge Section SAID", type: "string" },
+            u: { description: "Edge Section UUID", type: "string" },
+            o: { description: "Edge Section M-ary Operator", type: "string" },
+            w: { description: "Edge Section Weight", type: "number" },
+            edge: {
+              properties: {
+                n: { const: "farEdgeSaidSaidifiedEdgeSection" },
+                s: { const: "farEdgeSchemaSaidSaidifiedEdgeSection" },
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
+};
+
+const schemaWithMultipleEdges = {
+  title: "Schema with multiple edges",
+  description: "An ACDC schema with multiple edges in a saidified edge section",
+  version: "1.0",
+  properties: {
+    e: {
+      oneOf: [
+        { description: "Edge Section SAID", type: "string" },
+        {
+          properties: {
+            d: { description: "Edge Section SAID", type: "string" },
+            u: { description: "Edge Section UUID", type: "string" },
+            o: { description: "Edge Section M-ary Operator", type: "string" },
+            w: { description: "Edge Section Weight", type: "number" },
+            edgeA: {
+              properties: {
+                n: { const: "farEdgeASaid" },
+                s: { const: "farEdgeASchemaSaid" },
+              },
+            },
+            edgeB: {
+              properties: {
+                n: { const: "farEdgeBSaid" },
+                s: { const: "farEdgeBSchemaSaid" },
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
+};
+
+const schemaWithASaidifiedEdge = {
+  title: "Schema with a saidified edge",
+  description:
+    "An ACDC schema with a saidified edge in a saidified edge section",
+  version: "1.0",
+  properties: {
+    e: {
+      oneOf: [
+        { description: "Edge Section SAID", type: "string" },
+        {
+          properties: {
+            d: { description: "Edge Section SAID", type: "string" },
+            u: { description: "Edge Section UUID", type: "string" },
+            o: { description: "Edge Section M-ary Operator", type: "string" },
+            w: { description: "Edge Section Weight", type: "number" },
+            edge: {
+              oneOf: [
+                { description: "Edge SAID", type: "string" },
+                {
+                  properties: {
+                    n: { const: "farEdgeSaidifiedSchema" },
+                    s: { const: "farEdgeSaidifiedSchemaSaid" },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  },
+};
+
+const schemaWithEdgeGroup = {
+  title: "Schema with edge group",
+  description:
+    "An ACDC schema with an edge group within a saidified edge section",
+  version: "1.0",
+  properties: {
+    e: {
+      oneOf: [
+        { description: "Edge Section SAID", type: "string" },
+        {
+          properties: {
+            d: { description: "Edge Section SAID", type: "string" },
+            u: { description: "Edge Section UUID", type: "string" },
+            o: { description: "Edge Section M-ary Operator", type: "string" },
+            w: { description: "Edge Section Weight", type: "number" },
+            edgeGroup: {
+              properties: {
+                edgeA: {},
+                edgeB: {},
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
+};
+
+const schemaWithEdgeWithoutSchemaSaid = {
+  title: "Schema with edge without schema said",
+  description:
+    "An ACDC schema with an edge that does not specify the far ACDC schema (within a saidified edge section)",
+  version: "1.0",
+  properties: {
+    e: {
+      oneOf: [
+        { description: "Edge Section SAID", type: "string" },
+        {
+          properties: {
+            d: { description: "Edge Section SAID", type: "string" },
+            u: { description: "Edge Section UUID", type: "string" },
+            o: { description: "Edge Section M-ary Operator", type: "string" },
+            w: { description: "Edge Section Weight", type: "number" },
+            edge: {
+              properties: {
+                n: { const: "farEdgeSaid" },
+                s: {},
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
 };
 
 const credentialRecordProps = {
@@ -924,4 +1103,11 @@ export {
   ipexSubmitAdmitEnd,
   credentialStateIssued,
   credentialStateRevoked,
+  schemaNoEdges,
+  schemaWithEdge,
+  schemaWithSaidifiedEdgeSection,
+  schemaWithMultipleEdges,
+  schemaWithASaidifiedEdge,
+  schemaWithEdgeGroup,
+  schemaWithEdgeWithoutSchemaSaid,
 };

@@ -266,7 +266,7 @@ const ReceiveCredential = ({
     let name = memberConnection?.label || member;
 
     if (!memberConnection?.label) {
-      name = profile?.identity.groupMetadata?.proposedUsername || "";
+      name = profile.identity.groupUsername || "";
     }
 
     return {

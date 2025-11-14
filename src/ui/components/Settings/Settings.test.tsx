@@ -54,12 +54,31 @@ jest.mock("@capacitor/browser", () => ({
   },
 }));
 
-jest.mock("@capacitor/core", () => ({
-  Capacitor: {
-    isNativePlatform: jest.fn(() => true),
-    getPlatform: jest.fn(() => "web"),
-  },
-}));
+jest.mock("@capacitor/core", () => {
+  const actual = jest.requireActual("@capacitor/core");
+  return {
+    ...actual,
+    Capacitor: {
+      isNativePlatform: jest.fn(() => true),
+      getPlatform: jest.fn(() => "web"),
+    },
+    registerPlugin: jest.fn(() => ({
+      requestPermissions: jest.fn(() =>
+        Promise.resolve({ display: "granted" })
+      ),
+      schedule: jest.fn(() => Promise.resolve()),
+      addListener: jest.fn(() => Promise.resolve()),
+      removeAllListeners: jest.fn(() => Promise.resolve()),
+      cancel: jest.fn(() => Promise.resolve()),
+      getPending: jest.fn(() => Promise.resolve({ notifications: [] })),
+      getDeliveredNotifications: jest.fn(() =>
+        Promise.resolve({ notifications: [] })
+      ),
+      checkPermissions: jest.fn(() => Promise.resolve({ display: "granted" })),
+      createChannel: jest.fn(() => Promise.resolve()),
+    })),
+  };
+});
 
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {
@@ -161,7 +180,6 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
 }));
 
 const openSettingMock = jest.fn(() => Promise.resolve(true));
-const deleteAccount = jest.fn();
 jest.mock("capacitor-native-settings", () => ({
   NativeSettings: {
     open: jest.fn(),
@@ -182,7 +200,7 @@ jest.mock("../../../core/agent/agent", () => ({
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
       },
-      deleteAccount: () => deleteAccount(),
+      deleteWallet: jest.fn(),
       getMnemonic: jest.fn().mockResolvedValue("some test mnemonic"),
     },
   },
@@ -661,12 +679,12 @@ describe("Settings page", () => {
     );
 
     fireEvent.click(
-      getByText(EN_TRANSLATIONS.settings.sections.deleteaccount.button)
+      getByText(EN_TRANSLATIONS.settings.sections.deletewallet.button)
     );
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.settings.sections.deleteaccount.alert.title)
+        getByText(EN_TRANSLATIONS.settings.sections.deletewallet.alert.title)
       );
     });
 
@@ -679,7 +697,7 @@ describe("Settings page", () => {
     await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(deleteAccount).toBeCalled();
+      expect(Agent.agent.deleteWallet).toBeCalled();
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.DELETE_ACCOUNT_SUCCESS)
       );

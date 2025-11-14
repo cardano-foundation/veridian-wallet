@@ -30,18 +30,18 @@
     }
   },
   "createpasscodemodule": {
-    "errornomatch": "Passcode didn’t match",
-    "errormatch": "Passcode already in use",
+    "errornomatch": "PIN didn’t match",
+    "errormatch": "PIN already in use",
     "cantremember": "Can't remember?",
     "repeat": "Avoid matching numbers e.g. 111111",
     "consecutive": "Avoid consecutive numbers e.g. 123456",
-    "saveFailed": "Unable to save app passcode"
+    "saveFailed": "Unable to save app PIN"
   },
   "setpasscode": {
-    "enterpasscode": "Create your Passcode",
-    "description": "Create a passcode to secure your wallet and to continue the onboarding process",
-    "recoverydescription": "Create a passcode to secure your wallet and to continue the recovery process",
-    "reenterpasscode": "Re-enter your Passcode",
+    "enterpasscode": "Create your PIN",
+    "description": "Create a PIN to secure your wallet and to continue the onboarding process",
+    "recoverydescription": "Create a PIN to secure your wallet and to continue the recovery process",
+    "reenterpasscode": "Re-enter your PIN",
     "cancelbtn": "Cancel",
     "backbtn": "Back"
   },
@@ -155,10 +155,10 @@
   },
   "lockpage": {
     "title": "Welcome back",
-    "description": "Please enter your passcode to login",
-    "error": "Incorrect passcode",
+    "description": "Please enter your PIN to login",
+    "error": "Incorrect PIN",
     "forgotten": {
-      "button": "I've forgotten my passcode"
+      "button": "I've forgotten my PIN"
     },
     "attempterror": "{{attempt}} attempt remaining",
     "attemptalert": {
@@ -171,11 +171,11 @@
     },
     "alert": {
       "text": {
-        "verify": "If you've forgotten your passcode, please verify your recovery phrase to gain access to your wallet",
+        "verify": "If you've forgotten your PIN, please verify your recovery phrase to gain access to your wallet",
         "restart": "You currently haven't generated a recovery phrase, would you like to start your onboarding again?"
       },
       "button": {
-        "verify": "Verify your Recovery Phrase",
+        "verify": "Verify recovery phrase",
         "restart": "Start again",
         "cancel": "Cancel"
       }
@@ -267,7 +267,7 @@
       "title": "Switch to recover an existing wallet",
       "paragraphtop": "You're about to switch to the wallet recovery process. Here's what will happen:",
       "warning": {
-        "one": "<strong>Passcode & Operations Password:</strong> You'll keep your existing passcode and operations password. If you chose to skip setting an operations password, that preference will remain.",
+        "one": "<strong>Passcode & Operations Password:</strong> You'll keep your existing PIN and operations password. If you chose to skip setting an operations password, that preference will remain.",
         "two": "<strong>Recovery Phrase:</strong> If you've gone beyond the generation of a new recovery phrase, this will be wiped. You'll need to verify the recovery phrase associated with your previous wallet.",
         "three": "<strong>Connect URL:</strong> You will only need the Connect URL for the SSI agent screen."
       },
@@ -277,7 +277,7 @@
       "title": "Switch to create a new wallet",
       "paragraphtop": "You're about to switch to the new wallet creation process. Here's what will happen:",
       "warning": {
-        "one": "<strong>Passcode & Operations Password:</strong> You'll keep your existing passcode and operations password. If you chose to skip setting an operations password, that preference will remain.",
+        "one": "<strong>Passcode & Operations Password:</strong> You'll keep your existing PIN and operations password. If you chose to skip setting an operations password, that preference will remain.",
         "two": "<strong>Recovery Phrase:</strong> You'll need to generate a recovery phrase and copy these words down somewhere safe",
         "three": "<strong>Boot URL and Connect URL:</strong> You will need both your Boot URL and Connect URL for the SSI agent screen."
       },
@@ -318,7 +318,7 @@
       "skip": "Skip"
     },
     "alert": {
-      "text": "Are you sure you want to skip? By doing this, you will be required to use your passcode for any protected operations. You can, of course, set this up later if you prefer.",
+      "text": "Are you sure you want to skip? By doing this, you will be required to use your PIN for any protected operations. You can, of course, set this up later if you prefer.",
       "button": {
         "confirm": "Yes, skip",
         "cancel": "Cancel"
@@ -473,12 +473,12 @@
           "cancel": "Setup later"
         },
         "changepin": {
-          "title": "Change passcode",
-          "createpasscode": "Create new passcode",
-          "reenterpasscode": "Re-enter new passcode",
+          "title": "Change PIN",
+          "createpasscode": "Create new PIN",
+          "reenterpasscode": "Re-enter new PIN",
           "cancel": "Cancel",
           "back": "Back",
-          "description": "Create a new passcode to secure your wallet",
+          "description": "Create a new PIN to secure your wallet",
           "cantremember": {
             "label": "Can't remember?"
           }
@@ -490,8 +490,8 @@
             "enable": "Enable operations password",
             "change": "Change operations password",
             "alert": {
-              "enablemessage": "By turning on an operations password you will be required to use this to verify any future operations instead of your passcode.",
-              "disablemessage": "By turning off your operations password you will be required to use your passcode to verify any future operations.",
+              "enablemessage": "By turning on an operations password you will be required to use this to verify any future operations instead of your PIN.",
+              "disablemessage": "By turning off your operations password you will be required to use your PIN to verify any future operations.",
               "existingpassword": "Your new operations password must be different to your existing one.",
               "confirm": "Continue",
               "cancel": "Cancel",
@@ -542,11 +542,11 @@
         },
         "version": "App Version"
       },
-      "deleteaccount": {
+      "deletewallet": {
         "button": "Delete wallet",
         "alert": {
-          "title": "This will delete all wallet data. You can restore your account anytime with your secret recovery phrase.",
-          "confirm": "Delete account",
+          "title": "This will delete all wallet data. You can restore your wallet anytime with your secret recovery phrase.",
+          "confirm": "Delete wallet",
           "cancel": "Cancel"
         }
       }
@@ -957,7 +957,8 @@
           "exnipexapplyproposed": "<strong>{{initiator}}</strong> has proposed a credential for the <strong>{{connection}}’s</strong> request",
           "sign": "<strong>Signing request</strong> for <strong>{{connection}}</strong>",
           "signeventinfo": "<strong>Signing event information</strong>",
-          "connectinstructions": "<strong>Check your email for instructions on how to connect with {{connection}}</strong>"
+          "connectinstructions": "<strong>Check your email for instructions on how to connect with {{connection}}</strong>",
+          "fallback": "You have a new notification"
         }
       },
       "details": {
@@ -1207,15 +1208,15 @@
   },
   "verifypasscode": {
     "cancel": "Cancel",
-    "title": "Enter passcode",
-    "description": "Please enter your passcode to verify",
-    "error": "Incorrect passcode",
+    "title": "Enter PIN",
+    "description": "Please enter your PIN to verify",
+    "error": "Incorrect PIN",
     "forgotten": {
-      "button": "I've forgotten my passcode"
+      "button": "I've forgotten my PIN"
     },
     "alert": {
       "text": {
-        "verify": "If you've forgotten your passcode, please verify your recovery phrase to gain access to your wallet",
+        "verify": "If you've forgotten your PIN, please verify your recovery phrase to gain access to your wallet",
         "restart": "You currently haven't generated a recovery phrase, would you like to start your onboarding again?"
       },
       "button": {
@@ -1228,17 +1229,17 @@
   "forgotauth": {
     "cancel": "Cancel",
     "passcode": {
-      "title": "Forgot passcode",
-      "description": "Please verify your recovery phrase to reset your passcode. To start typing click on the first option."
+      "title": "Forgot PIN",
+      "description": "Please verify your recovery phrase to reset your PIN. To start typing click on the first option."
     },
     "password": {
       "title": "Forgot password",
       "description": "Please verify your recovery phrase to reset your password. To start typing click on the first option."
     },
     "newpasscode": {
-      "title": "New passcode",
-      "description": "Create a new passcode to re-secure your wallet and perform operations",
-      "reenterpasscode": "Re-enter passcode"
+      "title": "New PIN",
+      "description": "Create a new PIN to re-secure your wallet and perform operations",
+      "reenterpasscode": "Re-enter PIN"
     },
     "newpassword": {
       "title": "New password",
@@ -1457,7 +1458,7 @@
     "grouprequestsend": "Group request sent",
     "unablecreategrouperror": "Unable to create group",
     "delegatedidentifiercreated": "Profile added to “For delegates“",
-    "passcodeupdated": "Passcode updated successfully",
+    "passcodeupdated": "PIN updated",
     "passwordupdated": "Password updated successfully",
     "passworddisabled": "Password turned off",
     "passwordcreated": "Password created successfully",

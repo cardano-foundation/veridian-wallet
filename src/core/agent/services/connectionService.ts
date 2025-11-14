@@ -94,7 +94,7 @@ class ConnectionService extends AgentService {
   static readonly CANNOT_GET_OOBI = "No OOBI available from KERIA";
   static readonly OOBI_INVALID = "OOBI URL is invalid";
   static readonly NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER =
-    "Cannot set up normal connection without specifying a controlling identifier to complete the connection identifier is required for non-multi-sig invites";
+    "Cannot set up normal connection without specifying a local identifier to share with the other party";
 
   onConnectionStateChanged(
     callback: (event: ConnectionStateChangedEvent) => void
@@ -663,7 +663,9 @@ class ConnectionService extends AgentService {
       const pathName = oobi.pathname;
       const agentIndex = pathName.indexOf("/agent/");
       if (agentIndex !== -1) {
-        oobi.pathname = pathName.substring(0, agentIndex);
+        // @TODO - foconnor: Re-adding /agent here so that KERIA treats it as a normal OOBI (not SAID OOBI) and extracts
+        // the name parameter for one-way scanning. To be reverted once connection request protocol in place.
+        oobi.pathname = pathName.substring(0, agentIndex) + "/agent";
       }
     }
     if (parameters?.alias !== undefined) {

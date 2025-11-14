@@ -226,7 +226,7 @@ const RecoverySeedPhraseModule = forwardRef<
 
     return (
       <>
-        <div className="content-container verify-recovery-seed-phrase-module">
+        <div className="content-container recovery-seed-phrase-module">
           <div>
             {title && (
               <h2
@@ -255,25 +255,27 @@ const RecoverySeedPhraseModule = forwardRef<
               errorInputIndexs={errorInputIndex}
             />
             {(suggestSeedPhrase.length > 0 || displaySuggestionError) && (
-              <h3 className="suggestion-title">
-                {i18n.t("verifyrecoveryseedphrase.suggestions.title")}
-              </h3>
-            )}
-            {suggestSeedPhrase.length > 0 && (
-              <SeedPhraseModule
-                testId="suggestion-seed-phrase-container"
-                seedPhrase={suggestSeedPhrase}
-                addSeedPhraseSelected={addSeedPhraseSelected}
-                hideSeedNumber
-              />
-            )}
-            {displaySuggestionError && (
-              <p
-                className="suggest-error"
-                data-testid="no-suggest-error"
-              >
-                {i18n.t("verifyrecoveryseedphrase.suggestions.error")}
-              </p>
+              <div className="suggestions-feature">
+                <h3 className="suggestions-title">
+                  {i18n.t("verifyrecoveryseedphrase.suggestions.title")}
+                </h3>
+                {suggestSeedPhrase.length > 0 && (
+                  <SeedPhraseModule
+                    testId="suggestions-seed-phrase-container"
+                    seedPhrase={suggestSeedPhrase}
+                    addSeedPhraseSelected={addSeedPhraseSelected}
+                    hideSeedNumber
+                  />
+                )}
+                {displaySuggestionError && (
+                  <p
+                    className="suggest-error"
+                    data-testid="no-suggest-error"
+                  >
+                    {i18n.t("verifyrecoveryseedphrase.suggestions.error")}
+                  </p>
+                )}
+              </div>
             )}
             {seedPhrase.filter((item) => !!item).length > 0 && (
               <IonButton

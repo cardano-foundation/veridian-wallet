@@ -5,8 +5,6 @@ import { Agent } from "../agent";
 import { ConfigurationService } from "../../configuration";
 import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { CredentialStatus } from "./credentialService.types";
-import { CredentialMetadataRecord } from "../records/credentialMetadataRecord";
-import { IdentifierType } from "./identifier.types";
 import { EventTypes } from "../event.types";
 import {
   applyForPresentingExnMessage,
@@ -37,6 +35,13 @@ import {
   credentialStateIssued,
   credentialStateRevoked,
   admitForIssuanceExnMessage,
+  schemaNoEdges,
+  schemaWithEdge,
+  schemaWithSaidifiedEdgeSection,
+  schemaWithMultipleEdges,
+  schemaWithASaidifiedEdge,
+  schemaWithEdgeGroup,
+  schemaWithEdgeWithoutSchemaSaid,
 } from "../../__fixtures__/agent/ipexCommunicationFixtures";
 import { NotificationRoute } from "./keriaNotificationService.types";
 import {
@@ -51,7 +56,6 @@ import {
 import { MultiSigRoute } from "./multiSig.types";
 import { NotificationRecord } from "../records";
 import { StorageMessage } from "../../storage/storage.types";
-import { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
 
 const notificationStorage = jest.mocked({
   open: jest.fn(),
@@ -351,15 +355,12 @@ describe("Receive individual ACDC actions", () => {
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       id: "identifierId",
     });
-    schemaGetMock.mockResolvedValue(QVISchema);
-    credentialStorage.getCredentialMetadata = jest.fn().mockResolvedValue(
-      new CredentialMetadataRecord({
-        ...credentialRecordProps,
-        identifierId: "identifierId",
-        identifierType: IdentifierType.Individual,
-        createdAt: new Date(credentialRecordProps.issuanceDate),
-      })
-    );
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithEdge)
+      .mockResolvedValue(schemaNoEdges);
+    credentialStorage.getCredentialMetadata = jest.fn().mockResolvedValue({
+      id: "id",
+    });
     eventEmitter.emit = jest.fn();
     saveOperationPendingMock.mockResolvedValue({
       id: "opName",
@@ -387,20 +388,17 @@ describe("Receive individual ACDC actions", () => {
       identifierId: "identifierId",
       identifierType: "individual",
       createdAt: new Date(credentialRecordProps.issuanceDate),
+      credentialType: schemaWithEdge.title,
     });
     expect(eventEmitter.emit).toHaveBeenCalledWith({
       type: EventTypes.AcdcStateChanged,
       payload: {
-        credential: expect.objectContaining({
-          id: credentialRecordProps.id,
-          status: CredentialStatus.PENDING,
-          credentialType: credentialRecordProps.credentialType,
-          issuanceDate: credentialRecordProps.issuanceDate,
+        credential: {
+          ...credentialRecordProps,
           identifierId: "identifierId",
           identifierType: "individual",
-          schema: credentialRecordProps.schema,
-          connectionId: credentialRecordProps.connectionId,
-        }),
+          isArchived: undefined,
+        },
         status: CredentialStatus.PENDING,
       },
     });
@@ -433,6 +431,14 @@ describe("Receive individual ACDC actions", () => {
         hidden: true,
       })
     );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://127.0.0.1:3001/oobi/farEdgeSchemaSaid",
+      true
+    ); // Ensures we are calling recursiveSchemaResolve as it's public
   });
 
   test("Can accept ACDC from individual identifier even if already exists (idempotent)", async () => {
@@ -483,11 +489,7 @@ describe("Receive individual ACDC actions", () => {
       identifierType: "individual",
       createdAt: new Date(credentialRecordProps.issuanceDate),
     });
-    expect(eventEmitter.emit).toHaveBeenCalledTimes(1);
-    const emittedEvent = (eventEmitter.emit as jest.Mock).mock.calls[0][0];
-    expect(emittedEvent.type).toBe(EventTypes.AcdcStateChanged);
-    expect(emittedEvent.payload.status).toBe(CredentialStatus.PENDING);
-    expect(emittedEvent.payload.credential?.id).toBeDefined();
+    expect(eventEmitter.emit).not.toBeCalled();
     expect(ipexAdmitMock).toBeCalledWith({
       datetime: expect.any(String),
       message: "",
@@ -858,6 +860,9 @@ describe("Receive group ACDC actions", () => {
         identifierType: "group",
         createdAt: new Date(credentialRecordProps.issuanceDate),
       });
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithEdge)
+      .mockResolvedValue(schemaNoEdges);
 
     await ipexCommunicationService.joinMultisigAdmit("id");
 
@@ -867,7 +872,6 @@ describe("Receive group ACDC actions", () => {
       false,
       grantForIssuanceExnMessage.exn.rp
     );
-
     expect(getManagerMock).toBeCalledWith(gHab);
     expect(ipexSubmitAdmitMock).toBeCalledWith(
       "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
@@ -884,6 +888,7 @@ describe("Receive group ACDC actions", () => {
       identifierId: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
       identifierType: "group",
       createdAt: new Date(credentialRecordProps.issuanceDate),
+      credentialType: "Schema with edge",
     });
     expect(eventEmitter.emit).toHaveBeenCalledWith({
       type: EventTypes.AcdcStateChanged,
@@ -912,6 +917,14 @@ describe("Receive group ACDC actions", () => {
       recordType: OperationPendingRecordType.ExchangeReceiveCredential,
     });
     expect(notificationStorage.deleteById).not.toBeCalled();
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://127.0.0.1:3001/oobi/farEdgeSchemaSaid",
+      true
+    ); // Ensures we are calling recursiveSchemaResolve as it's public
   });
 
   test("Can join group admit of an ACDC even if ACDC already exists (idempotent)", async () => {
@@ -2289,6 +2302,169 @@ describe("Grant ACDC group actions", () => {
   });
 });
 
+describe("Chained ACDC schema resolution", () => {
+  test("Can resolve non-chained ACDC schema", async () => {
+    schemaGetMock.mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaNoEdges);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(1);
+  });
+
+  test("Can resolve chained ACDC schema with a non-saidified edge section", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithEdge)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithEdge);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(2);
+  });
+
+  test("Can resolve chained ACDC schema with a saidified edge section", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithSaidifiedEdgeSection)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithSaidifiedEdgeSection);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSchemaSaidSaidifiedEdgeSection",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(2);
+  });
+
+  test("Can resolve chained ACDC schema with more than a depth of 2", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithEdge)
+      .mockResolvedValueOnce(schemaWithSaidifiedEdgeSection)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithEdge);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSchemaSaidSaidifiedEdgeSection",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(3);
+  });
+
+  test("Can resolve a schema with multiple edges", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithMultipleEdges)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithMultipleEdges);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeASchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeBSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(3);
+  });
+
+  test("Can resolve a schema with a saidified edge", async () => {
+    schemaGetMock
+      .mockResolvedValueOnce(schemaWithASaidifiedEdge)
+      .mockResolvedValue(schemaNoEdges);
+    const schema = await ipexCommunicationService.recursiveSchemaResolve(
+      "http://issuerendpoint.com/oobi/",
+      "schemaSaid"
+    );
+    expect(schema).toBe(schemaWithASaidifiedEdge);
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSaidifiedSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(2);
+  });
+
+  test("Cannot resolve schemas with edge groups", async () => {
+    schemaGetMock.mockResolvedValue(schemaWithEdgeGroup);
+    await expect(
+      ipexCommunicationService.recursiveSchemaResolve(
+        "http://issuerendpoint.com/oobi/",
+        "schemaSaid"
+      )
+    ).rejects.toThrowError(
+      IpexCommunicationService.EDGE_GROUP_SCHEMA_RESOLUTION_UNSUPPORTED
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).not.toBeCalledWith(
+      "http://issuerendpoint.com/oobi/farEdgeSaidifiedSchemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(1);
+  });
+
+  test("Cannot resolve edge schemas that do not specify the schema SAID", async () => {
+    schemaGetMock.mockResolvedValue(schemaWithEdgeWithoutSchemaSaid);
+    await expect(
+      ipexCommunicationService.recursiveSchemaResolve(
+        "http://issuerendpoint.com/oobi/",
+        "schemaSaid"
+      )
+    ).rejects.toThrowError(
+      IpexCommunicationService.MISSING_SUB_SCHEMA_REFERENCE
+    );
+    expect(connections.resolveOobi).toBeCalledWith(
+      "http://issuerendpoint.com/oobi/schemaSaid",
+      true
+    );
+    expect(connections.resolveOobi).toBeCalledTimes(1);
+  });
+});
+
 // @TODO - foconnor: Split into individual describes and tidy up.
 describe("IPEX communication service of agent", () => {
   beforeAll(async () => {
@@ -2656,7 +2832,11 @@ describe("IPEX communication service of agent", () => {
         dt: "2024-07-30T04:19:55.348000+00:00",
         attendeeName: "ccc",
       },
-      s: QVISchema,
+      s: {
+        title: QVISchema.title,
+        description: QVISchema.description,
+        version: QVISchema.version,
+      },
       lastStatus: { s: "0", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
       identifierId: grantForIssuanceExnMessage.exn.rp,
@@ -2687,14 +2867,19 @@ describe("IPEX communication service of agent", () => {
         dt: "2024-07-30T04:19:55.348000+00:00",
         attendeeName: "ccc",
       },
-      s: QVISchema,
+      s: {
+        title: QVISchema.title,
+        description: QVISchema.description,
+        version: QVISchema.version,
+      },
       lastStatus: { s: "0", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
       identifierId: grantForIssuanceExnMessage.exn.rp,
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
     expect(connections.resolveOobi).toBeCalledWith(
-      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu"
+      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+      true
     );
   });
 
@@ -2733,7 +2918,11 @@ describe("IPEX communication service of agent", () => {
         dt: "2024-07-30T04:19:55.348000+00:00",
         attendeeName: "ccc",
       },
-      s: QVISchema,
+      s: {
+        title: QVISchema.title,
+        description: QVISchema.description,
+        version: QVISchema.version,
+      },
       lastStatus: { s: "1", dt: "2024-11-07T08:32:34.943Z" },
       status: "pending",
       identifierId: grantForIssuanceExnMessage.exn.rp,

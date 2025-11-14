@@ -53,7 +53,6 @@ import { StorageMessage } from "../../storage/storage.types";
 import { RpyRoute } from "./connectionService.types";
 import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
-const MAX_LOOP = 1e4;
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
   static readonly CANNOT_GET_KEYSTATE_OF_IDENTIFIER =
@@ -77,8 +76,6 @@ class MultiSigService extends AgentService {
     "We do not control any member AID of the multi-sig";
   static readonly QUEUED_GROUP_DATA_MISSING =
     "Cannot retry creating group identifier if retry data is missing from the DB";
-  static readonly MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND =
-    "Cannot find inception exchange message for multisigId";
   static readonly GROUP_DATA_MISSING_FOR_INITIATOR =
     "Group data missing for initiator";
 
@@ -843,39 +840,12 @@ class MultiSigService extends AgentService {
       .identifiers()
       .members(multisigId);
 
-    // TODO: We have an issue when using the signify-ts filter. Currently, we are loading all exchange messages and filtering them with JavaScript. We need to fix this in the future.
-    const exchanges = [];
-    let i = 0;
-
-    while (i < MAX_LOOP) {
-      const result = await this.props.signifyClient.exchanges().list({
-        skip: i * 25,
-        limit: (i + 1) * 25,
-      });
-
-      if (result.length === 0) break;
-
-      exchanges.push(...result);
-      i++;
-    }
-
-    const groupExchanges = exchanges.filter(
-      (exchange: { exn: { a: { gid: string }; r: string } }) => {
-        return (
-          exchange?.exn?.a?.gid === multisigId &&
-          exchange?.exn?.r === MultiSigRoute.ICP
-        );
-      }
-    );
-
-    if (groupExchanges.length === 0 || groupExchanges[0] === undefined) {
-      throw new Error(
-        MultiSigService.MULTI_SIG_INCEPTION_EXCHANGE_MESSAGE_NOT_FOUND
-      );
-    }
+    const exchanges = await this.props.signifyClient.exchanges().list({
+      filter: { "-r": MultiSigRoute.ICP, "-a-gid": multisigId },
+    });
 
     const memberInfos = members.signing.map((member: { aid: string }) => {
-      const hasAccepted = groupExchanges.some(
+      const hasAccepted = exchanges.some(
         (exn: { exn: { i: string } }) => exn.exn.i === member.aid
       );
 
@@ -887,8 +857,8 @@ class MultiSigService extends AgentService {
 
     return {
       threshold: {
-        signingThreshold: Number(groupExchanges[0].exn.e.icp.kt),
-        rotationThreshold: Number(groupExchanges[0].exn.e.icp.nt),
+        signingThreshold: Number(exchanges[0].exn.e.icp.kt),
+        rotationThreshold: Number(exchanges[0].exn.e.icp.nt),
       },
       members: memberInfos,
     };

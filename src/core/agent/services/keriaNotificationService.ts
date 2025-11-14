@@ -144,7 +144,7 @@ class KeriaNotificationService extends AgentService {
       /* eslint-disable no-console */
       console.error("Error at pollNotifications", error);
       setTimeout(
-        this.pollNotifications,
+        () => this.pollNotifications(),
         KeriaNotificationService.POLL_KERIA_INTERVAL
       );
     }
@@ -1106,7 +1106,7 @@ class KeriaNotificationService extends AgentService {
     } catch (error) {
       console.error("Error at pollLongOperations", error);
       setTimeout(
-        this.pollLongOperations,
+        () => this.pollLongOperations(),
         KeriaNotificationService.POLL_KERIA_INTERVAL
       );
     }
