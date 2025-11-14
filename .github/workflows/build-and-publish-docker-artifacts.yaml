@@ -186,7 +186,7 @@ jobs:
           fi
 
           # Force PR builds to be pushed to ghcr.io as well (by default cf-gha-baseline disables it)
-          echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES} ghcr.io/${GITHUB_REPOSITORY}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
+          echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES_FILTERED} ghcr.io/${GITHUB_REPOSITORY}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
 
       - name: 🌍 earthly (docker build and push)
         run: |
