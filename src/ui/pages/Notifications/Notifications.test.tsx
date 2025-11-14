@@ -453,7 +453,6 @@ describe("Notifications Tab", () => {
     };
 
     const mockOnClick = jest.fn();
-    const mockOptionClick = jest.fn();
     const customConnectionName = "Test Connection";
 
     const { getByTestId } = render(
@@ -490,7 +489,6 @@ describe("Notifications Tab", () => {
         <NotificationItem
           item={item}
           onClick={mockOnClick}
-          onOptionButtonClick={mockOptionClick}
           data-testid="notification-item-test"
         />
       </Provider>

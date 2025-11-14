@@ -85,15 +85,14 @@ enum InitializationPhase {
 
 export { IncomingRequestType, InitializationPhase };
 
-  export type {
-    AuthenticationCacheProps,
-    CurrentRouteCacheProps,
-    IncomingRequestProps,
-    PayloadData,
-    PeerConnectSigningEventRequest,
-    PendingJoinGroupMetadata,
-    QueueProps,
-    StateCacheProps,
-    ToastStackItem
-  };
-
+export type {
+  AuthenticationCacheProps,
+  CurrentRouteCacheProps,
+  IncomingRequestProps,
+  PayloadData,
+  PeerConnectSigningEventRequest,
+  PendingJoinGroupMetadata,
+  QueueProps,
+  StateCacheProps,
+  ToastStackItem,
+};

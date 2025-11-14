@@ -1,1 +1,1 @@
-export * from "./EarlierNotification";
+export { NotificationSection } from "./NotificationSection";

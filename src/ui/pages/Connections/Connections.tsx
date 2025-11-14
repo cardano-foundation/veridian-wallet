@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
-  RegularConnectionDetails
+  RegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
