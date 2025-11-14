@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    ndkVersion "28.0.12077973" // Use latest stable r28+
     namespace "org.cardanofoundation.idw"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
@@ -55,4 +56,10 @@ try {
     }
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.camera:camera-core:1.4.0'
+    }
 }

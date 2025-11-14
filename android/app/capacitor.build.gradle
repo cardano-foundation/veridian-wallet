@@ -27,7 +27,6 @@ dependencies {
     implementation project(':evva-capacitor-secure-storage-plugin')
     implementation project(':capacitor-freerasp')
     implementation project(':capacitor-native-settings')
-    implementation project(':capacitor-plugin-safe-area')
 
 }
 
