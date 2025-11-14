@@ -72,8 +72,6 @@ class KeriaNotificationService extends AgentService {
     "Out of order notification received, unable to process right now";
   static readonly DUPLICATE_ISSUANCE =
     "Duplicate IPEX grant message for same credential, may be out-of-order TEL updates for revocation";
-  static readonly SINGLETON_ROUTE_REQUIRED = "singleton";
-  static readonly SINGLETON_PRE = "singleton_pre"; // Dummy prefix to re-use within singleton notifications where unused (better than setting to optional, as weakens rest of code)
 
   static readonly POLL_KERIA_INTERVAL = 2000;
   static readonly CHECK_READINESS_INTERNAL = 25;
@@ -1234,6 +1232,18 @@ class KeriaNotificationService extends AgentService {
 
           for (const connectionPairRecord of connectionPairRecords) {
             if (
+              connectionPairRecord.creationStatus === CreationStatus.COMPLETE
+            ) {
+              continue;
+            }
+
+            connectionPairRecord.creationStatus = CreationStatus.COMPLETE;
+
+            const contact = await this.contactStorage.findExpectedById(
+              connectionPairRecord.contactId
+            );
+
+            if (
               connectionPairRecord.identifier &&
               !connectionPairRecord.pendingDeletion
             ) {
@@ -1243,37 +1253,16 @@ class KeriaNotificationService extends AgentService {
               );
             }
 
-            connectionPairRecord.creationStatus = CreationStatus.COMPLETE;
-
-            const keriaContact = await this.props.signifyClient
+            await this.props.signifyClient
               .contacts()
-              .get((operation.response as State).i)
-              .catch(() => undefined);
-
-            if (!keriaContact) {
-              const contact = await this.contactStorage.findById(
-                connectionPairRecord.contactId
-              );
-              if (!contact) {
-                throw new Error(
-                  `Contact not found for connection pair: ${connectionPairRecord.contactId}`
-                );
-              }
-
-              await this.props.signifyClient
-                .contacts()
-                .update((operation.response as State).i, {
-                  version: LATEST_CONTACT_VERSION,
-                  alias: contact.alias,
-                  [`${connectionPairRecord.identifier}:createdAt`]: new Date(
-                    (operation.response as State).dt
-                  ),
-                  oobi: contact.oobi,
-                });
-            }
+              .update((operation.response as State).i, {
+                version: LATEST_CONTACT_VERSION,
+                alias: contact.alias,
+                oobi: contact.oobi,
+                [`${connectionPairRecord.identifier}:createdAt`]: new Date(),
+              });
 
             await this.connectionPairStorage.update(connectionPairRecord);
-
             this.props.eventEmitter.emit<ConnectionStateChangedEvent>({
               type: EventTypes.ConnectionStateChanged,
               payload: {
@@ -1318,21 +1307,34 @@ class KeriaNotificationService extends AgentService {
               });
             }
 
-            await this.credentialService
-              .markAcdc(credentialId, CredentialStatus.CONFIRMED)
-              .catch((error) => {
-                // In case user deleted pending credential in UI
+            try {
+              await this.credentialService.markAcdc(
+                credentialId,
+                CredentialStatus.CONFIRMED
+              );
+            } catch (error) {
+              if (error instanceof Error) {
                 if (
-                  !(
-                    error instanceof Error &&
-                    error.message.startsWith(
-                      CredentialService.CREDENTIAL_MISSING_METADATA_ERROR_MSG
-                    )
+                  error.message.startsWith(
+                    CredentialService.CREDENTIAL_NOT_READY_ON_KERIA
+                  )
+                ) {
+                  return;
+                }
+
+                // Ignore case where metadata was removed locally (e.g. user deleted pending credential)
+                // and continue processing to clean up notifications/history.
+                if (
+                  !error.message.startsWith(
+                    CredentialService.CREDENTIAL_MISSING_METADATA_ERROR_MSG
                   )
                 ) {
                   throw error;
                 }
-              });
+              } else {
+                throw error;
+              }
+            }
 
             await this.ipexCommunications.createLinkedIpexMessageRecord(
               grantExchange,

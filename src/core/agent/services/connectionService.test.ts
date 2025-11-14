@@ -35,6 +35,7 @@ const submitRpyMock = jest.fn();
 const getExchangeMock = jest.fn();
 
 const failUuid = "fail-uuid";
+const errorUuid = "error-uuid";
 const signifyClient = jest.mocked({
   connect: jest.fn(),
   boot: jest.fn(),
@@ -46,6 +47,13 @@ const signifyClient = jest.mocked({
       if (id === `${oobiPrefix}${failUuid}`) {
         return {
           done: false,
+          name: id,
+        };
+      }
+      if (id === `${oobiPrefix}${errorUuid}`) {
+        return {
+          done: true,
+          error: "OOBI resolution failed",
           name: id,
         };
       }
@@ -67,6 +75,16 @@ const signifyClient = jest.mocked({
           name,
           metadata: {
             oobi: `${oobiPrefix}${failUuid}`,
+          },
+        };
+      }
+      if (name === `${oobiPrefix}${errorUuid}`) {
+        return {
+          done: true,
+          error: "OOBI resolution failed",
+          name,
+          metadata: {
+            oobi: `${oobiPrefix}${errorUuid}`,
           },
         };
       }
@@ -1156,6 +1174,16 @@ describe("Connection service of agent", () => {
     await expect(
       connectionService.resolveOobi(`${oobiPrefix}${failUuid}`, true)
     ).rejects.toThrowError(ConnectionService.FAILED_TO_RESOLVE_OOBI);
+  });
+
+  test("should throw if oobi resolves with operation.error", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    jest.spyOn(Date.prototype, "getTime").mockReturnValueOnce(0);
+    await expect(
+      connectionService.resolveOobi(`${oobiPrefix}${errorUuid}`, true)
+    ).rejects.toThrowError(
+      `${ConnectionService.FAILED_TO_RESOLVE_OOBI} [url: ${oobiPrefix}${errorUuid}] - OOBI resolution failed`
+    );
   });
 
   test("Should throw error when KERIA is offline", async () => {

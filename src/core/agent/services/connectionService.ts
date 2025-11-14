@@ -457,12 +457,10 @@ class ConnectionService extends AgentService {
     contactId: string,
     identifier: string
   ): Promise<void> {
-    // Check if the connection pair exists
     const connectionPair = await this.connectionPairStorage.findExpectedById(
       `${identifier}:${contactId}`
     );
 
-    // Get all connection pairs for this contactId to determine if this is the last one
     const allConnectionPairs = await this.connectionPairStorage.findAllByQuery({
       contactId,
     });
@@ -470,8 +468,7 @@ class ConnectionService extends AgentService {
     const isLastConnectionPair = allConnectionPairs.length === 1;
 
     if (isLastConnectionPair) {
-      // If this is the LAST connection pair left:
-      // Delete the entire Signify contact immediately
+      // Delete all
       await this.props.signifyClient
         .contacts()
         .delete(contactId)
@@ -483,7 +480,6 @@ class ConnectionService extends AgentService {
           // Idempotent - ignore 404 errors if already deleted
         });
 
-      // Delete the contact locally
       await this.contactStorage.deleteById(contactId);
       await this.connectionPairStorage.deleteById(connectionPair.id);
     } else {
@@ -791,6 +787,12 @@ class ConnectionService extends AgentService {
       if (!operation.done) {
         throw new Error(
           `${ConnectionService.FAILED_TO_RESOLVE_OOBI} [url: ${url}]`
+        );
+      }
+
+      if (operation.error) {
+        throw new Error(
+          `${ConnectionService.FAILED_TO_RESOLVE_OOBI} [url: ${url}] - ${operation.error}`
         );
       }
 

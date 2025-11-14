@@ -1944,14 +1944,14 @@ describe("Grant ACDC individual actions", () => {
       })
     );
     expect(updateContactMock).toBeCalledWith(
-      "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
+      agreeForPresentingExnMessage.exn.i,
       {
-        [`${KeriaContactKeyPrefix.HISTORY_IPEX}EJ1jbI8vTFCEloTfSsZkBpV0bUJnhGVyak5q-5IFIglL`]:
+        [`${agreeForPresentingExnMessage.exn.rp}:${KeriaContactKeyPrefix.HISTORY_IPEX}${agreeForPresentingExnMessage.exn.d}`]:
           JSON.stringify({
-            id: "EJ1jbI8vTFCEloTfSsZkBpV0bUJnhGVyak5q-5IFIglL",
+            id: agreeForPresentingExnMessage.exn.d,
             dt: agreeForPresentingExnMessage.exn.dt,
             credentialType: QVISchema.title,
-            connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
+            connectionId: agreeForPresentingExnMessage.exn.i,
             historyType: ConnectionHistoryType.IPEX_AGREE_COMPLETE,
           }),
       }
@@ -2141,14 +2141,14 @@ describe("Grant ACDC group actions", () => {
     expect(notificationStorage.deleteById).not.toBeCalled();
 
     expect(updateContactMock).toBeCalledWith(
-      "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
+      agreeForPresentingExnMessage.exn.i,
       {
-        [`${KeriaContactKeyPrefix.HISTORY_IPEX}EJ1jbI8vTFCEloTfSsZkBpV0bUJnhGVyak5q-5IFIglL`]:
+        [`${agreeForPresentingExnMessage.exn.rp}:${KeriaContactKeyPrefix.HISTORY_IPEX}${agreeForPresentingExnMessage.exn.d}`]:
           JSON.stringify({
-            id: "EJ1jbI8vTFCEloTfSsZkBpV0bUJnhGVyak5q-5IFIglL",
+            id: agreeForPresentingExnMessage.exn.d,
             dt: agreeForPresentingExnMessage.exn.dt,
             credentialType: QVISchema.title,
-            connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
+            connectionId: agreeForPresentingExnMessage.exn.i,
             historyType: ConnectionHistoryType.IPEX_AGREE_COMPLETE,
           }),
       }
@@ -2549,7 +2549,7 @@ describe("IPEX communication service of agent", () => {
     expect(updateContactMock).toBeCalledWith(
       applyForPresentingExnMessage.exn.i,
       {
-        [`${KeriaContactKeyPrefix.HISTORY_IPEX}${applyForPresentingExnMessage.exn.d}`]:
+        [`${applyForPresentingExnMessage.exn.rp}:${KeriaContactKeyPrefix.HISTORY_IPEX}${applyForPresentingExnMessage.exn.d}`]:
           JSON.stringify({
             id: applyForPresentingExnMessage.exn.d,
             dt: applyForPresentingExnMessage.exn.dt,
@@ -2574,7 +2574,7 @@ describe("IPEX communication service of agent", () => {
     expect(updateContactMock).toBeCalledWith(
       grantForIssuanceExnMessage.exn.rp,
       {
-        [`${KeriaContactKeyPrefix.HISTORY_IPEX}${grantForIssuanceExnMessage.exn.d}`]:
+        [`${grantForIssuanceExnMessage.exn.i}:${KeriaContactKeyPrefix.HISTORY_IPEX}${grantForIssuanceExnMessage.exn.d}`]:
           JSON.stringify({
             id: grantForIssuanceExnMessage.exn.d,
             dt: grantForIssuanceExnMessage.exn.dt,
@@ -2600,7 +2600,7 @@ describe("IPEX communication service of agent", () => {
     );
 
     expect(updateContactMock).toBeCalledWith(grantForIssuanceExnMessage.exn.i, {
-      [`${KeriaContactKeyPrefix.HISTORY_REVOKE}${grantForIssuanceExnMessage.exn.e.acdc.d}`]:
+      [`${grantForIssuanceExnMessage.exn.rp}:${KeriaContactKeyPrefix.HISTORY_REVOKE}${grantForIssuanceExnMessage.exn.e.acdc.d}`]:
         JSON.stringify({
           id: grantForIssuanceExnMessage.exn.d,
           dt: grantForIssuanceExnMessage.exn.dt,
@@ -2625,7 +2625,7 @@ describe("IPEX communication service of agent", () => {
     );
 
     expect(updateContactMock).toBeCalledWith(grantForIssuanceExnMessage.exn.i, {
-      [`${KeriaContactKeyPrefix.HISTORY_IPEX}${grantForIssuanceExnMessage.exn.d}`]:
+      [`${grantForIssuanceExnMessage.exn.rp}:${KeriaContactKeyPrefix.HISTORY_IPEX}${grantForIssuanceExnMessage.exn.d}`]:
         JSON.stringify({
           id: grantForIssuanceExnMessage.exn.d,
           dt: grantForIssuanceExnMessage.exn.dt,
