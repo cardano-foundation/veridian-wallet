@@ -790,6 +790,12 @@ class ConnectionService extends AgentService {
         );
       }
 
+      if (operation.error) {
+        throw new Error(
+          `${ConnectionService.FAILED_TO_RESOLVE_OOBI} [url: ${url}] - ${operation.error}`
+        );
+      }
+
       if (operation.response.i) {
         // Excludes schemas
         const connectionId = operation.response.i;

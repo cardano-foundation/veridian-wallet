@@ -553,7 +553,11 @@ describe("Credential service of agent", () => {
     credentialStorage.getCredentialMetadata = jest
       .fn()
       .mockResolvedValue(pendingCredentialMock);
+    getCredentialMock.mockResolvedValue({
+      sad: { d: "id" },
+    });
     await credentialService.markAcdc(id, CredentialStatus.CONFIRMED);
+    expect(getCredentialMock).toBeCalledWith(pendingCredentialMock.id);
     expect(credentialStorage.updateCredentialMetadata).toBeCalledWith(
       pendingCredentialMock.id,
       {
@@ -588,6 +592,116 @@ describe("Credential service of agent", () => {
       .fn()
       .mockResolvedValue(pendingCredentialMock);
     await credentialService.markAcdc(id, CredentialStatus.REVOKED);
+    expect(credentialStorage.updateCredentialMetadata).toBeCalledWith(
+      pendingCredentialMock.id,
+      {
+        ...pendingCredentialMock,
+        status: CredentialStatus.REVOKED,
+      }
+    );
+  });
+
+  test("Should throw CREDENTIAL_NOT_READY_ON_KERIA when credential fetch fails with 404 after retries", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    const id = "uuid";
+    const pendingCredentialMock = {
+      id: "id",
+      createdAt: new Date(),
+      issuanceDate: "",
+      credentialType: "",
+      status: CredentialStatus.PENDING,
+      connectionId: "connection-id",
+    };
+    credentialStorage.getCredentialMetadata = jest
+      .fn()
+      .mockResolvedValue(pendingCredentialMock);
+    getCredentialMock.mockRejectedValue(
+      new Error("request - 404 - credential not found")
+    );
+
+    await expect(
+      credentialService.markAcdc(id, CredentialStatus.CONFIRMED)
+    ).rejects.toThrow(CredentialService.CREDENTIAL_NOT_READY_ON_KERIA);
+
+    expect(getCredentialMock).toBeCalledTimes(3); // 3 retries
+    expect(credentialStorage.updateCredentialMetadata).not.toBeCalled();
+  });
+
+  test("Should propagate 500 errors immediately without retry", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    const id = "uuid";
+    const pendingCredentialMock = {
+      id: "id",
+      createdAt: new Date(),
+      issuanceDate: "",
+      credentialType: "",
+      status: CredentialStatus.PENDING,
+      connectionId: "connection-id",
+    };
+    credentialStorage.getCredentialMetadata = jest
+      .fn()
+      .mockResolvedValue(pendingCredentialMock);
+    getCredentialMock.mockRejectedValue(
+      new Error("request - 500 - internal server error")
+    );
+
+    await expect(
+      credentialService.markAcdc(id, CredentialStatus.CONFIRMED)
+    ).rejects.toThrow("request - 500 - internal server error");
+
+    expect(getCredentialMock).toBeCalledTimes(1); // No retry for 5xx errors
+    expect(credentialStorage.updateCredentialMetadata).not.toBeCalled();
+  });
+
+  test("Should confirm credential after retry succeeds on second attempt", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    const id = "uuid";
+    const pendingCredentialMock = {
+      id: "id",
+      createdAt: new Date(),
+      issuanceDate: "",
+      credentialType: "",
+      status: CredentialStatus.PENDING,
+      connectionId: "connection-id",
+    };
+    credentialStorage.getCredentialMetadata = jest
+      .fn()
+      .mockResolvedValue(pendingCredentialMock);
+    getCredentialMock
+      .mockRejectedValueOnce(new Error("request - 404 - not found"))
+      .mockResolvedValueOnce({ sad: { d: "id" } });
+
+    await credentialService.markAcdc(id, CredentialStatus.CONFIRMED);
+
+    expect(getCredentialMock).toBeCalledTimes(2); // Failed once, succeeded on retry
+    expect(credentialStorage.updateCredentialMetadata).toBeCalledWith(
+      pendingCredentialMock.id,
+      {
+        ...pendingCredentialMock,
+        status: CredentialStatus.CONFIRMED,
+      }
+    );
+  });
+
+  test("Should not call credentials().get() when marking as REVOKED", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    const id = "uuid";
+    const pendingCredentialMock = {
+      id: "id",
+      createdAt: new Date(),
+      issuanceDate: "",
+      credentialType: "",
+      status: CredentialStatus.PENDING,
+      connectionId: "connection-id",
+    };
+    credentialStorage.getCredentialMetadata = jest
+      .fn()
+      .mockResolvedValue(pendingCredentialMock);
+    getCredentialMock.mockClear(); // Clear any previous calls
+
+    await credentialService.markAcdc(id, CredentialStatus.REVOKED);
+
+    expect(getCredentialMock).not.toBeCalled(); // Should not fetch when marking as revoked
     expect(credentialStorage.updateCredentialMetadata).toBeCalledWith(
       pendingCredentialMock.id,
       {
