@@ -151,7 +151,7 @@ const Notifications = () => {
     },
     {
       filter: NotificationFilters.Identifier,
-      label: i18n.t("tabs.notifications.tab.chips.identifiers"),
+      label: i18n.t("tabs.notifications.tab.chips.connections"),
     },
     {
       filter: NotificationFilters.Credential,

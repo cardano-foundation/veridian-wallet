@@ -909,7 +909,7 @@
         "empty": "No notifications",
         "chips": {
           "all": "All",
-          "identifiers": "Identifiers",
+          "connections": "Connections",
           "credentials": "Credentials"
         },
         "unknownissuer": {

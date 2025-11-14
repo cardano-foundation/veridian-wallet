@@ -2,7 +2,6 @@ const bootAndConnectMock = jest.fn();
 const recoverKeriaAgentMock = jest.fn(() => Promise.resolve());
 const basicStorageDeleteMock = jest.fn(() => Promise.resolve());
 const createOrUpdateBasicRecordMock = jest.fn(() => Promise.resolve());
-const createSingletonNotificationMock = jest.fn();
 const browserMock = jest.fn();
 const checkPermisson = jest.fn(() =>
   Promise.resolve({

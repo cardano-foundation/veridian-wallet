@@ -184,7 +184,7 @@ describe("Notifications Tab", () => {
       getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.all)
     ).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.identifiers)
+      getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.connections)
     ).toBeInTheDocument();
     expect(
       getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.credentials)
