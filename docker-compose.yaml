@@ -3,7 +3,7 @@ services:
   keria:
     container_name: idw-keria
     restart: unless-stopped
-    image: ghcr.io/cardano-foundation/veridian-wallet/cf-idw-keria:PR1430
+    image: ghcr.io/cardano-foundation/cf-identity-wallet/cf-idw-keria:1.2.0-fix-VT20-2191-Un-ordered-exchange-queries-pagination-is-not-reliable-re-orders-a-a1cbe1f
     environment:
       - KERI_AGENT_CORS=true
       - ALLOW_INTRODUCTIONS=true
