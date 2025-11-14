@@ -7,8 +7,10 @@ const DOUBLE_TAP_DELAY = 300;
 const SUPPORT_EMAIL = "mailto:support@veridian.id";
 const WEBSITE_LINK = "https://www.veridian.id";
 const DOCUMENTATION_LINK = "https://docs.veridian.id/";
-const ONBOARDING_DOCUMENTATION_LINK = "https://docs.veridian.id/onboarding";
-const RECOVERY_DOCUMENTATION_LINK = "https://docs.veridian.id/recovery";
+const ONBOARDING_DOCUMENTATION_LINK =
+  "https://docs.veridian.id/onboarding#ssi-agent-details";
+const RECOVERY_DOCUMENTATION_LINK =
+  "https://docs.veridian.id/recovery#ssi-agent-details";
 const FEDERAL_DATA_PROTECTION_LINK = "https://www.edoeb.admin.ch/de";
 const DATA_PROTECTION_AUTHORITIES_LINK =
   "https://ec.europa.eu/justice/article-29/structure/data-protection-authorities/index_en.htm";

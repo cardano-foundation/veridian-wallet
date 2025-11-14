@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ConfigurationService } from "../../../../core/configuration";
 import { i18n } from "../../../../i18n";
 import { RoutePath } from "../../../../routes";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { useAppSelector } from "../../../../store/hooks";
 import { getStateCache } from "../../../../store/reducers/stateCache";
 import { CustomInput } from "../../../components/CustomInput";
 import { ErrorMessage } from "../../../components/ErrorMessage";
@@ -48,19 +48,17 @@ const AdvancedSetting = ({
 }: AdvancedSettingProps) => {
   const pageId = "create-ssi-agent";
   const [ssiAgent, setSsiAgent] = useState<SSIAgentState>({
-    connectUrl: "",
-    bootUrl: "",
+    connectUrl: ConfigurationService.env?.keri?.keria?.url || "",
+    bootUrl: ConfigurationService.env?.keri?.keria?.bootUrl || "",
   });
   const stateCache = useAppSelector(getStateCache);
 
-  const dispatch = useAppDispatch();
   const [connectUrlInputTouched, setConnectUrlTouched] = useState(false);
   const [bootUrlInputTouched, setBootUrlInputTouched] = useState(false);
   const hasMismatchError = errors.hasMismatchError;
   const unknownError = errors.unknownError;
   const isInvalidBootUrl = errors.isInvalidBootUrl;
   const isInvalidConnectUrl = errors.isInvalidConnectUrl;
-
   const isRecoveryMode = stateCache.authentication.recoveryWalletProgress;
 
   const setConnectUrl = (connectUrl?: string) => {
@@ -76,13 +74,6 @@ const AdvancedSetting = ({
       bootUrl,
     }));
   };
-
-  useEffect(() => {
-    if (!ssiAgent.bootUrl && !ssiAgent.connectUrl) {
-      setConnectUrl(ConfigurationService.env?.keri?.keria?.url || undefined);
-      setBootUrl(ConfigurationService.env?.keri?.keria?.bootUrl || undefined);
-    }
-  }, [dispatch, ssiAgent.bootUrl, ssiAgent.connectUrl]);
 
   const setTouchedConnectUrlInput = () => {
     setConnectUrlTouched(true);
@@ -153,8 +144,6 @@ const AdvancedSetting = ({
   })();
 
   const handleConnect = () => {
-    if (!ssiAgent.bootUrl || !ssiAgent.connectUrl) return;
-
     onSubmitForm(ssiAgent.bootUrl, ssiAgent.connectUrl);
   };
 
@@ -189,8 +178,8 @@ const AdvancedSetting = ({
       >
         {i18n.t(
           isRecoveryMode
-            ? "ssiagent.advancedsetup.description"
-            : "ssiagent.advancedsetup.description"
+            ? "ssiagent.advancedsetup.description.connect"
+            : "ssiagent.advancedsetup.description.connectboot"
         )}
       </p>
       {!isRecoveryMode && (
