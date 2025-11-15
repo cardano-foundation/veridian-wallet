@@ -186,7 +186,12 @@ jobs:
           fi
 
           # Force PR builds to be pushed to ghcr.io as well (by default cf-gha-baseline disables it)
-          echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES_FILTERED} ghcr.io/${GITHUB_REPOSITORY}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
+          if [ -z "$(echo ${DOCKER_REGISTRIES_FILTERED} | grep ghcr.io)" ]
+          then
+            echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES_FILTERED} ghcr.io/${GITHUB_REPOSITORY}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
+          else
+            echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES_FILTERED}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
+          fi
 
       - name: 🌍 earthly (docker build and push)
         run: |
@@ -285,12 +290,13 @@ jobs:
 
       - name: Merge multi-platform manifests
         run: |
+          set -x
           PLATFORMS=$(echo '${{ needs.set-matrix.outputs.matrix }}' | jq -r '.platform[]' | xargs echo)
           echo PLATFORMS=$PLATFORMS
           echo DOCKER_IMAGES_TARGETS=$DOCKER_IMAGES_TARGETS
           echo DOCKER_REGISTRIES_OVERRIDE=${DOCKER_REGISTRIES_OVERRIDE}
 
-          if [[ "${DOCKER_IMAGES_TARGETS}" != "null" ]] || [[ "${DOCKER_IMAGES_TARGETS}" != "" ]]
+          if [[ "${DOCKER_IMAGES_TARGETS}" != "null" ]] && [[ "${DOCKER_IMAGES_TARGETS}" != "" ]]
           then 
             DOCKER_IMAGES_TARGETS_ARG="--DOCKER_IMAGES_TARGETS=${DOCKER_IMAGES_TARGETS}"
             earthly \
