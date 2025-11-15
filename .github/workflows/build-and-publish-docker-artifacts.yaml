@@ -262,7 +262,7 @@ jobs:
         run: |
           DOCKER_IMAGES_TARGETS=$(find . -name ${MATRIX_STEP_NAME} -maxdepth 2 -type f | head -n1 | xargs cat | jq -r '.[].DOCKER_IMAGES_TARGETS')
           echo DOCKER_IMAGES_TARGETS=${DOCKER_IMAGES_TARGETS} | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
-          echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES} ghcr.io/${GITHUB_REPOSITORY}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
+          echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES_FILTERED} ghcr.io/${GITHUB_REPOSITORY}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
 
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
