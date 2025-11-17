@@ -3,7 +3,15 @@ import { chevronForwardOutline } from "ionicons/icons";
 import { TileProps } from "./Tile.types";
 import "./Tile.scss";
 
-const Tile = ({ icon, title, text, className, handleTileClick }: TileProps) => {
+const Tile = ({
+  icon,
+  chevron,
+  badge,
+  title,
+  text,
+  className,
+  handleTileClick,
+}: TileProps) => {
   return (
     <div
       className={`tile ${className || ""}`}
@@ -14,9 +22,12 @@ const Tile = ({ icon, title, text, className, handleTileClick }: TileProps) => {
         <span className="tile-icon">
           <IonIcon icon={icon} />
         </span>
-        <span className="tile-chevron">
-          <IonIcon icon={chevronForwardOutline} />
-        </span>
+        {badge && <span className="tile-badge">{badge}</span>}
+        {chevron && (
+          <span className="tile-chevron">
+            <IonIcon icon={chevronForwardOutline} />
+          </span>
+        )}
       </span>
       <span className="tile-bottom">
         <strong className="tile-title">{title}</strong>

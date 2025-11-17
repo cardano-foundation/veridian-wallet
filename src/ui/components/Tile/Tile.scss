@@ -30,6 +30,18 @@
       }
     }
 
+    .tile-badge {
+      padding: 0.25rem 0.5rem;
+      justify-content: center;
+      align-items: center;
+      gap: 0.25rem;
+      border-radius: 0.25rem;
+      color: var(--ion-color-neutral-700);
+      background: var(--ion-color-primary-300);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
     .tile-chevron {
       width: 1rem;
       height: 1rem;

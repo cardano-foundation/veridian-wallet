@@ -48,6 +48,7 @@ const Home = () => {
         <div className="home-tab-content">
           <Tile
             icon={ScanIcon}
+            badge={`${i18n.t("tabs.home.tab.tiles.scan.badge")}`}
             title={i18n.t("tabs.home.tab.tiles.scan.title")}
             text={i18n.t("tabs.home.tab.tiles.scan.text")}
             className="home-tab-scan-tile"
@@ -55,17 +56,20 @@ const Home = () => {
           />
           <Tile
             icon={CardanoLogo}
+            chevron={true}
             title={i18n.t("tabs.home.tab.tiles.dapps.title")}
             text={i18n.t("tabs.home.tab.tiles.dapps.text")}
           />
           <div className="home-tab-split-section">
             <Tile
               icon={personAdd}
+              chevron={true}
               title={i18n.t("tabs.home.tab.tiles.connections.title")}
               text={i18n.t("tabs.home.tab.tiles.connections.text")}
             />
             <Tile
               icon={refresh}
+              chevron={true}
               title={i18n.t("tabs.home.tab.tiles.rotate.title")}
               text={i18n.t("tabs.home.tab.tiles.rotate.text")}
             />
