@@ -208,8 +208,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
             )}`}
           />
         </CardBlock>
-        {state.signer.recoverySigners === 0 ||
-        state.signer.requiredSigners === 0 ? (
+        {!state.signer.recoverySigners || !state.signer.requiredSigners ? (
           <CardBlock
             testId="signer-alert"
             className="signer-alert"
