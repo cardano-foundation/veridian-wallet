@@ -206,11 +206,6 @@ const App = () => {
         });
       }
 
-      if (platforms.includes("android")) {
-        // SafeArea plugin removed, insets are now handled natively by Capacitor with edge-to-edge.
-        // CSS variables --ion-safe-area-* are automatically populated.
-      }
-
       return () => {
         ScreenOrientation.unlock();
       };
