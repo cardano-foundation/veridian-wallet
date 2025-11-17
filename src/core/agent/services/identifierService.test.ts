@@ -171,28 +171,38 @@ const groupMetadata = {
   proposedUsername: "testUser",
 };
 
-const keriMetadataRecordProps = {
+const identifierMetadataRecord = new IdentifierMetadataRecord({
   id: "aidHere",
   displayName: "Identifier 2",
   createdAt: now,
   theme: 0,
   creationStatus: CreationStatus.COMPLETE,
-  groupMetadata,
-  groupUsername: "testUser",
   sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
-};
-
-const identifierMetadataRecord = new IdentifierMetadataRecord({
-  ...keriMetadataRecordProps,
-  theme: 0,
 });
 
-const keriMetadataRecord = new IdentifierMetadataRecord(
-  keriMetadataRecordProps
-);
+const groupMemberMetadataRecord = new IdentifierMetadataRecord({
+  id: "EIZ-n_hHHY5ERGTxTpXYBkB6_yBAM4RXcjQGt5pykFXY",
+  displayName: "Member identifier",
+  createdAt: now,
+  theme: 0,
+  creationStatus: CreationStatus.COMPLETE,
+  groupMetadata,
+  sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
+});
+
+const groupMetadataRecord = new IdentifierMetadataRecord({
+  id: "EIZ-n_hHHY5ERGTzvpXYBkB6_yBAM4RXcjQG3-JykFvT",
+  displayName: "Identifier 2",
+  createdAt: now,
+  theme: 0,
+  creationStatus: CreationStatus.COMPLETE,
+  groupMemberPre: "EIZ-n_hHHY5ERGTxTpXYBkB6_yBAM4RXcjQGt5pykFXY",
+  groupUsername: "testUser",
+  sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
+});
 
 const identifierStateKeria = {
-  prefix: keriMetadataRecord.id,
+  prefix: identifierMetadataRecord.id,
   state: {
     s: "s",
     dt: "dt",
@@ -212,6 +222,7 @@ const identifierStateKeria = {
 
 const groupIdentifierStateKeria = {
   ...identifierStateKeria,
+  prefix: "EIZ-n_hHHY5ERGTzvpXYBkB6_yBAM4RXcjQG3-JykFvT",
   group: {},
   salty: undefined,
 };
@@ -288,68 +299,47 @@ describe("Single sig service of agent", () => {
   test("can get all user facing identifiers", async () => {
     identifierStorage.getUserFacingIdentifierRecords = jest
       .fn()
-      .mockResolvedValue([keriMetadataRecord]);
+      .mockResolvedValue([identifierMetadataRecord]);
     expect(await identifierService.getIdentifiers()).toStrictEqual([
       {
-        id: keriMetadataRecord.id,
+        id: identifierMetadataRecord.id,
         displayName: "Identifier 2",
         createdAtUTC: nowISO,
         theme: 0,
         creationStatus: CreationStatus.COMPLETE,
-        groupMetadata,
+        groupMetadata: undefined,
         groupMemberPre: undefined,
-        groupUsername: "testUser",
+        groupUsername: undefined,
       },
     ]);
   });
 
   test("can get all identifier records, even non user facing", async () => {
-    identifierStorage.getIdentifierRecords = jest.fn().mockResolvedValue([
-      keriMetadataRecord,
-      new IdentifierMetadataRecord({
-        ...keriMetadataRecordProps,
-        id: "EIZ-n_hHHY5ERGTzvpXYBkB6_yBAM4RXcjQG3-JykFvT",
-        displayName: "group",
-        groupMemberPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5InX",
-        groupMetadata: undefined,
-        groupUsername: "testUser",
-      }),
-    ]);
-    identifierStorage.getIdentifierMetadata = jest
+    identifierStorage.getIdentifierRecords = jest
       .fn()
-      .mockImplementation(async (identifierId: string) => {
-        if (identifierId === "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5InX") {
-          return new IdentifierMetadataRecord({
-            ...keriMetadataRecordProps,
-            id: identifierId,
-            groupMetadata,
-          });
-        }
-        return keriMetadataRecord;
-      });
+      .mockResolvedValue([identifierMetadataRecord, groupMetadataRecord]);
     expect(await identifierService.getIdentifiers(false)).toStrictEqual([
       {
-        id: keriMetadataRecord.id,
+        id: identifierMetadataRecord.id,
         displayName: "Identifier 2",
         createdAtUTC: nowISO,
         theme: 0,
         creationStatus: CreationStatus.COMPLETE,
-        groupMetadata,
+        groupMetadata: undefined,
         groupMemberPre: undefined,
-        groupUsername: "testUser",
+        groupUsername: undefined,
       },
       {
-        id: "EIZ-n_hHHY5ERGTzvpXYBkB6_yBAM4RXcjQG3-JykFvT",
-        displayName: "group",
+        id: groupMetadataRecord.id,
+        displayName: groupMetadataRecord.displayName,
         createdAtUTC: nowISO,
         theme: 0,
         creationStatus: CreationStatus.COMPLETE,
-        groupMemberPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5InX",
+        groupMemberPre: groupMetadataRecord.groupMemberPre,
         groupMetadata: undefined,
-        groupUsername: "testUser",
+        groupUsername: groupMetadataRecord.groupUsername,
       },
     ]);
-    identifierStorage.getIdentifierMetadata = jest.fn();
   });
 
   test("can get all identifiers without error if there are none", async () => {
@@ -363,41 +353,44 @@ describe("Single sig service of agent", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
-      .mockResolvedValue(keriMetadataRecord);
+      .mockResolvedValue(identifierMetadataRecord);
     getIdentifierMock.mockRejectedValue(
       new Error("request - 404 - SignifyClient message")
     );
     await expect(
-      identifierService.getIdentifier(keriMetadataRecord.id)
+      identifierService.getIdentifier(identifierMetadataRecord.id)
     ).rejects.toMatchObject(
-      new Error(`${Agent.MISSING_DATA_ON_KERIA}: ${keriMetadataRecord.id}`, {
-        cause: "request - 404 - SignifyClient message",
-      })
+      new Error(
+        `${Agent.MISSING_DATA_ON_KERIA}: ${identifierMetadataRecord.id}`,
+        {
+          cause: "request - 404 - SignifyClient message",
+        }
+      )
     );
     expect(identifierStorage.getIdentifierMetadata).toBeCalledWith(
-      keriMetadataRecord.id
+      identifierMetadataRecord.id
     );
   });
 
   test("cannot get identifier if it's still pending", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       creationStatus: CreationStatus.PENDING,
     });
     await expect(
-      identifierService.getIdentifier(keriMetadataRecord.id)
+      identifierService.getIdentifier(identifierMetadataRecord.id)
     ).rejects.toThrow(new Error(IdentifierService.IDENTIFIER_NOT_COMPLETE));
   });
 
   test("cannot get identifier if it failed", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       creationStatus: CreationStatus.FAILED,
     });
     await expect(
-      identifierService.getIdentifier(keriMetadataRecord.id)
+      identifierService.getIdentifier(identifierMetadataRecord.id)
     ).rejects.toThrow(new Error(IdentifierService.IDENTIFIER_NOT_COMPLETE));
   });
 
@@ -405,19 +398,19 @@ describe("Single sig service of agent", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
-      .mockResolvedValue(keriMetadataRecord);
+      .mockResolvedValue(identifierMetadataRecord);
     getIdentifierMock.mockResolvedValue(identifierStateKeria);
 
     expect(
-      await identifierService.getIdentifier(keriMetadataRecord.id)
+      await identifierService.getIdentifier(identifierMetadataRecord.id)
     ).toStrictEqual({
-      id: keriMetadataRecord.id,
-      displayName: keriMetadataRecordProps.displayName,
+      id: identifierMetadataRecord.id,
+      displayName: identifierMetadataRecord.displayName,
       createdAtUTC: nowISO,
       theme: 0,
-      groupMetadata: keriMetadataRecord.groupMetadata,
-      groupMemberPre: keriMetadataRecord.groupMemberPre,
-      groupUsername: "testUser",
+      groupMetadata: identifierMetadataRecord.groupMetadata,
+      groupMemberPre: identifierMetadataRecord.groupMemberPre,
+      groupUsername: undefined,
       ...identifierStateKeria.state,
       creationStatus: CreationStatus.COMPLETE,
       members: undefined,
@@ -428,21 +421,21 @@ describe("Single sig service of agent", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
-      .mockResolvedValue(keriMetadataRecord);
+      .mockResolvedValue(groupMetadataRecord);
     getIdentifierMock.mockResolvedValue(groupIdentifierStateKeria);
     getIdentifierMembersMock.mockResolvedValue(identifierMembersState);
 
     expect(
-      await identifierService.getIdentifier(keriMetadataRecord.id)
+      await identifierService.getIdentifier(groupMetadataRecord.id)
     ).toStrictEqual({
-      id: keriMetadataRecord.id,
-      displayName: keriMetadataRecordProps.displayName,
+      id: groupMetadataRecord.id,
+      displayName: groupMetadataRecord.displayName,
       createdAtUTC: nowISO,
       theme: 0,
-      groupMetadata: keriMetadataRecord.groupMetadata,
-      groupMemberPre: keriMetadataRecord.groupMemberPre,
+      groupMetadata: groupMetadataRecord.groupMetadata,
+      groupMemberPre: groupMetadataRecord.groupMemberPre,
       groupUsername: "testUser",
-      ...identifierStateKeria.state,
+      ...groupIdentifierStateKeria.state,
       creationStatus: CreationStatus.COMPLETE,
       members: [
         identifierMembersState.signing[0].aid,
@@ -1150,7 +1143,7 @@ describe("Single sig service of agent", () => {
 
   test("should delete all associated linked connections if the identifier is a group member identifier", async () => {
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      ...keriMetadataRecord,
+      ...groupMemberMetadataRecord,
       creationStatus: CreationStatus.PENDING,
     });
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([
@@ -1160,12 +1153,12 @@ describe("Single sig service of agent", () => {
     ]);
     PeerConnection.peerConnection.getConnectingIdentifier = jest
       .fn()
-      .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
+      .mockReturnValue({ id: groupMemberMetadataRecord.id, oobi: "oobi" });
     notificationStorage.findAllByQuery.mockResolvedValue(
       findNotificationsResult
     );
 
-    await identifierService.deleteIdentifier(identifierMetadataRecord.id);
+    await identifierService.deleteIdentifier(groupMemberMetadataRecord.id);
 
     expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
@@ -1187,32 +1180,20 @@ describe("Single sig service of agent", () => {
   });
 
   test("should delete the local member identifier for that multisig if deleting the multi-sig identifier", async () => {
-    const localMember = {
-      id: "aidLocalMember",
-      displayName: "Identifier Local",
-      createdAt: now,
-      theme: 0,
-      groupMetadata,
-      creationStatus: CreationStatus.PENDING,
-      groupMemberPre: "manageAid",
-    };
     identifierStorage.getIdentifierMetadata
       .mockReturnValueOnce({
-        ...keriMetadataRecord,
+        ...groupMetadataRecord,
         creationStatus: CreationStatus.PENDING,
-        groupMemberPre: "manageAid",
-        groupMetadata: undefined,
       })
-      .mockReturnValueOnce(localMember);
+      .mockReturnValueOnce(groupMemberMetadataRecord);
     connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([
       {
         id: "group-id",
       },
     ]);
-    identifierStorage.updateIdentifierMetadata = jest.fn();
     PeerConnection.peerConnection.getConnectingIdentifier = jest
       .fn()
-      .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
+      .mockReturnValue({ id: groupMetadataRecord.id, oobi: "oobi" });
     jest
       .spyOn(utils, "randomSalt")
       .mockReturnValueOnce("QOP7zdP-kJs8nlwVR290XfyAk")
@@ -1221,25 +1202,27 @@ describe("Single sig service of agent", () => {
       .mockResolvedValueOnce([findNotificationsResult[0]])
       .mockResolvedValueOnce([findNotificationsResult[1]]);
 
-    await identifierService.deleteIdentifier(identifierMetadataRecord.id);
+    await identifierService.deleteIdentifier(groupMetadataRecord.id);
 
     expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      "manageAid",
+      groupMemberMetadataRecord.id,
       {
         isDeleted: true,
         pendingDeletion: false,
       }
     );
-    expect(updateIdentifierMock).toBeCalledWith(localMember.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${localMember.groupMetadata.groupId}:${localMember.displayName}`,
+    expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
+      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${
+        groupMemberMetadataRecord.groupMetadata!.groupId
+      }:${groupMemberMetadataRecord.displayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      identifierMetadataRecord.id,
+      groupMetadataRecord.id,
       { isDeleted: true, pendingDeletion: false }
     );
-    expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
+    expect(updateIdentifierMock).toBeCalledWith(groupMetadataRecord.id, {
+      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -1257,7 +1240,6 @@ describe("Single sig service of agent", () => {
       type: EventTypes.NotificationRemoved,
       payload: { id: findNotificationsResult[1].id },
     });
-    expect(updateIdentifierMock).toBeCalledTimes(2);
   });
 
   test("can update an identifier", async () => {
@@ -1265,20 +1247,20 @@ describe("Single sig service of agent", () => {
     const newTheme = 1;
 
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       groupMemberPre: undefined,
       groupMetadata: undefined,
     });
 
-    await identifierService.updateIdentifier(keriMetadataRecord.id, {
+    await identifierService.updateIdentifier(identifierMetadataRecord.id, {
       displayName: newDisplayName,
       theme: newTheme,
     });
-    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
+    expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
       name: `1.2.0.2:${newTheme}:${newDisplayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      keriMetadataRecord.id,
+      identifierMetadataRecord.id,
       {
         displayName: newDisplayName,
         theme: newTheme,
@@ -1292,7 +1274,7 @@ describe("Single sig service of agent", () => {
     const newTheme = 2;
 
     const memberMetadata = {
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       id: "member-identifier-id",
       groupMetadata: {
         groupId: "test-group-123",
@@ -1305,18 +1287,18 @@ describe("Single sig service of agent", () => {
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValueOnce({
-        ...keriMetadataRecord,
+        ...identifierMetadataRecord,
         groupMemberPre: "member-identifier-id",
         groupMetadata: undefined,
       })
       .mockResolvedValueOnce(memberMetadata);
 
-    await identifierService.updateIdentifier(keriMetadataRecord.id, {
+    await identifierService.updateIdentifier(identifierMetadataRecord.id, {
       displayName: newDisplayName,
       theme: newTheme,
     });
 
-    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
+    expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
       name: `1.2.0.2:${newTheme}:${newDisplayName}`,
     });
 
@@ -1325,7 +1307,7 @@ describe("Single sig service of agent", () => {
     });
 
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      keriMetadataRecord.id,
+      identifierMetadataRecord.id,
       {
         displayName: newDisplayName,
         theme: newTheme,
@@ -1352,20 +1334,20 @@ describe("Single sig service of agent", () => {
     };
 
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       groupMemberPre: undefined,
       groupMetadata: groupMetadata,
     });
 
-    await identifierService.updateIdentifier(keriMetadataRecord.id, {
+    await identifierService.updateIdentifier(identifierMetadataRecord.id, {
       displayName: newDisplayName,
       theme: newTheme,
     });
-    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
+    expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
       name: `1.2.0.2:${newTheme}:1:${groupMetadata.groupId}:${groupMetadata.proposedUsername}:${newDisplayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      keriMetadataRecord.id,
+      identifierMetadataRecord.id,
       {
         displayName: newDisplayName,
         theme: newTheme,
@@ -1378,7 +1360,7 @@ describe("Single sig service of agent", () => {
     const newTheme = 2;
 
     const memberMetadataWithoutGroup = {
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       id: "member-identifier-id",
       groupMetadata: undefined,
     };
@@ -1386,14 +1368,14 @@ describe("Single sig service of agent", () => {
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValueOnce({
-        ...keriMetadataRecord,
+        ...identifierMetadataRecord,
         groupMemberPre: "member-identifier-id",
         groupMetadata: undefined,
       })
       .mockResolvedValueOnce(memberMetadataWithoutGroup);
 
     await expect(
-      identifierService.updateIdentifier(keriMetadataRecord.id, {
+      identifierService.updateIdentifier(identifierMetadataRecord.id, {
         displayName: newDisplayName,
         theme: newTheme,
       })
@@ -1411,7 +1393,7 @@ describe("Single sig service of agent", () => {
       proposedUsername: "oldusername",
     };
     const memberMetadata = {
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       id: "member-identifier-id",
       groupMetadata: {
         ...groupMetadata,
@@ -1422,7 +1404,7 @@ describe("Single sig service of agent", () => {
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValueOnce({
-        ...keriMetadataRecord,
+        ...identifierMetadataRecord,
         groupMemberPre: "member-identifier-id",
         groupMetadata: groupMetadata,
         theme: 2,
@@ -1431,7 +1413,7 @@ describe("Single sig service of agent", () => {
       .mockResolvedValueOnce(memberMetadata);
 
     await identifierService.updateGroupUsername(
-      keriMetadataRecord.id,
+      identifierMetadataRecord.id,
       newUsername
     );
 
@@ -1448,7 +1430,7 @@ describe("Single sig service of agent", () => {
       }
     );
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      keriMetadataRecord.id,
+      identifierMetadataRecord.id,
       {
         groupUsername: newUsername,
         groupMetadata: undefined,
@@ -1466,7 +1448,7 @@ describe("Single sig service of agent", () => {
     };
 
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       groupMemberPre: undefined,
       groupMetadata: groupMetadata,
       theme: 1,
@@ -1474,15 +1456,15 @@ describe("Single sig service of agent", () => {
     });
 
     await identifierService.updateGroupUsername(
-      keriMetadataRecord.id,
+      identifierMetadataRecord.id,
       newUsername
     );
 
-    expect(updateIdentifierMock).toBeCalledWith(keriMetadataRecord.id, {
+    expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
       name: `1.2.0.2:1:1:${groupMetadata.groupId}:${newUsername}:Partial Group`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      keriMetadataRecord.id,
+      identifierMetadataRecord.id,
       {
         groupMetadata: {
           ...groupMetadata,
@@ -1494,18 +1476,18 @@ describe("Single sig service of agent", () => {
 
   test("should throw error when updating username for identifier without groupMetadata", async () => {
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       groupMemberPre: undefined,
       groupMetadata: undefined,
     });
 
     await expect(
       identifierService.updateGroupUsername(
-        keriMetadataRecord.id,
+        identifierMetadataRecord.id,
         "newusername"
       )
     ).rejects.toThrow(
-      `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${keriMetadataRecord.id}`
+      `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifierMetadataRecord.id}`
     );
   });
 
@@ -1517,7 +1499,7 @@ describe("Single sig service of agent", () => {
       proposedUsername: "oldusername",
     };
     const memberMetadataWithoutGroup = {
-      ...keriMetadataRecord,
+      ...identifierMetadataRecord,
       id: "member-identifier-id",
       groupMetadata: undefined,
     };
@@ -1525,7 +1507,7 @@ describe("Single sig service of agent", () => {
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValueOnce({
-        ...keriMetadataRecord,
+        ...identifierMetadataRecord,
         groupMemberPre: "member-identifier-id",
         groupMetadata: groupMetadata,
       })
@@ -1533,7 +1515,7 @@ describe("Single sig service of agent", () => {
 
     await expect(
       identifierService.updateGroupUsername(
-        keriMetadataRecord.id,
+        identifierMetadataRecord.id,
         "newusername"
       )
     ).rejects.toThrow(
@@ -1546,7 +1528,6 @@ describe("Single sig service of agent", () => {
       ...identifierMetadataRecord,
       groupMetadata: undefined,
     });
-    identifierStorage.updateIdentifierMetadata = jest.fn();
     PeerConnection.peerConnection.getConnectedDAppAddress = jest
       .fn()
       .mockReturnValue("dApp-address");
@@ -1604,7 +1585,6 @@ describe("Single sig service of agent", () => {
       ...identifierMetadataRecord,
       groupMetadata: undefined,
     });
-    identifierStorage.updateIdentifierMetadata = jest.fn();
     PeerConnection.peerConnection.getConnectedDAppAddress = jest
       .fn()
       .mockReturnValue("");
@@ -1648,6 +1628,268 @@ describe("Single sig service of agent", () => {
     );
 
     mockDeleteNotificationRecordById.mockRestore();
+  });
+
+  test("should wipe identifier from queued pending identifier if still processing (individual)", async () => {
+    identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
+      ...identifierMetadataRecord,
+      groupMetadata: undefined,
+    });
+    basicStorage.findById = jest.fn().mockResolvedValueOnce(
+      new BasicRecord({
+        id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
+        content: {
+          queued: [
+            "1.2.0.2:0:Different identifier A",
+            "1.2.0.2:0:Identifier 2",
+            "1.2.0.2:0:Different identifier B",
+          ],
+        },
+      })
+    );
+    PeerConnection.peerConnection.getConnectedDAppAddress = jest
+      .fn()
+      .mockReturnValue("dApp-address");
+    PeerConnection.peerConnection.getConnectingIdentifier = jest
+      .fn()
+      .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
+    jest.spyOn(utils, "randomSalt").mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
+    notificationStorage.findAllByQuery.mockResolvedValue(
+      findNotificationsResult
+    );
+
+    await identifierService.deleteIdentifier(identifierMetadataRecord.id);
+
+    expect(basicStorage.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
+        content: {
+          queued: [
+            "1.2.0.2:0:Different identifier A",
+            "1.2.0.2:0:Different identifier B",
+          ],
+        },
+      })
+    );
+    expect(identifierStorage.getIdentifierMetadata).toBeCalledWith(
+      identifierMetadataRecord.id
+    );
+    expect(credentials.deleteAllCredentialsForIdentifier).toBeCalledWith(
+      identifierMetadataRecord.id
+    );
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      identifierMetadataRecord.id,
+      { isDeleted: true, pendingDeletion: false }
+    );
+    expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
+      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
+    });
+    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
+    expect(notificationStorage.deleteById).toBeCalledWith(
+      findNotificationsResult[0].id
+    );
+    expect(eventEmitter.emit).toBeCalledWith({
+      type: EventTypes.NotificationRemoved,
+      payload: { id: findNotificationsResult[0].id },
+    });
+    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
+    expect(notificationStorage.deleteById).toBeCalledWith(
+      findNotificationsResult[1].id
+    );
+    expect(eventEmitter.emit).toBeCalledWith({
+      type: EventTypes.NotificationRemoved,
+      payload: { id: findNotificationsResult[1].id },
+    });
+    expect(PeerConnection.peerConnection.disconnectDApp).toBeCalledWith(
+      "dApp-address",
+      true
+    );
+  });
+
+  test("should wipe identifier from queued pending identifier if still processing (group member)", async () => {
+    identifierStorage.getIdentifierMetadata = jest
+      .fn()
+      .mockResolvedValue(groupMemberMetadataRecord);
+    basicStorage.findById = jest.fn().mockResolvedValueOnce(
+      new BasicRecord({
+        id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
+        content: {
+          queued: [
+            "1.2.0.2:0:Different identifier A",
+            "1.2.0.2:0:1:group-id:testUser:Member identifier",
+            "1.2.0.2:0:Different identifier B",
+          ],
+        },
+      })
+    );
+    PeerConnection.peerConnection.getConnectedDAppAddress = jest
+      .fn()
+      .mockReturnValue("dApp-address");
+    PeerConnection.peerConnection.getConnectingIdentifier = jest
+      .fn()
+      .mockReturnValue({ id: groupMemberMetadataRecord.id, oobi: "oobi" });
+    jest.spyOn(utils, "randomSalt").mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
+    notificationStorage.findAllByQuery.mockResolvedValue(
+      findNotificationsResult
+    );
+
+    await identifierService.deleteIdentifier(groupMemberMetadataRecord.id);
+
+    expect(basicStorage.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
+        content: {
+          queued: [
+            "1.2.0.2:0:Different identifier A",
+            "1.2.0.2:0:Different identifier B",
+          ],
+        },
+      })
+    );
+    expect(identifierStorage.getIdentifierMetadata).toBeCalledWith(
+      groupMemberMetadataRecord.id
+    );
+    expect(credentials.deleteAllCredentialsForIdentifier).toBeCalledWith(
+      groupMemberMetadataRecord.id
+    );
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      groupMemberMetadataRecord.id,
+      { isDeleted: true, pendingDeletion: false }
+    );
+    expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
+      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMemberMetadataRecord.displayName}`,
+    });
+    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
+    expect(notificationStorage.deleteById).toBeCalledWith(
+      findNotificationsResult[0].id
+    );
+    expect(eventEmitter.emit).toBeCalledWith({
+      type: EventTypes.NotificationRemoved,
+      payload: { id: findNotificationsResult[0].id },
+    });
+    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
+    expect(notificationStorage.deleteById).toBeCalledWith(
+      findNotificationsResult[1].id
+    );
+    expect(eventEmitter.emit).toBeCalledWith({
+      type: EventTypes.NotificationRemoved,
+      payload: { id: findNotificationsResult[1].id },
+    });
+    expect(PeerConnection.peerConnection.disconnectDApp).toBeCalledWith(
+      "dApp-address",
+      true
+    );
+  });
+
+  test("should wipe group identifier from queued pending groups if still processing and corresponding group member from pending idnetifiers", async () => {
+    identifierStorage.getIdentifierMetadata
+      .mockReturnValueOnce({
+        ...groupMetadataRecord,
+        creationStatus: CreationStatus.PENDING,
+      })
+      .mockReturnValueOnce(groupMemberMetadataRecord);
+    basicStorage.findById = jest
+      .fn()
+      .mockResolvedValueOnce(
+        new BasicRecord({
+          id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
+          content: {
+            queued: [
+              { name: "1.2.0.2:0:Different group A" },
+              { name: "1.2.0.2:0:Identifier 2" },
+              { name: "1.2.0.2:0:Different group B" },
+            ],
+          },
+        })
+      )
+      .mockResolvedValueOnce(
+        new BasicRecord({
+          id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
+          content: {
+            queued: [
+              "1.2.0.2:0:Different identifier A",
+              "1.2.0.2:0:1:group-id:testUser:Member identifier",
+              "1.2.0.2:0:Different identifier B",
+            ],
+          },
+        })
+      );
+    connections.getMultisigLinkedContacts = jest.fn().mockResolvedValue([
+      {
+        id: "group-id",
+      },
+    ]);
+    PeerConnection.peerConnection.getConnectingIdentifier = jest
+      .fn()
+      .mockReturnValue({ id: groupMetadataRecord.id, oobi: "oobi" });
+    jest
+      .spyOn(utils, "randomSalt")
+      .mockReturnValueOnce("QOP7zdP-kJs8nlwVR290XfyAk")
+      .mockReturnValueOnce("0ADQpus-mQmmO4mgWcT3ekDz");
+    notificationStorage.findAllByQuery
+      .mockResolvedValueOnce([findNotificationsResult[0]])
+      .mockResolvedValueOnce([findNotificationsResult[1]]);
+
+    await identifierService.deleteIdentifier(groupMetadataRecord.id);
+
+    expect(basicStorage.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
+        content: {
+          queued: [
+            { name: "1.2.0.2:0:Different group A" },
+            { name: "1.2.0.2:0:Different group B" },
+          ],
+        },
+      })
+    );
+    expect(basicStorage.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
+        content: {
+          queued: [
+            "1.2.0.2:0:Different identifier A",
+            "1.2.0.2:0:Different identifier B",
+          ],
+        },
+      })
+    );
+    expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      groupMemberMetadataRecord.id,
+      {
+        isDeleted: true,
+        pendingDeletion: false,
+      }
+    );
+    expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
+      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${
+        groupMemberMetadataRecord.groupMetadata!.groupId
+      }:${groupMemberMetadataRecord.displayName}`,
+    });
+    expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
+      groupMetadataRecord.id,
+      { isDeleted: true, pendingDeletion: false }
+    );
+    expect(updateIdentifierMock).toBeCalledWith(groupMetadataRecord.id, {
+      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
+    });
+    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
+    expect(notificationStorage.deleteById).toBeCalledWith(
+      findNotificationsResult[0].id
+    );
+    expect(eventEmitter.emit).toBeCalledWith({
+      type: EventTypes.NotificationRemoved,
+      payload: { id: findNotificationsResult[0].id },
+    });
+    expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
+    expect(notificationStorage.deleteById).toBeCalledWith(
+      findNotificationsResult[1].id
+    );
+    expect(eventEmitter.emit).toBeCalledWith({
+      type: EventTypes.NotificationRemoved,
+      payload: { id: findNotificationsResult[1].id },
+    });
   });
 
   test("Should correctly sync identifiers, handling both group and non-group cases, initiator and not initiator", async () => {
@@ -1696,8 +1938,6 @@ describe("Single sig service of agent", () => {
       }) // Adjust formatting in the data to match new habName format
       .mockReturnValue({ aids: [] });
     identifierStorage.getAllIdentifiers = jest.fn().mockReturnValue([]);
-    identifierStorage.createIdentifierMetadataRecord = jest.fn();
-    identifierStorage.updateIdentifierMetadata = jest.fn();
     jest
       .spyOn(signifyClient.operations(), "get")
       .mockResolvedValueOnce({
@@ -1871,8 +2111,6 @@ describe("Single sig service of agent", () => {
       })
       .mockReturnValue({ aids: [] });
     identifierStorage.getAllIdentifiers = jest.fn().mockReturnValue([]);
-    identifierStorage.createIdentifierMetadataRecord = jest.fn();
-    identifierStorage.updateIdentifierMetadata = jest.fn();
     jest
       .spyOn(signifyClient.operations(), "get")
       .mockResolvedValueOnce({
@@ -1984,8 +2222,6 @@ describe("Single sig service of agent", () => {
       })
       .mockReturnValue({ aids: [] });
     identifierStorage.getAllIdentifiers = jest.fn().mockReturnValue([]);
-    identifierStorage.createIdentifierMetadataRecord = jest.fn();
-    identifierStorage.updateIdentifierMetadata = jest.fn();
     jest
       .spyOn(signifyClient.operations(), "get")
       .mockResolvedValueOnce({
@@ -2126,8 +2362,6 @@ describe("Single sig service of agent", () => {
       })
       .mockReturnValue({ aids: [] });
     identifierStorage.getAllIdentifiers = jest.fn().mockReturnValue([]);
-    identifierStorage.createIdentifierMetadataRecord = jest.fn();
-    identifierStorage.updateIdentifierMetadata = jest.fn();
     jest
       .spyOn(signifyClient.operations(), "get")
       .mockResolvedValueOnce({
@@ -2249,11 +2483,11 @@ describe("Single sig service of agent", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
-      .mockResolvedValue(keriMetadataRecord);
+      .mockResolvedValue(identifierMetadataRecord);
     getIdentifierMock.mockResolvedValue(identifierStateKeria);
 
     await expect(
-      identifierService.getSigner(keriMetadataRecord.id)
+      identifierService.getSigner(identifierMetadataRecord.id)
     ).rejects.toThrowError(IdentifierService.FAILED_TO_OBTAIN_KEY_MANAGER);
   });
 
@@ -2261,11 +2495,11 @@ describe("Single sig service of agent", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
-      .mockResolvedValue(keriMetadataRecord);
+      .mockResolvedValue(identifierMetadataRecord);
     getIdentifierMock.mockResolvedValue(identifierStateKeria);
     signifyClient.manager = managerMock as any;
     expect(
-      await identifierService.getSigner(keriMetadataRecord.id)
+      await identifierService.getSigner(identifierMetadataRecord.id)
     ).toStrictEqual(mockSigner);
   });
 
@@ -2315,19 +2549,21 @@ describe("Single sig service of agent", () => {
   test("Should mark identifier as pending when starting to delete identifier", async () => {
     identifierStorage.getIdentifierMetadata = jest
       .fn()
-      .mockResolvedValue(keriMetadataRecord);
+      .mockResolvedValue(identifierMetadataRecord);
     eventEmitter.emit = jest.fn();
 
-    await identifierService.markIdentifierPendingDelete(keriMetadataRecord.id);
+    await identifierService.markIdentifierPendingDelete(
+      identifierMetadataRecord.id
+    );
 
     expect(eventEmitter.emit).toHaveBeenCalledWith({
       type: EventTypes.IdentifierRemoved,
       payload: {
-        id: keriMetadataRecord.id,
+        id: identifierMetadataRecord.id,
       },
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
-      keriMetadataRecord.id,
+      identifierMetadataRecord.id,
       {
         pendingDeletion: true,
       }
@@ -2340,7 +2576,7 @@ describe("Single sig service of agent", () => {
       .mockResolvedValue(undefined);
 
     await expect(
-      identifierService.markIdentifierPendingDelete(keriMetadataRecord.id)
+      identifierService.markIdentifierPendingDelete(identifierMetadataRecord.id)
     ).rejects.toThrow(new Error("Identifier metadata record does not exist"));
     expect(identifierStorage.updateIdentifierMetadata).not.toBeCalled();
   });

@@ -6,7 +6,7 @@ import {
   IdentifierShortDetails,
   RemoteSignRequest,
 } from "./identifier.types";
-import type { GroupMetadata } from "./identifier.types";
+import type { GroupMetadata, QueuedGroupCreation } from "./identifier.types";
 import {
   CreationStatus,
   AgentServicesProps,
@@ -246,14 +246,7 @@ class IdentifierService extends AgentService {
       throw new Error(IdentifierService.INVALID_THEME);
     }
 
-    let name: string;
-    if (metadata.groupMetadata) {
-      const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
-      const proposedUsernamePart = metadata.groupMetadata.proposedUsername;
-      name = `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${proposedUsernamePart}:${metadata.displayName}`;
-    } else {
-      name = `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${metadata.displayName}`;
-    }
+    const name = this.calcKeriaHabName(metadata);
 
     // For distributed reliability, store name so we can re-try on start-up
     // Hence much of this function will ignore duplicate errors
@@ -358,29 +351,67 @@ class IdentifierService extends AgentService {
     });
 
     // Finally, remove from the re-try record
+    await this.clearQueuedIdentifier(name);
+    return { identifier, createdAt: identifierDetail.icp_dt };
+  }
+
+  private calcKeriaHabName(
+    metadata:
+      | IdentifierMetadataRecord
+      | Omit<IdentifierMetadataRecordProps, "id" | "createdAt">
+  ) {
+    if (metadata.groupMetadata) {
+      const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
+      const proposedUsernamePart = metadata.groupMetadata.proposedUsername;
+      return `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${proposedUsernamePart}:${metadata.displayName}`;
+    }
+    return `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${metadata.displayName}`;
+  }
+
+  private async clearQueuedIdentifier(name: string) {
     const pendingIdentifiersRecord = await this.basicStorage.findById(
       MiscRecordId.IDENTIFIERS_PENDING_CREATION
     );
+    if (!pendingIdentifiersRecord) return;
 
-    if (pendingIdentifiersRecord) {
-      const { queued } = pendingIdentifiersRecord.content;
-      if (!Array.isArray(queued)) {
-        throw new Error(IdentifierService.INVALID_QUEUED_DISPLAY_NAMES_FORMAT);
-      }
+    const { queued } = pendingIdentifiersRecord.content;
+    if (!Array.isArray(queued)) {
+      throw new Error(IdentifierService.INVALID_QUEUED_DISPLAY_NAMES_FORMAT);
+    }
 
-      const index = queued.indexOf(name);
-      if (index !== -1) {
-        queued.splice(index, 1);
-      }
+    const index = queued.indexOf(name);
+    if (index !== -1) {
+      queued.splice(index, 1);
       await this.basicStorage.update(pendingIdentifiersRecord);
     }
-    return { identifier, createdAt: identifierDetail.icp_dt };
+  }
+
+  private async clearQueuedGroup(groupName: string) {
+    const pendingGroupsRecord = await this.basicStorage.findById(
+      MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION
+    );
+    if (!pendingGroupsRecord) return;
+
+    const queued = pendingGroupsRecord.content.queued as QueuedGroupCreation[];
+
+    const index = queued.findIndex((group) => group.name === groupName);
+    if (index !== -1) {
+      queued.splice(index, 1);
+      await this.basicStorage.update(pendingGroupsRecord);
+    }
   }
 
   async deleteIdentifier(identifier: string): Promise<void> {
     const metadata = await this.identifierStorage.getIdentifierMetadata(
       identifier
     );
+
+    if (metadata.groupMemberPre) {
+      await this.clearQueuedGroup(this.calcKeriaHabName(metadata));
+    } else {
+      await this.clearQueuedIdentifier(this.calcKeriaHabName(metadata));
+    }
+
     if (metadata.groupMetadata) {
       await this.connections.deleteAllConnectionsForGroup(
         metadata.groupMetadata.groupId
@@ -395,6 +426,7 @@ class IdentifierService extends AgentService {
       const localMember = await this.identifierStorage.getIdentifierMetadata(
         metadata.groupMemberPre
       );
+      await this.clearQueuedIdentifier(this.calcKeriaHabName(localMember));
 
       await this.identifierStorage.updateIdentifierMetadata(
         metadata.groupMemberPre,
