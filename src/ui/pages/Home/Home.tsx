@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { chevronForwardOutline } from "ionicons/icons";
+import { personAdd, refresh } from "ionicons/icons";
 import { i18n } from "../../../i18n";
 import { useAppSelector } from "../../../store/hooks";
 import { getCurrentProfile } from "../../../store/reducers/profileCache";
@@ -42,6 +42,7 @@ const Home = () => {
         <div className="home-tab-content">
           <Tile
             icon={ScanIcon}
+            className="home-tab-scan-tile"
             title="Scan to login"
             text="Sign in to apps, games, social media, banking, and other services"
           />
@@ -52,12 +53,12 @@ const Home = () => {
           />
           <div className="home-tab-split-section">
             <Tile
-              icon={chevronForwardOutline}
+              icon={personAdd}
               title="Add connection"
               text="Establish a new connection"
             />
             <Tile
-              icon={chevronForwardOutline}
+              icon={refresh}
               title="Rotate key"
               text="Boost security by rotating your key"
             />

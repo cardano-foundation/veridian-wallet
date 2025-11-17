@@ -1,4 +1,5 @@
 interface TileProps {
+  className?: string;
   icon: string;
   title: string;
   text: string;
