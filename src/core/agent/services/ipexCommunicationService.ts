@@ -142,10 +142,9 @@ class IpexCommunicationService extends AgentService {
       )
     ).serviceEndpoints[0];
 
-    const inlineSchemaUrl = this.getInlineSchemaOobiBase(grantExn);
-    const schemaUrl = inlineSchemaUrl
-      ? inlineSchemaUrl
-      : await this.getSchemaUrl(issuerOobi, grantExn.exn.i);
+    const schemaUrl =
+      this.getInlineSchemaOobiBase(grantExn) ??
+      (await this.getSchemaUrl(issuerOobi, grantExn.exn.i));
     const schema = await this.recursiveSchemaResolve(schemaUrl, schemaSaid);
 
     try {
@@ -549,13 +548,14 @@ class IpexCommunicationService extends AgentService {
       schemaSaid = previousExchange.exn.e.acdc.s;
     }
 
-    const inlineSchemaUrl =
+    const schemaUrlBase =
       message.exn.r === ExchangeRoute.IpexGrant
-        ? this.getInlineSchemaOobiBase(message)
-        : undefined;
-    const schemaUrlBase = inlineSchemaUrl
-      ? inlineSchemaUrl
-      : await this.getSchemaUrl(connection.serviceEndpoints[0], connectionId);
+        ? this.getInlineSchemaOobiBase(message) ??
+          (await this.getSchemaUrl(
+            connection.serviceEndpoints[0],
+            connectionId
+          ))
+        : await this.getSchemaUrl(connection.serviceEndpoints[0], connectionId);
     await this.connections.resolveOobi(schemaUrlBase + schemaSaid, true);
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
 
@@ -638,10 +638,9 @@ class IpexCommunicationService extends AgentService {
         grantExn.exn.rp
       )
     ).serviceEndpoints[0];
-    const inlineSchemaUrl = this.getInlineSchemaOobiBase(grantExn);
-    const schemaUrl = inlineSchemaUrl
-      ? inlineSchemaUrl
-      : await this.getSchemaUrl(issuerOobi, connectionId);
+    const schemaUrl =
+      this.getInlineSchemaOobiBase(grantExn) ??
+      (await this.getSchemaUrl(issuerOobi, connectionId));
     const schema = await this.recursiveSchemaResolve(schemaUrl, schemaSaid);
 
     const { op } = await this.submitMultisigAdmit(
@@ -1029,10 +1028,9 @@ class IpexCommunicationService extends AgentService {
               exchange.exn.rp
             )
           ).serviceEndpoints[0];
-          const inlineSchemaUrl = this.getInlineSchemaOobiBase(exchange);
-          const schemaUrlBase = inlineSchemaUrl
-            ? inlineSchemaUrl
-            : await this.getSchemaUrl(issuerOobi, exchange.exn.i);
+          const schemaUrlBase =
+            this.getInlineSchemaOobiBase(exchange) ??
+            (await this.getSchemaUrl(issuerOobi, exchange.exn.i));
           await this.connections.resolveOobi(schemaUrlBase + schemaSaid, true);
           return await this.props.signifyClient.schemas().get(schemaSaid);
         } else {
