@@ -432,11 +432,11 @@ describe("Receive individual ACDC actions", () => {
       })
     );
     expect(connections.resolveOobi).toBeCalledWith(
-      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+      "https://issuer.example/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
       true
     );
     expect(connections.resolveOobi).toBeCalledWith(
-      "http://127.0.0.1:3001/oobi/farEdgeSchemaSaid",
+      "https://issuer.example/oobi/farEdgeSchemaSaid",
       true
     ); // Ensures we are calling recursiveSchemaResolve as it's public
   });
@@ -918,11 +918,11 @@ describe("Receive group ACDC actions", () => {
     });
     expect(notificationStorage.deleteById).not.toBeCalled();
     expect(connections.resolveOobi).toBeCalledWith(
-      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+      "https://issuer.example/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
       true
     );
     expect(connections.resolveOobi).toBeCalledWith(
-      "http://127.0.0.1:3001/oobi/farEdgeSchemaSaid",
+      "https://issuer.example/oobi/farEdgeSchemaSaid",
       true
     ); // Ensures we are calling recursiveSchemaResolve as it's public
   });
@@ -2878,7 +2878,7 @@ describe("IPEX communication service of agent", () => {
       connectionId: "EC9bQGHShmp2Juayqp0C5XcheBiHyc1p54pZ_Op-B95x",
     });
     expect(connections.resolveOobi).toBeCalledWith(
-      "http://127.0.0.1:3001/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
+      "https://issuer.example/oobi/EBIFDhtSE0cM4nbTnaMqiV1vUIlcnbsqBMeVMmeGmXOu",
       true
     );
   });
