@@ -3,10 +3,11 @@ import { chevronForwardOutline } from "ionicons/icons";
 import { TileProps } from "./Tile.types";
 import "./Tile.scss";
 
-const Tile = ({ className, icon, title, text }: TileProps) => {
+const Tile = ({ icon, title, text, className, handleTileClick }: TileProps) => {
   return (
     <div
       className={`tile ${className || ""}`}
+      onClick={handleTileClick}
       data-testid={`tile-${title}`}
     >
       <span className="tile-top">

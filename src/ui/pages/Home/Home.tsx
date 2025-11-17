@@ -10,14 +10,20 @@ import { Tile } from "../../components/Tile";
 import ScanIcon from "../../assets/images/scan-icon.svg";
 import CardanoLogo from "../../assets/images/cardano-logo.svg";
 import "./Home.scss";
+import { ScanToLogin } from "./components/ScanToLogin";
 
 const Home = () => {
   const pageId = "home-tab";
   const currentProfile = useAppSelector(getCurrentProfile);
   const [openProfiles, setOpenProfiles] = useState(false);
+  const [openScanToLogin, setOpenScanToLogin] = useState(false);
 
   const handleAvatarClick = () => {
     setOpenProfiles(true);
+  };
+
+  const handleScanToLoginClick = () => {
+    setOpenScanToLogin(true);
   };
 
   const AdditionalButtons = () => {
@@ -42,25 +48,26 @@ const Home = () => {
         <div className="home-tab-content">
           <Tile
             icon={ScanIcon}
+            title={i18n.t("tabs.home.tab.tiles.scan.title")}
+            text={i18n.t("tabs.home.tab.tiles.scan.text")}
             className="home-tab-scan-tile"
-            title="Scan to login"
-            text="Sign in to apps, games, social media, banking, and other services"
+            handleTileClick={handleScanToLoginClick}
           />
           <Tile
             icon={CardanoLogo}
-            title="Cardano Connect"
-            text="Use your Veridian wallet to access Cardano applications online"
+            title={i18n.t("tabs.home.tab.tiles.dapps.title")}
+            text={i18n.t("tabs.home.tab.tiles.dapps.text")}
           />
           <div className="home-tab-split-section">
             <Tile
               icon={personAdd}
-              title="Add connection"
-              text="Establish a new connection"
+              title={i18n.t("tabs.home.tab.tiles.connections.title")}
+              text={i18n.t("tabs.home.tab.tiles.connections.text")}
             />
             <Tile
               icon={refresh}
-              title="Rotate key"
-              text="Boost security by rotating your key"
+              title={i18n.t("tabs.home.tab.tiles.rotate.title")}
+              text={i18n.t("tabs.home.tab.tiles.rotate.text")}
             />
           </div>
         </div>
@@ -68,6 +75,10 @@ const Home = () => {
       <Profiles
         isOpen={openProfiles}
         setIsOpen={setOpenProfiles}
+      />
+      <ScanToLogin
+        isOpen={openScanToLogin}
+        setIsOpen={setOpenScanToLogin}
       />
     </>
   );
