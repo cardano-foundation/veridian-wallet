@@ -142,7 +142,10 @@ class IpexCommunicationService extends AgentService {
       )
     ).serviceEndpoints[0];
 
-    const schemaUrl = await this.getSchemaUrl(issuerOobi, grantExn.exn.i);
+    const inlineSchemaUrl = this.getInlineSchemaOobiBase(grantExn);
+    const schemaUrl = inlineSchemaUrl
+      ? inlineSchemaUrl
+      : await this.getSchemaUrl(issuerOobi, grantExn.exn.i);
     const schema = await this.recursiveSchemaResolve(schemaUrl, schemaSaid);
 
     try {
@@ -546,11 +549,14 @@ class IpexCommunicationService extends AgentService {
       schemaSaid = previousExchange.exn.e.acdc.s;
     }
 
-    await this.connections.resolveOobi(
-      (await this.getSchemaUrl(connection.serviceEndpoints[0], connectionId)) +
-        schemaSaid,
-      true
-    );
+    const inlineSchemaUrl =
+      message.exn.r === ExchangeRoute.IpexGrant
+        ? this.getInlineSchemaOobiBase(message)
+        : undefined;
+    const schemaUrlBase = inlineSchemaUrl
+      ? inlineSchemaUrl
+      : await this.getSchemaUrl(connection.serviceEndpoints[0], connectionId);
+    await this.connections.resolveOobi(schemaUrlBase + schemaSaid, true);
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
 
     let prefix;
@@ -632,10 +638,11 @@ class IpexCommunicationService extends AgentService {
         grantExn.exn.rp
       )
     ).serviceEndpoints[0];
-    const schema = await this.recursiveSchemaResolve(
-      await this.getSchemaUrl(issuerOobi, connectionId),
-      schemaSaid
-    );
+    const inlineSchemaUrl = this.getInlineSchemaOobiBase(grantExn);
+    const schemaUrl = inlineSchemaUrl
+      ? inlineSchemaUrl
+      : await this.getSchemaUrl(issuerOobi, connectionId);
+    const schema = await this.recursiveSchemaResolve(schemaUrl, schemaSaid);
 
     const { op } = await this.submitMultisigAdmit(
       holder.id,
@@ -1022,10 +1029,11 @@ class IpexCommunicationService extends AgentService {
               exchange.exn.rp
             )
           ).serviceEndpoints[0];
-          await this.connections.resolveOobi(
-            (await this.getSchemaUrl(issuerOobi, exchange.exn.i)) + schemaSaid,
-            true
-          );
+          const inlineSchemaUrl = this.getInlineSchemaOobiBase(exchange);
+          const schemaUrlBase = inlineSchemaUrl
+            ? inlineSchemaUrl
+            : await this.getSchemaUrl(issuerOobi, exchange.exn.i);
+          await this.connections.resolveOobi(schemaUrlBase + schemaSaid, true);
           return await this.props.signifyClient.schemas().get(schemaSaid);
         } else {
           throw error;
@@ -1239,6 +1247,20 @@ class IpexCommunicationService extends AgentService {
     const multiSigExn = await this.props.signifyClient.exchanges().get(current);
     const offerExn = multiSigExn.exn.e.exn;
     return offerExn.e.acdc.d;
+  }
+
+  private getInlineSchemaOobiBase(message: ExnMessage): string | undefined {
+    const rawUrl = message.exn.a?.oobiUrl;
+    if (typeof rawUrl !== "string") {
+      return undefined;
+    }
+
+    const trimmedUrl = rawUrl.trim();
+    if (!trimmedUrl) {
+      return undefined;
+    }
+
+    return `${trimmedUrl.replace(/\/+$/, "")}/`;
   }
 
   private async getSchemaUrl(

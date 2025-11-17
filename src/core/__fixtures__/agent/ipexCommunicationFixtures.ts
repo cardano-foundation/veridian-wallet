@@ -19,6 +19,7 @@ const grantForIssuanceExnMessage = {
       i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
       smids: ["EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"],
       gid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      oobiUrl: "https://issuer.example/oobi",
     },
     rp: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
     e: {
@@ -116,6 +117,7 @@ const offerForPresentingExnMessage = {
       i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
       smids: ["EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"],
       gid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      oobiUrl: "https://issuer.example/oobi",
     },
     e: {
       acdc: {
@@ -170,6 +172,7 @@ const admitForIssuanceExnMessage = {
       m: "",
       smids: ["EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK"],
       gid: "EI6lgpgvnVbl6hdfJNWCxlWEz9il1S1mu89XBBjvUBwK",
+      oobiUrl: "https://issuer.example/oobi",
     },
     e: {
       acdc: {
@@ -211,6 +214,7 @@ const agreeForPresentingExnMessage = {
       i: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
       smids: ["EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G"],
       gid: "EE-gjeEni5eCdpFlBtG7s4wkv7LJ0JmWplCS4DNQwW2G",
+      oobiUrl: "https://issuer.example/oobi",
     },
     rp: "ELjvc_mLWOx7pI4fBh7lGUYofOAJUgUrMKnaoFGdvs86",
     e: {
@@ -483,6 +487,7 @@ const multisigExnOfferForPresenting = {
       i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
       gid: "EC1cyV3zLnGs4B9AYgoGNjXESyQZrBWygz3jLlRD30bR",
       smids: ["EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn"],
+      oobiUrl: "https://issuer.example/oobi",
     },
     e: {
       exn: {
@@ -498,6 +503,7 @@ const multisigExnOfferForPresenting = {
         a: {
           i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
           m: "",
+          oobiUrl: "https://issuer.example/oobi",
         },
         e: { acdc: { d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT" } },
       },
@@ -518,6 +524,7 @@ const multisigExnOfferForPresenting = {
       a: {
         i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
         m: "",
+        oobiUrl: "https://issuer.example/oobi",
       },
       e: {
         acdc: { d: "EEuFpvZ2G_YMm3smqbwZn4SWArxQOen7ZypVVfr6fVCT" },
@@ -555,6 +562,7 @@ const multisigExnAdmitForIssuance = {
         a: {
           i: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s-RiLNyzupnk7edn",
           m: "",
+          oobiUrl: "https://issuer.example/oobi",
         },
         e: {},
       },
