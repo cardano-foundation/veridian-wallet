@@ -88,7 +88,9 @@
           }
         }
 
-        .read-button {
+        .read-button,
+        &.ion-activated {
+          background: var(--ion-color-neutral-600);
           --background: var(--ion-color-neutral-600);
           --color: var(--ion-color-neutral-100);
         }
