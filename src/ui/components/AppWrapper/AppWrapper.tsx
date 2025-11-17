@@ -66,7 +66,10 @@ import {
   InitializationPhase,
   PendingJoinGroupMetadata,
 } from "../../../store/reducers/stateCache/stateCache.types";
-import { filterProfileData } from "../../../store/reducers/stateCache/utils";
+import {
+  createProfileMapData,
+  filterMutisigData,
+} from "../../../store/reducers/stateCache/utils";
 import {
   setCredentialFavouriteIndex,
   setCredentialViewTypeCache,
@@ -403,35 +406,37 @@ const AppWrapper = (props: { children: ReactNode }) => {
         {}
       );
 
+      const {
+        profileArchivedCredentialsMap,
+        profileConnectionsMap,
+        profileCredentialsMap,
+        profileNotificationsMap,
+        profilePeerConnectionsMap,
+      } = createProfileMapData(
+        credsCache,
+        credsArchivedCache,
+        allConnections as RegularConnectionDetails[],
+        storedPeerConnections,
+        notifications
+      );
+
       const profiles = storedIdentifiers.reduce(
         (acc: Record<string, Profile>, identifier) => {
-          const {
-            profileIdentifier,
-            profileCredentials,
-            profileArchivedCredentials,
-            profileConnections,
-            profileMultisigConnections,
-            profilePeerConnections,
-            profileNotifications,
-          } = filterProfileData(
+          const multisigConnections = filterMutisigData(
             identifiersDict,
-            credsCache,
-            credsArchivedCache,
-            allConnections as RegularConnectionDetails[],
             allMultisigConnections as MultisigConnectionDetails[],
-            storedPeerConnections,
-            notifications,
             identifier
           );
 
           acc[identifier.id] = {
-            identity: profileIdentifier,
-            connections: profileConnections,
-            multisigConnections: profileMultisigConnections,
-            peerConnections: profilePeerConnections,
-            credentials: profileCredentials,
-            archivedCredentials: profileArchivedCredentials,
-            notifications: profileNotifications,
+            identity: identifier,
+            connections: profileConnectionsMap[identifier.id] || [],
+            multisigConnections: multisigConnections,
+            peerConnections: profilePeerConnectionsMap[identifier.id] || [],
+            credentials: profileCredentialsMap[identifier.id] || [],
+            archivedCredentials:
+              profileArchivedCredentialsMap[identifier.id] || [],
+            notifications: profileNotificationsMap[identifier.id] || [],
           };
 
           return acc;

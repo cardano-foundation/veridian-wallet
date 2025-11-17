@@ -7,51 +7,59 @@ import { IdentifierShortDetails } from "../../../core/agent/services/identifier.
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 import { DAppConnection } from "../profileCache";
 
+const createMapData = <T>(
+  items: T[],
+  filterKey: keyof T
+): Record<string, T[]> => {
+  return items.reduce((result, item) => {
+    const id = item[filterKey] as string;
+    if (result[id]) {
+      result[id].push(item);
+    } else {
+      result[id] = [item];
+    }
+
+    return result;
+  }, {} as Record<string, T[]>);
+};
+
 const filterProfileData = (
-  identifiers: Record<string, IdentifierShortDetails>,
   allCreds: CredentialShortDetails[],
   allArchivedCreds: CredentialShortDetails[],
   allConnections: RegularConnectionDetails[],
-  allMultisigConnections: MultisigConnectionDetails[],
   allPeerConnections: DAppConnection[],
-  allNotifications: KeriaNotification[],
+  allNotifications: KeriaNotification[]
+) => {
+  const profileCreds = createMapData(allCreds, "identifierId");
+  const profileArchivedCreds = createMapData(allArchivedCreds, "identifierId");
+  const profileConnections = createMapData(allConnections, "identifier");
+  const profilePeerConnections = createMapData(
+    allPeerConnections,
+    "selectedAid"
+  );
+  const profileNotifications = createMapData(allNotifications, "receivingPre");
+
+  return {
+    profileCredentialsMap: profileCreds,
+    profileConnectionsMap: profileConnections,
+    profileArchivedCredentialsMap: profileArchivedCreds,
+    profilePeerConnectionsMap: profilePeerConnections,
+    profileNotificationsMap: profileNotifications,
+  };
+};
+
+const filterMutisigData = (
+  identifiers: Record<string, IdentifierShortDetails>,
+  allMultisigConnections: MultisigConnectionDetails[],
   profile: IdentifierShortDetails
 ) => {
-  const profileId = profile.id;
-  const profileIdentifier = identifiers[profileId];
-  const profileCreds = allCreds.filter(
-    (cred) => cred.identifierId === profileId
-  );
-  const profileArchivedCreds = allArchivedCreds.filter(
-    (cred) => cred.identifierId === profileId
-  );
-  const profileConnections = allConnections.filter(
-    (conn) => conn.identifier === profileId
-  );
-
   const groupIdToFilter = profile.groupMemberPre
     ? identifiers[profile.groupMemberPre]?.groupMetadata?.groupId
     : profile.groupMetadata?.groupId;
 
-  const profileMultisigConnections = allMultisigConnections.filter(
+  return allMultisigConnections.filter(
     (conn) => "groupId" in conn && conn.groupId === groupIdToFilter
   );
-  const profilePeerConnections = allPeerConnections.filter(
-    (conn) => conn.selectedAid === profileId
-  );
-  const profileNotifications = allNotifications.filter(
-    (noti) => noti.receivingPre === profileId
-  );
-
-  return {
-    profileIdentifier: profileIdentifier,
-    profileCredentials: profileCreds,
-    profileConnections: profileConnections,
-    profileMultisigConnections: profileMultisigConnections,
-    profileArchivedCredentials: profileArchivedCreds,
-    profilePeerConnections: profilePeerConnections,
-    profileNotifications: profileNotifications,
-  };
 };
 
-export { filterProfileData };
+export { filterMutisigData, filterProfileData as createProfileMapData };
