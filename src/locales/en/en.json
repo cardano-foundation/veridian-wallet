@@ -698,8 +698,8 @@
     }
   },
   "connectdapp": {
-    "title": "dApps",
-    "connectbtn": "Connect dApp",
+    "title": "Connections",
+    "connectbtn": "Connect using Cardano",
     "disconnectbeforecreatealert": {
       "message": "You are currently connected. To connect with a new wallet, you will be disconnected from your current selection. Would you like to disconnect and continue?",
       "confirm": "Continue",
