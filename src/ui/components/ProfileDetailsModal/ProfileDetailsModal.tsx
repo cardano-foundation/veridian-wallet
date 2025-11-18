@@ -27,7 +27,6 @@ import { PageHeader } from "../PageHeader";
 import { SideSlider } from "../SideSlider";
 import { Verification } from "../Verification";
 import { ProfileContent } from "./components/ProfileContent";
-import { RotateKeyModal } from "./components/RotateKeyModal";
 import "./ProfileDetailsModal.scss";
 import { IdentifierDetailModalProps } from "./ProfileDetailsModal.types";
 
@@ -46,7 +45,6 @@ const ProfileDetailsModal = ({
     useAppSelector(getAuthentication).passwordIsSet;
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-  const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
   const [profile, setProfile] = useState<IdentifierDetailsCore | undefined>();
   const [oobi, setOobi] = useState("");
   const [cloudError, setCloudError] = useState(false);
@@ -54,9 +52,9 @@ const ProfileDetailsModal = ({
   const { setRecentProfileAsDefault, defaultProfile, defaultName } =
     useProfile();
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
-  };
+  }, [setIsOpen]);
 
   const fetchOobi = useCallback(async () => {
     try {
@@ -93,7 +91,7 @@ const ProfileDetailsModal = ({
         showError("Unable to get identifier details", error, dispatch);
       }
     }
-  }, [profileId, dispatch, isOpen]);
+  }, [profileId, dispatch, isOpen, handleClose, showProfiles]);
 
   useOnlineStatusEffect(getDetails);
   useOnlineStatusEffect(fetchOobi);
@@ -152,10 +150,6 @@ const ProfileDetailsModal = ({
   };
 
   const cancelDelete = () => setAlertIsOpen(false);
-
-  const openRotateModal = useCallback(() => {
-    setOpenRotateKeyModal(true);
-  }, []);
 
   const hardwareBackButtonConfig = useMemo(
     () => ({
@@ -217,7 +211,6 @@ const ProfileDetailsModal = ({
             {profile ? (
               <div className="card-details-content">
                 <ProfileContent
-                  onRotateKey={openRotateModal}
                   cardData={profile as IdentifierDetailsCore}
                   oobi={oobi}
                   setCardData={setProfile}
@@ -253,13 +246,6 @@ const ProfileDetailsModal = ({
         actionConfirm={handleAuthentication}
         actionCancel={cancelDelete}
         actionDismiss={cancelDelete}
-      />
-      <RotateKeyModal
-        identifierId={profileId}
-        onReloadData={getDetails}
-        signingKey={profile?.k[0] || ""}
-        isOpen={openRotateKeyModal}
-        onClose={() => setOpenRotateKeyModal(false)}
       />
       <Verification
         verifyIsOpen={verifyIsOpen}

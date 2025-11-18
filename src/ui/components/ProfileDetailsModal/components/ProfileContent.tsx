@@ -5,7 +5,6 @@ import {
   keyOutline,
   pencilOutline,
   personCircleOutline,
-  refreshOutline,
   shareOutline,
 } from "ionicons/icons";
 import { useCallback, useState } from "react";
@@ -54,7 +53,6 @@ const ProfileInformation = ({ value, text }: ProfileInformationProps) => {
 
 const ProfileContent = ({
   cardData,
-  onRotateKey,
   oobi,
   setCardData,
 }: ProfileContentProps) => {
@@ -303,7 +301,6 @@ const ProfileContent = ({
         <>
           <CardBlock
             copyContent={cardData.k[0]}
-            flatBorder={!isMultiSig ? FlatBorderType.BOT : undefined}
             title={i18n.t("profiledetails.identifierdetail.signingkey.title")}
             testId="signingkey-block"
           >
@@ -320,25 +317,6 @@ const ProfileContent = ({
               );
             })}
           </CardBlock>
-          {!isMultiSig && (
-            <CardBlock
-              className="rotate-button-container"
-              flatBorder={FlatBorderType.TOP}
-              testId="rotate-button-block"
-            >
-              <IonButton
-                shape="round"
-                className="rotate-keys-button"
-                data-testid="rotate-keys-button"
-                onClick={onRotateKey}
-              >
-                <p>
-                  {i18n.t("profiledetails.identifierdetail.signingkey.rotate")}
-                </p>
-                <IonIcon icon={refreshOutline} />
-              </IonButton>
-            </CardBlock>
-          )}
         </>
       )}
       <ListCard

@@ -14,11 +14,9 @@ import { MiscRecordId } from "../../../core/agent/agent.types";
 import { ConfigurationService } from "../../../core/configuration";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { updateRecentProfiles } from "../../../store/reducers/profileCache";
-import { setToastMsg } from "../../../store/reducers/stateCache";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
-import { ToastMsgType } from "../../globals/types";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -73,7 +71,6 @@ jest.mock("@ionic/react", () => {
   };
 });
 
-const rotateIdentifierMock = jest.fn((id: string) => Promise.resolve(id));
 const deleteIdentifier = jest.fn(() => Promise.resolve());
 const markIdentifierPendingDelete = jest.fn(() => Promise.resolve());
 const createOrUpdateMock = jest.fn().mockResolvedValue(undefined);
@@ -124,7 +121,6 @@ jest.mock("../../../core/agent/agent", () => ({
     agent: {
       identifiers: {
         getIdentifier: () => getIndentifier(),
-        rotateIdentifier: (id: string) => rotateIdentifierMock(id),
         deleteStaleLocalIdentifier: () => deleteStaleLocalIdentifierMock(),
         deleteIdentifier: () => deleteIdentifier(),
         markIdentifierPendingDelete: () => markIdentifierPendingDelete(),
@@ -222,7 +218,6 @@ describe("Individual profile details page", () => {
     expect(getByTestId("creation-timestamp")).toBeVisible();
     // Render List of signing keys
     expect(getByTestId("signing-key-0")).toBeInTheDocument();
-    expect(getByTestId("rotate-keys-button")).toBeInTheDocument();
     expect(
       getByText(
         identifierFix[0].k[0].substring(0, 5) +
@@ -495,132 +490,6 @@ describe("Individual profile details page", () => {
         null
       )
     );
-  });
-
-  test("Rotate key", async () => {
-    const initialStateKeri = {
-      stateCache: {
-        routes: [TabsRoutePath.CREDENTIALS],
-        authentication: {
-          loggedIn: true,
-          time: Date.now(),
-          passcodeIsSet: true,
-          passwordIsSet: false,
-        },
-        toastMsgs: [],
-        isOnline: true,
-      },
-      seedPhraseCache: {
-        seedPhrase: "",
-        bran: "bran",
-      },
-      profilesCache: profileCacheFixData,
-      biometricsCache: {
-        enabled: false,
-      },
-    };
-
-    const storeMockedAidKeri = {
-      ...makeTestStore(initialStateKeri),
-      dispatch: dispatchMock,
-    };
-
-    const { queryByTestId, getByTestId, getByText } = render(
-      <Provider store={storeMockedAidKeri}>
-        <ProfileDetailsModal
-          profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          pageId={pageId}
-          isOpen
-          setIsOpen={jest.fn}
-          showProfiles={jest.fn}
-        />
-      </Provider>
-    );
-    expect(
-      getByTestId("identifier-card-detail-spinner-container")
-    ).toBeVisible();
-
-    await waitFor(() => {
-      expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
-        null
-      );
-    });
-
-    await waitFor(() =>
-      expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
-        null
-      )
-    );
-
-    act(() => {
-      fireEvent.click(getByTestId("rotate-keys-button"));
-    });
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.profiledetails.rotatekeys.message)
-      ).toBeVisible();
-      expect(
-        getByText(EN_TRANSLATIONS.profiledetails.rotatekeys.description)
-      ).toBeVisible();
-      expect(
-        getByText(EN_TRANSLATIONS.profiledetails.rotatekeys.signingkey)
-      ).toBeVisible();
-      expect(getByTestId("rotate-keys-title").innerHTML).toBe(
-        EN_TRANSLATIONS.profiledetails.options.rotatekeys
-      );
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("primary-button-rotate-key"));
-    });
-
-    await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("passcode-button-1"));
-
-    await waitFor(() => {
-      expect(getByTestId("circle-0")).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("passcode-button-1"));
-
-    await waitFor(() => {
-      expect(getByTestId("circle-1")).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("passcode-button-1"));
-
-    await waitFor(() => {
-      expect(getByTestId("circle-2")).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("passcode-button-1"));
-
-    await waitFor(() => {
-      expect(getByTestId("circle-3")).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("passcode-button-1"));
-
-    await waitFor(() => {
-      expect(getByTestId("circle-4")).toBeVisible();
-    });
-
-    fireEvent.click(getByTestId("passcode-button-1"));
-
-    await waitFor(() => {
-      expect(getByTestId("circle-5")).toBeVisible();
-    });
-
-    await waitFor(() => {
-      expect(rotateIdentifierMock).toBeCalledWith(identifierFix[0].id);
-      expect(dispatchMock).toBeCalledWith(
-        setToastMsg(ToastMsgType.ROTATE_KEY_SUCCESS)
-      );
-    });
   });
 
   test("Can restrict view to not be able to delete identifier", async () => {

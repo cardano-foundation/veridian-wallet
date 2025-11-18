@@ -3,7 +3,6 @@ import { IdentifierDetails } from "../../../../core/agent/services/identifier.ty
 interface ProfileContentProps {
   oobi: string;
   cardData: IdentifierDetails;
-  onRotateKey: () => void;
   setCardData: (value: IdentifierDetails) => void;
 }
 

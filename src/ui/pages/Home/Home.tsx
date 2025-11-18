@@ -12,7 +12,7 @@ import CardanoLogo from "../../assets/images/cardano-logo.svg";
 import "./Home.scss";
 import { ScanToLogin } from "./components/ScanToLogin";
 import { ConnectdApp } from "../../components/ConnectdApp";
-import { RotateKeyModal } from "../../components/ProfileDetailsModal/components/RotateKeyModal";
+import { RotateKeyModal } from "./components/RotateKeyModal";
 import { Agent } from "../../../core/agent/agent";
 import { IdentifierDetails } from "../../../core/agent/services/identifier.types";
 import { showError } from "../../utils/error";
