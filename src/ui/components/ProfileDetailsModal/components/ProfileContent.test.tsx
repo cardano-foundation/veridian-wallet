@@ -11,11 +11,6 @@ jest.mock("../../../../i18n", () => ({
   },
 }));
 
-jest.mock("../../ConnectdApp", () => ({
-  ConnectdApp: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="connect-dapp">ConnectDApp</div> : null,
-}));
-
 jest.mock("../../EditProfile", () => ({
   EditProfile: () => <div data-testid="edit-profile">EditProfile</div>,
 }));
@@ -124,6 +119,14 @@ describe("ProfileContent", () => {
   });
 
   describe("Profile Information Display", () => {
+    it("Should render component correctly", () => {
+      const { getByTestId } = renderComponent();
+
+      expect(getByTestId("avatar")).toHaveTextContent(mockProps.cardData.id);
+      expect(getByTestId("edit-button")).toBeInTheDocument();
+      expect(getByTestId("share-button")).toBeInTheDocument();
+    });
+
     it("should display dynamic credential count from current profile", () => {
       renderComponent();
 
@@ -276,43 +279,6 @@ describe("ProfileContent", () => {
       const connectionsValue = connectionsLabel.previousElementSibling;
 
       expect(connectionsValue?.textContent).toBe("0");
-    });
-  });
-
-  describe("Component Rendering", () => {
-    it("should render profile avatar with correct id", () => {
-      const { getByTestId } = renderComponent();
-
-      expect(getByTestId("avatar")).toHaveTextContent(mockProps.cardData.id);
-    });
-
-    it("should render edit button", () => {
-      const { getByTestId } = renderComponent();
-
-      expect(getByTestId("edit-button")).toBeInTheDocument();
-    });
-
-    it("should render share button", () => {
-      const { getByTestId } = renderComponent();
-
-      expect(getByTestId("share-button")).toBeInTheDocument();
-    });
-
-    it("should render DApp connection block", () => {
-      const { getByTestId } = renderComponent();
-
-      expect(getByTestId("profiledetails-list-option-0")).toBeInTheDocument();
-    });
-
-    it("should open ConnectdApp modal when DApp block is clicked", () => {
-      const { getByTestId, queryByTestId } = renderComponent();
-
-      expect(queryByTestId("connect-dapp")).not.toBeInTheDocument();
-
-      const dappBlock = getByTestId("profiledetails-list-option-0");
-      fireEvent.click(dappBlock);
-
-      expect(queryByTestId("connect-dapp")).toBeInTheDocument();
     });
   });
 });

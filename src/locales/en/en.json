@@ -558,9 +558,6 @@
     "identifierdetail": {
       "title": "Profile details",
       "showadvanced": "Show advanced details",
-      "listoptions": {
-        "dapp": "dApps"
-      },
       "information": {
         "credentials": "Credentials",
         "connections": "Connections",
