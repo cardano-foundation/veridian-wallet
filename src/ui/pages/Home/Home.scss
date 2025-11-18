@@ -35,18 +35,6 @@
 
     .home-tab-content {
       margin: 1.2rem 0;
-
-      .home-tab-split-section {
-        flex-direction: column;
-
-        .tile {
-          width: auto;
-
-          &:first-child {
-            margin-right: 0;
-          }
-        }
-      }
     }
   }
 }
