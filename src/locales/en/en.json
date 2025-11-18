@@ -1555,8 +1555,9 @@
     "button": "OK"
   },
   "nowitnesserror": {
-    "text": "Your SSI agent is misconfigured. For additional information, contact your SSI Cloud Agent provider.",
-    "button": "OK"
+    "title": "Misconfigured cloud agent",
+    "description": "Due to your cloud agent being misconfigured, you’re unable to create a profile. Please contact your cloud provider for more information.",
+    "button": "Check again"
   },
   "readmore": {
     "more": "Read more",
