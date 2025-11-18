@@ -295,6 +295,7 @@ describe("Connection service of agent", () => {
       "https://localhost/oobi",
       "https://localhost",
       "https://localhost/oobi/1234/agent/eid/extra",
+      "https://localhost/oobi/1234/another/eid",
     ];
 
     for (const url of invalidUrls) {
@@ -309,6 +310,8 @@ describe("Connection service of agent", () => {
     let validUrls = [
       "https://localhost/oobi/1234/agent?name=alias",
       "https://localhost/oobi/1234/agent/5678?name=alias",
+      "https://localhost/oobi/1234/controller?name=alias",
+      "https://localhost/oobi/1234/mailbox/5678?name=alias",
       "https://localhost/.well-known/keri/oobi/1234?name=alias",
     ];
 
@@ -333,6 +336,8 @@ describe("Connection service of agent", () => {
     validUrls = [
       "https://localhost/oobi/1234/agent?name=alias",
       "https://localhost/oobi/1234/witness?name=alias",
+      "https://localhost/oobi/1234/controller?name=alias",
+      "https://localhost/oobi/1234/mailbox/5678?name=alias",
       "https://localhost/.well-known/keri/oobi/1234?name=alias",
       "https://localhost/oobi/EBfdlu8R27Fbx-ehrqwImnK-8Cm79sqbAQ4MmvEAYqao?name=alias",
     ];
