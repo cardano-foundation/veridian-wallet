@@ -50,6 +50,53 @@
       }
     }
 
+    .notification-tab-item-slide {
+      ion-item-options {
+        ion-item-option {
+          min-width: 5.5rem;
+          max-width: 5.5rem;
+
+          &[expandable] {
+            max-width: none;
+          }
+
+          .option-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+
+            ion-icon {
+              font-size: 1.25rem;
+              margin-bottom: 0.5rem;
+            }
+          }
+        }
+
+        @media screen and (min-width: 250px) and (max-width: 370px) {
+          ion-item-option {
+            min-width: 4.4rem;
+            max-width: 4.4rem;
+
+            .option-content {
+              ion-icon {
+                font-size: 1rem;
+                margin-bottom: 0.4rem;
+              }
+            }
+          }
+        }
+
+        .read-button,
+        &.ion-activated {
+          background: var(--ion-color-neutral-600);
+          --background: var(--ion-color-neutral-600);
+          --color: var(--ion-color-neutral-100);
+        }
+      }
+    }
+
     .notifications-tab-section {
       margin-top: 1.5rem;
 
@@ -65,7 +112,7 @@
         height: 4.5rem;
         display: flex;
         justify-content: space-between;
-        background: transparent;
+        background: var(--ion-color-neutral-200);
 
         &.unread {
           background: var(--ion-color-primary-200);
@@ -156,21 +203,6 @@
           ion-label {
             line-height: 0.8rem;
             font-size: 0.7rem;
-          }
-        }
-
-        ion-icon.notifications-tab-item-ellipsis {
-          width: 1.475rem;
-          height: 1.475rem;
-          margin: 0.25rem 0;
-          align-self: baseline;
-        }
-
-        @media screen and (min-width: 250px) and (max-width: 370px) {
-          ion-icon.notifications-tab-item-ellipsis {
-            width: 1.18rem;
-            height: 1.18rem;
-            margin: 0.5rem 0;
           }
         }
       }

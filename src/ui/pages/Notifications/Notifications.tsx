@@ -1,4 +1,4 @@
-import { IonList, useIonViewWillEnter } from "@ionic/react";
+import { useIonViewWillEnter } from "@ionic/react";
 import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
@@ -26,11 +26,9 @@ import { showError } from "../../utils/error";
 import { timeDifference } from "../../utils/formatters";
 import { Profiles } from "../Profiles";
 import { NotificationFilters } from "./Notification.types";
-import { NotificationItem } from "./NotificationItem";
 import "./Notifications.scss";
-import { EarlierNotification } from "./components";
-import { EarlierNotificationRef } from "./components/EarlierNotification.types";
-import { NotificationOptionsModal } from "./components/NotificationOptionsModal";
+import { NotificationSection } from "./components";
+import { NotificationSectionRef } from "./components/NotificationSection.types";
 
 const Notifications = () => {
   const pageId = "notifications-tab";
@@ -46,10 +44,7 @@ const Notifications = () => {
   const [selectedFilter, setSelectedFilter] = useState<NotificationFilters>(
     NotificationFilters.All
   );
-  const earlierNotificationRef = useRef<EarlierNotificationRef>(null);
-  const [selectedItem, setSelectedItem] = useState<KeriaNotification | null>(
-    null
-  );
+  const earlierNotificationRef = useRef<NotificationSectionRef>(null);
 
   const [isOpenCredModal, setIsOpenCredModal] = useState(false);
   const [openProfiles, setOpenProfiles] = useState(false);
@@ -164,10 +159,6 @@ const Notifications = () => {
     earlierNotificationRef.current?.reset();
   };
 
-  const onOpenOptionModal = (item: KeriaNotification | null) => {
-    setSelectedItem(item);
-  };
-
   useEffect(() => {
     if (history.location.pathname !== TabsRoutePath.NOTIFICATIONS)
       earlierNotificationRef.current?.reset();
@@ -225,35 +216,24 @@ const Notifications = () => {
           ))}
         </div>
         <div className="notifications-tab-content">
-          {!!notificationsNew.length && (
-            <div
-              className="notifications-tab-section"
-              data-testid="notifications-tab-section-new"
-            >
-              <h3 className="notifications-tab-section-title">
-                {i18n.t("tabs.notifications.tab.sections.new")}
-              </h3>
-              <IonList
-                lines="none"
-                data-testid="notifications-items"
-              >
-                {notificationsNew.map((item: KeriaNotification) => (
-                  <NotificationItem
-                    key={item.id}
-                    item={item}
-                    onClick={handleNotificationClick}
-                    onOptionButtonClick={onOpenOptionModal}
-                  />
-                ))}
-              </IonList>
-            </div>
-          )}
-          <EarlierNotification
+          <NotificationSection
+            title={i18n.t("tabs.notifications.tab.sections.new")}
+            data={notificationsNew}
             pageId={pageId}
-            ref={earlierNotificationRef}
-            data={notificationsEarlier}
             onNotificationClick={handleNotificationClick}
-            onOpenOptionModal={onOpenOptionModal}
+            enableInfiniteScroll={false}
+            testId="notifications-tab-section-new"
+          />
+          <NotificationSection
+            title={i18n.t("tabs.notifications.tab.sections.earlier.title")}
+            data={notificationsEarlier}
+            pageId={pageId}
+            onNotificationClick={handleNotificationClick}
+            enableInfiniteScroll={true}
+            initialDisplayCount={3}
+            loadMoreCount={5}
+            testId="notifications-tab-section-earlier"
+            ref={earlierNotificationRef}
           />
           <p className="notification-empty">
             {filteredNotification.length === 0
@@ -261,14 +241,6 @@ const Notifications = () => {
               : i18n.t("tabs.notifications.tab.sections.earlier.end")}
           </p>
         </div>
-        {selectedItem && (
-          <NotificationOptionsModal
-            notification={selectedItem}
-            onShowDetail={handleNotificationClick}
-            optionsIsOpen={!!selectedItem}
-            setCloseModal={() => onOpenOptionModal(null)}
-          />
-        )}
       </TabLayout>
       <Profiles
         isOpen={openProfiles}
