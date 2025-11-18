@@ -152,4 +152,21 @@ describe("Identifier storage test", () => {
       await identifierStorage.getIdentifierMetadataByGroupId(groupIdToSearch)
     ).toEqual(null);
   });
+
+  test("Should get identifiers pending update", async () => {
+    const pendingRecord = new IdentifierMetadataRecord({
+      ...identifierMetadataRecordProps,
+      id: "pending-id",
+      pendingUpdate: true,
+    });
+    storageService.findAllByQuery.mockResolvedValue([pendingRecord]);
+
+    await expect(
+      identifierStorage.getIdentifiersPendingUpdate()
+    ).resolves.toEqual([pendingRecord]);
+    expect(storageService.findAllByQuery).toHaveBeenCalledWith(
+      { pendingUpdate: true },
+      IdentifierMetadataRecord
+    );
+  });
 });

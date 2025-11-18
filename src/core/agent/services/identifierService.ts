@@ -355,6 +355,23 @@ class IdentifierService extends AgentService {
     return { identifier, createdAt: identifierDetail.icp_dt };
   }
 
+  private resolveGroupUsername(
+    metadata:
+      | IdentifierMetadataRecord
+      | Omit<IdentifierMetadataRecordProps, "id" | "createdAt">
+  ) {
+    if (
+      "groupUsername" in metadata &&
+      typeof metadata.groupUsername === "string"
+    ) {
+      return metadata.groupUsername;
+    }
+    if (metadata.groupMetadata) {
+      return metadata.groupMetadata.proposedUsername;
+    }
+    return undefined;
+  }
+
   private calcKeriaHabName(
     metadata:
       | IdentifierMetadataRecord
@@ -362,10 +379,37 @@ class IdentifierService extends AgentService {
   ) {
     if (metadata.groupMetadata) {
       const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
-      const proposedUsernamePart = metadata.groupMetadata.proposedUsername;
+      const proposedUsernamePart =
+        this.resolveGroupUsername(metadata) ??
+        metadata.groupMetadata.proposedUsername;
       return `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${proposedUsernamePart}:${metadata.displayName}`;
     }
     return `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${metadata.displayName}`;
+  }
+
+  private async pushIdentifierStateToKeria(
+    identifierId: string,
+    metadataOverride?: IdentifierMetadataRecord
+  ): Promise<void> {
+    const metadata =
+      metadataOverride ??
+      (await this.identifierStorage.getIdentifierMetadata(identifierId));
+    const desiredName = this.calcKeriaHabName(metadata);
+    const hab = (await this.props.signifyClient
+      .identifiers()
+      .get(identifierId)) as HabState;
+
+    if (hab.name !== desiredName) {
+      await this.props.signifyClient.identifiers().update(identifierId, {
+        name: desiredName,
+      });
+    }
+
+    if (metadata.pendingUpdate) {
+      await this.identifierStorage.updateIdentifierMetadata(identifierId, {
+        pendingUpdate: false,
+      });
+    }
   }
 
   private async clearQueuedIdentifier(name: string) {
@@ -517,6 +561,23 @@ class IdentifierService extends AgentService {
     }
   }
 
+  async processPendingIdentifierUpdates(): Promise<void> {
+    const pendingIdentifiers =
+      await this.identifierStorage.getIdentifiersPendingUpdate();
+
+    for (const identifier of pendingIdentifiers) {
+      try {
+        await this.pushIdentifierStateToKeria(identifier.id, identifier);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `Failed to process pending identifier update ${identifier.id}`,
+          error
+        );
+      }
+    }
+  }
+
   async markIdentifierPendingDelete(id: string): Promise<void> {
     const identifierProps = await this.identifierStorage.getIdentifierMetadata(
       id
@@ -558,11 +619,27 @@ class IdentifierService extends AgentService {
   ): Promise<void> {
     const identifierMetadata =
       await this.identifierStorage.getIdentifierMetadata(identifier);
+    const identifiersToUpdate: {
+      id: string;
+      metadata: IdentifierMetadataRecord;
+    }[] = [];
 
-    let name: string;
+    identifierMetadata.theme = data.theme;
+    identifierMetadata.displayName = data.displayName;
+    identifierMetadata.pendingUpdate = true;
+
+    await this.identifierStorage.updateIdentifierMetadata(identifier, {
+      theme: data.theme,
+      displayName: data.displayName,
+      pendingUpdate: true,
+    });
+
+    identifiersToUpdate.push({
+      id: identifier,
+      metadata: identifierMetadata,
+    });
+
     if (identifierMetadata.groupMemberPre) {
-      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${data.displayName}`;
-
       const memberMetadata = await this.identifierStorage.getIdentifierMetadata(
         identifierMetadata.groupMemberPre
       );
@@ -572,39 +649,27 @@ class IdentifierService extends AgentService {
         );
       }
 
-      const initiatorFlag = memberMetadata.groupMetadata.groupInitiator
-        ? "1"
-        : "0";
-      const memberName = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${memberMetadata.groupMetadata.groupId}:${memberMetadata.groupMetadata.proposedUsername}:${data.displayName}`;
+      memberMetadata.theme = data.theme;
+      memberMetadata.displayName = data.displayName;
+      memberMetadata.pendingUpdate = true;
 
-      await this.props.signifyClient
-        .identifiers()
-        .update(identifierMetadata.groupMemberPre, {
-          name: memberName,
-        });
       await this.identifierStorage.updateIdentifierMetadata(
         identifierMetadata.groupMemberPre,
         {
           theme: data.theme,
           displayName: data.displayName,
+          pendingUpdate: true,
         }
       );
-    } else if (identifierMetadata.groupMetadata) {
-      const initiatorFlag = identifierMetadata.groupMetadata.groupInitiator
-        ? "1"
-        : "0";
-      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${initiatorFlag}:${identifierMetadata.groupMetadata.groupId}:${identifierMetadata.groupMetadata.proposedUsername}:${data.displayName}`;
-    } else {
-      name = `${LATEST_IDENTIFIER_VERSION}:${data.theme}:${data.displayName}`;
+      identifiersToUpdate.unshift({
+        id: identifierMetadata.groupMemberPre,
+        metadata: memberMetadata,
+      });
     }
 
-    await this.props.signifyClient.identifiers().update(identifier, {
-      name,
-    });
-    return this.identifierStorage.updateIdentifierMetadata(identifier, {
-      theme: data.theme,
-      displayName: data.displayName,
-    });
+    for (const { id: identifierId, metadata } of identifiersToUpdate) {
+      await this.pushIdentifierStateToKeria(identifierId, metadata);
+    }
   }
 
   @OnlineOnly
@@ -625,29 +690,33 @@ class IdentifierService extends AgentService {
         );
       }
 
-      const initiatorFlag = memberMetadata.groupMetadata.groupInitiator
-        ? "1"
-        : "0";
-      const memberName = `${LATEST_IDENTIFIER_VERSION}:${identifierMetadata.theme}:${initiatorFlag}:${memberMetadata.groupMetadata.groupId}:${username}:${identifierMetadata.displayName}`;
-      await this.props.signifyClient
-        .identifiers()
-        .update(identifierMetadata.groupMemberPre, {
-          name: memberName,
-        });
+      memberMetadata.groupUsername = username;
+      memberMetadata.pendingUpdate = true;
 
-      const memberGroupMetadata: GroupMetadata = {
-        ...memberMetadata.groupMetadata,
-        proposedUsername: username,
-      };
       await this.identifierStorage.updateIdentifierMetadata(
         identifierMetadata.groupMemberPre,
-        { groupMetadata: memberGroupMetadata }
+        {
+          groupUsername: username,
+          pendingUpdate: true,
+        }
       );
 
-      return this.identifierStorage.updateIdentifierMetadata(identifier, {
+      identifierMetadata.groupUsername = username;
+      identifierMetadata.groupMetadata = undefined;
+      identifierMetadata.pendingUpdate = true;
+
+      await this.identifierStorage.updateIdentifierMetadata(identifier, {
         groupUsername: username,
         groupMetadata: undefined,
+        pendingUpdate: true,
       });
+
+      await this.pushIdentifierStateToKeria(
+        identifierMetadata.groupMemberPre,
+        memberMetadata
+      );
+      await this.pushIdentifierStateToKeria(identifier, identifierMetadata);
+      return;
     }
 
     if (!identifierMetadata.groupMetadata) {
@@ -656,23 +725,19 @@ class IdentifierService extends AgentService {
       );
     }
 
-    // Otherwise, we are updating the username for a partially created group
-    const initiatorFlag = identifierMetadata.groupMetadata.groupInitiator
-      ? "1"
-      : "0";
-    const name = `${LATEST_IDENTIFIER_VERSION}:${identifierMetadata.theme}:${initiatorFlag}:${identifierMetadata.groupMetadata.groupId}:${username}:${identifierMetadata.displayName}`;
-
-    await this.props.signifyClient.identifiers().update(identifier, {
-      name,
-    });
-
     const groupMetadata: GroupMetadata = {
       ...identifierMetadata.groupMetadata,
       proposedUsername: username,
     };
-    return this.identifierStorage.updateIdentifierMetadata(identifier, {
+    identifierMetadata.groupMetadata = groupMetadata;
+    identifierMetadata.pendingUpdate = true;
+
+    await this.identifierStorage.updateIdentifierMetadata(identifier, {
       groupMetadata,
+      pendingUpdate: true,
     });
+
+    await this.pushIdentifierStateToKeria(identifier, identifierMetadata);
   }
 
   @OnlineOnly
