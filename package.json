@@ -50,6 +50,7 @@
     "bip39": "^3.0.4",
     "capacitor-freerasp": "^2.2.2",
     "capacitor-native-settings": "^7.0.1",
+    "capacitor-plugin-safe-area": "^4.0.0",
     "dotenv": "^16.4.7",
     "i18next": "^22.4.14",
     "i18next-browser-languagedetector": "^7.0.1",

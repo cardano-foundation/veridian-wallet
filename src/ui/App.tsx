@@ -10,6 +10,7 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 
+import { SafeArea } from "capacitor-plugin-safe-area";
 import { StrictMode, useEffect, useState } from "react";
 import { ConfigurationService } from "../core/configuration";
 import { SecureStorage } from "../core/storage";
@@ -203,6 +204,17 @@ const App = () => {
       if (platforms.includes("ios")) {
         StatusBar.setStyle({
           style: Style.Light,
+        });
+      }
+
+      if (platforms.includes("android")) {
+        SafeArea.getSafeAreaInsets().then((insets) => {
+          Object.entries(insets.insets).forEach(([key, value]) => {
+            document.body.style.setProperty(
+              `--ion-safe-area-${key}`,
+              `${value}px`
+            );
+          });
         });
       }
 
