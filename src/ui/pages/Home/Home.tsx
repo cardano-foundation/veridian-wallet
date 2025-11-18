@@ -123,7 +123,7 @@ const Home = () => {
             text={i18n.t("tabs.home.tab.tiles.dapps.text")}
             handleTileClick={handleShowDappClick}
           />
-          {currentProfile?.identity.groupMetadata ? (
+          {currentProfile?.identity.groupMemberPre ? (
             <Tile
               icon={personAdd}
               chevron={true}
