@@ -95,6 +95,8 @@ const Home = () => {
     }
   }, [currentProfile]);
 
+  useOnlineStatusEffect(getDetails);
+
   return (
     <>
       <TabLayout
@@ -121,7 +123,7 @@ const Home = () => {
             text={i18n.t("tabs.home.tab.tiles.dapps.text")}
             handleTileClick={handleShowDappClick}
           />
-          <div className="home-tab-split-section">
+          {currentProfile?.identity.groupMetadata ? (
             <Tile
               icon={personAdd}
               chevron={true}
@@ -129,14 +131,24 @@ const Home = () => {
               text={i18n.t("tabs.home.tab.tiles.connections.text")}
               handleTileClick={handleShareCurrentProfileClick}
             />
-            <Tile
-              icon={refresh}
-              chevron={true}
-              title={i18n.t("tabs.home.tab.tiles.rotate.title")}
-              text={i18n.t("tabs.home.tab.tiles.rotate.text")}
-              handleTileClick={handleRotateKeyClick}
-            />
-          </div>
+          ) : (
+            <div className="home-tab-split-section">
+              <Tile
+                icon={personAdd}
+                chevron={true}
+                title={i18n.t("tabs.home.tab.tiles.connections.title")}
+                text={i18n.t("tabs.home.tab.tiles.connections.text")}
+                handleTileClick={handleShareCurrentProfileClick}
+              />
+              <Tile
+                icon={refresh}
+                chevron={true}
+                title={i18n.t("tabs.home.tab.tiles.rotate.title")}
+                text={i18n.t("tabs.home.tab.tiles.rotate.text")}
+                handleTileClick={handleRotateKeyClick}
+              />
+            </div>
+          )}
         </div>
       </TabLayout>
       <Profiles
