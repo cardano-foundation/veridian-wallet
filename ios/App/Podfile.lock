@@ -29,6 +29,8 @@ PODS:
     - GoogleMLKit/BarcodeScanning (= 7.0.0)
   - CapacitorNativeSettings (7.0.2):
     - Capacitor
+  - CapacitorPluginSafeArea (4.0.0):
+    - Capacitor
   - CapacitorScreenOrientation (7.0.2):
     - Capacitor
   - CapacitorShare (7.0.2):
@@ -111,6 +113,7 @@ DEPENDENCIES:
   - "CapacitorLocalNotifications (from `../../node_modules/@capacitor/local-notifications`)"
   - "CapacitorMlkitBarcodeScanning (from `../../node_modules/@capacitor-mlkit/barcode-scanning`)"
   - CapacitorNativeSettings (from `../../node_modules/capacitor-native-settings`)
+  - CapacitorPluginSafeArea (from `../../node_modules/capacitor-plugin-safe-area`)
   - "CapacitorScreenOrientation (from `../../node_modules/@capacitor/screen-orientation`)"
   - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
@@ -164,6 +167,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor-mlkit/barcode-scanning"
   CapacitorNativeSettings:
     :path: "../../node_modules/capacitor-native-settings"
+  CapacitorPluginSafeArea:
+    :path: "../../node_modules/capacitor-plugin-safe-area"
   CapacitorScreenOrientation:
     :path: "../../node_modules/@capacitor/screen-orientation"
   CapacitorShare:
@@ -192,6 +197,7 @@ SPEC CHECKSUMS:
   CapacitorLocalNotifications: 0811aef56ab2e5f7f9ae72f47d3473ab50c29038
   CapacitorMlkitBarcodeScanning: 05b2dfc7a70099f6d4594365c521534d79a17b1d
   CapacitorNativeSettings: 3cd2e2ef431fe471674f381609cfb29154ddfcfa
+  CapacitorPluginSafeArea: 22031c3436269ca80fac90ec2c94bc7c1e59a81d
   CapacitorScreenOrientation: e0d5b9ef293b269b8f93373355d5b276f50fabea
   CapacitorShare: be166411fa995ead2d39b104aa0aae56d8615c66
   CapacitorSplashScreen: e388b8e0ed0e982a9d3a40417f478e7a018a8763
@@ -213,6 +219,6 @@ SPEC CHECKSUMS:
   SQLCipher: 77fbe633cd84db04b07876dd50766b4924b57d61
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
 
-PODFILE CHECKSUM: f109c2fbca166b1840adb5a16fd88a951743d5b5
+PODFILE CHECKSUM: cd800a946aa7fdbcd965311ba62a2a0bac5e05ec
 
 COCOAPODS: 1.16.2
