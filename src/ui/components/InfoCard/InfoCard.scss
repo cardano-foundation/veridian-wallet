@@ -18,6 +18,18 @@
     }
   }
 
+  &.warning {
+    &.info-card {
+      background: rgba(var(--ion-color-warning-800-rgb), 0.1);
+
+      .alert-icon {
+        ion-icon {
+          color: var(--ion-color-warning-800);
+        }
+      }
+    }
+  }
+
   p {
     margin: 0;
     font-weight: 500;

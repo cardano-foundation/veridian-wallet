@@ -5,6 +5,7 @@ interface InfoCardProps {
   className?: string;
   icon?: string;
   danger?: boolean;
+  warning?: boolean;
   children?: ReactNode;
 }
 

@@ -5,10 +5,7 @@ import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch } from "../../../../../store/hooks";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import {
-  CardDetailsBlock,
-  CardDetailsItem,
-} from "../../../../components/CardDetails";
+import { CardBlock, CardDetailsItem } from "../../../../components/CardDetails";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
@@ -61,7 +58,7 @@ const RotateKeyModal = ({
             <PageHeader
               closeButton
               closeButtonLabel={`${i18n.t(
-                "tabs.home.tab.modals.rotatekeys.done"
+                "tabs.home.tab.modals.rotatekeys.close"
               )}`}
               closeButtonAction={onClose}
               title={`${i18n.t("tabs.home.tab.modals.rotatekeys.title")}`}
@@ -83,19 +80,20 @@ const RotateKeyModal = ({
           <p className="description">
             {i18n.t("tabs.home.tab.modals.rotatekeys.description")}
           </p>
-          <InfoCard
-            content={i18n.t("tabs.home.tab.modals.rotatekeys.message")}
-          />
-          <CardDetailsBlock
+          <CardBlock
+            copyContent={signingKey}
             title={i18n.t("tabs.home.tab.modals.rotatekeys.signingkey")}
           >
             <CardDetailsItem
               info={signingKey}
-              copyButton={true}
               testId={"signing-key"}
             />
             <Spinner show={loading} />
-          </CardDetailsBlock>
+          </CardBlock>
+          <InfoCard
+            warning={true}
+            content={i18n.t("tabs.home.tab.modals.rotatekeys.message")}
+          />
         </ScrollablePageLayout>
       </IonModal>
       <Verification

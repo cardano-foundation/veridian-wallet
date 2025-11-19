@@ -781,9 +781,9 @@
           "rotatekeys": {
             "title": "Rotate key",
             "message": "After rotating your keys, you may experience some delays when using this profile for a short period.",
-            "signingkey": "List of signing keys",
+            "signingkey": "Signing key",
             "description": "Rotating your signing keys boosts security by reducing the risk of key compromise.",
-            "done": "Done",
+            "close": "Close",
             "confirm": "Rotate key"
           }
         }

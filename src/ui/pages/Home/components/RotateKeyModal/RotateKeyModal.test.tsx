@@ -85,7 +85,7 @@ describe("RotateKeyModal", () => {
       EN_TRANSLATIONS.tabs.home.tab.modals.rotatekeys.title
     );
     expect(
-      getByText(EN_TRANSLATIONS.tabs.home.tab.modals.rotatekeys.done)
+      getByText(EN_TRANSLATIONS.tabs.home.tab.modals.rotatekeys.close)
     ).toBeInTheDocument();
     expect(
       getByText(EN_TRANSLATIONS.tabs.home.tab.modals.rotatekeys.description)
