@@ -324,9 +324,7 @@ describe("Scan", () => {
     );
 
     await waitFor(() => {
-      expect(
-        getByText(EN_Translation.tabs.scan.tab.cameraunavailable)
-      ).toBeVisible();
+      expect(getByText(EN_Translation.scan.cameraunavailable)).toBeVisible();
     });
   });
 

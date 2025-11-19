@@ -439,7 +439,7 @@ describe("Profile setup", () => {
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
           setCurrentRoute({
-            path: TabsRoutePath.CREDENTIALS,
+            path: TabsRoutePath.HOME,
           })
         );
       });
@@ -782,7 +782,7 @@ describe("Profile setup: use as modal", () => {
     expect(onClose).toBeCalled();
     expect(dispatchMock).toBeCalledWith(
       setCurrentRoute({
-        path: TabsRoutePath.CREDENTIALS,
+        path: TabsRoutePath.HOME,
       })
     );
   });

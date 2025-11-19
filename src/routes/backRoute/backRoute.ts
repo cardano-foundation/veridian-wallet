@@ -39,7 +39,7 @@ const updateStoreSetCurrentRoute = (data: DataProps) => {
 
 const getDefaultPath = (data: DataProps) => {
   if (data.store.stateCache.authentication.ssiAgentIsSet) {
-    return TabsRoutePath.CREDENTIALS;
+    return TabsRoutePath.HOME;
   }
 
   if (

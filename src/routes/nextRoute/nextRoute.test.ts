@@ -169,7 +169,7 @@ describe("NextRoute", () => {
     const result = getNextOnboardingRoute(data as DataProps);
 
     expect(result).toEqual({
-      pathname: TabsRoutePath.CREDENTIALS,
+      pathname: TabsRoutePath.HOME,
     });
   });
 
@@ -252,7 +252,7 @@ describe("NextRoute", () => {
     });
 
     expect(result).toEqual({
-      pathname: TabsRoutePath.CREDENTIALS,
+      pathname: TabsRoutePath.HOME,
     });
   });
 });
@@ -416,6 +416,6 @@ describe("getNextRoute", () => {
 
     const result = getNextRootRoute(mockData as any);
 
-    expect(result.pathname).toEqual(TabsRoutePath.CREDENTIALS);
+    expect(result.pathname).toEqual(TabsRoutePath.HOME);
   });
 });

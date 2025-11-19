@@ -39,7 +39,7 @@ const getNextRootRoute = (data: DataProps) => {
   if (authentication.ssiAgentIsSet) {
     path = data.store.stateCache.isSetupProfile
       ? RoutePath.PROFILE_SETUP
-      : TabsRoutePath.CREDENTIALS;
+      : TabsRoutePath.HOME;
   }
 
   const { currentProfile } = data.store;
@@ -122,7 +122,7 @@ const getNextSetPasscodeRoute = (store: StoreState) => {
   }
 
   if (ssiAgentIsSet) {
-    nextPath = TabsRoutePath.CREDENTIALS;
+    nextPath = TabsRoutePath.HOME;
   }
 
   return { pathname: nextPath };
@@ -173,7 +173,7 @@ const getNextVerifySeedPhraseRoute = () => {
 const getNextCreateSSIAgentRoute = (data: DataProps) => {
   const nextPath = data.state?.shouldSetupProfile
     ? RoutePath.PROFILE_SETUP
-    : TabsRoutePath.CREDENTIALS;
+    : TabsRoutePath.HOME;
   return { pathname: nextPath };
 };
 
@@ -196,7 +196,7 @@ const getNextCreatePasswordRoute = (data: DataProps) => {
 };
 
 const getNextProfileSetupRoute = () => {
-  return { pathname: TabsRoutePath.CREDENTIALS };
+  return { pathname: TabsRoutePath.HOME };
 };
 
 const updateStoreAfterCreatePassword = (data: DataProps) => {

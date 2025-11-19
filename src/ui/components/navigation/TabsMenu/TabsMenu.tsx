@@ -7,6 +7,8 @@ import {
   IonTabs,
 } from "@ionic/react";
 import {
+  home,
+  homeOutline,
   idCard,
   idCardOutline,
   notifications,
@@ -22,13 +24,20 @@ import { TabsRoutePath } from "../../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { getNotificationsCache } from "../../../../store/reducers/profileCache";
 import { setCurrentRoute } from "../../../../store/reducers/stateCache";
-import { Connections } from "../../../pages/Connections";
+import { Home } from "../../../pages/Home";
 import { Credentials } from "../../../pages/Credentials";
+import { Connections } from "../../../pages/Connections";
 import { Notifications } from "../../../pages/Notifications";
 import { BubbleCounter } from "../../BubbleCounter";
 import "./TabsMenu.scss";
 
 const tabsRoutes = [
+  {
+    label: i18n.t("tabsmenu.label.home"),
+    path: TabsRoutePath.HOME,
+    component: Home,
+    icon: [home, homeOutline],
+  },
   {
     label: i18n.t("tabsmenu.label.creds"),
     path: TabsRoutePath.CREDENTIALS,
@@ -66,7 +75,7 @@ const TabsMenu = ({ tab, path }: { tab: ComponentType; path: string }) => {
         <Redirect
           exact
           from={TabsRoutePath.ROOT}
-          to={TabsRoutePath.CREDENTIALS}
+          to={TabsRoutePath.HOME}
         />
         <Route
           path={path}
