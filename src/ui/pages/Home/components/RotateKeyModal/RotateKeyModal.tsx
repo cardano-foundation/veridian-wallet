@@ -1,5 +1,5 @@
 import { IonModal } from "@ionic/react";
-import { refreshOutline } from "ionicons/icons";
+import { refreshOutline, keyOutline } from "ionicons/icons";
 import { useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
@@ -85,7 +85,8 @@ const RotateKeyModal = ({
             title={i18n.t("tabs.home.tab.modals.rotatekeys.signingkey")}
           >
             <CardDetailsItem
-              info={signingKey}
+              info={`${signingKey.substring(0, 5)}...${signingKey.slice(-5)}`}
+              icon={keyOutline}
               testId={"signing-key"}
             />
             <Spinner show={loading} />

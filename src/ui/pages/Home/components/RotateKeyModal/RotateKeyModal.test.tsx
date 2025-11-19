@@ -96,6 +96,7 @@ describe("RotateKeyModal", () => {
     expect(
       getByText(EN_TRANSLATIONS.tabs.home.tab.modals.rotatekeys.signingkey)
     ).toBeInTheDocument();
+    expect(getByText("test-...g-key")).toBeInTheDocument();
     expect(getByTestId("primary-button-rotate-key")).toHaveTextContent(
       EN_TRANSLATIONS.tabs.home.tab.modals.rotatekeys.confirm
     );
