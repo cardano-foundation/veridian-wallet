@@ -1,0 +1,38 @@
+.no-witness-page {
+  .responsive-page-content {
+    justify-content: center;
+  }
+
+  .page-content-container {
+    text-align: center;
+    margin: 0;
+
+    .icon {
+      color: var(--ion-color-error-800);
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 1.5rem;
+      line-height: 1.75rem;
+      margin: 0.75rem 0;
+    }
+
+    p {
+      margin: 0 0 1.25rem;
+    }
+
+    @media screen and (min-width: 250px) and (max-width: 370px) {
+      h1 {
+        font-size: 1.125rem;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+}
