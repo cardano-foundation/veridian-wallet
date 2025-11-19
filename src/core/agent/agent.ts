@@ -454,6 +454,8 @@ class Agent {
         content: { value: true },
       })
     );
+
+    await this.markSeedPhraseAsVerified();
   }
 
   /**
@@ -620,6 +622,22 @@ class Agent {
       }
       throw error;
     }
+  }
+
+  async isSeedPhraseVerified(): Promise<boolean> {
+    const record = await this.basicStorage.findById(
+      MiscRecordId.SEED_PHRASE_VERIFIED
+    );
+    return record?.content.verified === true;
+  }
+
+  async markSeedPhraseAsVerified(): Promise<void> {
+    await this.basicStorage.createOrUpdateBasicRecord(
+      new BasicRecord({
+        id: MiscRecordId.SEED_PHRASE_VERIFIED,
+        content: { verified: true },
+      })
+    );
   }
 
   @OnlineOnly
