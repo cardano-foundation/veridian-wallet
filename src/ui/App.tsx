@@ -9,6 +9,7 @@ import {
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
+
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { StrictMode, useEffect, useState } from "react";
 import { ConfigurationService } from "../core/configuration";

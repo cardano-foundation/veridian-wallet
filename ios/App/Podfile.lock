@@ -29,7 +29,7 @@ PODS:
     - GoogleMLKit/BarcodeScanning (= 7.0.0)
   - CapacitorNativeSettings (7.0.2):
     - Capacitor
-  - CapacitorPluginSafeArea (4.0.2):
+  - CapacitorPluginSafeArea (4.0.0):
     - Capacitor
   - CapacitorScreenOrientation (7.0.2):
     - Capacitor
@@ -197,7 +197,7 @@ SPEC CHECKSUMS:
   CapacitorLocalNotifications: 0811aef56ab2e5f7f9ae72f47d3473ab50c29038
   CapacitorMlkitBarcodeScanning: 05b2dfc7a70099f6d4594365c521534d79a17b1d
   CapacitorNativeSettings: 3cd2e2ef431fe471674f381609cfb29154ddfcfa
-  CapacitorPluginSafeArea: d6b696287c91ab0e790d01213124a3cdba97dc43
+  CapacitorPluginSafeArea: 22031c3436269ca80fac90ec2c94bc7c1e59a81d
   CapacitorScreenOrientation: e0d5b9ef293b269b8f93373355d5b276f50fabea
   CapacitorShare: be166411fa995ead2d39b104aa0aae56d8615c66
   CapacitorSplashScreen: e388b8e0ed0e982a9d3a40417f478e7a018a8763
