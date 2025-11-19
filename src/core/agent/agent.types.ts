@@ -64,7 +64,6 @@ enum MiscRecordId {
   APP_BIOMETRY = "app-biometry",
   KERIA_NOTIFICATION_MARKER = "keria-notification-marker",
   APP_CRED_VIEW_TYPE = "app-cred-view-type",
-  APP_CRED_SELECTED_FILTER = "app-cred-selected-filter",
   KERIA_CONNECT_URL = "keria-connect-url",
   KERIA_BOOT_URL = "keria-boot-url",
   APP_CRED_FAVOURITE_INDEX = "cred-favourite-index",
@@ -77,7 +76,6 @@ enum MiscRecordId {
   IDENTIFIERS_PENDING_CREATION = "identifiers-pending-creation",
   MULTISIG_IDENTIFIERS_PENDING_CREATION = "multisig-identifiers-pending-creation",
   IS_SETUP_PROFILE = "is-setup-profile",
-  INDIVIDUAL_FIRST_CREATE = "individual-first-create",
   BIOMETRICS_SETUP = "biometrics-setup",
   PROFILE_HISTORIES = "profile-histories",
   PENDING_JOIN_GROUP_METADATA = "pending-join-group-metadata",
@@ -109,6 +107,7 @@ interface ExnMessageA {
   i?: string;
   s?: string;
   a?: Record<string, unknown>;
+  oobiUrl?: string;
   smids: string[];
   gid: string;
   t?: string;

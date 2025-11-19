@@ -18,13 +18,12 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { KeyStoreKeys } from "../../../core/storage";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
+import { RoutePath } from "../../../routes";
 import { rootReducer } from "../../../store";
 import { InitializationPhase } from "../../../store/reducers/stateCache/stateCache.types";
-import { RoutePath } from "../../../routes";
-import { OperationType } from "../../globals/types";
 import {
-  useBiometricAuth,
   BiometricAuthOutcome,
+  useBiometricAuth,
 } from "../../hooks/useBiometricsHook";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
@@ -116,7 +115,6 @@ interface StoreMockedProps {
         lockedUntil: number;
       };
     };
-    currentOperation: OperationType;
   };
   seedPhraseCache: {
     seedPhrase: string;
@@ -148,7 +146,6 @@ const initialState: StoreMockedProps = {
         lockedUntil: Date.now(),
       },
     },
-    currentOperation: OperationType.IDLE,
   },
   seedPhraseCache: {
     seedPhrase: "",
@@ -317,7 +314,6 @@ describe("Lock Page", () => {
           recoveryWalletProgress: false,
           firstAppLaunch: false,
         },
-        currentOperation: OperationType.IDLE,
         initializationPhase: InitializationPhase.PHASE_ONE,
         recoveryCompleteNoInterruption: false,
         isOnline: true,
@@ -485,7 +481,6 @@ describe("Lock Page: Max login attempt", () => {
           lockedUntil: Date.now(),
         },
       },
-      currentOperation: OperationType.IDLE,
     },
     seedPhraseCache: {
       seedPhrase: "",

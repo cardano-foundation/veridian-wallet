@@ -1,48 +1,32 @@
 import { IonIcon } from "@ionic/react";
 import { personCircleOutline } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PeerConnection } from "../../../../../core/cardano/walletConnect/peerConnection";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
-import { setCurrentOperation } from "../../../../../store/reducers/stateCache";
 import {
-  getPendingDAppConnection,
-  setIsConnectingToDApp,
-  setPendingDAppConnection,
   getCurrentProfile,
   getPeerConnections,
+  getPendingDAppConnection,
+  setIsConnectingToDApp,
   setPeerConnections,
+  setPendingDAppConnection,
 } from "../../../../../store/reducers/profileCache";
-import { OperationType, ToastMsgType } from "../../../../globals/types";
+import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
-import { combineClassNames } from "../../../../utils/style";
 import { Alert } from "../../../Alert";
-import { ResponsivePageLayout } from "../../../layout/ResponsivePageLayout";
 import { PageFooter } from "../../../PageFooter";
-import { PageHeader } from "../../../PageHeader";
-import { SidePageContentProps } from "../../../SidePage/SidePage.types";
 import { ANIMATION_DURATION } from "../../../SideSlider/SideSlider.types";
+import { Step } from "../../ConnectdApp.types";
 import "./WalletConnect.scss";
+import { WalletConnectProps } from "./WalletConnect.types";
 
-const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
+const WalletConnect = ({ close, handleAfterConnect }: WalletConnectProps) => {
   const pendingDAppConnection = useAppSelector(getPendingDAppConnection);
   const dispatch = useAppDispatch();
   const defaultProfile = useAppSelector(getCurrentProfile);
   const [openDeclineAlert, setOpenDeclineAlert] = useState(false);
-  const [startingMeerkat, setStartingMeerkat] = useState<boolean>(false);
   const existingConnections = useAppSelector(getPeerConnections);
-
-  const classes = combineClassNames({
-    show: !!pendingDAppConnection,
-    hide: !pendingDAppConnection,
-  });
-
-  // Reset startingMeerkat when pendingDAppConnection changes
-  useEffect(() => {
-    if (pendingDAppConnection) {
-      setStartingMeerkat(false);
-    }
-  }, [pendingDAppConnection]);
 
   const openDecline = () => {
     setOpenDeclineAlert(true);
@@ -51,7 +35,7 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
   if (!pendingDAppConnection) return null;
 
   const handleClose = () => {
-    setOpenPage(false);
+    close(Step.Scan);
 
     setTimeout(() => {
       dispatch(setPendingDAppConnection(null));
@@ -65,46 +49,40 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
     const peerConnectionId = `${pendingDAppMeerkat}:${defaultProfile.identity.id}`;
 
     try {
-      if (!startingMeerkat) {
-        setStartingMeerkat(true);
-        await PeerConnection.peerConnection.start(defaultProfile.identity.id);
-        await PeerConnection.peerConnection.connectWithDApp(peerConnectionId);
-        const existingConnection = existingConnections.find(
-          (connection) =>
-            `${connection.meerkatId}:${connection.selectedAid}` ===
-            peerConnectionId
-        );
-        if (existingConnection) {
-          const updatedConnections = [];
-          for (const connection of existingConnections) {
-            if (connection.meerkatId === existingConnection.meerkatId) {
-              updatedConnections.push({
-                ...existingConnection,
-                selectedAid: defaultProfile.identity.id,
-              });
-            } else {
-              updatedConnections.push(connection);
-            }
+      await PeerConnection.peerConnection.start(defaultProfile.identity.id);
+      await PeerConnection.peerConnection.connectWithDApp(peerConnectionId);
+      const existingConnection = existingConnections.find(
+        (connection) =>
+          `${connection.meerkatId}:${connection.selectedAid}` ===
+          peerConnectionId
+      );
+      if (existingConnection) {
+        const updatedConnections = [];
+        for (const connection of existingConnections) {
+          if (connection.meerkatId === existingConnection.meerkatId) {
+            updatedConnections.push({
+              ...existingConnection,
+              selectedAid: defaultProfile.identity.id,
+            });
+          } else {
+            updatedConnections.push(connection);
           }
-          dispatch(setPeerConnections(updatedConnections));
-        } else {
-          dispatch(
-            setPeerConnections([
-              ...existingConnections,
-              {
-                meerkatId: pendingDAppMeerkat,
-                selectedAid: defaultProfile.identity.id,
-              },
-            ])
-          );
         }
-
-        dispatch(setIsConnectingToDApp(true));
+        dispatch(setPeerConnections(updatedConnections));
+      } else {
         dispatch(
-          setCurrentOperation(OperationType.OPEN_WALLET_CONNECTION_DETAIL)
+          setPeerConnections([
+            ...existingConnections,
+            {
+              meerkatId: pendingDAppMeerkat,
+              selectedAid: defaultProfile.identity.id,
+            },
+          ])
         );
-        setOpenPage(false);
       }
+
+      dispatch(setIsConnectingToDApp(true));
+      handleAfterConnect?.();
     } catch (e) {
       showError(
         "Unable to connect wallet",
@@ -112,8 +90,6 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
         dispatch,
         ToastMsgType.UNABLE_CONNECT_WALLET
       );
-    } finally {
-      setStartingMeerkat(false);
     }
   };
 
@@ -121,19 +97,7 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
 
   return (
     <>
-      <ResponsivePageLayout
-        pageId="connect-wallet-stage-one"
-        activeStatus={!!pendingDAppConnection}
-        customClass={classes}
-        header={
-          <PageHeader
-            title={`${i18n.t("connectdapp.request.stageone.title")}`}
-            closeButton
-            closeButtonLabel={`${i18n.t("connectdapp.request.button.back")}`}
-            closeButtonAction={openDecline}
-          />
-        }
-      >
+      <div className="connect-wallet-stage-one">
         <div className="request-animation-center">
           <div className="request-icons-row">
             <div className="request-user-logo">
@@ -158,7 +122,7 @@ const WalletConnect = ({ setOpenPage }: SidePageContentProps) => {
           declineButtonText={`${i18n.t("connectdapp.request.button.decline")}`}
           declineButtonAction={openDecline}
         />
-      </ResponsivePageLayout>
+      </div>
       <Alert
         isOpen={openDeclineAlert}
         setIsOpen={setOpenDeclineAlert}

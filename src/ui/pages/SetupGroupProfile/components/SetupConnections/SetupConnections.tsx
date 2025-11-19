@@ -25,7 +25,6 @@ import { PageHeader } from "../../../../components/PageHeader";
 import { Scan } from "../../../../components/Scan";
 import { useScanHandle } from "../../../../components/Scan/hook/useScanHandle";
 import { ScanRef } from "../../../../components/Scan/Scan.types";
-import { useCameraDirection } from "../../../../components/Scanner/hook/useCameraDirection";
 import { ToastMsgType } from "../../../../globals/types";
 import { useOnlineStatusEffect } from "../../../../hooks";
 import { Profiles } from "../../../Profiles";
@@ -33,6 +32,7 @@ import { Stage, StageProps } from "../../SetupGroupProfile.types";
 import "./SetupConnections.scss";
 import { Tab } from "./SetupConnections.types";
 import { ShareConnections } from "./ShareConnections";
+import { useCameraDirection } from "../../../../components/Scan/hook/useCameraDirection";
 
 const SetupConnections = ({ setState }: StageProps) => {
   const componentId = "setup-group-profile";

@@ -18,6 +18,8 @@ import {
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import "./ForgotAuthInfo.scss";
 import { ForgotAuthInfoProps, ForgotType } from "./ForgotAuthInfo.types";
+import { PasswordModuleRef } from "../PasswordModule/PasswordModule.types";
+import { PageFooter } from "../PageFooter";
 
 const ForgotAuthInfo = ({
   isOpen,
@@ -31,6 +33,8 @@ const ForgotAuthInfo = ({
   const recoverySeedId = "forgot-auth-info";
   const [step, setStep] = useState(0);
   const [reEnterPasscodeStep, setReEnterPasscodeStep] = useState(true);
+  const [validPassword, setValidPassword] = useState(false);
+  const passwordModuleRef = useRef<PasswordModuleRef>(null);
 
   const ref = useRef<RecoverySeedPhraseModuleRef>(null);
 
@@ -49,16 +53,17 @@ const ForgotAuthInfo = ({
     onClose(shouldCloseParents);
   };
 
-  const handleCreatePasswordSuccess = (skipped: boolean) => {
+  const handleCreatePassword = async () => {
+    await passwordModuleRef.current?.savePassword();
+
     dispatch(
       setAuthentication({
         ...auth,
         passwordIsSet: true,
-        passwordIsSkipped: skipped,
       })
     );
 
-    handleClose(skipped);
+    handleClose();
   };
 
   const pageTitle = (() => {
@@ -104,6 +109,16 @@ const ForgotAuthInfo = ({
             }}
           />
         }
+        footer={
+          step !== 0 &&
+          type === ForgotType.Password && (
+            <PageFooter
+              primaryButtonText={`${i18n.t("createpassword.button.continue")}`}
+              primaryButtonAction={handleCreatePassword}
+              primaryButtonDisabled={!validPassword}
+            />
+          )
+        }
       >
         {step === 0 ? (
           <RecoverySeedPhraseModule
@@ -128,7 +143,8 @@ const ForgotAuthInfo = ({
           <PasswordModule
             testId={pageId}
             description={`${i18n.t("forgotauth.newpassword.description")}`}
-            onCreateSuccess={handleCreatePasswordSuccess}
+            ref={passwordModuleRef}
+            onValidationChange={setValidPassword}
           />
         )}
       </ScrollablePageLayout>

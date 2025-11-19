@@ -22,7 +22,6 @@ import { CardListViewType, SwitchCardViewProps } from "./SwitchCardView.types";
 const SwitchCardView = ({
   title,
   cardsData,
-  cardTypes,
   name,
   hideHeader,
   className,
@@ -96,13 +95,11 @@ const SwitchCardView = ({
       ) : type === CardListViewType.Stack ? (
         <CardsStack
           cardsData={cardsData}
-          cardsType={cardTypes}
           onShowCardDetails={onShowCardDetails}
           name={name}
         />
       ) : (
         <CardList
-          cardTypes={cardTypes}
           cardsData={cardsData}
           onCardClick={handleOpenDetail}
           testId="card-list"

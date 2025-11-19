@@ -5,22 +5,10 @@ import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../routes/paths";
 import { IncomingRequestType } from "../../../store/reducers/stateCache/stateCache.types";
-import { identifierFix } from "../../__fixtures__/identifierFix";
 import { signTransactionFix } from "../../__fixtures__/signTransactionFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { SidePage } from "./SidePage";
-import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
-
-jest.mock("../../../core/configuration", () => ({
-  ...jest.requireActual("../../../core/configuration"),
-  ConfigurationService: {
-    env: {
-      features: {
-        cut: [],
-      },
-    },
-  },
-}));
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
@@ -35,71 +23,12 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
     biometricInfo: {
       isAvailable: true,
       hasCredentials: false,
-      biometryType: BiometryType.FINGERPRINT
+      biometryType: BiometryType.FINGERPRINT,
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
     setBiometricsIsEnabled: jest.fn(),
   })),
 }));
-
-describe("Side Page: wallet connect", () => {
-  const initialStateFull = {
-    stateCache: {
-      routes: [TabsRoutePath.CREDENTIALS],
-      authentication: {
-        loggedIn: true,
-        time: Date.now(),
-        passcodeIsSet: true,
-      },
-      queueIncomingRequest: {
-        isProcessing: false,
-        queues: [],
-        isPaused: false,
-      },
-      isOnline: true,
-    },
-    profilesCache: {
-      ...profileCacheFixData,
-      pendingDAppConnection: {
-        meerkatId: "pending-meerkat",
-        name: "Test DApp",
-        selectedAid: "test-aid",
-        url: "http://test.com",
-      },
-    },
-    biometricsCache: {
-      enabled: false,
-    },
-  };
-
-  const dispatchMock = jest.fn();
-  const mockedStore = {
-    ...makeTestStore(initialStateFull),
-    dispatch: dispatchMock,
-  };
-
-  test("Render wallet connect", async () => {
-    const { getByText, getByTestId } = render(
-      <Provider store={mockedStore}>
-        <SidePage />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.connectdapp.request.stageone.title)
-      ).toBeInTheDocument();
-    });
-
-    act(() => {
-      fireEvent.click(getByTestId("decline-button-connect-wallet-stage-one"));
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("alert-decline-connect-confirm-button")).toBeVisible();
-    });
-  });
-});
 
 describe("Side Page: incoming request", () => {
   const initialStateFull = {

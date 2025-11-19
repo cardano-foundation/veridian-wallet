@@ -5,7 +5,7 @@ interface CredentialCardTemplateProps {
   cardData: CredentialShortDetails;
   isActive: boolean;
   index?: number;
-  onHandleShowCardDetails?: (index: number | undefined) => void;
+  onHandleShowCardDetails?: (index: number) => void;
   pickedCard?: boolean;
 }
 

@@ -19,12 +19,8 @@ enum TabsRoutePath {
   CREDENTIALS = "/tabs/credentials",
   CONNECTIONS = "/tabs/connections",
   NOTIFICATIONS = "/tabs/notifications",
-  CONNECTIONS_DETAILS = "/tabs/connections/:id",
   CREDENTIAL_DETAILS = "/tabs/credentials/:id",
   NOTIFICATION_DETAILS = "/tabs/notifications/:id",
-  SCAN = "/tabs/scan",
-  MENU = "/tabs/menu",
-  IDENTIFIER_DETAILS = "/tabs/identifiers/:id",
 }
 
 const PublicRoutes = [

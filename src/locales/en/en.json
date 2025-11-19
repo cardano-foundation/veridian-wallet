@@ -767,12 +767,6 @@
         "viewarchived": "Archived & Revoked",
         "favourites": "Favourites",
         "allcreds": "All credentials",
-        "filters": {
-          "all": "All",
-          "individual": "Individual",
-          "group": "Group",
-          "placeholder": "You currently have no {{ type }} credentials."
-        },
         "pendingcred": "Pending credentials",
         "deletepending": {
           "title": "Credential options",
@@ -915,7 +909,7 @@
         "empty": "No notifications",
         "chips": {
           "all": "All",
-          "identifiers": "Identifiers",
+          "connections": "Connections",
           "credentials": "Credentials"
         },
         "unknownissuer": {
@@ -936,19 +930,6 @@
             }
           }
         },
-        "optionmodal": {
-          "title": "Notification options",
-          "done": "Done",
-          "showdetail": "Show details",
-          "markasread": "Mark as read",
-          "markasunread": "Mark as unread",
-          "delete": "Delete notification",
-          "deletealert": {
-            "text": "Deleting this notification cannot be undone. Once deleted you will no longer be able to require any actions required from this notification.",
-            "accept": "Delete",
-            "cancel": "Cancel"
-          }
-        },
         "labels": {
           "exnipexgrant": "<strong>{{connection}}</strong> wants to issue you a credential",
           "multisigicp": "<strong>{{connection}}</strong> is requesting to create a group identifier with you",
@@ -959,6 +940,16 @@
           "signeventinfo": "<strong>Signing event information</strong>",
           "connectinstructions": "<strong>Check your email for instructions on how to connect with {{connection}}</strong>",
           "fallback": "You have a new notification"
+        },
+        "notificationitem": {
+          "read": "Read",
+          "unread": "Unread",
+          "delete": "Delete",
+          "deletealert": {
+            "text": "This will delete the selected notifications from your wallet permanently",
+            "accept": "Delete",
+            "cancel": "Cancel"
+          }
         }
       },
       "details": {
@@ -1564,8 +1555,9 @@
     "button": "OK"
   },
   "nowitnesserror": {
-    "text": "Your SSI agent is misconfigured. For additional information, contact your SSI Cloud Agent provider.",
-    "button": "OK"
+    "title": "Misconfigured cloud agent",
+    "description": "Due to your cloud agent being misconfigured, you’re unable to create a profile. Please contact your cloud provider for more information.",
+    "button": "Check again"
   },
   "readmore": {
     "more": "Read more",

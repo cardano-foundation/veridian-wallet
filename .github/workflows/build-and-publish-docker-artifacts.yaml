@@ -72,7 +72,7 @@ jobs:
           platforms: arm64
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@27ed10ed269f89d937edb58ceff0076e1d73bfd9 # main at 14/11/2025
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -185,6 +185,14 @@ jobs:
             fi
           fi
 
+          # Force PR builds to be pushed to ghcr.io as well (by default cf-gha-baseline disables it)
+          if [ -z "$(echo ${DOCKER_REGISTRIES_FILTERED} | grep ghcr.io)" ]
+          then
+            echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES_FILTERED} ghcr.io/${GITHUB_REPOSITORY}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
+          else
+            echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES_FILTERED}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
+          fi
+
       - name: 🌍 earthly (docker build and push)
         run: |
           set -x
@@ -197,7 +205,7 @@ jobs:
               +docker-publish \
               --PUSH=true \
               --TARGET_PLATFORM="${{ matrix.platform }}" \
-              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_OVERRIDE}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}" \
               --DOCKER_IMAGES_LABELS="${DOCKER_METADATA_OUTPUT_LABELS_COMMA_SEPARATED}" \
               --DOCKER_IMAGES_TARGETS="${DOCKER_IMAGES_TARGETS}"
@@ -216,7 +224,7 @@ jobs:
               "${DOCKER_IMAGES_TARGETS_ARG}" \
               --PUSH=true \
               --TARGET_PLATFORM="${{ matrix.platform }}" \
-              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_OVERRIDE}" \
               --DOCKER_IMAGES_LABELS="${DOCKER_METADATA_OUTPUT_LABELS_COMMA_SEPARATED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
             else
@@ -225,7 +233,7 @@ jobs:
               ${FORCE_BUILD} \
               --PUSH=true \
               --TARGET_PLATFORM="${{ matrix.platform }}" \
-              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_OVERRIDE}" \
               --DOCKER_IMAGES_LABELS="${DOCKER_METADATA_OUTPUT_LABELS_COMMA_SEPARATED}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
             fi
@@ -238,6 +246,7 @@ jobs:
           matrix-key: ${{ matrix.platform }}
           outputs: |-
             DOCKER_IMAGES_TARGETS: ${{ steps.metadata.outputs.DOCKER_IMAGES_TARGETS }}
+            DOCKER_REGISTRIES_OVERRIDE: ${{ steps.metadata.outputs.DOCKER_REGISTRIES_OVERRIDE }}
 
   merge-multi-platform-manifests:
     needs: 
@@ -249,16 +258,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      # Manually doing this instead of using the cloudposse/read action as it seems there is some issue with it
       - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
 
-      # Manually doing this instead of using the cloudposse/read action as it seems there is some issue with it
       - name: read-matrix-artifacts
         id: matrix-artifacts
         env:
           MATRIX_STEP_NAME: build-n-publish
         run: |
           DOCKER_IMAGES_TARGETS=$(find . -name ${MATRIX_STEP_NAME} -maxdepth 2 -type f | head -n1 | xargs cat | jq -r '.[].DOCKER_IMAGES_TARGETS')
+          DOCKER_REGISTRIES_OVERRIDE=$(find . -name ${MATRIX_STEP_NAME} -maxdepth 2 -type f | head -n1 | xargs cat | jq -r '.[].DOCKER_REGISTRIES_OVERRIDE')
           echo DOCKER_IMAGES_TARGETS=${DOCKER_IMAGES_TARGETS} | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
+          echo DOCKER_REGISTRIES_OVERRIDE="${DOCKER_REGISTRIES_OVERRIDE}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
 
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -266,7 +277,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@27ed10ed269f89d937edb58ceff0076e1d73bfd9 # main at 14/11/2025
         id: cf-gha-baseline
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -279,11 +290,13 @@ jobs:
 
       - name: Merge multi-platform manifests
         run: |
+          set -x
           PLATFORMS=$(echo '${{ needs.set-matrix.outputs.matrix }}' | jq -r '.platform[]' | xargs echo)
-          echo $PLATFORMS
-          echo $DOCKER_IMAGES_TARGETS
+          echo PLATFORMS=$PLATFORMS
+          echo DOCKER_IMAGES_TARGETS=$DOCKER_IMAGES_TARGETS
+          echo DOCKER_REGISTRIES_OVERRIDE=${DOCKER_REGISTRIES_OVERRIDE}
 
-          if [ "${DOCKER_IMAGES_TARGETS}" != "null" ]
+          if [[ "${DOCKER_IMAGES_TARGETS}" != "null" ]] && [[ "${DOCKER_IMAGES_TARGETS}" != "" ]]
           then 
             DOCKER_IMAGES_TARGETS_ARG="--DOCKER_IMAGES_TARGETS=${DOCKER_IMAGES_TARGETS}"
             earthly \
@@ -292,7 +305,7 @@ jobs:
               --PUSH=true \
               --PLATFORMS="${PLATFORMS}" \
               --DOCKER_IMAGES_TARGETS="${DOCKER_IMAGES_TARGETS}" \
-              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_OVERRIDE}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
           else
               if [ "$TRIGGERING_REF" == "pr" ]
@@ -304,7 +317,7 @@ jobs:
               +docker-manifests-merge \
               --PUSH=true \
               --PLATFORMS="${PLATFORMS}" \
-              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_FILTERED}" \
+              --DOCKER_REGISTRIES="${DOCKER_REGISTRIES_OVERRIDE}" \
               --DOCKER_IMAGES_EXTRA_TAGS="${EARTHLY_DOCKER_IMAGES_EXTRA_TAGS}"
           fi
 
@@ -317,8 +330,8 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@234ee2fbd4073e759aba6f3ca53e912ab8403886 # main at 02/10/2025
         id: cf-gha-baseline
+        uses: cardano-foundation/cf-gha-workflows/./actions/cf-gha-baseline@27ed10ed269f89d937edb58ceff0076e1d73bfd9 # main at 14/11/2025
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

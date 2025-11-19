@@ -41,7 +41,7 @@ const RemoteSignRequest = ({
   notificationDetails,
 }: NotificationDetailsProps) => {
   const dispatch = useAppDispatch();
-  const connections = useAppSelector(getConnectionsCache) as any[];
+  const connections = useAppSelector(getConnectionsCache);
   const [isSigningObject, setIsSigningObject] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [isExpand, setExpand] = useState(false);

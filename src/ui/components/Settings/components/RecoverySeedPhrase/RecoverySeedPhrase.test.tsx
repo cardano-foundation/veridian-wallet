@@ -3,11 +3,10 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import TRANSLATIONS from "../../../../../locales/en/en.json";
-import { RecoverySeedPhrase } from "./RecoverySeedPhrase";
 import { RoutePath } from "../../../../../routes";
-import { OperationType } from "../../../../globals/types";
-import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { makeTestStore } from "../../../../utils/makeTestStore";
+import { passcodeFiller } from "../../../../utils/passcodeFiller";
+import { RecoverySeedPhrase } from "./RecoverySeedPhrase";
 
 jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
@@ -27,7 +26,6 @@ jest.mock("../../../../hooks/useBiometricsHook", () => ({
       isAvailable: false,
       hasCredentials: false,
       biometryType: BiometryType.FINGERPRINT,
-      
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(false)),
     setBiometricsIsEnabled: jest.fn(),
@@ -51,7 +49,6 @@ const initialState = {
       seedPhraseIsSet: false,
     },
     isOnline: true,
-    currentOperation: OperationType.IDLE,
   },
   biometricsCache: {
     enabled: false,

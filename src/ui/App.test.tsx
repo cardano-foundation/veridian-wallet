@@ -29,16 +29,15 @@ import {
   showNoWitnessAlert,
 } from "../store/reducers/stateCache";
 import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
+import { useBiometricAuth } from "../ui/hooks/useBiometricsHook";
+import { filteredIdentifierFix } from "./__fixtures__/filteredIdentifierFix";
 import { App } from "./App";
 import {
   ANDROID_MIN_VERSION,
   IOS_MIN_VERSION,
   WEBVIEW_MIN_VERSION,
 } from "./globals/constants";
-import { OperationType } from "./globals/types";
 import { makeTestStore } from "./utils/makeTestStore";
-import { filteredIdentifierFix } from "./__fixtures__/filteredIdentifierFix";
-import { useBiometricAuth } from "../ui/hooks/useBiometricsHook";
 
 jest.mock("capacitor-freerasp", () => ({
   startFreeRASP: jest.fn(),
@@ -137,10 +136,6 @@ jest.mock("../core/configuration/configurationService", () => ({
         rasp: {
           enabled: true,
         },
-      },
-      features: {
-        cut: [],
-        customContent: [],
       },
     },
   },
@@ -309,7 +304,6 @@ const initialState = {
       archivedCredentials: [],
     },
     toastMsgs: [],
-    currentOperation: OperationType.IDLE,
     queueIncomingRequest: {
       isProcessing: false,
       queues: [],

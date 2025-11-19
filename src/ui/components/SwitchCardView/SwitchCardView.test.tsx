@@ -4,7 +4,6 @@ import { act } from "react";
 import { Provider } from "react-redux";
 // connectionsMapFix is not needed here; keep fixture imports minimal
 import { filteredCredsFix } from "../../__fixtures__/filteredCredsFix";
-import { CardType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { SwitchCardView } from "./SwitchCardView";
@@ -67,7 +66,6 @@ describe("Card switch view list Tab", () => {
     const { getByText, getByTestId } = render(
       <Provider store={mockedStore}>
         <SwitchCardView
-          cardTypes={CardType.CREDENTIALS}
           cardsData={filteredCredsFix}
           title="title"
           name="allidentifiers"

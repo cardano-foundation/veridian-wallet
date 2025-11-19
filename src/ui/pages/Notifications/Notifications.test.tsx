@@ -11,24 +11,11 @@ import { connectionsForNotificationsValues } from "../../__fixtures__/connection
 import { credsFixAcdc } from "../../__fixtures__/credsFix";
 import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../__fixtures__/notificationsFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { NotificationFilters } from "./Notification.types";
 import { NotificationItem } from "./NotificationItem";
 import { Notifications } from "./Notifications";
-import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
-
-jest.mock("../../../core/configuration", () => ({
-  ...jest.requireActual("../../../core/configuration"),
-  ConfigurationService: {
-    env: {
-      features: {
-        notifications: {
-          fallbackIcon: false,
-        },
-      },
-    },
-  },
-}));
 
 const readNotificationMock = jest.fn((id: string) => Promise.resolve(id));
 jest.mock("../../../core/agent/agent", () => ({
@@ -197,7 +184,7 @@ describe("Notifications Tab", () => {
       getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.all)
     ).toBeInTheDocument();
     expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.identifiers)
+      getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.connections)
     ).toBeInTheDocument();
     expect(
       getByText(EN_TRANSLATIONS.tabs.notifications.tab.chips.credentials)
@@ -466,7 +453,6 @@ describe("Notifications Tab", () => {
     };
 
     const mockOnClick = jest.fn();
-    const mockOptionClick = jest.fn();
     const customConnectionName = "Test Connection";
 
     const { getByTestId } = render(
@@ -503,7 +489,6 @@ describe("Notifications Tab", () => {
         <NotificationItem
           item={item}
           onClick={mockOnClick}
-          onOptionButtonClick={mockOptionClick}
           data-testid="notification-item-test"
         />
       </Provider>

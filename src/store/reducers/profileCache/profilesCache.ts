@@ -301,9 +301,6 @@ export const profilesCacheSlice = createSlice({
         state.profiles[key].peerConnections = updateData[key];
       });
     },
-    setIndividualFirstCreate: (state, action: PayloadAction<boolean>) => {
-      state.individualFirstCreate = action.payload;
-    },
     setConnectionsCache: (
       state,
       action: PayloadAction<RegularConnectionDetails[]>
@@ -537,7 +534,6 @@ export const {
   updateProfileCreationStatus,
   removeProfile,
   setGroupProfileCache,
-  setIndividualFirstCreate,
   setCurrentProfile,
   setScanGroupId,
   updatePeerConnectionsFromCore,
@@ -603,9 +599,6 @@ const getCredsArchivedCache = (state: RootState) =>
 const getProfileGroupCache = (state: RootState) =>
   state.profilesCache.multiSigGroup;
 
-const getIndividualFirstCreateSetting = (state: RootState) =>
-  state.profilesCache.individualFirstCreate;
-
 const getScanGroupId = (state: RootState) => state.profilesCache?.scanGroupId;
 
 const getConnectedDApp = (state: RootState) =>
@@ -626,7 +619,6 @@ export {
   getCredsArchivedCache,
   getCredsCache,
   getCurrentProfile,
-  getIndividualFirstCreateSetting,
   getIsConnectingToDApp,
   getMissingAliasConnection,
   getMultisigConnectionsCache,
