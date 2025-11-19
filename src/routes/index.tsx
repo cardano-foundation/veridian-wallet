@@ -24,6 +24,7 @@ import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
 import { getCurrentProfile } from "../store/reducers/profileCache";
 import { PUSH_NOTIFICATION_EVENT_LISTENER_TYPE } from "../native/pushNotifications/notificationService";
+import { TermAndPrivacy } from "../ui/pages/TermAndPrivacy/TermAndPrivacy";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
@@ -73,6 +74,11 @@ const Routes = () => {
       <Route
         path={RoutePath.ONBOARDING}
         component={Onboarding}
+        exact
+      />
+      <Route
+        path={RoutePath.TERM_AND_PRIVACY}
+        component={TermAndPrivacy}
         exact
       />
       <Route

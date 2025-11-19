@@ -85,11 +85,17 @@ const getNextOnboardingRoute = (data: DataProps) => {
 
   if (nextRoute.pathname === RoutePath.ONBOARDING) {
     return {
-      pathname: RoutePath.SET_PASSCODE,
+      pathname: RoutePath.TERM_AND_PRIVACY,
     };
   }
 
   return nextRoute;
+};
+
+const getNextTermPrivacy = () => {
+  return {
+    pathname: RoutePath.SET_PASSCODE,
+  };
 };
 
 const getNextCredentialDetailsRoute = () => {
@@ -245,6 +251,10 @@ const nextRoute: Record<string, NextRoute> = {
   [RoutePath.ONBOARDING]: {
     nextPath: (data: DataProps) => getNextOnboardingRoute(data),
     updateRedux: [updateStoreRecoveryWallet],
+  },
+  [RoutePath.TERM_AND_PRIVACY]: {
+    nextPath: () => getNextTermPrivacy(),
+    updateRedux: [],
   },
   [RoutePath.SET_PASSCODE]: {
     nextPath: (data: DataProps) => getNextSetPasscodeRoute(data.store),

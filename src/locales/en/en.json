@@ -37,6 +37,13 @@
     "consecutive": "Avoid consecutive numbers e.g. 123456",
     "saveFailed": "Unable to save app PIN"
   },
+  "termandprivacy": {
+    "tabs": {
+      "terms": "Terms",
+      "privacy": "Privacy"
+    },
+    "button": "I accept"
+  },
   "setpasscode": {
     "enterpasscode": "Create your PIN",
     "description": "Create a PIN to secure your wallet and to continue the onboarding process",
