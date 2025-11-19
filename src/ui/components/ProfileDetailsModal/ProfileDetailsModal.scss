@@ -61,33 +61,19 @@
         }
       }
 
-      @media screen and (min-width: 250px) and (max-width: 370px) {
-        flex-direction: column;
+      @media screen and (min-width: 250px) and (max-width: 425px) {
         margin-top: 1rem;
 
         .avatar-button {
-          margin-right: 0;
+          margin-right: 0.8rem;
 
           &::part(native) {
-            height: 3rem;
-            width: 3rem;
+            height: 3.4rem;
+            width: 3.4rem;
           }
 
           span {
             font-size: 2rem;
-          }
-        }
-
-        ion-grid {
-          margin: 0;
-          width: 100%;
-
-          .profile-info-row {
-            justify-content: space-between;
-          }
-
-          .profile-information {
-            text-align: center;
           }
         }
       }
