@@ -281,7 +281,6 @@ describe("Connection service of agent", () => {
       "https://localhost/oobi/1234",
       "https://localhost/oobi/1234/agent/eid/extra",
       "https://localhost/.well-known/keri/oobi/",
-      "https://localhost/oobi/1234/witness/eid",
       "https://localhost",
     ];
 
@@ -312,6 +311,8 @@ describe("Connection service of agent", () => {
       "https://localhost/oobi/1234/agent/5678?name=alias",
       "https://localhost/oobi/1234/controller?name=alias",
       "https://localhost/oobi/1234/mailbox/5678?name=alias",
+      "https://localhost/oobi/1234/witness?name=alias",
+      "https://localhost/oobi/1234/witness/5678?name=alias",
       "https://localhost/.well-known/keri/oobi/1234?name=alias",
     ];
 

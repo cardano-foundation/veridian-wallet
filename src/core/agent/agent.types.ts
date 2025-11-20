@@ -259,8 +259,6 @@ enum CreationStatus {
 
 export const OOBI_RE =
   /^\/oobi\/(?<cid>[^/]+)\/(?<role>agent|witness|controller|mailbox)(?:\/(?<eid>[^/]+))?$/i;
-export const OOBI_CONNECTION_RE =
-  /^\/oobi\/(?<cid>[^/]+)\/(agent|controller|mailbox)(?:\/(?<eid>[^/]+))?$/i;
 export const DOOBI_RE = /^\/oobi\/(?<said>[^/]+)$/i;
 export const WOOBI_RE = /^\/\.well-known\/keri\/oobi\/(?<cid>[^/]+)$/;
 

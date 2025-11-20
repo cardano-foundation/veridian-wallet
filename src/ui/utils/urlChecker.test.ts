@@ -46,6 +46,7 @@ describe("Connection url checker", () => {
     "https://domain.com:3213/oobi/connectionId-1/agent/ddasdasdqweqweq-122?params=21321dsada",
     "http://domain:3902/oobi/connectionId/controller",
     "https://domain:3902/oobi/connectionId-1/mailbox/ddasdasdqweqweq-122",
+    "https://domain:3902/oobi/connectionId-1/witness/ddasdasdqweqweq-122",
   ];
 
   const inValidUrl = [
@@ -54,7 +55,6 @@ describe("Connection url checker", () => {
     "https://domain:3902/connectionId-1/agent/ddasdasdqweqweq-122",
     "https://domain/oobi/connectionId-1/ddasdasdqweqweq-122",
     "https://domain/oobi/connectionId-1/agent",
-    "https://domain/oobi/connectionId-1/witness",
   ];
 
   test("Valid format", () => {

@@ -23,7 +23,6 @@ import {
   MultisigConnectionDetails,
   MultisigConnectionDetailsFull,
   OobiType,
-  OOBI_CONNECTION_RE,
   OOBI_RE,
   OobiScan,
   RegularConnectionDetails,
@@ -137,7 +136,7 @@ class ConnectionService extends AgentService {
     }
 
     if (
-      !new URL(url).pathname.match(OOBI_CONNECTION_RE) &&
+      !new URL(url).pathname.match(OOBI_RE) &&
       !new URL(url).pathname.match(WOOBI_RE)
     ) {
       throw new Error(ConnectionService.OOBI_INVALID);
