@@ -136,7 +136,6 @@ class IdentifierService extends AgentService {
     return identifiers;
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async getIdentifier(identifier: string): Promise<IdentifierDetails> {
     const metadata = await this.identifierStorage.getIdentifierMetadata(
@@ -232,7 +231,6 @@ class IdentifierService extends AgentService {
     }
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async createIdentifier(
     metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">,
@@ -438,9 +436,8 @@ class IdentifierService extends AgentService {
         }
       );
       await this.props.signifyClient.identifiers().update(localMember.id, {
-        name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${
-          localMember.groupMetadata?.groupId
-        }:${localMember.displayName}`,
+        name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${localMember.groupMetadata?.groupId
+          }:${localMember.displayName}`,
       });
 
       if (localMember.groupMetadata?.groupId) {
@@ -470,9 +467,8 @@ class IdentifierService extends AgentService {
     }
 
     await this.props.signifyClient.identifiers().update(identifier, {
-      name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${
-        metadata.displayName
-      }`,
+      name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${metadata.displayName
+        }`,
     });
 
     for (const notification of await this.notificationStorage.findAllByQuery({
@@ -499,7 +495,7 @@ class IdentifierService extends AgentService {
     if (
       connectedDApp !== "" &&
       metadata.id ===
-        (await PeerConnection.peerConnection.getConnectingIdentifier()).id
+      (await PeerConnection.peerConnection.getConnectingIdentifier()).id
     ) {
       PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
     }
@@ -519,7 +515,6 @@ class IdentifierService extends AgentService {
     }
   }
 
-  @SeedPhraseVerified
   async markIdentifierPendingDelete(id: string): Promise<void> {
     const identifierProps = await this.identifierStorage.getIdentifierMetadata(
       id
@@ -541,21 +536,19 @@ class IdentifierService extends AgentService {
     });
   }
 
-  @SeedPhraseVerified
   async deleteStaleLocalIdentifier(identifier: string): Promise<void> {
     const connectedDApp =
       PeerConnection.peerConnection.getConnectedDAppAddress();
     if (
       connectedDApp !== "" &&
       identifier ===
-        (await PeerConnection.peerConnection.getConnectingIdentifier()).id
+      (await PeerConnection.peerConnection.getConnectingIdentifier()).id
     ) {
       PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
     }
     await this.identifierStorage.deleteIdentifierMetadata(identifier);
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async updateIdentifier(
     identifier: string,
@@ -612,7 +605,6 @@ class IdentifierService extends AgentService {
     });
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async updateGroupUsername(
     identifier: string,
@@ -681,7 +673,6 @@ class IdentifierService extends AgentService {
     });
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async getSigner(identifier: string): Promise<Signer> {
     const hab = await this.props.signifyClient.identifiers().get(identifier);
@@ -859,9 +850,9 @@ class IdentifierService extends AgentService {
       .identifiers()
       .rotate(identifier);
     await rotateResult.op();
+    await Agent.agent.recordCriticalAction();
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async getRemoteSignRequestDetails(
     requestSaid: string
@@ -878,7 +869,6 @@ class IdentifierService extends AgentService {
     };
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async remoteSign(notificationId: string, requestSaid: string): Promise<void> {
     const noteRecord = await this.notificationStorage.findExpectedById(
@@ -929,7 +919,6 @@ class IdentifierService extends AgentService {
     });
   }
 
-  @SeedPhraseVerified
   async getAvailableWitnesses(): Promise<{
     toad: number;
     witnesses: Array<{ eid: string; oobi: string }>;

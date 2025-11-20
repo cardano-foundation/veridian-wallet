@@ -78,7 +78,6 @@ class CredentialService extends AgentService {
     return getCredentialShortDetails(await this.getMetadataById(id));
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async getCredentialDetailsById(id: string): Promise<ACDCDetails> {
     const metadata = await this.getMetadataById(id);
@@ -125,14 +124,12 @@ class CredentialService extends AgentService {
     await this.credentialStorage.saveCredentialMetadataRecord(metadataRecord);
   }
 
-  @SeedPhraseVerified
   async archiveCredential(id: string): Promise<void> {
     await this.credentialStorage.updateCredentialMetadata(id, {
       isArchived: true,
     });
   }
 
-  @SeedPhraseVerified
   async deleteStaleLocalCredential(id: string): Promise<void> {
     await this.credentialStorage.deleteCredentialMetadata(id);
   }
@@ -165,7 +162,6 @@ class CredentialService extends AgentService {
     }
   }
 
-  @SeedPhraseVerified
   async markCredentialPendingDeletion(id: string): Promise<void> {
     const metadata = await this.getMetadataById(id);
     this.validArchivedCredential(metadata);
@@ -191,7 +187,6 @@ class CredentialService extends AgentService {
     }
   }
 
-  @SeedPhraseVerified
   async restoreCredential(id: string): Promise<void> {
     const metadata = await this.getMetadataById(id);
     this.validArchivedCredential(metadata);
@@ -272,7 +267,6 @@ class CredentialService extends AgentService {
     }
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async markAcdc(
     credentialId: string,

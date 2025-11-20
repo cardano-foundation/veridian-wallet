@@ -376,6 +376,7 @@ class IpexCommunicationService extends AgentService {
     });
 
     await this.notificationStorage.update(agreeNoteRecord);
+    await Agent.agent.recordCriticalAction();
   }
 
   @OnlineOnly
@@ -405,13 +406,13 @@ class IpexCommunicationService extends AgentService {
       "-a-i": exchange.exn.rp,
       ...(Object.keys(attributes).length > 0
         ? {
-            ...Object.fromEntries(
-              Object.entries(attributes).map(([key, value]) => [
-                "-a-" + key,
-                value,
-              ])
-            ),
-          }
+          ...Object.fromEntries(
+            Object.entries(attributes).map(([key, value]) => [
+              "-a-" + key,
+              value,
+            ])
+          ),
+        }
         : {}),
     };
 
@@ -468,6 +469,7 @@ class IpexCommunicationService extends AgentService {
         : IdentifierType.Individual,
       createdAt: new Date(dateTime),
     };
+    await Agent.agent.recordCriticalAction();
     return await this.credentialStorage.saveCredentialMetadataRecord(
       credentialDetails
     );
@@ -551,10 +553,10 @@ class IpexCommunicationService extends AgentService {
     const schemaUrlBase =
       message.exn.r === ExchangeRoute.IpexGrant
         ? this.getInlineSchemaOobiBase(message) ??
-          (await this.getSchemaUrl(
-            connection.serviceEndpoints[0],
-            connectionId
-          ))
+        (await this.getSchemaUrl(
+          connection.serviceEndpoints[0],
+          connectionId
+        ))
         : await this.getSchemaUrl(connection.serviceEndpoints[0], connectionId);
     await this.connections.resolveOobi(schemaUrlBase + schemaSaid, true);
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
@@ -780,6 +782,7 @@ class IpexCommunicationService extends AgentService {
       accepted: true,
     };
     await this.notificationStorage.update(agreeNoteRecord);
+    await Agent.agent.recordCriticalAction();
   }
 
   private async submitMultisigOffer(

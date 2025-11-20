@@ -17,7 +17,10 @@ import {
   CreationStatus,
   SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED,
 } from "../agent.types";
-import { NotificationRoute } from "./keriaNotificationService.types";
+import { Agent } from "../agent";
+import {
+  NotificationRoute
+} from "./keriaNotificationService.types";
 import type {
   ConnectionShortDetails,
   MultisigConnectionDetails,
@@ -166,16 +169,16 @@ class MultiSigService extends AgentService {
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
-          mHab,
-          states,
-          groupName,
+        mHab,
+        states,
+        groupName,
+        threshold,
+        {
+          initiator: true,
+          groupConnections,
           threshold,
-          {
-            initiator: true,
-            groupConnections,
-            threshold,
-          }
-        );
+        }
+      );
     await this.inceptGroup(mHab, states, inceptionData);
 
     // Share witness OOBIs with other group members
@@ -248,6 +251,7 @@ class MultiSigService extends AgentService {
     }
     await this.basicStorage.update(pendingGroupsRecord);
 
+    await Agent.agent.recordCriticalAction();
     return multisigId;
   }
 
@@ -560,21 +564,21 @@ class MultiSigService extends AgentService {
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
-          mHab,
-          states,
-          groupName,
-          {
-            rotationThreshold: Number(exn.e.icp.nt),
-            signingThreshold: Number(exn.e.icp.kt),
-          },
-          {
-            initiator: false,
-            notificationId,
-            notificationSaid,
-          },
-          exn.e.icp.bt,
-          exn.e.icp.b
-        );
+        mHab,
+        states,
+        groupName,
+        {
+          rotationThreshold: Number(exn.e.icp.nt),
+          signingThreshold: Number(exn.e.icp.kt),
+        },
+        {
+          initiator: false,
+          notificationId,
+          notificationSaid,
+        },
+        exn.e.icp.bt,
+        exn.e.icp.b
+      );
     await this.inceptGroup(mHab, states, inceptionData);
 
     const multisigId = inceptionData.icp.i;
@@ -632,13 +636,15 @@ class MultiSigService extends AgentService {
     });
 
     try {
-      await deleteNotificationRecordById(
-        this.props.signifyClient,
-        this.notificationStorage,
-        notificationId,
-        NotificationRoute.MultiSigIcp,
-        this.operationPendingStorage
-      );
+      if (!backgroundTask) {
+        await deleteNotificationRecordById(
+          this.props.signifyClient,
+          this.notificationStorage,
+          notificationId,
+          NotificationRoute.MultiSigIcp,
+          this.operationPendingStorage
+        );
+      }
     } catch (error) {
       if (
         !(
@@ -663,6 +669,7 @@ class MultiSigService extends AgentService {
       queued.splice(index, 1);
     }
     await this.basicStorage.update(pendingGroupsRecord);
+    await Agent.agent.recordCriticalAction();
   }
 
   async getMultisigParticipants(

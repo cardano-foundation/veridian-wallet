@@ -85,6 +85,7 @@ class IdentityWalletConnect extends CardanoPeerConnect {
       return (await Agent.agent.identifiers.getSigner(identifier)).sign(
         Buffer.from(payload)
       ).qb64;
+      await Agent.agent.recordCriticalAction();
     } else {
       return { error: TxSignError.UserDeclined };
     }

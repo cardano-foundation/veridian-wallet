@@ -20,6 +20,7 @@ import {
   BranAndMnemonic,
   AgentUrls,
   MiscRecordId,
+  CriticalActionState,
 } from "./agent.types";
 import { CoreEventEmitter } from "./event";
 import {
@@ -73,6 +74,9 @@ class Agent {
     "Attempted to fetch data by ID on KERIA, but was not found. May indicate stale data records in the local database.";
   static readonly BUFFER_ALLOC_SIZE = 3;
   static readonly DEFAULT_RECONNECT_INTERVAL = 1000;
+  static readonly CRITICAL_ACTION_LIMIT = 5;
+  static readonly VERIFICATION_TIME_LIMIT_MS = 14 * 24 * 60 * 60 * 1000; // 2 weeks
+  static readonly REDUCED_TIME_LIMIT_MS = 24 * 60 * 60 * 1000; // 1 day
 
   private static instance: Agent | undefined;
   private agentServicesProps!: AgentServicesProps;
@@ -313,6 +317,7 @@ class Agent {
 
       await this.connectSignifyClient();
       await this.saveAgentUrls(agentUrls);
+      await this.getCriticalActionState(); // Initialize tracking
       this.markAgentStatus(true);
     }
   }
@@ -354,6 +359,8 @@ class Agent {
       url: connectUrl,
       bootUrl: "",
     });
+
+    await this.getCriticalActionState(); // Initialize tracking
 
     await this.syncWithKeria();
   }
@@ -642,6 +649,73 @@ class Agent {
     );
   }
 
+  async getCriticalActionState(): Promise<CriticalActionState> {
+    const record = await this.basicStorage.findById(
+      MiscRecordId.CRITICAL_ACTION_STATE
+    );
+
+    if (record) {
+      return record.content as CriticalActionState;
+    }
+
+    // Initialize if not found (should be done at boot, but safe fallback)
+    const initialState: CriticalActionState = {
+      actionCount: 0,
+      deadline: new Date(
+        Date.now() + Agent.VERIFICATION_TIME_LIMIT_MS
+      ).toISOString(),
+    };
+
+    await this.basicStorage.createOrUpdateBasicRecord(
+      new BasicRecord({
+        id: MiscRecordId.CRITICAL_ACTION_STATE,
+        content: initialState,
+      })
+    );
+
+    return initialState;
+  }
+
+  async recordCriticalAction(): Promise<void> {
+    if (await this.isSeedPhraseVerified()) {
+      return;
+    }
+
+    const state = await this.getCriticalActionState();
+    state.actionCount += 1;
+
+    // Check if threshold reached
+    if (state.actionCount >= Agent.CRITICAL_ACTION_LIMIT) {
+      const currentDeadline = new Date(state.deadline).getTime();
+      const now = Date.now();
+      const reducedDeadline = now + Agent.REDUCED_TIME_LIMIT_MS;
+
+      // If current deadline is further away than 1 day from now, reduce it
+      if (currentDeadline > reducedDeadline) {
+        state.deadline = new Date(reducedDeadline).toISOString();
+      }
+    }
+
+    await this.basicStorage.createOrUpdateBasicRecord(
+      new BasicRecord({
+        id: MiscRecordId.CRITICAL_ACTION_STATE,
+        content: state,
+      })
+    );
+  }
+
+  async isVerificationMandatory(): Promise<boolean> {
+    if (await this.isSeedPhraseVerified()) {
+      return false;
+    }
+
+    const state = await this.getCriticalActionState();
+    const deadline = new Date(state.deadline).getTime();
+    const now = Date.now();
+
+    return now > deadline;
+  }
+
   @OnlineOnly
   async deleteWallet() {
     const connectedDApp =
@@ -657,9 +731,8 @@ class Agent {
       await this.agentServicesProps.signifyClient
         .identifiers()
         .update(identifier.id, {
-          name: `${
-            IdentifierService.DELETED_IDENTIFIER_THEME
-          }-${randomSalt()}:${identifier.displayName}`,
+          name: `${IdentifierService.DELETED_IDENTIFIER_THEME
+            }-${randomSalt()}:${identifier.displayName}`,
         });
     }
 

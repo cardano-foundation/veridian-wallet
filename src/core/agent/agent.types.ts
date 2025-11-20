@@ -80,7 +80,13 @@ enum MiscRecordId {
   PROFILE_HISTORIES = "profile-histories",
   PENDING_JOIN_GROUP_METADATA = "pending-join-group-metadata",
   SEED_PHRASE_VERIFIED = "seed-phrase-verified",
+  CRITICAL_ACTION_STATE = "critical-action-state",
 }
+
+export type CriticalActionState = {
+  actionCount: number;
+  deadline: string; // ISO date string
+};
 
 type ConnectionNoteDetails = {
   id: string;
@@ -93,7 +99,7 @@ interface JSONObject {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface JSONArray extends Array<JSONValue> {}
+interface JSONArray extends Array<JSONValue> { }
 
 type JSONValue =
   | string
@@ -192,13 +198,13 @@ interface ConnectionDetailsExtras {
 
 interface RegularConnectionDetailsFull
   extends ConnectionShortDetailsBase,
-    ConnectionDetailsExtras {
+  ConnectionDetailsExtras {
   identifier: string;
 }
 
 interface MultisigConnectionDetailsFull
   extends ConnectionShortDetailsBase,
-    ConnectionDetailsExtras {
+  ConnectionDetailsExtras {
   groupId: string;
 }
 
@@ -232,10 +238,10 @@ enum OobiType {
 type OobiScan =
   | { type: OobiType.NORMAL; connection: ConnectionShortDetails }
   | {
-      type: OobiType.MULTI_SIG_INITIATOR;
-      groupId: string;
-      connection: MultisigConnectionDetails;
-    };
+    type: OobiType.MULTI_SIG_INITIATOR;
+    groupId: string;
+    connection: MultisigConnectionDetails;
+  };
 
 interface AgentServicesProps {
   signifyClient: SignifyClient;
