@@ -1326,6 +1326,7 @@ describe("Single sig service of agent", () => {
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValueOnce(groupClone)
+      .mockResolvedValueOnce(memberMetadata)
       .mockResolvedValueOnce(memberMetadata);
     getIdentifierMock
       .mockResolvedValueOnce({
@@ -1490,6 +1491,7 @@ describe("Single sig service of agent", () => {
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValueOnce(groupClone)
+      .mockResolvedValueOnce(memberMetadata)
       .mockResolvedValueOnce(memberMetadata);
     getIdentifierMock
       .mockResolvedValueOnce({

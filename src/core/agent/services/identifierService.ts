@@ -370,26 +370,53 @@ class IdentifierService extends AgentService {
 
   @OnlineOnly
   private async pushIdentifierStateToKeria(
-    identifierId: string,
-    metadata: IdentifierMetadataRecord,
-    pendingUpdateRecord: IdentifierMetadataRecord = metadata
+    metadata: IdentifierMetadataRecord
   ): Promise<void> {
-    const desiredName = this.calcKeriaHabName(metadata);
-    const hab = await this.props.signifyClient.identifiers().get(identifierId);
+    if (metadata.groupMemberPre) {
+      const groupHab = await this.props.signifyClient
+        .identifiers()
+        .get(metadata.id);
+      const desiredGroupName = `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${metadata.displayName}`;
+      if (groupHab.name !== desiredGroupName) {
+        await this.props.signifyClient.identifiers().update(metadata.id, {
+          name: desiredGroupName,
+        });
+      }
 
-    if (hab.name !== desiredName) {
-      await this.props.signifyClient.identifiers().update(identifierId, {
-        name: desiredName,
-      });
+      const memberMetadata = await this.identifierStorage.getIdentifierMetadata(
+        metadata.groupMemberPre
+      );
+      if (!memberMetadata.groupMetadata) {
+        throw new Error(
+          `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${metadata.groupMemberPre}`
+        );
+      }
+
+      const desiredMemberName = this.calcKeriaHabName(memberMetadata);
+      const memberHab = await this.props.signifyClient
+        .identifiers()
+        .get(metadata.groupMemberPre);
+      if (memberHab.name !== desiredMemberName) {
+        await this.props.signifyClient
+          .identifiers()
+          .update(metadata.groupMemberPre, {
+            name: desiredMemberName,
+          });
+      }
+    } else {
+      const desiredName = this.calcKeriaHabName(metadata);
+      const hab = await this.props.signifyClient.identifiers().get(metadata.id);
+      if (hab.name !== desiredName) {
+        await this.props.signifyClient.identifiers().update(metadata.id, {
+          name: desiredName,
+        });
+      }
     }
 
-    if (pendingUpdateRecord.pendingUpdate) {
-      await this.identifierStorage.updateIdentifierMetadata(
-        pendingUpdateRecord.id,
-        {
-          pendingUpdate: false,
-        }
-      );
+    if (metadata.pendingUpdate) {
+      await this.identifierStorage.updateIdentifierMetadata(metadata.id, {
+        pendingUpdate: false,
+      });
     }
   }
 
@@ -548,7 +575,7 @@ class IdentifierService extends AgentService {
 
     for (const identifier of pendingIdentifiers) {
       try {
-        await this.pushIdentifierStateToKeria(identifier.id, identifier);
+        await this.pushIdentifierStateToKeria(identifier);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(
@@ -630,14 +657,9 @@ class IdentifierService extends AgentService {
           displayName: data.displayName,
         }
       );
-      await this.pushIdentifierStateToKeria(
-        identifierMetadata.groupMemberPre,
-        memberMetadata,
-        identifierMetadata
-      );
-    } else {
-      await this.pushIdentifierStateToKeria(identifier, identifierMetadata);
     }
+
+    await this.pushIdentifierStateToKeria(identifierMetadata);
   }
 
   @OnlineOnly
@@ -678,34 +700,27 @@ class IdentifierService extends AgentService {
         groupUsername: username,
         pendingUpdate: true,
       });
+    } else {
+      if (!identifierMetadata.groupMetadata) {
+        throw new Error(
+          `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifier}`
+        );
+      }
 
-      await this.pushIdentifierStateToKeria(
-        identifierMetadata.groupMemberPre,
-        memberMetadata,
-        identifierMetadata
-      );
-      return;
+      const groupMetadata: GroupMetadata = {
+        ...identifierMetadata.groupMetadata,
+        proposedUsername: username,
+      };
+      identifierMetadata.groupMetadata = groupMetadata;
+      identifierMetadata.pendingUpdate = true;
+
+      await this.identifierStorage.updateIdentifierMetadata(identifier, {
+        groupMetadata,
+        pendingUpdate: true,
+      });
     }
 
-    if (!identifierMetadata.groupMetadata) {
-      throw new Error(
-        `${IdentifierService.INVALID_GROUP_IDENTIFIER}: ${identifier}`
-      );
-    }
-
-    const groupMetadata: GroupMetadata = {
-      ...identifierMetadata.groupMetadata,
-      proposedUsername: username,
-    };
-    identifierMetadata.groupMetadata = groupMetadata;
-    identifierMetadata.pendingUpdate = true;
-
-    await this.identifierStorage.updateIdentifierMetadata(identifier, {
-      groupMetadata,
-      pendingUpdate: true,
-    });
-
-    await this.pushIdentifierStateToKeria(identifier, identifierMetadata);
+    await this.pushIdentifierStateToKeria(identifierMetadata);
   }
 
   @OnlineOnly
