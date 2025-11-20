@@ -109,6 +109,24 @@ describe("Identifier storage test", () => {
     expect(storageService.update).toBeCalledWith(identifierWithGroupUsername);
   });
 
+  test("Should update identifier pendingUpdate flag", async () => {
+    const identifierWithPendingUpdate = new IdentifierMetadataRecord({
+      ...identifierMetadataRecordProps,
+      pendingUpdate: false,
+    });
+    storageService.findById.mockResolvedValue(identifierWithPendingUpdate);
+
+    await identifierStorage.updateIdentifierMetadata(
+      identifierMetadataRecord.id,
+      {
+        pendingUpdate: true,
+      }
+    );
+
+    expect(identifierWithPendingUpdate.pendingUpdate).toBe(true);
+    expect(storageService.update).toBeCalledWith(identifierWithPendingUpdate);
+  });
+
   test("Should get all identifier pending deletion", async () => {
     storageService.findAllByQuery.mockResolvedValue([
       {
