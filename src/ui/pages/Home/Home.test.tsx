@@ -41,38 +41,32 @@ jest.mock("../../hooks", () => {
   };
 });
 
-jest.mock(
-  "../../components/ProfileDetailsModal/components/RotateKeyModal",
-  () => {
-    type MockRotateKeyModalProps = {
-      isOpen: boolean;
-      onClose: () => void;
-    };
+jest.mock("./components/RotateKeyModal", () => {
+  type MockRotateKeyModalProps = {
+    isOpen: boolean;
+    onClose: () => void;
+  };
 
-    const MockRotateKeyModal = ({
-      isOpen,
-      onClose,
-    }: MockRotateKeyModalProps) => {
-      if (!isOpen) {
-        return null;
-      }
+  const MockRotateKeyModal = ({ isOpen, onClose }: MockRotateKeyModalProps) => {
+    if (!isOpen) {
+      return null;
+    }
 
-      return (
-        <>
-          <div data-testid="rotate-keys" />
-          <button
-            data-testid="rotate-keys-close-button"
-            onClick={onClose}
-          >
-            Close
-          </button>
-        </>
-      );
-    };
+    return (
+      <>
+        <div data-testid="rotate-keys" />
+        <button
+          data-testid="rotate-keys-close-button"
+          onClick={onClose}
+        >
+          Close
+        </button>
+      </>
+    );
+  };
 
-    return { RotateKeyModal: MockRotateKeyModal };
-  }
-);
+  return { RotateKeyModal: MockRotateKeyModal };
+});
 
 jest.mock("../../utils/error", () => ({
   showError: jest.fn(),
@@ -80,8 +74,10 @@ jest.mock("../../utils/error", () => ({
 
 const runOnlineStatusEffects = async () => {
   while (onlineStatusEffects.length) {
-    const effect = onlineStatusEffects.shift()!;
-    await act(() => effect());
+    const effect = onlineStatusEffects.shift();
+    if (effect) {
+      await act(() => effect());
+    }
   }
 };
 

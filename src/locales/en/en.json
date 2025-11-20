@@ -558,9 +558,6 @@
     "identifierdetail": {
       "title": "Profile details",
       "showadvanced": "Show advanced details",
-      "listoptions": {
-        "dapp": "dApps"
-      },
       "information": {
         "credentials": "Credentials",
         "connections": "Connections",
@@ -573,9 +570,7 @@
         "title": "Created"
       },
       "signingkey": {
-        "title": "Signing key",
-        "rotate": "Rotate key",
-        "multisigtitle": "Show {{singingKeys}} singing keys"
+        "title": "Signing key"
       }
     },
     "keyrotation": {
@@ -620,12 +615,6 @@
         "confirm": "Yes, I'm sure",
         "cancel": "Cancel"
       }
-    },
-    "rotatekeys": {
-      "message": "After rotating your keys, you may experience some delays when using this profile for a short period.",
-      "signingkey": "List of signing keys",
-      "description": "Rotating your signing keys boosts security by reducing the risk of key compromise.",
-      "done": "Done"
     },
     "options": {
       "cancel": "Cancel",
@@ -788,6 +777,14 @@
               "title": "What is “scan to login”?",
               "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
             }
+          },
+          "rotatekeys": {
+            "title": "Rotate key",
+            "message": "After rotating your keys, you may experience some delays when using this profile for a short period.",
+            "signingkey": "Signing key",
+            "description": "Rotating your signing keys boosts security by reducing the risk of key compromise.",
+            "close": "Close",
+            "confirm": "Rotate key"
           }
         }
       }

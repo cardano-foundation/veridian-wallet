@@ -1,5 +1,5 @@
 import { IonCard, IonIcon } from "@ionic/react";
-import { informationCircleOutline } from "ionicons/icons";
+import { informationCircleOutline, warningOutline } from "ionicons/icons";
 import { InfoCardProps } from "./InfoCard.types";
 import { combineClassNames } from "../../utils/style";
 import "./InfoCard.scss";
@@ -9,10 +9,12 @@ const InfoCard = ({
   className,
   icon,
   danger,
+  warning,
   children,
 }: InfoCardProps) => {
   const classes = combineClassNames("info-card", className, {
     danger: !!danger,
+    warning: !!warning,
   });
 
   return (
@@ -21,7 +23,7 @@ const InfoCard = ({
       {children}
       <div className="alert-icon">
         <IonIcon
-          icon={icon ?? informationCircleOutline}
+          icon={warning ? warningOutline : icon ?? informationCircleOutline}
           slot="icon-only"
         />
       </div>

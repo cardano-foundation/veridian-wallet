@@ -1,4 +1,4 @@
-import { act , createRef } from "react";
+import { act, createRef } from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { KeriaNotification } from "../../../../core/agent/services/keriaNotificationService.types";

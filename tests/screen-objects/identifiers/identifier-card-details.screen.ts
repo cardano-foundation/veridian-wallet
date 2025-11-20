@@ -4,40 +4,36 @@ import BaseModal from "../components/base.modal.js";
 import { IdentifierDetails } from "../../constants/text.constants.js";
 
 export class IdentifierCardDetailsScreen {
-  creationTimestampLocator="creation-timestamp";
-  identifierIdLocator="identifier-id";
-  signingKeyLocator="signingkey";
+  creationTimestampLocator = "creation-timestamp";
+  identifierIdLocator = "identifier-id";
+  signingKeyLocator = "signingkey";
 
   get alertModal() {
-    return "[data-testid=\"alert-confirm-identifier-delete-details\"]";
+    return '[data-testid="alert-confirm-identifier-delete-details"]';
   }
 
   get deleteIdentifierButton() {
-    return $("[data-testid=\"delete-button-identifier-card-details\"]");
+    return $('[data-testid="delete-button-identifier-card-details"]');
   }
 
   get favouriteButton() {
-    return $("[data-testid=\"heart-button\"]");
+    return $('[data-testid="heart-button"]');
   }
 
   get optionsButton() {
-    return $("[data-testid=\"identifier-options-button\"]");
-  }
-
-  get rotateKeyButton() {
-    return $("[data-testid=\"rotate-keys-button\"]");
+    return $('[data-testid="identifier-options-button"]');
   }
 
   get screenTitle() {
-    return $("[data-testid=\"list-header-title-identifier-details\"]");
+    return $('[data-testid="list-header-title-identifier-details"]');
   }
 
   get shareButton() {
-    return $("[data-testid=\"share-button\"]");
+    return $('[data-testid="share-button"]');
   }
 
   get showAdvancedDetailsButton() {
-    return $("[data-testid=\"show-advanced-block-nav-button\"]");
+    return $('[data-testid="show-advanced-block-nav-button"]');
   }
 
   identifierCardTemplateModal(index: number) {
@@ -49,11 +45,19 @@ export class IdentifierCardDetailsScreen {
   }
 
   async cardCreationDateText(index: number) {
-    return $(`${this.identifierCardTemplateModal(index)} [data-testid="card-created-${index}"]`);
+    return $(
+      `${this.identifierCardTemplateModal(
+        index
+      )} [data-testid="card-created-${index}"]`
+    );
   }
 
   async cardDisplayNameText(index: number) {
-    return $(`${this.identifierCardTemplateModal(index)} [data-testid="card-display-name-${index}"]`);
+    return $(
+      `${this.identifierCardTemplateModal(
+        index
+      )} [data-testid="card-display-name-${index}"]`
+    );
   }
 
   async copyButtonFor(name: string) {
@@ -64,7 +68,7 @@ export class IdentifierCardDetailsScreen {
     return $(`[data-testid="${blockName}-key-value"]`);
   }
 
-  async signingKeyValueLocator(index: number){
+  async signingKeyValueLocator(index: number) {
     return `signing-key-${index}`;
   }
 
@@ -74,9 +78,7 @@ export class IdentifierCardDetailsScreen {
 
   async assertCardDisplayName(identifierName: string) {
     await (await this.cardDisplayNameText(0)).waitForDisplayed();
-    await expect(
-      await this.cardDisplayNameText(0)
-    ).toHaveText(identifierName);
+    await expect(await this.cardDisplayNameText(0)).toHaveText(identifierName);
   }
 
   async loads(identifierName: string) {
@@ -85,9 +87,9 @@ export class IdentifierCardDetailsScreen {
     await expect(this.shareButton).toBeDisplayed();
     await expect(this.optionsButton).toBeDisplayed();
     await this.assertCardDisplayName(identifierName);
-    await expect(
-      await this.cardCreationDateText(0)
-    ).toHaveText(format(new Date(), "dd/MM/yyyy"));
+    await expect(await this.cardCreationDateText(0)).toHaveText(
+      format(new Date(), "dd/MM/yyyy")
+    );
     await expect(this.screenTitle).toHaveText(IdentifierDetails.Title);
     await expect(
       await this.blockTextValueFor(this.identifierIdLocator)
@@ -95,10 +97,10 @@ export class IdentifierCardDetailsScreen {
     await expect(
       await this.textValueFor(this.identifierIdLocator)
     ).not.toBeNull();
-    await expect(await this.copyButtonFor(this.identifierIdLocator)).toBeExisting();
     await expect(
-      await this.blockTextValueFor("created")
-    ).toHaveText("Created");
+      await this.copyButtonFor(this.identifierIdLocator)
+    ).toBeExisting();
+    await expect(await this.blockTextValueFor("created")).toHaveText("Created");
     await expect(
       await this.keyValueFor(this.creationTimestampLocator)
     ).toHaveText(format(new Date(), "dd/MM/yyyy"));
@@ -111,8 +113,9 @@ export class IdentifierCardDetailsScreen {
     await expect(
       await this.textValueFor(await this.signingKeyValueLocator(0))
     ).not.toBeNull();
-    await expect(await this.copyButtonFor(this.signingKeyLocator)).toBeExisting();
-    await expect(this.rotateKeyButton).toBeExisting();
+    await expect(
+      await this.copyButtonFor(this.signingKeyLocator)
+    ).toBeExisting();
     await expect(this.showAdvancedDetailsButton).toBeExisting();
     await expect(this.deleteIdentifierButton).toBeExisting();
   }

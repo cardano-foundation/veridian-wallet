@@ -5,7 +5,6 @@ import {
   keyOutline,
   pencilOutline,
   personCircleOutline,
-  refreshOutline,
   shareOutline,
 } from "ionicons/icons";
 import { useCallback, useState } from "react";
@@ -27,7 +26,6 @@ import { Avatar, MemberAvatar } from "../../Avatar";
 import { CardDetailsContent } from "../../CardDetails";
 import { CardBlock, FlatBorderType } from "../../CardDetails/CardDetailsBlock";
 import { CardDetailsItem } from "../../CardDetails/CardDetailsItem";
-import { ConnectdApp } from "../../ConnectdApp";
 import { EditProfile } from "../../EditProfile";
 import { ListCard } from "../../ListCard/ListCard";
 import { ListItem } from "../../ListCard/ListItem";
@@ -55,7 +53,6 @@ const ProfileInformation = ({ value, text }: ProfileInformationProps) => {
 
 const ProfileContent = ({
   cardData,
-  onRotateKey,
   oobi,
   setCardData,
 }: ProfileContentProps) => {
@@ -73,7 +70,6 @@ const ProfileContent = ({
   const [shareIsOpen, setShareIsOpen] = useState(false);
   const [editorOptionsIsOpen, setEditorIsOpen] = useState(false);
   const [editUserName, setEditUserName] = useState(false);
-  const [connectdApp, setConnectdApp] = useState(false);
 
   const openShareModal = () => {
     if (!cardData) return;
@@ -119,13 +115,8 @@ const ProfileContent = ({
     .slice(0, DISPLAY_MEMBERS);
 
   const openGroupMember = () => openPropDetailModal(DetailView.GroupMember);
-  const showDapp = () => {
-    setConnectdApp(true);
-  };
   const openEditModal = () => setEditorIsOpen(true);
-
   const openEditUserName = () => setEditUserName(true);
-
   const closeEditModal = (value: boolean) => {
     setEditorIsOpen(value);
     setEditUserName(value);
@@ -192,28 +183,6 @@ const ProfileContent = ({
           <span>{i18n.t("profiledetails.options.share")}</span>
         </IonButton>
       </div>
-      {!isMultiSig && (
-        <ListCard
-          items={[
-            {
-              label: i18n.t("profiledetails.identifierdetail.listoptions.dapp"),
-              icon: appsOutline,
-              onClick: showDapp,
-            },
-          ]}
-          renderItem={(item, index) => (
-            <ListItem
-              key={index}
-              icon={item.icon}
-              label={item.label}
-              onClick={item.onClick}
-              testId={`profiledetails-list-option-${index}`}
-              className="list-item"
-              showStartIcon={true}
-            />
-          )}
-        />
-      )}
       {isMultiSig && members && (
         <>
           <ListHeader title={i18n.t("profiledetails.group.title")} />
@@ -332,7 +301,6 @@ const ProfileContent = ({
         <>
           <CardBlock
             copyContent={cardData.k[0]}
-            flatBorder={!isMultiSig ? FlatBorderType.BOT : undefined}
             title={i18n.t("profiledetails.identifierdetail.signingkey.title")}
             testId="signingkey-block"
           >
@@ -349,25 +317,6 @@ const ProfileContent = ({
               );
             })}
           </CardBlock>
-          {!isMultiSig && (
-            <CardBlock
-              className="rotate-button-container"
-              flatBorder={FlatBorderType.TOP}
-              testId="rotate-button-block"
-            >
-              <IonButton
-                shape="round"
-                className="rotate-keys-button"
-                data-testid="rotate-keys-button"
-                onClick={onRotateKey}
-              >
-                <p>
-                  {i18n.t("profiledetails.identifierdetail.signingkey.rotate")}
-                </p>
-                <IonIcon icon={refreshOutline} />
-              </IonButton>
-            </CardBlock>
-          )}
         </>
       )}
       <ListCard
@@ -412,10 +361,6 @@ const ProfileContent = ({
         setCardData={setCardData}
         cardData={cardData}
         editType={editUserName ? "userName" : "name"}
-      />
-      <ConnectdApp
-        isOpen={connectdApp}
-        setIsOpen={setConnectdApp}
       />
     </>
   );

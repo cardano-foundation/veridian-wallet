@@ -1,17 +1,17 @@
 import { IonModal } from "@ionic/react";
-import { refreshOutline } from "ionicons/icons";
+import { refreshOutline, keyOutline } from "ionicons/icons";
 import { useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch } from "../../../../../store/hooks";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
-import { CardDetailsBlock, CardDetailsItem } from "../../../CardDetails";
-import { InfoCard } from "../../../InfoCard";
-import { ScrollablePageLayout } from "../../../layout/ScrollablePageLayout";
-import { PageFooter } from "../../../PageFooter";
-import { PageHeader } from "../../../PageHeader";
-import { Spinner } from "../../../Spinner";
-import { Verification } from "../../../Verification";
+import { CardBlock, CardDetailsItem } from "../../../../components/CardDetails";
+import { InfoCard } from "../../../../components/InfoCard";
+import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
+import { PageFooter } from "../../../../components/PageFooter";
+import { PageHeader } from "../../../../components/PageHeader";
+import { Spinner } from "../../../../components/Spinner";
+import { Verification } from "../../../../components/Verification";
 import { ToastMsgType } from "../../../../globals/types";
 import "./RotateKeyModal.scss";
 import { RotateKeyModalProps } from "./RotateKeyModal.types";
@@ -57,9 +57,11 @@ const RotateKeyModal = ({
           header={
             <PageHeader
               closeButton
-              closeButtonLabel={`${i18n.t("profiledetails.rotatekeys.done")}`}
+              closeButtonLabel={`${i18n.t(
+                "tabs.home.tab.modals.rotatekeys.close"
+              )}`}
               closeButtonAction={onClose}
-              title={`${i18n.t("profiledetails.options.rotatekeys")}`}
+              title={`${i18n.t("tabs.home.tab.modals.rotatekeys.title")}`}
             />
           }
           footer={
@@ -68,7 +70,7 @@ const RotateKeyModal = ({
               pageId="rotate-key"
               primaryButtonIcon={refreshOutline}
               primaryButtonText={`${i18n.t(
-                "profiledetails.options.rotatekeys"
+                "tabs.home.tab.modals.rotatekeys.confirm"
               )}`}
               primaryButtonAction={handleRotateKey}
               primaryButtonDisabled={loading}
@@ -76,19 +78,23 @@ const RotateKeyModal = ({
           }
         >
           <p className="description">
-            {i18n.t("profiledetails.rotatekeys.description")}
+            {i18n.t("tabs.home.tab.modals.rotatekeys.description")}
           </p>
-          <InfoCard content={i18n.t("profiledetails.rotatekeys.message")} />
-          <CardDetailsBlock
-            title={i18n.t("profiledetails.rotatekeys.signingkey")}
+          <CardBlock
+            copyContent={signingKey}
+            title={i18n.t("tabs.home.tab.modals.rotatekeys.signingkey")}
           >
             <CardDetailsItem
-              info={signingKey}
-              copyButton={true}
+              info={`${signingKey.substring(0, 5)}...${signingKey.slice(-5)}`}
+              icon={keyOutline}
               testId={"signing-key"}
             />
             <Spinner show={loading} />
-          </CardDetailsBlock>
+          </CardBlock>
+          <InfoCard
+            warning={true}
+            content={i18n.t("tabs.home.tab.modals.rotatekeys.message")}
+          />
         </ScrollablePageLayout>
       </IonModal>
       <Verification
