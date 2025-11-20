@@ -39,11 +39,14 @@ class IdentityWalletConnect extends CardanoPeerConnect {
     this.eventEmitter = eventService;
   }
 
-  @SeedPhraseVerified
   async getKeriIdentifier(): Promise<{
     id: string;
     oobi: string;
   }> {
+    if (!(await Agent.agent.isSeedPhraseVerified())) {
+      throw new Error(Agent.SEED_PHRASE_NOT_VERIFIED);
+    }
+
     const identifier = await Agent.agent.identifiers.getIdentifier(
       this.selectedAid
     );
@@ -53,11 +56,14 @@ class IdentityWalletConnect extends CardanoPeerConnect {
     };
   }
 
-  @SeedPhraseVerified
   async signKeri(
     identifier: string,
     payload: string
   ): Promise<string | { error: PeerConnectionError }> {
+    if (!(await Agent.agent.isSeedPhraseVerified())) {
+      throw new Error(Agent.SEED_PHRASE_NOT_VERIFIED);
+    }
+
     let approved: boolean | undefined = undefined;
     // Closure that updates approved variable
     const approvalCallback = (approvalStatus: boolean) => {
@@ -82,10 +88,10 @@ class IdentityWalletConnect extends CardanoPeerConnect {
       }
     }
     if (approved) {
+      await Agent.agent.recordCriticalAction();
       return (await Agent.agent.identifiers.getSigner(identifier)).sign(
         Buffer.from(payload)
       ).qb64;
-      await Agent.agent.recordCriticalAction();
     } else {
       return { error: TxSignError.UserDeclined };
     }
