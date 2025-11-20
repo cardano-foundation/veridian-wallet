@@ -60,6 +60,7 @@ const Intro = () => {
 
   return (
     <div className="slides-container">
+      <div></div>
       <div className="slides">
         <Swiper
           className="swiper-container"
