@@ -14,11 +14,15 @@ jest.mock("../../agent/agent", () => ({
       connections: {
         getConnectionShortDetailById: jest.fn(),
         getMultisigLinkedContacts: jest.fn(),
+        getOobi: jest.fn(),
       },
       identifiers: {
         updateIdentifier: jest.fn(),
+        getIdentifier: jest.fn(),
+        getSigner: jest.fn(),
       },
       getKeriaOnlineStatus: jest.fn(),
+      isSeedPhraseVerified: jest.fn().mockResolvedValue(true),
     },
   },
 }));

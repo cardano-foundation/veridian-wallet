@@ -28,6 +28,7 @@ jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       isMnemonicValid: () => verifySeedPhraseFnc(),
+      isSeedPhraseVerified: jest.fn().mockResolvedValue(true),
       basicStorage: {
         findById: jest.fn(),
         save: jest.fn(),

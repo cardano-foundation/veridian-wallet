@@ -21,7 +21,7 @@ import {
   IdentifierMetadataRecordProps,
 } from "../records/identifierMetadataRecord";
 import { AgentService } from "./agentService";
-import { OnlineOnly, randomSalt, deleteNotificationRecordById } from "./utils";
+import { OnlineOnly, SeedPhraseVerified, randomSalt, deleteNotificationRecordById } from "./utils";
 import {
   BasicRecord,
   BasicStorage,
@@ -136,6 +136,7 @@ class IdentifierService extends AgentService {
     return identifiers;
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async getIdentifier(identifier: string): Promise<IdentifierDetails> {
     const metadata = await this.identifierStorage.getIdentifierMetadata(
@@ -231,6 +232,7 @@ class IdentifierService extends AgentService {
     }
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async createIdentifier(
     metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">,
@@ -517,6 +519,7 @@ class IdentifierService extends AgentService {
     }
   }
 
+  @SeedPhraseVerified
   async markIdentifierPendingDelete(id: string): Promise<void> {
     const identifierProps = await this.identifierStorage.getIdentifierMetadata(
       id
@@ -538,6 +541,7 @@ class IdentifierService extends AgentService {
     });
   }
 
+  @SeedPhraseVerified
   async deleteStaleLocalIdentifier(identifier: string): Promise<void> {
     const connectedDApp =
       PeerConnection.peerConnection.getConnectedDAppAddress();
@@ -551,6 +555,7 @@ class IdentifierService extends AgentService {
     await this.identifierStorage.deleteIdentifierMetadata(identifier);
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async updateIdentifier(
     identifier: string,
@@ -607,6 +612,7 @@ class IdentifierService extends AgentService {
     });
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async updateGroupUsername(
     identifier: string,
@@ -675,6 +681,7 @@ class IdentifierService extends AgentService {
     });
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async getSigner(identifier: string): Promise<Signer> {
     const hab = await this.props.signifyClient.identifiers().get(identifier);
@@ -845,6 +852,7 @@ class IdentifierService extends AgentService {
     }
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async rotateIdentifier(identifier: string): Promise<void> {
     const rotateResult = await this.props.signifyClient
@@ -853,6 +861,7 @@ class IdentifierService extends AgentService {
     await rotateResult.op();
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async getRemoteSignRequestDetails(
     requestSaid: string
@@ -869,6 +878,7 @@ class IdentifierService extends AgentService {
     };
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async remoteSign(notificationId: string, requestSaid: string): Promise<void> {
     const noteRecord = await this.notificationStorage.findExpectedById(
@@ -919,6 +929,7 @@ class IdentifierService extends AgentService {
     });
   }
 
+  @SeedPhraseVerified
   async getAvailableWitnesses(): Promise<{
     toad: number;
     witnesses: Array<{ eid: string; oobi: string }>;

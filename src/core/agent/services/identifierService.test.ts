@@ -288,6 +288,7 @@ describe("Single sig service of agent", () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
+    jest.spyOn(Agent.agent, "isSeedPhraseVerified").mockResolvedValue(true);
 
     getAgentConfigMock.mockResolvedValue({
       iurls: WITNESSES.slice(0, 6),

@@ -54,6 +54,8 @@ const walletId = "idw";
 class Agent {
   static readonly KERIA_CONNECTION_BROKEN =
     "The app is not connected to KERIA at the moment";
+  static readonly SEED_PHRASE_NOT_VERIFIED =
+    "Operation blocked: Seed phrase has not been verified.";
   static readonly KERIA_BOOT_FAILED_BAD_NETWORK =
     "Failed to boot due to network connectivity";
   static readonly KERIA_CONNECT_FAILED_BAD_NETWORK =

@@ -18,6 +18,11 @@ import { CoreEventEmitter } from "./event";
 import { EventTypes } from "./event.types";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
 import { IdentifierService } from "./services";
+import {
+  BasicRecord,
+  BasicStorage,
+  CredentialMetadataRecord,
+} from "./records";
 
 jest.mock("signify-ts", () => ({
   SignifyClient: jest.fn(),
@@ -66,6 +71,7 @@ const mockBasicStorageService = {
   save: jest.fn(),
   update: jest.fn(),
   createOrUpdateBasicRecord: jest.fn(),
+  findById: jest.fn(),
 };
 
 const mockConnectionService = {
@@ -91,6 +97,7 @@ const mockKeriaNotificationService = {
 const mockIdentifierStorage = {
   getAllIdentifiers: getAllIdentifiersMock,
 };
+
 const mockCredentialStorage = {
   getAllCredentialMetadata: getAllCredentialsMock,
 };
@@ -753,5 +760,68 @@ describe("Agent setup and wiping", () => {
     await firstInstance.deleteWallet();
     const secondInstance = Agent.agent;
     expect(firstInstance).not.toBe(secondInstance);
+  });
+});
+
+describe("Seed Phrase Verification", () => {
+  let agent: Agent;
+
+  beforeEach(() => {
+    agent = Agent.agent;
+    (agent as any).basicStorageService = mockBasicStorageService;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("isSeedPhraseVerified should return false when record does not exist", async () => {
+    mockBasicStorageService.findById.mockResolvedValue(null);
+
+    const result = await agent.isSeedPhraseVerified();
+
+    expect(result).toBe(false);
+    expect(mockBasicStorageService.findById).toHaveBeenCalledWith(
+      MiscRecordId.SEED_PHRASE_VERIFIED
+    );
+  });
+
+  test("isSeedPhraseVerified should return false when verified is false", async () => {
+    mockBasicStorageService.findById.mockResolvedValue(
+      new BasicRecord({
+        id: MiscRecordId.SEED_PHRASE_VERIFIED,
+        content: { verified: false },
+      })
+    );
+
+    const result = await agent.isSeedPhraseVerified();
+
+    expect(result).toBe(false);
+  });
+
+  test("isSeedPhraseVerified should return true when verified is true", async () => {
+    mockBasicStorageService.findById.mockResolvedValue(
+      new BasicRecord({
+        id: MiscRecordId.SEED_PHRASE_VERIFIED,
+        content: { verified: true },
+      })
+    );
+
+    const result = await agent.isSeedPhraseVerified();
+
+    expect(result).toBe(true);
+  });
+
+  test("markSeedPhraseAsVerified should save the correct record", async () => {
+    await agent.markSeedPhraseAsVerified();
+
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: MiscRecordId.SEED_PHRASE_VERIFIED,
+        content: { verified: true },
+      })
+    );
   });
 });
