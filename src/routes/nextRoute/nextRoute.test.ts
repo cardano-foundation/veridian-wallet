@@ -311,7 +311,7 @@ describe("getNextRoute", () => {
     });
 
     expect(result.nextPath).toEqual({
-      pathname: RoutePath.TERM_AND_PRIVACY,
+      pathname: RoutePath.SETUP_BIOMETRICS,
     });
 
     storeMock.stateCache.authentication.passcodeIsSet = false;
@@ -322,7 +322,7 @@ describe("getNextRoute", () => {
       payload,
     });
 
-    expect(result.nextPath).toEqual({ pathname: RoutePath.SET_PASSCODE });
+    expect(result.nextPath).toEqual({ pathname: RoutePath.TERM_AND_PRIVACY });
   });
 
   test("getNextSetPasscodeRoute should return the correct next path when seed phrase is set", () => {
