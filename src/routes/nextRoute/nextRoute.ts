@@ -27,12 +27,6 @@ const getNextRootRoute = (data: DataProps) => {
   }
 
   if (authentication.passwordIsSet || authentication.passwordIsSkipped) {
-    path = authentication.recoveryWalletProgress
-      ? RoutePath.VERIFY_RECOVERY_SEED_PHRASE
-      : RoutePath.GENERATE_SEED_PHRASE;
-  }
-
-  if (authentication.seedPhraseIsSet) {
     path = RoutePath.SSI_AGENT;
   }
 
@@ -167,10 +161,6 @@ const updateStoreRecoveryWallet = (data: DataProps) => {
   });
 };
 
-const getNextGenerateSeedPhraseRoute = () => {
-  return { pathname: RoutePath.VERIFY_SEED_PHRASE };
-};
-
 const getNextVerifySeedPhraseRoute = () => {
   const nextPath = RoutePath.SSI_AGENT;
   return { pathname: nextPath };
@@ -198,7 +188,7 @@ const getNextCreatePasswordRoute = (data: DataProps) => {
     return { pathname: RoutePath.VERIFY_RECOVERY_SEED_PHRASE };
   }
 
-  return { pathname: RoutePath.GENERATE_SEED_PHRASE };
+  return { pathname: RoutePath.SSI_AGENT };
 };
 
 const getNextProfileSetupRoute = () => {
@@ -264,14 +254,6 @@ const nextRoute: Record<string, NextRoute> = {
     nextPath: (data: DataProps) => getNextRootRoute(data),
     updateRedux: [updateAfterSetupBiometrics],
   },
-  [RoutePath.GENERATE_SEED_PHRASE]: {
-    nextPath: () => getNextGenerateSeedPhraseRoute(),
-    updateRedux: [updateStoreSetSeedPhrase],
-  },
-  [RoutePath.VERIFY_SEED_PHRASE]: {
-    nextPath: () => getNextVerifySeedPhraseRoute(),
-    updateRedux: [updateStoreAfterVerifySeedPhraseRoute, clearSeedPhraseCache],
-  },
   [RoutePath.VERIFY_RECOVERY_SEED_PHRASE]: {
     nextPath: () => getNextVerifySeedPhraseRoute(),
     updateRedux: [],
@@ -305,7 +287,6 @@ const nextRoute: Record<string, NextRoute> = {
 export {
   getNextCreatePasswordRoute,
   getNextCreateSSIAgentRoute,
-  getNextGenerateSeedPhraseRoute,
   getNextOnboardingRoute,
   getNextRootRoute,
   getNextRoute,

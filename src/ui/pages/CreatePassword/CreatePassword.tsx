@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
+import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
@@ -61,24 +62,34 @@ const CreatePassword = ({
         dispatch(setToastMsg(ToastMsgType.PASSWORD_CREATED));
       handleClear();
     } else {
-      const { nextPath, updateRedux } = getNextRoute(
-        RoutePath.CREATE_PASSWORD,
-        {
-          store: { stateCache },
-          state: { skipped },
-        }
-      );
+      try {
+        const seedPhraseStore = await Agent.agent.getBranAndMnemonic();
+        await SecureStorage.set(
+          KeyStoreKeys.SIGNIFY_BRAN,
+          seedPhraseStore.bran
+        );
 
-      updateReduxState(
-        nextPath.pathname,
-        {
-          store: { stateCache },
-          state: { skipped },
-        },
-        dispatch,
-        updateRedux
-      );
-      ionRouter.push(nextPath.pathname, "forward", "push");
+        const { nextPath, updateRedux } = getNextRoute(
+          RoutePath.CREATE_PASSWORD,
+          {
+            store: { stateCache },
+            state: { skipped },
+          }
+        );
+
+        updateReduxState(
+          nextPath.pathname,
+          {
+            store: { stateCache },
+            state: { skipped },
+          },
+          dispatch,
+          updateRedux
+        );
+        ionRouter.push(nextPath.pathname, "forward", "push");
+      } catch (e) {
+        showError("Unable to save seedphrase", e, dispatch);
+      }
     }
   };
 

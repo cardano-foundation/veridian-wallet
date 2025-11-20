@@ -73,7 +73,7 @@ jest.mock("../../../CustomInput", () => ({
 
 const initialState = {
   stateCache: {
-    routes: [RoutePath.GENERATE_SEED_PHRASE],
+    routes: [RoutePath.SSI_AGENT],
     currentProfileId: "default-profile-id",
     authentication: {
       loggedIn: false,
@@ -246,7 +246,7 @@ describe("Manage password", () => {
 
     const initialState = {
       stateCache: {
-        routes: [RoutePath.GENERATE_SEED_PHRASE],
+        routes: [RoutePath.SSI_AGENT],
         currentProfileId: "default-profile-id",
         authentication: {
           loggedIn: false,
@@ -332,7 +332,7 @@ describe("Manage password", () => {
 
     const initialState = {
       stateCache: {
-        routes: [RoutePath.GENERATE_SEED_PHRASE],
+        routes: [RoutePath.SSI_AGENT],
         currentProfileId: "default-profile-id",
         authentication: {
           loggedIn: false,

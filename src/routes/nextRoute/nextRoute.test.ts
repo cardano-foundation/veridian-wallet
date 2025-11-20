@@ -4,7 +4,6 @@ import { RoutePath } from "../index";
 import { TabsRoutePath } from "../paths";
 import {
   getNextCreateSSIAgentRoute,
-  getNextGenerateSeedPhraseRoute,
   getNextOnboardingRoute,
   getNextRootRoute,
   getNextRoute,
@@ -102,7 +101,7 @@ describe("NextRoute", () => {
     const result = getNextOnboardingRoute(data as DataProps);
 
     expect(result).toEqual({
-      pathname: RoutePath.SET_PASSCODE,
+      pathname: RoutePath.TERM_AND_PRIVACY,
     });
   });
 
@@ -135,7 +134,7 @@ describe("NextRoute", () => {
     const result = getNextOnboardingRoute(data as DataProps);
 
     expect(result).toEqual({
-      pathname: RoutePath.GENERATE_SEED_PHRASE,
+      pathname: RoutePath.SSI_AGENT,
     });
   });
 
@@ -230,14 +229,6 @@ describe("NextRoute", () => {
     expect(result).toEqual(setAuthentication(expectedAuthentication));
   });
 
-  test("should return correct route for /generateseedphrase", () => {
-    const result = getNextGenerateSeedPhraseRoute();
-
-    expect(result).toEqual({
-      pathname: RoutePath.VERIFY_SEED_PHRASE,
-    });
-  });
-
   test("should return correct route for /verifyseedphrase", () => {
     const result = getNextVerifySeedPhraseRoute();
 
@@ -320,7 +311,7 @@ describe("getNextRoute", () => {
     });
 
     expect(result.nextPath).toEqual({
-      pathname: RoutePath.SETUP_BIOMETRICS,
+      pathname: RoutePath.TERM_AND_PRIVACY,
     });
 
     storeMock.stateCache.authentication.passcodeIsSet = false;

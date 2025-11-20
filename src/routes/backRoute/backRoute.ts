@@ -1,6 +1,5 @@
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
-import { clearSeedPhraseCache } from "../../store/reducers/seedPhraseCache";
 import {
   removeCurrentRoute,
   setCurrentRoute,
@@ -46,7 +45,7 @@ const getDefaultPath = (data: DataProps) => {
     data.store.stateCache.authentication.passwordIsSet ||
     data.store.stateCache.authentication.passwordIsSkipped
   ) {
-    return RoutePath.GENERATE_SEED_PHRASE;
+    return RoutePath.SSI_AGENT;
   }
 
   return RoutePath.ONBOARDING;
@@ -64,10 +63,6 @@ const getPreviousRoute = (data: DataProps): { pathname: string } => {
     path = prevPath.path;
   } else {
     path = getDefaultPath(data);
-  }
-
-  if (path === RoutePath.VERIFY_SEED_PHRASE) {
-    path = RoutePath.GENERATE_SEED_PHRASE;
   }
 
   return { pathname: path };
@@ -88,16 +83,6 @@ const backRoute: Record<string, any> = {
   },
   [RoutePath.ONBOARDING]: {
     updateRedux: [],
-  },
-  [RoutePath.GENERATE_SEED_PHRASE]: {
-    updateRedux: [
-      removeCurrentRoute,
-      updateStoreSetCurrentRoute,
-      clearSeedPhraseCache,
-    ],
-  },
-  [RoutePath.VERIFY_SEED_PHRASE]: {
-    updateRedux: [removeCurrentRoute, updateStoreSetCurrentRoute],
   },
   [RoutePath.VERIFY_RECOVERY_SEED_PHRASE]: {
     updateRedux: [removeCurrentRoute, updateStoreSetCurrentRoute],

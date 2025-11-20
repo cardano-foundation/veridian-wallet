@@ -98,30 +98,6 @@ describe("getBackRoute", () => {
     expect(result.updateRedux).toHaveLength(0);
   });
 
-  test("should return the correct back path when currentPath is /generateseedphrase", () => {
-    const currentPath = "/generateseedphrase";
-    const data: DataProps = {
-      store: storeMock as unknown as RootState,
-    };
-
-    const result = getBackRoute(currentPath, data);
-
-    expect(result.backPath).toEqual({ pathname: "/route2" });
-    expect(result.updateRedux).toHaveLength(3);
-  });
-
-  test("should return the correct back path when currentPath is /verifyseedphrase", () => {
-    const currentPath = "/verifyseedphrase";
-    const data: DataProps = {
-      store: storeMock as unknown as RootState,
-    };
-
-    const result = getBackRoute(currentPath, data);
-
-    expect(result.backPath).toEqual({ pathname: "/route2" });
-    expect(result.updateRedux).toHaveLength(2);
-  });
-
   test("should return the correct back path when currentPath is /setpasscode", () => {
     const currentPath = "/setpasscode";
     const data: DataProps = {

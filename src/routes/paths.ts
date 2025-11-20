@@ -3,8 +3,6 @@ enum RoutePath {
   ONBOARDING = "/onboarding",
   TERM_AND_PRIVACY = "/term-n-privacy",
   SET_PASSCODE = "/setpasscode",
-  GENERATE_SEED_PHRASE = "/generateseedphrase",
-  VERIFY_SEED_PHRASE = "/verifyseedphrase",
   TABS_MENU = "/tabs",
   CREATE_PASSWORD = "/createpassword",
   SSI_AGENT = "/ssiagent",
