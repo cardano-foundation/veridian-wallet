@@ -355,23 +355,6 @@ class IdentifierService extends AgentService {
     return { identifier, createdAt: identifierDetail.icp_dt };
   }
 
-  private resolveGroupUsername(
-    metadata:
-      | IdentifierMetadataRecord
-      | Omit<IdentifierMetadataRecordProps, "id" | "createdAt">
-  ) {
-    if (
-      "groupUsername" in metadata &&
-      typeof metadata.groupUsername === "string"
-    ) {
-      return metadata.groupUsername;
-    }
-    if (metadata.groupMetadata) {
-      return metadata.groupMetadata.proposedUsername;
-    }
-    return undefined;
-  }
-
   private calcKeriaHabName(
     metadata:
       | IdentifierMetadataRecord
@@ -379,25 +362,20 @@ class IdentifierService extends AgentService {
   ) {
     if (metadata.groupMetadata) {
       const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
-      const proposedUsernamePart =
-        this.resolveGroupUsername(metadata) ??
-        metadata.groupMetadata.proposedUsername;
+      const proposedUsernamePart = metadata.groupMetadata.proposedUsername;
       return `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${proposedUsernamePart}:${metadata.displayName}`;
     }
     return `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${metadata.displayName}`;
   }
 
+  @OnlineOnly
   private async pushIdentifierStateToKeria(
     identifierId: string,
-    metadataOverride?: IdentifierMetadataRecord
+    metadata: IdentifierMetadataRecord,
+    pendingUpdateRecord: IdentifierMetadataRecord = metadata
   ): Promise<void> {
-    const metadata =
-      metadataOverride ??
-      (await this.identifierStorage.getIdentifierMetadata(identifierId));
     const desiredName = this.calcKeriaHabName(metadata);
-    const hab = (await this.props.signifyClient
-      .identifiers()
-      .get(identifierId)) as HabState;
+    const hab = await this.props.signifyClient.identifiers().get(identifierId);
 
     if (hab.name !== desiredName) {
       await this.props.signifyClient.identifiers().update(identifierId, {
@@ -405,10 +383,13 @@ class IdentifierService extends AgentService {
       });
     }
 
-    if (metadata.pendingUpdate) {
-      await this.identifierStorage.updateIdentifierMetadata(identifierId, {
-        pendingUpdate: false,
-      });
+    if (pendingUpdateRecord.pendingUpdate) {
+      await this.identifierStorage.updateIdentifierMetadata(
+        pendingUpdateRecord.id,
+        {
+          pendingUpdate: false,
+        }
+      );
     }
   }
 
@@ -619,11 +600,6 @@ class IdentifierService extends AgentService {
   ): Promise<void> {
     const identifierMetadata =
       await this.identifierStorage.getIdentifierMetadata(identifier);
-    const identifiersToUpdate: {
-      id: string;
-      metadata: IdentifierMetadataRecord;
-    }[] = [];
-
     identifierMetadata.theme = data.theme;
     identifierMetadata.displayName = data.displayName;
     identifierMetadata.pendingUpdate = true;
@@ -632,11 +608,6 @@ class IdentifierService extends AgentService {
       theme: data.theme,
       displayName: data.displayName,
       pendingUpdate: true,
-    });
-
-    identifiersToUpdate.push({
-      id: identifier,
-      metadata: identifierMetadata,
     });
 
     if (identifierMetadata.groupMemberPre) {
@@ -651,24 +622,21 @@ class IdentifierService extends AgentService {
 
       memberMetadata.theme = data.theme;
       memberMetadata.displayName = data.displayName;
-      memberMetadata.pendingUpdate = true;
 
       await this.identifierStorage.updateIdentifierMetadata(
         identifierMetadata.groupMemberPre,
         {
           theme: data.theme,
           displayName: data.displayName,
-          pendingUpdate: true,
         }
       );
-      identifiersToUpdate.unshift({
-        id: identifierMetadata.groupMemberPre,
-        metadata: memberMetadata,
-      });
-    }
-
-    for (const { id: identifierId, metadata } of identifiersToUpdate) {
-      await this.pushIdentifierStateToKeria(identifierId, metadata);
+      await this.pushIdentifierStateToKeria(
+        identifierMetadata.groupMemberPre,
+        memberMetadata,
+        identifierMetadata
+      );
+    } else {
+      await this.pushIdentifierStateToKeria(identifier, identifierMetadata);
     }
   }
 
@@ -690,32 +658,32 @@ class IdentifierService extends AgentService {
         );
       }
 
-      memberMetadata.groupUsername = username;
-      memberMetadata.pendingUpdate = true;
+      const memberGroupMetadata: GroupMetadata = {
+        ...memberMetadata.groupMetadata,
+        proposedUsername: username,
+      };
+      memberMetadata.groupMetadata = memberGroupMetadata;
 
       await this.identifierStorage.updateIdentifierMetadata(
         identifierMetadata.groupMemberPre,
         {
-          groupUsername: username,
-          pendingUpdate: true,
+          groupMetadata: memberGroupMetadata,
         }
       );
 
       identifierMetadata.groupUsername = username;
-      identifierMetadata.groupMetadata = undefined;
       identifierMetadata.pendingUpdate = true;
 
       await this.identifierStorage.updateIdentifierMetadata(identifier, {
         groupUsername: username,
-        groupMetadata: undefined,
         pendingUpdate: true,
       });
 
       await this.pushIdentifierStateToKeria(
         identifierMetadata.groupMemberPre,
-        memberMetadata
+        memberMetadata,
+        identifierMetadata
       );
-      await this.pushIdentifierStateToKeria(identifier, identifierMetadata);
       return;
     }
 

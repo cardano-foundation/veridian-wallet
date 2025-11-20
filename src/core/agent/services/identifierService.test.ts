@@ -1343,10 +1343,6 @@ describe("Single sig service of agent", () => {
       theme: newTheme,
     });
 
-    expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
-      name: `1.2.0.2:${newTheme}:${newDisplayName}`,
-    });
-
     const memberGroupMetadata = memberMetadata.groupMetadata;
     if (!memberGroupMetadata) {
       throw new Error("member group metadata missing in test setup");
@@ -1370,18 +1366,18 @@ describe("Single sig service of agent", () => {
       {
         displayName: newDisplayName,
         theme: newTheme,
-        pendingUpdate: true,
+      }
+    );
+    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
+      2,
+      "member-identifier-id",
+      {
+        displayName: newDisplayName,
+        theme: newTheme,
       }
     );
     expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
       3,
-      "member-identifier-id",
-      {
-        pendingUpdate: false,
-      }
-    );
-    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
-      4,
       identifierMetadataRecord.id,
       {
         pendingUpdate: false,
@@ -1519,8 +1515,10 @@ describe("Single sig service of agent", () => {
       1,
       "member-identifier-id",
       {
-        groupUsername: newUsername,
-        pendingUpdate: true,
+        groupMetadata: {
+          ...memberMetadata.groupMetadata,
+          proposedUsername: newUsername,
+        },
       }
     );
     expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
@@ -1528,19 +1526,11 @@ describe("Single sig service of agent", () => {
       identifierMetadataRecord.id,
       {
         groupUsername: newUsername,
-        groupMetadata: undefined,
         pendingUpdate: true,
       }
     );
     expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
       3,
-      "member-identifier-id",
-      {
-        pendingUpdate: false,
-      }
-    );
-    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
-      4,
       identifierMetadataRecord.id,
       {
         pendingUpdate: false,
