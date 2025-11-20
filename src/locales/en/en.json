@@ -462,9 +462,9 @@
     }
   },
   "settings": {
+    "header": "Settings",
+    "info": "Settings affect your whole wallet, not just the profile you're currently using.",
     "sections": {
-      "header": "Settings",
-      "text": "Settings affect your whole wallet, not just the profile you're currently using.",
       "security": {
         "title": "Security",
         "biometry": "Biometric authentication",
@@ -526,6 +526,19 @@
                 "cancel": "Cancel"
               }
             }
+          }
+        }
+      },
+      "preferences": {
+        "title": "Preferences",
+        "notifications": {
+          "title": "Notifications",
+          "notificationsalert": {
+            "message": "In order to use notifications you need to enable this in your settings. Would you like to do this now?",
+            "confirm": "Go to settings",
+            "tryagain": "Try again",
+            "cancel": "Setup later",
+            "ok": "Ok"
           }
         }
       },

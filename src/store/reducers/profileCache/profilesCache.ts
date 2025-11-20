@@ -18,6 +18,7 @@ import {
   Profile,
   ProfileCache,
 } from "./profilesCache.types";
+import { getNotificationsPreferences } from "../notificationsPreferences/notificationsPreferences";
 import { showError } from "../../../ui/utils/error";
 
 // Shared empty arrays — return these to keep selector return references stable
@@ -479,6 +480,11 @@ export const handleNotificationReceived =
   async (_dispatch: AppDispatch, getState: () => RootState) => {
     const state = getState();
     const currentProfile = getCurrentProfile(state);
+    const notificationsPreferences = getNotificationsPreferences(state);
+
+    if (!notificationsPreferences.enabled) {
+      return;
+    }
     const currentProfileId = currentProfile?.identity.id;
 
     if (!currentProfileId || notification.receivingPre === currentProfileId) {
