@@ -352,6 +352,7 @@ class IdentifierService extends AgentService {
 
     // Finally, remove from the re-try record
     await this.clearQueuedIdentifier(name);
+    await Agent.agent.recordCriticalAction();
     return { identifier, createdAt: identifierDetail.icp_dt };
   }
 
@@ -911,6 +912,7 @@ class IdentifierService extends AgentService {
       noteRecord.route,
       this.operationPendingStorage
     );
+    await Agent.agent.recordCriticalAction();
     this.props.eventEmitter.emit<NotificationRemovedEvent>({
       type: EventTypes.NotificationRemoved,
       payload: {

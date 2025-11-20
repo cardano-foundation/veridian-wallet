@@ -251,7 +251,6 @@ class MultiSigService extends AgentService {
     }
     await this.basicStorage.update(pendingGroupsRecord);
 
-    await Agent.agent.recordCriticalAction();
     return multisigId;
   }
 
@@ -669,7 +668,6 @@ class MultiSigService extends AgentService {
       queued.splice(index, 1);
     }
     await this.basicStorage.update(pendingGroupsRecord);
-    await Agent.agent.recordCriticalAction();
   }
 
   async getMultisigParticipants(
