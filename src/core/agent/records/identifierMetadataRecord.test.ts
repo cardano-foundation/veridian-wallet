@@ -35,4 +35,19 @@ describe("Identifier Record", () => {
       createdAt.getTime()
     );
   });
+
+  test("should default pendingUpdate to false when omitted", () => {
+    const record = new IdentifierMetadataRecord(mockData);
+    expect(record.pendingUpdate).toBe(false);
+    expect(record.getTags().pendingUpdate).toBe(false);
+  });
+
+  test("should set pendingUpdate when provided", () => {
+    const record = new IdentifierMetadataRecord({
+      ...mockData,
+      pendingUpdate: true,
+    });
+    expect(record.pendingUpdate).toBe(true);
+    expect(record.getTags().pendingUpdate).toBe(true);
+  });
 });
