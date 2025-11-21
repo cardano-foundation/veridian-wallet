@@ -27,7 +27,9 @@ const getNextRootRoute = (data: DataProps) => {
   }
 
   if (authentication.passwordIsSet || authentication.passwordIsSkipped) {
-    path = RoutePath.SSI_AGENT;
+    path = authentication.recoveryWalletProgress
+      ? RoutePath.VERIFY_RECOVERY_SEED_PHRASE
+      : RoutePath.SSI_AGENT;
   }
 
   if (authentication.ssiAgentIsSet) {
