@@ -775,7 +775,7 @@ describe("Seed Phrase Verification", () => {
   test("isSeedPhraseVerified should return false when record does not exist", async () => {
     mockBasicStorageService.findById.mockResolvedValue(null);
 
-    const result = await agent.isSeedPhraseVerified();
+    const result = await (agent as any).isSeedPhraseVerified();
 
     expect(result).toBe(false);
     expect(mockBasicStorageService.findById).toHaveBeenCalledWith(
@@ -791,7 +791,7 @@ describe("Seed Phrase Verification", () => {
       })
     );
 
-    const result = await agent.isSeedPhraseVerified();
+    const result = await (agent as any).isSeedPhraseVerified();
 
     expect(result).toBe(false);
   });
@@ -804,7 +804,7 @@ describe("Seed Phrase Verification", () => {
       })
     );
 
-    const result = await agent.isSeedPhraseVerified();
+    const result = await (agent as any).isSeedPhraseVerified();
 
     expect(result).toBe(true);
   });
@@ -820,5 +820,216 @@ describe("Seed Phrase Verification", () => {
         content: { verified: true },
       })
     );
+  });
+});
+
+describe("Critical Action Tracking", () => {
+  let agent: Agent;
+
+  beforeEach(() => {
+    agent = Agent.agent;
+    (agent as any).basicStorageService = mockBasicStorageService;
+    (agent as any).seedPhraseVerifiedCache = undefined;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe("isVerificationMandatory", () => {
+    test("should return false if seed phrase is verified", async () => {
+      // Mock seed phrase verified = true
+      mockBasicStorageService.findById.mockImplementation((id) => {
+        if (id === MiscRecordId.SEED_PHRASE_VERIFIED) {
+          return Promise.resolve(
+            new BasicRecord({
+              id: MiscRecordId.SEED_PHRASE_VERIFIED,
+              content: { verified: true },
+            })
+          );
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await agent.isVerificationMandatory();
+      expect(result).toBe(false);
+    });
+
+    test("should return false if critical action limit not reached", async () => {
+      // Mock seed phrase verified = false
+      mockBasicStorageService.findById.mockImplementation((id) => {
+        if (id === MiscRecordId.SEED_PHRASE_VERIFIED) {
+          return Promise.resolve(null);
+        }
+        if (id === MiscRecordId.CRITICAL_ACTION_STATE) {
+          return Promise.resolve(
+            new BasicRecord({
+              id: MiscRecordId.CRITICAL_ACTION_STATE,
+              content: {
+                actionCount: Agent.CRITICAL_ACTION_LIMIT - 1,
+                deadline: new Date(Date.now() + 100000).toISOString(),
+              },
+            })
+          );
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await agent.isVerificationMandatory();
+      expect(result).toBe(false);
+    });
+
+    test("should return false if critical action limit reached but deadline not passed", async () => {
+      // Mock seed phrase verified = false
+      mockBasicStorageService.findById.mockImplementation((id) => {
+        if (id === MiscRecordId.SEED_PHRASE_VERIFIED) {
+          return Promise.resolve(null);
+        }
+        if (id === MiscRecordId.CRITICAL_ACTION_STATE) {
+          return Promise.resolve(
+            new BasicRecord({
+              id: MiscRecordId.CRITICAL_ACTION_STATE,
+              content: {
+                actionCount: Agent.CRITICAL_ACTION_LIMIT,
+                deadline: new Date(Date.now() + 100000).toISOString(), // Future deadline
+              },
+            })
+          );
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await agent.isVerificationMandatory();
+      expect(result).toBe(false);
+    });
+
+    test("should return true if critical action limit reached and deadline passed", async () => {
+      // Mock seed phrase verified = false
+      mockBasicStorageService.findById.mockImplementation((id) => {
+        if (id === MiscRecordId.SEED_PHRASE_VERIFIED) {
+          return Promise.resolve(null);
+        }
+        if (id === MiscRecordId.CRITICAL_ACTION_STATE) {
+          return Promise.resolve(
+            new BasicRecord({
+              id: MiscRecordId.CRITICAL_ACTION_STATE,
+              content: {
+                actionCount: Agent.CRITICAL_ACTION_LIMIT,
+                deadline: new Date(Date.now() - 1000).toISOString(), // Past deadline
+              },
+            })
+          );
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await agent.isVerificationMandatory();
+      expect(result).toBe(true);
+    });
+  });
+
+  describe("recordCriticalAction", () => {
+    test("should not increment count if seed phrase is verified", async () => {
+      // Mock seed phrase verified = true
+      mockBasicStorageService.findById.mockImplementation((id) => {
+        if (id === MiscRecordId.SEED_PHRASE_VERIFIED) {
+          return Promise.resolve(
+            new BasicRecord({
+              id: MiscRecordId.SEED_PHRASE_VERIFIED,
+              content: { verified: true },
+            })
+          );
+        }
+        return Promise.resolve(null);
+      });
+
+      await agent.recordCriticalAction();
+
+      expect(
+        mockBasicStorageService.createOrUpdateBasicRecord
+      ).not.toHaveBeenCalled();
+    });
+
+    test("should increment count if seed phrase not verified", async () => {
+      // Mock seed phrase verified = false
+      // Mock existing state
+      mockBasicStorageService.findById.mockImplementation((id) => {
+        if (id === MiscRecordId.SEED_PHRASE_VERIFIED) {
+          return Promise.resolve(null);
+        }
+        if (id === MiscRecordId.CRITICAL_ACTION_STATE) {
+          return Promise.resolve(
+            new BasicRecord({
+              id: MiscRecordId.CRITICAL_ACTION_STATE,
+              content: {
+                actionCount: 0,
+                deadline: new Date().toISOString(),
+              },
+            })
+          );
+        }
+        return Promise.resolve(null);
+      });
+
+      await agent.recordCriticalAction();
+
+      expect(
+        mockBasicStorageService.createOrUpdateBasicRecord
+      ).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.CRITICAL_ACTION_STATE,
+          content: expect.objectContaining({
+            actionCount: 1,
+          }),
+        })
+      );
+    });
+
+    test("should reduce deadline if limit reached", async () => {
+      const futureDate = new Date(
+        Date.now() + Agent.VERIFICATION_TIME_LIMIT_MS
+      );
+      // Mock seed phrase verified = false
+      mockBasicStorageService.findById.mockImplementation((id) => {
+        if (id === MiscRecordId.SEED_PHRASE_VERIFIED) {
+          return Promise.resolve(null);
+        }
+        if (id === MiscRecordId.CRITICAL_ACTION_STATE) {
+          return Promise.resolve(
+            new BasicRecord({
+              id: MiscRecordId.CRITICAL_ACTION_STATE,
+              content: {
+                actionCount: Agent.CRITICAL_ACTION_LIMIT - 1, // One less than limit
+                deadline: futureDate.toISOString(),
+              },
+            })
+          );
+        }
+        return Promise.resolve(null);
+      });
+
+      await agent.recordCriticalAction();
+
+      // Expect deadline to be reduced to approx 1 day from now
+      expect(
+        mockBasicStorageService.createOrUpdateBasicRecord
+      ).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: MiscRecordId.CRITICAL_ACTION_STATE,
+          content: expect.objectContaining({
+            actionCount: Agent.CRITICAL_ACTION_LIMIT,
+          }),
+        })
+      );
+
+      const callArgs = (
+        mockBasicStorageService.createOrUpdateBasicRecord as jest.Mock
+      ).mock.calls[0][0];
+      const newDeadline = new Date(callArgs.content.deadline).getTime();
+      const expectedDeadline = Date.now() + Agent.REDUCED_TIME_LIMIT_MS;
+
+      // Allow small delta for execution time
+      expect(Math.abs(newDeadline - expectedDeadline)).toBeLessThan(5000);
+    });
   });
 });
