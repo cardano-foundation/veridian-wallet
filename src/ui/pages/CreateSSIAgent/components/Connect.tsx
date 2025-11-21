@@ -10,7 +10,10 @@ import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { SwitchOnboardingModeModal } from "../../../components/SwitchOnboardingModeModal";
 import { OnboardingMode } from "../../../components/SwitchOnboardingModeModal/SwitchOnboardingModeModal.types";
-import { WEBSITE_LINK } from "../../../globals/constants";
+import {
+  ONBOARDING_DOCUMENTATION_LINK,
+  RECOVERY_DOCUMENTATION_LINK,
+} from "../../../globals/constants";
 import { openBrowserLink } from "../../../utils/openBrowserLink";
 import { ConnectProps } from "../CreateSSIAgent.types";
 
@@ -22,7 +25,11 @@ const Connect = ({ onConnect }: ConnectProps) => {
   const isRecoveryMode = authentication.recoveryWalletProgress;
 
   const handleOpenUrl = () => {
-    openBrowserLink(WEBSITE_LINK);
+    openBrowserLink(
+      isRecoveryMode
+        ? RECOVERY_DOCUMENTATION_LINK
+        : ONBOARDING_DOCUMENTATION_LINK
+    );
   };
 
   const mode = isRecoveryMode ? OnboardingMode.Create : OnboardingMode.Recovery;
@@ -84,9 +91,7 @@ const Connect = ({ onConnect }: ConnectProps) => {
             slot="end"
             icon={openOutline}
           />
-          {isRecoveryMode
-            ? `${i18n.t("ssiagent.connect.buttons.recoverydocumentation")}`
-            : `${i18n.t("ssiagent.connect.buttons.onboardingdocumentation")}`}
+          {`${i18n.t("ssiagent.connect.buttons.onboardingdocumentation")}`}
         </IonButton>
         <p
           className="third-page-paragraph"

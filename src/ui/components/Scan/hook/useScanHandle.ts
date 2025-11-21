@@ -1,9 +1,6 @@
 import { useCallback } from "react";
 import { Agent } from "../../../../core/agent/agent";
-import {
-  OOBI_AGENT_ONLY_RE,
-  WOOBI_RE,
-} from "../../../../core/agent/agent.types";
+import { OOBI_RE, WOOBI_RE } from "../../../../core/agent/agent.types";
 import { OobiQueryParams } from "../../../../core/agent/services/connectionService.types";
 import { StorageMessage } from "../../../../core/storage/storage.types";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
@@ -84,7 +81,7 @@ const useScanHandle = () => {
       try {
         if (
           !isValidConnectionUrl(content) ||
-          (!new URL(content).pathname.match(OOBI_AGENT_ONLY_RE) &&
+          (!new URL(content).pathname.match(OOBI_RE) &&
             !new URL(content).pathname.match(WOOBI_RE))
         ) {
           throw new Error(ErrorMessage.INVALID_CONNECTION_URL);
@@ -193,7 +190,7 @@ const useScanHandle = () => {
 
       if (
         (isMultiSigUrl && !isValidHttpUrl(content)) ||
-        (!new URL(content).pathname.match(OOBI_AGENT_ONLY_RE) &&
+        (!new URL(content).pathname.match(OOBI_RE) &&
           !new URL(content).pathname.match(WOOBI_RE))
       ) {
         throw new Error(ErrorMessage.INVALID_CONNECTION_URL);

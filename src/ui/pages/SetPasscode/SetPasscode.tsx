@@ -91,6 +91,10 @@ const SetPasscode = () => {
     ? i18n.t("setpasscode.recoverydescription")
     : i18n.t("setpasscode.description");
 
+  const progressBarValue = stateCache.authentication.recoveryWalletProgress
+    ? 0.25
+    : 0.33;
+
   return (
     <ResponsivePageLayout
       pageId={pageId}
@@ -101,7 +105,7 @@ const SetPasscode = () => {
           closeButtonLabel={closeButtonLabel}
           currentPath={RoutePath.SET_PASSCODE}
           progressBar={true}
-          progressBarValue={0.25}
+          progressBarValue={progressBarValue}
           progressBarBuffer={1}
         />
       }

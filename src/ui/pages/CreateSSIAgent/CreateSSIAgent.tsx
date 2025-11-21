@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
+import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -197,10 +198,27 @@ const CreateSSIAgent = () => {
     [dispatch, identifiers]
   );
 
-  const handleRecoveryWallet = async (connectUrl: string) => {
+  const getConnectUrl = async (bootUrl: string) => {
+    try {
+      return await Agent.agent.discoverConnectUrl(bootUrl);
+    } catch (e) {
+      const message = (e as Error).message;
+
+      if (
+        message.startsWith(Agent.CONNECT_URL_DISCOVERY_FAILED) ||
+        message.startsWith(Agent.CONNECT_URL_NOT_FOUND)
+      ) {
+        return bootUrl;
+      }
+
+      return null;
+    }
+  };
+
+  const handleRecoveryWallet = async (bootUrl: string) => {
     setLoading(true);
     try {
-      if (!connectUrl) {
+      if (!bootUrl) {
         throw new Error(SSI_URLS_EMPTY);
       }
 
@@ -208,11 +226,17 @@ const CreateSSIAgent = () => {
         throw new Error(SEED_PHRASE_EMPTY);
       }
 
-      const validConnectUrl = removeLastSlash(connectUrl.trim());
+      const validBootUrl = removeLastSlash(bootUrl.trim());
+
+      const connectUrl = await getConnectUrl(validBootUrl);
+
+      if (!connectUrl) {
+        throw new Error(Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT);
+      }
 
       await Agent.agent.recoverKeriaAgent(
         seedPhraseCache.seedPhrase.split(" "),
-        validConnectUrl
+        connectUrl
       );
 
       dispatch(setRecoveryCompleteNoInterruption());
@@ -288,6 +312,18 @@ const CreateSSIAgent = () => {
     try {
       const validBootUrl = removeLastSlash(bootUrl.trim());
 
+      const existBran = await SecureStorage.keyExists(
+        KeyStoreKeys.SIGNIFY_BRAN
+      );
+
+      if (!existBran) {
+        const seedPhraseStore = await Agent.agent.getBranAndMnemonic();
+        await SecureStorage.set(
+          KeyStoreKeys.SIGNIFY_BRAN,
+          seedPhraseStore.bran
+        );
+      }
+
       if (connectUrl) {
         const validconnectUrl = removeLastSlash(connectUrl.trim());
 
@@ -333,12 +369,16 @@ const CreateSSIAgent = () => {
     }
   };
 
-  const handleSSI = async (mainUrl: string, connectUrl?: string) => {
+  const handleSSI = async (mainUrl?: string, connectUrl?: string) => {
     if (stateCache.authentication.recoveryWalletProgress) {
-      return await handleRecoveryWallet(mainUrl);
-    } else {
-      if (currentPage == CurrentPage.AdvancedSetting && !connectUrl) return;
+      if (currentPage == CurrentPage.Scan && mainUrl) {
+        return await handleRecoveryWallet(mainUrl);
+      }
 
+      if (!connectUrl) return;
+      return await handleRecoveryWallet(connectUrl);
+    } else {
+      if (!mainUrl) return;
       return await handleCreateSSI(mainUrl, connectUrl);
     }
   };
@@ -351,6 +391,7 @@ const CreateSSIAgent = () => {
             setCurrentPage={setCurrentPage}
             onScanFinish={handleSSI}
             isLoading={loading}
+            isRecovery={stateCache.authentication.recoveryWalletProgress}
           />
         );
       case CurrentPage.AdvancedSetting:

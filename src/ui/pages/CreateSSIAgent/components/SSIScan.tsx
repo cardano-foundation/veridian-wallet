@@ -8,10 +8,10 @@ import { OptionModal } from "../../../components/OptionsModal";
 import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { Scan } from "../../../components/Scan";
+import { useCameraDirection } from "../../../components/Scan/hook/useCameraDirection";
 import { combineClassNames } from "../../../utils/style";
 import { isValidHttpUrl } from "../../../utils/urlChecker";
 import { CurrentPage, SSIScanProps } from "../CreateSSIAgent.types";
-import { useCameraDirection } from "../../../components/Scan/hook/useCameraDirection";
 
 const InputError = ({
   showError,
@@ -27,14 +27,18 @@ const InputError = ({
   );
 };
 
-const SSIScan = ({ setCurrentPage, onScanFinish, isLoading }: SSIScanProps) => {
+const SSIScan = ({
+  setCurrentPage,
+  onScanFinish,
+  isLoading,
+  isRecovery,
+}: SSIScanProps) => {
   const pageId = "ssi-agent-scan";
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
     useCameraDirection();
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [touched, setTouched] = useState(false);
-
   useEffect(() => {
     return () => {
       setOpen(false);
@@ -87,9 +91,11 @@ const SSIScan = ({ setCurrentPage, onScanFinish, isLoading }: SSIScanProps) => {
           tertiaryButtonAction={() =>
             setCurrentPage(CurrentPage.AdvancedSetting)
           }
-          tertiaryButtonText={`${i18n.t(
-            "ssiagent.scanssi.scan.button.advancedsetup"
-          )}`}
+          tertiaryButtonText={
+            isRecovery
+              ? undefined
+              : `${i18n.t("ssiagent.scanssi.scan.button.advancedsetup")}`
+          }
         />
       </ResponsivePageLayout>
       <OptionModal
@@ -99,6 +105,7 @@ const SSIScan = ({ setCurrentPage, onScanFinish, isLoading }: SSIScanProps) => {
           pageId + "-input-modal",
           isLoading ? "loading" : undefined
         )}
+        onDismiss={closeInputManualValue}
         header={{
           closeButton: true,
           closeButtonAction: closeInputManualValue,

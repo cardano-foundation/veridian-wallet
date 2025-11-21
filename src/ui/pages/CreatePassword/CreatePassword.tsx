@@ -88,6 +88,10 @@ const CreatePassword = ({
     setAlertCancelIsOpen(true);
   };
 
+  const progressBarValue = stateCache.authentication.recoveryWalletProgress
+    ? 0.5
+    : 0.66;
+
   return (
     <>
       <ResponsivePageLayout
@@ -97,7 +101,7 @@ const CreatePassword = ({
           <PageHeader
             currentPath={isOnboarding ? RoutePath.CREATE_PASSWORD : undefined}
             progressBar={isOnboarding}
-            progressBarValue={0.5}
+            progressBarValue={progressBarValue}
             progressBarBuffer={1}
             closeButton={!isOnboarding}
             closeButtonAction={handleClear}

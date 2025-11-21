@@ -40,7 +40,7 @@ jest.mock("@ionic/react", () => ({
 
 const initialState = {
   stateCache: {
-    routes: [RoutePath.GENERATE_SEED_PHRASE],
+    routes: [RoutePath.SSI_AGENT],
     authentication: {
       loggedIn: false,
       time: Date.now(),

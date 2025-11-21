@@ -14,11 +14,12 @@ interface SSIScanProps {
   setCurrentPage: (value: CurrentPage) => void;
   onScanFinish: (value: string) => Promise<void>;
   isLoading?: boolean;
+  isRecovery: boolean;
 }
 
 interface AdvancedSettingProps {
   setCurrentPage: (value: CurrentPage) => void;
-  onSubmitForm: (bootUrl: string, connectUrl: string) => Promise<void>;
+  onSubmitForm: (bootUrl?: string, connectUrl?: string) => Promise<void>;
   errors: SSIError;
   setErrors: (data: Partial<SSIError>) => void;
 }

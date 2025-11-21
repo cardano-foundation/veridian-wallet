@@ -135,7 +135,7 @@ const storeMocked = (initialState: StoreMockedProps) => {
 
 const initialState: StoreMockedProps = {
   stateCache: {
-    routes: [RoutePath.GENERATE_SEED_PHRASE],
+    routes: [RoutePath.SSI_AGENT],
     authentication: {
       loggedIn: false,
       time: Date.now(),
@@ -300,7 +300,7 @@ describe("Lock Page", () => {
 
     const store = makeRealStore({
       stateCache: {
-        routes: [{ path: RoutePath.GENERATE_SEED_PHRASE }],
+        routes: [{ path: RoutePath.SSI_AGENT }],
         authentication: {
           loggedIn: false,
           time: Date.now(),
@@ -470,7 +470,7 @@ describe("Lock Page", () => {
 describe("Lock Page: Max login attempt", () => {
   const initialState = {
     stateCache: {
-      routes: [RoutePath.GENERATE_SEED_PHRASE],
+      routes: [RoutePath.SSI_AGENT],
       authentication: {
         loggedIn: false,
         time: Date.now(),
