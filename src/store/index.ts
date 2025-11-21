@@ -4,12 +4,14 @@ import { profilesCacheSlice } from "./reducers/profileCache";
 import { seedPhraseCacheSlice } from "./reducers/seedPhraseCache";
 import { stateCacheSlice } from "./reducers/stateCache";
 import { viewTypeCacheSlice } from "./reducers/viewTypeCache";
+import { notificationsPreferencesSlice } from "./reducers/notificationsPreferences/notificationsPreferences";
 
 export const rootReducer = combineReducers({
   stateCache: stateCacheSlice.reducer,
   seedPhraseCache: seedPhraseCacheSlice.reducer,
   viewTypeCache: viewTypeCacheSlice.reducer,
   biometricsCache: biometricsCacheSlice.reducer,
+  notificationsPreferences: notificationsPreferencesSlice.reducer,
   profilesCache: profilesCacheSlice.reducer,
 });
 

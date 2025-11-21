@@ -4,6 +4,7 @@ import { profilesCacheSlice } from "../../store/reducers/profileCache";
 import { seedPhraseCacheSlice } from "../../store/reducers/seedPhraseCache";
 import { stateCacheSlice } from "../../store/reducers/stateCache";
 import { viewTypeCacheSlice } from "../../store/reducers/viewTypeCache";
+import { notificationsPreferencesSlice } from "../../store/reducers/notificationsPreferences/notificationsPreferences";
 
 export function makeTestStore(preloadedState?: any) {
   const transformedPreloaded = preloadedState
@@ -31,6 +32,7 @@ export function makeTestStore(preloadedState?: any) {
       seedPhraseCache: seedPhraseCacheSlice.reducer,
       viewTypeCache: viewTypeCacheSlice.reducer,
       biometricsCache: biometricsCacheSlice.reducer,
+      notificationsPreferences: notificationsPreferencesSlice.reducer,
       profilesCache: profilesCacheSlice.reducer,
     },
     preloadedState: transformedPreloaded,

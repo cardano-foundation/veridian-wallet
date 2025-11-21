@@ -103,6 +103,10 @@ export const storeStateFixData: RootState = {
   biometricsCache: {
     enabled: false,
   },
+  notificationsPreferences: {
+    enabled: false,
+    configured: false,
+  },
   profilesCache: {
     ...profileCacheFixData,
   },

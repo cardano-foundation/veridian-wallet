@@ -1,9 +1,6 @@
 import { useCallback } from "react";
 import { Agent } from "../../../../core/agent/agent";
-import {
-  OOBI_RE,
-  WOOBI_RE,
-} from "../../../../core/agent/agent.types";
+import { OOBI_RE, WOOBI_RE } from "../../../../core/agent/agent.types";
 import { OobiQueryParams } from "../../../../core/agent/services/connectionService.types";
 import { StorageMessage } from "../../../../core/storage/storage.types";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";

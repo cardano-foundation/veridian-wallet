@@ -31,6 +31,7 @@ enum OptionIndex {
   ChangePin,
   ManagePassword,
   RecoverySeedPhrase,
+  Notifications,
   Documentation,
   Term,
   Contact,

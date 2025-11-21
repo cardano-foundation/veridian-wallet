@@ -31,7 +31,7 @@ export const Settings = ({ show, setShow }: SettingsProps) => {
       case SettingScreen.RecoverySeedPhrase:
         return i18n.t("settings.sections.security.seedphrase.page.title");
       default:
-        return i18n.t("settings.sections.header");
+        return i18n.t("settings.header");
     }
   })();
 

@@ -38,11 +38,11 @@ class NotificationService {
   private pendingNotification: LocalNotificationSchema | null = null;
   private initialized = false;
 
-  async initialize(): Promise<void> {
-    if (this.initialized) return;
+  async initialize(): Promise<boolean> {
+    if (this.initialized) return this.permissionsGranted;
 
     if (!this.isNativeEnvironment()) {
-      return;
+      return this.permissionsGranted;
     }
 
     LocalNotifications.removeAllListeners();
@@ -59,6 +59,7 @@ class NotificationService {
     );
 
     this.initialized = true;
+    return this.permissionsGranted;
   }
 
   private isNativeEnvironment(): boolean {
@@ -167,7 +168,6 @@ class NotificationService {
     this.navigateToPath(TabsRoutePath.NOTIFICATIONS);
   }
 
-  // TODO: Implement permissions
   async arePermissionsGranted(): Promise<boolean> {
     const result = await LocalNotifications.checkPermissions();
     const granted = result.display === "granted";

@@ -1,4 +1,5 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
+import { Capacitor } from "@capacitor/core";
 import { notificationService } from "./notificationService";
 import { TabsRoutePath } from "../../routes/paths";
 
@@ -34,6 +35,47 @@ describe("NotificationService", () => {
     jest.clearAllMocks();
     (notificationService as any).permissionsGranted = true;
     (notificationService as any).profileSwitcher = null;
+    (notificationService as any).initialized = false;
+  });
+
+  describe("initialize", () => {
+    test("returns cached permission state when already initialized", async () => {
+      (notificationService as any).initialized = true;
+      (notificationService as any).permissionsGranted = true;
+
+      const result = await notificationService.initialize();
+
+      expect(LocalNotifications.requestPermissions).not.toHaveBeenCalled();
+      expect(result).toBe(true);
+    });
+
+    test("requests permissions and sets up listeners on native platforms", async () => {
+      (Capacitor.getPlatform as jest.Mock).mockReturnValue("android");
+      (LocalNotifications.requestPermissions as jest.Mock).mockResolvedValue({
+        display: "granted",
+      });
+
+      const result = await notificationService.initialize();
+
+      expect(LocalNotifications.removeAllListeners).toHaveBeenCalled();
+      expect(LocalNotifications.requestPermissions).toHaveBeenCalled();
+      expect(LocalNotifications.createChannel).toHaveBeenCalled();
+      expect(LocalNotifications.addListener).toHaveBeenCalledWith(
+        "localNotificationActionPerformed",
+        expect.any(Function)
+      );
+      expect(result).toBe(true);
+    });
+
+    test("skips setup when running on web", async () => {
+      (Capacitor.getPlatform as jest.Mock).mockReturnValue("web");
+      (notificationService as any).permissionsGranted = false;
+
+      const result = await notificationService.initialize();
+
+      expect(LocalNotifications.requestPermissions).not.toHaveBeenCalled();
+      expect(result).toBe(false);
+    });
   });
 
   describe("requestPermissions", () => {
