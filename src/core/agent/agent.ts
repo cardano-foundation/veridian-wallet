@@ -354,13 +354,13 @@ class Agent {
       content: { syncing: true },
     });
 
+    await this.markSeedPhraseAsVerified();
+
     await SecureStorage.set(KeyStoreKeys.SIGNIFY_BRAN, bran);
     await this.saveAgentUrls({
       url: connectUrl,
       bootUrl: "",
     });
-
-    await this.getCriticalActionState(); // Initialize tracking
 
     await this.syncWithKeria();
   }
@@ -731,8 +731,9 @@ class Agent {
       await this.agentServicesProps.signifyClient
         .identifiers()
         .update(identifier.id, {
-          name: `${IdentifierService.DELETED_IDENTIFIER_THEME
-            }-${randomSalt()}:${identifier.displayName}`,
+          name: `${
+            IdentifierService.DELETED_IDENTIFIER_THEME
+          }-${randomSalt()}:${identifier.displayName}`,
         });
     }
 
