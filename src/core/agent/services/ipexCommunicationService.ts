@@ -108,6 +108,7 @@ class IpexCommunicationService extends AgentService {
     this.connections = connections;
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async admitAcdcFromGrant(notificationId: string): Promise<void> {
     const grantNoteRecord = await this.notificationStorage.findById(
