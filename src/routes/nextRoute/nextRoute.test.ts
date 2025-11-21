@@ -101,7 +101,7 @@ describe("NextRoute", () => {
     const result = getNextOnboardingRoute(data as DataProps);
 
     expect(result).toEqual({
-      pathname: RoutePath.TERM_AND_PRIVACY,
+      pathname: RoutePath.TERMS_AND_PRIVACY,
     });
   });
 
@@ -322,7 +322,7 @@ describe("getNextRoute", () => {
       payload,
     });
 
-    expect(result.nextPath).toEqual({ pathname: RoutePath.TERM_AND_PRIVACY });
+    expect(result.nextPath).toEqual({ pathname: RoutePath.TERMS_AND_PRIVACY });
   });
 
   test("getNextSetPasscodeRoute should return the correct next path when seed phrase is set", () => {

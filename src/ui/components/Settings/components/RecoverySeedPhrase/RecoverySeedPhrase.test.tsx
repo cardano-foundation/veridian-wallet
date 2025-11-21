@@ -61,7 +61,7 @@ const storeMocked = {
   dispatch: dispatchMock,
 };
 
-describe.skip("Recovery Phrase", () => {
+describe("Recovery Phrase", () => {
   test("Render", async () => {
     const { getByTestId, getByText, queryByText } = render(
       <Provider store={storeMocked}>

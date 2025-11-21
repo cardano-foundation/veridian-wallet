@@ -3,7 +3,7 @@ import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import ENG_trans from "../../../locales/en/en.json";
 import { makeTestStore } from "../../utils/makeTestStore";
-import { TermAndPrivacy } from "./TermAndPrivacy";
+import { TermsAndPrivacy } from "./TermsAndPrivacy";
 
 const MockTitle = "Terms of use";
 
@@ -18,12 +18,12 @@ describe("Terms and conditions screen", () => {
     const { getByTestId, getByText } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
-          <TermAndPrivacy />
+          <TermsAndPrivacy />
         </Provider>
       </MemoryRouter>
     );
 
-    expect(getByTestId("term-n-privacy-content-page")).toBeVisible();
+    expect(getByTestId("terms-n-privacy-content-page")).toBeVisible();
     expect(getByText(ENG_trans.termandprivacy.button)).toBeVisible();
     expect(getByText(ENG_trans.termandprivacy.tabs.privacy)).toBeVisible();
     expect(getByText(ENG_trans.termandprivacy.tabs.terms)).toBeVisible();

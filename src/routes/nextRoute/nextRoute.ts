@@ -81,7 +81,7 @@ const getNextOnboardingRoute = (data: DataProps) => {
 
   if (nextRoute.pathname === RoutePath.ONBOARDING) {
     return {
-      pathname: RoutePath.TERM_AND_PRIVACY,
+      pathname: RoutePath.TERMS_AND_PRIVACY,
     };
   }
 
@@ -244,7 +244,7 @@ const nextRoute: Record<string, NextRoute> = {
     nextPath: (data: DataProps) => getNextOnboardingRoute(data),
     updateRedux: [updateStoreRecoveryWallet],
   },
-  [RoutePath.TERM_AND_PRIVACY]: {
+  [RoutePath.TERMS_AND_PRIVACY]: {
     nextPath: () => getNextTermPrivacy(),
     updateRedux: [],
   },

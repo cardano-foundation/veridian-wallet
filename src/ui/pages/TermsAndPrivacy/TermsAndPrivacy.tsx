@@ -20,13 +20,13 @@ import {
   SUPPORT_EMAIL,
 } from "../../globals/constants";
 import { openBrowserLink } from "../../utils/openBrowserLink";
-import "./TermAndPrivacy.scss";
+import "./TermsAndPrivacy.scss";
 import {
   PrivacyType,
   TermContent,
   TermsObject,
   TermsSection,
-} from "./TermAndPrivacy.types";
+} from "./TermsAndPrivacy.types";
 
 const Section = ({ title, content, componentId, altIsOpen }: TermsSection) => {
   const HandlePrivacy = () => {
@@ -157,8 +157,8 @@ const Section = ({ title, content, componentId, altIsOpen }: TermsSection) => {
   );
 };
 
-const TermAndPrivacy = () => {
-  const componentId = "term-n-privacy";
+const TermsAndPrivacy = () => {
+  const componentId = "terms-n-privacy";
   const [type, setType] = useState<PrivacyType>(PrivacyType.Term);
   const stateCache = useAppSelector(getStateCache);
   const dispatch = useDispatch();
@@ -183,7 +183,7 @@ const TermAndPrivacy = () => {
       store: { stateCache },
     };
     const { nextPath, updateRedux } = getNextRoute(
-      RoutePath.TERM_AND_PRIVACY,
+      RoutePath.TERMS_AND_PRIVACY,
       data
     );
 
@@ -255,4 +255,4 @@ const TermAndPrivacy = () => {
   );
 };
 
-export { TermAndPrivacy };
+export { TermsAndPrivacy };

@@ -19,7 +19,7 @@ import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
 import { SetPasscode } from "../ui/pages/SetPasscode";
 import { SetupBiometrics } from "../ui/pages/SetupBiometrics/SetupBiometrics";
 import { SetupGroupProfile } from "../ui/pages/SetupGroupProfile";
-import { TermAndPrivacy } from "../ui/pages/TermAndPrivacy/TermAndPrivacy";
+import { TermsAndPrivacy } from "../ui/pages/TermsAndPrivacy";
 import { VerifyRecoverySeedPhrase } from "../ui/pages/VerifyRecoverySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
@@ -75,8 +75,8 @@ const Routes = () => {
         exact
       />
       <Route
-        path={RoutePath.TERM_AND_PRIVACY}
-        component={TermAndPrivacy}
+        path={RoutePath.TERMS_AND_PRIVACY}
+        component={TermsAndPrivacy}
         exact
       />
       <Route
