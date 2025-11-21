@@ -26,7 +26,11 @@ import {
 } from "../records";
 import type { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
 import { AgentService } from "./agentService";
-import { getCredentialShortDetails, OnlineOnly, SeedPhraseVerified } from "./utils";
+import {
+  getCredentialShortDetails,
+  OnlineOnly,
+  SeedPhraseVerified,
+} from "./utils";
 import type { ACDC } from "./credentialService.types";
 import {
   CredentialStatus,
@@ -406,13 +410,13 @@ class IpexCommunicationService extends AgentService {
       "-a-i": exchange.exn.rp,
       ...(Object.keys(attributes).length > 0
         ? {
-          ...Object.fromEntries(
-            Object.entries(attributes).map(([key, value]) => [
-              "-a-" + key,
-              value,
-            ])
-          ),
-        }
+            ...Object.fromEntries(
+              Object.entries(attributes).map(([key, value]) => [
+                "-a-" + key,
+                value,
+              ])
+            ),
+          }
         : {}),
     };
 
@@ -469,7 +473,6 @@ class IpexCommunicationService extends AgentService {
         : IdentifierType.Individual,
       createdAt: new Date(dateTime),
     };
-    await Agent.agent.recordCriticalAction();
     return await this.credentialStorage.saveCredentialMetadataRecord(
       credentialDetails
     );
@@ -553,10 +556,10 @@ class IpexCommunicationService extends AgentService {
     const schemaUrlBase =
       message.exn.r === ExchangeRoute.IpexGrant
         ? this.getInlineSchemaOobiBase(message) ??
-        (await this.getSchemaUrl(
-          connection.serviceEndpoints[0],
-          connectionId
-        ))
+          (await this.getSchemaUrl(
+            connection.serviceEndpoints[0],
+            connectionId
+          ))
         : await this.getSchemaUrl(connection.serviceEndpoints[0], connectionId);
     await this.connections.resolveOobi(schemaUrlBase + schemaSaid, true);
     const schema = await this.props.signifyClient.schemas().get(schemaSaid);
@@ -596,6 +599,7 @@ class IpexCommunicationService extends AgentService {
     });
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async joinMultisigAdmit(grantNotificationId: string): Promise<void> {
     const grantNoteRecord = await this.notificationStorage.findById(
@@ -736,6 +740,7 @@ class IpexCommunicationService extends AgentService {
     await this.notificationStorage.update(applyNoteRecord);
   }
 
+  @SeedPhraseVerified
   async joinMultisigGrant(
     multiSigExn: ExnMessage,
     agreeNoteRecord: NotificationRecord
@@ -782,7 +787,6 @@ class IpexCommunicationService extends AgentService {
       accepted: true,
     };
     await this.notificationStorage.update(agreeNoteRecord);
-    await Agent.agent.recordCriticalAction();
   }
 
   private async submitMultisigOffer(

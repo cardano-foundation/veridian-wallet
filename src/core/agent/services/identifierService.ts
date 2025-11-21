@@ -21,7 +21,12 @@ import {
   IdentifierMetadataRecordProps,
 } from "../records/identifierMetadataRecord";
 import { AgentService } from "./agentService";
-import { OnlineOnly, SeedPhraseVerified, randomSalt, deleteNotificationRecordById } from "./utils";
+import {
+  OnlineOnly,
+  SeedPhraseVerified,
+  randomSalt,
+  deleteNotificationRecordById,
+} from "./utils";
 import {
   BasicRecord,
   BasicStorage,
@@ -231,6 +236,7 @@ class IdentifierService extends AgentService {
     }
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async createIdentifier(
     metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">,
@@ -352,7 +358,6 @@ class IdentifierService extends AgentService {
 
     // Finally, remove from the re-try record
     await this.clearQueuedIdentifier(name);
-    await Agent.agent.recordCriticalAction();
     return { identifier, createdAt: identifierDetail.icp_dt };
   }
 
@@ -437,8 +442,9 @@ class IdentifierService extends AgentService {
         }
       );
       await this.props.signifyClient.identifiers().update(localMember.id, {
-        name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${localMember.groupMetadata?.groupId
-          }:${localMember.displayName}`,
+        name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${
+          localMember.groupMetadata?.groupId
+        }:${localMember.displayName}`,
       });
 
       if (localMember.groupMetadata?.groupId) {
@@ -468,8 +474,9 @@ class IdentifierService extends AgentService {
     }
 
     await this.props.signifyClient.identifiers().update(identifier, {
-      name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${metadata.displayName
-        }`,
+      name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${
+        metadata.displayName
+      }`,
     });
 
     for (const notification of await this.notificationStorage.findAllByQuery({
@@ -496,7 +503,7 @@ class IdentifierService extends AgentService {
     if (
       connectedDApp !== "" &&
       metadata.id ===
-      (await PeerConnection.peerConnection.getConnectingIdentifier()).id
+        (await PeerConnection.peerConnection.getConnectingIdentifier()).id
     ) {
       PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
     }
@@ -543,7 +550,7 @@ class IdentifierService extends AgentService {
     if (
       connectedDApp !== "" &&
       identifier ===
-      (await PeerConnection.peerConnection.getConnectingIdentifier()).id
+        (await PeerConnection.peerConnection.getConnectingIdentifier()).id
     ) {
       PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
     }
@@ -869,6 +876,7 @@ class IdentifierService extends AgentService {
     };
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async remoteSign(notificationId: string, requestSaid: string): Promise<void> {
     const noteRecord = await this.notificationStorage.findExpectedById(
@@ -911,7 +919,6 @@ class IdentifierService extends AgentService {
       noteRecord.route,
       this.operationPendingStorage
     );
-    await Agent.agent.recordCriticalAction();
     this.props.eventEmitter.emit<NotificationRemovedEvent>({
       type: EventTypes.NotificationRemoved,
       payload: {
