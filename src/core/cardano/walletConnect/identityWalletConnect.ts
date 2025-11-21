@@ -13,6 +13,7 @@ import {
   TxSignError,
 } from "./peerConnection.types";
 import { CoreEventEmitter } from "../../agent/event";
+import { SeedPhraseVerified } from "../../agent/services/utils";
 
 class IdentityWalletConnect extends CardanoPeerConnect {
   private selectedAid: string;
@@ -42,10 +43,6 @@ class IdentityWalletConnect extends CardanoPeerConnect {
     id: string;
     oobi: string;
   }> {
-    if (await Agent.agent.isVerificationMandatory()) {
-      throw new Error(Agent.SEED_PHRASE_NOT_VERIFIED);
-    }
-
     const identifier = await Agent.agent.identifiers.getIdentifier(
       this.selectedAid
     );
@@ -53,17 +50,13 @@ class IdentityWalletConnect extends CardanoPeerConnect {
       id: this.selectedAid,
       oobi: await Agent.agent.connections.getOobi(identifier.id),
     };
-    await Agent.agent.recordCriticalAction();
   }
 
+  @SeedPhraseVerified
   async signKeri(
     identifier: string,
     payload: string
   ): Promise<string | { error: PeerConnectionError }> {
-    if (await Agent.agent.isVerificationMandatory()) {
-      throw new Error(Agent.SEED_PHRASE_NOT_VERIFIED);
-    }
-
     let approved: boolean | undefined = undefined;
     // Closure that updates approved variable
     const approvalCallback = (approvalStatus: boolean) => {
@@ -88,7 +81,6 @@ class IdentityWalletConnect extends CardanoPeerConnect {
       }
     }
     if (approved) {
-      await Agent.agent.recordCriticalAction();
       return (await Agent.agent.identifiers.getSigner(identifier)).sign(
         Buffer.from(payload)
       ).qb64;

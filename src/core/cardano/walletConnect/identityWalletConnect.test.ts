@@ -23,6 +23,8 @@ jest.mock("../../agent/agent", () => ({
       },
       getKeriaOnlineStatus: jest.fn(),
       isSeedPhraseVerified: jest.fn().mockResolvedValue(true),
+      isVerificationMandatory: jest.fn().mockResolvedValue(false),
+      recordCriticalAction: jest.fn(),
     },
   },
 }));
