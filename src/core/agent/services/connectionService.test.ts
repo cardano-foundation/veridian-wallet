@@ -278,7 +278,6 @@ describe("Connection service of agent", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     let invalidUrls = [
       "https://localhost/oobi",
-      "https://localhost/oobi/1234",
       "https://localhost/oobi/1234/agent/eid/extra",
       "https://localhost/.well-known/keri/oobi/",
       "https://localhost",
@@ -314,7 +313,14 @@ describe("Connection service of agent", () => {
       "https://localhost/oobi/1234/witness?name=alias",
       "https://localhost/oobi/1234/witness/5678?name=alias",
       "https://localhost/.well-known/keri/oobi/1234?name=alias",
+      "https://localhost/oobi/1234?name=alias",
     ];
+
+    global.fetch = jest.fn().mockResolvedValue({
+      headers: {
+        get: jest.fn().mockReturnValue("application/json+cesr"),
+      },
+    });
 
     for (const url of validUrls) {
       await connectionService.connectByOobiUrl(url, "shared-identifier");
@@ -333,6 +339,19 @@ describe("Connection service of agent", () => {
         })
       );
     }
+
+    const invalidDoobi = "https://localhost/oobi/1234?name=alias";
+    global.fetch = jest.fn().mockResolvedValue({
+      headers: {
+        get: jest.fn().mockReturnValue("text/html"),
+      },
+    });
+
+    await expect(
+      connectionService.connectByOobiUrl(invalidDoobi, "shared-identifier")
+    ).rejects.toThrowError(
+      new Error(ConnectionService.INVALID_DOOBI_CONTENT_TYPE)
+    );
 
     validUrls = [
       "https://localhost/oobi/1234/agent?name=alias",
