@@ -81,6 +81,7 @@ class Agent {
   private static instance: Agent | undefined;
   private agentServicesProps!: AgentServicesProps;
   private signifyClient!: SignifyClient;
+  private seedPhraseVerifiedCache: boolean | undefined;
 
   private storageSession!: SqliteSession | IonicSession;
 
@@ -634,13 +635,18 @@ class Agent {
   }
 
   async isSeedPhraseVerified(): Promise<boolean> {
+    if (this.seedPhraseVerifiedCache !== undefined) {
+      return this.seedPhraseVerifiedCache;
+    }
     const record = await this.basicStorage.findById(
       MiscRecordId.SEED_PHRASE_VERIFIED
     );
-    return record?.content.verified === true;
+    this.seedPhraseVerifiedCache = record?.content.verified === true;
+    return this.seedPhraseVerifiedCache;
   }
 
   async markSeedPhraseAsVerified(): Promise<void> {
+    this.seedPhraseVerifiedCache = true;
     await this.basicStorage.createOrUpdateBasicRecord(
       new BasicRecord({
         id: MiscRecordId.SEED_PHRASE_VERIFIED,

@@ -18,11 +18,7 @@ import { CoreEventEmitter } from "./event";
 import { EventTypes } from "./event.types";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
 import { IdentifierService } from "./services";
-import {
-  BasicRecord,
-  BasicStorage,
-  CredentialMetadataRecord,
-} from "./records";
+import { BasicRecord, BasicStorage, CredentialMetadataRecord } from "./records";
 
 jest.mock("signify-ts", () => ({
   SignifyClient: jest.fn(),
@@ -769,6 +765,7 @@ describe("Seed Phrase Verification", () => {
   beforeEach(() => {
     agent = Agent.agent;
     (agent as any).basicStorageService = mockBasicStorageService;
+    (agent as any).seedPhraseVerifiedCache = undefined;
   });
 
   afterEach(() => {
