@@ -1606,13 +1606,24 @@ describe("Single sig service of agent", () => {
   test("processes pending identifier updates", async () => {
     const pendingRecord = cloneIdentifierRecord(identifierMetadataRecord);
     pendingRecord.pendingUpdate = true;
+    const secondPendingRecord = cloneIdentifierRecord(identifierMetadataRecord);
+    secondPendingRecord.id = "second-id";
+    secondPendingRecord.displayName = "Second";
+    secondPendingRecord.theme = 2;
+    secondPendingRecord.pendingUpdate = true;
     identifierStorage.getIdentifiersPendingUpdate = jest
       .fn()
-      .mockResolvedValue([pendingRecord]);
-    getIdentifierMock.mockResolvedValueOnce({
-      ...identifierStateKeria,
-      name: "1.2.0.2:0:Outdated",
-    });
+      .mockResolvedValue([pendingRecord, secondPendingRecord]);
+    getIdentifierMock
+      .mockResolvedValueOnce({
+        ...identifierStateKeria,
+        name: "1.2.0.2:0:Outdated",
+      })
+      .mockResolvedValueOnce({
+        ...identifierStateKeria,
+        prefix: secondPendingRecord.id,
+        name: "1.2.0.2:1:Second",
+      });
 
     await identifierService.processPendingIdentifierUpdates();
 
@@ -1624,6 +1635,16 @@ describe("Single sig service of agent", () => {
     );
     expect(identifierStorage.updateIdentifierMetadata).toHaveBeenCalledWith(
       pendingRecord.id,
+      { pendingUpdate: false }
+    );
+    expect(updateIdentifierMock).toHaveBeenCalledWith(
+      secondPendingRecord.id,
+      expect.objectContaining({
+        name: `1.2.0.2:${secondPendingRecord.theme}:${secondPendingRecord.displayName}`,
+      })
+    );
+    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenCalledWith(
+      secondPendingRecord.id,
       { pendingUpdate: false }
     );
   });
