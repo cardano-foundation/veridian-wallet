@@ -913,16 +913,12 @@ const AppWrapper = (props: { children: ReactNode }) => {
         isOpen={showOnboardingNotificationsAlert}
         setIsOpen={setShowOnboardingNotificationsAlert}
         dataTestId="alert-onboarding-notifications-unavailable"
-        headerText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.onboardingunavailable"
-          )
+        headerText={i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.onboardingunavailable"
         )}
-        confirmButtonText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.ok"
-          )
-        )}
+        confirmButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.ok"
+        )}`}
         actionConfirm={() => setShowOnboardingNotificationsAlert(false)}
         actionDismiss={() => setShowOnboardingNotificationsAlert(false)}
       />

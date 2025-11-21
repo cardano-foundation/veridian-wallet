@@ -606,63 +606,45 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         isOpen={showNotificationsSettingsAlert}
         setIsOpen={setShowNotificationsSettingsAlert}
         dataTestId="notifications-settings-alert"
-        headerText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
-          )
+        headerText={i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
         )}
-        confirmButtonText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.confirm"
-          )
-        )}
-        cancelButtonText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.cancel"
-          )
-        )}
+        confirmButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.confirm"
+        )}`}
+        cancelButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.cancel"
+        )}`}
         actionConfirm={openNotificationSettings}
       />
       <Alert
         isOpen={showNotificationsErrorAlert}
         setIsOpen={setShowNotificationsErrorAlert}
         dataTestId="notifications-try-again-alert"
-        headerText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
-          )
+        headerText={i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
         )}
-        confirmButtonText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.tryagain"
-          )
-        )}
-        cancelButtonText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.cancel"
-          )
-        )}
+        confirmButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.tryagain"
+        )}`}
+        cancelButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.cancel"
+        )}`}
         actionConfirm={attemptEnableNotifications}
       />
       <Alert
         isOpen={showNotificationsSetupFailedAlert}
         setIsOpen={setShowNotificationsSetupFailedAlert}
         dataTestId="notifications-setup-failed-alert"
-        headerText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.setupfailed"
-          )
+        headerText={i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.setupfailed"
         )}
-        confirmButtonText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.tryagain"
-          )
-        )}
-        cancelButtonText={String(
-          i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.cancel"
-          )
-        )}
+        confirmButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.tryagain"
+        )}`}
+        cancelButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.cancel"
+        )}`}
         actionConfirm={openNotificationSettings}
       />
     </>
