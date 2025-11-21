@@ -9,7 +9,7 @@ import {
   KeriaCredential,
 } from "./credentialService.types";
 import { CredentialMetadataRecord } from "../records/credentialMetadataRecord";
-import { getCredentialShortDetails, OnlineOnly, SeedPhraseVerified } from "./utils";
+import { getCredentialShortDetails, OnlineOnly } from "./utils";
 import {
   CredentialStorage,
   IdentifierStorage,

@@ -13,7 +13,6 @@ import {
   TxSignError,
 } from "./peerConnection.types";
 import { CoreEventEmitter } from "../../agent/event";
-import { SeedPhraseVerified } from "../../agent/services/utils";
 
 class IdentityWalletConnect extends CardanoPeerConnect {
   private selectedAid: string;
