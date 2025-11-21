@@ -635,15 +635,13 @@ class MultiSigService extends AgentService {
     });
 
     try {
-      if (!backgroundTask) {
-        await deleteNotificationRecordById(
-          this.props.signifyClient,
-          this.notificationStorage,
-          notificationId,
-          NotificationRoute.MultiSigIcp,
-          this.operationPendingStorage
-        );
-      }
+      await deleteNotificationRecordById(
+        this.props.signifyClient,
+        this.notificationStorage,
+        notificationId,
+        NotificationRoute.MultiSigIcp,
+        this.operationPendingStorage
+      );
     } catch (error) {
       if (
         !(
