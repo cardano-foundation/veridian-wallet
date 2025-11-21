@@ -17,10 +17,7 @@ import {
   CreationStatus,
   SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED,
 } from "../agent.types";
-import { Agent } from "../agent";
-import {
-  NotificationRoute
-} from "./keriaNotificationService.types";
+import { NotificationRoute } from "./keriaNotificationService.types";
 import type {
   ConnectionShortDetails,
   MultisigConnectionDetails,
@@ -169,16 +166,16 @@ class MultiSigService extends AgentService {
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
-        mHab,
-        states,
-        groupName,
-        threshold,
-        {
-          initiator: true,
-          groupConnections,
+          mHab,
+          states,
+          groupName,
           threshold,
-        }
-      );
+          {
+            initiator: true,
+            groupConnections,
+            threshold,
+          }
+        );
     await this.inceptGroup(mHab, states, inceptionData);
 
     // Share witness OOBIs with other group members
@@ -563,21 +560,21 @@ class MultiSigService extends AgentService {
     const inceptionData = backgroundTask
       ? await this.getInceptionData(groupName)
       : await this.generateAndStoreInceptionData(
-        mHab,
-        states,
-        groupName,
-        {
-          rotationThreshold: Number(exn.e.icp.nt),
-          signingThreshold: Number(exn.e.icp.kt),
-        },
-        {
-          initiator: false,
-          notificationId,
-          notificationSaid,
-        },
-        exn.e.icp.bt,
-        exn.e.icp.b
-      );
+          mHab,
+          states,
+          groupName,
+          {
+            rotationThreshold: Number(exn.e.icp.nt),
+            signingThreshold: Number(exn.e.icp.kt),
+          },
+          {
+            initiator: false,
+            notificationId,
+            notificationSaid,
+          },
+          exn.e.icp.bt,
+          exn.e.icp.b
+        );
     await this.inceptGroup(mHab, states, inceptionData);
 
     const multisigId = inceptionData.icp.i;
