@@ -287,7 +287,11 @@ const agentServicesProps = {
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     MISSING_DATA_ON_KERIA: "Missing data error msg mock",
-    agent: {},
+    agent: {
+      isSeedPhraseVerified: jest.fn().mockResolvedValue(true),
+      isVerificationMandatory: jest.fn().mockResolvedValue(false),
+      recordCriticalAction: jest.fn(),
+    },
   },
 }));
 

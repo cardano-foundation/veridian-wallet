@@ -26,7 +26,11 @@ import {
 } from "../records";
 import type { CredentialMetadataRecordProps } from "../records/credentialMetadataRecord.types";
 import { AgentService } from "./agentService";
-import { getCredentialShortDetails, OnlineOnly } from "./utils";
+import {
+  getCredentialShortDetails,
+  OnlineOnly,
+  SeedPhraseVerified,
+} from "./utils";
 import type { ACDC } from "./credentialService.types";
 import {
   CredentialStatus,
@@ -104,6 +108,7 @@ class IpexCommunicationService extends AgentService {
     this.connections = connections;
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async admitAcdcFromGrant(notificationId: string): Promise<void> {
     const grantNoteRecord = await this.notificationStorage.findById(
@@ -281,6 +286,7 @@ class IpexCommunicationService extends AgentService {
     await this.notificationStorage.update(applyNoteRecord);
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async grantAcdcFromAgree(notificationId: string): Promise<void> {
     const agreeNoteRecord = await this.notificationStorage.findById(
@@ -594,6 +600,7 @@ class IpexCommunicationService extends AgentService {
     });
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async joinMultisigAdmit(grantNotificationId: string): Promise<void> {
     const grantNoteRecord = await this.notificationStorage.findById(
@@ -734,6 +741,7 @@ class IpexCommunicationService extends AgentService {
     await this.notificationStorage.update(applyNoteRecord);
   }
 
+  @SeedPhraseVerified
   async joinMultisigGrant(
     multiSigExn: ExnMessage,
     agreeNoteRecord: NotificationRecord
