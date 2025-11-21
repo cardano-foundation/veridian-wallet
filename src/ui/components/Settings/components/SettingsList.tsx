@@ -91,7 +91,13 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     useState(false);
   const [showNotificationsErrorAlert, setShowNotificationsErrorAlert] =
     useState(false);
+  const [
+    showNotificationsSetupFailedAlert,
+    setShowNotificationsSetupFailedAlert,
+  ] = useState(false);
   const [isProcessingNotificationsToggle, setIsProcessingNotificationsToggle] =
+    useState(false);
+  const [isAwaitingNotificationSettings, setIsAwaitingNotificationSettings] =
     useState(false);
   const history = useHistory();
 
@@ -104,13 +110,44 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     }
   }, [lockoutEndTime, showMaxAttemptsAlert]);
 
+  useEffect(() => {
+    const checkPermissionsOnResume = async () => {
+      if (!isAwaitingNotificationSettings) return;
+
+      try {
+        const granted = await notificationService.arePermissionsGranted();
+        if (granted) {
+          await persistNotificationsPreferences(true, true);
+        } else {
+          setShowNotificationsSetupFailedAlert(true);
+        }
+      } catch (error) {
+        setShowNotificationsSetupFailedAlert(true);
+      } finally {
+        setIsAwaitingNotificationSettings(false);
+      }
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        checkPermissionsOnResume();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isAwaitingNotificationSettings]);
+
   const openNotificationSettings = async () => {
     try {
+      setIsAwaitingNotificationSettings(true);
       await NativeSettings.open({
         optionAndroid: AndroidSettings.AppNotification,
         optionIOS: IOSSettings.AppNotification,
       });
     } catch (error) {
+      setIsAwaitingNotificationSettings(false);
       showError("Unable to open notification settings", error, dispatch);
     }
   };
@@ -160,7 +197,11 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         return;
       }
 
-      setShowNotificationsSettingsAlert(true);
+      if (!notificationsPreferences.configured) {
+        setShowNotificationsSettingsAlert(true);
+      } else {
+        await openNotificationSettings();
+      }
     } catch (error) {
       if (isAndroidPlatform) {
         setShowNotificationsErrorAlert(true);
@@ -169,7 +210,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
 
       showError(
         i18n.t(
-          "settings.sections.preferences.notifications.notificationsalert.message"
+          "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
         ),
         error,
         dispatch
@@ -567,7 +608,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         dataTestId="notifications-settings-alert"
         headerText={String(
           i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.message"
+            "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
           )
         )}
         confirmButtonText={String(
@@ -588,7 +629,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         dataTestId="notifications-try-again-alert"
         headerText={String(
           i18n.t(
-            "settings.sections.preferences.notifications.notificationsalert.message"
+            "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
           )
         )}
         confirmButtonText={String(
@@ -602,6 +643,27 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
           )
         )}
         actionConfirm={attemptEnableNotifications}
+      />
+      <Alert
+        isOpen={showNotificationsSetupFailedAlert}
+        setIsOpen={setShowNotificationsSetupFailedAlert}
+        dataTestId="notifications-setup-failed-alert"
+        headerText={String(
+          i18n.t(
+            "settings.sections.preferences.notifications.notificationsalert.setupfailed"
+          )
+        )}
+        confirmButtonText={String(
+          i18n.t(
+            "settings.sections.preferences.notifications.notificationsalert.tryagain"
+          )
+        )}
+        cancelButtonText={String(
+          i18n.t(
+            "settings.sections.preferences.notifications.notificationsalert.cancel"
+          )
+        )}
+        actionConfirm={openNotificationSettings}
       />
     </>
   );

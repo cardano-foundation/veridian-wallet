@@ -435,7 +435,7 @@
     "advancedsetup": {
       "title": "Advanced setup",
       "description": {
-        "connectboot":  "To connect, please enter the SSI agent boot and connect URLs (in your email or from your command line).",
+        "connectboot": "To connect, please enter the SSI agent boot and connect URLs (in your email or from your command line).",
         "connect": "To connect, please enter the SSI agent connect URL (in your email or from your command line)."
       },
       "buttons": {
@@ -544,7 +544,9 @@
         "notifications": {
           "title": "Notifications",
           "notificationsalert": {
-            "message": "In order to use notifications you need to enable this in your settings. Would you like to do this now?",
+            "onboardingunavailable": "Notifications is unavailable at this time. You can set this up later via the settings page.",
+            "setupfailed": "Notifications setup failed, would you like to try again?",
+            "enablepermissions": "In order to use notifications you need to enable this in your settings. Would you like to do this now?",
             "confirm": "Go to settings",
             "tryagain": "Try again",
             "cancel": "Setup later",

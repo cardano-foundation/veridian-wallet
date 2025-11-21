@@ -299,6 +299,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
     persistNotificationsPreferences,
   ]);
   const [isAlertPeerBrokenOpen, setIsAlertPeerBrokenOpen] = useState(false);
+  const [
+    showOnboardingNotificationsAlert,
+    setShowOnboardingNotificationsAlert,
+  ] = useState<boolean>(false);
   const { getRecentDefaultProfile, updateProfileHistories } = useProfile();
   useActivityTimer();
 
@@ -735,7 +739,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
         isNotificationsConfigured = true;
       }
     } catch (error) {
-      showError("Unable to initialise notification service", error, dispatch);
+      if (Capacitor.getPlatform() === "android") {
+        setShowOnboardingNotificationsAlert(true);
+      } else {
+        showError("Unable to initialise notification service", error, dispatch);
+      }
     }
 
     notificationService.setProfileSwitcher(async (profileId: string) => {
@@ -900,6 +908,23 @@ const AppWrapper = (props: { children: ReactNode }) => {
         )}`}
         actionConfirm={() => setIsAlertPeerBrokenOpen(false)}
         actionDismiss={() => setIsAlertPeerBrokenOpen(false)}
+      />
+      <Alert
+        isOpen={showOnboardingNotificationsAlert}
+        setIsOpen={setShowOnboardingNotificationsAlert}
+        dataTestId="alert-onboarding-notifications-unavailable"
+        headerText={String(
+          i18n.t(
+            "settings.sections.preferences.notifications.notificationsalert.onboardingunavailable"
+          )
+        )}
+        confirmButtonText={String(
+          i18n.t(
+            "settings.sections.preferences.notifications.notificationsalert.ok"
+          )
+        )}
+        actionConfirm={() => setShowOnboardingNotificationsAlert(false)}
+        actionDismiss={() => setShowOnboardingNotificationsAlert(false)}
       />
     </>
   );
