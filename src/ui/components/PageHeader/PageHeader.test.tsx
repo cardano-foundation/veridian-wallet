@@ -35,7 +35,7 @@ describe("Page Header", () => {
       <Provider store={storeMocked}>
         <PageHeader
           backButton={true}
-          currentPath={RoutePath.GENERATE_SEED_PHRASE}
+          currentPath={RoutePath.SSI_AGENT}
           progressBar={true}
           progressBarValue={0.66}
           progressBarBuffer={1}

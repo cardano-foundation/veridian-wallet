@@ -16,7 +16,7 @@ import { RoutePath } from "../../../routes";
 import { store } from "../../../store";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
-import { GenerateSeedPhrase } from "../GenerateSeedPhrase";
+import { CreateSSIAgent } from "../CreateSSIAgent";
 import { SetPasscode } from "./SetPasscode";
 
 jest.mock("../../utils/passcodeChecker", () => ({
@@ -148,8 +148,8 @@ describe("SetPasscode Page", () => {
             />
           </Provider>
           <Route
-            path={RoutePath.GENERATE_SEED_PHRASE}
-            component={GenerateSeedPhrase}
+            path={RoutePath.SSI_AGENT}
+            component={CreateSSIAgent}
           />
           <Redirect
             exact
@@ -205,7 +205,7 @@ describe("SetPasscode Page", () => {
     };
 
     const history = createMemoryHistory();
-    history.push(RoutePath.VERIFY_SEED_PHRASE);
+    history.push(RoutePath.SET_PASSCODE);
 
     const { queryByText, getByTestId } = render(
       <IonReactMemoryRouter

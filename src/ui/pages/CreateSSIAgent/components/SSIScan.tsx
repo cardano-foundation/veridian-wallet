@@ -1,8 +1,6 @@
 import { repeatOutline } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { i18n } from "../../../../i18n";
-import { useAppSelector } from "../../../../store/hooks";
-import { getAuthentication } from "../../../../store/reducers/stateCache";
 import { CustomInput } from "../../../components/CustomInput";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { ResponsivePageLayout } from "../../../components/layout/ResponsivePageLayout";
@@ -10,10 +8,10 @@ import { OptionModal } from "../../../components/OptionsModal";
 import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { Scan } from "../../../components/Scan";
+import { useCameraDirection } from "../../../components/Scan/hook/useCameraDirection";
 import { combineClassNames } from "../../../utils/style";
 import { isValidHttpUrl } from "../../../utils/urlChecker";
 import { CurrentPage, SSIScanProps } from "../CreateSSIAgent.types";
-import { useCameraDirection } from "../../../components/Scan/hook/useCameraDirection";
 
 const InputError = ({
   showError,
@@ -29,15 +27,18 @@ const InputError = ({
   );
 };
 
-const SSIScan = ({ setCurrentPage, onScanFinish, isLoading }: SSIScanProps) => {
+const SSIScan = ({
+  setCurrentPage,
+  onScanFinish,
+  isLoading,
+  isRecovery,
+}: SSIScanProps) => {
   const pageId = "ssi-agent-scan";
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
     useCameraDirection();
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [touched, setTouched] = useState(false);
-  const isRecovery = useAppSelector(getAuthentication).recoveryWalletProgress;
-
   useEffect(() => {
     return () => {
       setOpen(false);
@@ -91,9 +92,9 @@ const SSIScan = ({ setCurrentPage, onScanFinish, isLoading }: SSIScanProps) => {
             setCurrentPage(CurrentPage.AdvancedSetting)
           }
           tertiaryButtonText={
-            !isRecovery
-              ? `${i18n.t("ssiagent.scanssi.scan.button.advancedsetup")}`
-              : undefined
+            isRecovery
+              ? undefined
+              : `${i18n.t("ssiagent.scanssi.scan.button.advancedsetup")}`
           }
         />
       </ResponsivePageLayout>

@@ -1,7 +1,9 @@
 import { IonRouterOutlet, useIonRouter } from "@ionic/react";
 import { useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
+import { PUSH_NOTIFICATION_EVENT_LISTENER_TYPE } from "../native/pushNotifications/notificationService";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { getCurrentProfile } from "../store/reducers/profileCache";
 import {
   getRoutes,
   getStateCache,
@@ -11,19 +13,16 @@ import { TabsMenu, tabsRoutes } from "../ui/components/navigation/TabsMenu";
 import { CreatePassword } from "../ui/pages/CreatePassword";
 import { CreateSSIAgent } from "../ui/pages/CreateSSIAgent";
 import { CredentialDetails } from "../ui/pages/CredentialDetails";
-import { GenerateSeedPhrase } from "../ui/pages/GenerateSeedPhrase";
 import { NotificationDetails } from "../ui/pages/NotificationDetails";
 import { Onboarding } from "../ui/pages/Onboarding";
 import { ProfileSetup } from "../ui/pages/ProfileSetup/ProfileSetup";
 import { SetPasscode } from "../ui/pages/SetPasscode";
 import { SetupBiometrics } from "../ui/pages/SetupBiometrics/SetupBiometrics";
 import { SetupGroupProfile } from "../ui/pages/SetupGroupProfile";
+import { TermsAndPrivacy } from "../ui/pages/TermsAndPrivacy";
 import { VerifyRecoverySeedPhrase } from "../ui/pages/VerifyRecoverySeedPhrase";
-import { VerifySeedPhrase } from "../ui/pages/VerifySeedPhrase";
 import { getNextRoute } from "./nextRoute";
 import { RoutePath, TabsRoutePath } from "./paths";
-import { getCurrentProfile } from "../store/reducers/profileCache";
-import { PUSH_NOTIFICATION_EVENT_LISTENER_TYPE } from "../native/pushNotifications/notificationService";
 
 const Routes = () => {
   const stateCache = useAppSelector(getStateCache);
@@ -76,13 +75,8 @@ const Routes = () => {
         exact
       />
       <Route
-        path={RoutePath.GENERATE_SEED_PHRASE}
-        component={GenerateSeedPhrase}
-        exact
-      />
-      <Route
-        path={RoutePath.VERIFY_SEED_PHRASE}
-        component={VerifySeedPhrase}
+        path={RoutePath.TERMS_AND_PRIVACY}
+        component={TermsAndPrivacy}
         exact
       />
       <Route

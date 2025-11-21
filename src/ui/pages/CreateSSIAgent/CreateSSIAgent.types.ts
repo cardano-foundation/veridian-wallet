@@ -14,6 +14,7 @@ interface SSIScanProps {
   setCurrentPage: (value: CurrentPage) => void;
   onScanFinish: (value: string) => Promise<void>;
   isLoading?: boolean;
+  isRecovery: boolean;
 }
 
 interface AdvancedSettingProps {

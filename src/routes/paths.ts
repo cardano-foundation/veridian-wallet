@@ -1,9 +1,8 @@
 enum RoutePath {
   ROOT = "/",
   ONBOARDING = "/onboarding",
+  TERMS_AND_PRIVACY = "/termsandprivacy",
   SET_PASSCODE = "/setpasscode",
-  GENERATE_SEED_PHRASE = "/generateseedphrase",
-  VERIFY_SEED_PHRASE = "/verifyseedphrase",
   TABS_MENU = "/tabs",
   CREATE_PASSWORD = "/createpassword",
   SSI_AGENT = "/ssiagent",
@@ -28,6 +27,7 @@ const PublicRoutes = [
   RoutePath.ROOT,
   RoutePath.ONBOARDING,
   RoutePath.SET_PASSCODE,
+  RoutePath.TERMS_AND_PRIVACY,
 ];
 
 export { PublicRoutes, RoutePath, TabsRoutePath };

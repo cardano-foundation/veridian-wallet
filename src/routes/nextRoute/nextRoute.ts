@@ -29,11 +29,7 @@ const getNextRootRoute = (data: DataProps) => {
   if (authentication.passwordIsSet || authentication.passwordIsSkipped) {
     path = authentication.recoveryWalletProgress
       ? RoutePath.VERIFY_RECOVERY_SEED_PHRASE
-      : RoutePath.GENERATE_SEED_PHRASE;
-  }
-
-  if (authentication.seedPhraseIsSet) {
-    path = RoutePath.SSI_AGENT;
+      : RoutePath.SSI_AGENT;
   }
 
   if (authentication.ssiAgentIsSet) {
@@ -85,11 +81,17 @@ const getNextOnboardingRoute = (data: DataProps) => {
 
   if (nextRoute.pathname === RoutePath.ONBOARDING) {
     return {
-      pathname: RoutePath.SET_PASSCODE,
+      pathname: RoutePath.TERMS_AND_PRIVACY,
     };
   }
 
   return nextRoute;
+};
+
+const getNextTermPrivacy = () => {
+  return {
+    pathname: RoutePath.SET_PASSCODE,
+  };
 };
 
 const getNextCredentialDetailsRoute = () => {
@@ -161,10 +163,6 @@ const updateStoreRecoveryWallet = (data: DataProps) => {
   });
 };
 
-const getNextGenerateSeedPhraseRoute = () => {
-  return { pathname: RoutePath.VERIFY_SEED_PHRASE };
-};
-
 const getNextVerifySeedPhraseRoute = () => {
   const nextPath = RoutePath.SSI_AGENT;
   return { pathname: nextPath };
@@ -192,7 +190,7 @@ const getNextCreatePasswordRoute = (data: DataProps) => {
     return { pathname: RoutePath.VERIFY_RECOVERY_SEED_PHRASE };
   }
 
-  return { pathname: RoutePath.GENERATE_SEED_PHRASE };
+  return { pathname: RoutePath.SSI_AGENT };
 };
 
 const getNextProfileSetupRoute = () => {
@@ -246,6 +244,10 @@ const nextRoute: Record<string, NextRoute> = {
     nextPath: (data: DataProps) => getNextOnboardingRoute(data),
     updateRedux: [updateStoreRecoveryWallet],
   },
+  [RoutePath.TERMS_AND_PRIVACY]: {
+    nextPath: () => getNextTermPrivacy(),
+    updateRedux: [],
+  },
   [RoutePath.SET_PASSCODE]: {
     nextPath: (data: DataProps) => getNextSetPasscodeRoute(data.store),
     updateRedux: [updateStoreAfterSetPasscodeRoute],
@@ -253,14 +255,6 @@ const nextRoute: Record<string, NextRoute> = {
   [RoutePath.SETUP_BIOMETRICS]: {
     nextPath: (data: DataProps) => getNextRootRoute(data),
     updateRedux: [updateAfterSetupBiometrics],
-  },
-  [RoutePath.GENERATE_SEED_PHRASE]: {
-    nextPath: () => getNextGenerateSeedPhraseRoute(),
-    updateRedux: [updateStoreSetSeedPhrase],
-  },
-  [RoutePath.VERIFY_SEED_PHRASE]: {
-    nextPath: () => getNextVerifySeedPhraseRoute(),
-    updateRedux: [updateStoreAfterVerifySeedPhraseRoute, clearSeedPhraseCache],
   },
   [RoutePath.VERIFY_RECOVERY_SEED_PHRASE]: {
     nextPath: () => getNextVerifySeedPhraseRoute(),
@@ -295,7 +289,6 @@ const nextRoute: Record<string, NextRoute> = {
 export {
   getNextCreatePasswordRoute,
   getNextCreateSSIAgentRoute,
-  getNextGenerateSeedPhraseRoute,
   getNextOnboardingRoute,
   getNextRootRoute,
   getNextRoute,

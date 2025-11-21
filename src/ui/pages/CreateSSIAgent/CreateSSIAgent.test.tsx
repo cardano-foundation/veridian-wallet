@@ -12,6 +12,7 @@ const requestPermission = jest.fn();
 const startScan = jest.fn();
 const stopScan = jest.fn();
 const discoverConnectUrlMock = jest.fn();
+const getPlatformMock = jest.fn(() => ["mobile"]);
 
 import {
   BarcodeFormat,
@@ -97,6 +98,13 @@ jest.mock("@capacitor/core", () => {
   };
 });
 
+jest.mock("../../../core/storage", () => ({
+  ...jest.requireActual("../../../core/storage"),
+  SecureStorage: {
+    keyExists: jest.fn(() => true),
+  },
+}));
+
 jest.mock("../../../core/agent/agent", () => ({
   ...jest.requireActual("../../../core/agent/agent"),
   Agent: {
@@ -105,6 +113,7 @@ jest.mock("../../../core/agent/agent", () => ({
       bootAndConnect: bootAndConnectMock,
       recoverKeriaAgent: recoverKeriaAgentMock,
       discoverConnectUrl: discoverConnectUrlMock,
+      getBranAndMnemonic: jest.fn(),
       basicStorage: {
         deleteById: basicStorageDeleteMock,
         createOrUpdateBasicRecord: createOrUpdateBasicRecordMock,

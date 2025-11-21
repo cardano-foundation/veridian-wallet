@@ -1,0 +1,87 @@
+.terms-n-privacy-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  --height: auto;
+  white-space: pre-line;
+
+  .scrollable-page-content > div {
+    margin-bottom: 0;
+  }
+
+  .page-header {
+    ion-toolbar {
+      --background: transparent;
+    }
+  }
+
+  .segment {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-footer {
+    padding-bottom: 1rem;
+  }
+
+  &::part(content) {
+    height: 100%;
+  }
+
+  .terms-of-use-section {
+    display: grid;
+
+    .terms-of-use-section-bottom,
+    li {
+      font-weight: 400;
+
+      strong {
+        font-weight: 500;
+      }
+
+      &.nested-numberic {
+        list-style-type: lower-roman;
+      }
+    }
+
+    ul {
+      margin-top: 0;
+    }
+  }
+
+  p *:nth-child(2) {
+    margin-left: 0.5rem;
+  }
+
+  ion-toolbar {
+    --min-height: 4rem;
+
+    h2 {
+      margin: 0 auto;
+    }
+
+    &.md {
+      ion-title {
+        width: auto;
+      }
+    }
+  }
+
+  .open-ssi-documentation-button.secondary-button {
+    display: flex;
+    margin: 1.5rem 0.125rem;
+
+    &.ion-activated {
+      --ion-toolbar-color: var(--ion-color-neutral-100);
+      --ion-toolbar-background: var(--ion-color-neutral-700);
+      --color-activated: var(--ion-color-neutral-700);
+    }
+
+    @media screen and (min-width: 250px) and (max-width: 370px) {
+      margin: 0.8rem 0.125rem !important;
+    }
+  }
+}
+
+.unstyled-link {
+  all: unset;
+}
