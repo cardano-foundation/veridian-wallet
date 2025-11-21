@@ -288,9 +288,13 @@ describe("Single sig service of agent", () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
-    jest.spyOn(Agent.agent, "isSeedPhraseVerified").mockResolvedValue(true);
+    jest
+      .spyOn(Agent.agent as any, "isSeedPhraseVerified")
+      .mockResolvedValue(true);
     jest.spyOn(Agent.agent, "isVerificationMandatory").mockResolvedValue(false);
-    jest.spyOn(Agent.agent, "recordCriticalAction").mockImplementation(async () => { });
+    jest
+      .spyOn(Agent.agent, "recordCriticalAction")
+      .mockReturnValue(Promise.resolve());
 
     getAgentConfigMock.mockResolvedValue({
       iurls: WITNESSES.slice(0, 6),
@@ -1216,8 +1220,9 @@ describe("Single sig service of agent", () => {
       }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${groupMemberMetadataRecord.groupMetadata!.groupId
-        }:${groupMemberMetadataRecord.displayName}`,
+      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${
+        groupMemberMetadataRecord.groupMetadata!.groupId
+      }:${groupMemberMetadataRecord.displayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       groupMetadataRecord.id,
@@ -1865,8 +1870,9 @@ describe("Single sig service of agent", () => {
       }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${groupMemberMetadataRecord.groupMetadata!.groupId
-        }:${groupMemberMetadataRecord.displayName}`,
+      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${
+        groupMemberMetadataRecord.groupMetadata!.groupId
+      }:${groupMemberMetadataRecord.displayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       groupMetadataRecord.id,
