@@ -43,7 +43,7 @@ class IdentityWalletConnect extends CardanoPeerConnect {
     id: string;
     oobi: string;
   }> {
-    if (!(await Agent.agent.isSeedPhraseVerified())) {
+    if (await Agent.agent.isVerificationMandatory()) {
       throw new Error(Agent.SEED_PHRASE_NOT_VERIFIED);
     }
 
@@ -54,13 +54,14 @@ class IdentityWalletConnect extends CardanoPeerConnect {
       id: this.selectedAid,
       oobi: await Agent.agent.connections.getOobi(identifier.id),
     };
+    await Agent.agent.recordCriticalAction();
   }
 
   async signKeri(
     identifier: string,
     payload: string
   ): Promise<string | { error: PeerConnectionError }> {
-    if (!(await Agent.agent.isSeedPhraseVerified())) {
+    if (await Agent.agent.isVerificationMandatory()) {
       throw new Error(Agent.SEED_PHRASE_NOT_VERIFIED);
     }
 

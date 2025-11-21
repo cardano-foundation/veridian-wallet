@@ -851,7 +851,6 @@ class IdentifierService extends AgentService {
       .identifiers()
       .rotate(identifier);
     await rotateResult.op();
-    await Agent.agent.recordCriticalAction();
   }
 
   @OnlineOnly

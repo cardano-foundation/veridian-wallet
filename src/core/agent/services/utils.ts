@@ -73,11 +73,13 @@ const SeedPhraseVerified = (
 ) => {
   const originalMethod = descriptor.value;
   descriptor.value = async function (...args: unknown[]) {
-    if (!await Agent.agent.isSeedPhraseVerified()) {
+    if (await Agent.agent.isVerificationMandatory()) {
       throw new Error(Agent.SEED_PHRASE_NOT_VERIFIED);
     }
     // Call the original method
-    return await originalMethod.apply(this, args);
+    const result = await originalMethod.apply(this, args);
+    await Agent.agent.recordCriticalAction();
+    return result;
   };
 };
 
@@ -129,7 +131,7 @@ async function cleanupPendingOperations(
   }
 
   const deletePromises = pendingOperations.map(async (operation) => {
-      await operationPendingStorage.deleteById(operation.id);
+    await operationPendingStorage.deleteById(operation.id);
   });
 
   await Promise.allSettled(deletePromises);
