@@ -95,6 +95,9 @@ class ConnectionService extends AgentService {
   static readonly NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER =
     "Cannot set up normal connection without specifying a local identifier to share with the other party";
 
+  static readonly INVALID_DOOBI_CONTENT_TYPE =
+    "Invalid Content-Type for DOOBI. Expected application/json+cesr";
+
   onConnectionStateChanged(
     callback: (event: ConnectionStateChangedEvent) => void
   ) {
@@ -137,9 +140,18 @@ class ConnectionService extends AgentService {
 
     if (
       !new URL(url).pathname.match(OOBI_RE) &&
+      !new URL(url).pathname.match(DOOBI_RE) &&
       !new URL(url).pathname.match(WOOBI_RE)
     ) {
       throw new Error(ConnectionService.OOBI_INVALID);
+    }
+
+    if (new URL(url).pathname.match(DOOBI_RE)) {
+      const response = await fetch(url, { method: "GET" });
+      const contentType = response.headers.get("Content-Type");
+      if (!contentType?.includes("application/json+cesr")) {
+        throw new Error(ConnectionService.INVALID_DOOBI_CONTENT_TYPE);
+      }
     }
 
     const multiSigInvite = url.includes(OobiQueryParams.GROUP_ID);
@@ -147,6 +159,7 @@ class ConnectionService extends AgentService {
     if (!oobiPath) {
       throw new Error(ConnectionService.OOBI_INVALID);
     }
+
     const connectionId = oobiPath.split("/")[0];
 
     const alias =
