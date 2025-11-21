@@ -170,9 +170,6 @@ const archivedMetadataRecord = new CredentialMetadataRecord({
 describe("Credential service of agent", () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    jest.spyOn(Agent.agent, "isSeedPhraseVerified").mockResolvedValue(true);
-    jest.spyOn(Agent.agent, "isVerificationMandatory").mockResolvedValue(false);
-    jest.spyOn(Agent.agent, "recordCriticalAction").mockImplementation(async () => { });
   });
   test("can get all credentials", async () => {
     credentialStorage.getAllCredentialMetadata = jest
