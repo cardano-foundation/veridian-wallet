@@ -1367,14 +1367,7 @@ describe("Single sig service of agent", () => {
       {
         displayName: newDisplayName,
         theme: newTheme,
-      }
-    );
-    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
-      2,
-      "member-identifier-id",
-      {
-        displayName: newDisplayName,
-        theme: newTheme,
+        groupMetadata: memberMetadata.groupMetadata,
       }
     );
     expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
@@ -1515,20 +1508,22 @@ describe("Single sig service of agent", () => {
     });
     expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
       1,
-      "member-identifier-id",
-      {
-        groupMetadata: {
-          ...memberMetadata.groupMetadata,
-          proposedUsername: newUsername,
-        },
-      }
-    );
-    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
-      2,
       identifierMetadataRecord.id,
       {
         groupUsername: newUsername,
         pendingUpdate: true,
+      }
+    );
+    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
+      2,
+      "member-identifier-id",
+      {
+        displayName: "Group Name",
+        theme: 2,
+        groupMetadata: {
+          ...memberMetadata.groupMetadata,
+          proposedUsername: newUsername,
+        },
       }
     );
     expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
