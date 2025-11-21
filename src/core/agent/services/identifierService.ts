@@ -382,37 +382,21 @@ class IdentifierService extends AgentService {
         );
       }
 
-      let memberMetadataChanged = false;
-      if (
-        memberMetadata.displayName !== metadata.displayName ||
-        memberMetadata.theme !== metadata.theme
-      ) {
-        memberMetadata.displayName = metadata.displayName;
-        memberMetadata.theme = metadata.theme;
-        memberMetadataChanged = true;
-      }
+      memberMetadata.displayName = metadata.displayName;
+      memberMetadata.theme = metadata.theme;
 
-      if (
-        metadata.groupUsername &&
-        memberMetadata.groupMetadata.proposedUsername !== metadata.groupUsername
-      ) {
+      if (metadata.groupUsername) {
         memberMetadata.groupMetadata = {
           ...memberMetadata.groupMetadata,
           proposedUsername: metadata.groupUsername,
         };
-        memberMetadataChanged = true;
       }
 
-      if (memberMetadataChanged) {
-        await this.identifierStorage.updateIdentifierMetadata(
-          memberMetadata.id,
-          {
-            displayName: memberMetadata.displayName,
-            theme: memberMetadata.theme,
-            groupMetadata: memberMetadata.groupMetadata,
-          }
-        );
-      }
+      await this.identifierStorage.updateIdentifierMetadata(memberMetadata.id, {
+        displayName: memberMetadata.displayName,
+        theme: memberMetadata.theme,
+        groupMetadata: memberMetadata.groupMetadata,
+      });
 
       const desiredMemberName = this.calcKeriaHabName(memberMetadata);
       const memberHab = await this.props.signifyClient
