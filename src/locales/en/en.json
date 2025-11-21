@@ -406,7 +406,7 @@
       "bottomdescription": "If you’re ready and understand, please click the “Proceed to scan” button. This will open a scanner where you scan the QR code or manually enter the URL.",
       "buttons": {
         "connected": "Get connected",
-        "onboardingdocumentation": "Visit our website",
+        "onboardingdocumentation": "Visit our documentation",
         "recoverydocumentation": "Recovery documentation"
       }
     },
@@ -427,7 +427,10 @@
     },
     "advancedsetup": {
       "title": "Advanced setup",
-      "description": "To connect, please enter the SSI agent boot and connect URLs (in your email or from your command line).",
+      "description": {
+        "connectboot":  "To connect, please enter the SSI agent boot and connect URLs (in your email or from your command line).",
+        "connect": "To connect, please enter the SSI agent connect URL (in your email or from your command line)."
+      },
       "buttons": {
         "connect": "Connect",
         "cancel": "Cancel"
