@@ -109,6 +109,24 @@ describe("Identifier storage test", () => {
     expect(storageService.update).toBeCalledWith(identifierWithGroupUsername);
   });
 
+  test("Should update identifier pendingUpdate flag", async () => {
+    const identifierWithPendingUpdate = new IdentifierMetadataRecord({
+      ...identifierMetadataRecordProps,
+      pendingUpdate: false,
+    });
+    storageService.findById.mockResolvedValue(identifierWithPendingUpdate);
+
+    await identifierStorage.updateIdentifierMetadata(
+      identifierMetadataRecord.id,
+      {
+        pendingUpdate: true,
+      }
+    );
+
+    expect(identifierWithPendingUpdate.pendingUpdate).toBe(true);
+    expect(storageService.update).toBeCalledWith(identifierWithPendingUpdate);
+  });
+
   test("Should get all identifier pending deletion", async () => {
     storageService.findAllByQuery.mockResolvedValue([
       {
@@ -151,5 +169,22 @@ describe("Identifier storage test", () => {
     expect(
       await identifierStorage.getIdentifierMetadataByGroupId(groupIdToSearch)
     ).toEqual(null);
+  });
+
+  test("Should get identifiers pending update", async () => {
+    const pendingRecord = new IdentifierMetadataRecord({
+      ...identifierMetadataRecordProps,
+      id: "pending-id",
+      pendingUpdate: true,
+    });
+    storageService.findAllByQuery.mockResolvedValue([pendingRecord]);
+
+    await expect(
+      identifierStorage.getIdentifiersPendingUpdate()
+    ).resolves.toEqual([pendingRecord]);
+    expect(storageService.findAllByQuery).toHaveBeenCalledWith(
+      { pendingUpdate: true },
+      IdentifierMetadataRecord
+    );
   });
 });

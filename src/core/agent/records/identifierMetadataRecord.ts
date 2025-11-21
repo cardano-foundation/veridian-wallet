@@ -19,6 +19,7 @@ interface IdentifierMetadataRecordProps {
   groupMetadata?: GroupMetadata;
   groupUsername?: string;
   pendingDeletion?: boolean;
+  pendingUpdate?: boolean;
   sxlt?: string;
   tags?: Tags;
 }
@@ -29,6 +30,7 @@ class IdentifierMetadataRecord extends BaseRecord {
   creationStatus!: CreationStatus;
   isDeleted!: boolean;
   pendingDeletion!: boolean;
+  pendingUpdate!: boolean;
   groupMemberPre?: string;
   groupMetadata?: GroupMetadata;
   groupUsername?: string;
@@ -51,6 +53,7 @@ class IdentifierMetadataRecord extends BaseRecord {
       this.groupMemberPre = props.groupMemberPre;
       this.groupUsername = props.groupUsername;
       this.pendingDeletion = props.pendingDeletion ?? false;
+      this.pendingUpdate = props.pendingUpdate ?? false;
       this.sxlt = props.sxlt;
       this._tags = props.tags ?? {};
     }
@@ -64,6 +67,7 @@ class IdentifierMetadataRecord extends BaseRecord {
       creationStatus: this.creationStatus,
       groupCreated: this.groupMetadata?.groupCreated,
       pendingDeletion: this.pendingDeletion,
+      pendingUpdate: this.pendingUpdate,
     };
   }
 }
