@@ -12,7 +12,7 @@ const requestPermission = jest.fn();
 const startScan = jest.fn();
 const stopScan = jest.fn();
 const discoverConnectUrlMock = jest.fn();
-const getPlatformMock = jest.fn();
+const getPlatformMock = jest.fn(() => ["mobile"]);
 
 import {
   BarcodeFormat,
