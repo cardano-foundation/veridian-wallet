@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
-import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
@@ -62,34 +61,24 @@ const CreatePassword = ({
         dispatch(setToastMsg(ToastMsgType.PASSWORD_CREATED));
       handleClear();
     } else {
-      try {
-        const seedPhraseStore = await Agent.agent.getBranAndMnemonic();
-        await SecureStorage.set(
-          KeyStoreKeys.SIGNIFY_BRAN,
-          seedPhraseStore.bran
-        );
+      const { nextPath, updateRedux } = getNextRoute(
+        RoutePath.CREATE_PASSWORD,
+        {
+          store: { stateCache },
+          state: { skipped },
+        }
+      );
 
-        const { nextPath, updateRedux } = getNextRoute(
-          RoutePath.CREATE_PASSWORD,
-          {
-            store: { stateCache },
-            state: { skipped },
-          }
-        );
-
-        updateReduxState(
-          nextPath.pathname,
-          {
-            store: { stateCache },
-            state: { skipped },
-          },
-          dispatch,
-          updateRedux
-        );
-        ionRouter.push(nextPath.pathname, "forward", "push");
-      } catch (e) {
-        showError("Unable to save seedphrase", e, dispatch);
-      }
+      updateReduxState(
+        nextPath.pathname,
+        {
+          store: { stateCache },
+          state: { skipped },
+        },
+        dispatch,
+        updateRedux
+      );
+      ionRouter.push(nextPath.pathname, "forward", "push");
     }
   };
 
@@ -98,6 +87,10 @@ const CreatePassword = ({
   const handleSkip = () => {
     setAlertCancelIsOpen(true);
   };
+
+  const progressBarValue = stateCache.authentication.recoveryWalletProgress
+    ? 0.5
+    : 0.66;
 
   return (
     <>
@@ -108,7 +101,7 @@ const CreatePassword = ({
           <PageHeader
             currentPath={isOnboarding ? RoutePath.CREATE_PASSWORD : undefined}
             progressBar={isOnboarding}
-            progressBarValue={0.5}
+            progressBarValue={progressBarValue}
             progressBarBuffer={1}
             closeButton={!isOnboarding}
             closeButtonAction={handleClear}

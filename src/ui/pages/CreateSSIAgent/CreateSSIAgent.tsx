@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
+import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -311,6 +312,18 @@ const CreateSSIAgent = () => {
     try {
       const validBootUrl = removeLastSlash(bootUrl.trim());
 
+      const existBran = await SecureStorage.keyExists(
+        KeyStoreKeys.SIGNIFY_BRAN
+      );
+
+      if (!existBran) {
+        const seedPhraseStore = await Agent.agent.getBranAndMnemonic();
+        await SecureStorage.set(
+          KeyStoreKeys.SIGNIFY_BRAN,
+          seedPhraseStore.bran
+        );
+      }
+
       if (connectUrl) {
         const validconnectUrl = removeLastSlash(connectUrl.trim());
 
@@ -378,6 +391,7 @@ const CreateSSIAgent = () => {
             setCurrentPage={setCurrentPage}
             onScanFinish={handleSSI}
             isLoading={loading}
+            isRecovery={stateCache.authentication.recoveryWalletProgress}
           />
         );
       case CurrentPage.AdvancedSetting:
