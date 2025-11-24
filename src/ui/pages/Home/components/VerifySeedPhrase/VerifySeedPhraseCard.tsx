@@ -27,6 +27,7 @@ const VerifySeedPhraseCard = () => {
           seedPhraseIsSet: true,
         })
       );
+      setShowSuccess(false);
     }, MESSAGE_TIMEOUT);
   };
 

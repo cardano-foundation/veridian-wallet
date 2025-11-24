@@ -200,8 +200,7 @@
     "onboarding": {
       "title": "Verify your recovery phrase",
       "button": {
-        "continue": "Verify",
-        "back": "Back",
+        "continue": "Confirm",
         "clear": "Clear all"
       }
     },

@@ -21,6 +21,7 @@ const VerifySeedPhraseModal = ({
 }: VerifySeedPhraseModalProps) => {
   const [step, setStep] = useState<Step>(Step.View);
   const [seedPhrase, setSeedPhrase] = useState<string[]>([]);
+  const pageId = step == Step.View ? "view-seedphrase" : "verify-seedphrase";
 
   const handleClose = () => {
     setShow(false);
@@ -89,6 +90,7 @@ const VerifySeedPhraseModal = ({
   return (
     <IonModal isOpen={show}>
       <ScrollablePageLayout
+        pageId={pageId}
         header={
           <PageHeader
             title={title}
