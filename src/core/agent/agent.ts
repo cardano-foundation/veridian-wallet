@@ -408,7 +408,7 @@ class Agent {
       this.connections.resolvePendingConnections();
       this.identifiers.removeIdentifiersPendingDeletion();
       this.identifiers.processIdentifiersPendingCreation();
-      this.identifiers.processPendingIdentifierUpdates();
+      this.identifiers.processIdentifiersPendingUpdate();
       this.credentials.removeCredentialsPendingDeletion();
       this.multiSigs.processGroupsPendingCreation();
     }
