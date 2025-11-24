@@ -78,6 +78,7 @@ const mockConnectionService = {
 const mockIdentifierService = {
   processIdentifiersPendingCreation: jest.fn(),
   removeIdentifiersPendingDeletion: jest.fn(),
+  processIdentifiersPendingUpdate: jest.fn(),
   syncKeriaIdentifiers: jest.fn(),
 };
 const mockCredentialService = {
