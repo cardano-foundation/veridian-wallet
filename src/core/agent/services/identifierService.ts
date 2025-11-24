@@ -836,6 +836,7 @@ class IdentifierService extends AgentService {
         displayName: parsed.displayName,
         theme,
         groupMemberPre,
+        groupUsername: mhabParsed.groupMetadata.proposedUsername,
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
         isDeleted: identifier.name.startsWith(
