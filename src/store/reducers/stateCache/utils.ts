@@ -3,7 +3,6 @@ import {
   RegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 import { DAppConnection } from "../profileCache";
 
@@ -12,7 +11,12 @@ const createMapData = <T>(
   filterKey: keyof T
 ): Record<string, T[]> => {
   return items.reduce((result, item) => {
-    const id = item[filterKey] as string;
+    const id = item[filterKey] as string | undefined;
+
+    if (!id) {
+      return result;
+    }
+
     if (result[id]) {
       result[id].push(item);
     } else {
@@ -23,12 +27,13 @@ const createMapData = <T>(
   }, {} as Record<string, T[]>);
 };
 
-const filterProfileData = (
+const createProfileMapData = (
   allCreds: CredentialShortDetails[],
   allArchivedCreds: CredentialShortDetails[],
   allConnections: RegularConnectionDetails[],
   allPeerConnections: DAppConnection[],
-  allNotifications: KeriaNotification[]
+  allNotifications: KeriaNotification[],
+  allMultisigConnections: MultisigConnectionDetails[]
 ) => {
   const profileCreds = createMapData(allCreds, "identifierId");
   const profileArchivedCreds = createMapData(allArchivedCreds, "identifierId");
@@ -38,6 +43,7 @@ const filterProfileData = (
     "selectedAid"
   );
   const profileNotifications = createMapData(allNotifications, "receivingPre");
+  const filterMutisigMap = createMapData(allMultisigConnections, "groupId");
 
   return {
     profileCredentialsMap: profileCreds,
@@ -45,21 +51,8 @@ const filterProfileData = (
     profileArchivedCredentialsMap: profileArchivedCreds,
     profilePeerConnectionsMap: profilePeerConnections,
     profileNotificationsMap: profileNotifications,
+    filterMutisigMap,
   };
 };
 
-const filterMutisigData = (
-  identifiers: Record<string, IdentifierShortDetails>,
-  allMultisigConnections: MultisigConnectionDetails[],
-  profile: IdentifierShortDetails
-) => {
-  const groupIdToFilter = profile.groupMemberPre
-    ? identifiers[profile.groupMemberPre]?.groupMetadata?.groupId
-    : profile.groupMetadata?.groupId;
-
-  return allMultisigConnections.filter(
-    (conn) => "groupId" in conn && conn.groupId === groupIdToFilter
-  );
-};
-
-export { filterMutisigData, filterProfileData as createProfileMapData };
+export { createProfileMapData };
