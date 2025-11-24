@@ -10,7 +10,7 @@ import {
 import "./VerifySeedPhraseCard.scss";
 import { VerifySeedPhraseModal } from "./VerifySeedPhraseModal";
 
-const MESSAGE_TIMEOUT = 500;
+const MESSAGE_TIMEOUT = 2500;
 
 const VerifySeedPhraseCard = () => {
   const authentication = useAppSelector(getAuthentication);
