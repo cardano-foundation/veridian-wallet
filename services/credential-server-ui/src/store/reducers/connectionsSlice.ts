@@ -2,7 +2,11 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { config } from "../../config";
 import { Contact } from "../../pages/Connections/components/ConnectionsTable/ConnectionsTable.types";
-import { Credential, PresentationRequestData } from "./connectionsSlice.types";
+import {
+  Credential,
+  PresentationRequestData,
+  PresentationRequestStatus,
+} from "./connectionsSlice.types";
 
 interface ConnectionsState {
   contacts: Contact[];
@@ -43,6 +47,16 @@ export const fetchContactCredentials = createAsyncThunk(
   }
 );
 
+export const fetchPresentationRequests = createAsyncThunk(
+  "connections/fetchPresentationRequests",
+  async () => {
+    const response = await axios.get(
+      `${config.endpoint}${config.path.getPresentationRequests}`
+    );
+    return response.data.data;
+  }
+);
+
 const connectionsSlice = createSlice({
   name: "connections",
   initialState,
@@ -52,6 +66,24 @@ const connectionsSlice = createSlice({
       action: PayloadAction<PresentationRequestData>
     ) => {
       state.presentationRequests.push(action.payload);
+    },
+    updatePresentationStatus: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        status: PresentationRequestStatus;
+        acdcCredential?: any;
+      }>
+    ) => {
+      const request = state.presentationRequests.find(
+        (req) => req.id === action.payload.id
+      );
+      if (request) {
+        request.status = action.payload.status;
+        if (action.payload.acdcCredential) {
+          request.acdcCredential = action.payload.acdcCredential;
+        }
+      }
     },
   },
   extraReducers: (builder) => {
@@ -75,10 +107,21 @@ const connectionsSlice = createSlice({
         state.credentials = currentCredentials.concat(
           credentials.map((cred: Credential) => ({ ...cred, contactId }))
         );
+      })
+      .addCase(fetchPresentationRequests.fulfilled, (state, action) => {
+        const payload = action.payload.map((request: any) => {
+          return {
+            ...request,
+            attributes: request.attributes,
+          };
+        });
+
+        state.presentationRequests = payload;
       });
   },
 });
 
-export const { savePresentationRequest } = connectionsSlice.actions;
+export const { savePresentationRequest, updatePresentationStatus } =
+  connectionsSlice.actions;
 
 export default connectionsSlice.reducer;

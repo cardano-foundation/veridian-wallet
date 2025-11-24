@@ -36,6 +36,8 @@ const config = {
     resolveOobi: "/resolveOobi",
     requestDisclosure: "/requestDisclosure",
     revokeCredential: "/revokeCredential",
+    verifyIpexPresentation: "/verifyIpexPresentation",
+    getPresentationRequests: "/getPresentationRequests",
     schemas: "/schemas",
   },
 };

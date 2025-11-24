@@ -41,7 +41,7 @@ export const useTable = <T extends AppTableBaseData = AppTableBaseData>(
   const [orderBy, setOrderBy] = useState<keyof T>(initSortKey);
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleRequestSort = (property: keyof T) => {
     const isAsc = orderBy === property && order === "asc";
