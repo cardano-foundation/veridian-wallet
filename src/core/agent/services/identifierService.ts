@@ -369,7 +369,7 @@ class IdentifierService extends AgentService {
   }
 
   @OnlineOnly
-  private async pushIdentifierStateToKeria(
+  private async propagateUpdatesForIdentifier(
     metadata: IdentifierMetadataRecord
   ): Promise<void> {
     if (metadata.groupMemberPre) {
@@ -583,13 +583,13 @@ class IdentifierService extends AgentService {
     }
   }
 
-  async processPendingIdentifierUpdates(): Promise<void> {
+  async processIdentifiersPendingUpdate(): Promise<void> {
     const pendingIdentifiers =
       await this.identifierStorage.getIdentifiersPendingUpdate();
 
     for (const identifier of pendingIdentifiers) {
       try {
-        await this.pushIdentifierStateToKeria(identifier);
+        await this.propagateUpdatesForIdentifier(identifier);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(
@@ -651,7 +651,7 @@ class IdentifierService extends AgentService {
       pendingUpdate: true,
     });
 
-    await this.pushIdentifierStateToKeria(identifierMetadata);
+    await this.propagateUpdatesForIdentifier(identifierMetadata);
   }
 
   @OnlineOnly
@@ -690,7 +690,7 @@ class IdentifierService extends AgentService {
       });
     }
 
-    await this.pushIdentifierStateToKeria(identifierMetadata);
+    await this.propagateUpdatesForIdentifier(identifierMetadata);
   }
 
   @OnlineOnly

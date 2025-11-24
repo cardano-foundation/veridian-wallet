@@ -1625,7 +1625,7 @@ describe("Single sig service of agent", () => {
         name: "1.2.0.2:1:Second",
       });
 
-    await identifierService.processPendingIdentifierUpdates();
+    await identifierService.processIdentifiersPendingUpdate();
 
     expect(updateIdentifierMock).toHaveBeenCalledWith(
       pendingRecord.id,
