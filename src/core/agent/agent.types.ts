@@ -62,6 +62,7 @@ enum MiscRecordId {
   CREDS_FAVOURITES = "creds-favourites",
   DEFAULT_PROFILE = "default-profile",
   APP_BIOMETRY = "app-biometry",
+  APP_NOTIFICATIONS = "app-notifications",
   KERIA_NOTIFICATION_MARKER = "keria-notification-marker",
   APP_CRED_VIEW_TYPE = "app-cred-view-type",
   KERIA_CONNECT_URL = "keria-connect-url",

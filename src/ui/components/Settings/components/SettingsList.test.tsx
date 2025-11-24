@@ -3,6 +3,9 @@ import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import { SettingsList } from "./SettingsList";
 import { store } from "../../../../store";
+import { getNotificationsPreferences } from "../../../../store/reducers/notificationsPreferences/notificationsPreferences";
+import { getBiometricsCache } from "../../../../store/reducers/biometricsCache";
+import { OptionIndex } from "../Settings.types";
 
 jest.mock("../../../../i18n", () => ({
   i18n: { t: jest.fn((key: string) => key) },
@@ -109,9 +112,16 @@ describe("SettingsList", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest
-      .requireMock("react-redux")
-      .useSelector.mockReturnValue({ enabled: false });
+    const useSelectorMock = jest.requireMock("react-redux").useSelector;
+    useSelectorMock.mockImplementation((selector: unknown) => {
+      if (selector === getBiometricsCache) {
+        return { enabled: false };
+      }
+      if (selector === getNotificationsPreferences) {
+        return { enabled: false, configured: false };
+      }
+      return undefined;
+    });
     jest
       .requireMock("../../../hooks/useBiometricsHook")
       .useBiometricAuth.mockReturnValue({
@@ -166,7 +176,13 @@ describe("SettingsList", () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByTestId("settings-support-list-item-4")
+      screen.getByTestId(
+        `settings-support-list-item-${OptionIndex.Documentation}`
+      )
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByTestId("settings-preferences-items")
     ).toBeInTheDocument();
   });
 

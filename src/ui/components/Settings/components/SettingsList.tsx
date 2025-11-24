@@ -5,6 +5,7 @@ import {
   IOSSettings,
   NativeSettings,
 } from "capacitor-native-settings";
+import { Capacitor } from "@capacitor/core";
 import {
   checkboxOutline,
   fingerPrintOutline,
@@ -28,6 +29,11 @@ import {
   setEnableBiometricsCache,
 } from "../../../../store/reducers/biometricsCache";
 import {
+  getNotificationsPreferences,
+  setNotificationsConfigured,
+  setNotificationsEnabled,
+} from "../../../../store/reducers/notificationsPreferences/notificationsPreferences";
+import {
   BiometricAuthOutcome,
   useBiometricAuth,
   BIOMETRIC_SERVER_KEY,
@@ -45,6 +51,7 @@ import { Agent } from "../../../../core/agent/agent";
 import { BasicRecord } from "../../../../core/agent/records";
 import { MiscRecordId } from "../../../../core/agent/agent.types";
 import { showError } from "../../../utils/error";
+import { notificationService } from "../../../../native/pushNotifications/notificationService";
 import { openBrowserLink } from "../../../utils/openBrowserLink";
 import {
   setToastMsg,
@@ -63,6 +70,7 @@ import { InfoCard } from "../../InfoCard";
 const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const dispatch = useAppDispatch();
   const biometricsCache = useSelector(getBiometricsCache);
+  const notificationsPreferences = useSelector(getNotificationsPreferences);
   const [option, setOption] = useState<number | null>(null);
   const {
     biometricInfo,
@@ -79,13 +87,147 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
   const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] =
     useState(false);
+  const [showNotificationsSettingsAlert, setShowNotificationsSettingsAlert] =
+    useState(false);
+  const [showNotificationsErrorAlert, setShowNotificationsErrorAlert] =
+    useState(false);
+  const [
+    showNotificationsSetupFailedAlert,
+    setShowNotificationsSetupFailedAlert,
+  ] = useState(false);
+  const [isProcessingNotificationsToggle, setIsProcessingNotificationsToggle] =
+    useState(false);
+  const [isAwaitingNotificationSettings, setIsAwaitingNotificationSettings] =
+    useState(false);
   const history = useHistory();
+
+  const platform = Capacitor.getPlatform();
+  const isAndroidPlatform = platform === "android";
 
   useEffect(() => {
     if (!lockoutEndTime && showMaxAttemptsAlert) {
       setShowMaxAttemptsAlert(false);
     }
   }, [lockoutEndTime, showMaxAttemptsAlert]);
+
+  useEffect(() => {
+    const checkPermissionsOnResume = async () => {
+      if (!isAwaitingNotificationSettings) return;
+
+      try {
+        const granted = await notificationService.arePermissionsGranted();
+        if (granted) {
+          await persistNotificationsPreferences(true, true);
+        } else {
+          setShowNotificationsSetupFailedAlert(true);
+        }
+      } catch (error) {
+        setShowNotificationsSetupFailedAlert(true);
+      } finally {
+        setIsAwaitingNotificationSettings(false);
+      }
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        checkPermissionsOnResume();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isAwaitingNotificationSettings]);
+
+  const openNotificationSettings = async () => {
+    try {
+      setIsAwaitingNotificationSettings(true);
+      await NativeSettings.open({
+        optionAndroid: AndroidSettings.AppNotification,
+        optionIOS: IOSSettings.AppNotification,
+      });
+    } catch (error) {
+      setIsAwaitingNotificationSettings(false);
+      showError("Unable to open notification settings", error, dispatch);
+    }
+  };
+
+  const persistNotificationsPreferences = async (
+    enabled: boolean,
+    configuredOverride?: boolean
+  ) => {
+    const configured =
+      configuredOverride !== undefined
+        ? configuredOverride
+        : notificationsPreferences.configured;
+
+    dispatch(setNotificationsEnabled(enabled));
+    dispatch(setNotificationsConfigured(configured));
+
+    try {
+      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.APP_NOTIFICATIONS,
+          content: { enabled, configured },
+        })
+      );
+    } catch (error) {
+      showError("Failed to update notification settings", error, dispatch);
+    }
+  };
+
+  const attemptEnableNotifications = async () => {
+    if (isProcessingNotificationsToggle) {
+      return;
+    }
+
+    setIsProcessingNotificationsToggle(true);
+
+    try {
+      const permissionsGranted =
+        await notificationService.arePermissionsGranted();
+      if (permissionsGranted) {
+        await persistNotificationsPreferences(true, true);
+        return;
+      }
+
+      const granted = await notificationService.requestPermissions();
+      if (granted) {
+        await persistNotificationsPreferences(true, true);
+        return;
+      }
+
+      if (!notificationsPreferences.configured) {
+        setShowNotificationsSettingsAlert(true);
+      } else {
+        await openNotificationSettings();
+      }
+    } catch (error) {
+      if (isAndroidPlatform) {
+        setShowNotificationsErrorAlert(true);
+        return;
+      }
+
+      showError(
+        i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
+        ),
+        error,
+        dispatch
+      );
+    } finally {
+      setIsProcessingNotificationsToggle(false);
+    }
+  };
+
+  const handleNotificationToggle = async () => {
+    if (notificationsPreferences.enabled) {
+      await persistNotificationsPreferences(false);
+      return;
+    }
+
+    await attemptEnableNotifications();
+  };
 
   const securityItems: OptionProps[] = [
     {
@@ -119,6 +261,24 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
       ),
     });
   }
+
+  const preferencesItems: OptionProps[] = [
+    {
+      index: OptionIndex.Notifications,
+      icon: lockClosedOutline,
+      label: i18n.t("settings.sections.preferences.notifications.title"),
+      actionIcon: (
+        <IonToggle
+          aria-label="Notifications Toggle"
+          className="toggle-button"
+          checked={notificationsPreferences.enabled}
+          disabled={isProcessingNotificationsToggle}
+          onIonChange={() => handleNotificationToggle()}
+          onClick={(event) => event.stopPropagation()}
+        />
+      ),
+    },
+  ];
 
   const supportItems: OptionProps[] = [
     {
@@ -225,6 +385,10 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         handleBiometricUpdate();
         break;
       }
+      case OptionIndex.Notifications: {
+        handleNotificationToggle();
+        break;
+      }
       case OptionIndex.ChangePin: {
         openVerify();
         break;
@@ -307,7 +471,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   return (
     <>
       <InfoCard
-        content={i18n.t("settings.sections.text")}
+        content={i18n.t("settings.info")}
         icon={informationCircleOutline}
       />
       <div className="settings-section-title">
@@ -330,6 +494,27 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
           />
         )}
         testId="settings-security-items"
+      />
+      <div className="settings-section-title">
+        {i18n.t("settings.sections.preferences.title")}
+      </div>
+      <ListCard
+        items={preferencesItems}
+        renderItem={(item) => (
+          <ListItem
+            key={item.index}
+            index={item.index}
+            icon={item.icon}
+            label={item.label}
+            actionIcon={item.actionIcon}
+            note={item.note}
+            href={item.href}
+            onClick={() => handleOptionClick(item)}
+            testId={`settings-preferences-list-item-${item.index}`}
+            className="list-item"
+          />
+        )}
+        testId="settings-preferences-items"
       />
       <div className="settings-section-title">
         {i18n.t("settings.sections.support.title")}
@@ -416,6 +601,51 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
         actionConfirm={() => setShowPermanentLockoutAlert(false)}
         backdropDismiss={false}
+      />
+      <Alert
+        isOpen={showNotificationsSettingsAlert}
+        setIsOpen={setShowNotificationsSettingsAlert}
+        dataTestId="notifications-settings-alert"
+        headerText={i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
+        )}
+        confirmButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.confirm"
+        )}`}
+        cancelButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.cancel"
+        )}`}
+        actionConfirm={openNotificationSettings}
+      />
+      <Alert
+        isOpen={showNotificationsErrorAlert}
+        setIsOpen={setShowNotificationsErrorAlert}
+        dataTestId="notifications-try-again-alert"
+        headerText={i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.enablepermissions"
+        )}
+        confirmButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.tryagain"
+        )}`}
+        cancelButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.cancel"
+        )}`}
+        actionConfirm={attemptEnableNotifications}
+      />
+      <Alert
+        isOpen={showNotificationsSetupFailedAlert}
+        setIsOpen={setShowNotificationsSetupFailedAlert}
+        dataTestId="notifications-setup-failed-alert"
+        headerText={i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.setupfailed"
+        )}
+        confirmButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.tryagain"
+        )}`}
+        cancelButtonText={`${i18n.t(
+          "settings.sections.preferences.notifications.notificationsalert.cancel"
+        )}`}
+        actionConfirm={openNotificationSettings}
       />
     </>
   );
