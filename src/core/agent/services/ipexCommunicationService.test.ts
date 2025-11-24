@@ -1578,6 +1578,7 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Can join group offer of an ACDC", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     eventEmitter.emit = jest.fn();
     const notificationRecord = {
       type: "NotificationRecord",
@@ -1667,6 +1668,7 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Cannot join group to offer ACDC if linked apply notification does not exist", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     notificationStorage.findById.mockResolvedValue(null);
 
     await expect(
@@ -1680,6 +1682,7 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Cannot join group to offer ACDC twice", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const notificationRecord = {
       type: "NotificationRecord",
       id: "id",
@@ -1708,6 +1711,7 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Cannot join group to offer ACDC if there is no current offer", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const notificationRecord = {
       type: "NotificationRecord",
       id: "id",
