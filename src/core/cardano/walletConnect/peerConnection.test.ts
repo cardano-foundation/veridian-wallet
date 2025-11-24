@@ -19,6 +19,7 @@ jest.mock("../../agent/agent", () => ({
         updateIdentifier: jest.fn(),
       },
       getKeriaOnlineStatus: jest.fn(),
+      isSeedPhraseVerified: jest.fn().mockResolvedValue(true),
       peerConnectionPair: {
         getPeerConnection: jest.fn(),
         createPeerConnectionPairRecord: jest.fn(),

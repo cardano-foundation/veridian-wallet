@@ -66,6 +66,23 @@ const OnlineOnly = (
   };
 };
 
+const SeedPhraseVerified = (
+  _target: unknown,
+  _propertyKey: string,
+  descriptor: PropertyDescriptor
+) => {
+  const originalMethod = descriptor.value;
+  descriptor.value = async function (...args: unknown[]) {
+    if (await Agent.agent.isVerificationMandatory()) {
+      throw new Error(Agent.SEED_PHRASE_NOT_VERIFIED);
+    }
+    // Call the original method
+    const result = await originalMethod.apply(this, args);
+    await Agent.agent.recordCriticalAction();
+    return result;
+  };
+};
+
 export const deleteNotificationRecordById = async (
   client: SignifyClient,
   notificationStorage: NotificationStorage,
@@ -114,7 +131,7 @@ async function cleanupPendingOperations(
   }
 
   const deletePromises = pendingOperations.map(async (operation) => {
-      await operationPendingStorage.deleteById(operation.id);
+    await operationPendingStorage.deleteById(operation.id);
   });
 
   await Promise.allSettled(deletePromises);
@@ -141,6 +158,7 @@ function isNetworkError(error: Error): boolean {
 
 export {
   OnlineOnly,
+  SeedPhraseVerified,
   waitAndGetDoneOp,
   getCredentialShortDetails,
   randomSalt,

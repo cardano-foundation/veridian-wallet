@@ -21,7 +21,12 @@ import {
   IdentifierMetadataRecordProps,
 } from "../records/identifierMetadataRecord";
 import { AgentService } from "./agentService";
-import { OnlineOnly, randomSalt, deleteNotificationRecordById } from "./utils";
+import {
+  OnlineOnly,
+  SeedPhraseVerified,
+  randomSalt,
+  deleteNotificationRecordById,
+} from "./utils";
 import {
   BasicRecord,
   BasicStorage,
@@ -231,6 +236,7 @@ class IdentifierService extends AgentService {
     }
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async createIdentifier(
     metadata: Omit<IdentifierMetadataRecordProps, "id" | "createdAt">,
@@ -846,6 +852,7 @@ class IdentifierService extends AgentService {
     }
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async rotateIdentifier(identifier: string): Promise<void> {
     const rotateResult = await this.props.signifyClient
@@ -870,6 +877,7 @@ class IdentifierService extends AgentService {
     };
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async remoteSign(notificationId: string, requestSaid: string): Promise<void> {
     const noteRecord = await this.notificationStorage.findExpectedById(
