@@ -219,6 +219,7 @@ class IpexCommunicationService extends AgentService {
     await this.notificationStorage.update(grantNoteRecord);
   }
 
+  @SeedPhraseVerified
   @OnlineOnly
   async offerAcdcFromApply(notificationId: string, acdc: ACDC): Promise<void> {
     const applyNoteRecord = await this.notificationStorage.findById(
@@ -286,7 +287,6 @@ class IpexCommunicationService extends AgentService {
     await this.notificationStorage.update(applyNoteRecord);
   }
 
-  @SeedPhraseVerified
   @OnlineOnly
   async grantAcdcFromAgree(notificationId: string): Promise<void> {
     const agreeNoteRecord = await this.notificationStorage.findById(
@@ -699,6 +699,8 @@ class IpexCommunicationService extends AgentService {
     await this.notificationStorage.update(grantNoteRecord);
   }
 
+  @SeedPhraseVerified
+  @OnlineOnly
   async joinMultisigOffer(applyNotificationId: string): Promise<void> {
     const applyNoteRecord = await this.notificationStorage.findById(
       applyNotificationId
