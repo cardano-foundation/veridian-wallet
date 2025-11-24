@@ -3,55 +3,56 @@ import {
   RegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import { CredentialShortDetails } from "../../../core/agent/services/credentialService.types";
-import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { KeriaNotification } from "../../../core/agent/services/keriaNotificationService.types";
 import { DAppConnection } from "../profileCache";
 
-const filterProfileData = (
-  identifiers: Record<string, IdentifierShortDetails>,
+const createMapData = <T>(
+  items: T[],
+  filterKey: keyof T
+): Record<string, T[]> => {
+  return items.reduce((result, item) => {
+    const id = item[filterKey] as string | undefined;
+
+    if (!id) {
+      return result;
+    }
+
+    if (result[id]) {
+      result[id].push(item);
+    } else {
+      result[id] = [item];
+    }
+
+    return result;
+  }, {} as Record<string, T[]>);
+};
+
+const createProfileMapData = (
   allCreds: CredentialShortDetails[],
   allArchivedCreds: CredentialShortDetails[],
   allConnections: RegularConnectionDetails[],
-  allMultisigConnections: MultisigConnectionDetails[],
   allPeerConnections: DAppConnection[],
   allNotifications: KeriaNotification[],
-  profile: IdentifierShortDetails
+  allMultisigConnections: MultisigConnectionDetails[]
 ) => {
-  const profileId = profile.id;
-  const profileIdentifier = identifiers[profileId];
-  const profileCreds = allCreds.filter(
-    (cred) => cred.identifierId === profileId
+  const profileCreds = createMapData(allCreds, "identifierId");
+  const profileArchivedCreds = createMapData(allArchivedCreds, "identifierId");
+  const profileConnections = createMapData(allConnections, "identifier");
+  const profilePeerConnections = createMapData(
+    allPeerConnections,
+    "selectedAid"
   );
-  const profileArchivedCreds = allArchivedCreds.filter(
-    (cred) => cred.identifierId === profileId
-  );
-  const profileConnections = allConnections.filter(
-    (conn) => conn.identifier === profileId
-  );
-
-  const groupIdToFilter = profile.groupMemberPre
-    ? identifiers[profile.groupMemberPre]?.groupMetadata?.groupId
-    : profile.groupMetadata?.groupId;
-
-  const profileMultisigConnections = allMultisigConnections.filter(
-    (conn) => "groupId" in conn && conn.groupId === groupIdToFilter
-  );
-  const profilePeerConnections = allPeerConnections.filter(
-    (conn) => conn.selectedAid === profileId
-  );
-  const profileNotifications = allNotifications.filter(
-    (noti) => noti.receivingPre === profileId
-  );
+  const profileNotifications = createMapData(allNotifications, "receivingPre");
+  const filterMutisigMap = createMapData(allMultisigConnections, "groupId");
 
   return {
-    profileIdentifier: profileIdentifier,
-    profileCredentials: profileCreds,
-    profileConnections: profileConnections,
-    profileMultisigConnections: profileMultisigConnections,
-    profileArchivedCredentials: profileArchivedCreds,
-    profilePeerConnections: profilePeerConnections,
-    profileNotifications: profileNotifications,
+    profileCredentialsMap: profileCreds,
+    profileConnectionsMap: profileConnections,
+    profileArchivedCredentialsMap: profileArchivedCreds,
+    profilePeerConnectionsMap: profilePeerConnections,
+    profileNotificationsMap: profileNotifications,
+    filterMutisigMap,
   };
 };
 
-export { filterProfileData };
+export { createProfileMapData };

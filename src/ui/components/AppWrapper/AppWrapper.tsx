@@ -20,7 +20,6 @@ import { IdentifierService } from "../../../core/agent/services";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
-import { notificationService } from "../../../native/pushNotifications/notificationService";
 import {
   PeerConnectedEvent,
   PeerConnectionBrokenEvent,
@@ -29,6 +28,7 @@ import {
 } from "../../../core/cardano/walletConnect/peerConnection.types";
 import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
 import { i18n } from "../../../i18n";
+import { notificationService } from "../../../native/pushNotifications/notificationService";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { setEnableBiometricsCache } from "../../../store/reducers/biometricsCache";
 import {
@@ -72,7 +72,7 @@ import {
   InitializationPhase,
   PendingJoinGroupMetadata,
 } from "../../../store/reducers/stateCache/stateCache.types";
-import { filterProfileData } from "../../../store/reducers/stateCache/utils";
+import { createProfileMapData } from "../../../store/reducers/stateCache/utils";
 import {
   setCredentialFavouriteIndex,
   setCredentialViewTypeCache,
@@ -474,35 +474,42 @@ const AppWrapper = (props: { children: ReactNode }) => {
         {}
       );
 
+      const {
+        profileArchivedCredentialsMap,
+        profileConnectionsMap,
+        profileCredentialsMap,
+        profileNotificationsMap,
+        profilePeerConnectionsMap,
+        filterMutisigMap,
+      } = createProfileMapData(
+        credsCache,
+        credsArchivedCache,
+        allConnections as RegularConnectionDetails[],
+        storedPeerConnections,
+        notifications,
+        allMultisigConnections as MultisigConnectionDetails[]
+      );
+
       const profiles = storedIdentifiers.reduce(
         (acc: Record<string, Profile>, identifier) => {
-          const {
-            profileIdentifier,
-            profileCredentials,
-            profileArchivedCredentials,
-            profileConnections,
-            profileMultisigConnections,
-            profilePeerConnections,
-            profileNotifications,
-          } = filterProfileData(
-            identifiersDict,
-            credsCache,
-            credsArchivedCache,
-            allConnections as RegularConnectionDetails[],
-            allMultisigConnections as MultisigConnectionDetails[],
-            storedPeerConnections,
-            notifications,
-            identifier
-          );
+          const groupIdToFilter = identifier.groupMemberPre
+            ? identifiersDict[identifier.groupMemberPre]?.groupMetadata?.groupId
+            : identifier.groupMetadata?.groupId;
+
+          const multisigConnections =
+            groupIdToFilter && filterMutisigMap[groupIdToFilter]
+              ? filterMutisigMap[groupIdToFilter]
+              : [];
 
           acc[identifier.id] = {
-            identity: profileIdentifier,
-            connections: profileConnections,
-            multisigConnections: profileMultisigConnections,
-            peerConnections: profilePeerConnections,
-            credentials: profileCredentials,
-            archivedCredentials: profileArchivedCredentials,
-            notifications: profileNotifications,
+            identity: identifier,
+            connections: profileConnectionsMap[identifier.id] || [],
+            multisigConnections: multisigConnections,
+            peerConnections: profilePeerConnectionsMap[identifier.id] || [],
+            credentials: profileCredentialsMap[identifier.id] || [],
+            archivedCredentials:
+              profileArchivedCredentialsMap[identifier.id] || [],
+            notifications: profileNotificationsMap[identifier.id] || [],
           };
 
           return acc;
