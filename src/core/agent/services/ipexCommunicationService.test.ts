@@ -289,7 +289,7 @@ jest.mock("../../../core/agent/agent", () => ({
     MISSING_DATA_ON_KERIA: "Missing data error msg mock",
     agent: {
       isSeedPhraseVerified: jest.fn().mockResolvedValue(true),
-      isVerificationMandatory: jest.fn().mockResolvedValue(false),
+      isVerificationEnforced: jest.fn().mockResolvedValue(false),
       recordCriticalAction: jest.fn(),
     },
   },
@@ -2311,6 +2311,10 @@ describe("Grant ACDC group actions", () => {
 });
 
 describe("Chained ACDC schema resolution", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test("Can resolve non-chained ACDC schema", async () => {
     schemaGetMock.mockResolvedValue(schemaNoEdges);
     const schema = await ipexCommunicationService.recursiveSchemaResolve(

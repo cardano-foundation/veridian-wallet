@@ -776,7 +776,7 @@ describe("Seed Phrase Verification", () => {
   test("isSeedPhraseVerified should return false when record does not exist", async () => {
     mockBasicStorageService.findById.mockResolvedValue(null);
 
-    const result = await (agent as any).isSeedPhraseVerified();
+    const result = await agent.isSeedPhraseVerified();
 
     expect(result).toBe(false);
     expect(mockBasicStorageService.findById).toHaveBeenCalledWith(
@@ -792,7 +792,7 @@ describe("Seed Phrase Verification", () => {
       })
     );
 
-    const result = await (agent as any).isSeedPhraseVerified();
+    const result = await agent.isSeedPhraseVerified();
 
     expect(result).toBe(false);
   });
@@ -805,7 +805,7 @@ describe("Seed Phrase Verification", () => {
       })
     );
 
-    const result = await (agent as any).isSeedPhraseVerified();
+    const result = await agent.isSeedPhraseVerified();
 
     expect(result).toBe(true);
   });
@@ -837,8 +837,8 @@ describe("Critical Action Tracking", () => {
     jest.clearAllMocks();
   });
 
-  describe("isVerificationMandatory", () => {
-    test("should return false if seed phrase is verified", async () => {
+  describe("isVerificationEnforced", () => {
+    test("isVerificationEnforced should return false if seed phrase is verified", async () => {
       // Mock seed phrase verified = true
       mockBasicStorageService.findById.mockImplementation((id) => {
         if (id === MiscRecordId.SEED_PHRASE_VERIFIED) {
@@ -852,7 +852,7 @@ describe("Critical Action Tracking", () => {
         return Promise.resolve(null);
       });
 
-      const result = await agent.isVerificationMandatory();
+      const result = await agent.isVerificationEnforced();
       expect(result).toBe(false);
     });
 
@@ -876,7 +876,7 @@ describe("Critical Action Tracking", () => {
         return Promise.resolve(null);
       });
 
-      const result = await agent.isVerificationMandatory();
+      const result = await agent.isVerificationEnforced();
       expect(result).toBe(false);
     });
 
@@ -900,7 +900,7 @@ describe("Critical Action Tracking", () => {
         return Promise.resolve(null);
       });
 
-      const result = await agent.isVerificationMandatory();
+      const result = await agent.isVerificationEnforced();
       expect(result).toBe(false);
     });
 
@@ -924,7 +924,7 @@ describe("Critical Action Tracking", () => {
         return Promise.resolve(null);
       });
 
-      const result = await agent.isVerificationMandatory();
+      const result = await agent.isVerificationEnforced();
       expect(result).toBe(true);
     });
   });
