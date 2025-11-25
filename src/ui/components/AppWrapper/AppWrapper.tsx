@@ -706,15 +706,13 @@ const AppWrapper = (props: { children: ReactNode }) => {
         }
       }
 
-      const seedPhraseIsSet = await Agent.agent.basicStorage.findById(
-        MiscRecordId.VERIFY_SEEDPHRASE
-      );
+      const isSeedPhraseVerified = await Agent.agent.isSeedPhraseVerified();
 
       dispatch(
         setAuthentication({
           ...authentication,
           passcodeIsSet,
-          seedPhraseIsSet: !!seedPhraseIsSet?.content.value,
+          seedPhraseIsSet: !!isSeedPhraseVerified,
           passwordIsSet,
           passwordIsSkipped: !!passwordSkipped?.content.value,
           ssiAgentIsSet:

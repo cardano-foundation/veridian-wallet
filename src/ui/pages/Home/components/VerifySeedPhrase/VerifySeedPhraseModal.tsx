@@ -1,8 +1,6 @@
 import { IonModal } from "@ionic/react";
 import { useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
-import { MiscRecordId } from "../../../../../core/agent/agent.types";
-import { BasicRecord } from "../../../../../core/agent/records";
 import { i18n } from "../../../../../i18n";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../../../components/PageHeader";
@@ -37,14 +35,7 @@ const VerifySeedPhraseModal = ({
 
   const verifySuccess = async () => {
     try {
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.VERIFY_SEEDPHRASE,
-          content: {
-            value: true,
-          },
-        })
-      );
+      await Agent.agent.markSeedPhraseAsVerified();
 
       handleClose();
       onVerifySuccess();
