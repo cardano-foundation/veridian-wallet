@@ -73,7 +73,7 @@ const SeedPhraseVerified = (
 ) => {
   const originalMethod = descriptor.value;
   descriptor.value = async function (...args: unknown[]) {
-    if (await Agent.agent.isVerificationMandatory()) {
+    if (await Agent.agent.isVerificationEnforced()) {
       throw new Error(Agent.SEED_PHRASE_NOT_VERIFIED);
     }
     // Call the original method
@@ -105,7 +105,10 @@ export const deleteNotificationRecordById = async (
   }
 
   if (notificationRecord?.linkedRequest?.current) {
-    await cleanupPendingOperations(operationPendingStorage, notificationRecord.linkedRequest.current);
+    await cleanupPendingOperations(
+      operationPendingStorage,
+      notificationRecord.linkedRequest.current
+    );
   }
 
   await notificationStorage.deleteById(id);
@@ -118,12 +121,12 @@ export const deleteNotificationRecordById = async (
  */
 async function cleanupPendingOperations(
   operationPendingStorage: OperationPendingStorage,
-  linkedRequestCurrent: string,
+  linkedRequestCurrent: string
 ): Promise<void> {
   const pendingOperations = await operationPendingStorage.findAllByQuery({
     filter: {
-      id: { $regex: `^.*\\.${linkedRequestCurrent}$` }
-    }
+      id: { $regex: `^.*\\.${linkedRequestCurrent}$` },
+    },
   });
 
   if (pendingOperations.length === 0) {

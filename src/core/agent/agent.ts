@@ -635,7 +635,7 @@ class Agent {
     }
   }
 
-  private async isSeedPhraseVerified(): Promise<boolean> {
+  async isSeedPhraseVerified(): Promise<boolean> {
     if (this.seedPhraseVerifiedCache !== undefined) {
       return this.seedPhraseVerifiedCache;
     }
@@ -711,7 +711,7 @@ class Agent {
     );
   }
 
-  async isVerificationMandatory(): Promise<boolean> {
+  async isVerificationEnforced(): Promise<boolean> {
     if (await this.isSeedPhraseVerified()) {
       return false;
     }

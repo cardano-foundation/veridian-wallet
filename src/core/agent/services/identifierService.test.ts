@@ -311,7 +311,7 @@ describe("Single sig service of agent", () => {
     jest
       .spyOn(Agent.agent as any, "isSeedPhraseVerified")
       .mockResolvedValue(true);
-    jest.spyOn(Agent.agent, "isVerificationMandatory").mockResolvedValue(false);
+    jest.spyOn(Agent.agent, "isVerificationEnforced").mockResolvedValue(false);
     jest
       .spyOn(Agent.agent, "recordCriticalAction")
       .mockReturnValue(Promise.resolve());
