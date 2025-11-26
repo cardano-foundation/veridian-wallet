@@ -95,8 +95,8 @@ class ConnectionService extends AgentService {
   static readonly NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER =
     "Cannot set up normal connection without specifying a local identifier to share with the other party";
 
-  static readonly INVALID_DOOBI_CONTENT_TYPE =
-    "Invalid Content-Type for DOOBI. Expected application/json+cesr";
+  static readonly INVALID_DOOBI_CONNECTION_CONTENT_TYPE =
+    "Can only create new connections for DOOBIs with a content-type of application/json+cesr (DOOBI is a commonly used hack for group multi-sig OOBIs)";
 
   onConnectionStateChanged(
     callback: (event: ConnectionStateChangedEvent) => void
@@ -150,7 +150,9 @@ class ConnectionService extends AgentService {
       const response = await fetch(url, { method: "GET" });
       const contentType = response.headers.get("Content-Type");
       if (!contentType?.includes("application/json+cesr")) {
-        throw new Error(ConnectionService.INVALID_DOOBI_CONTENT_TYPE);
+        throw new Error(
+          ConnectionService.INVALID_DOOBI_CONNECTION_CONTENT_TYPE
+        );
       }
     }
 

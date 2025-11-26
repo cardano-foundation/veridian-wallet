@@ -350,7 +350,7 @@ describe("Connection service of agent", () => {
     await expect(
       connectionService.connectByOobiUrl(invalidDoobi, "shared-identifier")
     ).rejects.toThrowError(
-      new Error(ConnectionService.INVALID_DOOBI_CONTENT_TYPE)
+      new Error(ConnectionService.INVALID_DOOBI_CONNECTION_CONTENT_TYPE)
     );
 
     validUrls = [
