@@ -15,6 +15,7 @@ import {
   layersOutline,
   libraryOutline,
   lockClosedOutline,
+  notificationsOutline,
 } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -265,7 +266,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const preferencesItems: OptionProps[] = [
     {
       index: OptionIndex.Notifications,
-      icon: lockClosedOutline,
+      icon: notificationsOutline,
       label: i18n.t("settings.sections.preferences.notifications.title"),
       actionIcon: (
         <IonToggle
@@ -486,6 +487,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
             icon={item.icon}
             label={item.label}
             actionIcon={item.actionIcon}
+            showStartIcon
             note={item.note}
             href={item.href}
             onClick={() => handleOptionClick(item)}
@@ -502,6 +504,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         items={preferencesItems}
         renderItem={(item) => (
           <ListItem
+            showStartIcon
             key={item.index}
             index={item.index}
             icon={item.icon}
@@ -523,6 +526,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         items={supportItems}
         renderItem={(item) => (
           <ListItem
+            showStartIcon
             key={item.index}
             index={item.index}
             icon={item.icon}
