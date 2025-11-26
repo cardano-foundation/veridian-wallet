@@ -69,8 +69,8 @@ class IdentifierService extends AgentService {
     "Misconfigured KERIA agent for this wallet type";
   static readonly INVALID_QUEUED_DISPLAY_NAMES_FORMAT =
     "Queued display names has invalid format";
-  static readonly IDENTIFIER_GROUP_METADATA_MISSING =
-    "Group metadata data in identifier  does not exist";
+  static readonly MHAB_NAME_MISSING_GROUP_METADATA =
+    "Expected member hab name to include group metadata";
   static readonly CANNOT_FIND_EXISTING_IDENTIFIER_BY_SEARCH =
     "Identifier name taken on KERIA, but cannot be found when iterating over identifier list";
   // @TODO - foconnor: When we refactor this, only member identifiers will have groupMetadata
@@ -364,14 +364,18 @@ class IdentifierService extends AgentService {
   private calcKeriaHabName(
     metadata:
       | IdentifierMetadataRecord
-      | Omit<IdentifierMetadataRecordProps, "id" | "createdAt">
+      | Omit<IdentifierMetadataRecordProps, "id" | "createdAt">,
+    deletedVariant = false
   ) {
+    const theme = deletedVariant
+      ? `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}`
+      : metadata.theme;
     if (metadata.groupMetadata) {
       const initiatorFlag = metadata.groupMetadata.groupInitiator ? "1" : "0";
       const proposedUsernamePart = metadata.groupMetadata.proposedUsername;
-      return `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${proposedUsernamePart}:${metadata.displayName}`;
+      return `${LATEST_IDENTIFIER_VERSION}:${theme}:${initiatorFlag}:${metadata.groupMetadata.groupId}:${proposedUsernamePart}:${metadata.displayName}`;
     }
-    return `${LATEST_IDENTIFIER_VERSION}:${metadata.theme}:${metadata.displayName}`;
+    return `${LATEST_IDENTIFIER_VERSION}:${theme}:${metadata.displayName}`;
   }
 
   @OnlineOnly
@@ -508,9 +512,7 @@ class IdentifierService extends AgentService {
         }
       );
       await this.props.signifyClient.identifiers().update(localMember.id, {
-        name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${
-          localMember.groupMetadata?.groupId
-        }:${localMember.displayName}`,
+        name: this.calcKeriaHabName(localMember, true),
       });
 
       if (localMember.groupMetadata?.groupId) {
@@ -540,9 +542,7 @@ class IdentifierService extends AgentService {
     }
 
     await this.props.signifyClient.identifiers().update(identifier, {
-      name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}:${
-        metadata.displayName
-      }`,
+      name: this.calcKeriaHabName(metadata, true),
     });
 
     for (const notification of await this.notificationStorage.findAllByQuery({
@@ -770,9 +770,9 @@ class IdentifierService extends AgentService {
         ? 0
         : parseInt(parsed.theme, 10);
 
-      const identifierDetail = (await this.props.signifyClient
+      const identifierDetail = await this.props.signifyClient
         .identifiers()
-        .get(identifier.prefix)) as HabState;
+        .get(identifier.prefix);
 
       if (parsed.groupMetadata) {
         await this.identifierStorage.createIdentifierMetadataRecord({
@@ -807,16 +807,11 @@ class IdentifierService extends AgentService {
     }
 
     for (const identifier of unSyncedDataWithGroup) {
-      const identifierDetail = (await this.props.signifyClient
+      const identifierDetail = await this.props.signifyClient
         .identifiers()
-        .get(identifier.prefix)) as HabState;
+        .get(identifier.prefix);
 
-      const nameToParse = identifier.name.startsWith(
-        IdentifierService.DELETED_IDENTIFIER_THEME
-      )
-        ? identifier.group.mhab.name
-        : identifier.name;
-      const parsed = parseHabName(nameToParse);
+      const parsed = parseHabName(identifier.name);
       const theme = parsed.theme.startsWith(
         IdentifierService.DELETED_IDENTIFIER_THEME
       )
@@ -842,9 +837,8 @@ class IdentifierService extends AgentService {
       }
 
       const mhabParsed = parseHabName(identifier.group.mhab.name);
-
       if (!mhabParsed.groupMetadata) {
-        throw new Error(IdentifierService.IDENTIFIER_GROUP_METADATA_MISSING);
+        throw new Error(IdentifierService.MHAB_NAME_MISSING_GROUP_METADATA);
       }
 
       // Mark as created
