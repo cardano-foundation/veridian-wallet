@@ -65,7 +65,7 @@ const VerifySeedPhraseModal = ({
   };
 
   const handleCloseButtonClick = () => {
-    return step === Step.View ? handleClose() : () => setStep(Step.View);
+    return step === Step.View ? handleClose() : setStep(Step.View);
   };
 
   const title =
