@@ -1,0 +1,31 @@
+.settings-template {
+  display: flex !important;
+
+  &.show {
+    transform: translate3d(0, 0, 0);
+    transition-duration: 0.5s;
+  }
+
+  &.hide {
+    transform: translate3d(100%, 0, 0);
+    transition-duration: 0.5s;
+  }
+
+  ion-header.page-header ion-toolbar {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  ion-toolbar ion-buttons ion-button.back-button {
+    --background-activated: var(--ion-color-neutral-100);
+    --background-focused: var(--ion-color-neutral-100);
+    --background-hover: var(--ion-color-neutral-100);
+    background: var(--ion-color-neutral-100);
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    ion-header ion-toolbar {
+      margin-top: 0.531rem;
+    }
+  }
+}

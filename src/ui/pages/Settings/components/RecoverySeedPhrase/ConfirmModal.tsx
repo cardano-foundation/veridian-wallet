@@ -6,9 +6,9 @@ import {
   ConfirmModalProps,
 } from "./RecoverySeedPhrase.types";
 import { i18n } from "../../../../../i18n";
-import { OptionModal } from "../../../OptionsModal";
-import { PageFooter } from "../../../PageFooter";
-import { Verification } from "../../../Verification";
+import { OptionModal } from "../../../../components/OptionsModal";
+import { PageFooter } from "../../../../components/PageFooter";
+import { Verification } from "../../../../components/Verification";
 
 const ConditionItem = ({
   text,

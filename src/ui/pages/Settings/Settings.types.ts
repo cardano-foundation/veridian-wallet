@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 
 enum SettingScreen {
   Settings,
+  ChangePin,
   ManagePassword,
   TermsAndPrivacy,
   RecoverySeedPhrase,

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { i18n } from "../../../../../i18n";
-import { TermsModal } from "../../../TermsModal";
-import { ListCard } from "../../../ListCard/ListCard";
-import { ListItem } from "../../../ListCard/ListItem/ListItem";
+import { TermsModal } from "../../../../components/TermsModal";
+import { ListCard } from "../../../../components/ListCard/ListCard";
+import { ListItem } from "../../../../components/ListCard/ListItem/ListItem";
 const TermsAndPrivacy = () => {
   const [openTerms, setOpenTerms] = useState(false);
   const [openPrivacy, setOpenPrivacy] = useState(false);

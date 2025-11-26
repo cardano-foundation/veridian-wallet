@@ -5,12 +5,12 @@ import { i18n } from "../../../../../i18n";
 import { useAppDispatch } from "../../../../../store/hooks";
 import { useOnlineStatusEffect } from "../../../../hooks";
 import { showError } from "../../../../utils/error";
-import { InfoCard } from "../../../InfoCard";
-import { SeedPhraseModule } from "../../../SeedPhraseModule";
+import { InfoCard } from "../../../../components/InfoCard";
+import { SeedPhraseModule } from "../../../../components/SeedPhraseModule";
 import { ConfirmModal } from "./ConfirmModal";
 import "./RecoverySeedPhrase.scss";
 import { RecoverySeedPhraseProps } from "./RecoverySeedPhrase.types";
-import { PageFooter } from "../../../PageFooter";
+import { PageFooter } from "../../../../components/PageFooter";
 
 const RecoverySeedPhrase = ({ onClose }: RecoverySeedPhraseProps) => {
   const componentId = "recovery-seed-phrase";

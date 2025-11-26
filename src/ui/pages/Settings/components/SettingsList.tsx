@@ -20,8 +20,8 @@ import {
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { ListItem } from "../../ListCard/ListItem/ListItem";
-import { ListCard } from "../../ListCard/ListCard";
+import { ListItem } from "../../../components/ListCard/ListItem/ListItem";
+import { ListCard } from "../../../components/ListCard/ListCard";
 import pJson from "../../../../../package.json";
 import "./SettingsList.scss";
 import { useAppDispatch } from "../../../../store/hooks";
@@ -62,11 +62,11 @@ import {
 import { CLEAR_STORE_ACTIONS } from "../../../../store/utils";
 import { ToastMsgType } from "../../../globals/types";
 import { RoutePath } from "../../../../routes";
-import { PageFooter } from "../../PageFooter";
+import { PageFooter } from "../../../components/PageFooter";
 import { ChangePin } from "./ChangePin";
-import { Alert } from "../../Alert";
-import { Verification } from "../../Verification";
-import { InfoCard } from "../../InfoCard";
+import { Alert } from "../../../components/Alert";
+import { Verification } from "../../../components/Verification";
+import { InfoCard } from "../../../components/InfoCard";
 
 const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const dispatch = useAppDispatch();
@@ -440,12 +440,12 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
 
   const onVerify = () => {
     switch (option) {
-      case 0: {
+      case OptionIndex.BiometricUpdate: {
         biometricAuth();
         break;
       }
-      case 1: {
-        setChangePinIsOpen(true);
+      case OptionIndex.ChangePin: {
+        switchView && switchView(SettingScreen.ChangePin);
         break;
       }
       case OptionIndex.DeleteWallet:
@@ -544,10 +544,6 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
       <PageFooter
         deleteButtonAction={openDeleteWalletAlert}
         deleteButtonText={`${i18n.t("settings.sections.deletewallet.button")}`}
-      />
-      <ChangePin
-        isOpen={changePinIsOpen}
-        setIsOpen={setChangePinIsOpen}
       />
       <Alert
         isOpen={openBiometricAlert}

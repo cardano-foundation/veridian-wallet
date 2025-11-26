@@ -11,12 +11,12 @@ import { KeyStoreKeys, SecureStorage } from "../../../../../core/storage";
 import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { i18n } from "../../../../../i18n";
-import { Alert } from "../../../Alert";
-import { VerifyPassword } from "../../../VerifyPassword";
-import { VerifyPasscode } from "../../../VerifyPasscode";
-import { ListCard } from "../../../ListCard/ListCard";
-import { ListItem } from "../../../ListCard/ListItem/ListItem";
-import { CreatePassword } from "../../../../pages/CreatePassword";
+import { Alert } from "../../../../components/Alert";
+import { VerifyPassword } from "../../../../components/VerifyPassword";
+import { VerifyPasscode } from "../../../../components/VerifyPasscode";
+import { ListCard } from "../../../../components/ListCard/ListCard";
+import { ListItem } from "../../../../components/ListCard/ListItem/ListItem";
+import { CreatePassword } from "../../../CreatePassword";
 
 const ManagePassword = () => {
   const dispatch = useAppDispatch();

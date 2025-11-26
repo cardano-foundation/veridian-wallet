@@ -9,7 +9,7 @@ import TRANSLATIONS from "../../../../../locales/en/en.json";
 import { RoutePath } from "../../../../../routes";
 import { makeTestStore } from "../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
-import { CustomInputProps } from "../../../CustomInput/CustomInput.types";
+import { CustomInputProps } from "../../../../components/CustomInput/CustomInput.types";
 import { ManagePassword } from "./ManagePassword";
 
 const deletePasswordMock = jest.fn();
