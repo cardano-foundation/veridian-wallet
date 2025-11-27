@@ -64,7 +64,7 @@ export function parseHabName(name: string): HabNameParts {
   }
 
   // Handle old format: theme:groupInitiator-groupId:displayName or theme:displayName
-  if (parts.length < 2 || parts.length > 3) {
+  if (parts.length !== 2 && parts.length !== 3) {
     throw new Error(
       "Invalid old format name: Expected 2 or 3 parts separated by colons (theme:groupPart:displayName or theme:displayName)."
     );

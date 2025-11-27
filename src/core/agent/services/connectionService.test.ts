@@ -998,9 +998,6 @@ describe("Connection service of agent", () => {
       },
     ];
 
-    identifierStorage.getAllIdentifiers = jest
-      .fn()
-      .mockResolvedValue([localIdentifier]);
     contactListMock.mockReturnValue(cloudContacts);
     contactStorage.findById = jest.fn().mockResolvedValue(null);
     connectionPairStorage.findById = jest.fn().mockResolvedValue(null);
@@ -1027,7 +1024,7 @@ describe("Connection service of agent", () => {
     });
   });
 
-  test("should restore connection pairs from cloud contact data during recovery", async () => {
+  test("should restore connection pairs from a cloud contact in multiple profiles", async () => {
     const localIdentifier = { id: "Eabc123" };
     const anotherLocalIdentifier = { id: "Fdef456" };
     identifierStorage.getAllIdentifiers = jest
@@ -1040,7 +1037,7 @@ describe("Connection service of agent", () => {
       oobi: "http://oobi.com/Dcontact1",
       createdAt: "2025-01-01T00:00:00.000Z",
       "Eabc123:createdAt": "2025-01-02T00:00:00.000Z",
-      "Xyz789:createdAt": "2025-01-03T00:00:00.000Z", // This one should be ignored
+      "Fdef456:createdAt": "2025-01-03T00:00:00.000Z", // This one should be ignored
     };
     contactListMock.mockReturnValue([cloudContact]);
     contactStorage.findById = jest.fn().mockResolvedValue(null);
@@ -1048,7 +1045,6 @@ describe("Connection service of agent", () => {
 
     await connectionService.syncKeriaContacts();
 
-    // Verify that the main contact record was saved
     expect(contactStorage.save).toHaveBeenCalledTimes(1);
     expect(contactStorage.save).toHaveBeenCalledWith({
       id: "Dcontact1",
@@ -1057,13 +1053,19 @@ describe("Connection service of agent", () => {
       groupId: undefined,
       createdAt: expect.any(Date),
     });
-
-    // Verify that the connection pair for the matching identifier was created
-    expect(connectionPairStorage.save).toHaveBeenCalledTimes(1);
+    expect(connectionPairStorage.save).toHaveBeenCalledTimes(2);
     expect(connectionPairStorage.save).toHaveBeenCalledWith({
       id: "Eabc123:Dcontact1",
       contactId: "Dcontact1",
       identifier: "Eabc123",
+      creationStatus: CreationStatus.COMPLETE,
+      pendingDeletion: false,
+      createdAt: expect.any(Date),
+    });
+    expect(connectionPairStorage.save).toHaveBeenCalledWith({
+      id: "Fdef456:Dcontact1",
+      contactId: "Dcontact1",
+      identifier: "Fdef456",
       creationStatus: CreationStatus.COMPLETE,
       pendingDeletion: false,
       createdAt: expect.any(Date),

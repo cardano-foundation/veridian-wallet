@@ -217,9 +217,13 @@ class CredentialService extends AgentService {
     let iteration = 0;
 
     while (returned !== 0) {
+      // Pagination must be sorted to ensure if KERIA parses new credentials the re-indexing is much less likely to interfere
       const result = await this.props.signifyClient.credentials().list({
         skip: iteration * 24,
-        limit: 24 + iteration * 24,
+        limit: 24,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - @TODO - foconnor: object[] type is incorrect in signify-ts, to correct to string[].
+        sort: ["-a-dt"],
       });
       cloudCredentials.push(...result);
 

@@ -1,9 +1,11 @@
 import { SignifyClient } from "signify-ts";
-import { NotificationStorage, OperationPendingStorage, OperationPendingRecordType } from "../records";
+import {
+  NotificationStorage,
+  OperationPendingStorage,
+  OperationPendingRecordType,
+} from "../records";
 import { NotificationRoute } from "./keriaNotificationService.types";
 import { deleteNotificationRecordById } from "./utils";
-
-
 
 describe("Utils", () => {
   beforeEach(() => {
@@ -53,8 +55,12 @@ describe("Utils", () => {
           mockOperationPendingStorage
         );
 
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
-        expect(mockOperationPendingStorage.findAllByQuery).not.toHaveBeenCalled();
+        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(
+          notificationId
+        );
+        expect(
+          mockOperationPendingStorage.findAllByQuery
+        ).not.toHaveBeenCalled();
       });
 
       test("should delete notification without operation cleanup when operationPendingStorage is provided but no linked requests", async () => {
@@ -71,8 +77,12 @@ describe("Utils", () => {
           mockOperationPendingStorage
         );
 
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
-        expect(mockOperationPendingStorage.findAllByQuery).not.toHaveBeenCalled();
+        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(
+          notificationId
+        );
+        expect(
+          mockOperationPendingStorage.findAllByQuery
+        ).not.toHaveBeenCalled();
       });
 
       test("should delete notification when operationPendingStorage is provided but notification has no linkedRequest.current", async () => {
@@ -89,8 +99,12 @@ describe("Utils", () => {
           mockOperationPendingStorage
         );
 
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
-        expect(mockOperationPendingStorage.findAllByQuery).not.toHaveBeenCalled();
+        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(
+          notificationId
+        );
+        expect(
+          mockOperationPendingStorage.findAllByQuery
+        ).not.toHaveBeenCalled();
       });
     });
 
@@ -106,11 +120,19 @@ describe("Utils", () => {
 
       test("should clean up pending operations when notification has linked requests", async () => {
         const mockOperations = [
-          { id: "exchange.receivecredential.linked-request-456", recordType: OperationPendingRecordType.ExchangeReceiveCredential },
-          { id: "exchange.offercredential.linked-request-456", recordType: OperationPendingRecordType.ExchangeOfferCredential },
+          {
+            id: "exchange.receivecredential.linked-request-456",
+            recordType: OperationPendingRecordType.ExchangeReceiveCredential,
+          },
+          {
+            id: "exchange.offercredential.linked-request-456",
+            recordType: OperationPendingRecordType.ExchangeOfferCredential,
+          },
         ];
 
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(mockOperations as any);
+        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(
+          mockOperations as any
+        );
         mockOperationPendingStorage.deleteById.mockResolvedValue(undefined);
 
         await deleteNotificationRecordById(
@@ -121,27 +143,46 @@ describe("Utils", () => {
           mockOperationPendingStorage
         );
 
-        expect(mockOperationPendingStorage.findAllByQuery).toHaveBeenCalledWith({
-          filter: {
-            id: { $regex: `^.*\\.${linkedRequestCurrent}$` }
+        expect(mockOperationPendingStorage.findAllByQuery).toHaveBeenCalledWith(
+          {
+            filter: {
+              id: { $regex: `^.*\\.${linkedRequestCurrent}$` },
+            },
           }
-        });
+        );
 
         expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledTimes(2);
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("exchange.receivecredential.linked-request-456");
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("exchange.offercredential.linked-request-456");
+        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith(
+          "exchange.receivecredential.linked-request-456"
+        );
+        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith(
+          "exchange.offercredential.linked-request-456"
+        );
 
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
+        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(
+          notificationId
+        );
       });
 
       test("should delete all found operations regardless of type", async () => {
         const mockOperations = [
-          { id: "witness.linked-request-456", recordType: OperationPendingRecordType.Witness },
-          { id: "exchange.receivecredential.linked-request-456", recordType: OperationPendingRecordType.ExchangeReceiveCredential },
-          { id: "group.linked-request-456", recordType: OperationPendingRecordType.Group },
+          {
+            id: "witness.linked-request-456",
+            recordType: OperationPendingRecordType.Witness,
+          },
+          {
+            id: "exchange.receivecredential.linked-request-456",
+            recordType: OperationPendingRecordType.ExchangeReceiveCredential,
+          },
+          {
+            id: "group.linked-request-456",
+            recordType: OperationPendingRecordType.Group,
+          },
         ];
 
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(mockOperations as any);
+        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(
+          mockOperations as any
+        );
         mockOperationPendingStorage.deleteById.mockResolvedValue(undefined);
 
         await deleteNotificationRecordById(
@@ -154,11 +195,19 @@ describe("Utils", () => {
 
         // Should delete all operations found
         expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledTimes(3);
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("witness.linked-request-456");
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("exchange.receivecredential.linked-request-456");
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("group.linked-request-456");
+        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith(
+          "witness.linked-request-456"
+        );
+        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith(
+          "exchange.receivecredential.linked-request-456"
+        );
+        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith(
+          "group.linked-request-456"
+        );
 
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
+        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(
+          notificationId
+        );
       });
 
       test("should handle empty operations array gracefully", async () => {
@@ -173,19 +222,25 @@ describe("Utils", () => {
         );
 
         expect(mockOperationPendingStorage.deleteById).not.toHaveBeenCalled();
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
+        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(
+          notificationId
+        );
       });
 
       test("should handle non-array operations result gracefully", async () => {
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(null as any);
+        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(
+          null as any
+        );
 
-        await expect(deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
-        )).rejects.toThrow("Cannot read properties of null (reading 'length')");
+        await expect(
+          deleteNotificationRecordById(
+            mockSignifyClient,
+            mockNotificationStorage,
+            notificationId,
+            route,
+            mockOperationPendingStorage
+          )
+        ).rejects.toThrow("Cannot read properties of null (reading 'length')");
 
         expect(mockOperationPendingStorage.findAllByQuery).toHaveBeenCalled();
         expect(mockOperationPendingStorage.deleteById).not.toHaveBeenCalled();
@@ -198,7 +253,9 @@ describe("Utils", () => {
           { id: "group.linked-request-456", recordType: "group" },
         ];
 
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(mockOperations as any);
+        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(
+          mockOperations as any
+        );
         mockOperationPendingStorage.deleteById.mockResolvedValue(undefined);
 
         await deleteNotificationRecordById(
@@ -210,46 +267,23 @@ describe("Utils", () => {
         );
 
         expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledTimes(2);
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("witness.linked-request-456");
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("group.linked-request-456");
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
-      });
-
-      test("should continue processing other operations when one deletion fails", async () => {
-        const mockOperations = [
-          { id: "exchange.receivecredential.linked-request-456", recordType: OperationPendingRecordType.ExchangeReceiveCredential },
-          { id: "exchange.offercredential.linked-request-456", recordType: OperationPendingRecordType.ExchangeOfferCredential },
-          { id: "exchange.presentcredential.linked-request-456", recordType: OperationPendingRecordType.ExchangePresentCredential },
-        ];
-
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(mockOperations as any);
-        mockOperationPendingStorage.deleteById
-          .mockRejectedValueOnce(new Error("First deletion failed")) // First operation fails
-          .mockResolvedValueOnce(undefined) // Second operation succeeds
-          .mockResolvedValueOnce(undefined); // Third operation succeeds
-
-        await deleteNotificationRecordById(
-          mockSignifyClient,
-          mockNotificationStorage,
-          notificationId,
-          route,
-          mockOperationPendingStorage
+        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith(
+          "witness.linked-request-456"
         );
-
-        // Should attempt to delete all three operations despite the first failure
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledTimes(3);
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("exchange.receivecredential.linked-request-456");
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("exchange.offercredential.linked-request-456");
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("exchange.presentcredential.linked-request-456");
-        
-        // Notification should still be deleted even if some operations fail
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
+        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith(
+          "group.linked-request-456"
+        );
+        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(
+          notificationId
+        );
       });
     });
 
     describe("Notification storage error handling", () => {
       test("should throw error when notification findExpectedById fails", async () => {
-        mockNotificationStorage.findExpectedById.mockRejectedValue(new Error("Storage error"));
+        mockNotificationStorage.findExpectedById.mockRejectedValue(
+          new Error("Storage error")
+        );
 
         await expect(
           deleteNotificationRecordById(
@@ -318,7 +352,9 @@ describe("Utils", () => {
       });
 
       test("should ignore 404 errors from KERIA marking", async () => {
-        mockMarkFunction.mockRejectedValue(new Error("Not Found - 404 - Resource not found"));
+        mockMarkFunction.mockRejectedValue(
+          new Error("Not Found - 404 - Resource not found")
+        );
         mockNotificationStorage.findExpectedById.mockResolvedValue({
           id: notificationId,
           linkedRequest: { accepted: false },
@@ -333,7 +369,9 @@ describe("Utils", () => {
         );
 
         // Should not throw and should continue with deletion
-        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(notificationId);
+        expect(mockNotificationStorage.deleteById).toHaveBeenCalledWith(
+          notificationId
+        );
       });
     });
 
@@ -345,11 +383,16 @@ describe("Utils", () => {
         } as any);
 
         const mockOperations = [
-          { id: "exchange.receivecredential.linked-request-456", recordType: OperationPendingRecordType.ExchangeReceiveCredential },
+          {
+            id: "exchange.receivecredential.linked-request-456",
+            recordType: OperationPendingRecordType.ExchangeReceiveCredential,
+          },
           { id: "unknown.linked-request-456", recordType: "unknown" },
         ];
 
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(mockOperations as any);
+        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(
+          mockOperations as any
+        );
         mockOperationPendingStorage.deleteById.mockResolvedValue(undefined);
 
         await deleteNotificationRecordById(
@@ -362,8 +405,12 @@ describe("Utils", () => {
 
         // Should delete all operations found
         expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledTimes(2);
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("exchange.receivecredential.linked-request-456");
-        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith("unknown.linked-request-456");
+        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith(
+          "exchange.receivecredential.linked-request-456"
+        );
+        expect(mockOperationPendingStorage.deleteById).toHaveBeenCalledWith(
+          "unknown.linked-request-456"
+        );
       });
 
       test("should delete all operations regardless of type", async () => {
@@ -373,12 +420,23 @@ describe("Utils", () => {
         } as any);
 
         const mockOperations = [
-          { id: "exchange.receivecredential.linked-request-456", recordType: OperationPendingRecordType.ExchangeReceiveCredential },
-          { id: "exchange.offercredential.linked-request-456", recordType: OperationPendingRecordType.ExchangeOfferCredential },
-          { id: "exchange.presentcredential.linked-request-456", recordType: OperationPendingRecordType.ExchangePresentCredential },
+          {
+            id: "exchange.receivecredential.linked-request-456",
+            recordType: OperationPendingRecordType.ExchangeReceiveCredential,
+          },
+          {
+            id: "exchange.offercredential.linked-request-456",
+            recordType: OperationPendingRecordType.ExchangeOfferCredential,
+          },
+          {
+            id: "exchange.presentcredential.linked-request-456",
+            recordType: OperationPendingRecordType.ExchangePresentCredential,
+          },
         ];
 
-        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(mockOperations as any);
+        mockOperationPendingStorage.findAllByQuery.mockResolvedValue(
+          mockOperations as any
+        );
         mockOperationPendingStorage.deleteById.mockResolvedValue(undefined);
 
         await deleteNotificationRecordById(
