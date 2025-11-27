@@ -1240,16 +1240,14 @@ describe("Single sig service of agent", () => {
       }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${
-        groupMemberMetadataRecord.groupMetadata!.groupId
-      }:${groupMemberMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-QOP7zdP-kJs8nlwVR290XfyAk:1:group-id:testUser:${groupMemberMetadataRecord.displayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       groupMetadataRecord.id,
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -1717,7 +1715,7 @@ describe("Single sig service of agent", () => {
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -1847,7 +1845,7 @@ describe("Single sig service of agent", () => {
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -1922,7 +1920,7 @@ describe("Single sig service of agent", () => {
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMemberMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:1:${groupMemberMetadataRecord.groupMetadata?.groupId}:${groupMemberMetadataRecord.groupMetadata?.proposedUsername}:${groupMemberMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -2028,16 +2026,14 @@ describe("Single sig service of agent", () => {
       }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${
-        groupMemberMetadataRecord.groupMetadata!.groupId
-      }:${groupMemberMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-QOP7zdP-kJs8nlwVR290XfyAk:1:group-id:testUser:${groupMemberMetadataRecord.displayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       groupMetadataRecord.id,
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(

@@ -786,7 +786,7 @@ class IdentifierService extends AgentService {
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
           sxlt: identifierDetail.salty?.sxlt,
-          isDeleted: identifier.name.startsWith(
+          isDeleted: parsed.theme.startsWith(
             IdentifierService.DELETED_IDENTIFIER_THEME
           ),
         });
@@ -800,7 +800,7 @@ class IdentifierService extends AgentService {
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
         sxlt: identifierDetail.salty?.sxlt,
-        isDeleted: identifier.name.startsWith(
+        isDeleted: parsed.theme.startsWith(
           IdentifierService.DELETED_IDENTIFIER_THEME
         ),
       });
@@ -857,7 +857,7 @@ class IdentifierService extends AgentService {
         groupUsername: mhabParsed.groupMetadata.proposedUsername,
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
-        isDeleted: identifier.name.startsWith(
+        isDeleted: parsed.theme.startsWith(
           IdentifierService.DELETED_IDENTIFIER_THEME
         ),
       });
