@@ -13,7 +13,7 @@ const useOnlineStatusEffect = (callback: () => void | never) => {
     } else {
       return;
     }
-  }, [isOnline, callback]);
+  }, [isOnline, callback, isRunningInJest]);
 };
 
 export { useOnlineStatusEffect };
