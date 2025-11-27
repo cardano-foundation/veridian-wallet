@@ -87,7 +87,7 @@
             ]
           },
           "why": {
-            "title": "What is a recovery phrase?",
+            "title": "Why do I need a recovery phrase?",
             "content": [
               {
                 "text": "<strong>Your wallet, your control:</strong> Unlike traditional accounts, no one—not even us—can reset your wallet for you. This keeps your identity and data secure and fully under your control."
