@@ -1,23 +1,24 @@
-import { useCallback, useState } from "react";
 import { personAdd, refresh } from "ionicons/icons";
+import { useCallback, useState } from "react";
+import { Agent } from "../../../core/agent/agent";
+import { CreationStatus } from "../../../core/agent/agent.types";
+import { IdentifierDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getCurrentProfile } from "../../../store/reducers/profileCache";
-import { Avatar } from "../../components/Avatar";
-import { TabLayout } from "../../components/layout/TabLayout";
-import { Profiles } from "../Profiles";
-import { Tile } from "../../components/Tile";
-import ScanIcon from "../../assets/images/scan-icon.svg";
 import CardanoLogo from "../../assets/images/cardano-logo.svg";
-import "./Home.scss";
-import { ScanToLogin } from "./components/ScanToLogin";
+import ScanIcon from "../../assets/images/scan-icon.svg";
+import { Avatar } from "../../components/Avatar";
 import { ConnectdApp } from "../../components/ConnectdApp";
-import { RotateKeyModal } from "./components/RotateKeyModal";
-import { Agent } from "../../../core/agent/agent";
-import { IdentifierDetails } from "../../../core/agent/services/identifier.types";
-import { showError } from "../../utils/error";
 import { ShareProfile } from "../../components/ShareProfile";
+import { Tile } from "../../components/Tile";
+import { TabLayout } from "../../components/layout/TabLayout";
 import { useOnlineStatusEffect } from "../../hooks";
+import { showError } from "../../utils/error";
+import { Profiles } from "../Profiles";
+import "./Home.scss";
+import { RotateKeyModal } from "./components/RotateKeyModal";
+import { ScanToLogin } from "./components/ScanToLogin";
 import { VerifySeedPhraseCard } from "./components/VerifySeedPhrase";
 
 const Home = () => {
@@ -84,7 +85,14 @@ const Home = () => {
   useOnlineStatusEffect(fetchOobi);
 
   const getDetails = useCallback(async () => {
-    if (!currentProfile) return;
+    if (
+      !currentProfile ||
+      [CreationStatus.PENDING, CreationStatus.FAILED].includes(
+        currentProfile.identity.creationStatus
+      )
+    ) {
+      return;
+    }
 
     try {
       const cardDetailsResult = await Agent.agent.identifiers.getIdentifier(
