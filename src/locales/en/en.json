@@ -585,7 +585,7 @@
     "confirm": "Confirm",
     "input": {
       "label": "Username",
-      "placeholder": "AliBob123"
+      "placeholder": "e.g. JohnSmith25"
     },
     "alert": "No name was set when this group was created, which means other members can’t recognize who you are. Setting a name helps everyone know who's who."
   },
