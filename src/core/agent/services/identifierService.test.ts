@@ -1240,15 +1240,14 @@ describe("Single sig service of agent", () => {
       }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${groupMemberMetadataRecord.groupMetadata?.groupId
-        }:${groupMemberMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-QOP7zdP-kJs8nlwVR290XfyAk:1:group-id:testUser:${groupMemberMetadataRecord.displayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       groupMetadataRecord.id,
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -1715,7 +1714,7 @@ describe("Single sig service of agent", () => {
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -1845,7 +1844,7 @@ describe("Single sig service of agent", () => {
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -1920,7 +1919,7 @@ describe("Single sig service of agent", () => {
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMemberMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:1:${groupMemberMetadataRecord.groupMetadata?.groupId}:${groupMemberMetadataRecord.groupMetadata?.proposedUsername}:${groupMemberMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -2026,15 +2025,14 @@ describe("Single sig service of agent", () => {
       }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${groupMemberMetadataRecord.groupMetadata?.groupId
-        }:${groupMemberMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-QOP7zdP-kJs8nlwVR290XfyAk:1:group-id:testUser:${groupMemberMetadataRecord.displayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       groupMetadataRecord.id,
       { isDeleted: true, pendingDeletion: false }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMetadataRecord.id, {
-      name: `XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
+      name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
     });
     expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
     expect(notificationStorage.deleteById).toBeCalledWith(
@@ -2251,23 +2249,23 @@ describe("Single sig service of agent", () => {
       .mockReturnValueOnce({
         aids: [
           {
-            name: "XX:randomSalt1",
+            name: "XX-randomSalt1:test1",
             prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
             sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
           },
           {
-            name: "XX:randomSalt2",
+            name: "XX-randomSalt2:test2",
             prefix: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
             group: {
               mhab: {
-                name: "1.2.0.2:0:1:group1:user1:test1",
+                name: "1.2.0.2:XX-randomSalt3:1:group1:user1:test1",
                 prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
                 sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
               },
             },
           },
           {
-            name: "XX:randomSalt3",
+            name: "XX-randomSalt4:test3",
             prefix: "EJ9oenRW3_SNc0JkETnOegspNGaDCypBfTU1kJiL2AMs",
             sxlt: "1AAHOxnWacQOKjjcVD3Fl1PNyd9MDOkWAjpIfStG297qrCx9E2W5D8St0SdJ1E8N8yeaN0Gy4kLhH6PVHQwlupAGNRKvodlX-UKo",
           },
@@ -2312,7 +2310,7 @@ describe("Single sig service of agent", () => {
       identifierStorage.createIdentifierMetadataRecord
     ).toHaveBeenCalledWith({
       id: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
-      displayName: "randomSalt1",
+      displayName: "test1",
       theme: 0,
       creationStatus: CreationStatus.COMPLETE,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -2323,7 +2321,7 @@ describe("Single sig service of agent", () => {
       identifierStorage.createIdentifierMetadataRecord
     ).toHaveBeenCalledWith({
       id: "EJ9oenRW3_SNc0JkETnOegspNGaDCypBfTU1kJiL2AMs",
-      displayName: "randomSalt3",
+      displayName: "test3",
       theme: 0,
       creationStatus: CreationStatus.COMPLETE,
       createdAt: new Date("2024-12-10T07:28:18.217384+00:00"),
@@ -2334,7 +2332,7 @@ describe("Single sig service of agent", () => {
       identifierStorage.createIdentifierMetadataRecord
     ).toHaveBeenCalledWith({
       id: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
-      displayName: "test1",
+      displayName: "test2",
       theme: 0,
       groupMemberPre: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
       groupUsername: "user1",
