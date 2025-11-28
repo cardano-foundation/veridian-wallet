@@ -474,15 +474,13 @@ class ConnectionService extends AgentService {
     const connectionPair = await this.connectionPairStorage.findExpectedById(
       `${identifier}:${contactId}`
     );
+    const totalConnectionPairsForWallet =
+      await this.connectionPairStorage.findAllByQuery({
+        contactId,
+      });
 
-    const allConnectionPairs = await this.connectionPairStorage.findAllByQuery({
-      contactId,
-    });
-
-    const isLastConnectionPair = allConnectionPairs.length === 1;
-
-    if (isLastConnectionPair) {
-      // Delete all
+    if (totalConnectionPairsForWallet.length === 1) {
+      // Delete contact by idempotent
       await this.props.signifyClient
         .contacts()
         .delete(contactId)
@@ -491,14 +489,11 @@ class ConnectionService extends AgentService {
           if (!/404/gi.test(status)) {
             throw error;
           }
-          // Idempotent - ignore 404 errors if already deleted
         });
 
-      await this.contactStorage.deleteById(contactId);
-      await this.connectionPairStorage.deleteById(connectionPair.id);
+      await this.contactStorage.deleteByIdIfExists(contactId);
     } else {
-      // If this is not the last (more accounts with this connection):
-      // Update KERIA contact to remove fields
+      // Only remove relevant fields from contact as there are other connection pairs for this contact
       const connection = await this.props.signifyClient
         .contacts()
         .get(contactId)
@@ -520,10 +515,10 @@ class ConnectionService extends AgentService {
         await this.props.signifyClient
           .contacts()
           .update(contactId, contactUpdates);
-
-        await this.connectionPairStorage.deleteById(connectionPair.id);
       }
     }
+
+    await this.connectionPairStorage.deleteById(connectionPair.id);
   }
 
   async markConnectionPendingDelete(
