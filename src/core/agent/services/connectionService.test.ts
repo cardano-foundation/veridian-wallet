@@ -150,6 +150,7 @@ const contactStorage = jest.mocked({
   save: jest.fn(),
   delete: jest.fn(),
   deleteById: jest.fn(),
+  deleteByIdIfExists: jest.fn(),
   update: jest.fn(),
   findById: jest.fn(),
   findAllByQuery: jest.fn(),
@@ -1485,7 +1486,7 @@ describe("Connection service of agent", () => {
       contactId: "contact-id",
     });
     expect(deleteContactMock).toBeCalledWith("contact-id");
-    expect(contactStorage.deleteById).toBeCalledWith("contact-id");
+    expect(contactStorage.deleteByIdIfExists).toBeCalledWith("contact-id");
     expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
   });
 
@@ -1513,7 +1514,7 @@ describe("Connection service of agent", () => {
     );
 
     expect(deleteContactMock).toBeCalledWith("contact-id");
-    expect(contactStorage.deleteById).toBeCalledWith("contact-id");
+    expect(contactStorage.deleteByIdIfExists).toBeCalledWith("contact-id");
     expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
   });
 
@@ -1543,7 +1544,7 @@ describe("Connection service of agent", () => {
     ).rejects.toThrow("Some other error - 500");
 
     expect(deleteContactMock).toBeCalledWith("contact-id");
-    expect(contactStorage.deleteById).not.toBeCalled();
+    expect(contactStorage.deleteByIdIfExists).not.toBeCalled();
     expect(connectionPairStorage.deleteById).not.toBeCalled();
   });
 
@@ -1597,10 +1598,10 @@ describe("Connection service of agent", () => {
     });
     expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
     expect(deleteContactMock).not.toBeCalled();
-    expect(contactStorage.deleteById).not.toBeCalled();
+    expect(contactStorage.deleteByIdIfExists).not.toBeCalled();
   });
 
-  test("Should handle 404 error when getting contact for field removal", async () => {
+  test("Should handle 404 error when getting contact for field removal and continue to delete the connection pair", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const connectionPair = {
       id: "test-identifier:contact-id",
@@ -1612,7 +1613,6 @@ describe("Connection service of agent", () => {
       contactId: "contact-id",
       identifier: "other-identifier",
     };
-
     connectionPairStorage.findExpectedById = jest
       .fn()
       .mockResolvedValueOnce(connectionPair);
@@ -1630,9 +1630,9 @@ describe("Connection service of agent", () => {
 
     expect(contactGetMock).toBeCalledWith("contact-id");
     expect(updateContactMock).not.toBeCalled();
-    expect(connectionPairStorage.deleteById).not.toBeCalled();
     expect(deleteContactMock).not.toBeCalled();
-    expect(contactStorage.deleteById).not.toBeCalled();
+    expect(contactStorage.deleteByIdIfExists).not.toBeCalled();
+    expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
   });
 
   test("Should throw error when getting contact fails with non-404 error", async () => {
@@ -1670,18 +1670,16 @@ describe("Connection service of agent", () => {
     expect(connectionPairStorage.deleteById).not.toBeCalled();
   });
 
-  test("Can delete connection by id if keria throw error 404 when delete contact", async () => {
+  test("Can delete connection by id if keria throws a 404 error when delete contact", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const connectionPair = {
       id: `test-identifier:${contacts[0].id}`,
       contactId: contacts[0].id,
       identifier: "test-identifier",
     };
-
     deleteContactMock = jest
       .fn()
       .mockRejectedValue(new Error("request - 404 - SignifyClient message"));
-
     connectionPairStorage.findExpectedById = jest
       .fn()
       .mockResolvedValueOnce(connectionPair);
@@ -1693,7 +1691,8 @@ describe("Connection service of agent", () => {
       contacts[0].id,
       "test-identifier"
     );
-    expect(contactStorage.deleteById).toBeCalledWith(contacts[0].id);
+
+    expect(contactStorage.deleteByIdIfExists).toBeCalledWith(contacts[0].id);
     expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
   });
 
@@ -1722,7 +1721,7 @@ describe("Connection service of agent", () => {
       )
     ).rejects.toThrow("Some other error - 500");
 
-    expect(contactStorage.deleteById).not.toBeCalled();
+    expect(contactStorage.deleteByIdIfExists).not.toBeCalled();
     expect(connectionPairStorage.deleteById).not.toBeCalled();
   });
 
