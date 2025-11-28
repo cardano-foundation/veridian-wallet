@@ -87,8 +87,8 @@ const SetPasscode = () => {
     ionRouter.push(backPath.pathname, "back", "pop");
   };
 
-  const description = stateCache.authentication.recoveryWalletProgress
-    ? i18n.t("setpasscode.recoverydescription")
+  const description = isOnReenterPasscodeStep
+    ? i18n.t("setpasscode.reenterdescription")
     : i18n.t("setpasscode.description");
 
   const progressBarValue = stateCache.authentication.recoveryWalletProgress

@@ -4,6 +4,10 @@
   justify-content: space-between;
   min-height: calc(100vh - (4.5rem + var(--ion-safe-area-top)));
 
+  .title {
+    text-align: center;
+  }
+
   .paragraph-top {
     padding-inline: 1rem;
     text-align: center;

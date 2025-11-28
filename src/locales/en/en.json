@@ -47,6 +47,7 @@
   "setpasscode": {
     "enterpasscode": "Create your PIN",
     "description": "Create a PIN to secure your wallet and to continue the onboarding process",
+    "reenterdescription": "Re-enter your PIN to make sure it matches",
     "recoverydescription": "Create a PIN to secure your wallet and to continue the recovery process",
     "reenterpasscode": "Re-enter your PIN",
     "cancelbtn": "Cancel",
@@ -165,7 +166,7 @@
     "description": "Please enter your PIN to login",
     "error": "Incorrect PIN",
     "forgotten": {
-      "button": "I've forgotten my PIN"
+      "button": "Forgotten PIN?"
     },
     "attempterror": "{{attempt}} attempt remaining",
     "attemptalert": {
@@ -310,11 +311,11 @@
       "first": {
         "symbolguide": "Symbol guide",
         "title": "Create password",
-        "placeholder": "Type password"
+        "placeholder": "e.g. AbcDE123!"
       },
       "second": {
         "title": "Confirm password",
-        "placeholder": "Retype your password"
+        "placeholder": "e.g. AbcDE123!"
       },
       "third": {
         "title": "Create a hint",
