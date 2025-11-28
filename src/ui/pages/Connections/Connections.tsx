@@ -167,14 +167,14 @@ const Connections = () => {
   };
 
   const deleteConnection = async () => {
-    if (!deletePendingItem) return;
+    if (!deletePendingItem || !deletePendingItem.identifier) return;
 
     try {
       setDeletePendingItem(null);
 
       await Agent.agent.connections.deleteStaleLocalConnectionById(
         deletePendingItem.id,
-        deletePendingItem.identifier!
+        deletePendingItem.identifier
       );
       dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
       dispatch(removeConnectionCache(deletePendingItem.id));

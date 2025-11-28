@@ -1071,7 +1071,7 @@ class IpexCommunicationService extends AgentService {
   private async submitMultisigAdmit(
     multisigId: string,
     grantExn: ExnMessage,
-    admitExnToJoin?: any
+    admitExnToJoin?: Record<string, unknown>
   ): Promise<SubmitIPEXResult> {
     if (!this.props.signifyClient.manager) {
       throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);

@@ -31,6 +31,7 @@ const ConnectionNote = ({
   useEffect(() => {
     onErrorChange(id, hasError);
     hasErrorRef.current = hasError;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -42,6 +43,7 @@ const ConnectionNote = ({
 
   useEffect(() => {
     onErrorChange(id, hasError);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const submitNoteChange = () => {
