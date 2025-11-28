@@ -795,16 +795,9 @@ class Agent {
    * Wipe local database and secure storage to start fresh.
    */
   async wipeLocalDatabase(): Promise<void> {
-    // Stop background services
     this.keriaNotificationService.stopPolling();
-
-    // Wipe the storage session (this deletes the database file)
     await this.storageSession.wipe(walletId);
-
-    // Wipe secure storage
     await SecureStorage.wipe();
-
-    // Mark agent as offline
     this.markAgentStatus(false);
   }
 }

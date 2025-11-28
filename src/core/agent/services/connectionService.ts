@@ -724,8 +724,6 @@ class ConnectionService extends AgentService {
   }
 
   async syncKeriaContacts(): Promise<void> {
-    const localIdentifiers = await this.identifierStorage.getAllIdentifiers();
-    const localAIDs = localIdentifiers.map((id) => id.id);
     const cloudContacts = await this.props.signifyClient.contacts().list();
 
     for (const contact of cloudContacts) {
@@ -747,22 +745,18 @@ class ConnectionService extends AgentService {
         const keyParts = key.split(":");
         if (keyParts.length === 2 && keyParts[1] === "createdAt") {
           const aid = keyParts[0];
-          if (localAIDs.includes(aid)) {
-            const pairId = `${aid}:${contact.id}`;
-            const pairExists = await this.connectionPairStorage.findById(
-              pairId
-            );
+          const pairId = `${aid}:${contact.id}`;
+          const pairExists = await this.connectionPairStorage.findById(pairId);
 
-            if (!pairExists) {
-              await this.connectionPairStorage.save({
-                id: pairId,
-                contactId: contact.id,
-                identifier: aid,
-                creationStatus: CreationStatus.COMPLETE,
-                pendingDeletion: false,
-                createdAt: new Date(contact[key] as string),
-              });
-            }
+          if (!pairExists) {
+            await this.connectionPairStorage.save({
+              id: pairId,
+              contactId: contact.id,
+              identifier: aid,
+              creationStatus: CreationStatus.COMPLETE,
+              pendingDeletion: false,
+              createdAt: new Date(contact[key] as string),
+            });
           }
         }
       }
