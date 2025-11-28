@@ -586,7 +586,7 @@ describe("Setup Connections", () => {
 
     await waitFor(() => {
       expect(
-        getByText(multisignIdentifierFix[0].groupMetadata!.proposedUsername)
+        getByText(multisignIdentifierFix[0].groupMetadata?.proposedUsername || "")
       ).toBeVisible();
     });
   });

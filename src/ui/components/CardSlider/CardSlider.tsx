@@ -60,11 +60,11 @@ const CardSlider = ({
   useEffect(() => {
     if (!swiper) return;
     swiper.slideTo(favouriteIndex, 300);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [swiper]);
 
-  const containerClasses = `card-slider ${
-    pickedCardIndex !== null ? "transition-start" : ""
-  }`;
+  const containerClasses = `card-slider ${pickedCardIndex !== null ? "transition-start" : ""
+    }`;
 
   return (
     <div className={containerClasses}>

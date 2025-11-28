@@ -6,6 +6,7 @@ import { stateCacheSlice } from "../../store/reducers/stateCache";
 import { viewTypeCacheSlice } from "../../store/reducers/viewTypeCache";
 import { notificationsPreferencesSlice } from "../../store/reducers/notificationsPreferences/notificationsPreferences";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function makeTestStore(preloadedState?: any) {
   const transformedPreloaded = preloadedState
     ? { ...preloadedState }
@@ -19,7 +20,10 @@ export function makeTestStore(preloadedState?: any) {
     transformedPreloaded.profilesCache &&
     typeof transformedPreloaded.profilesCache === "object"
   ) {
-    const pc = transformedPreloaded.profilesCache as any;
+    const pc = transformedPreloaded.profilesCache as {
+      defaultProfile?: string;
+      profiles?: Record<string, unknown>;
+    };
     if (!pc.defaultProfile && pc.profiles && typeof pc.profiles === "object") {
       const first = Object.keys(pc.profiles)[0];
       if (first) pc.defaultProfile = first;

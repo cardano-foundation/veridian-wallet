@@ -50,6 +50,7 @@ const useActivityTimer = () => {
         clearTimer();
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pauseTimestamp]);
 
   useEffect(() => {
@@ -73,6 +74,7 @@ const useActivityTimer = () => {
       });
       clearTimer();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return {
     setPauseTimestamp,

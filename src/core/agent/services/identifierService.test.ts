@@ -1240,9 +1240,8 @@ describe("Single sig service of agent", () => {
       }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${
-        groupMemberMetadataRecord.groupMetadata!.groupId
-      }:${groupMemberMetadataRecord.displayName}`,
+      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${groupMemberMetadataRecord.groupMetadata?.groupId
+        }:${groupMemberMetadataRecord.displayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       groupMetadataRecord.id,
@@ -1404,10 +1403,9 @@ describe("Single sig service of agent", () => {
       .mockResolvedValue(memberClone);
     getIdentifierMock.mockResolvedValueOnce({
       ...identifierStateKeria,
-      name: `1.2.0.2:${identifierMetadataRecord.theme}:${
-        identifierMetadataRecord.groupMetadata?.proposedUsername ??
+      name: `1.2.0.2:${identifierMetadataRecord.theme}:${identifierMetadataRecord.groupMetadata?.proposedUsername ??
         identifierMetadataRecord.displayName
-      }`,
+        }`,
     });
 
     await identifierService.updateIdentifier(identifierMetadataRecord.id, {
@@ -2028,9 +2026,8 @@ describe("Single sig service of agent", () => {
       }
     );
     expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${
-        groupMemberMetadataRecord.groupMetadata!.groupId
-      }:${groupMemberMetadataRecord.displayName}`,
+      name: `XX-QOP7zdP-kJs8nlwVR290XfyAk:${groupMemberMetadataRecord.groupMetadata?.groupId
+        }:${groupMemberMetadataRecord.displayName}`,
     });
     expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
       groupMetadataRecord.id,

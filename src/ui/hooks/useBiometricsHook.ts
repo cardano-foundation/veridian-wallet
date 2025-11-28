@@ -263,11 +263,13 @@ const useBiometricAuth = (isLockPage = false) => {
   // By wrapping these functions in useCallback, we provide stable references to any
   // component that uses this hook. This is crucial to prevent unintended side effects,
   // like re-running useEffects, and avoids unnecessary re-renders.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedHandleBiometricAuth = useCallback(handleBiometricAuth, [
     memoizedCheckBiometrics,
     lockoutEndTime,
     setPauseTimestamp,
   ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedSetupBiometrics = useCallback(setupBiometrics, [
     memoizedCheckBiometrics,
     memoizedHandleBiometricAuth,
