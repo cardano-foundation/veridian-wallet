@@ -77,7 +77,7 @@ const SetupGroupProfile = () => {
       identity?.creationStatus === CreationStatus.COMPLETE &&
       !!identity?.groupMemberPre
     ) {
-      router.push(TabsRoutePath.CREDENTIALS, "root", "replace");
+      router.push(TabsRoutePath.HOME, "root", "replace");
     }
   }, [identity?.creationStatus, identity?.groupMemberPre, router]);
 
