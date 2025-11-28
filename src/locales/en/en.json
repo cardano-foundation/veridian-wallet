@@ -87,7 +87,7 @@
             ]
           },
           "why": {
-            "title": "Why is it so important?",
+            "title": "Why do I need a recovery phrase?",
             "content": [
               {
                 "text": "<strong>Your wallet, your control:</strong> Unlike traditional accounts, no one—not even us—can reset your wallet for you. This keeps your identity and data secure and fully under your control."
@@ -189,20 +189,27 @@
     }
   },
   "verifyseedphrase": {
+    "title": {
+      "recovery": "Recovery phrase",
+      "verify": "Verify"
+    },
+    "button": {
+      "cancel": "Cancel",
+      "back": "Back"
+    },
     "onboarding": {
       "title": "Verify your recovery phrase",
       "button": {
-        "continue": "Verify",
-        "back": "Back",
+        "continue": "Confirm",
         "clear": "Clear all"
       }
     },
     "paragraph": {
-      "top": "Please select each word in the order it was presented to you."
+      "top": "Please select each word in the order it was presented to verify your recovery phrase."
     },
     "alert": {
       "fail": {
-        "text": "Sorry, the recovery phrase you have entered is incorrect!",
+        "text": "Sorry, the seed phrase you have entered is incorrect!",
         "button": {
           "confirm": "Try again"
         }
@@ -523,7 +530,9 @@
             "hiddentext": "Press the ‘view recovery phrase’ button when you’re ready to see your recovery phrase. Remember to make sure nobody is looking!",
             "button": {
               "view": "View recovery phrase",
-              "hide": "Hide recovery phrase"
+              "hide": "Hide recovery phrase",
+              "next": "Next: View recovery phrase",
+              "verify": "Next: Verify"
             },
             "confirmmodal": {
               "title": "Stay safe",
@@ -791,6 +800,12 @@
             "title": "Rotate key",
             "text": "Boost security by rotating your key"
           }
+        },
+        "verifyseedphrase": {
+          "header": "Verify your recovery phrase",
+          "text": "Please verify your recovery phrase to ensure you’re able to recover your wallet.",
+          "button": "Verify",
+          "successmessage": "Recovery phrase verified!"
         },
         "modals": {
           "scan": {

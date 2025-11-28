@@ -18,6 +18,7 @@ import { IdentifierDetails } from "../../../core/agent/services/identifier.types
 import { showError } from "../../utils/error";
 import { ShareProfile } from "../../components/ShareProfile";
 import { useOnlineStatusEffect } from "../../hooks";
+import { VerifySeedPhraseCard } from "./components/VerifySeedPhrase";
 
 const Home = () => {
   const pageId = "home-tab";
@@ -108,6 +109,7 @@ const Home = () => {
         additionalButtons={<AdditionalButtons />}
       >
         <div className="home-tab-content">
+          <VerifySeedPhraseCard />
           <Tile
             icon={ScanIcon}
             badge={`${i18n.t("tabs.home.tab.tiles.scan.badge")}`}

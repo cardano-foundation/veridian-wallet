@@ -98,11 +98,14 @@ export const ProfileSetup = ({
       (step === SetupProfileStep.SetupProfile &&
         profileType !== ProfileType.Group)
     ) {
+      setGroupName("");
+      setUserName("");
       setStep(SetupProfileStep.SetupType);
       return;
     }
 
     if (step === SetupProfileStep.SetupProfile) {
+      setUserName("");
       setStep(SetupProfileStep.GroupSetupStart);
       return;
     }
