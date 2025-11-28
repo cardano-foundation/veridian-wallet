@@ -4,7 +4,7 @@ interface IdentifierDetailModalProps {
   restrictedOptions?: boolean;
   showProfiles?: (value: boolean) => void;
   isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
+  setIsOpen: (value: boolean, closeProfiles?: boolean) => void;
 }
 
 export type { IdentifierDetailModalProps };

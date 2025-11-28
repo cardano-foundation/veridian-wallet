@@ -114,6 +114,7 @@ jest.mock("../../../core/agent/agent", () => ({
       recoverKeriaAgent: recoverKeriaAgentMock,
       discoverConnectUrl: discoverConnectUrlMock,
       getBranAndMnemonic: jest.fn(),
+      markSeedPhraseAsVerified: () => jest.fn(),
       basicStorage: {
         deleteById: basicStorageDeleteMock,
         createOrUpdateBasicRecord: createOrUpdateBasicRecordMock,

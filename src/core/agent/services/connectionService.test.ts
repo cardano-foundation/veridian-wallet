@@ -278,7 +278,6 @@ describe("Connection service of agent", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     let invalidUrls = [
       "https://localhost/oobi",
-      "https://localhost/oobi/1234",
       "https://localhost/oobi/1234/agent/eid/extra",
       "https://localhost/.well-known/keri/oobi/",
       "https://localhost",
@@ -314,7 +313,14 @@ describe("Connection service of agent", () => {
       "https://localhost/oobi/1234/witness?name=alias",
       "https://localhost/oobi/1234/witness/5678?name=alias",
       "https://localhost/.well-known/keri/oobi/1234?name=alias",
+      "https://localhost/oobi/1234?name=alias",
     ];
+
+    global.fetch = jest.fn().mockResolvedValue({
+      headers: {
+        get: jest.fn().mockReturnValue("application/json+cesr"),
+      },
+    });
 
     for (const url of validUrls) {
       await connectionService.connectByOobiUrl(url, "shared-identifier");
@@ -333,6 +339,19 @@ describe("Connection service of agent", () => {
         })
       );
     }
+
+    const invalidDoobi = "https://localhost/oobi/1234?name=alias";
+    global.fetch = jest.fn().mockResolvedValue({
+      headers: {
+        get: jest.fn().mockReturnValue("text/html"),
+      },
+    });
+
+    await expect(
+      connectionService.connectByOobiUrl(invalidDoobi, "shared-identifier")
+    ).rejects.toThrowError(
+      new Error(ConnectionService.INVALID_DOOBI_CONNECTION_CONTENT_TYPE)
+    );
 
     validUrls = [
       "https://localhost/oobi/1234/agent?name=alias",
@@ -979,9 +998,6 @@ describe("Connection service of agent", () => {
       },
     ];
 
-    identifierStorage.getAllIdentifiers = jest
-      .fn()
-      .mockResolvedValue([localIdentifier]);
     contactListMock.mockReturnValue(cloudContacts);
     contactStorage.findById = jest.fn().mockResolvedValue(null);
     connectionPairStorage.findById = jest.fn().mockResolvedValue(null);
@@ -1008,7 +1024,7 @@ describe("Connection service of agent", () => {
     });
   });
 
-  test("should restore connection pairs from cloud contact data during recovery", async () => {
+  test("should restore connection pairs from a cloud contact in multiple profiles", async () => {
     const localIdentifier = { id: "Eabc123" };
     const anotherLocalIdentifier = { id: "Fdef456" };
     identifierStorage.getAllIdentifiers = jest
@@ -1021,7 +1037,7 @@ describe("Connection service of agent", () => {
       oobi: "http://oobi.com/Dcontact1",
       createdAt: "2025-01-01T00:00:00.000Z",
       "Eabc123:createdAt": "2025-01-02T00:00:00.000Z",
-      "Xyz789:createdAt": "2025-01-03T00:00:00.000Z", // This one should be ignored
+      "Fdef456:createdAt": "2025-01-03T00:00:00.000Z", // This one should be ignored
     };
     contactListMock.mockReturnValue([cloudContact]);
     contactStorage.findById = jest.fn().mockResolvedValue(null);
@@ -1029,7 +1045,6 @@ describe("Connection service of agent", () => {
 
     await connectionService.syncKeriaContacts();
 
-    // Verify that the main contact record was saved
     expect(contactStorage.save).toHaveBeenCalledTimes(1);
     expect(contactStorage.save).toHaveBeenCalledWith({
       id: "Dcontact1",
@@ -1038,13 +1053,19 @@ describe("Connection service of agent", () => {
       groupId: undefined,
       createdAt: expect.any(Date),
     });
-
-    // Verify that the connection pair for the matching identifier was created
-    expect(connectionPairStorage.save).toHaveBeenCalledTimes(1);
+    expect(connectionPairStorage.save).toHaveBeenCalledTimes(2);
     expect(connectionPairStorage.save).toHaveBeenCalledWith({
       id: "Eabc123:Dcontact1",
       contactId: "Dcontact1",
       identifier: "Eabc123",
+      creationStatus: CreationStatus.COMPLETE,
+      pendingDeletion: false,
+      createdAt: expect.any(Date),
+    });
+    expect(connectionPairStorage.save).toHaveBeenCalledWith({
+      id: "Fdef456:Dcontact1",
+      contactId: "Dcontact1",
+      identifier: "Fdef456",
       creationStatus: CreationStatus.COMPLETE,
       pendingDeletion: false,
       createdAt: expect.any(Date),

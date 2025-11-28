@@ -192,6 +192,9 @@ const stateCacheSlice = createSlice({
     ) => {
       state.pendingJoinGroupMetadata = action.payload;
     },
+    setSeedPhraseVerified: (state, action: PayloadAction<boolean>) => {
+      state.authentication.seedPhraseIsSet = action.payload;
+    },
   },
 });
 
@@ -221,6 +224,7 @@ const {
   showGlobalLoading,
   setIsSetupProfile,
   setPendingJoinGroupMetadata,
+  setSeedPhraseVerified,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -262,6 +266,7 @@ export {
   clearStateCache,
   dequeueIncomingRequest,
   enqueueIncomingRequest,
+  setSeedPhraseVerified,
   getAuthentication,
   getCameraDirection,
   getCurrentRoute,

@@ -565,10 +565,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const passcodeIsSet = await SecureStorage.keyExists(
         KeyStoreKeys.APP_PASSCODE
       );
-      const seedPhraseIsSet = await SecureStorage.keyExists(
-        KeyStoreKeys.SIGNIFY_BRAN
-      );
-
       const passwordIsSet = await SecureStorage.keyExists(
         KeyStoreKeys.APP_OP_PASSWORD
       );
@@ -583,6 +579,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
       const credsFavourites = await Agent.agent.basicStorage.findById(
         MiscRecordId.CREDS_FAVOURITES
       );
+
       if (credsFavourites) {
         dispatch(
           setFavouritesCredsCache(
@@ -709,11 +706,13 @@ const AppWrapper = (props: { children: ReactNode }) => {
         }
       }
 
+      const isSeedPhraseVerified = await Agent.agent.isSeedPhraseVerified();
+
       dispatch(
         setAuthentication({
           ...authentication,
           passcodeIsSet,
-          seedPhraseIsSet,
+          seedPhraseIsSet: !!isSeedPhraseVerified,
           passwordIsSet,
           passwordIsSkipped: !!passwordSkipped?.content.value,
           ssiAgentIsSet:

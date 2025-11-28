@@ -114,11 +114,6 @@ export const deleteNotificationRecordById = async (
   await notificationStorage.deleteById(id);
 };
 
-/**
- * Clean up pending operations related to a notification's linked request
- * @param operationPendingStorage - Storage for pending operations
- * @param linkedRequestCurrent - The current linked request identifier
- */
 async function cleanupPendingOperations(
   operationPendingStorage: OperationPendingStorage,
   linkedRequestCurrent: string
@@ -137,7 +132,7 @@ async function cleanupPendingOperations(
     await operationPendingStorage.deleteById(operation.id);
   });
 
-  await Promise.allSettled(deletePromises);
+  await Promise.all(deletePromises);
 }
 
 function randomSalt(): string {

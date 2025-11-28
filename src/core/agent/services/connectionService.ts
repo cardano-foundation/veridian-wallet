@@ -95,6 +95,9 @@ class ConnectionService extends AgentService {
   static readonly NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER =
     "Cannot set up normal connection without specifying a local identifier to share with the other party";
 
+  static readonly INVALID_DOOBI_CONNECTION_CONTENT_TYPE =
+    "Can only create new connections for DOOBIs with a content-type of application/json+cesr (DOOBI is a commonly used hack for group multi-sig OOBIs)";
+
   onConnectionStateChanged(
     callback: (event: ConnectionStateChangedEvent) => void
   ) {
@@ -137,9 +140,20 @@ class ConnectionService extends AgentService {
 
     if (
       !new URL(url).pathname.match(OOBI_RE) &&
+      !new URL(url).pathname.match(DOOBI_RE) &&
       !new URL(url).pathname.match(WOOBI_RE)
     ) {
       throw new Error(ConnectionService.OOBI_INVALID);
+    }
+
+    if (new URL(url).pathname.match(DOOBI_RE)) {
+      const response = await fetch(url, { method: "GET" });
+      const contentType = response.headers.get("Content-Type");
+      if (!contentType?.includes("application/json+cesr")) {
+        throw new Error(
+          ConnectionService.INVALID_DOOBI_CONNECTION_CONTENT_TYPE
+        );
+      }
     }
 
     const multiSigInvite = url.includes(OobiQueryParams.GROUP_ID);
@@ -147,6 +161,7 @@ class ConnectionService extends AgentService {
     if (!oobiPath) {
       throw new Error(ConnectionService.OOBI_INVALID);
     }
+
     const connectionId = oobiPath.split("/")[0];
 
     const alias =
@@ -709,8 +724,6 @@ class ConnectionService extends AgentService {
   }
 
   async syncKeriaContacts(): Promise<void> {
-    const localIdentifiers = await this.identifierStorage.getAllIdentifiers();
-    const localAIDs = localIdentifiers.map((id) => id.id);
     const cloudContacts = await this.props.signifyClient.contacts().list();
 
     for (const contact of cloudContacts) {
@@ -732,22 +745,18 @@ class ConnectionService extends AgentService {
         const keyParts = key.split(":");
         if (keyParts.length === 2 && keyParts[1] === "createdAt") {
           const aid = keyParts[0];
-          if (localAIDs.includes(aid)) {
-            const pairId = `${aid}:${contact.id}`;
-            const pairExists = await this.connectionPairStorage.findById(
-              pairId
-            );
+          const pairId = `${aid}:${contact.id}`;
+          const pairExists = await this.connectionPairStorage.findById(pairId);
 
-            if (!pairExists) {
-              await this.connectionPairStorage.save({
-                id: pairId,
-                contactId: contact.id,
-                identifier: aid,
-                creationStatus: CreationStatus.COMPLETE,
-                pendingDeletion: false,
-                createdAt: new Date(contact[key] as string),
-              });
-            }
+          if (!pairExists) {
+            await this.connectionPairStorage.save({
+              id: pairId,
+              contactId: contact.id,
+              identifier: aid,
+              creationStatus: CreationStatus.COMPLETE,
+              pendingDeletion: false,
+              createdAt: new Date(contact[key] as string),
+            });
           }
         }
       }
