@@ -163,6 +163,7 @@ jest.mock("../../../core/agent/agent", () => {
             })
           ),
         },
+        isSeedPhraseVerified: jest.fn(() => true),
         identifiers: {
           getIdentifiers: jest.fn().mockResolvedValue([]),
           getIdentifier: jest.fn().mockResolvedValue(null),

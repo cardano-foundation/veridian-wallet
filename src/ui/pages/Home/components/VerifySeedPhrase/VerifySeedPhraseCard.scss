@@ -1,0 +1,60 @@
+.verify-seedphrase-card {
+  padding: 1rem;
+  border: 1px solid var(--ion-color-primary-700);
+  background-color: var(--ion-color-primary-100);
+  border-radius: 1rem;
+  margin-bottom: 0.75rem;
+
+  .verify-seedphrase-header {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0.75rem;
+
+    ion-icon {
+      color: var(--ion-color-primary-700);
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .verify-seedphrase-header-content {
+      color: var(--ion-color-neutral-700);
+      font-weight: 500;
+
+      h3 {
+        margin: 0;
+        line-height: 1.5rem;
+        font-size: 1rem;
+      }
+
+      p {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.success-alert {
+  padding: 1rem;
+  border: 1px solid var(--ion-color-success-800);
+  background-color: var(--ion-color-success-100);
+  border-radius: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  ion-icon {
+    color: var(--ion-color-success-800);
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-neutral-700);
+    font-weight: 500;
+    line-height: 1.5rem;
+  }
+}

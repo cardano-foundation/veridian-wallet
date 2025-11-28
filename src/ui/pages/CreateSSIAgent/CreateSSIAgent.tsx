@@ -16,6 +16,7 @@ import {
   getStateCache,
   setIsSetupProfile,
   setRecoveryCompleteNoInterruption,
+  setSeedPhraseVerified,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ToastMsgType } from "../../globals/types";
@@ -238,6 +239,9 @@ const CreateSSIAgent = () => {
         seedPhraseCache.seedPhrase.split(" "),
         connectUrl
       );
+
+      await Agent.agent.markSeedPhraseAsVerified();
+      dispatch(setSeedPhraseVerified(true));
 
       dispatch(setRecoveryCompleteNoInterruption());
 
