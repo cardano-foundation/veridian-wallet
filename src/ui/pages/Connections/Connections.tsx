@@ -53,8 +53,8 @@ const Connections = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
   const currentProfile = useAppSelector(getCurrentProfile);
-  const profileConnections = useMemo(
-    () => (currentProfile?.connections || []) as RegularConnectionDetails[],
+  const profileConnections: RegularConnectionDetails[] = useMemo(
+    () => currentProfile?.connections || [],
     [currentProfile]
   );
   const showPlaceholder = profileConnections.length === 0;
