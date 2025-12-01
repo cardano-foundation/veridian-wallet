@@ -1,7 +1,6 @@
 interface ShareProfileProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  oobi: string;
 }
 
 enum Tab {
