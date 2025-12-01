@@ -50,6 +50,7 @@ import "./styles/style.scss";
 import "./App.scss";
 import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
+import { CreationStatus } from "../core/agent/agent.types";
 
 setupIonicReact();
 
@@ -60,7 +61,13 @@ const SetGroupNameWrapper = () => {
     !!currentProfile?.identity.groupMetadata ||
     !!currentProfile?.identity.groupMemberPre;
 
-  if (!isGroupProfile || currentProfile.identity.groupUsername) return;
+  if (
+    !isGroupProfile ||
+    currentProfile.identity.creationStatus == CreationStatus.PENDING ||
+    currentProfile.identity.groupMetadata?.proposedUsername ||
+    currentProfile.identity.groupUsername
+  )
+    return;
 
   return <SetGroupName identifier={currentProfile.identity} />;
 };
