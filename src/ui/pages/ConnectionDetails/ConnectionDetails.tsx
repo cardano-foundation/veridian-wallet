@@ -88,6 +88,7 @@ const ConnectionDetails = ({
     } finally {
       setLoading((value) => ({ ...value, details: false, history: false }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionShortDetails?.id, dispatch]);
 
   const getData = useCallback(() => {

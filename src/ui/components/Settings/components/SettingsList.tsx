@@ -138,6 +138,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAwaitingNotificationSettings]);
 
   const openNotificationSettings = async () => {

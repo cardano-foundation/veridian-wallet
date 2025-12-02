@@ -42,7 +42,7 @@ const ReadMore = ({ content }: { content: string }) => {
     let resizeObserver: ResizeObserver | null = null;
 
     if (textRef.current && typeof ResizeObserver !== "undefined") {
-      resizeObserver = new ResizeObserver((entries) => {
+      resizeObserver = new ResizeObserver((_entries) => {
         if (timeoutId) clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           checkOverflow();

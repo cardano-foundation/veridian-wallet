@@ -9,6 +9,7 @@ import {
   setAuthentication,
   setCurrentRoute,
   setIsSetupProfile,
+  StateCacheProps,
 } from "../../store/reducers/stateCache";
 import { RoutePath, TabsRoutePath } from "../paths";
 import { DataProps, NextRoute, StoreState } from "./nextRoute.types";
@@ -60,15 +61,16 @@ const getNextRootRoute = (data: DataProps) => {
     path =
       isGroupProfile && !isCreatedGroup && !isPendingAfterCreate
         ? RoutePath.GROUP_PROFILE_SETUP.replace(
-            ":id",
-            currentProfile.identity.id
-          )
+          ":id",
+          currentProfile.identity.id
+        )
         : path;
   }
 
   if (
     data.store.stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup ||
-    (data.store.stateCache as any).isPendingJoinGroup
+    (data.store.stateCache as StateCacheProps & { isPendingJoinGroup?: boolean })
+      .isPendingJoinGroup
   ) {
     path = RoutePath.PROFILE_SETUP;
   }
@@ -151,7 +153,7 @@ const updateStoreAfterSetupSSI = (data: DataProps) => {
 const updateStoreRecoveryWallet = (data: DataProps) => {
   return setAuthentication({
     ...data.store.stateCache.authentication,
-    recoveryWalletProgress: data.state?.recoveryWalletProgress,
+    recoveryWalletProgress: data.state?.recoveryWalletProgress ?? false,
   });
 };
 
@@ -169,12 +171,12 @@ const getNextCreateSSIAgentRoute = (data: DataProps) => {
 
 const updateStoreSetSeedPhrase = (data: DataProps) => {
   return setSeedPhraseCache({
-    seedPhrase: data.state?.seedPhrase,
-    bran: data.state?.bran,
+    seedPhrase: data.state?.seedPhrase ?? "",
+    bran: data.state?.bran ?? "",
   });
 };
 const updateStoreCurrentRoute = (data: DataProps) => {
-  return setCurrentRoute({ path: data.state?.nextRoute });
+  return setCurrentRoute({ path: data.state?.nextRoute ?? "" });
 };
 
 const getNextCreatePasswordRoute = (data: DataProps) => {
@@ -194,19 +196,19 @@ const updateStoreAfterCreatePassword = (data: DataProps) => {
   return setAuthentication({
     ...data.store.stateCache.authentication,
     passwordIsSet: !skipped,
-    passwordIsSkipped: skipped,
+    passwordIsSkipped: !!skipped,
   });
 };
 
 const updateStoreAfterSetupProfile = (data: DataProps) => {
-  return setIsSetupProfile(data.state?.isSetupProfile);
+  return setIsSetupProfile(data.state?.isSetupProfile ?? false);
 };
 
 const updateAfterSetupBiometrics = (data: DataProps) => {
   const finishedSetup = data.state?.finishedSetup;
   return setAuthentication({
     ...data.store.stateCache.authentication,
-    finishSetupBiometrics: finishedSetup,
+    finishSetupBiometrics: finishedSetup ?? false,
   });
 };
 
@@ -217,7 +219,7 @@ const getNextRoute = (
   nextPath: { pathname: string };
   updateRedux: ((
     data: DataProps
-  ) => ThunkAction<void, RootState, undefined, AnyAction>)[];
+  ) => AnyAction | ThunkAction<void, RootState, undefined, AnyAction>)[];
 } => {
   const { nextPath, updateRedux } = nextRoute[currentPath];
   const updateReduxFn = [...updateRedux, updateStoreCurrentRoute];
@@ -254,7 +256,7 @@ const nextRoute: Record<string, NextRoute> = {
   },
   [RoutePath.SSI_AGENT]: {
     nextPath: (data: DataProps) => getNextCreateSSIAgentRoute(data),
-    updateRedux: [updateStoreAfterSetupSSI, clearSeedPhraseCache],
+    updateRedux: [updateStoreAfterSetupSSI, () => clearSeedPhraseCache()],
   },
   [RoutePath.CREATE_PASSWORD]: {
     nextPath: (data: DataProps) => getNextCreatePasswordRoute(data),
