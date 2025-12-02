@@ -1,6 +1,6 @@
 import { IonModal } from "@ionic/react";
 import { warningOutline } from "ionicons/icons";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { CreationStatus } from "../../../core/agent/agent.types";
@@ -14,6 +14,7 @@ import {
 } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
+import { useOnlineStatusEffect } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
 import { Profiles } from "../../pages/Profiles";
 import { showError } from "../../utils/error";
@@ -87,7 +88,7 @@ const ProfileStateModal = () => {
     setIsOpen,
   ]);
 
-  useEffect(() => {
+  const checkProfileState = useCallback(() => {
     if (
       !currentProfile?.identity.creationStatus ||
       !currentProfile?.identity.createdAtUTC ||
@@ -147,11 +148,12 @@ const ProfileStateModal = () => {
     currentProfile?.identity.creationStatus,
     currentProfile?.identity.groupMemberPre,
     currentProfile?.identity.createdAtUTC,
-    dispatch,
     getDetails,
     setIsOpen,
     history.location.pathname,
   ]);
+
+  useOnlineStatusEffect(checkProfileState);
 
   const type = useMemo(() => {
     if (currentProfile?.identity.creationStatus === CreationStatus.PENDING)
