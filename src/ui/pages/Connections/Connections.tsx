@@ -1,5 +1,5 @@
 import { IonButton, IonIcon, useIonViewWillEnter } from "@ionic/react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
@@ -26,7 +26,6 @@ import { TabLayout } from "../../components/layout/TabLayout";
 import { RemovePendingAlert } from "../../components/RemovePendingAlert";
 import { ShareProfile } from "../../components/ShareProfile";
 import { ToastMsgType } from "../../globals/types";
-import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { ConnectionDetails } from "../ConnectionDetails";
@@ -51,7 +50,6 @@ const Connections = () => {
   const [deletePendingItem, setDeletePendingItem] =
     useState<RegularConnectionDetails | null>(null);
   const [openDeletePendingAlert, setOpenDeletePendingAlert] = useState(false);
-  const [oobi, setOobi] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
   const currentProfile = useAppSelector(getCurrentProfile);
@@ -123,28 +121,6 @@ const Connections = () => {
       );
     setConnectionShortDetails(shortDetails);
   };
-
-  const fetchOobi = useCallback(async () => {
-    try {
-      if (!currentProfile?.identity.id) return;
-
-      const oobiValue = await Agent.agent.connections.getOobi(
-        `${currentProfile.identity.id}`,
-        { alias: currentProfile?.identity.displayName || "" }
-      );
-      if (oobiValue) {
-        setOobi(oobiValue);
-      }
-    } catch (e) {
-      showError("Unable to fetch connection oobi", e, dispatch);
-    }
-  }, [
-    currentProfile?.identity.id,
-    currentProfile?.identity.displayName,
-    dispatch,
-  ]);
-
-  useOnlineStatusEffect(fetchOobi);
 
   const handleShowConnectionDetails = (item: RegularConnectionDetails) => {
     if (
@@ -275,7 +251,6 @@ const Connections = () => {
       <ShareProfile
         isOpen={openShareCurrentProfile}
         setIsOpen={setOpenShareCurrentProfile}
-        oobi={oobi}
       />
       <Profiles
         isOpen={openProfiles}

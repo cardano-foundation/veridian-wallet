@@ -4,7 +4,7 @@ import { Agent } from "../../../core/agent/agent";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import { IdentifierDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { useAppSelector } from "../../../store/hooks";
 import { getCurrentProfile } from "../../../store/reducers/profileCache";
 import CardanoLogo from "../../assets/images/cardano-logo.svg";
 import ScanIcon from "../../assets/images/scan-icon.svg";
@@ -23,14 +23,12 @@ import { VerifySeedPhraseCard } from "./components/VerifySeedPhrase";
 
 const Home = () => {
   const pageId = "home-tab";
-  const dispatch = useAppDispatch();
   const currentProfile = useAppSelector(getCurrentProfile);
   const [profile, setProfile] = useState<IdentifierDetails | undefined>();
   const [openProfiles, setOpenProfiles] = useState(false);
   const [openScanToLogin, setOpenScanToLogin] = useState(false);
   const [connectdApp, setConnectdApp] = useState(false);
   const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
-  const [oobi, setOobi] = useState("");
   const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
 
   const handleAvatarClick = () => {
@@ -61,28 +59,6 @@ const Home = () => {
       />
     );
   };
-
-  const fetchOobi = useCallback(async () => {
-    try {
-      if (!currentProfile?.identity.id) return;
-
-      const oobiValue = await Agent.agent.connections.getOobi(
-        `${currentProfile.identity.id}`,
-        { alias: currentProfile?.identity.displayName || "" }
-      );
-      if (oobiValue) {
-        setOobi(oobiValue);
-      }
-    } catch (e) {
-      showError("Unable to fetch connection oobi", e, dispatch);
-    }
-  }, [
-    currentProfile?.identity.id,
-    currentProfile?.identity.displayName,
-    dispatch,
-  ]);
-
-  useOnlineStatusEffect(fetchOobi);
 
   const getDetails = useCallback(async () => {
     if (
@@ -176,7 +152,6 @@ const Home = () => {
       <ShareProfile
         isOpen={openShareCurrentProfile}
         setIsOpen={setOpenShareCurrentProfile}
-        oobi={oobi}
       />
       <RotateKeyModal
         identifierId={currentProfile?.identity.id || ""}
