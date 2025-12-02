@@ -33,7 +33,7 @@ import { ToastStack } from "./components/CustomToast/ToastStack";
 import { GenericError, NoWitnessAlert } from "./components/Error";
 import { InputRequest } from "./components/InputRequest";
 import { ProfileStateModal } from "./components/ProfileStateModal";
-import { SetGroupName } from "./components/SetGroupName";
+import { SetGroupUserName } from "./components/SetGroupUserName";
 import { SidePage } from "./components/SidePage";
 import {
   ANDROID_MIN_VERSION,
@@ -67,7 +67,7 @@ const SetGroupNameWrapper = () => {
   )
     return;
 
-  return <SetGroupName identifier={currentProfile.identity} />;
+  return <SetGroupUserName identifier={currentProfile.identity} />;
 };
 
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
