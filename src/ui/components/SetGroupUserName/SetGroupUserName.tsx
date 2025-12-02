@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
-import {
-  GroupMetadata,
-  IdentifierShortDetails,
-} from "../../../core/agent/services/identifier.types";
+import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { useAppDispatch } from "../../../store/hooks";
 import { addOrUpdateProfileIdentity } from "../../../store/reducers/profileCache";
@@ -60,18 +57,18 @@ const SetGroupUserName = ({ identifier, onClose }: SetGroupNameProps) => {
         newDisplayName
       );
 
-      const newMetaData: GroupMetadata | undefined = identifier.groupMetadata
-        ? {
-            ...identifier.groupMetadata,
-            proposedUsername: newDisplayName,
-          }
-        : undefined;
-
       const updatedIdentifier: IdentifierShortDetails = {
         ...identifier,
-        groupUsername: newDisplayName,
-        groupMetadata: newMetaData,
       };
+
+      if (
+        !updatedIdentifier.groupMemberPre &&
+        updatedIdentifier?.groupMetadata
+      ) {
+        updatedIdentifier.groupMetadata.proposedUsername = newDisplayName;
+      } else {
+        updatedIdentifier.groupUsername = newDisplayName;
+      }
 
       dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
       onClose?.(updatedIdentifier);
