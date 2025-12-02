@@ -238,7 +238,7 @@ describe("Verify Passcode on Cards Details page", () => {
       </Provider>
     );
 
-    fireEvent.click(getByTestId("secondary-button-verify-passcode"));
+    fireEvent.click(getByTestId("tertiary-button-verify-passcode"));
 
     await waitFor(() => {
       expect(

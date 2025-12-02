@@ -124,8 +124,8 @@ const VerifyPasscode = ({
         />
         <PageFooter
           pageId={componentId}
-          secondaryButtonText={`${i18n.t("verifypasscode.forgotten.button")}`}
-          secondaryButtonAction={() => setAlertIsOpen(true)}
+          tertiaryButtonText={`${i18n.t("verifypasscode.forgotten.button")}`}
+          tertiaryButtonAction={() => setAlertIsOpen(true)}
         />
         <Alert
           isOpen={alertIsOpen}

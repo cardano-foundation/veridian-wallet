@@ -171,6 +171,7 @@ const VerifyPassword = ({
         <PageFooter
           primaryButtonAction={() => setAttempts(attempts - 1)}
           primaryButtonText={`${i18n.t("verifypassword.confirm")}`}
+          primaryButtonDisabled={verifyPasswordValue.length === 0}
         />
       </OptionModal>
       <Alert
