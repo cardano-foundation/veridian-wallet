@@ -152,6 +152,7 @@ jest.mock("../../../core/agent/agent", () => {
   return {
     Agent: {
       agent: {
+        isVerificationEnforced: jest.fn(),
         devPreload: jest.fn(),
         start: jest.fn(),
         setupLocalDependencies: jest.fn(),
