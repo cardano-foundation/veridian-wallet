@@ -27,6 +27,7 @@ import { ProfileSetup } from "../ProfileSetup";
 import { ProfileItem } from "./components/ProfileItem";
 import "./Profiles.scss";
 import { OptionButtonProps, ProfilesProps } from "./Profiles.types";
+import { TabsRoutePath } from "../../../routes/paths";
 
 const OptionButton = ({ icon, text, action, disabled }: OptionButtonProps) => {
   return (
@@ -110,6 +111,10 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
       handleClose();
       if (isOpenFromDetail.current) {
         setOpenProfileDetail(false);
+      }
+
+      if (!isGroupProfile || profile.groupMemberPre) {
+        ionHistory.push(TabsRoutePath.HOME);
       }
     } catch (e) {
       showError(
