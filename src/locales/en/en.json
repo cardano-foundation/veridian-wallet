@@ -1256,7 +1256,7 @@
       },
       "button": {
         "seepasswordhint": "View hint",
-        "resetmypassword": "Reset password",
+        "resetmypassword": "Forgotten your password?",
         "tryagain": "Try again",
         "cancel": "Cancel"
       },
@@ -1271,7 +1271,7 @@
     "description": "Please enter your PIN to verify",
     "error": "Incorrect PIN",
     "forgotten": {
-      "button": "I've forgotten my PIN"
+      "button": "Forgotten PIN?"
     },
     "alert": {
       "text": {
