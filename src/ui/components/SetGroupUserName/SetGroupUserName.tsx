@@ -17,13 +17,13 @@ import { PageFooter } from "../PageFooter";
 import { PageHeader } from "../PageHeader";
 import { Spinner } from "../Spinner";
 import { SpinnerConverage } from "../Spinner/Spinner.type";
-import "./SetGroupName.scss";
-import { SetGroupNameProps } from "./SetGroupName.types";
+import "./SetGroupUserName.scss";
+import { SetGroupNameProps } from "./SetGroupUserName.types";
 
 const IDENTIFIER_NOT_EXIST = "Identifier not existed. id: ";
 const DUPLICATE_NAME = "Identifier name is a duplicate";
 
-const SetGroupName = ({ identifier, onClose }: SetGroupNameProps) => {
+const SetGroupUserName = ({ identifier, onClose }: SetGroupNameProps) => {
   const pageId = "set-group-name";
   const dispatch = useAppDispatch();
   const [isLoading, setLoading] = useState(false);
@@ -59,8 +59,16 @@ const SetGroupName = ({ identifier, onClose }: SetGroupNameProps) => {
 
       const updatedIdentifier: IdentifierShortDetails = {
         ...identifier,
-        groupUsername: newDisplayName,
       };
+
+      if (
+        !updatedIdentifier.groupMemberPre &&
+        updatedIdentifier?.groupMetadata
+      ) {
+        updatedIdentifier.groupMetadata.proposedUsername = newDisplayName;
+      } else {
+        updatedIdentifier.groupUsername = newDisplayName;
+      }
 
       dispatch(addOrUpdateProfileIdentity(updatedIdentifier));
       onClose?.(updatedIdentifier);
@@ -151,4 +159,4 @@ const SetGroupName = ({ identifier, onClose }: SetGroupNameProps) => {
   );
 };
 
-export { SetGroupName };
+export { SetGroupUserName };

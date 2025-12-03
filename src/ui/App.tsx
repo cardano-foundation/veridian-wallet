@@ -33,7 +33,7 @@ import { ToastStack } from "./components/CustomToast/ToastStack";
 import { GenericError, NoWitnessAlert } from "./components/Error";
 import { InputRequest } from "./components/InputRequest";
 import { ProfileStateModal } from "./components/ProfileStateModal";
-import { SetGroupName } from "./components/SetGroupName";
+import { SetGroupUserName } from "./components/SetGroupUserName";
 import { SidePage } from "./components/SidePage";
 import {
   ANDROID_MIN_VERSION,
@@ -50,7 +50,6 @@ import "./styles/style.scss";
 import "./App.scss";
 import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
-import { CreationStatus } from "../core/agent/agent.types";
 
 setupIonicReact();
 
@@ -63,13 +62,12 @@ const SetGroupNameWrapper = () => {
 
   if (
     !isGroupProfile ||
-    currentProfile.identity.creationStatus == CreationStatus.PENDING ||
     currentProfile.identity.groupMetadata?.proposedUsername ||
     currentProfile.identity.groupUsername
   )
     return;
 
-  return <SetGroupName identifier={currentProfile.identity} />;
+  return <SetGroupUserName identifier={currentProfile.identity} />;
 };
 
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {

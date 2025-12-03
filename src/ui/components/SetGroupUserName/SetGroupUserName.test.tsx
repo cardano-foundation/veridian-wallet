@@ -10,7 +10,7 @@ import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
-import { SetGroupName } from "./SetGroupName";
+import { SetGroupUserName } from "./SetGroupUserName";
 
 const updateMock = jest.fn();
 
@@ -86,7 +86,7 @@ describe("Set individual name", () => {
   test("render", async () => {
     const { getByTestId, getByText } = render(
       <Provider store={mockedStore}>
-        <SetGroupName identifier={identifierFix[0]} />
+        <SetGroupUserName identifier={identifierFix[0]} />
       </Provider>
     );
 
@@ -99,7 +99,7 @@ describe("Set individual name", () => {
   test("set name", async () => {
     const { getByTestId } = render(
       <Provider store={mockedStore}>
-        <SetGroupName identifier={identifierFix[0]} />
+        <SetGroupUserName identifier={identifierFix[0]} />
       </Provider>
     );
 
@@ -128,7 +128,7 @@ describe("Set individual name", () => {
   test("Display error when display name invalid", async () => {
     const { getByTestId, getByText } = render(
       <Provider store={mockedStore}>
-        <SetGroupName identifier={identifierFix[0]} />
+        <SetGroupUserName identifier={identifierFix[0]} />
       </Provider>
     );
 

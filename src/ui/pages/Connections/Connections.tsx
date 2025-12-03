@@ -1,5 +1,5 @@
 import { IonButton, IonIcon, useIonViewWillEnter } from "@ionic/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
   ConnectionStatus,
@@ -53,11 +53,11 @@ const Connections = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [search, setSearch] = useState("");
   const currentProfile = useAppSelector(getCurrentProfile);
-  const profileConnections =
-    currentProfile?.connections as RegularConnectionDetails[];
-
-  const showPlaceholder =
-    !!profileConnections && profileConnections?.length === 0;
+  const profileConnections: RegularConnectionDetails[] = useMemo(
+    () => currentProfile?.connections || [],
+    [currentProfile]
+  );
+  const showPlaceholder = profileConnections.length === 0;
 
   useIonViewWillEnter(() => {
     dispatch(setCurrentRoute({ path: TabsRoutePath.CONNECTIONS }));
@@ -150,7 +150,7 @@ const Connections = () => {
 
       await Agent.agent.connections.deleteStaleLocalConnectionById(
         deletePendingItem.id,
-        deletePendingItem.identifier!
+        deletePendingItem.identifier
       );
       dispatch(setToastMsg(ToastMsgType.CONNECTION_DELETED));
       dispatch(removeConnectionCache(deletePendingItem.id));

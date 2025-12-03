@@ -16,7 +16,7 @@ import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
 import { ProfileDetailsModal } from "../../components/ProfileDetailsModal";
-import { SetGroupName } from "../../components/SetGroupName";
+import { SetGroupUserName } from "../../components/SetGroupUserName";
 import { Settings } from "../../components/Settings";
 import { SideSlider } from "../../components/SideSlider";
 import { ToastMsgType } from "../../globals/types";
@@ -189,7 +189,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         onDidDismiss={handleClose}
       >
         {missingNameIdentifier ? (
-          <SetGroupName
+          <SetGroupUserName
             identifier={missingNameIdentifier}
             onClose={handleCloseMissing}
           />
