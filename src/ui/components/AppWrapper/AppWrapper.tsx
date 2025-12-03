@@ -66,6 +66,7 @@ import {
   setQueueIncomingRequest,
   setToastMsg,
   showNoWitnessAlert,
+  showVerifySeedPhraseAlert,
 } from "../../../store/reducers/stateCache";
 import {
   IncomingRequestType,
@@ -707,6 +708,9 @@ const AppWrapper = (props: { children: ReactNode }) => {
       }
 
       const isSeedPhraseVerified = await Agent.agent.isSeedPhraseVerified();
+      const isShowVerifySeedPhrase = await Agent.agent.isVerificationEnforced();
+
+      dispatch(showVerifySeedPhraseAlert(isShowVerifySeedPhrase));
 
       dispatch(
         setAuthentication({

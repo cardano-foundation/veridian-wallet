@@ -167,7 +167,12 @@ const CredentialRequest = ({
         );
         handleBack();
       } catch (e) {
-        dispatch(setToastMsg(ToastMsgType.SHARE_CRED_FAIL));
+        showError(
+          "Failed to show cred",
+          e,
+          dispatch,
+          ToastMsgType.SHARE_CRED_FAIL
+        );
       } finally {
         setLoading(false);
       }
