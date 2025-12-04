@@ -99,7 +99,12 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
 
   const handleSelectProfile = async (profile: IdentifierShortDetails) => {
     const isGroupProfile = !!(profile.groupMemberPre || profile.groupMetadata);
-    if (isGroupProfile && !profile.groupUsername) {
+    if (
+      isGroupProfile &&
+      (profile.groupMemberPre
+        ? !profile.groupUsername
+        : !profile.groupMetadata?.proposedUsername)
+    ) {
       setMissingNameIdentifier(profile);
       return;
     }
