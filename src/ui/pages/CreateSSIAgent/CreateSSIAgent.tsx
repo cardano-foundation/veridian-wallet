@@ -31,6 +31,7 @@ import { SSIScan } from "./components/SSIScan";
 
 const SSI_URLS_EMPTY = "SSI url is empty";
 const SEED_PHRASE_EMPTY = "Invalid seed phrase";
+const FAILED_TO_FETCH = "Failed to fetch";
 
 const CreateSSIAgent = () => {
   const seedPhraseCache = useAppSelector(getSeedPhraseCache);
@@ -94,6 +95,11 @@ const CreateSSIAgent = () => {
         dispatch,
         ToastMsgType.INVALID_CONNECT_URL
       );
+      return;
+    }
+
+    if (errorMessage.includes(FAILED_TO_FETCH)) {
+      showError(errorMessage, error, dispatch, ToastMsgType.NETWORK_ERROR);
       return;
     }
 
@@ -213,7 +219,7 @@ const CreateSSIAgent = () => {
         return bootUrl;
       }
 
-      return null;
+      throw e;
     }
   };
 
@@ -268,10 +274,6 @@ const CreateSSIAgent = () => {
       const validBootUrl = removeLastSlash(bootUrl.trim());
 
       const connectUrl = await getConnectUrl(validBootUrl);
-
-      if (!connectUrl) {
-        throw new Error(Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT);
-      }
 
       await Agent.agent.recoverKeriaAgent(
         seedPhraseCache.seedPhrase.split(" "),

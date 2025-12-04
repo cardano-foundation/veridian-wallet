@@ -47,6 +47,11 @@ const SSIScan = ({
   }, []);
   const [pastedValue, setPastedValue] = useState("");
 
+  const closeInputManualValue = () => {
+    setPastedValue("");
+    setOpen(false);
+  };
+
   const getErrorMessage = () => {
     if (!pastedValue || !isValidHttpUrl(pastedValue))
       return i18n.t("ssiagent.error.invalidurl");
