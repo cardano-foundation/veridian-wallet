@@ -80,6 +80,7 @@ enum ToastMsgType {
   INVALID_BOOT_URL = "invalidbooturlerror",
   MISMATCH_ERROR = "mismatcherror",
   INVALID_CONNECT_URL = "invalidconnecturlerror",
+  NETWORK_ERROR = "networkerror",
 }
 
 const PASSCODE_MAPPING = {

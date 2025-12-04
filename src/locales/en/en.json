@@ -1552,7 +1552,8 @@
     "connecturldiscovererror": "Failed to discovery connect url",
     "findconnecturlerror": "Connect URL not found",
     "invalidbooturlerror": "Invalid boot url",
-    "invalidconnecturlerror": "Invalid connect url"
+    "invalidconnecturlerror": "Invalid connect url",
+    "networkerror": "Network issue"
   },
   "request": {
     "sign": {
