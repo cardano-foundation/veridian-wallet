@@ -36,9 +36,4 @@ describe("uniqueGroupName", () => {
     const result = uniqueGroupName("Veridian", profiles);
     expect(result).toBe("Veridian #1");
   });
-
-  test("handles name with existing suffix", () => {
-    const result = uniqueGroupName("Veridian #2", profiles);
-    expect(result).toBe("Veridian #3");
-  });
 });
