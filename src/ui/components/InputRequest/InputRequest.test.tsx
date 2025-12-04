@@ -134,7 +134,7 @@ describe("Set connection alias", () => {
       fireEvent(
         getByTestId("input-request-input"),
         new CustomEvent("ionInput", {
-          detail: { value: "connectionName" },
+          detail: { value: "connection Name" },
         })
       );
     });
@@ -142,7 +142,7 @@ describe("Set connection alias", () => {
     await waitFor(() => {
       expect(
         (getByTestId("input-request-input") as HTMLInputElement).value
-      ).toBe("connectionName");
+      ).toBe("connection Name");
     });
 
     act(() => {
@@ -151,7 +151,7 @@ describe("Set connection alias", () => {
 
     await waitFor(() => {
       expect(connectByOobiUrl).toBeCalledWith(
-        "http://keria:3902/oobi/EJ0XanWANawPeyCzyPxAbilMId9FNHY8eobED84Gxfij/agent/ENmmQwmKjO7UQdRMGd2STVUvjV8y1sKCkg1Wc_QvpZU3?name=connectionName"
+        "http://keria:3902/oobi/EJ0XanWANawPeyCzyPxAbilMId9FNHY8eobED84Gxfij/agent/ENmmQwmKjO7UQdRMGd2STVUvjV8y1sKCkg1Wc_QvpZU3?name=connection+Name"
       );
     });
   });
