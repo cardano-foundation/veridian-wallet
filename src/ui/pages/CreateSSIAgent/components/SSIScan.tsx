@@ -44,9 +44,12 @@ const SSIScan = ({
       setOpen(false);
     };
   }, []);
-
-  const closeInputManualValue = () => setOpen(false);
   const [pastedValue, setPastedValue] = useState("");
+
+  const closeInputManualValue = () => {
+    setPastedValue("");
+    setOpen(false);
+  };
 
   const getErrorMessage = () => {
     if (!pastedValue || !isValidHttpUrl(pastedValue))
