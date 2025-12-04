@@ -1593,7 +1593,8 @@
     "onlyspace": "Must contain at least 1 (non-space) character",
     "maxlength": "You have reached the 32 character limit",
     "hasspecialchar": "Only use letters (a-z), numbers (0-9), underscores (_) and hyphens (-)",
-    "duplicatename": "Must not be a name already in use"
+    "duplicatename": "Must not be a name already in use",
+    "duplicategroupname": "You already have a group with this name. Pick a new name to continue."
   },
   "biometry": {
     "reason": "Please authenticate",

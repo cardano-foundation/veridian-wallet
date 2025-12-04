@@ -34,6 +34,7 @@ import {
   OobiType,
 } from "../../../core/agent/agent.types";
 import { ToastMsgType } from "../../globals/types";
+import { filteredIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
 
 jest.mock("signify-ts", () => ({
   ...jest.requireActual("signify-ts"),
@@ -699,7 +700,6 @@ describe("Profile setup: use as modal", () => {
       },
       profileHistories: [],
     },
-
     profilesCache: profileCacheFixData,
   });
 
@@ -847,6 +847,92 @@ describe("Profile setup: use as modal", () => {
 
     await waitFor(() => {
       expect(createIdentifierMock).toBeCalled();
+    });
+  });
+
+  test("Join group with duplicate group", async () => {
+    const mockStore = makeTestStore({
+      stateCache: {
+        routes: ["/"],
+        authentication: {
+          defaultProfile: "",
+          loggedIn: true,
+          time: 0,
+          passcodeIsSet: true,
+          seedPhraseIsSet: true,
+          passwordIsSet: false,
+          passwordIsSkipped: true,
+          ssiAgentIsSet: true,
+          ssiAgentUrl: "http://keria.com",
+          recoveryWalletProgress: false,
+          loginAttempt: {
+            attempts: 0,
+            lockedUntil: 0,
+          },
+          firstAppLaunch: false,
+        },
+        profileHistories: [],
+      },
+      profilesCache: {
+        profiles: {
+          [filteredIdentifierFix[1].id]: {
+            identity: {
+              ...filteredIdentifierFix[1],
+              displayName: "MockGroup",
+            },
+            connections: [],
+            multisigConnections: [],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [],
+          },
+        },
+        defaultProfile: filteredIdentifierFix[1].id,
+        recentProfiles: [],
+        multiSigGroup: undefined,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
+      },
+    });
+
+    const dispatchMock = jest.fn();
+
+    const storeMocked = {
+      ...mockStore,
+      dispatch: dispatchMock,
+    };
+
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ProfileSetup />
+      </Provider>
+    );
+
+    fireEvent.click(getByTestId("identifier-select-group"));
+
+    expect(
+      getByText(EN_TRANSLATIONS.setupprofile.button.confirm)
+    ).toBeVisible();
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.setupprofile.button.confirm));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.setupprofile.groupsetupstart.title)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("join-group-button"));
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+    });
+
+    await waitFor(() => {
+      expect(getByText("MockGroup #1")).toBeVisible();
     });
   });
 

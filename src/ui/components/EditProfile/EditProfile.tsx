@@ -1,7 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
 import { IonModal, IonSpinner } from "@ionic/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { IdentifierMetadataRecordProps } from "../../../core/agent/records";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
@@ -12,7 +12,6 @@ import {
   getProfiles,
 } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
-import { DISPLAY_NAME_LENGTH } from "../../globals/constants";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
@@ -25,7 +24,6 @@ import "./EditProfile.scss";
 import { EditProfileProps } from "./EditProfile.types";
 
 const IDENTIFIER_NOT_EXIST = "Identifier not existed. id: ";
-const DUPLICATE_NAME = "Identifier name is a duplicate";
 
 const EditProfile = ({
   modalIsOpen,
@@ -41,18 +39,35 @@ const EditProfile = ({
   const currentIdentifier = profiles[cardData.id];
   const [isLoading, setLoading] = useState(false);
 
-  const getCurrentUsername = () =>
-    cardData.groupMemberPre
-      ? cardData.groupUsername || ""
-      : cardData.groupMetadata?.proposedUsername || "";
-
-  const [newDisplayName, setNewDisplayName] = useState(
-    editType === "userName" ? getCurrentUsername() : cardData.displayName
+  const currentUsername = useMemo(
+    () =>
+      cardData.groupMemberPre
+        ? cardData.groupUsername || ""
+        : cardData.groupMetadata?.proposedUsername || "",
+    [
+      cardData.groupMemberPre,
+      cardData.groupMetadata?.proposedUsername,
+      cardData.groupUsername,
+    ]
   );
-  const [keyboardIsOpen, setKeyboardIsOpen] = useState(false);
 
-  const [duplicateName, setDuplicateName] = useState(false);
+  const baselineValue =
+    editType === "userName" ? currentUsername : cardData.displayName;
+
+  const [newDisplayName, setNewDisplayName] = useState(baselineValue);
+  const [keyboardIsOpen, setKeyboardIsOpen] = useState(false);
   const [inputChange, setInputChange] = useState(false);
+
+  const nameValueChanged = newDisplayName.trim() !== baselineValue.trim();
+
+  const duplicateError = Object.values(profiles).some(
+    (item) => item.identity.displayName === newDisplayName
+  )
+    ? cardData.groupMemberPre
+      ? `${i18n.t("nameerror.duplicategroupname")}`
+      : `${i18n.t("nameerror.duplicatename")}`
+    : undefined;
+
   const localValidateMessage = inputChange
     ? nameChecker.getError(newDisplayName)
     : undefined;
@@ -76,37 +91,12 @@ const EditProfile = ({
     setModalIsOpen(false);
   };
 
-  const baselineValue =
-    editType === "userName" ? getCurrentUsername() : cardData.displayName;
-
-  const verifyDisplayName =
-    newDisplayName.length > 0 &&
-    newDisplayName.length <= DISPLAY_NAME_LENGTH &&
-    newDisplayName.trim() !== baselineValue.trim();
-
   useEffect(() => {
-    setNewDisplayName(
-      editType === "userName" ? getCurrentUsername() : cardData.displayName
-    );
-  }, [
-    editType,
-    cardData.displayName,
-    cardData.groupMetadata?.proposedUsername,
-    cardData.groupUsername,
-    cardData.groupMemberPre,
-  ]);
+    setNewDisplayName(baselineValue);
+  }, [baselineValue]);
 
   const handleSubmit = async () => {
     try {
-      if (
-        newDisplayName.trim() !== cardData.displayName.trim() &&
-        Object.values(profiles).some(
-          (item) => item.identity.displayName === newDisplayName
-        )
-      ) {
-        throw new Error(DUPLICATE_NAME);
-      }
-
       setLoading(true);
 
       if (!currentIdentifier) {
@@ -163,11 +153,6 @@ const EditProfile = ({
         )
       );
     } catch (e) {
-      if ((e as Error).message === DUPLICATE_NAME) {
-        setDuplicateName(true);
-        return;
-      }
-
       showError(
         "Unable to edit identifier",
         e,
@@ -184,12 +169,13 @@ const EditProfile = ({
   const handleChangeName = (value: string) => {
     setNewDisplayName(value);
     setInputChange(true);
-    setDuplicateName(false);
   };
 
-  const hasError = localValidateMessage || duplicateName;
-  const errorMessage =
-    localValidateMessage || `${i18n.t("nameerror.duplicatename")}`;
+  const errorMessage = nameValueChanged
+    ? localValidateMessage || duplicateError
+    : undefined;
+
+  const verifyDisplayName = !errorMessage && nameValueChanged;
 
   return (
     <IonModal
@@ -223,7 +209,7 @@ const EditProfile = ({
           />
         }
       >
-        <div className={`indentifier-input${hasError ? " has-error" : ""}`}>
+        <div className={`indentifier-input${errorMessage ? " has-error" : ""}`}>
           <CustomInput
             dataTestId="edit-name-input"
             title={`${
@@ -238,7 +224,7 @@ const EditProfile = ({
             onChangeInput={handleChangeName}
             value={newDisplayName}
           />
-          {hasError ? (
+          {errorMessage ? (
             <ErrorMessage
               message={errorMessage}
               timeout={false}
