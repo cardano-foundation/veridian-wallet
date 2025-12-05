@@ -66,7 +66,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
         verifySecret: jest.fn().mockResolvedValue(true),
       },
       basicStorage: {
-        deleteById: jest.fn(),
+        deleteById: jest.fn(() => Promise.resolve(true)),
       },
     },
   },
