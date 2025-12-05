@@ -11,6 +11,7 @@ import {
   updateCurrentProfile,
   updateRecentProfiles,
 } from "../../store/reducers/profileCache";
+import { showError } from "../utils/error";
 
 export const useProfile = () => {
   const defaultProfile = useAppSelector(getCurrentProfile);
@@ -64,11 +65,13 @@ export const useProfile = () => {
 
   const clearDefaultProfile = useCallback(async () => {
     await Agent.agent.basicStorage.deleteById(MiscRecordId.DEFAULT_PROFILE);
-
     dispatch(updateCurrentProfile(""));
 
-    await Agent.agent.basicStorage.deleteById(MiscRecordId.PROFILE_HISTORIES);
-
+    await Agent.agent.basicStorage
+      .deleteById(MiscRecordId.PROFILE_HISTORIES)
+      // The record may not exist in storage, so I think we can ignore this error,
+      // since the goal is to remove this record anyway.
+      .catch((e) => showError("Failed to delete profile histories", e));
     dispatch(updateRecentProfiles([]));
   }, [dispatch]);
 

@@ -134,7 +134,7 @@ jest.mock("../../../core/agent/agent", () => ({
         save: jest.fn(),
         createOrUpdateBasicRecord: (param: unknown) =>
           createOrUpdateMock(param),
-        deleteById: jest.fn(),
+        deleteById: jest.fn(() => Promise.resolve(true)),
       },
       auth: {
         verifySecret: verifySecretMock,
