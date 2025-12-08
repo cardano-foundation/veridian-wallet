@@ -1,6 +1,7 @@
 import { i18n } from "../../i18n";
 
 const nameRequirements = {
+  validConnectionCharactersPattern: /^[a-zA-Z0-9-_\s]+$/,
   validCharactersPattern: /^[a-zA-Z0-9-_]+$/,
   lengthPattern: /^.{1,32}$/,
   onlySpacePattern: /^\s+$/,
@@ -14,8 +15,10 @@ const nameErrorMessages = {
 };
 
 const nameChecker = {
-  isValidCharacters(name: string) {
-    return nameRequirements.validCharactersPattern.test(name);
+  isValidCharacters(name: string, allowSpace = false) {
+    return allowSpace
+      ? nameRequirements.validConnectionCharactersPattern.test(name)
+      : nameRequirements.validCharactersPattern.test(name);
   },
   isValidLength(name: string) {
     return nameRequirements.lengthPattern.test(name);
@@ -23,7 +26,7 @@ const nameChecker = {
   hasNonSpaceCharacter(name: string) {
     return !nameRequirements.onlySpacePattern.test(name);
   },
-  getError(name: string) {
+  getError(name: string, allowSpace = false) {
     if (name.length > 32) {
       return nameErrorMessages.invalidMaxLength;
     }
@@ -32,7 +35,7 @@ const nameChecker = {
       return nameErrorMessages.invalidMinLength;
     }
 
-    if (!this.isValidCharacters(name)) {
+    if (!this.isValidCharacters(name, allowSpace)) {
       return nameErrorMessages.invalidCharacter;
     }
 
