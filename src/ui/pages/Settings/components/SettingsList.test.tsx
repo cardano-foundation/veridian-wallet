@@ -49,7 +49,7 @@ jest.mock("../../../utils/openBrowserLink", () => ({
   openBrowserLink: jest.fn(),
 }));
 
-jest.mock("../../PageFooter", () => ({
+jest.mock("../../../components/PageFooter", () => ({
   PageFooter: ({ deleteButtonAction }: any) => (
     <div data-testid="page-footer">
       <button
@@ -62,11 +62,11 @@ jest.mock("../../PageFooter", () => ({
   ),
 }));
 
-jest.mock("../../InfoCard", () => ({
+jest.mock("../../../components/InfoCard", () => ({
   InfoCard: () => <div data-testid="info-card">Info Card</div>,
 }));
 
-jest.mock("../../Alert", () => ({
+jest.mock("../../../components/Alert", () => ({
   Alert: ({
     isOpen,
     dataTestId,
@@ -87,7 +87,7 @@ jest.mock("../../Alert", () => ({
     ) : null,
 }));
 
-jest.mock("../../Verification", () => ({
+jest.mock("../../../components/Verification", () => ({
   Verification: ({ verifyIsOpen }: any) =>
     verifyIsOpen ? (
       <div data-testid="verification-modal">Verification</div>

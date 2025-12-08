@@ -562,7 +562,7 @@ describe("Settings page", () => {
   });
 
   test("Open seedphrase screen", async () => {
-    const { getByText, getByTestId, getAllByText } = render(
+    const { getByTestId, getAllByText } = render(
       <Provider store={store}>
         <Settings
           show
@@ -587,10 +587,10 @@ describe("Settings page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(
+        getAllByText(
           EN_TRANSLATIONS.settings.sections.security.seedphrase.page.title
-        )
-      ).toBeInTheDocument();
+        ).length
+      ).toBeGreaterThan(0);
     });
   });
 

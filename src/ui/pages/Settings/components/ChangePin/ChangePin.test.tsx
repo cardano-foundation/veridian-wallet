@@ -17,8 +17,6 @@ jest.mock("../../../../utils/passcodeChecker", () => ({
   isReverseConsecutive: () => false,
 }));
 
-const mockSetIsOpen = jest.fn();
-
 jest.mock("../../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
@@ -54,9 +52,14 @@ jest.mock("signify-ts", () => ({
   })),
 }));
 
+const mockHandleClose = jest.fn();
+const mockSetChangePinStep = jest.fn();
+
 describe("ChangePin Modal", () => {
   beforeEach(() => {
     jest.resetModules();
+    mockHandleClose.mockClear();
+    mockSetChangePinStep.mockClear();
     jest.doMock("@ionic/react", () => {
       const actualIonicReact = jest.requireActual("@ionic/react");
       return {
@@ -69,7 +72,7 @@ describe("ChangePin Modal", () => {
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.FINGERPRINT
+        biometryType: BiometryType.FINGERPRINT,
       },
       handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
       setBiometricsIsEnabled: jest.fn(),
@@ -82,21 +85,13 @@ describe("ChangePin Modal", () => {
     const { getByText, getByTestId } = render(
       <Provider store={store}>
         <ChangePin
-          isOpen={true}
-          setIsOpen={mockSetIsOpen}
+          changePinStep={0}
+          setChangePinStep={mockSetChangePinStep}
+          handleClose={mockHandleClose}
         />
       </Provider>
     );
 
-    expect(getByTestId("close-button")).toBeInTheDocument();
-    expect(
-      getByText(
-        EN_TRANSLATIONS.settings.sections.security.changepin.createpasscode
-      )
-    ).toBeInTheDocument();
-    expect(
-      getByText(EN_TRANSLATIONS.settings.sections.security.changepin.cancel)
-    ).toBeInTheDocument();
     expect(
       getByText(
         EN_TRANSLATIONS.settings.sections.security.changepin.description
@@ -106,30 +101,20 @@ describe("ChangePin Modal", () => {
     expect(getByTestId("change-pin-footer")).toHaveClass("hide");
   });
 
-  test("Renders Re-enter Passcode when first time passcode is set", async () => {
+  test("Shows footer when first passcode is set", async () => {
     require("@ionic/react");
-    const { getByText, queryByText, getByTestId, findByText } = render(
+    const { getByText, queryByText, getByTestId } = render(
       <Provider store={store}>
         <ChangePin
-          isOpen={true}
-          setIsOpen={mockSetIsOpen}
+          changePinStep={0}
+          setChangePinStep={mockSetChangePinStep}
+          handleClose={mockHandleClose}
         />
       </Provider>
     );
 
     await passcodeFiller(getByText, getByTestId, "193212");
 
-    const text = await findByText(
-      EN_TRANSLATIONS.settings.sections.security.changepin.reenterpasscode
-    );
-
-    await waitFor(() => expect(text).toBeInTheDocument());
-
-    await waitFor(() =>
-      expect(
-        queryByText(EN_TRANSLATIONS.settings.sections.security.changepin.back)
-      ).toBeInTheDocument()
-    );
     await waitFor(() =>
       expect(
         queryByText(EN_TRANSLATIONS.createpasscodemodule.cantremember)
@@ -146,28 +131,26 @@ describe("ChangePin Modal", () => {
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.FINGERPRINT
+        biometryType: BiometryType.FINGERPRINT,
       },
       handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
       setBiometricsIsEnabled: jest.fn(),
     }));
 
-    const { getByText, getByTestId, findByText } = render(
+    const { getByText, getByTestId } = render(
       <Provider store={store}>
         <ChangePin
-          isOpen={true}
-          setIsOpen={mockSetIsOpen}
+          changePinStep={0}
+          setChangePinStep={mockSetChangePinStep}
+          handleClose={mockHandleClose}
         />
       </Provider>
     );
 
     await passcodeFiller(getByText, getByTestId, "193212");
-    const text = await findByText(
-      EN_TRANSLATIONS.settings.sections.security.changepin.reenterpasscode
-    );
 
     await waitFor(() => {
-      expect(text).toBeInTheDocument();
+      expect(getByTestId("change-pin-footer")).not.toHaveClass("hide");
     });
 
     await passcodeFiller(getByText, getByTestId, "193212");
@@ -180,25 +163,34 @@ describe("ChangePin Modal", () => {
     });
   });
 
-  test("Cancel change pin", async () => {
-    const { getByText } = render(
+  test("Reset passcode when can't remember is clicked", async () => {
+    const { getByText, getByTestId } = render(
       <Provider store={store}>
         <ChangePin
-          isOpen={true}
-          setIsOpen={mockSetIsOpen}
+          changePinStep={0}
+          setChangePinStep={mockSetChangePinStep}
+          handleClose={mockHandleClose}
         />
       </Provider>
     );
 
+    // First enter a passcode to show the "can't remember" button
+    await passcodeFiller(getByText, getByTestId, "193212");
+
+    await waitFor(() => {
+      expect(getByTestId("change-pin-footer")).not.toHaveClass("hide");
+    });
+
+    // Click "can't remember" button - this resets the passcode entry
     act(() => {
       fireEvent.click(
-        getByText(EN_TRANSLATIONS.settings.sections.security.changepin.cancel)
+        getByText(EN_TRANSLATIONS.createpasscodemodule.cantremember)
       );
     });
 
+    // After clicking "can't remember", the footer should be hidden again (state is reset)
     await waitFor(() => {
-      expect(mockSetIsOpen).toBeCalledWith(false);
+      expect(getByTestId("change-pin-footer")).toHaveClass("hide");
     });
   });
 });
-

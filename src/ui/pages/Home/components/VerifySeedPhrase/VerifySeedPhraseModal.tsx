@@ -4,7 +4,7 @@ import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../../../components/PageHeader";
-import { RecoverySeedPhrase } from "../../../../components/Settings/components/RecoverySeedPhrase";
+import { RecoverySeedPhrase } from "../../../Settings/components/RecoverySeedPhrase";
 import { showError } from "../../../../utils/error";
 import {
   Step,

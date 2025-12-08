@@ -1,9 +1,9 @@
 import { IonModal } from "@ionic/react";
 import { i18n } from "../../../../../../i18n";
 import Image from "../../../../../assets/images/SeedPhraseDocs.png";
-import { InfoCard } from "../../../../InfoCard";
-import { ScrollablePageLayout } from "../../../../layout/ScrollablePageLayout";
-import { PageHeader } from "../../../../PageHeader";
+import { InfoCard } from "../../../../../components/InfoCard";
+import { ScrollablePageLayout } from "../../../../../components/layout/ScrollablePageLayout";
+import { PageHeader } from "../../../../../components/PageHeader";
 import { DocumentSection } from "./DocumentSection";
 import "./RecoverySeedPhraseDocumentModal.scss";
 import { RecoverySeedPhraseDocumentModalProps } from "./RecoverySeedPhraseDocumentModal.types";

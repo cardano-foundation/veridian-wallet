@@ -56,7 +56,7 @@ jest.mock("@ionic/react", () => ({
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
 }));
 
-jest.mock("../../../CustomInput", () => ({
+jest.mock("../../../../components/CustomInput", () => ({
   CustomInput: (props: CustomInputProps) => {
     return (
       <>
