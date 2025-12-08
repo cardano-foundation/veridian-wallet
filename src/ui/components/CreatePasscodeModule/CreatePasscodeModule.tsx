@@ -276,8 +276,8 @@ const CreatePasscodeModule = forwardRef<
         <PageFooter
           pageId={testId}
           customClass={originalPassCode === "" ? "hide " : ""}
-          secondaryButtonText={`${i18n.t("createpasscodemodule.cantremember")}`}
-          secondaryButtonAction={() => handleClearState()}
+          tertiaryButtonText={`${i18n.t("createpasscodemodule.cantremember")}`}
+          tertiaryButtonAction={() => handleClearState()}
         />
         <Alert
           isOpen={showSetupBiometricsAlert}

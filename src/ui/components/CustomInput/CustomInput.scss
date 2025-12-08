@@ -49,6 +49,7 @@ ion-item.custom-input {
     width: 100%;
     border: 1px solid var(--ion-color-neutral-400);
     border-radius: 0.5rem;
+    background: var(--ion-color-neutral-100);
 
     &:focus-within {
       border-color: var(--ion-color-neutral-700);

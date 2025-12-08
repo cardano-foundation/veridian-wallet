@@ -34,7 +34,7 @@ import { ToastMsgType } from "../../globals/types";
 import { useAppIonRouter } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
 import { showError } from "../../utils/error";
-import { nameChecker } from "../../utils/nameChecker";
+import { nameChecker, uniqueGroupName } from "../../utils/nameChecker";
 import { GroupSetup } from "./components/GroupSetup";
 import { SetupProfile } from "./components/SetupProfile";
 import { ProfileType, SetupProfileType } from "./components/SetupProfileType";
@@ -98,11 +98,14 @@ export const ProfileSetup = ({
       (step === SetupProfileStep.SetupProfile &&
         profileType !== ProfileType.Group)
     ) {
+      setGroupName("");
+      setUserName("");
       setStep(SetupProfileStep.SetupType);
       return;
     }
 
     if (step === SetupProfileStep.SetupProfile) {
+      setUserName("");
       setStep(SetupProfileStep.GroupSetupStart);
       return;
     }
@@ -113,12 +116,15 @@ export const ProfileSetup = ({
   const errorMessage = (() => {
     const isGroup = profileType === ProfileType.Group;
     if (
-      Object.values(profiles).some(
-        (item) => item.identity.displayName === userName
-      ) &&
-      !isGroup
+      Object.values(profiles).some((item) =>
+        isGroup
+          ? item.identity.displayName === groupName
+          : item.identity.displayName === userName
+      )
     ) {
-      return `${i18n.t("nameerror.duplicatename")}`;
+      return isGroup
+        ? `${i18n.t("nameerror.duplicategroupname")}`
+        : `${i18n.t("nameerror.duplicatename")}`;
     }
 
     return isGroup && step === SetupProfileStep.GroupSetupStart
@@ -347,6 +353,14 @@ export const ProfileSetup = ({
         return;
       }
 
+      const profileNames = Object.values(profiles).map(
+        (pro) => pro.identity.displayName
+      );
+
+      const newName = uniqueGroupName(scannedGroupName, profileNames);
+      url.searchParams.set("groupName", newName);
+      content = url.toString();
+
       const invitation = await resolveGroupConnection(
         content,
         scanGroupId,
@@ -361,14 +375,14 @@ export const ProfileSetup = ({
       const pendingJoinData = {
         isPendingJoinGroup: true,
         groupId: scanGroupId,
-        groupName: scannedGroupName,
+        groupName: newName,
         initiatorName: groupInitiator,
         connection: invitation.connection,
       };
       dispatch(setPendingJoinGroupMetadata(pendingJoinData));
 
       // Update local state
-      setGroupName(scannedGroupName);
+      setGroupName(newName);
       setStep(SetupProfileStep.GroupSetupConfirm);
 
       // Update persistent storage

@@ -4,6 +4,20 @@ import Eng_trans from "../../../../locales/en/en.json";
 import { store } from "../../../../store";
 import { CardDetailsExpandAttributes } from "./CardDetailsExpandAttributes";
 
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // Deprecated
+    removeListener: jest.fn(), // Deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 describe("Card Details Expand Attribute", () => {
   test("Render nested value", async () => {
     const { getAllByTestId, getByText } = render(

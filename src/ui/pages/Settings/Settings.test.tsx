@@ -38,14 +38,10 @@ jest.mock("@capacitor-community/privacy-screen", () => ({
 
 jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
-  IonModal: (props: any) => (
-    <div
-      data-testid={props["data-testid"]}
-      style={{ display: props.isOpen ? "block" : "none" }}
-    >
-      {props.children}
-    </div>
-  ),
+  IonModal: (props: any) =>
+    props.isOpen ? (
+      <div data-testid={props["data-testid"]}>{props.children}</div>
+    ) : null,
 }));
 
 jest.mock("@capacitor/browser", () => ({
@@ -566,7 +562,7 @@ describe("Settings page", () => {
   });
 
   test("Open seedphrase screen", async () => {
-    const { getByText, getByTestId } = render(
+    const { getByText, getByTestId, getAllByText } = render(
       <Provider store={store}>
         <Settings
           show
@@ -576,8 +572,10 @@ describe("Settings page", () => {
     );
 
     expect(
-      getByText(EN_TRANSLATIONS.settings.sections.security.seedphrase.title)
-    ).toBeInTheDocument();
+      getByTestId(
+        `settings-security-list-item-${OptionIndex.RecoverySeedPhrase}`
+      )
+    ).toBeVisible();
 
     act(() => {
       fireEvent.click(

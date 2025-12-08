@@ -30,7 +30,7 @@ const InputRequest = () => {
   const [inputValue, setInputValue] = useState("");
 
   const errorMessage = inputChange
-    ? nameChecker.getError(inputValue)
+    ? nameChecker.getError(inputValue, true)
     : undefined;
 
   const showModal = !!missingAliasUrl;

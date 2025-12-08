@@ -11,10 +11,11 @@ jest.mock("../services/utils", () => ({
   randomSalt: jest.fn(() => "mocked-random-salt"),
 }));
 
-const storageService = jest.mocked<StorageService<ContactRecord>>({
+const storageService = jest.mocked({
   save: jest.fn(),
   delete: jest.fn(),
   deleteById: jest.fn(),
+  deleteByIdIfExists: jest.fn(),
   update: jest.fn(),
   findById: jest.fn(),
   findAllByQuery: jest.fn(),
@@ -58,19 +59,35 @@ describe("Contact Storage", () => {
   });
 
   test("Should delete contact record", async () => {
-    storageService.delete.mockResolvedValue();
+    storageService.delete.mockResolvedValue(undefined);
     await contactStorage.delete(contactRecordA);
     expect(storageService.delete).toBeCalledWith(contactRecordA);
   });
 
   test("Should delete contact record by ID", async () => {
-    storageService.deleteById.mockResolvedValue();
+    storageService.deleteById.mockResolvedValue(undefined);
     await contactStorage.deleteById(contactRecordA.id);
     expect(storageService.deleteById).toBeCalledWith(contactRecordA.id);
   });
 
+  test("Should delete connection pair record by ID if exists", async () => {
+    storageService.deleteById.mockResolvedValue(undefined);
+    await contactStorage.deleteByIdIfExists(contactRecordA.id);
+    expect(storageService.deleteById).toBeCalledWith(contactRecordA.id);
+  });
+
+  test("deleteByIdIfExists should ignore missing entries for idempotency", async () => {
+    storageService.deleteById.mockRejectedValue(
+      new Error(
+        `${StorageMessage.RECORD_DOES_NOT_EXIST_ERROR_MSG} ${contactRecordA.id}`
+      )
+    );
+    await contactStorage.deleteByIdIfExists(contactRecordA.id);
+    expect(storageService.deleteById).toBeCalledWith(contactRecordA.id);
+  });
+
   test("Should update contact record", async () => {
-    storageService.update.mockResolvedValue();
+    storageService.update.mockResolvedValue(undefined);
     await contactStorage.update(contactRecordA);
     expect(storageService.update).toBeCalledWith(contactRecordA);
   });
@@ -143,6 +160,15 @@ describe("Contact Storage", () => {
     await expect(contactStorage.deleteById(contactRecordA.id)).rejects.toThrow(
       "Deleting by ID error"
     );
+  });
+
+  test("deleteByIdIfExists should error for unrelated errors", async () => {
+    storageService.deleteById.mockRejectedValue(
+      new Error("Deleting by ID unrelated error")
+    );
+    await expect(
+      contactStorage.deleteByIdIfExists(contactRecordA.id)
+    ).rejects.toThrow("Deleting by ID unrelated error");
   });
 
   test("Should handle updating error", async () => {

@@ -18,7 +18,10 @@ import { i18n } from "../i18n";
 import { Routes } from "../routes";
 import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { getShowProfileState } from "../store/reducers/profileCache";
+import {
+  getCurrentProfile,
+  getShowProfileState,
+} from "../store/reducers/profileCache";
 import {
   getGlobalLoading,
   getInitializationPhase,
@@ -30,6 +33,7 @@ import { ToastStack } from "./components/CustomToast/ToastStack";
 import { GenericError, NoWitnessAlert } from "./components/Error";
 import { InputRequest } from "./components/InputRequest";
 import { ProfileStateModal } from "./components/ProfileStateModal";
+import { SetGroupUserName } from "./components/SetGroupUserName";
 import { SidePage } from "./components/SidePage";
 import {
   ANDROID_MIN_VERSION,
@@ -48,6 +52,23 @@ import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
 
 setupIonicReact();
+
+const SetGroupNameWrapper = () => {
+  const currentProfile = useAppSelector(getCurrentProfile);
+
+  const isGroupProfile =
+    !!currentProfile?.identity.groupMetadata ||
+    !!currentProfile?.identity.groupMemberPre;
+
+  if (
+    !isGroupProfile ||
+    currentProfile.identity.groupMetadata?.proposedUsername ||
+    currentProfile.identity.groupUsername
+  )
+    return;
+
+  return <SetGroupUserName identifier={currentProfile.identity} />;
+};
 
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
   const showProfileState = useAppSelector(getShowProfileState);
@@ -78,6 +99,7 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
             <ProfileStateModal />
             <LockPage />
           </IonReactRouter>
+          <SetGroupNameWrapper />
           <AppOffline />
         </>
       );

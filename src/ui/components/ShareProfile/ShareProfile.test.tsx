@@ -23,6 +23,10 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { ShareProfile } from "./ShareProfile";
+import { showError } from "../../utils/error";
+
+const getOobiMock = jest.fn();
+const dispatchMock = jest.fn();
 
 const connectByOobiUrlMock = jest.fn();
 jest.mock("../../../core/agent/agent", () => ({
@@ -30,6 +34,7 @@ jest.mock("../../../core/agent/agent", () => ({
     agent: {
       connections: {
         connectByOobiUrl: (...arg: unknown[]) => connectByOobiUrlMock(...arg),
+        getOobi: (...params: unknown[]) => getOobiMock(...params),
       },
     },
   },
@@ -146,6 +151,8 @@ describe("Share Profile", () => {
 
     isNativePlatformMock.mockImplementation(() => true);
 
+    getOobiMock.mockResolvedValue("oobi");
+
     addListener.mockImplementation(
       (
         eventName: string,
@@ -171,7 +178,6 @@ describe("Share Profile", () => {
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <ShareProfile
-          oobi="oobi"
           isOpen
           setIsOpen={closeModal}
         />
@@ -190,6 +196,30 @@ describe("Share Profile", () => {
 
     fireEvent.click(getByText(EN_Translation.shareprofile.buttons.close));
     expect(closeModal).toBeCalled();
+  });
+
+  test("Failed to get QR", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+    const closeModal = jest.fn();
+
+    const expectedError = new Error("fetch oobi failure");
+    getOobiMock.mockRejectedValue(expectedError);
+
+    render(
+      <Provider store={storeMocked}>
+        <ShareProfile
+          isOpen
+          setIsOpen={closeModal}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(showGenericError(true));
+    });
   });
 
   test("Scan oobi: Success", async () => {
@@ -216,7 +246,6 @@ describe("Share Profile", () => {
     const { getByTestId } = render(
       <Provider store={storeMocked}>
         <ShareProfile
-          oobi="oobi"
           isOpen
           setIsOpen={jest.fn()}
         />
@@ -279,7 +308,6 @@ describe("Share Profile", () => {
     const { getByTestId } = render(
       <Provider store={storeMocked}>
         <ShareProfile
-          oobi="oobi"
           isOpen
           setIsOpen={jest.fn()}
         />
@@ -343,12 +371,15 @@ describe("Share Profile", () => {
     const { getByTestId } = render(
       <Provider store={storeMocked}>
         <ShareProfile
-          oobi="oobi"
           isOpen
           setIsOpen={jest.fn()}
         />
       </Provider>
     );
+
+    await waitFor(() => {
+      expect(getOobiMock).toBeCalled();
+    });
 
     fireEvent(
       getByTestId("share-profile-segment"),
@@ -424,8 +455,6 @@ describe("Share Profile", () => {
         },
       };
     }
-
-    const dispatchMock = jest.fn();
     const storeMocked = {
       ...makeTestStore(state),
       dispatch: dispatchMock,
@@ -434,7 +463,6 @@ describe("Share Profile", () => {
     const { getByTestId } = render(
       <Provider store={storeMocked}>
         <ShareProfile
-          oobi="oobi"
           isOpen
           setIsOpen={jest.fn()}
         />
@@ -500,7 +528,6 @@ describe("Share Profile", () => {
     const { getByTestId } = render(
       <Provider store={storeMocked}>
         <ShareProfile
-          oobi="oobi"
           isOpen
           setIsOpen={jest.fn()}
         />

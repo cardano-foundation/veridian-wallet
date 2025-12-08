@@ -60,6 +60,7 @@ jest.mock("../core/agent/agent", () => ({
           mnemonic: "",
         })
       ),
+      isSeedPhraseVerified: jest.fn(() => true),
       identifiers: {
         getIdentifiers: jest.fn().mockResolvedValue([]),
         syncKeriaIdentifiers: jest.fn(),
