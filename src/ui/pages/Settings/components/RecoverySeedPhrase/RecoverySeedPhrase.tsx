@@ -10,8 +10,8 @@ import { InfoCard } from "../../../../components/InfoCard";
 import { SeedPhraseModule } from "../../../../components/SeedPhraseModule";
 import { ConfirmModal } from "./ConfirmModal";
 import "./RecoverySeedPhrase.scss";
-import { RecoverySeedPhraseProps } from "./RecoverySeedPhrase.types";
 import { PageFooter } from "../../../../components/PageFooter";
+import { RecoverySeedPhraseProps } from "./RecoverySeedPhrase.types";
 import { RecoverySeedPhraseDocumentModal } from "./RecoverySeedPhraseDocumentModal";
 
 const RecoverySeedPhrase = ({
