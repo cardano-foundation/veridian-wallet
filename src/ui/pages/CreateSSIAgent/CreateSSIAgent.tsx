@@ -17,6 +17,7 @@ import {
   setIsSetupProfile,
   setRecoveryCompleteNoInterruption,
   setSeedPhraseVerified,
+  setSsiAgentIsSet,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ToastMsgType } from "../../globals/types";
@@ -30,6 +31,7 @@ import { SSIScan } from "./components/SSIScan";
 
 const SSI_URLS_EMPTY = "SSI url is empty";
 const SEED_PHRASE_EMPTY = "Invalid seed phrase";
+const FAILED_TO_FETCH = "Failed to fetch";
 
 const CreateSSIAgent = () => {
   const seedPhraseCache = useAppSelector(getSeedPhraseCache);
@@ -216,6 +218,20 @@ const CreateSSIAgent = () => {
     }
   };
 
+  const handleAfterRecovery = async () => {
+    await Agent.agent.markSeedPhraseAsVerified();
+    dispatch(setSeedPhraseVerified(true));
+    dispatch(setRecoveryCompleteNoInterruption());
+  };
+
+  const recoverAndLoadDb = async (isSyncing: boolean) => {
+    if (isSyncing) {
+      await Agent.agent.syncWithKeria();
+    }
+
+    await handleAfterRecovery();
+  };
+
   const handleRecoveryWallet = async (bootUrl: string) => {
     setLoading(true);
     try {
@@ -240,11 +256,7 @@ const CreateSSIAgent = () => {
         connectUrl
       );
 
-      await Agent.agent.markSeedPhraseAsVerified();
-      dispatch(setSeedPhraseVerified(true));
-
-      dispatch(setRecoveryCompleteNoInterruption());
-
+      await handleAfterRecovery();
       // Note: We need to wait load data from db before go to next page
     } catch (e) {
       const errorMessage = (e as Error).message;
@@ -254,6 +266,25 @@ const CreateSSIAgent = () => {
           errorMessage
         )
       ) {
+        return;
+      }
+
+      if (errorMessage.includes(FAILED_TO_FETCH)) {
+        const recoveryStatus = await Agent.agent.basicStorage.findById(
+          MiscRecordId.CLOUD_RECOVERY_STATUS
+        );
+
+        if (recoveryStatus?.content?.syncing) {
+          setCurrentPage(CurrentPage.Connect);
+          dispatch(setSsiAgentIsSet(true));
+        }
+
+        Agent.agent
+          .connect(Agent.DEFAULT_RECONNECT_INTERVAL, false)
+          .then(() => {
+            recoverAndLoadDb(!!recoveryStatus?.content?.syncing);
+          });
+
         return;
       }
 
