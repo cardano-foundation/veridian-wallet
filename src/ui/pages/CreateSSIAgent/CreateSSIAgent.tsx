@@ -224,12 +224,33 @@ const CreateSSIAgent = () => {
     dispatch(setRecoveryCompleteNoInterruption());
   };
 
-  const recoverAndLoadDb = async (isSyncing: boolean) => {
-    if (isSyncing) {
-      await Agent.agent.syncWithKeria();
-    }
+  const recoverAndLoadDb = async () => {
+    try {
+      const recoveryStatus = await Agent.agent.basicStorage.findById(
+        MiscRecordId.CLOUD_RECOVERY_STATUS
+      );
 
-    await handleAfterRecovery();
+      const isSyncing = recoveryStatus?.content?.syncing;
+
+      if (isSyncing) {
+        setCurrentPage(CurrentPage.Connect);
+        dispatch(setSsiAgentIsSet(true));
+      }
+
+      await Agent.agent.connect(Agent.DEFAULT_RECONNECT_INTERVAL, false);
+
+      if (isSyncing) {
+        await Agent.agent.syncWithKeria();
+      }
+
+      await handleAfterRecovery();
+    } catch (e) {
+      const errorMessage = (e as Error).message;
+
+      if (errorMessage.includes(FAILED_TO_FETCH)) {
+        recoverAndLoadDb();
+      }
+    }
   };
 
   const handleRecoveryWallet = async (bootUrl: string) => {
@@ -270,21 +291,7 @@ const CreateSSIAgent = () => {
       }
 
       if (errorMessage.includes(FAILED_TO_FETCH)) {
-        const recoveryStatus = await Agent.agent.basicStorage.findById(
-          MiscRecordId.CLOUD_RECOVERY_STATUS
-        );
-
-        if (recoveryStatus?.content?.syncing) {
-          setCurrentPage(CurrentPage.Connect);
-          dispatch(setSsiAgentIsSet(true));
-        }
-
-        Agent.agent
-          .connect(Agent.DEFAULT_RECONNECT_INTERVAL, false)
-          .then(() => {
-            recoverAndLoadDb(!!recoveryStatus?.content?.syncing);
-          });
-
+        recoverAndLoadDb();
         return;
       }
 
