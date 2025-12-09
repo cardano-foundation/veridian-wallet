@@ -198,6 +198,12 @@ const stateCacheSlice = createSlice({
     showVerifySeedPhraseAlert: (state, action: PayloadAction<boolean>) => {
       state.showVerifySeedPhraseAlert = action.payload;
     },
+    setSsiAgentIsSet: (state, action: PayloadAction<boolean>) => {
+      state.authentication.ssiAgentIsSet = action.payload;
+    },
+    setFinishLoadDB: (state, action: PayloadAction<boolean>) => {
+      state.finishLoadData = action.payload;
+    },
   },
 });
 
@@ -229,6 +235,8 @@ const {
   setPendingJoinGroupMetadata,
   setSeedPhraseVerified,
   showVerifySeedPhraseAlert,
+  setSsiAgentIsSet,
+  setFinishLoadDB,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -261,6 +269,7 @@ const getShowSetupProfilePage = (state: RootState) =>
   state.stateCache.isSetupProfile;
 const getShowVerifySeedPhraseAlert = (state: RootState) =>
   state.stateCache.showVerifySeedPhraseAlert;
+const getFinishLoadDB = (state: RootState) => state.stateCache.isSetupProfile;
 
 export type {
   AuthenticationCacheProps,
@@ -275,6 +284,7 @@ export {
   dequeueIncomingRequest,
   enqueueIncomingRequest,
   setSeedPhraseVerified,
+  setSsiAgentIsSet,
   getAuthentication,
   getCameraDirection,
   getCurrentRoute,
@@ -293,6 +303,7 @@ export {
   getStateCache,
   getToastMgs,
   getToastMsgs,
+  getFinishLoadDB,
   initialState,
   login,
   logout,
@@ -317,4 +328,5 @@ export {
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
+  setFinishLoadDB,
 };
