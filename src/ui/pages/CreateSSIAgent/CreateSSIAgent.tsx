@@ -28,10 +28,10 @@ import { CurrentPage, SSIError } from "./CreateSSIAgent.types";
 import { AdvancedSetting, removeLastSlash } from "./components/AdvancedSetting";
 import { Connect } from "./components/Connect";
 import { SSIScan } from "./components/SSIScan";
+import { FAILED_TO_FETCH_ERROR } from "../../globals/constants";
 
 const SSI_URLS_EMPTY = "SSI url is empty";
 const SEED_PHRASE_EMPTY = "Invalid seed phrase";
-const FAILED_TO_FETCH = "Failed to fetch";
 
 const CreateSSIAgent = () => {
   const seedPhraseCache = useAppSelector(getSeedPhraseCache);
@@ -247,7 +247,10 @@ const CreateSSIAgent = () => {
     } catch (e) {
       const errorMessage = (e as Error).message;
 
-      if (errorMessage.includes(FAILED_TO_FETCH)) {
+      if (
+        errorMessage.includes(FAILED_TO_FETCH_ERROR) ||
+        errorMessage === Agent.KERIA_CONNECT_FAILED_BAD_NETWORK
+      ) {
         recoverAndLoadDb();
       }
     }
@@ -290,7 +293,10 @@ const CreateSSIAgent = () => {
         return;
       }
 
-      if (errorMessage.includes(FAILED_TO_FETCH)) {
+      if (
+        errorMessage.includes(FAILED_TO_FETCH_ERROR) ||
+        Agent.KERIA_CONNECT_FAILED_BAD_NETWORK === errorMessage
+      ) {
         recoverAndLoadDb();
         return;
       }
