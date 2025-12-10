@@ -31,7 +31,6 @@ import { SSIScan } from "./components/SSIScan";
 
 const SSI_URLS_EMPTY = "SSI url is empty";
 const SEED_PHRASE_EMPTY = "Invalid seed phrase";
-const FAILED_TO_FETCH = "Failed to fetch";
 
 const CreateSSIAgent = () => {
   const seedPhraseCache = useAppSelector(getSeedPhraseCache);
@@ -98,7 +97,7 @@ const CreateSSIAgent = () => {
       return;
     }
 
-    if (errorMessage.includes(FAILED_TO_FETCH)) {
+    if (errorMessage.includes(Agent.CONNECT_URL_DISCOVERY_BAD_ERROR)) {
       showError(errorMessage, error, dispatch, ToastMsgType.NETWORK_ERROR);
       return;
     }

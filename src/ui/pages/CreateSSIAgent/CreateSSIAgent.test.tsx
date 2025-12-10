@@ -1032,7 +1032,7 @@ describe("SSI agent page", () => {
       );
 
       discoverConnectUrlMock.mockImplementation(() => {
-        return Promise.reject(new Error("Failed to fetch"));
+        return Promise.reject(new Error(Agent.CONNECT_URL_DISCOVERY_BAD_ERROR));
       });
 
       const history = createMemoryHistory();
