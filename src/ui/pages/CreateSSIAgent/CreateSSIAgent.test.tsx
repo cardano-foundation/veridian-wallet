@@ -797,7 +797,7 @@ describe("SSI agent page", () => {
       );
 
       recoverKeriaAgentMock.mockImplementation(() => {
-        throw new Error("Failed to fetch");
+        throw new Error(Agent.SYNC_DATA_NETWORK_ERROR);
       });
 
       findByIdMock.mockImplementation(() =>
