@@ -384,4 +384,55 @@ describe("Verify Password", () => {
       expect(setIsOpenMock).toBeCalled();
     });
   });
+
+  test("Confirm button is disabled when input is empty and enabled when input has value", async () => {
+    jest.spyOn(Agent.agent.basicStorage, "findById").mockResolvedValue(
+      Promise.resolve({
+        content: {
+          value: "1111",
+        },
+      } as any)
+    );
+
+    const dispatchMock = jest.fn();
+    storeMocked = {
+      ...makeTestStore(initialStateWithPassword),
+      dispatch: dispatchMock,
+    };
+
+    const setIsOpenMock = jest.fn();
+    const onVerifyMock = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <VerifyPassword
+          isOpen={true}
+          setIsOpen={setIsOpenMock}
+          onVerify={onVerifyMock}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("forgot-hint-btn")).toBeVisible();
+    });
+
+    const confirmButton = getByTestId("primary-button");
+    const passwordInput = getByTestId("verify-password-value");
+
+    expect(confirmButton.getAttribute("disabled")).not.toBe("false");
+
+    act(() => {
+      fireEvent(
+        passwordInput,
+        new CustomEvent("ionInput", {
+          detail: { value: "test" },
+        })
+      );
+    });
+
+    await waitFor(() => {
+      expect(confirmButton.getAttribute("disabled")).toBe("false");
+    });
+  });
 });

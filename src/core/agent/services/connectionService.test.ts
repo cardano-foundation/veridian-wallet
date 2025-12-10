@@ -150,6 +150,7 @@ const contactStorage = jest.mocked({
   save: jest.fn(),
   delete: jest.fn(),
   deleteById: jest.fn(),
+  deleteByIdIfExists: jest.fn(),
   update: jest.fn(),
   findById: jest.fn(),
   findAllByQuery: jest.fn(),
@@ -278,7 +279,6 @@ describe("Connection service of agent", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     let invalidUrls = [
       "https://localhost/oobi",
-      "https://localhost/oobi/1234",
       "https://localhost/oobi/1234/agent/eid/extra",
       "https://localhost/.well-known/keri/oobi/",
       "https://localhost",
@@ -314,7 +314,14 @@ describe("Connection service of agent", () => {
       "https://localhost/oobi/1234/witness?name=alias",
       "https://localhost/oobi/1234/witness/5678?name=alias",
       "https://localhost/.well-known/keri/oobi/1234?name=alias",
+      "https://localhost/oobi/1234?name=alias",
     ];
+
+    global.fetch = jest.fn().mockResolvedValue({
+      headers: {
+        get: jest.fn().mockReturnValue("application/json+cesr"),
+      },
+    });
 
     for (const url of validUrls) {
       await connectionService.connectByOobiUrl(url, "shared-identifier");
@@ -333,6 +340,19 @@ describe("Connection service of agent", () => {
         })
       );
     }
+
+    const invalidDoobi = "https://localhost/oobi/1234?name=alias";
+    global.fetch = jest.fn().mockResolvedValue({
+      headers: {
+        get: jest.fn().mockReturnValue("text/html"),
+      },
+    });
+
+    await expect(
+      connectionService.connectByOobiUrl(invalidDoobi, "shared-identifier")
+    ).rejects.toThrowError(
+      new Error(ConnectionService.INVALID_DOOBI_CONNECTION_CONTENT_TYPE)
+    );
 
     validUrls = [
       "https://localhost/oobi/1234/agent?name=alias",
@@ -979,9 +999,6 @@ describe("Connection service of agent", () => {
       },
     ];
 
-    identifierStorage.getAllIdentifiers = jest
-      .fn()
-      .mockResolvedValue([localIdentifier]);
     contactListMock.mockReturnValue(cloudContacts);
     contactStorage.findById = jest.fn().mockResolvedValue(null);
     connectionPairStorage.findById = jest.fn().mockResolvedValue(null);
@@ -1008,7 +1025,7 @@ describe("Connection service of agent", () => {
     });
   });
 
-  test("should restore connection pairs from cloud contact data during recovery", async () => {
+  test("should restore connection pairs from a cloud contact in multiple profiles", async () => {
     const localIdentifier = { id: "Eabc123" };
     const anotherLocalIdentifier = { id: "Fdef456" };
     identifierStorage.getAllIdentifiers = jest
@@ -1021,7 +1038,7 @@ describe("Connection service of agent", () => {
       oobi: "http://oobi.com/Dcontact1",
       createdAt: "2025-01-01T00:00:00.000Z",
       "Eabc123:createdAt": "2025-01-02T00:00:00.000Z",
-      "Xyz789:createdAt": "2025-01-03T00:00:00.000Z", // This one should be ignored
+      "Fdef456:createdAt": "2025-01-03T00:00:00.000Z", // This one should be ignored
     };
     contactListMock.mockReturnValue([cloudContact]);
     contactStorage.findById = jest.fn().mockResolvedValue(null);
@@ -1029,7 +1046,6 @@ describe("Connection service of agent", () => {
 
     await connectionService.syncKeriaContacts();
 
-    // Verify that the main contact record was saved
     expect(contactStorage.save).toHaveBeenCalledTimes(1);
     expect(contactStorage.save).toHaveBeenCalledWith({
       id: "Dcontact1",
@@ -1038,13 +1054,19 @@ describe("Connection service of agent", () => {
       groupId: undefined,
       createdAt: expect.any(Date),
     });
-
-    // Verify that the connection pair for the matching identifier was created
-    expect(connectionPairStorage.save).toHaveBeenCalledTimes(1);
+    expect(connectionPairStorage.save).toHaveBeenCalledTimes(2);
     expect(connectionPairStorage.save).toHaveBeenCalledWith({
       id: "Eabc123:Dcontact1",
       contactId: "Dcontact1",
       identifier: "Eabc123",
+      creationStatus: CreationStatus.COMPLETE,
+      pendingDeletion: false,
+      createdAt: expect.any(Date),
+    });
+    expect(connectionPairStorage.save).toHaveBeenCalledWith({
+      id: "Fdef456:Dcontact1",
+      contactId: "Dcontact1",
+      identifier: "Fdef456",
       creationStatus: CreationStatus.COMPLETE,
       pendingDeletion: false,
       createdAt: expect.any(Date),
@@ -1464,7 +1486,7 @@ describe("Connection service of agent", () => {
       contactId: "contact-id",
     });
     expect(deleteContactMock).toBeCalledWith("contact-id");
-    expect(contactStorage.deleteById).toBeCalledWith("contact-id");
+    expect(contactStorage.deleteByIdIfExists).toBeCalledWith("contact-id");
     expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
   });
 
@@ -1492,7 +1514,7 @@ describe("Connection service of agent", () => {
     );
 
     expect(deleteContactMock).toBeCalledWith("contact-id");
-    expect(contactStorage.deleteById).toBeCalledWith("contact-id");
+    expect(contactStorage.deleteByIdIfExists).toBeCalledWith("contact-id");
     expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
   });
 
@@ -1522,7 +1544,7 @@ describe("Connection service of agent", () => {
     ).rejects.toThrow("Some other error - 500");
 
     expect(deleteContactMock).toBeCalledWith("contact-id");
-    expect(contactStorage.deleteById).not.toBeCalled();
+    expect(contactStorage.deleteByIdIfExists).not.toBeCalled();
     expect(connectionPairStorage.deleteById).not.toBeCalled();
   });
 
@@ -1576,10 +1598,10 @@ describe("Connection service of agent", () => {
     });
     expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
     expect(deleteContactMock).not.toBeCalled();
-    expect(contactStorage.deleteById).not.toBeCalled();
+    expect(contactStorage.deleteByIdIfExists).not.toBeCalled();
   });
 
-  test("Should handle 404 error when getting contact for field removal", async () => {
+  test("Should handle 404 error when getting contact for field removal and continue to delete the connection pair", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const connectionPair = {
       id: "test-identifier:contact-id",
@@ -1591,7 +1613,6 @@ describe("Connection service of agent", () => {
       contactId: "contact-id",
       identifier: "other-identifier",
     };
-
     connectionPairStorage.findExpectedById = jest
       .fn()
       .mockResolvedValueOnce(connectionPair);
@@ -1609,9 +1630,9 @@ describe("Connection service of agent", () => {
 
     expect(contactGetMock).toBeCalledWith("contact-id");
     expect(updateContactMock).not.toBeCalled();
-    expect(connectionPairStorage.deleteById).not.toBeCalled();
     expect(deleteContactMock).not.toBeCalled();
-    expect(contactStorage.deleteById).not.toBeCalled();
+    expect(contactStorage.deleteByIdIfExists).not.toBeCalled();
+    expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
   });
 
   test("Should throw error when getting contact fails with non-404 error", async () => {
@@ -1649,18 +1670,16 @@ describe("Connection service of agent", () => {
     expect(connectionPairStorage.deleteById).not.toBeCalled();
   });
 
-  test("Can delete connection by id if keria throw error 404 when delete contact", async () => {
+  test("Can delete connection by id if keria throws a 404 error when delete contact", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const connectionPair = {
       id: `test-identifier:${contacts[0].id}`,
       contactId: contacts[0].id,
       identifier: "test-identifier",
     };
-
     deleteContactMock = jest
       .fn()
       .mockRejectedValue(new Error("request - 404 - SignifyClient message"));
-
     connectionPairStorage.findExpectedById = jest
       .fn()
       .mockResolvedValueOnce(connectionPair);
@@ -1672,7 +1691,8 @@ describe("Connection service of agent", () => {
       contacts[0].id,
       "test-identifier"
     );
-    expect(contactStorage.deleteById).toBeCalledWith(contacts[0].id);
+
+    expect(contactStorage.deleteByIdIfExists).toBeCalledWith(contacts[0].id);
     expect(connectionPairStorage.deleteById).toBeCalledWith(connectionPair.id);
   });
 
@@ -1701,7 +1721,7 @@ describe("Connection service of agent", () => {
       )
     ).rejects.toThrow("Some other error - 500");
 
-    expect(contactStorage.deleteById).not.toBeCalled();
+    expect(contactStorage.deleteByIdIfExists).not.toBeCalled();
     expect(connectionPairStorage.deleteById).not.toBeCalled();
   });
 

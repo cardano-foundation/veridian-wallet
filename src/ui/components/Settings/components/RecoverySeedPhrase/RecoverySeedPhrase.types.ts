@@ -1,5 +1,7 @@
 interface RecoverySeedPhraseProps {
   onClose: () => void;
+  starVerify?: (seedPhrase: string[]) => void;
+  mode?: "view" | "verify";
 }
 
 interface ConfirmModalProps {
@@ -15,4 +17,4 @@ interface ConditionItemProps {
   onClick: (index: number) => void;
 }
 
-export type { ConfirmModalProps, ConditionItemProps, RecoverySeedPhraseProps };
+export type { ConditionItemProps, ConfirmModalProps, RecoverySeedPhraseProps };

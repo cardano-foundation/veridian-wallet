@@ -191,7 +191,7 @@ describe("Forgot Passcode Page", () => {
 
     await waitFor(() => {
       expect(
-        getByTestId("secondary-button-forgot-auth-info-modal")
+        getByTestId("tertiary-button-forgot-auth-info-modal")
       ).toBeVisible();
     });
 

@@ -30,7 +30,10 @@ import {
   showGenericError,
 } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
-import { ErrorMessage, MESSAGE_MILLISECONDS } from "../../components/ErrorMessage";
+import {
+  ErrorMessage,
+  MESSAGE_MILLISECONDS,
+} from "../../components/ErrorMessage";
 import { ForgotAuthInfo } from "../../components/ForgotAuthInfo";
 import { ForgotType } from "../../components/ForgotAuthInfo/ForgotAuthInfo.types";
 import {
@@ -272,7 +275,10 @@ const LockPageContainer = () => {
         <MaxLoginAttemptAlert lockDuration={lockDuration} />
       ) : (
         <>
-          <h2 className={`${pageId}-title`} data-testid={`${pageId}-title`}>
+          <h2
+            className={`${pageId}-title`}
+            data-testid={`${pageId}-title`}
+          >
             {i18n.t("lockpage.title")}
           </h2>
           <p
@@ -282,7 +288,13 @@ const LockPageContainer = () => {
             {i18n.t("lockpage.description")}
           </p>
           <PasscodeModule
-            error={<ErrorMessage message={error} timeout={true} key={error} />}
+            error={
+              <ErrorMessage
+                message={error}
+                timeout={true}
+                key={error}
+              />
+            }
             hasError={!!error}
             passcode={passcode}
             handlePinChange={handlePinChange}
@@ -293,8 +305,8 @@ const LockPageContainer = () => {
       )}
       <PageFooter
         pageId={pageId}
-        secondaryButtonText={`${i18n.t("lockpage.forgotten.button")}`}
-        secondaryButtonAction={handleRecoveryButtonClick}
+        tertiaryButtonText={`${i18n.t("lockpage.forgotten.button")}`}
+        tertiaryButtonAction={handleRecoveryButtonClick}
       />
       <Alert
         isOpen={alertIsOpen}

@@ -24,9 +24,11 @@ import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayo
 import { ToastMsgType } from "../../globals/types";
 import { useAppIonRouter } from "../../hooks";
 import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
-import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
+import {
+  useBiometricAuth,
+  BiometricAuthOutcome,
+} from "../../hooks/useBiometricsHook";
 import "./SetupBiometrics.scss";
-
 
 const SetupBiometrics = () => {
   const pageId = "set-biometrics";
@@ -36,19 +38,21 @@ const SetupBiometrics = () => {
   const [showCancelBiometricsAlert, setShowCancelBiometricsAlert] =
     useState(false);
   const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
-  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
+  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] =
+    useState(false);
   const setupBiometricsConfirmtext = i18n.t("biometry.setupbiometryconfirm");
   const cancelBiometricsHeaderText = i18n.t("biometry.cancelbiometryheader");
   const cancelBiometricsConfirmText = setupBiometricsConfirmtext;
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
-  const { setupBiometrics, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
+  const { setupBiometrics, remainingLockoutSeconds, lockoutEndTime } =
+    useBiometricAuth();
 
   useEffect(() => {
     if (!lockoutEndTime && showMaxAttemptsAlert) {
       setShowMaxAttemptsAlert(false);
     }
   }, [lockoutEndTime, showMaxAttemptsAlert]);
-  
+
   const navToNextStep = async () => {
     await Agent.agent.basicStorage
       .createOrUpdateBasicRecord(
@@ -139,7 +143,11 @@ const SetupBiometrics = () => {
 
   const handleCancelBiometrics = () => {
     navToNextStep();
-  };  
+  };
+
+  const progressBarValue = stateCache.authentication.recoveryWalletProgress
+    ? 0.25
+    : 0.33;
 
   return (
     <>
@@ -150,7 +158,7 @@ const SetupBiometrics = () => {
           <PageHeader
             currentPath={RoutePath.SETUP_BIOMETRICS}
             progressBar={true}
-            progressBarValue={0.25}
+            progressBarValue={progressBarValue}
             progressBarBuffer={1}
             actionButton={true}
             actionButtonLabel={`${i18n.t("createpassword.button.skip")}`}
@@ -183,7 +191,9 @@ const SetupBiometrics = () => {
         isOpen={showMaxAttemptsAlert}
         setIsOpen={setShowMaxAttemptsAlert}
         dataTestId="alert-max-attempts"
-        headerText={`${i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds })}`}
+        headerText={`${i18n.t("biometry.lockoutheader", {
+          seconds: remainingLockoutSeconds,
+        })}`}
         confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
         actionConfirm={() => setShowMaxAttemptsAlert(false)}
         backdropDismiss={false}

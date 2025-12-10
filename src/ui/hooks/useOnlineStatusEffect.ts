@@ -13,8 +13,7 @@ const useOnlineStatusEffect = (callback: () => void | never) => {
     } else {
       return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOnline, callback]);
+  }, [isOnline, callback, isRunningInJest]);
 };
 
 export { useOnlineStatusEffect };

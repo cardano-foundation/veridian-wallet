@@ -254,21 +254,6 @@ describe("Home page", () => {
     expect(queryByTestId(`tile-${rotateTitle}`)).not.toBeInTheDocument();
   });
 
-  test("logs error when fetchOobi fails", async () => {
-    const expectedError = new Error("fetch oobi failure");
-    (Agent.agent.connections.getOobi as jest.Mock).mockRejectedValue(
-      expectedError
-    );
-
-    await renderHome(createTestState());
-
-    expect(showErrorMock).toHaveBeenCalledWith(
-      "Unable to fetch connection oobi",
-      expectedError,
-      expect.any(Function)
-    );
-  });
-
   test("logs error when fetching identifier details fails", async () => {
     const expectedError = new Error("identifier failure");
     (Agent.agent.identifiers.getIdentifier as jest.Mock).mockRejectedValue(

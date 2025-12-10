@@ -1,34 +1,34 @@
-import { useCallback, useState } from "react";
 import { personAdd, refresh } from "ionicons/icons";
-import { i18n } from "../../../i18n";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getCurrentProfile } from "../../../store/reducers/profileCache";
-import { Avatar } from "../../components/Avatar";
-import { TabLayout } from "../../components/layout/TabLayout";
-import { Profiles } from "../Profiles";
-import { Tile } from "../../components/Tile";
-import ScanIcon from "../../assets/images/scan-icon.svg";
-import CardanoLogo from "../../assets/images/cardano-logo.svg";
-import "./Home.scss";
-import { ScanToLogin } from "./components/ScanToLogin";
-import { ConnectdApp } from "../../components/ConnectdApp";
-import { RotateKeyModal } from "./components/RotateKeyModal";
+import { useCallback, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
+import { CreationStatus } from "../../../core/agent/agent.types";
 import { IdentifierDetails } from "../../../core/agent/services/identifier.types";
-import { showError } from "../../utils/error";
+import { i18n } from "../../../i18n";
+import { useAppSelector } from "../../../store/hooks";
+import { getCurrentProfile } from "../../../store/reducers/profileCache";
+import CardanoLogo from "../../assets/images/cardano-logo.svg";
+import ScanIcon from "../../assets/images/scan-icon.svg";
+import { Avatar } from "../../components/Avatar";
+import { ConnectdApp } from "../../components/ConnectdApp";
 import { ShareProfile } from "../../components/ShareProfile";
+import { Tile } from "../../components/Tile";
+import { TabLayout } from "../../components/layout/TabLayout";
 import { useOnlineStatusEffect } from "../../hooks";
+import { showError } from "../../utils/error";
+import { Profiles } from "../Profiles";
+import "./Home.scss";
+import { RotateKeyModal } from "./components/RotateKeyModal";
+import { ScanToLogin } from "./components/ScanToLogin";
+import { VerifySeedPhraseCard } from "./components/VerifySeedPhrase";
 
 const Home = () => {
   const pageId = "home-tab";
-  const dispatch = useAppDispatch();
   const currentProfile = useAppSelector(getCurrentProfile);
   const [profile, setProfile] = useState<IdentifierDetails | undefined>();
   const [openProfiles, setOpenProfiles] = useState(false);
   const [openScanToLogin, setOpenScanToLogin] = useState(false);
   const [connectdApp, setConnectdApp] = useState(false);
   const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
-  const [oobi, setOobi] = useState("");
   const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
 
   const handleAvatarClick = () => {
@@ -60,30 +60,15 @@ const Home = () => {
     );
   };
 
-  const fetchOobi = useCallback(async () => {
-    try {
-      if (!currentProfile?.identity.id) return;
-
-      const oobiValue = await Agent.agent.connections.getOobi(
-        `${currentProfile.identity.id}`,
-        { alias: currentProfile?.identity.displayName || "" }
-      );
-      if (oobiValue) {
-        setOobi(oobiValue);
-      }
-    } catch (e) {
-      showError("Unable to fetch connection oobi", e, dispatch);
-    }
-  }, [
-    currentProfile?.identity.id,
-    currentProfile?.identity.displayName,
-    dispatch,
-  ]);
-
-  useOnlineStatusEffect(fetchOobi);
-
   const getDetails = useCallback(async () => {
-    if (!currentProfile) return;
+    if (
+      !currentProfile ||
+      [CreationStatus.PENDING, CreationStatus.FAILED].includes(
+        currentProfile.identity.creationStatus
+      )
+    ) {
+      return;
+    }
 
     try {
       const cardDetailsResult = await Agent.agent.identifiers.getIdentifier(
@@ -108,6 +93,7 @@ const Home = () => {
         additionalButtons={<AdditionalButtons />}
       >
         <div className="home-tab-content">
+          <VerifySeedPhraseCard />
           <Tile
             icon={ScanIcon}
             badge={`${i18n.t("tabs.home.tab.tiles.scan.badge")}`}
@@ -166,7 +152,6 @@ const Home = () => {
       <ShareProfile
         isOpen={openShareCurrentProfile}
         setIsOpen={setOpenShareCurrentProfile}
-        oobi={oobi}
       />
       <RotateKeyModal
         identifierId={currentProfile?.identity.id || ""}

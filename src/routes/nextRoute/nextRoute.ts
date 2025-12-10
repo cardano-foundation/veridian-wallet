@@ -142,19 +142,11 @@ const updateStoreAfterSetPasscodeRoute = (data: DataProps) => {
   });
 };
 
-const updateStoreAfterVerifySeedPhraseRoute = (data: DataProps) => {
-  return setAuthentication({
-    ...data.store.stateCache.authentication,
-    seedPhraseIsSet: true,
-  });
-};
-
 const updateStoreAfterSetupSSI = (data: DataProps) => {
   return setAuthentication({
     ...data.store.stateCache.authentication,
     ssiAgentIsSet: true,
     recoveryWalletProgress: false,
-    seedPhraseIsSet: true,
   });
 };
 
@@ -298,7 +290,6 @@ export {
   getNextVerifySeedPhraseRoute,
   updateStoreAfterCreatePassword,
   updateStoreAfterSetPasscodeRoute,
-  updateStoreAfterVerifySeedPhraseRoute,
   updateStoreCurrentRoute,
   updateStoreSetSeedPhrase,
 };

@@ -21,6 +21,23 @@ export class ContactStorage {
     return this.storageService.deleteById(id);
   }
 
+  // @TODO - foconnor: Some refactoring should be done to just have an idempotent deleteById
+  async deleteByIdIfExists(id: string): Promise<void> {
+    try {
+      return await this.storageService.deleteById(id);
+    } catch (error) {
+      if (
+        !(
+          error instanceof Error &&
+          error.message ===
+            `${StorageMessage.RECORD_DOES_NOT_EXIST_ERROR_MSG} ${id}`
+        )
+      ) {
+        throw error;
+      }
+    }
+  }
+
   update(record: ContactRecord): Promise<void> {
     return this.storageService.update(record);
   }
