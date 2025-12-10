@@ -143,7 +143,7 @@ const Connections = () => {
   };
 
   const deleteConnection = async () => {
-    if (!deletePendingItem) return;
+    if (!deletePendingItem || !deletePendingItem.identifier) return;
 
     try {
       setDeletePendingItem(null);

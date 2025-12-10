@@ -89,6 +89,7 @@ const VerifyPassword = ({
           }
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attempts]);
 
   const handleRecoveryPassword = () => {

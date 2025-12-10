@@ -50,8 +50,8 @@ const CredentialRequest = ({
   const reachThreshold =
     linkedGroup &&
     linkedGroup.othersJoined.length +
-      (linkedGroup.linkedRequest.accepted ? 1 : 0) >=
-      Number(linkedGroup.threshold.signingThreshold);
+    (linkedGroup.linkedRequest.accepted ? 1 : 0) >=
+    Number(linkedGroup.threshold.signingThreshold);
 
   const userAID = !credentialRequest?.identifier
     ? null
@@ -116,6 +116,7 @@ const CredentialRequest = ({
       handleBack();
       showError("Unable to get credential request detail", e, dispatch);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notificationDetails, profiles, getMultisigInfo, dispatch]);
 
   useOnlineStatusEffect(getCrendetialRequest);

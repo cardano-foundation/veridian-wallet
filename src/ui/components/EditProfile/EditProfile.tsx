@@ -148,8 +148,8 @@ const EditProfile = ({
           isGroup
             ? ToastMsgType.GROUP_UPDATED
             : editType === "userName"
-            ? ToastMsgType.IDENTIFIER_USERNAME_UPDATED
-            : ToastMsgType.IDENTIFIER_NAME_UPDATED
+              ? ToastMsgType.IDENTIFIER_USERNAME_UPDATED
+              : ToastMsgType.IDENTIFIER_NAME_UPDATED
         )
       );
     } catch (e) {
@@ -212,13 +212,12 @@ const EditProfile = ({
         <div className={`indentifier-input${errorMessage ? " has-error" : ""}`}>
           <CustomInput
             dataTestId="edit-name-input"
-            title={`${
-              editType === "userName"
-                ? i18n.t("profiledetails.options.inner.usernamelabel")
-                : isGroup
+            title={`${editType === "userName"
+              ? i18n.t("profiledetails.options.inner.usernamelabel")
+              : isGroup
                 ? i18n.t("profiledetails.options.inner.groupLabel")
                 : i18n.t("profiledetails.options.inner.label")
-            }`}
+              }`}
             hiddenInput={false}
             autofocus={true}
             onChangeInput={handleChangeName}

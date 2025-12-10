@@ -202,6 +202,7 @@ const CreatePasscodeModule = forwardRef<
             setPasscode("");
           });
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [originalPassCode, passcode]);
 
     const errorMessage = () => {

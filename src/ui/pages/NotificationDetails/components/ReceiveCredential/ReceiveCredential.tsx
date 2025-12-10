@@ -91,8 +91,8 @@ const ReceiveCredential = ({
   const maxThreshold =
     isMultisig &&
     multisigMemberStatus.othersJoined.length +
-      (multisigMemberStatus.linkedRequest.accepted ? 1 : 0) >=
-      Number(multisigMemberStatus.threshold);
+    (multisigMemberStatus.linkedRequest.accepted ? 1 : 0) >=
+    Number(multisigMemberStatus.threshold);
 
   const profile = profiles[credDetail?.identifierId || ""];
   const groupInitiatorAid = multisigMemberStatus.members[0] || "";
@@ -166,6 +166,7 @@ const ReceiveCredential = ({
     } finally {
       setIsLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, getMultiSigMemberStatus, profiles, notificationDetails.a.d]);
 
   useOnlineStatusEffect(getAcdc);
@@ -294,12 +295,12 @@ const ReceiveCredential = ({
   const primaryButtonText = isRevoked
     ? undefined
     : `${i18n.t(
-        displayInitiatorNotAcceptedAlert
-          ? "tabs.notifications.details.buttons.ok"
-          : maxThreshold
+      displayInitiatorNotAcceptedAlert
+        ? "tabs.notifications.details.buttons.ok"
+        : maxThreshold
           ? "tabs.notifications.details.buttons.addcred"
           : "tabs.notifications.details.buttons.accept"
-      )}`;
+    )}`;
 
   const declineButtonText =
     maxThreshold || isRevoked || displayInitiatorNotAcceptedAlert
@@ -356,8 +357,7 @@ const ReceiveCredential = ({
           <InfoCard
             className="alert"
             content={i18n.t(
-              `tabs.notifications.details.credential.receive.${
-                isRevoked ? "revokedalert" : "initiatoracceptedalert"
+              `tabs.notifications.details.credential.receive.${isRevoked ? "revokedalert" : "initiatoracceptedalert"
               }`
             )}
             icon={isRevoked ? alertCircleOutline : undefined}

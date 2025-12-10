@@ -8,6 +8,7 @@ import privacypolicy from "./locales/en/privacypolicy.json";
 import aboutssiagentcreate from "./locales/en/aboutssiagentcreate.json";
 import aboutssiagentrecovery from "./locales/en/aboutssiagentrecovery.json";
 
+// eslint-disable-next-line import/no-named-as-default-member
 i18n
   .use(initReactI18next)
   .use(Languagedetector)

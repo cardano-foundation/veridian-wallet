@@ -12,7 +12,9 @@ const getBackRoute = (
   data: DataProps
 ): {
   backPath: { pathname: string };
-  updateRedux: (() => ThunkAction<void, RootState, undefined, AnyAction>)[];
+  updateRedux: ((
+    data: DataProps
+  ) => AnyAction | ThunkAction<void, RootState, undefined, AnyAction>)[];
 } => {
   const { updateRedux } = backRoute[currentPath];
   const backPathUrl = backPath(data);
@@ -77,7 +79,14 @@ const calcPreviousRoute = (
 
 const backPath = (data: DataProps) => getPreviousRoute(data);
 
-const backRoute: Record<string, any> = {
+const backRoute: Record<
+  string,
+  {
+    updateRedux: ((
+      data: DataProps
+    ) => AnyAction | ThunkAction<void, RootState, undefined, AnyAction>)[];
+  }
+> = {
   [RoutePath.ROOT]: {
     updateRedux: [],
   },
@@ -85,22 +94,22 @@ const backRoute: Record<string, any> = {
     updateRedux: [],
   },
   [RoutePath.VERIFY_RECOVERY_SEED_PHRASE]: {
-    updateRedux: [removeCurrentRoute, updateStoreSetCurrentRoute],
+    updateRedux: [() => removeCurrentRoute(), updateStoreSetCurrentRoute],
   },
   [RoutePath.SSI_AGENT]: {
-    updateRedux: [removeCurrentRoute],
+    updateRedux: [() => removeCurrentRoute()],
   },
   [RoutePath.SET_PASSCODE]: {
-    updateRedux: [removeCurrentRoute, updateStoreSetCurrentRoute],
+    updateRedux: [() => removeCurrentRoute(), updateStoreSetCurrentRoute],
   },
   [RoutePath.CREATE_PASSWORD]: {
-    updateRedux: [removeCurrentRoute],
+    updateRedux: [() => removeCurrentRoute()],
   },
   [TabsRoutePath.NOTIFICATION_DETAILS]: {
-    updateRedux: [removeCurrentRoute],
+    updateRedux: [() => removeCurrentRoute()],
   },
   [TabsRoutePath.CREDENTIAL_DETAILS]: {
-    updateRedux: [removeCurrentRoute],
+    updateRedux: [() => removeCurrentRoute()],
   },
 };
 

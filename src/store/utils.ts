@@ -16,7 +16,7 @@ const updateReduxState = (
   dispatch: ThunkDispatch<RootState, undefined, AnyAction>,
   functions: ((
     data: DataProps
-  ) => ThunkAction<void, RootState, undefined, AnyAction>)[]
+  ) => AnyAction | ThunkAction<void, RootState, undefined, AnyAction>)[]
 ) => {
   if (data.state) {
     data.state.nextRoute = nextRoute;

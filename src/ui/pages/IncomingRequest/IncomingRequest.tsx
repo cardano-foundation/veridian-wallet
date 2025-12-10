@@ -56,6 +56,7 @@ const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
     }
     setRequestData(incomingRequest);
     setOpenPage(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectedDApp, incomingRequest, setOpenPage]);
 
   useEffect(() => {

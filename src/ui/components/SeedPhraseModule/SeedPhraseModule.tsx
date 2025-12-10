@@ -40,7 +40,7 @@ const SeedPhraseModule = forwardRef<SeedPhraseModuleRef, SeedPhraseModuleProps>(
         const input = seedInputs.current.at(index);
         if (!input) return;
 
-        (input as any).setFocus();
+        (input as HTMLIonInputElement & { setFocus: () => Promise<void> }).setFocus();
       },
     }));
 
@@ -58,9 +58,8 @@ const SeedPhraseModule = forwardRef<SeedPhraseModuleRef, SeedPhraseModuleProps>(
     return (
       <div
         data-testid="seed-phrase-module"
-        className={`seed-phrase-module ${
-          hideSeedPhrase ? "seed-phrase-hidden" : "seed-phrase-visible"
-        }`}
+        className={`seed-phrase-module ${hideSeedPhrase ? "seed-phrase-hidden" : "seed-phrase-visible"
+          }`}
       >
         <div
           data-testid="seed-phrase-privacy-overlay"

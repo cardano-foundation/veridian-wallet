@@ -1402,10 +1402,9 @@ describe("Single sig service of agent", () => {
       .mockResolvedValue(memberClone);
     getIdentifierMock.mockResolvedValueOnce({
       ...identifierStateKeria,
-      name: `1.2.0.2:${identifierMetadataRecord.theme}:${
-        identifierMetadataRecord.groupMetadata?.proposedUsername ??
+      name: `1.2.0.2:${identifierMetadataRecord.theme}:${identifierMetadataRecord.groupMetadata?.proposedUsername ??
         identifierMetadataRecord.displayName
-      }`,
+        }`,
     });
 
     await identifierService.updateIdentifier(identifierMetadataRecord.id, {

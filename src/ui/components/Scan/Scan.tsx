@@ -171,6 +171,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
 
       if (!isAlreadyLoaded) return;
       handleCameraChange();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [cameraDirection]);
 
     useEffect(() => {
@@ -186,6 +187,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       return () => {
         stopScan();
       };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stopScan, loggedIn]);
 
     const closePasteContentModal = () => {

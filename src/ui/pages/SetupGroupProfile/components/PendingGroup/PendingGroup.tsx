@@ -126,6 +126,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       ),
     }));
     return mapped;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     state.selectedConnections,
     identity?.groupMetadata?.proposedUsername,
