@@ -381,7 +381,11 @@ class Agent {
         })
       );
     } catch (e) {
-      throw new Error(Agent.SYNC_DATA_NETWORK_ERROR);
+      if (e instanceof Error && isNetworkError(e)) {
+        throw new Error(Agent.SYNC_DATA_NETWORK_ERROR);
+      }
+
+      throw e;
     }
   }
 
