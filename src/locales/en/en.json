@@ -1553,7 +1553,7 @@
     "findconnecturlerror": "Connect URL not found",
     "invalidbooturlerror": "Invalid boot url",
     "invalidconnecturlerror": "Invalid connect url",
-    "networkerror": "Network issue"
+    "networkerror": "Unavailable while offline"
   },
   "request": {
     "sign": {
