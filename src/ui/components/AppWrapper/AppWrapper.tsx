@@ -96,7 +96,6 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
-import { FAILED_TO_FETCH_ERROR } from "../../globals/constants";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -400,27 +399,15 @@ const AppWrapper = (props: { children: ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recoveryCompleteNoInterruption]);
 
-  const recoveryAfterDisconnect = async () => {
+  const handlePostRecovery = async () => {
     try {
       dispatch(setInitializationPhase(InitializationPhase.PHASE_TWO)); // Show offline mode page
 
-      // No await, background this task and continue initializing
       await Agent.agent.connect(Agent.DEFAULT_RECONNECT_INTERVAL, false);
       await recoverAndLoadDb();
     } catch (e) {
-      if (
-        e instanceof Error &&
-        (e.message === Agent.KERIA_CONNECT_FAILED_BAD_NETWORK ||
-          e.message.includes(FAILED_TO_FETCH_ERROR))
-      ) {
-        dispatch(setInitializationPhase(InitializationPhase.PHASE_TWO)); // Show offline mode page
-
-        // No await, background this task and continue initializing
-        Agent.agent
-          .connect(Agent.DEFAULT_RECONNECT_INTERVAL, false)
-          .then(() => {
-            recoverAndLoadDb();
-          });
+      if (e instanceof Error && e.message === Agent.SYNC_DATA_NETWORK_ERROR) {
+        handlePostRecovery();
       } else {
         throw e;
       }
@@ -441,9 +428,9 @@ const AppWrapper = (props: { children: ReactNode }) => {
         if (
           e instanceof Error &&
           (e.message === Agent.KERIA_CONNECT_FAILED_BAD_NETWORK ||
-            e.message.includes(FAILED_TO_FETCH_ERROR))
+            e.message === Agent.SYNC_DATA_NETWORK_ERROR)
         ) {
-          recoveryAfterDisconnect();
+          handlePostRecovery();
         } else {
           throw e;
         }
