@@ -3,6 +3,7 @@ import { Dict } from "signify-ts";
 export type BranFileContent = {
   bran: string;
   issuerBran: string;
+  leBran: string;
 };
 
 export enum NotificationRoute {

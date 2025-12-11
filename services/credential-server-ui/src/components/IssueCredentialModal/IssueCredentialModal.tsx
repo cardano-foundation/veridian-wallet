@@ -1,5 +1,5 @@
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
-import { Box, Button } from "@mui/material";
+import { Box, Button, List } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { Trans } from "react-i18next";
 import { IGNORE_ATTRIBUTES } from "../../const";
@@ -248,16 +248,22 @@ const IssueCredentialModal = ({
         );
       }
       case IssueCredentialStage.InputAttribute: {
-        return attributeKeys.map((attribute) => (
-          <InputAttribute
-            key={attribute}
-            value={attributes}
-            setValue={updateAttributes}
-            attributes={[attribute]}
-            required={requiredList.includes(attribute)}
-            properties={properties}
-          />
-        ));
+        return (
+          <>
+            <List className="attribute-list">
+              {attributeKeys.map((attribute) => (
+                <InputAttribute
+                  key={attribute}
+                  value={attributes}
+                  setValue={updateAttributes}
+                  attributes={[attribute]}
+                  required={requiredList.includes(attribute)}
+                  properties={properties}
+                />
+              ))}
+            </List>
+          </>
+        );
       }
       case IssueCredentialStage.Review: {
         const nonEmptyAttributes = Object.fromEntries(

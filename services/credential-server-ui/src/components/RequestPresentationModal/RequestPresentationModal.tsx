@@ -7,10 +7,9 @@ import { IGNORE_ATTRIBUTES } from "../../const";
 import { useSchemaDetail } from "../../hooks/SchemaDetail";
 import { i18n } from "../../i18n";
 import { CredentialService } from "../../services";
-import { CredentialIssueRequest } from "../../services/credential.types";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { CredentialRequest } from "../../services/credential.types";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { savePresentationRequest } from "../../store/reducers/connectionsSlice";
-import { PresentationRequestStatus } from "../../store/reducers/connectionsSlice.types";
 import { PopupModal } from "../PopupModal";
 import { InputAttribute } from "./InputAttribute";
 import "./RequestPresentationModal.scss";
@@ -21,6 +20,7 @@ import {
 } from "./RequestPresentationModal.types";
 import { Review } from "./Review";
 import { SelectList } from "./SelectList";
+import { PresentationRequestStatus } from "../../store/reducers/connectionsSlice.types";
 
 const RESET_TIMEOUT = 1000;
 
@@ -111,45 +111,47 @@ const RequestPresentationModal = ({
     if (!selectedCredTemplate || !selectedConnection || !credTemplateType)
       return;
 
-    let objAttributes = {};
-    const attribute: Record<string, string> = {};
+    const attributeData: Record<string, string> = {};
 
     Object.entries(attributes).forEach(([key, value]) => {
-      if (key && value) attribute[key] = value;
+      if (key && value) attributeData[key] = value;
     });
 
-    if (Object.keys(attribute).length) {
-      objAttributes = {
-        attribute,
-      };
-    }
-
-    const data: CredentialIssueRequest = {
+    const data: CredentialRequest = {
       schemaSaid: selectedCredTemplate,
       aid: selectedConnection,
-      ...objAttributes,
+      attributes: attributeData,
     };
 
     try {
       setLoading(true);
-      await CredentialService.requestPresentation(data);
+      const response = await CredentialService.requestPresentation(data);
+      // Add new request to Redux for demo purposes
+      if (response.data.success && response.data.ipexApplySaid) {
+        dispatch(
+          savePresentationRequest({
+            id: response.data.ipexApplySaid,
+            connectionName:
+              connections.find((item) => item.id === selectedConnection)
+                ?.alias || "",
+            credentialType: credTemplateType,
+            attributes: attributeData,
+            requestDate: Date.now(),
+            status: PresentationRequestStatus.Requested,
+            ipexApplySaid: response.data.ipexApplySaid,
+            schemaSaid: selectedCredTemplate,
+            discloserIdentifier: selectedConnection,
+          })
+        );
+      }
+
       triggerToast(
         i18n.t("pages.requestPresentation.modal.messages.success"),
         "success"
       );
 
-      dispatch(
-        savePresentationRequest({
-          id: String(Date.now),
-          connectionName:
-            connections.find((item) => item.id === selectedConnection)?.alias ||
-            "",
-          credentialType: credTemplateType,
-          attribute: Object.values(attributes)[0],
-          requestDate: Date.now(),
-          status: PresentationRequestStatus.Requested,
-        })
-      );
+      // dispatch(fetchPresentationRequests());
+
       resetModal();
     } catch (e) {
       triggerToast(
@@ -239,10 +241,9 @@ const RequestPresentationModal = ({
         );
       }
       case RequestPresentationStage.InputAttribute: {
-        const schemaRequiredAttributes =
-          schema?.properties.a.oneOf[1].required || [];
+        const schemaAttributes = schema?.properties.a.oneOf[1].properties || [];
 
-        const requiredAttributes = schemaRequiredAttributes.filter(
+        const requiredAttributes = Object.keys(schemaAttributes).filter(
           (item) => !IGNORE_ATTRIBUTES.includes(item)
         );
 

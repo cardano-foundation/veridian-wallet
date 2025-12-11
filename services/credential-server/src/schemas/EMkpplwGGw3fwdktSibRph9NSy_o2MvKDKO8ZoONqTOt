@@ -1,0 +1,86 @@
+{
+  "$id": "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Rome Offsite 2025 Credential",
+  "description": "This credential recognizes the holder's attendance at the Cardano Foundation Offsite in Rome, Italy. It confirms their active participation in exclusive sessions, including a hands-on experience with the Veridian platform, exploring the future of digital identity.",
+  "type": "object",
+  "credentialType": "RomeOffsite2025Credential",
+  "version": "1.0.0",
+  "properties": {
+    "v": {
+      "description": "Version",
+      "type": "string"
+    },
+    "d": {
+      "description": "Credential SAID",
+      "type": "string"
+    },
+    "u": {
+      "description": "One time use nonce",
+      "type": "string"
+    },
+    "i": {
+      "description": "Issuee AID",
+      "type": "string"
+    },
+    "ri": {
+      "description": "Credential status registry",
+      "type": "string"
+    },
+    "s": {
+      "description": "Schema SAID",
+      "type": "string"
+    },
+    "a": {
+      "oneOf": [
+        {
+          "description": "Attributes block SAID",
+          "type": "string"
+        },
+        {
+          "$id": "ECFCzjZFsIppr1In2g2Yy6EtpChVbeM5F6eP7-nS2GrZ",
+          "description": "Attributes block",
+          "type": "object",
+          "properties": {
+            "d": {
+              "description": "Attributes block SAID",
+              "type": "string"
+            },
+            "i": {
+              "description": "Issuee AID",
+              "type": "string"
+            },
+            "dt": {
+              "description": "Issuance date time",
+              "type": "string",
+              "format": "date-time"
+            },
+            "attendeeName": {
+              "description": "The name of the attendee",
+              "type": "string"
+            },
+            "u": {
+              "description": "One time use nonce",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "i",
+            "dt",
+            "attendeeName",
+            "u"
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "i",
+    "ri",
+    "s",
+    "d",
+    "u"
+  ]
+}

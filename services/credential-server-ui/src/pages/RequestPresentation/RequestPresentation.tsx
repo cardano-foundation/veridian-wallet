@@ -14,9 +14,12 @@ import { filter, FilterBar } from "../../components/FilterBar";
 import { FilterData } from "../../components/FilterBar/FilterBar.types";
 import { PageHeader } from "../../components/PageHeader";
 import { RequestPresentationModal } from "../../components/RequestPresentationModal";
+import { PresentationDetailModal } from "../../components/PresentationDetailModal";
+import { AttributeDisplay } from "./components/AttributeDisplay";
 import { i18n } from "../../i18n";
 import { useAppSelector } from "../../store/hooks";
 import { PresentationRequestData } from "../../store/reducers/connectionsSlice.types";
+import { usePresentationPolling } from "../../hooks/usePresentationPolling";
 import { formatDate, formatDateTime } from "../../utils/dateFormatter";
 import "./RequestPresentation.scss";
 
@@ -30,7 +33,7 @@ const headers: AppTableHeader<PresentationRequestData>[] = [
     label: i18n.t("pages.requestPresentation.table.credential"),
   },
   {
-    id: "attribute",
+    id: "attributes",
     label: i18n.t("pages.requestPresentation.table.attribute"),
   },
   {
@@ -44,10 +47,15 @@ const headers: AppTableHeader<PresentationRequestData>[] = [
 ];
 
 export const RequestPresentation = () => {
+  // const dispatch = useAppDispatch();
   const presentationRequests = useAppSelector(
     (state) => state.connections.presentationRequests
   );
+  // const hasInitialized = useRef(false);
   const [openModal, setOpenModal] = useState(false);
+  const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [selectedPresentation, setSelectedPresentation] =
+    useState<PresentationRequestData | null>(null);
 
   const {
     order,
@@ -58,10 +66,24 @@ export const RequestPresentation = () => {
     handleChangePage,
     handleChangeRowsPerPage,
     visibleRows,
-  } = useTable(presentationRequests, "requestDate");
+  } = useTable(presentationRequests, "requestDate", "desc");
+
+  // useEffect(() => {
+  //   if (!hasInitialized.current) {
+  //     hasInitialized.current = true;
+  //     dispatch(fetchPresentationRequests());
+  //   }
+  // }, []);
+
+  usePresentationPolling();
 
   const handleClick = () => {
     setOpenModal(true);
+  };
+
+  const handleRowClick = (row: PresentationRequestData) => {
+    setSelectedPresentation(row);
+    setOpenDetailModal(true);
   };
 
   const [filterData, setFilterData] = useState<FilterData>({
@@ -115,6 +137,8 @@ export const RequestPresentation = () => {
                   tabIndex={-1}
                   key={row.id}
                   className="table-row"
+                  onClick={() => handleRowClick(row)}
+                  sx={{ cursor: "pointer" }}
                 >
                   <TableCell
                     component="th"
@@ -138,13 +162,11 @@ export const RequestPresentation = () => {
                       <span>{row.credentialType}</span>
                     </Tooltip>
                   </TableCell>
-                  <TableCell align="left">
-                    <Tooltip
-                      title={row.attribute}
-                      placement="top"
-                    >
-                      <span>{row.attribute}</span>
-                    </Tooltip>
+                  <TableCell
+                    align="left"
+                    width={50}
+                  >
+                    <AttributeDisplay data={row} />
                   </TableCell>
                   <TableCell
                     component="th"
@@ -159,9 +181,7 @@ export const RequestPresentation = () => {
                   </TableCell>
                   <TableCell align="left">
                     <Box className={`label ${row.status}`}>
-                      {i18n.t(
-                        "pages.requestPresentation.table.status.requested"
-                      )}
+                      {row.status[0].toUpperCase() + row.status.slice(1)}
                     </Box>
                   </TableCell>
                   <TableCell />
@@ -187,6 +207,14 @@ export const RequestPresentation = () => {
         onClose={() => {
           setOpenModal(false);
         }}
+      />
+      <PresentationDetailModal
+        open={openDetailModal}
+        onClose={() => {
+          setOpenDetailModal(false);
+          setSelectedPresentation(null);
+        }}
+        data={selectedPresentation}
       />
     </>
   );

@@ -1,5 +1,5 @@
 import { config } from "../config";
-import { CredentialIssueRequest } from "./credential.types";
+import { CredentialIssueRequest, CredentialRequest } from "./credential.types";
 import { httpInstance } from "./http";
 
 const CredentialService = {
@@ -15,11 +15,31 @@ const CredentialService = {
       data
     );
   },
-  requestPresentation: (data: CredentialIssueRequest) => {
+  requestPresentation: (data: CredentialRequest) => {
     return httpInstance.post(
       `${config.endpoint}${config.path.requestDisclosure}`,
       data
     );
+  },
+  verifyPresentation: async (
+    ipexApplySaid: string,
+    discloserIdentifier: string
+  ) => {
+    return httpInstance.post(
+      `${config.endpoint}${config.path.verifyIpexPresentation}`,
+      {
+        ipexApplySaid,
+        discloserIdentifier,
+      }
+    );
+  },
+  getPresentationRequests: async () => {
+    return httpInstance.get(
+      `${config.endpoint}${config.path.getPresentationRequests}`
+    );
+  },
+  getCredential: async (credentialId: string) => {
+    return httpInstance.get(`${config.endpoint}/credentials/${credentialId}`);
   },
 };
 

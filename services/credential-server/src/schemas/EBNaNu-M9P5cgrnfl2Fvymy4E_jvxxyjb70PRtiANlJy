@@ -1,0 +1,190 @@
+{
+  "$id": "EBNaNu-M9P5cgrnfl2Fvymy4E_jvxxyjb70PRtiANlJy",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Legal Entity Official Organizational Role vLEI Credential",
+  "description": "A vLEI Role Credential issued by a Qualified vLEI issuer to official representatives of a Legal Entity",
+  "type": "object",
+  "credentialType": "LegalEntityOfficialOrganizationalRolevLEICredential",
+  "version": "1.0.0",
+  "properties": {
+    "v": {
+      "description": "Version",
+      "type": "string"
+    },
+    "d": {
+      "description": "Credential SAID",
+      "type": "string"
+    },
+    "u": {
+      "description": "One time use nonce",
+      "type": "string"
+    },
+    "i": {
+      "description": "QVI Issuer AID",
+      "type": "string"
+    },
+    "ri": {
+      "description": "Credential status registry",
+      "type": "string"
+    },
+    "s": {
+      "description": "Schema SAID",
+      "type": "string"
+    },
+    "a": {
+      "oneOf": [
+        {
+          "description": "Attributes block SAID",
+          "type": "string"
+        },
+        {
+          "$id": "ELDXjQ-FnKApK1DJhzmtKDcnfoJ9qusQr1Qz5g9MFt0o",
+          "description": "Attributes block",
+          "type": "object",
+          "properties": {
+            "d": {
+              "description": "Attributes block SAID",
+              "type": "string"
+            },
+            "i": {
+              "description": "Person Issuee AID",
+              "type": "string"
+            },
+            "dt": {
+              "description": "Issuance date time",
+              "type": "string",
+              "format": "date-time"
+            },
+            "LEI": {
+              "description": "LEI of the Legal Entity",
+              "type": "string",
+              "format": "ISO 17442"
+            },
+            "personLegalName": {
+              "description": "Recipient name as provided during identity assurance",
+              "type": "string"
+            },
+            "officialRole": {
+              "description": "Official role title",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "i",
+            "dt",
+            "LEI",
+            "personLegalName",
+            "officialRole"
+          ]
+        }
+      ]
+    },
+    "e": {
+      "oneOf": [
+        {
+          "description": "Edges block SAID",
+          "type": "string"
+        },
+        {
+          "$id": "EMsSqaJsthSBA4OINZ1_fxfNVkgEPF-Sg5fq-vXM7Z6b",
+          "description": "Edges block",
+          "type": "object",
+          "properties": {
+            "d": {
+              "description": "Edges block SAID",
+              "type": "string"
+            },
+            "auth": {
+              "description": "Chain to Auth vLEI credential from legal entity",
+              "type": "object",
+              "properties": {
+                "n": {
+                  "description": "SAID of the ACDC to which the edge connects",
+                  "type": "string"
+                },
+                "s": {
+                  "description": "SAID of required schema of the credential pointed to by this node",
+                  "type": "string",
+                  "const": "EKA57bKBKxr_kN7iN5i7lMUxpMG-s19dRcmov1iDxz-E"
+                },
+                "o": {
+                  "description": "Operator indicating this node is the issuer",
+                  "type": "string",
+                  "const": "I2I"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "n",
+                "s",
+                "o"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "d",
+            "auth"
+          ]
+        }
+      ]
+    },
+    "r": {
+      "oneOf": [
+        {
+          "description": "Rules block SAID",
+          "type": "string"
+        },
+        {
+          "$id": "ECllqarpkZrSIWCb97XlMpEZZH3q4kc--FQ9mbkFMb_5",
+          "description": "Rules block",
+          "type": "object",
+          "properties": {
+            "d": {
+              "description": "Rules block SAID",
+              "type": "string"
+            },
+            "usageDisclaimer": {
+              "description": "Usage Disclaimer",
+              "type": "object",
+              "properties": {
+                "l": {
+                  "description": "Associated legal language",
+                  "type": "string",
+                  "const": "Usage of a valid, unexpired, and non-revoked vLEI Credential, as defined in the associated Ecosystem Governance Framework, does not assert that the Legal Entity is trustworthy, honest, reputable in its business dealings, safe to do business with, or compliant with any laws or that an implied or expressly intended purpose will be fulfilled."
+                }
+              }
+            },
+            "issuanceDisclaimer": {
+              "description": "Issuance Disclaimer",
+              "type": "object",
+              "properties": {
+                "l": {
+                  "description": "Associated legal language",
+                  "type": "string",
+                  "const": "All information in a valid, unexpired, and non-revoked vLEI Credential, as defined in the associated Ecosystem Governance Framework, is accurate as of the date the validation process was complete. The vLEI Credential has been issued to the legal entity or person named in the vLEI Credential as the subject; and the qualified vLEI Issuer exercised reasonable care to perform the validation process set forth in the vLEI Ecosystem Governance Framework."
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "d",
+            "usageDisclaimer",
+            "issuanceDisclaimer"
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "i",
+    "ri",
+    "s",
+    "d",
+    "e",
+    "r"
+  ]
+}

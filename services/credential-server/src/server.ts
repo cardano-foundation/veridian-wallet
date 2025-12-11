@@ -4,12 +4,14 @@ import express from "express";
 import { join } from "path";
 import { SignifyClient, ready as signifyReady, Tier } from "signify-ts";
 import { config } from "./config";
-import { ACDC_SCHEMAS_ID, ISSUER_NAME, QVI_NAME } from "./consts";
+import { ACDC_SCHEMAS_ID, ISSUER_NAME, LE_NAME, GLEIF_NAME } from "./consts";
 import { log } from "./log";
 import { router } from "./routes";
 import { EndRole } from "./server.types";
 import { PollingService } from "./services/pollingService";
 import {
+  createLECredential,
+  createOORAuthCredential,
   createQVICredential,
   getEndRoles,
   getRegistry,
@@ -112,24 +114,28 @@ async function ensureRegistryExists(
 }
 
 async function initializeCredentials(
-  client: SignifyClient,
-  issuerClient: SignifyClient
-): Promise<string> {
-  const issuerRegistry = await getRegistry(issuerClient, QVI_NAME);
+  issuerClient: SignifyClient,
+  gleifClient: SignifyClient,
+  leClient: SignifyClient
+): Promise<[string, string]> {
+  const qviCredentialId = await createQVICredential(gleifClient, issuerClient);
 
-  const qviCredentialId = await createQVICredential(
-    client,
+  const leCredentialId = await createLECredential(
     issuerClient,
-    issuerRegistry
-  ).catch((e) => {
-    console.error(e);
-    return "";
-  });
+    leClient,
+    qviCredentialId
+  );
 
-  const pollingService = new PollingService(client);
+  const oorAuthCredentialId = await createOORAuthCredential(
+    leClient,
+    issuerClient,
+    leCredentialId
+  );
+
+  const pollingService = new PollingService(issuerClient);
   pollingService.start();
 
-  return qviCredentialId;
+  return [qviCredentialId, oorAuthCredentialId];
 }
 
 async function startServer() {
@@ -157,29 +163,34 @@ async function startServer() {
     await signifyReady();
     const brans = await loadBrans();
 
-    const signifyClient = await getSignifyClient(brans.bran);
-    const signifyClientIssuer = await getSignifyClient(brans.issuerBran);
+    const issuerClient = await getSignifyClient(brans.bran); // Effectively a QVI
+    const gleifClient = await getSignifyClient(brans.issuerBran);
+    const leClient = await getSignifyClient(brans.leBran);
 
     // Ensure identifiers exist first
-    await ensureIdentifierExists(signifyClient, ISSUER_NAME);
-    await ensureIdentifierExists(signifyClientIssuer, QVI_NAME);
+    await ensureIdentifierExists(issuerClient, ISSUER_NAME);
+    await ensureIdentifierExists(gleifClient, GLEIF_NAME);
+    await ensureIdentifierExists(leClient, LE_NAME);
 
     // Add end roles before creating registries (KERIA bug workaround)
-    await ensureEndRoles(signifyClient, ISSUER_NAME);
-    await ensureEndRoles(signifyClientIssuer, QVI_NAME);
+    await ensureEndRoles(issuerClient, ISSUER_NAME);
+    await ensureEndRoles(gleifClient, GLEIF_NAME);
+    await ensureEndRoles(leClient, LE_NAME);
 
     // Now create registries
-    await ensureRegistryExists(signifyClient, ISSUER_NAME);
-    await ensureRegistryExists(signifyClientIssuer, QVI_NAME);
+    await ensureRegistryExists(issuerClient, ISSUER_NAME);
+    await ensureRegistryExists(gleifClient, GLEIF_NAME);
+    await ensureRegistryExists(leClient, LE_NAME);
 
-    app.set("signifyClient", signifyClient);
-    app.set("signifyClientIssuer", signifyClientIssuer);
+    app.set("issuerClient", issuerClient);
 
-    const qviCredentialId = await initializeCredentials(
-      signifyClient,
-      signifyClientIssuer
+    const [qviCredentialId, oorAuthCredentialId] = await initializeCredentials(
+      issuerClient,
+      gleifClient,
+      leClient
     );
     app.set("qviCredentialId", qviCredentialId);
+    app.set("oorAuthCredentialId", oorAuthCredentialId);
 
     log(`Listening on port ${config.port}`);
   });

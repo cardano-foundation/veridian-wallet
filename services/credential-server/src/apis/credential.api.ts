@@ -1,6 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import { Operation, Saider, Serder, SignifyClient } from "signify-ts";
-import { ACDC_SCHEMAS_ID, ISSUER_NAME, LE_SCHEMA_SAID } from "../consts";
+import {
+  Contact,
+  Operation,
+  Saider,
+  Salter,
+  Serder,
+  SignifyClient,
+} from "signify-ts";
+import {
+  ACDC_SCHEMAS_ID,
+  ISSUER_NAME,
+  LE_SCHEMA_SAID,
+  OOR_SCHEMA_SAID,
+} from "../consts";
 import { getRegistry, OP_TIMEOUT, waitAndGetDoneOp } from "../utils/utils";
 import { QviCredential } from "../utils/utils.types";
 
@@ -14,9 +26,7 @@ export async function issueAcdcCredential(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
-  const qviCredentialId = req.app.get("qviCredentialId");
-
+  const client: SignifyClient = req.app.get("issuerClient");
   const { schemaSaid, aid, attribute } = req.body;
 
   if (!ACDC_SCHEMAS_ID.some((schemaId) => schemaId === schemaSaid)) {
@@ -33,14 +43,36 @@ export async function issueAcdcCredential(
   let issueParams: any;
   let grantParams: any;
 
-  if (schemaSaid === LE_SCHEMA_SAID) {
-    const qviCredential: QviCredential = await client
-      .credentials()
-      .get(qviCredentialId);
+  if ([LE_SCHEMA_SAID, OOR_SCHEMA_SAID].includes(schemaSaid)) {
+    let e = {};
+    if (schemaSaid === LE_SCHEMA_SAID) {
+      const qviCredential: QviCredential = await client
+        .credentials()
+        .get(req.app.get("qviCredentialId"));
+      e = {
+        d: "",
+        qvi: {
+          n: qviCredential.sad.d,
+          s: qviCredential.sad.s,
+        },
+      };
+    } else if (schemaSaid === OOR_SCHEMA_SAID) {
+      const oorAuthCredential = await client
+        .credentials()
+        .get(req.app.get("oorAuthCredentialId"));
+      e = {
+        d: "",
+        auth: {
+          n: oorAuthCredential.sad.d,
+          s: oorAuthCredential.sad.s,
+          o: "I2I",
+        },
+      };
+    }
 
     issueParams = {
       ri: keriRegistryRegk,
-      s: LE_SCHEMA_SAID,
+      s: schemaSaid,
       a: {
         i: aid,
         ...attribute,
@@ -54,13 +86,7 @@ export async function issueAcdcCredential(
           l: "All information in a valid, unexpired, and non-revoked vLEI Credential, as defined in the associated Ecosystem Governance Framework, is accurate as of the date the validation process was complete. The vLEI Credential has been issued to the legal entity or person named in the vLEI Credential as the subject; and the qualified vLEI Issuer exercised reasonable care to perform the validation process set forth in the vLEI Ecosystem Governance Framework.",
         },
       })[1],
-      e: Saider.saidify({
-        d: "",
-        qvi: {
-          n: qviCredential.sad.d,
-          s: qviCredential.sad.s,
-        },
-      })[1],
+      e,
     };
 
     grantParams = {
@@ -69,11 +95,18 @@ export async function issueAcdcCredential(
       ancAttachment: true,
     };
   } else {
+    const priv = [
+      "EE6DAsJPqDspkLhbk1pVELQVbqyz6TFSEKXdS1Iz-Nz1",
+      "EFVZujklqUEubsyY9PRgBRMf39HgHzCPo3Ii_-xhkOlF",
+      "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt",
+    ].includes(schemaSaid);
     issueParams = {
       ri: keriRegistryRegk,
       s: schemaSaid,
+      u: priv ? new Salter({}).qb64 : undefined,
       a: {
         i: aid,
+        u: priv ? new Salter({}).qb64 : undefined,
         ...attribute,
       },
     };
@@ -115,7 +148,7 @@ export async function requestDisclosure(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
+  const client: SignifyClient = req.app.get("issuerClient");
   const { schemaSaid, aid, attributes } = req.body;
 
   const [apply, sigs] = await client.ipex().apply({
@@ -126,9 +159,12 @@ export async function requestDisclosure(
   });
   await client.ipex().submitApply(ISSUER_NAME, apply, sigs, [aid]);
 
+  const ipexApplySaid = apply.ked.d;
+
   res.status(200).send({
     success: true,
-    data: "Apply schema successfully",
+    message: "Apply schema successfully",
+    ipexApplySaid: ipexApplySaid,
   });
 }
 
@@ -136,7 +172,7 @@ export async function contactCredentials(
   req: Request,
   res: Response
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
+  const client: SignifyClient = req.app.get("issuerClient");
   const { contactId } = req.query;
 
   const issuer = await client.identifiers().get(ISSUER_NAME);
@@ -158,7 +194,7 @@ export async function revokeCredential(
   req: Request,
   res: Response
 ): Promise<void> {
-  const client: SignifyClient = req.app.get("signifyClient");
+  const client: SignifyClient = req.app.get("issuerClient");
   const { credentialId, holder } = req.body;
 
   // Get the credential first
@@ -212,5 +248,150 @@ export async function revokeCredential(
   res.status(200).send({
     success: true,
     data: "Revoke credential successfully",
+  });
+}
+
+interface PresentationRequestResponse {
+  id: string;
+  connectionId: string;
+  discloserIdentifier: string;
+  schemaSaid: string;
+  attributes: any;
+  requestDate: number;
+  status: string;
+  ipexApplySaid: string;
+  connectionName: string;
+  credentialType: string;
+  acdcCredential?: any;
+}
+
+export async function getPresentationRequests(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const client: SignifyClient = req.app.get("issuerClient");
+
+  let exchanges: any[] = [];
+  let skip = 0;
+  const limit = 100;
+
+  while (true) {
+    const exchangePage = await client.exchanges().list({ skip, limit });
+
+    if (!exchangePage || exchangePage.length === 0) {
+      break;
+    }
+
+    exchanges.push(...exchangePage);
+
+    if (exchangePage.length < limit) {
+      break;
+    }
+
+    skip += limit;
+  }
+
+  const applyExchanges = exchanges.filter(
+    (exchange) => exchange.exn.r === "/ipex/apply"
+  );
+  const offerExchanges = exchanges.filter(
+    (exchange) => exchange.exn.r === "/ipex/offer"
+  );
+
+  const presentationRequests: PresentationRequestResponse[] = [];
+
+  for (const exchange of applyExchanges) {
+    let contact: Contact;
+    try {
+      contact = await client.contacts().get(exchange.exn.rp);
+    } catch (e) {
+      continue;
+    }
+
+    const offerExchange = offerExchanges.find(
+      (offer) =>
+        offer.exn.i === exchange.exn.rp && offer.exn.p === exchange.exn.d
+    );
+
+    const schema = await client.schemas().get(exchange.exn.a.s);
+    const presentationRequest: PresentationRequestResponse = {
+      id: exchange.exn.d,
+      connectionId: exchange.exn.rp,
+      discloserIdentifier: exchange.exn.rp,
+      schemaSaid: exchange.exn.a.s,
+      attributes: exchange.exn.a.a,
+      status: offerExchange ? "presented" : "requested",
+      ipexApplySaid: exchange.exn.d,
+      connectionName: contact.alias as string,
+      credentialType: schema.title as string,
+      requestDate: exchange.exn.dt,
+      acdcCredential: offerExchange ? offerExchange.exn.e.acdc : null,
+    };
+
+    presentationRequests.push(presentationRequest);
+  }
+
+  res.status(200).send({
+    success: true,
+    data: presentationRequests,
+  });
+}
+
+export async function verifyIpexPresentation(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const client: SignifyClient = req.app.get("issuerClient");
+  const { ipexApplySaid, discloserIdentifier } = req.body;
+
+  if (!ipexApplySaid || !discloserIdentifier) {
+    res.status(400).send({
+      success: false,
+      data: "Missing required parameters: ipexApplySaid and discloserIdentifier",
+    });
+    return;
+  }
+
+  const exchanges = await client
+    .exchanges()
+    .list({ filter: { "-p": ipexApplySaid } });
+
+  const offerExchanges = exchanges.filter(
+    (exchange) => exchange.exn.r === "/ipex/offer"
+  );
+
+  const offerExchange = offerExchanges.find(
+    (exchange) =>
+      exchange.exn.i === discloserIdentifier && exchange.exn.p === ipexApplySaid
+  );
+
+  res.status(200).send({
+    success: true,
+    data: offerExchange
+      ? { verified: true, acdcCredential: offerExchange.exn.e.acdc }
+      : { verified: false },
+  });
+}
+
+export async function getCredential(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const client: SignifyClient = req.app.get("issuerClient");
+  const { credentialId } = req.params;
+
+  if (!credentialId) {
+    res.status(400).send({
+      success: false,
+      data: "Missing credential ID",
+    });
+    return;
+  }
+
+  const credential = await client.credentials().get(credentialId);
+
+  res.status(200).send({
+    success: true,
+    credential,
   });
 }

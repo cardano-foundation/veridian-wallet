@@ -7,7 +7,7 @@ export async function resolveOobi(
   res: Response,
   next: NextFunction
 ) {
-  const client: SignifyClient = req.app.get("signifyClient");
+  const client: SignifyClient = req.app.get("issuerClient");
   const { oobi } = req.body;
 
   await resolveOobiFromUtils(client, oobi);

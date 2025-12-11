@@ -5,7 +5,7 @@ import { IconButton } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { closeSnackbar, SnackbarProvider } from "notistack";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { RoutePath } from "./const/route";
 import { Layout } from "./layouts/Layout";
@@ -35,14 +35,15 @@ const App = () => {
 
   const dispatch = useAppDispatch();
   const contacts = useAppSelector((state) => state.connections.contacts);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    dispatch(fetchContacts());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(fetchSchemas());
-  }, [dispatch]);
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      dispatch(fetchContacts());
+      dispatch(fetchSchemas());
+    }
+  }, []); // Empty dependency array to prevent duplicate calls
 
   useEffect(() => {
     contacts.forEach((contact) => {

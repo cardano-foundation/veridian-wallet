@@ -229,7 +229,8 @@
         "requestDate": "Date Requested",
         "status": {
           "header": "Status",
-          "requested": "Requested"
+          "requested": "Requested",
+          "presented": "Presented"
         }
       },
       "modal": {
@@ -258,7 +259,7 @@
         "review": {
           "description": "<strong>Review the details before requesting</strong>. Ensure all information is accurate.",
           "credential": "Credential Presentation Requested",
-          "issueTo": "Being Requested From",
+          "requestFrom": "Being Requested From",
           "button": {
             "issue": "Request Presentation"
           }
