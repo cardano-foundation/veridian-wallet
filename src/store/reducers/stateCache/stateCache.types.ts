@@ -77,6 +77,7 @@ interface StateCacheProps {
   pendingJoinGroupMetadata: PendingJoinGroupMetadata | null;
   showVerifySeedPhraseAlert?: boolean;
   finishLoadData?: boolean;
+  isSyncingData?: boolean;
 }
 
 enum InitializationPhase {

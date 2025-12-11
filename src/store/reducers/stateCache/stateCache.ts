@@ -204,6 +204,9 @@ const stateCacheSlice = createSlice({
     setFinishLoadDB: (state, action: PayloadAction<boolean>) => {
       state.finishLoadData = action.payload;
     },
+    setSyncingData: (state, action: PayloadAction<boolean>) => {
+      state.isSyncingData = action.payload;
+    },
   },
 });
 
@@ -237,6 +240,7 @@ const {
   showVerifySeedPhraseAlert,
   setSsiAgentIsSet,
   setFinishLoadDB,
+  setSyncingData,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -269,7 +273,8 @@ const getShowSetupProfilePage = (state: RootState) =>
   state.stateCache.isSetupProfile;
 const getShowVerifySeedPhraseAlert = (state: RootState) =>
   state.stateCache.showVerifySeedPhraseAlert;
-const getFinishLoadDB = (state: RootState) => state.stateCache.isSetupProfile;
+const getFinishLoadDB = (state: RootState) => state.stateCache.finishLoadData;
+const getIsSyncingData = (state: RootState) => state.stateCache.isSyncingData;
 
 export type {
   AuthenticationCacheProps,
@@ -280,6 +285,8 @@ export type {
 export {
   getShowVerifySeedPhraseAlert,
   showVerifySeedPhraseAlert,
+  getIsSyncingData,
+  setSyncingData,
   clearStateCache,
   dequeueIncomingRequest,
   enqueueIncomingRequest,
