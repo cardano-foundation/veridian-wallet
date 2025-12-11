@@ -72,7 +72,7 @@ class Agent {
   static readonly INVALID_MNEMONIC = "Seed phrase is invalid";
   static readonly CONNECT_URL_DISCOVERY_FAILED = "Cannot discover connect URL";
   static readonly CONNECT_URL_NOT_FOUND = "Connect URL not found in response";
-  static readonly CONNECT_URL_DISCOVERY_BAD_ERROR =
+  static readonly CONNECT_URL_DISCOVERY_BAD_NETWORK =
     "Failed to discover connect URL due to network connectivity";
   static readonly MISSING_DATA_ON_KERIA =
     "Attempted to fetch data by ID on KERIA, but was not found. May indicate stale data records in the local database.";
@@ -513,7 +513,7 @@ class Agent {
       return data.connectUrl;
     } catch (error) {
       if (error instanceof Error && isNetworkError(error)) {
-        throw new Error(Agent.CONNECT_URL_DISCOVERY_BAD_ERROR, {
+        throw new Error(Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK, {
           cause: error,
         });
       }

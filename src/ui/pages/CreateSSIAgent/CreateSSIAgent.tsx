@@ -97,7 +97,7 @@ const CreateSSIAgent = () => {
       return;
     }
 
-    if (errorMessage.includes(Agent.CONNECT_URL_DISCOVERY_BAD_ERROR)) {
+    if (errorMessage.includes(Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK)) {
       showError(errorMessage, error, dispatch, ToastMsgType.NETWORK_ERROR);
       return;
     }
