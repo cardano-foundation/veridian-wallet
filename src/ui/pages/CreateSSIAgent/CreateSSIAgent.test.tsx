@@ -941,7 +941,9 @@ describe("SSI agent page", () => {
       );
 
       discoverConnectUrlMock.mockImplementation(() => {
-        return Promise.reject(new Error(Agent.CONNECT_URL_DISCOVERY_BAD_ERROR));
+        return Promise.reject(
+          new Error(Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK)
+        );
       });
 
       const history = createMemoryHistory();
