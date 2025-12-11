@@ -160,37 +160,37 @@ async function startServer() {
   });
 
   app.listen(config.port, async () => {
-    // await signifyReady();
-    // const brans = await loadBrans();
+    await signifyReady();
+    const brans = await loadBrans();
 
-    // const issuerClient = await getSignifyClient(brans.bran); // Effectively a QVI
-    // const gleifClient = await getSignifyClient(brans.issuerBran);
-    // const leClient = await getSignifyClient(brans.leBran);
+    const issuerClient = await getSignifyClient(brans.bran); // Effectively a QVI
+    const gleifClient = await getSignifyClient(brans.issuerBran);
+    const leClient = await getSignifyClient(brans.leBran);
 
-    // // Ensure identifiers exist first
-    // await ensureIdentifierExists(issuerClient, ISSUER_NAME);
-    // await ensureIdentifierExists(gleifClient, GLEIF_NAME);
-    // await ensureIdentifierExists(leClient, LE_NAME);
+    // Ensure identifiers exist first
+    await ensureIdentifierExists(issuerClient, ISSUER_NAME);
+    await ensureIdentifierExists(gleifClient, GLEIF_NAME);
+    await ensureIdentifierExists(leClient, LE_NAME);
 
-    // // Add end roles before creating registries (KERIA bug workaround)
-    // await ensureEndRoles(issuerClient, ISSUER_NAME);
-    // await ensureEndRoles(gleifClient, GLEIF_NAME);
-    // await ensureEndRoles(leClient, LE_NAME);
+    // Add end roles before creating registries (KERIA bug workaround)
+    await ensureEndRoles(issuerClient, ISSUER_NAME);
+    await ensureEndRoles(gleifClient, GLEIF_NAME);
+    await ensureEndRoles(leClient, LE_NAME);
 
-    // // Now create registries
-    // await ensureRegistryExists(issuerClient, ISSUER_NAME);
-    // await ensureRegistryExists(gleifClient, GLEIF_NAME);
-    // await ensureRegistryExists(leClient, LE_NAME);
+    // Now create registries
+    await ensureRegistryExists(issuerClient, ISSUER_NAME);
+    await ensureRegistryExists(gleifClient, GLEIF_NAME);
+    await ensureRegistryExists(leClient, LE_NAME);
 
-    // app.set("issuerClient", issuerClient);
+    app.set("issuerClient", issuerClient);
 
-    // const [qviCredentialId, oorAuthCredentialId] = await initializeCredentials(
-    //   issuerClient,
-    //   gleifClient,
-    //   leClient
-    // );
-    // app.set("qviCredentialId", qviCredentialId);
-    // app.set("oorAuthCredentialId", oorAuthCredentialId);
+    const [qviCredentialId, oorAuthCredentialId] = await initializeCredentials(
+      issuerClient,
+      gleifClient,
+      leClient
+    );
+    app.set("qviCredentialId", qviCredentialId);
+    app.set("oorAuthCredentialId", oorAuthCredentialId);
 
     log(`Listening on port ${config.port}`);
   });
