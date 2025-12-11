@@ -18,7 +18,7 @@ export const FISHING_HUNTING_LICENSE =
 export const ROME_OFFSITE = "EMkpplwGGw3fwdktSibRph9NSy_o2MvKDKO8ZoONqTOt";
 export const REEVE = "EG9587oc7lSUJGS7mtTkpmRUnJ8F5Ji79-e_pY4jt3Ik";
 export const CARDANO_METADATA_SIGNER =
-  "EJVgEQO8BEhGGM7GcAjlqoKG1upeuBZj9WjvjZo353sQ";
+  "EFldQpJ2WY2_f2vfNYW_5SK6_IissMcpqzhsG3uO12aq";
 
 export const ACDC_SCHEMAS_ID = [
   QVI_SCHEMA_SAID,

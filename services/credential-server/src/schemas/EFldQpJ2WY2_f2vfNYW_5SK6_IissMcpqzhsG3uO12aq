@@ -1,5 +1,5 @@
 {
-  "$id": "EJVgEQO8BEhGGM7GcAjlqoKG1upeuBZj9WjvjZo353sQ",
+  "$id": "EFldQpJ2WY2_f2vfNYW_5SK6_IissMcpqzhsG3uO12aq",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "vLEI Cardano Metadata Signer Credential",
   "description": "A vLEI Cardano Metadata Signer Credential issued to a person or machine which may sign metadata embedded in Cardano transactions on behalf of a Legal Entity",
@@ -34,7 +34,7 @@
           "type": "string"
         },
         {
-          "$id": "EBCRiKplQ_uucawOH7lVt0PErQs_9Y2coohaC12zy8f3",
+          "$id": "EIpa9MQsxiVss4iNE7fxfgE7K1GWEQj5H9D-WHroXxmy",
           "description": "Attributes block",
           "type": "object",
           "properties": {
@@ -51,19 +51,16 @@
               "type": "string",
               "format": "date-time"
             },
-            "labels": {
-              "description": "Array of metadata labels that can be signed",
-              "type": "array",
-              "items": {
-                "type": "number"
-              }
+            "label": {
+              "description": "Metadata label that can be signed",
+              "type": "integer"
             }
           },
           "additionalProperties": false,
           "required": [
             "i",
             "dt",
-            "labels"
+            "label"
           ]
         }
       ]
