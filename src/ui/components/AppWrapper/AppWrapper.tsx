@@ -65,6 +65,7 @@ import {
   setPauseQueueIncomingRequest,
   setPendingJoinGroupMetadata,
   setQueueIncomingRequest,
+  setSyncingData,
   setToastMsg,
   showNoWitnessAlert,
 } from "../../../store/reducers/stateCache";
@@ -898,11 +899,14 @@ const AppWrapper = (props: { children: ReactNode }) => {
     const recoveryStatus = await Agent.agent.basicStorage.findById(
       MiscRecordId.CLOUD_RECOVERY_STATUS
     );
+
     if (recoveryStatus?.content?.syncing) {
+      dispatch(setSyncingData(true));
       await Agent.agent.syncWithKeria();
     }
 
     await loadDb();
+    dispatch(setSyncingData(false));
   };
 
   const loadDb = async () => {
