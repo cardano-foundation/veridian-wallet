@@ -58,7 +58,7 @@ const EditProfile = ({
   const [keyboardIsOpen, setKeyboardIsOpen] = useState(false);
   const [inputChange, setInputChange] = useState(false);
 
-  const nameValueChanged = newDisplayName.trim() !== baselineValue.trim();
+  const nameValueChanged = newDisplayName !== baselineValue;
 
   const duplicateError = Object.values(profiles).some(
     (item) => item.identity.displayName === newDisplayName
