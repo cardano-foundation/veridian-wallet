@@ -15,6 +15,7 @@ import { Verification } from "../../../../components/Verification";
 import { ToastMsgType } from "../../../../globals/types";
 import "./RotateKeyModal.scss";
 import { RotateKeyModalProps } from "./RotateKeyModal.types";
+import { showError } from "../../../../utils/error";
 
 const RotateKeyModal = ({
   isOpen,
@@ -39,7 +40,12 @@ const RotateKeyModal = ({
       await onReloadData();
       dispatch(setToastMsg(ToastMsgType.ROTATE_KEY_SUCCESS));
     } catch (e) {
-      dispatch(setToastMsg(ToastMsgType.ROTATE_KEY_ERROR));
+      showError(
+        "Failed to rotate identifier",
+        e,
+        dispatch,
+        ToastMsgType.ROTATE_KEY_ERROR
+      );
     } finally {
       setLoading(false);
     }

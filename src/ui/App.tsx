@@ -25,6 +25,7 @@ import {
 import {
   getGlobalLoading,
   getInitializationPhase,
+  getShowVerifySeedPhraseAlert,
 } from "../store/reducers/stateCache";
 import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
 import { AppOffline } from "./components/AppOffline";
@@ -35,6 +36,7 @@ import { InputRequest } from "./components/InputRequest";
 import { ProfileStateModal } from "./components/ProfileStateModal";
 import { SetGroupUserName } from "./components/SetGroupUserName";
 import { SidePage } from "./components/SidePage";
+import { VerifySeedPhraseAlert } from "./components/VerifySeedPhraseAlert";
 import {
   ANDROID_MIN_VERSION,
   IOS_MIN_VERSION,
@@ -72,6 +74,7 @@ const SetGroupNameWrapper = () => {
 
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
   const showProfileState = useAppSelector(getShowProfileState);
+  const showAlert = useAppSelector(getShowVerifySeedPhraseAlert);
 
   switch (initPhase) {
     case InitializationPhase.PHASE_ZERO:
@@ -93,7 +96,11 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
             >
               <IonSpinner name="circular" />
             </div>
-            <div className={`app-router ${showProfileState ? "ion-hide" : ""}`}>
+            <div
+              className={`app-router ${
+                showProfileState || showAlert ? "ion-hide" : ""
+              }`}
+            >
               <Routes />
             </div>
             <ProfileStateModal />
@@ -129,6 +136,7 @@ const AppContent = ({
           <NoWitnessAlert />
           <ToastStack />
           {globalLoading && <LoadingPage fullPage />}
+          <VerifySeedPhraseAlert />
         </StrictMode>
       </AppWrapper>
     </>

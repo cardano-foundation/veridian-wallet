@@ -195,6 +195,9 @@ const stateCacheSlice = createSlice({
     setSeedPhraseVerified: (state, action: PayloadAction<boolean>) => {
       state.authentication.seedPhraseIsSet = action.payload;
     },
+    showVerifySeedPhraseAlert: (state, action: PayloadAction<boolean>) => {
+      state.showVerifySeedPhraseAlert = action.payload;
+    },
   },
 });
 
@@ -225,6 +228,7 @@ const {
   setIsSetupProfile,
   setPendingJoinGroupMetadata,
   setSeedPhraseVerified,
+  showVerifySeedPhraseAlert,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -255,6 +259,8 @@ const getForceInitApp = (state: RootState) => state.stateCache.forceInitApp;
 const getGlobalLoading = (state: RootState) => state.stateCache.showLoading;
 const getShowSetupProfilePage = (state: RootState) =>
   state.stateCache.isSetupProfile;
+const getShowVerifySeedPhraseAlert = (state: RootState) =>
+  state.stateCache.showVerifySeedPhraseAlert;
 
 export type {
   AuthenticationCacheProps,
@@ -263,6 +269,8 @@ export type {
 };
 
 export {
+  getShowVerifySeedPhraseAlert,
+  showVerifySeedPhraseAlert,
   clearStateCache,
   dequeueIncomingRequest,
   enqueueIncomingRequest,

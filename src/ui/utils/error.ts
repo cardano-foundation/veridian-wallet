@@ -1,8 +1,12 @@
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
-import { RootState } from "../../store";
-import { setToastMsg, showGenericError } from "../../store/reducers/stateCache";
-import { ToastMsgType } from "../globals/types";
 import { Agent } from "../../core/agent/agent";
+import { RootState } from "../../store";
+import {
+  setToastMsg,
+  showGenericError,
+  showVerifySeedPhraseAlert,
+} from "../../store/reducers/stateCache";
+import { ToastMsgType } from "../globals/types";
 
 const showError = (
   message: string,
@@ -12,6 +16,20 @@ const showError = (
 ) => {
   // eslint-disable-next-line no-console
   console.error(`${message}:`, error);
+
+  if (
+    error instanceof Error &&
+    error.message.includes(Agent.SEED_PHRASE_NOT_VERIFIED)
+  ) {
+    // if we has dispatch as a param => show method
+    if (dispatch) {
+      dispatch(showVerifySeedPhraseAlert(true));
+      return;
+    } else {
+      // If it's a seed phrase verification error, we will pass it to the global error handler.
+      throw error;
+    }
+  }
 
   if (!dispatch) return;
 

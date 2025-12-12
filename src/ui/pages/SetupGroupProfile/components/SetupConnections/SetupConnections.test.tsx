@@ -212,6 +212,7 @@ describe("Setup Connection", () => {
       profiles: {
         [initiatorGroupProfile.id]: {
           identity: initiatorGroupProfile,
+          multisigConnections: [],
         },
       },
       defaultProfile: initiatorGroupProfile.id,

@@ -1766,5 +1766,12 @@
       "description": "To connect, share your profile by showing your QR code, sending the link, or using another method.",
       "button": "Share"
     }
+  },
+  "verifyseedphrasealert": {
+    "title": "Verify recovery phrase",
+    "text": "You’ve reached the point where recovery phrase verification is required. Please verify your recovery phrase now to ensure you’ll be able to recover your wallet.",
+    "firstinfo": "Enables you to recover your wallet if you forget your pin or operations password",
+    "secondinfo": "Regain access to your identity if you get a new device or lose your current one",
+    "button": "Verify now"
   }
 }
