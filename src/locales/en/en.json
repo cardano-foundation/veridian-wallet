@@ -309,7 +309,7 @@
     }
   },
   "createpassword": {
-    "title": "Create password",
+    "title": "Create a password",
     "change": "New password",
     "cancel": "Cancel",
     "description": "Add an extra layer of security for sensitive actions in your wallet by creating an optional password.",
