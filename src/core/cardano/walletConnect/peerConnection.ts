@@ -142,8 +142,12 @@ class PeerConnection {
 
     this.identityWalletConnect.setEnableExperimentalApi(
       new ExperimentalContainer<ExperimentalAPIFunctions>({
-        getKeriIdentifier: this.identityWalletConnect.getKeriIdentifier,
-        signKeri: this.identityWalletConnect.signKeri,
+        getKeriIdentifier: this.identityWalletConnect.getKeriIdentifier.bind(
+          this.identityWalletConnect
+        ),
+        signKeri: this.identityWalletConnect.signKeri.bind(
+          this.identityWalletConnect
+        ),
       })
     );
   }
