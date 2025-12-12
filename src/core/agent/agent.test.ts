@@ -408,7 +408,7 @@ describe("KERIA connectivity", () => {
     (signifyReady as jest.Mock).mockResolvedValueOnce(true);
 
     await expect(agent.bootAndConnect(mockBootUrl)).rejects.toThrowError(
-      "Failed to fetch"
+      Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK
     );
 
     expect(fetch).toHaveBeenCalledWith("http://127.0.0.1:3903/connect", {
@@ -498,7 +498,7 @@ describe("Connect URL Discovery", () => {
       .mockRejectedValueOnce(new Error("Failed to fetch"));
 
     await expect(agent.discoverConnectUrl(mockBootUrl)).rejects.toThrowError(
-      "Failed to fetch"
+      Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK
     );
   });
 

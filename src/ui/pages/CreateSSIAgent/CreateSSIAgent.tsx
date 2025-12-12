@@ -96,6 +96,11 @@ const CreateSSIAgent = () => {
       return;
     }
 
+    if (errorMessage.includes(Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK)) {
+      showError(errorMessage, error, dispatch, ToastMsgType.NETWORK_ERROR);
+      return;
+    }
+
     showError(
       "Unable to boot or connect keria",
       error,
@@ -212,7 +217,7 @@ const CreateSSIAgent = () => {
         return bootUrl;
       }
 
-      return null;
+      throw e;
     }
   };
 
@@ -230,10 +235,6 @@ const CreateSSIAgent = () => {
       const validBootUrl = removeLastSlash(bootUrl.trim());
 
       const connectUrl = await getConnectUrl(validBootUrl);
-
-      if (!connectUrl) {
-        throw new Error(Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT);
-      }
 
       await Agent.agent.recoverKeriaAgent(
         seedPhraseCache.seedPhrase.split(" "),
