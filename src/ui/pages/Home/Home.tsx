@@ -102,13 +102,6 @@ const Home = () => {
             className="home-tab-scan-tile"
             handleTileClick={handleScanToLoginClick}
           />
-          <Tile
-            icon={CardanoLogo}
-            chevron={true}
-            title={i18n.t("tabs.home.tab.tiles.dapps.title")}
-            text={i18n.t("tabs.home.tab.tiles.dapps.text")}
-            handleTileClick={handleShowDappClick}
-          />
           {currentProfile?.identity.groupMemberPre ? (
             <Tile
               icon={personAdd}
@@ -118,22 +111,31 @@ const Home = () => {
               handleTileClick={handleShareCurrentProfileClick}
             />
           ) : (
-            <div className="home-tab-split-section">
+            <>
               <Tile
-                icon={personAdd}
+                icon={CardanoLogo}
                 chevron={true}
-                title={i18n.t("tabs.home.tab.tiles.connections.title")}
-                text={i18n.t("tabs.home.tab.tiles.connections.text")}
-                handleTileClick={handleShareCurrentProfileClick}
+                title={i18n.t("tabs.home.tab.tiles.dapps.title")}
+                text={i18n.t("tabs.home.tab.tiles.dapps.text")}
+                handleTileClick={handleShowDappClick}
               />
-              <Tile
-                icon={refresh}
-                chevron={true}
-                title={i18n.t("tabs.home.tab.tiles.rotate.title")}
-                text={i18n.t("tabs.home.tab.tiles.rotate.text")}
-                handleTileClick={handleRotateKeyClick}
-              />
-            </div>
+              <div className="home-tab-split-section">
+                <Tile
+                  icon={personAdd}
+                  chevron={true}
+                  title={i18n.t("tabs.home.tab.tiles.connections.title")}
+                  text={i18n.t("tabs.home.tab.tiles.connections.text")}
+                  handleTileClick={handleShareCurrentProfileClick}
+                />
+                <Tile
+                  icon={refresh}
+                  chevron={true}
+                  title={i18n.t("tabs.home.tab.tiles.rotate.title")}
+                  text={i18n.t("tabs.home.tab.tiles.rotate.text")}
+                  handleTileClick={handleRotateKeyClick}
+                />
+              </div>
+            </>
           )}
         </div>
       </TabLayout>
