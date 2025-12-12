@@ -17,6 +17,7 @@ import {
   setIsSetupProfile,
   setRecoveryCompleteNoInterruption,
   setSeedPhraseVerified,
+  setSsiAgentIsSet,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ToastMsgType } from "../../globals/types";
@@ -216,6 +217,41 @@ const CreateSSIAgent = () => {
     }
   };
 
+  const handleAfterRecovery = async () => {
+    await Agent.agent.markSeedPhraseAsVerified();
+    dispatch(setSeedPhraseVerified(true));
+    dispatch(setRecoveryCompleteNoInterruption());
+  };
+
+  const recoverAndLoadDb = async () => {
+    try {
+      const recoveryStatus = await Agent.agent.basicStorage.findById(
+        MiscRecordId.CLOUD_RECOVERY_STATUS
+      );
+
+      const isSyncing = recoveryStatus?.content?.syncing;
+
+      if (isSyncing) {
+        setCurrentPage(CurrentPage.Connect);
+        dispatch(setSsiAgentIsSet(true));
+      }
+
+      await Agent.agent.connect(Agent.DEFAULT_RECONNECT_INTERVAL, false);
+
+      if (isSyncing) {
+        await Agent.agent.syncWithKeria();
+      }
+
+      await handleAfterRecovery();
+    } catch (e) {
+      const errorMessage = (e as Error).message;
+
+      if (errorMessage === Agent.SYNC_DATA_NETWORK_ERROR) {
+        recoverAndLoadDb();
+      }
+    }
+  };
+
   const handleRecoveryWallet = async (bootUrl: string) => {
     setLoading(true);
     try {
@@ -240,11 +276,7 @@ const CreateSSIAgent = () => {
         connectUrl
       );
 
-      await Agent.agent.markSeedPhraseAsVerified();
-      dispatch(setSeedPhraseVerified(true));
-
-      dispatch(setRecoveryCompleteNoInterruption());
-
+      await handleAfterRecovery();
       // Note: We need to wait load data from db before go to next page
     } catch (e) {
       const errorMessage = (e as Error).message;
@@ -254,6 +286,11 @@ const CreateSSIAgent = () => {
           errorMessage
         )
       ) {
+        return;
+      }
+
+      if (Agent.SYNC_DATA_NETWORK_ERROR === errorMessage) {
+        recoverAndLoadDb();
         return;
       }
 

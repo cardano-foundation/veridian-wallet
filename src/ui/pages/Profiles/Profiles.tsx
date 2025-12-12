@@ -12,7 +12,10 @@ import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getProfiles } from "../../../store/reducers/profileCache";
-import { setToastMsg } from "../../../store/reducers/stateCache";
+import {
+  getFinishLoadDB,
+  setToastMsg,
+} from "../../../store/reducers/stateCache";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
 import { ProfileDetailsModal } from "../../components/ProfileDetailsModal";
@@ -55,6 +58,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
   const profiles = useAppSelector(getProfiles);
+  const finishLoadDb = useAppSelector(getFinishLoadDB);
   const ionHistory = useAppIonRouter();
   const { updateDefaultProfile, defaultProfile } = useProfile();
   const profileList = Object.values(profiles);
@@ -132,6 +136,9 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   useEffect(() => {
+    // If the wallet has not finished loading data into Redux, we should not open the setup-wallet screen yet — even if the wallet does not have a profile.
+    if (!finishLoadDb) return;
+
     if (!defaultProfile) {
       setIsJoinGroupMode(false);
       setOpenSetupProfile(true);
@@ -158,7 +165,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         )
       );
     }
-  }, [defaultProfile, ionHistory]);
+  }, [defaultProfile, finishLoadDb, ionHistory]);
 
   const isDisableManageProfile = () => {
     const isGroupProfile = !!(
