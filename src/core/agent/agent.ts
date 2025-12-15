@@ -490,27 +490,15 @@ class Agent {
    * @throws Error if the connect URL cannot be discovered
    */
   async discoverConnectUrl(bootUrl: string): Promise<string> {
-    try {
-      const url = new URL(bootUrl);
-      const connectEndpoint = `${url.protocol}//${url.host}/connect`;
+    const url = new URL(bootUrl);
+    const connectEndpoint = `${url.protocol}//${url.host}/connect`;
 
-      const response = await fetch(connectEndpoint, {
+    let response: Response;
+    try {
+      response = await fetch(connectEndpoint, {
         method: "GET",
         headers: { Accept: "application/json" },
       });
-
-      if (!response.ok) {
-        throw new Error(
-          `${Agent.CONNECT_URL_DISCOVERY_FAILED} (${response.status})`
-        );
-      }
-
-      const data = await response.json();
-      if (!data.connectUrl) {
-        throw new Error(Agent.CONNECT_URL_NOT_FOUND);
-      }
-
-      return data.connectUrl;
     } catch (error) {
       if (error instanceof Error && isNetworkError(error)) {
         throw new Error(Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK, {
@@ -520,6 +508,19 @@ class Agent {
 
       throw error;
     }
+
+    if (!response.ok) {
+      throw new Error(
+        `${Agent.CONNECT_URL_DISCOVERY_FAILED} (${response.status})`
+      );
+    }
+
+    const data = await response.json();
+    if (!data.connectUrl) {
+      throw new Error(Agent.CONNECT_URL_NOT_FOUND);
+    }
+
+    return data.connectUrl;
   }
 
   private async saveAgentUrls(agentUrls: AgentUrls): Promise<void> {
