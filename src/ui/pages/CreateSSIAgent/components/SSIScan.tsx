@@ -44,14 +44,17 @@ const SSIScan = ({
       setOpen(false);
     };
   }, []);
-
-  const closeInputManualValue = () => setOpen(false);
   const [pastedValue, setPastedValue] = useState("");
 
   const getErrorMessage = () => {
     if (!pastedValue || !isValidHttpUrl(pastedValue))
       return i18n.t("ssiagent.error.invalidurl");
     return "";
+  };
+
+  const closeInputManualValue = () => {
+    setOpen(false);
+    setPastedValue("");
   };
 
   const handleConfirm = () => {
