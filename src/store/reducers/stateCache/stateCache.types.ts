@@ -76,7 +76,6 @@ interface StateCacheProps {
   isSetupProfile?: boolean;
   pendingJoinGroupMetadata: PendingJoinGroupMetadata | null;
   showVerifySeedPhraseAlert?: boolean;
-  finishLoadData?: boolean;
   isSyncingData?: boolean;
 }
 

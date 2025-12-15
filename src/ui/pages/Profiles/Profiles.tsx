@@ -6,16 +6,15 @@ import {
   settingsOutline,
 } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
-import { CreationStatus } from "../../../core/agent/agent.types";
+import { Agent } from "../../../core/agent/agent";
+import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
+import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getProfiles } from "../../../store/reducers/profileCache";
-import {
-  getFinishLoadDB,
-  setToastMsg,
-} from "../../../store/reducers/stateCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
 import { PageHeader } from "../../components/PageHeader";
 import { ProfileDetailsModal } from "../../components/ProfileDetailsModal";
@@ -30,7 +29,6 @@ import { ProfileSetup } from "../ProfileSetup";
 import { ProfileItem } from "./components/ProfileItem";
 import "./Profiles.scss";
 import { OptionButtonProps, ProfilesProps } from "./Profiles.types";
-import { TabsRoutePath } from "../../../routes/paths";
 
 const OptionButton = ({ icon, text, action, disabled }: OptionButtonProps) => {
   return (
@@ -58,7 +56,6 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const componentId = "profiles";
   const dispatch = useAppDispatch();
   const profiles = useAppSelector(getProfiles);
-  const finishLoadDb = useAppSelector(getFinishLoadDB);
   const ionHistory = useAppIonRouter();
   const { updateDefaultProfile, defaultProfile } = useProfile();
   const profileList = Object.values(profiles);
@@ -136,36 +133,47 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   useEffect(() => {
-    // If the wallet has not finished loading data into Redux, we should not open the setup-wallet screen yet — even if the wallet does not have a profile.
-    if (!finishLoadDb) return;
-
-    if (!defaultProfile) {
-      setIsJoinGroupMode(false);
-      setOpenSetupProfile(true);
-    }
-
-    const isGroup =
-      !!defaultProfile?.identity.groupMetadata ||
-      !!defaultProfile?.identity.groupMemberPre;
-    const isCreated =
-      defaultProfile?.identity.creationStatus === CreationStatus.COMPLETE &&
-      !!defaultProfile?.identity.groupMemberPre;
-    const isPendingOrFailedOnKeria =
-      defaultProfile &&
-      [CreationStatus.PENDING, CreationStatus.FAILED].includes(
-        defaultProfile?.identity.creationStatus
-      ) &&
-      !defaultProfile?.identity.groupMemberPre;
-
-    if (isGroup && !isPendingOrFailedOnKeria && !isCreated) {
-      ionHistory.push(
-        RoutePath.GROUP_PROFILE_SETUP.replace(
-          ":id",
-          defaultProfile?.identity.id
-        )
+    async function showSetupProfileScreen() {
+      const recoveryStatus = await Agent.agent.basicStorage.findById(
+        MiscRecordId.CLOUD_RECOVERY_STATUS
       );
+
+      const isSyncing = recoveryStatus?.content?.syncing;
+
+      if (isSyncing) {
+        return;
+      }
+
+      if (!defaultProfile) {
+        setIsJoinGroupMode(false);
+        setOpenSetupProfile(true);
+      }
+
+      const isGroup =
+        !!defaultProfile?.identity.groupMetadata ||
+        !!defaultProfile?.identity.groupMemberPre;
+      const isCreated =
+        defaultProfile?.identity.creationStatus === CreationStatus.COMPLETE &&
+        !!defaultProfile?.identity.groupMemberPre;
+      const isPendingOrFailedOnKeria =
+        defaultProfile &&
+        [CreationStatus.PENDING, CreationStatus.FAILED].includes(
+          defaultProfile?.identity.creationStatus
+        ) &&
+        !defaultProfile?.identity.groupMemberPre;
+
+      if (isGroup && !isPendingOrFailedOnKeria && !isCreated) {
+        ionHistory.push(
+          RoutePath.GROUP_PROFILE_SETUP.replace(
+            ":id",
+            defaultProfile?.identity.id
+          )
+        );
+      }
     }
-  }, [defaultProfile, finishLoadDb, ionHistory]);
+
+    showSetupProfileScreen();
+  }, [defaultProfile, ionHistory]);
 
   const isDisableManageProfile = () => {
     const isGroupProfile = !!(

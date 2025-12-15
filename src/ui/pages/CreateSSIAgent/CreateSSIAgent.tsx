@@ -217,37 +217,39 @@ const CreateSSIAgent = () => {
     }
   };
 
-  const handleAfterRecovery = async () => {
+  const handlePostRecovery = async () => {
     await Agent.agent.markSeedPhraseAsVerified();
     dispatch(setSeedPhraseVerified(true));
     dispatch(setRecoveryCompleteNoInterruption());
   };
 
   const recoverAndLoadDb = async () => {
-    try {
-      const recoveryStatus = await Agent.agent.basicStorage.findById(
-        MiscRecordId.CLOUD_RECOVERY_STATUS
-      );
+    const recoveryStatus = await Agent.agent.basicStorage.findById(
+      MiscRecordId.CLOUD_RECOVERY_STATUS
+    );
 
-      const isSyncing = recoveryStatus?.content?.syncing;
+    const isSyncing = recoveryStatus?.content?.syncing;
 
-      if (isSyncing) {
-        setCurrentPage(CurrentPage.Connect);
-        dispatch(setSsiAgentIsSet(true));
-      }
+    if (isSyncing) {
+      setCurrentPage(CurrentPage.Connect);
+      dispatch(setSsiAgentIsSet(true));
+    }
 
-      await Agent.agent.connect(Agent.DEFAULT_RECONNECT_INTERVAL, false);
+    await Agent.agent.connect(Agent.DEFAULT_RECONNECT_INTERVAL, false);
 
-      if (isSyncing) {
+    if (isSyncing) {
+      try {
         await Agent.agent.syncWithKeria();
-      }
+        await handlePostRecovery();
+      } catch (e) {
+        const errorMessage = (e as Error).message;
 
-      await handleAfterRecovery();
-    } catch (e) {
-      const errorMessage = (e as Error).message;
+        if (errorMessage === Agent.SYNC_DATA_NETWORK_ERROR) {
+          await recoverAndLoadDb();
+          return;
+        }
 
-      if (errorMessage === Agent.SYNC_DATA_NETWORK_ERROR) {
-        recoverAndLoadDb();
+        throw e;
       }
     }
   };
@@ -276,7 +278,7 @@ const CreateSSIAgent = () => {
         connectUrl
       );
 
-      await handleAfterRecovery();
+      await handlePostRecovery();
       // Note: We need to wait load data from db before go to next page
     } catch (e) {
       const errorMessage = (e as Error).message;
@@ -290,7 +292,7 @@ const CreateSSIAgent = () => {
       }
 
       if (Agent.SYNC_DATA_NETWORK_ERROR === errorMessage) {
-        recoverAndLoadDb();
+        await recoverAndLoadDb();
         return;
       }
 

@@ -58,7 +58,6 @@ import {
   getRecoveryCompleteNoInterruption,
   setAuthentication,
   setCameraDirection,
-  setFinishLoadDB,
   setInitializationPhase,
   setIsOnline,
   setIsSetupProfile,
@@ -566,7 +565,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
       dispatch(setProfiles(profiles));
       dispatch(setCurrentProfile(currentProfileAid));
-      dispatch(setFinishLoadDB(true));
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
     }
