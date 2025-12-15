@@ -79,9 +79,14 @@ const VerifySeedPhraseModal = ({
       : i18n.t("verifyseedphrase.button.back");
 
   return (
-    <IonModal isOpen={show}>
+    <IonModal
+      className="verify-seedphrase"
+      isOpen={show}
+      onDidDismiss={handleCloseButtonClick}
+    >
       <ScrollablePageLayout
         pageId={pageId}
+        activeStatus
         header={
           <PageHeader
             title={title}
