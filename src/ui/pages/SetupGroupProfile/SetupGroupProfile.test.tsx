@@ -34,6 +34,15 @@ jest.mock("../../../core/agent/agent", () => ({
       connections: {
         connectByOobiUrl: (...arg: unknown[]) => connectByOobiUrlMock(...arg),
       },
+      basicStorage: {
+        findById: jest.fn(() =>
+          Promise.resolve({
+            content: {
+              syncing: false,
+            },
+          })
+        ),
+      },
     },
   },
 }));

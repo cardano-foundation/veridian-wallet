@@ -33,6 +33,13 @@ jest.mock("../../../core/agent/agent", () => ({
       },
       basicStorage: {
         deleteById: jest.fn(() => Promise.resolve()),
+        findById: jest.fn(() =>
+          Promise.resolve({
+            content: {
+              syncing: false,
+            },
+          })
+        ),
       },
       credentials: {
         getCredentialDetailsById: jest.fn(() =>
