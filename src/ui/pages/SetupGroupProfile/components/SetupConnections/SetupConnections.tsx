@@ -56,10 +56,6 @@ const SetupConnections = ({ setState }: StageProps) => {
     MultiSigGroup | undefined
   >();
 
-  const isCompleteGroup =
-    profile?.groupMemberPre &&
-    profile?.creationStatus === CreationStatus.COMPLETE;
-
   const handleAvatarClick = () => {
     setOpenProfiles(true);
   };
@@ -174,7 +170,6 @@ const SetupConnections = ({ setState }: StageProps) => {
       <ScrollablePageLayout
         pageId={componentId}
         customClass={tab}
-        activeStatus={!isCompleteGroup}
         header={
           <PageHeader
             title={
