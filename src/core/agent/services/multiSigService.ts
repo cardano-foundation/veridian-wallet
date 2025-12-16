@@ -78,6 +78,7 @@ class MultiSigService extends AgentService {
     "Cannot retry creating group identifier if retry data is missing from the DB";
   static readonly GROUP_DATA_MISSING_FOR_INITIATOR =
     "Group data missing for initiator";
+  static readonly CANNOT_FIND_EXCHANGES = "Cannot find exchanges";
 
   protected readonly identifierStorage: IdentifierStorage;
   protected readonly operationPendingStorage: OperationPendingStorage;
@@ -843,6 +844,10 @@ class MultiSigService extends AgentService {
     const exchanges = await this.props.signifyClient.exchanges().list({
       filter: { "-r": MultiSigRoute.ICP, "-a-gid": multisigId },
     });
+
+    if (exchanges.length === 0) {
+      throw new Error(MultiSigService.CANNOT_FIND_EXCHANGES);
+    }
 
     const memberInfos = members.signing.map((member: { aid: string }) => {
       const hasAccepted = exchanges.some(

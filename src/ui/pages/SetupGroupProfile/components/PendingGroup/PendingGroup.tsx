@@ -1,6 +1,6 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { exitOutline, refreshOutline, warningOutline } from "ionicons/icons";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import { MultiSigIcpRequestDetails } from "../../../../../core/agent/services/identifier.types";
 import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
@@ -38,6 +38,7 @@ import { showError } from "../../../../utils/error";
 import { Profiles } from "../../../Profiles";
 import { StageProps } from "../../SetupGroupProfile.types";
 import "./PendingGroup.scss";
+import { MultiSigService } from "../../../../../core/agent/services";
 
 const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const componentId = "pending-group";
@@ -52,6 +53,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const ionRouter = useAppIonRouter();
   const [multisigIcpDetails, setMultisigIcpDetails] =
     useState<MultiSigIcpRequestDetails | null>(null);
+  const retry = useRef(0);
 
   const initGroupNotification = defaultProfile?.notifications.find(
     (item) => item.a.r === NotificationRoute.MultiSigIcp
@@ -129,6 +131,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     state.selectedConnections,
+    identity?.groupUsername,
     identity?.groupMetadata?.proposedUsername,
     identity?.groupMemberPre,
     groupDetails?.members,
@@ -186,8 +189,21 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       const details = await Agent.agent.multiSigs.getInceptionStatus(
         identity.id
       );
+      retry.current = 0;
       setGroupDetails(details);
     } catch (e) {
+      if (
+        e instanceof Error &&
+        e.message === MultiSigService.CANNOT_FIND_EXCHANGES &&
+        retry.current < 3
+      ) {
+        setTimeout(() => {
+          retry.current += 1;
+          getInceptionStatus();
+        }, 100);
+        return;
+      }
+
       showError("Unable to load group: ", e, dispatch);
     } finally {
       setLoading(false);

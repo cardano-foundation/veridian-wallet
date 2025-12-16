@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { Redirect } from "react-router-dom";
 import { CreationStatus } from "../../../core/agent/agent.types";
 import { NotificationRoute } from "../../../core/agent/services/keriaNotificationService.types";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppSelector } from "../../../store/hooks";
 import { getCurrentProfile } from "../../../store/reducers/profileCache";
-import { useAppIonRouter } from "../../hooks";
 import { InitializeGroup } from "./components/InitializeGroup/InitializeGroup";
 import { PendingGroup } from "./components/PendingGroup/PendingGroup";
 import { SetupConnections } from "./components/SetupConnections";
@@ -42,7 +42,6 @@ const initialState: GroupInfomation = {
 const SetupGroupProfile = () => {
   const currentProfile = useAppSelector(getCurrentProfile);
   const identity = currentProfile?.identity;
-  const router = useAppIonRouter();
 
   const isPendingState = useMemo(() => {
     if (!currentProfile) return false;
@@ -72,14 +71,9 @@ const SetupGroupProfile = () => {
   });
   const CurrentStage = stages[state.stage];
 
-  useEffect(() => {
-    if (
-      identity?.creationStatus === CreationStatus.COMPLETE &&
-      !!identity?.groupMemberPre
-    ) {
-      router.push(TabsRoutePath.HOME, "root", "replace");
-    }
-  }, [identity?.creationStatus, identity?.groupMemberPre, router]);
+  const isCompleteGroup =
+    identity?.creationStatus === CreationStatus.COMPLETE &&
+    !!identity?.groupMemberPre;
 
   useEffect(() => {
     if (!currentProfile) return;
@@ -98,6 +92,15 @@ const SetupGroupProfile = () => {
       groupMetadata: currentProfile.identity.groupMetadata,
     });
   }, [currentProfile, isPendingState]);
+
+  if (isCompleteGroup) {
+    return (
+      <Redirect
+        exact
+        to={TabsRoutePath.HOME}
+      />
+    );
+  }
 
   return (
     <CurrentStage
