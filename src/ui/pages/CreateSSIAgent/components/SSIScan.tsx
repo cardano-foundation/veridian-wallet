@@ -117,7 +117,7 @@ const SSIScan = ({
           closeButtonLabel: `${i18n.t("ssiagent.scanssi.scan.modal.cancel")}`,
           title: `${i18n.t("ssiagent.scanssi.scan.modal.title")}`,
           actionButton: true,
-          actionButtonDisabled: !pastedValue,
+          actionButtonDisabled: !pastedValue || !!getErrorMessage(),
           actionButtonAction: handleConfirm,
           actionButtonLabel: `${i18n.t("ssiagent.scanssi.scan.modal.confirm")}`,
         }}
@@ -128,7 +128,11 @@ const SSIScan = ({
           onChangeInput={setPastedValue}
           value={pastedValue}
           placeholder={`${i18n.t("ssiagent.scanssi.scan.modal.placeholder")}`}
-          onChangeFocus={(value) => !value && setTouched(true)}
+          onChangeFocus={(focusValue) => {
+            if (!pastedValue) return;
+            if (focusValue) setTouched(true);
+          }}
+          error={!!getErrorMessage() && touched}
         />
         <InputError
           showError={!!getErrorMessage() && touched}
