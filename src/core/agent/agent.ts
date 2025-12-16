@@ -61,6 +61,8 @@ class Agent {
     "Failed to boot due to network connectivity";
   static readonly KERIA_CONNECT_FAILED_BAD_NETWORK =
     "Failed to connect due to network connectivity";
+  static readonly SYNC_DATA_NETWORK_ERROR =
+    "Failed to sync data due to network connectivity";
   static readonly KERIA_BOOT_FAILED = "Failed to boot signify client";
   static readonly KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT =
     "KERIA agent is already booted but cannot connect";
@@ -367,16 +369,24 @@ class Agent {
   }
 
   async syncWithKeria() {
-    await this.identifiers.syncKeriaIdentifiers();
-    await this.connections.syncKeriaContacts();
-    await this.credentials.syncKeriaCredentials();
+    try {
+      await this.identifiers.syncKeriaIdentifiers();
+      await this.connections.syncKeriaContacts();
+      await this.credentials.syncKeriaCredentials();
 
-    await this.basicStorage.createOrUpdateBasicRecord(
-      new BasicRecord({
-        id: MiscRecordId.CLOUD_RECOVERY_STATUS,
-        content: { syncing: false },
-      })
-    );
+      await this.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.CLOUD_RECOVERY_STATUS,
+          content: { syncing: false },
+        })
+      );
+    } catch (e) {
+      if (e instanceof Error && isNetworkError(e)) {
+        throw new Error(Agent.SYNC_DATA_NETWORK_ERROR, { cause: e });
+      }
+
+      throw e;
+    }
   }
 
   private async connectSignifyClient(): Promise<void> {

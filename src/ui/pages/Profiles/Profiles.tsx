@@ -6,10 +6,12 @@ import {
   settingsOutline,
 } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
-import { CreationStatus } from "../../../core/agent/agent.types";
+import { Agent } from "../../../core/agent/agent";
+import { CreationStatus, MiscRecordId } from "../../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../../core/agent/services/identifier.types";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
+import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { getProfiles } from "../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../store/reducers/stateCache";
@@ -27,7 +29,6 @@ import { ProfileSetup } from "../ProfileSetup";
 import { ProfileItem } from "./components/ProfileItem";
 import "./Profiles.scss";
 import { OptionButtonProps, ProfilesProps } from "./Profiles.types";
-import { TabsRoutePath } from "../../../routes/paths";
 
 const OptionButton = ({ icon, text, action, disabled }: OptionButtonProps) => {
   return (
@@ -132,32 +133,46 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   };
 
   useEffect(() => {
-    if (!defaultProfile) {
-      setIsJoinGroupMode(false);
-      setOpenSetupProfile(true);
-    }
-
-    const isGroup =
-      !!defaultProfile?.identity.groupMetadata ||
-      !!defaultProfile?.identity.groupMemberPre;
-    const isCreated =
-      defaultProfile?.identity.creationStatus === CreationStatus.COMPLETE &&
-      !!defaultProfile?.identity.groupMemberPre;
-    const isPendingOrFailedOnKeria =
-      defaultProfile &&
-      [CreationStatus.PENDING, CreationStatus.FAILED].includes(
-        defaultProfile?.identity.creationStatus
-      ) &&
-      !defaultProfile?.identity.groupMemberPre;
-
-    if (isGroup && !isPendingOrFailedOnKeria && !isCreated) {
-      ionHistory.push(
-        RoutePath.GROUP_PROFILE_SETUP.replace(
-          ":id",
-          defaultProfile?.identity.id
-        )
+    async function showSetupProfileScreen() {
+      const recoveryStatus = await Agent.agent.basicStorage.findById(
+        MiscRecordId.CLOUD_RECOVERY_STATUS
       );
+
+      const isSyncing = recoveryStatus?.content?.syncing;
+
+      if (isSyncing) {
+        return;
+      }
+
+      if (!defaultProfile) {
+        setIsJoinGroupMode(false);
+        setOpenSetupProfile(true);
+      }
+
+      const isGroup =
+        !!defaultProfile?.identity.groupMetadata ||
+        !!defaultProfile?.identity.groupMemberPre;
+      const isCreated =
+        defaultProfile?.identity.creationStatus === CreationStatus.COMPLETE &&
+        !!defaultProfile?.identity.groupMemberPre;
+      const isPendingOrFailedOnKeria =
+        defaultProfile &&
+        [CreationStatus.PENDING, CreationStatus.FAILED].includes(
+          defaultProfile?.identity.creationStatus
+        ) &&
+        !defaultProfile?.identity.groupMemberPre;
+
+      if (isGroup && !isPendingOrFailedOnKeria && !isCreated) {
+        ionHistory.push(
+          RoutePath.GROUP_PROFILE_SETUP.replace(
+            ":id",
+            defaultProfile?.identity.id
+          )
+        );
+      }
     }
+
+    showSetupProfileScreen();
   }, [defaultProfile, ionHistory]);
 
   const isDisableManageProfile = () => {

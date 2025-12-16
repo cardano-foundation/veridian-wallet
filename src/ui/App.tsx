@@ -26,6 +26,7 @@ import {
   getGlobalLoading,
   getInitializationPhase,
   getShowVerifySeedPhraseAlert,
+  getIsSyncingData,
 } from "../store/reducers/stateCache";
 import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
 import { AppOffline } from "./components/AppOffline";
@@ -75,6 +76,7 @@ const SetGroupNameWrapper = () => {
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
   const showProfileState = useAppSelector(getShowProfileState);
   const showAlert = useAppSelector(getShowVerifySeedPhraseAlert);
+  const isSyncingData = useAppSelector(getIsSyncingData);
 
   switch (initPhase) {
     case InitializationPhase.PHASE_ZERO:
@@ -82,7 +84,9 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
     case InitializationPhase.PHASE_ONE:
       return (
         <>
-          <LoadingPage type={LoadingType.Splash} />
+          <LoadingPage
+            type={isSyncingData ? LoadingType.Spin : LoadingType.Splash}
+          />
           <LockPage />
         </>
       );

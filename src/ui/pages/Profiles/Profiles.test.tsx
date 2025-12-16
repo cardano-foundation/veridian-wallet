@@ -21,6 +21,13 @@ jest.mock("../../../core/agent/agent", () => ({
     agent: {
       basicStorage: {
         createOrUpdateBasicRecord: jest.fn(),
+        findById: jest.fn(() =>
+          Promise.resolve({
+            content: {
+              syncing: false,
+            },
+          })
+        ),
       },
     },
   },

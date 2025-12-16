@@ -64,6 +64,7 @@ import {
   setPauseQueueIncomingRequest,
   setPendingJoinGroupMetadata,
   setQueueIncomingRequest,
+  setSyncingData,
   setToastMsg,
   showNoWitnessAlert,
   showVerifySeedPhraseAlert,
@@ -398,6 +399,21 @@ const AppWrapper = (props: { children: ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recoveryCompleteNoInterruption]);
 
+  const handlePostRecovery = async () => {
+    try {
+      dispatch(setInitializationPhase(InitializationPhase.PHASE_TWO)); // Show offline mode page
+
+      await Agent.agent.connect(Agent.DEFAULT_RECONNECT_INTERVAL, false);
+      await recoverAndLoadDb();
+    } catch (e) {
+      if (e instanceof Error && e.message === Agent.SYNC_DATA_NETWORK_ERROR) {
+        handlePostRecovery();
+      } else {
+        throw e;
+      }
+    }
+  };
+
   useEffect(() => {
     const startAgent = async () => {
       // This small pause allows the LockPage to close fully in the UI before starting the agent.
@@ -411,16 +427,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
       } catch (e) {
         if (
           e instanceof Error &&
-          e.message === Agent.KERIA_CONNECT_FAILED_BAD_NETWORK
+          (e.message === Agent.KERIA_CONNECT_FAILED_BAD_NETWORK ||
+            e.message === Agent.SYNC_DATA_NETWORK_ERROR)
         ) {
-          dispatch(setInitializationPhase(InitializationPhase.PHASE_TWO)); // Show offline mode page
-
-          // No await, background this task and continue initializing
-          Agent.agent
-            .connect(Agent.DEFAULT_RECONNECT_INTERVAL, false)
-            .then(() => {
-              recoverAndLoadDb();
-            });
+          handlePostRecovery();
         } else {
           throw e;
         }
@@ -554,7 +564,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       }
 
       dispatch(setProfiles(profiles));
-
       dispatch(setCurrentProfile(currentProfileAid));
     } catch (e) {
       showError("Failed to load database data", e, dispatch);
@@ -892,11 +901,14 @@ const AppWrapper = (props: { children: ReactNode }) => {
     const recoveryStatus = await Agent.agent.basicStorage.findById(
       MiscRecordId.CLOUD_RECOVERY_STATUS
     );
+
     if (recoveryStatus?.content?.syncing) {
+      dispatch(setSyncingData(true));
       await Agent.agent.syncWithKeria();
     }
 
     await loadDb();
+    dispatch(setSyncingData(false));
   };
 
   const loadDb = async () => {

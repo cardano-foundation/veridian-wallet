@@ -198,6 +198,12 @@ const stateCacheSlice = createSlice({
     showVerifySeedPhraseAlert: (state, action: PayloadAction<boolean>) => {
       state.showVerifySeedPhraseAlert = action.payload;
     },
+    setSsiAgentIsSet: (state, action: PayloadAction<boolean>) => {
+      state.authentication.ssiAgentIsSet = action.payload;
+    },
+    setSyncingData: (state, action: PayloadAction<boolean>) => {
+      state.isSyncingData = action.payload;
+    },
   },
 });
 
@@ -229,6 +235,8 @@ const {
   setPendingJoinGroupMetadata,
   setSeedPhraseVerified,
   showVerifySeedPhraseAlert,
+  setSsiAgentIsSet,
+  setSyncingData,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -261,6 +269,7 @@ const getShowSetupProfilePage = (state: RootState) =>
   state.stateCache.isSetupProfile;
 const getShowVerifySeedPhraseAlert = (state: RootState) =>
   state.stateCache.showVerifySeedPhraseAlert;
+const getIsSyncingData = (state: RootState) => state.stateCache.isSyncingData;
 
 export type {
   AuthenticationCacheProps,
@@ -271,10 +280,13 @@ export type {
 export {
   getShowVerifySeedPhraseAlert,
   showVerifySeedPhraseAlert,
+  getIsSyncingData,
+  setSyncingData,
   clearStateCache,
   dequeueIncomingRequest,
   enqueueIncomingRequest,
   setSeedPhraseVerified,
+  setSsiAgentIsSet,
   getAuthentication,
   getCameraDirection,
   getCurrentRoute,

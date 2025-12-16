@@ -35,6 +35,15 @@ jest.mock("../../../core/agent/agent", () => ({
       auth: {
         verifySecret: verifySecretMock,
       },
+      basicStorage: {
+        findById: jest.fn(() =>
+          Promise.resolve({
+            content: {
+              syncing: false,
+            },
+          })
+        ),
+      },
     },
   },
 }));

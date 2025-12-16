@@ -76,6 +76,13 @@ jest.mock("../../../../../core/agent/agent", () => ({
       },
       basicStorage: {
         deleteById: jest.fn(() => Promise.resolve(true)),
+        findById: jest.fn(() =>
+          Promise.resolve({
+            content: {
+              syncing: false,
+            },
+          })
+        ),
       },
     },
   },

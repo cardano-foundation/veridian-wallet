@@ -13,6 +13,9 @@ const startScan = jest.fn();
 const stopScan = jest.fn();
 const discoverConnectUrlMock = jest.fn();
 const getPlatformMock = jest.fn(() => ["mobile"]);
+const findByIdMock = jest.fn();
+const connectMock = jest.fn();
+const syncWithKeriaMock = jest.fn();
 
 import {
   BarcodeFormat,
@@ -118,7 +121,10 @@ jest.mock("../../../core/agent/agent", () => ({
       basicStorage: {
         deleteById: basicStorageDeleteMock,
         createOrUpdateBasicRecord: createOrUpdateBasicRecordMock,
+        findById: findByIdMock,
       },
+      connect: connectMock,
+      syncWithKeria: syncWithKeriaMock,
     },
   },
 }));
@@ -756,6 +762,91 @@ describe("SSI agent page", () => {
           initialState.seedPhraseCache.seedPhrase.split(" "),
           connectUrl
         );
+      });
+    });
+
+    test("While recovery wallet, device lost connection", async () => {
+      const barcodes = [
+        {
+          displayValue: bootUrl,
+          format: BarcodeFormat.QrCode,
+          rawValue: bootUrl,
+          valueType: BarcodeValueType.Url,
+        },
+      ];
+
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      discoverConnectUrlMock.mockImplementation(() =>
+        Promise.resolve(connectUrl)
+      );
+
+      recoverKeriaAgentMock.mockImplementation(() => {
+        throw new Error(Agent.SYNC_DATA_NETWORK_ERROR);
+      });
+
+      findByIdMock.mockImplementation(() =>
+        Promise.resolve({
+          content: {
+            syncing: true,
+          },
+        })
+      );
+
+      connectMock.mockImplementation(() => Promise.resolve());
+
+      const history = createMemoryHistory();
+      const { getByText, queryByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          queryByText(
+            EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup
+          )
+        ).toBe(null);
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible;
+      });
+
+      await waitFor(() => {
+        expect(recoverKeriaAgentMock).toBeCalledWith(
+          initialState.seedPhraseCache.seedPhrase.split(" "),
+          connectUrl
+        );
+      });
+
+      await waitFor(() => {
+        expect(connectMock).toBeCalledWith(
+          Agent.DEFAULT_RECONNECT_INTERVAL,
+          false
+        );
+        expect(syncWithKeriaMock).toBeCalled();
       });
     });
 
