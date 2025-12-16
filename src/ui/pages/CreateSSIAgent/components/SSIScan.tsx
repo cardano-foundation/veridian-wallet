@@ -39,6 +39,7 @@ const SSIScan = ({
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [touched, setTouched] = useState(false);
+
   useEffect(() => {
     return () => {
       setOpen(false);
@@ -55,6 +56,7 @@ const SSIScan = ({
   const closeInputManualValue = () => {
     setOpen(false);
     setPastedValue("");
+    setTouched(false);
   };
 
   const handleConfirm = () => {
