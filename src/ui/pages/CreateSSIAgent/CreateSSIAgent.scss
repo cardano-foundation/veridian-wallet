@@ -82,8 +82,12 @@
     min-width: auto !important;
 
     .action-button-label > p {
-      color: var(--ion-color-primary-700) !important;
+      color: var(--ion-color-primary-700);
     }
+  }
+
+  .ssi-input {
+    margin-top: 0.625rem;
   }
 
   & .responsive-modal-content {

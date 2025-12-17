@@ -47,12 +47,12 @@ ion-item.custom-input {
   .input-line {
     display: flex;
     width: 100%;
-    border: 1px solid var(--ion-color-neutral-400);
+    border: 2px solid var(--ion-color-neutral-400);
     border-radius: 0.5rem;
     background: var(--ion-color-neutral-100);
 
     &:focus-within {
-      border-color: var(--ion-color-neutral-700);
+      border-color: var(--ion-color-primary-700);
     }
 
     .input-wrapper {

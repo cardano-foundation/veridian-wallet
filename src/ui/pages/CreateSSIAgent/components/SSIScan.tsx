@@ -39,19 +39,24 @@ const SSIScan = ({
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [touched, setTouched] = useState(false);
+
   useEffect(() => {
     return () => {
       setOpen(false);
     };
   }, []);
-
-  const closeInputManualValue = () => setOpen(false);
   const [pastedValue, setPastedValue] = useState("");
 
   const getErrorMessage = () => {
     if (!pastedValue || !isValidHttpUrl(pastedValue))
       return i18n.t("ssiagent.error.invalidurl");
     return "";
+  };
+
+  const closeInputManualValue = () => {
+    setOpen(false);
+    setPastedValue("");
+    setTouched(false);
   };
 
   const handleConfirm = () => {
@@ -112,7 +117,7 @@ const SSIScan = ({
           closeButtonLabel: `${i18n.t("ssiagent.scanssi.scan.modal.cancel")}`,
           title: `${i18n.t("ssiagent.scanssi.scan.modal.title")}`,
           actionButton: true,
-          actionButtonDisabled: !pastedValue,
+          actionButtonDisabled: !pastedValue || !!getErrorMessage(),
           actionButtonAction: handleConfirm,
           actionButtonLabel: `${i18n.t("ssiagent.scanssi.scan.modal.confirm")}`,
         }}
@@ -123,7 +128,12 @@ const SSIScan = ({
           onChangeInput={setPastedValue}
           value={pastedValue}
           placeholder={`${i18n.t("ssiagent.scanssi.scan.modal.placeholder")}`}
-          onChangeFocus={(value) => !value && setTouched(true)}
+          onChangeFocus={() => {
+            if (!pastedValue) return;
+            setTouched(true);
+          }}
+          error={!!getErrorMessage() && touched}
+          className="ssi-input"
         />
         <InputError
           showError={!!getErrorMessage() && touched}
