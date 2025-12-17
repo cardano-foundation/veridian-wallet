@@ -446,7 +446,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.CONNECT_URL_DISCOVER_ERROR)
+          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
         );
       });
     });
@@ -502,7 +502,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.FIND_CONNECT_URL_ERROR)
+          setToastMsg(ToastMsgType.URL_ERROR)
         );
       });
     });
@@ -558,7 +558,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.INVALID_BOOT_URL)
+          setToastMsg(ToastMsgType.URL_ERROR)
         );
       });
     });
@@ -616,7 +616,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.INVALID_CONNECT_URL)
+          setToastMsg(ToastMsgType.URL_ERROR)
         );
       });
     });
@@ -674,7 +674,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.INVALID_CONNECT_URL)
+          setToastMsg(ToastMsgType.URL_ERROR)
         );
       });
     });
@@ -1623,7 +1623,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(
-          getByText(EN_TRANSLATIONS.ssiagent.error.unknownissue)
+          getByText(EN_TRANSLATIONS.ssiagent.error.networkissue)
         ).toBeVisible();
       });
     });

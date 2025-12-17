@@ -7,6 +7,7 @@ interface ResponsiveModalProps {
   children?: ReactNode;
   backdropDismiss?: boolean;
   onDismiss?: () => void;
+  onWillDismiss?: () => void;
 }
 
 export type { ResponsiveModalProps };

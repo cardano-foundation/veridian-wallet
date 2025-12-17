@@ -1,6 +1,8 @@
 import { repeatOutline } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { i18n } from "../../../../i18n";
+import { useAppDispatch } from "../../../../store/hooks";
+import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { CustomInput } from "../../../components/CustomInput";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { ResponsivePageLayout } from "../../../components/layout/ResponsivePageLayout";
@@ -9,6 +11,7 @@ import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { Scan } from "../../../components/Scan";
 import { useCameraDirection } from "../../../components/Scan/hook/useCameraDirection";
+import { ToastMsgType } from "../../../globals/types";
 import { combineClassNames } from "../../../utils/style";
 import { isValidHttpUrl } from "../../../utils/urlChecker";
 import { CurrentPage, SSIScanProps } from "../CreateSSIAgent.types";
@@ -27,6 +30,8 @@ const InputError = ({
   );
 };
 
+const FOCUS_OUT_TIME = 200;
+
 const SSIScan = ({
   setCurrentPage,
   onScanFinish,
@@ -34,23 +39,20 @@ const SSIScan = ({
   isRecovery,
 }: SSIScanProps) => {
   const pageId = "ssi-agent-scan";
+  const dispatch = useAppDispatch();
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
     useCameraDirection();
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [touched, setTouched] = useState(false);
+  const modalOpen = useRef(false);
 
-  useEffect(() => {
-    return () => {
-      setOpen(false);
-    };
-  }, []);
-  const [pastedValue, setPastedValue] = useState("");
-
-  const closeInputManualValue = () => {
-    setPastedValue("");
-    setOpen(false);
+  const setOpenModal = (value: boolean) => {
+    modalOpen.current = value;
+    setOpen(value);
   };
+
+  const [pastedValue, setPastedValue] = useState("");
 
   const getErrorMessage = () => {
     if (!pastedValue || !isValidHttpUrl(pastedValue))
@@ -67,6 +69,23 @@ const SSIScan = ({
   const handleConfirm = () => {
     if (!pastedValue || !isValidHttpUrl(pastedValue)) return;
     onScanFinish(pastedValue);
+  };
+
+  const handleChangeFocus = (value: boolean) => {
+    if (!value) {
+      setTouched(true);
+
+      setTimeout(() => {
+        if (!modalOpen.current) {
+          return;
+        }
+
+        const message = getErrorMessage();
+        if (message) {
+          dispatch(setToastMsg(ToastMsgType.URL_ERROR));
+        }
+      }, FOCUS_OUT_TIME);
+    }
   };
 
   return (
@@ -94,7 +113,9 @@ const SSIScan = ({
           hiddenDefaultPasteValueButton
         />
         <PageFooter
-          primaryButtonAction={() => setOpen(true)}
+          primaryButtonAction={() => {
+            setOpenModal(true);
+          }}
           primaryButtonText={`${i18n.t(
             "ssiagent.scanssi.scan.button.entermanual"
           )}`}
@@ -115,7 +136,8 @@ const SSIScan = ({
           pageId + "-input-modal",
           isLoading ? "loading" : undefined
         )}
-        onDismiss={closeInputManualValue}
+        onWillDismiss={closeInputManualValue}
+        backdropDismiss
         header={{
           closeButton: true,
           closeButtonAction: closeInputManualValue,
@@ -133,12 +155,9 @@ const SSIScan = ({
           onChangeInput={setPastedValue}
           value={pastedValue}
           placeholder={`${i18n.t("ssiagent.scanssi.scan.modal.placeholder")}`}
-          onChangeFocus={() => {
-            if (!pastedValue) return;
-            setTouched(true);
-          }}
           error={!!getErrorMessage() && touched}
           className="ssi-input"
+          onChangeFocus={handleChangeFocus}
         />
         <InputError
           showError={!!getErrorMessage() && touched}
