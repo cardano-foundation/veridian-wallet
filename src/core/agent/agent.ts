@@ -1,55 +1,55 @@
 import { Capacitor } from "@capacitor/core";
+import { entropyToMnemonic, mnemonicToEntropy } from "bip39";
 import {
   randomPasscode,
   SignifyClient,
   ready as signifyReady,
   Tier,
 } from "signify-ts";
-import { entropyToMnemonic, mnemonicToEntropy } from "bip39";
-import {
-  AuthService,
-  ConnectionService,
-  CredentialService,
-  IdentifierService,
-  KeriaNotificationService,
-  MultiSigService,
-  IpexCommunicationService,
-} from "./services";
+import { PeerConnection } from "../cardano/walletConnect/peerConnection";
+import { KeyStoreKeys, SecureStorage } from "../storage";
+import { IonicStorage } from "../storage/ionicStorage";
+import { IonicSession } from "../storage/ionicStorage/ionicSession";
+import { SqliteStorage } from "../storage/sqliteStorage";
+import { SqliteSession } from "../storage/sqliteStorage/sqliteSession";
+import { BaseRecord } from "../storage/storage.types";
 import {
   AgentServicesProps,
-  BranAndMnemonic,
   AgentUrls,
-  MiscRecordId,
+  BranAndMnemonic,
   CriticalActionState,
+  MiscRecordId,
 } from "./agent.types";
 import { CoreEventEmitter } from "./event";
+import { EventTypes, KeriaStatusChangedEvent } from "./event.types";
 import {
   BasicRecord,
   BasicStorage,
+  ConnectionPairRecord,
+  ConnectionPairStorage,
+  ContactRecord,
+  ContactStorage,
   CredentialMetadataRecord,
   CredentialStorage,
   IdentifierMetadataRecord,
   IdentifierStorage,
   NotificationRecord,
   NotificationStorage,
-  ContactStorage,
-  ConnectionPairStorage,
-  ContactRecord,
-  ConnectionPairRecord,
   PeerConnectionPairRecord,
   PeerConnectionPairStorage,
 } from "./records";
-import { KeyStoreKeys, SecureStorage } from "../storage";
-import { SqliteSession } from "../storage/sqliteStorage/sqliteSession";
-import { IonicSession } from "../storage/ionicStorage/ionicSession";
-import { IonicStorage } from "../storage/ionicStorage";
-import { SqliteStorage } from "../storage/sqliteStorage";
-import { BaseRecord } from "../storage/storage.types";
-import { OperationPendingStorage } from "./records/operationPendingStorage";
 import { OperationPendingRecord } from "./records/operationPendingRecord";
-import { EventTypes, KeriaStatusChangedEvent } from "./event.types";
+import { OperationPendingStorage } from "./records/operationPendingStorage";
+import {
+  AuthService,
+  ConnectionService,
+  CredentialService,
+  IdentifierService,
+  IpexCommunicationService,
+  KeriaNotificationService,
+  MultiSigService,
+} from "./services";
 import { isNetworkError, OnlineOnly, randomSalt } from "./services/utils";
-import { PeerConnection } from "../cardano/walletConnect/peerConnection";
 
 const walletId = "idw";
 class Agent {
@@ -72,6 +72,8 @@ class Agent {
   static readonly INVALID_MNEMONIC = "Seed phrase is invalid";
   static readonly CONNECT_URL_DISCOVERY_FAILED = "Cannot discover connect URL";
   static readonly CONNECT_URL_NOT_FOUND = "Connect URL not found in response";
+  static readonly CONNECT_URL_DISCOVERY_BAD_NETWORK =
+    "Failed to discover connect URL due to network connectivity";
   static readonly MISSING_DATA_ON_KERIA =
     "Attempted to fetch data by ID on KERIA, but was not found. May indicate stale data records in the local database.";
   static readonly BUFFER_ALLOC_SIZE = 3;
@@ -491,10 +493,21 @@ class Agent {
     const url = new URL(bootUrl);
     const connectEndpoint = `${url.protocol}//${url.host}/connect`;
 
-    const response = await fetch(connectEndpoint, {
-      method: "GET",
-      headers: { Accept: "application/json" },
-    });
+    let response: Response;
+    try {
+      response = await fetch(connectEndpoint, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+    } catch (error) {
+      if (error instanceof Error && isNetworkError(error)) {
+        throw new Error(Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK, {
+          cause: error,
+        });
+      }
+
+      throw error;
+    }
 
     if (!response.ok) {
       throw new Error(

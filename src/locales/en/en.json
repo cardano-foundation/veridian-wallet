@@ -467,7 +467,7 @@
       "invalidconnecturl": "Enter a valid connect URL",
       "mismatchconnecturl": "This connect URL doesn’t match the boot URL",
       "recoverymismatchconnecturl": "Please check this connect URL matches the original boot URL used for onboarding and that your agent is still active",
-      "unknownissue": "We could not reach this server. Either the server is down, you have entered an incorrect URL or you have internet connectivity issues."
+      "networkissue": "We could not reach this server. Either the server is down, you have entered an incorrect URL or you have internet connectivity issues."
     }
   },
   "operationspasswordregex": {
@@ -1535,6 +1535,7 @@
     "duplicateconnectionerror": "Connection already established",
     "groupidnotmatcherror": "Connection not part of this group",
     "unknownerror": "Something went wrong, try again",
+    "urlerror": "Incorrect URL",
     "proposalcredaccepted": "Credential proposal accepted",
     "proposalcredreject": "Credential proposal rejected",
     "proposalcredfailerror": "Unable to record response",
@@ -1549,10 +1550,10 @@
     "groupmetadatanotfounderror": "Group metadata is missing. Please try again.",
     "unabletoaccepterror": "Unable to accept",
     "acceptsuccess": "Accepted Successfully",
-    "connecturldiscovererror": "Failed to discovery connect url",
-    "findconnecturlerror": "Connect URL not found",
-    "invalidbooturlerror": "Invalid boot url",
-    "invalidconnecturlerror": "Invalid connect url"
+    "connecturlmismatch": "There’s a URL mismatch",
+    "invalidbooturlerror": "Incorrect boot url",
+    "invalidconnecturlerror": "Incorrect connect url",
+    "networkerror": "Unable to reach the cloud"
   },
   "request": {
     "sign": {

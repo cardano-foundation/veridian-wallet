@@ -52,13 +52,15 @@ const AdvancedSetting = ({
     bootUrl: ConfigurationService.env?.keri?.keria?.bootUrl || "",
   });
   const stateCache = useAppSelector(getStateCache);
-
   const [connectUrlInputTouched, setConnectUrlTouched] = useState(false);
   const [bootUrlInputTouched, setBootUrlInputTouched] = useState(false);
-  const hasMismatchError = errors.hasMismatchError;
-  const unknownError = errors.unknownError;
-  const isInvalidBootUrl = errors.isInvalidBootUrl;
-  const isInvalidConnectUrl = errors.isInvalidConnectUrl;
+  const {
+    hasMismatchError,
+    networkIssue,
+    isInvalidBootUrl,
+    isInvalidConnectUrl,
+  } = errors;
+
   const isRecoveryMode = stateCache.authentication.recoveryWalletProgress;
 
   const setConnectUrl = (connectUrl?: string) => {
@@ -83,30 +85,32 @@ const AdvancedSetting = ({
     setBootUrlInputTouched(true);
   };
 
-  const validBootUrl =
+  const validInputBootUrl =
     isRecoveryMode || (ssiAgent.bootUrl && isValidHttpUrl(ssiAgent.bootUrl));
 
-  const validConnectUrl =
+  const validInputConnectUrl =
     ssiAgent.connectUrl && isValidHttpUrl(ssiAgent.connectUrl);
 
   const displayBootUrlError =
-    !isRecoveryMode &&
-    bootUrlInputTouched &&
-    ssiAgent.bootUrl &&
-    !isValidHttpUrl(ssiAgent.bootUrl);
+    (!isRecoveryMode &&
+      bootUrlInputTouched &&
+      ssiAgent.bootUrl &&
+      !isValidHttpUrl(ssiAgent.bootUrl)) ||
+    isInvalidBootUrl;
 
   const displayConnectUrlError =
-    connectUrlInputTouched &&
-    ssiAgent.connectUrl &&
-    !isValidHttpUrl(ssiAgent.connectUrl);
+    (connectUrlInputTouched &&
+      ssiAgent.connectUrl &&
+      !isValidHttpUrl(ssiAgent.connectUrl)) ||
+    isInvalidConnectUrl;
 
-  const validated = validBootUrl && validConnectUrl;
+  const validated = validInputBootUrl && validInputConnectUrl;
 
   const handleChangeConnectUrl = (connectionUrl: string) => {
     setErrors({
       isInvalidConnectUrl: false,
       hasMismatchError: false,
-      unknownError: false,
+      networkIssue: false,
     });
     setConnectUrl(connectionUrl);
   };
@@ -122,11 +126,12 @@ const AdvancedSetting = ({
     !!displayConnectUrlError ||
     hasMismatchError ||
     isInvalidConnectUrl ||
-    unknownError;
-
+    networkIssue;
   const connectionUrlError = (() => {
-    if (unknownError) {
-      return "ssiagent.error.unknownissue";
+    if (!showConnectionUrlError) return "";
+
+    if (networkIssue) {
+      return "ssiagent.error.networkissue";
     }
 
     if (hasMismatchError) {
@@ -141,6 +146,15 @@ const AdvancedSetting = ({
     }
 
     return "ssiagent.error.invalidconnecturl";
+  })();
+
+  const bootUrlError = (() => {
+    if (isRecoveryMode || !displayBootUrlError) return "";
+
+    if ((displayBootUrlError || isInvalidBootUrl) && !displayConnectUrlError)
+      return "ssiagent.error.invalidbooturl";
+
+    return "ssiagent.error.invalidurl";
   })();
 
   const handleConnect = () => {
@@ -200,16 +214,11 @@ const AdvancedSetting = ({
                 setBootUrl(removeLastSlash(ssiAgent.bootUrl.trim()));
               }
             }}
-            error={!!displayBootUrlError || isInvalidBootUrl}
+            error={displayBootUrlError}
           />
           <InputError
-            showError={!!displayBootUrlError || isInvalidBootUrl}
-            errorMessage={
-              (displayBootUrlError || isInvalidBootUrl) &&
-              !displayConnectUrlError
-                ? `${i18n.t("ssiagent.error.invalidbooturl")}`
-                : `${i18n.t("ssiagent.error.invalidurl")}`
-            }
+            showError={displayBootUrlError}
+            errorMessage={`${i18n.t(bootUrlError)}`}
           />
         </>
       )}

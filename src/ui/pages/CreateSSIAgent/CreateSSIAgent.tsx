@@ -47,6 +47,7 @@ const CreateSSIAgent = () => {
     isInvalidConnectUrl: false,
     failedDiscoveryConnectUrl: false,
     connectURlNotFound: false,
+    networkIssue: false,
   });
   const [currentPage, setCurrentPage] = useState(CurrentPage.Connect);
 
@@ -63,37 +64,25 @@ const CreateSSIAgent = () => {
   const handleScanError = (error: Error) => {
     const errorMessage = error.message;
 
-    if (errorMessage.includes(Agent.CONNECT_URL_DISCOVERY_FAILED)) {
-      showError(
-        errorMessage,
-        error,
-        dispatch,
-        ToastMsgType.CONNECT_URL_DISCOVER_ERROR
-      );
+    if (
+      [
+        Agent.CONNECT_URL_NOT_FOUND,
+        Agent.KERIA_BOOT_FAILED,
+        Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT,
+      ].some((message) => errorMessage.includes(message))
+    ) {
+      showError(errorMessage, error, dispatch, ToastMsgType.URL_ERROR);
       return;
     }
 
-    if (errorMessage.includes(Agent.CONNECT_URL_NOT_FOUND)) {
-      showError(
-        errorMessage,
-        error,
-        dispatch,
-        ToastMsgType.FIND_CONNECT_URL_ERROR
-      );
-      return;
-    }
-
-    if (Agent.KERIA_BOOT_FAILED === errorMessage) {
-      showError(errorMessage, error, dispatch, ToastMsgType.INVALID_BOOT_URL);
-    }
-
-    if (Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT === errorMessage) {
-      showError(
-        errorMessage,
-        error,
-        dispatch,
-        ToastMsgType.INVALID_CONNECT_URL
-      );
+    if (
+      [
+        Agent.KERIA_BOOT_FAILED_BAD_NETWORK,
+        Agent.KERIA_CONNECT_FAILED_BAD_NETWORK,
+        Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK,
+      ].some((message) => errorMessage.includes(message))
+    ) {
+      showError(errorMessage, error, dispatch, ToastMsgType.NETWORK_ERROR);
       return;
     }
 
@@ -108,28 +97,31 @@ const CreateSSIAgent = () => {
   const handleError = (error: Error) => {
     const errorMessage = error.message;
 
-    if (errorMessage.includes(Agent.CONNECT_URL_DISCOVERY_FAILED)) {
-      setSSIError({
-        failedDiscoveryConnectUrl: true,
-      });
-    }
-
     if (Agent.KERIA_BOOT_FAILED === errorMessage) {
       setSSIError({
         isInvalidBootUrl: true,
       });
-    }
-
-    if (Agent.KERIA_NOT_BOOTED === errorMessage) {
-      setSSIError({
-        hasMismatchError: true,
-      });
+      return;
     }
 
     if (Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT === errorMessage) {
       setSSIError({
         isInvalidConnectUrl: true,
       });
+      return;
+    }
+
+    if (Agent.KERIA_NOT_BOOTED === errorMessage) {
+      showError(
+        errorMessage,
+        error,
+        dispatch,
+        ToastMsgType.CONNECT_URL_MISMATCH
+      );
+      setSSIError({
+        hasMismatchError: true,
+      });
+      return;
     }
 
     if (
@@ -138,10 +130,10 @@ const CreateSSIAgent = () => {
         Agent.KERIA_CONNECT_FAILED_BAD_NETWORK,
       ].includes(errorMessage)
     ) {
+      showError(errorMessage, error, dispatch, ToastMsgType.NETWORK_ERROR);
       setSSIError({
-        unknownError: true,
+        networkIssue: true,
       });
-      showError("Bad network", error);
       return;
     }
 
@@ -213,7 +205,7 @@ const CreateSSIAgent = () => {
         return bootUrl;
       }
 
-      return null;
+      throw e;
     }
   };
 
@@ -268,10 +260,6 @@ const CreateSSIAgent = () => {
       const validBootUrl = removeLastSlash(bootUrl.trim());
 
       const connectUrl = await getConnectUrl(validBootUrl);
-
-      if (!connectUrl) {
-        throw new Error(Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT);
-      }
 
       await Agent.agent.recoverKeriaAgent(
         seedPhraseCache.seedPhrase.split(" "),

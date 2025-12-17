@@ -36,6 +36,7 @@ interface SSIError {
   isInvalidConnectUrl: boolean;
   failedDiscoveryConnectUrl: boolean;
   connectURlNotFound: boolean;
+  networkIssue: boolean;
 }
 
 enum CurrentPage {

@@ -1,9 +1,4 @@
-import {
-  Dispatch,
-  MouseEvent as ReactMouseEvent,
-  ReactNode,
-  SetStateAction,
-} from "react";
+import { MouseEvent as ReactMouseEvent, ReactNode } from "react";
 
 type TextFieldTypes =
   | "date"
@@ -38,7 +33,7 @@ interface CustomInputProps {
   hiddenInput?: boolean;
   value: string;
   onChangeInput: (text: string) => void;
-  onChangeFocus?: Dispatch<SetStateAction<boolean>>;
+  onChangeFocus?: (value: boolean) => void;
   optional?: boolean;
   error?: boolean;
   actionIcon?: string;

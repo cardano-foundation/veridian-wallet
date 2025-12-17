@@ -446,7 +446,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.CONNECT_URL_DISCOVER_ERROR)
+          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
         );
       });
     });
@@ -502,7 +502,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.FIND_CONNECT_URL_ERROR)
+          setToastMsg(ToastMsgType.URL_ERROR)
         );
       });
     });
@@ -558,7 +558,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.INVALID_BOOT_URL)
+          setToastMsg(ToastMsgType.URL_ERROR)
         );
       });
     });
@@ -616,7 +616,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.INVALID_CONNECT_URL)
+          setToastMsg(ToastMsgType.URL_ERROR)
         );
       });
     });
@@ -674,7 +674,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.INVALID_CONNECT_URL)
+          setToastMsg(ToastMsgType.URL_ERROR)
         );
       });
     });
@@ -1008,7 +1008,58 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.INVALID_CONNECT_URL)
+          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
+        );
+      });
+    });
+
+    test("Show a toast error when a network error is thrown", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      discoverConnectUrlMock.mockImplementation(() => {
+        return Promise.reject(
+          new Error(Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK)
+        );
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.NETWORK_ERROR)
         );
       });
     });
@@ -1572,7 +1623,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(
-          getByText(EN_TRANSLATIONS.ssiagent.error.unknownissue)
+          getByText(EN_TRANSLATIONS.ssiagent.error.networkissue)
         ).toBeVisible();
       });
     });

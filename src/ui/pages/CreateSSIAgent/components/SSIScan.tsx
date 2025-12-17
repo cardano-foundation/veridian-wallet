@@ -1,5 +1,5 @@
 import { repeatOutline } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { i18n } from "../../../../i18n";
 import { CustomInput } from "../../../components/CustomInput";
 import { ErrorMessage } from "../../../components/ErrorMessage";
@@ -40,11 +40,10 @@ const SSIScan = ({
   const [isOpen, setOpen] = useState(false);
   const [touched, setTouched] = useState(false);
 
-  useEffect(() => {
-    return () => {
-      setOpen(false);
-    };
-  }, []);
+  const setOpenModal = (value: boolean) => {
+    setOpen(value);
+  };
+
   const [pastedValue, setPastedValue] = useState("");
 
   const getErrorMessage = () => {
@@ -62,6 +61,12 @@ const SSIScan = ({
   const handleConfirm = () => {
     if (!pastedValue || !isValidHttpUrl(pastedValue)) return;
     onScanFinish(pastedValue);
+  };
+
+  const handleChangeFocus = (value: boolean) => {
+    if (!value) {
+      setTouched(true);
+    }
   };
 
   return (
@@ -89,7 +94,9 @@ const SSIScan = ({
           hiddenDefaultPasteValueButton
         />
         <PageFooter
-          primaryButtonAction={() => setOpen(true)}
+          primaryButtonAction={() => {
+            setOpenModal(true);
+          }}
           primaryButtonText={`${i18n.t(
             "ssiagent.scanssi.scan.button.entermanual"
           )}`}
@@ -111,6 +118,7 @@ const SSIScan = ({
           isLoading ? "loading" : undefined
         )}
         onDismiss={closeInputManualValue}
+        backdropDismiss
         header={{
           closeButton: true,
           closeButtonAction: closeInputManualValue,
@@ -128,12 +136,9 @@ const SSIScan = ({
           onChangeInput={setPastedValue}
           value={pastedValue}
           placeholder={`${i18n.t("ssiagent.scanssi.scan.modal.placeholder")}`}
-          onChangeFocus={() => {
-            if (!pastedValue) return;
-            setTouched(true);
-          }}
           error={!!getErrorMessage() && touched}
           className="ssi-input"
+          onChangeFocus={handleChangeFocus}
         />
         <InputError
           showError={!!getErrorMessage() && touched}
