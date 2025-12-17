@@ -1,8 +1,6 @@
 import { repeatOutline } from "ionicons/icons";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { i18n } from "../../../../i18n";
-import { useAppDispatch } from "../../../../store/hooks";
-import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { CustomInput } from "../../../components/CustomInput";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { ResponsivePageLayout } from "../../../components/layout/ResponsivePageLayout";
@@ -11,7 +9,6 @@ import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { Scan } from "../../../components/Scan";
 import { useCameraDirection } from "../../../components/Scan/hook/useCameraDirection";
-import { ToastMsgType } from "../../../globals/types";
 import { combineClassNames } from "../../../utils/style";
 import { isValidHttpUrl } from "../../../utils/urlChecker";
 import { CurrentPage, SSIScanProps } from "../CreateSSIAgent.types";
@@ -30,8 +27,6 @@ const InputError = ({
   );
 };
 
-const FOCUS_OUT_TIME = 200;
-
 const SSIScan = ({
   setCurrentPage,
   onScanFinish,
@@ -39,16 +34,13 @@ const SSIScan = ({
   isRecovery,
 }: SSIScanProps) => {
   const pageId = "ssi-agent-scan";
-  const dispatch = useAppDispatch();
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
     useCameraDirection();
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [touched, setTouched] = useState(false);
-  const modalOpen = useRef(false);
 
   const setOpenModal = (value: boolean) => {
-    modalOpen.current = value;
     setOpen(value);
   };
 
@@ -74,17 +66,6 @@ const SSIScan = ({
   const handleChangeFocus = (value: boolean) => {
     if (!value) {
       setTouched(true);
-
-      setTimeout(() => {
-        if (!modalOpen.current) {
-          return;
-        }
-
-        const message = getErrorMessage();
-        if (message) {
-          dispatch(setToastMsg(ToastMsgType.URL_ERROR));
-        }
-      }, FOCUS_OUT_TIME);
     }
   };
 
@@ -136,7 +117,7 @@ const SSIScan = ({
           pageId + "-input-modal",
           isLoading ? "loading" : undefined
         )}
-        onWillDismiss={closeInputManualValue}
+        onDismiss={closeInputManualValue}
         backdropDismiss
         header={{
           closeButton: true,

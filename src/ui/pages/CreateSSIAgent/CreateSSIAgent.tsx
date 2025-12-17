@@ -98,7 +98,6 @@ const CreateSSIAgent = () => {
     const errorMessage = error.message;
 
     if (Agent.KERIA_BOOT_FAILED === errorMessage) {
-      showError(errorMessage, error, dispatch, ToastMsgType.INVALID_BOOT_URL);
       setSSIError({
         isInvalidBootUrl: true,
       });
@@ -106,12 +105,6 @@ const CreateSSIAgent = () => {
     }
 
     if (Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT === errorMessage) {
-      showError(
-        errorMessage,
-        error,
-        dispatch,
-        ToastMsgType.INVALID_CONNECT_URL
-      );
       setSSIError({
         isInvalidConnectUrl: true,
       });

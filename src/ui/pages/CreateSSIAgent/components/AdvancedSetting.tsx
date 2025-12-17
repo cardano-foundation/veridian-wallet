@@ -2,17 +2,13 @@ import { useState } from "react";
 import { ConfigurationService } from "../../../../core/configuration";
 import { i18n } from "../../../../i18n";
 import { RoutePath } from "../../../../routes";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import {
-  getStateCache,
-  setToastMsg,
-} from "../../../../store/reducers/stateCache";
+import { useAppSelector } from "../../../../store/hooks";
+import { getStateCache } from "../../../../store/reducers/stateCache";
 import { CustomInput } from "../../../components/CustomInput";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { ScrollablePageLayout } from "../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
-import { ToastMsgType } from "../../../globals/types";
 import { isValidHttpUrl } from "../../../utils/urlChecker";
 import {
   AdvancedSettingProps,
@@ -56,7 +52,6 @@ const AdvancedSetting = ({
     bootUrl: ConfigurationService.env?.keri?.keria?.bootUrl || "",
   });
   const stateCache = useAppSelector(getStateCache);
-  const dispatch = useAppDispatch();
   const [connectUrlInputTouched, setConnectUrlTouched] = useState(false);
   const [bootUrlInputTouched, setBootUrlInputTouched] = useState(false);
   const {
@@ -166,18 +161,6 @@ const AdvancedSetting = ({
     onSubmitForm(ssiAgent.bootUrl, ssiAgent.connectUrl);
   };
 
-  const showBootErrorToast = () => {
-    if (bootUrlError === "ssiagent.error.invalidbooturl") {
-      dispatch(setToastMsg(ToastMsgType.INVALID_BOOT_URL));
-    }
-  };
-
-  const showConnectErrorToast = () => {
-    if (connectionUrlError === "ssiagent.error.invalidconnecturl") {
-      dispatch(setToastMsg(ToastMsgType.INVALID_CONNECT_URL));
-    }
-  };
-
   return (
     <ScrollablePageLayout
       pageId={pageId}
@@ -230,10 +213,6 @@ const AdvancedSetting = ({
               if (!result && ssiAgent.bootUrl) {
                 setBootUrl(removeLastSlash(ssiAgent.bootUrl.trim()));
               }
-
-              if (!result) {
-                showBootErrorToast();
-              }
             }}
             error={displayBootUrlError}
           />
@@ -256,10 +235,6 @@ const AdvancedSetting = ({
 
           if (!result && ssiAgent.connectUrl) {
             setConnectUrl(removeLastSlash(ssiAgent.connectUrl.trim()));
-          }
-
-          if (!result) {
-            showConnectErrorToast();
           }
         }}
         value={ssiAgent.connectUrl || ""}
