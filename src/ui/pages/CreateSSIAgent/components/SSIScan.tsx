@@ -128,11 +128,12 @@ const SSIScan = ({
           onChangeInput={setPastedValue}
           value={pastedValue}
           placeholder={`${i18n.t("ssiagent.scanssi.scan.modal.placeholder")}`}
-          onChangeFocus={(focusValue) => {
+          onChangeFocus={() => {
             if (!pastedValue) return;
-            if (focusValue) setTouched(true);
+            setTouched(true);
           }}
           error={!!getErrorMessage() && touched}
+          className="ssi-input"
         />
         <InputError
           showError={!!getErrorMessage() && touched}

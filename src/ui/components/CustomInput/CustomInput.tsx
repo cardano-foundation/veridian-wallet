@@ -42,22 +42,8 @@ const CustomInput = ({
 
   return (
     <IonItem className={inputClassname}>
-      {!labelAction ? (
-        <IonLabel
-          position="stacked"
-          data-testid={`${title
-            ?.toLowerCase()
-            .replace(/\s/g, "-")}-input-title`}
-        >
-          {title}
-          {optional && (
-            <span className="custom-input-optional">
-              {i18n.t("custominput.optional")}
-            </span>
-          )}
-        </IonLabel>
-      ) : (
-        <div className="input-label">
+      {title &&
+        (!labelAction ? (
           <IonLabel
             position="stacked"
             data-testid={`${title
@@ -71,9 +57,24 @@ const CustomInput = ({
               </span>
             )}
           </IonLabel>
-          {labelAction}
-        </div>
-      )}
+        ) : (
+          <div className="input-label">
+            <IonLabel
+              position="stacked"
+              data-testid={`${title
+                ?.toLowerCase()
+                .replace(/\s/g, "-")}-input-title`}
+            >
+              {title}
+              {optional && (
+                <span className="custom-input-optional">
+                  {i18n.t("custominput.optional")}
+                </span>
+              )}
+            </IonLabel>
+            {labelAction}
+          </div>
+        ))}
       <div className="input-line">
         <IonInput
           id={dataTestId}
