@@ -1,26 +1,15 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
-import { MiscRecordId } from "../../../core/agent/agent.types";
-import { BasicRecord } from "../../../core/agent/records";
 import { AuthService } from "../../../core/agent/services";
 import { KeyStoreKeys } from "../../../core/storage";
 import { i18n } from "../../../i18n";
 import { useAppDispatch } from "../../../store/hooks";
-import { setEnableBiometricsCache } from "../../../store/reducers/biometricsCache";
-import { setToastMsg } from "../../../store/reducers/stateCache";
-import { ToastMsgType } from "../../globals/types";
-import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
-import {
-  BiometricAuthOutcome,
-  useBiometricAuth,
-} from "../../hooks/useBiometricsHook";
 import { showError } from "../../utils/error";
 import {
   isConsecutive,
   isRepeat,
   isReverseConsecutive,
 } from "../../utils/passcodeChecker";
-import { Alert } from "../Alert";
 import { ErrorMessage, MESSAGE_MILLISECONDS } from "../ErrorMessage";
 import { PageFooter } from "../PageFooter";
 import { PasscodeModule } from "../PasscodeModule";
@@ -33,278 +22,177 @@ import {
 const CreatePasscodeModule = forwardRef<
   CreatePasscodeModuleRef,
   CreatePasscodeModuleProps
->(
-  (
-    {
-      testId,
-      title,
-      description,
-      overrideAlertZIndex,
-      changePasscodeMode,
-      onCreateSuccess,
-      onPasscodeChange,
-    },
-    ref
-  ) => {
-    const dispatch = useAppDispatch();
-    const [passcode, setPasscode] = useState("");
-    const [passcodeMatch, setPasscodeMatch] = useState(false);
-    const [showSetupBiometricsAlert, setShowSetupBiometricsAlert] =
-      useState(false);
-    const [showCancelBiometricsAlert, setShowCancelBiometricsAlert] =
-      useState(false);
-    const [originalPassCode, setOriginalPassCode] = useState("");
-    const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
-    const { handleBiometricAuth, biometricInfo } = useBiometricAuth();
+>(({ testId, title, description, onCreateSuccess, onPasscodeChange }, ref) => {
+  const dispatch = useAppDispatch();
+  const [passcode, setPasscode] = useState("");
+  const [passcodeMatch, setPasscodeMatch] = useState(false);
+  const [originalPassCode, setOriginalPassCode] = useState("");
 
-    const setupBiometricsHeaderText = i18n.t("biometry.setupbiometryheader");
+  useEffect(() => {
+    if (passcodeMatch) {
+      setTimeout(() => {
+        setPasscodeMatch(false);
+      }, MESSAGE_MILLISECONDS);
+    }
+  }, [passcodeMatch]);
 
-    const setupBiometricsConfirmtext = i18n.t("biometry.setupbiometryconfirm");
-    const setupBiometricsCanceltext = i18n.t("biometry.setupbiometrycancel");
-
-    const alertClasses = overrideAlertZIndex ? "max-zindex" : undefined;
-    const cancelBiometricsHeaderText = i18n.t("biometry.cancelbiometryheader");
-    const cancelBiometricsConfirmText = setupBiometricsConfirmtext;
-
-    useEffect(() => {
-      if (passcodeMatch) {
-        setTimeout(() => {
-          setPasscodeMatch(false);
-        }, MESSAGE_MILLISECONDS);
-      }
-    }, [passcodeMatch]);
-
-    const handlePinChange = async (digit: number) => {
-      if (passcode.length < 6) {
-        setPasscode(passcode + digit);
-        if (originalPassCode !== "" && passcode.length === 5) {
-          if (originalPassCode === passcode + digit) {
-            if (biometricInfo.isAvailable && !changePasscodeMode) {
-              setShowSetupBiometricsAlert(true);
-            } else {
-              await handlePassAuth();
-            }
-          }
+  const handlePinChange = async (digit: number) => {
+    if (passcode.length < 6) {
+      setPasscode(passcode + digit);
+      if (originalPassCode !== "" && passcode.length === 5) {
+        if (originalPassCode === passcode + digit) {
+          await handlePassAuth();
         }
       }
-    };
+    }
+  };
 
-    const processBiometrics = async () => {
-      let biometricOutcome: BiometricAuthOutcome =
-        BiometricAuthOutcome.GENERIC_ERROR;
-      try {
-        await disablePrivacy();
-        biometricOutcome = await handleBiometricAuth();
-      } finally {
-        await enablePrivacy();
-      }
+  const handlePassAuth = async () => {
+    try {
+      await Agent.agent.auth.storeSecret(
+        KeyStoreKeys.APP_PASSCODE,
+        originalPassCode
+      );
+      onCreateSuccess();
+    } catch (e) {
+      showError(i18n.t("createpasscodemodule.saveFailed"), e, dispatch);
+    }
+  };
 
-      if (biometricOutcome === BiometricAuthOutcome.SUCCESS) {
-        await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-          new BasicRecord({
-            id: MiscRecordId.APP_BIOMETRY,
-            content: { enabled: true },
-          })
-        );
-        dispatch(setEnableBiometricsCache(true));
-        dispatch(
-          setToastMsg(ToastMsgType.SETUP_BIOMETRIC_AUTHENTICATION_SUCCESS)
-        );
-        await handlePassAuth();
-      } else if (biometricOutcome === BiometricAuthOutcome.USER_CANCELLED) {
-        setShowCancelBiometricsAlert(true);
-      } else {
-        showError(
-          i18n.t("biometry.errors.toggleFailed"),
-          new Error("Biometrics authentication failed"),
-          dispatch
-        );
-      }
-    };
+  const handleRemove = () => {
+    if (passcode.length >= 1) {
+      setPasscode(passcode.substring(0, passcode.length - 1));
+    }
+  };
 
-    const handlePassAuth = async () => {
-      try {
-        await Agent.agent.auth.storeSecret(
-          KeyStoreKeys.APP_PASSCODE,
-          originalPassCode
-        );
-        onCreateSuccess();
-      } catch (e) {
-        showError(i18n.t("createpasscodemodule.saveFailed"), e, dispatch);
-      }
-    };
+  const handleClearState = () => {
+    setPasscode("");
+    setOriginalPassCode("");
+  };
 
-    const handleSetupAndroidBiometrics = async () => {
-      await processBiometrics();
-    };
+  useImperativeHandle(ref, () => ({
+    clearState: handleClearState,
+  }));
 
-    const handleCancelSetupAndroidBiometrics = async () => {
-      setShowCancelBiometricsAlert(true);
-    };
+  useEffect(() => {
+    if (
+      passcode.length === 6 &&
+      (isRepeat(passcode) ||
+        isConsecutive(passcode) ||
+        isReverseConsecutive(passcode))
+    ) {
+      return;
+    }
 
-    const handleCancelBiometrics = async () => {
-      await handlePassAuth();
-    };
+    onPasscodeChange?.(passcode, originalPassCode);
 
-    const handleRemove = () => {
-      if (passcode.length >= 1) {
-        setPasscode(passcode.substring(0, passcode.length - 1));
-      }
-    };
-
-    const handleClearState = () => {
-      setPasscode("");
-      setOriginalPassCode("");
-      setShowCancelBiometricsAlert(false);
-      setShowSetupBiometricsAlert(false);
-    };
-
-    useImperativeHandle(ref, () => ({
-      clearState: handleClearState,
-    }));
-
-    useEffect(() => {
-      if (
-        passcode.length === 6 &&
-        (isRepeat(passcode) ||
-          isConsecutive(passcode) ||
-          isReverseConsecutive(passcode))
-      ) {
-        return;
-      }
-
-      onPasscodeChange?.(passcode, originalPassCode);
-
-      if (passcode.length === 6 && originalPassCode === "") {
-        Agent.agent.auth
-          .verifySecret(KeyStoreKeys.APP_PASSCODE, passcode)
-          .then((match) => {
-            if (match) {
-              setPasscodeMatch(true);
-              setTimeout(() => {
-                setPasscode("");
-              }, MESSAGE_MILLISECONDS);
-            } else {
-              setOriginalPassCode(passcode);
+    if (passcode.length === 6 && originalPassCode === "") {
+      Agent.agent.auth
+        .verifySecret(KeyStoreKeys.APP_PASSCODE, passcode)
+        .then((match) => {
+          if (match) {
+            setPasscodeMatch(true);
+            setTimeout(() => {
               setPasscode("");
-            }
-          })
-          .catch((error) => {
-            if (
-              !(
-                error instanceof Error &&
-                error.message.startsWith(AuthService.SECRET_NOT_STORED)
-              )
-            ) {
-              throw error;
-            }
+            }, MESSAGE_MILLISECONDS);
+          } else {
             setOriginalPassCode(passcode);
             setPasscode("");
-          });
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [originalPassCode, passcode]);
-
-    const errorMessage = () => {
-      const resetPasscode = () => {
-        setTimeout(() => {
+          }
+        })
+        .catch((error) => {
+          if (
+            !(
+              error instanceof Error &&
+              error.message.startsWith(AuthService.SECRET_NOT_STORED)
+            )
+          ) {
+            throw error;
+          }
+          setOriginalPassCode(passcode);
           setPasscode("");
-        }, MESSAGE_MILLISECONDS);
-      };
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [originalPassCode, passcode]);
 
-      const getErrorMessage = () => {
-        if (passcodeMatch) {
-          return i18n.t("createpasscodemodule.errormatch");
-        }
-
-        if (passcode.length === 6) {
-          if (isRepeat(passcode)) {
-            return i18n.t("createpasscodemodule.repeat");
-          }
-
-          if (isConsecutive(passcode) || isReverseConsecutive(passcode)) {
-            return i18n.t("createpasscodemodule.consecutive");
-          }
-        }
-
-        if (originalPassCode !== "" && passcode.length === 6) {
-          if (originalPassCode !== passcode) {
-            return i18n.t("createpasscodemodule.errornomatch");
-          }
-        }
-
-        return undefined;
-      };
-
-      const errorMessage = getErrorMessage();
-      if (errorMessage) {
-        resetPasscode();
-      }
-
-      return errorMessage;
+  const errorMessage = () => {
+    const resetPasscode = () => {
+      setTimeout(() => {
+        setPasscode("");
+      }, MESSAGE_MILLISECONDS);
     };
 
-    return (
-      <div className="create-passcode-module">
-        {title && (
-          <h2
-            className="set-passcode-title"
-            data-testid={`${testId}-title`}
-          >
-            {title}
-          </h2>
-        )}
-        {description && (
-          <p
-            className="set-passcode-description small-hide"
-            data-testid="set-passcode-description"
-          >
-            {description}
-          </p>
-        )}
-        <PasscodeModule
-          error={
-            <ErrorMessage
-              message={errorMessage()}
-              timeout={true}
-            />
-          }
-          hasError={!!errorMessage()}
-          passcode={passcode}
-          handlePinChange={handlePinChange}
-          handleRemove={handleRemove}
-        />
-        <PageFooter
-          pageId={testId}
-          customClass={originalPassCode === "" ? "hide " : ""}
-          tertiaryButtonText={`${i18n.t("createpasscodemodule.cantremember")}`}
-          tertiaryButtonAction={() => handleClearState()}
-        />
-        <Alert
-          isOpen={showSetupBiometricsAlert}
-          setIsOpen={setShowSetupBiometricsAlert}
-          dataTestId="alert-setup-biometry"
-          headerText={setupBiometricsHeaderText}
-          confirmButtonText={setupBiometricsConfirmtext}
-          cancelButtonText={setupBiometricsCanceltext}
-          actionConfirm={handleSetupAndroidBiometrics}
-          actionCancel={handleCancelSetupAndroidBiometrics}
-          backdropDismiss={false}
-          className={alertClasses}
-        />
-        <Alert
-          isOpen={showCancelBiometricsAlert}
-          setIsOpen={setShowCancelBiometricsAlert}
-          dataTestId="alert-cancel-biometry"
-          headerText={cancelBiometricsHeaderText}
-          confirmButtonText={cancelBiometricsConfirmText}
-          actionConfirm={handleCancelBiometrics}
-          backdropDismiss={false}
-          className={alertClasses}
-        />
-      </div>
-    );
-  }
-);
+    const getErrorMessage = () => {
+      if (passcodeMatch) {
+        return i18n.t("createpasscodemodule.errormatch");
+      }
+
+      if (passcode.length === 6) {
+        if (isRepeat(passcode)) {
+          return i18n.t("createpasscodemodule.repeat");
+        }
+
+        if (isConsecutive(passcode) || isReverseConsecutive(passcode)) {
+          return i18n.t("createpasscodemodule.consecutive");
+        }
+      }
+
+      if (originalPassCode !== "" && passcode.length === 6) {
+        if (originalPassCode !== passcode) {
+          return i18n.t("createpasscodemodule.errornomatch");
+        }
+      }
+
+      return undefined;
+    };
+
+    const errorMessage = getErrorMessage();
+    if (errorMessage) {
+      resetPasscode();
+    }
+
+    return errorMessage;
+  };
+
+  return (
+    <div className="create-passcode-module">
+      {title && (
+        <h2
+          className="set-passcode-title"
+          data-testid={`${testId}-title`}
+        >
+          {title}
+        </h2>
+      )}
+      {description && (
+        <p
+          className="set-passcode-description small-hide"
+          data-testid="set-passcode-description"
+        >
+          {description}
+        </p>
+      )}
+      <PasscodeModule
+        error={
+          <ErrorMessage
+            message={errorMessage()}
+            timeout={true}
+          />
+        }
+        hasError={!!errorMessage()}
+        passcode={passcode}
+        handlePinChange={handlePinChange}
+        handleRemove={handleRemove}
+      />
+      <PageFooter
+        pageId={testId}
+        customClass={originalPassCode === "" ? "hide " : ""}
+        tertiaryButtonText={`${i18n.t("createpasscodemodule.cantremember")}`}
+        tertiaryButtonAction={() => handleClearState()}
+      />
+    </div>
+  );
+});
 
 export { CreatePasscodeModule };

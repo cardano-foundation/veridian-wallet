@@ -122,7 +122,6 @@ const SetPasscode = () => {
             originalPasscode,
           });
         }}
-        changePasscodeMode
       />
     </ResponsivePageLayout>
   );

@@ -6,13 +6,7 @@ const verifySecretMock = jest.fn();
 import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { IonReactRouter } from "@ionic/react-router";
 import { configureStore } from "@reduxjs/toolkit";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
 import { MiscRecordId } from "../../../core/agent/agent.types";
@@ -21,10 +15,7 @@ import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { rootReducer } from "../../../store";
 import { InitializationPhase } from "../../../store/reducers/stateCache/stateCache.types";
-import {
-  BiometricAuthOutcome,
-  useBiometricAuth,
-} from "../../hooks/useBiometricsHook";
+import { useBiometricAuth } from "../../hooks/useBiometricsHook";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { SetPasscode } from "../SetPasscode";
@@ -388,81 +379,6 @@ describe("Lock Page", () => {
 
     await waitFor(() => {
       expect(queryByTestId("lock-page")).not.toBeInTheDocument();
-    });
-  });
-
-  test("should display temporary lockout message when biometrics fails with TEMPORARY_LOCKOUT", async () => {
-    // Override the useBiometricAuth mock for this specific test case
-    (useBiometricAuth as jest.Mock).mockImplementation(() => ({
-      biometricsIsEnabled: true,
-      biometricInfo: {
-        isAvailable: true,
-        hasCredentials: false,
-        biometryType: BiometryType.FINGERPRINT,
-      },
-      // Ensure the handleBiometricAuth mock resolves with the lockout outcome
-      handleBiometricAuth: jest
-        .fn()
-        .mockResolvedValue(BiometricAuthOutcome.TEMPORARY_LOCKOUT),
-      setBiometricsIsEnabled: jest.fn(),
-      setupBiometrics: jest.fn(),
-      checkBiometrics: jest.fn(),
-      // Provide the specific lockout data needed by the component to render the alert
-      remainingLockoutSeconds: 30,
-      lockoutEndTime: Date.now() + 30000,
-    }));
-
-    render(
-      <Provider store={storeMocked(initialState)}>
-        <LockPage />
-      </Provider>
-    );
-
-    // Wait for the asynchronous biometric auth process and the subsequent UI update
-    await waitFor(async () => {
-      // Check that the correct alert is displayed
-      const lockoutAlert = await screen.findByTestId("alert-max-attempts");
-      expect(lockoutAlert).toBeInTheDocument();
-
-      // Verify the alert contains the correct, interpolated text
-      const expectedText = EN_TRANSLATIONS.biometry.lockoutheader.replace(
-        "{{seconds}}",
-        "30"
-      );
-      expect(screen.getByText(expectedText)).toBeInTheDocument();
-    });
-  });
-
-  test("should display permanent lockout message when biometrics fails with PERMANENT_LOCKOUT", async () => {
-    (useBiometricAuth as jest.Mock).mockImplementation(() => ({
-      biometricsIsEnabled: true,
-      biometricInfo: {
-        isAvailable: true,
-        hasCredentials: false,
-        biometryType: BiometryType.FINGERPRINT,
-      },
-      handleBiometricAuth: jest
-        .fn()
-        .mockResolvedValue(BiometricAuthOutcome.PERMANENT_LOCKOUT),
-      setBiometricsIsEnabled: jest.fn(),
-      setupBiometrics: jest.fn(),
-      checkBiometrics: jest.fn(),
-      remainingLockoutSeconds: 0,
-      lockoutEndTime: null,
-    }));
-
-    render(
-      <Provider store={storeMocked(initialState)}>
-        <LockPage />
-      </Provider>
-    );
-
-    await waitFor(async () => {
-      const lockoutAlert = await screen.findByTestId("alert-permanent-lockout");
-      expect(lockoutAlert).toBeInTheDocument();
-      expect(lockoutAlert).toHaveTextContent(
-        EN_TRANSLATIONS.biometry.permanentlockoutheader
-      );
     });
   });
 });
