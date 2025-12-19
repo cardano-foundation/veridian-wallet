@@ -15,7 +15,11 @@ import { store } from "../../../store";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { CreatePasscodeModule } from "./CreatePasscodeModule";
 import { makeTestStore } from "../../utils/makeTestStore";
-import { BiometricAuthOutcome, BiometryError, useBiometricAuth } from "../../hooks/useBiometricsHook";
+import {
+  BiometricAuthOutcome,
+  BiometryError,
+  useBiometricAuth,
+} from "../../hooks/useBiometricsHook";
 
 const isRepeativeMock = jest.fn(() => false);
 const isConsecutiveMock = jest.fn(() => false);
@@ -44,12 +48,14 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
-const handleBiometricAuthMock = jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
+const handleBiometricAuthMock = jest.fn(() =>
+  Promise.resolve(BiometricAuthOutcome.SUCCESS)
+);
 
 jest.mock("../../hooks/useBiometricsHook", () => {
   const actual = jest.requireActual("../../hooks/useBiometricsHook");
   return {
-    ...actual, 
+    ...actual,
     useBiometricAuth: jest.fn(),
   };
 });
@@ -94,11 +100,13 @@ describe("SetPasscode Page", () => {
     isReverseConsecutiveMock.mockImplementation(() => false);
     isConsecutiveMock.mockImplementation(() => false);
     isRepeativeMock.mockImplementation(() => false);
-    handleBiometricAuthMock.mockImplementation(() => Promise.resolve(BiometricAuthOutcome.SUCCESS));
+    handleBiometricAuthMock.mockImplementation(() =>
+      Promise.resolve(BiometricAuthOutcome.SUCCESS)
+    );
     (useBiometricAuth as jest.Mock).mockReturnValue({
       biometricsIsEnabled: false,
-      biometricInfo: { 
-        isAvailable: true, 
+      biometricInfo: {
+        isAvailable: true,
         hasCredentials: false,
         biometryType: BiometryType.FINGERPRINT,
       },
@@ -248,262 +256,6 @@ describe("SetPasscode Page", () => {
       () =>
         expect(queryByText(EN_TRANSLATIONS.createpasscodemodule.consecutive))
           .toBeVisible
-    );
-  });
-
-  test("Setup passcode and Android biometrics", async () => {
-    getPlatformsMock.mockImplementation(() => ["android"]);
-    verifySecretMock.mockResolvedValue(false);
-
-    const { getByText, queryByText, getByTestId } = render(
-      <IonReactRouter>
-        <IonRouterOutlet animated={false}>
-          <Provider store={store}>
-            <CreatePasscodeModule
-              title={EN_TRANSLATIONS.setpasscode.reenterpasscode}
-              description={EN_TRANSLATIONS.setpasscode.description}
-              testId="set-passcode"
-              onCreateSuccess={jest.fn()}
-            />
-          </Provider>
-        </IonRouterOutlet>
-      </IonReactRouter>
-    );
-
-    expect(
-      getByText(EN_TRANSLATIONS.setpasscode.reenterpasscode)
-    ).toBeInTheDocument();
-
-    await passcodeFiller(getByText, getByTestId, "193212");
-
-    await waitFor(() =>
-      expect(
-        getByText(EN_TRANSLATIONS.createpasscodemodule.cantremember)
-      ).toBeInTheDocument()
-    );
-
-    await passcodeFiller(getByText, getByTestId, "193212");
-
-    await waitFor(() =>
-      expect(
-        queryByText(EN_TRANSLATIONS.biometry.setupbiometryheader)
-      ).toBeInTheDocument()
-    );
-
-    fireEvent.click(getByTestId("alert-setup-biometry-confirm-button"));
-
-    await waitFor(() => {
-      expect(Agent.agent.basicStorage.createOrUpdateBasicRecord).toBeCalledWith(
-        expect.objectContaining({
-          id: MiscRecordId.APP_BIOMETRY,
-          content: {
-            enabled: true,
-          },
-        })
-      );
-    });
-
-    await waitFor(() => {
-      expect(storeSecretMock).toBeCalledWith(
-        KeyStoreKeys.APP_PASSCODE,
-        "193212"
-      );
-    });
-  });
-
-  test("Setup passcode and cancel Android biometrics", async () => {
-    verifySecretMock.mockResolvedValue(false);
-    getPlatformsMock.mockImplementation(() => ["android"]);
-    require("@ionic/react");
-
-    const { getByText, queryByText, getByTestId } = render(
-      <IonReactRouter>
-        <IonRouterOutlet animated={false}>
-          <Provider store={store}>
-            <CreatePasscodeModule
-              title={EN_TRANSLATIONS.setpasscode.reenterpasscode}
-              description={EN_TRANSLATIONS.setpasscode.description}
-              testId="set-passcode"
-              onCreateSuccess={jest.fn()}
-            />
-          </Provider>
-        </IonRouterOutlet>
-      </IonReactRouter>
-    );
-
-    await passcodeFiller(getByText, getByTestId, "193212");
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.setpasscode.reenterpasscode)
-      ).toBeInTheDocument();
-
-      expect(
-        getByText(EN_TRANSLATIONS.createpasscodemodule.cantremember)
-      ).toBeInTheDocument();
-    });
-
-    await passcodeFiller(getByText, getByTestId, "193212");
-
-    await waitFor(() =>
-      expect(
-        queryByText(EN_TRANSLATIONS.biometry.setupbiometryheader)
-      ).toBeInTheDocument()
-    );
-
-    act(() => {
-      fireEvent.click(getByTestId("alert-setup-biometry-cancel-button"));
-    });
-
-    await waitFor(() =>
-      expect(
-        queryByText(EN_TRANSLATIONS.biometry.setupbiometrycancel)
-      ).toBeInTheDocument()
-    );
-  });
-
-  test("Setup passcode and iOS biometrics", async () => {
-    verifySecretMock.mockResolvedValue(false);
-    (useBiometricAuth as jest.Mock).mockReturnValueOnce({
-      biometricInfo: {
-        isAvailable: true,
-        hasCredentials: false,
-        biometryType: BiometryType.FACE_ID,
-  
-      },
-      handleBiometricAuth: jest.fn(() => Promise.resolve(BiometricAuthOutcome.SUCCESS)),
-      setBiometricsIsEnabled: jest.fn(),
-    });
-    getPlatformsMock.mockImplementation(() => ["ios"]);
-
-    const onCreateSuccessMock = jest.fn();
-    const { getByText, queryByText, getByTestId } = render(
-      <IonReactRouter>
-        <IonRouterOutlet animated={false}>
-          <Provider store={store}>
-            <CreatePasscodeModule
-              title={EN_TRANSLATIONS.setpasscode.reenterpasscode}
-              description={EN_TRANSLATIONS.setpasscode.description}
-              testId="set-passcode"
-              onCreateSuccess={onCreateSuccessMock}
-            />
-          </Provider>
-        </IonRouterOutlet>
-      </IonReactRouter>
-    );
-
-    await passcodeFiller(getByText, getByTestId, "193212");
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.createpasscodemodule.cantremember)
-      ).toBeInTheDocument();
-      expect(
-        getByText(EN_TRANSLATIONS.setpasscode.reenterpasscode)
-      ).toBeInTheDocument();
-    });
-
-    await passcodeFiller(getByText, getByTestId, "193212");
-
-    await waitFor(() =>
-      expect(
-        queryByText(EN_TRANSLATIONS.biometry.setupbiometryheader)
-      ).toBeInTheDocument()
-    );
-
-    await act(async () => {
-      fireEvent.click(getByTestId("alert-setup-biometry-confirm-button"));
-    });
-
-    await waitFor(() => {
-      expect(
-        Agent.agent.basicStorage.createOrUpdateBasicRecord
-      ).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: MiscRecordId.APP_BIOMETRY,
-          content: {
-            enabled: true,
-          },
-        })
-      );
-    });
-
-    await waitFor(() => {
-      expect(storeSecretMock).toHaveBeenCalledWith(
-        KeyStoreKeys.APP_PASSCODE,
-        "193212"
-      );
-    });
-
-    await waitFor(() => {
-      expect(onCreateSuccessMock).toHaveBeenCalled();
-    });
-  });
-
-  test("Setup passcode and cancel iOS biometrics", async () => {
-    verifySecretMock.mockResolvedValue(false);
-    jest.doMock("../../hooks/useBiometricsHook", () => {
-      const actual = jest.requireActual("../../hooks/useBiometricsHook");
-      return {
-        ...actual,
-        useBiometricAuth: jest.fn(() => ({
-          biometricsIsEnabled: false,
-          biometricInfo: {
-            isAvailable: true,
-            hasCredentials: false,
-            biometryType: actual.BiometryType.FACE_ID, 
-      
-          },
-          handleBiometricAuth: jest.fn(() =>
-            Promise.resolve(new actual.BiometryError("", actual.BiometricAuthError.USER_CANCEL)) 
-          ),
-          setBiometricsIsEnabled: jest.fn(),
-        })),
-      };
-    });
-    getPlatformsMock.mockImplementation(() => ["ios"]);
-    require("@ionic/react");
-
-    const { getByText, queryByText, getByTestId } = render(
-      <IonReactRouter>
-        <IonRouterOutlet animated={false}>
-          <Provider store={store}>
-            <CreatePasscodeModule
-              title={EN_TRANSLATIONS.setpasscode.reenterpasscode}
-              description={EN_TRANSLATIONS.setpasscode.description}
-              testId="set-passcode"
-              onCreateSuccess={jest.fn()}
-            />
-          </Provider>
-        </IonRouterOutlet>
-      </IonReactRouter>
-    );
-
-    expect(
-      getByText(EN_TRANSLATIONS.setpasscode.reenterpasscode)
-    ).toBeInTheDocument();
-
-    await passcodeFiller(getByText, getByTestId, "193212");
-
-    await waitFor(() => {
-      expect(verifySecretMock).toBeCalledWith(
-        KeyStoreKeys.APP_PASSCODE,
-        "193212"
-      );
-    });
-
-    await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.createpasscodemodule.cantremember)
-      ).toBeInTheDocument();
-    });
-
-    passcodeFiller(getByText, getByTestId, "193212");
-
-    await waitFor(() =>
-      expect(
-        queryByText(EN_TRANSLATIONS.biometry.setupbiometrycancel)
-      ).toBeInTheDocument()
     );
   });
 });

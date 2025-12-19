@@ -1,0 +1,15 @@
+.native-alert {
+  .alert-title {
+    color: var(--native-text-color);
+  }
+
+  .alert-sub-title {
+    color: var(--native-text-color);
+  }
+
+  .alert-button-group {
+    button {
+      color: var(--native-button-text-color);
+    }
+  }
+}
