@@ -23,6 +23,7 @@ import {
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { Alert } from "../../components/Alert";
+import { NativeAlert } from "../../components/Alert/NativeAlert";
 import { PageFooter } from "../../components/PageFooter";
 import { PageHeader } from "../../components/PageHeader";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
@@ -47,12 +48,17 @@ const SetupBiometrics = () => {
   const [showSetupBiometricsAlert, setShowSetupBiometricsAlert] =
     useState(false);
   const [showGenericAlert, setShowGenericAlert] = useState(false);
-  const [openBiometricAndroidAlert, setOpenBiometricAndroidAlert] =
+  const [
+    openBiometricAndroidSettingAlert,
+    setOpenBiometricAndroidSettingAlert,
+  ] = useState(false);
+  const [openBiometricIOSSettingAlert, setOpenBiometricIOSSettingAlert] =
     useState(false);
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
-  const { setupBiometrics } = useBiometricAuth();
+  const { setupBiometrics, checkBiometrics } = useBiometricAuth();
 
   const isAndroid = getPlatforms().includes("android");
+  const isIOS = getPlatforms().includes("ios");
 
   const handleSetupSuccess = async () => {
     await Agent.agent.basicStorage.createOrUpdateBasicRecord(
@@ -119,26 +125,24 @@ const SetupBiometrics = () => {
       await enablePrivacy();
     }
 
-    if (biometricOutcome === BiometricAuthOutcome.SUCCESS) {
-      await handleSetupSuccess();
-      return;
-    }
-
-    if (isAndroid) {
-      switch (biometricOutcome) {
-        case BiometricAuthOutcome.PERMANENT_LOCKOUT:
-        case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
-          setShowBiometricsNotAvailable(true);
-          break;
-        case BiometricAuthOutcome.NOT_AVAILABLE:
-          setOpenBiometricAndroidAlert(true);
-          break;
-        case BiometricAuthOutcome.USER_CANCELLED:
-        case BiometricAuthOutcome.GENERIC_ERROR:
-        default:
-          setShowGenericAlert(true);
-          break;
-      }
+    switch (biometricOutcome) {
+      case BiometricAuthOutcome.SUCCESS:
+        await handleSetupSuccess();
+        break;
+      case BiometricAuthOutcome.NOT_AVAILABLE:
+        isAndroid
+          ? setOpenBiometricAndroidSettingAlert(true)
+          : setOpenBiometricIOSSettingAlert(true);
+        break;
+      case BiometricAuthOutcome.PERMANENT_LOCKOUT:
+      case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
+        isAndroid ? setShowBiometricsNotAvailable(true) : navToNextStep();
+        break;
+      case BiometricAuthOutcome.USER_CANCELLED:
+      case BiometricAuthOutcome.GENERIC_ERROR:
+      default:
+        isAndroid ? setShowGenericAlert(true) : navToNextStep();
+        break;
     }
   };
 
@@ -150,10 +154,24 @@ const SetupBiometrics = () => {
     navToNextStep();
   };
 
-  const handleEnableButtonClick = () => {
+  const handleEnableButtonClick = async () => {
+    const biometricInfo = await checkBiometrics();
+
     if (isAndroid) {
+      if (!biometricInfo.isAvailable) {
+        setOpenBiometricAndroidSettingAlert(true);
+        return;
+      }
+
       setShowSetupBiometricsAlert(true);
       return;
+    }
+
+    if (isIOS) {
+      if (!biometricInfo.isAvailable) {
+        setOpenBiometricIOSSettingAlert(true);
+        return;
+      }
     }
 
     processBiometrics();
@@ -182,11 +200,15 @@ const SetupBiometrics = () => {
   };
 
   const closeAlert = () => {
-    setOpenBiometricAndroidAlert(false);
+    setOpenBiometricAndroidSettingAlert(false);
   };
 
   const handleSetupLater = () => {
     navToNextStep();
+  };
+
+  const handleCloseIosAlert = () => {
+    setOpenBiometricIOSSettingAlert(false);
   };
 
   return (
@@ -241,7 +263,7 @@ const SetupBiometrics = () => {
         setIsOpen={setShowGenericAlert}
         dataTestId="alert-generic-error"
         headerText={`${i18n.t("biometry.biometricsetupretry")}`}
-        confirmButtonText={`${i18n.t("biometry.biometryunavailableconfirm")}`}
+        confirmButtonText={`${i18n.t("biometry.confirmyes")}`}
         actionConfirm={processBiometrics}
         secondaryConfirmButtonText={`${i18n.t("biometry.setuplater")}`}
         actionSecondaryConfirm={handleCancelBiometrics}
@@ -259,8 +281,8 @@ const SetupBiometrics = () => {
         backdropDismiss={false}
       />
       <Alert
-        isOpen={openBiometricAndroidAlert}
-        setIsOpen={setOpenBiometricAndroidAlert}
+        isOpen={openBiometricAndroidSettingAlert}
+        setIsOpen={setOpenBiometricAndroidSettingAlert}
         dataTestId="biometric-enable-alert"
         headerText={i18n.t(
           "settings.sections.security.biometricsalert.message"
@@ -274,6 +296,29 @@ const SetupBiometrics = () => {
         actionConfirm={openSetting}
         actionSecondaryConfirm={handleSetupLater}
         actionDismiss={closeAlert}
+      />
+      <NativeAlert
+        dataTestId="ios-setup-biometrics-alert"
+        setIsOpen={setOpenBiometricIOSSettingAlert}
+        isOpen={openBiometricIOSSettingAlert}
+        backdropDismiss={false}
+        headerText={`${i18n.t("biometry.enablebiometrytitle")}`}
+        subheaderText={`${i18n.t("biometry.enablebiometrymessage")}`}
+        customButtons={[
+          {
+            text: i18n.t("biometry.notnow"),
+            role: "cancel",
+            handler: handleCloseIosAlert,
+          },
+          {
+            text: i18n.t("biometry.setting"),
+            role: "confirm",
+            handler: () => {
+              handleCloseIosAlert();
+              openSetting();
+            },
+          },
+        ]}
       />
     </>
   );
