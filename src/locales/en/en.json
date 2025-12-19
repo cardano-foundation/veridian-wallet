@@ -1617,8 +1617,8 @@
     "tryagain": "Try again",
     "setuplater": "Setup later",
     "confirmyes": "Yes",
-    "biometryunavailable": "Biometrics is unavailable at this time. You can set this up later via the settings page.",
-    "biometryunavailableconfirm": "Ok",
+    "biometricunavailable": "Biometrics is unavailable at this time. You can set this up later via the settings page.",
+    "biometricunavailableconfirm": "Ok",
     "errors": {
       "notAvailable": "Biometry is not available on this device.",
       "strongBiometricsRequired": "Only strong biometrics (FaceID, Fingerprint) are allowed.",

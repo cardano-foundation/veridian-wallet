@@ -193,6 +193,7 @@ const SetupBiometrics = () => {
   };
 
   const openSetting = () => {
+    setOpenBiometricAndroidSettingAlert(false);
     NativeSettings.open({
       optionAndroid: AndroidSettings.Security,
       optionIOS: IOSSettings.TouchIdPasscode,
@@ -253,8 +254,8 @@ const SetupBiometrics = () => {
         isOpen={showBiometricsNotAvailable}
         setIsOpen={setShowBiometricsNotAvailable}
         dataTestId="alert-unavailable-error"
-        headerText={`${i18n.t("biometry.biometryunavailable")}`}
-        confirmButtonText={`${i18n.t("biometry.biometryunavailableconfirm")}`}
+        headerText={`${i18n.t("biometry.biometricunavailable")}`}
+        confirmButtonText={`${i18n.t("biometry.biometricunavailableconfirm")}`}
         actionConfirm={handleCancelBiometrics}
         backdropDismiss={false}
       />
@@ -283,7 +284,7 @@ const SetupBiometrics = () => {
       <Alert
         isOpen={openBiometricAndroidSettingAlert}
         setIsOpen={setOpenBiometricAndroidSettingAlert}
-        dataTestId="biometric-enable-alert"
+        dataTestId="android-biometric-enable-alert"
         headerText={i18n.t(
           "settings.sections.security.biometricsalert.message"
         )}
@@ -298,7 +299,7 @@ const SetupBiometrics = () => {
         actionDismiss={closeAlert}
       />
       <NativeAlert
-        dataTestId="ios-setup-biometrics-alert"
+        dataTestId="ios-biometric-enable-alert"
         setIsOpen={setOpenBiometricIOSSettingAlert}
         isOpen={openBiometricIOSSettingAlert}
         backdropDismiss={false}

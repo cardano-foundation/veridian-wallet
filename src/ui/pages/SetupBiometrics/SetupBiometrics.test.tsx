@@ -1,16 +1,13 @@
 const verifySecretMock = jest.fn();
 const storeSecretMock = jest.fn();
 const setupBiometricsMock = jest.fn();
+const checkBiometricsMock = jest.fn();
+const getPlatformsMock = jest.fn();
+const nativeSettingOpenMock = jest.fn();
 
 import { BiometryType } from "@capgo/capacitor-native-biometric";
 import { IonReactMemoryRouter } from "@ionic/react-router";
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Provider } from "react-redux";
 
@@ -18,15 +15,11 @@ import { Agent } from "../../../core/agent/agent";
 import { AuthService } from "../../../core/agent/services";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes/paths";
-import { setEnableBiometricsCache } from "../../../store/reducers/biometricsCache";
-import {
-  setToastMsg,
-  showGenericError,
-} from "../../../store/reducers/stateCache";
+import { setToastMsg } from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
 import {
-  useBiometricAuth,
   BiometricAuthOutcome,
+  useBiometricAuth,
 } from "../../hooks/useBiometricsHook";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { SetupBiometrics } from "./SetupBiometrics";
@@ -76,6 +69,20 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
+jest.mock("@ionic/react", () => {
+  return {
+    ...jest.requireActual("@ionic/react"),
+    getPlatforms: () => getPlatformsMock(),
+  };
+});
+
+jest.mock("capacitor-native-settings", () => ({
+  ...jest.requireActual("capacitor-native-settings"),
+  NativeSettings: {
+    open: nativeSettingOpenMock,
+  },
+}));
+
 jest.mock("@capacitor/core", () => ({
   ...jest.requireActual("@capacitor/core"),
   Capacitor: {
@@ -118,10 +125,6 @@ const initialState = {
 const dispatchMock = jest.fn();
 const storeMocked = { ...makeTestStore(initialState), dispatch: dispatchMock };
 
-const EN_TRANSLATIONS_ACTUAL = jest.requireActual(
-  "../../../locales/en/en.json"
-);
-
 describe("SetupBiometrics Page", () => {
   afterEach(() => {
     cleanup();
@@ -139,7 +142,7 @@ describe("SetupBiometrics Page", () => {
       handleBiometricAuth: jest.fn(),
       setBiometricsIsEnabled: jest.fn(),
       setupBiometrics: setupBiometricsMock,
-      checkBiometrics: jest.fn(),
+      checkBiometrics: checkBiometricsMock,
       remainingLockoutSeconds: 30,
       lockoutEndTime: null,
     }));
@@ -149,6 +152,10 @@ describe("SetupBiometrics Page", () => {
     verifySecretMock.mockRejectedValue(
       new Error(AuthService.SECRET_NOT_STORED)
     );
+    checkBiometricsMock.mockImplementation(() => ({
+      isAvailable: true,
+    }));
+    getPlatformsMock.mockImplementation(() => ["android"]);
   });
 
   const history = createMemoryHistory();
@@ -188,63 +195,125 @@ describe("SetupBiometrics Page", () => {
     expect(dispatchMock).toBeCalled();
   });
 
-  test("Click on setup", async () => {
-    setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.SUCCESS);
-    const { getByTestId } = renderComponent();
+  test("Show enable biometric alert on android", async () => {
+    checkBiometricsMock.mockImplementation(() => ({
+      isAvailable: false,
+    }));
+    const { getByTestId, queryByTestId, getByText } = renderComponent();
     fireEvent.click(getByTestId("primary-button"));
     await waitFor(() => {
-      expect(setupBiometricsMock).toBeCalled();
+      expect(getByTestId("android-biometric-enable-alert")).toBeVisible();
     });
-    expect(dispatchMock).toBeCalledWith(setEnableBiometricsCache(true));
-    expect(dispatchMock).toBeCalledWith(
-      setToastMsg(ToastMsgType.SETUP_BIOMETRIC_AUTHENTICATION_SUCCESS)
+
+    fireEvent.click(
+      getByText(EN_TRANSLATIONS.settings.sections.security.biometricsalert.ok)
     );
     await waitFor(() => {
-      expect(Agent.agent.basicStorage.createOrUpdateBasicRecord).toBeCalled();
+      expect(queryByTestId("android-biometric-enable-alert")).toBeNull();
+      expect(nativeSettingOpenMock).toBeCalled();
     });
-    expect(dispatchMock).toBeCalled();
+  });
+
+  test("Show enable biometric alert on ios", async () => {
+    checkBiometricsMock.mockImplementation(() => ({
+      isAvailable: false,
+    }));
+    getPlatformsMock.mockImplementation(() => ["ios"]);
+    const { getByTestId, queryByTestId, getByText } = renderComponent();
+    fireEvent.click(getByTestId("primary-button"));
+    await waitFor(() => {
+      expect(getByTestId("ios-biometric-enable-alert")).toBeVisible();
+    });
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.biometry.setting));
+
+    await waitFor(() => {
+      expect(queryByTestId("ios-biometric-enable-alert")).toBeNull();
+      expect(nativeSettingOpenMock).toBeCalled();
+    });
   });
 
   test("Click on setup with GENERIC_ERROR outcome", async () => {
     setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.GENERIC_ERROR);
-    const { getByTestId } = renderComponent();
+    const { getByTestId, getByText } = renderComponent();
     fireEvent.click(getByTestId("primary-button"));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.biometry.setupbiometryheader)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.biometry.setupbiometryconfirm));
+
     await waitFor(() => {
       expect(setupBiometricsMock).toBeCalled();
     });
-    expect(dispatchMock).toBeCalledWith(showGenericError(true));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.biometry.biometricsetupretry)
+      ).toBeVisible();
+    });
   });
 
-  test("Click on setup with NOT_AVAILABLE outcome", async () => {
-    setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.NOT_AVAILABLE);
-    const { getByTestId } = renderComponent();
+  test("Click on setup with PERMANENT_LOCKOUT outcome", async () => {
+    setupBiometricsMock.mockResolvedValue(
+      BiometricAuthOutcome.PERMANENT_LOCKOUT
+    );
+    const { getByTestId, getByText } = renderComponent();
     fireEvent.click(getByTestId("primary-button"));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.biometry.setupbiometryheader)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.biometry.setupbiometryconfirm));
+
     await waitFor(() => {
       expect(setupBiometricsMock).toBeCalled();
     });
-    expect(dispatchMock).toBeCalledWith(showGenericError(true));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.biometry.biometricunavailable)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(EN_TRANSLATIONS.biometry.biometricunavailableconfirm)
+    );
+
+    await waitFor(() => {
+      expect(Agent.agent.basicStorage.createOrUpdateBasicRecord).toBeCalled();
+    });
   });
 
-  test("Privacy screen is disabled and enabled during biometrics setup", async () => {
+  test("Click on setup with SUCCESS outcome", async () => {
     setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.SUCCESS);
-    const { getByTestId } = renderComponent();
+    const { getByTestId, getByText } = renderComponent();
     fireEvent.click(getByTestId("primary-button"));
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.biometry.setupbiometryheader)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(getByText(EN_TRANSLATIONS.biometry.setupbiometryconfirm));
+
     await waitFor(() => {
       expect(disablePrivacy).toBeCalled();
       expect(setupBiometricsMock).toBeCalled();
       expect(enablePrivacy).toBeCalled();
     });
-  });
 
-  test("Should display cancel message when status is USER_CANCELLED", async () => {
-    setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.USER_CANCELLED);
-    const { getByTestId, findByText } = renderComponent();
-    fireEvent.click(getByTestId("primary-button"));
     await waitFor(() => {
-      expect(setupBiometricsMock).toBeCalled();
+      expect(dispatchMock).toBeCalledWith(
+        setToastMsg(ToastMsgType.SETUP_BIOMETRIC_AUTHENTICATION_SUCCESS)
+      );
     });
-    expect(
-      await findByText(EN_TRANSLATIONS.biometry.cancelbiometryheader)
-    ).toBeInTheDocument();
   });
 });

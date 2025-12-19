@@ -333,6 +333,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     }
 
     const biometricInfo = await checkBiometrics();
+
     if (!biometricInfo.isAvailable) {
       if (isAndroidPlatform) {
         setOpenAndroidBiometricSettingAlert(true);
@@ -587,7 +588,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
       <Alert
         isOpen={openAndroidBiometricSettingAlert}
         setIsOpen={setOpenAndroidBiometricSettingAlert}
-        dataTestId="biometric-enable-alert"
+        dataTestId="android-biometric-enable-alert"
         headerText={i18n.t(
           "settings.sections.security.biometricsalert.message"
         )}
@@ -605,8 +606,8 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         isOpen={showBiometricsNotAvailable}
         setIsOpen={setShowBiometricsNotAvailable}
         dataTestId="alert-unavailable-error"
-        headerText={`${i18n.t("biometry.biometryunavailable")}`}
-        confirmButtonText={`${i18n.t("biometry.biometryunavailableconfirm")}`}
+        headerText={`${i18n.t("biometry.biometricunavailable")}`}
+        confirmButtonText={`${i18n.t("biometry.biometricunavailableconfirm")}`}
         actionConfirm={() => setShowBiometricsNotAvailable(false)}
         backdropDismiss={false}
       />
@@ -687,7 +688,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         actionConfirm={openNotificationSettings}
       />
       <NativeAlert
-        dataTestId="ios-setup-biometrics-alert"
+        dataTestId="ios-biometric-enable-alert"
         setIsOpen={setOpenBiometricIOSSettingAlert}
         isOpen={openBiometricIOSSettingAlert}
         backdropDismiss={false}
