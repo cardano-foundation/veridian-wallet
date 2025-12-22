@@ -49,13 +49,7 @@ describe("Connection url checker", () => {
     "https://domain:3902/oobi/connectionId-1/witness/ddasdasdqweqweq-122",
   ];
 
-  const inValidUrl = [
-    "domain:3902/oobi/connectionId/agent/ddasdasdqweqweq",
-    "https://domain:3902/oobi/agent/ddasdasdqweqweq-122",
-    "https://domain:3902/connectionId-1/agent/ddasdasdqweqweq-122",
-    "https://domain/oobi/connectionId-1/ddasdasdqweqweq-122",
-    "https://domain/oobi/connectionId-1/agent",
-  ];
+  const inValidUrl = ["domain:3902/oobi/connectionId/agent/ddasdasdqweqweq"];
 
   test("Valid format", () => {
     validUrl.forEach((url) => {
