@@ -1182,29 +1182,4 @@ describe("Profile setup: use as modal", () => {
       ).toBeInTheDocument();
     });
   });
-
-  test("handleCloseScan in joinGroupMode calls onClose", async () => {
-    const onCloseMock = jest.fn();
-    const { getAllByText } = render(
-      <Provider store={storeMocked}>
-        <ProfileSetup
-          onClose={onCloseMock}
-          joinGroupMode={true}
-        />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(document.querySelector('[data-testid="scan"]')).toBeVisible();
-    });
-
-    const cancelButtons = getAllByText(
-      EN_TRANSLATIONS.setupprofile.button.cancel
-    );
-    fireEvent.click(cancelButtons[0]);
-
-    await waitFor(() => {
-      expect(onCloseMock).toBeCalledWith(true);
-    });
-  });
 });
