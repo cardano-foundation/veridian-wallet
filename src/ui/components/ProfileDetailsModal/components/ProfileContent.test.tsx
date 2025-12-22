@@ -55,6 +55,10 @@ jest.mock("../../CardDetails/CardDetailsBlock", () => ({
       {title}
     </div>
   ),
+  FlatBorderType: {
+    BOT: "bot",
+    TOP: "top",
+  },
 }));
 
 jest.mock("../../CardDetails/CardDetailsItem", () => ({
@@ -94,6 +98,7 @@ describe("ProfileContent", () => {
     cardData: identifierFix[0],
     oobi: "test-oobi",
     setCardData: jest.fn(),
+    onRotateKey: jest.fn(),
   };
 
   const renderComponent = (storeOverrides = {}) => {
