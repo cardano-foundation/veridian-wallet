@@ -275,11 +275,7 @@ export const ProfileSetup = ({
   };
 
   const handleCloseScan = () => {
-    if (joinGroupMode) {
-      onClose?.(true);
-    } else {
-      setIsScanOpen(false);
-    }
+    setIsScanOpen(false);
   };
 
   const handleChangeStep = () => {
