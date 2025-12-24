@@ -521,6 +521,73 @@ describe("Individual profile details page", () => {
       queryByTestId("delete-button-identifier-card-details")
     ).not.toBeInTheDocument();
   });
+
+  test("Rotate key", async () => {
+    const initialStateKeri = {
+      stateCache: {
+        routes: [TabsRoutePath.CREDENTIALS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+        },
+        toastMsgs: [],
+        isOnline: true,
+      },
+      seedPhraseCache: {
+        seedPhrase: "",
+        bran: "bran",
+      },
+      profilesCache: profileCacheFixData,
+      biometricsCache: {
+        enabled: false,
+      },
+    };
+
+    const storeMockedAidKeri = {
+      ...makeTestStore(initialStateKeri),
+      dispatch: dispatchMock,
+    };
+
+    const { queryByTestId, getByTestId, getByText } = render(
+      <Provider store={storeMockedAidKeri}>
+        <ProfileDetailsModal
+          profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
+          pageId={pageId}
+          isOpen
+          setIsOpen={jest.fn}
+          showProfiles={jest.fn}
+        />
+      </Provider>
+    );
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
+    await waitFor(() => {
+      expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
+        null
+      );
+    });
+
+    await waitFor(() =>
+      expect(queryByTestId("identifier-card-detail-spinner-container")).toBe(
+        null
+      )
+    );
+
+    act(() => {
+      fireEvent.click(getByTestId("rotate-keys-button"));
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("rotate-key-title")).toBeVisible();
+      expect(getByTestId("rotate-key-title").innerHTML).toBe(
+        EN_TRANSLATIONS.tabs.home.tab.modals.rotatekeys.title
+      );
+    });
+  });
 });
 
 describe("Group profile details page", () => {

@@ -6,6 +6,7 @@ import {
   pencilOutline,
   personCircleOutline,
   shareOutline,
+  refreshOutline,
 } from "ionicons/icons";
 import { useCallback, useState } from "react";
 import { i18n } from "../../../../i18n";
@@ -55,6 +56,7 @@ const ProfileContent = ({
   cardData,
   oobi,
   setCardData,
+  onRotateKey,
 }: ProfileContentProps) => {
   const profiles = useAppSelector(getProfiles);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
@@ -303,6 +305,7 @@ const ProfileContent = ({
             copyContent={cardData.k[0]}
             title={i18n.t("profiledetails.identifierdetail.signingkey.title")}
             testId="signingkey-block"
+            flatBorder={isMultiSig ? undefined : FlatBorderType.BOT}
           >
             {cardData.k.map((item, index) => {
               return (
@@ -317,6 +320,23 @@ const ProfileContent = ({
               );
             })}
           </CardBlock>
+          {!isMultiSig && (
+            <CardBlock
+              className="rotate-button-container"
+              flatBorder={FlatBorderType.TOP}
+              testId="rotate-button-block"
+            >
+              <IonButton
+                shape="round"
+                className="rotate-keys-button"
+                data-testid="rotate-keys-button"
+                onClick={onRotateKey}
+              >
+                <p>{i18n.t("tabs.home.tab.tiles.rotate.title")}</p>
+                <IonIcon icon={refreshOutline} />
+              </IonButton>
+            </CardBlock>
+          )}
         </>
       )}
       <ListCard

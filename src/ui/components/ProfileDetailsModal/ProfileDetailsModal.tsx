@@ -29,6 +29,7 @@ import { Verification } from "../Verification";
 import { ProfileContent } from "./components/ProfileContent";
 import "./ProfileDetailsModal.scss";
 import { IdentifierDetailModalProps } from "./ProfileDetailsModal.types";
+import { RotateKeyModal } from "../../pages/Home/components/RotateKeyModal";
 
 const ProfileDetailsModal = ({
   profileId,
@@ -49,6 +50,7 @@ const ProfileDetailsModal = ({
   const [oobi, setOobi] = useState("");
   const [cloudError, setCloudError] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
   const { setRecentProfileAsDefault, defaultProfile, defaultName } =
     useProfile();
 
@@ -170,6 +172,10 @@ const ProfileDetailsModal = ({
     "ion-hide": hidden,
   });
 
+  const openRotateModal = useCallback(() => {
+    setOpenRotateKeyModal(true);
+  }, []);
+
   return (
     <>
       <SideSlider
@@ -221,6 +227,7 @@ const ProfileDetailsModal = ({
                   cardData={profile as IdentifierDetailsCore}
                   oobi={oobi}
                   setCardData={setProfile}
+                  onRotateKey={openRotateModal}
                 />
                 {!restrictedOptions && (
                   <PageFooter
@@ -264,6 +271,13 @@ const ProfileDetailsModal = ({
           setVerifyIsOpen(value);
         }}
         onVerify={handleDelete}
+      />
+      <RotateKeyModal
+        identifierId={profileId}
+        onReloadData={getDetails}
+        signingKey={profile?.k[0] || ""}
+        isOpen={openRotateKeyModal}
+        onClose={() => setOpenRotateKeyModal(false)}
       />
     </>
   );

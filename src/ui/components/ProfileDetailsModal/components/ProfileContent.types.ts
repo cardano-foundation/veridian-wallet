@@ -4,6 +4,7 @@ interface ProfileContentProps {
   oobi: string;
   cardData: IdentifierDetails;
   setCardData: (value: IdentifierDetails) => void;
+  onRotateKey: () => void;
 }
 
 interface ProfileInformationProps {
