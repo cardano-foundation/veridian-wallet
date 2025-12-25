@@ -16,7 +16,7 @@ const isValidHttpUrl = (urlString: string) => {
 const isValidConnectionUrl = (url: string) => {
   // Pattern: http://domain/oobi/:connectionId/(agent|mailbox)/:eid?param OR http://domain/oobi/:connectionId/controller?param
   const pattern =
-    /https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+([\w])?(\.|(:\d*))?([^\s]{0,})\/oobi\/([\w-]+)\/(?:agent|mailbox|witness)\/([\w-]+)|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+([\w])?(\.|(:\d*))?([^\s]{0,})\/oobi\/([\w-]+)\/controller/;
+    /https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+([\w])?(\.|(:\d*))?([^\s]{0,})\/oobi\/([\w-]+)(?:\/(?:agent|mailbox|witness))?(\/[\w-]+)?\w+|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+([\w])?(\.|(:\d*))?([^\s]{0,})\/oobi\/([\w-]+)\/controller/;
 
   return pattern.test(url);
 };
