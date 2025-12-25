@@ -1,6 +1,6 @@
 ## Splashscreen and Icons  
 
-To customize the app icons and splash screens, the Veridian Wallet uses the [@capacitor/assets](https://github.com/ionic-team/capacitor-assets) package.    
+To customize the app icons and splash screens, the Veridian Wallet uses the [@capacitor/assets](https://github.com/ionic-team/capacitor-assets) package.
 
 ### Steps to Customize  
 
@@ -11,7 +11,7 @@ To customize the app icons and splash screens, the Veridian Wallet uses the [@ca
    Run the following command to generate platform-specific resources for all platforms:  
 
    ```bash  
-   npx capacitor-assets generate --assetPath ./src/assets  
+   npx capacitor-assets@latest generate --assetPath ./src/assets  
 
 This will generate the icons and splash screens for all platforms.  
 
