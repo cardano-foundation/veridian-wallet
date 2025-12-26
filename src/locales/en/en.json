@@ -179,7 +179,7 @@
     },
     "alert": {
       "text": {
-        "verify": "If you've forgotten your PIN, please verify your recovery phrase to gain access to your wallet",
+        "verify": "If you’ve forgotten your PIN, please verify your recovery phrase to gain access to your wallet",
         "restart": "You currently haven't generated a recovery phrase, would you like to start your onboarding again?"
       },
       "button": {
@@ -1275,11 +1275,11 @@
     },
     "alert": {
       "text": {
-        "verify": "If you've forgotten your PIN, please verify your recovery phrase to gain access to your wallet",
+        "verify": "If you’ve forgotten your PIN, please verify your recovery phrase to gain access to your wallet",
         "restart": "You currently haven't generated a recovery phrase, would you like to start your onboarding again?"
       },
       "button": {
-        "verify": "Verify your Recovery Phrase",
+        "verify": "Verify recovery phrase",
         "restart": "Start again",
         "cancel": "Cancel"
       }
