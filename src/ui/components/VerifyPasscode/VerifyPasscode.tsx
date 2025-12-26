@@ -75,6 +75,12 @@ const VerifyPasscode = ({
   };
 
   const onClose = () => handleClearState(true);
+  const handleCloseForgotModal = (shouldCloseParent?: boolean) => {
+    setOpenRecoveryAuth(false);
+    if (shouldCloseParent) {
+      setIsOpen(false);
+    }
+  };
 
   return (
     <IonModal
@@ -138,7 +144,7 @@ const VerifyPasscode = ({
         />
         <ForgotAuthInfo
           isOpen={openRecoveryAuth}
-          onClose={() => setOpenRecoveryAuth(false)}
+          onClose={handleCloseForgotModal}
           type={ForgotType.Passcode}
         />
       </ResponsivePageLayout>
