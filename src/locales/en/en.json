@@ -1302,7 +1302,15 @@
     },
     "newpassword": {
       "title": "New password",
-      "description": "Create a new operations password so you can access additional wallet features."
+      "description": "Create a new password",
+      "skip": "Skip",
+      "alert": {
+        "text": "Are you sure you want to skip? By doing this, you will be required to use your passcode for any protected operations. You can, of course, set this up later if you prefer.",
+        "button": {
+          "confirm": "Yes, skip",
+          "cancel": "Cancel"
+        }
+      }
     }
   },
   "shareidentifier": {

@@ -1,16 +1,18 @@
-
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useBiometricAuth, BiometricAuthOutcome } from "../../hooks/useBiometricsHook";
+import { i18n } from "../../../i18n";
 import { getBiometricsCache } from "../../../store/reducers/biometricsCache";
 import { getStateCache } from "../../../store/reducers/stateCache";
 import { usePrivacyScreen } from "../../hooks/privacyScreenHook";
+import {
+  BiometricAuthOutcome,
+  useBiometricAuth,
+} from "../../hooks/useBiometricsHook";
 import { showError } from "../../utils/error";
+import { Alert } from "../Alert";
 import { VerifyPasscode } from "../VerifyPasscode";
 import { VerifyPassword } from "../VerifyPassword";
 import { VerifyProps } from "./Verification.types";
-import { Alert } from "../Alert";
-import { i18n } from "../../../i18n";
 
 const Verification = ({
   verifyIsOpen,
@@ -20,12 +22,14 @@ const Verification = ({
   const [openModalAfterBiometricFail, setOpenModalAfterBiometricFail] =
     useState(false);
   const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
-  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] = useState(false);
-  
+  const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] =
+    useState(false);
+
   const stateCache = useSelector(getStateCache);
   const biometrics = useSelector(getBiometricsCache);
   const authentication = stateCache.authentication;
-  const { handleBiometricAuth, remainingLockoutSeconds, lockoutEndTime } = useBiometricAuth();
+  const { handleBiometricAuth, remainingLockoutSeconds, lockoutEndTime } =
+    useBiometricAuth();
   const { disablePrivacy, enablePrivacy } = usePrivacyScreen();
 
   const canOpenModal =
@@ -82,43 +86,41 @@ const Verification = ({
     }
   }, [verifyIsOpen]);
 
-  return (<>{
-    canOpenModal &&
-    (authentication.passwordIsSet ? (
+  return (
+    <>
       <VerifyPassword
-        isOpen={verifyIsOpen}
+        isOpen={canOpenModal && authentication.passwordIsSet}
         setIsOpen={setVerifyIsOpen}
         onVerify={onVerify}
       />
-    ) : (
       <VerifyPasscode
-        isOpen={verifyIsOpen}
+        isOpen={canOpenModal && !authentication.passwordIsSet}
         setIsOpen={setVerifyIsOpen}
         onVerify={onVerify}
       />
-    ))
-  }
-  <Alert
-    isOpen={showMaxAttemptsAlert}
-    setIsOpen={setShowMaxAttemptsAlert}
-    dataTestId="alert-max-attempts"
-    headerText={`${i18n.t("biometry.lockoutheader", { seconds: remainingLockoutSeconds })}`}
-    confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
-    actionConfirm={() => setShowMaxAttemptsAlert(false)}
-    backdropDismiss={false}
-    className="force-on-top"
-  />
-  <Alert
-    isOpen={showPermanentLockoutAlert}
-    setIsOpen={setShowPermanentLockoutAlert}
-    dataTestId="alert-permanent-lockout"
-    headerText={`${i18n.t("biometry.permanentlockoutheader")}`}
-    confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
-    actionConfirm={() => setShowPermanentLockoutAlert(false)}
-    backdropDismiss={false}
-    className="force-on-top"
-  />
-  </>
+      <Alert
+        isOpen={showMaxAttemptsAlert}
+        setIsOpen={setShowMaxAttemptsAlert}
+        dataTestId="alert-max-attempts"
+        headerText={`${i18n.t("biometry.lockoutheader", {
+          seconds: remainingLockoutSeconds,
+        })}`}
+        confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
+        actionConfirm={() => setShowMaxAttemptsAlert(false)}
+        backdropDismiss={false}
+        className="force-on-top"
+      />
+      <Alert
+        isOpen={showPermanentLockoutAlert}
+        setIsOpen={setShowPermanentLockoutAlert}
+        dataTestId="alert-permanent-lockout"
+        headerText={`${i18n.t("biometry.permanentlockoutheader")}`}
+        confirmButtonText={`${i18n.t("biometry.lockoutconfirm")}`}
+        actionConfirm={() => setShowPermanentLockoutAlert(false)}
+        backdropDismiss={false}
+        className="force-on-top"
+      />
+    </>
   );
 };
 
