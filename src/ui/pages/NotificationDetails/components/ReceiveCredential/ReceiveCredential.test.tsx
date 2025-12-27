@@ -550,7 +550,7 @@ describe("Credential request: Multisig", () => {
     });
 
     getLinkedGroupFromIpexGrantMock.mockResolvedValue({
-      threshold: "2",
+      threshold: { signingThreshold: 2, rotationThreshold: 0 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1", "member-2"],
       linkedRequest: {

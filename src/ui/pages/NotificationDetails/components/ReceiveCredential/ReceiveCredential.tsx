@@ -1,7 +1,8 @@
-import { IonButton, IonCol, IonIcon, IonItem, IonText } from "@ionic/react";
+import { IonButton, IonCol, IonIcon } from "@ionic/react";
 import {
   alertCircleOutline,
   checkmark,
+  checkmarkCircleOutline,
   informationCircleOutline,
   personCircleOutline,
   swapHorizontalOutline,
@@ -24,16 +25,14 @@ import {
   getProfiles,
 } from "../../../../../store/reducers/profileCache";
 import { Alert, Alert as AlertDecline } from "../../../../components/Alert";
-import { Avatar } from "../../../../components/Avatar";
-import { CardDetailsBlock } from "../../../../components/CardDetails";
+import { Avatar, MemberAvatar } from "../../../../components/Avatar";
+import { CardBlock, CardDetailsItem } from "../../../../components/CardDetails";
 import { CredentialDetailModal } from "../../../../components/CredentialDetailModule";
-import {
-  MemberAcceptStatus,
-  MultisigMember,
-} from "../../../../components/CredentialDetailModule/components";
+import { MemberAcceptStatus } from "../../../../components/CredentialDetailModule/components";
 import { FallbackIcon } from "../../../../components/FallbackIcon";
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
+import { MemberList } from "../../../../components/MemberList";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
 import { ProfileDetailsModal } from "../../../../components/ProfileDetailsModal";
@@ -48,6 +47,7 @@ import { showError } from "../../../../utils/error";
 import { combineClassNames } from "../../../../utils/style";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./ReceiveCredential.scss";
+import { IpexCommunicationService } from "../../../../../core/agent/services";
 
 const ANIMATION_DELAY = 2600;
 
@@ -91,8 +91,8 @@ const ReceiveCredential = ({
   const maxThreshold =
     isMultisig &&
     multisigMemberStatus.othersJoined.length +
-    (multisigMemberStatus.linkedRequest.accepted ? 1 : 0) >=
-    Number(multisigMemberStatus.threshold);
+      (multisigMemberStatus.linkedRequest.accepted ? 1 : 0) >=
+      Number(multisigMemberStatus.threshold.signingThreshold);
 
   const profile = profiles[credDetail?.identifierId || ""];
   const groupInitiatorAid = multisigMemberStatus.members[0] || "";
@@ -124,9 +124,17 @@ const ReceiveCredential = ({
       setMultisigMemberStatus(result);
     } catch (e) {
       setInitiateAnimation(false);
+      if (
+        e instanceof Error &&
+        e.message.includes(IpexCommunicationService.NOTIFICATION_NOT_FOUND)
+      ) {
+        handleBack();
+        return;
+      }
+
       showError("Unable to get group members", e, dispatch);
     }
-  }, [dispatch, notificationDetails]);
+  }, [dispatch, notificationDetails, handleBack]);
 
   const getAcdc = useCallback(async () => {
     try {
@@ -259,20 +267,30 @@ const ReceiveCredential = ({
     ]
   );
 
-  const members = multisigMemberStatus.members.map((member) => {
+  const members = multisigMemberStatus.members.map((member, index) => {
     const memberConnection = multisignConnectionsCache.find(
       (c) => c.id === member
     );
 
     let name = memberConnection?.label || member;
-
+    let isCurrent = false;
     if (!memberConnection?.label) {
       name = profile.identity.groupUsername || "";
+      isCurrent = true;
     }
 
+    const rank = index >= 0 ? index % 5 : 0;
+
     return {
-      id: member,
       name,
+      isCurrentUser: isCurrent,
+      avatar: (
+        <MemberAvatar
+          firstLetter={name.at(0)?.toLocaleUpperCase() || ""}
+          rank={rank}
+        />
+      ),
+      status: getStatus(member),
     };
   });
 
@@ -295,12 +313,12 @@ const ReceiveCredential = ({
   const primaryButtonText = isRevoked
     ? undefined
     : `${i18n.t(
-      displayInitiatorNotAcceptedAlert
-        ? "tabs.notifications.details.buttons.ok"
-        : maxThreshold
+        displayInitiatorNotAcceptedAlert
+          ? "tabs.notifications.details.buttons.ok"
+          : maxThreshold
           ? "tabs.notifications.details.buttons.addcred"
           : "tabs.notifications.details.buttons.accept"
-    )}`;
+      )}`;
 
   const declineButtonText =
     maxThreshold || isRevoked || displayInitiatorNotAcceptedAlert
@@ -357,10 +375,22 @@ const ReceiveCredential = ({
           <InfoCard
             className="alert"
             content={i18n.t(
-              `tabs.notifications.details.credential.receive.${isRevoked ? "revokedalert" : "initiatoracceptedalert"
+              `tabs.notifications.details.credential.receive.${
+                isRevoked ? "revokedalert" : "initiatoracceptedalert"
               }`
             )}
             icon={isRevoked ? alertCircleOutline : undefined}
+          />
+        )}
+        {(maxThreshold || multisigMemberStatus.linkedRequest.accepted) && (
+          <InfoCard
+            className={`alert${maxThreshold ? " max-threshhold" : undefined}`}
+            content={i18n.t(
+              `tabs.notifications.details.credential.receive.${
+                maxThreshold ? "thresholdmet" : "accepted"
+              }`
+            )}
+            icon={maxThreshold ? checkmarkCircleOutline : undefined}
           />
         )}
         <div className="request-animation-center">
@@ -442,44 +472,38 @@ const ReceiveCredential = ({
             </IonButton>
           </div>
           {isMultisig && (
-            <CardDetailsBlock
+            <CardBlock
               className="group-members"
+              testId="group-members-content"
               title={i18n.t(
                 "tabs.notifications.details.credential.receive.members"
               )}
             >
-              {members.map(({ id, name }) => (
-                <MultisigMember
-                  key={id}
-                  name={name}
-                  status={getStatus(id)}
-                />
-              ))}
-            </CardDetailsBlock>
+              <MemberList
+                members={members}
+                bottomText={`${i18n.t(
+                  "tabs.notifications.details.credential.receive.bottom",
+                  { members: members?.length || 0 }
+                )}`}
+              />
+            </CardBlock>
           )}
           {profile && (
-            <CardDetailsBlock className="related-identifiers">
-              <IonItem
-                lines="none"
-                className="related-identifier-label"
-              >
-                <IonText>
-                  {i18n.t(
-                    "tabs.notifications.details.credential.receive.relatedprofile"
-                  )}
-                </IonText>
-              </IonItem>
-              <IonItem
-                lines="none"
-                className="related-identifier"
-                data-testid="related-identifier-detail"
-              >
-                <Avatar id={profile.identity.id} />
-                <IonText className="identifier-name">
-                  {profile.identity.displayName}
-                </IonText>
-              </IonItem>
-            </CardDetailsBlock>
+            <CardBlock
+              className="related-identifiers"
+              testId="related-profile"
+              title={i18n.t(
+                "tabs.notifications.details.credential.receive.relatedprofile"
+              )}
+              onClick={() => setOpenIdentifierDetail(true)}
+            >
+              <CardDetailsItem
+                info={profile.identity.displayName}
+                startSlot={<Avatar id={profile.identity.id} />}
+                className="member"
+                testId="related-identifier-detail"
+              />
+            </CardBlock>
           )}
         </div>
       </ScrollablePageLayout>
