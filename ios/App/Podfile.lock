@@ -183,27 +183,27 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@evva/capacitor-secure-storage-plugin"
 
 SPEC CHECKSUMS:
-  Capacitor: 358dd1c3fdd71d969547b17e159fd8a7736cb45f
-  CapacitorApp: 26587c2ce485d88ddb39adb21cac64f8e481afe3
-  CapacitorBrowser: 22541e48442de44dc629c214388290d6eecc6ae9
-  CapacitorClipboard: 7e227702976d4435a5a40df54f65e154d0dfc1f3
-  CapacitorCommunityPrivacyScreen: 682470c41cce325d7a85b95907887919d4694066
-  CapacitorCommunitySqlite: a57c58e1c37f4bc250ef01e66b0055cb6ddd775e
-  CapacitorCommunityTapJacking: 9bd7ea023ae9f95f9a700355eb9a6b8d583d9bb6
+  Capacitor: 09d9ff8e9618e8c4b3cab2bbee34a17215dd2fef
+  CapacitorApp: 846d4b4a1dbb19dd1e9029c08ba6f028aa7be862
+  CapacitorBrowser: 45c681e7abc3b4384e54eb52bafeef1347d98fa8
+  CapacitorClipboard: e8b3578b2fce3c4795a5bdf2990b3b7dcef83f65
+  CapacitorCommunityPrivacyScreen: 088ffe903fe97c6de54f31407d1bc72c2528a5fc
+  CapacitorCommunitySqlite: b8e23cd2fd5bff7da8cb2a3a1cb3a6ffb9714a32
+  CapacitorCommunityTapJacking: 011d6aa099fff38e5bf2bc068f7329ae6d03fb10
   CapacitorCordova: bf648a636f3c153f652d312ae145fb508b6ffced
-  CapacitorDevice: 81ae78d5d1942707caad79276badd458bf6ec603
-  CapacitorFreerasp: 357a2143f48caa566c6b30ef3c23b49e0ac28b77
-  CapacitorKeyboard: 62f36104f26d53d8b3a2a43f2a69fe714f1777d5
-  CapacitorLocalNotifications: 0811aef56ab2e5f7f9ae72f47d3473ab50c29038
-  CapacitorMlkitBarcodeScanning: 05b2dfc7a70099f6d4594365c521534d79a17b1d
-  CapacitorNativeSettings: 3cd2e2ef431fe471674f381609cfb29154ddfcfa
-  CapacitorPluginSafeArea: 22031c3436269ca80fac90ec2c94bc7c1e59a81d
-  CapacitorScreenOrientation: e0d5b9ef293b269b8f93373355d5b276f50fabea
-  CapacitorShare: be166411fa995ead2d39b104aa0aae56d8615c66
-  CapacitorSplashScreen: e388b8e0ed0e982a9d3a40417f478e7a018a8763
-  CapacitorStatusBar: 0659ddc7b1713764a05831463d215b177a15d054
-  CapgoCapacitorNativeBiometric: be4ceeff38739d9c0f59b8c41456a3b01cfeddf0
-  EvvaCapacitorSecureStoragePlugin: 43df44513abd5295a63f8e8813e9b5b7159dbfe0
+  CapacitorDevice: a50a45f0d075e55e2392c7a4be5404d4f69515de
+  CapacitorFreerasp: 434f6b28a9469954f9b2c7b419d8723a97b2ac97
+  CapacitorKeyboard: 3822c3a0c6b58168f96ca562f9534ed095d40860
+  CapacitorLocalNotifications: a57a6ff87c1f69a00598f9b97cf52eba8f9ff867
+  CapacitorMlkitBarcodeScanning: 1c8ef85be4994a7e3361633abb510d48e7ddd727
+  CapacitorNativeSettings: f5511eb94cb5700ac4edf54f992d2c0dda1857d6
+  CapacitorPluginSafeArea: af80830df43015a915e504a56318a3027d3fc806
+  CapacitorScreenOrientation: f698d08d01a06dfe0b21392f6c6ba522b9f61773
+  CapacitorShare: 051c3ceee0ddf3bb54574851a622bbb317eed5bd
+  CapacitorSplashScreen: d06ae8804808e9f649a08e7bb7f283c77b688084
+  CapacitorStatusBar: 7d8fcbd6768db014bd721d75e246590b014928e8
+  CapgoCapacitorNativeBiometric: ef4244ffac92fb918ec8aaf19dc0aaef54e24a99
+  EvvaCapacitorSecureStoragePlugin: 0d5ce72e8d8cc62255b7151733ed8c2e0fdc1eed
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleMLKit: eff9e23ec1d90ea4157a1ee2e32a4f610c5b3318
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
@@ -221,4 +221,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: cd800a946aa7fdbcd965311ba62a2a0bac5e05ec
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2
