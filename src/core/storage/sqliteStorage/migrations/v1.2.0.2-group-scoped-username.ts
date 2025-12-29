@@ -30,9 +30,20 @@ export const DATA_V1202: LocalMigration = {
       let recordValue = JSON.parse(identifier.value);
       const groupMetadata = recordValue.groupMetadata || {};
 
+      const calculatedTags = {
+        ...(recordValue.tags || {}),
+        groupId: groupMetadata.groupId,
+        isDeleted: recordValue.isDeleted,
+        creationStatus: recordValue.creationStatus,
+        groupCreated: groupMetadata.groupCreated,
+        pendingDeletion: recordValue.pendingDeletion,
+        pendingUpdate: recordValue.pendingUpdate,
+      };
+
       recordValue = {
         ...recordValue,
         groupMetadata: { ...groupMetadata, proposedUsername: "" },
+        tags: calculatedTags,
       };
 
       statements.push({

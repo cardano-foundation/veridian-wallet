@@ -77,6 +77,12 @@ export const DATA_V1200: TsMigration = {
 
       if (selectedAidForNewRecord) {
         const newRecordId = `${peerConnectionData.id}:${selectedAidForNewRecord}`;
+
+        const calculatedTags = {
+          ...(peerConnectionData.tags || {}),
+          selectedAid: selectedAidForNewRecord,
+        };
+
         const newRecordValue = {
           id: newRecordId,
           type: "peerConnectionPairRecord",
@@ -85,7 +91,7 @@ export const DATA_V1200: TsMigration = {
           url: peerConnectionData.url,
           iconB64: peerConnectionData.iconB64,
           createdAt: peerConnectionData.createdAt,
-          tags: peerConnectionData.tags,
+          tags: calculatedTags,
         };
 
         // eslint-disable-next-line no-console
