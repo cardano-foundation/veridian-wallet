@@ -93,7 +93,10 @@ const ProfileStateModal = () => {
       !currentProfile?.identity.creationStatus ||
       !currentProfile?.identity.createdAtUTC ||
       history.location.pathname.includes(RoutePath.PROFILE_SETUP) ||
-      checkedProfileId.current === currentProfile?.identity.id
+      (checkedProfileId.current === currentProfile?.identity.id &&
+        ![CreationStatus.FAILED, CreationStatus.PENDING].includes(
+          currentProfile?.identity.creationStatus
+        ))
     ) {
       setIsOpen(false);
       return;
