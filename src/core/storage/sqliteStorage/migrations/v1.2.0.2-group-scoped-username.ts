@@ -28,11 +28,31 @@ export const DATA_V1202: LocalMigration = {
       );
 
       let recordValue = JSON.parse(identifier.value);
-      const groupMetadata = recordValue.groupMetadata || {};
+
+      if (!recordValue.groupMetadata || recordValue.groupMemberPre) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `  - Skipping identifier ${identifier.id} (not a group member)`
+        );
+        continue;
+      }
 
       recordValue = {
         ...recordValue,
-        groupMetadata: { ...groupMetadata, proposedUsername: "" },
+        groupMetadata: {
+          ...recordValue.groupMetadata,
+          proposedUsername: "",
+        },
+      };
+
+      const calculatedTags = {
+        ...(recordValue.tags || {}),
+        groupId: recordValue.groupMetadata.groupId,
+        isDeleted: recordValue.isDeleted,
+        creationStatus: recordValue.creationStatus,
+        groupCreated: recordValue.groupMetadata.groupCreated,
+        pendingDeletion: recordValue.pendingDeletion,
+        pendingUpdate: recordValue.pendingUpdate,
       };
 
       statements.push({
@@ -47,7 +67,12 @@ export const DATA_V1202: LocalMigration = {
         statement: "DELETE FROM items_tags WHERE item_id = ?",
         values: [identifier.id],
       });
-      statements.push(...createInsertItemTagsStatements(recordValue));
+      statements.push(
+        ...createInsertItemTagsStatements({
+          id: identifier.id,
+          tags: calculatedTags,
+        })
+      );
     }
     // eslint-disable-next-line no-console
     console.log(
