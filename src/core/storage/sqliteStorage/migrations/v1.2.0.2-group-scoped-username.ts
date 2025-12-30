@@ -30,6 +30,11 @@ export const DATA_V1202: LocalMigration = {
       let recordValue = JSON.parse(identifier.value);
       const groupMetadata = recordValue.groupMetadata || {};
 
+      recordValue = {
+        ...recordValue,
+        groupMetadata: { ...groupMetadata, proposedUsername: "" },
+      };
+
       const calculatedTags = {
         ...(recordValue.tags || {}),
         groupId: groupMetadata.groupId,
@@ -38,12 +43,6 @@ export const DATA_V1202: LocalMigration = {
         groupCreated: groupMetadata.groupCreated,
         pendingDeletion: recordValue.pendingDeletion,
         pendingUpdate: recordValue.pendingUpdate,
-      };
-
-      recordValue = {
-        ...recordValue,
-        groupMetadata: { ...groupMetadata, proposedUsername: "" },
-        tags: calculatedTags,
       };
 
       statements.push({
@@ -58,7 +57,12 @@ export const DATA_V1202: LocalMigration = {
         statement: "DELETE FROM items_tags WHERE item_id = ?",
         values: [identifier.id],
       });
-      statements.push(...createInsertItemTagsStatements(recordValue));
+      statements.push(
+        ...createInsertItemTagsStatements({
+          id: identifier.id,
+          tags: calculatedTags,
+        })
+      );
     }
     // eslint-disable-next-line no-console
     console.log(
