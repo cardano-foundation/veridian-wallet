@@ -28,19 +28,25 @@ export const DATA_V1202: LocalMigration = {
       );
 
       let recordValue = JSON.parse(identifier.value);
-      const groupMetadata = recordValue.groupMetadata || {};
 
-      recordValue = {
-        ...recordValue,
-        groupMetadata: { ...groupMetadata, proposedUsername: "" },
-      };
+      // Only add proposedUsername to identifiers that are actually group members
+      // Individual identifiers should NOT have groupMetadata at all
+      if (recordValue.groupMetadata && !recordValue.groupMemberPre) {
+        recordValue = {
+          ...recordValue,
+          groupMetadata: {
+            ...recordValue.groupMetadata,
+            proposedUsername: "",
+          },
+        };
+      }
 
       const calculatedTags = {
         ...(recordValue.tags || {}),
-        groupId: groupMetadata.groupId,
+        groupId: recordValue.groupMetadata?.groupId,
         isDeleted: recordValue.isDeleted,
         creationStatus: recordValue.creationStatus,
-        groupCreated: groupMetadata.groupCreated,
+        groupCreated: recordValue.groupMetadata?.groupCreated,
         pendingDeletion: recordValue.pendingDeletion,
         pendingUpdate: recordValue.pendingUpdate,
       };
