@@ -14,6 +14,7 @@ import {
   CredentialStatus,
 } from "../../../../../core/agent/services/credentialService.types";
 import { IdentifierType } from "../../../../../core/agent/services/identifier.types";
+import { IpexCommunicationService } from "../../../../../core/agent/services/ipexCommunicationService";
 import { LinkedGroupInfo } from "../../../../../core/agent/services/ipexCommunicationService.types";
 import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../../../i18n";
@@ -47,7 +48,6 @@ import { showError } from "../../../../utils/error";
 import { combineClassNames } from "../../../../utils/style";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./ReceiveCredential.scss";
-import { IpexCommunicationService } from "../../../../../core/agent/services";
 
 const ANIMATION_DELAY = 2600;
 
@@ -62,7 +62,7 @@ const ReceiveCredential = ({
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-  const [initiateAnimation, setInitiateAnimation] = useState(false);
+  const [isAccepting, setIsAccepting] = useState(false);
   const [openInfo, setOpenInfo] = useState(false);
   const [showCommonError, setShowCommonError] = useState(false);
   const [showMissingIssuerModal, setShowMissingIssuerModal] = useState(false);
@@ -115,6 +115,8 @@ const ReceiveCredential = ({
   };
 
   const getMultiSigMemberStatus = useCallback(async () => {
+    if (isAccepting) return;
+
     try {
       const result =
         await Agent.agent.ipexCommunications.getLinkedGroupFromIpexGrant(
@@ -123,7 +125,7 @@ const ReceiveCredential = ({
 
       setMultisigMemberStatus(result);
     } catch (e) {
-      setInitiateAnimation(false);
+      setIsAccepting(false);
       if (
         e instanceof Error &&
         e.message.includes(IpexCommunicationService.NOTIFICATION_NOT_FOUND)
@@ -131,12 +133,13 @@ const ReceiveCredential = ({
         handleBack();
         return;
       }
-
       showError("Unable to get group members", e, dispatch);
     }
-  }, [dispatch, notificationDetails, handleBack]);
+  }, [dispatch, notificationDetails, isAccepting, handleBack]);
 
   const getAcdc = useCallback(async () => {
+    if (isAccepting) return;
+
     try {
       setIsLoading(!credDetail);
 
@@ -169,13 +172,19 @@ const ReceiveCredential = ({
     } catch (e) {
       setShowCommonError(true);
       setTimeout(handleBack);
-      setInitiateAnimation(false);
+      setIsAccepting(false);
       showError("Unable to get acdc", e, dispatch);
     } finally {
       setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, getMultiSigMemberStatus, profiles, notificationDetails.a.d]);
+  }, [
+    dispatch,
+    getMultiSigMemberStatus,
+    profiles,
+    notificationDetails.a.d,
+    isAccepting,
+  ]);
 
   useOnlineStatusEffect(getAcdc);
 
@@ -195,7 +204,7 @@ const ReceiveCredential = ({
   const handleAccept = async () => {
     try {
       const startTime = Date.now();
-      setInitiateAnimation(true);
+      setIsAccepting(true);
 
       if (!isMultisig || (isMultisig && isGroupInitiator)) {
         await Agent.agent.ipexCommunications.admitAcdcFromGrant(
@@ -218,7 +227,7 @@ const ReceiveCredential = ({
         setOpenInfo(false);
       }, ANIMATION_DELAY - (finishTime - startTime));
     } catch (e) {
-      setInitiateAnimation(false);
+      setIsAccepting(false);
       showError("Unable to accept acdc", e, dispatch);
     }
   };
@@ -238,8 +247,8 @@ const ReceiveCredential = ({
   };
 
   const classes = combineClassNames(`${pageId}-receive-credential`, {
-    "animation-on": initiateAnimation,
-    "animation-off": !initiateAnimation,
+    "animation-on": isAccepting,
+    "animation-off": !isAccepting,
     "pending-multisig": userAccepted && isMultisig,
     "ion-hide": isLoading || showCommonError,
     revoked: isRevoked,
