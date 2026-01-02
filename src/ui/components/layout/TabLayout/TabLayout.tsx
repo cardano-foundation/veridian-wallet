@@ -144,7 +144,7 @@ const TabLayout = ({
       )}
       {placeholder || (
         <IonContent
-          id={pageId}
+          id={`${pageId}-content`}
           className="tab-content"
           color="transparent"
         >
