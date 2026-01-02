@@ -10,9 +10,9 @@ import { i18n } from "../../../i18n";
 import { TabsRoutePath } from "../../../routes/paths";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
+  getConnectionsCache,
   getCurrentProfile,
   markNotificationAsRead,
-  getConnectionsCache,
 } from "../../../store/reducers/profileCache";
 import { setCurrentRoute } from "../../../store/reducers/stateCache";
 import { Alert } from "../../components/Alert";
@@ -229,17 +229,17 @@ const Notifications = () => {
             data={notificationsEarlier}
             pageId={pageId}
             onNotificationClick={handleNotificationClick}
-            enableInfiniteScroll={true}
+            enableInfiniteScroll
             initialDisplayCount={3}
             loadMoreCount={5}
             testId="notifications-tab-section-earlier"
             ref={earlierNotificationRef}
           />
-          <p className="notification-empty">
-            {filteredNotification.length === 0
-              ? i18n.t("tabs.notifications.tab.empty")
-              : i18n.t("tabs.notifications.tab.sections.earlier.end")}
-          </p>
+          {filteredNotification.length === 0 && (
+            <p className="notification-empty">
+              {i18n.t("tabs.notifications.tab.empty")}
+            </p>
+          )}
         </div>
       </TabLayout>
       <Profiles

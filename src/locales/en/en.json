@@ -1087,6 +1087,9 @@
             "revokedalert": "This credential has been revoked by the issuer and is no longer available.",
             "relatedprofile": "Related profile",
             "initiatoracceptedalert": "Your group is receiving a credential. Once the group initiator accepts it, you’ll be able to accept yours too.",
+            "accepted": "Once the threshold is met your credential will move from your pending into your main listings",
+            "thresholdmet": "The threshold for this credential has already been met. You can add this to your wallet.",
+            "bottom": "{{members}} group members",
             "alert": {
               "textdecline": "Are you sure you want to decline this credential issuance? You won't be able to change your decision later."
             }
@@ -1256,7 +1259,7 @@
       },
       "button": {
         "seepasswordhint": "View hint",
-        "resetmypassword": "Forgotten your password?",
+        "resetmypassword": "Reset password",
         "tryagain": "Try again",
         "cancel": "Cancel"
       },
