@@ -287,7 +287,7 @@ describe("Receive credential", () => {
     // We also need to mock valid response for getLinkedGroupFromIpexGrantMock
     // so the component doesn't error out before we can test this race condition
     getLinkedGroupFromIpexGrantMock.mockResolvedValue({
-      threshold: "2",
+      threshold: { signingThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: ["member-1"],
       linkedRequest: {
@@ -548,7 +548,7 @@ describe("Credential request: Multisig", () => {
     });
 
     getLinkedGroupFromIpexGrantMock.mockResolvedValue({
-      threshold: "2",
+      threshold: { signingThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: [],
       linkedRequest: {
@@ -606,7 +606,7 @@ describe("Credential request: Multisig", () => {
     });
 
     getLinkedGroupFromIpexGrantMock.mockResolvedValue({
-      threshold: "2",
+      threshold: { signingThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: ["member-1"],
       linkedRequest: {
@@ -655,7 +655,7 @@ describe("Credential request: Multisig", () => {
     });
 
     getLinkedGroupFromIpexGrantMock.mockResolvedValue({
-      threshold: "2",
+      threshold: { signingThreshold: 2 },
       members: ["member-1", "member-2", "member-3"],
       othersJoined: ["member-1", "member-2"],
       linkedRequest: {
@@ -697,7 +697,7 @@ describe("Credential request: Multisig", () => {
     });
 
     getLinkedGroupFromIpexGrantMock.mockResolvedValue({
-      threshold: "2",
+      threshold: { signingThreshold: 2 },
       members: ["member-1", "member-2"],
       othersJoined: ["member-1"],
       linkedRequest: {

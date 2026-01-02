@@ -13,6 +13,7 @@ import {
   CredentialStatus,
 } from "../../../../../core/agent/services/credentialService.types";
 import { IdentifierType } from "../../../../../core/agent/services/identifier.types";
+import { IpexCommunicationService } from "../../../../../core/agent/services/ipexCommunicationService";
 import { LinkedGroupInfo } from "../../../../../core/agent/services/ipexCommunicationService.types";
 import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
 import { i18n } from "../../../../../i18n";
@@ -92,7 +93,7 @@ const ReceiveCredential = ({
     isMultisig &&
     multisigMemberStatus.othersJoined.length +
       (multisigMemberStatus.linkedRequest.accepted ? 1 : 0) >=
-      Number(multisigMemberStatus.threshold);
+      Number(multisigMemberStatus.threshold.signingThreshold);
 
   const profile = profiles[credDetail?.identifierId || ""];
   const groupInitiatorAid = multisigMemberStatus.members[0] || "";
@@ -126,9 +127,16 @@ const ReceiveCredential = ({
       setMultisigMemberStatus(result);
     } catch (e) {
       setIsAccepting(false);
+      if (
+        e instanceof Error &&
+        e.message.includes(IpexCommunicationService.NOTIFICATION_NOT_FOUND)
+      ) {
+        handleBack();
+        return;
+      }
       showError("Unable to get group members", e, dispatch);
     }
-  }, [dispatch, notificationDetails, isAccepting]);
+  }, [dispatch, notificationDetails, isAccepting, handleBack]);
 
   const getAcdc = useCallback(async () => {
     if (isAccepting) return;
