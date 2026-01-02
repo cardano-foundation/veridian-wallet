@@ -354,10 +354,12 @@ class Agent {
     this.agentServicesProps.signifyClient = this.signifyClient;
     await this.connectSignifyClient();
 
-    await this.basicStorage.save({
-      id: MiscRecordId.CLOUD_RECOVERY_STATUS,
-      content: { syncing: true },
-    });
+    await this.basicStorage.createOrUpdateBasicRecord(
+      new BasicRecord({
+        id: MiscRecordId.CLOUD_RECOVERY_STATUS,
+        content: { syncing: true },
+      })
+    );
 
     await this.markSeedPhraseAsVerified();
 
@@ -524,18 +526,22 @@ class Agent {
   }
 
   private async saveAgentUrls(agentUrls: AgentUrls): Promise<void> {
-    await this.basicStorageService.save({
-      id: MiscRecordId.KERIA_CONNECT_URL,
-      content: {
-        url: agentUrls.url,
-      },
-    });
-    await this.basicStorageService.save({
-      id: MiscRecordId.KERIA_BOOT_URL,
-      content: {
-        url: agentUrls.bootUrl,
-      },
-    });
+    await this.basicStorageService.createOrUpdateBasicRecord(
+      new BasicRecord({
+        id: MiscRecordId.KERIA_CONNECT_URL,
+        content: {
+          url: agentUrls.url,
+        },
+      })
+    );
+    await this.basicStorageService.createOrUpdateBasicRecord(
+      new BasicRecord({
+        id: MiscRecordId.KERIA_BOOT_URL,
+        content: {
+          url: agentUrls.bootUrl,
+        },
+      })
+    );
   }
 
   async setupLocalDependencies(): Promise<void> {

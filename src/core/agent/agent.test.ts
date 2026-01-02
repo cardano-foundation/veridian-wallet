@@ -246,7 +246,9 @@ describe("KERIA connectivity", () => {
     expect(SecureStorage.get).toBeCalledWith(KeyStoreKeys.SIGNIFY_BRAN);
     expect(mockSignifyClient.boot).toHaveBeenCalled();
     expect(mockSignifyClient.connect).toHaveBeenCalled();
-    expect(mockBasicStorageService.save).toBeCalledTimes(2);
+    expect(mockBasicStorageService.createOrUpdateBasicRecord).toBeCalledTimes(
+      3
+    );
     expect(Agent.isOnline).toBe(true);
     expect(mockAgentServicesProps.eventEmitter.emit).toBeCalledWith({
       type: EventTypes.KeriaStatusChanged,
@@ -264,6 +266,7 @@ describe("KERIA connectivity", () => {
     });
     mockSignifyClient.connect.mockResolvedValueOnce(true);
     SecureStorage.get = jest.fn().mockResolvedValueOnce(mockGetBranValue);
+
     await agent.bootAndConnect(mockAgentUrls);
 
     expect(signifyReady).toHaveBeenCalled();
@@ -276,7 +279,9 @@ describe("KERIA connectivity", () => {
     expect(SecureStorage.get).toBeCalledWith(KeyStoreKeys.SIGNIFY_BRAN);
     expect(mockSignifyClient.boot).toHaveBeenCalled();
     expect(mockSignifyClient.connect).toHaveBeenCalled();
-    expect(mockBasicStorageService.save).toBeCalledTimes(2);
+    expect(mockBasicStorageService.createOrUpdateBasicRecord).toBeCalledTimes(
+      3
+    );
     expect(Agent.isOnline).toBe(true);
     expect(mockAgentServicesProps.eventEmitter.emit).toBeCalledWith({
       type: EventTypes.KeriaStatusChanged,
