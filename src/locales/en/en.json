@@ -1259,7 +1259,7 @@
       },
       "button": {
         "seepasswordhint": "View hint",
-        "resetmypassword": "Forgotten your password?",
+        "resetmypassword": "Reset password",
         "tryagain": "Try again",
         "cancel": "Cancel"
       },

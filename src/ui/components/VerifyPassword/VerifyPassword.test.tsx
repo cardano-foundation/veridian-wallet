@@ -426,7 +426,7 @@ describe("Verify Password", () => {
       fireEvent(
         passwordInput,
         new CustomEvent("ionInput", {
-          detail: { value: "test" },
+          detail: { value: "testgames" },
         })
       );
     });

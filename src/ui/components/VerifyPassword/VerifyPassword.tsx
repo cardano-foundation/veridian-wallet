@@ -172,12 +172,13 @@ const VerifyPassword = ({
         <PageFooter
           primaryButtonAction={() => setAttempts(attempts - 1)}
           primaryButtonText={`${i18n.t("verifypassword.confirm")}`}
-          primaryButtonDisabled={verifyPasswordValue.length === 0}
+          primaryButtonDisabled={verifyPasswordValue.length < 8}
         />
       </OptionModal>
       <Alert
         isOpen={alertChoiceIsOpen}
         setIsOpen={setAlertChoiceIsOpen}
+        className="verify-password-modal"
         dataTestId="alert-choice"
         headerText={i18n.t("verifypassword.alert.choice.title")}
         confirmButtonText={`${i18n.t(
@@ -207,6 +208,7 @@ const VerifyPassword = ({
         isOpen={alertHintIsOpen}
         setIsOpen={setAlertHintIsOpen}
         dataTestId="alert-tryagain"
+        className="verify-password-modal"
         headerText={i18n.t("verifypassword.alert.hint.title")}
         subheaderText={storedHint}
         confirmButtonText={`${i18n.t("verifypassword.alert.button.tryagain")}`}
