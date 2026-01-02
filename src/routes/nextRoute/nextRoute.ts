@@ -39,6 +39,17 @@ const getNextRootRoute = (data: DataProps) => {
       : TabsRoutePath.HOME;
   }
 
+  if (
+    data.store.stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup ||
+    (
+      data.store.stateCache as StateCacheProps & {
+        isPendingJoinGroup?: boolean;
+      }
+    ).isPendingJoinGroup
+  ) {
+    path = RoutePath.PROFILE_SETUP;
+  }
+
   const { currentProfile } = data.store;
   if (
     currentProfile &&
@@ -61,18 +72,10 @@ const getNextRootRoute = (data: DataProps) => {
     path =
       isGroupProfile && !isCreatedGroup && !isPendingAfterCreate
         ? RoutePath.GROUP_PROFILE_SETUP.replace(
-          ":id",
-          currentProfile.identity.id
-        )
+            ":id",
+            currentProfile.identity.id
+          )
         : path;
-  }
-
-  if (
-    data.store.stateCache.pendingJoinGroupMetadata?.isPendingJoinGroup ||
-    (data.store.stateCache as StateCacheProps & { isPendingJoinGroup?: boolean })
-      .isPendingJoinGroup
-  ) {
-    path = RoutePath.PROFILE_SETUP;
   }
 
   return { pathname: path };

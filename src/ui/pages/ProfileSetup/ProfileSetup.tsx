@@ -274,8 +274,11 @@ export const ProfileSetup = ({
     setIsScanOpen(true);
   };
 
-  const handleCloseScan = () => {
+  const handleCloseScan = (shouldClosePage = false) => {
     setIsScanOpen(false);
+    if (shouldClosePage && joinGroupMode) {
+      onClose?.(true);
+    }
   };
 
   const handleChangeStep = () => {
@@ -494,7 +497,7 @@ export const ProfileSetup = ({
             <PageHeader
               closeButton={!!back}
               closeButtonLabel={back}
-              closeButtonAction={handleCloseScan}
+              closeButtonAction={() => handleCloseScan(true)}
               actionButton={supportMultiCamera}
               actionButtonIcon={repeatOutline}
               actionButtonAction={changeCameraDirection}

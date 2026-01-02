@@ -363,6 +363,7 @@ describe("getNextRoute", () => {
             ssiAgentIsSet: true,
             ssiAgentUrl: "http://keria.com",
             finishSetupBiometrics: true,
+            isSetupProfile: false,
           },
           queueIncomingRequest: {
             isProcessing: false,

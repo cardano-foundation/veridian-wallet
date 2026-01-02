@@ -57,7 +57,7 @@ const ShareConnections = ({ group, oobi, profile }: SetupConnectionsProps) => {
       dispatch(setToastMsg(ToastMsgType.IDENTIFIER_DELETED));
       ionRouter.push(
         !nextCurrentProfile || !nextCurrentProfile.groupMetadata
-          ? TabsRoutePath.CREDENTIALS
+          ? TabsRoutePath.HOME
           : RoutePath.GROUP_PROFILE_SETUP.replace(":id", nextCurrentProfile.id)
       );
       // Waiting
