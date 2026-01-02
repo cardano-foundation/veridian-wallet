@@ -48,7 +48,6 @@ import { showError } from "../../../../utils/error";
 import { combineClassNames } from "../../../../utils/style";
 import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./ReceiveCredential.scss";
-import { IpexCommunicationService } from "../../../../../core/agent/services";
 
 const ANIMATION_DELAY = 2600;
 
