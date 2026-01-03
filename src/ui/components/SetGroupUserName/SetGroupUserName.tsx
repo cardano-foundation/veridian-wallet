@@ -59,6 +59,9 @@ const SetGroupUserName = ({ identifier, onClose }: SetGroupNameProps) => {
 
       const updatedIdentifier: IdentifierShortDetails = {
         ...identifier,
+        groupMetadata: identifier.groupMetadata
+          ? { ...identifier.groupMetadata }
+          : undefined,
       };
 
       if (

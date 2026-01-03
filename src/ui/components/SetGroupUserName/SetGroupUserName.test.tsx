@@ -4,13 +4,17 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
-import { multisignIdentifierFix } from "../../__fixtures__/filteredIdentifierFix";
+import {
+  multisignIdentifierFix,
+  pendingMemberIdentifierFix,
+} from "../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../__fixtures__/identifierFix";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { SetGroupUserName } from "./SetGroupUserName";
+import { addOrUpdateProfileIdentity } from "../../../store/reducers/profileCache";
 
 const updateMock = jest.fn();
 
@@ -125,6 +129,48 @@ describe("Set individual name", () => {
     });
   });
 
+  test("set name when data loaded from redux", async () => {
+    const { getByTestId } = render(
+      <Provider store={mockedStore}>
+        <SetGroupUserName
+          identifier={deepFreeze(pendingMemberIdentifierFix[0])}
+        />
+      </Provider>
+    );
+
+    act(() => {
+      fireEvent(
+        getByTestId("edit-member-name-input"),
+        new CustomEvent("ionInput", { detail: { value: "Duke" } })
+      );
+    });
+
+    await waitFor(() => {
+      expect(
+        getByTestId("primary-button-set-group-name").getAttribute("disabled")
+      ).toBe("false");
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("primary-button-set-group-name"));
+    });
+
+    await waitFor(() => {
+      expect(updateMock).toBeCalledTimes(1);
+      expect(dispatchMock).toBeCalledWith(
+        addOrUpdateProfileIdentity({
+          ...pendingMemberIdentifierFix[0],
+          groupMetadata: !pendingMemberIdentifierFix[0].groupMetadata
+            ? undefined
+            : {
+                ...pendingMemberIdentifierFix[0].groupMetadata,
+                proposedUsername: "Duke",
+              },
+        })
+      );
+    });
+  });
+
   test("Display error when display name invalid", async () => {
     const { getByTestId, getByText } = render(
       <Provider store={mockedStore}>
@@ -171,3 +217,21 @@ describe("Set individual name", () => {
     });
   });
 });
+
+function deepFreeze<T>(obj: T): T {
+  Object.freeze(obj);
+
+  Object.getOwnPropertyNames(obj).forEach((prop) => {
+    const value = (obj as any)[prop];
+
+    if (
+      value !== null &&
+      (typeof value === "object" || typeof value === "function") &&
+      !Object.isFrozen(value)
+    ) {
+      deepFreeze(value);
+    }
+  });
+
+  return obj;
+}
