@@ -100,7 +100,7 @@ interface JSONObject {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface JSONArray extends Array<JSONValue> { }
+interface JSONArray extends Array<JSONValue> {}
 
 type JSONValue =
   | string
@@ -199,13 +199,13 @@ interface ConnectionDetailsExtras {
 
 interface RegularConnectionDetailsFull
   extends ConnectionShortDetailsBase,
-  ConnectionDetailsExtras {
+    ConnectionDetailsExtras {
   identifier: string;
 }
 
 interface MultisigConnectionDetailsFull
   extends ConnectionShortDetailsBase,
-  ConnectionDetailsExtras {
+    ConnectionDetailsExtras {
   groupId: string;
 }
 
@@ -239,10 +239,10 @@ enum OobiType {
 type OobiScan =
   | { type: OobiType.NORMAL; connection: ConnectionShortDetails }
   | {
-    type: OobiType.MULTI_SIG_INITIATOR;
-    groupId: string;
-    connection: MultisigConnectionDetails;
-  };
+      type: OobiType.MULTI_SIG_INITIATOR;
+      groupId: string;
+      connection: MultisigConnectionDetails;
+    };
 
 interface AgentServicesProps {
   signifyClient: SignifyClient;
@@ -266,7 +266,7 @@ enum CreationStatus {
 }
 
 export const OOBI_RE =
-  /^\/oobi\/(?<cid>[^/]+)\/(?<role>agent|witness|controller|mailbox)(?:\/(?<eid>[^/]+))?$/i;
+  /^\/oobi\/(?<cid>[^/]+)(?:\/(?:(?<role>agent|witness|controller|mailbox)\/)?(?<eid>[^/?]+))?$/i;
 export const DOOBI_RE = /^\/oobi\/(?<said>[^/]+)$/i;
 export const WOOBI_RE = /^\/\.well-known\/keri\/oobi\/(?<cid>[^/]+)$/;
 
