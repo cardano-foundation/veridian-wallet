@@ -55,7 +55,7 @@ const VerifySeedPhraseCard = () => {
         <IonButton
           shape="round"
           expand="block"
-          className="primary-button"
+          className="primary-button button-slim"
           onClick={() => setOpen(true)}
         >
           {i18n.t("tabs.home.tab.verifyseedphrase.button")}
