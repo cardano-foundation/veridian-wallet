@@ -250,6 +250,12 @@ p {
   &.button-slim {
     height: 2.5rem;
   }
+
+  @media screen and (min-height: 300px) and (max-height: 580px) {
+    &.button-slim {
+      height: 2rem;
+    }
+  }
 }
 
 @media screen and (min-width: 250px) and (max-width: 370px) {
@@ -261,6 +267,10 @@ p {
     font-size: 0.8rem;
     height: 2.8rem;
     margin: 0 auto 0.8rem;
+
+    &.button-slim {
+      height: 2rem;
+    }
   }
 }
 

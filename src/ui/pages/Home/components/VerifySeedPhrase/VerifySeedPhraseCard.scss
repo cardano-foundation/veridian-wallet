@@ -31,6 +31,16 @@
         line-height: 1.25rem;
         margin: 0;
       }
+
+      @media screen and (min-height: 300px) and (max-height: 580px) {
+        h3 {
+          font-size: 0.8rem;
+        }
+
+        p {
+          font-size: 0.7rem;
+        }
+      }
     }
   }
 }
