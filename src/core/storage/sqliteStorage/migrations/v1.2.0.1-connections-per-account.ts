@@ -1,4 +1,3 @@
-import { Tags } from "../../storage.types";
 import { IdentifierMetadataRecordProps } from "../../../agent/records/identifierMetadataRecord";
 import { MigrationType, TsMigration } from "./migrations.types";
 import {
@@ -53,10 +52,11 @@ export const DATA_V1201: TsMigration = {
         alias: connectionData.alias,
         oobi: connectionData.oobi,
         groupId: connectionData.groupId,
-        tags: {
-          groupId: connectionData.groupId,
-        },
         type: "ContactRecord",
+      };
+
+      const contactTags = {
+        groupId: connectionData.groupId,
       };
 
       // we need to delete the connection with this id, because it will be replaced by the new connection in items table
@@ -72,9 +72,18 @@ export const DATA_V1201: TsMigration = {
         identifier: string;
         creationStatus: string;
         pendingDeletion: boolean;
-        tags: Tags;
         type: string;
       }> = [];
+
+      const connectionPairTags: Record<
+        string,
+        {
+          identifier: string;
+          contactId: string;
+          creationStatus: string;
+          pendingDeletion: boolean;
+        }
+      > = {};
 
       if (!connectionData.sharedIdentifier) {
         if (!connectionData.groupId) {
@@ -84,21 +93,22 @@ export const DATA_V1201: TsMigration = {
 
         // No sharedIdentifier: create pair for every non-deleted identifier
         for (const identifier of identifiers) {
+          const pairId = `${identifier.id}:${connectionData.id}`;
           connectionPairsToInsert.push({
-            id: `${identifier.id}:${connectionData.id}`,
+            id: pairId,
             contactId: contactRecord.id,
             createdAt: connectionData.createdAt,
             identifier: identifier.id,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
-            tags: {
-              identifier: identifier.id,
-              contactId: contactRecord.id,
-              creationStatus: connectionData.creationStatus,
-              pendingDeletion: connectionData.pendingDeletion,
-            },
             type: "ConnectionPairRecord",
           });
+          connectionPairTags[pairId] = {
+            identifier: identifier.id,
+            contactId: contactRecord.id,
+            creationStatus: connectionData.creationStatus,
+            pendingDeletion: connectionData.pendingDeletion,
+          };
         }
       } else {
         // Has sharedIdentifier: only create pair if identifier exists and is not deleted/pending
@@ -106,31 +116,42 @@ export const DATA_V1201: TsMigration = {
           return identifier.id === connectionData.sharedIdentifier;
         });
         if (identifier) {
+          const pairId = `${identifier.id}:${connectionData.id}`;
           connectionPairsToInsert.push({
-            id: `${identifier.id}:${connectionData.id}`,
+            id: pairId,
             contactId: contactRecord.id,
             identifier: identifier.id,
             createdAt: connectionData.createdAt,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
-            tags: {
-              identifier: identifier.id,
-              contactId: contactRecord.id,
-              creationStatus: connectionData.creationStatus,
-              pendingDeletion: connectionData.pendingDeletion,
-            },
             type: "ConnectionPairRecord",
           });
+          connectionPairTags[pairId] = {
+            identifier: identifier.id,
+            contactId: contactRecord.id,
+            creationStatus: connectionData.creationStatus,
+            pendingDeletion: connectionData.pendingDeletion,
+          };
         }
       }
 
       if (connectionPairsToInsert.length > 0 || connectionData.groupId) {
         statements.push(createInsertItemStatement(contactRecord));
-        statements.push(...createInsertItemTagsStatements(contactRecord));
+        statements.push(
+          ...createInsertItemTagsStatements({
+            id: contactRecord.id,
+            tags: contactTags,
+          })
+        );
 
         for (const connectionPair of connectionPairsToInsert) {
           statements.push(createInsertItemStatement(connectionPair));
-          statements.push(...createInsertItemTagsStatements(connectionPair));
+          statements.push(
+            ...createInsertItemTagsStatements({
+              id: connectionPair.id,
+              tags: connectionPairTags[connectionPair.id],
+            })
+          );
         }
       }
     }
