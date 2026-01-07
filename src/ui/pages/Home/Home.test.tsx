@@ -102,13 +102,14 @@ afterEach(() => {
   clearOnlineStatusEffects();
 });
 
-const createTestState = (groupMemberPre = false) => ({
+const createTestState = (groupMemberPre = false, seedPhraseIsSet = false) => ({
   stateCache: {
     routes: [TabsRoutePath.HOME],
     authentication: {
       loggedIn: true,
       time: Date.now(),
       passcodeIsSet: true,
+      seedPhraseIsSet,
     },
     toastMsgs: [],
   },
@@ -291,6 +292,20 @@ describe("Home page", () => {
 
     await waitFor(() => {
       expect(queryAllByTestId("rotate-keys")).toHaveLength(0);
+    });
+  });
+
+  test("renders verify seed phrase card while seed phrase is unverified", async () => {
+    const { getByTestId } = await renderHome(createTestState());
+
+    expect(getByTestId("verify-seedphrase-card")).toBeInTheDocument();
+  });
+
+  test("hides verify seed phrase card once the seed phrase is verified", async () => {
+    const { queryByTestId } = await renderHome(createTestState(false, true));
+
+    await waitFor(() => {
+      expect(queryByTestId("verify-seedphrase-card")).toBeNull();
     });
   });
 });

@@ -3,12 +3,17 @@ import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import { Agent } from "../../../../core/agent/agent";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
-import { store } from "../../../../store";
+import { makeTestStore } from "../../../utils/makeTestStore";
 import {
-  getBiometricsCache,
+  biometricsCacheSlice,
   setEnableBiometricsCache,
 } from "../../../../store/reducers/biometricsCache";
-import { getNotificationsPreferences } from "../../../../store/reducers/notificationsPreferences/notificationsPreferences";
+import { notificationsPreferencesSlice } from "../../../../store/reducers/notificationsPreferences/notificationsPreferences";
+import {
+  AuthenticationCacheProps,
+  StateCacheProps,
+  initialState as stateCacheInitialState,
+} from "../../../../store/reducers/stateCache";
 import { BiometricAuthOutcome } from "../../../hooks/useBiometricsHook";
 import { OptionIndex } from "../Settings.types";
 import { SettingsList } from "./SettingsList";
@@ -114,25 +119,36 @@ jest.mock("../../../hooks/useBiometricsHook", () => ({
 describe("SettingsList", () => {
   const mockSwitchView = jest.fn();
   const mockHandleClose = jest.fn();
-  const dispatchMock = jest.fn();
 
   const defaultProps = {
     switchView: mockSwitchView,
     handleClose: mockHandleClose,
   };
 
+  type RenderOptions = {
+    props?: typeof defaultProps;
+    authOverrides?: Partial<AuthenticationCacheProps>;
+  };
+
+  const createStateCache = (
+    authOverrides?: Partial<AuthenticationCacheProps>
+  ): StateCacheProps => {
+    const stateCache = JSON.parse(
+      JSON.stringify(stateCacheInitialState)
+    ) as StateCacheProps;
+
+    if (authOverrides) {
+      stateCache.authentication = {
+        ...stateCache.authentication,
+        ...authOverrides,
+      };
+    }
+
+    return stateCache;
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    const useSelectorMock = jest.requireMock("react-redux").useSelector;
-    useSelectorMock.mockImplementation((selector: unknown) => {
-      if (selector === getBiometricsCache) {
-        return { enabled: false };
-      }
-      if (selector === getNotificationsPreferences) {
-        return { enabled: false, configured: false };
-      }
-      return undefined;
-    });
     jest
       .requireMock("../../../hooks/privacyScreenHook")
       .usePrivacyScreen.mockReturnValue({
@@ -145,14 +161,26 @@ describe("SettingsList", () => {
     }));
   });
 
-  const renderComponent = (props = defaultProps) =>
-    render(
-      <Provider store={{ ...store, dispatch: dispatchMock }}>
+  const renderComponent = (options: RenderOptions = {}) => {
+    const { props = defaultProps, authOverrides } = options;
+    const preloadedState = {
+      stateCache: createStateCache(authOverrides),
+      biometricsCache: biometricsCacheSlice.getInitialState(),
+      notificationsPreferences: notificationsPreferencesSlice.getInitialState(),
+    };
+    const testStore = makeTestStore(preloadedState);
+    const dispatchSpy = jest.spyOn(testStore, "dispatch");
+
+    const utils = render(
+      <Provider store={testStore}>
         <MemoryRouter>
           <SettingsList {...props} />
         </MemoryRouter>
       </Provider>
     );
+
+    return { ...utils, dispatchSpy };
+  };
 
   test("renders complete component structure", () => {
     renderComponent();
@@ -212,6 +240,20 @@ describe("SettingsList", () => {
     renderComponent();
 
     expect(screen.getByText("1.0.0")).toBeInTheDocument();
+  });
+
+  test("shows verify seed phrase card when seed phrase is not verified", () => {
+    const { getByTestId } = renderComponent();
+
+    expect(getByTestId("verify-seedphrase-card")).toBeVisible();
+  });
+
+  test("hides verify seed phrase card when it has already been verified", () => {
+    const { queryByTestId } = renderComponent({
+      authOverrides: { seedPhraseIsSet: true },
+    });
+
+    expect(queryByTestId("verify-seedphrase-card")).toBeNull();
   });
 
   test("handles biometric settings", () => {
@@ -314,7 +356,7 @@ describe("SettingsList", () => {
 
   test("Click on setup with SUCCESS outcome", async () => {
     setupBiometricsMock.mockResolvedValue(BiometricAuthOutcome.SUCCESS);
-    const { getByText } = renderComponent();
+    const { getByText, dispatchSpy } = renderComponent();
     const biometricToggle = screen.getByTestId("settings-security-list-item-0");
     fireEvent.click(biometricToggle);
 
@@ -331,7 +373,7 @@ describe("SettingsList", () => {
     });
 
     await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(setEnableBiometricsCache(true));
+      expect(dispatchSpy).toHaveBeenCalledWith(setEnableBiometricsCache(true));
     });
   });
 });

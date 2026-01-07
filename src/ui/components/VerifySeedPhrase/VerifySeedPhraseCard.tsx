@@ -44,7 +44,10 @@ const VerifySeedPhraseCard = () => {
 
   return (
     <>
-      <div className="verify-seedphrase-card">
+      <div
+        className="verify-seedphrase-card"
+        data-testid="verify-seedphrase-card"
+      >
         <div className="verify-seedphrase-header">
           <IonIcon icon={syncOutline} />
           <div className="verify-seedphrase-header-content">
