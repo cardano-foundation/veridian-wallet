@@ -3,6 +3,10 @@
     ion-toolbar {
       --background: transparent;
     }
+
+    ion-title {
+      text-align: left;
+    }
   }
 
   .alert {

@@ -36,6 +36,8 @@ import { ErrorPageProps } from "./ErrorPage.types";
 import { MemberAcceptStatus } from "../../../../components/MemberList/MemberList.type";
 import { showError } from "../../../../utils/error";
 import { Agent } from "../../../../../core/agent/agent";
+import { Avatar } from "../../../../components/Avatar";
+import { Profiles } from "../../../Profiles";
 
 const ErrorPage = ({
   pageId,
@@ -52,7 +54,9 @@ const ErrorPage = ({
   const [showShareProfile, setShowShareProfile] = useState(false);
   const [alertDeleteOpen, setAlertDeleteOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
+  const [openProfiles, setOpenProfiles] = useState(false);
   const [totalMember, setTotalMember] = useState(0);
+  const identity = profile.identity;
 
   const { resolveGroupConnection } = useScanHandle();
   const dispatch = useAppDispatch();
@@ -152,6 +156,9 @@ const ErrorPage = ({
 
   const closeAlert = () => setAlertDeleteOpen(false);
   const showVerify = () => setVerifyIsOpen(true);
+  const handleAvatarClick = () => {
+    setOpenProfiles(true);
+  };
 
   const primaryButtonLabel =
     totalMember > 0 && isConnectAllMember
@@ -166,9 +173,18 @@ const ErrorPage = ({
         activeStatus={activeStatus}
         header={
           <PageHeader
-            title={`${i18n.t(
-              "tabs.notifications.details.identifier.errorpage.title"
-            )}`}
+            title={
+              identity?.groupUsername ||
+              identity?.groupMetadata?.proposedUsername
+            }
+            additionalButtons={
+              identity?.id && (
+                <Avatar
+                  id={identity?.id}
+                  handleAvatarClick={handleAvatarClick}
+                />
+              )
+            }
           />
         }
         footer={
@@ -310,6 +326,10 @@ const ErrorPage = ({
         defaultTab={Tab.Scan}
         oobi={oobi}
         onScan={handleScan}
+      />
+      <Profiles
+        isOpen={openProfiles}
+        setIsOpen={setOpenProfiles}
       />
     </>
   );
