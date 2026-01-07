@@ -151,6 +151,7 @@ describe("Pending group", () => {
           [initiatorGroupProfile.id]: {
             identity: initiatorGroupProfile,
             notifications: [],
+            multisigConnections: [],
           },
         },
         defaultProfile: initiatorGroupProfile.id,
@@ -282,6 +283,7 @@ describe("Pending group", () => {
           [initiatorGroupProfile.id]: {
             identity: memberGroupProfile,
             notifications: [notificationsFix[3]],
+            multisigConnections: [],
           },
         },
         defaultProfile: initiatorGroupProfile.id,

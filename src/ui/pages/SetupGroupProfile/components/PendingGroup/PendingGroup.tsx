@@ -65,7 +65,6 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const [showErrorPage, setShowErrorPage] = useState(false);
   const [shareProfile, setShareProfile] = useState(false);
   const [oobi, setOobi] = useState("");
-  const [intiatorName, setInitatorName] = useState("");
 
   const initGroupNotification = defaultProfile?.notifications.find(
     (item) => item.a.r === NotificationRoute.MultiSigIcp
@@ -273,7 +272,6 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
         initGroupNotification.a.d as string
       );
       setMultisigIcpDetails(details);
-      setInitatorName(details.sender.label);
       setShowErrorPage(false);
     } catch (e) {
       if (
@@ -286,29 +284,6 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     }
   }, [initGroupNotification]);
 
-  const getIntiatorName = useCallback(async () => {
-    if (!identity?.groupMemberPre || !!intiatorName) return;
-
-    try {
-      const identifiers = await Agent.agent.identifiers.getIdentifiers(false);
-      const preIdentifier = identifiers.find(
-        (item) => item.id == identity.groupMemberPre
-      );
-
-      if (
-        !preIdentifier ||
-        !!preIdentifier.groupMetadata?.groupInitiator ||
-        !preIdentifier.groupMetadata?.initiatorName
-      ) {
-        return;
-      }
-
-      setInitatorName(preIdentifier.groupMetadata.initiatorName);
-    } catch (e) {
-      showError("Failed to get intiator name", e);
-    }
-  }, [identity?.groupMemberPre, intiatorName]);
-
   const fetchGroupDetails = useCallback(async () => {
     if (!isPendingGroup) return;
 
@@ -317,10 +292,8 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       return;
     }
 
-    await getIntiatorName();
     await getInceptionStatus();
   }, [
-    getIntiatorName,
     fetchMultisigDetails,
     getInceptionStatus,
     isPendingGroup,
@@ -361,6 +334,8 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const closeDeclineAlert = () => setAlertDeclineIsOpen(false);
   const openDeclineAlert = () => setAlertDeclineIsOpen(true);
   const showVerify = () => setVerifyIsOpen(true);
+  const intiatorName =
+    multisigIcpDetails?.sender.label || groupDetails?.members[0].name;
 
   const text = isPendingMember
     ? i18n.t("setupgroupprofile.pending.alert.membertext")

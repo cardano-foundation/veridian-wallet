@@ -2,6 +2,7 @@ import { IonButton, IonIcon, IonText } from "@ionic/react";
 import { alertCircleOutline, exitOutline, qrCodeOutline } from "ionicons/icons";
 import { useCallback, useEffect, useState } from "react";
 import { Trans } from "react-i18next";
+import { Agent } from "../../../../../core/agent/agent";
 import {
   isMultisigConnectionDetails,
   OobiType,
@@ -10,11 +11,11 @@ import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
   getMultisigConnectionsCache,
-  getProfiles,
   updateOrAddMultisigConnectionCache,
 } from "../../../../../store/reducers/profileCache";
 import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { Alert } from "../../../../components/Alert";
+import { Avatar } from "../../../../components/Avatar";
 import {
   CardBlock,
   CardDetailsBlock,
@@ -23,6 +24,7 @@ import {
 import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { MemberList } from "../../../../components/MemberList";
+import { MemberAcceptStatus } from "../../../../components/MemberList/MemberList.type";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
 import { useScanHandle } from "../../../../components/Scan/hook/useScanHandle";
@@ -31,13 +33,10 @@ import { Tab } from "../../../../components/ShareProfile/ShareProfile.types";
 import { Verification } from "../../../../components/Verification";
 import { SUPPORT_EMAIL } from "../../../../globals/constants";
 import { ToastMsgType } from "../../../../globals/types";
+import { showError } from "../../../../utils/error";
+import { Profiles } from "../../../Profiles";
 import "./ErrorPage.scss";
 import { ErrorPageProps } from "./ErrorPage.types";
-import { MemberAcceptStatus } from "../../../../components/MemberList/MemberList.type";
-import { showError } from "../../../../utils/error";
-import { Agent } from "../../../../../core/agent/agent";
-import { Avatar } from "../../../../components/Avatar";
-import { Profiles } from "../../../Profiles";
 
 const ErrorPage = ({
   pageId,
@@ -49,7 +48,6 @@ const ErrorPage = ({
   handleLeaveGroup,
   onFinishSetup,
 }: ErrorPageProps) => {
-  const profiles = useAppSelector(getProfiles);
   const connectionsCache = useAppSelector(getMultisigConnectionsCache);
   const [showShareProfile, setShowShareProfile] = useState(false);
   const [alertDeleteOpen, setAlertDeleteOpen] = useState(false);
@@ -62,7 +60,7 @@ const ErrorPage = ({
   const dispatch = useAppDispatch();
 
   const isConnectAllMember =
-    profile.multisigConnections.length == totalMember - 1;
+    profile.multisigConnections.length === totalMember - 1;
 
   const actionAccept = () => {
     if (isConnectAllMember) {
@@ -70,22 +68,7 @@ const ErrorPage = ({
       return;
     }
 
-    const connection = connectionsCache.find(
-      (c) => c.id === notificationDetails.connectionId
-    );
-    const multiSignGroupId =
-      connection && isMultisigConnectionDetails(connection)
-        ? connection.groupId
-        : undefined;
-
-    const identifier = Object.values(profiles).find((item) => {
-      const profileGroupId = item.identity.groupMetadata?.groupId;
-      return profileGroupId === multiSignGroupId;
-    });
-
-    if (identifier) {
-      setShowShareProfile(true);
-    }
+    setShowShareProfile(true);
   };
 
   const HandleEmail = () => {

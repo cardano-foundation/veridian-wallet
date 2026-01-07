@@ -168,3 +168,24 @@ export const multisignConnection: MultisigConnectionDetails = {
   contactId: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
   groupId: "0AB-FeKhcGbqGs6Ao39SytSw",
 };
+
+export const multisignConnections: MultisigConnectionDetails[] = [
+  {
+    id: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d3",
+    label: "Leader",
+    createdAtUTC: "2025-09-19T10:35:27.838Z",
+    status: ConnectionStatus.CONFIRMED,
+    oobi: "https://keria-ext.dev.idw-sandboxes.cf-deployments.org/oobi/EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2/agent/EOf2XGHRW_94wyPkBFwNRupyTdWlhbD-qzQIzXWRIA7u?name=Leader&groupId=0AB-FeKhcGbqGs6Ao39SytSw&groupName=Group+Name",
+    contactId: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+    groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
+  },
+  {
+    id: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+    label: "Member1",
+    createdAtUTC: "2025-09-19T10:35:27.838Z",
+    status: ConnectionStatus.CONFIRMED,
+    oobi: "https://keria-ext.dev.idw-sandboxes.cf-deployments.org/oobi/EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2/agent/EOf2XGHRW_94wyPkBFwNRupyTdWlhbD-qzQIzXWRIA7u?name=Leader&groupId=0AB-FeKhcGbqGs6Ao39SytSw&groupName=Group+Name",
+    contactId: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+    groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
+  },
+];
