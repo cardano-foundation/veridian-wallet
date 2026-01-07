@@ -11,7 +11,7 @@ import { VerifySeedPhraseModal } from "./VerifySeedPhraseModal";
 const SeedPhrase =
   "example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 example13 example14 example15 example16 example17 example18";
 
-jest.mock("../../../../../core/agent/agent", () => ({
+jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       getMnemonic: jest.fn(() => Promise.resolve(SeedPhrase)),
