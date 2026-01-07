@@ -1112,7 +1112,11 @@
           },
           "errorpage": {
             "title": "Please review",
-            "alerttext": "You are missing one or more connections required for this group request. Please scan all necessary QR codes to proceed.",
+            "alerttext": "You are missing one or more connections required for this group request. Please connect with all members to proceed.",
+            "groupmember": "Group members",
+            "member": "{{member}} members",
+            "connectedmember": "Connected members",
+            "listmember": "{{currentMembers}} out of {{totalMembers}} connected members",
             "instructions": {
               "title": "Instructions",
               "detailtext": "In order to continue and complete the group setup, please follow the instructions below.",
@@ -1124,7 +1128,8 @@
               "detailtext": "If you need assistance, please email us - <0>{{emailAddress}}</0>.",
               "emailaddress": "support@veridian.id"
             },
-            "continuesetup": "Continue setup"
+            "continuesetup": "Continue setup",
+            "addmember": "Add members"
           }
         },
         "sign": {
@@ -1344,7 +1349,8 @@
       },
       "button": {
         "accept": "Accept",
-        "decline": "Decline"
+        "decline": "Decline",
+        "share": "Share your connection"
       },
       "decline": {
         "alert": {

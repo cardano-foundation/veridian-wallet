@@ -16,6 +16,19 @@
     flex-direction: column;
   }
 
+  margin-bottom: 0 !important;
+
+  .secondary-button {
+    color: var(--ion-color-primary-700);
+    height: auto;
+
+    &::part(native) {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      border-color: var(--ion-color-primary-700);
+    }
+  }
+
   ion-icon {
     width: 1.475rem;
     height: 1.475rem;

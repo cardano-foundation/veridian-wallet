@@ -1,7 +1,12 @@
 import { IonLabel, IonModal, IonSegment, IonSegmentButton } from "@ionic/react";
 import { repeatOutline } from "ionicons/icons";
 import { useCallback, useRef, useState } from "react";
+import { Agent } from "../../../core/agent/agent";
 import { i18n } from "../../../i18n";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { getCurrentProfile } from "../../../store/reducers/profileCache";
+import { useOnlineStatusEffect } from "../../hooks";
+import { showError } from "../../utils/error";
 import { PageHeader } from "../PageHeader";
 import { Scan } from "../Scan";
 import { ScanRef } from "../Scan/Scan.types";
@@ -11,15 +16,17 @@ import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
 import "./ShareProfile.scss";
 import { ShareProfileProps, Tab } from "./ShareProfile.types";
 import { ShareOobi } from "./components/ShareOobi";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getCurrentProfile } from "../../../store/reducers/profileCache";
-import { Agent } from "../../../core/agent/agent";
-import { showError } from "../../utils/error";
-import { useOnlineStatusEffect } from "../../hooks";
 
-const ShareProfile = ({ isOpen, setIsOpen }: ShareProfileProps) => {
+const ShareProfile = ({
+  isOpen,
+  oobi,
+  hiddenScan,
+  setIsOpen,
+  onScan,
+  defaultTab = Tab.ShareOobi,
+}: ShareProfileProps) => {
   const componentId = "share-profile";
-  const [tab, setTab] = useState<Tab>(Tab.ShareOobi);
+  const [tab, setTab] = useState<Tab>(defaultTab);
   const isScanTab = Tab.Scan === tab;
   const scanRef = useRef<ScanRef>(null);
   const { resolveIndividualConnection } = useScanHandle();
@@ -34,8 +41,16 @@ const ShareProfile = ({ isOpen, setIsOpen }: ShareProfileProps) => {
   const fetchOobi = useCallback(async () => {
     if (!isOpen) return;
 
+    if (defaultTab) {
+      setTab(defaultTab);
+    }
+
+    if (oobi) {
+      setDisplayOobi(oobi);
+    }
+
     try {
-      if (!currentProfile?.identity.id) return;
+      if (!currentProfile?.identity.id || oobi) return;
 
       const oobiValue = await Agent.agent.connections.getOobi(
         `${currentProfile.identity.id}`,
@@ -48,10 +63,12 @@ const ShareProfile = ({ isOpen, setIsOpen }: ShareProfileProps) => {
       showError("Unable to fetch connection oobi", e, dispatch);
     }
   }, [
+    isOpen,
+    defaultTab,
+    oobi,
     currentProfile?.identity.id,
     currentProfile?.identity.displayName,
     dispatch,
-    isOpen,
   ]);
 
   useOnlineStatusEffect(fetchOobi);
@@ -64,6 +81,11 @@ const ShareProfile = ({ isOpen, setIsOpen }: ShareProfileProps) => {
 
   const handleScan = useCallback(
     async (content: string) => {
+      if (onScan) {
+        await onScan(content, scanRef.current?.registerScanHandler);
+        return;
+      }
+
       await resolveIndividualConnection(
         content,
         handleClose,
@@ -71,7 +93,7 @@ const ShareProfile = ({ isOpen, setIsOpen }: ShareProfileProps) => {
         handleClose
       );
     },
-    [handleClose, resolveIndividualConnection]
+    [handleClose, onScan, resolveIndividualConnection]
   );
 
   return (
@@ -120,25 +142,29 @@ const ShareProfile = ({ isOpen, setIsOpen }: ShareProfileProps) => {
             />
           </>
         )}
-        <IonSegment
-          data-testid="share-profile-segment"
-          className="share-profile-segment"
-          value={tab}
-          onIonChange={(event) => setTab(event.detail.value as Tab)}
-        >
-          <IonSegmentButton
-            value={Tab.ShareOobi}
-            data-testid="share-oobi-segment-button"
+        {hiddenScan ? (
+          <div />
+        ) : (
+          <IonSegment
+            data-testid="share-profile-segment"
+            className="share-profile-segment"
+            value={tab}
+            onIonChange={(event) => setTab(event.detail.value as Tab)}
           >
-            <IonLabel>{`${i18n.t("shareprofile.buttons.provide")}`}</IonLabel>
-          </IonSegmentButton>
-          <IonSegmentButton
-            value={Tab.Scan}
-            data-testid="scan-profile-segment-button"
-          >
-            <IonLabel>{`${i18n.t("shareprofile.buttons.scan")}`}</IonLabel>
-          </IonSegmentButton>
-        </IonSegment>
+            <IonSegmentButton
+              value={Tab.ShareOobi}
+              data-testid="share-oobi-segment-button"
+            >
+              <IonLabel>{`${i18n.t("shareprofile.buttons.provide")}`}</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton
+              value={Tab.Scan}
+              data-testid="scan-profile-segment-button"
+            >
+              <IonLabel>{`${i18n.t("shareprofile.buttons.scan")}`}</IonLabel>
+            </IonSegmentButton>
+          </IonSegment>
+        )}
       </ResponsivePageLayout>
     </IonModal>
   );

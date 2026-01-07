@@ -50,7 +50,7 @@ const ShareOobi = ({ oobi }: ShareOobiProps) => {
         <IonButton
           shape="round"
           expand="block"
-          className="primary-button"
+          className="secondary-button"
           onClick={nativeShare}
         >
           <IonIcon

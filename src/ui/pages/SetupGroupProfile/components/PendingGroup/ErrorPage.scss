@@ -1,0 +1,134 @@
+.error-feedback {
+  .page-header {
+    ion-toolbar {
+      --background: transparent;
+    }
+  }
+
+  .alert {
+    margin-top: 1.5rem;
+    margin-bottom: 1.75rem;
+    background: rgba(var(--ion-color-error-800-rgb), 0.1);
+
+    p {
+      font-size: 1rem;
+      line-height: 1.375rem;
+    }
+
+    ion-icon {
+      color: var(--ion-color-danger);
+    }
+  }
+
+  .title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--ion-color-neutral-800);
+  }
+
+  .instructions {
+    margin-bottom: 1.75rem;
+    margin-top: 0.75rem;
+
+    .content {
+      .card-details-info-block-inner {
+        padding: 1.25rem;
+        margin-top: 12px;
+      }
+
+      .instruction-list {
+        margin: 0;
+        padding-left: 1.25rem;
+
+        li:not(:last-child) {
+          margin-bottom: 0.5rem;
+        }
+      }
+    }
+  }
+
+  .total-member {
+    .card-detail-stack-item h2 {
+      font-weight: 700;
+    }
+  }
+
+  .group-members {
+    .member {
+      margin-bottom: 0.75rem;
+    }
+
+    ion-item {
+      display: flex;
+      align-items: center;
+
+      &.card-header {
+        padding-bottom: 1.25rem;
+
+        .action-button {
+          color: var(--ion-color-neutral-500);
+        }
+      }
+    }
+
+    .card-details-info-block-line {
+      align-items: center;
+      .card-details-info-block-line-start-icon {
+        height: auto;
+
+        ion-button.avatar-button {
+          width: 1.5rem;
+          min-height: auto;
+          margin-bottom: 0.125rem;
+
+          span {
+            font-size: 1rem;
+            line-height: 1rem;
+          }
+
+          &::part(native) {
+            width: 1.5rem;
+            height: 1.5rem;
+          }
+        }
+
+        @media screen and (min-width: 250px) and (max-width: 370px) {
+          width: auto;
+        }
+      }
+    }
+  }
+
+  .error-feedback-footer {
+    padding: 1rem 0;
+  }
+
+  @media screen and (min-width: 250px) and (max-width: 370px) {
+    .alert {
+      margin-bottom: 1.5rem;
+
+      p {
+        font-size: 0.85rem;
+      }
+    }
+
+    .title {
+      font-size: 1rem;
+    }
+
+    .detail-text {
+      font-size: 0.85rem;
+    }
+
+    .instructions {
+      margin-bottom: 1.5rem;
+      .content {
+        .card-details-info-block-inner {
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+}

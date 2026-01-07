@@ -1,28 +1,30 @@
 import {
   Algos,
+  b,
   CreateIdentifierBody,
   d,
   HabState,
   messagize,
+  reply,
   Serder,
+  Serials,
   Siger,
   State,
-  b,
-  reply,
-  Serials,
 } from "signify-ts";
-import {
-  AgentServicesProps,
-  MiscRecordId,
-  CreationStatus,
-  SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED,
-} from "../agent.types";
-import { NotificationRoute } from "./keriaNotificationService.types";
+import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
+import { StorageMessage } from "../../storage/storage.types";
 import type {
+  AuthorizationRequestExn,
   ConnectionShortDetails,
   MultisigConnectionDetails,
-  AuthorizationRequestExn,
 } from "../agent.types";
+import {
+  AgentServicesProps,
+  CreationStatus,
+  MiscRecordId,
+  SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED,
+} from "../agent.types";
+import { EventTypes, GroupCreatedEvent } from "../event.types";
 import {
   BasicRecord,
   BasicStorage,
@@ -30,28 +32,26 @@ import {
   NotificationStorage,
   OperationPendingStorage,
 } from "../records";
+import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
 import { AgentService } from "./agentService";
+import { ConnectionService } from "./connectionService";
+import { RpyRoute } from "./connectionService.types";
+import type { MultisigThresholds } from "./identifier.types";
 import {
   GroupParticipants,
+  isGroupInceptionData,
   MultiSigIcpRequestDetails,
   QueuedGroupCreation,
   QueuedGroupProps,
-  isGroupInceptionData,
 } from "./identifier.types";
-import type { MultisigThresholds } from "./identifier.types";
+import { IdentifierService } from "./identifierService";
+import { NotificationRoute } from "./keriaNotificationService.types";
 import {
-  MultiSigRoute,
-  InceptMultiSigExnMessage,
   GroupInformation,
+  InceptMultiSigExnMessage,
+  MultiSigRoute,
 } from "./multiSig.types";
 import { deleteNotificationRecordById, OnlineOnly } from "./utils";
-import { OperationPendingRecordType } from "../records/operationPendingRecord.type";
-import { EventTypes, GroupCreatedEvent } from "../event.types";
-import { ConnectionService } from "./connectionService";
-import { IdentifierService } from "./identifierService";
-import { StorageMessage } from "../../storage/storage.types";
-import { RpyRoute } from "./connectionService.types";
-import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
 
 class MultiSigService extends AgentService {
   static readonly INVALID_THRESHOLD = "Invalid threshold";
@@ -424,6 +424,29 @@ class MultiSigService extends AgentService {
         await this.props.signifyClient.replies().submitRpy(connection.id, ims);
       }
     }
+  }
+
+  @OnlineOnly
+  async getTotalMember(notificationSaid: string): Promise<number> {
+    const icpMsg: InceptMultiSigExnMessage[] = await this.props.signifyClient
+      .groups()
+      .getRequest(notificationSaid)
+      .catch((error) => {
+        const status = error.message.split(" - ")[1];
+        if (/404/gi.test(status)) {
+          return [];
+        } else {
+          throw error;
+        }
+      });
+
+    if (!icpMsg.length) {
+      throw new Error(
+        `${MultiSigService.EXN_MESSAGE_NOT_FOUND} ${notificationSaid}`
+      );
+    }
+
+    return icpMsg[0]?.exn.a.smids.length;
   }
 
   @OnlineOnly

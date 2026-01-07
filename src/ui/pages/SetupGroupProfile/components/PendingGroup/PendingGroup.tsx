@@ -1,7 +1,14 @@
 import { IonButton, IonIcon } from "@ionic/react";
-import { exitOutline, refreshOutline, warningOutline } from "ionicons/icons";
-import { useCallback, useMemo, useRef, useState } from "react";
+import {
+  exitOutline,
+  qrCodeOutline,
+  refreshOutline,
+  warningOutline,
+} from "ionicons/icons";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
+import { CreationStatus } from "../../../../../core/agent/agent.types";
+import { MultiSigService } from "../../../../../core/agent/services";
 import { MultiSigIcpRequestDetails } from "../../../../../core/agent/services/identifier.types";
 import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
 import { GroupInformation } from "../../../../../core/agent/services/multiSig.types";
@@ -28,6 +35,7 @@ import {
 } from "../../../../components/MemberList/MemberList.type";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
+import { ShareProfile } from "../../../../components/ShareProfile";
 import { Spinner } from "../../../../components/Spinner";
 import { SpinnerConverage } from "../../../../components/Spinner/Spinner.type";
 import { Verification } from "../../../../components/Verification";
@@ -37,8 +45,8 @@ import { useProfile } from "../../../../hooks/useProfile";
 import { showError } from "../../../../utils/error";
 import { Profiles } from "../../../Profiles";
 import { StageProps } from "../../SetupGroupProfile.types";
+import { ErrorPage } from "./ErrorPage";
 import "./PendingGroup.scss";
-import { MultiSigService } from "../../../../../core/agent/services";
 
 const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const componentId = "pending-group";
@@ -54,6 +62,10 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const [multisigIcpDetails, setMultisigIcpDetails] =
     useState<MultiSigIcpRequestDetails | null>(null);
   const retry = useRef(0);
+  const [showErrorPage, setShowErrorPage] = useState(false);
+  const [shareProfile, setShareProfile] = useState(false);
+  const [oobi, setOobi] = useState("");
+  const [intiatorName, setInitatorName] = useState("");
 
   const initGroupNotification = defaultProfile?.notifications.find(
     (item) => item.a.r === NotificationRoute.MultiSigIcp
@@ -75,6 +87,49 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const handleAvatarClick = () => {
     setOpenProfiles(true);
   };
+
+  useEffect(() => {
+    const fetchOobi = async () => {
+      const alias =
+        identity?.groupMetadata?.proposedUsername || identity?.groupUsername;
+      const groupId = defaultProfile?.multisigConnections[0]?.groupId;
+      const groupName = identity?.displayName;
+      const identityId = identity?.groupMemberPre || identity?.id;
+
+      if (!alias || !groupId || !groupName || !identityId) return;
+
+      try {
+        const oobiValue = await Agent.agent.connections.getOobi(identityId, {
+          alias,
+          groupId,
+          groupName,
+        });
+        if (oobiValue) {
+          setOobi(oobiValue);
+        }
+      } catch (e) {
+        dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
+      }
+    };
+
+    if (
+      identity?.creationStatus === CreationStatus.COMPLETE &&
+      !!identity?.groupMemberPre
+    )
+      return;
+
+    fetchOobi();
+  }, [
+    defaultProfile?.multisigConnections,
+    identity?.creationStatus,
+    dispatch,
+    identity?.displayName,
+    identity?.groupMemberPre,
+    identity?.groupMetadata?.groupId,
+    identity?.groupMetadata?.proposedUsername,
+    identity?.groupUsername,
+    identity?.id,
+  ]);
 
   const members = useMemo(() => {
     const members = state.selectedConnections?.map((connection): Member => {
@@ -211,12 +266,48 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   }, [dispatch, identity?.id]);
 
   const fetchMultisigDetails = useCallback(async () => {
-    if (!initGroupNotification) return;
-    const details = await Agent.agent.multiSigs.getMultisigIcpDetails(
-      initGroupNotification.a.d as string
-    );
-    setMultisigIcpDetails(details);
+    try {
+      if (!initGroupNotification) return;
+      setLoading(true);
+      const details = await Agent.agent.multiSigs.getMultisigIcpDetails(
+        initGroupNotification.a.d as string
+      );
+      setMultisigIcpDetails(details);
+      setInitatorName(details.sender.label);
+      setShowErrorPage(false);
+    } catch (e) {
+      if (
+        (e as Error).message === MultiSigService.UNKNOWN_AIDS_IN_MULTISIG_ICP
+      ) {
+        setShowErrorPage(true);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [initGroupNotification]);
+
+  const getIntiatorName = useCallback(async () => {
+    if (!identity?.groupMemberPre || !!intiatorName) return;
+
+    try {
+      const identifiers = await Agent.agent.identifiers.getIdentifiers(false);
+      const preIdentifier = identifiers.find(
+        (item) => item.id == identity.groupMemberPre
+      );
+
+      if (
+        !preIdentifier ||
+        !!preIdentifier.groupMetadata?.groupInitiator ||
+        !preIdentifier.groupMetadata?.initiatorName
+      ) {
+        return;
+      }
+
+      setInitatorName(preIdentifier.groupMetadata.initiatorName);
+    } catch (e) {
+      showError("Failed to get intiator name", e);
+    }
+  }, [identity?.groupMemberPre, intiatorName]);
 
   const fetchGroupDetails = useCallback(async () => {
     if (!isPendingGroup) return;
@@ -225,8 +316,11 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       await fetchMultisigDetails();
       return;
     }
+
+    await getIntiatorName();
     await getInceptionStatus();
   }, [
+    getIntiatorName,
     fetchMultisigDetails,
     getInceptionStatus,
     isPendingGroup,
@@ -272,6 +366,21 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     ? i18n.t("setupgroupprofile.pending.alert.membertext")
     : i18n.t("setupgroupprofile.pending.alert.initiatortext");
 
+  if (showErrorPage && initGroupNotification && defaultProfile) {
+    return (
+      <ErrorPage
+        pageId={componentId}
+        activeStatus
+        notificationDetails={initGroupNotification}
+        onFinishSetup={fetchMultisigDetails}
+        profile={defaultProfile}
+        oobi={oobi}
+        groupMembers={members}
+        handleLeaveGroup={handleDelete}
+      />
+    );
+  }
+
   return (
     <>
       <ScrollablePageLayout
@@ -315,7 +424,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
           content={text}
         />
         <ListHeader title={i18n.t("setupgroupprofile.pending.groupinfor")} />
-        {multisigIcpDetails && (
+        {intiatorName && (
           <CardBlock
             title={i18n.t("setupgroupprofile.pending.request")}
             testId="request-from"
@@ -324,16 +433,12 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
             <CardDetailsItem
               startSlot={
                 <MemberAvatar
-                  firstLetter={
-                    multisigIcpDetails.sender.label
-                      .at(0)
-                      ?.toLocaleUpperCase() || ""
-                  }
+                  firstLetter={intiatorName.at(0)?.toLocaleUpperCase() || ""}
                   rank={0}
                 />
               }
               className="member"
-              info={multisigIcpDetails.sender.label}
+              info={intiatorName}
             />
           </CardBlock>
         )}
@@ -354,6 +459,24 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
             )}`}
           />
         </CardBlock>
+        <IonButton
+          shape="round"
+          expand="block"
+          fill="outline"
+          className="secondary-button share-profile-button"
+          data-testid="share-profile"
+          onClick={() => {
+            setShareProfile(true);
+          }}
+        >
+          <IonIcon
+            slot="icon-only"
+            size="small"
+            icon={qrCodeOutline}
+            color="primary"
+          />
+          {i18n.t("setupgroupprofile.pending.button.share")}
+        </IonButton>
         <CardBlock
           flatBorder={FlatBorderType.BOT}
           title={i18n.t(
@@ -434,6 +557,12 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       <Profiles
         isOpen={openProfiles}
         setIsOpen={setOpenProfiles}
+      />
+      <ShareProfile
+        isOpen={shareProfile}
+        setIsOpen={setShareProfile}
+        hiddenScan
+        oobi={oobi}
       />
       <Alert
         isOpen={alertDeclineIsOpen}

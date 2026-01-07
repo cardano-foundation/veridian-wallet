@@ -22,6 +22,22 @@
       }
     }
 
+    .share-profile-button {
+      height: auto;
+
+      ion-icon {
+        --ion-color-base: var(--ion-color-primary-700) !important;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+
+      &::part(native) {
+        padding: 1rem 0;
+        border-color: var(--ion-color-primary-700);
+        color: var(--ion-color-primary-700);
+      }
+    }
+
     .alert {
       margin-top: 1.5rem;
       background-color: rgba(var(--ion-color-warning-800-rgb), 0.1);

@@ -1,0 +1,139 @@
+import { fireEvent, render } from "@testing-library/react";
+import { act } from "react";
+import { Provider } from "react-redux";
+
+import { CreationStatus } from "../../../../../core/agent/agent.types";
+import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
+import { TabsRoutePath } from "../../../../../routes/paths";
+import { connectionsFix } from "../../../../__fixtures__/connectionsFix";
+import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
+import { makeTestStore } from "../../../../utils/makeTestStore";
+import { ErrorPage } from "./ErrorPage";
+
+const mockGetMultisigConnection = jest.fn(() =>
+  Promise.resolve([connectionsFix[3]])
+);
+
+jest.mock("../../../../../core/agent/agent", () => ({
+  Agent: {
+    agent: {
+      identifiers: {
+        getIdentifiersCache: jest.fn(),
+        createIdentifier: jest.fn(() => ({
+          identifier: "mock-id",
+          creationStatus: CreationStatus.COMPLETE,
+        })),
+      },
+      connections: {
+        getMultisigLinkedContacts: () => mockGetMultisigConnection(),
+        getOobi: jest.fn(),
+      },
+    },
+  },
+}));
+
+const dispatchMock = jest.fn();
+
+const initialState = {
+  stateCache: {
+    routes: [TabsRoutePath.NOTIFICATIONS],
+    authentication: {
+      loggedIn: true,
+      time: Date.now(),
+      passcodeIsSet: true,
+    },
+    queueIncomingRequest: {
+      isProcessing: false,
+      queues: [],
+      isPaused: false,
+    },
+  },
+  profilesCache: {
+    ...profileCacheFixData,
+  },
+};
+
+describe("Multisign error feedback", () => {
+  test("Render and scan", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ErrorPage
+          pageId="feedback"
+          activeStatus
+          notificationDetails={notificationsFix[4]}
+          onFinishSetup={jest.fn()}
+          profile={profileCacheFixData.profiles[0]}
+          oobi=""
+          handleLeaveGroup={jest.fn()}
+        />
+      </Provider>
+    );
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage
+          .alerttext
+      )
+    ).toBeVisible();
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage
+          .instructions.title
+      )
+    ).toBeVisible();
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage
+          .instructions.detailtext
+      )
+    ).toBeVisible();
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage
+          .instructions.stepone
+      )
+    ).toBeVisible();
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage
+          .instructions.steptwo
+      )
+    ).toBeVisible();
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage.help
+          .title
+      )
+    ).toBeVisible();
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage.help.detailtext.replace(
+          "<0>{{emailAddress}}</0>",
+          ""
+        )
+      )
+    ).toBeVisible();
+
+    expect(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.identifier.errorpage.help
+          .emailaddress
+      )
+    ).toBeVisible();
+
+    act(() => {
+      fireEvent.click(getByTestId("primary-button-feedback"));
+    });
+  });
+});
