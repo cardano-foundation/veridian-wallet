@@ -180,13 +180,15 @@ const ErrorPage = ({
           />
         }
       >
-        <InfoCard
-          className="alert"
-          content={i18n.t(
-            "tabs.notifications.details.identifier.errorpage.alerttext"
-          )}
-          icon={alertCircleOutline}
-        />
+        {!isConnectAllMember && (
+          <InfoCard
+            className="alert"
+            content={i18n.t(
+              "tabs.notifications.details.identifier.errorpage.alerttext"
+            )}
+            icon={alertCircleOutline}
+          />
+        )}
         <CardBlock
           className="total-member"
           title={i18n.t(

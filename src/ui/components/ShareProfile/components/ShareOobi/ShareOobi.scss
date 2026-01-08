@@ -21,6 +21,7 @@
   .secondary-button {
     color: var(--ion-color-primary-700);
     height: auto;
+    width: 12.5rem;
 
     &::part(native) {
       padding-top: 1rem;
