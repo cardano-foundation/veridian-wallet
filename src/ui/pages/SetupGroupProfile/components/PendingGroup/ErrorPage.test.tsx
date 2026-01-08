@@ -84,7 +84,7 @@ jest.mock("../../../../../core/agent/agent", () => ({
         })),
       },
       multiSigs: {
-        getTotalMember: jest.fn(() => Promise.resolve(3)),
+        getGroupSizeFromIcpExn: jest.fn(() => Promise.resolve(3)),
       },
       connections: {
         getMultisigLinkedContacts: () => mockGetMultisigConnection(),

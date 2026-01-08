@@ -87,7 +87,7 @@ const ErrorPage = ({
   useEffect(() => {
     const getTotalMember = async () => {
       try {
-        const totalMember = await Agent.agent.multiSigs.getTotalMember(
+        const totalMember = await Agent.agent.multiSigs.getGroupSizeFromIcpExn(
           notificationDetails.a.d as string
         );
         setTotalMember(totalMember);

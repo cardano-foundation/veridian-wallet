@@ -1527,6 +1527,39 @@ describe("Creation of multi-sig", () => {
     );
   });
 
+  test("Cannot get multisig icp details if the exn is missing when get group size", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    groupGetRequestMock.mockRejectedValue(
+      new Error("request - 404 - not found")
+    );
+    await expect(
+      multiSigService.getGroupSizeFromIcpExn(
+        "ELLb0OvktIxeHDeeOnRJ2pc9IkYJ38An4PXYigUQ_3AO"
+      )
+    ).rejects.toThrowError(
+      `${MultiSigService.EXN_MESSAGE_NOT_FOUND} ELLb0OvktIxeHDeeOnRJ2pc9IkYJ38An4PXYigUQ_3AO`
+    );
+  });
+
+  test("Can get group size of 2 person group", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    groupGetRequestMock.mockResolvedValue([
+      {
+        ...getRequestMultisigIcp,
+        exn: {
+          ...getRequestMultisigIcp.exn,
+          e: { icp: { kt: "3", nt: "2" } },
+        },
+      },
+    ]);
+
+    const result = await multiSigService.getGroupSizeFromIcpExn(
+      "ELLb0OvktIxeHDeeOnRJ2pc9IkYJ38An4PXYigUQ_3AO"
+    );
+
+    expect(result).toBe(2);
+  });
+
   test("Should processs any groups pending creation", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     basicStorage.findById.mockResolvedValueOnce(

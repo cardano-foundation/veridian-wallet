@@ -427,7 +427,7 @@ class MultiSigService extends AgentService {
   }
 
   @OnlineOnly
-  async getTotalMember(notificationSaid: string): Promise<number> {
+  async getGroupSizeFromIcpExn(notificationSaid: string): Promise<number> {
     const icpMsg: InceptMultiSigExnMessage[] = await this.props.signifyClient
       .groups()
       .getRequest(notificationSaid)
@@ -446,7 +446,7 @@ class MultiSigService extends AgentService {
       );
     }
 
-    return icpMsg[0]?.exn.a.smids.length;
+    return icpMsg[0].exn.a.smids.length;
   }
 
   @OnlineOnly
