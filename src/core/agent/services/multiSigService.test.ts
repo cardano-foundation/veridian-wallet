@@ -177,6 +177,7 @@ const connections = jest.mocked({
   resolveOobi: jest.fn(),
   getConnectionShortDetailById: jest.fn(),
   getMultisigLinkedContacts: jest.fn(),
+  getOobi: jest.fn(),
 });
 
 const identifiers = jest.mocked({
@@ -332,25 +333,26 @@ describe("Usage of multi-sig", () => {
 });
 
 const expectAllWitnessIntroductions = () => {
-  expect(submitRpyMock).toHaveBeenCalledTimes(
-    getAvailableWitnesses.witnesses.length
-  );
-
+  // Note: submitRpy is called for member introduction first, then witness introductions
+  // Member intro is call #1, witness intros are calls #2-7
+  // We only verify witness introduction details here
   getAvailableWitnesses.witnesses.forEach((witness, index) => {
+    // Witness introductions start at call #2 (after member intro at #1)
+    const callNumber = index + 2;
     expect(submitRpyMock).toHaveBeenNthCalledWith(
-      index + 1,
+      callNumber,
       linkedContacts[0].id,
       expect.stringContaining(
         `"a":{"cid":"EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8","oobi":"${witness.oobi}"}`
       )
     );
     expect(submitRpyMock).toHaveBeenNthCalledWith(
-      index + 1,
+      callNumber,
       linkedContacts[0].id,
       expect.stringContaining('"t":"rpy"')
     );
     expect(submitRpyMock).toHaveBeenNthCalledWith(
-      index + 1,
+      callNumber,
       linkedContacts[0].id,
       expect.stringContaining('"r":"/introduce"')
     );
@@ -406,6 +408,10 @@ describe("Creation of multi-sig", () => {
 
     identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
 
+    connections.getOobi.mockResolvedValue(
+      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
+    );
+
     getMemberMock.mockReturnValue({
       sign: jest
         .fn()
@@ -422,6 +428,29 @@ describe("Creation of multi-sig", () => {
     );
 
     expectAllWitnessIntroductions();
+
+    // Verify member introduction is sent
+    expect(connections.getOobi).toHaveBeenCalledWith(
+      getMemberIdentifierResponse.prefix,
+      {
+        alias: memberMetadataRecord.displayName,
+      }
+    );
+    // The member introduction should be sent to the other group member
+    // Total submitRpy calls = witness introductions (6) + member introduction (1) = 7
+    expect(submitRpyMock).toHaveBeenCalledTimes(
+      getAvailableWitnesses.witnesses.length + 1
+    );
+    // Verify the member introduction message contains the member's OOBI and is sent to the other member
+    expect(submitRpyMock).toHaveBeenCalledWith(
+      "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
+      expect.stringContaining(`"cid":"${getMemberIdentifierResponse.prefix}"`)
+    );
+    expect(submitRpyMock).toHaveBeenCalledWith(
+      "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
+      expect.stringContaining('"r":"/introduce"')
+    );
+
     expect(identifierCreateIcpDataMock).toBeCalledWith(
       "1.2.0.2:0:Identifier 2",
       {
@@ -628,6 +657,10 @@ describe("Creation of multi-sig", () => {
 
     identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
 
+    connections.getOobi.mockResolvedValue(
+      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
+    );
+
     getMemberMock.mockReturnValue({
       sign: jest
         .fn()
@@ -751,6 +784,10 @@ describe("Creation of multi-sig", () => {
 
     identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
 
+    connections.getOobi.mockResolvedValue(
+      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
+    );
+
     getMemberMock.mockReturnValue({
       sign: jest
         .fn()
@@ -873,6 +910,9 @@ describe("Creation of multi-sig", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers.mockResolvedValue([memberMetadataRecord]);
+    identifierStorage.getIdentifierMetadata = jest
+      .fn()
+      .mockResolvedValue(memberMetadataRecord);
     identifiersGetMock
       .mockResolvedValueOnce(getMemberIdentifierResponse)
       .mockResolvedValueOnce(getMultisigIdentifierResponse);
@@ -903,6 +943,10 @@ describe("Creation of multi-sig", () => {
     notificationStorage.deleteById = jest.fn();
 
     identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
+
+    connections.getOobi.mockResolvedValue(
+      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
+    );
 
     getMemberMock.mockReturnValue({
       sign: jest
@@ -1052,6 +1096,9 @@ describe("Creation of multi-sig", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers.mockResolvedValue([memberMetadataRecord]);
+    identifierStorage.getIdentifierMetadata = jest
+      .fn()
+      .mockResolvedValue(memberMetadataRecord);
     identifiersGetMock
       .mockResolvedValueOnce(getMemberIdentifierResponse)
       .mockResolvedValueOnce(getMultisigIdentifierResponse);
@@ -1069,6 +1116,18 @@ describe("Creation of multi-sig", () => {
     identifierCreateIcpDataMock.mockResolvedValue(inceptionDataFix);
     markNotificationMock.mockResolvedValue({ status: "done" });
     notificationStorage.deleteById = jest.fn();
+
+    connections.getOobi.mockResolvedValue(
+      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
+    );
+
+    getMemberMock.mockReturnValue({
+      sign: jest
+        .fn()
+        .mockResolvedValue([
+          "AACK3Pk2vKzotWjsUnbhKqs7P68NoeyIN5Ae7aGYl3ALCXDOk72Mby9kCu_vSpezqZzjWP9D2tQzwyvGCY26ovoE",
+        ]),
+    });
 
     await multiSigService.joinGroup("id", "d", true);
 
@@ -1150,6 +1209,9 @@ describe("Creation of multi-sig", () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers.mockResolvedValue([memberMetadataRecord]);
+    identifierStorage.getIdentifierMetadata = jest
+      .fn()
+      .mockResolvedValue(memberMetadataRecord);
     identifiersGetMock
       .mockResolvedValueOnce(getMemberIdentifierResponse)
       .mockResolvedValueOnce(getMultisigIdentifierResponse);
@@ -1180,6 +1242,18 @@ describe("Creation of multi-sig", () => {
     notificationStorage.deleteById.mockRejectedValueOnce(
       new Error(StorageMessage.RECORD_DOES_NOT_EXIST_ERROR_MSG)
     );
+
+    connections.getOobi.mockResolvedValue(
+      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
+    );
+
+    getMemberMock.mockReturnValue({
+      sign: jest
+        .fn()
+        .mockResolvedValue([
+          "AACK3Pk2vKzotWjsUnbhKqs7P68NoeyIN5Ae7aGYl3ALCXDOk72Mby9kCu_vSpezqZzjWP9D2tQzwyvGCY26ovoE",
+        ]),
+    });
 
     await multiSigService.joinGroup("id", "d", true);
 
