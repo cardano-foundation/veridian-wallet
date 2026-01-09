@@ -1,4 +1,7 @@
-import { Serder } from "signify-ts";
+/**
+ * @jest-environment node
+ */
+import { ready, Serder } from "signify-ts";
 import * as utils from "./utils";
 import { ConnectionStatus, MiscRecordId, CreationStatus } from "../agent.types";
 import { Agent } from "../agent";
@@ -333,26 +336,25 @@ describe("Usage of multi-sig", () => {
 });
 
 const expectAllWitnessIntroductions = () => {
-  // Note: submitRpy is called for member introduction first, then witness introductions
-  // Member intro is call #1, witness intros are calls #2-7
-  // We only verify witness introduction details here
+  expect(submitRpyMock).toHaveBeenCalledTimes(
+    getAvailableWitnesses.witnesses.length
+  );
+
   getAvailableWitnesses.witnesses.forEach((witness, index) => {
-    // Witness introductions start at call #2 (after member intro at #1)
-    const callNumber = index + 2;
     expect(submitRpyMock).toHaveBeenNthCalledWith(
-      callNumber,
+      index + 1,
       linkedContacts[0].id,
       expect.stringContaining(
         `"a":{"cid":"EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8","oobi":"${witness.oobi}"}`
       )
     );
     expect(submitRpyMock).toHaveBeenNthCalledWith(
-      callNumber,
+      index + 1,
       linkedContacts[0].id,
       expect.stringContaining('"t":"rpy"')
     );
     expect(submitRpyMock).toHaveBeenNthCalledWith(
-      callNumber,
+      index + 1,
       linkedContacts[0].id,
       expect.stringContaining('"r":"/introduce"')
     );
@@ -360,7 +362,8 @@ const expectAllWitnessIntroductions = () => {
 };
 
 describe("Creation of multi-sig", () => {
-  beforeAll(() => {
+  beforeAll(async () => {
+    await ready();
     eventEmitter.emit = jest.fn();
   });
 
@@ -408,10 +411,6 @@ describe("Creation of multi-sig", () => {
 
     identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
 
-    connections.getOobi.mockResolvedValue(
-      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
-    );
-
     getMemberMock.mockReturnValue({
       sign: jest
         .fn()
@@ -428,29 +427,6 @@ describe("Creation of multi-sig", () => {
     );
 
     expectAllWitnessIntroductions();
-
-    // Verify member introduction is sent
-    expect(connections.getOobi).toHaveBeenCalledWith(
-      getMemberIdentifierResponse.prefix,
-      {
-        alias: memberMetadataRecord.displayName,
-      }
-    );
-    // The member introduction should be sent to the other group member
-    // Total submitRpy calls = witness introductions (6) + member introduction (1) = 7
-    expect(submitRpyMock).toHaveBeenCalledTimes(
-      getAvailableWitnesses.witnesses.length + 1
-    );
-    // Verify the member introduction message contains the member's OOBI and is sent to the other member
-    expect(submitRpyMock).toHaveBeenCalledWith(
-      "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
-      expect.stringContaining(`"cid":"${getMemberIdentifierResponse.prefix}"`)
-    );
-    expect(submitRpyMock).toHaveBeenCalledWith(
-      "EH_rgokxkQE886aZf7ZRBgqN2y6aALPAmUvI5haK4yr7",
-      expect.stringContaining('"r":"/introduce"')
-    );
-
     expect(identifierCreateIcpDataMock).toBeCalledWith(
       "1.2.0.2:0:Identifier 2",
       {
@@ -657,10 +633,6 @@ describe("Creation of multi-sig", () => {
 
     identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
 
-    connections.getOobi.mockResolvedValue(
-      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
-    );
-
     getMemberMock.mockReturnValue({
       sign: jest
         .fn()
@@ -783,10 +755,6 @@ describe("Creation of multi-sig", () => {
     );
 
     identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
-
-    connections.getOobi.mockResolvedValue(
-      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
-    );
 
     getMemberMock.mockReturnValue({
       sign: jest
@@ -958,6 +926,14 @@ describe("Creation of multi-sig", () => {
 
     await multiSigService.joinGroup("id", "d");
 
+    expect(connections.getOobi).toHaveBeenCalledWith(
+      getMemberIdentifierResponse.prefix
+    );
+    expect(submitRpyMock).toHaveBeenCalledWith(
+      "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ",
+      expect.stringContaining('"r":"/introduce"')
+    );
+
     expect(identifierCreateIcpDataMock).toBeCalledWith(
       "1.2.0.2:0:Identifier 2",
       {
@@ -1067,6 +1043,93 @@ describe("Creation of multi-sig", () => {
     );
   });
 
+  test("Can join a 3-person group and share OOBI with multiple members", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
+
+    // Create a 3-person group exn message
+    const threePersonGroupExn = {
+      ...getRequestMultisigIcp,
+      exn: {
+        ...getRequestMultisigIcp.exn,
+        a: {
+          ...getRequestMultisigIcp.exn.a,
+          smids: [
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8", // Bob (joiner)
+            "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ", // Alice
+            "ECar0lM9D8n0eF9X8X9kx6YG7RQh9WpG4zY5LwN3bZ8M", // Carol
+          ],
+          rmids: [
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
+            "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ",
+            "ECar0lM9D8n0eF9X8X9kx6YG7RQh9WpG4zY5LwN3bZ8M",
+          ],
+        },
+      },
+    };
+
+    groupGetRequestMock.mockResolvedValue([threePersonGroupExn]);
+    identifiers.getIdentifiers.mockResolvedValue([memberMetadataRecord]);
+    identifierStorage.getIdentifierMetadata = jest
+      .fn()
+      .mockResolvedValue(memberMetadataRecord);
+    identifiersGetMock
+      .mockResolvedValueOnce(getMemberIdentifierResponse)
+      .mockResolvedValueOnce(getMultisigIdentifierResponse);
+    queryKeyStateGetMock
+      .mockResolvedValueOnce([resolvedOobiOpResponse.op.response]) // Bob's key state
+      .mockResolvedValueOnce([getMemberIdentifierResponse.state]) // Alice's key state
+      .mockResolvedValueOnce([getMemberIdentifierResponse.state]); // Carol's key state
+    basicStorage.findById.mockResolvedValueOnce(
+      new BasicRecord({
+        id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
+        content: { queued: [] },
+      })
+    );
+    basicStorage.findExpectedById.mockResolvedValueOnce(
+      new BasicRecord({
+        id: MiscRecordId.MULTISIG_IDENTIFIERS_PENDING_CREATION,
+        content: { queued: [] },
+      })
+    );
+    identifierCreateIcpDataMock.mockResolvedValue(inceptionDataFix);
+    markNotificationMock.mockResolvedValue({ status: "done" });
+    notificationStorage.deleteById = jest.fn();
+
+    identifiers.getAvailableWitnesses.mockResolvedValue(getAvailableWitnesses);
+
+    connections.getOobi.mockResolvedValue(
+      "http://127.0.0.1:3902/oobi/EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8/agent/EF_member"
+    );
+
+    getMemberMock.mockReturnValue({
+      sign: jest
+        .fn()
+        .mockResolvedValue([
+          "AACK3Pk2vKzotWjsUnbhKqs7P68NoeyIN5Ae7aGYl3ALCXDOk72Mby9kCu_vSpezqZzjWP9D2tQzwyvGCY26ovoE",
+        ]),
+    });
+
+    await multiSigService.joinGroup("id", "d");
+
+    // Verify joiner shares their member OOBI before inception
+    expect(connections.getOobi).toHaveBeenCalledWith(
+      getMemberIdentifierResponse.prefix
+    );
+
+    // Verify member introduction is sent to BOTH other members (not to self)
+    expect(submitRpyMock).toHaveBeenCalledWith(
+      "EKlUo3CAqjPfFt0Wr2vvSc7MqT9WiL2EGadRsAP3V1IJ", // Alice
+      expect.stringContaining('"r":"/introduce"')
+    );
+    expect(submitRpyMock).toHaveBeenCalledWith(
+      "ECar0lM9D8n0eF9X8X9kx6YG7RQh9WpG4zY5LwN3bZ8M", // Carol
+      expect.stringContaining('"r":"/introduce"')
+    );
+
+    // Joiners only send member intros (2 calls), NOT witness intros
+    expect(submitRpyMock).toHaveBeenCalledTimes(2);
+  });
+
   test("Cannot join group if we do not control any member", async () => {
     Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
@@ -1130,6 +1193,10 @@ describe("Creation of multi-sig", () => {
     });
 
     await multiSigService.joinGroup("id", "d", true);
+
+    expect(connections.getOobi).toHaveBeenCalledWith(
+      getMemberIdentifierResponse.prefix
+    );
 
     expect(identifierSubmitIcpDataMock).toBeCalledWith(inceptionDataFix);
     expect(sendExchangesMock).toBeCalledWith(
@@ -1256,6 +1323,10 @@ describe("Creation of multi-sig", () => {
     });
 
     await multiSigService.joinGroup("id", "d", true);
+
+    expect(connections.getOobi).toHaveBeenCalledWith(
+      getMemberIdentifierResponse.prefix
+    );
 
     expect(identifierSubmitIcpDataMock).toBeCalledWith(inceptionDataFix);
     expect(sendExchangesMock).toBeCalledWith(

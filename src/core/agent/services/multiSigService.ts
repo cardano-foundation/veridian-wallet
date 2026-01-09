@@ -1,11 +1,13 @@
 import {
   Algos,
+  Cigar,
   CreateIdentifierBody,
   d,
   HabState,
   messagize,
   Serder,
   Siger,
+  Signer,
   State,
   b,
   reply,
@@ -340,47 +342,6 @@ class MultiSigService extends AgentService {
     return inceptionData;
   }
 
-  private async introduceMemberToGroup(
-    mHab: HabState,
-    recipientIds: string[]
-  ): Promise<void> {
-    if (!this.props.signifyClient.manager) {
-      throw new Error(SIGNIFY_CLIENT_MANAGER_NOT_INITIALIZED);
-    }
-
-    const identifierMetadata =
-      await this.identifierStorage.getIdentifierMetadata(mHab.prefix);
-    const oobi = await this.connections.getOobi(mHab.prefix, {
-      alias: identifierMetadata.displayName,
-    });
-
-    const keeper = this.props.signifyClient.manager.get(mHab);
-    const rpyData = {
-      cid: mHab.prefix,
-      oobi: oobi,
-    };
-
-    const rpy = reply(
-      RpyRoute.INTRODUCE,
-      rpyData,
-      undefined,
-      undefined,
-      Serials.JSON
-    );
-
-    const sigs = await keeper.sign(b(rpy.raw));
-    const sigers = sigs.map((sig: string) => new Siger({ qb64: sig }));
-    const seal = [
-      "SealEvent",
-      { i: mHab.prefix, s: mHab.state.ee.s, d: mHab.state.ee.d },
-    ];
-    const ims = d(messagize(rpy, sigers, seal));
-
-    for (const recipientId of recipientIds) {
-      await this.props.signifyClient.replies().submitRpy(recipientId, ims);
-    }
-  }
-
   private async inceptGroup(
     mHab: HabState,
     states: State[],
@@ -412,10 +373,6 @@ class MultiSigService extends AgentService {
 
     const smids = states.map((state) => state["i"]);
     const recp = smids.filter((prefix) => prefix !== mHab.prefix);
-
-    // Send /introduce message to all other members before sending the incept message
-    // This ensures KERIA won't drop the /multisig/icp message if OOBIs are scanned late
-    await this.introduceMemberToGroup(mHab, recp);
 
     await this.props.signifyClient.exchanges().send(
       mHab.prefix,
@@ -468,6 +425,37 @@ class MultiSigService extends AgentService {
       for (const connection of groupConnections) {
         await this.props.signifyClient.replies().submitRpy(connection.id, ims);
       }
+    }
+  }
+
+  private async shareMemberOobiToGroup(
+    mHab: HabState,
+    recipientIds: string[]
+  ): Promise<void> {
+    const oobi = await this.connections.getOobi(mHab.prefix);
+
+    const signer = new Signer({ transferable: false });
+
+    const rpyData = {
+      cid: signer.verfer.qb64,
+      oobi,
+    };
+
+    const rpy = reply(
+      RpyRoute.INTRODUCE,
+      rpyData,
+      undefined,
+      undefined,
+      Serials.JSON
+    );
+
+    const sig = signer.sign(new Uint8Array(b(rpy.raw)));
+    const ims = d(
+      messagize(rpy, undefined, undefined, undefined, [sig as Cigar])
+    );
+
+    for (const recipientId of recipientIds) {
+      await this.props.signifyClient.replies().submitRpy(recipientId, ims);
     }
   }
 
@@ -621,6 +609,13 @@ class MultiSigService extends AgentService {
           exn.e.icp.bt,
           exn.e.icp.b
         );
+
+    const otherMembers = exn.a.smids.filter((id: string) => id !== mHab.prefix);
+
+    // Joiners must share their OOBI to other members before inception
+    // This ensures other members can parse the inception message even if OOBIs are scanned late
+    await this.shareMemberOobiToGroup(mHab, otherMembers);
+
     await this.inceptGroup(mHab, states, inceptionData);
 
     const multisigId = inceptionData.icp.i;
