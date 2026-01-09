@@ -58,5 +58,8 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
+  },
+  "overrides": {
+    "qs": "6.14.1"
   }
 }
