@@ -1,6 +1,7 @@
 import {
   Algos,
   b,
+  Cigar,
   CreateIdentifierBody,
   d,
   HabState,
@@ -9,6 +10,7 @@ import {
   Serder,
   Serials,
   Siger,
+  Signer,
   State,
 } from "signify-ts";
 import { LATEST_IDENTIFIER_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
@@ -426,6 +428,37 @@ class MultiSigService extends AgentService {
     }
   }
 
+  private async shareMemberOobiToGroup(
+    mHab: HabState,
+    recipientIds: string[]
+  ): Promise<void> {
+    const oobi = await this.connections.getOobi(mHab.prefix);
+
+    const signer = new Signer({ transferable: false });
+
+    const rpyData = {
+      cid: signer.verfer.qb64,
+      oobi,
+    };
+
+    const rpy = reply(
+      RpyRoute.INTRODUCE,
+      rpyData,
+      undefined,
+      undefined,
+      Serials.JSON
+    );
+
+    const sig = signer.sign(new Uint8Array(b(rpy.raw)));
+    const ims = d(
+      messagize(rpy, undefined, undefined, undefined, [sig as Cigar])
+    );
+
+    for (const recipientId of recipientIds) {
+      await this.props.signifyClient.replies().submitRpy(recipientId, ims);
+    }
+  }
+
   @OnlineOnly
   async getGroupSizeFromIcpExn(notificationSaid: string): Promise<number> {
     const icpMsg: InceptMultiSigExnMessage[] = await this.props.signifyClient
@@ -599,6 +632,13 @@ class MultiSigService extends AgentService {
           exn.e.icp.bt,
           exn.e.icp.b
         );
+
+    const otherMembers = exn.a.smids.filter((id: string) => id !== mHab.prefix);
+
+    // Joiners must share their OOBI to other members before inception
+    // This ensures other members can parse the inception message even if OOBIs are scanned late
+    await this.shareMemberOobiToGroup(mHab, otherMembers);
+
     await this.inceptGroup(mHab, states, inceptionData);
 
     const multisigId = inceptionData.icp.i;
