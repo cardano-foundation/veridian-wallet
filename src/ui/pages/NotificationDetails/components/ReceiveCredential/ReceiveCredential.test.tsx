@@ -585,10 +585,6 @@ describe("Credential request: Multisig", () => {
           .initiatoracceptedalert
       )
     ).toBeVisible();
-
-    expect(
-      getByText(EN_TRANSLATIONS.tabs.notifications.details.buttons.ok)
-    ).toBeVisible();
   });
 
   test("Hide alert when group initiator accept cred", async () => {

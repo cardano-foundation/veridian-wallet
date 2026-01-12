@@ -319,15 +319,14 @@ const ReceiveCredential = ({
 
   const closeAlert = () => setShowMissingIssuerModal(false);
 
-  const primaryButtonText = isRevoked
-    ? undefined
-    : `${i18n.t(
-        displayInitiatorNotAcceptedAlert
-          ? "tabs.notifications.details.buttons.ok"
-          : maxThreshold
-          ? "tabs.notifications.details.buttons.addcred"
-          : "tabs.notifications.details.buttons.accept"
-      )}`;
+  const primaryButtonText =
+    isRevoked || displayInitiatorNotAcceptedAlert
+      ? undefined
+      : `${i18n.t(
+          maxThreshold
+            ? "tabs.notifications.details.buttons.addcred"
+            : "tabs.notifications.details.buttons.accept"
+        )}`;
 
   const declineButtonText =
     maxThreshold || isRevoked || displayInitiatorNotAcceptedAlert
