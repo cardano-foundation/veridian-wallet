@@ -1,5 +1,8 @@
 import { RootState } from "../../store";
-import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
+import {
+  GlobalLoadingType,
+  InitializationPhase,
+} from "../../store/reducers/stateCache/stateCache.types";
 import { DataProps } from "../nextRoute/nextRoute.types";
 import { calcPreviousRoute, getBackRoute, getPreviousRoute } from "./backRoute";
 
@@ -35,6 +38,7 @@ describe("getBackRoute", () => {
         isOnline: true,
         initializationPhase: InitializationPhase.PHASE_TWO,
         recoveryCompleteNoInterruption: false,
+        showLoading: GlobalLoadingType.NONE,
         routes: [{ path: "/route1" }, { path: "/route2" }, { path: "/route3" }],
         authentication: {
           passcodeIsSet: true,

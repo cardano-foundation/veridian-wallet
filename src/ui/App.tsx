@@ -28,7 +28,10 @@ import {
   getShowVerifySeedPhraseAlert,
   getIsSyncingData,
 } from "../store/reducers/stateCache";
-import { InitializationPhase } from "../store/reducers/stateCache/stateCache.types";
+import {
+  GlobalLoadingType,
+  InitializationPhase,
+} from "../store/reducers/stateCache/stateCache.types";
 import { AppOffline } from "./components/AppOffline";
 import { AppWrapper } from "./components/AppWrapper";
 import { ToastStack } from "./components/CustomToast/ToastStack";
@@ -139,7 +142,12 @@ const AppContent = ({
           <GenericError />
           <NoWitnessAlert />
           <ToastStack />
-          {globalLoading && <LoadingPage fullPage />}
+          {globalLoading !== GlobalLoadingType.NONE && (
+            <LoadingPage
+              hideBg={globalLoading === GlobalLoadingType.HIDEBG}
+              fullPage
+            />
+          )}
           <VerifySeedPhraseAlert />
         </StrictMode>
       </AppWrapper>

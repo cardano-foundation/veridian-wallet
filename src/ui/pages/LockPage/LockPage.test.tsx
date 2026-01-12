@@ -14,7 +14,10 @@ import { KeyStoreKeys } from "../../../core/storage";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { rootReducer } from "../../../store";
-import { InitializationPhase } from "../../../store/reducers/stateCache/stateCache.types";
+import {
+  GlobalLoadingType,
+  InitializationPhase,
+} from "../../../store/reducers/stateCache/stateCache.types";
 import { useBiometricAuth } from "../../hooks/useBiometricsHook";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
@@ -292,6 +295,7 @@ describe("Lock Page", () => {
     const store = makeRealStore({
       stateCache: {
         routes: [{ path: RoutePath.SSI_AGENT }],
+        showLoading: GlobalLoadingType.NONE,
         authentication: {
           loggedIn: false,
           time: Date.now(),

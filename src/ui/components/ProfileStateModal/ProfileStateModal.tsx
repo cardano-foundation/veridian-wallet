@@ -12,7 +12,11 @@ import {
   removeProfile,
   setShowProfileState,
 } from "../../../store/reducers/profileCache";
-import { setToastMsg } from "../../../store/reducers/stateCache";
+import {
+  getIsSyncingData,
+  setSyncingData,
+  setToastMsg,
+} from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
@@ -45,6 +49,7 @@ const ProfileStateModal = () => {
   const [hiddenContent, setHiddenContent] = useState(true);
   const [isOpenProfiles, setOpenProfiles] = useState(false);
   const isOpen = useAppSelector(getShowProfileState);
+  const isSynching = useAppSelector(getIsSyncingData);
   const history = useHistory();
   const checkedProfile = useRef<{
     id: string;
@@ -150,7 +155,13 @@ const ProfileStateModal = () => {
       return;
     }
 
-    getDetails();
+    // If we are syncing data from KERIA, I don’t think we need to check whether it exists on KERIA.
+    // This will fix the flickering issue during recovery.
+    if (!isSynching) {
+      getDetails();
+    } else {
+      dispatch(setSyncingData(false));
+    }
   }, [
     currentProfile?.identity.id,
     currentProfile?.identity.creationStatus,
@@ -159,6 +170,8 @@ const ProfileStateModal = () => {
     getDetails,
     setIsOpen,
     history.location.pathname,
+    isSynching,
+    dispatch,
   ]);
 
   useOnlineStatusEffect(checkProfileState);

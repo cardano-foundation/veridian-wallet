@@ -68,6 +68,7 @@ import {
 import { ChangePin } from "./ChangePin";
 import "./SettingsList.scss";
 import { VerifySeedPhraseCard } from "../../VerifySeedPhrase";
+import { GlobalLoadingType } from "../../../../store/reducers/stateCache/stateCache.types";
 
 const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const dispatch = useAppDispatch();
@@ -438,7 +439,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
 
   const deleteWallet = async () => {
     try {
-      dispatch(showGlobalLoading(true));
+      dispatch(showGlobalLoading(GlobalLoadingType.SHOWBG));
       await Agent.agent.deleteWallet();
       CLEAR_STORE_ACTIONS.forEach((action) => dispatch(action()));
       dispatch(setToastMsg(ToastMsgType.DELETE_ACCOUNT_SUCCESS));
@@ -452,7 +453,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         ToastMsgType.DELETE_ACCOUNT_ERROR
       );
     } finally {
-      dispatch(showGlobalLoading(false));
+      dispatch(showGlobalLoading(GlobalLoadingType.NONE));
     }
   };
 
