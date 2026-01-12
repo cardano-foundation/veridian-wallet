@@ -75,13 +75,10 @@ const CredentialItem = ({
               {!isRevoked ? (
                 formatShortDate(credential.issuanceDate)
               ) : (
-                <>
-                  <span className="revoked-label">{credential.status}</span>
-                  &nbsp;|&nbsp;
-                </>
+                <span className="revoked-label">{credential.status}</span>
               )}
-              &nbsp;•&nbsp;
-              <span>{connectionName}</span>
+              <span className="dot">•</span>
+              <span className="connection-name">{connectionName}</span>
             </div>
           </div>
         </IonLabel>
