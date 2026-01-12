@@ -1288,46 +1288,6 @@ describe("SSI agent page", () => {
           getByText(EN_TRANSLATIONS.ssiagent.error.invalidconnecturl)
         ).toBeVisible();
       });
-
-      act(() => {
-        fireEvent(
-          getByTestId("boot-url-input"),
-          new CustomEvent("ionInput", { detail: { value: "11111" } })
-        );
-      });
-
-      await waitFor(() => {
-        expect((getByTestId("boot-url-input") as HTMLInputElement).value).toBe(
-          "11111"
-        );
-      });
-
-      act(() => {
-        fireEvent(
-          getByTestId("connect-url-input"),
-          new CustomEvent("ionInput", { detail: { value: "11111" } })
-        );
-      });
-
-      await waitFor(() => {
-        expect(
-          (getByTestId("connect-url-input") as HTMLInputElement).value
-        ).toBe("11111");
-      });
-
-      act(() => {
-        fireEvent(getByTestId("boot-url-input"), new CustomEvent("ionFocus"));
-        fireEvent(
-          getByTestId("connect-url-input"),
-          new CustomEvent("ionFocus")
-        );
-      });
-
-      await waitFor(() => {
-        expect(
-          getAllByText(EN_TRANSLATIONS.ssiagent.error.invalidurl).length
-        ).toBe(2);
-      });
     });
 
     test("Show an error when the boot url is invalid", async () => {

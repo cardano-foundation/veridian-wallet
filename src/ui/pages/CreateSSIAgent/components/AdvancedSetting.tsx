@@ -141,20 +141,12 @@ const AdvancedSetting = ({
       return "ssiagent.error.mismatchconnecturl";
     }
 
-    if (displayBootUrlError && !isInvalidConnectUrl) {
-      return "ssiagent.error.invalidurl";
-    }
-
     return "ssiagent.error.invalidconnecturl";
   })();
 
   const bootUrlError = (() => {
     if (isRecoveryMode || !displayBootUrlError) return "";
-
-    if ((displayBootUrlError || isInvalidBootUrl) && !displayConnectUrlError)
-      return "ssiagent.error.invalidbooturl";
-
-    return "ssiagent.error.invalidurl";
+    return "ssiagent.error.invalidbooturl";
   })();
 
   const handleConnect = () => {
