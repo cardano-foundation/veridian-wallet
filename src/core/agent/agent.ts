@@ -406,10 +406,11 @@ class Agent {
       }
 
       const status = error.message.split(" - ")[1];
-      if (/404/gi.test(status)) {
-        throw new Error(Agent.KERIA_NOT_BOOTED, {
-          cause: error,
-        });
+      if (
+        /404/gi.test(status) ||
+        /agent does not exist/gi.test(error.message)
+      ) {
+        throw new Error(Agent.KERIA_NOT_BOOTED, { cause: error });
       }
 
       throw new Error(Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT, {
