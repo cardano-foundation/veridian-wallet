@@ -573,6 +573,19 @@ describe("App", () => {
 });
 
 describe("Witness availability", () => {
+  beforeAll(() => {
+    const deviceInfo = {
+      platform: "android",
+      osVersion: "12.0",
+      model: "",
+      operatingSystem: "android",
+      manufacturer: "",
+      isVirtual: false,
+      webViewVersion: "131.0.6778.260",
+    };
+    getDeviceInfo.mockImplementation(() => Promise.resolve(deviceInfo));
+  });
+
   test("No witness availability", async () => {
     getAvailableWitnessesMock.mockRejectedValue(
       new Error(IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE)
@@ -720,6 +733,77 @@ describe("Witness availability", () => {
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(showNoWitnessAlert(true));
+    });
+  });
+
+  test("Not show any message when error is network error", async () => {
+    getAvailableWitnessesMock.mockRejectedValue(new Error("Failed to fetch"));
+
+    const initialState = {
+      stateCache: {
+        isOnline: true,
+        routes: [{ path: TabsRoutePath.ROOT }],
+        currentProfileId: "Account1",
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          seedPhraseIsSet: true,
+          passwordIsSet: false,
+          passwordIsSkipped: true,
+          ssiAgentIsSet: true,
+          ssiAgentUrl: "http://keria.com",
+          recoveryWalletProgress: false,
+          loginAttempt: {
+            attempts: 0,
+            lockedUntil: Date.now(),
+          },
+        },
+        toastMsgs: [],
+        queueIncomingRequest: {
+          isProcessing: false,
+          queues: [],
+          isPaused: false,
+        },
+      },
+      seedPhraseCache: {
+        seedPhrase: "",
+        bran: "",
+      },
+      profilesCache: {
+        profiles: {},
+        defaultProfile: undefined,
+        connectedDApp: null,
+        pendingDAppConnection: null,
+        isConnectingToDApp: false,
+        showDAppConnect: false,
+      },
+      viewTypeCache: {
+        credential: {
+          viewType: null,
+          favouriteIndex: 0,
+        },
+      },
+      biometricsCache: {
+        enabled: false,
+      },
+    };
+
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    render(
+      <Provider store={storeMocked}>
+        <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
+          <App />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(dispatchMock).not.toBeCalledWith(showNoWitnessAlert(true));
     });
   });
 });

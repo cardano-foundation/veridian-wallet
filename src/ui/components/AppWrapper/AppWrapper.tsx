@@ -96,6 +96,7 @@ import {
   operationFailureHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
+import { isNetworkError } from "../../../core/agent/services/utils";
 
 const connectionStateChangedHandler = async (
   event: ConnectionStateChangedEvent,
@@ -321,17 +322,22 @@ const AppWrapper = (props: { children: ReactNode }) => {
     try {
       await Agent.agent.identifiers.getAvailableWitnesses();
     } catch (e) {
-      if (
-        e instanceof Error &&
-        (e.message.includes(
-          IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE
-        ) ||
-          e.message.includes(
-            IdentifierService.MISCONFIGURED_AGENT_CONFIGURATION
-          ))
-      ) {
-        dispatch(showNoWitnessAlert(true));
-        return;
+      if (e instanceof Error) {
+        const { message } = e;
+        if (
+          message.includes(
+            IdentifierService.INSUFFICIENT_WITNESSES_AVAILABLE
+          ) ||
+          message.includes(IdentifierService.MISCONFIGURED_AGENT_CONFIGURATION)
+        ) {
+          dispatch(showNoWitnessAlert(true));
+          return;
+        }
+
+        // If this is a network error, the app will display the offline screen
+        if (isNetworkError(e)) {
+          return;
+        }
       }
 
       throw e;

@@ -65,7 +65,8 @@ const Home = () => {
       !currentProfile ||
       [CreationStatus.PENDING, CreationStatus.FAILED].includes(
         currentProfile.identity.creationStatus
-      )
+      ) ||
+      !openRotateKeyModal
     ) {
       return;
     }
@@ -78,7 +79,7 @@ const Home = () => {
     } catch (error) {
       showError("Unable to get identifier details", error);
     }
-  }, [currentProfile]);
+  }, [currentProfile, openRotateKeyModal]);
 
   useOnlineStatusEffect(getDetails);
 

@@ -268,6 +268,7 @@ const CreateSSIAgent = () => {
 
       const connectUrl = await getConnectUrl(validBootUrl);
 
+      dispatch(setSyncingData(true));
       await Agent.agent.recoverKeriaAgent(
         seedPhraseCache.seedPhrase.split(" "),
         connectUrl
