@@ -38,18 +38,6 @@ jest.mock("../../../core/agent/agent", () => ({
   },
 }));
 
-const onlineStatusEffects: Array<() => unknown> = [];
-
-jest.mock("../../hooks", () => {
-  const actualHooks = jest.requireActual("../../hooks");
-  return {
-    ...actualHooks,
-    useOnlineStatusEffect: (callback: () => unknown) => {
-      onlineStatusEffects.push(callback);
-    },
-  };
-});
-
 jest.mock("./components/RotateKeyModal", () => {
   type MockRotateKeyModalProps = {
     isOpen: boolean;
@@ -81,25 +69,11 @@ jest.mock("../../utils/error", () => ({
   showError: jest.fn(),
 }));
 
-const runOnlineStatusEffects = async () => {
-  while (onlineStatusEffects.length) {
-    const effect = onlineStatusEffects.shift();
-    if (effect) {
-      await act(() => effect());
-    }
-  }
-};
-
-const clearOnlineStatusEffects = () => {
-  onlineStatusEffects.length = 0;
-};
-
 const showErrorMock = showError as jest.MockedFunction<typeof showError>;
 
 afterEach(() => {
   cleanup();
   jest.clearAllMocks();
-  clearOnlineStatusEffects();
 });
 
 const createTestState = (groupMemberPre = false, seedPhraseIsSet = false) => ({
@@ -110,6 +84,7 @@ const createTestState = (groupMemberPre = false, seedPhraseIsSet = false) => ({
       time: Date.now(),
       passcodeIsSet: true,
       seedPhraseIsSet,
+      isOnline: true,
     },
     toastMsgs: [],
   },
@@ -136,7 +111,6 @@ const createTestState = (groupMemberPre = false, seedPhraseIsSet = false) => ({
 });
 
 const renderHome = async (initialState: any) => {
-  clearOnlineStatusEffects();
   const store = makeTestStore(initialState);
   const history = createMemoryHistory();
   history.push(TabsRoutePath.HOME);
@@ -152,7 +126,6 @@ const renderHome = async (initialState: any) => {
     </Provider>
   );
 
-  await runOnlineStatusEffects();
   return result;
 };
 
@@ -270,12 +243,20 @@ describe("Home page", () => {
       expectedError
     );
 
-    await renderHome(createTestState());
+    const { getByTestId } = await renderHome(createTestState());
 
-    expect(showErrorMock).toHaveBeenCalledWith(
-      "Unable to get identifier details",
-      expectedError
-    );
+    fireEvent.click(getByTestId("tile-Rotate key"));
+
+    await waitFor(() => {
+      expect(getByTestId("rotate-keys")).toBeVisible();
+    });
+
+    await waitFor(() => {
+      expect(showErrorMock).toHaveBeenCalledWith(
+        "Unable to get identifier details",
+        expectedError
+      );
+    });
   });
 
   test("RotateKeyModal onClose closes the modal", async () => {

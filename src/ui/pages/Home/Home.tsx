@@ -12,6 +12,7 @@ import { Avatar } from "../../components/Avatar";
 import { ConnectdApp } from "../../components/ConnectdApp";
 import { ShareProfile } from "../../components/ShareProfile";
 import { Tile } from "../../components/Tile";
+import { VerifySeedPhraseCard } from "../../components/VerifySeedPhrase";
 import { TabLayout } from "../../components/layout/TabLayout";
 import { useOnlineStatusEffect } from "../../hooks";
 import { showError } from "../../utils/error";
@@ -19,7 +20,6 @@ import { Profiles } from "../Profiles";
 import "./Home.scss";
 import { RotateKeyModal } from "./components/RotateKeyModal";
 import { ScanToLogin } from "./components/ScanToLogin";
-import { VerifySeedPhraseCard } from "../../components/VerifySeedPhrase";
 
 const Home = () => {
   const pageId = "home-tab";
