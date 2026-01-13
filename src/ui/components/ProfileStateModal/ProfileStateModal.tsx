@@ -49,7 +49,7 @@ const ProfileStateModal = () => {
   const [hiddenContent, setHiddenContent] = useState(true);
   const [isOpenProfiles, setOpenProfiles] = useState(false);
   const isOpen = useAppSelector(getShowProfileState);
-  const isSynching = useAppSelector(getIsSyncingData);
+  const isSyncing = useAppSelector(getIsSyncingData);
   const history = useHistory();
   const checkedProfile = useRef<{
     id: string;
@@ -155,9 +155,7 @@ const ProfileStateModal = () => {
       return;
     }
 
-    // If we are syncing data from KERIA, I don’t think we need to check whether it exists on KERIA.
-    // This will fix the flickering issue during recovery.
-    if (!isSynching) {
+    if (!isSyncing) {
       getDetails();
     } else {
       dispatch(setSyncingData(false));
@@ -170,7 +168,7 @@ const ProfileStateModal = () => {
     getDetails,
     setIsOpen,
     history.location.pathname,
-    isSynching,
+    isSyncing,
     dispatch,
   ]);
 
