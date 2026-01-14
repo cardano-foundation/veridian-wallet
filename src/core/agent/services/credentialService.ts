@@ -218,12 +218,7 @@ class CredentialService extends AgentService {
       return;
     }
 
-    // Build filter for credentials where we are the issuee (holder)
-    // Use $or operator for multiple identifiers, or simple filter for single identifier
-    const filter =
-      identifiers.length === 1
-        ? { "-a-i": identifiers[0].id }
-        : { $or: identifiers.map((id) => ({ "-a-i": id.id })) };
+    const localIdentifierIds = new Set(identifiers.map((id) => id.id));
 
     const cloudCredentials: KeriaCredential[] = [];
     let returned = -1;
@@ -237,7 +232,6 @@ class CredentialService extends AgentService {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore - @TODO - foconnor: object[] type is incorrect in signify-ts, to correct to string[].
         sort: ["-a-dt"],
-        filter,
       });
       cloudCredentials.push(...result);
 
@@ -245,10 +239,17 @@ class CredentialService extends AgentService {
       iteration += 1;
     }
 
+    // Filter credentials where we are the issuee (holder)
+    // @TODO Implement $or filter in KERIA to filter at source instead of in TypeScript
+    const localCredentialsFiltered = cloudCredentials.filter(
+      (credential: KeriaCredential) =>
+        localIdentifierIds.has(credential.sad.a.i)
+    );
+
     const localCredentials =
       await this.credentialStorage.getAllCredentialMetadata();
 
-    const unSyncedData = cloudCredentials.filter(
+    const unSyncedData = localCredentialsFiltered.filter(
       (credential: KeriaCredential) =>
         !localCredentials.find((item) => credential.sad.d === item.id)
     );
