@@ -94,6 +94,7 @@ import {
   notificationStateChanged,
   operationCompleteHandler,
   operationFailureHandler,
+  removeConnectionCacheHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
 
@@ -821,6 +822,11 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
     Agent.agent.multiSigs.onGroupAdded((event) => {
       groupCreatedHandler(event, dispatch);
+    });
+
+    Agent.agent.connections.onConnectionInvalid((event) => {
+      removeConnectionCacheHandler(event, dispatch);
+      dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
     });
   };
 

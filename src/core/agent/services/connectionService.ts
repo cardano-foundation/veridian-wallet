@@ -44,6 +44,7 @@ import { AgentService } from "./agentService";
 import { OnlineOnly, randomSalt, waitAndGetDoneOp } from "./utils";
 import { StorageMessage } from "../../storage/storage.types";
 import {
+  ConnectionInvalidEvent,
   ConnectionRemovedEvent,
   ConnectionStateChangedEvent,
   EventTypes,
@@ -144,16 +145,6 @@ class ConnectionService extends AgentService {
       !new URL(url).pathname.match(WOOBI_RE)
     ) {
       throw new Error(ConnectionService.OOBI_INVALID);
-    }
-
-    if (new URL(url).pathname.match(DOOBI_RE)) {
-      const response = await fetch(url, { method: "GET" });
-      const contentType = response.headers.get("Content-Type");
-      if (!contentType?.includes("application/json+cesr")) {
-        throw new Error(
-          ConnectionService.INVALID_DOOBI_CONNECTION_CONTENT_TYPE
-        );
-      }
     }
 
     const multiSigInvite = url.includes(OobiQueryParams.GROUP_ID);
@@ -846,6 +837,10 @@ class ConnectionService extends AgentService {
     }
 
     return pendingDeletions;
+  }
+
+  onConnectionInvalid(callback: (event: ConnectionInvalidEvent) => void) {
+    this.props.eventEmitter.on(EventTypes.ConnectionInvalid, callback);
   }
 
   async resolvePendingConnections(): Promise<void> {

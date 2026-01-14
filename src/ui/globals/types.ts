@@ -79,7 +79,7 @@ enum ToastMsgType {
   CONNECT_URL_MISMATCH = "connecturlmismatch",
   INVALID_BOOT_URL = "invalidbooturlerror",
   MISMATCH_ERROR = "mismatcherror",
-  INVALID_CONNECT_URL = "invalidconnecturlerror",
+  INVALID_CONNECTION_URL = "invalidconnectionurlerror",
   NETWORK_ERROR = "networkerror",
   CREATE_IDENTIFIER_FAIL = "createidentifiererror",
 }
