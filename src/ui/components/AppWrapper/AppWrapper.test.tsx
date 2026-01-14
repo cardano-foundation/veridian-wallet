@@ -225,7 +225,11 @@ jest.mock("../../../core/agent/agent", () => {
           findById: jest.fn(),
           save: jest.fn(),
           createOrUpdateBasicRecord: jest.fn(),
+          deleteById: jest.fn(),
         },
+        dependenciesInitialized: false,
+        eventListenersSetup: false,
+        isPolling: false,
       },
     },
   };
@@ -359,6 +363,51 @@ describe("AppWrapper notification preferences", () => {
         content: { enabled: true, configured: true },
       })
     );
+  });
+
+  test("does not persist notifications when dependenciesInitialized is false (wallet deletion scenario)", async () => {
+    // This test simulates the race condition during wallet deletion:
+    // 1. AppWrapper mounts and areDependenciesReady becomes true
+    // 2. Wallet is deleted, Agent.instance = undefined
+    // 3. notificationsPreferences.configured is reset to false
+    // 4. syncNotificationsPreferences effect runs but should NOT persist
+    //    because dependenciesInitialized is false in the new Agent instance
+
+    // First, let initApp run normally so areDependenciesReady becomes true
+    notificationModule.arePermissionsGranted.mockResolvedValue(true);
+
+    const { unmount } = render(
+      <Provider store={store}>
+        <AppWrapper>
+          <div>App Content</div>
+        </AppWrapper>
+      </Provider>
+    );
+
+    // Wait for initial setup to complete
+    await waitFor(() => {
+      expect((Agent.agent as any).dependenciesInitialized).toBe(true);
+    });
+
+    // Now simulate wallet deletion scenario:
+    // Reset dependenciesInitialized to false (simulating Agent.instance = undefined)
+    (Agent.agent as any).dependenciesInitialized = false;
+    createOrUpdateMock.mockClear();
+
+    // Trigger the effect by clearing notifications preferences
+    store.dispatch(clearNotificationsPreferences());
+
+    // Wait a bit for effects to potentially run
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // The guard should prevent persistence when dependenciesInitialized is false
+    expect(createOrUpdateMock).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: MiscRecordId.APP_NOTIFICATIONS,
+      })
+    );
+
+    unmount();
   });
 });
 
