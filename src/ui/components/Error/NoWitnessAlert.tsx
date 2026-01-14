@@ -19,7 +19,7 @@ const NoWitnessAlert = () => {
   const isShowNoWitnessAlert = useAppSelector(getShowNoWitnessAlert);
   const [loading, setLoading] = useState(false);
 
-  const closeAlert = useCallback(async () => {
+  const checkAgain = useCallback(async () => {
     try {
       setLoading(true);
       await Agent.agent.identifiers.getAvailableWitnesses();
@@ -66,7 +66,7 @@ const NoWitnessAlert = () => {
         shape="round"
         expand="block"
         className="primary-button"
-        onClick={closeAlert}
+        onClick={checkAgain}
       >
         {i18n.t("nowitnesserror.button")}
       </IonButton>
