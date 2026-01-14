@@ -472,7 +472,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("cannot create an identifier if theme is not valid", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
 
     await expect(
       identifierService.createIdentifier({
@@ -485,7 +485,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("should throw an error if queued is not an array when creating identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const newTheme = 1;
     basicStorage.findById.mockResolvedValueOnce(
       new BasicRecord({
@@ -511,7 +511,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("can create an identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -594,7 +594,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("can create local group member identifier (initiator)", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -699,7 +699,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("can create local group member identifier (non initiator)", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -802,7 +802,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("can retry creating an identifier (skip storing name)", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -879,7 +879,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("can continue to create identifier if already exists on the cloud", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockRejectedValue(
@@ -949,7 +949,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("should error if display name is conflicting but cannot find by name thereafter", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockRejectedValue(
@@ -999,7 +999,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("should continue to track operations if metadata record already exists when creating identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -1070,7 +1070,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("should remove pending identifier name if all actions complete and duplicated", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -1137,7 +1137,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("cannot create identifier is agent config is missing", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     getAgentConfigMock.mockResolvedValueOnce({});
 
     await expect(
@@ -1151,7 +1151,7 @@ describe("Single sig service of agent", () => {
   });
 
   test("cannot create identifier is there are no discoverable witnesses", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: [
         "http://witnesess:5642/oobi/BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha/controller",
