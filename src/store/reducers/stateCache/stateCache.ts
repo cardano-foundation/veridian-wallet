@@ -7,6 +7,7 @@ import { RootState } from "../../index";
 import {
   AuthenticationCacheProps,
   CurrentRouteCacheProps,
+  GlobalLoadingType,
   IncomingRequestProps,
   InitializationPhase,
   PendingJoinGroupMetadata,
@@ -18,6 +19,7 @@ const initialState: StateCacheProps = {
   recoveryCompleteNoInterruption: false,
   isOnline: false,
   routes: [],
+  showLoading: GlobalLoadingType.NONE,
   authentication: {
     loggedIn: false,
     time: 0,
@@ -171,7 +173,7 @@ const stateCacheSlice = createSlice({
     showGenericError: (state, action: PayloadAction<boolean | undefined>) => {
       state.showGenericError = action.payload;
     },
-    showGlobalLoading: (state, action: PayloadAction<boolean>) => {
+    showGlobalLoading: (state, action: PayloadAction<GlobalLoadingType>) => {
       state.showLoading = action.payload;
     },
     showNoWitnessAlert: (state, action: PayloadAction<boolean | undefined>) => {
@@ -284,15 +286,9 @@ export type {
 };
 
 export {
-  getShowVerifySeedPhraseAlert,
-  showVerifySeedPhraseAlert,
-  getIsSyncingData,
-  setSyncingData,
   clearStateCache,
   dequeueIncomingRequest,
   enqueueIncomingRequest,
-  setSeedPhraseVerified,
-  setSsiAgentIsSet,
   getAuthentication,
   getCameraDirection,
   getCurrentRoute,
@@ -301,6 +297,7 @@ export {
   getGlobalLoading,
   getInitializationPhase,
   getIsOnline,
+  getIsSyncingData,
   getLoginAttempt,
   getQueueIncomingRequest,
   getRecoveryCompleteNoInterruption,
@@ -308,6 +305,7 @@ export {
   getShowCommonError,
   getShowNoWitnessAlert,
   getShowSetupProfilePage,
+  getShowVerifySeedPhraseAlert,
   getStateCache,
   getToastMgs,
   getToastMsgs,
@@ -330,10 +328,14 @@ export {
   setPendingJoinGroupMetadata,
   setQueueIncomingRequest,
   setRecoveryCompleteNoInterruption,
+  setSeedPhraseVerified,
+  setSsiAgentIsSet,
+  setSyncingData,
   setToastMsg,
   showGenericError,
   showGlobalLoading,
   showNoWitnessAlert,
+  showVerifySeedPhraseAlert,
   stateCacheSlice,
   getIsShowSeedPhrase,
   setShowSeedPhraseScreen,

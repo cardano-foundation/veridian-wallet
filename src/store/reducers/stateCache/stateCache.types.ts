@@ -72,7 +72,7 @@ interface StateCacheProps {
   showNoWitnessAlert?: boolean;
   toastMsgs: ToastStackItem[];
   forceInitApp?: number;
-  showLoading?: boolean;
+  showLoading: GlobalLoadingType;
   isSetupProfile?: boolean;
   pendingJoinGroupMetadata: PendingJoinGroupMetadata | null;
   showVerifySeedPhraseAlert?: boolean;
@@ -86,7 +86,13 @@ enum InitializationPhase {
   PHASE_TWO = "PHASE_TWO",
 }
 
-export { IncomingRequestType, InitializationPhase };
+enum GlobalLoadingType {
+  NONE = "NONE",
+  HIDEBG = "HIDE_BG",
+  SHOWBG = "SHOW_BG",
+}
+
+export { IncomingRequestType, InitializationPhase, GlobalLoadingType };
 
 export type {
   AuthenticationCacheProps,

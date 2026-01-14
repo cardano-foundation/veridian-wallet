@@ -510,14 +510,14 @@ describe("App", () => {
       dispatch: dispatchMock,
     };
 
-    const { getByTestId } = render(
+    const { getAllByTestId } = render(
       <Provider store={storeMocked}>
         <App />
       </Provider>
     );
 
     await waitFor(() => {
-      expect(getByTestId("loading-page")).toBeVisible();
+      expect(getAllByTestId("loading-page")[0]).toBeVisible();
     });
   });
 

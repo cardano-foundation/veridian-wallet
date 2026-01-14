@@ -940,6 +940,7 @@ class IdentifierService extends AgentService {
     });
   }
 
+  @OnlineOnly
   async getAvailableWitnesses(): Promise<{
     toad: number;
     witnesses: Array<{ eid: string; oobi: string }>;

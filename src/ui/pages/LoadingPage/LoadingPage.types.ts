@@ -6,6 +6,7 @@ enum LoadingType {
 interface LoadingPageProps {
   type?: LoadingType;
   fullPage?: boolean;
+  hideBg?: boolean;
 }
 
 export { LoadingType };

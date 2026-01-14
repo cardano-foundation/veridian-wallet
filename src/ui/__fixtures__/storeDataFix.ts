@@ -1,6 +1,9 @@
 import { RootState } from "../../store";
 import { Profile, ProfileCache } from "../../store/reducers/profileCache";
-import { InitializationPhase } from "../../store/reducers/stateCache/stateCache.types";
+import {
+  GlobalLoadingType,
+  InitializationPhase,
+} from "../../store/reducers/stateCache/stateCache.types";
 import { filteredArchivedCredsFix, filteredCredsFix } from "./filteredCredsFix";
 import { filteredIdentifierFix } from "./filteredIdentifierFix";
 import { notificationsFix } from "./notificationsFix";
@@ -64,6 +67,7 @@ export const storeStateFixData: RootState = {
     isOnline: true,
     initializationPhase: InitializationPhase.PHASE_TWO,
     recoveryCompleteNoInterruption: false,
+    showLoading: GlobalLoadingType.NONE,
     routes: [],
     authentication: {
       loggedIn: false,

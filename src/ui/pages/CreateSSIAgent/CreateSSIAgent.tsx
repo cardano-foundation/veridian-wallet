@@ -18,6 +18,8 @@ import {
   setRecoveryCompleteNoInterruption,
   setSeedPhraseVerified,
   setSsiAgentIsSet,
+  setSyncingData,
+  showGlobalLoading,
 } from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { ToastMsgType } from "../../globals/types";
@@ -28,6 +30,7 @@ import { CurrentPage, SSIError } from "./CreateSSIAgent.types";
 import { AdvancedSetting, removeLastSlash } from "./components/AdvancedSetting";
 import { Connect } from "./components/Connect";
 import { SSIScan } from "./components/SSIScan";
+import { GlobalLoadingType } from "../../../store/reducers/stateCache/stateCache.types";
 
 const SSI_URLS_EMPTY = "SSI url is empty";
 const SEED_PHRASE_EMPTY = "Invalid seed phrase";
@@ -231,6 +234,8 @@ const CreateSSIAgent = () => {
 
     if (isSyncing) {
       try {
+        dispatch(setSyncingData(true));
+        dispatch(showGlobalLoading(GlobalLoadingType.HIDEBG));
         await Agent.agent.syncWithKeria();
         await handlePostRecovery();
       } catch (e) {
@@ -242,6 +247,8 @@ const CreateSSIAgent = () => {
         }
 
         throw e;
+      } finally {
+        dispatch(showGlobalLoading(GlobalLoadingType.NONE));
       }
     }
   };

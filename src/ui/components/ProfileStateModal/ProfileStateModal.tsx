@@ -12,7 +12,11 @@ import {
   removeProfile,
   setShowProfileState,
 } from "../../../store/reducers/profileCache";
-import { setToastMsg } from "../../../store/reducers/stateCache";
+import {
+  getIsSyncingData,
+  setSyncingData,
+  setToastMsg,
+} from "../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
@@ -45,6 +49,7 @@ const ProfileStateModal = () => {
   const [hiddenContent, setHiddenContent] = useState(true);
   const [isOpenProfiles, setOpenProfiles] = useState(false);
   const isOpen = useAppSelector(getShowProfileState);
+  const isSyncing = useAppSelector(getIsSyncingData);
   const history = useHistory();
   const checkedProfile = useRef<{
     id: string;
@@ -150,7 +155,11 @@ const ProfileStateModal = () => {
       return;
     }
 
-    getDetails();
+    if (!isSyncing) {
+      getDetails();
+    } else {
+      dispatch(setSyncingData(false));
+    }
   }, [
     currentProfile?.identity.id,
     currentProfile?.identity.creationStatus,
@@ -159,6 +168,8 @@ const ProfileStateModal = () => {
     getDetails,
     setIsOpen,
     history.location.pathname,
+    isSyncing,
+    dispatch,
   ]);
 
   useOnlineStatusEffect(checkProfileState);
