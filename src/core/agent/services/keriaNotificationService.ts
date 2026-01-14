@@ -42,6 +42,7 @@ import {
 import {
   deleteNotificationRecordById,
   isNetworkError,
+  OnlineOnly,
   randomSalt,
 } from "./utils";
 import { CredentialService } from "./credentialService";
@@ -296,6 +297,7 @@ class KeriaNotificationService extends AgentService {
     this.loggedIn = false;
   }
 
+  @OnlineOnly
   async deleteNotificationRecordById(
     id: string,
     route: NotificationRoute

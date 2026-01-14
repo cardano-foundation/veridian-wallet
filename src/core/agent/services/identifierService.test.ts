@@ -377,7 +377,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("identifier exists in the database but not on Signify", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(identifierMetadataRecord);
@@ -400,7 +399,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("cannot get identifier if it's still pending", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       ...identifierMetadataRecord,
       creationStatus: CreationStatus.PENDING,
@@ -411,7 +409,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("cannot get identifier if it failed", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       ...identifierMetadataRecord,
       creationStatus: CreationStatus.FAILED,
@@ -422,7 +419,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("can get an identifier in detailed view", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(identifierMetadataRecord);
@@ -445,7 +441,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("group identifier detailed view should contain the member identifiers", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(groupMetadataRecord);
@@ -472,7 +467,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("cannot create an identifier if theme is not valid", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
 
     await expect(
       identifierService.createIdentifier({
@@ -485,7 +479,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("should throw an error if queued is not an array when creating identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const newTheme = 1;
     basicStorage.findById.mockResolvedValueOnce(
       new BasicRecord({
@@ -511,7 +504,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("can create an identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -594,7 +586,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("can create local group member identifier (initiator)", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -699,7 +690,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("can create local group member identifier (non initiator)", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -802,7 +792,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("can retry creating an identifier (skip storing name)", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -879,7 +868,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("can continue to create identifier if already exists on the cloud", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockRejectedValue(
@@ -949,7 +937,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("should error if display name is conflicting but cannot find by name thereafter", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockRejectedValue(
@@ -999,7 +986,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("should continue to track operations if metadata record already exists when creating identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -1070,7 +1056,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("should remove pending identifier name if all actions complete and duplicated", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const displayName = "displayName";
     eventEmitter.emit = jest.fn();
     createIdentifierMock.mockResolvedValue({
@@ -1137,7 +1122,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("cannot create identifier is agent config is missing", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     getAgentConfigMock.mockResolvedValueOnce({});
 
     await expect(
@@ -1151,7 +1135,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("cannot create identifier is there are no discoverable witnesses", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     getAgentConfigMock.mockResolvedValueOnce({
       iurls: [
         "http://witnesess:5642/oobi/BBilc4-L3tFUnfM_wJr4S4OJanAv_VmF_dJNN6vkf2Ha/controller",
@@ -2054,7 +2037,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("Should correctly sync identifiers, handling both group and non-group cases, initiator and not initiator", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     listIdentifiersMock
       .mockReturnValueOnce({
         aids: [
@@ -2245,7 +2227,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("Deleted identifiers are re-synced as soft deleted", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     listIdentifiersMock
       .mockReturnValueOnce({
         aids: [
@@ -2357,7 +2338,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("Should add operation record for pending group and non-group identifiers", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     listIdentifiersMock
       .mockReturnValueOnce({
         aids: [
@@ -2498,7 +2478,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("Should add operation record for failed group and non-group identifiers", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     listIdentifiersMock
       .mockReturnValueOnce({
         aids: [
@@ -2633,7 +2612,6 @@ describe("Single sig service of agent", () => {
 
   test("Should sync group identifiers with empty proposedUsername from migration", async () => {
     // This test simulates recovery after migrating a 1.1 wallet where username was not set
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     listIdentifiersMock
       .mockReturnValueOnce({
         aids: [
@@ -2728,7 +2706,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("should call signify.rotateIdentifier with correct params", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const identifierId = "identifierId";
     rotateIdentifierMock.mockResolvedValue({
       op: jest.fn().mockResolvedValue({
@@ -2742,7 +2719,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("Should throw error if we failed to obtain key manager when call getSigner", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(identifierMetadataRecord);
@@ -2754,7 +2730,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("Can get signer", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(identifierMetadataRecord);
@@ -2763,25 +2738,6 @@ describe("Single sig service of agent", () => {
     expect(
       await identifierService.getSigner(identifierMetadataRecord.id)
     ).toStrictEqual(mockSigner);
-  });
-
-  test("getIdentifier should throw an error when KERIA is offline", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(false);
-    await expect(identifierService.getIdentifier("id")).rejects.toThrowError(
-      Agent.KERIA_CONNECTION_BROKEN
-    );
-    await expect(identifierService.getSigner("id")).rejects.toThrowError(
-      Agent.KERIA_CONNECTION_BROKEN
-    );
-    await expect(
-      identifierService.createIdentifier({
-        displayName: "name",
-        theme: 0,
-      })
-    ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
-    await expect(identifierService.rotateIdentifier("id")).rejects.toThrowError(
-      Agent.KERIA_CONNECTION_BROKEN
-    );
   });
 
   test("Can delete stale local identifier", async () => {
@@ -2844,7 +2800,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("Should retrieve identifiers pending deletion and delete each by ID", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     identifierService.deleteIdentifier = jest
       .fn()
       .mockResolvedValueOnce(undefined)
@@ -2861,7 +2816,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("should processs any identifiers pending creation", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     basicStorage.findById.mockResolvedValueOnce(
       new BasicRecord({
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
@@ -2921,7 +2875,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("should throw error if queued identifiers has invalid format", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     basicStorage.findById.mockResolvedValueOnce(
       new BasicRecord({
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,

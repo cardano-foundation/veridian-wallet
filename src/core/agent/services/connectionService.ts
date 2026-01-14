@@ -15,7 +15,6 @@ import {
   AgentServicesProps,
   ConnectionDetails,
   ConnectionNoteDetails,
-  ConnectionNoteProps,
   ConnectionShortDetails,
   ConnectionStatus,
   CreationStatus,
@@ -29,6 +28,7 @@ import {
   RegularConnectionDetailsFull,
   WOOBI_RE,
 } from "../agent.types";
+import type { ConnectionNoteProps } from "../agent.types";
 import {
   BasicStorage,
   ConnectionPairRecord,
@@ -451,7 +451,6 @@ class ConnectionService extends AgentService {
     }
   }
 
-  @OnlineOnly
   async deleteMultisigConnectionById(contactId: string): Promise<void> {
     await this.props.signifyClient
       .contacts()
@@ -466,7 +465,6 @@ class ConnectionService extends AgentService {
     await this.contactStorage.deleteById(contactId);
   }
 
-  @OnlineOnly
   async deleteConnectionByIdAndIdentifier(
     contactId: string,
     identifier: string
@@ -616,6 +614,7 @@ class ConnectionService extends AgentService {
     return this.getConnectionShortDetails(metadata);
   }
 
+  @OnlineOnly
   async createConnectionNote(
     connectionId: string,
     note: ConnectionNoteProps,
@@ -632,6 +631,7 @@ class ConnectionService extends AgentService {
     });
   }
 
+  @OnlineOnly
   async updateConnectionNoteById(
     connectionId: string,
     connectionNoteId: string,
@@ -643,6 +643,7 @@ class ConnectionService extends AgentService {
     });
   }
 
+  @OnlineOnly
   async deleteConnectionNoteById(
     connectionId: string,
     connectionNoteId: string,
@@ -758,7 +759,6 @@ class ConnectionService extends AgentService {
     }
   }
 
-  @OnlineOnly
   async resolveOobi(
     url: string,
     waitForCompletion = true
@@ -891,6 +891,7 @@ class ConnectionService extends AgentService {
     await this.props.signifyClient.replies().submitRpy(connectionId, ims);
   }
 
+  @OnlineOnly
   async getHumanReadableMessage(
     exnSaid: string
   ): Promise<HumanReadableMessage> {

@@ -899,6 +899,7 @@ class MultiSigService extends AgentService {
     }
   }
 
+  @OnlineOnly
   async getInceptionStatus(multisigId: string): Promise<GroupInformation> {
     const members = await this.props.signifyClient
       .identifiers()

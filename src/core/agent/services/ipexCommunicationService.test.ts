@@ -336,10 +336,10 @@ const DATETIME = new Date();
 describe("Receive individual ACDC actions", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Can accept ACDC from individual identifier and remove notification", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const id = "uuid";
     notificationStorage.findById = jest.fn().mockResolvedValue({
       type: "NotificationRecord",
@@ -446,7 +446,6 @@ describe("Receive individual ACDC actions", () => {
   });
 
   test("Can accept ACDC from individual identifier even if already exists (idempotent)", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const id = "uuid";
     notificationStorage.findById = jest.fn().mockResolvedValue({
       type: "NotificationRecord",
@@ -526,7 +525,6 @@ describe("Receive individual ACDC actions", () => {
   });
 
   test("Cannot accept ACDC if the notification is missing in the DB", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "not-found-id";
     notificationStorage.findById = jest.fn().mockResolvedValue(null);
 
@@ -544,7 +542,6 @@ describe("Receive individual ACDC actions", () => {
   });
 
   test("Cannot accept ACDC if identifier is not locally stored", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
     notificationStorage.findById = jest.fn().mockResolvedValue({
       id,
@@ -576,10 +573,10 @@ describe("Receive individual ACDC actions", () => {
 describe("Receive group ACDC actions", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Can begin admitting an ACDC for a group and the notification remains", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const id = "uuid";
 
     notificationStorage.findById = jest.fn().mockResolvedValue({
@@ -738,7 +735,6 @@ describe("Receive group ACDC actions", () => {
   });
 
   test("Cannot begin admitting an ACDC twice", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const id = "uuid";
 
     notificationStorage.findById = jest.fn().mockResolvedValue({
@@ -770,8 +766,6 @@ describe("Receive group ACDC actions", () => {
   });
 
   test("Can join group admit of an ACDC", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
-
     notificationStorage.findById = jest.fn().mockResolvedValue({
       type: "NotificationRecord",
       id: "id",
@@ -932,8 +926,6 @@ describe("Receive group ACDC actions", () => {
   });
 
   test("Can join group admit of an ACDC even if ACDC already exists (idempotent)", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
-
     notificationStorage.findById = jest.fn().mockResolvedValue({
       type: "NotificationRecord",
       id: "id",
@@ -1060,7 +1052,6 @@ describe("Receive group ACDC actions", () => {
   });
 
   test("Cannot join group admit for a grant notification that does not exist", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
 
     notificationStorage.findById = jest.fn().mockResolvedValue(null);
@@ -1076,7 +1067,6 @@ describe("Receive group ACDC actions", () => {
   });
 
   test("Cannot join group admit of an ACDC twice", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
 
     notificationStorage.findById = jest.fn().mockResolvedValue({
@@ -1108,7 +1098,6 @@ describe("Receive group ACDC actions", () => {
   });
 
   test("Cannot join group admit of an ACDC if there is no current admit to join", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
 
     notificationStorage.findById = jest.fn().mockResolvedValue({
@@ -1141,7 +1130,6 @@ describe("Receive group ACDC actions", () => {
   });
 
   test("Cannot join group admit of an ACDC if group identifier is not locally stored", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
 
     notificationStorage.findById = jest.fn().mockResolvedValue({
@@ -1182,6 +1170,7 @@ describe("Receive group ACDC actions", () => {
 describe("Receive group ACDC progress", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Cannot get linkedRequest from ipex/grant if the notification is missing in the DB", async () => {
@@ -1316,10 +1305,10 @@ describe("Receive group ACDC progress", () => {
 describe("Offer ACDC individual actions", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Can offer ACDC in response to IPEX apply", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
     eventEmitter.emit = jest.fn();
     notificationStorage.findById = jest.fn().mockResolvedValue({
@@ -1413,7 +1402,6 @@ describe("Offer ACDC individual actions", () => {
   });
 
   test("Cannot offer ACDC if the apply notification is missing in the DB", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "not-found-id";
     eventEmitter.emit = jest.fn();
     notificationStorage.findById.mockResolvedValueOnce(null);
@@ -1449,10 +1437,10 @@ describe("Offer ACDC individual actions", () => {
 describe("Offer ACDC group actions", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Can begin offering an ACDC from a group identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const id = "uuid";
     eventEmitter.emit = jest.fn();
     notificationStorage.findById = jest.fn().mockResolvedValue({
@@ -1543,7 +1531,6 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Cannot begin offering an ACDC twice", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     eventEmitter.emit = jest.fn();
     const applyNoteRecord = {
       linkedRequest: {
@@ -1578,7 +1565,6 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Can join group offer of an ACDC", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     eventEmitter.emit = jest.fn();
     const notificationRecord = {
       type: "NotificationRecord",
@@ -1668,7 +1654,6 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Cannot join group to offer ACDC if linked apply notification does not exist", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     notificationStorage.findById.mockResolvedValue(null);
 
     await expect(
@@ -1682,7 +1667,6 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Cannot join group to offer ACDC twice", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const notificationRecord = {
       type: "NotificationRecord",
       id: "id",
@@ -1711,7 +1695,6 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Cannot join group to offer ACDC if there is no current offer", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const notificationRecord = {
       type: "NotificationRecord",
       id: "id",
@@ -1741,8 +1724,7 @@ describe("Offer ACDC group actions", () => {
   });
 
   test("Can retrieve the current offered credential SAID", async () => {
-    getExchangeMock.mockReturnValueOnce(multisigExnOfferForPresenting);
-
+    getExchangeMock.mockReturnValue(multisigExnOfferForPresenting);
     const result = await ipexCommunicationService.getOfferedCredentialSaid(
       "current-said"
     );
@@ -1755,6 +1737,7 @@ describe("Offer ACDC group actions", () => {
 describe("Offer ACDC group progress", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Cannot get group offer progress if the apply notification is missing in the DB", async () => {
@@ -1868,10 +1851,10 @@ describe("Offer ACDC group progress", () => {
 describe("Grant ACDC individual actions", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Can present ACDC in response to agree", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     eventEmitter.emit = jest.fn();
     notificationStorage.findById = jest.fn().mockResolvedValue({
       type: "NotificationRecord",
@@ -1967,7 +1950,6 @@ describe("Grant ACDC individual actions", () => {
   });
 
   test("Cannot present ACDC if the notification is missing in the DB", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "not-found-id";
     notificationStorage.findById = jest.fn().mockResolvedValue(null);
 
@@ -1986,7 +1968,6 @@ describe("Grant ACDC individual actions", () => {
   });
 
   test("Cannot present non existing ACDC", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     eventEmitter.emit = jest.fn();
     notificationStorage.findById = jest.fn().mockResolvedValueOnce({
       type: "NotificationRecord",
@@ -2023,7 +2004,6 @@ describe("Grant ACDC individual actions", () => {
   });
 
   test("Should throw if unknown error occurs when fetching ACDC to present", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     getExchangeMock.mockReturnValue(agreeForPresentingExnMessage);
     notificationStorage.findById = jest.fn().mockResolvedValue({
       type: "NotificationRecord",
@@ -2059,10 +2039,10 @@ describe("Grant ACDC group actions", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
     eventEmitter.emit = jest.fn();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Can begin presenting an ACDC in response to agree", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     notificationStorage.findById = jest.fn().mockResolvedValue({
       type: "NotificationRecord",
       id: "note-id",
@@ -2164,7 +2144,6 @@ describe("Grant ACDC group actions", () => {
   });
 
   test("Cannot begin presenting an ACDC twice", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     notificationStorage.findById = jest.fn().mockResolvedValue({
       type: "NotificationRecord",
       id: "note-id",
@@ -2313,6 +2292,7 @@ describe("Grant ACDC group actions", () => {
 describe("Chained ACDC schema resolution", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Can resolve non-chained ACDC schema", async () => {
@@ -2481,10 +2461,10 @@ describe("Chained ACDC schema resolution", () => {
 describe("IPEX communication service of agent", () => {
   beforeAll(async () => {
     await new ConfigurationService().start();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Can get matching credential for apply", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const notiId = "notiId";
     const mockExchange = {
       exn: {
@@ -2678,7 +2658,6 @@ describe("IPEX communication service of agent", () => {
   });
 
   test("Should throw error if schemas.get has an unexpected error", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     schemaGetMock.mockRejectedValueOnce(new Error("Unknown error"));
     await expect(
       ipexCommunicationService.createLinkedIpexMessageRecord(
@@ -2689,7 +2668,6 @@ describe("IPEX communication service of agent", () => {
   });
 
   test("Cannot get matching credential for apply if cannot get the schema", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const notiId = "notiId";
     getExchangeMock = jest.fn().mockResolvedValueOnce({
       exn: {
@@ -2762,7 +2740,6 @@ describe("IPEX communication service of agent", () => {
   });
 
   test("Cannot get ipex apply details if the schema cannot be located", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const mockNotification = {
       a: {
         d: "msgSaid",
@@ -2792,7 +2769,6 @@ describe("IPEX communication service of agent", () => {
   });
 
   test("Should throw error for non-404 errors - getIpexApplyDetails", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     const mockNotification = {
       a: {
         d: "msgSaid",

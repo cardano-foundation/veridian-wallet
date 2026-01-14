@@ -365,10 +365,10 @@ describe("Creation of multi-sig", () => {
   beforeAll(async () => {
     await ready();
     eventEmitter.emit = jest.fn();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
 
   test("Can create a multisig identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(memberMetadataRecord);
@@ -534,7 +534,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot create a group if the threshold is invalid", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     await expect(
       multiSigService.createGroup(
         memberPrefix,
@@ -552,7 +551,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot create a group with an invalid member identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue(
       new IdentifierMetadataRecord({
         ...memberMetadataRecordProps,
@@ -587,7 +585,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot create a group with contacts that are not linked to the group", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(memberMetadataRecord);
@@ -607,7 +604,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Can re-try creating a multisig identifier", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(memberMetadataRecord);
@@ -722,7 +718,6 @@ describe("Creation of multi-sig", () => {
 
   test("Can retry creating an identifier that was completely created but not removed from queue", async () => {
     // This test should be enough to capture all of the try catches
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(memberMetadataRecord);
@@ -844,7 +839,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot retry creating an identifier if its inception data is not stored", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     identifierStorage.getIdentifierMetadata = jest
       .fn()
       .mockResolvedValue(memberMetadataRecord);
@@ -875,7 +869,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Can join a group", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers.mockResolvedValue([memberMetadataRecord]);
     identifiersGetMock
@@ -1027,7 +1020,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot join group by notification if exn message is missing", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockRejectedValue(
       new Error("request - 404 - SignifyClient message")
     );
@@ -1037,7 +1029,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Can join a 3-person group and share OOBI with multiple members", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
 
     // Create a 3-person group exn message
     const threePersonGroupExn = {
@@ -1124,7 +1115,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot join group if we do not control any member", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers = jest
       .fn()
@@ -1135,7 +1125,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot join group if member identifier is malformed", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers = jest.fn().mockResolvedValue([
       new IdentifierMetadataRecord({
@@ -1149,7 +1138,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Can retry joining a group", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers.mockResolvedValue([memberMetadataRecord]);
     identifiersGetMock
@@ -1251,7 +1239,6 @@ describe("Creation of multi-sig", () => {
 
   test("Can retry joining a group that was completely joined but not removed from queue", async () => {
     // This test should be enough to capture all of the try catches
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers.mockResolvedValue([memberMetadataRecord]);
     identifiersGetMock
@@ -1365,7 +1352,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot retry creating an identifier if its inception data is not stored", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers.mockResolvedValue([memberMetadataRecord]);
     identifiersGetMock
@@ -1392,7 +1378,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Can get multisig icp details of 2 person group", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([
       {
         ...getRequestMultisigIcp,
@@ -1435,7 +1420,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Throw error if the group join request contains unknown identifiers", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([
       {
         ...getRequestMultisigIcp,
@@ -1473,7 +1457,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Should not error if we have extra linked contacts", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([
       {
         ...getRequestMultisigIcp,
@@ -1531,7 +1514,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Can get multisig icp details of 3 person group", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([
       {
         ...getRequestMultisigIcp,
@@ -1590,7 +1572,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot get multisig icp details if the exn is missing", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockRejectedValue(
       new Error("request - 404 - not found")
     );
@@ -1604,7 +1585,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Throw error if we do not control any member of the group", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([getRequestMultisigIcp]);
     identifiers.getIdentifiers = jest
       .fn()
@@ -1623,7 +1603,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot get multi-sig details from a notification with no matching exn message", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([]);
 
     await expect(
@@ -1636,7 +1615,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Cannot get multisig icp details if the exn is missing when get group size", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockRejectedValue(
       new Error("request - 404 - not found")
     );
@@ -1650,7 +1628,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Can get group size of 2 person group", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     groupGetRequestMock.mockResolvedValue([
       {
         ...getRequestMultisigIcp,
@@ -1669,7 +1646,6 @@ describe("Creation of multi-sig", () => {
   });
 
   test("Should processs any groups pending creation", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     basicStorage.findById.mockResolvedValueOnce(
       new BasicRecord({
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,
@@ -1759,7 +1735,6 @@ describe("Creation of multi-sig", () => {
     } as any;
 
     // Mock the necessary dependencies
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     basicStorage.findById.mockResolvedValueOnce(
       new BasicRecord({
         id: MiscRecordId.IDENTIFIERS_PENDING_CREATION,

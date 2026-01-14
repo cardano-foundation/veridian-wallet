@@ -287,7 +287,6 @@ class IpexCommunicationService extends AgentService {
     await this.notificationStorage.update(applyNoteRecord);
   }
 
-  @OnlineOnly
   async grantAcdcFromAgree(notificationId: string): Promise<void> {
     const agreeNoteRecord = await this.notificationStorage.findById(
       notificationId
@@ -1015,6 +1014,7 @@ class IpexCommunicationService extends AgentService {
     return { op, exnSaid: exn.ked.d };
   }
 
+  @OnlineOnly
   async getAcdcFromIpexGrant(
     said: string
   ): Promise<Omit<ACDCDetails, "identifierType">> {
@@ -1164,6 +1164,7 @@ class IpexCommunicationService extends AgentService {
     return { op, exnSaid: exn.ked.d };
   }
 
+  @OnlineOnly
   async getLinkedGroupFromIpexGrant(id: string): Promise<LinkedGroupInfo> {
     const grantNoteRecord = await this.notificationStorage.findById(id);
     if (!grantNoteRecord) {
@@ -1207,6 +1208,7 @@ class IpexCommunicationService extends AgentService {
     };
   }
 
+  @OnlineOnly
   async getLinkedGroupFromIpexApply(id: string): Promise<LinkedGroupInfo> {
     const applyNoteRecord = await this.notificationStorage.findById(id);
     if (!applyNoteRecord) {
@@ -1250,6 +1252,7 @@ class IpexCommunicationService extends AgentService {
     };
   }
 
+  @OnlineOnly
   async getOfferedCredentialSaid(current: string): Promise<string> {
     const multiSigExn = await this.props.signifyClient.exchanges().get(current);
     const offerExn = multiSigExn.exn.e.exn;

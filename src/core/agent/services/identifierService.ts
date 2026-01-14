@@ -378,7 +378,6 @@ class IdentifierService extends AgentService {
     return `${LATEST_IDENTIFIER_VERSION}:${theme}:${metadata.displayName}`;
   }
 
-  @OnlineOnly
   private async propagateUpdatesForIdentifier(
     metadata: IdentifierMetadataRecord
   ): Promise<void> {
@@ -940,6 +939,7 @@ class IdentifierService extends AgentService {
     });
   }
 
+  @OnlineOnly
   async getAvailableWitnesses(): Promise<{
     toad: number;
     witnesses: Array<{ eid: string; oobi: string }>;
