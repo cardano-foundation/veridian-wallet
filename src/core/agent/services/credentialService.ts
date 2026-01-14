@@ -212,6 +212,19 @@ class CredentialService extends AgentService {
   }
 
   async syncKeriaCredentials(): Promise<void> {
+    const identifiers = await this.identifierStorage.getIdentifierRecords();
+
+    if (identifiers.length === 0) {
+      return;
+    }
+
+    // Build filter for credentials where we are the issuee (holder)
+    // Use $or operator for multiple identifiers, or simple filter for single identifier
+    const filter =
+      identifiers.length === 1
+        ? { "-a-i": identifiers[0].id }
+        : { $or: identifiers.map((id) => ({ "-a-i": id.id })) };
+
     const cloudCredentials: KeriaCredential[] = [];
     let returned = -1;
     let iteration = 0;
@@ -224,6 +237,7 @@ class CredentialService extends AgentService {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore - @TODO - foconnor: object[] type is incorrect in signify-ts, to correct to string[].
         sort: ["-a-dt"],
+        filter,
       });
       cloudCredentials.push(...result);
 

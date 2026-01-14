@@ -98,6 +98,7 @@ const signifyClient = jest.mocked({
 const identifierStorage = jest.mocked({
   getIdentifierMetadata: jest.fn(),
   getUserFacingIdentifierRecords: jest.fn(),
+  getIdentifierRecords: jest.fn(),
   getAllIdentifiers: jest.fn(),
   updateIdentifierMetadata: jest.fn(),
   createIdentifierMetadataRecord: jest.fn(),
@@ -356,6 +357,14 @@ describe("Credential service of agent", () => {
   });
 
   test("Can sync ACDCs from KERIA to local", async () => {
+    // Mock identifiers that will be used in the filter
+    identifierStorage.getIdentifierRecords = jest
+      .fn()
+      .mockResolvedValue([
+        { id: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+        { id: "EFr4DyYerYKgdUq3Nw5wbq7OjEZT6cn45omHCiIZ0elD" },
+      ]);
+
     credentialListMock
       .mockReturnValueOnce([
         {
