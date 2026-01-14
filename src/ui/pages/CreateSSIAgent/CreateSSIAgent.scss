@@ -134,6 +134,11 @@
 
     & > * {
       margin: 0;
+
+      &.error-message,
+      &.ssi-error-placeholder {
+        margin-top: 0.25rem;
+      }
     }
 
     & > ion-item {

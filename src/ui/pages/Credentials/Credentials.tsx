@@ -1,4 +1,10 @@
-import { IonButton, IonLabel, useIonViewWillEnter } from "@ionic/react";
+import {
+  IonButton,
+  IonIcon,
+  IonLabel,
+  useIonViewWillEnter,
+} from "@ionic/react";
+import { archiveOutline } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import {
@@ -159,6 +165,7 @@ const Credentials = () => {
           data-testid="cred-archived-revoked-button"
           onClick={() => setArchivedCredentialsIsOpen(true)}
         >
+          <IonIcon icon={archiveOutline} />
           <IonLabel color="secondary">
             {i18n.t("tabs.credentials.tab.viewarchived")}
           </IonLabel>
@@ -235,49 +242,53 @@ const Credentials = () => {
           )
         }
       >
-        {!showPlaceholder && (
-          <>
-            {favouriteCredentials.length > 0 && (
-              <div
-                ref={favouriteContainerElement}
-                className="credentials-tab-content-block credential-favourite-cards"
-                data-testid="favourite-container-element"
-              >
-                <CardSlider
-                  title={`${i18n.t("tabs.credentials.tab.favourites")}`}
-                  name="favs"
-                  cardsData={sortedFavouriteCredentials}
-                  onShowCardDetails={() => handleShowNavAnimation("favourite")}
+        <div className="cred-container">
+          {!showPlaceholder && (
+            <>
+              {favouriteCredentials.length > 0 && (
+                <div
+                  ref={favouriteContainerElement}
+                  className="credentials-tab-content-block credential-favourite-cards"
+                  data-testid="favourite-container-element"
+                >
+                  <CardSlider
+                    title={`${i18n.t("tabs.credentials.tab.favourites")}`}
+                    name="favs"
+                    cardsData={sortedFavouriteCredentials}
+                    onShowCardDetails={() =>
+                      handleShowNavAnimation("favourite")
+                    }
+                  />
+                </div>
+              )}
+              {!!confirmedCreds.length && (
+                <SwitchCardView
+                  className="credentials-tab-content-block credential-cards"
+                  cardsData={confirmedCreds}
+                  onShowCardDetails={() => handleShowNavAnimation("cards")}
+                  title={`${i18n.t("tabs.credentials.tab.allcreds")}`}
+                  name="allcreds"
                 />
-              </div>
-            )}
-            {!!confirmedCreds.length && (
-              <SwitchCardView
-                className="credentials-tab-content-block credential-cards"
-                cardsData={confirmedCreds}
-                onShowCardDetails={() => handleShowNavAnimation("cards")}
-                title={`${i18n.t("tabs.credentials.tab.allcreds")}`}
-                name="allcreds"
-              />
-            )}
-            {!!pendingCreds.length && (
-              <div className="credetial-tab-content-block pending-container">
-                <ListHeader
-                  title={`${i18n.t("tabs.credentials.tab.pendingcred")}`}
-                />
-                <CredentialCardList
-                  cardsData={pendingCreds}
-                  testId="pending-creds-list"
-                  onCardClick={(cred) => {
-                    setDeletePendingItem(cred as CredentialShortDetails);
-                    setOpenDeletePendingAlert(true);
-                  }}
-                />
-              </div>
-            )}
-            <ArchivedCredentialsButton />
-          </>
-        )}
+              )}
+              {!!pendingCreds.length && (
+                <div className="credetial-tab-content-block pending-container">
+                  <ListHeader
+                    title={`${i18n.t("tabs.credentials.tab.pendingcred")}`}
+                  />
+                  <CredentialCardList
+                    cardsData={pendingCreds}
+                    testId="pending-creds-list"
+                    onCardClick={(cred) => {
+                      setDeletePendingItem(cred as CredentialShortDetails);
+                      setOpenDeletePendingAlert(true);
+                    }}
+                  />
+                </div>
+              )}
+              <ArchivedCredentialsButton />
+            </>
+          )}
+        </div>
       </TabLayout>
       <Profiles
         isOpen={openProfiles}

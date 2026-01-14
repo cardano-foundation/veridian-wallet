@@ -45,11 +45,6 @@ export function parseHabName(name: string): HabNameParts {
     if (!groupId || groupId.trim() === "") {
       throw new Error("Invalid new format name: groupId cannot be empty.");
     }
-    if (!proposedUsername) {
-      throw new Error(
-        "Invalid new format name: proposedUsername cannot be null."
-      );
-    }
 
     return {
       version,

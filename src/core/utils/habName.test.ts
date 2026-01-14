@@ -111,6 +111,19 @@ describe("habName", () => {
         },
       },
       {
+        name: "1.2.0.2:XX:1:groupId123::MyGroup", // Empty proposedUsername (migrated from 1.1)
+        expected: {
+          version: "1.2.0.2",
+          displayName: "MyGroup",
+          theme: "XX",
+          groupMetadata: {
+            groupInitiator: true,
+            groupId: "groupId123",
+            proposedUsername: "",
+          },
+        },
+      },
+      {
         name: "1.2.0.2:XX:MyNewWallet", // Non-group member in new format
         expected: {
           version: "1.2.0.2",

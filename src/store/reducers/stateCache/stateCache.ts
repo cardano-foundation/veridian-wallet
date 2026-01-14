@@ -204,6 +204,9 @@ const stateCacheSlice = createSlice({
     setSyncingData: (state, action: PayloadAction<boolean>) => {
       state.isSyncingData = action.payload;
     },
+    setShowSeedPhraseScreen: (state, action: PayloadAction<boolean>) => {
+      state.isShowSeedPhraseScreen = action.payload;
+    },
   },
 });
 
@@ -237,6 +240,7 @@ const {
   showVerifySeedPhraseAlert,
   setSsiAgentIsSet,
   setSyncingData,
+  setShowSeedPhraseScreen,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -270,6 +274,8 @@ const getShowSetupProfilePage = (state: RootState) =>
 const getShowVerifySeedPhraseAlert = (state: RootState) =>
   state.stateCache.showVerifySeedPhraseAlert;
 const getIsSyncingData = (state: RootState) => state.stateCache.isSyncingData;
+const getIsShowSeedPhrase = (state: RootState) =>
+  state.stateCache.isShowSeedPhraseScreen;
 
 export type {
   AuthenticationCacheProps,
@@ -329,4 +335,6 @@ export {
   showGlobalLoading,
   showNoWitnessAlert,
   stateCacheSlice,
+  getIsShowSeedPhrase,
+  setShowSeedPhraseScreen,
 };

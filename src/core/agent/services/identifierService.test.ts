@@ -1402,9 +1402,10 @@ describe("Single sig service of agent", () => {
       .mockResolvedValue(memberClone);
     getIdentifierMock.mockResolvedValueOnce({
       ...identifierStateKeria,
-      name: `1.2.0.2:${identifierMetadataRecord.theme}:${identifierMetadataRecord.groupMetadata?.proposedUsername ??
+      name: `1.2.0.2:${identifierMetadataRecord.theme}:${
+        identifierMetadataRecord.groupMetadata?.proposedUsername ??
         identifierMetadataRecord.displayName
-        }`,
+      }`,
     });
 
     await identifierService.updateIdentifier(identifierMetadataRecord.id, {
@@ -2628,6 +2629,102 @@ describe("Single sig service of agent", () => {
     });
     expect(operationPendingStorage.save).not.toBeCalled();
     expect(eventEmitter.emit).not.toBeCalled();
+  });
+
+  test("Should sync group identifiers with empty proposedUsername from migration", async () => {
+    // This test simulates recovery after migrating a 1.1 wallet where username was not set
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
+    listIdentifiersMock
+      .mockReturnValueOnce({
+        aids: [
+          {
+            name: "1.2.0.2:0:1:group1::test1", // Empty proposedUsername from migration
+            prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
+            sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
+          },
+          {
+            name: "1.2.0.2:15:test1",
+            prefix: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
+            group: {
+              mhab: {
+                name: "1.2.0.2:0:1:group1::test1", // Empty proposedUsername
+                prefix: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
+                sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
+              },
+            },
+          },
+        ],
+      })
+      .mockReturnValue({ aids: [] });
+    identifierStorage.getAllIdentifiers = jest.fn().mockReturnValue([]);
+    jest
+      .spyOn(signifyClient.operations(), "get")
+      .mockResolvedValueOnce({
+        done: true,
+        name: "witness.EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
+      })
+      .mockResolvedValueOnce({
+        done: true,
+        name: "group.EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
+      });
+    getIdentifierMock
+      .mockResolvedValueOnce({
+        salty: {
+          sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
+        },
+        icp_dt: "2024-12-10T07:28:18.217384+00:00",
+      })
+      .mockResolvedValueOnce({
+        icp_dt: "2024-12-10T07:28:18.217384+00:00",
+      });
+
+    await identifierService.syncKeriaIdentifiers();
+
+    // Verify member identifier was created with empty proposedUsername
+    expect(
+      identifierStorage.createIdentifierMetadataRecord
+    ).toHaveBeenCalledWith({
+      createdAt: new Date("2024-12-10T07:28:18.217Z"),
+      creationStatus: CreationStatus.COMPLETE,
+      displayName: "test1",
+      groupMetadata: {
+        groupCreated: false,
+        groupId: "group1",
+        groupInitiator: true,
+        proposedUsername: "", // Empty from migration
+      },
+      id: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
+      isDeleted: false,
+      sxlt: "1AAHFlFbNZ29MWHve6gyXfaJr4q2xgCmNEadpkh7IPuP1weDcOEb-bv3CmOoXK3xIik85tc9AYlNxFn_sTMpcvlbog8k4T5rE35i",
+      theme: 0,
+    });
+
+    // Verify member was marked as created
+    expect(identifierStorage.updateIdentifierMetadata).toHaveBeenCalledWith(
+      "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
+      {
+        groupMetadata: {
+          groupId: "group1",
+          groupCreated: true,
+          groupInitiator: true,
+          proposedUsername: "", // Empty from migration
+        },
+      }
+    );
+
+    // Verify group identifier was created with empty groupUsername
+    expect(
+      identifierStorage.createIdentifierMetadataRecord
+    ).toHaveBeenCalledWith({
+      id: "EPMFON5GHY3o4mLr7XsHvXBCED4gkr1ILUX9NSRkOPM",
+      displayName: "test1",
+      theme: 15,
+      groupMemberPre: "EL-EboMhx-DaBLiAS_Vm3qtJOubb2rkcS3zLU_r7UXtl",
+      groupUsername: "", // Empty from migration
+      creationStatus: CreationStatus.COMPLETE,
+      createdAt: new Date("2024-12-10T07:28:18.217Z"),
+      isDeleted: false,
+    });
   });
 
   test("should call signify.rotateIdentifier with correct params", async () => {

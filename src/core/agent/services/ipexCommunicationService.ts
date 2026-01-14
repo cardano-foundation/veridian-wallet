@@ -743,7 +743,6 @@ class IpexCommunicationService extends AgentService {
     await this.notificationStorage.update(applyNoteRecord);
   }
 
-  @SeedPhraseVerified
   async joinMultisigGrant(
     multiSigExn: ExnMessage,
     agreeNoteRecord: NotificationRecord
