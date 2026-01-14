@@ -567,7 +567,7 @@
       "support": {
         "title": "Support & Legal",
         "contact": "Veridian support",
-        "learnmore": "Learn more about Cardano IDW",
+        "learnmore": "Learn more about Veridian",
         "terms": {
           "title": "Terms and Privacy Policy",
           "submenu": {
@@ -1562,8 +1562,8 @@
     "proposalcredaccepted": "Credential proposal accepted",
     "proposalcredreject": "Credential proposal rejected",
     "proposalcredfailerror": "Unable to record response",
-    "deleteaccounterror": "Unable to delete account",
-    "deleteaccountsuccess": "Account deleted successfully",
+    "deleteaccounterror": "Unable to delete wallet",
+    "deleteaccountsuccess": "Wallet deleted successfully",
     "remotesignsuccess": "Signed successfully",
     "profileswitched": "Profile switched",
     "unabletoswitchprofile": "Unable to switch profile",
