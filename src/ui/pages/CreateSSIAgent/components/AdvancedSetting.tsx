@@ -56,7 +56,8 @@ const AdvancedSetting = ({
   const [bootUrlInputTouched, setBootUrlInputTouched] = useState(false);
   const {
     hasMismatchError,
-    networkIssue,
+    bootNetworkIssue,
+    connectNetworkIssue,
     isInvalidBootUrl,
     isInvalidConnectUrl,
   } = errors;
@@ -96,13 +97,15 @@ const AdvancedSetting = ({
       bootUrlInputTouched &&
       ssiAgent.bootUrl &&
       !isValidHttpUrl(ssiAgent.bootUrl)) ||
-    isInvalidBootUrl;
+    isInvalidBootUrl ||
+    bootNetworkIssue;
 
   const displayConnectUrlError =
     (connectUrlInputTouched &&
       ssiAgent.connectUrl &&
       !isValidHttpUrl(ssiAgent.connectUrl)) ||
-    isInvalidConnectUrl;
+    isInvalidConnectUrl ||
+    connectNetworkIssue;
 
   const validated = validInputBootUrl && validInputConnectUrl;
 
@@ -110,7 +113,7 @@ const AdvancedSetting = ({
     setErrors({
       isInvalidConnectUrl: false,
       hasMismatchError: false,
-      networkIssue: false,
+      connectNetworkIssue: false,
     });
     setConnectUrl(connectionUrl);
   };
@@ -118,19 +121,18 @@ const AdvancedSetting = ({
   const handleChangeBootUrl = (bootUrl: string) => {
     setErrors({
       isInvalidBootUrl: false,
+      bootNetworkIssue: false,
     });
     setBootUrl(bootUrl);
   };
 
   const showConnectionUrlError =
-    !!displayConnectUrlError ||
-    hasMismatchError ||
-    isInvalidConnectUrl ||
-    networkIssue;
+    !!displayConnectUrlError || hasMismatchError || isInvalidConnectUrl;
+
   const connectionUrlError = (() => {
     if (!showConnectionUrlError) return "";
 
-    if (networkIssue) {
+    if (connectNetworkIssue) {
       return "ssiagent.error.networkissue";
     }
 
@@ -145,6 +147,10 @@ const AdvancedSetting = ({
   })();
 
   const bootUrlError = (() => {
+    if (bootNetworkIssue) {
+      return "ssiagent.error.networkissue";
+    }
+
     if (isRecoveryMode || !displayBootUrlError) return "";
     return "ssiagent.error.invalidbooturl";
   })();
@@ -164,7 +170,19 @@ const AdvancedSetting = ({
           closeButtonLabel={`${i18n.t(
             "ssiagent.advancedsetup.buttons.cancel"
           )}`}
-          closeButtonAction={() => setCurrentPage(CurrentPage.Scan)}
+          closeButtonAction={() => {
+            setErrors({
+              hasMismatchError: false,
+              unknownError: false,
+              isInvalidBootUrl: false,
+              isInvalidConnectUrl: false,
+              failedDiscoveryConnectUrl: false,
+              connectURlNotFound: false,
+              bootNetworkIssue: false,
+              connectNetworkIssue: false,
+            });
+            setCurrentPage(CurrentPage.Scan);
+          }}
         />
       }
       footer={

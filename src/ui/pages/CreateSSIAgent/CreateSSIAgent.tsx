@@ -50,7 +50,8 @@ const CreateSSIAgent = () => {
     isInvalidConnectUrl: false,
     failedDiscoveryConnectUrl: false,
     connectURlNotFound: false,
-    networkIssue: false,
+    bootNetworkIssue: false,
+    connectNetworkIssue: false,
   });
   const [currentPage, setCurrentPage] = useState(CurrentPage.Connect);
 
@@ -135,7 +136,9 @@ const CreateSSIAgent = () => {
     ) {
       showError(errorMessage, error, dispatch, ToastMsgType.NETWORK_ERROR);
       setSSIError({
-        networkIssue: true,
+        bootNetworkIssue: errorMessage === Agent.KERIA_BOOT_FAILED_BAD_NETWORK,
+        connectNetworkIssue:
+          errorMessage === Agent.KERIA_CONNECT_FAILED_BAD_NETWORK,
       });
       return;
     }
