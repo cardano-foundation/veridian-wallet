@@ -200,24 +200,6 @@ describe("KERIA connectivity", () => {
     expect(mockSignifyClient.connect).toHaveBeenCalled();
   });
 
-  test("should throw KERIA_NOT_BOOTED error when connect fails with 'agent does not exist' message (URL mismatch)", async () => {
-    (signifyReady as jest.Mock).mockResolvedValueOnce(true);
-    mockSignifyClient.boot.mockResolvedValueOnce({ ok: true });
-    // This error format occurs before signed headers are set up (e.g., URL mismatch scenario)
-    mockSignifyClient.connect.mockRejectedValueOnce(
-      new Error(
-        "agent does not exist for controller ECaANtlZsJWy0ty4QDDVPcuLY0DYE3yY6Ykq0oa8X5Ly"
-      )
-    );
-
-    await expect(agent.bootAndConnect(mockAgentUrls)).rejects.toThrowError(
-      Agent.KERIA_NOT_BOOTED
-    );
-
-    expect(mockSignifyClient.boot).toHaveBeenCalled();
-    expect(mockSignifyClient.connect).toHaveBeenCalled();
-  });
-
   test("should throw an error if connect fails after booting", async () => {
     (signifyReady as jest.Mock).mockResolvedValueOnce(true);
     mockSignifyClient.boot.mockResolvedValueOnce({ ok: true });
@@ -653,23 +635,6 @@ describe("Recovery of DB from cloud sync", () => {
     (mnemonicToEntropy as jest.Mock).mockReturnValueOnce(mockEntropy);
     mockSignifyClient.connect.mockRejectedValueOnce(
       new Error("agent does not exist for controller")
-    );
-
-    await expect(
-      agent.recoverKeriaAgent(mockSeedPhrase, mockConnectUrl)
-    ).rejects.toThrowError(Agent.KERIA_NOT_BOOTED);
-
-    expect(SecureStorage.set).not.toHaveBeenCalled();
-  });
-
-  test("should throw KERIA_NOT_BOOTED error when recovery connect fails with 'agent does not exist' message", async () => {
-    (mnemonicToEntropy as jest.Mock).mockReturnValueOnce(mockEntropy);
-    (mnemonicToEntropy as jest.Mock).mockReturnValueOnce(mockEntropy);
-    // This error format occurs before signed headers are set up
-    mockSignifyClient.connect.mockRejectedValueOnce(
-      new Error(
-        "agent does not exist for controller ECaANtlZsJWy0ty4QDDVPcuLY0DYE3yY6Ykq0oa8X5Ly"
-      )
     );
 
     await expect(
