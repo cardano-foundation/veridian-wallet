@@ -478,7 +478,7 @@ describe("Credential service of agent", () => {
     );
   });
 
-  test("Should return early when there are no identifiers", async () => {
+  test("Should not sync any credentials records if we have no identifiers", async () => {
     identifierStorage.getIdentifierRecords = jest.fn().mockResolvedValue([]);
     credentialListMock = jest.fn();
 
