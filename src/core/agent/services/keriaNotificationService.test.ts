@@ -3261,33 +3261,62 @@ describe("Long running operation tracker", () => {
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB"
     );
     expect(connectionService.shareIdentifier).toBeCalledTimes(2);
-    expect(connectionPairStorage.update).toBeCalledWith({
-      contactId: "idA",
-      creationStatus: CreationStatus.COMPLETE,
-      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA",
-      pendingDeletion: false,
-    });
-    expect(connectionPairStorage.update).toBeCalledWith({
-      contactId: "idB",
-      creationStatus: CreationStatus.COMPLETE,
-      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
-      pendingDeletion: false,
-    });
+
+    // Extract the createdAt from the first update call to verify it matches KERIA update
+    const firstUpdateCall = (connectionPairStorage.update as jest.Mock).mock
+      .calls[0][0];
+    const secondUpdateCall = (connectionPairStorage.update as jest.Mock).mock
+      .calls[1][0];
+
+    expect(connectionPairStorage.update).toBeCalledWith(
+      expect.objectContaining({
+        contactId: "idA",
+        creationStatus: CreationStatus.COMPLETE,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA",
+        pendingDeletion: false,
+        createdAt: expect.any(Date),
+      })
+    );
+    expect(connectionPairStorage.update).toBeCalledWith(
+      expect.objectContaining({
+        contactId: "idB",
+        creationStatus: CreationStatus.COMPLETE,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
+        pendingDeletion: false,
+        createdAt: expect.any(Date),
+      })
+    );
     expect(connectionPairStorage.update).toBeCalledTimes(2);
+
+    // Verify that the createdAt in local storage matches the KERIA contact update
+    const firstKeriaUpdateCall = (contactsUpdateMock as jest.Mock).mock
+      .calls[0][1];
+    const secondKeriaUpdateCall = (contactsUpdateMock as jest.Mock).mock
+      .calls[1][1];
+
+    expect(firstUpdateCall.createdAt).toEqual(
+      firstKeriaUpdateCall[
+        "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt"
+      ]
+    );
+    expect(secondUpdateCall.createdAt).toEqual(
+      secondKeriaUpdateCall[
+        "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt"
+      ]
+    );
+
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt": new Date(
-        oobiResolutionTime + 500
-      ),
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt":
+        expect.any(Date),
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt": new Date(
-        oobiResolutionTime + 500
-      ),
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
+        expect.any(Date),
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(2);

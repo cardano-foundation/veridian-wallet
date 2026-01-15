@@ -1253,15 +1253,18 @@ class KeriaNotificationService extends AgentService {
               );
             }
 
+            const pairCreatedAt = new Date();
+
             await this.props.signifyClient
               .contacts()
               .update((operation.response as State).i, {
                 version: LATEST_CONTACT_VERSION,
                 alias: contact.alias,
                 oobi: contact.oobi,
-                [`${connectionPairRecord.identifier}:createdAt`]: new Date(),
+                [`${connectionPairRecord.identifier}:createdAt`]: pairCreatedAt,
               });
 
+            connectionPairRecord.createdAt = pairCreatedAt;
             await this.connectionPairStorage.update(connectionPairRecord);
             this.props.eventEmitter.emit<ConnectionStateChangedEvent>({
               type: EventTypes.ConnectionStateChanged,
