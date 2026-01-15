@@ -180,6 +180,7 @@ jest.mock("../../../core/agent/agent", () => {
           getConnections: jest.fn().mockResolvedValue([]),
           getMultisigConnections: jest.fn().mockResolvedValue([]),
           onConnectionStateChanged: jest.fn(),
+          onConnectionInvalid: jest.fn(),
           getConnectionShortDetails: jest.fn(),
           isConnectionRequestSent: jest.fn(),
           isConnectionResponseReceived: jest.fn(),
