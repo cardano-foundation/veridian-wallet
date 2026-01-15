@@ -405,11 +405,7 @@ class Agent {
         });
       }
 
-      const status = error.message.split(" - ")[1];
-      if (
-        /404/gi.test(status) ||
-        /agent does not exist/gi.test(error.message)
-      ) {
+      if (/agent does not exist/gi.test(error.message)) {
         throw new Error(Agent.KERIA_NOT_BOOTED, { cause: error });
       }
 
