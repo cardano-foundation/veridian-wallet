@@ -3263,33 +3263,67 @@ describe("Long running operation tracker", () => {
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB"
     );
     expect(connectionService.shareIdentifier).toBeCalledTimes(2);
-    expect(connectionPairStorage.update).toBeCalledWith({
-      contactId: "idA",
-      creationStatus: CreationStatus.COMPLETE,
-      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA",
-      pendingDeletion: false,
-    });
-    expect(connectionPairStorage.update).toBeCalledWith({
-      contactId: "idB",
-      creationStatus: CreationStatus.COMPLETE,
-      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
-      pendingDeletion: false,
-    });
+
+    // Extract the createdAt from the update calls to verify it matches KERIA update
+    const firstUpdateCall = (connectionPairStorage.update as jest.Mock).mock
+      .calls[0][0];
+    const secondUpdateCall = (connectionPairStorage.update as jest.Mock).mock
+      .calls[1][0];
+    const firstKeriaUpdateCall = (contactsUpdateMock as jest.Mock).mock
+      .calls[0][1];
+    const secondKeriaUpdateCall = (contactsUpdateMock as jest.Mock).mock
+      .calls[1][1];
+
+    expect(connectionPairStorage.update).toBeCalledWith(
+      expect.objectContaining({
+        contactId: "idA",
+        creationStatus: CreationStatus.COMPLETE,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA",
+        pendingDeletion: false,
+        createdAt:
+          firstKeriaUpdateCall[
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt"
+          ],
+      })
+    );
+    expect(connectionPairStorage.update).toBeCalledWith(
+      expect.objectContaining({
+        contactId: "idB",
+        creationStatus: CreationStatus.COMPLETE,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
+        pendingDeletion: false,
+        createdAt:
+          secondKeriaUpdateCall[
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt"
+          ],
+      })
+    );
     expect(connectionPairStorage.update).toBeCalledTimes(2);
+
+    // Verify that the createdAt in local storage matches the KERIA contact update
+    expect(firstUpdateCall.createdAt).toEqual(
+      firstKeriaUpdateCall[
+        "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt"
+      ]
+    );
+    expect(secondUpdateCall.createdAt).toEqual(
+      secondKeriaUpdateCall[
+        "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt"
+      ]
+    );
+
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt": new Date(
-        oobiResolutionTime + 500
-      ),
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt":
+        firstUpdateCall.createdAt,
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt": new Date(
-        oobiResolutionTime + 500
-      ),
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
+        secondUpdateCall.createdAt,
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(2);
@@ -3377,19 +3411,36 @@ describe("Long running operation tracker", () => {
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB"
     );
     expect(connectionService.shareIdentifier).toBeCalledTimes(1); // Only once, not twice now
-    expect(connectionPairStorage.update).toHaveBeenCalledWith({
-      contactId: "idB",
-      creationStatus: CreationStatus.COMPLETE,
-      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
-      pendingDeletion: false,
-    });
+
+    // Extract the createdAt to verify it matches between local storage and KERIA
+    const updateCall = (connectionPairStorage.update as jest.Mock).mock
+      .calls[0][0];
+    const keriaUpdateCall = (contactsUpdateMock as jest.Mock).mock.calls[0][1];
+
+    expect(connectionPairStorage.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contactId: "idB",
+        creationStatus: CreationStatus.COMPLETE,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
+        pendingDeletion: false,
+        createdAt:
+          keriaUpdateCall[
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt"
+          ],
+      })
+    );
     expect(connectionPairStorage.update).toBeCalledTimes(1);
+
+    // Verify that the createdAt in local storage matches the KERIA contact update
+    expect(updateCall.createdAt).toEqual(
+      keriaUpdateCall["EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt"]
+    );
+
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt": new Date(
-        oobiResolutionTime + 500
-      ),
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
+        updateCall.createdAt,
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(1);
@@ -4379,7 +4430,8 @@ describe("Long running operation tracker", () => {
     };
     operationsGetMock.mockResolvedValue(operationMock);
     connectionPairStorage.findByContactId = jest.fn().mockResolvedValue([
-      { identifier: "my-identifier-1" }
+      { identifier: "my-identifier-1" },
+      { identifier: "my-identifier-2" },
     ]);
 
     const operationRecord = {
@@ -4390,15 +4442,29 @@ describe("Long running operation tracker", () => {
 
     await keriaNotificationService.processOperation(operationRecord);
 
-    expect(connectionService.markConnectionPendingDelete).toHaveBeenCalledWith(
+    expect(connectionService.markConnectionPendingDelete).toHaveBeenCalledTimes(2);
+    expect(connectionService.markConnectionPendingDelete).toHaveBeenNthCalledWith(
+      1,
       contactId,
       "my-identifier-1"
+    );
+    expect(connectionService.markConnectionPendingDelete).toHaveBeenNthCalledWith(
+      2,
+      contactId,
+      "my-identifier-2"
     );
     expect(eventEmitter.emit).toHaveBeenCalledWith({
       type: EventTypes.ConnectionInvalid,
       payload: {
-        contactId: contactId,
+        contactId,
         identifier: "my-identifier-1",
+      },
+    });
+    expect(eventEmitter.emit).toHaveBeenCalledWith({
+      type: EventTypes.ConnectionInvalid,
+      payload: {
+        contactId,
+        identifier: "my-identifier-2",
       },
     });
   });

@@ -510,7 +510,7 @@ describe("Credential request - choose request", () => {
     },
   };
 
-  test("Render empty active credentials & full revoked tab", async () => {
+  test("Render full revoked tab", async () => {
     const storeMocked = {
       ...makeTestStore(initialState),
       dispatch: dispatchMock,
@@ -534,7 +534,7 @@ describe("Credential request - choose request", () => {
     const history = createMemoryHistory();
 
     const onSubmitFn = jest.fn();
-    const { getAllByText, getByText, getByTestId } = render(
+    const { getAllByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <IonReactMemoryRouter history={history}>
           <ChooseCredential
@@ -558,26 +558,6 @@ describe("Credential request - choose request", () => {
             .choosecredential.title
         )[0]
       ).toBeVisible();
-    });
-
-    expect(
-      getByText(
-        EN_TRANSLATIONS.tabs.notifications.details.credential.request.choosecredential.noactive.replace(
-          "{{requestCred}}",
-          credRequestFix.schema.name
-        )
-      )
-    ).toBeVisible();
-
-    const segment = getByTestId("choose-credential-segment");
-
-    act(() => {
-      fireEvent(
-        segment,
-        new CustomEvent("ionChange", {
-          detail: { value: "revoked" },
-        })
-      );
     });
 
     await waitFor(() =>

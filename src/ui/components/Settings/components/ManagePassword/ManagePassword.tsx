@@ -84,7 +84,7 @@ const ManagePassword = () => {
         renderItem={(item) => (
           <ListItem
             key={item.id}
-            onClick={() => handleToggle()}
+            onClick={handleToggle}
             testId="settings-item-toggle-password"
             className="list-item"
             label={`${i18n.t(
@@ -97,6 +97,7 @@ const ManagePassword = () => {
                 )}`}
                 className="toggle-button"
                 checked={passwordIsSet}
+                onIonChange={handleToggle}
               />
             }
           />

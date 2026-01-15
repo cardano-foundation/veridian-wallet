@@ -96,9 +96,6 @@ class ConnectionService extends AgentService {
   static readonly NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER =
     "Cannot set up normal connection without specifying a local identifier to share with the other party";
 
-  static readonly INVALID_DOOBI_CONNECTION_CONTENT_TYPE =
-    "Can only create new connections for DOOBIs with a content-type of application/json+cesr (DOOBI is a commonly used hack for group multi-sig OOBIs)";
-
   onConnectionStateChanged(
     callback: (event: ConnectionStateChangedEvent) => void
   ) {
@@ -128,6 +125,10 @@ class ConnectionService extends AgentService {
           data.payload.identifier
         )
     );
+  }
+
+  onConnectionInvalid(callback: (event: ConnectionInvalidEvent) => void) {
+    this.props.eventEmitter.on(EventTypes.ConnectionInvalid, callback);
   }
 
   @OnlineOnly
@@ -837,10 +838,6 @@ class ConnectionService extends AgentService {
     }
 
     return pendingDeletions;
-  }
-
-  onConnectionInvalid(callback: (event: ConnectionInvalidEvent) => void) {
-    this.props.eventEmitter.on(EventTypes.ConnectionInvalid, callback);
   }
 
   async resolvePendingConnections(): Promise<void> {

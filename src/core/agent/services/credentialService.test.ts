@@ -98,6 +98,7 @@ const signifyClient = jest.mocked({
 const identifierStorage = jest.mocked({
   getIdentifierMetadata: jest.fn(),
   getUserFacingIdentifierRecords: jest.fn(),
+  getIdentifierRecords: jest.fn(),
   getAllIdentifiers: jest.fn(),
   updateIdentifierMetadata: jest.fn(),
   createIdentifierMetadataRecord: jest.fn(),
@@ -356,6 +357,14 @@ describe("Credential service of agent", () => {
   });
 
   test("Can sync ACDCs from KERIA to local", async () => {
+    // Mock identifiers that will be used in the filter
+    identifierStorage.getIdentifierRecords = jest
+      .fn()
+      .mockResolvedValue([
+        { id: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+        { id: "EFr4DyYerYKgdUq3Nw5wbq7OjEZT6cn45omHCiIZ0elD" },
+      ]);
+
     credentialListMock
       .mockReturnValueOnce([
         {
@@ -466,6 +475,231 @@ describe("Credential service of agent", () => {
     expect(credentialStateMock).toBeCalledWith(
       "EA67QQC6C6OG4Pok44UHKegNS0YoQm3yxeZwJEbbdCrh",
       "EL24R3ECGtv_UzQmYUcu9AeP1ks2JPzTxgPcQPkadEPY"
+    );
+  });
+
+  test("Should not sync any credentials records if we have no identifiers", async () => {
+    identifierStorage.getIdentifierRecords = jest.fn().mockResolvedValue([]);
+    credentialListMock = jest.fn();
+
+    await credentialService.syncKeriaCredentials();
+
+    expect(identifierStorage.getIdentifierRecords).toHaveBeenCalled();
+    expect(credentialListMock).not.toHaveBeenCalled();
+    expect(
+      credentialStorage.saveCredentialMetadataRecord
+    ).not.toHaveBeenCalled();
+  });
+
+  test("Should filter out credentials in TypeScript where we are not the issuee", async () => {
+    const localIdentifier = {
+      id: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8",
+    };
+    identifierStorage.getIdentifierRecords = jest
+      .fn()
+      .mockResolvedValue([localIdentifier]);
+
+    // KERIA returns credentials including one where we are NOT the issuee (chained ACDC)
+    const credentialsFromKeria = [
+      {
+        sad: {
+          d: "local-credential",
+          i: "issuer1",
+          ri: "registry1",
+          s: "schema1",
+          a: {
+            i: localIdentifier.id,
+            dt: "2023-11-29T02:13:34.858000+00:00",
+          },
+        },
+        schema: { $id: "schema-id-1", title: "Legal Entity vLEI" },
+      },
+      {
+        sad: {
+          d: "chained-acdc-not-local",
+          i: "issuer2",
+          ri: "registry2",
+          s: "schema2",
+          a: {
+            i: "EDifferentIdentifier_NotLocal_ChainedACDC",
+            dt: "2023-11-29T02:14:00.000000+00:00",
+          },
+        },
+        schema: { $id: "schema-id-2", title: "QVI vLEI Credential" },
+      },
+    ];
+
+    credentialListMock
+      .mockResolvedValueOnce(credentialsFromKeria)
+      .mockResolvedValueOnce([]);
+    credentialStorage.getAllCredentialMetadata = jest
+      .fn()
+      .mockResolvedValue([]);
+    identifiersGetMock.mockResolvedValue(hab);
+    credentialStateMock.mockResolvedValue({ et: Ilks.iss });
+
+    await credentialService.syncKeriaCredentials();
+
+    // Should only sync local credential, NOT the chained ACDC
+    expect(
+      credentialStorage.saveCredentialMetadataRecord
+    ).toHaveBeenCalledTimes(1);
+    expect(credentialStorage.saveCredentialMetadataRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "local-credential",
+        identifierId: localIdentifier.id,
+      })
+    );
+    // Should NOT have synced the chained ACDC
+    expect(
+      credentialStorage.saveCredentialMetadataRecord
+    ).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "chained-acdc-not-local",
+      })
+    );
+  });
+
+  test("Should filter credentials in TypeScript for multiple identifiers", async () => {
+    const localIdentifiers = [
+      { id: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+      { id: "EFr4DyYerYKgdUq3Nw5wbq7OjEZT6cn45omHCiIZ0elD" },
+    ];
+    identifierStorage.getIdentifierRecords = jest
+      .fn()
+      .mockResolvedValue(localIdentifiers);
+
+    // KERIA returns mixed credentials
+    const credentialsFromKeria = [
+      {
+        sad: {
+          d: "cred-for-first-id",
+          i: "issuer1",
+          ri: "registry1",
+          s: "schema1",
+          a: {
+            i: localIdentifiers[0].id,
+            dt: "2023-11-29T02:13:34.858000+00:00",
+          },
+        },
+        schema: { $id: "schema-id-1", title: "Credential Type 1" },
+      },
+      {
+        sad: {
+          d: "cred-for-second-id",
+          i: "issuer2",
+          ri: "registry2",
+          s: "schema2",
+          a: {
+            i: localIdentifiers[1].id,
+            dt: "2023-11-29T02:14:00.000000+00:00",
+          },
+        },
+        schema: { $id: "schema-id-2", title: "Credential Type 2" },
+      },
+      {
+        sad: {
+          d: "cred-not-local",
+          i: "issuer3",
+          ri: "registry3",
+          s: "schema3",
+          a: {
+            i: "ESomeOtherIdentifier_NotInWallet",
+            dt: "2023-11-29T02:15:00.000000+00:00",
+          },
+        },
+        schema: { $id: "schema-id-3", title: "Credential Not Local" },
+      },
+    ];
+
+    credentialListMock
+      .mockResolvedValueOnce(credentialsFromKeria)
+      .mockResolvedValueOnce([]);
+    credentialStorage.getAllCredentialMetadata = jest
+      .fn()
+      .mockResolvedValue([]);
+    identifiersGetMock.mockResolvedValue(hab);
+    credentialStateMock.mockResolvedValue({ et: Ilks.iss });
+
+    await credentialService.syncKeriaCredentials();
+
+    // Should sync both local credentials, but NOT the one that's not local
+    expect(
+      credentialStorage.saveCredentialMetadataRecord
+    ).toHaveBeenCalledTimes(2);
+    expect(credentialStorage.saveCredentialMetadataRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "cred-for-first-id" })
+    );
+    expect(credentialStorage.saveCredentialMetadataRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "cred-for-second-id" })
+    );
+    expect(
+      credentialStorage.saveCredentialMetadataRecord
+    ).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: "cred-not-local" })
+    );
+  });
+
+  test("Should not sync credentials that already exist locally", async () => {
+    const localIdentifiers = [
+      { id: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_z8" },
+    ];
+    identifierStorage.getIdentifierRecords = jest
+      .fn()
+      .mockResolvedValue(localIdentifiers);
+
+    const credentialsFromKeria = [
+      {
+        sad: {
+          d: "cred-already-local",
+          i: "issuer1",
+          ri: "registry1",
+          s: "schema1",
+          a: {
+            i: localIdentifiers[0].id,
+            dt: "2023-11-29T02:13:34.858000+00:00",
+          },
+        },
+        schema: { $id: "schema-id-1", title: "Credential Type 1" },
+      },
+      {
+        sad: {
+          d: "cred-new",
+          i: "issuer2",
+          ri: "registry2",
+          s: "schema2",
+          a: {
+            i: localIdentifiers[0].id,
+            dt: "2023-11-29T02:14:00.000000+00:00",
+          },
+        },
+        schema: { $id: "schema-id-2", title: "Credential Type 2" },
+      },
+    ];
+
+    credentialListMock
+      .mockResolvedValueOnce(credentialsFromKeria)
+      .mockResolvedValueOnce([]);
+    // First credential already exists locally
+    credentialStorage.getAllCredentialMetadata = jest
+      .fn()
+      .mockResolvedValue([{ id: "cred-already-local" }]);
+    identifiersGetMock.mockResolvedValue(hab);
+    credentialStateMock.mockResolvedValue({ et: Ilks.iss });
+
+    await credentialService.syncKeriaCredentials();
+
+    // Should only sync the new credential
+    expect(
+      credentialStorage.saveCredentialMetadataRecord
+    ).toHaveBeenCalledTimes(1);
+    expect(credentialStorage.saveCredentialMetadataRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "cred-new" })
+    );
+    expect(
+      credentialStorage.saveCredentialMetadataRecord
+    ).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: "cred-already-local" })
     );
   });
 

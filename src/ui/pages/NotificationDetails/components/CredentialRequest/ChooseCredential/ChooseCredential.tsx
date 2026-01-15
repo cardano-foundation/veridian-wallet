@@ -6,7 +6,7 @@ import {
   IonSegmentButton,
 } from "@ionic/react";
 import { informationCircleOutline, warningOutline } from "ionicons/icons";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Agent } from "../../../../../../core/agent/agent";
 import { CredentialStatus } from "../../../../../../core/agent/services/credentialService.types";
@@ -102,6 +102,10 @@ const ChooseCredential = ({
   const activeCredentials = sortedCredentials.filter(
     (cred) => !revokedCredsCache.some((revoked) => revoked.id === cred.id)
   );
+
+  useEffect(() => {
+    setSegmentValue(activeCredentials.length == 0 ? "revoked" : "active");
+  }, [activeCredentials.length]);
 
   const handleSelectCred = useCallback((data: RequestCredential) => {
     setSelectedCred((selectedCred) =>

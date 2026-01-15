@@ -104,11 +104,12 @@ const groupCreatedHandler = async (
   await dispatch(addGroupProfileAsync(event.payload.group));
 };
 
-const removeConnectionCacheHandler = async (
+const removeInvalidConnectionCacheHandler = async (
   event: ConnectionInvalidEvent,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
   dispatch(removeConnectionCache(event.payload.contactId));
+  dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
 };
 
 export {
@@ -117,5 +118,5 @@ export {
   notificationStateChanged,
   operationCompleteHandler,
   operationFailureHandler,
-  removeConnectionCacheHandler,
+  removeInvalidConnectionCacheHandler,
 };

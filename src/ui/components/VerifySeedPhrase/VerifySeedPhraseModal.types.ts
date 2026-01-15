@@ -2,6 +2,7 @@ interface VerifySeedPhraseModalProps {
   show: boolean;
   setShow: (value: boolean) => void;
   onVerifySuccess: () => void;
+  showCancel?: boolean;
 }
 
 interface VerifyStageProps {

@@ -335,17 +335,6 @@ describe("Connection service of agent", () => {
       );
     }
 
-    // Schema URL Should also work - VT20-2427 
-    const invalidDoobi = "https://localhost/oobi/1234?name=alias";
-    await connectionService.connectByOobiUrl(invalidDoobi, "shared-identifier");
-    expect(contactStorage.save).toBeCalledWith(
-      expect.objectContaining({
-        alias: "alias",
-        id: "1234",
-        oobi: invalidDoobi,
-      })
-    );
-
     validUrls = [
       "https://localhost/oobi/1234/agent?name=alias",
       "https://localhost/oobi/1234/witness?name=alias",

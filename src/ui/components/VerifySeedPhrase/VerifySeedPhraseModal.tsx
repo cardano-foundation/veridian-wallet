@@ -16,6 +16,7 @@ const VerifySeedPhraseModal = ({
   setShow,
   show,
   onVerifySuccess,
+  showCancel = true,
 }: VerifySeedPhraseModalProps) => {
   const [step, setStep] = useState<Step>(Step.View);
   const [seedPhrase, setSeedPhrase] = useState<string[]>([]);
@@ -90,7 +91,7 @@ const VerifySeedPhraseModal = ({
         header={
           <PageHeader
             title={title}
-            closeButton
+            closeButton={showCancel || step !== Step.View}
             closeButtonLabel={back}
             closeButtonAction={handleCloseButtonClick}
           />
