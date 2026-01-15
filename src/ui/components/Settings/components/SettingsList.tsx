@@ -230,6 +230,31 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     await attemptEnableNotifications();
   };
 
+  const handleBiometricUpdate = async () => {
+    if (biometricsCache.enabled) {
+      handleToggleBiometricAuth();
+      return;
+    }
+
+    const biometricInfo = await checkBiometrics();
+
+    if (!biometricInfo.isAvailable) {
+      if (isAndroidPlatform) {
+        setOpenAndroidBiometricSettingAlert(true);
+      } else {
+        setOpenBiometricIOSSettingAlert(true);
+      }
+      return;
+    }
+
+    if (isAndroidPlatform) {
+      setShowSetupBiometricsAlert(true);
+      return;
+    }
+
+    biometricAuth();
+  };
+
   const securityItems: OptionProps[] = [
     {
       index: OptionIndex.ChangePin,
@@ -258,6 +283,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
           aria-label="Biometric Toggle"
           className="toggle-button"
           checked={biometricsCache.enabled}
+          onIonChange={handleBiometricUpdate}
         />
       ),
     });
@@ -274,7 +300,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
           className="toggle-button"
           checked={notificationsPreferences.enabled}
           disabled={isProcessingNotificationsToggle}
-          onIonChange={() => handleNotificationToggle()}
+          onIonChange={handleNotificationToggle}
           onClick={(event) => event.stopPropagation()}
         />
       ),
@@ -326,31 +352,6 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     } catch (e) {
       showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
     }
-  };
-
-  const handleBiometricUpdate = async () => {
-    if (biometricsCache.enabled) {
-      handleToggleBiometricAuth();
-      return;
-    }
-
-    const biometricInfo = await checkBiometrics();
-
-    if (!biometricInfo.isAvailable) {
-      if (isAndroidPlatform) {
-        setOpenAndroidBiometricSettingAlert(true);
-      } else {
-        setOpenBiometricIOSSettingAlert(true);
-      }
-      return;
-    }
-
-    if (isAndroidPlatform) {
-      setShowSetupBiometricsAlert(true);
-      return;
-    }
-
-    biometricAuth();
   };
 
   const biometricAuth = async () => {
