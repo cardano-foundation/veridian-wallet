@@ -3262,11 +3262,15 @@ describe("Long running operation tracker", () => {
     );
     expect(connectionService.shareIdentifier).toBeCalledTimes(2);
 
-    // Extract the createdAt from the first update call to verify it matches KERIA update
+    // Extract the createdAt from the update calls to verify it matches KERIA update
     const firstUpdateCall = (connectionPairStorage.update as jest.Mock).mock
       .calls[0][0];
     const secondUpdateCall = (connectionPairStorage.update as jest.Mock).mock
       .calls[1][0];
+    const firstKeriaUpdateCall = (contactsUpdateMock as jest.Mock).mock
+      .calls[0][1];
+    const secondKeriaUpdateCall = (contactsUpdateMock as jest.Mock).mock
+      .calls[1][1];
 
     expect(connectionPairStorage.update).toBeCalledWith(
       expect.objectContaining({
@@ -3274,7 +3278,10 @@ describe("Long running operation tracker", () => {
         creationStatus: CreationStatus.COMPLETE,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA",
         pendingDeletion: false,
-        createdAt: expect.any(Date),
+        createdAt:
+          firstKeriaUpdateCall[
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt"
+          ],
       })
     );
     expect(connectionPairStorage.update).toBeCalledWith(
@@ -3283,17 +3290,15 @@ describe("Long running operation tracker", () => {
         creationStatus: CreationStatus.COMPLETE,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
         pendingDeletion: false,
-        createdAt: expect.any(Date),
+        createdAt:
+          secondKeriaUpdateCall[
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt"
+          ],
       })
     );
     expect(connectionPairStorage.update).toBeCalledTimes(2);
 
     // Verify that the createdAt in local storage matches the KERIA contact update
-    const firstKeriaUpdateCall = (contactsUpdateMock as jest.Mock).mock
-      .calls[0][1];
-    const secondKeriaUpdateCall = (contactsUpdateMock as jest.Mock).mock
-      .calls[1][1];
-
     expect(firstUpdateCall.createdAt).toEqual(
       firstKeriaUpdateCall[
         "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt"
@@ -3309,14 +3314,14 @@ describe("Long running operation tracker", () => {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt":
-        expect.any(Date),
+        firstUpdateCall.createdAt,
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
-        expect.any(Date),
+        secondUpdateCall.createdAt,
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(2);
@@ -3404,19 +3409,36 @@ describe("Long running operation tracker", () => {
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB"
     );
     expect(connectionService.shareIdentifier).toBeCalledTimes(1); // Only once, not twice now
-    expect(connectionPairStorage.update).toHaveBeenCalledWith({
-      contactId: "idB",
-      creationStatus: CreationStatus.COMPLETE,
-      identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
-      pendingDeletion: false,
-    });
+
+    // Extract the createdAt to verify it matches between local storage and KERIA
+    const updateCall = (connectionPairStorage.update as jest.Mock).mock
+      .calls[0][0];
+    const keriaUpdateCall = (contactsUpdateMock as jest.Mock).mock.calls[0][1];
+
+    expect(connectionPairStorage.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contactId: "idB",
+        creationStatus: CreationStatus.COMPLETE,
+        identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
+        pendingDeletion: false,
+        createdAt:
+          keriaUpdateCall[
+            "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt"
+          ],
+      })
+    );
     expect(connectionPairStorage.update).toBeCalledTimes(1);
+
+    // Verify that the createdAt in local storage matches the KERIA contact update
+    expect(updateCall.createdAt).toEqual(
+      keriaUpdateCall["EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt"]
+    );
+
     expect(contactsUpdateMock).toBeCalledWith("id", {
       version: "1.2.0.1",
       alias: "CF Credential Issuance",
-      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt": new Date(
-        oobiResolutionTime + 500
-      ),
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
+        updateCall.createdAt,
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(1);
