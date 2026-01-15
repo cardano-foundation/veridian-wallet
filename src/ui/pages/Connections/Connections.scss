@@ -1,7 +1,11 @@
 .connections-tab {
   padding-inline: 0;
 
-  ion-header.page-header ion-toolbar {
+  button.searchbar-clear-button {
+    color: var(--ion-color-neutral-700);
+  }
+
+  ion-header.tab-header ion-toolbar {
     padding-right: 0;
     padding-left: 0;
 
@@ -13,11 +17,6 @@
   ion-header {
     margin-bottom: -1px;
     padding-inline: 1.25rem;
-  }
-
-  ion-content.scrollable-page-content {
-    --offset-bottom: 1px !important;
-    --background: var(--ion-color-neutral-200);
   }
 
   .cards-placeholder-container {
@@ -39,7 +38,7 @@
     overflow: initial;
   }
 
-  .page-header {
+  .tab-header {
     height: calc(var(--ion-safe-area-top, 0) + 4.25rem);
     transition: all 0.25s;
 
@@ -58,7 +57,7 @@
   }
 
   &.hide-header {
-    .page-header {
+    .tab-header {
       height: var(--ion-safe-area-top, 0);
       --min-height: 0;
       overflow: hidden;
