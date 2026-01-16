@@ -249,8 +249,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setNotificationsEnabled(enabled));
       dispatch(setNotificationsConfigured(configured));
 
-      // Guard: Only persist to storage if agent dependencies are initialized
-      // This prevents errors during wallet deletion when Agent.instance is reset
       if (!Agent.agent.dependenciesInitialized) {
         return;
       }
@@ -271,8 +269,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   useEffect(() => {
     const syncNotificationsPreferences = async (): Promise<void> => {
-      // Check both React state AND actual Agent state
-      // This handles the race condition during wallet deletion
       if (!areDependenciesReady || !Agent.agent.dependenciesInitialized) {
         return;
       }
@@ -774,7 +770,6 @@ const AppWrapper = (props: { children: ReactNode }) => {
     }
 
     notificationService.setProfileSwitcher(async (profileId: string) => {
-      // Guard: Only persist if agent dependencies are initialized
       if (!Agent.agent.dependenciesInitialized) {
         return;
       }
