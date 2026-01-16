@@ -3315,6 +3315,8 @@ describe("Long running operation tracker", () => {
       alias: "CF Credential Issuance",
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt":
         firstUpdateCall.createdAt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:alias":
+        "CF Credential Issuance",
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledWith("id", {
@@ -3322,6 +3324,8 @@ describe("Long running operation tracker", () => {
       alias: "CF Credential Issuance",
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
         secondUpdateCall.createdAt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:alias":
+        "CF Credential Issuance",
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(2);
@@ -3439,6 +3443,8 @@ describe("Long running operation tracker", () => {
       alias: "CF Credential Issuance",
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
         updateCall.createdAt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:alias":
+        "CF Credential Issuance",
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(1);

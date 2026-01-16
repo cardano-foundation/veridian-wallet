@@ -335,6 +335,7 @@ describe("Connection service of agent", () => {
       expect(connectionPairStorage.save).toBeCalledWith(
         expect.objectContaining({
           contactId: "1234",
+          alias: "alias",
           creationStatus: CreationStatus.PENDING,
           pendingDeletion: false,
         })
@@ -413,6 +414,7 @@ describe("Connection service of agent", () => {
       expect.objectContaining({
         contactId: "1234",
         identifier: individualRecord.id,
+        alias: "alias",
         creationStatus: CreationStatus.PENDING,
         pendingDeletion: false,
       })
@@ -427,6 +429,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.COMPLETE,
         pendingDeletion: false,
         identifier: "test-identifier-1",
+        alias: "profile-alias-1",
       },
       {
         contactId: contacts[0].id,
@@ -434,19 +437,20 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.PENDING,
         pendingDeletion: false,
         identifier: "test-identifier-2",
+        alias: "profile-alias-2",
       },
     ]);
 
     contactStorage.findExpectedById = jest.fn().mockResolvedValue({
       id: contacts[0].id,
-      alias: "keri",
+      alias: "contact-alias",
       oobi: "oobi",
     });
 
     expect(await connectionService.getConnections()).toEqual([
       {
         id: contacts[0].id,
-        label: "keri",
+        label: "profile-alias-1",
         oobi: "oobi",
         status: ConnectionStatus.CONFIRMED,
         createdAtUTC: expect.any(String),
@@ -455,7 +459,7 @@ describe("Connection service of agent", () => {
       },
       {
         id: contacts[0].id,
-        label: "keri",
+        label: "profile-alias-2",
         oobi: "oobi",
         status: ConnectionStatus.PENDING,
         createdAtUTC: expect.any(String),
@@ -477,6 +481,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.COMPLETE,
         pendingDeletion: false,
         identifier: targetIdentifier,
+        alias: "filtered-profile-alias",
       },
     ]);
 
@@ -491,7 +496,7 @@ describe("Connection service of agent", () => {
     expect(result).toEqual([
       {
         id: contacts[0].id,
-        label: "filtered-contact",
+        label: "filtered-profile-alias",
         oobi: "oobi-filtered",
         status: ConnectionStatus.CONFIRMED,
         createdAtUTC: expect.any(String),
@@ -514,6 +519,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.COMPLETE,
         pendingDeletion: false,
         identifier: "identifier-1",
+        alias: "pair-alias-1",
       },
       {
         contactId: sharedContactId,
@@ -521,6 +527,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.PENDING,
         pendingDeletion: false,
         identifier: "identifier-2",
+        alias: "pair-alias-2",
       },
       {
         contactId: sharedContactId,
@@ -528,6 +535,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.FAILED,
         pendingDeletion: false,
         identifier: "identifier-3",
+        alias: "pair-alias-3",
       },
     ]);
 
@@ -546,7 +554,7 @@ describe("Connection service of agent", () => {
     expect(result).toEqual([
       {
         id: sharedContactId,
-        label: "shared-contact",
+        label: "pair-alias-1",
         oobi: "shared-oobi",
         status: ConnectionStatus.CONFIRMED,
         createdAtUTC: expect.any(String),
@@ -555,7 +563,7 @@ describe("Connection service of agent", () => {
       },
       {
         id: sharedContactId,
-        label: "shared-contact",
+        label: "pair-alias-2",
         oobi: "shared-oobi",
         status: ConnectionStatus.PENDING,
         createdAtUTC: expect.any(String),
@@ -564,7 +572,7 @@ describe("Connection service of agent", () => {
       },
       {
         id: sharedContactId,
-        label: "shared-contact",
+        label: "pair-alias-3",
         oobi: "shared-oobi",
         status: ConnectionStatus.FAILED,
         createdAtUTC: expect.any(String),
@@ -881,13 +889,14 @@ describe("Connection service of agent", () => {
     const identifier = "test-identifier";
     contactStorage.findExpectedById = jest.fn().mockResolvedValue({
       id: contacts[0].id,
-      alias: "keri",
+      alias: "contact-alias",
       oobi: "test-oobi",
       // No groupId for regular connections
     });
     connectionPairStorage.findExpectedById = jest.fn().mockResolvedValue({
       contactId: contacts[0].id,
       identifier,
+      alias: "pair-alias",
       createdAt: now,
       creationStatus: CreationStatus.COMPLETE,
       pendingDeletion: false,
@@ -901,7 +910,7 @@ describe("Connection service of agent", () => {
     ).toMatchObject({
       id: contacts[0].id,
       createdAtUTC: nowISO,
-      label: "keri",
+      label: "pair-alias",
       status: ConnectionStatus.CONFIRMED,
       identifier,
     });
@@ -1019,6 +1028,7 @@ describe("Connection service of agent", () => {
       id: `${localIdentifier.id}:${cloudContacts[0].id}`,
       contactId: cloudContacts[0].id,
       identifier: localIdentifier.id,
+      alias: "MyFirstContact",
       creationStatus: CreationStatus.COMPLETE,
       pendingDeletion: false,
       createdAt: DATE,
@@ -1039,6 +1049,8 @@ describe("Connection service of agent", () => {
       createdAt: "2025-01-01T00:00:00.000Z",
       "Eabc123:createdAt": "2025-01-02T00:00:00.000Z",
       "Fdef456:createdAt": "2025-01-03T00:00:00.000Z", // This one should be ignored
+      "Eabc123:alias": "Profile A Alias",
+      "Fdef456:alias": "Profile B Alias",
     };
     contactListMock.mockReturnValue([cloudContact]);
     contactStorage.findById = jest.fn().mockResolvedValue(null);
@@ -1059,6 +1071,7 @@ describe("Connection service of agent", () => {
       id: "Eabc123:Dcontact1",
       contactId: "Dcontact1",
       identifier: "Eabc123",
+      alias: "Profile A Alias",
       creationStatus: CreationStatus.COMPLETE,
       pendingDeletion: false,
       createdAt: expect.any(Date),
@@ -1067,6 +1080,7 @@ describe("Connection service of agent", () => {
       id: "Fdef456:Dcontact1",
       contactId: "Dcontact1",
       identifier: "Fdef456",
+      alias: "Profile B Alias",
       creationStatus: CreationStatus.COMPLETE,
       pendingDeletion: false,
       createdAt: expect.any(Date),
@@ -1756,6 +1770,8 @@ describe("Connection service of agent", () => {
         oobi: "oobi",
         id: "id",
         sharedIdentifier,
+        [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`]:
+          "alias-by-identifier",
         [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}id`]:
           JSON.stringify(connectionNote),
         [`${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}id`]:
@@ -1781,7 +1797,7 @@ describe("Connection service of agent", () => {
       id: "id",
       contactId: "id",
       identifier: "test-shared-identifier",
-      label: "alias",
+      label: "alias-by-identifier",
       serviceEndpoints: ["oobi"],
       status: ConnectionStatus.CONFIRMED,
       createdAtUTC: nowISO,
@@ -1916,6 +1932,8 @@ describe("Connection service of agent", () => {
       oobi: "http://test.oobi",
       id: "test-id",
       sharedIdentifier,
+      [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`]:
+        "alias-by-identifier",
       [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}id`]:
         JSON.stringify(connectionNote),
       [`${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}ipex1`]:
@@ -1943,7 +1961,7 @@ describe("Connection service of agent", () => {
       id: "test-id",
       contactId: "test-id",
       identifier: "test-shared-identifier",
-      label: "alias",
+      label: "alias-by-identifier",
       serviceEndpoints: ["http://test.oobi"],
       status: ConnectionStatus.CONFIRMED,
       createdAtUTC: nowISO,
@@ -2002,6 +2020,8 @@ describe("Connection service of agent", () => {
       oobi: "http://test.oobi",
       id: "test-id",
       sharedIdentifier,
+      [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`]:
+        "alias-by-identifier",
       [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}id`]:
         JSON.stringify(connectionNote),
       [`${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}ipex1`]:
@@ -2029,7 +2049,7 @@ describe("Connection service of agent", () => {
       id: "test-id",
       contactId: "test-id",
       identifier: "test-shared-identifier",
-      label: "alias",
+      label: "alias-by-identifier",
       serviceEndpoints: ["http://test.oobi"],
       status: ConnectionStatus.CONFIRMED,
       createdAtUTC: nowISO,

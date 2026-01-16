@@ -287,9 +287,11 @@ class ConnectionService extends AgentService {
         );
       }
 
+      const connectionAlias = connectionPair.alias ?? contact.alias;
+
       connections.push({
         id: connectionPair.contactId,
-        alias: contact.alias,
+        alias: connectionAlias,
         createdAt: connectionPair.createdAt,
         oobi: contact.oobi,
         groupId: contact.groupId,
@@ -383,8 +385,13 @@ class ConnectionService extends AgentService {
         }
       });
 
+    const rawAlias = identifier
+      ? connection[`${identifier}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`]
+      : undefined;
+    const identifierAlias = typeof rawAlias === "string" ? rawAlias : undefined;
+
     const baseConnectionDetails = {
-      label: connection.alias,
+      label: identifierAlias ?? connection.alias,
       id: connection.id,
       contactId: connection.id,
       status: ConnectionStatus.CONFIRMED,
@@ -601,7 +608,7 @@ class ConnectionService extends AgentService {
 
       metadata = {
         id,
-        alias: contact.alias,
+        alias: connectionPair.alias ?? contact.alias,
         createdAt: connectionPair.createdAt,
         oobi: contact.oobi,
         groupId: contact.groupId,
@@ -711,6 +718,7 @@ class ConnectionService extends AgentService {
         id: `${metadata.sharedIdentifier}:${connectionId}`,
         contactId: connectionId,
         identifier: metadata.sharedIdentifier as string,
+        alias: metadata.alias as string,
         creationStatus: metadata.creationStatus as CreationStatus,
         pendingDeletion: false,
         createdAt,
@@ -736,6 +744,19 @@ class ConnectionService extends AgentService {
         });
       }
 
+      const aliasByIdentifier = new Map<string, string>();
+
+      for (const key of Object.keys(contact)) {
+        const keyParts = key.split(":");
+        if (
+          keyParts.length === 2 &&
+          keyParts[1] === KeriaContactKeyPrefix.CONNECTION_ALIAS &&
+          typeof contact[key] === "string"
+        ) {
+          aliasByIdentifier.set(keyParts[0], contact[key] as string);
+        }
+      }
+
       for (const key of Object.keys(contact)) {
         const keyParts = key.split(":");
         if (keyParts.length === 2 && keyParts[1] === "createdAt") {
@@ -748,6 +769,7 @@ class ConnectionService extends AgentService {
               id: pairId,
               contactId: contact.id,
               identifier: aid,
+              alias: aliasByIdentifier.get(aid) ?? contact.alias,
               creationStatus: CreationStatus.COMPLETE,
               pendingDeletion: false,
               createdAt: new Date(contact[key] as string),

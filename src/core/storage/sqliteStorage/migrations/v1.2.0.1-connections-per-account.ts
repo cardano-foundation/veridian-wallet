@@ -70,6 +70,7 @@ export const DATA_V1201: TsMigration = {
         contactId: string;
         createdAt: string;
         identifier: string;
+        alias?: string;
         creationStatus: string;
         pendingDeletion: boolean;
         type: string;
@@ -99,6 +100,7 @@ export const DATA_V1201: TsMigration = {
             contactId: contactRecord.id,
             createdAt: connectionData.createdAt,
             identifier: identifier.id,
+            alias: connectionData.alias,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
             type: "ConnectionPairRecord",
@@ -122,6 +124,7 @@ export const DATA_V1201: TsMigration = {
             contactId: contactRecord.id,
             identifier: identifier.id,
             createdAt: connectionData.createdAt,
+            alias: connectionData.alias,
             creationStatus: connectionData.creationStatus,
             pendingDeletion: connectionData.pendingDeletion,
             type: "ConnectionPairRecord",
