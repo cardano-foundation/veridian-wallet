@@ -373,7 +373,6 @@ describe("AppWrapper notification preferences", () => {
     // 4. syncNotificationsPreferences effect runs but should NOT persist
     //    because dependenciesInitialized is false in the new Agent instance
 
-    // First, let initApp run normally so areDependenciesReady becomes true
     notificationModule.arePermissionsGranted.mockResolvedValue(true);
 
     const { unmount } = render(
@@ -384,23 +383,17 @@ describe("AppWrapper notification preferences", () => {
       </Provider>
     );
 
-    // Wait for initial setup to complete
     await waitFor(() => {
       expect((Agent.agent as any).dependenciesInitialized).toBe(true);
     });
 
-    // Now simulate wallet deletion scenario:
-    // Reset dependenciesInitialized to false (simulating Agent.instance = undefined)
     (Agent.agent as any).dependenciesInitialized = false;
     createOrUpdateMock.mockClear();
 
-    // Trigger the effect by clearing notifications preferences
     store.dispatch(clearNotificationsPreferences());
 
-    // Wait a bit for effects to potentially run
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    // The guard should prevent persistence when dependenciesInitialized is false
     expect(createOrUpdateMock).not.toHaveBeenCalledWith(
       expect.objectContaining({
         id: MiscRecordId.APP_NOTIFICATIONS,
