@@ -17,7 +17,7 @@ import {
   lockClosedOutline,
   notificationsOutline,
 } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import pJson from "../../../../../package.json";
@@ -106,6 +106,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const [isAwaitingNotificationSettings, setIsAwaitingNotificationSettings] =
     useState(false);
   const history = useHistory();
+  const isInBiometricProcess = useRef(false);
 
   const platform = Capacitor.getPlatform();
   const isAndroidPlatform = platform === "android";
@@ -354,9 +355,11 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   };
 
   const biometricAuth = async () => {
-    try {
-      await disablePrivacy();
+    if (isInBiometricProcess.current) return;
 
+    try {
+      isInBiometricProcess.current = true;
+      await disablePrivacy();
       const setupResult = await setupBiometrics();
       await enablePrivacy();
 
@@ -384,6 +387,8 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     } catch (e) {
       // This catch block is for unexpected errors during the process.
       showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
+    } finally {
+      isInBiometricProcess.current = false;
     }
   };
 
