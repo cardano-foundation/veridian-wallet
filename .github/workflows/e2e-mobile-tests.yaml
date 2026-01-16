@@ -26,9 +26,12 @@ jobs:
           export LANG=en_US.UTF-8
           npm run build:cap
 
+      - name: 🔧 Select Xcode 26
+        run: sudo xcode-select -s '/Applications/Xcode_26.0.app/Contents/Developer'
+
       - name: 🔨 Build app for iOS simulator
         run: |
-          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator18.0 CODE_SIGN_INDENTITY="org.cardanofoundation.idw" CODE_SIGNING_REQUIRED=YES CODE_SIGNING_ALLOWED=YES -derivedDataPath $HOME/Documents/xcode/DerivedData
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator26.0 CODE_SIGN_INDENTITY="org.cardanofoundation.idw" CODE_SIGNING_REQUIRED=YES CODE_SIGNING_ALLOWED=YES -derivedDataPath $HOME/Documents/xcode/DerivedData
 
       - name: 📱 Start appium
         run: appium &
