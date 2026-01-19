@@ -1818,6 +1818,23 @@ describe("Connection service of agent", () => {
     });
   });
 
+  test("throws if identifier alias is missing when fetching connection by id", async () => {
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
+    const sharedIdentifier = "test-shared-identifier";
+    contactGetMock = jest.fn().mockResolvedValue({
+      alias: "alias",
+      oobi: "oobi",
+      id: "id",
+      sharedIdentifier,
+      [`${sharedIdentifier}:${KeriaContactKeyElement.CONNECTION_ALIAS}`]: 123,
+      [`${sharedIdentifier}:createdAt`]: nowISO,
+    });
+
+    await expect(
+      connectionService.getConnectionById("id", false, sharedIdentifier)
+    ).rejects.toThrow(ConnectionService.CONNECTION_PAIR_MISSING_ALIAS);
+  });
+
   test("Can get pending connection", async () => {
     connectionPairStorage.findAllByQuery = jest.fn().mockResolvedValueOnce([
       {
