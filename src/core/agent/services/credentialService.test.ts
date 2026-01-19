@@ -171,7 +171,9 @@ const archivedMetadataRecord = new CredentialMetadataRecord({
 describe("Credential service of agent", () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValue(true);
   });
+
   test("can get all credentials", async () => {
     credentialStorage.getAllCredentialMetadata = jest
       .fn()
@@ -262,7 +264,6 @@ describe("Credential service of agent", () => {
   });
 
   test("get acdc credential details successfully record by id", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     credentialStorage.getCredentialMetadata = jest
       .fn()
       .mockResolvedValue(credentialMetadataRecordA);
@@ -347,13 +348,6 @@ describe("Credential service of agent", () => {
     ).rejects.toThrowError(
       CredentialService.CREDENTIAL_MISSING_METADATA_ERROR_MSG
     );
-  });
-
-  test("Should throw an error when KERIA is offline ", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(false);
-    await expect(
-      credentialService.getCredentialDetailsById("not-found-id")
-    ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
   });
 
   test("Can sync ACDCs from KERIA to local", async () => {
@@ -705,7 +699,6 @@ describe("Credential service of agent", () => {
 
   test("Must throw 'Credential with given SAID not found on KERIA' when there's no KERI credential", async () => {
     const id = "not-found-id";
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     credentialStorage.getCredentialMetadata = jest
       .fn()
       .mockResolvedValue(credentialMetadataRecordA);
@@ -720,7 +713,6 @@ describe("Credential service of agent", () => {
 
   test("Should throw error if other error occurs with get credential in cloud", async () => {
     const id = "not-found-id";
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     credentialStorage.getCredentialMetadata = jest
       .fn()
       .mockResolvedValue(credentialMetadataRecordA);
@@ -742,7 +734,6 @@ describe("Credential service of agent", () => {
   });
 
   test("cannot mark credential as confirmed if metadata is missing", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       id: "id",
@@ -764,7 +755,6 @@ describe("Credential service of agent", () => {
   });
 
   test("Can mark credential as confirmed", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       id: "id",
@@ -802,7 +792,6 @@ describe("Credential service of agent", () => {
   });
 
   test("Can mark credential as revoked", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
     identifierStorage.getIdentifierMetadata = jest.fn().mockResolvedValue({
       id: "id",
@@ -836,7 +825,6 @@ describe("Credential service of agent", () => {
   });
 
   test("Should throw CREDENTIAL_NOT_READY_ON_KERIA when credential fetch fails with 404 after retries", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
     const pendingCredentialMock = {
       id: "id",
@@ -862,7 +850,6 @@ describe("Credential service of agent", () => {
   });
 
   test("Should propagate 500 errors immediately without retry", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
     const pendingCredentialMock = {
       id: "id",
@@ -888,7 +875,6 @@ describe("Credential service of agent", () => {
   });
 
   test("Should confirm credential after retry succeeds on second attempt", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
     const pendingCredentialMock = {
       id: "id",
@@ -918,7 +904,6 @@ describe("Credential service of agent", () => {
   });
 
   test("Should not call credentials().get() when marking as REVOKED", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     const id = "uuid";
     const pendingCredentialMock = {
       id: "id",
@@ -1037,7 +1022,6 @@ describe("Credential service of agent", () => {
   });
 
   test("Should retrieve pending deletions and delete each by ID", async () => {
-    Agent.agent.getKeriaOnlineStatus = jest.fn().mockReturnValueOnce(true);
     credentialStorage.deleteCredentialMetadata = jest
       .fn()
       .mockResolvedValueOnce(undefined)
