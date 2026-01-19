@@ -14,7 +14,11 @@ import "./SystemThreatAlert.scss";
 import { SystemThreatAlertProps } from "./SystemThreatAlert.types";
 import { SUPPORT_EMAIL } from "../../globals/constants";
 
-const SystemThreatAlert: React.FC<SystemThreatAlertProps> = ({ errors }) => {
+const SystemThreatAlert: React.FC<SystemThreatAlertProps> = ({
+  errors,
+  threats,
+  deviceInfo,
+}) => {
   const pageId = "system-threat-alert-page";
 
   return (
@@ -52,6 +56,29 @@ const SystemThreatAlert: React.FC<SystemThreatAlertProps> = ({ errors }) => {
           content={i18n.t("systemthreats.alert")}
           icon={warningOutline}
         />
+        {(threats || deviceInfo) && (
+          <CardDetailsBlock className="debug-info">
+            <h3>Debug Information</h3>
+            {threats && threats.length > 0 && (
+              <div className="debug-section">
+                <h4>Threat Codes:</h4>
+                <ul>
+                  {threats.map((t, i) => (
+                    <li key={i}>{t.name}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {deviceInfo && (
+              <div className="debug-section">
+                <h4>Device Info:</h4>
+                <pre style={{ whiteSpace: "pre-wrap", fontSize: "10px" }}>
+                  {JSON.stringify(deviceInfo, null, 2)}
+                </pre>
+              </div>
+            )}
+          </CardDetailsBlock>
+        )}
         <PageFooter
           primaryButtonText={`${i18n.t("systemthreats.help")}`}
           primaryButtonIcon={helpCircleOutline}

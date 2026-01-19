@@ -16,7 +16,7 @@ import { ConfigurationService } from "../core/configuration";
 import { SecureStorage } from "../core/storage";
 import { i18n } from "../i18n";
 import { Routes } from "../routes";
-import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
+import { initializeFreeRASP, ThreatCheck, ThreatName } from "../security/freerasp";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   getCurrentProfile,
@@ -104,9 +104,8 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
               <IonSpinner name="circular" />
             </div>
             <div
-              className={`app-router ${
-                showProfileState || showAlert ? "ion-hide" : ""
-              }`}
+              className={`app-router ${showProfileState || showAlert ? "ion-hide" : ""
+                }`}
             >
               <Routes />
             </div>
@@ -309,6 +308,8 @@ const App = () => {
     return (
       <SystemThreatAlert
         errors={threatsDetected.map((threat) => threat.description)}
+        threats={threatsDetected}
+        deviceInfo={deviceInfo}
       />
     );
   }
