@@ -70,7 +70,7 @@ export const DATA_V1201: TsMigration = {
         contactId: string;
         createdAt: string;
         identifier: string;
-        alias?: string;
+        alias: string;
         creationStatus: string;
         pendingDeletion: boolean;
         type: string;

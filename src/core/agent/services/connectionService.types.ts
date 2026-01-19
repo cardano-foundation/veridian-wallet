@@ -1,6 +1,6 @@
 import { CreationStatus, ExnMessage } from "../agent.types";
 
-enum KeriaContactKeyPrefix {
+enum KeriaContactKeyElement {
   CONNECTION_NOTE = "note:",
   HISTORY_IPEX = "history:ipex:",
   HISTORY_REVOKE = "history:revoke:",
@@ -60,7 +60,7 @@ interface HumanReadableMessage {
 
 export {
   ConnectionHistoryType,
-  KeriaContactKeyPrefix,
+  KeriaContactKeyElement,
   RpyRoute,
   OobiQueryParams,
 };

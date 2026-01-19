@@ -3227,12 +3227,14 @@ describe("Long running operation tracker", () => {
         creationStatus: CreationStatus.PENDING,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA",
         pendingDeletion: false,
+        alias: "CF Credential Issuance",
       },
       {
         contactId: "idB",
         creationStatus: CreationStatus.PENDING,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
         pendingDeletion: false,
+        alias: "CF Credential Issuance",
       },
     ]);
     contactStorage.findExpectedById.mockResolvedValue({
@@ -3378,12 +3380,14 @@ describe("Long running operation tracker", () => {
         creationStatus: CreationStatus.COMPLETE,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA",
         pendingDeletion: false,
+        alias: "CF Credential Issuance",
       },
       {
         contactId: "idB",
         creationStatus: CreationStatus.PENDING,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
         pendingDeletion: false,
+        alias: "CF Credential Issuance",
       },
     ]);
     const operationRecord = {

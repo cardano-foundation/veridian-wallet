@@ -48,7 +48,7 @@ import { CredentialService } from "./credentialService";
 import {
   ConnectionHistoryType,
   ExnMessage,
-  KeriaContactKeyPrefix,
+  KeriaContactKeyElement,
 } from "./connectionService.types";
 import { NotificationAttempts } from "../records/notificationRecord.types";
 import { StorageMessage } from "../../storage/storage.types";
@@ -1258,7 +1258,7 @@ class KeriaNotificationService extends AgentService {
             }
 
             const pairCreatedAt = new Date();
-            const connectionAlias = connectionPairRecord.alias ?? contact.alias;
+            const connectionAlias = connectionPairRecord.alias;
 
             await this.props.signifyClient
               .contacts()
@@ -1267,7 +1267,7 @@ class KeriaNotificationService extends AgentService {
                 alias: contact.alias,
                 oobi: contact.oobi,
                 [`${connectionPairRecord.identifier}:createdAt`]: pairCreatedAt,
-                [`${connectionPairRecord.identifier}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`]:
+                [`${connectionPairRecord.identifier}:${KeriaContactKeyElement.CONNECTION_ALIAS}`]:
                   connectionAlias,
               });
 

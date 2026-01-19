@@ -1,5 +1,5 @@
 import { SignifyClient } from "signify-ts";
-import { KeriaContactKeyPrefix } from "../../../agent/services/connectionService.types";
+import { KeriaContactKeyElement } from "../../../agent/services/connectionService.types";
 import { CloudMigration } from "./cloudMigrations.types";
 
 export const CLOUD_V1201: CloudMigration = {
@@ -117,7 +117,7 @@ export const CLOUD_V1201: CloudMigration = {
           contactUpdates[`${sharedIdentifierPrefix}:createdAt`] =
             contact["createdAt"];
           contactUpdates[
-            `${sharedIdentifierPrefix}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`
+            `${sharedIdentifierPrefix}:${KeriaContactKeyElement.CONNECTION_ALIAS}`
           ] = contact.alias;
 
           keysToDelete.push("sharedIdentifier");
@@ -145,7 +145,7 @@ export const CLOUD_V1201: CloudMigration = {
         for (const prefix of identifiers) {
           contactUpdates[`${prefix}:createdAt`] = contact["createdAt"];
           contactUpdates[
-            `${prefix}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`
+            `${prefix}:${KeriaContactKeyElement.CONNECTION_ALIAS}`
           ] = contact.alias;
 
           for (const noteItem of noteItems) {

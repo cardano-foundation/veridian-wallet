@@ -15,7 +15,7 @@ import { EventTypes } from "../event.types";
 import {
   ConnectionHistoryItem,
   ConnectionHistoryType,
-  KeriaContactKeyPrefix,
+  KeriaContactKeyElement,
 } from "./connectionService.types";
 import { memberMetadataRecord } from "../../__fixtures__/agent/multiSigFixtures";
 import { individualRecord } from "../../__fixtures__/agent/identifierFixtures";
@@ -596,6 +596,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.COMPLETE,
         pendingDeletion: false,
         identifier: "multisig-identifier",
+        alias: "multisig-contact",
       },
     ]);
 
@@ -641,6 +642,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.COMPLETE,
         pendingDeletion: false,
         identifier: "active-identifier",
+        alias: "active-contact",
       },
     ]);
 
@@ -665,6 +667,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.COMPLETE,
         pendingDeletion: false,
         identifier: "complete-identifier",
+        alias: "complete-contact",
       },
       {
         contactId: "contact-2",
@@ -672,6 +675,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.PENDING,
         pendingDeletion: false,
         identifier: "pending-identifier",
+        alias: "pending-contact",
       },
       {
         contactId: "contact-3",
@@ -679,6 +683,7 @@ describe("Connection service of agent", () => {
         creationStatus: CreationStatus.FAILED,
         pendingDeletion: false,
         identifier: "failed-identifier",
+        alias: "failed-contact",
       },
     ]);
 
@@ -1770,13 +1775,13 @@ describe("Connection service of agent", () => {
         oobi: "oobi",
         id: "id",
         sharedIdentifier,
-        [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`]:
+        [`${sharedIdentifier}:${KeriaContactKeyElement.CONNECTION_ALIAS}`]:
           "alias-by-identifier",
-        [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}id`]:
+        [`${sharedIdentifier}:${KeriaContactKeyElement.CONNECTION_NOTE}id`]:
           JSON.stringify(connectionNote),
-        [`${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}id`]:
+        [`${sharedIdentifier}:${KeriaContactKeyElement.HISTORY_IPEX}id`]:
           JSON.stringify(mockHistoryIpexMessage),
-        [`${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_REVOKE}id`]:
+        [`${sharedIdentifier}:${KeriaContactKeyElement.HISTORY_REVOKE}id`]:
           JSON.stringify(mockHistoryRevokeMessage),
         [`${sharedIdentifier}:createdAt`]: nowISO,
       })
@@ -1932,13 +1937,13 @@ describe("Connection service of agent", () => {
       oobi: "http://test.oobi",
       id: "test-id",
       sharedIdentifier,
-      [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`]:
+      [`${sharedIdentifier}:${KeriaContactKeyElement.CONNECTION_ALIAS}`]:
         "alias-by-identifier",
-      [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}id`]:
+      [`${sharedIdentifier}:${KeriaContactKeyElement.CONNECTION_NOTE}id`]:
         JSON.stringify(connectionNote),
-      [`${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}ipex1`]:
+      [`${sharedIdentifier}:${KeriaContactKeyElement.HISTORY_IPEX}ipex1`]:
         JSON.stringify(mockHistoryItems[0]),
-      [`${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}cred1`]:
+      [`${sharedIdentifier}:${KeriaContactKeyElement.HISTORY_IPEX}cred1`]:
         JSON.stringify(mockHistoryItems[1]),
       [`${sharedIdentifier}:createdAt`]: nowISO,
     });
@@ -2020,13 +2025,13 @@ describe("Connection service of agent", () => {
       oobi: "http://test.oobi",
       id: "test-id",
       sharedIdentifier,
-      [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`]:
+      [`${sharedIdentifier}:${KeriaContactKeyElement.CONNECTION_ALIAS}`]:
         "alias-by-identifier",
-      [`${sharedIdentifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}id`]:
+      [`${sharedIdentifier}:${KeriaContactKeyElement.CONNECTION_NOTE}id`]:
         JSON.stringify(connectionNote),
-      [`${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}ipex1`]:
+      [`${sharedIdentifier}:${KeriaContactKeyElement.HISTORY_IPEX}ipex1`]:
         JSON.stringify(mockHistoryItems[0]),
-      [`${sharedIdentifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}cred1`]:
+      [`${sharedIdentifier}:${KeriaContactKeyElement.HISTORY_IPEX}cred1`]:
         JSON.stringify(mockHistoryItems[1]),
       [`${sharedIdentifier}:createdAt`]: nowISO,
     });

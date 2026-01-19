@@ -37,6 +37,7 @@ const connectionPairRecordProps: ConnectionPairRecordStorageProps = {
   createdAt: now,
   contactId: contactId1,
   identifier: identifier1,
+  alias: "alias-1",
   creationStatus: CreationStatus.COMPLETE,
   pendingDeletion: false,
   tags: { category: "test" },
@@ -282,6 +283,7 @@ describe("ConnectionPair Storage", () => {
     const minimalProps: ConnectionPairRecordStorageProps = {
       contactId: contactId1,
       identifier: identifier1,
+      alias: "alias-minimal",
     };
     const minimalRecord = new ConnectionPairRecord(minimalProps);
     storageService.save.mockResolvedValue(minimalRecord);
@@ -303,6 +305,7 @@ describe("ConnectionPair Storage", () => {
     const pendingProps: ConnectionPairRecordStorageProps = {
       contactId: contactId1,
       identifier: identifier1,
+      alias: "alias-pending",
       creationStatus: CreationStatus.PENDING,
     };
     const pendingRecord = new ConnectionPairRecord(pendingProps);
@@ -324,6 +327,7 @@ describe("ConnectionPair Storage", () => {
     const failedProps: ConnectionPairRecordStorageProps = {
       contactId: contactId1,
       identifier: identifier1,
+      alias: "alias-failed",
       creationStatus: CreationStatus.FAILED,
     };
     const failedRecord = new ConnectionPairRecord(failedProps);
@@ -345,6 +349,7 @@ describe("ConnectionPair Storage", () => {
     const deletionProps: ConnectionPairRecordStorageProps = {
       contactId: contactId1,
       identifier: identifier1,
+      alias: "alias-deletion",
       pendingDeletion: true,
     };
     const deletionRecord = new ConnectionPairRecord(deletionProps);

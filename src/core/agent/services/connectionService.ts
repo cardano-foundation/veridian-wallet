@@ -50,7 +50,7 @@ import {
 } from "../event.types";
 import {
   ConnectionHistoryType,
-  KeriaContactKeyPrefix,
+  KeriaContactKeyElement,
   OobiQueryParams,
   RpyRoute,
 } from "./connectionService.types";
@@ -94,6 +94,8 @@ class ConnectionService extends AgentService {
   static readonly OOBI_INVALID = "OOBI URL is invalid";
   static readonly NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER =
     "Cannot set up normal connection without specifying a local identifier to share with the other party";
+  static readonly CONNECTION_PAIR_MISSING_ALIAS =
+    "Connection pair missing alias";
 
   static readonly INVALID_DOOBI_CONNECTION_CONTENT_TYPE =
     "Can only create new connections for DOOBIs with a content-type of application/json+cesr (DOOBI is a commonly used hack for group multi-sig OOBIs)";
@@ -287,7 +289,9 @@ class ConnectionService extends AgentService {
         );
       }
 
-      const connectionAlias = connectionPair.alias ?? contact.alias;
+      const connectionAlias = contact.groupId
+        ? contact.alias
+        : connectionPair.alias;
 
       connections.push({
         id: connectionPair.contactId,
@@ -385,13 +389,7 @@ class ConnectionService extends AgentService {
         }
       });
 
-    const rawAlias = identifier
-      ? connection[`${identifier}:${KeriaContactKeyPrefix.CONNECTION_ALIAS}`]
-      : undefined;
-    const identifierAlias = typeof rawAlias === "string" ? rawAlias : undefined;
-
     const baseConnectionDetails = {
-      label: identifierAlias ?? connection.alias,
       id: connection.id,
       contactId: connection.id,
       status: ConnectionStatus.CONFIRMED,
@@ -399,6 +397,11 @@ class ConnectionService extends AgentService {
     };
 
     if (identifier) {
+      const alias =
+        connection[`${identifier}:${KeriaContactKeyElement.CONNECTION_ALIAS}`];
+      if (typeof alias !== "string") {
+        throw new Error(ConnectionService.CONNECTION_PAIR_MISSING_ALIAS);
+      }
       const createdAt = connection[`${identifier}:createdAt`] as string;
 
       const notes: Array<ConnectionNoteDetails> = [];
@@ -408,17 +411,17 @@ class ConnectionService extends AgentService {
       Object.keys(connection).forEach((key) => {
         if (
           key.startsWith(
-            `${identifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}`
+            `${identifier}:${KeriaContactKeyElement.CONNECTION_NOTE}`
           ) &&
           connection[key]
         ) {
           notes.push(JSON.parse(connection[key] as string));
         } else if (
           key.startsWith(
-            `${identifier}:${KeriaContactKeyPrefix.HISTORY_IPEX}`
+            `${identifier}:${KeriaContactKeyElement.HISTORY_IPEX}`
           ) ||
           key.startsWith(
-            `${identifier}:${KeriaContactKeyPrefix.HISTORY_REVOKE}`
+            `${identifier}:${KeriaContactKeyElement.HISTORY_REVOKE}`
           )
         ) {
           const historyItem: ConnectionHistoryItem = JSON.parse(
@@ -432,6 +435,7 @@ class ConnectionService extends AgentService {
 
       return {
         ...baseConnectionDetails,
+        label: alias,
         createdAtUTC: createdAt,
         identifier,
         notes,
@@ -450,6 +454,7 @@ class ConnectionService extends AgentService {
     } else {
       return {
         ...baseConnectionDetails,
+        label: connection.alias,
         createdAtUTC: connection.createdAt as string,
         groupId: connection.groupCreationId as string,
         notes: [],
@@ -608,7 +613,7 @@ class ConnectionService extends AgentService {
 
       metadata = {
         id,
-        alias: connectionPair.alias ?? contact.alias,
+        alias: connectionPair.alias,
         createdAt: connectionPair.createdAt,
         oobi: contact.oobi,
         groupId: contact.groupId,
@@ -630,10 +635,10 @@ class ConnectionService extends AgentService {
   ): Promise<void> {
     const id = randomSalt();
     await this.props.signifyClient.contacts().update(connectionId, {
-      [`${identifier}:${KeriaContactKeyPrefix.CONNECTION_NOTE}${id}`]:
+      [`${identifier}:${KeriaContactKeyElement.CONNECTION_NOTE}${id}`]:
         JSON.stringify({
           ...note,
-          id: `${KeriaContactKeyPrefix.CONNECTION_NOTE}${id}`,
+          id: `${KeriaContactKeyElement.CONNECTION_NOTE}${id}`,
           timestamp: new Date().toISOString(),
         }),
     });
@@ -744,19 +749,6 @@ class ConnectionService extends AgentService {
         });
       }
 
-      const aliasByIdentifier = new Map<string, string>();
-
-      for (const key of Object.keys(contact)) {
-        const keyParts = key.split(":");
-        if (
-          keyParts.length === 2 &&
-          keyParts[1] === KeriaContactKeyPrefix.CONNECTION_ALIAS &&
-          typeof contact[key] === "string"
-        ) {
-          aliasByIdentifier.set(keyParts[0], contact[key] as string);
-        }
-      }
-
       for (const key of Object.keys(contact)) {
         const keyParts = key.split(":");
         if (keyParts.length === 2 && keyParts[1] === "createdAt") {
@@ -765,11 +757,15 @@ class ConnectionService extends AgentService {
           const pairExists = await this.connectionPairStorage.findById(pairId);
 
           if (!pairExists) {
+            const aliasValue =
+              contact[`${aid}:${KeriaContactKeyElement.CONNECTION_ALIAS}`];
+            const alias =
+              typeof aliasValue === "string" ? aliasValue : contact.alias;
             await this.connectionPairStorage.save({
               id: pairId,
               contactId: contact.id,
               identifier: aid,
-              alias: aliasByIdentifier.get(aid) ?? contact.alias,
+              alias,
               creationStatus: CreationStatus.COMPLETE,
               pendingDeletion: false,
               createdAt: new Date(contact[key] as string),

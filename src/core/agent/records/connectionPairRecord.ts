@@ -8,7 +8,7 @@ interface ConnectionPairRecordStorageProps {
   tags?: Tags;
   contactId: string;
   identifier: string;
-  alias?: string;
+  alias: string;
   creationStatus?: CreationStatus;
   pendingDeletion?: boolean;
 }
@@ -16,7 +16,7 @@ interface ConnectionPairRecordStorageProps {
 class ConnectionPairRecord extends BaseRecord {
   contactId!: string;
   identifier!: string;
-  alias?: string;
+  alias!: string;
   creationStatus!: CreationStatus;
   pendingDeletion!: boolean;
 
