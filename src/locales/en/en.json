@@ -1198,9 +1198,9 @@
       "details": {
         "done": "Done",
         "label": "Label",
-        "date": "Date Created",
-        "endpoints": "Service Endpoints",
-        "history": "Connection History",
+        "date": "Connection date",
+        "endpoints": "Service endpoints",
+        "history": "Connection history",
         "connectedwith": "Connected with “{{ issuer }}“",
         "issuance": "Received a “{{ credential }}“",
         "requestpresent": "“{{ issuer }}“ has requested a credential presentation",
