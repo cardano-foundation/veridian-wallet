@@ -99,4 +99,130 @@
     all: unset;
     width: 100%;
   }
-}
+  /* ... existing styles */
+
+  .debug-info,
+  .storage-experiment {
+    width: 100%;
+    margin-top: 1rem;
+    text-align: left;
+    
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--ion-color-neutral-800);
+    }
+  }
+
+  .debug-info {
+    .debug-section {
+      margin-top: 0.5rem;
+      
+      h4 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--ion-color-neutral-700);
+      }
+
+      ul {
+        padding-left: 1.5rem;
+        margin: 0;
+        li {
+          font-size: 0.85rem;
+          color: var(--ion-color-neutral-600);
+          font-family: monospace;
+        }
+      }
+
+      pre {
+        background: var(--ion-color-neutral-100);
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        border: 1px solid var(--ion-color-neutral-200);
+      }
+    }
+  }
+
+  .storage-experiment {
+    .experiment-intro {
+      font-size: 0.85rem;
+      color: var(--ion-color-neutral-600);
+      margin-bottom: 1rem;
+    }
+
+    .experiment-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .experiment-step {
+      background: var(--ion-color-neutral-50);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--ion-color-neutral-200);
+
+      &.success {
+        border-color: var(--ion-color-success-300);
+        background: var(--ion-color-success-50);
+      }
+
+      &.error {
+        border-color: var(--ion-color-danger-300);
+        background: var(--ion-color-danger-50);
+      }
+
+      .step-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .step-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+
+      .step-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--ion-color-neutral-800);
+      }
+
+      .step-message {
+        margin-top: 0.25rem;
+        padding-left: 2rem;
+        font-size: 0.8rem;
+        color: var(--ion-color-neutral-600);
+        font-family: monospace;
+      }
+    }
+  }
+
+  .spinner-small {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--ion-color-primary);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+  }
+
+  .dot-pending {
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: var(--ion-color-neutral-400);
+    border-radius: 50%;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
