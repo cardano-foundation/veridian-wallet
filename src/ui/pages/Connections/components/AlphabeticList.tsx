@@ -29,14 +29,11 @@ const AlphabeticList = ({
       onRenderEndSlot={(data) =>
         data.status === ConnectionStatus.PENDING ||
         data.status === ConnectionStatus.FAILED ? (
-            <IonChip>
-              <IonIcon
-                icon={hourglassOutline}
-                color="primary"
-              ></IonIcon>
-              <span>{ConnectionStatus.PENDING}</span>
-            </IonChip>
-          ) : null
+          <IonChip>
+            <IonIcon icon={hourglassOutline}></IonIcon>
+            <span>{ConnectionStatus.PENDING}</span>
+          </IonChip>
+        ) : null
       }
     />
   );
