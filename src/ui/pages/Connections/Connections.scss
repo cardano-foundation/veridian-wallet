@@ -22,6 +22,11 @@
   .cards-placeholder-container {
     padding-inline: 1.25rem;
     margin-top: 2.5rem;
+
+    .primary-button ion-icon {
+      height: 1.5rem;
+      width: 1.5rem;
+    }
   }
 
   .placeholder-spacer {
@@ -199,6 +204,11 @@
     ion-header,
     .cards-placeholder-container {
       padding-inline: 1rem;
+
+      .primary-button ion-icon {
+        height: 1.2rem;
+        width: 1.2rem;
+      }
     }
 
     .placeholder-spacer {
