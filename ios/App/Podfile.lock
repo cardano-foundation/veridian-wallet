@@ -41,7 +41,7 @@ PODS:
     - Capacitor
   - CapgoCapacitorNativeBiometric (0.0.1):
     - Capacitor
-  - EvvaCapacitorSecureStoragePlugin (3.1.0):
+  - EvvaCapacitorSecureStoragePlugin (4.0.4):
     - Capacitor
     - SimpleKeychain
   - GoogleDataTransport (10.1.0):
@@ -203,7 +203,7 @@ SPEC CHECKSUMS:
   CapacitorSplashScreen: e388b8e0ed0e982a9d3a40417f478e7a018a8763
   CapacitorStatusBar: 0659ddc7b1713764a05831463d215b177a15d054
   CapgoCapacitorNativeBiometric: be4ceeff38739d9c0f59b8c41456a3b01cfeddf0
-  EvvaCapacitorSecureStoragePlugin: 43df44513abd5295a63f8e8813e9b5b7159dbfe0
+  EvvaCapacitorSecureStoragePlugin: c26b3b29ee92e1db7ed0c20d8220a3552a59a8f7
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleMLKit: eff9e23ec1d90ea4157a1ee2e32a4f610c5b3318
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
