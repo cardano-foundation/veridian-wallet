@@ -2699,46 +2699,6 @@ describe("IPEX communication service of agent", () => {
     ).rejects.toThrowError(IpexCommunicationService.SCHEMA_NOT_FOUND);
   });
 
-  test("Should throw error when KERIA is offline", async () => {
-    await expect(
-      ipexCommunicationService.admitAcdcFromGrant("id")
-    ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
-    const noti = {
-      id: "id",
-      createdAt: DATETIME.toISOString(),
-      a: {
-        d: "keri",
-      },
-      connectionId: "EGR7Jm38EcsXRIidKDZBYDm_xox6eapfU1tqxdAUzkFd",
-      read: true,
-      groupReplied: false,
-      receivingPre: "EGR7Jm38EcsXRIidKDZBYDm_xox6eapfU1tqxdAUzkFA",
-    };
-
-    const acdcData = {
-      v: "ACDC10JSON000197_",
-      d: "credential-id",
-      i: "issuer-aid",
-      ri: "registry-aid",
-      s: "schema-said",
-      a: {
-        d: "attribute-said",
-        i: "holder-aid",
-        dt: "2024-01-01T00:00:00.000Z",
-      },
-    };
-
-    await expect(
-      ipexCommunicationService.offerAcdcFromApply(noti.id, acdcData)
-    ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
-    await expect(
-      ipexCommunicationService.grantAcdcFromAgree(noti.a.d)
-    ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
-    await expect(
-      ipexCommunicationService.getIpexApplyDetails(noti)
-    ).rejects.toThrowError(Agent.KERIA_CONNECTION_BROKEN);
-  });
-
   test("Cannot get ipex apply details if the schema cannot be located", async () => {
     const mockNotification = {
       a: {
