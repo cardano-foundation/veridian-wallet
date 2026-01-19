@@ -6,7 +6,7 @@ import {
   NativeSettings,
 } from "capacitor-native-settings";
 import { fingerPrintOutline } from "ionicons/icons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
@@ -56,6 +56,7 @@ const SetupBiometrics = () => {
     useState(false);
   const { enablePrivacy, disablePrivacy } = usePrivacyScreen();
   const { setupBiometrics, checkBiometrics } = useBiometricAuth();
+  const isInBiometricProcess = useRef(false);
 
   const isAndroid = getPlatforms().includes("android");
   const isIOS = getPlatforms().includes("ios");
@@ -109,6 +110,8 @@ const SetupBiometrics = () => {
   };
 
   const processBiometrics = async () => {
+    if (isInBiometricProcess.current) return;
+
     let biometricOutcome: BiometricAuthOutcome;
     if (!Capacitor.isNativePlatform()) {
       navToNextStep();
@@ -116,6 +119,7 @@ const SetupBiometrics = () => {
     }
 
     try {
+      isInBiometricProcess.current = true;
       await disablePrivacy();
       biometricOutcome = await setupBiometrics();
     } catch (error) {
@@ -123,6 +127,7 @@ const SetupBiometrics = () => {
       throw error;
     } finally {
       await enablePrivacy();
+      isInBiometricProcess.current = false;
     }
 
     switch (biometricOutcome) {

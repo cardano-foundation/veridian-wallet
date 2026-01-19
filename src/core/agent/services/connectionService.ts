@@ -44,6 +44,7 @@ import { AgentService } from "./agentService";
 import { OnlineOnly, randomSalt, waitAndGetDoneOp } from "./utils";
 import { StorageMessage } from "../../storage/storage.types";
 import {
+  ConnectionInvalidEvent,
   ConnectionRemovedEvent,
   ConnectionStateChangedEvent,
   EventTypes,
@@ -95,9 +96,6 @@ class ConnectionService extends AgentService {
   static readonly NORMAL_CONNECTIONS_REQUIRE_SHARED_IDENTIFIER =
     "Cannot set up normal connection without specifying a local identifier to share with the other party";
 
-  static readonly INVALID_DOOBI_CONNECTION_CONTENT_TYPE =
-    "Can only create new connections for DOOBIs with a content-type of application/json+cesr (DOOBI is a commonly used hack for group multi-sig OOBIs)";
-
   onConnectionStateChanged(
     callback: (event: ConnectionStateChangedEvent) => void
   ) {
@@ -129,6 +127,10 @@ class ConnectionService extends AgentService {
     );
   }
 
+  onConnectionInvalid(callback: (event: ConnectionInvalidEvent) => void) {
+    this.props.eventEmitter.on(EventTypes.ConnectionInvalid, callback);
+  }
+
   @OnlineOnly
   async connectByOobiUrl(
     url: string,
@@ -144,16 +146,6 @@ class ConnectionService extends AgentService {
       !new URL(url).pathname.match(WOOBI_RE)
     ) {
       throw new Error(ConnectionService.OOBI_INVALID);
-    }
-
-    if (new URL(url).pathname.match(DOOBI_RE)) {
-      const response = await fetch(url, { method: "GET" });
-      const contentType = response.headers.get("Content-Type");
-      if (!contentType?.includes("application/json+cesr")) {
-        throw new Error(
-          ConnectionService.INVALID_DOOBI_CONNECTION_CONTENT_TYPE
-        );
-      }
     }
 
     const multiSigInvite = url.includes(OobiQueryParams.GROUP_ID);

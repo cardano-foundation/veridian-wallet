@@ -92,6 +92,10 @@ const CreatePassword = ({
     ? 0.5
     : 0.66;
 
+  const subTitle =
+    userAction?.current == "change"
+      ? i18n.t("forgotauth.newpassword.description")
+      : i18n.t("createpassword.description");
   return (
     <>
       <ResponsivePageLayout
@@ -136,7 +140,7 @@ const CreatePassword = ({
             title={
               isOnboarding ? `${i18n.t("createpassword.title")}` : undefined
             }
-            description={`${i18n.t("createpassword.description")}`}
+            description={`${subTitle}`}
             onValidationChange={setValidPassword}
           />
         )}

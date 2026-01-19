@@ -212,6 +212,14 @@ class CredentialService extends AgentService {
   }
 
   async syncKeriaCredentials(): Promise<void> {
+    const identifiers = await this.identifierStorage.getIdentifierRecords();
+
+    if (identifiers.length === 0) {
+      return;
+    }
+
+    const localIdentifierIds = new Set(identifiers.map((id) => id.id));
+
     const cloudCredentials: KeriaCredential[] = [];
     let returned = -1;
     let iteration = 0;
@@ -231,10 +239,17 @@ class CredentialService extends AgentService {
       iteration += 1;
     }
 
+    // Filter credentials where we are the issuee (holder)
+    // @TODO Implement $or filter in KERIA to filter at source instead of in TypeScript
+    const localCredentialsFiltered = cloudCredentials.filter(
+      (credential: KeriaCredential) =>
+        localIdentifierIds.has(credential.sad.a.i)
+    );
+
     const localCredentials =
       await this.credentialStorage.getAllCredentialMetadata();
 
-    const unSyncedData = cloudCredentials.filter(
+    const unSyncedData = localCredentialsFiltered.filter(
       (credential: KeriaCredential) =>
         !localCredentials.find((item) => credential.sad.d === item.id)
     );

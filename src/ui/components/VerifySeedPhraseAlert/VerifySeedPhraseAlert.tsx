@@ -71,6 +71,7 @@ export const VerifySeedPhraseAlert = () => {
         show={isOpen}
         setShow={setIsOpen}
         onVerifySuccess={verifySuccess}
+        showCancel={false}
       />
     </>
   );

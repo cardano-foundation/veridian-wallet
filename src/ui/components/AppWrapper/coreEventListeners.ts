@@ -4,6 +4,7 @@ import {
   isRegularConnectionDetails,
 } from "../../../core/agent/agent.types";
 import {
+  ConnectionInvalidEvent,
   EventTypes,
   GroupCreatedEvent,
   IdentifierAddedEvent,
@@ -18,6 +19,7 @@ import {
   addOrUpdateProfileIdentity,
   deleteNotificationById,
   handleNotificationReceived,
+  removeConnectionCache,
   updateOrAddConnectionCache,
   updateProfileCreationStatus,
 } from "../../../store/reducers/profileCache";
@@ -102,10 +104,19 @@ const groupCreatedHandler = async (
   await dispatch(addGroupProfileAsync(event.payload.group));
 };
 
+const removeInvalidConnectionCacheHandler = async (
+  event: ConnectionInvalidEvent,
+  dispatch: ReturnType<typeof useAppDispatch>
+) => {
+  dispatch(removeConnectionCache(event.payload.contactId));
+  dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
+};
+
 export {
   groupCreatedHandler,
   identifierAddedHandler,
   notificationStateChanged,
   operationCompleteHandler,
   operationFailureHandler,
+  removeInvalidConnectionCacheHandler,
 };

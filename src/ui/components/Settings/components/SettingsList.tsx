@@ -17,7 +17,7 @@ import {
   lockClosedOutline,
   notificationsOutline,
 } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import pJson from "../../../../../package.json";
@@ -106,6 +106,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const [isAwaitingNotificationSettings, setIsAwaitingNotificationSettings] =
     useState(false);
   const history = useHistory();
+  const isInBiometricProcess = useRef(false);
 
   const platform = Capacitor.getPlatform();
   const isAndroidPlatform = platform === "android";
@@ -230,6 +231,31 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     await attemptEnableNotifications();
   };
 
+  const handleBiometricUpdate = async () => {
+    if (biometricsCache.enabled) {
+      handleToggleBiometricAuth();
+      return;
+    }
+
+    const biometricInfo = await checkBiometrics();
+
+    if (!biometricInfo.isAvailable) {
+      if (isAndroidPlatform) {
+        setOpenAndroidBiometricSettingAlert(true);
+      } else {
+        setOpenBiometricIOSSettingAlert(true);
+      }
+      return;
+    }
+
+    if (isAndroidPlatform) {
+      setShowSetupBiometricsAlert(true);
+      return;
+    }
+
+    biometricAuth();
+  };
+
   const securityItems: OptionProps[] = [
     {
       index: OptionIndex.ChangePin,
@@ -258,6 +284,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
           aria-label="Biometric Toggle"
           className="toggle-button"
           checked={biometricsCache.enabled}
+          onIonChange={handleBiometricUpdate}
         />
       ),
     });
@@ -274,7 +301,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
           className="toggle-button"
           checked={notificationsPreferences.enabled}
           disabled={isProcessingNotificationsToggle}
-          onIonChange={() => handleNotificationToggle()}
+          onIonChange={handleNotificationToggle}
           onClick={(event) => event.stopPropagation()}
         />
       ),
@@ -328,35 +355,12 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     }
   };
 
-  const handleBiometricUpdate = async () => {
-    if (biometricsCache.enabled) {
-      handleToggleBiometricAuth();
-      return;
-    }
-
-    const biometricInfo = await checkBiometrics();
-
-    if (!biometricInfo.isAvailable) {
-      if (isAndroidPlatform) {
-        setOpenAndroidBiometricSettingAlert(true);
-      } else {
-        setOpenBiometricIOSSettingAlert(true);
-      }
-      return;
-    }
-
-    if (isAndroidPlatform) {
-      setShowSetupBiometricsAlert(true);
-      return;
-    }
-
-    biometricAuth();
-  };
-
   const biometricAuth = async () => {
-    try {
-      await disablePrivacy();
+    if (isInBiometricProcess.current) return;
 
+    try {
+      isInBiometricProcess.current = true;
+      await disablePrivacy();
       const setupResult = await setupBiometrics();
       await enablePrivacy();
 
@@ -384,6 +388,8 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     } catch (e) {
       // This catch block is for unexpected errors during the process.
       showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
+    } finally {
+      isInBiometricProcess.current = false;
     }
   };
 

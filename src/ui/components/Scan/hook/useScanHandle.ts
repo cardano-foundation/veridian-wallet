@@ -16,6 +16,7 @@ import {
   isValidConnectionUrl,
   isValidHttpUrl,
 } from "../../../utils/urlChecker";
+import { setToastMsg } from "../../../../store/reducers/stateCache";
 
 enum ErrorMessage {
   INVALID_CONNECTION_URL = "Invalid connection url",
@@ -116,6 +117,7 @@ const useScanHandle = () => {
 
         if (existsLocally) {
           // Duplicate detected: surface it to the UI the same way the Agent would.
+          dispatch(setToastMsg(ToastMsgType.DUPLICATE_CONNECTION));
           dispatch(setOpenConnectionId(connectionId));
           handleDuplicate?.(connectionId);
           await closeScan?.();

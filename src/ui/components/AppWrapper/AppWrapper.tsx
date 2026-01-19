@@ -94,6 +94,7 @@ import {
   notificationStateChanged,
   operationCompleteHandler,
   operationFailureHandler,
+  removeInvalidConnectionCacheHandler,
 } from "./coreEventListeners";
 import { useActivityTimer } from "./hooks/useActivityTimer";
 
@@ -249,6 +250,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
       dispatch(setNotificationsEnabled(enabled));
       dispatch(setNotificationsConfigured(configured));
 
+      if (!Agent.agent.dependenciesInitialized) {
+        return;
+      }
+
       try {
         await Agent.agent.basicStorage.createOrUpdateBasicRecord(
           new BasicRecord({
@@ -265,7 +270,7 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
   useEffect(() => {
     const syncNotificationsPreferences = async (): Promise<void> => {
-      if (!areDependenciesReady) {
+      if (!areDependenciesReady || !Agent.agent.dependenciesInitialized) {
         return;
       }
 
@@ -766,6 +771,9 @@ const AppWrapper = (props: { children: ReactNode }) => {
     }
 
     notificationService.setProfileSwitcher(async (profileId: string) => {
+      if (!Agent.agent.dependenciesInitialized) {
+        return;
+      }
       dispatch(setCurrentProfile(profileId));
       await Agent.agent.basicStorage.createOrUpdateBasicRecord(
         new BasicRecord({
@@ -821,6 +829,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
     Agent.agent.multiSigs.onGroupAdded((event) => {
       groupCreatedHandler(event, dispatch);
+    });
+
+    Agent.agent.connections.onConnectionInvalid((event) => {
+      removeInvalidConnectionCacheHandler(event, dispatch);
     });
   };
 

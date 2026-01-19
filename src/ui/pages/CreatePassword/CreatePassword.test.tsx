@@ -336,7 +336,7 @@ describe("Create Password Page", () => {
       ).toHaveTextContent(EN_TRANSLATIONS.createpassword.change);
       expect(getByTestId("create-password-top-paragraph")).toBeInTheDocument();
       expect(getByTestId("create-password-top-paragraph")).toHaveTextContent(
-        EN_TRANSLATIONS.createpassword.description
+        EN_TRANSLATIONS.forgotauth.newpassword.description
       );
 
       const input = getByTestId("create-password-input");

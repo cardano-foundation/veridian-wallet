@@ -37,6 +37,7 @@ import {
   OperationAddedEvent,
   NotificationRemovedEvent,
   ConnectionStateChangedEvent,
+  ConnectionInvalidEvent,
   OperationFailedEvent,
 } from "../event.types";
 import {
@@ -1226,6 +1227,31 @@ class KeriaNotificationService extends AgentService {
           break;
         }
         case OperationPendingRecordType.Oobi: {
+          if (!(operation.response as State).i) {
+            const contactId =
+              operation.metadata?.oobi?.split("/oobi/")[1] ?? "";
+            const connectionPair =
+              await this.connectionPairStorage.findByContactId(contactId);
+
+            await Promise.all(
+              connectionPair.map(async ({ identifier }) => {
+                await this.connectionService.markConnectionPendingDelete(
+                  contactId,
+                  identifier
+                );
+
+                this.props.eventEmitter.emit<ConnectionInvalidEvent>({
+                  type: EventTypes.ConnectionInvalid,
+                  payload: {
+                    contactId,
+                    identifier,
+                  },
+                });
+              })
+            );
+            break;
+          }
+
           const connectionPairRecords =
             await this.connectionPairStorage.findAllByQuery({
               contactId: (operation.response as State).i,
@@ -1255,15 +1281,18 @@ class KeriaNotificationService extends AgentService {
               );
             }
 
+            const pairCreatedAt = new Date();
+
             await this.props.signifyClient
               .contacts()
               .update((operation.response as State).i, {
                 version: LATEST_CONTACT_VERSION,
                 alias: contact.alias,
                 oobi: contact.oobi,
-                [`${connectionPairRecord.identifier}:createdAt`]: new Date(),
+                [`${connectionPairRecord.identifier}:createdAt`]: pairCreatedAt,
               });
 
+            connectionPairRecord.createdAt = pairCreatedAt;
             await this.connectionPairStorage.update(connectionPairRecord);
             this.props.eventEmitter.emit<ConnectionStateChangedEvent>({
               type: EventTypes.ConnectionStateChanged,

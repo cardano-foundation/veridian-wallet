@@ -185,11 +185,11 @@ describe("KERIA connectivity", () => {
     expect(mockSignifyClient.connect).toHaveBeenCalled();
   });
 
-  test("should throw an not booted error if connect fails after booting", async () => {
+  test("should throw KERIA_NOT_BOOTED error if connect fails with 'agent does not exist' after booting", async () => {
     (signifyReady as jest.Mock).mockResolvedValueOnce(true);
     mockSignifyClient.boot.mockResolvedValueOnce({ ok: true });
     mockSignifyClient.connect.mockRejectedValueOnce(
-      new Error("Error - 404: agent does not exist for controller")
+      new Error("agent does not exist for controller")
     );
 
     await expect(agent.bootAndConnect(mockAgentUrls)).rejects.toThrowError(
@@ -630,11 +630,11 @@ describe("Recovery of DB from cloud sync", () => {
     expect(SecureStorage.set).not.toHaveBeenCalled();
   });
 
-  test("should throw KERIA_NOT_BOOTED error if agent is not booted", async () => {
+  test("should throw KERIA_NOT_BOOTED error if agent does not exist during recovery", async () => {
     (mnemonicToEntropy as jest.Mock).mockReturnValueOnce(mockEntropy);
     (mnemonicToEntropy as jest.Mock).mockReturnValueOnce(mockEntropy);
     mockSignifyClient.connect.mockRejectedValueOnce(
-      new Error("Error - 404: agent does not exist for controller")
+      new Error("agent does not exist for controller")
     );
 
     await expect(

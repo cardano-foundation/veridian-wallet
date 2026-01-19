@@ -314,12 +314,6 @@ describe("Connection service of agent", () => {
       "https://localhost/oobi/1234?name=alias",
     ];
 
-    global.fetch = jest.fn().mockResolvedValue({
-      headers: {
-        get: jest.fn().mockReturnValue("application/json+cesr"),
-      },
-    });
-
     for (const url of validUrls) {
       await connectionService.connectByOobiUrl(url, "shared-identifier");
       expect(contactStorage.save).toBeCalledWith(
@@ -337,19 +331,6 @@ describe("Connection service of agent", () => {
         })
       );
     }
-
-    const invalidDoobi = "https://localhost/oobi/1234?name=alias";
-    global.fetch = jest.fn().mockResolvedValue({
-      headers: {
-        get: jest.fn().mockReturnValue("text/html"),
-      },
-    });
-
-    await expect(
-      connectionService.connectByOobiUrl(invalidDoobi, "shared-identifier")
-    ).rejects.toThrowError(
-      new Error(ConnectionService.INVALID_DOOBI_CONNECTION_CONTENT_TYPE)
-    );
 
     validUrls = [
       "https://localhost/oobi/1234/agent?name=alias",
