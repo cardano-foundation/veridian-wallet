@@ -271,6 +271,66 @@ describe("Share Profile", () => {
     });
   });
 
+  test("Scan oobi: input group oobi in connection scan", async () => {
+    getPlatformMock.mockImplementation(() => ["ios"]);
+    addListener.mockImplementation(
+      (
+        eventName: string,
+        listenerFunc: (result: BarcodesScannedEvent) => void
+      ) => {
+        setTimeout(() => {
+          listenerFunc({
+            barcodes: [
+              {
+                displayValue:
+                  "http://keria:3902/oobi/EG4zitndqMNRbo3opV6POGv9WGSoUqGm2-uJfeXNGAKD/agent/EMc7yWeHgiaKROAeDWmt-LLDRWthtUo7oS-kLv8LY4jD?name=Leader&groupId=0AD0Su_NNIjm7EfXsUw_9bh6&groupName=Group",
+                format: BarcodeFormat.QrCode,
+                rawValue:
+                  "http://keria:3902/oobi/EG4zitndqMNRbo3opV6POGv9WGSoUqGm2-uJfeXNGAKD/agent/EMc7yWeHgiaKROAeDWmt-LLDRWthtUo7oS-kLv8LY4jD?name=Leader&groupId=0AD0Su_NNIjm7EfXsUw_9bh6&groupName=Group",
+                valueType: BarcodeValueType.Url,
+              },
+            ],
+          });
+        }, 100);
+
+        return {
+          remove: jest.fn(),
+        };
+      }
+    );
+
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ShareProfile
+          isOpen
+          setIsOpen={jest.fn()}
+        />
+      </Provider>
+    );
+
+    fireEvent(
+      getByTestId("share-profile-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("scan")).toBeVisible();
+    });
+
+    await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(
+        setToastMsg(ToastMsgType.INVALID_CONNECTION_URL)
+      );
+    });
+  });
+
   test("Scan oobi: missing alias", async () => {
     getPlatformMock.mockImplementation(() => ["ios"]);
     addListener.mockImplementation(

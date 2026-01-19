@@ -1575,9 +1575,10 @@
     "acceptsuccess": "Accepted Successfully",
     "connecturlmismatch": "There’s a URL mismatch",
     "invalidbooturlerror": "Incorrect boot url",
-    "invalidconnectionurlerror": "Invalid connection removed",
+    "invalidremovedconnectionurlerror": "Invalid connection removed",
     "networkerror": "Unable to reach the cloud",
-    "createidentifiererror": "Unable to create profile"
+    "createidentifiererror": "Unable to create profile",
+    "invalidconnectionurlerror": "Invalid connection URL"
   },
   "request": {
     "sign": {

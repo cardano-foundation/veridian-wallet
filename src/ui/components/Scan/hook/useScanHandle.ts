@@ -88,9 +88,14 @@ const useScanHandle = () => {
           throw new Error(ErrorMessage.INVALID_CONNECTION_URL);
         }
 
-        const connectionName = new URL(content).searchParams.get(
-          OobiQueryParams.NAME
-        );
+        const url = new URL(content);
+
+        if (url.searchParams.get(OobiQueryParams.GROUP_ID)) {
+          dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
+          return;
+        }
+
+        const connectionName = url.searchParams.get(OobiQueryParams.NAME);
 
         if (!connectionName) {
           setTimeout(() => {

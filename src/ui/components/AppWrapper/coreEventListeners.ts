@@ -109,7 +109,7 @@ const removeInvalidConnectionCacheHandler = async (
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
   dispatch(removeConnectionCache(event.payload.contactId));
-  dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
+  dispatch(setToastMsg(ToastMsgType.INVALID_REMOVED_CONNECTION_URL));
 };
 
 export {
