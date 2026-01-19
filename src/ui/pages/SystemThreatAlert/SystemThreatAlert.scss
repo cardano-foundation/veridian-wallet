@@ -99,6 +99,7 @@
     all: unset;
     width: 100%;
   }
+
   /* ... existing styles */
 
   .debug-info,
@@ -106,7 +107,7 @@
     width: 100%;
     margin-top: 1rem;
     text-align: left;
-    
+
     h3 {
       font-size: 1.1rem;
       font-weight: 600;
@@ -118,7 +119,7 @@
   .debug-info {
     .debug-section {
       margin-top: 0.5rem;
-      
+
       h4 {
         font-size: 0.9rem;
         font-weight: 600;
@@ -129,6 +130,7 @@
       ul {
         padding-left: 1.5rem;
         margin: 0;
+
         li {
           font-size: 0.85rem;
           color: var(--ion-color-neutral-600);
@@ -226,3 +228,4 @@
       transform: rotate(360deg);
     }
   }
+}
