@@ -345,10 +345,7 @@ const ProfileContent = ({
           {
             label: i18n.t("profiledetails.identifierdetail.showadvanced"),
             icon: appsOutline,
-            onClick: () =>
-              isMultiSig
-                ? undefined
-                : openPropDetailModal(DetailView.AdvancedDetail),
+            onClick: () => openPropDetailModal(DetailView.AdvancedDetail),
           },
         ]}
         renderItem={(item, index) => (
