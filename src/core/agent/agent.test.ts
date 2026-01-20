@@ -170,6 +170,19 @@ describe("KERIA connectivity", () => {
     expect(mockSignifyClient.connect).not.toHaveBeenCalled();
   });
 
+  test("a 503 (keria down) from the provisioning service should manifest itself as a connectivity error to KERIA", async () => {
+    (signifyReady as jest.Mock).mockResolvedValueOnce(true);
+    mockSignifyClient.boot.mockResolvedValueOnce({
+      ok: false,
+      status: 503,
+    });
+
+    await expect(agent.bootAndConnect(mockAgentUrls)).rejects.toThrowError(
+      Agent.KERIA_BOOT_FAILED_BAD_NETWORK
+    );
+    expect(mockSignifyClient.connect).not.toHaveBeenCalled();
+  });
+
   test("should throw an connection error if connect fetch failing", async () => {
     (signifyReady as jest.Mock).mockResolvedValueOnce(true);
     mockSignifyClient.boot.mockResolvedValueOnce({ ok: true });
@@ -451,6 +464,26 @@ describe("Connect URL Discovery", () => {
 
     expect(result).toBe(mockConnectUrl);
     expect(fetch).toHaveBeenCalledWith("https://boot.keria.com/connect", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+  });
+
+  test("should pretend https:// if missing", async () => {
+    const mockBootUrl = "www.google.com";
+    const mockConnectUrl = "https://keria.com:3901";
+
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: jest.fn().mockResolvedValueOnce({ connectUrl: mockConnectUrl }),
+    });
+
+    const result = await agent.discoverConnectUrl(mockBootUrl);
+
+    expect(result).toBe(mockConnectUrl);
+    expect(fetch).toHaveBeenCalledWith("https://www.google.com/connect", {
       method: "GET",
       headers: {
         Accept: "application/json",

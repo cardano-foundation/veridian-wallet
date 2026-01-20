@@ -65,16 +65,20 @@ const CreateSSIAgent = () => {
     }));
   };
 
-  const handleScanError = (error: Error) => {
+  const handleScanError = (
+    error: Error,
+    context:
+      | { recovery: false }
+      | { recovery: true; connectUrlDiscovered: boolean }
+  ) => {
     const errorMessage = error.message;
 
-    if (
-      [
-        Agent.CONNECT_URL_NOT_FOUND,
-        Agent.KERIA_BOOT_FAILED,
-        Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT,
-      ].some((message) => errorMessage.includes(message))
-    ) {
+    const invalidUrlErrors = [Agent.CONNECT_URL_DISCOVERY_FAILED];
+    if (context.recovery && !context.connectUrlDiscovered) {
+      invalidUrlErrors.push(Agent.KERIA_NOT_BOOTED);
+    }
+
+    if (invalidUrlErrors.some((message) => errorMessage.includes(message))) {
       showError(errorMessage, error, dispatch, ToastMsgType.URL_ERROR);
       return;
     }
@@ -204,10 +208,7 @@ const CreateSSIAgent = () => {
     } catch (e) {
       const message = (e as Error).message;
 
-      if (
-        message.startsWith(Agent.CONNECT_URL_DISCOVERY_FAILED) ||
-        message.startsWith(Agent.CONNECT_URL_NOT_FOUND)
-      ) {
+      if (message.startsWith(Agent.CONNECT_URL_DISCOVERY_FAILED)) {
         return bootUrl;
       }
 
@@ -258,6 +259,10 @@ const CreateSSIAgent = () => {
 
   const handleRecoveryWallet = async (bootUrl: string) => {
     setLoading(true);
+
+    let validBootUrl: string | undefined;
+    let connectUrl: string | undefined;
+
     try {
       if (!bootUrl) {
         throw new Error(SSI_URLS_EMPTY);
@@ -267,9 +272,8 @@ const CreateSSIAgent = () => {
         throw new Error(SEED_PHRASE_EMPTY);
       }
 
-      const validBootUrl = removeLastSlash(bootUrl.trim());
-
-      const connectUrl = await getConnectUrl(validBootUrl);
+      validBootUrl = removeLastSlash(bootUrl.trim());
+      connectUrl = await getConnectUrl(validBootUrl);
 
       await Agent.agent.recoverKeriaAgent(
         seedPhraseCache.seedPhrase.split(" "),
@@ -295,7 +299,9 @@ const CreateSSIAgent = () => {
       }
 
       if (currentPage === CurrentPage.Scan) {
-        handleScanError(e as Error);
+        const connectUrlDiscovered =
+          connectUrl !== undefined && validBootUrl !== connectUrl;
+        handleScanError(e as Error, { recovery: true, connectUrlDiscovered });
         return;
       }
 
@@ -400,7 +406,7 @@ const CreateSSIAgent = () => {
       ionRouter.push(nextPath.pathname, "forward", "push");
     } catch (e) {
       if (currentPage === CurrentPage.Scan) {
-        handleScanError(e as Error);
+        handleScanError(e as Error, { recovery: false });
         return;
       }
 

@@ -1558,7 +1558,7 @@
     "duplicateconnectionerror": "Connection already established",
     "groupidnotmatcherror": "Connection not part of this group",
     "unknownerror": "Something went wrong, try again",
-    "urlerror": "Incorrect URL",
+    "urlerror": "Enter a valid URL",
     "proposalcredaccepted": "Credential proposal accepted",
     "proposalcredreject": "Credential proposal rejected",
     "proposalcredfailerror": "Unable to record response",

@@ -395,7 +395,179 @@ describe("SSI agent page", () => {
       });
     });
 
-    test("Show a toast error when discovery connect URL fails", async () => {
+    test("Show an connectivity error toast error when provisioning service is down", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      bootAndConnectMock.mockImplementation(() => {
+        return Promise.reject(
+          new Error(Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK)
+        );
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+        ).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(bootAndConnectMock).toBeCalledWith(bootUrl);
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.NETWORK_ERROR)
+        );
+      });
+    });
+
+    test("Show an connectivity error toast error when provisioning service directs boot call to KERIA that is down", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      bootAndConnectMock.mockImplementation(() => {
+        return Promise.reject(new Error(Agent.KERIA_BOOT_FAILED_BAD_NETWORK));
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+        ).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(bootAndConnectMock).toBeCalledWith(bootUrl);
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.NETWORK_ERROR)
+        );
+      });
+    });
+
+    test("Show an connectivity error toast error when we discover a KERIA connect URL that is down", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      bootAndConnectMock.mockImplementation(() => {
+        return Promise.reject(
+          new Error(Agent.KERIA_CONNECT_FAILED_BAD_NETWORK)
+        );
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+        ).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(bootAndConnectMock).toBeCalledWith(bootUrl);
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.NETWORK_ERROR)
+        );
+      });
+    });
+
+    test("Show a invalid URL toast error when discovery connect URL fails", async () => {
       addListener.mockImplementation(
         (
           eventName: string,
@@ -446,12 +618,12 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
+          setToastMsg(ToastMsgType.URL_ERROR)
         );
       });
     });
 
-    test("Show a toast error when the connect url cannot be found", async () => {
+    test("Show a something went wrong toast error when the provisioning service returns the wrong response format", async () => {
       addListener.mockImplementation(
         (
           eventName: string,
@@ -502,12 +674,68 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.URL_ERROR)
+          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
         );
       });
     });
 
-    test("Show a toast error when the boot url cannot be booted", async () => {
+    test("Show a something went wrong toast error when the provisioning service returns a different KERIA instance than the boot (mismatch)", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      bootAndConnectMock.mockImplementation(() => {
+        return Promise.reject(new Error(Agent.KERIA_NOT_BOOTED));
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
+        ).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(bootAndConnectMock).toBeCalledWith(bootUrl);
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
+        );
+      });
+    });
+
+    test("Show a something went wrong toast error when there is an unknown error while booting", async () => {
       addListener.mockImplementation(
         (
           eventName: string,
@@ -558,12 +786,12 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.URL_ERROR)
+          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
         );
       });
     });
 
-    test("Show a toast error when the connect url cannot be booted", async () => {
+    test("Show a something went wrong toast error if there is an unknown error while connecting", async () => {
       addListener.mockImplementation(
         (
           eventName: string,
@@ -616,65 +844,7 @@ describe("SSI agent page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.URL_ERROR)
-        );
-      });
-    });
-
-    test("Show a toast error when an unknown error is thrown.", async () => {
-      addListener.mockImplementation(
-        (
-          eventName: string,
-          listenerFunc: (result: BarcodesScannedEvent) => void
-        ) => {
-          setTimeout(() => {
-            listenerFunc({
-              barcodes,
-            });
-          }, 100);
-
-          return {
-            remove: jest.fn(),
-          };
-        }
-      );
-
-      bootAndConnectMock.mockImplementation(() => {
-        return Promise.reject(
-          new Error(Agent.KERIA_BOOTED_ALREADY_BUT_CANNOT_CONNECT)
-        );
-      });
-
-      const history = createMemoryHistory();
-
-      const { getByText } = render(
-        <IonReactMemoryRouter history={history}>
-          <Provider store={storeMocked}>
-            <CreateSSIAgent />
-          </Provider>
-        </IonReactMemoryRouter>
-      );
-
-      fireEvent.click(
-        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
-      );
-
-      await waitFor(() => {
-        expect(
-          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.advancedsetup)
-        ).toBeVisible();
-        expect(
-          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
-        ).toBeVisible();
-      });
-
-      await waitFor(() => {
-        expect(bootAndConnectMock).toBeCalledWith(bootUrl);
-      });
-
-      await waitFor(() => {
-        expect(dispatchMock).toBeCalledWith(
-          setToastMsg(ToastMsgType.URL_ERROR)
+          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
         );
       });
     });
@@ -702,7 +872,7 @@ describe("SSI agent page", () => {
       dispatch: dispatchMock,
     };
 
-    test("SSI boot url with scanner", async () => {
+    test("Scan recovery URL using camera", async () => {
       const barcodes = [
         {
           displayValue: bootUrl,
@@ -850,7 +1020,7 @@ describe("SSI agent page", () => {
       });
     });
 
-    test("SSI boot url with manual modal", async () => {
+    test("Can recovery wallet by discovering the connect URL dynamically", async () => {
       addListener.mockImplementation(
         (
           eventName: string,
@@ -914,7 +1084,7 @@ describe("SSI agent page", () => {
       });
     });
 
-    test("recovery with input url when failed to search connect url", async () => {
+    test("Recovery URL treated as connect URL when we are unable to discover the connect url", async () => {
       addListener.mockImplementation(
         (
           eventName: string,
@@ -964,7 +1134,7 @@ describe("SSI agent page", () => {
       });
     });
 
-    test("Show a toast error when the input url isn't boot and connect url", async () => {
+    test("Show a something went wrong toast error for unknown errors while trying to discover the connect URL", async () => {
       addListener.mockImplementation(
         (
           eventName: string,
@@ -1013,7 +1183,162 @@ describe("SSI agent page", () => {
       });
     });
 
-    test("Show a toast error when a network error is thrown", async () => {
+    test("Show a something went wrong toast error if the provisioning service API returns a bad response", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      discoverConnectUrlMock.mockImplementation(() => {
+        return Promise.reject(new Error(Agent.CONNECT_URL_NOT_FOUND));
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
+        );
+      });
+    });
+
+    test("Show a something went wrong toast error if the provisioning service API returns a mismatched KERIA server", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      discoverConnectUrlMock.mockImplementation(() =>
+        Promise.resolve(connectUrl)
+      );
+
+      recoverKeriaAgentMock.mockImplementation(() => {
+        throw new Error(Agent.KERIA_NOT_BOOTED);
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.UNKNOWN_ERROR)
+        );
+      });
+    });
+
+    test("Show an invalid URL toast error if the user enters a direct connect URL, but mismatched KERIA URL compared to their old wallet", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      discoverConnectUrlMock.mockImplementation(() => {
+        return Promise.reject(new Error(Agent.CONNECT_URL_DISCOVERY_FAILED));
+      });
+
+      recoverKeriaAgentMock.mockImplementation(() => {
+        throw new Error(Agent.KERIA_NOT_BOOTED);
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.URL_ERROR)
+        );
+      });
+    });
+
+    test("Show a connectivity toast error if there is a network error when discovering the connect URL", async () => {
       addListener.mockImplementation(
         (
           eventName: string,
@@ -1035,6 +1360,112 @@ describe("SSI agent page", () => {
         return Promise.reject(
           new Error(Agent.CONNECT_URL_DISCOVERY_BAD_NETWORK)
         );
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.NETWORK_ERROR)
+        );
+      });
+    });
+
+    test("Show a connectivity toast error if we discover a connect URL that is down", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      discoverConnectUrlMock.mockImplementation(() =>
+        Promise.resolve(connectUrl)
+      );
+
+      recoverKeriaAgentMock.mockImplementation(() => {
+        throw new Error(Agent.KERIA_CONNECT_FAILED_BAD_NETWORK);
+      });
+
+      const history = createMemoryHistory();
+
+      const { getByText } = render(
+        <IonReactMemoryRouter history={history}>
+          <Provider store={storeMocked}>
+            <CreateSSIAgent />
+          </Provider>
+        </IonReactMemoryRouter>
+      );
+
+      fireEvent.click(
+        getByText(EN_TRANSLATIONS.ssiagent.connect.buttons.connected)
+      );
+
+      await waitFor(() => {
+        expect(
+          getByText(EN_TRANSLATIONS.ssiagent.scanssi.scan.button.entermanual)
+        ).toBeVisible();
+      });
+
+      await waitFor(() => {
+        expect(dispatchMock).toBeCalledWith(
+          setToastMsg(ToastMsgType.NETWORK_ERROR)
+        );
+      });
+    });
+
+    test("Show a connectivity toast error if there is a network error while connecting to KERIA during recovery", async () => {
+      addListener.mockImplementation(
+        (
+          eventName: string,
+          listenerFunc: (result: BarcodesScannedEvent) => void
+        ) => {
+          setTimeout(() => {
+            listenerFunc({
+              barcodes,
+            });
+          }, 100);
+
+          return {
+            remove: jest.fn(),
+          };
+        }
+      );
+
+      discoverConnectUrlMock.mockImplementation(() => {
+        return Promise.reject(new Error(Agent.CONNECT_URL_DISCOVERY_FAILED));
+      });
+
+      recoverKeriaAgentMock.mockImplementation(() => {
+        throw new Error(Agent.KERIA_CONNECT_FAILED_BAD_NETWORK);
       });
 
       const history = createMemoryHistory();

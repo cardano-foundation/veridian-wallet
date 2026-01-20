@@ -302,7 +302,7 @@ class Agent {
       const bootResult = await this.signifyClient.boot().catch((e) => {
         /* eslint-disable no-console */
         console.error(e);
-        if (e.message === "Failed to fetch") {
+        if (e instanceof Error && isNetworkError(e)) {
           throw new Error(Agent.KERIA_BOOT_FAILED_BAD_NETWORK, {
             cause: e,
           });
@@ -317,6 +317,11 @@ class Agent {
         console.warn(
           `Unexpected KERIA boot status returned: ${bootResult.status} ${bootResult.statusText}`
         );
+
+        if (bootResult.status === 503) {
+          throw new Error(Agent.KERIA_BOOT_FAILED_BAD_NETWORK);
+        }
+
         throw new Error(Agent.KERIA_BOOT_FAILED);
       }
 
@@ -489,7 +494,11 @@ class Agent {
    * @throws Error if the connect URL cannot be discovered
    */
   async discoverConnectUrl(bootUrl: string): Promise<string> {
-    const url = new URL(bootUrl);
+    const url = new URL(
+      bootUrl.startsWith("http://") || bootUrl.startsWith("https://")
+        ? bootUrl
+        : `https://${bootUrl}`
+    );
     const connectEndpoint = `${url.protocol}//${url.host}/connect`;
 
     let response: Response;
