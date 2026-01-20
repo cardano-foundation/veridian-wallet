@@ -22,6 +22,11 @@
   .cards-placeholder-container {
     padding-inline: 1.25rem;
     margin-top: 2.5rem;
+
+    .primary-button ion-icon {
+      height: 1.5rem;
+      width: 1.5rem;
+    }
   }
 
   .placeholder-spacer {
@@ -180,17 +185,26 @@
     }
 
     ion-chip {
-      width: 6.4rem;
-      height: 1.9rem;
-      font-weight: 400;
-      margin: 0.3rem auto;
-      border-radius: 0.5rem;
-      padding-inline: 0.62rem;
+      gap: 0.25rem;
+      min-height: 1.5rem;
+      margin: 0 0.5rem 0;
+      border-radius: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      color: var(--ion-color-primary-100);
+      background: var(--ion-color-primary-700);
+
+      ion-icon {
+        margin: 0;
+        width: 0.75rem;
+        height: 0.75rem;
+        color: var(--ion-color-primary-100);
+      }
 
       span {
         text-transform: capitalize;
-        margin-right: 4px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
+        font-style: normal;
+        font-weight: 500;
       }
     }
   }
@@ -199,6 +213,11 @@
     ion-header,
     .cards-placeholder-container {
       padding-inline: 1rem;
+
+      .primary-button ion-icon {
+        height: 1.2rem;
+        width: 1.2rem;
+      }
     }
 
     .placeholder-spacer {
@@ -225,13 +244,19 @@
       }
 
       ion-chip {
-        width: 5.12rem;
-        height: 1.52rem;
-        margin: 0.24rem auto;
-        padding: 0.496rem;
+        gap: 0.2rem;
+        min-height: 1.2rem;
+        margin: 0 0.4rem 0;
+        border-radius: 0.2rem;
+        padding: 0.16rem 0.4rem;
+
+        ion-icon {
+          width: 0.6rem;
+          height: 0.6rem;
+        }
 
         span {
-          margin-right: 3px;
+          font-size: 0.6rem;
         }
       }
     }

@@ -49,7 +49,7 @@ describe("noteValidation", () => {
 
     it("should return false for empty strings", () => {
       const result = validateNoteContent("", "");
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
 
     it("should return false for title at max length", () => {

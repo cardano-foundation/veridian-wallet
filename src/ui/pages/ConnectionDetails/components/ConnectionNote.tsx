@@ -20,11 +20,15 @@ const ConnectionNote = ({
   const [newTitle, setNewTitle] = useState(title);
   const [newMessage, setNewMessage] = useState(message);
   const { hideKeyboard } = useHideKeyboard();
+  const [touchedTitle, setTouchedTitle] = useState(false);
+  const [touchedMessage, setTouchedMessage] = useState(false);
 
   const hasError = validateNoteContent(newTitle, newMessage);
   const titleError =
+    newTitle.length < 1 ||
     newTitle.length > NOTE_VALIDATION_CONSTANTS.TITLE_MAX_LENGTH;
   const messageError =
+    newMessage.length < 1 ||
     newMessage.length > NOTE_VALIDATION_CONSTANTS.MESSAGE_MAX_LENGTH;
 
   const hasErrorRef = useRef<boolean>();
@@ -74,11 +78,15 @@ const ConnectionNote = ({
               "tabs.connections.details.notes.placeholders.title"
             )}`}
             onIonInput={(e) => setNewTitle(`${e.target.value ?? ""}`)}
-            onIonBlur={submitNoteChange}
+            onIonBlur={() => {
+              setTouchedTitle(true);
+              submitNoteChange();
+            }}
             value={newTitle}
             onKeyDown={hideKeyboard}
+            className={titleError && touchedTitle ? "error" : undefined}
           />
-          {titleError && (
+          {titleError && touchedTitle && (
             <ErrorMessage
               message={`${i18n.t(
                 "tabs.connections.details.notes.errors.title"
@@ -100,10 +108,14 @@ const ConnectionNote = ({
               "tabs.connections.details.notes.placeholders.message"
             )}`}
             onIonInput={(e) => setNewMessage(`${e.target.value ?? ""}`)}
-            onIonBlur={submitNoteChange}
+            onIonBlur={() => {
+              setTouchedMessage(true);
+              submitNoteChange();
+            }}
             value={newMessage}
+            className={messageError && touchedMessage ? "error" : undefined}
           />
-          {messageError && (
+          {messageError && touchedMessage && (
             <ErrorMessage
               message={`${i18n.t(
                 "tabs.connections.details.notes.errors.message"

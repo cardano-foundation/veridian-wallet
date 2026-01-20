@@ -6,7 +6,9 @@ const NOTE_VALIDATION_CONSTANTS = {
 const validateNoteContent = (title: string, message: string): boolean => {
   return (
     title.length > NOTE_VALIDATION_CONSTANTS.TITLE_MAX_LENGTH ||
-    message.length > NOTE_VALIDATION_CONSTANTS.MESSAGE_MAX_LENGTH
+    title.length < 1 ||
+    message.length > NOTE_VALIDATION_CONSTANTS.MESSAGE_MAX_LENGTH ||
+    message.length < 1
   );
 };
 

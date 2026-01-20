@@ -700,7 +700,7 @@ describe("Edit Connection Modal", () => {
       dispatch: dispatchMock,
     };
 
-    const { getByTestId, getByText } = render(
+    const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <EditConnectionsContainer
           onConfirm={jest.fn()}
@@ -719,6 +719,8 @@ describe("Edit Connection Modal", () => {
         />
       </Provider>
     );
+
+    fireEvent.blur(getByTestId("edit-connections-modal-note-title-1"));
 
     await waitFor(() => {
       expect(
