@@ -482,8 +482,10 @@ class IdentifierService extends AgentService {
     );
 
     if (metadata.groupMemberPre) {
+      await this.cleanupPendingOperationsForIdentifier(identifier, "group");
       await this.clearQueuedGroup(this.calcKeriaHabName(metadata));
     } else {
+      await this.cleanupPendingOperationsForIdentifier(identifier, "witness");
       await this.clearQueuedIdentifier(this.calcKeriaHabName(metadata));
     }
 
@@ -637,6 +639,27 @@ class IdentifierService extends AgentService {
       PeerConnection.peerConnection.disconnectDApp(connectedDApp, true);
     }
     await this.identifierStorage.deleteIdentifierMetadata(identifier);
+  }
+
+  private async cleanupPendingOperationsForIdentifier(identifierId: string, operationType: string): Promise<void> {
+    const operationId = `${operationType}.${identifierId}`;
+
+    try {
+      await this.operationPendingStorage.deleteById(operationId);
+
+      this.props.eventEmitter.emit({
+        type: EventTypes.OperationRemoved,
+        payload: {
+          operationId,
+        },
+      });
+    } catch (error) {
+      console.error(
+        `Failed to delete pending operation ${operationId}`,
+        error
+      );
+    }
+
   }
 
   @OnlineOnly
