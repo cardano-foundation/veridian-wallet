@@ -495,7 +495,9 @@ class Agent {
    */
   async discoverConnectUrl(bootUrl: string): Promise<string> {
     const url = new URL(
-      bootUrl.startsWith("http") ? bootUrl : `https://${bootUrl}`
+      bootUrl.startsWith("http://") || bootUrl.startsWith("https://")
+        ? bootUrl
+        : `https://${bootUrl}`
     );
     const connectEndpoint = `${url.protocol}//${url.host}/connect`;
 
