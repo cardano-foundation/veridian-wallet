@@ -260,8 +260,8 @@ const CreateSSIAgent = () => {
   const handleRecoveryWallet = async (bootUrl: string) => {
     setLoading(true);
 
-    let validBootUrl;
-    let connectUrl;
+    let validBootUrl: string | undefined;
+    let connectUrl: string | undefined;
 
     try {
       if (!bootUrl) {
@@ -299,7 +299,8 @@ const CreateSSIAgent = () => {
       }
 
       if (currentPage === CurrentPage.Scan) {
-        const connectUrlDiscovered = validBootUrl !== connectUrl;
+        const connectUrlDiscovered =
+          connectUrl !== undefined && validBootUrl !== connectUrl;
         handleScanError(e as Error, { recovery: true, connectUrlDiscovered });
         return;
       }
