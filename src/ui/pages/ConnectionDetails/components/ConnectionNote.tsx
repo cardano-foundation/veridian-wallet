@@ -23,8 +23,10 @@ const ConnectionNote = ({
 
   const hasError = validateNoteContent(newTitle, newMessage);
   const titleError =
+    newTitle.length < 1 ||
     newTitle.length > NOTE_VALIDATION_CONSTANTS.TITLE_MAX_LENGTH;
   const messageError =
+    newMessage.length < 1 ||
     newMessage.length > NOTE_VALIDATION_CONSTANTS.MESSAGE_MAX_LENGTH;
 
   const hasErrorRef = useRef<boolean>();
@@ -77,6 +79,7 @@ const ConnectionNote = ({
             onIonBlur={submitNoteChange}
             value={newTitle}
             onKeyDown={hideKeyboard}
+            className={titleError ? "error" : undefined}
           />
           {titleError && (
             <ErrorMessage
@@ -102,6 +105,7 @@ const ConnectionNote = ({
             onIonInput={(e) => setNewMessage(`${e.target.value ?? ""}`)}
             onIonBlur={submitNoteChange}
             value={newMessage}
+            className={messageError ? "error" : undefined}
           />
           {messageError && (
             <ErrorMessage

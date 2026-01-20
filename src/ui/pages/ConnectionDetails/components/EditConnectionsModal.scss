@@ -127,9 +127,18 @@
         }
       }
 
+      &.error {
+        border-width: 2px;
+        border-color: var(--ion-color-danger);
+      }
+
       &.has-focus {
         border-width: 2px;
         border-color: var(--ion-color-primary-700);
+
+        &.error {
+          border-color: var(--ion-color-danger);
+        }
       }
     }
 
