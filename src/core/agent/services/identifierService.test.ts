@@ -34,6 +34,7 @@ const exchangeGetMock = jest.fn();
 const interactMock = jest.fn();
 const sendFromEventsMock = jest.fn();
 const createExchangeMessageMock = jest.fn();
+const deleteByIdMock = jest.fn();
 
 const mockSigner = {
   _code: "A",
@@ -108,6 +109,7 @@ const identifierStorage = jest.mocked({
 const operationPendingStorage = jest.mocked({
   save: saveOperationPendingMock,
   findById: findOperationMock,
+  deleteById: deleteByIdMock,
 });
 
 const eventEmitter = new CoreEventEmitter();
@@ -1247,6 +1249,26 @@ describe("Single sig service of agent", () => {
     expect(eventEmitter.emit).toBeCalledWith({
       type: EventTypes.NotificationRemoved,
       payload: { id: findNotificationsResult[1].id },
+    });
+  });
+
+  test("should clean up pending operation and emit OperationRemoved event", async () => {
+    // arrange
+    const identifierId = "test-identifier";
+    const operationType = "witness";
+    const operationId = `${operationType}.${identifierId}`;
+
+    await (identifierService as any).cleanupPendingOperationsForIdentifier(
+      identifierId,
+      operationType
+    );
+
+    expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
+    expect(eventEmitter.emit).toBeCalledWith({
+      type: EventTypes.OperationRemoved,
+      payload: {
+        operationId,
+      },
     });
   });
 

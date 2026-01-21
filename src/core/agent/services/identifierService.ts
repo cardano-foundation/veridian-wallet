@@ -654,10 +654,16 @@ class IdentifierService extends AgentService {
         },
       });
     } catch (error) {
-      console.error(
-        `Failed to delete pending operation ${operationId}`,
-        error
-      );
+      if (
+        !(
+          error instanceof Error &&
+          error.message.startsWith(
+            StorageMessage.RECORD_DOES_NOT_EXIST_ERROR_MSG
+          )
+        )
+      ) {
+        throw error;
+      }
     }
 
   }
