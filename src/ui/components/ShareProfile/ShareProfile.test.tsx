@@ -454,7 +454,7 @@ describe("Share Profile", () => {
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
-        setToastMsg(ToastMsgType.SCANNER_ERROR)
+        setToastMsg(ToastMsgType.INVALID_CONNECTION_URL)
       );
     });
   });

@@ -40,7 +40,7 @@ enum ToastMsgType {
   SETUP_BIOMETRIC_AUTHENTICATION_SUCCESS = "setupbiometricsuccess",
   ROTATE_KEY_SUCCESS = "rotatekeysuccess",
   ROTATE_KEY_ERROR = "rotatekeyerror",
-  SCANNER_ERROR = "qrerror",
+  SCAN_SELF_CONNECTION = "scanselfconnectionerror",
   CONNECTION_ERROR = "connectionerror",
   NEW_MULTI_SIGN_MEMBER = "newmultisignmember",
   PASSCODE_UPDATED = "passcodeupdated",

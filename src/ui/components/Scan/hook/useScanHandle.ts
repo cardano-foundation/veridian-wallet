@@ -7,16 +7,17 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import {
   getConnectionsCache,
   getCurrentProfile,
+  getProfiles,
   setMissingAliasConnection,
   setOpenConnectionId,
 } from "../../../../store/reducers/profileCache";
+import { setToastMsg } from "../../../../store/reducers/stateCache";
 import { ToastMsgType } from "../../../globals/types";
 import { showError } from "../../../utils/error";
 import {
   isValidConnectionUrl,
   isValidHttpUrl,
 } from "../../../utils/urlChecker";
-import { setToastMsg } from "../../../../store/reducers/stateCache";
 
 enum ErrorMessage {
   INVALID_CONNECTION_URL = "Invalid connection url",
@@ -26,6 +27,7 @@ enum ErrorMessage {
 const useScanHandle = () => {
   const dispatch = useAppDispatch();
   const defaultIdentifier = useAppSelector(getCurrentProfile)?.identity.id;
+  const profiles = useAppSelector(getProfiles);
   const connections = useAppSelector(getConnectionsCache);
 
   const handleDuplicateConnectionError = useCallback(
@@ -42,12 +44,29 @@ const useScanHandle = () => {
         urlId = new URL(url).searchParams.get(OobiQueryParams.GROUP_ID);
       } else {
         urlId = e.message
-          .replace(`${StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG}: `, "")
+          .replace(`${StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG} `, "")
           .trim();
       }
 
       if (!urlId) {
-        showError("Scanner Error:", e, dispatch, ToastMsgType.SCANNER_ERROR);
+        showError(
+          "Scanner Error:",
+          e,
+          dispatch,
+          ToastMsgType.INVALID_CONNECTION_URL
+        );
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await reloadScan?.();
+        return;
+      }
+
+      if (profiles[urlId]) {
+        showError(
+          "Scanner Error:",
+          e,
+          dispatch,
+          ToastMsgType.SCAN_SELF_CONNECTION
+        );
         await new Promise((resolve) => setTimeout(resolve, 500));
         await reloadScan?.();
         return;
@@ -69,7 +88,7 @@ const useScanHandle = () => {
 
       await new Promise((resolve) => setTimeout(resolve, 500));
     },
-    [dispatch]
+    [dispatch, profiles]
   );
 
   const resolveIndividualConnection = useCallback(
@@ -80,19 +99,15 @@ const useScanHandle = () => {
       handleDuplicate?: (id: string) => void
     ) => {
       try {
+        const url = new URL(content);
+
         if (
           !isValidConnectionUrl(content) ||
           (!new URL(content).pathname.match(OOBI_RE) &&
-            !new URL(content).pathname.match(WOOBI_RE))
+            !new URL(content).pathname.match(WOOBI_RE)) ||
+          url.searchParams.get(OobiQueryParams.GROUP_ID)
         ) {
           throw new Error(ErrorMessage.INVALID_CONNECTION_URL);
-        }
-
-        const url = new URL(content);
-
-        if (url.searchParams.get(OobiQueryParams.GROUP_ID)) {
-          dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
-          return;
         }
 
         const connectionName = url.searchParams.get(OobiQueryParams.NAME);
@@ -150,7 +165,12 @@ const useScanHandle = () => {
         const errorMessage = (e as Error).message;
 
         if (errorMessage.includes(ErrorMessage.INVALID_CONNECTION_URL)) {
-          showError("Scanner Error:", e, dispatch, ToastMsgType.SCANNER_ERROR);
+          showError(
+            "Scanner Error:",
+            e,
+            dispatch,
+            ToastMsgType.INVALID_CONNECTION_URL
+          );
           await new Promise((resolve) => setTimeout(resolve, 500));
           await reloadScan?.();
           return;
