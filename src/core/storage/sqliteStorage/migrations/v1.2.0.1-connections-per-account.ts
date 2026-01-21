@@ -4,10 +4,16 @@ import {
   createInsertItemStatement,
 } from "./migrationUtils";
 
-type IdentifierMetadataRecordProps = {
+enum CreationStatus_V1_1_0 {
+  PENDING = "PENDING",
+  COMPLETE = "COMPLETE",
+  FAILED = "FAILED",
+}
+
+type IdentifierMetadataRecordProps_V1_1_0 = {
   id: string;
   displayName?: string;
-  creationStatus?: string;
+  creationStatus?: CreationStatus_V1_1_0;
   createdAt?: string;
   isDeleted?: boolean;
   theme?: number;
@@ -37,11 +43,11 @@ export const DATA_V1201: TsMigration = {
     let identifiers = identifierResult.values;
     identifiers = identifiers
       ?.map(
-        (row: { value: string }): IdentifierMetadataRecordProps =>
-          JSON.parse(row.value) as IdentifierMetadataRecordProps
+        (row: { value: string }): IdentifierMetadataRecordProps_V1_1_0 =>
+          JSON.parse(row.value) as IdentifierMetadataRecordProps_V1_1_0
       )
       .filter(
-        (identifier: IdentifierMetadataRecordProps) =>
+        (identifier: IdentifierMetadataRecordProps_V1_1_0) =>
           !identifier.isDeleted && !identifier.pendingDeletion
       );
 
