@@ -57,7 +57,7 @@ import { IdentifierType } from "./identifier.types";
 import {
   ConnectionHistoryItem,
   ConnectionHistoryType,
-  KeriaContactKeyPrefix,
+  KeriaContactKeyElement,
 } from "./connectionService.types";
 import { Agent } from "../agent";
 import { StorageMessage } from "../../storage/storage.types";
@@ -572,7 +572,7 @@ class IpexCommunicationService extends AgentService {
         if (!exnHasAcdc(message.exn.e)) {
           throw new Error("CREDENTIAL_REVOKED message must have e.acdc");
         }
-        prefix = KeriaContactKeyPrefix.HISTORY_REVOKE;
+        prefix = KeriaContactKeyElement.HISTORY_REVOKE;
         // TypeScript now knows message.exn.e.acdc exists
         key = message.exn.e.acdc.d;
         break;
@@ -580,7 +580,7 @@ class IpexCommunicationService extends AgentService {
       case ConnectionHistoryType.CREDENTIAL_REQUEST_PRESENT:
       case ConnectionHistoryType.CREDENTIAL_PRESENTED:
       case ConnectionHistoryType.IPEX_AGREE_COMPLETE:
-        prefix = KeriaContactKeyPrefix.HISTORY_IPEX;
+        prefix = KeriaContactKeyElement.HISTORY_IPEX;
         key = message.exn.d;
         break;
       default:

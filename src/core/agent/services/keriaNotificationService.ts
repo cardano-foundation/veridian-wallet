@@ -48,7 +48,11 @@ import {
   randomSalt,
 } from "./utils";
 import { CredentialService } from "./credentialService";
-import { ConnectionHistoryType, ExnMessage } from "./connectionService.types";
+import {
+  ConnectionHistoryType,
+  ExnMessage,
+  KeriaContactKeyElement,
+} from "./connectionService.types";
 import { NotificationAttempts } from "../records/notificationRecord.types";
 import { StorageMessage } from "../../storage/storage.types";
 import { IdentifierService } from "./identifierService";
@@ -1294,6 +1298,7 @@ class KeriaNotificationService extends AgentService {
             }
 
             const pairCreatedAt = new Date();
+            const connectionAlias = connectionPairRecord.alias;
 
             await this.props.signifyClient
               .contacts()
@@ -1302,6 +1307,8 @@ class KeriaNotificationService extends AgentService {
                 alias: contact.alias,
                 oobi: contact.oobi,
                 [`${connectionPairRecord.identifier}:createdAt`]: pairCreatedAt,
+                [`${connectionPairRecord.identifier}:${KeriaContactKeyElement.CONNECTION_ALIAS}`]:
+                  connectionAlias,
               });
 
             connectionPairRecord.createdAt = pairCreatedAt;

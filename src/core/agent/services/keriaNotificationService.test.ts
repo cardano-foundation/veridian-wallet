@@ -3227,12 +3227,14 @@ describe("Long running operation tracker", () => {
         creationStatus: CreationStatus.PENDING,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA",
         pendingDeletion: false,
+        alias: "CF Credential Issuance",
       },
       {
         contactId: "idB",
         creationStatus: CreationStatus.PENDING,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
         pendingDeletion: false,
+        alias: "CF Credential Issuance",
       },
     ]);
     contactStorage.findExpectedById.mockResolvedValue({
@@ -3315,6 +3317,8 @@ describe("Long running operation tracker", () => {
       alias: "CF Credential Issuance",
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:createdAt":
         firstUpdateCall.createdAt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA:alias":
+        "CF Credential Issuance",
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledWith("id", {
@@ -3322,6 +3326,8 @@ describe("Long running operation tracker", () => {
       alias: "CF Credential Issuance",
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
         secondUpdateCall.createdAt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:alias":
+        "CF Credential Issuance",
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(2);
@@ -3373,12 +3379,14 @@ describe("Long running operation tracker", () => {
         creationStatus: CreationStatus.COMPLETE,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pA",
         pendingDeletion: false,
+        alias: "CF Credential Issuance",
       },
       {
         contactId: "idB",
         creationStatus: CreationStatus.PENDING,
         identifier: "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB",
         pendingDeletion: false,
+        alias: "CF Credential Issuance",
       },
     ]);
     const operationRecord = {
@@ -3438,6 +3446,8 @@ describe("Long running operation tracker", () => {
       alias: "CF Credential Issuance",
       "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:createdAt":
         updateCall.createdAt,
+      "EGrdtLIlSIQHF1gHhE7UVfs9yRF-EDhqtLT41pJlj_pB:alias":
+        "CF Credential Issuance",
       oobi: "http://oobi.com/",
     });
     expect(contactsUpdateMock).toBeCalledTimes(1);
