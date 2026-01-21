@@ -416,7 +416,22 @@ const CreateSSIAgent = () => {
     }
   };
 
+  const clearError = () => {
+    setError({
+      hasMismatchError: false,
+      unknownError: false,
+      isInvalidBootUrl: false,
+      isInvalidConnectUrl: false,
+      failedDiscoveryConnectUrl: false,
+      connectURlNotFound: false,
+      bootNetworkIssue: false,
+      connectNetworkIssue: false,
+    });
+  };
+
   const handleSSI = async (mainUrl?: string, connectUrl?: string) => {
+    clearError();
+
     if (stateCache.authentication.recoveryWalletProgress) {
       if (currentPage == CurrentPage.Scan && mainUrl) {
         return await handleRecoveryWallet(mainUrl);
