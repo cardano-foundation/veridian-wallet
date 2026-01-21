@@ -1,9 +1,29 @@
-import { IdentifierMetadataRecordProps } from "../../../agent/records/identifierMetadataRecord";
 import { MigrationType, TsMigration } from "./migrations.types";
 import {
   createInsertItemTagsStatements,
   createInsertItemStatement,
 } from "./migrationUtils";
+
+type IdentifierMetadataRecordProps = {
+  id: string;
+  displayName?: string;
+  creationStatus?: string;
+  createdAt?: string;
+  isDeleted?: boolean;
+  theme?: number;
+  groupMemberPre?: string;
+  groupMetadata?: {
+    groupId: string;
+    groupInitiator: boolean;
+    groupCreated: boolean;
+    proposedUsername: string;
+  };
+  groupUsername?: string;
+  pendingDeletion?: boolean;
+  pendingUpdate?: boolean;
+  sxlt?: string;
+  tags?: Record<string, unknown>;
+};
 
 export const DATA_V1201: TsMigration = {
   type: MigrationType.TS,
