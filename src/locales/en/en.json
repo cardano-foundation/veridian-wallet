@@ -1644,6 +1644,9 @@
     "confirmyes": "Yes",
     "biometricunavailable": "Biometrics is unavailable at this time. You can set this up later via the settings page.",
     "biometricunavailableconfirm": "Ok",
+    "lockoutheader": "Biometrics are temporarily disabled. Please try again in {{seconds}} seconds.",
+    "lockoutconfirm": "Got it",
+    "permanentlockoutheader": "For your security, biometrics are turned off. Lock and unlock your device to turn them back on.",
     "errors": {
       "notAvailable": "Biometry is not available on this device.",
       "strongBiometricsRequired": "Only strong biometrics (FaceID, Fingerprint) are allowed.",

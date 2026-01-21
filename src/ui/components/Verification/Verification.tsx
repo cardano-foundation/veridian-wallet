@@ -19,8 +19,6 @@ const Verification = ({
   setVerifyIsOpen,
   onVerify,
 }: VerifyProps) => {
-  const [openModalAfterBiometricFail, setOpenModalAfterBiometricFail] =
-    useState(false);
   const [showMaxAttemptsAlert, setShowMaxAttemptsAlert] = useState(false);
   const [showPermanentLockoutAlert, setShowPermanentLockoutAlert] =
     useState(false);
@@ -28,12 +26,13 @@ const Verification = ({
   const stateCache = useSelector(getStateCache);
   const biometrics = useSelector(getBiometricsCache);
   const authentication = stateCache.authentication;
-  const { handleBiometricAuth, remainingLockoutSeconds, lockoutEndTime } =
-    useBiometricAuth();
+  const {
+    handleBiometricAuth,
+    remainingLockoutSeconds,
+    lockoutEndTime,
+    isInBiometricProcess,
+  } = useBiometricAuth();
   const { disablePrivacy, enablePrivacy } = usePrivacyScreen();
-
-  const canOpenModal =
-    verifyIsOpen && (!biometrics.enabled || openModalAfterBiometricFail);
 
   useEffect(() => {
     if (!lockoutEndTime && showMaxAttemptsAlert) {
@@ -42,6 +41,8 @@ const Verification = ({
   }, [lockoutEndTime, showMaxAttemptsAlert]);
 
   const handleBiometrics = async () => {
+    if (isInBiometricProcess) return;
+
     try {
       await disablePrivacy();
       const authenResult = await handleBiometricAuth();
@@ -51,9 +52,6 @@ const Verification = ({
           onVerify();
           setVerifyIsOpen(false);
           break;
-        case BiometricAuthOutcome.USER_CANCELLED:
-          setVerifyIsOpen(false, true);
-          break;
         case BiometricAuthOutcome.TEMPORARY_LOCKOUT:
           setShowMaxAttemptsAlert(true);
           break;
@@ -62,8 +60,8 @@ const Verification = ({
           break;
         case BiometricAuthOutcome.NOT_AVAILABLE:
         case BiometricAuthOutcome.GENERIC_ERROR:
+        case BiometricAuthOutcome.USER_CANCELLED:
         default:
-          setOpenModalAfterBiometricFail(true);
           break;
       }
     } catch (e) {
@@ -74,27 +72,21 @@ const Verification = ({
   };
 
   useEffect(() => {
-    if (biometrics.enabled && !openModalAfterBiometricFail && verifyIsOpen) {
+    if (biometrics.enabled && verifyIsOpen) {
       handleBiometrics();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [biometrics.enabled, openModalAfterBiometricFail, verifyIsOpen]);
-
-  useEffect(() => {
-    if (!verifyIsOpen) {
-      setOpenModalAfterBiometricFail(false);
-    }
-  }, [verifyIsOpen]);
+  }, [biometrics.enabled, verifyIsOpen]);
 
   return (
     <>
       <VerifyPassword
-        isOpen={canOpenModal && authentication.passwordIsSet}
+        isOpen={verifyIsOpen && authentication.passwordIsSet}
         setIsOpen={setVerifyIsOpen}
         onVerify={onVerify}
       />
       <VerifyPasscode
-        isOpen={canOpenModal && !authentication.passwordIsSet}
+        isOpen={verifyIsOpen && !authentication.passwordIsSet}
         setIsOpen={setVerifyIsOpen}
         onVerify={onVerify}
       />

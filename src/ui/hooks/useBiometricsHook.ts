@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import {
   AvailableResult,
   BiometricAuthError,
@@ -5,12 +6,15 @@ import {
   NativeBiometric,
   SetCredentialOptions,
 } from "@capgo/capacitor-native-biometric";
-import { Capacitor } from "@capacitor/core";
 import { useCallback, useEffect, useState } from "react";
 import { i18n } from "../../i18n";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  getAuthentication,
+  getIsInBiometricProcess,
+  setIsInBiometricProcess,
+} from "../../store/reducers/stateCache";
 import { useActivityTimer } from "../components/AppWrapper/hooks/useActivityTimer";
-import { getAuthentication } from "../../store/reducers/stateCache";
-import { useAppSelector } from "../../store/hooks";
 
 class BiometryError extends Error {
   public code: BiometricAuthError;
@@ -73,6 +77,8 @@ const useBiometricAuth = (isLockPage = false) => {
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(0);
   const { passwordIsSet } = useAppSelector(getAuthentication);
   const { setPauseTimestamp } = useActivityTimer();
+  const isInBiometricProcess = useAppSelector(getIsInBiometricProcess);
+  const dispatch = useAppDispatch();
 
   const checkBiometrics = async () => {
     if (!Capacitor.isNativePlatform()) {
@@ -141,7 +147,7 @@ const useBiometricAuth = (isLockPage = false) => {
 
     try {
       const platform = Capacitor.getPlatform();
-
+      dispatch(setIsInBiometricProcess(true));
       if (platform === "android") {
         await NativeBiometric.verifyIdentity({
           reason: i18n.t("biometry.reason") as string,
@@ -219,6 +225,8 @@ const useBiometricAuth = (isLockPage = false) => {
         }
       }
       return outcome;
+    } finally {
+      dispatch(setIsInBiometricProcess(false));
     }
   };
 
@@ -282,12 +290,13 @@ const useBiometricAuth = (isLockPage = false) => {
     checkBiometrics: memoizedCheckBiometrics,
     remainingLockoutSeconds,
     lockoutEndTime,
+    isInBiometricProcess: isInBiometricProcess,
   };
 };
 
 export {
-  useBiometricAuth,
-  BiometryError,
-  BiometricAuthOutcome,
   BIOMETRIC_SERVER_KEY,
+  BiometricAuthOutcome,
+  BiometryError,
+  useBiometricAuth,
 };

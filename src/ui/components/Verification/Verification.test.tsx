@@ -80,12 +80,11 @@ describe("Verification", () => {
 
     render(
       <Provider store={storeMocked}>
-        {" "}
         <Verification
           verifyIsOpen
           setVerifyIsOpen={setVerifyOpen}
           onVerify={verify}
-        />{" "}
+        />
       </Provider>
     );
 
@@ -105,12 +104,11 @@ describe("Verification", () => {
 
     const { getByText } = render(
       <Provider store={storeMocked}>
-        {" "}
         <Verification
           verifyIsOpen
           setVerifyIsOpen={setVerifyOpen}
           onVerify={verify}
-        />{" "}
+        />
       </Provider>
     );
 
@@ -142,12 +140,11 @@ describe("Verification", () => {
 
     const { getByText } = render(
       <Provider store={customStoreMocked}>
-        {" "}
         <Verification
           verifyIsOpen
           setVerifyIsOpen={setVerifyOpen}
           onVerify={verify}
-        />{" "}
+        />
       </Provider>
     );
 
@@ -156,26 +153,25 @@ describe("Verification", () => {
     });
   });
 
-  test("Cancel auth when user cancel", async () => {
+  test("Show PIN screen when user cancel biometric auth", async () => {
     handleBiometricAuthMock.mockResolvedValue(
       BiometricAuthOutcome.USER_CANCELLED
     );
     const setVerifyOpen = jest.fn();
     const verify = jest.fn();
 
-    render(
+    const { getByText } = render(
       <Provider store={storeMocked}>
-        {" "}
         <Verification
           verifyIsOpen
           setVerifyIsOpen={setVerifyOpen}
           onVerify={verify}
-        />{" "}
+        />
       </Provider>
     );
 
     await waitFor(() => {
-      expect(setVerifyOpen).toBeCalledWith(false, true);
+      expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
     });
   });
 });

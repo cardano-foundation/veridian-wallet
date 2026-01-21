@@ -209,6 +209,9 @@ const stateCacheSlice = createSlice({
     setShowSeedPhraseScreen: (state, action: PayloadAction<boolean>) => {
       state.isShowSeedPhraseScreen = action.payload;
     },
+    setIsInBiometricProcess: (state, action: PayloadAction<boolean>) => {
+      state.isInBiometricProcess = action.payload;
+    },
   },
 });
 
@@ -243,6 +246,7 @@ const {
   setSsiAgentIsSet,
   setSyncingData,
   setShowSeedPhraseScreen,
+  setIsInBiometricProcess,
 } = stateCacheSlice.actions;
 
 const getStateCache = (state: RootState) => state.stateCache;
@@ -278,6 +282,8 @@ const getShowVerifySeedPhraseAlert = (state: RootState) =>
 const getIsSyncingData = (state: RootState) => state.stateCache.isSyncingData;
 const getIsShowSeedPhrase = (state: RootState) =>
   state.stateCache.isShowSeedPhraseScreen;
+const getIsInBiometricProcess = (state: RootState) =>
+  state.stateCache.isInBiometricProcess;
 
 export type {
   AuthenticationCacheProps,
@@ -339,4 +345,6 @@ export {
   stateCacheSlice,
   getIsShowSeedPhrase,
   setShowSeedPhraseScreen,
+  getIsInBiometricProcess,
+  setIsInBiometricProcess,
 };

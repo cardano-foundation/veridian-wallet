@@ -27,6 +27,7 @@ import {
   getInitializationPhase,
   getShowVerifySeedPhraseAlert,
   getIsSyncingData,
+  getIsInBiometricProcess,
 } from "../store/reducers/stateCache";
 import {
   GlobalLoadingType,
@@ -74,6 +75,12 @@ const SetGroupNameWrapper = () => {
     return;
 
   return <SetGroupUserName identifier={currentProfile.identity} />;
+};
+
+const BiometricOverlay = () => {
+  const isInBiometricProcess = useAppSelector(getIsInBiometricProcess);
+
+  return isInBiometricProcess && <div className="biometric-overlay"></div>;
 };
 
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
@@ -316,6 +323,7 @@ const App = () => {
   return (
     <IonApp>
       <AppContent isFreeRASPInitialized={isFreeRASPInitialized} />
+      <BiometricOverlay />
     </IonApp>
   );
 };
