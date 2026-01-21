@@ -1556,6 +1556,7 @@
     "editidentifiererror": "Unable to update profile",
     "failedupdateconnectionerror": "Failed to update connection",
     "duplicateconnectionerror": "Connection already established",
+    "scanselfconnectionerror": "You can't add yourself as a connection",
     "groupidnotmatcherror": "Connection not part of this group",
     "unknownerror": "Something went wrong, try again",
     "urlerror": "Incorrect URL",
