@@ -7,9 +7,9 @@ import {
   setSeedPhraseVerified,
   showVerifySeedPhraseAlert,
 } from "../../../store/reducers/stateCache";
-import FilledIcon from "../../assets/images/filled.png";
-import MissingMobileImage from "../../assets/images/mobile_question.png";
-import PasswordImage from "../../assets/images/password_icon.png";
+import CircleArrows from "../../assets/images/circle-arrows.svg";
+import MissingMobileImage from "../../assets/images/mobile-question.svg";
+import PasswordImage from "../../assets/images/password-icon.svg";
 
 import "./VerifySeedPhraseAlert.scss";
 import { VerifySeedPhraseModal } from "../VerifySeedPhrase/VerifySeedPhraseModal";
@@ -35,7 +35,7 @@ export const VerifySeedPhraseAlert = () => {
         <div className="content">
           <img
             className="title-image"
-            src={FilledIcon}
+            src={CircleArrows}
           />
           <h2 className="title">{i18n.t("verifyseedphrasealert.title")}</h2>
           <p className="text">{i18n.t("verifyseedphrasealert.text")}</p>
