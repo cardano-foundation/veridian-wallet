@@ -10,26 +10,24 @@ enum CreationStatus_V1_1_0 {
   FAILED = "FAILED",
 }
 
-type IdentifierMetadataRecordProps_V1_1_0 = {
+interface GroupMetadata_V1_1_0 {
+  groupId: string;
+  groupInitiator: boolean;
+  groupCreated: boolean;
+}
+
+interface IdentifierMetadataRecordProps_V1_1_0 {
   id: string;
-  displayName?: string;
+  displayName: string;
   creationStatus?: CreationStatus_V1_1_0;
-  createdAt?: string;
+  createdAt?: Date;
   isDeleted?: boolean;
-  theme?: number;
+  theme: number;
   groupMemberPre?: string;
-  groupMetadata?: {
-    groupId: string;
-    groupInitiator: boolean;
-    groupCreated: boolean;
-    proposedUsername: string;
-  };
-  groupUsername?: string;
+  groupMetadata?: GroupMetadata_V1_1_0;
   pendingDeletion?: boolean;
-  pendingUpdate?: boolean;
   sxlt?: string;
-  tags?: Record<string, unknown>;
-};
+}
 
 export const DATA_V1201: TsMigration = {
   type: MigrationType.TS,
