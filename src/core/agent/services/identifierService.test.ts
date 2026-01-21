@@ -1253,7 +1253,6 @@ describe("Single sig service of agent", () => {
   });
 
   test("should clean up pending operation and emit OperationRemoved event", async () => {
-    // arrange
     const identifierId = "test-identifier";
     const operationType = "witness";
     const operationId = `${operationType}.${identifierId}`;
@@ -1270,6 +1269,44 @@ describe("Single sig service of agent", () => {
         operationId,
       },
     });
+  });
+
+  test("should silently ignore when pending operation does not exist", async () => {
+    const identifierId = "test-identifier";
+    const operationType = "witness";
+    const operationId = `${operationType}.${identifierId}`;
+
+    const notFoundError = new Error(
+      `${StorageMessage.RECORD_DOES_NOT_EXIST_ERROR_MSG}: ${operationId}`
+    );
+    operationPendingStorage.deleteById.mockRejectedValueOnce(notFoundError);
+
+    await expect(
+      (identifierService as any).cleanupPendingOperationsForIdentifier(
+        identifierId,
+        operationType
+      )
+    ).resolves.toBeUndefined();
+    expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
+    expect(eventEmitter.emit).not.toBeCalled();
+  });
+
+  test("should rethrow unknown errors when cleanup fails", async () => {
+    const identifierId = "test-identifier";
+    const operationType = "witness";
+    const operationId = `${operationType}.${identifierId}`;
+
+    const unknownError = new Error("database connection lost");
+    operationPendingStorage.deleteById.mockRejectedValueOnce(unknownError);
+
+    await expect(
+      (identifierService as any).cleanupPendingOperationsForIdentifier(
+        identifierId,
+        operationType
+      )
+    ).rejects.toThrow(unknownError);
+    expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
+    expect(eventEmitter.emit).not.toBeCalled();
   });
 
   test("can update an identifier", async () => {
