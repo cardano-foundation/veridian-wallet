@@ -32,8 +32,13 @@ const CloudError = ({
       customClass="cloud-error"
     >
       <InfoCard
-        danger={type === "error"}
         content={getMessage(pageId)}
+        {...(pageId !== "connection-details"
+          ? {
+              danger: type === "error",
+              warning: type === "warning",
+            }
+          : {})}
       />
       {children}
     </ResponsivePageLayout>

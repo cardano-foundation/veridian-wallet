@@ -262,3 +262,10 @@
     }
   }
 }
+
+// Patch to hide tabs bar when connection details are open
+body.hide-ion-tab-bar {
+  ion-tab-bar {
+    display: none !important;
+  }
+}
