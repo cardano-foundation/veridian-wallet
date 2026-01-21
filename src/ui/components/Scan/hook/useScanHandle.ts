@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import {
   getConnectionsCache,
   getCurrentProfile,
+  getProfiles,
   setMissingAliasConnection,
   setOpenConnectionId,
 } from "../../../../store/reducers/profileCache";
@@ -26,6 +27,7 @@ enum ErrorMessage {
 const useScanHandle = () => {
   const dispatch = useAppDispatch();
   const defaultIdentifier = useAppSelector(getCurrentProfile)?.identity.id;
+  const profiles = useAppSelector(getProfiles);
   const connections = useAppSelector(getConnectionsCache);
 
   const handleDuplicateConnectionError = useCallback(
@@ -47,13 +49,18 @@ const useScanHandle = () => {
       }
 
       if (!urlId) {
-        showError("Scanner Error:", e, dispatch, ToastMsgType.SCANNER_ERROR);
+        showError(
+          "Scanner Error:",
+          e,
+          dispatch,
+          ToastMsgType.INVALID_CONNECTION_URL
+        );
         await new Promise((resolve) => setTimeout(resolve, 500));
         await reloadScan?.();
         return;
       }
 
-      if (urlId == defaultIdentifier) {
+      if (profiles[urlId]) {
         showError(
           "Scanner Error:",
           e,
@@ -81,7 +88,7 @@ const useScanHandle = () => {
 
       await new Promise((resolve) => setTimeout(resolve, 500));
     },
-    [dispatch]
+    [dispatch, profiles]
   );
 
   const resolveIndividualConnection = useCallback(

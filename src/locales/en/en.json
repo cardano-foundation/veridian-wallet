@@ -1516,7 +1516,6 @@
     "credentialsrestored": "Credentials restored successfully",
     "connectiondeleted": "Connection deleted successfully",
     "qrsuccess": "QR code scanned successfully",
-    "qrerror": "QR code not recognised",
     "connectionerror": "Something went wrong. Please try again.",
     "connectionrequestincoming": "New Connection Request",
     "connectionrequestpending": "Connection request pending",

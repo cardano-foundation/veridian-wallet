@@ -393,7 +393,7 @@ export const ProfileSetup = ({
       );
     } catch (error) {
       handleCloseScan();
-      dispatch(setToastMsg(ToastMsgType.SCANNER_ERROR));
+      dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
     }
   };
 

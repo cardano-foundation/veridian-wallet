@@ -1,29 +1,24 @@
 import { IonModal, isPlatform } from "@ionic/react";
 import { useEffect, useState } from "react";
-import { Agent } from "../../../core/agent/agent";
 import { OobiQueryParams } from "../../../core/agent/services/connectionService.types";
-import { StorageMessage } from "../../../core/storage/storage.types";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
-  getConnectionsCache,
   getMissingAliasConnection,
   setMissingAliasConnection,
-  setOpenConnectionId,
 } from "../../../store/reducers/profileCache";
-import { ToastMsgType } from "../../globals/types";
-import { showError } from "../../utils/error";
 import { nameChecker } from "../../utils/nameChecker";
 import { CustomInput } from "../CustomInput";
 import { ErrorMessage } from "../ErrorMessage";
 import { PageFooter } from "../PageFooter";
+import { useScanHandle } from "../Scan/hook/useScanHandle";
 import "./InputRequest.scss";
 
 const InputRequest = () => {
   const dispatch = useAppDispatch();
-  const connections = useAppSelector(getConnectionsCache);
   const missingAliasConnection = useAppSelector(getMissingAliasConnection);
   const missingAliasUrl = missingAliasConnection?.url;
+  const { resolveIndividualConnection } = useScanHandle();
 
   const componentId = "input-request";
   const [inputChange, setInputChange] = useState(false);
@@ -42,43 +37,7 @@ const InputRequest = () => {
   }, [showModal]);
 
   const resolveConnectionOobi = async (content: string) => {
-    try {
-      const connectionId = new URL(content).pathname
-        .split("/oobi/")
-        .pop()
-        ?.split("/")[0];
-
-      if (connectionId && connections.find((c) => c.id === connectionId)) {
-        throw new Error(
-          `${StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG}: ${connectionId}`
-        );
-      }
-
-      await Agent.agent.connections.connectByOobiUrl(
-        content,
-        missingAliasConnection?.identifier
-      );
-    } catch (e) {
-      const errorMessage = (e as Error).message;
-
-      const urlId = errorMessage
-        .replace(StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG, "")
-        .trim();
-
-      if (!urlId) {
-        showError("Scanner Error:", e, dispatch, ToastMsgType.SCANNER_ERROR);
-        return;
-      }
-
-      showError(
-        "Scanner Error:",
-        e,
-        dispatch,
-        ToastMsgType.DUPLICATE_CONNECTION
-      );
-
-      dispatch(setOpenConnectionId(urlId));
-    }
+    resolveIndividualConnection(content);
   };
 
   const handleConfirm = () => {
