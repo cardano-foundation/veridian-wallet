@@ -1,7 +1,7 @@
 import { ready, Serder } from "signify-ts";
 import { PeerConnection } from "../../cardano/walletConnect/peerConnection";
 import { Agent } from "../agent";
-import { ConnectionStatus, MiscRecordId, CreationStatus } from "../agent.types";
+import { MiscRecordId, CreationStatus } from "../agent.types";
 import { IdentifierMetadataRecord } from "../records/identifierMetadataRecord";
 import { CoreEventEmitter } from "../event";
 import { IdentifierService } from "./identifierService";
