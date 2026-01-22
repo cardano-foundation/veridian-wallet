@@ -6,6 +6,7 @@ import {
 import { IonInput } from "@ionic/react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
+import { MemoryRouter } from "react-router-dom";
 import EN_Translation from "../../../locales/en/en.json";
 import {
   setMissingAliasConnection,
@@ -23,7 +24,6 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { ShareProfile } from "./ShareProfile";
-import { showError } from "../../utils/error";
 
 const getOobiMock = jest.fn();
 const dispatchMock = jest.fn();
@@ -177,10 +177,12 @@ describe("Share Profile", () => {
 
     const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
-        <ShareProfile
-          isOpen
-          setIsOpen={closeModal}
-        />
+        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+          <ShareProfile
+            isOpen
+            setIsOpen={closeModal}
+          />
+        </MemoryRouter>
       </Provider>
     );
 
@@ -210,10 +212,12 @@ describe("Share Profile", () => {
 
     render(
       <Provider store={storeMocked}>
-        <ShareProfile
-          isOpen
-          setIsOpen={closeModal}
-        />
+        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+          <ShareProfile
+            isOpen
+            setIsOpen={closeModal}
+          />
+        </MemoryRouter>
       </Provider>
     );
 
@@ -245,10 +249,12 @@ describe("Share Profile", () => {
 
     const { getByTestId } = render(
       <Provider store={storeMocked}>
-        <ShareProfile
-          isOpen
-          setIsOpen={jest.fn()}
-        />
+        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+          <ShareProfile
+            isOpen
+            setIsOpen={jest.fn()}
+          />
+        </MemoryRouter>
       </Provider>
     );
 
@@ -306,10 +312,12 @@ describe("Share Profile", () => {
 
     const { getByTestId } = render(
       <Provider store={storeMocked}>
-        <ShareProfile
-          isOpen
-          setIsOpen={jest.fn()}
-        />
+        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+          <ShareProfile
+            isOpen
+            setIsOpen={jest.fn()}
+          />
+        </MemoryRouter>
       </Provider>
     );
 
@@ -367,10 +375,12 @@ describe("Share Profile", () => {
 
     const { getByTestId } = render(
       <Provider store={storeMocked}>
-        <ShareProfile
-          isOpen
-          setIsOpen={jest.fn()}
-        />
+        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+          <ShareProfile
+            isOpen
+            setIsOpen={jest.fn()}
+          />
+        </MemoryRouter>
       </Provider>
     );
 
@@ -430,10 +440,12 @@ describe("Share Profile", () => {
 
     const { getByTestId } = render(
       <Provider store={storeMocked}>
-        <ShareProfile
-          isOpen
-          setIsOpen={jest.fn()}
-        />
+        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+          <ShareProfile
+            isOpen
+            setIsOpen={jest.fn()}
+          />
+        </MemoryRouter>
       </Provider>
     );
 
@@ -522,10 +534,12 @@ describe("Share Profile", () => {
 
     const { getByTestId } = render(
       <Provider store={storeMocked}>
-        <ShareProfile
-          isOpen
-          setIsOpen={jest.fn()}
-        />
+        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+          <ShareProfile
+            isOpen
+            setIsOpen={jest.fn()}
+          />
+        </MemoryRouter>
       </Provider>
     );
 
@@ -587,10 +601,12 @@ describe("Share Profile", () => {
 
     const { getByTestId } = render(
       <Provider store={storeMocked}>
-        <ShareProfile
-          isOpen
-          setIsOpen={jest.fn()}
-        />
+        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+          <ShareProfile
+            isOpen
+            setIsOpen={jest.fn()}
+          />
+        </MemoryRouter>
       </Provider>
     );
 

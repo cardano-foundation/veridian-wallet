@@ -1,6 +1,7 @@
 import { IonLabel, IonModal, IonSegment, IonSegmentButton } from "@ionic/react";
 import { repeatOutline } from "ionicons/icons";
 import { useCallback, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { i18n } from "../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -13,6 +14,7 @@ import { ScanRef } from "../Scan/Scan.types";
 import { useCameraDirection } from "../Scan/hook/useCameraDirection";
 import { useScanHandle } from "../Scan/hook/useScanHandle";
 import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
+import { TabsRoutePath } from "../navigation/TabsMenu";
 import "./ShareProfile.scss";
 import { ShareProfileProps, Tab } from "./ShareProfile.types";
 import { ShareOobi } from "./components/ShareOobi";
@@ -33,6 +35,7 @@ const ShareProfile = ({
   const dispatch = useAppDispatch();
   const currentProfile = useAppSelector(getCurrentProfile);
   const [displayOobi, setDisplayOobi] = useState("");
+  const history = useHistory();
 
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
     useCameraDirection();
@@ -86,14 +89,22 @@ const ShareProfile = ({
         return;
       }
 
+      const close = () => {
+        handleClose();
+
+        if (history.location.pathname != TabsRoutePath.CONNECTIONS) {
+          history.push(TabsRoutePath.CONNECTIONS);
+        }
+      };
+
       await resolveIndividualConnection(
         content,
-        handleClose,
+        close,
         scanRef.current?.registerScanHandler,
-        handleClose
+        close
       );
     },
-    [handleClose, onScan, resolveIndividualConnection]
+    [handleClose, history, onScan, resolveIndividualConnection]
   );
 
   return (
