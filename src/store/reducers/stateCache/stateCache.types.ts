@@ -78,6 +78,7 @@ interface StateCacheProps {
   showVerifySeedPhraseAlert?: boolean;
   isSyncingData?: boolean;
   isShowSeedPhraseScreen?: boolean;
+  isInBiometricProcess?: boolean;
 }
 
 enum InitializationPhase {

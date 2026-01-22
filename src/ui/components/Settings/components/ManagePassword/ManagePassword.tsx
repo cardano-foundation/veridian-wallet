@@ -12,11 +12,10 @@ import { ToastMsgType } from "../../../../globals/types";
 import { showError } from "../../../../utils/error";
 import { i18n } from "../../../../../i18n";
 import { Alert } from "../../../Alert";
-import { VerifyPassword } from "../../../VerifyPassword";
-import { VerifyPasscode } from "../../../VerifyPasscode";
 import { ListCard } from "../../../ListCard/ListCard";
 import { ListItem } from "../../../ListCard/ListItem/ListItem";
 import { CreatePassword } from "../../../../pages/CreatePassword";
+import { Verification } from "../../../Verification";
 
 const ManagePassword = () => {
   const dispatch = useAppDispatch();
@@ -28,8 +27,7 @@ const ManagePassword = () => {
   );
   const [alertEnableIsOpen, setAlertEnableIsOpen] = useState(false);
   const [alertDisableIsOpen, setAlertDisableIsOpen] = useState(false);
-  const [verifyPasswordIsOpen, setVerifyPasswordIsOpen] = useState(false);
-  const [verifyPasscodeIsOpen, setVerifyPasscodeIsOpen] = useState(false);
+  const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [createPasswordModalIsOpen, setCreatePasswordModalIsOpen] =
     useState(false);
 
@@ -73,7 +71,7 @@ const ManagePassword = () => {
 
   const handleChange = () => {
     userAction.current = "change";
-    setVerifyPasswordIsOpen(true);
+    setVerifyIsOpen(true);
   };
 
   return (
@@ -134,7 +132,7 @@ const ManagePassword = () => {
         cancelButtonText={`${i18n.t(
           "settings.sections.security.managepassword.page.alert.cancel"
         )}`}
-        actionConfirm={() => setVerifyPasscodeIsOpen(true)}
+        actionConfirm={() => setVerifyIsOpen(true)}
         actionCancel={handleClear}
         actionDismiss={handleClear}
       />
@@ -151,18 +149,13 @@ const ManagePassword = () => {
         cancelButtonText={`${i18n.t(
           "settings.sections.security.managepassword.page.alert.cancel"
         )}`}
-        actionConfirm={() => setVerifyPasswordIsOpen(true)}
+        actionConfirm={() => setVerifyIsOpen(true)}
         actionCancel={handleClear}
         actionDismiss={handleClear}
       />
-      <VerifyPassword
-        isOpen={verifyPasswordIsOpen}
-        setIsOpen={setVerifyPasswordIsOpen}
-        onVerify={onVerify}
-      />
-      <VerifyPasscode
-        isOpen={verifyPasscodeIsOpen}
-        setIsOpen={setVerifyPasscodeIsOpen}
+      <Verification
+        verifyIsOpen={verifyIsOpen}
+        setVerifyIsOpen={setVerifyIsOpen}
         onVerify={onVerify}
       />
       <IonModal

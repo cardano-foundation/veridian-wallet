@@ -17,7 +17,7 @@ import {
   lockClosedOutline,
   notificationsOutline,
 } from "ionicons/icons";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import pJson from "../../../../../package.json";
@@ -41,6 +41,7 @@ import {
   setToastMsg,
   showGlobalLoading,
 } from "../../../../store/reducers/stateCache";
+import { GlobalLoadingType } from "../../../../store/reducers/stateCache/stateCache.types";
 import { CLEAR_STORE_ACTIONS } from "../../../../store/utils";
 import { DOCUMENTATION_LINK, SUPPORT_EMAIL } from "../../../globals/constants";
 import { ToastMsgType } from "../../../globals/types";
@@ -59,6 +60,7 @@ import { ListCard } from "../../ListCard/ListCard";
 import { ListItem } from "../../ListCard/ListItem/ListItem";
 import { PageFooter } from "../../PageFooter";
 import { Verification } from "../../Verification";
+import { VerifySeedPhraseCard } from "../../VerifySeedPhrase";
 import {
   OptionIndex,
   OptionProps,
@@ -67,15 +69,14 @@ import {
 } from "../Settings.types";
 import { ChangePin } from "./ChangePin";
 import "./SettingsList.scss";
-import { VerifySeedPhraseCard } from "../../VerifySeedPhrase";
-import { GlobalLoadingType } from "../../../../store/reducers/stateCache/stateCache.types";
 
 const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const dispatch = useAppDispatch();
   const biometricsCache = useSelector(getBiometricsCache);
   const notificationsPreferences = useSelector(getNotificationsPreferences);
   const [option, setOption] = useState<number | null>(null);
-  const { setupBiometrics, checkBiometrics } = useBiometricAuth();
+  const { setupBiometrics, checkBiometrics, isInBiometricProcess } =
+    useBiometricAuth();
 
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [changePinIsOpen, setChangePinIsOpen] = useState(false);
@@ -106,7 +107,6 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const [isAwaitingNotificationSettings, setIsAwaitingNotificationSettings] =
     useState(false);
   const history = useHistory();
-  const isInBiometricProcess = useRef(false);
 
   const platform = Capacitor.getPlatform();
   const isAndroidPlatform = platform === "android";
@@ -356,10 +356,9 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   };
 
   const biometricAuth = async () => {
-    if (isInBiometricProcess.current) return;
+    if (isInBiometricProcess) return;
 
     try {
-      isInBiometricProcess.current = true;
       await disablePrivacy();
       const setupResult = await setupBiometrics();
       await enablePrivacy();
@@ -388,8 +387,6 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     } catch (e) {
       // This catch block is for unexpected errors during the process.
       showError(i18n.t("biometry.errors.toggleFailed"), e, dispatch);
-    } finally {
-      isInBiometricProcess.current = false;
     }
   };
 

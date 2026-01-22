@@ -56,6 +56,7 @@ import "./styles/style.scss";
 import "./App.scss";
 import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
+import { BiometricOverlay } from "./components/Verification/BiometricOverlay";
 
 setupIonicReact();
 
@@ -316,6 +317,7 @@ const App = () => {
   return (
     <IonApp>
       <AppContent isFreeRASPInitialized={isFreeRASPInitialized} />
+      <BiometricOverlay />
     </IonApp>
   );
 };
