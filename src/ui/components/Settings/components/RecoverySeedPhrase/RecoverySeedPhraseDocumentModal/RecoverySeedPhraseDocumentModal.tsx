@@ -1,6 +1,6 @@
 import { IonModal } from "@ionic/react";
 import { i18n } from "../../../../../../i18n";
-import Image from "../../../../../assets/images/SeedPhraseDocs.png";
+import Image from "../../../../../assets/images/seed-phrase-docs.svg";
 import { InfoCard } from "../../../../InfoCard";
 import { ScrollablePageLayout } from "../../../../layout/ScrollablePageLayout";
 import { PageHeader } from "../../../../PageHeader";
