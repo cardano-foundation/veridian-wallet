@@ -1328,7 +1328,24 @@ class KeriaNotificationService extends AgentService {
               }
             );
 
-            // First try to mark the credential - if this fails, we'll retry on next poll cycle
+            for (const notification of notifications) {
+              await deleteNotificationRecordById(
+                this.props.signifyClient,
+                this.notificationStorage,
+                notification.id,
+                notification.a.r as NotificationRoute,
+                this.operationPendingStorage
+              );
+
+              this.props.eventEmitter.emit<NotificationRemovedEvent>({
+                type: EventTypes.NotificationRemoved,
+                payload: {
+                  id: notification.id,
+                },
+              });
+            }
+
+            // Mark the credential as confirmed
             try {
               await this.credentialService.markAcdc(
                 credentialId,
@@ -1356,30 +1373,6 @@ class KeriaNotificationService extends AgentService {
               } else {
                 throw error;
               }
-            }
-
-            // Clean up notifications in background (fire-and-forget)
-            // This prevents slow KERIA notifications().mark() calls from blocking the pending queue on Android
-            for (const notification of notifications) {
-              deleteNotificationRecordById(
-                this.props.signifyClient,
-                this.notificationStorage,
-                notification.id,
-                notification.a.r as NotificationRoute,
-                this.operationPendingStorage
-              ).catch((err) => {
-                console.error(
-                  `Failed to delete notification ${notification.id}:`,
-                  err
-                );
-              });
-
-              this.props.eventEmitter.emit<NotificationRemovedEvent>({
-                type: EventTypes.NotificationRemoved,
-                payload: {
-                  id: notification.id,
-                },
-              });
             }
 
             await this.ipexCommunications.createLinkedIpexMessageRecord(
