@@ -31,7 +31,8 @@
     "react-dom": "^19.0.0",
     "react-i18next": "^15.4.0",
     "react-redux": "^9.2.0",
-    "react-router": "^7.1.5"
+    "react-router": "^7.1.5",
+    "signify-polaris-web": "file:../libs/polaris-web"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
