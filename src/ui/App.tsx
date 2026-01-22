@@ -27,7 +27,6 @@ import {
   getInitializationPhase,
   getShowVerifySeedPhraseAlert,
   getIsSyncingData,
-  getIsInBiometricProcess,
 } from "../store/reducers/stateCache";
 import {
   GlobalLoadingType,
@@ -57,6 +56,7 @@ import "./styles/style.scss";
 import "./App.scss";
 import { showError } from "./utils/error";
 import { compareVersion } from "./utils/version";
+import { BiometricOverlay } from "./components/Verification/BiometricOverlay";
 
 setupIonicReact();
 
@@ -75,12 +75,6 @@ const SetGroupNameWrapper = () => {
     return;
 
   return <SetGroupUserName identifier={currentProfile.identity} />;
-};
-
-const BiometricOverlay = () => {
-  const isInBiometricProcess = useAppSelector(getIsInBiometricProcess);
-
-  return isInBiometricProcess && <div className="biometric-overlay"></div>;
 };
 
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
