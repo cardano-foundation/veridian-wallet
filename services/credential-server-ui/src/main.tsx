@@ -4,11 +4,14 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import "./styles/main.scss";
 import { App } from "./App";
+import { KERIAuthProvider } from "./components/AuthContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <App />
+      <KERIAuthProvider>
+        <App />
+      </KERIAuthProvider>
     </Provider>
   </StrictMode>
 );

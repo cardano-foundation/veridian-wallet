@@ -1,45 +1,83 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { keriAuthService } from '../services/keriAuthService';
 
-interface AuthContextType {
-  aid: string | null;
+interface KERIAuthContextType {
   isAuthorized: boolean;
-  authorize: () => Promise<void>;
-  disconnect: () => Promise<void>;
+  aid: string | null;
+  extensionId: string | false | null;
+  isExtensionInstalled: boolean;
+  loading: boolean;
+  error: string | null;
+  authorize: (message?: string) => Promise<void>;
+  logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const KERIAuthContext = createContext<KERIAuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [aid, setAid] = useState<string | null>(null);
+export function KERIAuthProvider({ children }: { children: ReactNode }) {
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [aid, setAid] = useState<string | null>(null);
+  const [extensionId, setExtensionId] = useState<string | false | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const authorize = async () => {
+  // Initialize extension check on mount
+  useEffect(() => {
+    keriAuthService.initialize()
+      .then(setExtensionId)
+      .catch(err => setError(err.message));
+  }, []);
+
+  const authorize = async (message?: string) => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      await keriAuthService.authorize();
-      const userAid = keriAuthService.getAID();
-      setAid(userAid);
+      const result = await keriAuthService.authorize(message);
       setIsAuthorized(true);
-    } catch (error) {
-      console.error('Authorization failed:', error);
+      setAid(result.identifier?.prefix || null);
+    } catch (err: any) {
+      setError(err.message || 'Authorization failed');
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const disconnect = async () => {
-    await keriAuthService.disconnect();
-    setAid(null);
+  const logout = () => {
+    keriAuthService.reset();
     setIsAuthorized(false);
+    setAid(null);
   };
 
-  return (
-    <AuthContext.Provider value={{ aid, isAuthorized, authorize, disconnect }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const isExtensionInstalled = extensionId !== false && extensionId !== null;
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  return (
+    <KERIAuthContext.Provider 
+      value={{ 
+        isAuthorized, 
+        aid, 
+        extensionId, 
+        isExtensionInstalled,
+        loading, 
+        error, 
+        authorize, 
+        logout 
+      }}
+    >
+      {children}
+    </KERIAuthContext.Provider>
+  );
+}
+
+export function useKERIAuth() {
+  const context = useContext(KERIAuthContext);
+  if (!context) {
+    throw new Error('useKERIAuth must be used within KERIAuthProvider');
+  }
   return context;
-};
+}
+
+// Keep backward compatibility - export as AuthProvider and useAuth as well
+export const AuthProvider = KERIAuthProvider;
+export const useAuth = useKERIAuth;
