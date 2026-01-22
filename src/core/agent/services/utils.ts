@@ -1,5 +1,9 @@
 import { Operation, Salter, SignifyClient } from "signify-ts";
-import { CredentialMetadataRecord, NotificationStorage } from "../records";
+import {
+  CredentialMetadataRecord,
+  NotificationStorage,
+  OperationPendingRecordType,
+} from "../records";
 import { CredentialShortDetails } from "./credentialService.types";
 import { Agent } from "../agent";
 import { NotificationRoute } from "./keriaNotificationService.types";
@@ -118,12 +122,22 @@ async function cleanupPendingOperations(
   operationPendingStorage: OperationPendingStorage,
   linkedRequestCurrent: string
 ): Promise<void> {
-  const allOperations = await operationPendingStorage.getAll();
-  const suffix = `.${linkedRequestCurrent}`;
-
-  const pendingOperations = allOperations.filter((op) =>
-    op.id.endsWith(suffix)
-  );
+  // findAllByQuery with $regex is not supported by SqliteStorage on Android and crashes.
+  // Instead of in-memory filtering, we use explicit $or query with known operation types.
+  // WARNING: If new operation types are added that support linked requests, they MUST be added here.
+  const pendingOperations = await operationPendingStorage.findAllByQuery({
+    $or: [
+      {
+        id: `${OperationPendingRecordType.ExchangeReceiveCredential}.${linkedRequestCurrent}`,
+      },
+      {
+        id: `${OperationPendingRecordType.ExchangeOfferCredential}.${linkedRequestCurrent}`,
+      },
+      {
+        id: `${OperationPendingRecordType.ExchangePresentCredential}.${linkedRequestCurrent}`,
+      },
+    ],
+  });
 
   if (pendingOperations.length === 0) {
     return;
