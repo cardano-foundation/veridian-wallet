@@ -203,6 +203,15 @@ const Connections = () => {
     setConnectionShortDetails(undefined);
   };
 
+  // Note: Hide tab bar when connection details are open.
+  // This is a temporary solution until we will refactor the connection details to a separate page.
+  // Remember to remove scss changes as well in Connections.scss
+  useEffect(() => {
+    connectionShortDetails
+      ? document?.querySelector("body")?.classList.add("hide-ion-tab-bar")
+      : document?.querySelector("body")?.classList.remove("hide-ion-tab-bar");
+  }, [connectionShortDetails]);
+
   return connectionShortDetails ? (
     <ConnectionDetails
       connectionShortDetails={connectionShortDetails}

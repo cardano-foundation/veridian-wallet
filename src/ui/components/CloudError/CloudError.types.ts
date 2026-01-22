@@ -5,7 +5,6 @@ interface CloudErrorProps {
   header?: ReactNode;
   children?: ReactNode;
   content?: string;
-  type?: "error" | "warning";
 }
 
 export type { CloudErrorProps };
