@@ -1345,7 +1345,6 @@ class KeriaNotificationService extends AgentService {
               });
             }
 
-            // Mark the credential as confirmed
             try {
               await this.credentialService.markAcdc(
                 credentialId,

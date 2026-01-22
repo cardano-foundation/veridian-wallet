@@ -122,8 +122,6 @@ async function cleanupPendingOperations(
   operationPendingStorage: OperationPendingStorage,
   linkedRequestCurrent: string
 ): Promise<void> {
-  // findAllByQuery with $regex is not supported by SqliteStorage on Android and crashes.
-  // Instead of in-memory filtering, we use explicit $or query with known operation types.
   // WARNING: If new operation types are added that support linked requests, they MUST be added here.
   const pendingOperations = await operationPendingStorage.findAllByQuery({
     $or: [
