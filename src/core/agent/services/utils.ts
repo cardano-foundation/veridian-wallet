@@ -141,12 +141,6 @@ async function cleanupPendingOperations(
     return;
   }
 
-  // eslint-disable-next-line no-console
-  console.debug(
-    `[cleanupPendingOperations] Found ${pendingOperations.length} operations to delete for SAID ${linkedRequestCurrent}:`,
-    pendingOperations.map((op) => op.id)
-  );
-
   const deletePromises = pendingOperations.map(async (operation) => {
     await operationPendingStorage.deleteById(operation.id);
   });
