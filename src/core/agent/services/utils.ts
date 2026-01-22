@@ -118,11 +118,14 @@ async function cleanupPendingOperations(
   operationPendingStorage: OperationPendingStorage,
   linkedRequestCurrent: string
 ): Promise<void> {
-  const pendingOperations = await operationPendingStorage.findAllByQuery({
-    filter: {
-      id: { $regex: `^.*\\.${linkedRequestCurrent}$` },
-    },
-  });
+  // findAllByQuery with $regex is not supported by SqliteStorage on Android and crashes
+  // So we get all records and filter in memory
+  const allOperations = await operationPendingStorage.getAll();
+  const suffix = `.${linkedRequestCurrent}`;
+
+  const pendingOperations = allOperations.filter((op) =>
+    op.id.endsWith(suffix)
+  );
 
   if (pendingOperations.length === 0) {
     return;
