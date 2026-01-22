@@ -1,8 +1,4 @@
-import {
-  formatToV1_2_0_2,
-  parseHabName,
-  resolveBrokenMhabFormat,
-} from "../../../utils/habName";
+import { formatToV1_2_0_2, parseHabName } from "../../../utils/habName";
 import { CloudMigration } from "./cloudMigrations.types";
 
 const migrationVersion = "1.2.0.2";
@@ -34,7 +30,7 @@ export const CLOUD_V1202: CloudMigration = {
 
       for (const identifier of batchToProcess) {
         const currentName = identifier.name;
-        let parts = parseHabName(currentName);
+        const parts = parseHabName(currentName);
 
         if (!parts) {
           throw new Error(
@@ -49,13 +45,6 @@ export const CLOUD_V1202: CloudMigration = {
           );
           continue;
         }
-
-        // Handle broken 1.1.X deleted mHab format (missing isInitiator flag)
-        parts = await resolveBrokenMhabFormat(
-          parts,
-          identifier.prefix,
-          (groupId) => signifyClient.identifiers().members(groupId)
-        );
 
         // eslint-disable-next-line no-console
         console.log(

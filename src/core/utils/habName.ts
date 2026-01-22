@@ -2,12 +2,11 @@ export interface HabNameParts {
   version?: string;
   displayName: string;
   groupMetadata?: {
-    groupInitiator: boolean | undefined;
+    groupInitiator: boolean;
     groupId: string;
     proposedUsername: string;
   };
   theme: string;
-  isBrokenMhabFormat?: boolean;
 }
 
 // Old format: theme:groupInitiator-groupId:displayName or  theme:displayName
@@ -88,15 +87,17 @@ export function parseHabName(name: string): HabNameParts {
     // groupId never contains -, so if theme starts with XX- and groupPart has no hyphen,
     // this is a broken deleted mHab that's missing the isInitiator flag
     if (theme.startsWith("XX-")) {
+      if (!groupPart || groupPart.trim() === "") {
+        throw new Error("Invalid old format name: groupId cannot be empty.");
+      }
       return {
         theme,
         displayName,
         groupMetadata: {
-          groupInitiator: undefined, // Must be determined via members API
+          groupInitiator: false, // Cannot be determined, default to false
           groupId: groupPart,
           proposedUsername: "",
         },
-        isBrokenMhabFormat: true,
       };
     }
     throw new Error(
@@ -137,32 +138,4 @@ export function formatToV1_2_0_2(parts: HabNameParts): string {
   } else {
     return `${version}:${themePart}:${displayNamePart}`;
   }
-}
-
-/**
- * Resolves the groupInitiator for broken 1.1.X deleted mHab format.
- * This function handles the async lookup to determine if the mHab is the initiator.
- *
- * @param parsed - The parsed hab name parts from parseHabName()
- * @param mhabPrefix - The prefix of the mHab identifier
- * @param getMembers - Function to get group members (returns signing array with aid)
- * @returns The parsed parts with groupInitiator resolved
- */
-export async function resolveBrokenMhabFormat(
-  parsed: HabNameParts,
-  mhabPrefix: string,
-  getMembers: (groupId: string) => Promise<{ signing: { aid: string }[] }>
-): Promise<HabNameParts> {
-  if (parsed.isBrokenMhabFormat && parsed.groupMetadata) {
-    try {
-      const members = await getMembers(parsed.groupMetadata.groupId);
-      // The first member in signing array is the initiator
-      parsed.groupMetadata.groupInitiator =
-        members.signing[0].aid === mhabPrefix;
-    } catch {
-      // Group may not exist or be accessible, default to false
-      parsed.groupMetadata.groupInitiator = false;
-    }
-  }
-  return parsed;
 }

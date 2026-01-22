@@ -1,5 +1,5 @@
 import { HabState, Operation, Signer } from "signify-ts";
-import { parseHabName, resolveBrokenMhabFormat } from "../../utils/habName";
+import { parseHabName } from "../../utils/habName";
 import {
   CreateIdentifierResult,
   IdentifierDetails,
@@ -222,7 +222,7 @@ class IdentifierService extends AgentService {
           groupMetadata: {
             groupId: parsed.groupMetadata.groupId,
             groupCreated: false,
-            groupInitiator: parsed.groupMetadata.groupInitiator ?? false,
+            groupInitiator: parsed.groupMetadata.groupInitiator,
             proposedUsername: parsed.groupMetadata.proposedUsername,
           },
         };
@@ -774,27 +774,18 @@ class IdentifierService extends AgentService {
         .get(identifier.prefix);
 
       if (parsed.groupMetadata) {
-        // Handle broken 1.1.X deleted mHab format (missing isInitiator flag)
-        const resolvedParsed = await resolveBrokenMhabFormat(
-          parsed,
-          identifier.prefix,
-          (groupId) => this.props.signifyClient.identifiers().members(groupId)
-        );
-
         await this.identifierStorage.createIdentifierMetadataRecord({
           id: identifier.prefix,
-          displayName: resolvedParsed.displayName,
+          displayName: parsed.displayName,
           theme,
           groupMetadata: {
-            ...resolvedParsed.groupMetadata!,
+            ...parsed.groupMetadata,
             groupCreated: false,
-            groupInitiator:
-              resolvedParsed.groupMetadata!.groupInitiator ?? false,
           },
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
           sxlt: identifierDetail.salty?.sxlt,
-          isDeleted: resolvedParsed.theme.startsWith(
+          isDeleted: parsed.theme.startsWith(
             IdentifierService.DELETED_IDENTIFIER_THEME
           ),
         });
@@ -844,16 +835,7 @@ class IdentifierService extends AgentService {
         });
       }
 
-      let mhabParsed = parseHabName(identifier.group.mhab.name);
-
-      // Handle broken 1.1.X deleted mHab format (missing isInitiator flag)
-      // Note: identifier.prefix is the groupId, identifier.group.mhab.prefix is the mHab prefix
-      mhabParsed = await resolveBrokenMhabFormat(
-        mhabParsed,
-        identifier.group.mhab.prefix,
-        () => this.props.signifyClient.identifiers().members(identifier.prefix)
-      );
-
+      const mhabParsed = parseHabName(identifier.group.mhab.name);
       if (!mhabParsed.groupMetadata) {
         throw new Error(IdentifierService.MHAB_NAME_MISSING_GROUP_METADATA);
       }
@@ -863,7 +845,6 @@ class IdentifierService extends AgentService {
         groupMetadata: {
           ...mhabParsed.groupMetadata,
           groupCreated: true,
-          groupInitiator: mhabParsed.groupMetadata.groupInitiator ?? false,
         },
       });
 

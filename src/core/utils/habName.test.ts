@@ -70,6 +70,7 @@ describe("habName", () => {
     });
 
     // Tests for broken 1.1.X deleted mHab format (XX-salt:groupId:displayName - missing isInitiator)
+    // These default groupInitiator to false since we cannot determine it
     test.each([
       {
         name: "XX-abc123:groupId456:MyDeletedGroup",
@@ -77,11 +78,10 @@ describe("habName", () => {
           displayName: "MyDeletedGroup",
           theme: "XX-abc123",
           groupMetadata: {
-            groupInitiator: undefined,
+            groupInitiator: false,
             groupId: "groupId456",
             proposedUsername: "",
           },
-          isBrokenMhabFormat: true,
         },
       },
       {
@@ -90,11 +90,10 @@ describe("habName", () => {
           displayName: "DeletedMember",
           theme: "XX-randomSalt",
           groupMetadata: {
-            groupInitiator: undefined,
+            groupInitiator: false,
             groupId: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s",
             proposedUsername: "",
           },
-          isBrokenMhabFormat: true,
         },
       },
     ])(
