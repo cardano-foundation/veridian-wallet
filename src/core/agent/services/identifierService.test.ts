@@ -2201,6 +2201,65 @@ describe("Identifier Deletion Logic", () => {
     });
   });
 
+  describe("Private: cleanupPendingOperationsForIdentifier", () => {
+    test("should clean up pending operation and emit OperationRemoved event", async () => {
+      const identifierId = "test-identifier";
+      const operationType = "witness";
+      const operationId = `${operationType}.${identifierId}`;
+
+      await (identifierService as any).cleanupPendingOperationsForIdentifier(
+        identifierId,
+        operationType
+      );
+
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
+      expect(eventEmitter.emit).toBeCalledWith({
+        type: EventTypes.OperationRemoved,
+        payload: {
+          operationId,
+        },
+      });
+    });
+
+    test("should silently ignore when pending operation does not exist", async () => {
+      const identifierId = "test-identifier";
+      const operationType = "witness";
+      const operationId = `${operationType}.${identifierId}`;
+
+      const notFoundError = new Error(
+        `${StorageMessage.RECORD_DOES_NOT_EXIST_ERROR_MSG}: ${operationId}`
+      );
+      operationPendingStorage.deleteById.mockRejectedValueOnce(notFoundError);
+
+      await expect(
+        (identifierService as any).cleanupPendingOperationsForIdentifier(
+          identifierId,
+          operationType
+        )
+      ).resolves.toBeUndefined();
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
+      expect(eventEmitter.emit).not.toBeCalled();
+    });
+
+    test("should rethrow unknown errors when cleanup fails", async () => {
+      const identifierId = "test-identifier";
+      const operationType = "witness";
+      const operationId = `${operationType}.${identifierId}`;
+
+      const unknownError = new Error("database connection lost");
+      operationPendingStorage.deleteById.mockRejectedValueOnce(unknownError);
+
+      await expect(
+        (identifierService as any).cleanupPendingOperationsForIdentifier(
+          identifierId,
+          operationType
+        )
+      ).rejects.toThrow(unknownError);
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
+      expect(eventEmitter.emit).not.toBeCalled();
+    });
+  });
+
   describe("deleteStaleLocalIdentifier", () => {
     test("Can delete stale local identifier", async () => {
       const identifierId = "identifier-id";
