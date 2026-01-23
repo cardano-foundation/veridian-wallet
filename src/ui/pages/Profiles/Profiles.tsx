@@ -175,6 +175,12 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
     showSetupProfileScreen();
   }, [defaultProfile, ionHistory]);
 
+  useEffect(() => {
+    handleCloseSetupProfile();
+    setOpenSetting(false);
+    setIsOpen(false);
+  }, [defaultProfile?.identity.id, setIsOpen]);
+
   const isDisableManageProfile = () => {
     const isGroupProfile = !!(
       defaultProfile?.identity.groupMemberPre ||
