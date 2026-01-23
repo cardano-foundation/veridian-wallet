@@ -1821,7 +1821,7 @@ describe("Signify notification service of agent", () => {
       );
     identifiersGetMock.mockResolvedValue({
       ...getMultisigIdentifierResponse,
-      name: `${DELETED_IDENTIFIER_THEME}:deleted`,
+      name: `1.2.0.2:${DELETED_IDENTIFIER_THEME}-salt:deleted`,
     });
 
     await keriaNotificationService.processNotification(
@@ -2059,7 +2059,7 @@ describe("Signify notification service of agent", () => {
     identifiersGetMock.mockReset();
     identifiersGetMock.mockResolvedValue({
       ...hab,
-      name: `${DELETED_IDENTIFIER_THEME}:deletedIdentifier`,
+      name: `1.2.0.2:${DELETED_IDENTIFIER_THEME}-salt:deletedIdentifier`,
     });
 
     await keriaNotificationService.processNotification(
@@ -2083,7 +2083,7 @@ describe("Signify notification service of agent", () => {
     identifiersGetMock.mockReset();
     identifiersGetMock.mockResolvedValue({
       ...hab,
-      name: `${DELETED_IDENTIFIER_THEME}:deletedIdentifier`,
+      name: `1.2.0.2:${DELETED_IDENTIFIER_THEME}-salt:deletedIdentifier`,
     });
 
     await keriaNotificationService.processNotification(
@@ -2107,7 +2107,7 @@ describe("Signify notification service of agent", () => {
     identifiersGetMock.mockReset();
     identifiersGetMock.mockResolvedValue({
       ...hab,
-      name: `${DELETED_IDENTIFIER_THEME}:deletedIdentifier`,
+      name: `1.2.0.2:${DELETED_IDENTIFIER_THEME}-salt:deletedIdentifier`,
     });
 
     await keriaNotificationService.processNotification(
