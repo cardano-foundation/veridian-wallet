@@ -36,7 +36,7 @@ const multisigMetadataRecord = {
 } as IdentifierMetadataRecord;
 
 const getMemberIdentifierResponse = {
-  name: "00:groupid:groupName",
+  name: "1.2.0.2:00:1:groupid::groupName",
   prefix: memberMetadataRecord.id,
   state: {
     vn: [1, 0],
