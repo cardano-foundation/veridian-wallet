@@ -139,3 +139,26 @@ export function formatToV1_2_0_2(parts: HabNameParts): string {
     return `${version}:${themePart}:${displayNamePart}`;
   }
 }
+
+export const DELETED_IDENTIFIER_THEME = "XX";
+
+export interface DeletedHabNameInput {
+  displayName: string;
+  groupMetadata?: {
+    groupInitiator: boolean;
+    groupId: string;
+    proposedUsername: string;
+  };
+}
+
+export function buildDeletedHabName(
+  input: DeletedHabNameInput,
+  salt: string
+): string {
+  const deletedTheme = `${DELETED_IDENTIFIER_THEME}-${salt}`;
+  return formatToV1_2_0_2({
+    theme: deletedTheme,
+    displayName: input.displayName,
+    groupMetadata: input.groupMetadata,
+  });
+}

@@ -1,4 +1,9 @@
-import { parseHabName, formatToV1_2_0_2 } from "./habName";
+import {
+  parseHabName,
+  formatToV1_2_0_2,
+  buildDeletedHabName,
+  DELETED_IDENTIFIER_THEME,
+} from "./habName";
 
 describe("habName", () => {
   describe("parseHabName", () => {
@@ -273,5 +278,74 @@ describe("habName", () => {
         expect(result).toBe(expected);
       }
     );
+  });
+
+  describe("buildDeletedHabName", () => {
+    test("should build deleted hab name for regular identifier", () => {
+      const input = {
+        displayName: "my-identifier",
+      };
+      const salt = "test-salt";
+
+      const result = buildDeletedHabName(input, salt);
+
+      expect(result).toBe(
+        `1.2.0.2:${DELETED_IDENTIFIER_THEME}-${salt}:my-identifier`
+      );
+    });
+
+    test("should build deleted hab name for group identifier", () => {
+      const input = {
+        displayName: "my-group",
+        groupMetadata: {
+          groupInitiator: true,
+          groupId: "group-123",
+          proposedUsername: "user1",
+        },
+      };
+      const salt = "test-salt";
+
+      const result = buildDeletedHabName(input, salt);
+
+      expect(result).toBe(
+        `1.2.0.2:${DELETED_IDENTIFIER_THEME}-${salt}:1:group-123:user1:my-group`
+      );
+    });
+
+    test("should build deleted hab name for non-initiator group identifier", () => {
+      const input = {
+        displayName: "member-identifier",
+        groupMetadata: {
+          groupInitiator: false,
+          groupId: "group-456",
+          proposedUsername: "member1",
+        },
+      };
+      const salt = "random-salt";
+
+      const result = buildDeletedHabName(input, salt);
+
+      expect(result).toBe(
+        `1.2.0.2:${DELETED_IDENTIFIER_THEME}-${salt}:0:group-456:member1:member-identifier`
+      );
+    });
+
+    test("should handle empty proposedUsername for group identifier", () => {
+      const input = {
+        displayName: "migrated-group",
+        groupMetadata: {
+          groupInitiator: true,
+          groupId: "legacy-group",
+          proposedUsername: "",
+        },
+      };
+      const salt = "salt123";
+
+      const result = buildDeletedHabName(input, salt);
+
+      expect(result).toBe(
+        `1.2.0.2:${DELETED_IDENTIFIER_THEME}-${salt}:1:legacy-group::migrated-group`
+      );
+    });
   });
 });
