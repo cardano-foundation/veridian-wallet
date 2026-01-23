@@ -1782,6 +1782,7 @@ describe("Identifier Deletion Logic", () => {
         true
       );
       const operationId = `witness.${identifierMetadataRecord.id}`;
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
       expect(eventEmitter.emit).toBeCalledWith({
         type: EventTypes.OperationRemoved,
         payload: {
@@ -1828,6 +1829,7 @@ describe("Identifier Deletion Logic", () => {
         payload: { id: findNotificationsResult[1].id },
       });
       const operationId = `witness.${groupMemberMetadataRecord.id}`;
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
       expect(eventEmitter.emit).toBeCalledWith({
         type: EventTypes.OperationRemoved,
         payload: {
@@ -1897,6 +1899,7 @@ describe("Identifier Deletion Logic", () => {
         payload: { id: findNotificationsResult[1].id },
       });
       const operationId = `group.${groupMetadataRecord.id}`;
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
       expect(eventEmitter.emit).toBeCalledWith({
         type: EventTypes.OperationRemoved,
         payload: {
@@ -1957,6 +1960,7 @@ describe("Identifier Deletion Logic", () => {
         operationPendingStorage
       );
       const operationId = `witness.${identifierMetadataRecord.id}`;
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
       expect(eventEmitter.emit).toBeCalledWith({
         type: EventTypes.OperationRemoved,
         payload: {
@@ -2043,6 +2047,7 @@ describe("Identifier Deletion Logic", () => {
         true
       );
       const operationId = `witness.${identifierMetadataRecord.id}`;
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
       expect(eventEmitter.emit).toBeCalledWith({
         type: EventTypes.OperationRemoved,
         payload: {
@@ -2125,6 +2130,7 @@ describe("Identifier Deletion Logic", () => {
         true
       );
       const operationId = `witness.${groupMemberMetadataRecord.id}`;
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
       expect(eventEmitter.emit).toBeCalledWith({
         type: EventTypes.OperationRemoved,
         payload: {
@@ -2241,6 +2247,7 @@ describe("Identifier Deletion Logic", () => {
         payload: { id: findNotificationsResult[1].id },
       });
       const operationId = `group.${groupMetadataRecord.id}`;
+      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
       expect(eventEmitter.emit).toBeCalledWith({
         type: EventTypes.OperationRemoved,
         payload: {
@@ -2251,25 +2258,6 @@ describe("Identifier Deletion Logic", () => {
   });
 
   describe("Private: cleanupPendingOperationsForIdentifier", () => {
-    test("should clean up pending operation and emit OperationRemoved event", async () => {
-      const identifierId = "test-identifier";
-      const operationType = "witness";
-      const operationId = `${operationType}.${identifierId}`;
-
-      await (identifierService as any).cleanupPendingOperationsForIdentifier(
-        identifierId,
-        operationType
-      );
-
-      expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
-      expect(eventEmitter.emit).toBeCalledWith({
-        type: EventTypes.OperationRemoved,
-        payload: {
-          operationId,
-        },
-      });
-    });
-
     test("should silently ignore when pending operation does not exist", async () => {
       const identifierId = "test-identifier";
       const operationType = "witness";
@@ -2280,12 +2268,7 @@ describe("Identifier Deletion Logic", () => {
       );
       operationPendingStorage.deleteById.mockRejectedValueOnce(notFoundError);
 
-      await expect(
-        (identifierService as any).cleanupPendingOperationsForIdentifier(
-          identifierId,
-          operationType
-        )
-      ).resolves.toBeUndefined();
+      await (identifierService as any).cleanupPendingOperationsForIdentifier(identifierId, operationType);
       expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
       expect(eventEmitter.emit).not.toBeCalled();
     });
