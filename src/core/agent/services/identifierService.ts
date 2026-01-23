@@ -79,7 +79,6 @@ class IdentifierService extends AgentService {
   // @TODO - foconnor: When we refactor this, only member identifiers will have groupMetadata
   static readonly INVALID_GROUP_IDENTIFIER =
     "Identifier is not a valid group or group member identifier (missing groupMetadata)";
-  static readonly DELETED_IDENTIFIER_THEME = DELETED_IDENTIFIER_THEME;
 
   protected readonly identifierStorage: IdentifierStorage;
   protected readonly operationPendingStorage: OperationPendingStorage;
@@ -371,7 +370,7 @@ class IdentifierService extends AgentService {
     deletedVariant = false
   ) {
     const theme = deletedVariant
-      ? `${IdentifierService.DELETED_IDENTIFIER_THEME}-${randomSalt()}`
+      ? `${DELETED_IDENTIFIER_THEME}-${randomSalt()}`
       : String(metadata.theme);
 
     return formatToV1_2_0_2({
@@ -766,9 +765,7 @@ class IdentifierService extends AgentService {
       }
 
       const parsed = parseHabName(identifier.name);
-      const theme = parsed.theme.startsWith(
-        IdentifierService.DELETED_IDENTIFIER_THEME
-      )
+      const theme = parsed.theme.startsWith(DELETED_IDENTIFIER_THEME)
         ? 0
         : parseInt(parsed.theme, 10);
 
@@ -788,9 +785,7 @@ class IdentifierService extends AgentService {
           creationStatus,
           createdAt: new Date(identifierDetail.icp_dt),
           sxlt: identifierDetail.salty?.sxlt,
-          isDeleted: parsed.theme.startsWith(
-            IdentifierService.DELETED_IDENTIFIER_THEME
-          ),
+          isDeleted: parsed.theme.startsWith(DELETED_IDENTIFIER_THEME),
         });
         continue;
       }
@@ -802,9 +797,7 @@ class IdentifierService extends AgentService {
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
         sxlt: identifierDetail.salty?.sxlt,
-        isDeleted: parsed.theme.startsWith(
-          IdentifierService.DELETED_IDENTIFIER_THEME
-        ),
+        isDeleted: parsed.theme.startsWith(DELETED_IDENTIFIER_THEME),
       });
     }
 
@@ -814,9 +807,7 @@ class IdentifierService extends AgentService {
         .get(identifier.prefix);
 
       const parsed = parseHabName(identifier.name);
-      const theme = parsed.theme.startsWith(
-        IdentifierService.DELETED_IDENTIFIER_THEME
-      )
+      const theme = parsed.theme.startsWith(DELETED_IDENTIFIER_THEME)
         ? 0
         : parseInt(parsed.theme, 10);
 
@@ -859,9 +850,7 @@ class IdentifierService extends AgentService {
         groupUsername: mhabParsed.groupMetadata.proposedUsername,
         creationStatus,
         createdAt: new Date(identifierDetail.icp_dt),
-        isDeleted: parsed.theme.startsWith(
-          IdentifierService.DELETED_IDENTIFIER_THEME
-        ),
+        isDeleted: parsed.theme.startsWith(DELETED_IDENTIFIER_THEME),
       });
     }
   }
