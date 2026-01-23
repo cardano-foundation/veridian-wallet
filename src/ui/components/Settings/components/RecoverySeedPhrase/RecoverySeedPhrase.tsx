@@ -1,5 +1,5 @@
 import { IonButton, IonIcon } from "@ionic/react";
-import { alertCircleOutline, informationCircleOutline } from "ionicons/icons";
+import { informationCircleOutline } from "ionicons/icons";
 import { useCallback, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import { i18n } from "../../../../../i18n";
@@ -69,7 +69,7 @@ const RecoverySeedPhrase = ({
       <div className="recovery-page-container">
         <InfoCard
           className="user-tips"
-          icon={alertCircleOutline}
+          icon={informationCircleOutline}
         >
           <div>
             <p>
