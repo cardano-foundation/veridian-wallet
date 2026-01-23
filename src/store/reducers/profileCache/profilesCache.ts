@@ -20,6 +20,8 @@ import {
 } from "./profilesCache.types";
 import { getNotificationsPreferences } from "../notificationsPreferences/notificationsPreferences";
 import { showError } from "../../../ui/utils/error";
+import { setToastMsg } from "../stateCache";
+import { ToastMsgType } from "../../../ui/globals/types";
 
 // Shared empty arrays — return these to keep selector return references stable
 const DefaultArrayValue = {
@@ -473,6 +475,34 @@ export const addGroupProfileAsync =
         content: { value: replaceHistories },
       })
     );
+  };
+
+export const switchProfileFromNotification =
+  (profileId: string) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    const profiles = getState().profilesCache.profiles;
+    let savedProfile = profileId;
+
+    if (Object.values(profiles).length == 0) {
+      savedProfile = "";
+      dispatch(setCurrentProfile(""));
+    }
+
+    if (profiles[profileId]) {
+      dispatch(setCurrentProfile(profileId));
+    } else {
+      dispatch(setToastMsg(ToastMsgType.PROFILE_NOT_EXIST));
+      return false;
+    }
+
+    await Agent.agent.basicStorage.createOrUpdateBasicRecord(
+      new BasicRecord({
+        id: MiscRecordId.DEFAULT_PROFILE,
+        content: { defaultProfile: savedProfile },
+      })
+    );
+
+    return true;
   };
 
 export const handleNotificationReceived =
