@@ -1781,6 +1781,13 @@ describe("Identifier Deletion Logic", () => {
         "dApp-address",
         true
       );
+      const operationId = `witness.${identifierMetadataRecord.id}`;
+      expect(eventEmitter.emit).toBeCalledWith({
+        type: EventTypes.OperationRemoved,
+        payload: {
+          operationId,
+        },
+      });
     });
 
     // Success flow (Group Member)
@@ -1819,6 +1826,13 @@ describe("Identifier Deletion Logic", () => {
       expect(eventEmitter.emit).toBeCalledWith({
         type: EventTypes.NotificationRemoved,
         payload: { id: findNotificationsResult[1].id },
+      });
+      const operationId = `witness.${groupMemberMetadataRecord.id}`;
+      expect(eventEmitter.emit).toBeCalledWith({
+        type: EventTypes.OperationRemoved,
+        payload: {
+          operationId,
+        },
       });
     });
 
@@ -1882,6 +1896,13 @@ describe("Identifier Deletion Logic", () => {
         type: EventTypes.NotificationRemoved,
         payload: { id: findNotificationsResult[1].id },
       });
+      const operationId = `group.${groupMetadataRecord.id}`;
+      expect(eventEmitter.emit).toBeCalledWith({
+        type: EventTypes.OperationRemoved,
+        payload: {
+          operationId,
+        },
+      });
     });
 
     // Notification cleanup verification
@@ -1935,6 +1956,13 @@ describe("Identifier Deletion Logic", () => {
         NotificationRoute.ExnIpexGrant,
         operationPendingStorage
       );
+      const operationId = `witness.${identifierMetadataRecord.id}`;
+      expect(eventEmitter.emit).toBeCalledWith({
+        type: EventTypes.OperationRemoved,
+        payload: {
+          operationId,
+        },
+      });
 
       mockDeleteNotificationRecordById.mockRestore();
     });
@@ -2014,6 +2042,13 @@ describe("Identifier Deletion Logic", () => {
         "dApp-address",
         true
       );
+      const operationId = `witness.${identifierMetadataRecord.id}`;
+      expect(eventEmitter.emit).toBeCalledWith({
+        type: EventTypes.OperationRemoved,
+        payload: {
+          operationId,
+        },
+      });
     });
 
     test("should wipe identifier from queued pending identifier if still processing (group member)", async () => {
@@ -2089,6 +2124,13 @@ describe("Identifier Deletion Logic", () => {
         "dApp-address",
         true
       );
+      const operationId = `witness.${groupMemberMetadataRecord.id}`;
+      expect(eventEmitter.emit).toBeCalledWith({
+        type: EventTypes.OperationRemoved,
+        payload: {
+          operationId,
+        },
+      });
     });
 
     test("should wipe group identifier from queued pending groups if still processing and corresponding group member from pending identifiers", async () => {
@@ -2197,6 +2239,13 @@ describe("Identifier Deletion Logic", () => {
       expect(eventEmitter.emit).toBeCalledWith({
         type: EventTypes.NotificationRemoved,
         payload: { id: findNotificationsResult[1].id },
+      });
+      const operationId = `group.${groupMetadataRecord.id}`;
+      expect(eventEmitter.emit).toBeCalledWith({
+        type: EventTypes.OperationRemoved,
+        payload: {
+          operationId,
+        },
       });
     });
   });
