@@ -83,6 +83,23 @@ export function parseHabName(name: string): HabNameParts {
   const firstHyphenIndex = groupPart.indexOf("-");
 
   if (firstHyphenIndex === -1) {
+    // Check for broken 1.1.X deleted mHab format: XX-salt:groupId:displayName
+    // groupId never contains -, so if theme starts with XX- and groupPart has no hyphen,
+    // this is a broken deleted mHab that's missing the isInitiator flag
+    if (theme.startsWith("XX-")) {
+      if (!groupPart || groupPart.trim() === "") {
+        throw new Error("Invalid old format name: groupId cannot be empty.");
+      }
+      return {
+        theme,
+        displayName,
+        groupMetadata: {
+          groupInitiator: false, // Cannot be determined, default to false
+          groupId: groupPart,
+          proposedUsername: "",
+        },
+      };
+    }
     throw new Error(
       "Invalid old format name: Invalid group part format (expected groupInitiator-groupId)."
     );

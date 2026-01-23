@@ -69,6 +69,41 @@ describe("habName", () => {
       expect(result).toEqual(expect.objectContaining(expected));
     });
 
+    // Tests for broken 1.1.X deleted mHab format (XX-salt:groupId:displayName - missing isInitiator)
+    // These default groupInitiator to false since we cannot determine it
+    test.each([
+      {
+        name: "XX-abc123:groupId456:MyDeletedGroup",
+        expected: {
+          displayName: "MyDeletedGroup",
+          theme: "XX-abc123",
+          groupMetadata: {
+            groupInitiator: false,
+            groupId: "groupId456",
+            proposedUsername: "",
+          },
+        },
+      },
+      {
+        name: "XX-randomSalt:EJ84hiNC0ts71HARE1ZkcnYAFJP0s:DeletedMember",
+        expected: {
+          displayName: "DeletedMember",
+          theme: "XX-randomSalt",
+          groupMetadata: {
+            groupInitiator: false,
+            groupId: "EJ84hiNC0ts71HARE1ZkcnYAFJP0s",
+            proposedUsername: "",
+          },
+        },
+      },
+    ])(
+      "should handle broken 1.1.X deleted mHab format: %s",
+      ({ name, expected }) => {
+        const result = parseHabName(name);
+        expect(result).toEqual(expect.objectContaining(expected));
+      }
+    );
+
     // Tests for new format names (1.2.0.2:theme:groupInitiator:groupId:userName:displayName)
     test.each([
       {
@@ -168,6 +203,11 @@ describe("habName", () => {
       {
         name: "1.2.0.2:XX:1::user123:MyGroup", // Empty groupId for new format
         errorMessage: "Invalid new format name: groupId cannot be empty.",
+      },
+      {
+        name: "01:groupIdNoHyphen:MyGroup", // Non-deleted mHab missing hyphen (not broken format)
+        errorMessage:
+          "Invalid old format name: Invalid group part format (expected groupInitiator-groupId).",
       },
     ])(
       "should throw error for invalid format: %s",
