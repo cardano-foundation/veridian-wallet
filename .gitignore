@@ -3,6 +3,7 @@
 # dependencies
 node_modules
 keria
+signify-ts
 /.pnp
 .pnp.js
 
