@@ -5,6 +5,10 @@ import { getMultisigConnectionsCache } from "../../../../../store/reducers/profi
 import { MemberAvatar } from "../../../Avatar";
 import { InfoCard } from "../../../InfoCard";
 import { ScrollablePageLayout } from "../../../layout/ScrollablePageLayout";
+import {
+  Member,
+  MemberAcceptStatus,
+} from "../../../MemberList/MemberList.type";
 import { PageHeader } from "../../../PageHeader";
 import { Advanced } from "./Advanced";
 import "./IdentifierAttributeDetailModal.scss";
@@ -13,12 +17,7 @@ import {
   IdentifierAttributeDetailModalProps,
 } from "./IdentifierAttributeDetailModal.types";
 import { List } from "./List";
-import { RotationThreshold } from "./RotationThreshold";
 import { SigningThreshold } from "./SigningThreshold";
-import {
-  Member,
-  MemberAcceptStatus,
-} from "../../../MemberList/MemberList.type";
 
 const IdentifierAttributeDetailModal = ({
   isOpen,
@@ -64,16 +63,10 @@ const IdentifierAttributeDetailModal = ({
     });
 
     switch (view) {
+      case DetailView.RotationThreshold:
       case DetailView.SigningThreshold:
         return (
           <SigningThreshold
-            data={data}
-            setViewType={setViewType}
-          />
-        );
-      case DetailView.RotationThreshold:
-        return (
-          <RotationThreshold
             data={data}
             setViewType={setViewType}
           />

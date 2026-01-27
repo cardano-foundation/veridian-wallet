@@ -1,27 +1,50 @@
 import { i18n } from "../../../../../i18n";
-import { CardBlock, CardDetailsItem } from "../../../CardDetails";
-import { ListHeader } from "../../../ListHeader";
+import {
+  CardBlock,
+  CardDetailsContent,
+  FlatBorderType,
+} from "../../../CardDetails";
+import { InfoCard } from "../../../InfoCard";
 import { SigningThresholdProps } from "./IdentifierAttributeDetailModal.types";
 
 export const SigningThreshold = ({ data }: SigningThresholdProps) => {
   return (
     <>
-      <ListHeader
-        title={i18n.t(
-          "profiledetails.detailsmodal.signingthreshold.threshold.title"
-        )}
-      />
-      <CardBlock testId="signing-threshold-block">
-        <CardDetailsItem
-          info={i18n.t(
-            "profiledetails.detailsmodal.signingthreshold.threshold.text",
-            {
-              members: data.members?.length || 0,
-              threshold: data.kt,
-            }
-          )}
+      <CardBlock
+        title={i18n.t("profiledetails.group.signingkeysthreshold.title")}
+        flatBorder={FlatBorderType.BOT}
+      >
+        <CardDetailsContent
+          mainContent={`${i18n.t(
+            "profiledetails.group.signingkeysthreshold.member",
+            { member: data.kt }
+          )}`}
         />
       </CardBlock>
+      <CardBlock
+        title={i18n.t("profiledetails.group.rotationthreshold.title")}
+        flatBorder={FlatBorderType.TOP}
+      >
+        <CardDetailsContent
+          mainContent={`${i18n.t(
+            "profiledetails.group.rotationthreshold.member",
+            { member: data.nt }
+          )}`}
+        />
+      </CardBlock>
+      <div className="attribute-description">
+        <h3>
+          {i18n.t(
+            `profiledetails.detailsmodal.signingthreshold.threshold.recovery.explaintitle`
+          )}
+        </h3>
+      </div>
+      <InfoCard
+        className="attribute-description-content"
+        content={i18n.t(
+          `profiledetails.detailsmodal.signingthreshold.threshold.recovery.explain`
+        )}
+      />
     </>
   );
 };

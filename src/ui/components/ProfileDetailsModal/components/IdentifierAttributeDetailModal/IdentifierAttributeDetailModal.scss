@@ -131,6 +131,26 @@
     margin-bottom: 0.75rem;
   }
 
+  .signingthreshold {
+    .card-header {
+      padding-bottom: 1.25rem;
+    }
+
+    .card-detail-stack-item {
+      h2 {
+        font-weight: 700;
+      }
+    }
+
+    .card-block {
+      margin-bottom: 0.25rem;
+    }
+
+    .flat-border-top {
+      margin-bottom: 1.5rem;
+    }
+  }
+
   @media screen and (min-width: 250px) and (max-width: 370px) {
     .attribute-description {
       h2 {

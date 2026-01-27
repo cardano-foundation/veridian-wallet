@@ -701,25 +701,18 @@
         "hiderotationkey": "Hide {{keys}} rotation key digests"
       },
       "signingthreshold": {
-        "title": "Signing threshold",
+        "title": "Signers",
         "propexplain": {
-          "title": "About signing threshold",
-          "content": "Minimum number of signing keys required to approve a transaction or event within the profile."
+          "title": "About required signers",
+          "content": "This sets the minimum number of group members who must approve an action for it to go ahead."
         },
         "threshold": {
           "title": "Threshold",
-          "text": "{{threshold}} out of {{members}}"
-        }
-      },
-      "rotationthreshold": {
-        "title": "Rotation threshold",
-        "propexplain": {
-          "title": "About rotation threshold",
-          "content": "Provides additional details on this profile for users interested in more technical insights."
-        },
-        "threshold": {
-          "title": "Threshold",
-          "text": "{{threshold}} out of {{members}}"
+          "text": "{{threshold}} out of {{members}}",
+          "recovery": {
+            "explaintitle": "About recovery signers",
+            "explain": "This sets the minimum number of group members needed to recover the group profile if something goes wrong."
+          }
         }
       },
       "groupmember": {

@@ -872,48 +872,16 @@ describe("Group profile details page", () => {
             .propexplain.content
         )
       ).toBeVisible();
-    });
-  });
-
-  test("Open rotation threshold", async () => {
-    const { getByText, getAllByText, getByTestId } = render(
-      <Provider store={storeMockedAidKeri}>
-        <ProfileDetailsModal
-          profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
-          pageId={pageId}
-          isOpen
-          setIsOpen={jest.fn}
-          showProfiles={jest.fn}
-        />
-      </Provider>
-    );
-
-    expect(
-      getByTestId("identifier-card-detail-spinner-container")
-    ).toBeVisible();
-
-    await waitFor(() => {
-      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
-      getAllByText(identifierFix[2].displayName).forEach((item) => {
-        expect(item).toBeVisible();
-      });
-    });
-
-    fireEvent.click(
-      getByText(EN_TRANSLATIONS.profiledetails.group.rotationthreshold.title)
-    );
-
-    await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
-            .propexplain.title
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold.threshold
+            .recovery.explaintitle
         )
       ).toBeVisible();
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
-            .propexplain.content
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold.threshold
+            .recovery.explain
         )
       ).toBeVisible();
     });
