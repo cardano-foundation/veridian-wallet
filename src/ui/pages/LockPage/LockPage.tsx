@@ -145,6 +145,8 @@ const LockPageContainer = () => {
   }, [dispatch, handleBiometricAuth, disablePrivacy, enablePrivacy]);
 
   const handleUseBiometrics = useCallback(async () => {
+    if (isLock) return;
+
     if (biometricsCache.enabled && !isBiometricPromptActive.current) {
       isBiometricPromptActive.current = true;
       try {
@@ -153,14 +155,14 @@ const LockPageContainer = () => {
         isBiometricPromptActive.current = false;
       }
     }
-  }, [biometricsCache.enabled, handleBiometrics]);
+  }, [biometricsCache.enabled, handleBiometrics, isLock]);
 
   useEffect(() => {
-    if (firstAppLaunch && !hasTriggeredInitialBiometrics.current) {
+    if (firstAppLaunch && !hasTriggeredInitialBiometrics.current && !isLock) {
       hasTriggeredInitialBiometrics.current = true;
       handleUseBiometrics();
     }
-  }, [firstAppLaunch, handleUseBiometrics]);
+  }, [firstAppLaunch, handleUseBiometrics, isLock]);
 
   const handlePinChange = async (digit: number) => {
     const updatedPasscode = `${passcode}${digit}`;
