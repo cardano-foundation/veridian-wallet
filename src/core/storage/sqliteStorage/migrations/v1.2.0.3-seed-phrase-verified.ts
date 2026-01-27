@@ -24,15 +24,15 @@ export const DATA_V1203: LocalMigration = {
       return statements;
     }
 
-    const identifierResult = await session.query(
-      "SELECT * FROM items WHERE category = ?",
-      ["IdentifierMetadataRecord"]
+    const keriaConnectUrlRecord = await session.query(
+      "SELECT * FROM items WHERE id = ?",
+      ["keria-connect-url"]
     );
 
-    const hasIdentifiers =
-      identifierResult.values && identifierResult.values.length > 0;
+    const hasCompletedOnboarding =
+      keriaConnectUrlRecord.values && keriaConnectUrlRecord.values.length > 0;
 
-    if (hasIdentifiers) {
+    if (hasCompletedOnboarding) {
       const verifiedRecord = {
         id: "seed-phrase-verified",
         type: "BasicRecord",
