@@ -78,6 +78,7 @@ const SetGroupNameWrapper = () => {
 };
 
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
+  const currentProfile = useAppSelector(getCurrentProfile);
   const showProfileState = useAppSelector(getShowProfileState);
   const showAlert = useAppSelector(getShowVerifySeedPhraseAlert);
   const isSyncingData = useAppSelector(getIsSyncingData);
@@ -105,6 +106,7 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
               <IonSpinner name="circular" />
             </div>
             <div
+              key={currentProfile?.identity.id}
               className={`app-router ${
                 showProfileState || showAlert ? "ion-hide" : ""
               }`}
