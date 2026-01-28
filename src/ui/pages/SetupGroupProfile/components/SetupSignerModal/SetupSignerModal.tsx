@@ -128,7 +128,6 @@ export const SetupSignerModal = ({
 
   const handleSubmit = () => {
     onSubmit(data);
-    handleClose();
   };
 
   const isValidData = useCallback(
@@ -139,12 +138,7 @@ export const SetupSignerModal = ({
   );
 
   useEffect(() => {
-    if (
-      isOpen &&
-      isValidData(Number(currentValue.recoverySigners)) &&
-      isValidData(Number(currentValue.requiredSigners))
-    )
-      setData({ ...currentValue });
+    if (isOpen) setData({ ...currentValue });
   }, [isOpen, currentValue, isValidData]);
 
   const setField = (name: keyof SignerData, value: number | null) => {

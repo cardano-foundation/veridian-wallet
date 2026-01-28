@@ -1,6 +1,6 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { pencilOutline, warningOutline } from "ionicons/icons";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import {
@@ -44,6 +44,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   const [openSigners, setOpenSigners] = useState(false);
   const [openEditMembers, setOpenEditMembers] = useState(false);
   const [loading, setLoading] = useState(false);
+  const isOpenFromSetMemberModal = useRef(false);
   const history = useHistory();
 
   const profile = useAppSelector(getCurrentProfile);
@@ -91,8 +92,13 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
     setState((state) => ({
       ...state,
       selectedConnections: [...data],
+      signer: {
+        recoverySigners: null,
+        requiredSigners: null,
+      },
     }));
 
+    isOpenFromSetMemberModal.current = true;
     openSignerModal();
   };
 
@@ -101,6 +107,9 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       ...state,
       signer: data,
     });
+
+    isOpenFromSetMemberModal.current = false;
+    setOpenSigners(false);
   };
 
   const createMultisigIdentifier = async () => {
@@ -142,6 +151,20 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
         setLoading(false);
       }
     }
+  };
+
+  const openMemberModal = () => {
+    setOpenEditMembers(true);
+  };
+
+  const handleCloseSignerModal = (value: boolean) => {
+    setOpenSigners(value);
+
+    if (!value && isOpenFromSetMemberModal.current) {
+      openMemberModal();
+    }
+
+    isOpenFromSetMemberModal.current = false;
   };
 
   return (
@@ -194,9 +217,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
           testId="group-member-block"
           className="group-members"
           endSlotIcon={pencilOutline}
-          onClick={() => {
-            setOpenEditMembers(true);
-          }}
+          onClick={openMemberModal}
         >
           <MemberList
             members={members}
@@ -279,7 +300,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       />
       <SetupSignerModal
         isOpen={openSigners}
-        setOpen={setOpenSigners}
+        setOpen={handleCloseSignerModal}
         connectionsLength={state.selectedConnections.length + 1}
         currentValue={state.signer}
         onSubmit={updateSigners}

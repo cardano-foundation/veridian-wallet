@@ -123,12 +123,24 @@ describe("Init group", () => {
     ).toBeVisible();
   });
 
-  test("Config member and signer", async () => {
-    const setStateMock = jest.fn();
+  test("Reset signer after update member member", async () => {
+    const newState = {
+      ...state,
+      signer: {
+        recoverySigners: 1,
+        requiredSigners: 2,
+      },
+    };
+    const innerFnc = jest.fn();
+    const setStateMock = jest.fn((fn) => {
+      if (typeof fn === "function") {
+        innerFnc(fn(newState));
+      }
+    });
     const { getByText, getByTestId } = render(
       <Provider store={makeTestStore()}>
         <InitializeGroup
-          state={state}
+          state={newState}
           setState={setStateMock}
         />
       </Provider>
@@ -148,23 +160,11 @@ describe("Init group", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("setup-signer-modal")).toBeVisible();
-    });
-
-    fireEvent.click(
-      getByText(
-        EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.button.confirm
-      )
-    );
-
-    await waitFor(() => {
-      expect(setStateMock).toBeCalledWith({
-        ...state,
-        signer: {
-          recoverySigners: null,
-          requiredSigners: null,
-        },
-      });
+      expect(innerFnc).toBeCalledWith(
+        expect.objectContaining({
+          signer: { recoverySigners: null, requiredSigners: null },
+        })
+      );
     });
   });
 
