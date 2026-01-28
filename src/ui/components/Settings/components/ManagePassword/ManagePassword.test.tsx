@@ -11,6 +11,7 @@ import { makeTestStore } from "../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { CustomInputProps } from "../../../CustomInput/CustomInput.types";
 import { ManagePassword } from "./ManagePassword";
+import { BiometricAuthOutcome } from "../../../../hooks/useBiometricsHook";
 
 const deletePasswordMock = jest.fn();
 
@@ -37,7 +38,11 @@ jest.mock("../../../../../core/agent/agent", () => ({
   },
 }));
 
+const handleBiometricAuthMock = jest.fn(() =>
+  Promise.resolve(BiometricAuthOutcome.SUCCESS)
+);
 jest.mock("../../../../hooks/useBiometricsHook", () => ({
+  ...jest.requireActual("../../../../hooks/useBiometricsHook"),
   useBiometricAuth: jest.fn(() => ({
     biometricsIsEnabled: false,
     biometricInfo: {
@@ -45,7 +50,7 @@ jest.mock("../../../../hooks/useBiometricsHook", () => ({
       hasCredentials: false,
       biometryType: BiometryType.FINGERPRINT,
     },
-    handleBiometricAuth: jest.fn(() => Promise.resolve(false)),
+    handleBiometricAuth: () => handleBiometricAuthMock(),
     setBiometricsIsEnabled: jest.fn(),
   })),
 }));
@@ -100,6 +105,10 @@ describe("Manage password", () => {
         getPlatforms: () => ["mobileweb"],
       };
     });
+
+    handleBiometricAuthMock.mockImplementation(() =>
+      Promise.resolve(BiometricAuthOutcome.SUCCESS)
+    );
   });
 
   test("Cancel alert", async () => {
@@ -385,6 +394,64 @@ describe("Manage password", () => {
 
     await waitFor(() => {
       expect(getByTestId("create-password-modal")).toBeVisible();
+    });
+  });
+
+  test("Show password verification after successful biometric authentication when changing the password", async () => {
+    jest.spyOn(Agent.agent.basicStorage, "findById").mockResolvedValue(
+      new BasicRecord({
+        id: "id",
+        content: {
+          value: "1213213",
+        },
+      })
+    );
+
+    const initialState = {
+      stateCache: {
+        routes: [RoutePath.SSI_AGENT],
+        currentProfileId: "default-profile-id",
+        authentication: {
+          loggedIn: false,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: true,
+          seedPhraseIsSet: false,
+        },
+      },
+      biometricsCache: {
+        enabled: true,
+      },
+    };
+
+    const dispatchMock = jest.fn();
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+    handleBiometricAuthMock.mockResolvedValue(BiometricAuthOutcome.SUCCESS);
+    const { queryByTestId, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ManagePassword />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("settings-item-toggle-password")).toBeVisible();
+      expect(queryByTestId("settings-item-change-password")).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("settings-item-change-password"));
+    });
+
+    await waitFor(() => {
+      expect(handleBiometricAuthMock).toBeCalled();
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("verify-password-value")).toBeVisible();
+      expect(getByTestId("forgot-hint-btn")).toBeVisible();
     });
   });
 });

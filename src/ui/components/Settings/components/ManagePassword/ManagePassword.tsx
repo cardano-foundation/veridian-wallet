@@ -1,7 +1,7 @@
 import { IonModal, IonToggle } from "@ionic/react";
 import { useSelector } from "react-redux";
 import { useRef, useState } from "react";
-import { useAppDispatch } from "../../../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
   getStateCache,
   setAuthentication,
@@ -16,15 +16,20 @@ import { ListCard } from "../../../ListCard/ListCard";
 import { ListItem } from "../../../ListCard/ListItem/ListItem";
 import { CreatePassword } from "../../../../pages/CreatePassword";
 import { Verification } from "../../../Verification";
+import { VerifyPassword } from "../../../VerifyPassword";
+import { getBiometricsCache } from "../../../../../store/reducers/biometricsCache";
 
 const ManagePassword = () => {
   const dispatch = useAppDispatch();
   const stateCache = useSelector(getStateCache);
   const authentication = stateCache.authentication;
+  const biometricCache = useAppSelector(getBiometricsCache);
   const userAction = useRef("");
   const [passwordIsSet, setPasswordIsSet] = useState(
     stateCache?.authentication.passwordIsSet
   );
+
+  const [confirmPassword, setConfirmPassword] = useState(false);
   const [alertEnableIsOpen, setAlertEnableIsOpen] = useState(false);
   const [alertDisableIsOpen, setAlertDisableIsOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
@@ -65,13 +70,21 @@ const ManagePassword = () => {
         showError("Unable to delete password", e, dispatch);
       }
     } else {
-      setCreatePasswordModalIsOpen(true);
+      if (biometricCache.enabled && userAction.current === "change") {
+        setConfirmPassword(true);
+      } else {
+        openChangePassword();
+      }
     }
   };
 
   const handleChange = () => {
     userAction.current = "change";
     setVerifyIsOpen(true);
+  };
+
+  const openChangePassword = () => {
+    setCreatePasswordModalIsOpen(true);
   };
 
   return (
@@ -108,7 +121,7 @@ const ManagePassword = () => {
           renderItem={(item) => (
             <ListItem
               key={item.id}
-              onClick={() => handleChange()}
+              onClick={handleChange}
               testId="settings-item-change-password"
               className="list-item"
               label={`${i18n.t(
@@ -157,6 +170,11 @@ const ManagePassword = () => {
         verifyIsOpen={verifyIsOpen}
         setVerifyIsOpen={setVerifyIsOpen}
         onVerify={onVerify}
+      />
+      <VerifyPassword
+        isOpen={confirmPassword}
+        setIsOpen={setConfirmPassword}
+        onVerify={openChangePassword}
       />
       <IonModal
         isOpen={createPasswordModalIsOpen}
