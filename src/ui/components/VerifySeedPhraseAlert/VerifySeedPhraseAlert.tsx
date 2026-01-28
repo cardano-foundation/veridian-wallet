@@ -1,6 +1,7 @@
 import { IonButton, IonModal } from "@ionic/react";
 import { useState } from "react";
 import { i18n } from "../../../i18n";
+import { notificationService } from "../../../native/pushNotifications/notificationService";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getShowVerifySeedPhraseAlert,
@@ -20,10 +21,13 @@ export const VerifySeedPhraseAlert = () => {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState(false);
 
-  const verifySuccess = () => {
+  const verifySuccess = async () => {
     setIsOpen(false);
     dispatch(showVerifySeedPhraseAlert(false));
     dispatch(setSeedPhraseVerified(true));
+
+    // Process any pending navigation that was blocked by this modal
+    await notificationService.processPendingNavigation();
   };
 
   return (

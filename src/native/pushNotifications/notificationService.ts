@@ -35,10 +35,16 @@ const CHANNEL_CONFIG = {
 
 type ProfileSwitcher = (profileId: string) => Promise<boolean>;
 
+interface PendingNavigation {
+  path: string;
+  profileId: string;
+}
+
 class NotificationService {
   private profileSwitcher: ProfileSwitcher | null = null;
   private permissionsGranted = false;
   private pendingNotification: LocalNotificationSchema | null = null;
+  private pendingNavigation: PendingNavigation | null = null;
   private initialized = false;
 
   async initialize(): Promise<boolean> {
@@ -169,6 +175,11 @@ class NotificationService {
 
     const canProceed = await dismissAllModals();
     if (!canProceed) {
+      // Queue the navigation to be executed after verification completes
+      this.pendingNavigation = {
+        path: TabsRoutePath.NOTIFICATIONS,
+        profileId,
+      };
       return;
     }
 
@@ -184,6 +195,38 @@ class NotificationService {
     const granted = result.display === "granted";
     this.permissionsGranted = granted;
     return granted;
+  }
+
+  getPendingNavigation(): PendingNavigation | null {
+    return this.pendingNavigation;
+  }
+
+  clearPendingNavigation(): void {
+    this.pendingNavigation = null;
+  }
+
+  async processPendingNavigation(): Promise<void> {
+    if (!this.pendingNavigation || !this.profileSwitcher) {
+      return;
+    }
+
+    const { path, profileId } = this.pendingNavigation;
+    this.pendingNavigation = null;
+
+    // Dismiss any remaining modals
+    const canProceed = await dismissAllModals();
+    if (!canProceed) {
+      // Another blocking modal exists - navigation lost
+      return;
+    }
+
+    // Switch to the correct profile
+    const result = await this.profileSwitcher(profileId);
+
+    // Navigate to the pending path only if profile switch succeeded
+    if (result) {
+      this.navigateToPath(path);
+    }
   }
 }
 
