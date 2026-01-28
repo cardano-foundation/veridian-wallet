@@ -15,7 +15,7 @@ import { StrictMode, useEffect, useState } from "react";
 import { ConfigurationService } from "../core/configuration";
 import { SecureStorage } from "../core/storage";
 import { i18n } from "../i18n";
-import { Routes, RoutePath } from "../routes";
+import { Routes } from "../routes";
 import { initializeFreeRASP, ThreatCheck } from "../security/freerasp";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -27,7 +27,6 @@ import {
   getInitializationPhase,
   getShowVerifySeedPhraseAlert,
   getIsSyncingData,
-  getCurrentRoute,
 } from "../store/reducers/stateCache";
 import {
   GlobalLoadingType,
@@ -79,11 +78,9 @@ const SetGroupNameWrapper = () => {
 };
 
 const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
-  const currentProfile = useAppSelector(getCurrentProfile);
   const showProfileState = useAppSelector(getShowProfileState);
   const showAlert = useAppSelector(getShowVerifySeedPhraseAlert);
   const isSyncingData = useAppSelector(getIsSyncingData);
-  const currentRoute = useAppSelector(getCurrentRoute);
 
   switch (initPhase) {
     case InitializationPhase.PHASE_ZERO:
@@ -108,14 +105,6 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
               <IonSpinner name="circular" />
             </div>
             <div
-              key={
-                [
-                  RoutePath.PROFILE_SETUP,
-                  RoutePath.GROUP_PROFILE_SETUP,
-                ].includes(currentRoute?.path as RoutePath)
-                  ? "profile-setup"
-                  : currentProfile?.identity.id
-              }
               className={`app-router ${
                 showProfileState || showAlert ? "ion-hide" : ""
               }`}
