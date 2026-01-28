@@ -17,8 +17,8 @@ import { KeyStoreKeys, SecureStorage } from "../storage";
 import { CoreEventEmitter } from "./event";
 import { EventTypes } from "./event.types";
 import { PeerConnection } from "../cardano/walletConnect/peerConnection";
-import { IdentifierService } from "./services";
 import { BasicRecord, BasicStorage, CredentialMetadataRecord } from "./records";
+import { DELETED_IDENTIFIER_THEME } from "../utils/habName";
 
 jest.mock("signify-ts", () => ({
   SignifyClient: jest.fn(),
@@ -749,7 +749,7 @@ describe("Agent setup and wiping", () => {
     expect(PeerConnection.peerConnection.disconnectDApp).not.toBeCalled();
     expect(stopPollingMock).toBeCalled();
     expect(updateIdentifierMock).toBeCalledWith("identifier", {
-      name: `${IdentifierService.DELETED_IDENTIFIER_THEME}-my-salt:my-identifier`,
+      name: `1.2.0.2:${DELETED_IDENTIFIER_THEME}-my-salt:my-identifier`,
     });
     expect(deleteCredentialMock).toBeCalledWith("credential-id");
     expect(deleteContactMock).toBeCalledWith("connection-id");

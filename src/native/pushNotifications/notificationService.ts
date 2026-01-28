@@ -1,12 +1,12 @@
+import { Capacitor } from "@capacitor/core";
 import {
   LocalNotifications,
   LocalNotificationSchema,
 } from "@capacitor/local-notifications";
-import { Capacitor } from "@capacitor/core";
 import { TabsRoutePath } from "../../routes/paths";
-import { NotificationPayload } from "./notificationService.types";
 import { showError } from "../../ui/utils/error";
 import { dismissAllModals } from "../../ui/utils/modal";
+import { NotificationPayload } from "./notificationService.types";
 
 const PRIMARY_COLOR =
   getComputedStyle(document.documentElement)
@@ -33,8 +33,10 @@ const CHANNEL_CONFIG = {
   vibration: true,
 };
 
+type ProfileSwitcher = (profileId: string) => Promise<boolean>;
+
 class NotificationService {
-  private profileSwitcher: ((profileId: string) => void) | null = null;
+  private profileSwitcher: ProfileSwitcher | null = null;
   private permissionsGranted = false;
   private pendingNotification: LocalNotificationSchema | null = null;
   private initialized = false;
@@ -72,7 +74,7 @@ class NotificationService {
     }
   }
 
-  setProfileSwitcher(profileSwitcher: (profileId: string) => void) {
+  setProfileSwitcher(profileSwitcher: ProfileSwitcher) {
     this.profileSwitcher = profileSwitcher;
     this.processPendingNotification();
   }
@@ -170,8 +172,11 @@ class NotificationService {
       return;
     }
 
-    this.profileSwitcher(profileId);
-    this.navigateToPath(TabsRoutePath.NOTIFICATIONS);
+    const result = await this.profileSwitcher(profileId);
+
+    if (result) {
+      this.navigateToPath(TabsRoutePath.NOTIFICATIONS);
+    }
   }
 
   async arePermissionsGranted(): Promise<boolean> {

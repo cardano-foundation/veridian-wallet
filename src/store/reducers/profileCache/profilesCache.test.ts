@@ -1,4 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { waitFor } from "@testing-library/dom";
 import {
   ConnectionStatus,
   CreationStatus,
@@ -13,6 +14,7 @@ import {
 } from "../../../core/agent/services/identifier.types";
 import { filteredCredsFix } from "../../../ui/__fixtures__/filteredCredsFix";
 import {
+  filteredIdentifierFix,
   pendingGroupIdentifierFix,
   pendingIdentifierFix,
   pendingMemberIdentifierFix,
@@ -26,6 +28,8 @@ import {
   recentProfilesDataFix,
   storeStateFixData,
 } from "../../../ui/__fixtures__/storeDataFix";
+import { ToastMsgType } from "../../../ui/globals/types";
+import { makeTestStore } from "../../../ui/utils/makeTestStore";
 import {
   addGroupProfile,
   addNotification,
@@ -48,6 +52,7 @@ import {
   setPeerConnections,
   setProfiles,
   setScanGroupId,
+  switchProfileFromNotification,
   updateCurrentProfile,
   updateOrAddCredsCache,
   updateProfileCreationStatus,
@@ -58,6 +63,23 @@ import {
   MultiSigGroup,
   ProfileCache,
 } from "./profilesCache.types";
+
+jest.mock("signify-ts", () => ({
+  ...jest.requireActual("signify-ts"),
+  Salter: jest.fn(() => ({
+    qb64: "qb64",
+  })),
+}));
+
+jest.mock("../../../core/agent/agent", () => ({
+  Agent: {
+    agent: {
+      basicStorage: {
+        createOrUpdateBasicRecord: jest.fn(),
+      },
+    },
+  },
+}));
 
 describe("Profile cache", () => {
   const initialState: ProfileCache = {
@@ -410,5 +432,67 @@ describe("Profile cache", () => {
     } as any;
     const scanGroupId = getScanGroupId(state);
     expect(scanGroupId).toEqual(state.profilesCache.scanGroupId);
+  });
+});
+
+describe("switch to profile from noti", () => {
+  test("dispatch toast and set default profile is empty when profile does not exist", async () => {
+    const store = makeTestStore({
+      profilesCache: {
+        profiles: {},
+      },
+    });
+
+    await store.dispatch(switchProfileFromNotification("deleted_id"));
+
+    await waitFor(() => {
+      expect(
+        store
+          .getState()
+          .stateCache.toastMsgs.some(
+            (item) => item.message === ToastMsgType.PROFILE_NOT_EXIST
+          )
+      ).toBe(true);
+
+      expect(store.getState().profilesCache.defaultProfile).toBe("");
+    });
+  });
+
+  test("dispatch toast when profile does not exist", async () => {
+    const store = makeTestStore({
+      profilesCache: {
+        ...profileCacheFixData,
+      },
+    });
+
+    await store.dispatch(switchProfileFromNotification("deleted_id"));
+
+    await waitFor(() => {
+      expect(
+        store
+          .getState()
+          .stateCache.toastMsgs.some(
+            (item) => item.message === ToastMsgType.PROFILE_NOT_EXIST
+          )
+      ).toBe(true);
+    });
+  });
+
+  test("switch to new profile", async () => {
+    const store = makeTestStore({
+      profilesCache: {
+        ...profileCacheFixData,
+      },
+    });
+
+    await store.dispatch(
+      switchProfileFromNotification(filteredIdentifierFix[0].id)
+    );
+
+    await waitFor(() => {
+      expect(store.getState().profilesCache.defaultProfile).toBe(
+        filteredIdentifierFix[0].id
+      );
+    });
   });
 });

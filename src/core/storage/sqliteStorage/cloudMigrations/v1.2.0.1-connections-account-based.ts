@@ -139,12 +139,13 @@ export const CLOUD_V1201: CloudMigration = {
         }
 
         // associate createdAt and all notes for every non-deleted identifier
-        for (const prefix of identifiers) {
-          contactUpdates[`${prefix}:createdAt`] = contact["createdAt"];
-          contactUpdates[`${prefix}:alias`] = contact.alias;
+        for (const identifier of identifiers) {
+          contactUpdates[`${identifier.prefix}:createdAt`] =
+            contact["createdAt"];
+          contactUpdates[`${identifier.prefix}:alias`] = contact.alias;
 
           for (const noteItem of noteItems) {
-            const newPrefixedNote = `${prefix}:${noteItem.key}`;
+            const newPrefixedNote = `${identifier.prefix}:${noteItem.key}`;
             contactUpdates[newPrefixedNote] = noteItem.data;
           }
         }

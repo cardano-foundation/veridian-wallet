@@ -45,6 +45,7 @@ import {
   setIsConnectingToDApp,
   setPendingDAppConnection,
   setProfiles,
+  switchProfileFromNotification,
   updateOrAddConnectionCache,
   updateOrAddCredsCache,
   updatePeerConnectionsFromCore,
@@ -772,15 +773,10 @@ const AppWrapper = (props: { children: ReactNode }) => {
 
     notificationService.setProfileSwitcher(async (profileId: string) => {
       if (!Agent.agent.dependenciesInitialized) {
-        return;
+        return false;
       }
-      dispatch(setCurrentProfile(profileId));
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.DEFAULT_PROFILE,
-          content: { defaultProfile: profileId },
-        })
-      );
+
+      return await dispatch(switchProfileFromNotification(profileId));
     });
 
     Agent.agent.onKeriaStatusStateChanged((event) => {

@@ -46,6 +46,10 @@
       }
     }
   }
+
+  .switch-button.secondary-button {
+    --border-radius: 0.5rem;
+  }
 }
 
 .recovery-seed-phrase-page-footer {

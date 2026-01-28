@@ -1578,7 +1578,8 @@
     "invalidremovedconnectionurlerror": "Invalid connection removed",
     "networkerror": "Unable to reach the cloud",
     "createidentifiererror": "Unable to create profile",
-    "invalidconnectionurlerror": "Invalid connection URL"
+    "invalidconnectionurlerror": "Invalid connection URL",
+    "profilenotexisterror": "This profile no longer exists"
   },
   "request": {
     "sign": {

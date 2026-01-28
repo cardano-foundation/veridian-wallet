@@ -50,6 +50,7 @@ import {
   MultiSigService,
 } from "./services";
 import { isNetworkError, OnlineOnly, randomSalt } from "./services/utils";
+import { buildDeletedHabName } from "../utils/habName";
 
 const walletId = "idw";
 class Agent {
@@ -773,9 +774,7 @@ class Agent {
       await this.agentServicesProps.signifyClient
         .identifiers()
         .update(identifier.id, {
-          name: `${
-            IdentifierService.DELETED_IDENTIFIER_THEME
-          }-${randomSalt()}:${identifier.displayName}`,
+          name: buildDeletedHabName(identifier, randomSalt()),
         });
     }
 

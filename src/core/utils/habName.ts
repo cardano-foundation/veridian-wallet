@@ -83,6 +83,23 @@ export function parseHabName(name: string): HabNameParts {
   const firstHyphenIndex = groupPart.indexOf("-");
 
   if (firstHyphenIndex === -1) {
+    // Check for broken 1.1.X deleted mHab format: XX-salt:groupId:displayName
+    // groupId never contains -, so if theme starts with XX- and groupPart has no hyphen,
+    // this is a broken deleted mHab that's missing the isInitiator flag
+    if (theme.startsWith("XX-")) {
+      if (!groupPart || groupPart.trim() === "") {
+        throw new Error("Invalid old format name: groupId cannot be empty.");
+      }
+      return {
+        theme,
+        displayName,
+        groupMetadata: {
+          groupInitiator: false, // Cannot be determined, default to false
+          groupId: groupPart,
+          proposedUsername: "",
+        },
+      };
+    }
     throw new Error(
       "Invalid old format name: Invalid group part format (expected groupInitiator-groupId)."
     );
@@ -110,15 +127,38 @@ export function parseHabName(name: string): HabNameParts {
 
 export function formatToV1_2_0_2(parts: HabNameParts): string {
   const version = "1.2.0.2";
-  const themePart = parts.theme || ""; // Ensure theme is not undefined
-  const displayNamePart = parts.displayName || ""; // Ensure display name is not undefined
+  const theme = parts.theme;
+  const displayName = parts.displayName;
 
   if (parts.groupMetadata) {
-    const groupInitiatorStr = parts.groupMetadata.groupInitiator ? "1" : "0";
-    const groupIdPart = parts.groupMetadata.groupId || "";
-    const proposedUsernamePart = parts.groupMetadata.proposedUsername || "";
-    return `${version}:${themePart}:${groupInitiatorStr}:${groupIdPart}:${proposedUsernamePart}:${displayNamePart}`;
+    const initiatorFlag = parts.groupMetadata.groupInitiator ? "1" : "0";
+    const groupId = parts.groupMetadata.groupId;
+    const proposedUsername = parts.groupMetadata.proposedUsername;
+    return `${version}:${theme}:${initiatorFlag}:${groupId}:${proposedUsername}:${displayName}`;
   } else {
-    return `${version}:${themePart}:${displayNamePart}`;
+    return `${version}:${theme}:${displayName}`;
   }
+}
+
+export const DELETED_IDENTIFIER_THEME = "XX";
+
+export interface DeletedHabNameInput {
+  displayName: string;
+  groupMetadata?: {
+    groupInitiator: boolean;
+    groupId: string;
+    proposedUsername: string;
+  };
+}
+
+export function buildDeletedHabName(
+  input: DeletedHabNameInput,
+  salt: string
+): string {
+  const deletedTheme = `${DELETED_IDENTIFIER_THEME}-${salt}`;
+  return formatToV1_2_0_2({
+    theme: deletedTheme,
+    displayName: input.displayName,
+    groupMetadata: input.groupMetadata,
+  });
 }

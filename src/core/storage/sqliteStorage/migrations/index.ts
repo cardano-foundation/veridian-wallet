@@ -3,6 +3,7 @@ import { DATA_V001 } from "./v0.0.1-init_sql";
 import { DATA_V1201 } from "./v1.2.0.1-connections-per-account";
 import { DATA_V1202 } from "./v1.2.0.2-group-scoped-username";
 import { DATA_V1200 } from "./v1.2.0.0-peer_connection_account_migration";
+import { DATA_V1203 } from "./v1.2.0.3-seed-phrase-verified";
 
 // Local migrations (SQLite database only)
 const LOCAL_MIGRATIONS: LocalMigration[] = [
@@ -10,6 +11,7 @@ const LOCAL_MIGRATIONS: LocalMigration[] = [
   DATA_V1200, // TS migration for peer connection account migration
   DATA_V1201, // TS migration for connections per account (local part only)
   DATA_V1202, // TS migration for identifier group-scoped username (v1.2.0.2)
+  DATA_V1203, // TS migration for marking existing users' seed phrase as verified (v1.2.0.3)
 ];
 
 export { LOCAL_MIGRATIONS };

@@ -112,29 +112,26 @@ export const DATA_V1201: TsMigration = {
 
       if (!connectionData.sharedIdentifier) {
         if (!connectionData.groupId) {
-          console.log("No groupId found for connection, skipping migration");
-          continue;
-        }
-
-        // No sharedIdentifier: create pair for every non-deleted identifier
-        for (const identifier of identifiers) {
-          const pairId = `${identifier.id}:${connectionData.id}`;
-          connectionPairsToInsert.push({
-            id: pairId,
-            contactId: contactRecord.id,
-            createdAt: connectionData.createdAt,
-            identifier: identifier.id,
-            alias: connectionData.alias,
-            creationStatus: connectionData.creationStatus,
-            pendingDeletion: connectionData.pendingDeletion,
-            type: "ConnectionPairRecord",
-          });
-          connectionPairTags[pairId] = {
-            identifier: identifier.id,
-            contactId: contactRecord.id,
-            creationStatus: connectionData.creationStatus,
-            pendingDeletion: connectionData.pendingDeletion,
-          };
+          // No sharedIdentifier: create pair for every non-deleted identifier (unless this is a group connection)
+          for (const identifier of identifiers) {
+            const pairId = `${identifier.id}:${connectionData.id}`;
+            connectionPairsToInsert.push({
+              id: pairId,
+              contactId: contactRecord.id,
+              createdAt: connectionData.createdAt,
+              identifier: identifier.id,
+              alias: connectionData.alias,
+              creationStatus: connectionData.creationStatus,
+              pendingDeletion: connectionData.pendingDeletion,
+              type: "ConnectionPairRecord",
+            });
+            connectionPairTags[pairId] = {
+              identifier: identifier.id,
+              contactId: contactRecord.id,
+              creationStatus: connectionData.creationStatus,
+              pendingDeletion: connectionData.pendingDeletion,
+            };
+          }
         }
       } else {
         // Has sharedIdentifier: only create pair if identifier exists and is not deleted/pending

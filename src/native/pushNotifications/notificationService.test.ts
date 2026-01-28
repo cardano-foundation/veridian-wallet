@@ -226,7 +226,7 @@ describe("NotificationService", () => {
           notificationId: "notif-123",
         },
       };
-
+      mockProfileSwitcher.mockImplementationOnce(() => Promise.resolve(true));
       await (notificationService as any).handleNotificationTap(notification);
 
       expect(dismissAllModals).toHaveBeenCalled();
@@ -325,6 +325,7 @@ describe("NotificationService", () => {
       );
 
       const mockProfileSwitcher = jest.fn();
+      mockProfileSwitcher.mockImplementationOnce(() => Promise.resolve(true));
       const mockPushState = jest.spyOn(window.history, "pushState");
       const mockDispatchEvent = jest.spyOn(window, "dispatchEvent");
 
@@ -345,5 +346,36 @@ describe("NotificationService", () => {
       mockPushState.mockRestore();
       mockDispatchEvent.mockRestore();
     });
+  });
+
+  test("should not redirect to notification tab when switch to deleted profile", async () => {
+    const notification = {
+      id: 1,
+      extra: {
+        profileId: "profile-abc",
+        notificationId: "notif-123",
+      },
+    };
+
+    (notificationService as any).profileSwitcher = null;
+    await (notificationService as any).handleNotificationTap(notification);
+
+    expect((notificationService as any).pendingNotification).toEqual(
+      notification
+    );
+
+    const mockProfileSwitcher = jest.fn();
+    mockProfileSwitcher.mockImplementationOnce(() => Promise.resolve(false));
+    const mockPushState = jest.spyOn(window.history, "pushState");
+    const mockDispatchEvent = jest.spyOn(window, "dispatchEvent");
+
+    notificationService.setProfileSwitcher(mockProfileSwitcher);
+
+    (dismissAllModals as jest.Mock).mockResolvedValue(true);
+    await (notificationService as any).processPendingNotification();
+
+    expect((notificationService as any).pendingNotification).toBeNull();
+    expect(mockProfileSwitcher).toHaveBeenCalledWith("profile-abc");
+    expect(mockPushState).not.toBeCalled();
   });
 });

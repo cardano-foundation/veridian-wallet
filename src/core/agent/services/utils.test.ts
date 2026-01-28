@@ -145,9 +145,17 @@ describe("Utils", () => {
 
         expect(mockOperationPendingStorage.findAllByQuery).toHaveBeenCalledWith(
           {
-            filter: {
-              id: { $regex: `^.*\\.${linkedRequestCurrent}$` },
-            },
+            $or: [
+              {
+                id: `${OperationPendingRecordType.ExchangeReceiveCredential}.${linkedRequestCurrent}`,
+              },
+              {
+                id: `${OperationPendingRecordType.ExchangeOfferCredential}.${linkedRequestCurrent}`,
+              },
+              {
+                id: `${OperationPendingRecordType.ExchangePresentCredential}.${linkedRequestCurrent}`,
+              },
+            ],
           }
         );
 

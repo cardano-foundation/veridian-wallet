@@ -83,6 +83,7 @@ enum ToastMsgType {
   NETWORK_ERROR = "networkerror",
   CREATE_IDENTIFIER_FAIL = "createidentifiererror",
   INVALID_CONNECTION_URL = "invalidconnectionurlerror",
+  PROFILE_NOT_EXIST = "profilenotexisterror",
 }
 
 const PASSCODE_MAPPING = {

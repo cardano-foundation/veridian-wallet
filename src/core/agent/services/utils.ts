@@ -1,5 +1,9 @@
 import { Operation, Salter, SignifyClient } from "signify-ts";
-import { CredentialMetadataRecord, NotificationStorage } from "../records";
+import {
+  CredentialMetadataRecord,
+  NotificationStorage,
+  OperationPendingRecordType,
+} from "../records";
 import { CredentialShortDetails } from "./credentialService.types";
 import { Agent } from "../agent";
 import { NotificationRoute } from "./keriaNotificationService.types";
@@ -118,10 +122,19 @@ async function cleanupPendingOperations(
   operationPendingStorage: OperationPendingStorage,
   linkedRequestCurrent: string
 ): Promise<void> {
+  // WARNING: If new operation types are added that support linked requests, they MUST be added here.
   const pendingOperations = await operationPendingStorage.findAllByQuery({
-    filter: {
-      id: { $regex: `^.*\\.${linkedRequestCurrent}$` },
-    },
+    $or: [
+      {
+        id: `${OperationPendingRecordType.ExchangeReceiveCredential}.${linkedRequestCurrent}`,
+      },
+      {
+        id: `${OperationPendingRecordType.ExchangeOfferCredential}.${linkedRequestCurrent}`,
+      },
+      {
+        id: `${OperationPendingRecordType.ExchangePresentCredential}.${linkedRequestCurrent}`,
+      },
+    ],
   });
 
   if (pendingOperations.length === 0) {
