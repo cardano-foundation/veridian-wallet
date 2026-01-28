@@ -76,11 +76,14 @@ const ShareProfile = ({
 
   useOnlineStatusEffect(fetchOobi);
 
-  const handleClose = useCallback(() => {
-    setIsOpen(false);
-    scanRef.current?.stopScan();
-    setTab(Tab.ShareOobi);
-  }, [setIsOpen]);
+  const handleClose = useCallback(
+    (closeModals?: boolean) => {
+      setIsOpen(false, closeModals);
+      scanRef.current?.stopScan();
+      setTab(Tab.ShareOobi);
+    },
+    [setIsOpen]
+  );
 
   const handleScan = useCallback(
     async (content: string) => {
@@ -90,7 +93,7 @@ const ShareProfile = ({
       }
 
       const close = () => {
-        handleClose();
+        handleClose(true);
 
         if (history.location.pathname != TabsRoutePath.CONNECTIONS) {
           history.push(TabsRoutePath.CONNECTIONS);
@@ -112,7 +115,7 @@ const ShareProfile = ({
       className={`${componentId}-modal ${tab}`}
       data-testid={componentId}
       isOpen={isOpen}
-      onDidDismiss={handleClose}
+      onDidDismiss={() => handleClose()}
     >
       <ResponsivePageLayout
         pageId={componentId}
@@ -120,7 +123,7 @@ const ShareProfile = ({
         header={
           <PageHeader
             closeButton={true}
-            closeButtonAction={handleClose}
+            closeButtonAction={() => handleClose()}
             closeButtonLabel={`${i18n.t("shareprofile.buttons.close")}`}
             title={
               tab === Tab.ShareOobi

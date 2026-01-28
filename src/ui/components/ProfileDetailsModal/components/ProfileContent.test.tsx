@@ -15,12 +15,6 @@ jest.mock("../../EditProfile", () => ({
   EditProfile: () => <div data-testid="edit-profile">EditProfile</div>,
 }));
 
-jest.mock("../../ShareConnection", () => ({
-  ShareConnection: () => (
-    <div data-testid="share-connection">ShareConnection</div>
-  ),
-}));
-
 jest.mock("../../Avatar", () => ({
   Avatar: ({ id }: { id: string }) => <div data-testid="avatar">{id}</div>,
   MemberAvatar: () => <div data-testid="member-avatar">MemberAvatar</div>,
@@ -99,6 +93,7 @@ describe("ProfileContent", () => {
     oobi: "test-oobi",
     setCardData: jest.fn(),
     onRotateKey: jest.fn(),
+    onAfterScan: jest.fn(),
   };
 
   const renderComponent = (storeOverrides = {}) => {

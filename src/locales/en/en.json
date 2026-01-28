@@ -1327,17 +1327,6 @@
       }
     }
   },
-  "shareidentifier": {
-    "title": "Share connection",
-    "subtitle": {
-      "identifier": "To share, either scan the QR code or select from the provided options below",
-      "connection": "Show this QR code to the person you want to connect with, or click the 'More share options' link"
-    },
-    "done": "Done",
-    "divider": "or",
-    "copykey": "Copy connection URL",
-    "more": "More share options"
-  },
   "setupgroupprofile": {
     "cancel": "Cancel",
     "back": "Back",

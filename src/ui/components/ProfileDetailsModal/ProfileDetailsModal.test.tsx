@@ -302,7 +302,7 @@ describe("Individual profile details page", () => {
     });
 
     await waitFor(() => {
-      expect(getByTestId("share-connection-modal")).toBeVisible();
+      expect(getByTestId("share-profile")).toBeVisible();
     });
   });
 
