@@ -249,7 +249,7 @@ const ProfileContent = ({
           {cardData.nt && (
             <CardBlock
               title={i18n.t("profiledetails.group.rotationthreshold.title")}
-              onClick={() => openPropDetailModal(DetailView.RotationThreshold)}
+              onClick={() => openPropDetailModal(DetailView.SigningThreshold)}
               testId="rotate-threshold-block"
             >
               <CardDetailsContent
