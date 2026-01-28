@@ -31,6 +31,7 @@ export const VerifySeedPhraseAlert = () => {
       <IonModal
         className={pageId}
         isOpen={!!showAlert}
+        backdropDismiss={false}
       >
         <div className="content">
           <img
