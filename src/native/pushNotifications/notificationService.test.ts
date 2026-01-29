@@ -428,7 +428,6 @@ describe("NotificationService", () => {
 
       await notificationService.processPendingNavigation();
 
-      expect(dismissAllModals).toHaveBeenCalled();
       expect(mockProfileSwitcher).toHaveBeenCalledWith("profile-abc");
       expect(mockPushState).toHaveBeenCalledWith(
         null,

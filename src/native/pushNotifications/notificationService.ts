@@ -213,13 +213,6 @@ class NotificationService {
     const { path, profileId } = this.pendingNavigation;
     this.pendingNavigation = null;
 
-    // Dismiss any remaining modals
-    const canProceed = await dismissAllModals();
-    if (!canProceed) {
-      // Another blocking modal exists - navigation lost
-      return;
-    }
-
     // Switch to the correct profile
     const result = await this.profileSwitcher(profileId);
 
