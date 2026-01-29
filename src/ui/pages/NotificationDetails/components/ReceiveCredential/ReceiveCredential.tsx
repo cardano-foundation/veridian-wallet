@@ -565,6 +565,7 @@ const ReceiveCredential = ({
           setIsOpen={setOpenIdentifierDetail}
           pageId="profile-details"
           profileId={credDetail.identifierId}
+          restrictedOptions
         />
       )}
     </>
