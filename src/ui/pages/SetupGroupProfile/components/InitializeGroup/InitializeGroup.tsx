@@ -245,7 +245,9 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
               <CardDetailsContent
                 testId="required-signer-key"
                 mainContent={`${i18n.t(
-                  `setupgroupprofile.initgroup.setsigner.members`,
+                  `setupgroupprofile.initgroup.setsigner.${
+                    state.signer.requiredSigners > 1 ? "members" : "member"
+                  }`,
                   {
                     members: state.signer.requiredSigners || 0,
                   }
@@ -263,7 +265,9 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
               <CardDetailsContent
                 testId="recovery-signer-key"
                 mainContent={`${i18n.t(
-                  `setupgroupprofile.initgroup.setsigner.members`,
+                  `setupgroupprofile.initgroup.setsigner.${
+                    state.signer.recoverySigners > 1 ? "members" : "member"
+                  }`,
                   {
                     members: state.signer.recoverySigners || 0,
                   }

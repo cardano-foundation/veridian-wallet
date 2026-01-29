@@ -832,7 +832,7 @@ describe("Group profile details page", () => {
     });
   });
 
-  test("Open signing threshold", async () => {
+  test("Click on signing threshold", async () => {
     const { getByText, getAllByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
@@ -857,6 +857,61 @@ describe("Group profile details page", () => {
 
     fireEvent.click(
       getByText(EN_TRANSLATIONS.profiledetails.group.signingkeysthreshold.title)
+    );
+
+    await waitFor(() => {
+      expect(
+        getByText(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold
+            .propexplain.title
+        )
+      ).toBeVisible();
+      expect(
+        getByText(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold
+            .propexplain.content
+        )
+      ).toBeVisible();
+      expect(
+        getByText(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold.threshold
+            .recovery.explaintitle
+        )
+      ).toBeVisible();
+      expect(
+        getByText(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold.threshold
+            .recovery.explain
+        )
+      ).toBeVisible();
+    });
+  });
+
+  test("Click on rotate threshold", async () => {
+    const { getByText, getAllByText, getByTestId } = render(
+      <Provider store={storeMockedAidKeri}>
+        <ProfileDetailsModal
+          profileId="ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb"
+          pageId={pageId}
+          isOpen
+          setIsOpen={jest.fn}
+          showProfiles={jest.fn}
+        />
+      </Provider>
+    );
+    expect(
+      getByTestId("identifier-card-detail-spinner-container")
+    ).toBeVisible();
+
+    await waitFor(() => {
+      expect(getAllByText(identifierFix[2].displayName).length).toBe(1);
+      getAllByText(identifierFix[2].displayName).forEach((item) => {
+        expect(item).toBeVisible();
+      });
+    });
+
+    fireEvent.click(
+      getByText(EN_TRANSLATIONS.profiledetails.group.rotationthreshold.title)
     );
 
     await waitFor(() => {

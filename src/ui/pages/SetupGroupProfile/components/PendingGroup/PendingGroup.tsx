@@ -463,7 +463,9 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
           <CardDetailsContent
             testId="required-signer-key"
             mainContent={`${i18n.t(
-              `setupgroupprofile.initgroup.setsigner.members`,
+              `setupgroupprofile.initgroup.setsigner.${
+                (signingThreshold || 0) > 1 ? "members" : "member"
+              }`,
               {
                 members: signingThreshold || 0,
               }
@@ -481,7 +483,9 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
           <CardDetailsContent
             testId="recovery-signer-key"
             mainContent={`${i18n.t(
-              `setupgroupprofile.initgroup.setsigner.members`,
+              `setupgroupprofile.initgroup.setsigner.${
+                (rotationThreshold || 0) > 1 ? "members" : "member"
+              }`,
               {
                 members: rotationThreshold || 0,
               }

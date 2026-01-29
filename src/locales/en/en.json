@@ -642,12 +642,14 @@
       },
       "signingkeysthreshold": {
         "title": "Required signers",
-        "member": "{{member}} members",
+        "members": "{{member}} members",
+        "member": "{{member}} member",
         "outof": "out of {{threshold}}"
       },
       "rotationthreshold": {
         "title": "Recovery signers",
-        "member": "{{member}} members",
+        "members": "{{member}} members",
+        "member": "{{member}} member",
         "outof": "out of {{threshold}}"
       },
       "button": {
@@ -1434,6 +1436,7 @@
         "recoverysigners": "Recovery signers",
         "recoverysignershelptext": "This sets the minimum number of group members needed to recover the group profile if something goes wrong.",
         "members": "{{members}} members",
+        "member": "{{members}} member",
         "button": {
           "back": "Back",
           "confirm": "Confirm signers"

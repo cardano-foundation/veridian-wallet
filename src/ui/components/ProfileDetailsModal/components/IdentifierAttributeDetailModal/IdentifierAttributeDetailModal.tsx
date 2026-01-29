@@ -17,7 +17,7 @@ import {
   IdentifierAttributeDetailModalProps,
 } from "./IdentifierAttributeDetailModal.types";
 import { List } from "./List";
-import { SigningThreshold } from "./SigningThreshold";
+import { SignersDetails } from "./SignersDetails";
 
 const IdentifierAttributeDetailModal = ({
   isOpen,
@@ -66,7 +66,7 @@ const IdentifierAttributeDetailModal = ({
       case DetailView.RotationThreshold:
       case DetailView.SigningThreshold:
         return (
-          <SigningThreshold
+          <SignersDetails
             data={data}
             setViewType={setViewType}
           />

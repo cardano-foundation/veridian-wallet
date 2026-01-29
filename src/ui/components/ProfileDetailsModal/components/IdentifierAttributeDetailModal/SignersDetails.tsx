@@ -7,7 +7,7 @@ import {
 import { InfoCard } from "../../../InfoCard";
 import { SigningThresholdProps } from "./IdentifierAttributeDetailModal.types";
 
-export const SigningThreshold = ({ data }: SigningThresholdProps) => {
+export const SignersDetails = ({ data }: SigningThresholdProps) => {
   return (
     <>
       <CardBlock
@@ -16,7 +16,9 @@ export const SigningThreshold = ({ data }: SigningThresholdProps) => {
       >
         <CardDetailsContent
           mainContent={`${i18n.t(
-            "profiledetails.group.signingkeysthreshold.member",
+            Number(data.kt) === 1
+              ? "profiledetails.group.signingkeysthreshold.member"
+              : "profiledetails.group.signingkeysthreshold.members",
             { member: data.kt }
           )}`}
         />
@@ -27,7 +29,9 @@ export const SigningThreshold = ({ data }: SigningThresholdProps) => {
       >
         <CardDetailsContent
           mainContent={`${i18n.t(
-            "profiledetails.group.rotationthreshold.member",
+            Number(data.nt) === 1
+              ? "profiledetails.group.rotationthreshold.member"
+              : "profiledetails.group.rotationthreshold.members",
             { member: data.nt }
           )}`}
         />
