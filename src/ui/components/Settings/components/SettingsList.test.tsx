@@ -380,7 +380,7 @@ describe("SettingsList", () => {
     });
   });
 
-  test("Show passcode verification after successful biometric authentication when changing the passcode", async () => {
+  test("Show passcode verification", async () => {
     handleBiometricAuthMock.mockResolvedValue(BiometricAuthOutcome.SUCCESS);
 
     const dispatchMock = jest.fn();
@@ -415,10 +415,6 @@ describe("SettingsList", () => {
     fireEvent.click(
       getByTestId(`settings-security-list-item-${OptionIndex.ChangePin}`)
     );
-
-    await waitFor(() => {
-      expect(handleBiometricAuthMock).toBeCalled();
-    });
 
     await waitFor(() => {
       expect(getByTestId("verify-passcode")).toBeVisible();

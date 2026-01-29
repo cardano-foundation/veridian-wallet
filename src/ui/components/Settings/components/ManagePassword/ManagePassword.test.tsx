@@ -397,7 +397,7 @@ describe("Manage password", () => {
     });
   });
 
-  test("Show password verification after successful biometric authentication when changing the password", async () => {
+  test("Show password verification", async () => {
     jest.spyOn(Agent.agent.basicStorage, "findById").mockResolvedValue(
       new BasicRecord({
         id: "id",
@@ -443,10 +443,6 @@ describe("Manage password", () => {
 
     act(() => {
       fireEvent.click(getByTestId("settings-item-change-password"));
-    });
-
-    await waitFor(() => {
-      expect(handleBiometricAuthMock).toBeCalled();
     });
 
     await waitFor(() => {

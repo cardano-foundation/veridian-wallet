@@ -415,7 +415,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         break;
       }
       case OptionIndex.ChangePin: {
-        openVerify();
+        setConfirmPasscode(true);
         break;
       }
       case OptionIndex.ManagePassword: {
@@ -466,14 +466,6 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
     switch (option) {
       case 0: {
         biometricAuth();
-        break;
-      }
-      case 1: {
-        if (biometricsCache.enabled) {
-          setConfirmPasscode(true);
-        } else {
-          openChangePin();
-        }
         break;
       }
       case OptionIndex.DeleteWallet:
