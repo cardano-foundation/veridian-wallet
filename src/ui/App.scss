@@ -72,8 +72,12 @@ body {
 
 ion-content {
   --offset-bottom: auto !important;
-  --overflow: hidden;
-  overflow: auto;
+
+  /* Ionic 8 fix: Ensure Shadow DOM scroll container has explicit height */
+  &::part(scroll) {
+    height: 100%;
+  }
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -321,6 +325,7 @@ ion-segment {
 
     &.segment-button-checked {
       --color-checked: var(--ion-color-neutral-100);
+
       &::part(indicator-background) {
         background: var(--ion-color-primary-700);
       }
