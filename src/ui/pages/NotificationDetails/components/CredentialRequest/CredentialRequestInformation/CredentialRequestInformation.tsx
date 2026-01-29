@@ -546,6 +546,7 @@ const CredentialRequestInformation = ({
       <SideSlider
         isOpen={showConnection && !!connection}
         renderAsModal
+        onClose={() => setShowConnection(false)}
       >
         {connection && (
           <ConnectionDetails

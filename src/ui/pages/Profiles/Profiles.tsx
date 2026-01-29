@@ -283,6 +283,7 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         isOpen={openSetupProfile}
         renderAsModal
         animation={false}
+        onClose={handleCloseSetupProfile}
       >
         <ProfileSetup
           onClose={(cancel) => {

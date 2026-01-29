@@ -290,6 +290,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
         renderAsModal
         isOpen={isOpen}
         className="connect-dapp-modal"
+        onClose={() => setIsOpen(false)}
       >
         <ScrollablePageLayout
           pageId={pageId}

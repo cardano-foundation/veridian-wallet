@@ -11,6 +11,7 @@ import {
   VerifySeedPhraseModalProps,
 } from "./VerifySeedPhraseModal.types";
 import { VerifyStage } from "./VerifyStage";
+import { combineClassNames } from "../../utils/style";
 
 const VerifySeedPhraseModal = ({
   setShow,
@@ -81,7 +82,9 @@ const VerifySeedPhraseModal = ({
 
   return (
     <IonModal
-      className="verify-seedphrase"
+      className={combineClassNames("verify-seedphrase", {
+        "not-dismiss": !showCancel,
+      })}
       isOpen={show}
       onDidDismiss={handleCloseButtonClick}
     >

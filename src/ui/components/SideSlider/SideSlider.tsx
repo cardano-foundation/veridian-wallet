@@ -15,6 +15,7 @@ const SideSlider = ({
   zIndex = SIDE_SLIDER_Z_INDEX,
   className,
   animation = true,
+  onClose,
 }: SideSliderProps) => {
   const baseClass = combineClassNames(
     className,
@@ -64,6 +65,7 @@ const SideSlider = ({
         data-testid="side-slider"
         className={cssClass}
         animated={false}
+        onDidDismiss={onClose}
       >
         {children}
       </IonModal>

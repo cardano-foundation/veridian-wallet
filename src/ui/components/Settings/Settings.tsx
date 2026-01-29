@@ -58,6 +58,7 @@ export const Settings = ({ show, setShow }: SettingsProps) => {
       renderAsModal={true}
       isOpen={show}
       className="settings-modal"
+      onClose={() => setShow(false)}
     >
       <ScrollablePageLayout
         pageId="settings"

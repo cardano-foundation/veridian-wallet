@@ -108,6 +108,7 @@ const IdentifierAttributeDetailModal = ({
         isOpen={isOpen}
         className="identifier-detail-modal"
         data-testid="identifier-detail-modal"
+        onDidDismiss={handleClose}
       >
         <ScrollablePageLayout
           pageId={view}

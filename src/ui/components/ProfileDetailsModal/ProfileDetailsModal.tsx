@@ -182,6 +182,7 @@ const ProfileDetailsModal = ({
         isOpen={isOpen}
         renderAsModal
         className="profile-detail-modal"
+        onClose={() => setIsOpen(false)}
       >
         {cloudError ? (
           <CloudError

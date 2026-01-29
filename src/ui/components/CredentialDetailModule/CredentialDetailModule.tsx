@@ -430,6 +430,7 @@ const CredentialDetailModule = ({
       <SideSlider
         isOpen={openConnectionlModal && !!connectionShortDetails}
         renderAsModal
+        onClose={() => setOpenConnectionlModal(false)}
       >
         {connectionShortDetails && (
           <ConnectionDetails
