@@ -15,10 +15,11 @@ import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { Connections } from "./Connections";
 import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
+import { showGenericError } from "../../../store/reducers/stateCache";
 
 const deleteConnectionByIdMock = jest.fn();
 const getConnectionByIdMock = jest.fn();
-
+const getOobiMock = jest.fn(() => Promise.resolve("mock-oobi"));
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
@@ -30,7 +31,7 @@ jest.mock("../../../core/agent/agent", () => ({
         deleteStaleLocalConnectionById: (id: string, identifier: string) =>
           deleteConnectionByIdMock(id, identifier),
         getConnectionShortDetailById: jest.fn(() => Promise.resolve([])),
-        getOobi: jest.fn(() => Promise.resolve("mock-oobi")),
+        getOobi: () => getOobiMock(),
       },
       auth: {
         verifySecret: verifySecretMock,
@@ -488,6 +489,30 @@ describe("Connections tab", () => {
       expect(
         getByTestId("alphabet-selector-C").classList.contains("active")
       ).toBeFalsy();
+    });
+  });
+
+  test("Failed to get QR", async () => {
+    const storeMocked = {
+      ...makeTestStore(),
+      dispatch: dispatchMock,
+    };
+
+    const expectedError = new Error("fetch oobi failure");
+    getOobiMock.mockRejectedValue(expectedError);
+
+    render(
+      <Provider store={storeMocked}>
+        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
+          <Provider store={mockedStore}>
+            <Connections />
+          </Provider>
+        </MemoryRouter>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(showGenericError(true));
     });
   });
 });

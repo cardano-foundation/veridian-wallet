@@ -26,6 +26,7 @@ import { TabLayout } from "../../components/layout/TabLayout";
 import { RemovePendingAlert } from "../../components/RemovePendingAlert";
 import { ShareProfile } from "../../components/ShareProfile";
 import { ToastMsgType } from "../../globals/types";
+import { useGetOobi } from "../../hooks/useGetOobi";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { ConnectionDetails } from "../ConnectionDetails";
@@ -58,6 +59,10 @@ const Connections = () => {
     [currentProfile]
   );
   const showPlaceholder = profileConnections.length === 0;
+  const oobi = useGetOobi(
+    currentProfile?.identity.id,
+    currentProfile?.identity.displayName
+  );
 
   useIonViewWillEnter(() => {
     dispatch(setCurrentRoute({ path: TabsRoutePath.CONNECTIONS }));
@@ -260,6 +265,7 @@ const Connections = () => {
       <ShareProfile
         isOpen={openShareCurrentProfile}
         setIsOpen={setOpenShareCurrentProfile}
+        oobi={oobi}
       />
       <Profiles
         isOpen={openProfiles}

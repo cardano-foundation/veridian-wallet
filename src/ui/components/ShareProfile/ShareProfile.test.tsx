@@ -181,6 +181,7 @@ describe("Share Profile", () => {
           <ShareProfile
             isOpen
             setIsOpen={closeModal}
+            oobi="oobi"
           />
         </MemoryRouter>
       </Provider>
@@ -198,32 +199,6 @@ describe("Share Profile", () => {
 
     fireEvent.click(getByText(EN_Translation.shareprofile.buttons.close));
     expect(closeModal).toBeCalled();
-  });
-
-  test("Failed to get QR", async () => {
-    const storeMocked = {
-      ...makeTestStore(initialState),
-      dispatch: dispatchMock,
-    };
-    const closeModal = jest.fn();
-
-    const expectedError = new Error("fetch oobi failure");
-    getOobiMock.mockRejectedValue(expectedError);
-
-    render(
-      <Provider store={storeMocked}>
-        <MemoryRouter initialEntries={[TabsRoutePath.CONNECTIONS]}>
-          <ShareProfile
-            isOpen
-            setIsOpen={closeModal}
-          />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(dispatchMock).toBeCalledWith(showGenericError(true));
-    });
   });
 
   test("Scan oobi: Success", async () => {
@@ -253,6 +228,7 @@ describe("Share Profile", () => {
           <ShareProfile
             isOpen
             setIsOpen={jest.fn()}
+            oobi="oobi"
           />
         </MemoryRouter>
       </Provider>
@@ -316,6 +292,7 @@ describe("Share Profile", () => {
           <ShareProfile
             isOpen
             setIsOpen={jest.fn()}
+            oobi="oobi"
           />
         </MemoryRouter>
       </Provider>
@@ -379,6 +356,7 @@ describe("Share Profile", () => {
           <ShareProfile
             isOpen
             setIsOpen={jest.fn()}
+            oobi="oobi"
           />
         </MemoryRouter>
       </Provider>
@@ -444,14 +422,11 @@ describe("Share Profile", () => {
           <ShareProfile
             isOpen
             setIsOpen={jest.fn()}
+            oobi="oobi"
           />
         </MemoryRouter>
       </Provider>
     );
-
-    await waitFor(() => {
-      expect(getOobiMock).toBeCalled();
-    });
 
     fireEvent(
       getByTestId("share-profile-segment"),
@@ -538,6 +513,7 @@ describe("Share Profile", () => {
           <ShareProfile
             isOpen
             setIsOpen={jest.fn()}
+            oobi="oobi"
           />
         </MemoryRouter>
       </Provider>
@@ -605,6 +581,7 @@ describe("Share Profile", () => {
           <ShareProfile
             isOpen
             setIsOpen={jest.fn()}
+            oobi="oobi"
           />
         </MemoryRouter>
       </Provider>

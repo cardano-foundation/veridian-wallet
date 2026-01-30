@@ -18,6 +18,7 @@ import {
   getPeerConnections,
   getProfiles,
 } from "../../../../store/reducers/profileCache";
+import { useGetOobi } from "../../../hooks/useGetOobi";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -72,6 +73,7 @@ const ProfileContent = ({
   const [shareIsOpen, setShareIsOpen] = useState(false);
   const [editorOptionsIsOpen, setEditorIsOpen] = useState(false);
   const [editUserName, setEditUserName] = useState(false);
+  const oobi = useGetOobi(cardData.id, cardData.displayName);
 
   const openShareModal = () => {
     if (!cardData) return;
@@ -375,6 +377,7 @@ const ProfileContent = ({
             onAfterScan();
           }
         }}
+        oobi={oobi}
       />
       <EditProfile
         modalIsOpen={editorOptionsIsOpen || editUserName}
