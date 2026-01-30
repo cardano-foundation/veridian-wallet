@@ -86,7 +86,9 @@ const SetupGroupProfile = () => {
         recoverySigners: null,
       },
       scannedConections: currentProfile.multisigConnections,
-      selectedConnections: currentProfile.multisigConnections,
+      selectedConnections: isPendingState
+        ? []
+        : currentProfile.multisigConnections,
       ourIdentifier: currentProfile.identity.id,
       newIdentifier: currentProfile.identity,
       groupMetadata: currentProfile.identity.groupMetadata,

@@ -27,10 +27,45 @@ import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { SetupGroupProfile } from "./SetupGroupProfile";
+import { notificationsFix } from "../../__fixtures__/notificationsFix";
+import {
+  ConnectionStatus,
+  CreationStatus,
+} from "../../../core/agent/agent.types";
+import EN_TRANS from "../../../locales/en/en.json";
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
+      multiSigs: {
+        getMultisigIcpDetails: jest.fn(() =>
+          Promise.resolve({
+            sender: {
+              contactId: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+              label: "Leader",
+              id: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+            },
+            otherConnections: [],
+            rotationThreshold: 2,
+            signingThreshold: 2,
+          })
+        ),
+        getInceptionStatus: jest.fn(() =>
+          Promise.resolve({
+            threshold: {
+              signingThreshold: 2,
+              rotationThreshold: 2,
+            },
+            members: [
+              {
+                aid: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+                name: "Member1",
+                hasAccepted: false,
+              },
+            ],
+          })
+        ),
+      },
       connections: {
         connectByOobiUrl: (...arg: unknown[]) => connectByOobiUrlMock(...arg),
       },
@@ -227,8 +262,178 @@ describe("Setup Connections", () => {
 
     await waitFor(() => {
       expect(
-        getByText(multisignIdentifierFix[0].groupMetadata?.proposedUsername || "")
+        getByText(
+          multisignIdentifierFix[0].groupMetadata?.proposedUsername || ""
+        )
       ).toBeVisible();
+    });
+  });
+
+  test("Initiator - scan 3 members but select 2", async () => {
+    const initialState = {
+      stateCache: {
+        routes: [TabsRoutePath.CONNECTIONS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+        },
+      },
+      profilesCache: {
+        defaultProfile: multisignIdentifierFix[0].id,
+        profiles: {
+          [multisignIdentifierFix[0].id]: {
+            identity: {
+              ...multisignIdentifierFix[0],
+              creationStatus: CreationStatus.PENDING,
+            },
+            connections: [],
+            multisigConnections: [
+              {
+                id: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+                label: "Member1",
+                createdAtUTC: "2025-09-19T10:35:27.838Z",
+                status: ConnectionStatus.CONFIRMED,
+                oobi: "https://keria-ext.dev.idw-sandboxes.cf-deployments.org/oobi/EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2/agent/EOf2XGHRW_94wyPkBFwNRupyTdWlhbD-qzQIzXWRIA7u?name=Leader&groupId=0AB-FeKhcGbqGs6Ao39SytSw&groupName=Group+Name",
+                contactId: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+                groupId: "0AB-FeKhcGbqGs6Ao39SytSw",
+              },
+              {
+                id: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d3",
+                label: "Leader",
+                createdAtUTC: "2025-09-19T10:35:27.838Z",
+                status: ConnectionStatus.CONFIRMED,
+                oobi: "https://keria-ext.dev.idw-sandboxes.cf-deployments.org/oobi/EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2/agent/EOf2XGHRW_94wyPkBFwNRupyTdWlhbD-qzQIzXWRIA7u?name=Leader&groupId=0AB-FeKhcGbqGs6Ao39SytSw&groupName=Group+Name",
+                contactId: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d3",
+                groupId: "0AB-FeKhcGbqGs6Ao39SytSw",
+              },
+            ],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [],
+          },
+        },
+      },
+    };
+
+    const storeMocked = makeTestStore(initialState);
+
+    const history = createMemoryHistory();
+    history.push(
+      RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
+    );
+
+    const { getByText } = render(
+      <Provider store={storeMocked}>
+        <IonReactMemoryRouter history={history}>
+          <Route
+            path={RoutePath.GROUP_PROFILE_SETUP}
+            component={SetupGroupProfile}
+          />
+        </IonReactMemoryRouter>
+      </Provider>
+    );
+
+    expect(
+      getByText(EN_TRANS.setupgroupprofile.initgroup.members)
+    ).toBeVisible();
+
+    await waitFor(() => {
+      getByText(
+        EN_TRANS.setupgroupprofile.initgroup.numberofmember.replace(
+          "{{members}}",
+          "2"
+        )
+      );
+    });
+  });
+
+  test("Member - scan 3 members but select 2", async () => {
+    const initialState = {
+      stateCache: {
+        routes: [TabsRoutePath.CONNECTIONS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+        },
+      },
+      profilesCache: {
+        defaultProfile: multisignIdentifierFix[0].id,
+        profiles: {
+          [multisignIdentifierFix[0].id]: {
+            identity: {
+              ...multisignIdentifierFix[0],
+              creationStatus: CreationStatus.PENDING,
+              groupMetadata: {
+                groupId: "549eb79f-856c-4bb7-8dd5-d5eed865906a",
+                groupCreated: false,
+                groupInitiator: false,
+                proposedUsername: "test",
+              },
+            },
+            connections: [],
+            multisigConnections: [
+              {
+                id: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+                label: "Member1",
+                createdAtUTC: "2025-09-19T10:35:27.838Z",
+                status: ConnectionStatus.CONFIRMED,
+                oobi: "https://keria-ext.dev.idw-sandboxes.cf-deployments.org/oobi/EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2/agent/EOf2XGHRW_94wyPkBFwNRupyTdWlhbD-qzQIzXWRIA7u?name=Leader&groupId=0AB-FeKhcGbqGs6Ao39SytSw&groupName=Group+Name",
+                contactId: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2",
+                groupId: "0AB-FeKhcGbqGs6Ao39SytSw",
+              },
+              {
+                id: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d3",
+                label: "Leader",
+                createdAtUTC: "2025-09-19T10:35:27.838Z",
+                status: ConnectionStatus.CONFIRMED,
+                oobi: "https://keria-ext.dev.idw-sandboxes.cf-deployments.org/oobi/EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d2/agent/EOf2XGHRW_94wyPkBFwNRupyTdWlhbD-qzQIzXWRIA7u?name=Leader&groupId=0AB-FeKhcGbqGs6Ao39SytSw&groupName=Group+Name",
+                contactId: "EGpdFYdBkhbMBqTkUGaYeHmu0cX0EgxohGXwY6uLa2d3",
+                groupId: "0AB-FeKhcGbqGs6Ao39SytSw",
+              },
+            ],
+            peerConnections: [],
+            credentials: [],
+            archivedCredentials: [],
+            notifications: [notificationsFix[3]],
+          },
+        },
+      },
+    };
+
+    const storeMocked = makeTestStore(initialState);
+
+    const history = createMemoryHistory();
+    history.push(
+      RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
+    );
+
+    const { getByText } = render(
+      <Provider store={storeMocked}>
+        <IonReactMemoryRouter history={history}>
+          <Route
+            path={RoutePath.GROUP_PROFILE_SETUP}
+            component={SetupGroupProfile}
+          />
+        </IonReactMemoryRouter>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANS.setupgroupprofile.pending.request)
+      ).toBeVisible();
+
+      getByText(
+        EN_TRANS.setupgroupprofile.initgroup.numberofmember.replace(
+          "{{members}}",
+          "2"
+        )
+      );
     });
   });
 });

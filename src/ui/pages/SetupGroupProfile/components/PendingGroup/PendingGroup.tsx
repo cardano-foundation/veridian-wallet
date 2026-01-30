@@ -7,7 +7,10 @@ import {
 } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
-import { CreationStatus } from "../../../../../core/agent/agent.types";
+import {
+  ConnectionShortDetails,
+  CreationStatus,
+} from "../../../../../core/agent/agent.types";
 import { MultiSigService } from "../../../../../core/agent/services";
 import { MultiSigIcpRequestDetails } from "../../../../../core/agent/services/identifier.types";
 import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
@@ -48,7 +51,7 @@ import { StageProps } from "../../SetupGroupProfile.types";
 import { ErrorPage } from "./ErrorPage";
 import "./PendingGroup.scss";
 
-const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
+const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
   const componentId = "pending-group";
   const [openProfiles, setOpenProfiles] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
@@ -130,8 +133,39 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     identity?.id,
   ]);
 
+  const getMemberConnections = useCallback(
+    (
+      connections: ConnectionShortDetails[],
+      groupDetails: GroupInformation | null,
+      multisigIcpDetails: MultiSigIcpRequestDetails | null
+    ) => {
+      let memberData = [...connections];
+
+      if (groupDetails) {
+        memberData = memberData.filter((connection) => {
+          return groupDetails?.members.some(
+            (m) => m.aid == connection.contactId
+          );
+        });
+      }
+
+      if (multisigIcpDetails && isPendingMember) {
+        memberData = memberData.filter(
+          (item) =>
+            item.contactId == multisigIcpDetails.sender.contactId ||
+            multisigIcpDetails.otherConnections.some(
+              (c) => c.contactId == item.contactId
+            )
+        );
+      }
+
+      return memberData;
+    },
+    [isPendingMember]
+  );
+
   const members = useMemo(() => {
-    const members = state.selectedConnections?.map((connection): Member => {
+    const members = state.selectedConnections.map((connection): Member => {
       const name = connection?.label || "";
 
       let hasAccepted = false;
@@ -245,6 +279,27 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       );
       retry.current = 0;
       setGroupDetails(details);
+      setState((state) => {
+        const memberConnections = getMemberConnections(
+          state.scannedConections,
+          details,
+          null
+        );
+
+        if (
+          memberConnections.length == state.selectedConnections.length &&
+          state.selectedConnections.every((item) =>
+            memberConnections.some((m) => m.contactId == item.contactId)
+          )
+        ) {
+          return state;
+        }
+
+        return {
+          ...state,
+          selectedConnections: memberConnections,
+        };
+      });
     } catch (e) {
       if (
         e instanceof Error &&
@@ -262,7 +317,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     } finally {
       setLoading(false);
     }
-  }, [dispatch, identity?.id]);
+  }, [dispatch, getMemberConnections, identity?.id, setState]);
 
   const fetchMultisigDetails = useCallback(async () => {
     try {
@@ -273,6 +328,28 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       );
       setMultisigIcpDetails(details);
       setShowErrorPage(false);
+
+      setState((state) => {
+        const memberConnections = getMemberConnections(
+          state.scannedConections,
+          null,
+          details
+        );
+
+        if (
+          memberConnections.length == state.selectedConnections.length &&
+          state.selectedConnections.every((item) =>
+            memberConnections.some((m) => m.contactId == item.contactId)
+          )
+        ) {
+          return state;
+        }
+
+        return {
+          ...state,
+          selectedConnections: memberConnections,
+        };
+      });
     } catch (e) {
       if (
         (e as Error).message === MultiSigService.UNKNOWN_AIDS_IN_MULTISIG_ICP
@@ -282,7 +359,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     } finally {
       setLoading(false);
     }
-  }, [initGroupNotification]);
+  }, [getMemberConnections, initGroupNotification, setState]);
 
   const fetchGroupDetails = useCallback(async () => {
     if (!isPendingGroup) return;
@@ -463,7 +540,9 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
           <CardDetailsContent
             testId="required-signer-key"
             mainContent={`${i18n.t(
-              `setupgroupprofile.initgroup.setsigner.members`,
+              `setupgroupprofile.initgroup.setsigner.${
+                (signingThreshold || 0) > 1 ? "members" : "member"
+              }`,
               {
                 members: signingThreshold || 0,
               }
@@ -481,7 +560,9 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
           <CardDetailsContent
             testId="recovery-signer-key"
             mainContent={`${i18n.t(
-              `setupgroupprofile.initgroup.setsigner.members`,
+              `setupgroupprofile.initgroup.setsigner.${
+                (rotationThreshold || 0) > 1 ? "members" : "member"
+              }`,
               {
                 members: rotationThreshold || 0,
               }
