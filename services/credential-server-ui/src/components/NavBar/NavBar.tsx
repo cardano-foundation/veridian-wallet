@@ -10,6 +10,8 @@ import {
   SettingsOutlined,
   SwapHorizontalCircle,
   SwapHorizontalCircleOutlined,
+  CheckCircle,
+  Logout,
 } from "@mui/icons-material";
 import {
   AppBar,
@@ -22,14 +24,17 @@ import {
   MenuItem,
   Toolbar,
   Typography,
+  Chip,
+  Tooltip,
 } from "@mui/material";
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../../assets/Logo.svg";
 import { RoutePath } from "../../const/route";
 import { i18n } from "../../i18n";
 import { SwitchAccount } from "../SwitchAccount";
 import { DrawerContent } from "./components/DrawerContent";
+import { useKERIAuth } from "../AuthContext";
 import "./NavBar.scss";
 import { isActivePath } from "./helper";
 import { useAppSelector } from "../../store/hooks";
@@ -75,8 +80,15 @@ const getIcon = (icons: React.ReactElement[], isActive: boolean) =>
 
 const NavBar = ({ window }: Props) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const roleViewIndex = useAppSelector(getRoleView) as RoleIndex;
+  const { isAuthorized, aid, logout } = useKERIAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate(RoutePath.Credentials); // Will show auth prompt
+  };
 
   const displayMenuItems = menuItems.filter((item) =>
     roleViewIndex !== RoleIndex.ISSUER
@@ -193,8 +205,21 @@ const NavBar = ({ window }: Props) => {
           </Box>
           <Box
             className="nav-right"
-            sx={{ display: { xs: "none", sm: "flex" } }}
+            sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", gap: 1 }}
           >
+            {/* KERIAuth Status */}
+            {isAuthorized && aid && (
+              <Tooltip title={`Authorized AID: ${aid}`}>
+                <Chip
+                  icon={<CheckCircle />}
+                  label={`${aid.substring(0, 8)}...${aid.slice(-4)}`}
+                  color="success"
+                  size="small"
+                  sx={{ mr: 1 }}
+                />
+              </Tooltip>
+            )}
+            
             <IconButton
               size="large"
               aria-label="show new notifications"
@@ -232,6 +257,21 @@ const NavBar = ({ window }: Props) => {
                 )}
               </Badge>
             </IconButton>
+            
+            {/* Logout Button */}
+            {isAuthorized && (
+              <Tooltip title="Logout">
+                <IconButton
+                  size="large"
+                  aria-label="logout"
+                  color="inherit"
+                  onClick={handleLogout}
+                  disableRipple
+                >
+                  <Logout />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
           <SwitchAccount />
         </Toolbar>

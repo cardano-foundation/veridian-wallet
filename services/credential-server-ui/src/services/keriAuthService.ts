@@ -14,11 +14,15 @@ class KERIAuthService {
    * @returns Extension ID if installed, false otherwise
    */
   async initialize(): Promise<string | false> {
+    console.log('[KERIAuth] Initializing...');
+    
     this.client = createClient();
     const extensionId = await this.client.isExtensionInstalled();
     
-    if (!extensionId) {
-      console.warn('KERI Auth extension not found');
+    if (extensionId) {
+      console.log('[KERIAuth] Extension detected:', extensionId);
+    } else {
+      console.log('[KERIAuth] Extension not detected');
     }
     
     return extensionId;
@@ -39,7 +43,6 @@ class KERIAuthService {
     });
     
     this.authorizeResult = result;
-    console.log('Authorization successful:', result.identifier?.prefix);
     
     return result;
   }
@@ -64,20 +67,47 @@ class KERIAuthService {
 
   /**
    * Create a data attestation credential
+   * This will open the KERIAuth extension UI for credential preview and signing
    * @param params Credential data and schema SAID
+   * @returns Signed credential with ACDC, issuance, anchoring, and operation details
    */
   async createDataAttestationCredential(params: {
     credData: any;
     schemaSaid: string;
   }) {
     if (!this.client) {
-      throw new Error('Client not initialized');
+      throw new Error('Client not initialized. Call initialize() first.');
     }
 
-    const result = await this.client.createDataAttestationCredential(params);
-    console.log('Credential created');
-    
-    return result;
+    if (!this.authorizeResult) {
+      throw new Error('Must authorize before creating credentials. Call authorize() first.');
+    }
+
+    console.log('[KERIAuth] Creating data attestation credential...');
+    console.log('[KERIAuth] Schema SAID:', params.schemaSaid);
+    console.log('[KERIAuth] Credential data:', JSON.stringify(params.credData, null, 2));
+
+    try {
+      const result = await this.client.createDataAttestationCredential(params);
+      
+      console.log('[KERIAuth] Credential signed successfully!');
+      console.log('[KERIAuth] Result:', {
+        acdc: result.acdc ? 'Present' : 'Missing',
+        iss: result.iss ? 'Present' : 'Missing',
+        anc: result.anc ? 'Present' : 'Missing',
+        op: result.op ? 'Present' : 'Missing',
+      });
+      console.log('[KERIAuth] Full result:', JSON.stringify(result, null, 2));
+
+      return result;
+    } catch (error: any) {
+      console.error('[KERIAuth] Error creating credential:', error);
+      console.error('[KERIAuth] Error details:', {
+        message: error.message,
+        stack: error.stack,
+      });
+      throw error;
+    }
   }
 
   /**

@@ -1,6 +1,7 @@
 import { MoreVert } from "@mui/icons-material";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import {
   Box,
   IconButton,
@@ -8,6 +9,12 @@ import {
   TableCell,
   TableRow,
   Tooltip,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
@@ -25,6 +32,7 @@ import { useAppSelector } from "../../store/hooks";
 import { getRoleView } from "../../store/reducers";
 import { formatDate } from "../../utils/dateFormatter";
 import { CredentialTemplateRow } from "./Credential.types";
+import { useKERIAuth } from "../../components/AuthContext";
 
 const headers: AppTableHeader<CredentialTemplateRow>[] = [
   {
@@ -38,6 +46,7 @@ const headers: AppTableHeader<CredentialTemplateRow>[] = [
 ];
 
 export const Credentials = () => {
+  const { isAuthorized, isExtensionInstalled, authorize, loading, error } = useKERIAuth();
   const roleViewIndex = useAppSelector(getRoleView) as RoleIndex;
   const schemaCaches = useAppSelector((state) => state.schemasCache.schemas);
   const tableRows: CredentialTemplateRow[] = schemaCaches.map((row) => ({
@@ -47,21 +56,16 @@ export const Credentials = () => {
   }));
   const nav = useNavigate();
 
+  // ALL hooks must be at the top, before any conditional returns
   const [open, setOpen] = useState(false);
   const [selectedCredType, setSelectedCredType] = useState<string>();
-
-  useEffect(() => {
-    if (roleViewIndex !== RoleIndex.ISSUER) nav(RoutePath.Connections);
-  }, [nav, roleViewIndex]);
-
   const [filterData, setFilterData] = useState<FilterData>({
     startDate: null,
     endDate: null,
     keyword: "",
   });
 
-  const visibleData = filter(tableRows, filterData, { date: "date" });
-
+  // Call useTable hook before any conditional returns
   const {
     order,
     orderBy,
@@ -72,6 +76,73 @@ export const Credentials = () => {
     handleChangeRowsPerPage,
     visibleRows,
   } = useTable(tableRows, "date");
+
+  useEffect(() => {
+    if (roleViewIndex !== RoleIndex.ISSUER) nav(RoutePath.Connections);
+  }, [nav, roleViewIndex]);
+
+  // Calculate visible data (can be before conditional return since it doesn't use hooks)
+  const visibleData = filter(tableRows, filterData, { date: "date" });
+
+  const handleAuthorize = async () => {
+    try {
+      await authorize("Veridian Credential Issuance - Authorize access");
+      // After successful authorization, the state updates and component re-renders
+      // No need to navigate - just let the component show the credentials
+    } catch (err) {
+      console.error("Authorization failed:", err);
+      // Error handled in context
+    }
+  };
+
+  // Show auth prompt if not authorized
+  if (!isAuthorized) {
+    return (
+      <Box sx={{ 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        minHeight: "60vh",
+        padding: "2rem"
+      }}>
+        <Card sx={{ maxWidth: 400, width: "100%" }}>
+          <CardContent sx={{ textAlign: "center", p: 4 }}>
+            <LockOpenIcon sx={{ fontSize: 64, color: "primary.main", mb: 2 }} />
+            <Typography variant="h5" gutterBottom fontWeight={600}>
+              Sign In Required
+            </Typography>
+            <Typography variant="body2" color="textSecondary" paragraph>
+              Connect your KERI wallet to access credentials
+            </Typography>
+            
+            {error && (
+              <Alert severity="error" sx={{ mb: 2, textAlign: "left" }}>
+                {error}
+              </Alert>
+            )}
+            
+            <Button
+              variant="contained"
+              size="large"
+              fullWidth
+              onClick={handleAuthorize}
+              disabled={loading || !isExtensionInstalled}
+              startIcon={loading ? <CircularProgress size={20} /> : <LockOpenIcon />}
+              sx={{ mt: 2 }}
+            >
+              {loading ? "Authorizing..." : "Authorize"}
+            </Button>
+            
+            {!isExtensionInstalled && (
+              <Typography variant="caption" color="error" sx={{ mt: 2, display: "block" }}>
+                KERIAuth extension required - Please install and activate it
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  }
 
   const viewCredTemplate = (id: string) => {
     nav(`${RoutePath.Credentials}/${id}`);

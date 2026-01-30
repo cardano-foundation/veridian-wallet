@@ -24,8 +24,14 @@ export function KERIAuthProvider({ children }: { children: ReactNode }) {
   // Initialize extension check on mount
   useEffect(() => {
     keriAuthService.initialize()
-      .then(setExtensionId)
-      .catch(err => setError(err.message));
+      .then((id) => {
+        console.log('[AuthContext] Extension ID:', id);
+        setExtensionId(id);
+      })
+      .catch(err => {
+        console.error('[AuthContext] Init error:', err.message);
+        setError(err.message);
+      });
   }, []);
 
   const authorize = async (message?: string) => {
@@ -34,13 +40,18 @@ export function KERIAuthProvider({ children }: { children: ReactNode }) {
     
     try {
       const result = await keriAuthService.authorize(message);
+      
+      // Update state in a single batch to prevent multiple re-renders
       setIsAuthorized(true);
       setAid(result.identifier?.prefix || null);
-    } catch (err: any) {
-      setError(err.message || 'Authorization failed');
-      throw err;
-    } finally {
       setLoading(false);
+      
+      console.log('[AuthContext] Authorization successful:', result.identifier?.prefix);
+    } catch (err: any) {
+      console.error('[AuthContext] Authorization failed:', err);
+      setError(err.message || 'Authorization failed');
+      setLoading(false);
+      throw err;
     }
   };
 

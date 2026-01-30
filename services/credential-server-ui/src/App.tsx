@@ -15,6 +15,7 @@ import { Credentials } from "./pages/Credentials";
 import { NoPage } from "./pages/NoPage";
 import { Notifications } from "./pages/Notifications";
 import { Settings } from "./pages/Settings";
+import { Auth } from "./pages/Auth";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import {
   fetchContactCredentials,
@@ -72,18 +73,18 @@ const App = () => {
         >
           <BrowserRouter>
             <Routes>
+              {/* Auth route - outside of Layout */}
+              <Route
+                path="/auth"
+                element={<Auth />}
+              />
+              
               <Route
                 path="/"
                 element={<Layout />}
               >
-                {/* TODO: Bring back when we're ready to ship Overview */}
-                {/* <Route
-                index
-                element={<Overview />}
-              /> */}
                 <Route
                   index
-                  //path={RoutePath.Connections}
                   element={<Connections />}
                 />
                 <Route
@@ -97,10 +98,6 @@ const App = () => {
                 <Route
                   path={RoutePath.CredentialDetails}
                   element={<CredentialDetails />}
-                />
-                <Route
-                  path={RoutePath.Credentials}
-                  element={<Credentials />}
                 />
                 <Route
                   path={RoutePath.Notifications}
