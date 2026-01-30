@@ -490,6 +490,7 @@ export const switchProfileFromNotification =
 
     if (profiles[profileId]) {
       dispatch(setCurrentProfile(profileId));
+      dispatch(setMissingAliasConnection(undefined));
     } else {
       dispatch(setToastMsg(ToastMsgType.PROFILE_NOT_EXIST));
       return false;

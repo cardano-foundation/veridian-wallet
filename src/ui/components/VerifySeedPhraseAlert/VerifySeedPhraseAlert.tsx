@@ -1,7 +1,6 @@
 import { IonButton, IonModal } from "@ionic/react";
 import { useState } from "react";
 import { i18n } from "../../../i18n";
-import { notificationService } from "../../../native/pushNotifications/notificationService";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getShowVerifySeedPhraseAlert,
@@ -12,8 +11,8 @@ import CircleArrows from "../../assets/images/circle-arrows.svg";
 import MissingMobileImage from "../../assets/images/mobile-question.svg";
 import PasswordImage from "../../assets/images/password-icon.svg";
 
-import "./VerifySeedPhraseAlert.scss";
 import { VerifySeedPhraseModal } from "../VerifySeedPhrase/VerifySeedPhraseModal";
+import "./VerifySeedPhraseAlert.scss";
 
 export const VerifySeedPhraseAlert = () => {
   const pageId = "verify-seedphrase-alert";
@@ -25,9 +24,6 @@ export const VerifySeedPhraseAlert = () => {
     setIsOpen(false);
     dispatch(showVerifySeedPhraseAlert(false));
     dispatch(setSeedPhraseVerified(true));
-
-    // Process any pending navigation that was blocked by this modal
-    await notificationService.processPendingNavigation();
   };
 
   return (

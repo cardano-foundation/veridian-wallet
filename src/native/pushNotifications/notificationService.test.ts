@@ -252,8 +252,7 @@ describe("NotificationService", () => {
       await (notificationService as any).handleNotificationTap(notification);
 
       expect(dismissAllModals).toHaveBeenCalled();
-      expect(mockProfileSwitcher).not.toHaveBeenCalled();
-      expect(mockPushState).not.toHaveBeenCalled();
+      expect(mockProfileSwitcher).toHaveBeenCalled();
     });
 
     test("should queue notification if profileSwitcher not set", async () => {
@@ -377,85 +376,5 @@ describe("NotificationService", () => {
     expect((notificationService as any).pendingNotification).toBeNull();
     expect(mockProfileSwitcher).toHaveBeenCalledWith("profile-abc");
     expect(mockPushState).not.toBeCalled();
-  });
-
-  describe("processPendingNavigation", () => {
-    let mockPushState: jest.SpyInstance;
-    let mockDispatchEvent: jest.SpyInstance;
-
-    beforeEach(() => {
-      mockPushState = jest.spyOn(window.history, "pushState");
-      mockDispatchEvent = jest.spyOn(window, "dispatchEvent");
-    });
-
-    afterEach(() => {
-      mockPushState.mockRestore();
-      mockDispatchEvent.mockRestore();
-    });
-
-    test("should queue navigation when blocked by modal", async () => {
-      (dismissAllModals as jest.Mock).mockResolvedValue(false);
-      const mockProfileSwitcher = jest.fn().mockResolvedValue(true);
-      (notificationService as any).profileSwitcher = mockProfileSwitcher;
-
-      const notification = {
-        id: 1,
-        extra: {
-          profileId: "profile-abc",
-          notificationId: "notif-123",
-        },
-      };
-
-      await (notificationService as any).handleNotificationTap(notification);
-
-      expect(dismissAllModals).toHaveBeenCalled();
-      expect(mockProfileSwitcher).not.toHaveBeenCalled();
-      expect(notificationService.getPendingNavigation()).toEqual({
-        path: TabsRoutePath.NOTIFICATIONS,
-        profileId: "profile-abc",
-      });
-    });
-
-    test("should process pending navigation after verification", async () => {
-      // Set up pending navigation with profileId
-      const mockProfileSwitcher = jest.fn().mockResolvedValue(true);
-      (notificationService as any).profileSwitcher = mockProfileSwitcher;
-      (notificationService as any).pendingNavigation = {
-        path: TabsRoutePath.NOTIFICATIONS,
-        profileId: "profile-abc",
-      };
-      (dismissAllModals as jest.Mock).mockResolvedValue(true);
-
-      await notificationService.processPendingNavigation();
-
-      expect(mockProfileSwitcher).toHaveBeenCalledWith("profile-abc");
-      expect(mockPushState).toHaveBeenCalledWith(
-        null,
-        "",
-        TabsRoutePath.NOTIFICATIONS
-      );
-      expect(mockDispatchEvent).toHaveBeenCalled();
-      expect(notificationService.getPendingNavigation()).toBeNull();
-    });
-
-    test("should do nothing if no pending navigation", async () => {
-      (notificationService as any).pendingNavigation = null;
-
-      await notificationService.processPendingNavigation();
-
-      expect(dismissAllModals).not.toHaveBeenCalled();
-      expect(mockPushState).not.toHaveBeenCalled();
-    });
-
-    test("should clear pending navigation", () => {
-      (notificationService as any).pendingNavigation = {
-        path: TabsRoutePath.NOTIFICATIONS,
-        profileId: "profile-abc",
-      };
-
-      notificationService.clearPendingNavigation();
-
-      expect(notificationService.getPendingNavigation()).toBeNull();
-    });
   });
 });

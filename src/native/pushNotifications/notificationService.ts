@@ -173,15 +173,7 @@ class NotificationService {
       return;
     }
 
-    const canProceed = await dismissAllModals();
-    if (!canProceed) {
-      // Queue the navigation to be executed after verification completes
-      this.pendingNavigation = {
-        path: TabsRoutePath.NOTIFICATIONS,
-        profileId,
-      };
-      return;
-    }
+    await dismissAllModals();
 
     const result = await this.profileSwitcher(profileId);
 
@@ -203,23 +195,6 @@ class NotificationService {
 
   clearPendingNavigation(): void {
     this.pendingNavigation = null;
-  }
-
-  async processPendingNavigation(): Promise<void> {
-    if (!this.pendingNavigation || !this.profileSwitcher) {
-      return;
-    }
-
-    const { path, profileId } = this.pendingNavigation;
-    this.pendingNavigation = null;
-
-    // Switch to the correct profile
-    const result = await this.profileSwitcher(profileId);
-
-    // Navigate to the pending path only if profile switch succeeded
-    if (result) {
-      this.navigateToPath(path);
-    }
   }
 }
 
