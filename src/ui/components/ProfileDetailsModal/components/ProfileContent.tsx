@@ -235,7 +235,9 @@ const ProfileContent = ({
             >
               <CardDetailsContent
                 mainContent={`${i18n.t(
-                  "profiledetails.group.signingkeysthreshold.member",
+                  Number(cardData.kt) === 1
+                    ? "profiledetails.group.signingkeysthreshold.member"
+                    : "profiledetails.group.signingkeysthreshold.members",
                   { member: cardData.kt }
                 )}`}
                 subContent={`${i18n.t(
@@ -254,7 +256,9 @@ const ProfileContent = ({
             >
               <CardDetailsContent
                 mainContent={`${i18n.t(
-                  "profiledetails.group.rotationthreshold.member",
+                  Number(cardData.nt) === 1
+                    ? "profiledetails.group.rotationthreshold.member"
+                    : "profiledetails.group.rotationthreshold.members",
                   { member: cardData.nt }
                 )}`}
                 subContent={`${i18n.t(
