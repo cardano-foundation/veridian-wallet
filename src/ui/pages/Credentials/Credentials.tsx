@@ -245,46 +245,48 @@ const Credentials = () => {
         <div className="cred-container">
           {!showPlaceholder && (
             <>
-              {favouriteCredentials.length > 0 && (
-                <div
-                  ref={favouriteContainerElement}
-                  className="credentials-tab-content-block credential-favourite-cards"
-                  data-testid="favourite-container-element"
-                >
-                  <CardSlider
-                    title={`${i18n.t("tabs.credentials.tab.favourites")}`}
-                    name="favs"
-                    cardsData={sortedFavouriteCredentials}
-                    onShowCardDetails={() =>
-                      handleShowNavAnimation("favourite")
-                    }
+              <div>
+                {favouriteCredentials.length > 0 && (
+                  <div
+                    ref={favouriteContainerElement}
+                    className="credentials-tab-content-block credential-favourite-cards"
+                    data-testid="favourite-container-element"
+                  >
+                    <CardSlider
+                      title={`${i18n.t("tabs.credentials.tab.favourites")}`}
+                      name="favs"
+                      cardsData={sortedFavouriteCredentials}
+                      onShowCardDetails={() =>
+                        handleShowNavAnimation("favourite")
+                      }
+                    />
+                  </div>
+                )}
+                {!!confirmedCreds.length && (
+                  <SwitchCardView
+                    className="credentials-tab-content-block credential-cards"
+                    cardsData={confirmedCreds}
+                    onShowCardDetails={() => handleShowNavAnimation("cards")}
+                    title={`${i18n.t("tabs.credentials.tab.allcreds")}`}
+                    name="allcreds"
                   />
-                </div>
-              )}
-              {!!confirmedCreds.length && (
-                <SwitchCardView
-                  className="credentials-tab-content-block credential-cards"
-                  cardsData={confirmedCreds}
-                  onShowCardDetails={() => handleShowNavAnimation("cards")}
-                  title={`${i18n.t("tabs.credentials.tab.allcreds")}`}
-                  name="allcreds"
-                />
-              )}
-              {!!pendingCreds.length && (
-                <div className="credetial-tab-content-block pending-container">
-                  <ListHeader
-                    title={`${i18n.t("tabs.credentials.tab.pendingcred")}`}
-                  />
-                  <CredentialCardList
-                    cardsData={pendingCreds}
-                    testId="pending-creds-list"
-                    onCardClick={(cred) => {
-                      setDeletePendingItem(cred as CredentialShortDetails);
-                      setOpenDeletePendingAlert(true);
-                    }}
-                  />
-                </div>
-              )}
+                )}
+                {!!pendingCreds.length && (
+                  <div className="credetial-tab-content-block pending-container">
+                    <ListHeader
+                      title={`${i18n.t("tabs.credentials.tab.pendingcred")}`}
+                    />
+                    <CredentialCardList
+                      cardsData={pendingCreds}
+                      testId="pending-creds-list"
+                      onCardClick={(cred) => {
+                        setDeletePendingItem(cred as CredentialShortDetails);
+                        setOpenDeletePendingAlert(true);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
               <ArchivedCredentialsButton />
             </>
           )}
