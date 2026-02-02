@@ -294,7 +294,7 @@ describe("Credential request", () => {
     expect(offerAcdcFromApplyMock).not.toHaveBeenCalled();
   });
 
-  test("Auto-submit when only one suitable credential exists after filtering out revoked", async () => {
+  test("Auto-submit when only one revoke credential exists", async () => {
     const stateWithRevokedCreds = {
       ...initialState,
       profilesCache: {
@@ -322,7 +322,6 @@ describe("Credential request", () => {
       Promise.resolve({
         ...credRequestFix,
         credentials: [
-          credRequestFix.credentials[0],
           {
             connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
             acdc: {

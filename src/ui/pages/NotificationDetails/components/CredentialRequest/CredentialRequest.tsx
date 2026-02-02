@@ -1,14 +1,12 @@
 import { IonSpinner } from "@ionic/react";
 import { useCallback, useMemo, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
-import { CredentialStatus } from "../../../../../core/agent/services/credentialService.types";
 import { IdentifierType } from "../../../../../core/agent/services/identifier.types";
 import { CredentialsMatchingApply } from "../../../../../core/agent/services/ipexCommunicationService.types";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import {
   deleteNotificationById,
-  getCredsCache,
   getCurrentProfile,
   getMultisigConnectionsCache,
   getProfiles,
@@ -33,7 +31,6 @@ const CredentialRequest = ({
 }: NotificationDetailsProps) => {
   const dispatch = useAppDispatch();
   const profiles = useAppSelector(getProfiles);
-  const credsCache = useAppSelector(getCredsCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
   const [requestStage, setRequestStage] = useState(0);
   const [credentialRequest, setCredentialRequest] =
@@ -50,8 +47,8 @@ const CredentialRequest = ({
   const reachThreshold =
     linkedGroup &&
     linkedGroup.othersJoined.length +
-    (linkedGroup.linkedRequest.accepted ? 1 : 0) >=
-    Number(linkedGroup.threshold.signingThreshold);
+      (linkedGroup.linkedRequest.accepted ? 1 : 0) >=
+      Number(linkedGroup.threshold.signingThreshold);
 
   const userAID = !credentialRequest?.identifier
     ? null
@@ -125,24 +122,13 @@ const CredentialRequest = ({
   const suitableCredentials = useMemo(() => {
     if (!credentialRequest) return [];
 
-    const revokedCredsCache = credsCache.filter(
-      (item) => item.status === CredentialStatus.REVOKED
-    );
-
-    const mappedCredentials = credentialRequest.credentials.map(
+    return credentialRequest.credentials.map(
       (cred): RequestCredential => ({
         connectionId: cred.connectionId,
         acdc: cred.acdc,
       })
     );
-
-    // Filter out revoked credentials to get active/suitable ones
-    const activeCredentials = mappedCredentials.filter(
-      (cred) => !revokedCredsCache.some((revoked) => revoked.id === cred.acdc.d)
-    );
-
-    return activeCredentials;
-  }, [credentialRequest, credsCache]);
+  }, [credentialRequest]);
 
   // Function to automatically submit a credential
   const handleSubmitCredential = useCallback(
