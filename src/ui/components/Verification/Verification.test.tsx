@@ -68,7 +68,7 @@ describe("Verification", () => {
         biometryType: BiometryType.FINGERPRINT,
       },
       handleBiometricAuth: handleBiometricAuthMock,
-      remainingLockoutSeconds: 30,
+      remainingLockoutSeconds: 0,
       lockoutEndTime: null,
     }));
   });
@@ -93,6 +93,62 @@ describe("Verification", () => {
       expect(verify).toBeCalled();
       expect(setVerifyOpen).toBeCalledWith(false);
     });
+  });
+
+  test("Show biometric temporarily lock", async () => {
+    handleBiometricAuthMock.mockResolvedValue(
+      BiometricAuthOutcome.TEMPORARY_LOCKOUT
+    );
+    const setVerifyOpen = jest.fn();
+    const verify = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <Verification
+          verifyIsOpen
+          setVerifyIsOpen={setVerifyOpen}
+          onVerify={verify}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(handleBiometricAuthMock).toBeCalled();
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("alert-max-attempts")).toBeVisible();
+    });
+  });
+
+  test("Show permanent temporarily lock", async () => {
+    handleBiometricAuthMock.mockResolvedValue(
+      BiometricAuthOutcome.PERMANENT_LOCKOUT
+    );
+    const setVerifyOpen = jest.fn();
+    const verify = jest.fn();
+
+    const { getByTestId, getByText } = render(
+      <Provider store={storeMocked}>
+        <Verification
+          verifyIsOpen
+          setVerifyIsOpen={setVerifyOpen}
+          onVerify={verify}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(handleBiometricAuthMock).toBeCalled();
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("alert-permanent-lockout")).toBeVisible();
+    });
+
+    expect(
+      getByText(EN_TRANSLATIONS.biometry.permanentlockoutheader)
+    ).toBeVisible();
   });
 
   test("Show passcode option when auth fail", async () => {

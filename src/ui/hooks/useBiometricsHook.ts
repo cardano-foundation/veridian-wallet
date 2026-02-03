@@ -237,6 +237,7 @@ const useBiometricAuth = (isLockPage = false) => {
       return BiometricAuthOutcome.NOT_AVAILABLE;
     }
 
+    dispatch(setIsInBiometricProcess(true));
     try {
       await NativeBiometric.getCredentials({
         server: BIOMETRIC_SERVER_KEY,
@@ -265,6 +266,8 @@ const useBiometricAuth = (isLockPage = false) => {
       } catch (setCredError) {
         return BiometricAuthOutcome.GENERIC_ERROR;
       }
+    } finally {
+      dispatch(setIsInBiometricProcess(false));
     }
   };
 
