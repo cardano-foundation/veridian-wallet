@@ -499,7 +499,6 @@ const CredentialRequestInformation = ({
         isOpen={!!viewCredId}
         setIsOpen={handleClose}
         onClose={handleClose}
-        joinedCredRequestMembers={linkedGroup?.memberInfos}
         viewOnly
       />
       <AlertDecline
