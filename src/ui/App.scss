@@ -76,6 +76,10 @@ ion-content {
   /* Ionic 8 fix: Ensure Shadow DOM scroll container has explicit height */
   &::part(scroll) {
     height: 100%;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   &::-webkit-scrollbar {

@@ -428,7 +428,7 @@ const CredentialRequestInformation = ({
               title={`${i18n.t(
                 "tabs.notifications.details.credential.request.information.requestfrom"
               )}`}
-              onClick={isGroup ? openConnection : undefined}
+              onClick={openConnection}
             >
               <CardDetailsItem
                 info={connection?.label || i18n.t("tabs.connections.unknown")}
