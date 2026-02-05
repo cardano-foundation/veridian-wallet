@@ -126,6 +126,7 @@ const LockPageContainer = () => {
     try {
       await disablePrivacy();
       authenResult = await handleBiometricAuth();
+      await resetLoginAttempt();
       preventBiometricOnEvent.current =
         authenResult === BiometricAuthOutcome.USER_CANCELLED ||
         authenResult === BiometricAuthOutcome.SUCCESS;

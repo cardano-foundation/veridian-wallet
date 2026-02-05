@@ -395,6 +395,7 @@ describe("Lock Page", () => {
     await waitFor(() => {
       expect(handleBiometricAuthMock).toBeCalled();
       expect(queryByTestId("lock-page-page")).not.toBeInTheDocument();
+      expect(resetLoginAttemptsMock).toBeCalled();
     });
   });
 
@@ -570,6 +571,38 @@ describe("Lock Page: Max login attempt", () => {
   });
 
   test("Reset login attempt", async () => {
+    verifySecretMock.mockResolvedValueOnce(true);
+    const customInitialState = {
+      ...initialState,
+      stateCache: {
+        ...initialState.stateCache,
+        authentication: {
+          ...initialState.stateCache.authentication,
+          loginAttempt: {
+            ...initialState.stateCache.authentication.loginAttempt,
+            attempts: 2,
+          },
+        },
+      },
+    };
+
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked(customInitialState)}>
+        <LockPage />
+      </Provider>
+    );
+
+    expect(getByText(EN_TRANSLATIONS.lockpage.title)).toBeInTheDocument();
+    expect(getByText(EN_TRANSLATIONS.lockpage.description)).toBeInTheDocument();
+
+    await passcodeFiller(getByText, getByTestId, "193212");
+
+    await waitFor(() => {
+      expect(resetLoginAttemptsMock).toBeCalled();
+    });
+  });
+
+  test("Reset login attempt after login by biometric auth", async () => {
     verifySecretMock.mockResolvedValueOnce(true);
     const customInitialState = {
       ...initialState,
