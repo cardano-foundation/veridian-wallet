@@ -335,19 +335,16 @@ export const ProfileSetup = ({
             profile.identity.groupMetadata?.groupId === scanGroupId
         )
       ) {
-        handleCloseScan();
         dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR));
         return;
       }
 
       if (!scanGroupId) {
-        handleCloseScan();
         dispatch(setToastMsg(ToastMsgType.NOT_VALID_GROUP_INVITE));
         return;
       }
 
       if (!scannedGroupName) {
-        handleCloseScan();
         dispatch(setToastMsg(ToastMsgType.GROUP_NAME_NOT_FOUND_ERROR));
         return;
       }
@@ -392,7 +389,6 @@ export const ProfileSetup = ({
         })
       );
     } catch (error) {
-      handleCloseScan();
       dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
     }
   };

@@ -993,6 +993,7 @@ describe("Profile setup: use as modal", () => {
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.NOT_VALID_GROUP_INVITE)
       );
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
     });
   });
 
@@ -1108,6 +1109,7 @@ describe("Profile setup: use as modal", () => {
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR)
       );
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
     });
   });
 
@@ -1146,6 +1148,7 @@ describe("Profile setup: use as modal", () => {
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.CONNECTION_ERROR)
       );
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
     });
   });
 
