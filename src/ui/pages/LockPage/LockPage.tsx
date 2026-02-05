@@ -293,9 +293,9 @@ const LockPageContainer = () => {
 
   return (
     <ResponsivePageLayout
-      pageId="lock"
+      pageId={pageId}
       activeStatus={true}
-      customClass={"show animation-off max-overlay"}
+      customClass={"lock-page show animation-off max-overlay"}
     >
       {isLock ? (
         <MaxLoginAttemptAlert lockDuration={lockDuration} />

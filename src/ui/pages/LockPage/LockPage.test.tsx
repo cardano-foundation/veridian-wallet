@@ -394,7 +394,7 @@ describe("Lock Page", () => {
 
     await waitFor(() => {
       expect(handleBiometricAuthMock).toBeCalled();
-      expect(queryByTestId("lock-page")).not.toBeInTheDocument();
+      expect(queryByTestId("lock-page-page")).not.toBeInTheDocument();
     });
   });
 
@@ -434,7 +434,7 @@ describe("Lock Page", () => {
     );
 
     await waitFor(() => {
-      expect(queryByTestId("lock-page")).toBeInTheDocument();
+      expect(queryByTestId("lock-page-page")).toBeInTheDocument();
       expect(getByTestId("alert-max-attempts")).toBeVisible();
     });
   });
@@ -475,7 +475,7 @@ describe("Lock Page", () => {
     );
 
     await waitFor(() => {
-      expect(queryByTestId("lock-page")).toBeInTheDocument();
+      expect(queryByTestId("lock-page-page")).toBeInTheDocument();
       expect(getByTestId("alert-permanent-lockout")).toBeVisible();
     });
 
