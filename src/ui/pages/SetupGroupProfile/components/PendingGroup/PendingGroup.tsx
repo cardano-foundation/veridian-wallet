@@ -51,7 +51,7 @@ import { StageProps } from "../../SetupGroupProfile.types";
 import { ErrorPage } from "./ErrorPage";
 import "./PendingGroup.scss";
 
-const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
+const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const componentId = "pending-group";
   const [openProfiles, setOpenProfiles] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
@@ -155,7 +155,17 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
   );
 
   const members = useMemo(() => {
-    const members = state.selectedConnections.map((connection): Member => {
+    const groupMembers =
+      isPendingMember && multisigIcpDetails
+        ? getMemberConnectionsFromMultisigIcp(multisigIcpDetails)
+        : groupDetails
+        ? getMemberConnectionsFormGroupInformation(
+            state.scannedConections,
+            groupDetails
+          )
+        : [];
+
+    const members = groupMembers.map((connection): Member => {
       const name = connection?.label || "";
 
       let hasAccepted = false;
@@ -269,15 +279,6 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
       );
       retry.current = 0;
       setGroupDetails(details);
-      setState((state) => {
-        return {
-          ...state,
-          selectedConnections: getMemberConnectionsFormGroupInformation(
-            state.scannedConections,
-            details
-          ),
-        };
-      });
     } catch (e) {
       if (
         e instanceof Error &&
@@ -295,12 +296,7 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
     } finally {
       setLoading(false);
     }
-  }, [
-    dispatch,
-    getMemberConnectionsFormGroupInformation,
-    identity?.id,
-    setState,
-  ]);
+  }, [dispatch, identity?.id]);
 
   const fetchMultisigDetails = useCallback(async () => {
     try {
@@ -311,13 +307,6 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
       );
       setMultisigIcpDetails(details);
       setShowErrorPage(false);
-
-      setState((state) => {
-        return {
-          ...state,
-          selectedConnections: getMemberConnectionsFromMultisigIcp(details),
-        };
-      });
     } catch (e) {
       if (
         (e as Error).message === MultiSigService.UNKNOWN_AIDS_IN_MULTISIG_ICP
@@ -327,7 +316,7 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
     } finally {
       setLoading(false);
     }
-  }, [getMemberConnectionsFromMultisigIcp, initGroupNotification, setState]);
+  }, [initGroupNotification]);
 
   const fetchGroupDetails = useCallback(async () => {
     if (!isPendingGroup) return;
