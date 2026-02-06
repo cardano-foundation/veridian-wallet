@@ -73,7 +73,7 @@ const ProfileContent = ({
   const [shareIsOpen, setShareIsOpen] = useState(false);
   const [editorOptionsIsOpen, setEditorIsOpen] = useState(false);
   const [editUserName, setEditUserName] = useState(false);
-  const oobi = useGetOobi(cardData.id, cardData.displayName);
+  const oobi = useGetOobi(cardData);
 
   const openShareModal = () => {
     if (!cardData) return;
