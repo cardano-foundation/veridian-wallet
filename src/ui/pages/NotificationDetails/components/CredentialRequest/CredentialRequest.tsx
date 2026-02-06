@@ -227,7 +227,6 @@ const CredentialRequest = ({
           activeStatus={activeStatus}
           credentialRequest={credentialRequest}
           notificationDetails={notificationDetails}
-          linkedGroup={linkedGroup}
           onBack={backToStageOne}
           reloadData={getCrendetialRequest}
           onSubmit={handleSubmitCredential}
