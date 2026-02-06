@@ -138,8 +138,13 @@ export const SetupSignerModal = ({
   );
 
   useEffect(() => {
-    if (isOpen) setData({ ...currentValue });
-  }, [isOpen, currentValue, isValidData]);
+    if (isOpen)
+      setData(
+        currentValue
+          ? { ...currentValue }
+          : { recoverySigners: null, requiredSigners: null }
+      );
+  }, [isOpen, currentValue]);
 
   const setField = (name: keyof SignerData, value: number | null) => {
     setData((values) => ({

@@ -1,6 +1,6 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { pencilOutline, warningOutline } from "ionicons/icons";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import {
@@ -44,7 +44,6 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   const [openSigners, setOpenSigners] = useState(false);
   const [openEditMembers, setOpenEditMembers] = useState(false);
   const [loading, setLoading] = useState(false);
-  const isOpenFromSetMemberModal = useRef(false);
   const history = useHistory();
 
   const profile = useAppSelector(getCurrentProfile);
@@ -88,18 +87,17 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
 
   const openSignerModal = () => setOpenSigners(true);
 
-  const updateMembers = (data: ConnectionShortDetails[]) => {
+  const updateMembers = (
+    data: ConnectionShortDetails[],
+    signerData: SignerData
+  ) => {
     setState((state) => ({
       ...state,
       selectedConnections: [...data],
       signer: {
-        recoverySigners: null,
-        requiredSigners: null,
+        ...signerData,
       },
     }));
-
-    isOpenFromSetMemberModal.current = true;
-    openSignerModal();
   };
 
   const updateSigners = (data: SignerData) => {
@@ -108,7 +106,6 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       signer: data,
     });
 
-    isOpenFromSetMemberModal.current = false;
     setOpenSigners(false);
   };
 
@@ -159,12 +156,6 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
 
   const handleCloseSignerModal = (value: boolean) => {
     setOpenSigners(value);
-
-    if (!value && isOpenFromSetMemberModal.current) {
-      openMemberModal();
-    }
-
-    isOpenFromSetMemberModal.current = false;
   };
 
   return (

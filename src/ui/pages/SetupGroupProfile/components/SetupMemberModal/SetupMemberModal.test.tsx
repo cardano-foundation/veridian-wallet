@@ -139,6 +139,9 @@ describe("Setup member modal", () => {
       )
     );
 
-    expect(submit).toBeCalledWith([memberConnections[0]]);
+    await waitFor(() => {
+      expect(getByTestId("setup-signer-modal")).toBeVisible();
+      expect(submit).not.toBeCalled();
+    });
   });
 });
