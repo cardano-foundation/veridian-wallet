@@ -7,10 +7,7 @@ import {
 } from "ionicons/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
-import {
-  ConnectionShortDetails,
-  CreationStatus,
-} from "../../../../../core/agent/agent.types";
+import { CreationStatus } from "../../../../../core/agent/agent.types";
 import { MultiSigService } from "../../../../../core/agent/services";
 import { MultiSigIcpRequestDetails } from "../../../../../core/agent/services/identifier.types";
 import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
@@ -133,36 +130,16 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     identity?.id,
   ]);
 
-  const getMemberConnectionsFormGroupInformation = useCallback(
-    (connections: ConnectionShortDetails[], groupDetails: GroupInformation) => {
-      let memberData = [...connections];
-
-      return (memberData = memberData.filter((connection) => {
-        return groupDetails.members.some((m) => m.aid == connection.contactId);
-      }));
-    },
-    []
-  );
-
-  const getMemberConnectionsFromMultisigIcp = useCallback(
-    (multisigIcpDetails: MultiSigIcpRequestDetails) => {
-      return [
-        multisigIcpDetails.sender,
-        ...multisigIcpDetails.otherConnections,
-      ];
-    },
-    []
-  );
-
   const members = useMemo(() => {
     const groupMembers =
       isPendingMember && multisigIcpDetails
-        ? getMemberConnectionsFromMultisigIcp(multisigIcpDetails)
+        ? [multisigIcpDetails.sender, ...multisigIcpDetails.otherConnections]
         : groupDetails
-        ? getMemberConnectionsFormGroupInformation(
-            state.scannedConections,
-            groupDetails
-          )
+        ? state.scannedConections.filter((connection) => {
+            return groupDetails.members.some(
+              (m) => m.aid == connection.contactId
+            );
+          })
         : [];
 
     const members = groupMembers.map((connection): Member => {
