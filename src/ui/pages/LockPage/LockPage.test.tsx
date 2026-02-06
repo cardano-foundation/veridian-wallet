@@ -485,6 +485,37 @@ describe("Lock Page", () => {
 });
 
 describe("Lock Page: Max login attempt", () => {
+  let handleBiometricAuthMock: jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    handleBiometricAuthMock = jest.fn(() => Promise.resolve(true));
+
+    jest.doMock("@ionic/react", () => {
+      const actualIonicReact = jest.requireActual("@ionic/react");
+      return {
+        ...actualIonicReact,
+        getPlatforms: () => ["ios"],
+      };
+    });
+    isNativeMock.mockImplementation(() => false);
+
+    (useBiometricAuth as jest.Mock).mockImplementation(() => ({
+      biometricsIsEnabled: true,
+      biometricInfo: {
+        isAvailable: true,
+        hasCredentials: false,
+        biometryType: BiometryType.FINGERPRINT,
+      },
+      handleBiometricAuth: handleBiometricAuthMock,
+      setBiometricsIsEnabled: jest.fn(),
+      setupBiometrics: jest.fn(),
+      checkBiometrics: jest.fn(),
+      remainingLockoutSeconds: 0,
+      lockoutEndTime: null,
+    }));
+  });
+
   const initialState = {
     stateCache: {
       routes: [RoutePath.SSI_AGENT],
@@ -602,14 +633,14 @@ describe("Lock Page: Max login attempt", () => {
     });
   });
 
-  test("Reset login attempt after login by biometric auth", async () => {
-    verifySecretMock.mockResolvedValueOnce(true);
+  test("Reset login attempt after login by biometric auth success", async () => {
     const customInitialState = {
       ...initialState,
       stateCache: {
         ...initialState.stateCache,
         authentication: {
           ...initialState.stateCache.authentication,
+          firstAppLaunch: true,
           loginAttempt: {
             ...initialState.stateCache.authentication.loginAttempt,
             attempts: 2,
@@ -618,7 +649,9 @@ describe("Lock Page: Max login attempt", () => {
       },
     };
 
-    const { getByText, getByTestId } = render(
+    handleBiometricAuthMock.mockResolvedValue(BiometricAuthOutcome.SUCCESS);
+
+    const { getByText } = render(
       <Provider store={storeMocked(customInitialState)}>
         <LockPage />
       </Provider>
@@ -627,10 +660,44 @@ describe("Lock Page: Max login attempt", () => {
     expect(getByText(EN_TRANSLATIONS.lockpage.title)).toBeInTheDocument();
     expect(getByText(EN_TRANSLATIONS.lockpage.description)).toBeInTheDocument();
 
-    await passcodeFiller(getByText, getByTestId, "193212");
+    await waitFor(() => {
+      expect(handleBiometricAuthMock).toBeCalled();
+      expect(resetLoginAttemptsMock).toBeCalled();
+    });
+  });
+
+  test("Not reset login attempt after login by biometric auth fail", async () => {
+    const customInitialState = {
+      ...initialState,
+      stateCache: {
+        ...initialState.stateCache,
+        authentication: {
+          ...initialState.stateCache.authentication,
+          firstAppLaunch: true,
+          loginAttempt: {
+            ...initialState.stateCache.authentication.loginAttempt,
+            attempts: 2,
+          },
+        },
+      },
+    };
+
+    handleBiometricAuthMock.mockResolvedValue(
+      BiometricAuthOutcome.GENERIC_ERROR
+    );
+
+    const { getByText } = render(
+      <Provider store={storeMocked(customInitialState)}>
+        <LockPage />
+      </Provider>
+    );
+
+    expect(getByText(EN_TRANSLATIONS.lockpage.title)).toBeInTheDocument();
+    expect(getByText(EN_TRANSLATIONS.lockpage.description)).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(resetLoginAttemptsMock).toBeCalled();
+      expect(handleBiometricAuthMock).toBeCalled();
+      expect(resetLoginAttemptsMock).not.toBeCalled();
     });
   });
 });

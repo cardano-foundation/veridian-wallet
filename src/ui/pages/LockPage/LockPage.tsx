@@ -126,7 +126,11 @@ const LockPageContainer = () => {
     try {
       await disablePrivacy();
       authenResult = await handleBiometricAuth();
-      await resetLoginAttempt();
+
+      if (authenResult === BiometricAuthOutcome.SUCCESS) {
+        await resetLoginAttempt();
+      }
+
       preventBiometricOnEvent.current =
         authenResult === BiometricAuthOutcome.USER_CANCELLED ||
         authenResult === BiometricAuthOutcome.SUCCESS;
@@ -151,13 +155,7 @@ const LockPageContainer = () => {
         dispatch(showGenericError(true));
         break;
     }
-  }, [
-    isInBiometricProcess,
-    disablePrivacy,
-    handleBiometricAuth,
-    enablePrivacy,
-    dispatch,
-  ]);
+  }, [isInBiometricProcess, disablePrivacy, handleBiometricAuth, resetLoginAttempt, enablePrivacy, dispatch]);
 
   const handleUseBiometrics = useCallback(async () => {
     if (remainingLockoutSeconds > 0) {
