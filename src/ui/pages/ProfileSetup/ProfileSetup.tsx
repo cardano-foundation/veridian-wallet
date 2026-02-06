@@ -336,16 +336,19 @@ export const ProfileSetup = ({
         )
       ) {
         dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR));
+        scanRef.current?.registerScanHandler();
         return;
       }
 
       if (!scanGroupId) {
         dispatch(setToastMsg(ToastMsgType.NOT_VALID_GROUP_INVITE));
+        scanRef.current?.registerScanHandler();
         return;
       }
 
       if (!scannedGroupName) {
         dispatch(setToastMsg(ToastMsgType.GROUP_NAME_NOT_FOUND_ERROR));
+        scanRef.current?.registerScanHandler();
         return;
       }
 
