@@ -133,35 +133,25 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
     identity?.id,
   ]);
 
-  const getMemberConnections = useCallback(
-    (
-      connections: ConnectionShortDetails[],
-      groupDetails: GroupInformation | null,
-      multisigIcpDetails: MultiSigIcpRequestDetails | null
-    ) => {
+  const getMemberConnectionsFormGroupInformation = useCallback(
+    (connections: ConnectionShortDetails[], groupDetails: GroupInformation) => {
       let memberData = [...connections];
 
-      if (groupDetails) {
-        memberData = memberData.filter((connection) => {
-          return groupDetails?.members.some(
-            (m) => m.aid == connection.contactId
-          );
-        });
-      }
-
-      if (multisigIcpDetails && isPendingMember) {
-        memberData = memberData.filter(
-          (item) =>
-            item.contactId == multisigIcpDetails.sender.contactId ||
-            multisigIcpDetails.otherConnections.some(
-              (c) => c.contactId == item.contactId
-            )
-        );
-      }
-
-      return memberData;
+      return (memberData = memberData.filter((connection) => {
+        return groupDetails.members.some((m) => m.aid == connection.contactId);
+      }));
     },
-    [isPendingMember]
+    []
+  );
+
+  const getMemberConnectionsFromMultisigIcp = useCallback(
+    (multisigIcpDetails: MultiSigIcpRequestDetails) => {
+      return [
+        multisigIcpDetails.sender,
+        ...multisigIcpDetails.otherConnections,
+      ];
+    },
+    []
   );
 
   const members = useMemo(() => {
@@ -280,24 +270,12 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
       retry.current = 0;
       setGroupDetails(details);
       setState((state) => {
-        const memberConnections = getMemberConnections(
-          state.scannedConections,
-          details,
-          null
-        );
-
-        if (
-          memberConnections.length == state.selectedConnections.length &&
-          state.selectedConnections.every((item) =>
-            memberConnections.some((m) => m.contactId == item.contactId)
-          )
-        ) {
-          return state;
-        }
-
         return {
           ...state,
-          selectedConnections: memberConnections,
+          selectedConnections: getMemberConnectionsFormGroupInformation(
+            state.scannedConections,
+            details
+          ),
         };
       });
     } catch (e) {
@@ -317,7 +295,12 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
     } finally {
       setLoading(false);
     }
-  }, [dispatch, getMemberConnections, identity?.id, setState]);
+  }, [
+    dispatch,
+    getMemberConnectionsFormGroupInformation,
+    identity?.id,
+    setState,
+  ]);
 
   const fetchMultisigDetails = useCallback(async () => {
     try {
@@ -330,24 +313,9 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
       setShowErrorPage(false);
 
       setState((state) => {
-        const memberConnections = getMemberConnections(
-          state.scannedConections,
-          null,
-          details
-        );
-
-        if (
-          memberConnections.length == state.selectedConnections.length &&
-          state.selectedConnections.every((item) =>
-            memberConnections.some((m) => m.contactId == item.contactId)
-          )
-        ) {
-          return state;
-        }
-
         return {
           ...state,
-          selectedConnections: memberConnections,
+          selectedConnections: getMemberConnectionsFromMultisigIcp(details),
         };
       });
     } catch (e) {
@@ -359,7 +327,7 @@ const PendingGroup = ({ state, isPendingGroup, setState }: StageProps) => {
     } finally {
       setLoading(false);
     }
-  }, [getMemberConnections, initGroupNotification, setState]);
+  }, [getMemberConnectionsFromMultisigIcp, initGroupNotification, setState]);
 
   const fetchGroupDetails = useCallback(async () => {
     if (!isPendingGroup) return;
