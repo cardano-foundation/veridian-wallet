@@ -986,14 +986,14 @@ describe("Profile setup: use as modal", () => {
     fireEvent.click(getByTestId("join-group-button"));
 
     await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+      expect(getByTestId("paste-content-button")).toBeVisible();
     });
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.NOT_VALID_GROUP_INVITE)
       );
-      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+      expect(getByTestId("paste-content-button")).toBeVisible();
     });
   });
 
@@ -1102,14 +1102,14 @@ describe("Profile setup: use as modal", () => {
     fireEvent.click(getByTestId("join-group-button"));
 
     await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+      expect(getByTestId("paste-content-button")).toBeVisible();
     });
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR)
       );
-      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+      expect(getByTestId("paste-content-button")).toBeVisible();
     });
   });
 
