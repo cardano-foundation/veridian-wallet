@@ -1564,7 +1564,8 @@
     "networkerror": "Unable to reach the cloud",
     "createidentifiererror": "Unable to create profile",
     "invalidconnectionurlerror": "Invalid connection URL",
-    "profilenotexisterror": "This profile no longer exists"
+    "profilenotexisterror": "This profile no longer exists",
+    "memberalreadyexisterror": "Member already added"
   },
   "request": {
     "sign": {

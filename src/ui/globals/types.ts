@@ -84,6 +84,7 @@ enum ToastMsgType {
   CREATE_IDENTIFIER_FAIL = "createidentifiererror",
   INVALID_CONNECTION_URL = "invalidconnectionurlerror",
   PROFILE_NOT_EXIST = "profilenotexisterror",
+  MEMBER_ALREADY_EXIST = "memberalreadyexisterror",
 }
 
 const PASSCODE_MAPPING = {

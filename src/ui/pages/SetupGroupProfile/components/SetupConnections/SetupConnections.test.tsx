@@ -602,6 +602,100 @@ describe("Setup Connection", () => {
     });
   });
 
+  test("Scan member who already added", async () => {
+    const connection: ConnectionShortDetails = {
+      id: "string1",
+      label: "Cambridge University",
+      createdAtUTC: "2017-01-14T19:23:24Z",
+      status: ConnectionStatus.CONFIRMED,
+      groupId,
+      contactId: "string1",
+    };
+
+    const initialState = {
+      stateCache: {
+        routes: [RoutePath.GROUP_PROFILE_SETUP],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+          proposedUsername: "Duke",
+        },
+        isOnline: true,
+      },
+      profilesCache: {
+        profiles: {
+          [initiatorGroupProfile.id]: {
+            identity: initiatorGroupProfile,
+            multisigConnections: [connection],
+          },
+        },
+        defaultProfile: initiatorGroupProfile.id,
+        recentProfiles: [],
+      },
+    };
+    const dispatchMock = jest.fn();
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    addListener.mockImplementation(
+      (
+        eventName: string,
+        listenerFunc: (result: BarcodesScannedEvent) => void
+      ) => {
+        setTimeout(() => {
+          listenerFunc({
+            barcodes,
+          });
+        }, 100);
+
+        return {
+          remove: jest.fn(),
+        };
+      }
+    );
+
+    const history = createMemoryHistory();
+    history.push(
+      RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
+    );
+
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <IonReactMemoryRouter history={history}>
+          <SetupConnections
+            state={stage1State}
+            setState={setState}
+          />
+        </IonReactMemoryRouter>
+      </Provider>
+    );
+
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.share)
+      ).toBeVisible()
+    );
+
+    expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
+
+    fireEvent(
+      getByTestId("setup-members-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
+
+    await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(
+        setToastMsg(ToastMsgType.MEMBER_ALREADY_EXIST)
+      );
+    });
+  });
+
   test("Scan duplication", async () => {
     addListener.mockImplementation(
       (
