@@ -642,12 +642,14 @@
       },
       "signingkeysthreshold": {
         "title": "Required signers",
-        "member": "{{member}} members",
+        "members": "{{member}} members",
+        "member": "{{member}} member",
         "outof": "out of {{threshold}}"
       },
       "rotationthreshold": {
         "title": "Recovery signers",
-        "member": "{{member}} members",
+        "members": "{{member}} members",
+        "member": "{{member}} member",
         "outof": "out of {{threshold}}"
       },
       "button": {
@@ -701,25 +703,18 @@
         "hiderotationkey": "Hide {{keys}} rotation key digests"
       },
       "signingthreshold": {
-        "title": "Signing threshold",
+        "title": "Signers",
         "propexplain": {
-          "title": "About signing threshold",
-          "content": "Minimum number of signing keys required to approve a transaction or event within the profile."
+          "title": "About required signers",
+          "content": "This sets the minimum number of group members who must approve an action for it to go ahead."
         },
         "threshold": {
           "title": "Threshold",
-          "text": "{{threshold}} out of {{members}}"
-        }
-      },
-      "rotationthreshold": {
-        "title": "Rotation threshold",
-        "propexplain": {
-          "title": "About rotation threshold",
-          "content": "Provides additional details on this profile for users interested in more technical insights."
-        },
-        "threshold": {
-          "title": "Threshold",
-          "text": "{{threshold}} out of {{members}}"
+          "text": "{{threshold}} out of {{members}}",
+          "recovery": {
+            "explaintitle": "About recovery signers",
+            "explain": "This sets the minimum number of group members needed to recover the group profile if something goes wrong."
+          }
         }
       },
       "groupmember": {
@@ -1430,6 +1425,7 @@
         "recoverysigners": "Recovery signers",
         "recoverysignershelptext": "This sets the minimum number of group members needed to recover the group profile if something goes wrong.",
         "members": "{{members}} members",
+        "member": "{{members}} member",
         "button": {
           "back": "Back",
           "confirm": "Confirm signers"
@@ -1635,7 +1631,7 @@
     "biometricunavailable": "Biometrics is unavailable at this time. You can set this up later via the settings page.",
     "biometricunavailableconfirm": "Ok",
     "lockoutheader": "Biometrics are temporarily disabled. Please try again in {{seconds}} seconds.",
-    "lockoutconfirm": "Got it",
+    "lockoutconfirm": "Continue without",
     "permanentlockoutheader": "For your security, biometrics are turned off. Lock and unlock your device to turn them back on.",
     "errors": {
       "notAvailable": "Biometry is not available on this device.",

@@ -832,7 +832,7 @@ describe("Group profile details page", () => {
     });
   });
 
-  test("Open signing threshold", async () => {
+  test("Click on signing threshold", async () => {
     const { getByText, getAllByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
@@ -872,10 +872,22 @@ describe("Group profile details page", () => {
             .propexplain.content
         )
       ).toBeVisible();
+      expect(
+        getByText(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold.threshold
+            .recovery.explaintitle
+        )
+      ).toBeVisible();
+      expect(
+        getByText(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold.threshold
+            .recovery.explain
+        )
+      ).toBeVisible();
     });
   });
 
-  test("Open rotation threshold", async () => {
+  test("Click on rotate threshold", async () => {
     const { getByText, getAllByText, getByTestId } = render(
       <Provider store={storeMockedAidKeri}>
         <ProfileDetailsModal
@@ -887,7 +899,6 @@ describe("Group profile details page", () => {
         />
       </Provider>
     );
-
     expect(
       getByTestId("identifier-card-detail-spinner-container")
     ).toBeVisible();
@@ -906,14 +917,26 @@ describe("Group profile details page", () => {
     await waitFor(() => {
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold
             .propexplain.title
         )
       ).toBeVisible();
       expect(
         getByText(
-          EN_TRANSLATIONS.profiledetails.detailsmodal.rotationthreshold
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold
             .propexplain.content
+        )
+      ).toBeVisible();
+      expect(
+        getByText(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold.threshold
+            .recovery.explaintitle
+        )
+      ).toBeVisible();
+      expect(
+        getByText(
+          EN_TRANSLATIONS.profiledetails.detailsmodal.signingthreshold.threshold
+            .recovery.explain
         )
       ).toBeVisible();
     });

@@ -35,16 +35,10 @@ const CHANNEL_CONFIG = {
 
 type ProfileSwitcher = (profileId: string) => Promise<boolean>;
 
-interface PendingNavigation {
-  path: string;
-  profileId: string;
-}
-
 class NotificationService {
   private profileSwitcher: ProfileSwitcher | null = null;
   private permissionsGranted = false;
   private pendingNotification: LocalNotificationSchema | null = null;
-  private pendingNavigation: PendingNavigation | null = null;
   private initialized = false;
 
   async initialize(): Promise<boolean> {
@@ -187,14 +181,6 @@ class NotificationService {
     const granted = result.display === "granted";
     this.permissionsGranted = granted;
     return granted;
-  }
-
-  getPendingNavigation(): PendingNavigation | null {
-    return this.pendingNavigation;
-  }
-
-  clearPendingNavigation(): void {
-    this.pendingNavigation = null;
   }
 }
 

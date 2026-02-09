@@ -213,6 +213,9 @@ describe("Archived and revoked credentials", () => {
 
       await waitFor(() => {
         expect(getByTestId("action-button")).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.tabs.credentials.archived.archivedtitle)
+        ).toBeVisible();
       });
 
       act(() => {
@@ -317,6 +320,9 @@ describe("Archived and revoked credentials", () => {
 
       await waitFor(() => {
         expect(getByTestId("action-button")).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.tabs.credentials.archived.revokedtitle)
+        ).toBeVisible();
       });
 
       act(() => {

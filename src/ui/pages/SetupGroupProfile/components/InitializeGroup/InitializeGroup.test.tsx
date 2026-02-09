@@ -186,7 +186,7 @@ describe("Init group", () => {
 
     expect(
       getByText(
-        EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.members.replace(
+        EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.member.replace(
           "{{members}}",
           "1"
         )
