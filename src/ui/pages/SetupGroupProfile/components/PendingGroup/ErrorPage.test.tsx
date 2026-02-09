@@ -153,6 +153,7 @@ const initialState = {
       queues: [],
       isPaused: false,
     },
+    toastMsgs: [],
   },
   profilesCache: {
     ...profileCacheFixData,

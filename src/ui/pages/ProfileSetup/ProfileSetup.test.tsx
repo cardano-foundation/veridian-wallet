@@ -195,6 +195,7 @@ describe("Profile setup", () => {
           },
           firstAppLaunch: true,
         },
+        toastMsgs: [],
         profileHistories: [],
       },
 
@@ -468,6 +469,7 @@ describe("Profile setup", () => {
           },
           firstAppLaunch: true,
         },
+        toastMsgs: [],
       },
 
       profilesCache: profileCacheFixData,
@@ -698,6 +700,7 @@ describe("Profile setup: use as modal", () => {
         },
         firstAppLaunch: false,
       },
+      toastMsgs: [],
       profileHistories: [],
     },
     profilesCache: profileCacheFixData,
@@ -871,6 +874,7 @@ describe("Profile setup: use as modal", () => {
           },
           firstAppLaunch: false,
         },
+        toastMsgs: [],
         profileHistories: [],
       },
       profilesCache: {
@@ -1044,6 +1048,7 @@ describe("Profile setup: use as modal", () => {
           },
           firstAppLaunch: false,
         },
+        toastMsgs: [],
       },
       profilesCache: {
         profiles: {

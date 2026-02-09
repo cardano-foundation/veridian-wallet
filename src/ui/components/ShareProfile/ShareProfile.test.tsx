@@ -136,6 +136,7 @@ describe("Share Profile", () => {
         passcodeIsSet: true,
         passwordIsSet: false,
       },
+      toastMsgs: [],
     },
     profilesCache: profileCacheFixData,
   };

@@ -110,6 +110,7 @@ describe("Scan", () => {
         passcodeIsSet: true,
         passwordIsSet: false,
       },
+      toastMsgs: [],
     },
   };
 
