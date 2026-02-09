@@ -1,15 +1,18 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { ProfileContent } from "./ProfileContent";
 import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { identifierFix } from "../../../__fixtures__/identifierFix";
+import { TabsRoutePath } from "../../navigation/TabsMenu";
+import { ConnectionService } from "../../../../core/agent/services";
 
+const getOobiMock = jest.fn(() => Promise.resolve("oobi"));
 jest.mock("../../../../core/agent/agent", () => ({
   Agent: {
     agent: {
       connections: {
-        getOobi: jest.fn(() => Promise.resolve("oobi")),
+        getOobi: () => getOobiMock(),
       },
     },
   },
@@ -108,6 +111,17 @@ describe("ProfileContent", () => {
 
   const renderComponent = (storeOverrides = {}) => {
     const store = makeTestStore({
+      stateCache: {
+        routes: [TabsRoutePath.CREDENTIALS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+          passwordIsSkipped: true,
+        },
+        isOnline: true,
+      },
       profilesCache: profileCacheFixData,
       ...storeOverrides,
     });
@@ -284,6 +298,23 @@ describe("ProfileContent", () => {
       const connectionsValue = connectionsLabel.previousElementSibling;
 
       expect(connectionsValue?.textContent).toBe("0");
+    });
+
+    test("retry to get oobi when fetchOobi throw ConnectionService.CANNOT_GET_OOBI", async () => {
+      getOobiMock
+        .mockImplementationOnce(() =>
+          Promise.reject(new Error(ConnectionService.CANNOT_GET_OOBI))
+        )
+        .mockImplementationOnce(() =>
+          Promise.reject(new Error(ConnectionService.CANNOT_GET_OOBI))
+        )
+        .mockImplementationOnce(() => Promise.resolve("oobi-value"));
+
+      renderComponent();
+
+      await waitFor(() => {
+        expect(getOobiMock).toBeCalledTimes(3);
+      });
     });
   });
 });
