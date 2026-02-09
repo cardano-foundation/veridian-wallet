@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { Agent } from "../../core/agent/agent";
 import { CreationStatus } from "../../core/agent/agent.types";
 import { IdentifierShortDetails } from "../../core/agent/services/identifier.types";
@@ -9,7 +9,6 @@ import { useOnlineStatusEffect } from "./useOnlineStatusEffect";
 export const useGetOobi = (profile?: IdentifierShortDetails) => {
   const [oobi, setOobi] = useState("");
   const dispatch = useAppDispatch();
-  const retry = useRef(0);
 
   const fetchOobi = useCallback(async () => {
     try {
@@ -23,11 +22,6 @@ export const useGetOobi = (profile?: IdentifierShortDetails) => {
         setOobi(oobiValue);
       }
     } catch (e) {
-      if (retry.current < 3) {
-        await fetchOobi();
-        return;
-      }
-
       showError("Unable to fetch connection oobi", e, dispatch);
     }
   }, [profile, dispatch]);

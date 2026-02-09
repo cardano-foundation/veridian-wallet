@@ -5,6 +5,16 @@ import { ProfileContent } from "./ProfileContent";
 import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { identifierFix } from "../../../__fixtures__/identifierFix";
 
+jest.mock("../../../../core/agent/agent", () => ({
+  Agent: {
+    agent: {
+      connections: {
+        getOobi: jest.fn(() => Promise.resolve("oobi")),
+      },
+    },
+  },
+}));
+
 jest.mock("../../../../i18n", () => ({
   i18n: {
     t: jest.fn((key: string) => key),
