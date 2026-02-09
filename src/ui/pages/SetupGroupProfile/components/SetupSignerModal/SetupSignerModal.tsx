@@ -138,6 +138,7 @@ export const SetupSignerModal = ({
   );
 
   useEffect(() => {
+    // When opened directly, we use the currently set value but if opened from the members modal, we reset to null to make the user choose again.
     if (isOpen)
       setData(
         currentValue

@@ -95,7 +95,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
 
   const openSignerModal = () => setOpenSigners(true);
 
-  const updateMembers = (
+  const updateMembersAndSigners = (
     data: ConnectionShortDetails[],
     signerData: SignerData
   ) => {
@@ -313,7 +313,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
         setOpen={setOpenEditMembers}
         connections={state.scannedConections}
         currentSelectedConnections={state.selectedConnections}
-        onSubmit={updateMembers}
+        onSubmit={updateMembersAndSigners}
       />
       <Alert
         isOpen={openCancelAlert}
