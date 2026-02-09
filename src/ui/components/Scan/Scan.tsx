@@ -24,7 +24,10 @@ import {
 } from "react";
 import { i18n } from "../../../i18n";
 import { useAppSelector } from "../../../store/hooks";
-import { getAuthentication } from "../../../store/reducers/stateCache";
+import {
+  getAuthentication,
+  getToastMgs,
+} from "../../../store/reducers/stateCache";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { CustomInput } from "../CustomInput";
@@ -56,6 +59,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [isAlreadyLoaded, setIsAlreadyLoaded] = useState(false);
     const loggedIn = useAppSelector(getAuthentication).loggedIn;
+    const toastMsgs = useAppSelector(getToastMgs);
 
     const mobileweb = platforms.includes("mobileweb");
 
@@ -95,12 +99,12 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       const listener = await BarcodeScanner.addListener(
         "barcodesScanned",
         async (result) => {
-          if (!result.barcodes?.length) return;
+          if (!result.barcodes?.length || toastMsgs.length > 0) return;
           await listener.remove();
           await handleScanValue(result.barcodes[0].rawValue);
         }
       );
-    }, [handleScanValue]);
+    }, [handleScanValue, toastMsgs.length]);
 
     const startScan = useCallback(async () => {
       if (Capacitor.isNativePlatform()) {
