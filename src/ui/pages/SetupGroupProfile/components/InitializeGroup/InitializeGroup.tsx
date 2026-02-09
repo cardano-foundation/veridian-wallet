@@ -51,7 +51,15 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   const openCloseAlert = () => setOpenCancelAlert(true);
 
   const handleClose = () => {
-    setState((state) => ({ ...state, stage: Stage.SetupConnection }));
+    setState((state) => ({
+      ...state,
+      signer: {
+        requiredSigners: null,
+        recoverySigners: null,
+      },
+      selectedConnections: [...state.scannedConections],
+      stage: Stage.SetupConnection,
+    }));
   };
 
   const members = useMemo(() => {
