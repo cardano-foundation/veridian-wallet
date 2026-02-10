@@ -761,6 +761,69 @@ describe("Setup Connection", () => {
     });
   });
 
+  test("Scan self oobi", async () => {
+    addListener.mockImplementation(
+      (
+        eventName: string,
+        listenerFunc: (result: BarcodesScannedEvent) => void
+      ) => {
+        setTimeout(() => {
+          listenerFunc({
+            barcodes: [
+              {
+                displayValue: `http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org/oobi/${multisignIdentifierFix[0].id}/agent/string2?groupId=${initiatorGroupProfile.groupMetadata.groupId}`,
+                format: BarcodeFormat.QrCode,
+                rawValue: `http://dev.keria.cf-keripy.metadata.dev.cf-deployments.org/oobi/${multisignIdentifierFix[0].id}/agent/string2?groupId=${initiatorGroupProfile.groupMetadata.groupId}`,
+                valueType: BarcodeValueType.Url,
+              },
+            ],
+          });
+        }, 100);
+
+        return {
+          remove: jest.fn(),
+        };
+      }
+    );
+
+    const history = createMemoryHistory();
+    history.push(
+      RoutePath.GROUP_PROFILE_SETUP.replace(":id", multisignIdentifierFix[0].id)
+    );
+
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <IonReactMemoryRouter history={history}>
+          <SetupConnections
+            state={stage1State}
+            setState={setState}
+          />
+        </IonReactMemoryRouter>
+      </Provider>
+    );
+
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.setupgroupprofile.setupmembers.share)
+      ).toBeVisible()
+    );
+
+    expect(getByText(EN_TRANSLATIONS.shareprofile.buttons.scan)).toBeVisible();
+
+    fireEvent(
+      getByTestId("setup-members-segment"),
+      new CustomEvent("ionChange", {
+        detail: { value: "scan" },
+      })
+    );
+
+    await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(
+        setToastMsg(ToastMsgType.SCAN_SELF_CONNECTION)
+      );
+    });
+  });
+
   test("Scan connection when group did not match", async () => {
     connectByOobiUrlMock.mockImplementation(() => {
       return Promise.reject(

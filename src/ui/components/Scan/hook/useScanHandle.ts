@@ -235,6 +235,16 @@ const useScanHandle = () => {
         throw new Error(ErrorMessage.MEMBER_EXIST);
       }
 
+      if (
+        currentProfile &&
+        urlGroupId === scanGroupId &&
+        currentProfile.identity.id === contactId
+      ) {
+        dispatch(setToastMsg(ToastMsgType.SCAN_SELF_CONNECTION));
+        closeScan?.();
+        return;
+      }
+
       const invitation = await Agent.agent.connections.connectByOobiUrl(
         content
       );
