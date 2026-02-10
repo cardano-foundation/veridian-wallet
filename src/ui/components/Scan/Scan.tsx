@@ -31,6 +31,7 @@ import {
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { CustomInput } from "../CustomInput";
+import { TOAST_DURATION } from "../CustomToast/CustomToast";
 import { OptionModal } from "../OptionsModal";
 import "./Scan.scss";
 import { ScanProps, ScanRef } from "./Scan.types";
@@ -60,6 +61,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const [isAlreadyLoaded, setIsAlreadyLoaded] = useState(false);
     const loggedIn = useAppSelector(getAuthentication).loggedIn;
     const toastMsgs = useAppSelector(getToastMgs);
+    const lastScanReceiveValue = useRef(0);
 
     const mobileweb = platforms.includes("mobileweb");
 
@@ -80,6 +82,14 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const handleScanValue = useCallback(
       async (result: string) => {
         if (isHandlingQR.current) return;
+
+        if (
+          lastScanReceiveValue.current !== 0 &&
+          Date.now() - lastScanReceiveValue.current < TOAST_DURATION
+        )
+          return;
+
+        lastScanReceiveValue.current = Date.now();
         try {
           setScanning(false);
           isHandlingQR.current = true;
