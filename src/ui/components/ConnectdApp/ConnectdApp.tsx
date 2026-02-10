@@ -242,11 +242,9 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
     return undefined;
   }, [step]);
 
-  const handleAfterConnect = () => {
-    if (!pendingConnection) return;
-
+  const handleAfterConnect = (data: DAppConnection) => {
     setStep(Step.Connections);
-    handleOpenConfirmConnectModal(pendingConnection);
+    handleOpenConfirmConnectModal(data);
   };
 
   const getContent = () => {
