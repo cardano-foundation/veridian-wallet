@@ -7,6 +7,8 @@ import { useAppDispatch } from "../../store/hooks";
 import { showError } from "../utils/error";
 import { useOnlineStatusEffect } from "./useOnlineStatusEffect";
 
+export const RETRY_TIMES = [1, 2.5, 5, 10, 30, 60];
+
 export const useGetOobi = (profile?: IdentifierShortDetails) => {
   const [oobi, setOobi] = useState("");
   const dispatch = useAppDispatch();
@@ -26,10 +28,11 @@ export const useGetOobi = (profile?: IdentifierShortDetails) => {
     } catch (e) {
       if (
         e instanceof Error &&
-        e.message.includes(ConnectionService.CANNOT_GET_OOBI) &&
-        retry.current < 3
+        e.message.includes(ConnectionService.CANNOT_GET_OOBI)
       ) {
         retry.current++;
+        const delay = RETRY_TIMES[retry.current] || RETRY_TIMES[5] * 1000;
+        await new Promise((resolve) => setTimeout(resolve, delay));
         await fetchOobi();
         return;
       }
