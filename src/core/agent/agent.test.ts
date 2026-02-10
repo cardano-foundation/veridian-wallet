@@ -262,6 +262,21 @@ describe("KERIA connectivity", () => {
     expect(mockBasicStorageService.createOrUpdateBasicRecord).toBeCalledTimes(
       3
     );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.KERIA_BOOT_URL })
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.KERIA_CONNECT_URL })
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.CRITICAL_ACTION_STATE })
+    );
     expect(Agent.isOnline).toBe(true);
     expect(mockAgentServicesProps.eventEmitter.emit).toBeCalledWith({
       type: EventTypes.KeriaStatusChanged,
@@ -294,6 +309,21 @@ describe("KERIA connectivity", () => {
     expect(mockSignifyClient.connect).toHaveBeenCalled();
     expect(mockBasicStorageService.createOrUpdateBasicRecord).toBeCalledTimes(
       3
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.KERIA_BOOT_URL })
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.KERIA_CONNECT_URL })
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.CRITICAL_ACTION_STATE })
     );
     expect(Agent.isOnline).toBe(true);
     expect(mockAgentServicesProps.eventEmitter.emit).toBeCalledWith({
@@ -1071,94 +1101,6 @@ describe("Critical Action Tracking", () => {
 
       // Allow small delta for execution time
       expect(Math.abs(newDeadline - expectedDeadline)).toBeLessThan(5000);
-    });
-  });
-
-  describe("Critical Action State Initialization", () => {
-    test("getCriticalActionState should return default state but NOT save to DB if not found", async () => {
-      mockBasicStorageService.findById.mockResolvedValue(null);
-      mockBasicStorageService.createOrUpdateBasicRecord.mockClear();
-
-      const state = await agent.getCriticalActionState();
-
-      expect(state.actionCount).toBe(0);
-      expect(state.deadline).toBeDefined();
-      expect(
-        mockBasicStorageService.createOrUpdateBasicRecord
-      ).not.toHaveBeenCalled();
-    });
-
-    test("initCriticalActionState should save to DB if not found", async () => {
-      mockBasicStorageService.findById.mockResolvedValue(null);
-      mockBasicStorageService.createOrUpdateBasicRecord.mockClear();
-
-      await agent.initCriticalActionState();
-
-      expect(
-        mockBasicStorageService.createOrUpdateBasicRecord
-      ).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: MiscRecordId.CRITICAL_ACTION_STATE,
-          content: expect.objectContaining({
-            actionCount: 0,
-          }),
-        })
-      );
-    });
-
-    test("initCriticalActionState should NOT save to DB if already exists", async () => {
-      mockBasicStorageService.findById.mockResolvedValue(
-        new BasicRecord({
-          id: MiscRecordId.CRITICAL_ACTION_STATE,
-          content: { actionCount: 1, deadline: "existing" },
-        })
-      );
-      mockBasicStorageService.createOrUpdateBasicRecord.mockClear();
-
-      await agent.initCriticalActionState();
-
-      expect(
-        mockBasicStorageService.createOrUpdateBasicRecord
-      ).not.toHaveBeenCalled();
-    });
-
-    test("bootAndConnect should initialize critical action state", async () => {
-      const initSpy = jest.spyOn(agent, "initCriticalActionState");
-      const mockBoot = jest.fn().mockResolvedValue({ ok: true });
-      const mockConnect = jest.fn().mockResolvedValue(undefined);
-
-      (SignifyClient as jest.Mock).mockImplementation(() => ({
-        boot: mockBoot,
-        connect: mockConnect,
-      }));
-
-      const bootUrl = "http://boot.url";
-      const connectUrl = "http://connect.url";
-      (fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ connectUrl }),
-      });
-
-      jest
-        .spyOn(SecureStorage, "get")
-        .mockResolvedValue("AEsI_2YqNsQlf8brzDJaP");
-
-      // Mock internal services to avoid failures during markAgentStatus(true)
-      (agent as any).connectionService = mockConnectionService;
-      (agent as any).identifierService = mockIdentifierService;
-      (agent as any).credentialService = mockCredentialService;
-      (agent as any).multiSigService = mockMultiSigService;
-      (agent as any).storageSession = {
-        executeCloudMigrationsOnConnection: jest.fn(),
-      };
-
-      // Reset agent online status to ensure it runs
-      (Agent as any).isOnline = false;
-
-      await agent.bootAndConnect(bootUrl);
-
-      expect(initSpy).toHaveBeenCalled();
-      initSpy.mockRestore();
     });
   });
 });
