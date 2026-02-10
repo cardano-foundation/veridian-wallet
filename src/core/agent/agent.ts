@@ -328,7 +328,7 @@ class Agent {
 
       await this.connectSignifyClient();
       await this.saveAgentUrls(agentUrls);
-      await this.getCriticalActionState(); // Initialize tracking
+      await this.initCriticalActionState(); // Initialize tracking
       this.markAgentStatus(true);
     }
   }
@@ -701,22 +701,35 @@ class Agent {
       return record.content as CriticalActionState;
     }
 
-    // Initialize if not found (should be done at boot, but safe fallback)
-    const initialState: CriticalActionState = {
+    // Return default state if not found, without seeding the DB
+    return {
       actionCount: 0,
       deadline: new Date(
         Date.now() + Agent.VERIFICATION_TIME_LIMIT_MS
       ).toISOString(),
     };
+  }
 
-    await this.basicStorage.createOrUpdateBasicRecord(
-      new BasicRecord({
-        id: MiscRecordId.CRITICAL_ACTION_STATE,
-        content: initialState,
-      })
+  async initCriticalActionState(): Promise<void> {
+    const record = await this.basicStorage.findById(
+      MiscRecordId.CRITICAL_ACTION_STATE
     );
 
-    return initialState;
+    if (!record) {
+      const initialState: CriticalActionState = {
+        actionCount: 0,
+        deadline: new Date(
+          Date.now() + Agent.VERIFICATION_TIME_LIMIT_MS
+        ).toISOString(),
+      };
+
+      await this.basicStorage.createOrUpdateBasicRecord(
+        new BasicRecord({
+          id: MiscRecordId.CRITICAL_ACTION_STATE,
+          content: initialState,
+        })
+      );
+    }
   }
 
   async recordCriticalAction(): Promise<void> {
