@@ -383,10 +383,10 @@ describe("ProfileContent", () => {
         </Provider>
       );
 
-      const keyItem = screen.getByTestId("signing-key-text-value");
+      const keyItem = screen.getByTestId("signing-key-0-text-value");
       expect(keyItem).toHaveTextContent("KEY_1".substring(0, 5));
 
-      const allKeyValues = screen.getAllByTestId("signing-key-text-value");
+      const allKeyValues = screen.getAllByTestId("signing-key-0-text-value");
       expect(allKeyValues).toHaveLength(1);
     });
 
@@ -411,10 +411,10 @@ describe("ProfileContent", () => {
         </Provider>
       );
 
-      const keyItem = screen.getByTestId("signing-key-text-value");
+      const keyItem = screen.getByTestId("signing-key-0-text-value");
       expect(keyItem).toHaveTextContent("KEY_0".substring(0, 5));
 
-      const allKeyValues = screen.getAllByTestId("signing-key-text-value");
+      const allKeyValues = screen.getAllByTestId("signing-key-0-text-value");
       expect(allKeyValues).toHaveLength(1);
     });
   });

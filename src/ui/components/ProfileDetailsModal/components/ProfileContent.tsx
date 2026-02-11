@@ -325,7 +325,7 @@ const ProfileContent = ({
           >
             <CardDetailsItem
               info={`${signingKey.substring(0, 5)}...${signingKey.slice(-5)}`}
-              testId="signing-key"
+              testId="signing-key-0"
               icon={keyOutline}
               mask={false}
               fullText={false}
