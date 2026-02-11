@@ -471,8 +471,11 @@ describe("ProfileContent", () => {
           Promise.reject(new Error(ConnectionService.CANNOT_GET_OOBI))
         )
         .mockImplementationOnce(() => Promise.resolve("oobi-value"));
+      jest.spyOn(window, "setTimeout");
 
       renderComponent();
+
+      await new Promise((resolve) => setTimeout(() => resolve(false), 3000));
 
       await waitFor(() => {
         expect(getOobiMock).toBeCalledTimes(3);

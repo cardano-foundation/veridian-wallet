@@ -30,9 +30,9 @@ export const useGetOobi = (profile?: IdentifierShortDetails) => {
         e instanceof Error &&
         e.message.includes(ConnectionService.CANNOT_GET_OOBI)
       ) {
-        retry.current++;
         const delay = (RETRY_TIMES[retry.current] || RETRY_TIMES[5]) * 1000;
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        retry.current++;
+        await new Promise((resolve) => setTimeout(() => resolve(false), delay));
         await fetchOobi();
         return;
       }
