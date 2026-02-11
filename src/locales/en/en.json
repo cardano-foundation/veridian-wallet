@@ -671,7 +671,6 @@
       "rotatekeys": "Rotate keys",
       "share": "Share",
       "inner": {
-        "label": "Display name",
         "groupLabel": "Group name",
         "usernamelabel": "Username",
         "confirm": "Confirm"
