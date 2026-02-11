@@ -401,7 +401,11 @@ const ReceiveCredential = ({
             icon={maxThreshold ? checkmarkCircleOutline : undefined}
           />
         )}
-        <div className="request-animation-center">
+        <div
+          className={combineClassNames("request-animation-center", {
+            "reduce-height": userAccepted,
+          })}
+        >
           <div className="request-icons-row">
             <div className="request-user-logo">
               <IonIcon
