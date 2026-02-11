@@ -23,6 +23,7 @@ enum ErrorMessage {
   INVALID_CONNECTION_URL = "Invalid connection url",
   GROUP_ID_NOT_MATCH = "Multisig group id not match",
   MEMBER_EXIST = "Member already added",
+  SCAN_SELF = "Scan self connection",
 }
 
 const useScanHandle = () => {
@@ -240,9 +241,7 @@ const useScanHandle = () => {
         urlGroupId === scanGroupId &&
         currentProfile.identity.id === contactId
       ) {
-        dispatch(setToastMsg(ToastMsgType.SCAN_SELF_CONNECTION));
-        closeScan?.();
-        return;
+        throw new Error(ErrorMessage.SCAN_SELF);
       }
 
       const invitation = await Agent.agent.connections.connectByOobiUrl(
@@ -255,6 +254,17 @@ const useScanHandle = () => {
     } catch (e) {
       const errorMessage = (e as Error).message;
 
+      if (errorMessage === ErrorMessage.SCAN_SELF) {
+        showError(
+          "Scanner Error:",
+          e,
+          dispatch,
+          ToastMsgType.SCAN_SELF_CONNECTION
+        );
+        closeScan?.();
+        return;
+      }
+
       if (errorMessage === ErrorMessage.MEMBER_EXIST) {
         closeScan?.();
         showError(
@@ -263,6 +273,7 @@ const useScanHandle = () => {
           dispatch,
           ToastMsgType.MEMBER_ALREADY_EXIST
         );
+        reloadScan?.();
         return;
       }
 
