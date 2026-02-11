@@ -143,7 +143,7 @@ describe("Init group", () => {
     ).toBeVisible();
   });
 
-  test("Show setup signer after finish setup members", async () => {
+  test("Show setup signer after changing members", async () => {
     const newState = {
       ...state,
       signer: {
@@ -172,6 +172,9 @@ describe("Init group", () => {
       expect(getByTestId("setup-connections-modal")).toBeVisible();
     });
 
+    // Change a member
+    fireEvent.click(getByTestId(`card-item-${memberConnections[0].id}`));
+
     fireEvent.click(
       getByText(
         EN_TRANSLATIONS.setupgroupprofile.initgroup.setconnections.button
@@ -195,6 +198,43 @@ describe("Init group", () => {
     fireEvent.click(getByTestId("primary-button-setup-signer-modal"));
 
     expect(setStateMock).toBeCalled();
+  });
+
+  test("Do not show setup signer if members didn't change", async () => {
+    const newState = {
+      ...state,
+      signer: {
+        recoverySigners: 1,
+        requiredSigners: 2,
+      },
+    };
+    const setStateMock = jest.fn();
+    const { getByText, getByTestId, queryByTestId } = render(
+      <Provider store={makeTestStore()}>
+        <InitializeGroup
+          state={newState}
+          setState={setStateMock}
+        />
+      </Provider>
+    );
+
+    fireEvent.click(getByTestId("group-member-block"));
+
+    await waitFor(() => {
+      expect(getByTestId("setup-connections-modal")).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.initgroup.setconnections.button
+          .confirm
+      )
+    );
+
+    await waitFor(() => {
+      expect(queryByTestId("setup-signer-modal")).toBeNull();
+      expect(setStateMock).toBeCalled();
+    });
   });
 
   test("Send request", async () => {

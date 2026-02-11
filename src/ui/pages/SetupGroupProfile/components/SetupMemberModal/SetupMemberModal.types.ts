@@ -5,6 +5,7 @@ interface SetupMemberModalProps {
   isOpen: boolean;
   connections: ConnectionShortDetails[];
   currentSelectedConnections: ConnectionShortDetails[];
+  currentSignerData: SignerData;
   setOpen: (value: boolean) => void;
   onSubmit: (data: ConnectionShortDetails[], signerData: SignerData) => void;
 }

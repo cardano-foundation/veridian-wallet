@@ -16,6 +16,7 @@ export const SetupMemberModal = ({
   isOpen,
   connections,
   currentSelectedConnections,
+  currentSignerData,
   setOpen,
   onSubmit,
 }: SetupMemberModalProps) => {
@@ -34,7 +35,19 @@ export const SetupMemberModal = ({
   };
 
   const handleSubmit = () => {
-    setOpenSignerModal(true);
+    const hasChanged =
+      data.length !== currentSelectedConnections.length ||
+      data.some(
+        (connection) =>
+          !currentSelectedConnections.find((item) => item.id === connection.id)
+      );
+
+    if (hasChanged) {
+      setOpenSignerModal(true);
+    } else {
+      onSubmit(data, currentSignerData);
+      handleClose();
+    }
   };
 
   const displayConnections = useMemo(() => {
