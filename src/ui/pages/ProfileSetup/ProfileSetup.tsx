@@ -385,13 +385,18 @@ export const ProfileSetup = ({
       setStep(SetupProfileStep.GroupSetupConfirm);
 
       // Update persistent storage
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.PENDING_JOIN_GROUP_METADATA,
-          content: pendingJoinData,
-        })
-      );
+      await Agent.agent.basicStorage
+        .createOrUpdateBasicRecord(
+          new BasicRecord({
+            id: MiscRecordId.PENDING_JOIN_GROUP_METADATA,
+            content: pendingJoinData,
+          })
+        )
+        .catch((e) => {
+          showError("Show error", e);
+        });
     } catch (error) {
+      scanRef.current?.registerScanHandler();
       dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
     }
   };
