@@ -106,7 +106,10 @@ class PeerConnection {
             )
           ) {
             iconB64 = icon;
+          } else {
+            iconB64 = ICON_BASE64;
           }
+
           const peerConnectionId = `${address}:${selectedAid}`;
           await Agent.agent.peerConnectionPair.updatePeerConnectionAccount(
             peerConnectionId,
@@ -176,7 +179,6 @@ class PeerConnection {
       await Agent.agent.peerConnectionPair.createPeerConnectionPairRecord({
         id: `${dAppIdentifier}:${connectingIdentifier}`,
         selectedAid: connectingIdentifier,
-        iconB64: ICON_BASE64,
       });
     }
     const seed = this.identityWalletConnect.connect(dAppIdentifier);

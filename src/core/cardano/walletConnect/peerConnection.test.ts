@@ -3,7 +3,7 @@ import { Agent } from "../../agent/agent";
 import { PeerConnectionPairRecord } from "../../agent/records";
 import { PeerConnection } from "./peerConnection";
 import { KeyStoreKeys, SecureStorage } from "../../storage";
-import ICON_BASE64 from "../../../assets/icon-only";
+
 require("fake-indexeddb/auto");
 
 jest.mock("../../agent/agent", () => ({
@@ -109,7 +109,6 @@ describe("PeerConnection", () => {
     ).toHaveBeenCalledWith({
       id: `${dAppIdentifier}:${accountId}`,
       selectedAid: accountId,
-      iconB64: expect.any(String),
     });
     expect(connectSpy).toHaveBeenCalledWith(dAppIdentifier);
     expect(SecureStorage.set).toHaveBeenCalledWith(
