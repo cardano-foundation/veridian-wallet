@@ -31,7 +31,7 @@ export const useGetOobi = (profile?: IdentifierShortDetails) => {
         e.message.includes(ConnectionService.CANNOT_GET_OOBI)
       ) {
         retry.current++;
-        const delay = RETRY_TIMES[retry.current] || RETRY_TIMES[5] * 1000;
+        const delay = (RETRY_TIMES[retry.current] || RETRY_TIMES[5]) * 1000;
         await new Promise((resolve) => setTimeout(resolve, delay));
         await fetchOobi();
         return;
