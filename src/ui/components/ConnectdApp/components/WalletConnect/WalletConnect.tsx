@@ -82,7 +82,10 @@ const WalletConnect = ({ close, handleAfterConnect }: WalletConnectProps) => {
       }
 
       dispatch(setIsConnectingToDApp(true));
-      handleAfterConnect?.();
+      handleAfterConnect?.({
+        meerkatId: pendingDAppMeerkat,
+        selectedAid: defaultProfile.identity.id,
+      });
     } catch (e) {
       showError(
         "Unable to connect wallet",

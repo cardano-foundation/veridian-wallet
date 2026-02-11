@@ -1,8 +1,8 @@
-import { Step } from "../../ConnectdApp.types";
+import { DAppConnection, Step } from "../../ConnectdApp.types";
 
 interface WalletConnectProps {
   close: (step: Step) => void;
-  handleAfterConnect?: () => void;
+  handleAfterConnect?: (connection: DAppConnection) => void;
 }
 
 export type { WalletConnectProps };

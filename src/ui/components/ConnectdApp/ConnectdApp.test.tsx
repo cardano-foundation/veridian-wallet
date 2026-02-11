@@ -1,3 +1,9 @@
+import {
+  BarcodeFormat,
+  BarcodesScannedEvent,
+  BarcodeValueType,
+} from "@capacitor-mlkit/barcode-scanning";
+import { IonInput } from "@ionic/react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
@@ -15,8 +21,10 @@ import { walletConnectionsFix } from "../../__fixtures__/walletConnectionsFix";
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
+import { CustomInputProps } from "../CustomInput/CustomInput.types";
 import { TabsRoutePath } from "../navigation/TabsMenu";
 import { ConnectdApp } from "./ConnectdApp";
+import { Agent } from "../../../core/agent/agent";
 
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
@@ -24,12 +32,16 @@ jest.mock("../../../core/agent/agent", () => ({
       peerConnectionAccounts: {
         getAll: jest.fn().mockImplementation(() => walletConnectionsFix),
         deleteById: jest.fn().mockResolvedValue(true),
+        deletePeerConnectionPairRecord: jest.fn(),
       },
       peerConnectionPair: {
         deletePeerConnectionPairRecord: jest.fn().mockResolvedValue(true),
       },
       auth: {
         verifySecret: jest.fn().mockResolvedValue(true),
+      },
+      basicStorage: {
+        findById: jest.fn(),
       },
     },
   },
@@ -39,6 +51,8 @@ jest.mock("../../../core/cardano/walletConnect/peerConnection", () => ({
   PeerConnection: {
     peerConnection: {
       disconnectDApp: jest.fn(),
+      start: jest.fn(),
+      connectWithDApp: jest.fn(),
     },
   },
 }));
@@ -74,6 +88,101 @@ const storeMocked = {
   ...makeTestStore(initialState),
   dispatch: dispatchMock,
 };
+
+jest.mock("../../hooks/useBiometricsHook", () => ({
+  ...jest.requireActual("../../hooks/useBiometricsHook"),
+  useBiometricAuth: () => ({
+    biometricInfo: { isAvailable: false },
+    setupBiometrics: jest.fn(),
+    checkBiometrics: jest.fn(),
+    handleBiometricAuth: jest.fn(),
+    remainingLockoutSeconds: 0,
+    lockoutEndTime: null,
+  }),
+}));
+
+const getPlatformMock = jest.fn(() => ["mobile"]);
+
+jest.mock("@ionic/react", () => ({
+  ...jest.requireActual("@ionic/react"),
+  isPlatform: () => true,
+  getPlatforms: () => getPlatformMock(),
+  IonModal: ({ children, isOpen, ...props }: any) =>
+    isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
+}));
+
+const isNativePlatformMock = jest.fn(() => true);
+
+jest.mock("@capacitor/core", () => {
+  return {
+    ...jest.requireActual("@capacitor/core"),
+    Capacitor: {
+      isNativePlatform: () => isNativePlatformMock(),
+    },
+  };
+});
+
+const barcodes = [
+  {
+    displayValue: "bWt4YGfkwhj9YTMLoZrRtPp426Zd8h7ehY",
+    format: BarcodeFormat.QrCode,
+    rawValue: "bWt4YGfkwhj9YTMLoZrRtPp426Zd8h7ehY",
+    valueType: BarcodeValueType.Url,
+  },
+];
+
+const addListener = jest.fn(
+  (eventName: string, listenerFunc: (result: BarcodesScannedEvent) => void) => {
+    setTimeout(() => {
+      listenerFunc({
+        barcodes,
+      });
+    }, 100);
+
+    return {
+      remove: jest.fn(),
+    };
+  }
+);
+
+const checkPermisson = jest.fn(() =>
+  Promise.resolve({
+    camera: "granted",
+  })
+);
+
+const requestPermission = jest.fn();
+const startScan = jest.fn();
+const stopScan = jest.fn();
+jest.mock("@capacitor-mlkit/barcode-scanning", () => {
+  return {
+    ...jest.requireActual("@capacitor-mlkit/barcode-scanning"),
+    BarcodeScanner: {
+      checkPermissions: () => checkPermisson(),
+      requestPermissions: () => requestPermission(),
+      addListener: (
+        eventName: string,
+        listenerFunc: (result: BarcodesScannedEvent) => void
+      ) => addListener(eventName, listenerFunc),
+      startScan: () => startScan(),
+      stopScan: () => stopScan(),
+      removeAllListeners: jest.fn(),
+    },
+  };
+});
+
+jest.mock("../CustomInput", () => ({
+  CustomInput: (props: CustomInputProps) => {
+    return (
+      <IonInput
+        data-testid={props.dataTestId}
+        onIonInput={(e) => {
+          props.onChangeInput(e.detail.value as string);
+        }}
+      />
+    );
+  },
+}));
 
 describe("Wallet connect: empty history", () => {
   afterEach(() => {
@@ -120,7 +229,7 @@ describe("Wallet connect: empty history", () => {
     });
   });
 
-  test("Connect wallet modal: scan QR when other connection connected", async () => {
+  test("Connect wallet modal: open scan when other connection connected", async () => {
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],
@@ -187,7 +296,7 @@ describe("Wallet connect: empty history", () => {
     });
   });
 
-  test.skip("Connect wallet modal: scan QR", async () => {
+  test("Scan connection and delete when connecting", async () => {
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],
@@ -195,13 +304,16 @@ describe("Wallet connect: empty history", () => {
           loggedIn: true,
           time: Date.now(),
           passcodeIsSet: true,
-          passwordIsSet: true,
+          passwordIsSet: false,
         },
         toastMsgs: [],
       },
       profilesCache: {
         ...profileCacheFixData,
         defaultProfile: filteredIdentifierFix[2].id,
+        pendingDAppConnection: {
+          meerkatId: "bWt4YGfkwhj9YTMLoZrRtPp426Zd8h7ehY",
+        },
       },
       biometricsCache: {
         enabled: false,
@@ -213,7 +325,7 @@ describe("Wallet connect: empty history", () => {
       dispatch: dispatchMock,
     };
 
-    const { getByText } = render(
+    const { getByText, getByTestId } = render(
       <MemoryRouter>
         <Provider store={storeMocked}>
           <ConnectdApp
@@ -230,6 +342,57 @@ describe("Wallet connect: empty history", () => {
 
     act(() => {
       fireEvent.click(getByText(EN_TRANSLATIONS.connectdapp.connectbtn));
+    });
+
+    await waitFor(() => {
+      expect(dispatchMock).toBeCalledWith(
+        setToastMsg(ToastMsgType.PEER_ID_SUCCESS)
+      );
+    });
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.connectdapp.request.stageone.message)
+      ).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(EN_TRANSLATIONS.connectdapp.request.button.accept)
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("add-connection-modal")).toBeVisible();
+    });
+
+    fireEvent.click(getByTestId("action-button"));
+
+    await waitFor(() => {
+      expect(
+        getByText(
+          EN_TRANSLATIONS.connectdapp.connectionhistory.deletealert.message
+        )
+      ).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(
+        EN_TRANSLATIONS.connectdapp.connectionhistory.deletealert.confirm
+      )
+    );
+
+    await waitFor(() => {
+      expect(getByText(EN_TRANSLATIONS.verifypasscode.title)).toBeVisible();
+    });
+
+    await passcodeFiller(getByText, getByTestId, "193212");
+
+    await waitFor(() => {
+      expect(PeerConnection.peerConnection.disconnectDApp).not.toBeCalled();
+      expect(
+        Agent.agent.peerConnectionPair.deletePeerConnectionPairRecord
+      ).toBeCalledWith(
+        `${barcodes[0].rawValue}:${filteredIdentifierFix[2].id}`
+      );
     });
   });
 });
@@ -336,7 +499,7 @@ describe("Wallet connect", () => {
     });
   });
 
-  test("Delete pending wallet connections", async () => {
+  test("Open and delete pending wallet connections", async () => {
     const initialState = {
       stateCache: {
         routes: [TabsRoutePath.CREDENTIALS],
@@ -409,8 +572,8 @@ describe("Wallet connect", () => {
     });
   });
 
-  test("Connect wallet", async () => {
-    const { getByText, getByTestId, queryByText, getAllByText } = render(
+  test("Connect to exist connection", async () => {
+    const { getByText, getByTestId, queryByText } = render(
       <Provider store={storeMocked}>
         <ConnectdApp
           isOpen
@@ -476,6 +639,7 @@ describe("Wallet connect", () => {
     act(() => {
       fireEvent.click(getByTestId("confirm-connect-btn"));
     });
+
     await waitFor(() => {
       expect(PeerConnection.peerConnection.disconnectDApp).toBeCalledWith(
         walletConnectionsFix[1].meerkatId
