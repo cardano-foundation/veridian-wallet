@@ -1509,7 +1509,7 @@
     "newcredentialadded": "New credential added",
     "notesupdated": "Notes updated successfully",
     "noteremoved": "Note removed successfully",
-    "maxfavouritesreached": "Maximum of 5 favourites reached",
+    "maxfavouritesreachederror": "Maximum of 5 favorites",
     "dappconnectiondeleted": "dApp deleted successfully",
     "connectwalletsuccess": "Connected successfully",
     "disconnectwallet": "Disconnected successfully",

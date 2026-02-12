@@ -29,7 +29,7 @@ enum ToastMsgType {
   NEW_CREDENTIAL_ADDED = "newCredentialAdded",
   NOTES_UPDATED = "notesUpdated",
   NOTE_REMOVED = "noteRemoved",
-  MAX_FAVOURITES_REACHED = "maxFavouritesReached",
+  MAX_FAVOURITES_REACHED = "maxFavouritesReachedError",
   WALLET_CONNECTION_DELETED = "dappconnectiondeleted",
   CONNECT_WALLET_SUCCESS = "connectwalletsuccess",
   DISCONNECT_WALLET_SUCCESS = "disconnectwallet",
