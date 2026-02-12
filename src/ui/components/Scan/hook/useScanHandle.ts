@@ -254,6 +254,7 @@ const useScanHandle = () => {
           dispatch,
           ToastMsgType.GROUP_ID_NOT_MATCH_ERROR
         );
+        await reloadScan?.();
         return;
       }
 
