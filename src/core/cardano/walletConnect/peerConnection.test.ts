@@ -109,6 +109,7 @@ describe("PeerConnection", () => {
     ).toHaveBeenCalledWith({
       id: `${dAppIdentifier}:${accountId}`,
       selectedAid: accountId,
+      iconB64: expect.any(String),
     });
     expect(connectSpy).toHaveBeenCalledWith(dAppIdentifier);
     expect(SecureStorage.set).toHaveBeenCalledWith(
