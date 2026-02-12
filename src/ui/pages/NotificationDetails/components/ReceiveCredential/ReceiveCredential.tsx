@@ -392,7 +392,7 @@ const ReceiveCredential = ({
         )}
         {(maxThreshold || multisigMemberStatus.linkedRequest.accepted) && (
           <InfoCard
-            className={`alert${maxThreshold ? " max-threshhold" : undefined}`}
+            className={`alert ${maxThreshold ? " max-threshhold" : ""}`}
             content={i18n.t(
               `tabs.notifications.details.credential.receive.${
                 maxThreshold ? "thresholdmet" : "accepted"
@@ -401,11 +401,7 @@ const ReceiveCredential = ({
             icon={maxThreshold ? checkmarkCircleOutline : undefined}
           />
         )}
-        <div
-          className={combineClassNames("request-animation-center", {
-            "reduce-height": userAccepted,
-          })}
-        >
+        <div className="request-animation-center">
           <div className="request-icons-row">
             <div className="request-user-logo">
               <IonIcon
