@@ -88,8 +88,11 @@ const KeriCardTemplate = ({
             <span className="card-footer-column-label card-text">
               {i18n.t("tabs.credentials.layout.issuer")}
             </span>
-            <span className="card-footer-column-value card-text">
-              {connection?.label}
+            <span
+              data-testid="card-connection"
+              className="card-footer-column-value card-text"
+            >
+              {connection?.label || i18n.t("tabs.connections.unknown")}
             </span>
           </div>
           <div className="card-footer-column">
