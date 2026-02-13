@@ -10,6 +10,10 @@
       --display-fallback: none;
     }
 
+    .dot {
+      margin: 0 0.25rem;
+    }
+
     .card-item {
       &:last-child {
         --inner-border-width: 0;

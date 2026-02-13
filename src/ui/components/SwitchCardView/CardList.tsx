@@ -7,15 +7,29 @@ import { CardList as BaseCardList, CardItem } from "../CardList";
 import { CardTheme } from "../CardTheme";
 import "./SwitchCardView.scss";
 import { CardListProps } from "./SwitchCardView.types";
+import { useAppSelector } from "../../../store/hooks";
+import { getConnectionsCache } from "../../../store/reducers/profileCache";
+import { i18n } from "../../../i18n";
 
 const CardList = ({ cardsData, testId, onCardClick }: CardListProps) => {
+  const connections = useAppSelector(getConnectionsCache);
+
   const cardListData = cardsData.map(
-    (item): CardItem<CredentialShortDetails> => {
-      const cred = item as CredentialShortDetails;
+    (cred): CardItem<CredentialShortDetails> => {
+      const connection = connections.find((c) => c.id === cred.connectionId);
+
       return {
-        id: item.id,
+        id: cred.id,
         title: cred.credentialType,
-        subtitle: formatShortDate(cred.issuanceDate),
+        subtitle: (
+          <>
+            {formatShortDate(cred.issuanceDate)}
+            <span className="dot">•</span>
+            <span className="connection-name">
+              {connection?.label || i18n.t("tabs.connections.unknown")}
+            </span>
+          </>
+        ),
         data: cred,
       };
     }
