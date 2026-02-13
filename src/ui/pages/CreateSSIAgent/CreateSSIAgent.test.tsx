@@ -199,7 +199,6 @@ describe("SSI agent page", () => {
         passcodeIsSet: true,
         recoveryWalletProgress: false,
       },
-      toastMsgs: [],
     },
   };
 
@@ -862,7 +861,6 @@ describe("SSI agent page", () => {
           passcodeIsSet: true,
           recoveryWalletProgress: true,
         },
-        toastMsgs: [],
       },
       seedPhraseCache: {
         seedPhrase: "seedphrase seedphrase",

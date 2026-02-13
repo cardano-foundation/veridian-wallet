@@ -213,7 +213,6 @@ describe("Setup Connection", () => {
         passwordIsSet: false,
         proposedUsername: "Duke",
       },
-      toastMsgs: [],
       isOnline: true,
     },
     profilesCache: {

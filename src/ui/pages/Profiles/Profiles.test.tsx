@@ -51,7 +51,6 @@ const initialState = {
       credentials: [],
       archivedCredentials: [],
     },
-    toastMsgs: [],
   },
   profilesCache: profileCacheFixData,
   biometricsCache: {
