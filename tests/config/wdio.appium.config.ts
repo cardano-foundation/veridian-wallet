@@ -28,16 +28,26 @@ export const config = {
     ],
     capabilities: [
       {
-        // For W3C the appium capabilities need to have an extension prefix
-        // This is `appium:` for all Appium Capabilities which can be found here
-        // http://appium.io/docs/en/writing-running-appium/caps/
+        platformName: "Android",
+        "appium:automationName": "UiAutomator2",
         maxInstances: 1,
         "appium:orientation": "PORTRAIT",
-        "appium:autoWebview": true,
+        "appium:autoWebview": false, // Handle context switch manually using switchToAppWebview() helper
         "appium:noReset": false,
+        "appium:fullReset": false, // Don't uninstall app, but ensure clean state
         "appium:app": process.env.APP_PATH,
+        "appium:appPackage": "org.cardanofoundation.idw", // MUST match your app ID
+        "appium:webviewDevtoolsPort": 9222,
+        "appium:enableWebviewDetailsCollection": false, // CRITICAL: Prevents CDP collection for all webviews (eliminates 2000ms timeouts)
         "appium:newCommandTimeout": 260,
-        "appium:webviewConnectTimeout": 80 * 1000, // 80 seconds
+        "appium:chromedriverConnectTimeout": 80 * 1000, // 80 seconds - correct W3C format
+        "appium:autoGrantPermissions": true, // Automatically grant permissions (notifications, etc.)
+        "appium:avdLaunchTimeout": 120000, // 2 minutes for Android 16 emulator to launch
+        "appium:androidInstallTimeout": 90000, // 90 seconds for app installation on heavy Android 16 image
+        "appium:adbExecTimeout": 180000, // 180 seconds (3 minutes) for ADB commands - increased for heavy operations
+        "appium:suppressKillServer": false, // Allow killing ADB server if it becomes unresponsive
+        "appium:forceAppLaunch": true, // Ensures a fresh start of the app process
+        "appium:chromedriverArgs": ["--disable-dev-shm-usage", "--no-sandbox"], // Helps with Webview/CDP connection issues
       },
     ]
   },

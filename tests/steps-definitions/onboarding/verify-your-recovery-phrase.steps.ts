@@ -7,6 +7,9 @@ import VerifyYourRecoveryPhraseScreen from "../../screen-objects/onboarding/veri
 export let recoveryPhraseWords: string[] = [];
 
 export async function generateRecoveryPhraseOf() {
+  await YourRecoveryPhraseScreen.loads();
+  await YourRecoveryPhraseScreen.viewRecoveryPhraseButton.waitForClickable();
+  await YourRecoveryPhraseScreen.viewRecoveryPhraseButton.scrollIntoView();
   await YourRecoveryPhraseScreen.viewRecoveryPhraseButton.click();
   recoveryPhraseWords = await recoveryPhrase().save();
   (global as any).recoveryPhraseWords = recoveryPhraseWords;

@@ -214,11 +214,9 @@ const EditProfile = ({
           <CustomInput
             dataTestId="edit-name-input"
             title={`${
-              editType === "userName"
+              editType === "userName" || !isGroup
                 ? i18n.t("profiledetails.options.inner.usernamelabel")
-                : isGroup
-                ? i18n.t("profiledetails.options.inner.groupLabel")
-                : i18n.t("profiledetails.options.inner.label")
+                : i18n.t("profiledetails.options.inner.groupLabel")
             }`}
             hiddenInput={false}
             autofocus={true}

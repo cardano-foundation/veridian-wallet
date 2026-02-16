@@ -5,10 +5,6 @@ import CreatePasswordScreen from "../../screen-objects/onboarding/create-passwor
 import { returnPassword } from "../../helpers/generate.js";
 import { CreatePassword } from "../../constants/text.constants.js";
 
-Given(/^skip Create Password screen$/, async function () {
-  await CreatePasswordScreen.setUpLaterButton.click();
-  await AlertModal.clickConfirmButtonOf(CreatePasswordScreen.alertModal);
-});
 
 Given(/^user tap Skip button on Create Password screen$/, async function () {
   await CreatePasswordScreen.skipButton.click();

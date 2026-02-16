@@ -28,6 +28,7 @@ import { getAuthentication } from "../../../store/reducers/stateCache";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { CustomInput } from "../CustomInput";
+import { TOAST_DURATION } from "../CustomToast/CustomToast";
 import { OptionModal } from "../OptionsModal";
 import "./Scan.scss";
 import { ScanProps, ScanRef } from "./Scan.types";
@@ -56,7 +57,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [isAlreadyLoaded, setIsAlreadyLoaded] = useState(false);
     const loggedIn = useAppSelector(getAuthentication).loggedIn;
-
+    const lastScanReceiveValue = useRef(0);
     const mobileweb = platforms.includes("mobileweb");
 
     const stopScan = useCallback(async () => {
@@ -76,6 +77,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
     const handleScanValue = useCallback(
       async (result: string) => {
         if (isHandlingQR.current) return;
+
         try {
           setScanning(false);
           isHandlingQR.current = true;
@@ -95,7 +97,15 @@ const Scan = forwardRef<ScanRef, ScanProps>(
       const listener = await BarcodeScanner.addListener(
         "barcodesScanned",
         async (result) => {
-          if (!result.barcodes?.length) return;
+          if (
+            !result.barcodes?.length ||
+            (lastScanReceiveValue.current !== 0 &&
+              Date.now() - lastScanReceiveValue.current < TOAST_DURATION)
+          ) {
+            return;
+          }
+
+          lastScanReceiveValue.current = Date.now();
           await listener.remove();
           await handleScanValue(result.barcodes[0].rawValue);
         }

@@ -206,10 +206,6 @@ describe("Pending group", () => {
           EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.requiredsigners
         )
       ).toBeVisible();
-
-      await waitFor(() => {
-        expect(getByText(multisignConnection.label)).toBeVisible();
-      });
     });
 
     test("Leave group", async () => {

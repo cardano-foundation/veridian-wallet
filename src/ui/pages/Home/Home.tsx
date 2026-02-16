@@ -31,10 +31,7 @@ const Home = () => {
   const [connectdApp, setConnectdApp] = useState(false);
   const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
   const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
-  const oobi = useGetOobi(
-    currentProfile?.identity.id,
-    currentProfile?.identity.displayName
-  );
+  const oobi = useGetOobi(currentProfile?.identity);
   const handleAvatarClick = () => {
     setOpenProfiles(true);
   };

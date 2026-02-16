@@ -1,0 +1,101 @@
+name: e2e-pr-check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  e2e-onboarding-intro:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+
+      # Running some environment optimization as per https://github.com/ReactiveCircus/android-emulator-runner/issues/324#issuecomment-2009351180
+      # From https://github.com/android/nowinandroid/pull/1219/files to fix flaky emulator start
+      # See https://github.com/ReactiveCircus/android-emulator-runner/issues/324#issuecomment-1998737488
+      - name: Delete unnecessary tools 🔧
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          android: false # Keep Don't remove Android tools
+          tool-cache: true # Remove image tool cache - rm -rf "$AGENT_TOOLSDIRECTORY"
+          dotnet: true # rm -rf /usr/share/dotnet
+          haskell: true # rm -rf /opt/ghc...
+          swap-storage: true # rm -f /mnt/swapfile (4GiB)
+          docker-images: false # Takes 16s (`nowinandroid`), enable if needed in the future
+          large-packages: false # includes google-cloud-sdk and it's slow
+
+      # Set up KVM permissions to enable efficient Android emulator runs by modifying udev rules for universal access.
+      # From https://github.com/android/nowinandroid/blob/main/.github/workflows/Build.yaml#L142
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls /dev/kvm
+
+
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+          cache: 'npm' 
+
+      - name: Setup Java
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle' 
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project for E2E
+        run: |
+          export LANG=en_US.UTF-8
+          export KERIA_IP=10.0.2.2
+          npm run build:e2e
+
+      - name: Build Android APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+          cd ..
+          # Dynamically set the APP_PATH for the test runner
+          APK_PATH=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -1)
+          echo "APP_PATH=$APK_PATH" >> "$GITHUB_ENV"
+
+      - name: Start Appium
+        run: |
+          npm install -g appium
+          appium driver install uiautomator2 || appium driver update uiautomator2
+          appium --log-level error & 
+
+      - name: Wait for Appium to be ready
+        run: |
+          npx wait-on --timeout 120s http-get://127.0.0.1:4723/status
+
+      - name: Run onboarding-intro E2E test
+        uses: reactivecircus/android-emulator-runner@b530d96654c385303d652368551fb075bc2f0b6b # v2.35.0
+        env:
+          NODE_OPTIONS: "--max_old_space_size=8192" 
+        with:
+          api-level: 31 
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: true
+          emulator-options: -no-window -no-audio -gpu swiftshader_indirect -no-snapshot -no-boot-anim
+          disable-animations: true
+          disk-size: 6000M
+          heap-size: 600M
+          script: |
+            npm run wdio:android:s24ultra -- --spec ./tests/features/onboarding/onboarding-intro.feature
+
+      - name: Cleanup
+        if: always()
+        run: |
+          pkill -f appium || true

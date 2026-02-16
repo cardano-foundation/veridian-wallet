@@ -9,15 +9,21 @@ export class OnboardingScreen {
     return $("[data-testid=\"tertiary-button-onboarding\"]");
   }
 
+  async loads() {
+    await expect(this.getStartedButton).toBeDisplayed();
+    await expect(this.iAlreadyHaveAWalletButton).toBeDisplayed();
+  }
+
   async tapOnGetStartedButton() {
     await expect(this.getStartedButton).toBeDisplayed();
     await expect(this.getStartedButton).toBeEnabled();
     await this.getStartedButton.click();
   }
 
-  async loads() {
-    await expect(this.getStartedButton).toBeDisplayed();
+  async tapOnIAlreadyHaveAWalletButton() {
     await expect(this.iAlreadyHaveAWalletButton).toBeDisplayed();
+    await expect(this.iAlreadyHaveAWalletButton).toBeEnabled();
+    await this.iAlreadyHaveAWalletButton.click();
   }
 }
 

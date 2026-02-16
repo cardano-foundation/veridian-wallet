@@ -7,7 +7,7 @@ import { delay } from "../base.screen";
 
 export class PasscodeScreen {
   get cantRememberButton() {
-    return $('[data-testid="secondary-button-set-passcode"]');
+    return $('[data-testid="tertiary-button-set-passcode"]');
   }
 
   get id() {
@@ -88,6 +88,49 @@ export class PasscodeScreen {
     log.info(`randomPasscode: ${randomPasscode}`);
     await this.enterPasscode(randomPasscode, parentElement);
     return randomPasscode;
+  }
+
+  async getBackButton() {
+    return $('[data-testid="close-button"]');
+  }
+
+  async areAllCirclesEmpty(): Promise<boolean> {
+    const circles = await this.passcodePoint;
+    for (const circle of circles) {
+      const classes = await circle.getAttribute("class");
+      // Check if circle is empty (not filled)
+      if (classes?.includes("filled") || classes?.includes("active")) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  async areAllCirclesFilled(): Promise<boolean> {
+    const circles = this.passcodePoint;
+    const length = await circles.length;
+    if (length === 0) return false;
+    for (let i = 0; i < length; i++) {
+      const circle = await circles[i];
+      const classes = await circle.getAttribute("class");
+      // Check if circle is filled
+      if (!classes?.includes("filled") && !classes?.includes("active")) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  async waitForCirclesToClear() {
+    await browser.waitUntil(
+      async () => {
+        return await this.areAllCirclesEmpty();
+      },
+      {
+        timeout: 5000,
+        timeoutMsg: "PIN circles did not clear after error",
+      }
+    );
   }
 }
 

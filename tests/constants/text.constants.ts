@@ -9,11 +9,11 @@ export enum IdentifierDetails {
 }
 
 export enum Passcode {
-  Description = "Create a passcode to secure your wallet and to continue the onboarding process",
+  Description = "Create a PIN to secure your wallet and to continue the onboarding process",
   DescriptionNewPasscode = "Create a new passcode to secure your wallet",
   DescriptionEnterPasscode = "Please enter your passcode to verify",
-  Title = "Create your Passcode",
-  TitleReEnter = "Re-enter your Passcode",
+  Title = "Create your PIN",
+  TitleReEnter = "Re-enter your PIN",
   TitleNewPasscode = "Create new passcode",
   TitleEnterPasscode = "Enter passcode",
   TitleReEnterNewPasscode = "Re-enter new passcode",
@@ -34,11 +34,20 @@ export enum Scan {
   InvalidContent = "https://www.google.com/",
 }
 
-export enum SSIAgent {
-  BootURL = "http://127.0.0.1:3903",
-  ConnectURL = "http://127.0.0.1:3901",
-  TitleAboutSSIAgent = "About SSI agent",
-}
+import { getSSIAgentUrls } from "../helpers/ssi-agent-urls.helper.js";
+
+// Get SSI Agent URLs based on environment
+const ssiAgentUrls = getSSIAgentUrls();
+
+export const SSIAgent = {
+  get BootURL() {
+    return getSSIAgentUrls().bootUrl;
+  },
+  get ConnectURL() {
+    return getSSIAgentUrls().connectUrl;
+  },
+  TitleAboutSSIAgent: "About SSI agent",
+} as const;
 
 export enum WelcomeModalText {
   Title = "Welcome! What should we call you?",

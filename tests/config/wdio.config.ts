@@ -1,6 +1,8 @@
 import type { Options } from "@wdio/types";
 import "dotenv/config";
 import { returnBoolean } from "../helpers/parse.js";
+import * as fs from "fs";
+import * as path from "path";
 
 export const config: Options.Testrunner = {
   runner: "local",
@@ -43,176 +45,155 @@ export const config: Options.Testrunner = {
     snippets: true,
     source: true,
     profile: [],
-    require: ["./tests/steps-definitions/**/*.ts", "./tests/actions/**/*.ts"],
-    // <string> (expression) only execute the features or scenarios with tags matching the expression
+    require: [
+      "./tests/steps-definitions/**/*.ts",
+      "./tests/actions/**/*.ts",
+    ],
     tags: "",
-    // <number> timeout for step definitions
-    timeout: 100 * 1000, // 100 seconds
+    timeout: 100 * 1000,
   },
-  //
-  // =====
-  // Hooks
-  // =====
-  // WebdriverIO provides several hooks you can use to interfere with the test process in order to enhance
-  // it and to build services around it. You can either apply a single function or an array of
-  // methods to it. If one of them returns with a promise, WebdriverIO will wait until that promise got
-  // resolved to continue.
-  /**
-   * Gets executed once before all workers get launched.
-   * @param {Object} config wdio configuration object
-   * @param {Array.<Object>} capabilities list of capabilities details
-   */
-  // onPrepare: function (config, capabilities) {
-  // },
-  /**
-   * Gets executed before a worker process is spawned and can be used to initialise specific service
-   * for that worker as well as modify runtime environments in an async fashion.
-   * @param  {String} cid      capability id (e.g 0-0)
-   * @param  {[type]} caps     object containing capabilities for session that will be spawn in the worker
-   * @param  {[type]} specs    specs to be run in the worker process
-   * @param  {[type]} args     object that will be merged with the main configuration once worker is initialized
-   * @param  {[type]} execArgv list of string arguments passed to the worker process
-   */
-  // onWorkerStart: function (cid, caps, specs, args, execArgv) {
-  // },
-  /**
-   * Gets executed just after a worker process has exited.
-   * @param  {String} cid      capability id (e.g 0-0)
-   * @param  {Number} exitCode 0 - success, 1 - fail
-   * @param  {[type]} specs    specs to be run in the worker process
-   * @param  {Number} retries  number of retries used
-   */
-  // onWorkerEnd: function (cid, exitCode, specs, retries) {
-  // },
-  /**
-   * Gets executed just before initialising the webdriver session and test framework. It allows you
-   * to manipulate configurations depending on the capability or spec.
-   * @param {Object} config wdio configuration object
-   * @param {Array.<Object>} capabilities list of capabilities details
-   * @param {Array.<String>} specs List of spec file paths that are to be run
-   * @param {String} cid worker id (e.g. 0-0)
-   */
-  // beforeSession: function (config, capabilities, specs, cid) {
-  // },
-  /**
-   * Gets executed before test execution begins. At this point you can access to all global
-   * variables like `browser`. It is the perfect place to define custom commands.
-   * @param {Array.<Object>} capabilities list of capabilities details
-   * @param {Array.<String>} specs        List of spec file paths that are to be run
-   * @param {Object}         browser      instance of created browser/device session
-   */
-  // before: function (capabilities, specs) {
-  // },
-  /**
-   * Runs before a WebdriverIO command gets executed.
-   * @param {String} commandName hook command name
-   * @param {Array} args arguments that command would receive
-   */
-  // beforeCommand: function (commandName, args) {
-  // },
-  /**
-   * Cucumber Hooks
-   *
-   * Runs before a Cucumber Feature.
-   * @param {String}                   uri      path to feature file
-   * @param {GherkinDocument.IFeature} feature  Cucumber feature object
-   */
-  // beforeFeature: function (uri, feature) {
-  // },
-  /**
-   *
-   * Runs before a Cucumber Scenario.
-   * @param {ITestCaseHookParameter} world    world object containing information on pickle and test step
-   * @param {Object}                 context  Cucumber World object
-   */
-  // beforeScenario: async function (scenario) {
-  // },
-  /**
-   *
-   * Runs before a Cucumber Step.
-   * @param {Pickle.IPickleStep} step     step data
-   * @param {IPickle}            scenario scenario pickle
-   * @param {Object}             context  Cucumber World object
-   */
-  // beforeStep: function (step, scenario, context) {
-  // },
-  /**
-   *
-   * Runs after a Cucumber Step.
-   * @param {Pickle.IPickleStep} step             step data
-   * @param {IPickle}            scenario         scenario pickle
-   * @param {Object}             result           results object containing scenario results
-   * @param {boolean}            result.passed    true if scenario has passed
-   * @param {string}             result.error     error stack if scenario failed
-   * @param {number}             result.duration  duration of scenario in milliseconds
-   * @param {Object}             context          Cucumber World object
-   */
-  // afterStep: function (step, scenario, result, context) {
-  // },
-  /**
-   *
-   * Runs after a Cucumber Scenario.
-   * @param {ITestCaseHookParameter} world            world object containing information on pickle and test step
-   * @param {Object}                 result           results object containing scenario results
-   * @param {boolean}                result.passed    true if scenario has passed
-   * @param {string}                 result.error     error stack if scenario failed
-   * @param {number}                 result.duration  duration of scenario in milliseconds
-   * @param {Object}                 context          Cucumber World object
-   */
+  onPrepare: function (config, capabilities) {
+    const screenshotsDir = path.join(process.cwd(), "tests", "screenshots");
+    if (!fs.existsSync(screenshotsDir)) {
+      fs.mkdirSync(screenshotsDir, { recursive: true });
+      console.log(`[WDIO] Created screenshots directory: ${screenshotsDir}`);
+    }
+    
+    // Pre-test "Hitman" strategy: Force-stop problematic background apps
+    console.log("[Setup] Suppressing background webview processes...");
+    try {
+      const { execSync } = require('child_process');
+      // Kill the specific apps that keep hanging the CDP bridge
+      execSync('adb shell am force-stop com.google.android.apps.messaging', { stdio: 'ignore' });
+      execSync('adb shell am force-stop com.android.chrome', { stdio: 'ignore' });
+      // Clear stale devtools sockets that trigger the 2000ms timeout
+      execSync('adb shell "rm /data/local/tmp/webview-devtools-remote*" 2>/dev/null || true', { stdio: 'ignore' });
+    } catch (e) {
+      console.warn("[Setup] Process suppression failed, but proceeding...");
+    }
+  },
+  beforeScenario: async function (scenario) {
+    try {
+      const { driver, browser } = await import("@wdio/globals");
+      const { execSync } = require('child_process');
+      
+      // Aggressive process suppression before each scenario
+      try {
+        execSync('adb shell am force-stop com.google.android.apps.messaging', { stdio: 'ignore', timeout: 5000 });
+        execSync('adb shell am force-stop com.android.chrome', { stdio: 'ignore', timeout: 5000 });
+      } catch (e) {
+        // Ignore suppression failures
+      }
+      
+      await browser.pause(1000);
+      
+      // Try direct switch to NATIVE_APP first (avoid getContexts() greedy scan)
+      try {
+        await driver.switchContext('NATIVE_APP');
+      } catch (e) {
+        // Fallback: use getContexts() with timeout protection
+        try {
+          const contextsPromise = driver.getContexts();
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('getContexts timeout')), 5000)
+          );
+          const contexts = await Promise.race([contextsPromise, timeoutPromise]) as any[];
+          
+          const nativeContext = contexts.find((ctx) => {
+            const ctxStr = typeof ctx === 'string' ? ctx : ctx.id || String(ctx);
+            return !ctxStr.includes('WEBVIEW');
+          });
+          
+          if (nativeContext) {
+            const nativeCtxStr = typeof nativeContext === 'string' ? nativeContext : nativeContext.id || String(nativeContext);
+            await driver.switchContext(nativeCtxStr);
+          }
+        } catch (e) {
+          // If all else fails, try direct switch anyway
+          try {
+            await driver.switchContext('NATIVE_APP');
+          } catch (e) {}
+        }
+      }
+      
+      // Handle permission dialogs
+      try {
+        const dontAllowButton = await driver.$('//android.widget.Button[@text="Don\'t allow" or @text="DON\'T ALLOW" or @text="Not now" or @text="Deny" or @text="DENY"]');
+        if (await dontAllowButton.isExisting().catch(() => false) && await dontAllowButton.isDisplayed().catch(() => false)) {
+          await dontAllowButton.click();
+        } else {
+          await driver.pressKeyCode(4);
+        }
+        await browser.pause(500);
+      } catch (e) {}
+      
+      // Switch to webview if needed (use direct switch first)
+      try {
+        await driver.switchContext('WEBVIEW_org.cardanofoundation.idw');
+      } catch (e) {
+        // Fallback only if direct switch fails
+        try {
+          const contextsPromise = driver.getContexts();
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('getContexts timeout')), 5000)
+          );
+          const contexts = await Promise.race([contextsPromise, timeoutPromise]) as any[];
+          
+          const webviewContext = contexts.find((ctx) => {
+            const ctxStr = typeof ctx === 'string' ? ctx : ctx.id || String(ctx);
+            return ctxStr.includes('WEBVIEW') && ctxStr.includes('org.cardanofoundation.idw');
+          });
+          if (webviewContext) {
+            const webviewCtxStr = typeof webviewContext === 'string' ? webviewContext : webviewContext.id || String(webviewContext);
+            await driver.switchContext(webviewCtxStr);
+          }
+        } catch (e) {
+          // Ignore webview switch failures in beforeScenario
+        }
+      }
+    } catch (e) {
+      // Silently continue if beforeScenario fails
+    }
+  },
   afterScenario: async function (world, result, context) {
-    if (returnBoolean(process.env.RELOAD_SESSION as string))
+    const { driver } = await import("@wdio/globals");
+    const appPackage = "org.cardanofoundation.idw";
+    
+    try {
+      // Try direct switch to NATIVE_APP first (avoid getContexts() greedy scan)
+      try {
+        await driver.switchContext('NATIVE_APP');
+      } catch (e) {
+        // Fallback: use getContexts() with timeout protection
+        try {
+          const contextsPromise = driver.getContexts();
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('getContexts timeout')), 5000)
+          );
+          const contexts = await Promise.race([contextsPromise, timeoutPromise]) as any[];
+          
+          const nativeContext = contexts.find((ctx) => {
+            const ctxStr = typeof ctx === 'string' ? ctx : ctx.id || String(ctx);
+            return !ctxStr.includes('WEBVIEW');
+          });
+          if (nativeContext) {
+            const nativeCtxStr = typeof nativeContext === 'string' ? nativeContext : nativeContext.id || String(nativeContext);
+            await driver.switchContext(nativeCtxStr);
+          }
+        } catch (e) {
+          // If all else fails, try direct switch anyway
+          try {
+            await driver.switchContext('NATIVE_APP');
+          } catch (e) {}
+        }
+      }
+      await driver.terminateApp(appPackage);
+    } catch (e) {
+      // Ignore cleanup errors
+    }
+    
+    if (returnBoolean(process.env.RELOAD_SESSION as string)) {
       await driver.reloadSession();
+    }
   },
-  /**
-   *
-   * Runs after a Cucumber Feature.
-   * @param {String}                   uri      path to feature file
-   * @param {GherkinDocument.IFeature} feature  Cucumber feature object
-   */
-  // afterFeature: function (uri, feature) {
-  // },
-
-  /**
-   * Runs after a WebdriverIO command gets executed
-   * @param {String} commandName hook command name
-   * @param {Array} args arguments that command would receive
-   * @param {Number} result 0 - command success, 1 - command error
-   * @param {Object} error error object if any
-   */
-  // afterCommand: function (commandName, args, result, error) {
-  // },
-  /**
-   * Gets executed after all tests are done. You still have access to all global variables from
-   * the test.
-   * @param {Number} result 0 - test pass, 1 - test fail
-   * @param {Array.<Object>} capabilities list of capabilities details
-   * @param {Array.<String>} specs List of spec file paths that ran
-   */
-  // after: function (result, capabilities, specs) {
-  // },
-  /**
-   * Gets executed right after terminating the webdriver session.
-   * @param {Object} config wdio configuration object
-   * @param {Array.<Object>} capabilities list of capabilities details
-   * @param {Array.<String>} specs List of spec file paths that ran
-   */
-  // afterSession: function (config, capabilities, specs) {
-  // },
-  /**
-   * Gets executed after all workers got shut down and the process is about to exit. An error
-   * thrown in the onComplete hook will result in the test run failing.
-   * @param {Object} exitCode 0 - success, 1 - fail
-   * @param {Object} config wdio configuration object
-   * @param {Array.<Object>} capabilities list of capabilities details
-   * @param {<Object>} results object containing test results
-   */
-  // onComplete: function(exitCode, config, capabilities, results) {
-  // },
-  /**
-   * Gets executed when a refresh happens.
-   * @param {String} oldSessionId session ID of the old session
-   * @param {String} newSessionId session ID of the new session
-   */
-  // onReload: function(oldSessionId, newSessionId) {
-  // }
 };

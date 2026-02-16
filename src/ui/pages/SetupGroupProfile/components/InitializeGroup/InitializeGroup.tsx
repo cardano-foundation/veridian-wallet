@@ -1,6 +1,6 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { pencilOutline, warningOutline } from "ionicons/icons";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Agent } from "../../../../../core/agent/agent";
 import {
@@ -44,7 +44,6 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   const [openSigners, setOpenSigners] = useState(false);
   const [openEditMembers, setOpenEditMembers] = useState(false);
   const [loading, setLoading] = useState(false);
-  const isOpenFromSetMemberModal = useRef(false);
   const history = useHistory();
 
   const profile = useAppSelector(getCurrentProfile);
@@ -52,7 +51,15 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   const openCloseAlert = () => setOpenCancelAlert(true);
 
   const handleClose = () => {
-    setState((state) => ({ ...state, stage: Stage.SetupConnection }));
+    setState((state) => ({
+      ...state,
+      signer: {
+        requiredSigners: null,
+        recoverySigners: null,
+      },
+      selectedConnections: [...state.scannedConections],
+      stage: Stage.SetupConnection,
+    }));
   };
 
   const members = useMemo(() => {
@@ -88,18 +95,17 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
 
   const openSignerModal = () => setOpenSigners(true);
 
-  const updateMembers = (data: ConnectionShortDetails[]) => {
+  const updateMembersAndSigners = (
+    data: ConnectionShortDetails[],
+    signerData: SignerData
+  ) => {
     setState((state) => ({
       ...state,
       selectedConnections: [...data],
       signer: {
-        recoverySigners: null,
-        requiredSigners: null,
+        ...signerData,
       },
     }));
-
-    isOpenFromSetMemberModal.current = true;
-    openSignerModal();
   };
 
   const updateSigners = (data: SignerData) => {
@@ -108,7 +114,6 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       signer: data,
     });
 
-    isOpenFromSetMemberModal.current = false;
     setOpenSigners(false);
   };
 
@@ -159,12 +164,6 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
 
   const handleCloseSignerModal = (value: boolean) => {
     setOpenSigners(value);
-
-    if (!value && isOpenFromSetMemberModal.current) {
-      openMemberModal();
-    }
-
-    isOpenFromSetMemberModal.current = false;
   };
 
   return (
@@ -314,7 +313,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
         setOpen={setOpenEditMembers}
         connections={state.scannedConections}
         currentSelectedConnections={state.selectedConnections}
-        onSubmit={updateMembers}
+        onSubmit={updateMembersAndSigners}
       />
       <Alert
         isOpen={openCancelAlert}

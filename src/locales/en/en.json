@@ -671,7 +671,6 @@
       "rotatekeys": "Rotate keys",
       "share": "Share",
       "inner": {
-        "label": "Display name",
         "groupLabel": "Group name",
         "usernamelabel": "Username",
         "confirm": "Confirm"
@@ -862,7 +861,6 @@
         "issuer": "Issuer"
       },
       "details": {
-        "joinedmember": "Joined members",
         "done": "Done",
         "restore": "Restore",
         "delete": "Delete",
@@ -1057,7 +1055,6 @@
                 "textdecline": "Are you sure you want to decline this credential presentation request? You won't be able to change your decision later."
               },
               "groupmember": "Group members",
-              "joinedmembers": "Joined members",
               "reachthreshold": "The threshold has been met, and your group has agreed to your proposed credential presentation.",
               "initiatorselectcred": "The group has been asked to provide a credential. Please review the request and choose to accept or decline it.",
               "initiatorselectedcred": "You've already proposed a credential for this request. It will be sent once the group’s threshold is met.",

@@ -16,7 +16,7 @@ Given(/^user had already setup a identity$/, async function () {
     await OnboardingScreen.tapOnGetStartedButton();
     await PasscodeScreen.enterPasscode(
       (this.passcode = await PasscodeScreen.createAndEnterRandomPasscode())
-    );
+    ); 
     if (await BiometricScreen.biometricTitleText.isExisting()) {
       await BiometricScreen.setUpLaterButton.click();
     }

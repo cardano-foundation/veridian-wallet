@@ -7,6 +7,8 @@ import { CardItem, CardList } from "../../../../components/CardList";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
+import { SetupSignerModal } from "../SetupSignerModal";
+import { SignerData } from "../SetupSignerModal/SetupSignerModal.types";
 import "./SetupMemberModal.scss";
 import { SetupMemberModalProps } from "./SetupMemberModal.types";
 
@@ -17,6 +19,7 @@ export const SetupMemberModal = ({
   setOpen,
   onSubmit,
 }: SetupMemberModalProps) => {
+  const [openSigner, setOpenSignerModal] = useState(false);
   const [data, setData] = useState<ConnectionShortDetails[]>([
     ...currentSelectedConnections,
   ]);
@@ -31,8 +34,7 @@ export const SetupMemberModal = ({
   };
 
   const handleSubmit = () => {
-    onSubmit(data);
-    handleClose();
+    setOpenSignerModal(true);
   };
 
   const displayConnections = useMemo(() => {
@@ -54,71 +56,88 @@ export const SetupMemberModal = ({
     });
   };
 
+  const onSubmitSigner = (signerData: SignerData) => {
+    onSubmit(data, signerData);
+    handleCloseSigner();
+    handleClose();
+  };
+
+  const handleCloseSigner = () => setOpenSignerModal(false);
+
   return (
-    <IonModal
-      isOpen={isOpen}
-      className="setup-connections-modal"
-      data-testid="setup-connections-modal"
-      onDidDismiss={handleClose}
-    >
-      <ScrollablePageLayout
-        pageId="setup-connections-modal-content"
-        header={
-          <PageHeader
-            closeButton={true}
-            closeButtonLabel={`${i18n.t(
-              "setupgroupprofile.initgroup.setconnections.button.back"
-            )}`}
-            closeButtonAction={handleClose}
-            title={`${i18n.t(
-              "setupgroupprofile.initgroup.setconnections.title"
-            )}`}
-          />
-        }
-        footer={
-          <PageFooter
-            pageId="setup-connections-modal"
-            primaryButtonText={`${i18n.t(
-              "setupgroupprofile.initgroup.setconnections.button.confirm"
-            )}`}
-            primaryButtonAction={handleSubmit}
-            primaryButtonDisabled={data.length === 0}
-          />
-        }
+    <>
+      <IonModal
+        isOpen={isOpen}
+        className="setup-connections-modal"
+        data-testid="setup-connections-modal"
+        onDidDismiss={handleClose}
       >
-        <p className="header-text">
-          {i18n.t("setupgroupprofile.initgroup.setconnections.text")}
-        </p>
-        <CardList
-          className="member-list"
-          data={displayConnections}
-          hiddenImage
-          onCardClick={(data, e) => {
-            e.stopPropagation();
-            handleSelectConnection(data);
-          }}
-          onRenderStartSlot={(connection, index) => {
-            return (
-              <MemberAvatar
-                rank={index % 5}
-                firstLetter={connection.label[0] || ""}
-              />
-            );
-          }}
-          onRenderEndSlot={(connection) => {
-            return (
-              <IonCheckbox
-                checked={data.some(
-                  (checkedConenction) => checkedConenction.id === connection.id
-                )}
-                aria-label=""
-                className="checkbox"
-                data-testid={`connection-select-${connection.id}`}
-              />
-            );
-          }}
-        />
-      </ScrollablePageLayout>
-    </IonModal>
+        <ScrollablePageLayout
+          pageId="setup-connections-modal-content"
+          header={
+            <PageHeader
+              closeButton={true}
+              closeButtonLabel={`${i18n.t(
+                "setupgroupprofile.initgroup.setconnections.button.back"
+              )}`}
+              closeButtonAction={handleClose}
+              title={`${i18n.t(
+                "setupgroupprofile.initgroup.setconnections.title"
+              )}`}
+            />
+          }
+          footer={
+            <PageFooter
+              pageId="setup-connections-modal"
+              primaryButtonText={`${i18n.t(
+                "setupgroupprofile.initgroup.setconnections.button.confirm"
+              )}`}
+              primaryButtonAction={handleSubmit}
+              primaryButtonDisabled={data.length === 0}
+            />
+          }
+        >
+          <p className="header-text">
+            {i18n.t("setupgroupprofile.initgroup.setconnections.text")}
+          </p>
+          <CardList
+            className="member-list"
+            data={displayConnections}
+            hiddenImage
+            onCardClick={(data, e) => {
+              e.stopPropagation();
+              handleSelectConnection(data);
+            }}
+            onRenderStartSlot={(connection, index) => {
+              return (
+                <MemberAvatar
+                  rank={index % 5}
+                  firstLetter={connection.label[0] || ""}
+                />
+              );
+            }}
+            onRenderEndSlot={(connection) => {
+              return (
+                <IonCheckbox
+                  checked={data.some(
+                    (checkedConenction) =>
+                      checkedConenction.id === connection.id
+                  )}
+                  aria-label=""
+                  className="checkbox"
+                  data-testid={`connection-select-${connection.id}`}
+                />
+              );
+            }}
+          />
+        </ScrollablePageLayout>
+      </IonModal>
+      <SetupSignerModal
+        onSubmit={onSubmitSigner}
+        isOpen={openSigner}
+        connectionsLength={data.length + 1}
+        setOpen={handleCloseSigner}
+      />
+    </>
   );
 };

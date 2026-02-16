@@ -1,6 +1,7 @@
 const createGroupMock = jest.fn();
 
 import { fireEvent, render, waitFor } from "@testing-library/react";
+import { forwardRef, useImperativeHandle } from "react";
 import { Provider } from "react-redux";
 import { ConnectionStatus } from "../../../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
@@ -13,6 +14,25 @@ jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
   IonModal: ({ children, isOpen, ...props }: any) =>
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
+  IonInput: forwardRef((props: any, ref: any) => {
+    const { onIonBlur, onIonFocus, onIonInput, value } = props;
+    const testId = props["data-testid"];
+
+    useImperativeHandle(ref, () => ({
+      setFocus: jest.fn(),
+    }));
+
+    return (
+      <input
+        ref={ref}
+        value={value}
+        data-testid={testId}
+        onBlur={onIonBlur}
+        onFocus={onIonFocus}
+        onChange={onIonInput}
+      />
+    );
+  }),
 }));
 
 jest.mock("signify-ts", () => ({
@@ -123,7 +143,7 @@ describe("Init group", () => {
     ).toBeVisible();
   });
 
-  test("Reset signer after update member member", async () => {
+  test("Show setup signer after finish setup members", async () => {
     const newState = {
       ...state,
       signer: {
@@ -160,12 +180,21 @@ describe("Init group", () => {
     );
 
     await waitFor(() => {
-      expect(innerFnc).toBeCalledWith(
-        expect.objectContaining({
-          signer: { recoverySigners: null, requiredSigners: null },
-        })
-      );
+      expect(getByTestId("setup-signer-modal")).toBeVisible();
+      expect(setStateMock).not.toBeCalled();
     });
+
+    fireEvent.change(getByTestId("threshold-recoverySigners"), {
+      target: { value: "1" },
+    });
+
+    fireEvent.change(getByTestId("threshold-requiredSigners"), {
+      target: { value: "1" },
+    });
+
+    fireEvent.click(getByTestId("primary-button-setup-signer-modal"));
+
+    expect(setStateMock).toBeCalled();
   });
 
   test("Send request", async () => {
