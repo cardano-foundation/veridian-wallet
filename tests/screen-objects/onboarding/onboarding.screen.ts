@@ -9,9 +9,9 @@ export class OnboardingScreen {
     return $("[data-testid=\"tertiary-button-onboarding\"]");
   }
 
-  async loads() {
-    await expect(this.getStartedButton).toBeDisplayed();
-    await expect(this.iAlreadyHaveAWalletButton).toBeDisplayed();
+  async loads(timeoutMs = 30000) {
+    await this.getStartedButton.waitForDisplayed({ timeout: timeoutMs });
+    await this.iAlreadyHaveAWalletButton.waitForDisplayed({ timeout: timeoutMs });
   }
 
   async tapOnGetStartedButton() {

@@ -1,8 +1,10 @@
 import { Given, Then, When } from "@wdio/cucumber-framework";
 import { expect } from "expect-webdriverio";
 import OnboardingScreen from "../../screen-objects/onboarding/onboarding.screen.js";
+import { waitForAppWebviewAndSwitch } from "../../helpers/webview.helper.js";
 
 Given(/^user is on the intro screen$/, async function () {
+  await waitForAppWebviewAndSwitch();
   await OnboardingScreen.loads();
 });
 

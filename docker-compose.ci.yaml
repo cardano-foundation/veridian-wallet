@@ -1,0 +1,9 @@
+# CI-only: bind KERIA ports to 0.0.0.0 so the Android emulator (10.0.2.2 = host) can reach them.
+# Use: docker compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d keria
+version: "3.9"
+services:
+  keria:
+    ports:
+      - "0.0.0.0:3901:3901"
+      - "0.0.0.0:3902:3902"
+      - "0.0.0.0:3903:3903"

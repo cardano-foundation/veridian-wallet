@@ -1,0 +1,8 @@
+# CI / Android emulator: KERIA on host at 10.0.2.2 (emulator's alias for runner)
+keri:
+  keria:
+    url: "http://10.0.2.2:3901"
+    bootUrl: "http://10.0.2.2:3903"
+security:
+  rasp:
+    enabled: false

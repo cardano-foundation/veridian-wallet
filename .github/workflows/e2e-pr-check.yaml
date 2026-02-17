@@ -54,18 +54,38 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project for E2E
-        run: |
-          export LANG=en_US.UTF-8
-          export KERIA_IP=10.0.2.2
-          npm run build:e2e
+      # KERIA must be reachable at 10.0.2.2 so the app can validate boot/connect URLs during onboarding
+      - name: Start KERIA (Docker)
+        run: docker compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d keria
 
-      - name: Build Android APK
+      - name: Wait for KERIA to be ready
+        run: npx wait-on --timeout 90000 tcp:127.0.0.1:3901 tcp:127.0.0.1:3903
+
+      - name: Wait for KERIA HTTP to respond
+        run: |
+          for i in $(seq 1 45); do
+            c1=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 http://127.0.0.1:3901/ 2>/dev/null || true)
+            c2=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 http://127.0.0.1:3903/ 2>/dev/null || true)
+            if [ -n "$c1" ] && [ -n "$c2" ]; then echo "KERIA responded: 3901=$c1 3903=$c2"; exit 0; fi
+            sleep 2
+          done
+          echo "KERIA did not respond on 3901/3903"; exit 1
+
+      - name: Give KERIA time to fully initialize
+        run: sleep 15
+
+      - name: Build project for E2E
+        env:
+          LANG: en_US.UTF-8
+          KERIA_IP: "10.0.2.2"
+        run: npm run build:e2e:ci
+
+      - name: Build Android APK (debug)
         run: |
           cd android
           ./gradlew assembleDebug
           cd ..
-          # Dynamically set the APP_PATH for the test runner
+          # Debug APK has cleartext permitted for 10.0.2.2 (emulator host) via app/src/debug/
           APK_PATH=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -1)
           echo "APP_PATH=$APK_PATH" >> "$GITHUB_ENV"
 
@@ -80,9 +100,14 @@ jobs:
           npx wait-on --timeout 120s http-get://127.0.0.1:4723/status
 
       - name: Run onboarding-intro E2E test
+        id: e2e-test
         uses: reactivecircus/android-emulator-runner@b530d96654c385303d652368551fb075bc2f0b6b # v2.35.0
         env:
-          NODE_OPTIONS: "--max_old_space_size=8192" 
+          NODE_OPTIONS: "--max_old_space_size=8192"
+          KERIA_IP: "10.0.2.2"
+          # Force test helper getSSIAgentUrls() to use 10.0.2.2 (emulator host), not 127.0.0.1
+          ANDROID_EMULATOR: "true"
+          APP_PATH: ${{ env.APP_PATH }}
         with:
           api-level: 31 
           target: google_apis
@@ -92,8 +117,36 @@ jobs:
           disable-animations: true
           disk-size: 6000M
           heap-size: 600M
-          script: |
-            npm run wdio:android:s24ultra -- --spec ./tests/features/onboarding/onboarding-intro.feature
+          script: npm run e2e:onboarding
+
+      - name: Dump KERIA logs on E2E failure
+        if: failure() && steps.e2e-test.outcome == 'failure'
+        run: |
+          echo "=== KERIA container logs (last 200 lines) ==="
+          docker compose -f docker-compose.yaml -f docker-compose.ci.yaml logs --tail=200 keria || true
+          echo "=== Host connectivity check ==="
+          curl -s -o /dev/null -w "127.0.0.1:3901 -> %{http_code}\n" --connect-timeout 2 http://127.0.0.1:3901/ || true
+          curl -s -o /dev/null -w "127.0.0.1:3903 -> %{http_code}\n" --connect-timeout 2 http://127.0.0.1:3903/ || true
+
+      - name: Upload E2E test report (Allure results)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-allure-results
+          path: tests/.reports/allure-results/
+          if-no-files-found: ignore
+          retention-days: 1
+
+      - name: Report E2E test result
+        if: always()
+        run: |
+          if [ "${{ steps.e2e-test.outcome }}" == "success" ]; then
+            echo "E2E onboarding tests passed." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "E2E onboarding tests failed." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "For more detail, download the e2e-allure-results artifact and run \`allure serve\` in the extracted folder." >> $GITHUB_STEP_SUMMARY
 
       - name: Cleanup
         if: always()

@@ -12,7 +12,8 @@ export const config: Options.Testrunner = {
   specFileRetriesDelay: 3,
   specFileRetriesDeferred: false,
   maxInstances: 1,
-  logLevel: "debug",
+  // Less noise in CI; keep debug locally for development
+  logLevel: process.env.CI ? "warn" : "debug",
   bail: 0,
   baseUrl: "LACK_OF_BASE_URL",
   waitforTimeout: 45000,
