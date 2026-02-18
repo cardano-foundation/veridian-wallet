@@ -230,6 +230,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
       setStep(Step.Confirm);
     } else {
       dispatch(setToastMsg(ToastMsgType.PEER_ID_ERROR));
+      scanRef.current?.registerScanHandler();
     }
   };
 

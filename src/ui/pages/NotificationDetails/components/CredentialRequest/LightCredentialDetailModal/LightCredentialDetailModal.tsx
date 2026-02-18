@@ -6,7 +6,6 @@ const LightCredentialDetailModal = ({
   credId,
   isOpen,
   defaultSelected,
-  joinedCredRequestMembers,
   setIsOpen,
   onClose,
   viewOnly,
@@ -29,7 +28,6 @@ const LightCredentialDetailModal = ({
       isLightMode
       selected={isSelected}
       setSelected={setSelected}
-      joinedCredRequestMembers={joinedCredRequestMembers}
       viewOnly={viewOnly}
     />
   );

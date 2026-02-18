@@ -14,17 +14,14 @@ import {
 import { Alert } from "../../Alert";
 import {
   CardBlock,
-  CardDetailsBlock,
   CardDetailsExpandAttributes,
   CardDetailsItem,
-  FlatBorderType,
+  FlatBorderType
 } from "../../CardDetails";
 import { FallbackIcon } from "../../FallbackIcon";
 import { ListHeader } from "../../ListHeader";
 import { ReadMore } from "../../ReadMore";
 import { CredentialContentProps, IssuerProps } from "./CredentialContent.types";
-import { MultisigMember } from "./MultisigMember";
-import { MemberAcceptStatus } from "./MultisigMember.types";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
 
@@ -79,7 +76,6 @@ const Issuer = ({
 
 const CredentialContent = ({
   cardData,
-  joinedCredRequestMembers,
   connectionShortDetails,
   setOpenConnectionlModal,
 }: CredentialContentProps) => {
@@ -106,19 +102,6 @@ const CredentialContent = ({
       >
         <ReadMore content={cardData.s.description} />
       </CardBlock>
-      {joinedCredRequestMembers && joinedCredRequestMembers.length > 0 && (
-        <CardDetailsBlock
-          title={i18n.t("tabs.credentials.details.joinedmember")}
-        >
-          {joinedCredRequestMembers?.map((member) => (
-            <MultisigMember
-              key={member.aid}
-              name={member.name}
-              status={MemberAcceptStatus.Accepted}
-            />
-          ))}
-        </CardDetailsBlock>
-      )}
       <ListHeader title={i18n.t("tabs.credentials.details.attributes.label")} />
       <CardBlock title={i18n.t("tabs.credentials.details.attributes.title")}>
         <CardDetailsExpandAttributes

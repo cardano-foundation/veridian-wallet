@@ -2,7 +2,7 @@ import { IConnectMessage } from "@fabianbormann/cardano-peer-connect/dist/src/ty
 import { ExperimentalContainer } from "@fabianbormann/cardano-peer-connect";
 import { IdentityWalletConnect } from "./identityWalletConnect";
 import packageInfo from "../../../../package.json";
-import ICON_BASE64 from "../../../assets/icon-only";
+import FALLBACK_ICON_BASE64 from "../../../assets/fallback-icon-only";
 import { KeyStoreKeys, SecureStorage } from "../../storage";
 import { CoreEventEmitter } from "../../agent/event";
 import {
@@ -23,7 +23,7 @@ class PeerConnection {
   private walletInfo = {
     address: "",
     name: "idw_p2p",
-    icon: ICON_BASE64,
+    icon: FALLBACK_ICON_BASE64,
     version: packageInfo.version,
     requestAutoconnect: true,
   };
@@ -107,6 +107,7 @@ class PeerConnection {
           ) {
             iconB64 = icon;
           }
+
           const peerConnectionId = `${address}:${selectedAid}`;
           await Agent.agent.peerConnectionPair.updatePeerConnectionAccount(
             peerConnectionId,
@@ -176,7 +177,7 @@ class PeerConnection {
       await Agent.agent.peerConnectionPair.createPeerConnectionPairRecord({
         id: `${dAppIdentifier}:${connectingIdentifier}`,
         selectedAid: connectingIdentifier,
-        iconB64: ICON_BASE64,
+        iconB64: FALLBACK_ICON_BASE64,
       });
     }
     const seed = this.identityWalletConnect.connect(dAppIdentifier);

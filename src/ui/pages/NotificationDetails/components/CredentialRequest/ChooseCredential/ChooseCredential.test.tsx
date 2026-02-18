@@ -144,7 +144,6 @@ describe("Credential request - choose request", () => {
             credentialRequest={credRequestFix}
             notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
-            linkedGroup={null}
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -229,7 +228,6 @@ describe("Credential request - choose request", () => {
             credentialRequest={credRequestFix}
             notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
-            linkedGroup={null}
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -297,7 +295,6 @@ describe("Credential request - choose request", () => {
             credentialRequest={credRequestFix}
             notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
-            linkedGroup={null}
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -434,7 +431,6 @@ describe("Credential request - choose request", () => {
             credentialRequest={credRequestFix}
             notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
-            linkedGroup={null}
           />
         </IonReactMemoryRouter>
       </Provider>
@@ -545,7 +541,6 @@ describe("Credential request - choose request", () => {
             credentialRequest={credMock}
             notificationDetails={notificationsFix[4]}
             reloadData={jest.fn}
-            linkedGroup={null}
           />
         </IonReactMemoryRouter>
       </Provider>

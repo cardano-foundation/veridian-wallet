@@ -1,11 +1,23 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
+import { ConnectionService } from "../../../../core/agent/services";
+import ENG_TRANS from "../../../../locales/en/en.json";
 import { identifierFix } from "../../../__fixtures__/identifierFix";
 import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../../utils/makeTestStore";
-import { ProfileContent } from "./ProfileContent";
-import ENG_TRANS from "../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../navigation/TabsMenu";
+import { ProfileContent } from "./ProfileContent";
+
+const getOobiMock = jest.fn(() => Promise.resolve("oobi"));
+jest.mock("../../../../core/agent/agent", () => ({
+  Agent: {
+    agent: {
+      connections: {
+        getOobi: () => getOobiMock(),
+      },
+    },
+  },
+}));
 
 const defaultProfileId =
   profileCacheFixData.defaultProfile || "test-profile-id";
@@ -21,6 +33,17 @@ describe("ProfileContent", () => {
 
   const renderComponent = (storeOverrides = {}) => {
     const store = makeTestStore({
+      stateCache: {
+        routes: [TabsRoutePath.CREDENTIALS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+          passwordIsSkipped: true,
+        },
+        isOnline: true,
+      },
       profilesCache: profileCacheFixData,
       ...storeOverrides,
     });
@@ -358,6 +381,84 @@ describe("ProfileContent", () => {
       const connectionsValue = connectionsLabel.previousElementSibling;
 
       expect(connectionsValue?.textContent).toBe("0");
+    });
+
+    test("retry to get oobi when fetchOobi throw ConnectionService.CANNOT_GET_OOBI", async () => {
+      getOobiMock
+        .mockImplementationOnce(() =>
+          Promise.reject(new Error(ConnectionService.CANNOT_GET_OOBI))
+        )
+        .mockImplementationOnce(() =>
+          Promise.reject(new Error(ConnectionService.CANNOT_GET_OOBI))
+        )
+        .mockImplementationOnce(() => Promise.resolve("oobi-value"));
+      jest.spyOn(window, "setTimeout");
+
+      renderComponent();
+
+      await new Promise((resolve) => setTimeout(() => resolve(false), 3000));
+
+      await waitFor(() => {
+        expect(getOobiMock).toBeCalledTimes(3);
+      });
+    });
+  });
+
+  describe("Signing Keys Display", () => {
+    it("should show ONLY the user's signing key in a group profile", () => {
+      const groupCardData = {
+        ...identifierFix[0],
+        groupMemberPre: "MEMBER_AID_1",
+        members: ["MEMBER_AID_0", "MEMBER_AID_1", "MEMBER_AID_2"],
+        k: ["KEY_0", "KEY_1", "KEY_2"],
+      };
+
+      const store = makeTestStore({
+        profilesCache: profileCacheFixData,
+      });
+
+      render(
+        <Provider store={store}>
+          <ProfileContent
+            {...mockProps}
+            cardData={groupCardData}
+          />
+        </Provider>
+      );
+
+      const keyItem = screen.getByTestId("signing-key-0-text-value");
+      expect(keyItem).toHaveTextContent("KEY_1".substring(0, 5));
+
+      const allKeyValues = screen.getAllByTestId("signing-key-0-text-value");
+      expect(allKeyValues).toHaveLength(1);
+    });
+
+    it("should show ONLY the first signing key in an individual profile", () => {
+      const individualCardData = {
+        ...identifierFix[0],
+        groupMemberPre: undefined,
+        members: undefined,
+        k: ["KEY_0", "KEY_1"],
+      };
+
+      const store = makeTestStore({
+        profilesCache: profileCacheFixData,
+      });
+
+      render(
+        <Provider store={store}>
+          <ProfileContent
+            {...mockProps}
+            cardData={individualCardData}
+          />
+        </Provider>
+      );
+
+      const keyItem = screen.getByTestId("signing-key-0-text-value");
+      expect(keyItem).toHaveTextContent("KEY_0".substring(0, 5));
+
+      const allKeyValues = screen.getAllByTestId("signing-key-0-text-value");
+      expect(allKeyValues).toHaveLength(1);
     });
   });
 });

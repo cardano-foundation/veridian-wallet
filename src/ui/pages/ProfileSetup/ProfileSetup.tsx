@@ -335,20 +335,20 @@ export const ProfileSetup = ({
             profile.identity.groupMetadata?.groupId === scanGroupId
         )
       ) {
-        handleCloseScan();
         dispatch(setToastMsg(ToastMsgType.DUPLICATE_GROUP_ID_ERROR));
+        scanRef.current?.registerScanHandler();
         return;
       }
 
       if (!scanGroupId) {
-        handleCloseScan();
         dispatch(setToastMsg(ToastMsgType.NOT_VALID_GROUP_INVITE));
+        scanRef.current?.registerScanHandler();
         return;
       }
 
       if (!scannedGroupName) {
-        handleCloseScan();
         dispatch(setToastMsg(ToastMsgType.GROUP_NAME_NOT_FOUND_ERROR));
+        scanRef.current?.registerScanHandler();
         return;
       }
 
@@ -385,14 +385,18 @@ export const ProfileSetup = ({
       setStep(SetupProfileStep.GroupSetupConfirm);
 
       // Update persistent storage
-      await Agent.agent.basicStorage.createOrUpdateBasicRecord(
-        new BasicRecord({
-          id: MiscRecordId.PENDING_JOIN_GROUP_METADATA,
-          content: pendingJoinData,
-        })
-      );
+      await Agent.agent.basicStorage
+        .createOrUpdateBasicRecord(
+          new BasicRecord({
+            id: MiscRecordId.PENDING_JOIN_GROUP_METADATA,
+            content: pendingJoinData,
+          })
+        )
+        .catch((e) => {
+          showError("Show error", e);
+        });
     } catch (error) {
-      handleCloseScan();
+      scanRef.current?.registerScanHandler();
       dispatch(setToastMsg(ToastMsgType.INVALID_CONNECTION_URL));
     }
   };

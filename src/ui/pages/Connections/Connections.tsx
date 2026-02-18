@@ -59,10 +59,7 @@ const Connections = () => {
     [currentProfile]
   );
   const showPlaceholder = profileConnections.length === 0;
-  const oobi = useGetOobi(
-    currentProfile?.identity.id,
-    currentProfile?.identity.displayName
-  );
+  const oobi = useGetOobi(currentProfile?.identity);
 
   useIonViewWillEnter(() => {
     dispatch(setCurrentRoute({ path: TabsRoutePath.CONNECTIONS }));

@@ -333,7 +333,7 @@ describe("Individual profile details page", () => {
 
     await waitFor(() =>
       expect(
-        getByText(EN_TRANSLATIONS.profiledetails.options.inner.label)
+        getByText(EN_TRANSLATIONS.profiledetails.options.inner.usernamelabel)
       ).toBeInTheDocument()
     );
   });
