@@ -44,7 +44,6 @@ const ChooseCredential = ({
   pageId,
   activeStatus,
   credentialRequest,
-  linkedGroup,
   onBack,
   reloadData,
   onSubmit,
@@ -144,11 +143,6 @@ const ChooseCredential = ({
   const handleBack = () => {
     onBack();
   };
-
-  // @TODO - foconnor: joinedCredMembers and showCredMembers of these will default to all joined members, this UI will change.
-  const joinedCredMembers = !viewCredDetail
-    ? []
-    : linkedGroup?.memberInfos.filter((member) => member.joined) || [];
 
   const decline = () => setAlertDeclineIsOpen(true);
   const closeAlert = () => setAlertDeclineIsOpen(false);
@@ -339,7 +333,6 @@ const ChooseCredential = ({
         isOpen={!!viewCredDetail}
         setIsOpen={() => setViewCredDetail(null)}
         onClose={handleSelectCredOnModal}
-        joinedCredRequestMembers={joinedCredMembers}
       />
     </>
   );

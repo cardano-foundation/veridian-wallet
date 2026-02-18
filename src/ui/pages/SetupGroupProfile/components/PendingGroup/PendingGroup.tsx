@@ -5,7 +5,7 @@ import {
   refreshOutline,
   warningOutline,
 } from "ionicons/icons";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import {
   ConnectionShortDetails,
@@ -87,48 +87,45 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     setOpenProfiles(true);
   };
 
-  useEffect(() => {
-    const fetchOobi = async () => {
-      const alias =
-        identity?.groupMetadata?.proposedUsername || identity?.groupUsername;
-      const groupId = defaultProfile?.multisigConnections[0]?.groupId;
-      const groupName = identity?.displayName;
-      const identityId = identity?.groupMemberPre || identity?.id;
-
-      if (!alias || !groupId || !groupName || !identityId) return;
-
-      try {
-        const oobiValue = await Agent.agent.connections.getOobi(identityId, {
-          alias,
-          groupId,
-          groupName,
-        });
-        if (oobiValue) {
-          setOobi(oobiValue);
-        }
-      } catch (e) {
-        dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
-      }
-    };
-
+  const fetchOobi = useCallback(async () => {
     if (
       identity?.creationStatus === CreationStatus.COMPLETE &&
       !!identity?.groupMemberPre
     )
       return;
 
-    fetchOobi();
+    const alias =
+      identity?.groupMetadata?.proposedUsername || identity?.groupUsername;
+    const groupId = defaultProfile?.multisigConnections[0]?.groupId;
+    const groupName = identity?.displayName;
+    const identityId = identity?.groupMemberPre || identity?.id;
+
+    if (!alias || !groupId || !groupName || !identityId) return;
+
+    try {
+      const oobiValue = await Agent.agent.connections.getOobi(identityId, {
+        alias,
+        groupId,
+        groupName,
+      });
+      if (oobiValue) {
+        setOobi(oobiValue);
+      }
+    } catch (e) {
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
+    }
   }, [
     defaultProfile?.multisigConnections,
-    identity?.creationStatus,
     dispatch,
+    identity?.creationStatus,
     identity?.displayName,
     identity?.groupMemberPre,
-    identity?.groupMetadata?.groupId,
     identity?.groupMetadata?.proposedUsername,
     identity?.groupUsername,
     identity?.id,
   ]);
+
+  useOnlineStatusEffect(fetchOobi);
 
   const getMemberName = useCallback(
     (connections: ConnectionShortDetails[], id: string) => {

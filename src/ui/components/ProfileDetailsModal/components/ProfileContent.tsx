@@ -73,7 +73,7 @@ const ProfileContent = ({
   const [shareIsOpen, setShareIsOpen] = useState(false);
   const [editorOptionsIsOpen, setEditorIsOpen] = useState(false);
   const [editUserName, setEditUserName] = useState(false);
-  const oobi = useGetOobi(cardData.id, cardData.displayName);
+  const oobi = useGetOobi(cardData);
 
   const openShareModal = () => {
     if (!cardData) return;
@@ -125,6 +125,16 @@ const ProfileContent = ({
     setEditorIsOpen(value);
     setEditUserName(value);
   };
+
+  const signingKey = (() => {
+    if (isMultiSig && cardData.groupMemberPre && cardData.members) {
+      const myIndex = cardData.members.indexOf(cardData.groupMemberPre);
+      if (myIndex !== -1 && cardData.k[myIndex]) {
+        return cardData.k[myIndex];
+      }
+    }
+    return cardData.k[0];
+  })();
 
   return (
     <>
@@ -305,26 +315,21 @@ const ProfileContent = ({
           />
         </CardBlock>
       </div>
-      {cardData.k.length && (
+      {signingKey && (
         <>
           <CardBlock
-            copyContent={cardData.k[0]}
+            copyContent={signingKey}
             title={i18n.t("profiledetails.identifierdetail.signingkey.title")}
             testId="signingkey-block"
             flatBorder={isMultiSig ? undefined : FlatBorderType.BOT}
           >
-            {cardData.k.map((item, index) => {
-              return (
-                <CardDetailsItem
-                  key={item}
-                  info={`${item.substring(0, 5)}...${item.slice(-5)}`}
-                  testId={`signing-key-${index}`}
-                  icon={keyOutline}
-                  mask={false}
-                  fullText={false}
-                />
-              );
-            })}
+            <CardDetailsItem
+              info={`${signingKey.substring(0, 5)}...${signingKey.slice(-5)}`}
+              testId="signing-key-0"
+              icon={keyOutline}
+              mask={false}
+              fullText={false}
+            />
           </CardBlock>
           {!isMultiSig && (
             <CardBlock

@@ -5,6 +5,7 @@ import { store } from "../../../../../store";
 import { RomeCardTemplate } from "./RomeCardTemplate";
 import { shortCredsFix } from "../../../../__fixtures__/shortCredsFix";
 import { formatShortDate } from "../../../../utils/formatters";
+import { CredentialStatus } from "../../../../../core/agent/services/credentialService.types";
 
 describe("Rome Card Template", () => {
   it("renders Rome Card Template", async () => {
@@ -74,5 +75,28 @@ describe("Rome Card Template", () => {
     const card = getByTestId("rome-card-template-name-index-0");
 
     expect(card.classList.contains("active")).toBe(false);
+  });
+
+  it("Revoke card status", async () => {
+    const handleShowCardDetails = jest.fn();
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <RomeCardTemplate
+          name="name"
+          index={0}
+          cardData={{
+            ...shortCredsFix[4],
+            status: CredentialStatus.REVOKED,
+          }}
+          isActive={false}
+          onHandleShowCardDetails={() => handleShowCardDetails(0)}
+        />
+      </Provider>
+    );
+    const card = getByTestId("rome-card-template-name-index-0");
+    expect(card.classList.contains("active")).toBe(false);
+    expect(getByTestId("card-issued-date").innerHTML).toBe(
+      formatShortDate(shortCredsFix[4].issuanceDate)
+    );
   });
 });

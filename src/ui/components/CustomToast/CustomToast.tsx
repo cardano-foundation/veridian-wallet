@@ -12,7 +12,7 @@ const TOAST_HEIGHT = 52;
 // Toast height on small screen
 const SMALL_TOAST_HEIGHT = 45;
 const TOAST_ANIMATION_DURATION = 350;
-const TOAST_DURATION = 2500;
+export const TOAST_DURATION = 2500;
 
 const CustomToast = ({
   toastMsg,

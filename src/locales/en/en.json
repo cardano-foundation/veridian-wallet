@@ -671,7 +671,6 @@
       "rotatekeys": "Rotate keys",
       "share": "Share",
       "inner": {
-        "label": "Display name",
         "groupLabel": "Group name",
         "usernamelabel": "Username",
         "confirm": "Confirm"
@@ -862,7 +861,6 @@
         "issuer": "Issuer"
       },
       "details": {
-        "joinedmember": "Joined members",
         "done": "Done",
         "restore": "Restore",
         "delete": "Delete",
@@ -1031,7 +1029,7 @@
           "choosecredential": "Choose credential",
           "providecredential": "Provide credential",
           "presentcredential": "Present Credential",
-          "addcred": "Add Credential",
+          "addcred": "Add credential",
           "done": "Done",
           "ok": "Ok",
           "delete": "Delete",
@@ -1057,7 +1055,6 @@
                 "textdecline": "Are you sure you want to decline this credential presentation request? You won't be able to change your decision later."
               },
               "groupmember": "Group members",
-              "joinedmembers": "Joined members",
               "reachthreshold": "The threshold has been met, and your group has agreed to your proposed credential presentation.",
               "initiatorselectcred": "The group has been asked to provide a credential. Please review the request and choose to accept or decline it.",
               "initiatorselectedcred": "You've already proposed a credential for this request. It will be sent once the group’s threshold is met.",
@@ -1509,7 +1506,7 @@
     "newcredentialadded": "New credential added",
     "notesupdated": "Notes updated successfully",
     "noteremoved": "Note removed successfully",
-    "maxfavouritesreached": "Maximum of 5 favourites reached",
+    "maxfavouritesreachederror": "Maximum of 5 favorites",
     "dappconnectiondeleted": "dApp deleted successfully",
     "connectwalletsuccess": "Connected successfully",
     "disconnectwallet": "Disconnected successfully",
@@ -1564,7 +1561,8 @@
     "networkerror": "Unable to reach the cloud",
     "createidentifiererror": "Unable to create profile",
     "invalidconnectionurlerror": "Invalid connection URL",
-    "profilenotexisterror": "This profile no longer exists"
+    "profilenotexisterror": "This profile no longer exists",
+    "memberalreadyexisterror": "Member already added"
   },
   "request": {
     "sign": {

@@ -392,7 +392,7 @@ const ReceiveCredential = ({
         )}
         {(maxThreshold || multisigMemberStatus.linkedRequest.accepted) && (
           <InfoCard
-            className={`alert${maxThreshold ? " max-threshhold" : undefined}`}
+            className={`alert ${maxThreshold ? " max-threshhold" : ""}`}
             content={i18n.t(
               `tabs.notifications.details.credential.receive.${
                 maxThreshold ? "thresholdmet" : "accepted"
