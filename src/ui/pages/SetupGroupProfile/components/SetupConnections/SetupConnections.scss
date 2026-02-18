@@ -45,6 +45,7 @@
     &.setup-members {
       .page-header {
         padding: 1rem 0;
+
         ion-title {
           text-align: left;
         }
@@ -61,6 +62,7 @@
 
       .scrollable-page-content {
         position: static;
+        --overflow: hidden;
       }
 
       .alert {
@@ -77,6 +79,7 @@
         }
 
         padding: 0 1.25rem;
+
         .close-button-label > p {
           color: var(--ion-color-neutral-200) !important;
         }
@@ -167,15 +170,19 @@
         &.rank-0 {
           background: var(--ion-color-primary-400);
         }
+
         &.rank-1 {
           background: var(--ion-color-success-400);
         }
+
         &.rank-2 {
           background: var(--ion-color-warning-400);
         }
+
         &.rank-3 {
           background: var(--ion-color-error-400);
         }
+
         &.rank-4 {
           background: var(--ion-color-primary-300);
         }
@@ -327,6 +334,7 @@
         flex-grow: 2;
         margin-bottom: 0.5rem;
       }
+
       .share-profile-divider-text {
         margin-inline: 0.5rem;
       }
