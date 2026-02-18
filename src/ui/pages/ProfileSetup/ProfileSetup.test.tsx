@@ -932,7 +932,7 @@ describe("Profile setup: use as modal", () => {
     });
 
     await waitFor(() => {
-      expect(getByText("MockGroup #1")).toBeVisible();
+      expect(getByText("MockGroup #2")).toBeVisible();
     });
   });
 
