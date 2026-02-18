@@ -233,7 +233,7 @@ describe("Init group", () => {
 
     await waitFor(() => {
       expect(queryByTestId("setup-signer-modal")).toBeNull();
-      expect(setStateMock).toBeCalled();
+      expect(setStateMock).not.toBeCalled();
     });
   });
 
