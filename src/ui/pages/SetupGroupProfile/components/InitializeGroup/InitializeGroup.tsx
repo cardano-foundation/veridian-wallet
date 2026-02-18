@@ -313,7 +313,6 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
         setOpen={setOpenEditMembers}
         connections={state.scannedConections}
         currentSelectedConnections={state.selectedConnections}
-        currentSignerData={state.signer}
         onSubmit={updateMembersAndSigners}
       />
       <Alert

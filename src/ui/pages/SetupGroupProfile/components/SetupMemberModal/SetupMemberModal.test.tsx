@@ -51,7 +51,6 @@ describe("Setup member modal", () => {
           onSubmit={jest.fn}
           connections={memberConnections}
           currentSelectedConnections={memberConnections}
-          currentSignerData={{ recoverySigners: 1, requiredSigners: 1 }}
         />
       </Provider>
     );
@@ -78,17 +77,17 @@ describe("Setup member modal", () => {
     }
   });
 
-  test("Submit without changes calls onSubmit directly", async () => {
+  test("Submit without changes closes modal", async () => {
     const submit = jest.fn();
-    const { getByText, getByTestId, queryByTestId } = render(
+    const setOpen = jest.fn();
+    const { getByText, queryByTestId } = render(
       <Provider store={makeTestStore()}>
         <SetupMemberModal
           isOpen
-          setOpen={jest.fn}
+          setOpen={setOpen}
           onSubmit={submit}
           connections={memberConnections}
           currentSelectedConnections={[memberConnections[0]]}
-          currentSignerData={{ recoverySigners: 1, requiredSigners: 1 }}
         />
       </Provider>
     );
@@ -102,10 +101,8 @@ describe("Setup member modal", () => {
 
     await waitFor(() => {
       expect(queryByTestId("setup-signer-modal")).toBeNull();
-      expect(submit).toHaveBeenCalledWith([memberConnections[0]], {
-        recoverySigners: 1,
-        requiredSigners: 1,
-      });
+      expect(submit).not.toBeCalled();
+      expect(setOpen).toBeCalledWith(false);
     });
   });
 
@@ -119,7 +116,6 @@ describe("Setup member modal", () => {
           onSubmit={submit}
           connections={memberConnections}
           currentSelectedConnections={[memberConnections[0]]}
-          currentSignerData={{ recoverySigners: 1, requiredSigners: 1 }}
         />
       </Provider>
     );

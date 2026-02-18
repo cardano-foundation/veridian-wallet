@@ -16,7 +16,6 @@ export const SetupMemberModal = ({
   isOpen,
   connections,
   currentSelectedConnections,
-  currentSignerData,
   setOpen,
   onSubmit,
 }: SetupMemberModalProps) => {
@@ -45,7 +44,6 @@ export const SetupMemberModal = ({
     if (hasChanged) {
       setOpenSignerModal(true);
     } else {
-      onSubmit(data, currentSignerData);
       handleClose();
     }
   };
