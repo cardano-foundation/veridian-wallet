@@ -1,5 +1,5 @@
 import { IonModal, IonToggle } from "@ionic/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { KeyStoreKeys, SecureStorage } from "../../../../../core/storage";
 import { i18n } from "../../../../../i18n";
@@ -26,6 +26,10 @@ const ManagePassword = () => {
   const [passwordIsSet, setPasswordIsSet] = useState(
     stateCache?.authentication.passwordIsSet
   );
+
+  useEffect(() => {
+    setPasswordIsSet(stateCache?.authentication.passwordIsSet);
+  }, [stateCache?.authentication.passwordIsSet]);
 
   const [confirmPassword, setConfirmPassword] = useState(false);
   const [alertEnableIsOpen, setAlertEnableIsOpen] = useState(false);

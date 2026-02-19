@@ -450,4 +450,52 @@ describe("Manage password", () => {
       expect(getByTestId("forgot-hint-btn")).toBeVisible();
     });
   });
+
+  test("Updates state when store changes", async () => {
+    const initialState = {
+      stateCache: {
+        routes: [RoutePath.SSI_AGENT],
+        currentProfileId: "default-profile-id",
+        authentication: {
+          loggedIn: false,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: true,
+          seedPhraseIsSet: false,
+        },
+      },
+    };
+
+    const store = makeTestStore(initialState);
+
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <ManagePassword />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      const toggle = getByTestId("settings-item-toggle-password").querySelector(
+        "ion-toggle"
+      );
+      expect(toggle).toHaveAttribute("checked", "true");
+    });
+
+    act(() => {
+      store.dispatch({
+        type: "stateCache/setAuthentication",
+        payload: {
+          ...initialState.stateCache.authentication,
+          passwordIsSet: false,
+        },
+      });
+    });
+
+    await waitFor(() => {
+      const toggle = getByTestId("settings-item-toggle-password").querySelector(
+        "ion-toggle"
+      );
+      expect(toggle).toHaveAttribute("checked", "false");
+    });
+  });
 });
