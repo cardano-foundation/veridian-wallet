@@ -8,7 +8,11 @@ import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getStateCache, setToastMsg } from "../../../store/reducers/stateCache";
+import {
+  getStateCache,
+  setAuthentication,
+  setToastMsg,
+} from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { Alert } from "../../components/Alert";
 import { PageFooter } from "../../components/PageFooter";
@@ -22,11 +26,7 @@ import { showError } from "../../utils/error";
 import "./CreatePassword.scss";
 import { CreatePasswordProps } from "./CreatePassword.types";
 
-const CreatePassword = ({
-  handleClear,
-  setPasswordIsSet,
-  userAction,
-}: CreatePasswordProps) => {
+const CreatePassword = ({ handleClear, userAction }: CreatePasswordProps) => {
   const pageId = "create-password";
   const dispatch = useAppDispatch();
   const stateCache = useAppSelector(getStateCache);
@@ -54,7 +54,12 @@ const CreatePassword = ({
     }
 
     if (!isOnboarding) {
-      setPasswordIsSet?.(true);
+      dispatch(
+        setAuthentication({
+          ...stateCache.authentication,
+          passwordIsSet: true,
+        })
+      );
       userAction?.current === "change" &&
         dispatch(setToastMsg(ToastMsgType.PASSWORD_UPDATED));
       userAction?.current === "enable" &&

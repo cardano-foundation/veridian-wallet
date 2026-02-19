@@ -10,7 +10,10 @@ import { BasicRecord } from "../../../core/agent/records";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
 import { RoutePath } from "../../../routes";
 import { TabsRoutePath } from "../../../routes/paths";
-import { setToastMsg } from "../../../store/reducers/stateCache";
+import {
+  setAuthentication,
+  setToastMsg,
+} from "../../../store/reducers/stateCache";
 import { CustomInputProps } from "../../components/CustomInput/CustomInput.types";
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
@@ -174,7 +177,6 @@ describe("Create Password Page", () => {
     });
     test("User Action: Skip on setup page", async () => {
       const handleClear = jest.fn();
-      const setPasswordIsSet = jest.fn();
 
       const history = createMemoryHistory();
       history.push(RoutePath.CREATE_PASSWORD);
@@ -185,10 +187,7 @@ describe("Create Password Page", () => {
           history={history}
         >
           <Provider store={storeMocked}>
-            <CreatePassword
-              handleClear={handleClear}
-              setPasswordIsSet={setPasswordIsSet}
-            />
+            <CreatePassword handleClear={handleClear} />
           </Provider>
         </IonReactMemoryRouter>
       );
@@ -240,7 +239,6 @@ describe("Create Password Page", () => {
 
     test("Submit password", async () => {
       const handleClear = jest.fn();
-      const setPasswordIsSet = jest.fn();
 
       const history = createMemoryHistory();
       history.push(RoutePath.CREATE_PASSWORD);
@@ -248,10 +246,7 @@ describe("Create Password Page", () => {
       const { getByTestId, getByText } = render(
         <IonReactMemoryRouter history={history}>
           <Provider store={storeMocked}>
-            <CreatePassword
-              handleClear={handleClear}
-              setPasswordIsSet={setPasswordIsSet}
-            />
+            <CreatePassword handleClear={handleClear} />
           </Provider>
         </IonReactMemoryRouter>
       );
@@ -308,12 +303,10 @@ describe("Create Password Page", () => {
 
     test("User Action: Change", async () => {
       const handleClear = jest.fn();
-      const setPasswordIsSet = jest.fn();
       const { getByTestId, queryByTestId } = render(
         <Provider store={storeMocked}>
           <CreatePassword
             handleClear={handleClear}
-            setPasswordIsSet={setPasswordIsSet}
             userAction={{
               current: "change",
             }}
@@ -364,12 +357,10 @@ describe("Create Password Page", () => {
 
     test("User Action: enable", async () => {
       const handleClear = jest.fn();
-      const setPasswordIsSet = jest.fn();
       const { getByTestId, queryByTestId } = render(
         <Provider store={storeMocked}>
           <CreatePassword
             handleClear={handleClear}
-            setPasswordIsSet={setPasswordIsSet}
             userAction={{
               current: "enable",
             }}
@@ -412,6 +403,12 @@ describe("Create Password Page", () => {
 
       await waitFor(() => {
         expect(dispatchMock).toBeCalledWith(
+          setAuthentication({
+            ...initialStateWithPassword.stateCache.authentication,
+            passwordIsSet: true,
+          } as any)
+        );
+        expect(dispatchMock).toBeCalledWith(
           setToastMsg(ToastMsgType.PASSWORD_CREATED)
         );
       });
@@ -440,13 +437,11 @@ describe("Create Password Page", () => {
     };
 
     const handleClear = jest.fn();
-    const setPasswordIsSet = jest.fn();
     const { queryByText } = render(
       <MemoryRouter initialEntries={[TabsRoutePath.CREDENTIALS]}>
         <Provider store={storeMocked}>
           <CreatePassword
             handleClear={handleClear}
-            setPasswordIsSet={setPasswordIsSet}
             userAction={{
               current: "enable",
             }}
