@@ -214,7 +214,7 @@ describe("Forgot Passcode Page", () => {
     await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(onCloseMock).toHaveBeenCalled();
+      expect(onCloseMock).toHaveBeenCalledWith(true);
     });
   }, 10000);
 });

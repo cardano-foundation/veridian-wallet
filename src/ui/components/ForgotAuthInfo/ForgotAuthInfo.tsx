@@ -181,7 +181,7 @@ const ForgotAuthInfo = ({
               onPasscodeChange={(passcode, originalPassCode) => {
                 setReEnterPasscodeStep(!!originalPassCode);
               }}
-              onCreateSuccess={handleClose}
+              onCreateSuccess={() => handleClose(true)}
               overrideAlertZIndex={overrideAlertZIndex}
               changePasscodeMode
             />
