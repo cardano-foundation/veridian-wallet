@@ -54,7 +54,7 @@ const CreatePassword = ({
     }
 
     if (!isOnboarding) {
-      setPasswordIsSet(true);
+      setPasswordIsSet?.(true);
       userAction?.current === "change" &&
         dispatch(setToastMsg(ToastMsgType.PASSWORD_UPDATED));
       userAction?.current === "enable" &&
