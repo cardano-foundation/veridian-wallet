@@ -87,7 +87,17 @@ const ConnectionsBody = ({
       className={classes}
       ref={container}
     >
-      <IonContent className="connections-list">
+      <IonContent
+        className="connections-list"
+        scrollY={
+          !search ||
+          mappedConnections.flatMap((item) =>
+            item.value.filter((connection) =>
+              connection.label.toLowerCase().includes(search.toLowerCase())
+            )
+          ).length > 0
+        }
+      >
         <IonGrid>
           <IonRow>
             <IonCol size="12">
