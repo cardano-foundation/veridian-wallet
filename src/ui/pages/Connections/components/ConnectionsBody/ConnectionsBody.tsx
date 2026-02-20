@@ -2,7 +2,6 @@ import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
 import {
   IonCol,
-  IonContent,
   IonGrid,
   IonItemDivider,
   IonItemGroup,
@@ -87,17 +86,7 @@ const ConnectionsBody = ({
       className={classes}
       ref={container}
     >
-      <IonContent
-        className="connections-list"
-        scrollY={
-          !search ||
-          mappedConnections.flatMap((item) =>
-            item.value.filter((connection) =>
-              connection.label.toLowerCase().includes(search.toLowerCase())
-            )
-          ).length > 0
-        }
-      >
+      <div className="connections-list">
         <IonGrid>
           <IonRow>
             <IonCol size="12">
@@ -137,7 +126,7 @@ const ConnectionsBody = ({
             </IonCol>
           </IonRow>
         </IonGrid>
-      </IonContent>
+      </div>
       {!search && <AlphabetSelector />}
     </div>
   );

@@ -3,14 +3,6 @@ import { ConnectionsBody } from "./ConnectionsBody";
 import { ConnectionsBodyProps } from "./ConnectionsBody.types";
 
 jest.mock("@ionic/react", () => ({
-  IonContent: ({ children, scrollY }: any) => (
-    <div
-      data-testid="ion-content"
-      data-scrolly={scrollY.toString()}
-    >
-      {children}
-    </div>
-  ),
   IonGrid: ({ children }: any) => <div>{children}</div>,
   IonRow: ({ children }: any) => <div>{children}</div>,
   IonCol: ({ children }: any) => <div>{children}</div>,
@@ -56,31 +48,13 @@ describe("ConnectionsBody", () => {
     setSearch: jest.fn(),
   };
 
-  it("should have scrollY={true} when search is empty string", () => {
-    const { getByTestId } = render(<ConnectionsBody {...defaultProps} />);
-    const content = getByTestId("ion-content");
-    expect(content.getAttribute("data-scrolly")).toBe("true");
-  });
-
-  it("should have scrollY={true} when search has results", () => {
+  it("should render SearchConnectionContent when search has a value", () => {
     const { getByTestId } = render(
       <ConnectionsBody
         {...defaultProps}
         search="Alice"
       />
     );
-    const content = getByTestId("ion-content");
-    expect(content.getAttribute("data-scrolly")).toBe("true");
-  });
-
-  it("should have scrollY={false} when search has no results", () => {
-    const { getByTestId } = render(
-      <ConnectionsBody
-        {...defaultProps}
-        search="Zyx"
-      />
-    );
-    const content = getByTestId("ion-content");
-    expect(content.getAttribute("data-scrolly")).toBe("false");
+    expect(getByTestId("search-connection-content")).toBeDefined();
   });
 });

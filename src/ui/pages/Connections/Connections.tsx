@@ -227,6 +227,14 @@ const Connections = () => {
         title={`${i18n.t("tabs.connections.tab.title")}`}
         additionalButtons={<AdditionalButtons />}
         header
+        scrollY={
+          !search ||
+          mappedConnections.flatMap((item) =>
+            item.value.filter((connection) =>
+              connection.label.toLowerCase().includes(search.toLowerCase())
+            )
+          ).length > 0
+        }
         headerCustomContent={
           !showPlaceholder && (
             <div className="search-input-row">
