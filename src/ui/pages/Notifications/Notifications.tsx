@@ -240,6 +240,11 @@ const Notifications = () => {
               {i18n.t("tabs.notifications.tab.empty")}
             </p>
           )}
+          {notificationsEarlier.length === 0 && (
+            <p className="notification-empty">
+              {i18n.t("tabs.notifications.tab.sections.earlier.end")}
+            </p>
+          )}
         </div>
       </TabLayout>
       <Profiles
