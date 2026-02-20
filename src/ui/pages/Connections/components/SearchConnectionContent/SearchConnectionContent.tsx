@@ -46,11 +46,7 @@ const SearchConnectionContent = ({
   onItemClick,
   keyword,
 }: SearchConnectionContentProps) => {
-  const connections = mappedConnections.flatMap((item) => {
-    return item.value.filter((item) =>
-      item.label.toLowerCase().includes(keyword.toLowerCase())
-    );
-  });
+  const connections = mappedConnections.flatMap((item) => item.value);
 
   if (connections.length === 0) {
     return (
