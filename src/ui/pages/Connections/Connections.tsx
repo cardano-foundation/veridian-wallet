@@ -242,7 +242,6 @@ const Connections = () => {
         title={`${i18n.t("tabs.connections.tab.title")}`}
         additionalButtons={<AdditionalButtons />}
         header
-        scrollY={!search || filteredConnections.length > 0}
         headerCustomContent={
           !showPlaceholder && (
             <div className="search-input-row">
