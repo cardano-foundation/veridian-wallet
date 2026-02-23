@@ -9,6 +9,7 @@ interface SideSliderProps {
   className?: string;
   animation?: boolean;
   onClose?: () => void;
+  onDidDismiss?: () => void;
 }
 
 export const ANIMATION_DURATION = 300;

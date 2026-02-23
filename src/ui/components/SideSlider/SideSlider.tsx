@@ -16,6 +16,7 @@ const SideSlider = ({
   className,
   animation = true,
   onClose,
+  onDidDismiss,
 }: SideSliderProps) => {
   const baseClass = combineClassNames(
     className,
@@ -51,12 +52,13 @@ const SideSlider = ({
 
     const timer = setTimeout(() => {
       setInnerOpen(false);
+      onDidDismiss?.();
     }, ANIMATION_DURATION);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [isOpen, baseClass, animation]);
+  }, [isOpen, baseClass, animation, onDidDismiss]);
 
   if (renderAsModal) {
     return (
@@ -65,7 +67,10 @@ const SideSlider = ({
         data-testid="side-slider"
         className={cssClass}
         animated={false}
-        onDidDismiss={onClose}
+        onDidDismiss={() => {
+          onClose?.();
+          onDidDismiss?.();
+        }}
       >
         {children}
       </IonModal>

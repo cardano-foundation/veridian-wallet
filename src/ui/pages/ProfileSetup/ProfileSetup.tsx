@@ -19,7 +19,9 @@ import {
   setPendingJoinGroupMetadata,
   setToastMsg,
   showNoWitnessAlert,
+  showGlobalLoading,
 } from "../../../store/reducers/stateCache";
+import { GlobalLoadingType } from "../../../store/reducers/stateCache/stateCache.types";
 import { updateReduxState } from "../../../store/utils";
 import { ResponsivePageLayout } from "../../components/layout/ResponsivePageLayout";
 import { PageFooter } from "../../components/PageFooter";
@@ -218,8 +220,19 @@ export const ProfileSetup = ({
       }
 
       if (isModal) {
-        onClose?.();
-        navToCredentials(identifier);
+        if (isGroup) {
+          dispatch(showGlobalLoading(GlobalLoadingType.SHOWBG));
+          onClose?.(false, () => {
+            dispatch(showGlobalLoading(GlobalLoadingType.NONE));
+          });
+
+          ionRouter.push(
+            RoutePath.GROUP_PROFILE_SETUP.replace(":id", identifier)
+          );
+        } else {
+          onClose?.();
+          navToCredentials(identifier);
+        }
         return;
       }
 

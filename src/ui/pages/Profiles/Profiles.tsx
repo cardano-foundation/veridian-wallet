@@ -68,8 +68,11 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
   const [openProfileDetail, setOpenProfileDetail] = useState(false);
   const [openSetupProfile, setOpenSetupProfile] = useState(false);
   const [isJoinGroupMode, setIsJoinGroupMode] = useState(false);
-  const [missingNameIdentifier, setMissingNameIdentifier] =
-    useState<IdentifierShortDetails>();
+  const [missingNameIdentifier, setMissingNameIdentifier] = useState<
+    IdentifierShortDetails | undefined
+  >();
+
+  const setupProfileOnFinishRef = useRef<(() => void) | undefined>(undefined);
   const isOpenFromDetail = useRef(false);
 
   const handleClose = () => {
@@ -284,9 +287,18 @@ const Profiles = ({ isOpen, setIsOpen }: ProfilesProps) => {
         renderAsModal
         animation={false}
         onClose={handleCloseSetupProfile}
+        onDidDismiss={() => {
+          if (setupProfileOnFinishRef.current) {
+            setupProfileOnFinishRef.current();
+            setupProfileOnFinishRef.current = undefined;
+          }
+        }}
       >
         <ProfileSetup
-          onClose={(cancel) => {
+          onClose={(cancel, onFinish) => {
+            if (onFinish) {
+              setupProfileOnFinishRef.current = onFinish;
+            }
             handleCloseSetupProfile();
             if (!cancel) {
               setIsOpen(false);
