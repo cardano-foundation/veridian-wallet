@@ -14,8 +14,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: calc(100% - 0.75rem);
-    overflow: hidden;
+    height: calc(100vh - 9.5rem);
 
     ion-icon {
       color: var(--ion-color-neutral-400);
