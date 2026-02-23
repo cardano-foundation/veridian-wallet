@@ -116,14 +116,15 @@ const Connections = () => {
 
   const filteredConnections = useMemo(() => {
     if (!search) return mappedConnections;
-    return mappedConnections
-      .map((item) => ({
-        ...item,
-        value: item.value.filter((connection) =>
-          connection.label.toLowerCase().includes(search.toLowerCase())
-        ),
-      }))
-      .filter((item) => item.value.length > 0);
+    return mappedConnections.reduce((acc, item) => {
+      const filteredValue = item.value.filter((connection) =>
+        connection.label.toLowerCase().includes(search.toLowerCase())
+      );
+      if (filteredValue.length > 0) {
+        acc.push({ ...item, value: filteredValue });
+      }
+      return acc;
+    }, [] as typeof mappedConnections);
   }, [mappedConnections, search]);
 
   const getConnectionShortDetails = async (
