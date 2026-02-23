@@ -77,14 +77,7 @@ const NotificationSection = forwardRef<
       if (!isScrollable && displayLength < data.length) {
         loadMore();
       }
-    }, [
-      displayLength,
-      data.length,
-      enableInfiniteScroll,
-      loadMore,
-      pageId,
-      infiniteScrollActivated,
-    ]);
+    }, [displayLength, data.length, enableInfiniteScroll]);
 
     if (!data.length) return null;
 

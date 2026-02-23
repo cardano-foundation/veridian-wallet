@@ -235,11 +235,6 @@ const Notifications = () => {
             testId="notifications-tab-section-earlier"
             ref={earlierNotificationRef}
           />
-          {filteredNotification.length === 0 && (
-            <p className="notification-empty">
-              {i18n.t("tabs.notifications.tab.empty")}
-            </p>
-          )}
           {notificationsEarlier.length === 0 && (
             <p className="notification-empty">
               {i18n.t("tabs.notifications.tab.sections.earlier.end")}
