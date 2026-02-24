@@ -8,6 +8,8 @@ interface VerifySeedPhraseModalProps {
 interface VerifyStageProps {
   seedPhrase: string[];
   onVerifySuccess: () => void;
+  handleClose: () => void;
+  pageId: string;
 }
 
 enum Step {

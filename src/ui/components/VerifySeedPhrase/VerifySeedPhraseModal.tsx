@@ -2,16 +2,14 @@ import { IonModal } from "@ionic/react";
 import { useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { i18n } from "../../../i18n";
-import { ScrollablePageLayout } from "../../components/layout/ScrollablePageLayout";
-import { PageHeader } from "../../components/PageHeader";
 import { RecoverySeedPhrase } from "../../components/Settings/components/RecoverySeedPhrase";
 import { showError } from "../../utils/error";
+import { combineClassNames } from "../../utils/style";
 import {
   Step,
   VerifySeedPhraseModalProps,
 } from "./VerifySeedPhraseModal.types";
 import { VerifyStage } from "./VerifyStage";
-import { combineClassNames } from "../../utils/style";
 
 const VerifySeedPhraseModal = ({
   setShow,
@@ -46,6 +44,10 @@ const VerifySeedPhraseModal = ({
     }
   };
 
+  const handleCloseButtonClick = () => {
+    return step === Step.View ? handleClose() : setStep(Step.View);
+  };
+
   const getContent = () => {
     switch (step) {
       case Step.Verify:
@@ -53,32 +55,23 @@ const VerifySeedPhraseModal = ({
           <VerifyStage
             onVerifySuccess={verifySuccess}
             seedPhrase={seedPhrase}
+            handleClose={handleClose}
+            pageId={pageId}
           />
         );
       default:
         return (
           <RecoverySeedPhrase
+            title={i18n.t("verifyseedphrase.title.recovery")}
             onClose={handleClose}
             mode="verify"
             starVerify={startVerify}
+            pageId={pageId}
+            showCloseButton={showCancel}
           />
         );
     }
   };
-
-  const handleCloseButtonClick = () => {
-    return step === Step.View ? handleClose() : setStep(Step.View);
-  };
-
-  const title =
-    step === Step.View
-      ? i18n.t("verifyseedphrase.title.recovery")
-      : i18n.t("verifyseedphrase.title.verify");
-
-  const back =
-    step === Step.View
-      ? i18n.t("verifyseedphrase.button.cancel")
-      : i18n.t("verifyseedphrase.button.back");
 
   return (
     <IonModal
@@ -88,20 +81,7 @@ const VerifySeedPhraseModal = ({
       isOpen={show}
       onDidDismiss={handleCloseButtonClick}
     >
-      <ScrollablePageLayout
-        pageId={pageId}
-        activeStatus
-        header={
-          <PageHeader
-            title={title}
-            closeButton={showCancel || step !== Step.View}
-            closeButtonLabel={back}
-            closeButtonAction={handleCloseButtonClick}
-          />
-        }
-      >
-        {getContent()}
-      </ScrollablePageLayout>
+      {getContent()}
     </IonModal>
   );
 };

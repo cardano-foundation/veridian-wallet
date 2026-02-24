@@ -65,7 +65,11 @@ describe("Recovery Phrase", () => {
   test("Render", async () => {
     const { getByTestId, getByText, queryByText } = render(
       <Provider store={storeMocked}>
-        <RecoverySeedPhrase onClose={jest.fn} />
+        <RecoverySeedPhrase
+          title={TRANSLATIONS.settings.sections.security.seedphrase.page.title}
+          pageId="settings"
+          onClose={jest.fn}
+        />
       </Provider>
     );
 
@@ -105,7 +109,11 @@ describe("Recovery Phrase", () => {
   test("Show phrase", async () => {
     const { queryByTestId, getByTestId, getByText, queryByText } = render(
       <Provider store={storeMocked}>
-        <RecoverySeedPhrase onClose={jest.fn} />
+        <RecoverySeedPhrase
+          title={TRANSLATIONS.settings.sections.security.seedphrase.page.title}
+          pageId="settings"
+          onClose={jest.fn}
+        />
       </Provider>
     );
 

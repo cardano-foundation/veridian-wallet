@@ -7,10 +7,13 @@ import { PageFooter } from "../PageFooter";
 import { SeedPhraseModule } from "../SeedPhraseModule";
 import { VerifyStageProps } from "./VerifySeedPhraseModal.types";
 import "./VerifyStage.scss";
+import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
+import { PageHeader } from "../PageHeader";
 
 const VerifyStage = ({
   seedPhrase: originalSeedPhrase,
   onVerifySuccess,
+  handleClose,
 }: VerifyStageProps) => {
   const pageId = "verify-seed-phrase";
   const [seedPhraseRemaining, setSeedPhraseRemaining] = useState<string[]>([]);
@@ -83,52 +86,65 @@ const VerifyStage = ({
 
   return (
     <>
-      <div className="content-container">
-        <div>
-          <p
-            className="paragraph-top"
-            data-testid={`${pageId}-paragraph-top`}
-          >
-            {i18n.t("verifyseedphrase.paragraph.top")}
-          </p>
-          <SeedPhraseModule
-            testId="matching-seed-phrase-container"
-            seedPhrase={seedPhraseSelected}
-            emptyWord={!!seedPhraseRemaining.length}
-            removeSeedPhraseSelected={removeSeedPhraseSelected}
+      <ScrollablePageLayout
+        pageId={pageId}
+        activeStatus
+        header={
+          <PageHeader
+            title={`${i18n.t("verifyseedphrase.title.verify")}`}
+            closeButton
+            closeButtonLabel={`${i18n.t("verifyseedphrase.button.back")}`}
+            closeButtonAction={handleClose}
           />
-          <SeedPhraseModule
-            testId="original-seed-phrase-container"
-            seedPhrase={seedPhraseRemaining}
-            addSeedPhraseSelected={addSeedPhraseSelected}
-            hideSeedNumber
-          />
-          {seedPhraseSelected.length > 0 && (
-            <IonButton
-              onClick={() => setClearAlertOpen(true)}
-              fill="outline"
-              data-testid="verify-clear-button"
-              className="clear-button secondary-button"
+        }
+      >
+        <div className="content-container">
+          <div>
+            <p
+              className="paragraph-top"
+              data-testid={`${pageId}-paragraph-top`}
             >
-              <IonIcon
-                slot="start"
-                icon={backspaceOutline}
-              />
-              {i18n.t("verifyseedphrase.onboarding.button.clear")}
-            </IonButton>
-          )}
+              {i18n.t("verifyseedphrase.paragraph.top")}
+            </p>
+            <SeedPhraseModule
+              testId="matching-seed-phrase-container"
+              seedPhrase={seedPhraseSelected}
+              emptyWord={!!seedPhraseRemaining.length}
+              removeSeedPhraseSelected={removeSeedPhraseSelected}
+            />
+            <SeedPhraseModule
+              testId="original-seed-phrase-container"
+              seedPhrase={seedPhraseRemaining}
+              addSeedPhraseSelected={addSeedPhraseSelected}
+              hideSeedNumber
+            />
+            {seedPhraseSelected.length > 0 && (
+              <IonButton
+                onClick={() => setClearAlertOpen(true)}
+                fill="outline"
+                data-testid="verify-clear-button"
+                className="clear-button secondary-button"
+              >
+                <IonIcon
+                  slot="start"
+                  icon={backspaceOutline}
+                />
+                {i18n.t("verifyseedphrase.onboarding.button.clear")}
+              </IonButton>
+            )}
+          </div>
+          <PageFooter
+            pageId={pageId}
+            primaryButtonText={`${i18n.t(
+              "verifyseedphrase.onboarding.button.continue"
+            )}`}
+            primaryButtonAction={() => handleContinue()}
+            primaryButtonDisabled={
+              !(originalSeedPhrase.length == seedPhraseSelected.length)
+            }
+          />
         </div>
-        <PageFooter
-          pageId={pageId}
-          primaryButtonText={`${i18n.t(
-            "verifyseedphrase.onboarding.button.continue"
-          )}`}
-          primaryButtonAction={() => handleContinue()}
-          primaryButtonDisabled={
-            !(originalSeedPhrase.length == seedPhraseSelected.length)
-          }
-        />
-      </div>
+      </ScrollablePageLayout>
       <Alert
         isOpen={alertIsOpen}
         setIsOpen={setAlertIsOpen}

@@ -4,13 +4,14 @@ import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import { PageHeader } from "../PageHeader";
 import { SideSlider } from "../SideSlider";
 import { ManagePassword } from "./components/ManagePassword";
+import { RecoverySeedPhrase } from "./components/RecoverySeedPhrase";
 import { SettingsList } from "./components/SettingsList";
 import { TermsAndPrivacy } from "./components/TermsAndPrivacy";
-import { SettingScreen, SettingsProps } from "./Settings.types";
-import { RecoverySeedPhrase } from "./components/RecoverySeedPhrase";
 import "./Settings.scss";
+import { SettingScreen, SettingsProps } from "./Settings.types";
 
 export const Settings = ({ show, setShow }: SettingsProps) => {
+  const pageId = "settings";
   const [screen, setScreen] = useState(SettingScreen.Settings);
 
   const handleClose = () => {
@@ -41,8 +42,6 @@ export const Settings = ({ show, setShow }: SettingsProps) => {
         return <ManagePassword />;
       case SettingScreen.TermsAndPrivacy:
         return <TermsAndPrivacy />;
-      case SettingScreen.RecoverySeedPhrase:
-        return <RecoverySeedPhrase onClose={handleClose} />;
       default:
         return (
           <SettingsList
@@ -60,26 +59,34 @@ export const Settings = ({ show, setShow }: SettingsProps) => {
       className="settings-modal"
       onClose={() => setShow(false)}
     >
-      <ScrollablePageLayout
-        pageId="settings"
-        activeStatus={show}
-        header={
-          <PageHeader
-            backButton={true}
-            onBack={handleClose}
-            title={title}
-          />
-        }
-      >
-        <div
-          className={`${title?.toLowerCase().replace(" ", "-")}-content${
-            screen === SettingScreen.Settings ? "" : " nested-content"
-          }`}
-          data-testid={`${title?.toLowerCase().replace(" ", "-")}-content`}
+      {screen === SettingScreen.RecoverySeedPhrase ? (
+        <RecoverySeedPhrase
+          onClose={handleClose}
+          pageId={pageId}
+          title={title}
+        />
+      ) : (
+        <ScrollablePageLayout
+          pageId={pageId}
+          activeStatus={show}
+          header={
+            <PageHeader
+              backButton={true}
+              onBack={handleClose}
+              title={title}
+            />
+          }
         >
-          {getCurrentScreen()}
-        </div>
-      </ScrollablePageLayout>
+          <div
+            className={`${title?.toLowerCase().replace(" ", "-")}-content${
+              screen === SettingScreen.Settings ? "" : " nested-content"
+            }`}
+            data-testid={`${title?.toLowerCase().replace(" ", "-")}-content`}
+          >
+            {getCurrentScreen()}
+          </div>
+        </ScrollablePageLayout>
+      )}
     </SideSlider>
   );
 };

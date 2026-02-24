@@ -52,8 +52,8 @@
   }
 }
 
-.recovery-seed-phrase-page-footer {
-  margin: 1rem 0;
+.recovery-seed-phrase-page-footer.ios {
+  margin-bottom: var(--ion-safe-area-bottom);
   padding: 0 !important;
 }
 
