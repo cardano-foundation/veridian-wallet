@@ -77,7 +77,7 @@
     .confirm-connect-submit {
       width: 100%;
       --border-radius: 2rem;
-      margin-bottom: 2rem;
+      margin-bottom: 0.5rem;
 
       &.md {
         --box-shadow: none;
@@ -131,10 +131,6 @@
 
       .confirm-modal-name-title {
         font-size: 0.875rem;
-      }
-
-      .confirm-connect-submit {
-        margin-bottom: 1.5rem;
       }
     }
   }

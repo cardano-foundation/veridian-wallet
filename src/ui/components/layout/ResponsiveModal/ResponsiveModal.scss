@@ -17,7 +17,7 @@ ion-modal.responsive-modal {
     flex-direction: column;
     justify-content: end;
     padding: 1.25rem;
-    padding-bottom: calc(var(--ion-safe-area-bottom) + 1.25rem);
+    padding-bottom: var(--ion-safe-area-bottom);
     border-radius: 1rem 1rem 0rem 0rem;
     background: var(--ion-color-neutral-200);
 
