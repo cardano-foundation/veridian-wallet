@@ -25,8 +25,13 @@ import { useAppIonRouter } from "../../hooks";
 import { showError } from "../../utils/error";
 import "./CreatePassword.scss";
 import { CreatePasswordProps } from "./CreatePassword.types";
+import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
 
-const CreatePassword = ({ handleClear, userAction }: CreatePasswordProps) => {
+const CreatePassword = ({
+  handleClear,
+  userAction,
+  showSkip = false,
+}: CreatePasswordProps) => {
   const pageId = "create-password";
   const dispatch = useAppDispatch();
   const stateCache = useAppSelector(getStateCache);
@@ -39,6 +44,7 @@ const CreatePassword = ({ handleClear, userAction }: CreatePasswordProps) => {
 
   const handleContinue = async (skipped: boolean) => {
     if (skipped) {
+      await SecureStorage.delete(KeyStoreKeys.APP_OP_PASSWORD);
       await Agent.agent.basicStorage
         .createOrUpdateBasicRecord(
           new BasicRecord({
@@ -124,7 +130,7 @@ const CreatePassword = ({ handleClear, userAction }: CreatePasswordProps) => {
                   )}`
                 : undefined
             }
-            actionButton={isOnboarding}
+            actionButton={isOnboarding || showSkip}
             actionButtonLabel={`${i18n.t("createpassword.button.skip")}`}
             actionButtonAction={handleSkip}
           />

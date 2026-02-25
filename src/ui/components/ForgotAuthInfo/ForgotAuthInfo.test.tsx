@@ -188,10 +188,14 @@ describe("Forgot Passcode Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpasscode.title)
+        getByText(
+          EN_TRANSLATIONS.settings.sections.security.changepin.createpasscode
+        )
       ).toBeVisible();
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpasscode.description)
+        getByText(
+          EN_TRANSLATIONS.settings.sections.security.changepin.description
+        )
       ).toBeVisible();
     });
 
@@ -204,7 +208,7 @@ describe("Forgot Passcode Page", () => {
     });
 
     const text = await findByText(
-      EN_TRANSLATIONS.forgotauth.newpasscode.reenterpasscode
+      EN_TRANSLATIONS.settings.sections.security.changepin.reenterpasscode
     );
 
     await waitFor(() => {
@@ -223,6 +227,7 @@ describe("Forgot Password Page", () => {
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
+      routes: [],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -420,9 +425,7 @@ describe("Forgot Password Page", () => {
     });
 
     await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpassword.title)
-      ).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.createpassword.change)).toBeVisible();
       expect(
         getByText(EN_TRANSLATIONS.forgotauth.newpassword.description)
       ).toBeVisible();
@@ -438,12 +441,12 @@ describe("Forgot Password Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpassword.alert.text)
+        getByText(EN_TRANSLATIONS.createpassword.alert.text)
       ).toBeVisible();
     });
 
     fireEvent.click(
-      getByText(EN_TRANSLATIONS.forgotauth.newpassword.alert.button.confirm)
+      getByText(EN_TRANSLATIONS.createpassword.alert.button.confirm)
     );
 
     expect(SecureStorage.delete).toBeCalledWith(KeyStoreKeys.APP_OP_PASSWORD);

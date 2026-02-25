@@ -11,6 +11,7 @@ interface PasswordRegexProps {
 interface CreatePasswordProps {
   handleClear: () => void;
   userAction?: MutableRefObject<string>;
+  showSkip?: boolean;
 }
 
 export type { PasswordRegexProps, RegexItemProps, CreatePasswordProps };

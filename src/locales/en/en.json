@@ -1301,22 +1301,10 @@
       "title": "Forgot password",
       "description": "Please verify your recovery phrase to reset your password. To start typing click on the first option."
     },
-    "newpasscode": {
-      "title": "New PIN",
-      "description": "Create a new PIN to re-secure your wallet and perform operations",
-      "reenterpasscode": "Re-enter PIN"
-    },
     "newpassword": {
       "title": "New password",
       "description": "Create a new password",
-      "skip": "Skip",
-      "alert": {
-        "text": "Are you sure you want to skip? By doing this, you will be required to use your passcode for any protected operations. You can, of course, set this up later if you prefer.",
-        "button": {
-          "confirm": "Yes, skip",
-          "cancel": "Cancel"
-        }
-      }
+      "skip": "Skip"
     }
   },
   "setupgroupprofile": {
