@@ -84,6 +84,10 @@
       border-radius: 1rem !important;
       border: none;
 
+      @media screen and (min-width: 250px) and (max-width: 370px) {
+        font-size: 0.8rem;
+      }
+
       .alert-button-inner {
         line-height: 1.5rem;
       }
