@@ -14,7 +14,7 @@ import {
   mailUnreadOutline,
   trashOutline,
 } from "ionicons/icons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Trans } from "react-i18next";
 import {
   KeriaNotification,
@@ -45,6 +45,7 @@ const NotificationItem = ({ item, onClick }: NotificationItemProps) => {
     connectionsCache,
     multisigConnectionsCache,
   });
+  const slidingRef = useRef<any>(null);
 
   const referIcon = (item: KeriaNotification) => {
     switch (item.a.r) {
@@ -61,6 +62,7 @@ const NotificationItem = ({ item, onClick }: NotificationItemProps) => {
   };
 
   const toggleReadStatus = async () => {
+    slidingRef?.current?.close();
     try {
       if (item.read) {
         await Agent.agent.keriaNotifications.unreadNotification(item.id);
@@ -98,7 +100,10 @@ const NotificationItem = ({ item, onClick }: NotificationItemProps) => {
 
   return (
     <>
-      <IonItemSliding className="notification-tab-item-slide">
+      <IonItemSliding
+        ref={slidingRef}
+        className="notification-tab-item-slide"
+      >
         <IonItem
           onClick={() => onClick(item)}
           className={`notifications-tab-item${item.read ? "" : " unread"}`}
