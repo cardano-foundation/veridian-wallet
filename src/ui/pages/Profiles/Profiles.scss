@@ -29,10 +29,11 @@
   }
 
   .profiles-selected-profile {
-    margin: 2rem 0 1.5rem;
+    padding: 2rem 0 1.5rem;
+    border-bottom: 1px solid var(--ion-color-neutral-300);
 
     @media screen and (min-width: 250px) and (max-width: 374px) {
-      margin: 1.2rem 0;
+      padding: 1.2rem 0;
     }
 
     .profiles-list-item {
@@ -45,7 +46,7 @@
   }
 
   .profiles-list {
-    > * {
+    > *:not(:first-child) {
       border-top: 1px solid var(--ion-color-neutral-300);
     }
   }
@@ -133,7 +134,12 @@
   }
 
   .profiles-options {
+    margin-top: 1rem;
     min-height: 6rem;
+
+    @media screen and (min-width: 250px) and (max-width: 374px) {
+      margin-top: 0.8rem;
+    }
   }
 
   .profiles-options-button {
