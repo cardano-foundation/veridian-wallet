@@ -370,7 +370,6 @@ const CredentialRequestInformation = ({
                 "tabs.notifications.details.credential.request.information.proposalfrom"
               )}`}
               className="request-from"
-              showIcon
             >
               <CardDetailsItem
                 info={
