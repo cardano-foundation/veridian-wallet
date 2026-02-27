@@ -10,7 +10,7 @@
         "description": "Your identity is encrypted and stored safely on your device. Only you have access"
       },
       {
-        "title": "Privacy First",
+        "title": "Privacy first",
         "description": "Control when to present your credentials, keeping your personal data private"
       },
       {
@@ -20,7 +20,7 @@
     ],
     "getstarted": {
       "button": {
-        "label": "Get Started"
+        "label": "Get started"
       }
     },
     "alreadywallet": {
@@ -122,7 +122,7 @@
     "privacy": {
       "overlay": {
         "text": "Press the ‘view recovery phrase’ button when you’re ready to see your recovery phrase. Remember to make sure nobody is looking!",
-        "button": "View Recovery Phrase"
+        "button": "View recovery phrase"
       }
     },
     "alert": {
@@ -158,7 +158,7 @@
     "termsandconditions": {
       "text": "I have read and agree to the <0>{{clickableTerms}}</0> and <1>{{clickablePrivacy}}</1>.",
       "terms": "Terms of Use",
-      "privacy": "Privacy Policy"
+      "privacy": "Privacy policy"
     }
   },
   "lockpage": {
@@ -330,7 +330,7 @@
       }
     },
     "button": {
-      "continue": "Create Password",
+      "continue": "Create password",
       "skip": "Skip"
     },
     "alert": {
@@ -576,7 +576,7 @@
             "privacy": "Privacy policy"
           }
         },
-        "version": "App Version"
+        "version": "App version"
       },
       "deletewallet": {
         "button": "Delete wallet",
@@ -681,7 +681,7 @@
       "missingoncloud": "We couldn’t locate this profile in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this profile, tap “Delete profile” to remove it.",
       "nowitness": "There was an issue creating this profile. Please contact your cloud provider for more information. To remove it from your pending list, tap “Delete profile”.",
       "button": {
-        "delete": "Delete Profile",
+        "delete": "Delete profile",
         "retry": "Retry"
       }
     },
@@ -739,13 +739,13 @@
       "confirm": "Ok"
     },
     "inputpidmodal": {
-      "header": "Paste Peer ID",
+      "header": "Paste peer ID",
       "cancel": "Cancel",
       "confirm": "Confirm",
       "scanQR": "Scan QR code"
     },
     "connectionhistory": {
-      "title": "Connection History",
+      "title": "Connection history",
       "action": {
         "delete": "Delete"
       },
@@ -791,12 +791,12 @@
         "title": "Hi, {{name}}",
         "tiles": {
           "scan": {
-            "badge": "Coming Soon",
+            "badge": "Coming soon",
             "title": "Scan to login",
             "text": "Sign in to apps, games, social media, banking, and other services"
           },
           "dapps": {
-            "title": "Cardano Connect",
+            "title": "Cardano connect",
             "text": "Use your Veridian wallet to access Cardano applications online"
           },
           "connections": {
@@ -883,7 +883,7 @@
           "issuancedate": "Issuance Date Time",
           "lei": "LEI"
         },
-        "schemaversion": "Schema Version",
+        "schemaversion": "Schema version",
         "issuer": "Issuer",
         "status": {
           "label": "Status",
@@ -933,7 +933,7 @@
         "title": "History",
         "done": "Done",
         "select": "Select",
-        "selectall": "Select All",
+        "selectall": "Select all",
         "deselectall": "Deselect all",
         "cancel": "Cancel",
         "delete": "Delete",
@@ -1029,7 +1029,7 @@
           "back": "Back",
           "choosecredential": "Choose credential",
           "providecredential": "Provide credential",
-          "presentcredential": "Present Credential",
+          "presentcredential": "Present credential",
           "addcred": "Add credential",
           "done": "Done",
           "ok": "Ok",
@@ -1487,7 +1487,7 @@
     "credentialsrestored": "Credentials restored",
     "connectiondeleted": "Connection deleted",
     "connectionerror": "Something went wrong. Please try again.",
-    "connectionrequestincoming": "New Connection Request",
+    "connectionrequestincoming": "New connection request",
     "connectionrequestpending": "Connection request pending",
     "newconnectionadded": "New connection added",
     "credentialrequestpending": "Credential request pending",
@@ -1650,14 +1650,14 @@
     "ios": {
       "os": "Required iOS",
       "youros": "Your iOS",
-      "storage": "Secure Storage"
+      "storage": "Secure storage"
     },
     "android": {
       "os": "Required Android OS",
       "youros": "Your Android OS",
       "webview": "Required WebView",
       "yourwebview": "Your WebView",
-      "storage": "Secure Storage"
+      "storage": "Secure storage"
     },
     "noinfo": "No device information available."
   },
