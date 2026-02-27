@@ -1638,7 +1638,8 @@
   "nowitnesserror": {
     "title": "Misconfigured cloud agent",
     "description": "Due to your cloud agent being misconfigured, you’re unable to create a profile. Please contact your cloud provider for more information.",
-    "button": "Check again"
+    "button": "Check again",
+    "close": "Close"
   },
   "readmore": {
     "more": "Read more",

@@ -113,6 +113,7 @@ const InitPhase = ({ initPhase }: { initPhase: InitializationPhase }) => {
             </div>
             <ProfileStateModal />
             <LockPage />
+            <NoWitnessAlert />
           </IonReactRouter>
           <SetGroupNameWrapper />
           <AppOffline />
@@ -141,7 +142,6 @@ const AppContent = ({
           <InputRequest />
           <SidePage />
           <GenericError />
-          <NoWitnessAlert />
           <ToastStack />
           {globalLoading !== GlobalLoadingType.NONE && (
             <LoadingPage
