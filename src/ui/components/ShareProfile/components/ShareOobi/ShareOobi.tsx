@@ -1,10 +1,10 @@
 import { Share } from "@capacitor/share";
-import { IonButton, IonIcon } from "@ionic/react";
-import { qrCodeOutline, shareOutline } from "ionicons/icons";
+import { IonButton, IonIcon, IonSpinner } from "@ionic/react";
+import { shareOutline } from "ionicons/icons";
 import { QRCode } from "react-qrcode-logo";
 import { i18n } from "../../../../../i18n";
-import { ShareOobiProps } from "./ShareOobi.types";
 import "./ShareOobi.scss";
+import { ShareOobiProps } from "./ShareOobi.types";
 
 const SHARE_CANCELLED_ERROR = "Share canceled";
 const ShareOobi = ({ oobi }: ShareOobiProps) => {
@@ -40,10 +40,15 @@ const ShareOobi = ({ oobi }: ShareOobiProps) => {
           />
           <span className="share-qr-code-blur-overlay-container">
             <span className="share-qr-code-blur-overlay-inner">
-              <IonIcon
-                slot="icon-only"
-                icon={qrCodeOutline}
-              />
+              {!oobi && <IonSpinner name="circular" />}
+              <div className="text">
+                <p className="top">
+                  {i18n.t("setupgroupprofile.setupmembers.pending.top")}
+                </p>
+                <p className="bottom">
+                  {i18n.t("setupgroupprofile.setupmembers.pending.bottom")}
+                </p>
+              </div>
             </span>
           </span>
         </div>
