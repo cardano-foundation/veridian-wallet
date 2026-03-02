@@ -77,9 +77,16 @@ const NotificationSection = forwardRef<
       if (!isScrollable && displayLength < data.length) {
         loadMore();
       }
-    }, [displayLength, data.length, enableInfiniteScroll]);
+    }, [
+      displayLength,
+      data.length,
+      enableInfiniteScroll,
+      loadMore,
+      pageId,
+      infiniteScrollActivated,
+    ]);
 
-    if (!data.length) return null;
+    if (!data.length && !enableInfiniteScroll) return null;
 
     const content = (
       <IonList
@@ -101,7 +108,9 @@ const NotificationSection = forwardRef<
         className="notifications-tab-section"
         data-testid={testId}
       >
-        <h3 className="notifications-tab-section-title">{title}</h3>
+        {data.length > 0 && (
+          <h3 className="notifications-tab-section-title">{title}</h3>
+        )}
         {enableInfiniteScroll ? (
           <>
             <InfiniteScroll
@@ -109,7 +118,7 @@ const NotificationSection = forwardRef<
               next={loadMore}
               loader={<div></div>}
               hasMore={
-                data.length >= displayLength && !shouldDisplayExpandButton
+                data.length > displayLength && !shouldDisplayExpandButton
               }
               scrollableTarget={`${pageId}-content`}
             >
