@@ -7,7 +7,7 @@ enum SetupProfileStep {
 }
 
 interface ProfileSetupProps {
-  onClose?: (cancel?: boolean) => void;
+  onClose?: (cancel?: boolean, onFinish?: () => void) => void;
   joinGroupMode?: boolean;
   displayOnModal?: boolean;
 }
