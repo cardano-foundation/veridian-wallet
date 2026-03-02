@@ -34,7 +34,6 @@ const TabLayout = ({
   placeholder,
   hardwareBackButtonConfig,
   headerCustomContent,
-  scrollY,
 }: TabLayoutProps) => {
   const [isActive, setIsActive] = useState(false);
 
@@ -148,7 +147,6 @@ const TabLayout = ({
           id={`${pageId}-content`}
           className="tab-content"
           color="transparent"
-          scrollY={scrollY}
         >
           {children}
         </IonContent>

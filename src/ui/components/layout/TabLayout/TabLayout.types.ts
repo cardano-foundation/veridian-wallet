@@ -17,7 +17,6 @@ interface TabLayoutProps {
   children?: ReactNode;
   placeholder?: ReactNode;
   headerCustomContent?: ReactNode;
-  scrollY?: boolean;
   hardwareBackButtonConfig?: {
     prevent: boolean;
     priority?: BackEventPriorityType;
