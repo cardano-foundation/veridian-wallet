@@ -36,7 +36,6 @@ const CredentialRequest = ({
   const [credentialRequest, setCredentialRequest] =
     useState<CredentialsMatchingApply | null>();
   const currentProfile = useAppSelector(getCurrentProfile);
-
   const [linkedGroup, setLinkedGroup] = useState<LinkedGroup | null>(null);
   const [isOpenAlert, setIsOpenAlert] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -44,6 +43,9 @@ const CredentialRequest = ({
     useState<RequestCredential | null>(null);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
 
+  const notificationExists = !!currentProfile?.notifications.some(
+    (notification) => notification.id === notificationDetails.id
+  );
   const reachThreshold =
     linkedGroup &&
     linkedGroup.othersJoined.length +
@@ -92,6 +94,8 @@ const CredentialRequest = ({
   ]);
 
   const getCrendetialRequest = useCallback(async () => {
+    if (!notificationExists) return;
+
     try {
       const request = await Agent.agent.ipexCommunications.getIpexApplyDetails(
         notificationDetails
@@ -114,7 +118,13 @@ const CredentialRequest = ({
       showError("Unable to get credential request detail", e, dispatch);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notificationDetails, profiles, getMultisigInfo, dispatch]);
+  }, [
+    notificationDetails,
+    profiles,
+    getMultisigInfo,
+    dispatch,
+    notificationExists,
+  ]);
 
   useOnlineStatusEffect(getCrendetialRequest);
 

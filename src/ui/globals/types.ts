@@ -31,12 +31,12 @@ enum ToastMsgType {
   NOTE_REMOVED = "noteRemoved",
   MAX_FAVOURITES_REACHED = "maxFavouritesReachedError",
   WALLET_CONNECTION_DELETED = "dappconnectiondeleted",
+  WALLET_CONNECTION_DELETE_ERROR = "dappconnectiondeleteerror",
   CONNECT_WALLET_SUCCESS = "connectwalletsuccess",
   DISCONNECT_WALLET_SUCCESS = "disconnectwallet",
   UNABLE_CONNECT_WALLET = "unableconnectwalleterror",
   PEER_ID_SUCCESS = "peeridsuccess",
   PEER_ID_ERROR = "peeriderror",
-  PEER_ID_NOT_RECOGNISED = "peeridnotrecognised",
   SETUP_BIOMETRIC_AUTHENTICATION_SUCCESS = "setupbiometricsuccess",
   ROTATE_KEY_SUCCESS = "rotatekeysuccess",
   ROTATE_KEY_ERROR = "rotatekeyerror",
@@ -45,7 +45,8 @@ enum ToastMsgType {
   NEW_MULTI_SIGN_MEMBER = "newmultisignmember",
   PASSCODE_UPDATED = "passcodeupdated",
   PASSWORD_UPDATED = "passwordupdated",
-  PASSWORD_DISABLED = "passworddisabled",
+  PASSWORD_SETTING_UPDATE = "passwordsettingupdate",
+  PASSWORD_SETTING_UPDATE_FAIL = "passwordsettingupdateerror",
   PASSWORD_CREATED = "passwordcreated",
   PROPOSED_CRED_SUCCESS = "proposedcredsuccess",
   SHARE_CRED_SUCCESS = "sharecredsuccess",
@@ -85,6 +86,8 @@ enum ToastMsgType {
   INVALID_CONNECTION_URL = "invalidconnectionurlerror",
   PROFILE_NOT_EXIST = "profilenotexisterror",
   MEMBER_ALREADY_EXIST = "memberalreadyexisterror",
+  GROUP_CREATED = "groupcreated",
+  SIGN_ERROR = "signerror",
 }
 
 const PASSCODE_MAPPING = {

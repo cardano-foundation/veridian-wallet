@@ -60,9 +60,14 @@ const ManagePassword = () => {
             passwordIsSet: false,
           })
         );
-        dispatch(setToastMsg(ToastMsgType.PASSWORD_DISABLED));
+        dispatch(setToastMsg(ToastMsgType.PASSWORD_SETTING_UPDATE));
       } catch (e) {
-        showError("Unable to delete password", e, dispatch);
+        showError(
+          "Unable to delete password",
+          e,
+          dispatch,
+          ToastMsgType.PASSWORD_SETTING_UPDATE_FAIL
+        );
       }
     } else {
       openChangePassword();
@@ -176,6 +181,7 @@ const ManagePassword = () => {
         <CreatePassword
           handleClear={handleClear}
           userAction={userAction}
+          isSetting
         />
       </IonModal>
     </>

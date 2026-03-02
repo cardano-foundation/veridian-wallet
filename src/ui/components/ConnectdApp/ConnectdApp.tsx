@@ -123,7 +123,12 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
 
       dispatch(setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED));
     } catch (e) {
-      showError("Unable to delete peer connection", e, dispatch);
+      showError(
+        "Unable to delete peer connection",
+        e,
+        dispatch,
+        ToastMsgType.WALLET_CONNECTION_DELETE_ERROR
+      );
     }
   };
 
