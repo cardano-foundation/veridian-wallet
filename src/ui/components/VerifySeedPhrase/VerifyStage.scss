@@ -1,9 +1,4 @@
 .content-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: calc(100vh - (4.5rem + var(--ion-safe-area-top)));
-
   .paragraph-top {
     padding-inline: 1rem;
     text-align: center;
@@ -17,8 +12,9 @@
     border: none;
   }
 
-  .page-footer {
-    margin-top: auto !important;
+  .page-footer.ios {
+    margin-bottom: var(--ion-safe-area-bottom);
+    padding: 0 !important;
   }
 
   .clear-button {

@@ -97,42 +97,7 @@ const VerifyStage = ({
             closeButtonAction={handleClose}
           />
         }
-      >
-        <div className="content-container">
-          <div>
-            <p
-              className="paragraph-top"
-              data-testid={`${pageId}-paragraph-top`}
-            >
-              {i18n.t("verifyseedphrase.paragraph.top")}
-            </p>
-            <SeedPhraseModule
-              testId="matching-seed-phrase-container"
-              seedPhrase={seedPhraseSelected}
-              emptyWord={!!seedPhraseRemaining.length}
-              removeSeedPhraseSelected={removeSeedPhraseSelected}
-            />
-            <SeedPhraseModule
-              testId="original-seed-phrase-container"
-              seedPhrase={seedPhraseRemaining}
-              addSeedPhraseSelected={addSeedPhraseSelected}
-              hideSeedNumber
-            />
-            {seedPhraseSelected.length > 0 && (
-              <IonButton
-                onClick={() => setClearAlertOpen(true)}
-                fill="outline"
-                data-testid="verify-clear-button"
-                className="clear-button secondary-button"
-              >
-                <IonIcon
-                  slot="start"
-                  icon={backspaceOutline}
-                />
-                {i18n.t("verifyseedphrase.onboarding.button.clear")}
-              </IonButton>
-            )}
-          </div>
+        footer={
           <PageFooter
             pageId={pageId}
             primaryButtonText={`${i18n.t(
@@ -143,6 +108,41 @@ const VerifyStage = ({
               !(originalSeedPhrase.length == seedPhraseSelected.length)
             }
           />
+        }
+      >
+        <div className="content-container">
+          <p
+            className="paragraph-top"
+            data-testid={`${pageId}-paragraph-top`}
+          >
+            {i18n.t("verifyseedphrase.paragraph.top")}
+          </p>
+          <SeedPhraseModule
+            testId="matching-seed-phrase-container"
+            seedPhrase={seedPhraseSelected}
+            emptyWord={!!seedPhraseRemaining.length}
+            removeSeedPhraseSelected={removeSeedPhraseSelected}
+          />
+          <SeedPhraseModule
+            testId="original-seed-phrase-container"
+            seedPhrase={seedPhraseRemaining}
+            addSeedPhraseSelected={addSeedPhraseSelected}
+            hideSeedNumber
+          />
+          {seedPhraseSelected.length > 0 && (
+            <IonButton
+              onClick={() => setClearAlertOpen(true)}
+              fill="outline"
+              data-testid="verify-clear-button"
+              className="clear-button secondary-button"
+            >
+              <IonIcon
+                slot="start"
+                icon={backspaceOutline}
+              />
+              {i18n.t("verifyseedphrase.onboarding.button.clear")}
+            </IonButton>
+          )}
         </div>
       </ScrollablePageLayout>
       <Alert
