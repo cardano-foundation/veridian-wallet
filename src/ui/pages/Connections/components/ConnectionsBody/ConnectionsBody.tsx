@@ -87,11 +87,11 @@ const ConnectionsBody = ({
       ref={container}
     >
       <div className="connections-list">
-        <IonGrid>
-          <IonRow>
-            <IonCol size="12">
-              {!search &&
-                mappedConnections.map((alphabeticGroup, index) => {
+        {!search ? (
+          <IonGrid>
+            <IonRow>
+              <IonCol size="12">
+                {mappedConnections.map((alphabeticGroup, index) => {
                   return (
                     <IonItemGroup
                       className="connections-list-alphabetic-block"
@@ -114,18 +114,18 @@ const ConnectionsBody = ({
                     </IonItemGroup>
                   );
                 })}
-              {search && (
-                <SearchConnectionContent
-                  keyword={search}
-                  mappedConnections={mappedConnections}
-                  onItemClick={(item) => {
-                    handleShowConnectionDetails(item);
-                  }}
-                />
-              )}
-            </IonCol>
-          </IonRow>
-        </IonGrid>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        ) : (
+          <SearchConnectionContent
+            keyword={search}
+            mappedConnections={mappedConnections}
+            onItemClick={(item) => {
+              handleShowConnectionDetails(item);
+            }}
+          />
+        )}
       </div>
       {!search && <AlphabetSelector />}
     </div>
