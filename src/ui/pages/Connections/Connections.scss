@@ -124,6 +124,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 
     &.md {
       --top-space: calc(8.125rem + var(--ion-safe-area-bottom));
