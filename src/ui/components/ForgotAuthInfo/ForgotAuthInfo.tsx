@@ -1,8 +1,7 @@
 import { IonModal } from "@ionic/react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { CreatePassword } from "../../pages/CreatePassword";
 import { combineClassNames } from "../../utils/style";
-import { RecoverySeedPhraseModuleRef } from "../RecoverySeedPhraseModule";
 import { ChangePinPage } from "../Settings/components/ChangePin";
 import "./ForgotAuthInfo.scss";
 import { ForgotAuthInfoProps, ForgotType } from "./ForgotAuthInfo.types";
@@ -16,14 +15,9 @@ const ForgotAuthInfo = ({
 }: ForgotAuthInfoProps) => {
   const pageId = "forgot-auth-info-modal";
   const [step, setStep] = useState(0);
-  const [, setReEnterPasscodeStep] = useState(true);
-
-  const ref = useRef<RecoverySeedPhraseModuleRef>(null);
 
   const handleClearState = () => {
-    ref.current?.clearState();
     setStep(0);
-    setReEnterPasscodeStep(false);
   };
 
   const handleClose = (shouldCloseParents?: boolean) => {

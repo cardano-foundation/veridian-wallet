@@ -1,7 +1,7 @@
 const verifySecretMock = jest.fn();
 
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor, within } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
@@ -254,7 +254,9 @@ describe("Verify Passcode on Cards Details page", () => {
       expect(getByTestId("forgot-auth-info-modal")).toBeVisible();
     });
 
-    fireEvent.click(getAllByTestId("close-button")[1]);
+    fireEvent.click(
+      within(getByTestId("forgot-auth-info-modal")).getByTestId("close-button")
+    );
 
     await waitFor(() => {
       expect(queryByText(EN_TRANSLATIONS.forgotauth.passcode.title)).toBeNull();
