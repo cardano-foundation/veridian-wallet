@@ -114,19 +114,6 @@ const Connections = () => {
     }
   }, [profileConnections]);
 
-  const filteredConnections = useMemo(() => {
-    if (!search) return mappedConnections;
-    return mappedConnections.reduce((acc, item) => {
-      const filteredValue = item.value.filter((connection) =>
-        connection.label.toLowerCase().includes(search.toLowerCase())
-      );
-      if (filteredValue.length > 0) {
-        acc.push({ ...item, value: filteredValue });
-      }
-      return acc;
-    }, [] as typeof mappedConnections);
-  }, [mappedConnections, search]);
-
   const getConnectionShortDetails = async (
     connectionId: string,
     identifier: string
@@ -268,7 +255,7 @@ const Connections = () => {
       >
         <ConnectionsBody
           onSearchFocus={setHideHeader}
-          mappedConnections={filteredConnections}
+          mappedConnections={mappedConnections}
           handleShowConnectionDetails={handleShowConnectionDetails}
           search={search}
           setSearch={setSearch}
