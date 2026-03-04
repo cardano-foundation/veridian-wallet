@@ -1,7 +1,7 @@
 const verifySecretMock = jest.fn().mockResolvedValue(true);
 
-import { act } from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
+import { act } from "react";
 import { Provider } from "react-redux";
 import { KeyStoreKeys } from "../../../core/storage";
 import EN_TRANSLATIONS from "../../../locales/en/en.json";
@@ -12,9 +12,11 @@ import {
   signObjectFix,
   signTransactionFix,
 } from "../../__fixtures__/signTransactionFix";
+import { profileCacheFixData } from "../../__fixtures__/storeDataFix";
+import { makeTestStore } from "../../utils/makeTestStore";
 import { passcodeFiller } from "../../utils/passcodeFiller";
 import { IncomingRequest } from "./IncomingRequest";
-import { makeTestStore } from "../../utils/makeTestStore";
+import { identifierFix } from "../../__fixtures__/identifierFix";
 
 const mockApprovalCallback = jest.fn((status: boolean) => status);
 
@@ -71,6 +73,10 @@ const initialState = {
       isPaused: false,
     },
   },
+  profilesCache: {
+    ...profileCacheFixData,
+    pendingConnection: null,
+  },
   biometricsCache: {
     enabled: false,
   },
@@ -81,6 +87,18 @@ describe("Sign request", () => {
   const storeMocked = {
     ...makeTestStore(initialState),
     dispatch: dispatchMock,
+  };
+
+  global.ResizeObserver = class {
+    observe() {
+      jest.fn();
+    }
+    unobserve() {
+      jest.fn();
+    }
+    disconnect() {
+      jest.fn();
+    }
   };
 
   test("It renders content for BALLOT_TRANSACTION_REQUEST ", async () => {
@@ -97,9 +115,7 @@ describe("Sign request", () => {
     expect(
       getByText(requestData.signTransaction.payload.payload)
     ).toBeVisible();
-    expect(
-      getByText(requestData.signTransaction.payload.identifier)
-    ).toBeVisible();
+    expect(getByText(identifierFix[0].displayName)).toBeVisible();
   });
 
   test("Display fallback image when provider logo is empty: BALLOT_TRANSACTION_REQUEST", async () => {
@@ -122,6 +138,10 @@ describe("Sign request", () => {
           ],
           isPaused: false,
         },
+      },
+      profilesCache: {
+        ...profileCacheFixData,
+        pendingConnection: null,
       },
       biometricsCache: {
         enabled: false,
@@ -233,6 +253,10 @@ describe("Sign request", () => {
           isPaused: false,
         },
       },
+      profilesCache: {
+        ...profileCacheFixData,
+        pendingConnection: null,
+      },
       biometricsCache: {
         enabled: false,
       },
@@ -273,6 +297,10 @@ describe("Sign request", () => {
           queues: [],
           isPaused: false,
         },
+      },
+      profilesCache: {
+        ...profileCacheFixData,
+        pendingConnection: null,
       },
       biometricsCache: {
         enabled: false,

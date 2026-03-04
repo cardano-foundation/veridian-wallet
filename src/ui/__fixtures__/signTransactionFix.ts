@@ -6,7 +6,7 @@ import {
 const signTransactionFix: PeerConnectSigningEvent = {
   type: PeerConnectionEventTypes.PeerConnectSign,
   payload: {
-    identifier: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRc",
+    identifier: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
     payload: "Hello",
     approvalCallback: (approvalStatus: boolean) => approvalStatus,
   },
@@ -15,7 +15,7 @@ const signTransactionFix: PeerConnectSigningEvent = {
 const signObjectFix: PeerConnectSigningEvent = {
   type: PeerConnectionEventTypes.PeerConnectSign,
   payload: {
-    identifier: "EN5dwY0N7RKn6OcVrK7ksIniSgPcItCuBRax2JFUpuRc",
+    identifier: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
     payload: JSON.stringify({
       action: "CAST_VOTE",
       actionText: "Cast Vote",

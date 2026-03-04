@@ -72,6 +72,18 @@ describe("Side Page: incoming request", () => {
   };
 
   test("Render incomming request", async () => {
+    global.ResizeObserver = class {
+      observe() {
+        jest.fn();
+      }
+      unobserve() {
+        jest.fn();
+      }
+      disconnect() {
+        jest.fn();
+      }
+    };
+
     const { getByText } = render(
       <Provider store={mockedStore}>
         <SidePage />
