@@ -1531,7 +1531,7 @@
     "unknownerror": "Something went wrong, try again",
     "urlerror": "Enter a valid URL",
     "proposalcredaccepted": "Proposal accepted",
-    "proposalcredreject": "Proposal decline",
+    "proposalcredreject": "Proposal declined",
     "proposalcredfailerror": "Unable to record response",
     "deleteaccounterror": "Unable to delete wallet",
     "deleteaccountsuccess": "Wallet deleted",
