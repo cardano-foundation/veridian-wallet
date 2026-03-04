@@ -8,10 +8,34 @@
       margin-bottom: 0;
     }
 
+    .logo-container {
+      position: relative;
+
+      .check-mark {
+        position: absolute;
+        right: 0;
+        bottom: 1rem;
+        background: var(--ion-color-primary-700);
+        border: 1px solid var(--ion-color-neutral-200);
+        border-radius: 50%;
+        width: 1.75rem;
+        height: 1.75rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        ion-icon {
+          color: var(--ion-color-neutral-100);
+          width: 0.875rem;
+          height: 0.875rem;
+        }
+      }
+    }
+
     .wallet-connect-logo {
       border-radius: 50%;
-      width: 2.75rem;
-      height: 2.75rem;
+      width: 5.5rem;
+      height: 5.5rem;
       margin-bottom: 1rem;
     }
 
@@ -28,13 +52,19 @@
     }
 
     .confirm-modal-name-title {
-      margin-bottom: 0.25rem;
-      font-size: 1rem;
-      font-weight: 500;
+      line-height: 1.75rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+
+      &.pending-title {
+        font-size: 1rem;
+        line-height: 1.5rem;
+        font-weight: 400;
+      }
     }
 
     .confirm-modal-name {
-      margin: 0 0 1.25rem;
+      margin: 0 0 1.5rem;
       font-size: 0.875rem;
       line-height: 1rem;
       font-weight: 400;
@@ -42,31 +72,35 @@
     }
 
     .confirm-modal-id {
-      margin: 0 0 1.5rem;
-      padding: 1rem 1.5rem;
-      background-color: var(--ion-color-neutral-100);
-      border-radius: 1.875rem;
-
+      margin: 0 0 0.75rem;
+      --padding-bottom: 0.5rem;
+      --padding-top: 0.5rem;
+      height: 2.5rem;
+      min-height: auto;
       display: flex;
+      width: 100%;
       align-items: center;
-
-      & > span {
-        font-weight: 500;
-        color: var(--ion-color-neutral-700);
-      }
+      --border-radius: 0.5rem;
 
       & > ion-icon {
-        margin-left: 0.625rem;
-        width: 1.375rem;
-        height: 1.375rem;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+
+      span {
+        line-height: 1.5rem;
       }
     }
 
     .pending-chip {
-      margin: 1.25rem 0 1.5rem;
+      margin: 1.5rem 0 0.75rem;
       border-radius: 0.25rem;
-      color: var(--ion-color-neutral-700);
-      background: var(--ion-color-neutral-300);
+      background: var(--ion-color-primary-700);
+      color: var(--ion-color-neutral-100);
+
+      ion-icon {
+        --ion-color-primary: var(--ion-color-neutral-100);
+      }
 
       & > span {
         font-size: 0.75rem;
@@ -76,11 +110,17 @@
 
     .confirm-connect-submit {
       width: 100%;
-      --border-radius: 2rem;
+      --border-radius: 1rem;
       margin-bottom: 0.5rem;
 
       &.md {
         --box-shadow: none;
+      }
+
+      &.tertiary-button {
+        &::part(native) {
+          color: var(--ion-color-error-800);
+        }
       }
     }
   }
@@ -89,10 +129,10 @@
     min-width: fit-content !important;
 
     .action-button {
-      background: var(--ion-color-danger) !important;
+      background: var(--ion-color-error-button) !important;
 
       & > ion-icon {
-        --ion-color-base: var(--ion-color-neutral-100) !important;
+        --ion-color-base: var(--ion-color-error-800) !important;
         width: 1.5rem;
         height: 1.5rem;
       }
@@ -117,20 +157,54 @@
 
     &.responsive-modal .responsive-modal-content {
       .confirm-modal-id {
-        padding: 0.875rem 1.5rem;
-
         & > span {
-          font-size: 0.875rem;
+          font-size: 0.8rem;
+        }
+
+        & > ion-icon {
+          width: 1rem;
+          height: 1rem;
         }
       }
 
-      .wallet-connect-fallback-logo {
-        width: 2.5rem;
-        height: 2.5rem;
+      .pending-chip {
+        margin: 1rem 0 0.75rem;
+        border-radius: 0.25rem;
+        background: var(--ion-color-primary-700);
+        color: var(--ion-color-neutral-100);
+
+        ion-icon {
+          --ion-color-primary: var(--ion-color-neutral-100);
+        }
+      }
+
+      .wallet-connect-logo {
+        width: 3.5rem;
+        height: 3.5rem;
       }
 
       .confirm-modal-name-title {
-        font-size: 0.875rem;
+        line-height: 1.5rem;
+        font-size: 1.25rem;
+      }
+
+      .confirm-modal-name {
+        font-size: 0.75rem;
+        line-height: 0.75rem;
+      }
+
+      .logo-container {
+        .check-mark {
+          width: 1rem;
+          height: 1rem;
+          bottom: 1.25rem;
+
+          ion-icon {
+            color: var(--ion-color-neutral-100);
+            width: 0.75rem;
+            height: 0.75rem;
+          }
+        }
       }
     }
   }
