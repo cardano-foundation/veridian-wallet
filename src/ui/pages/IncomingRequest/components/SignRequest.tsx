@@ -35,19 +35,26 @@ const SignRequest = ({
   const attributeContainerRef = useRef<HTMLDivElement>(null);
   const attributeRef = useRef<HTMLDivElement>(null);
   const signRequest = requestData.signTransaction;
-  const signDetails = (() => {
-    if (!requestData.signTransaction) {
-      return {};
-    }
+  const [isJSON, setIsJSON] = useState(false);
+  const [signDetails, setSignDetails] = useState<any>({});
 
-    let signContent;
-    try {
-      signContent = JSON.parse(requestData.signTransaction.payload.payload);
-    } catch (error) {
-      signContent = requestData.signTransaction.payload.payload;
+  useEffect(() => {
+    if (!requestData.signTransaction) {
+      setSignDetails({});
+      setIsJSON(false);
+      return;
     }
-    return signContent;
-  })();
+    const payload = requestData.signTransaction.payload.payload;
+    try {
+      const parsed = JSON.parse(payload);
+      setSignDetails(parsed);
+      setIsJSON(true);
+    } catch (error) {
+      setSignDetails(payload);
+      setIsJSON(false);
+    }
+  }, [requestData.signTransaction]);
+
   const logo = requestData.peerConnection.iconB64;
 
   const handleSign = () => {
@@ -169,7 +176,7 @@ const SignRequest = ({
                 ref={attributeRef}
                 className="content"
               >
-                {typeof signDetails === "object" ? (
+                {isJSON ? (
                   <CardDetailsAttributes
                     data={signDetails}
                     itemProps={{
