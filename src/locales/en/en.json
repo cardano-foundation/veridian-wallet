@@ -1555,10 +1555,10 @@
   },
   "request": {
     "sign": {
-      "title": "Connections",
+      "title": "Sign",
       "identifier": "Related profile",
       "transaction": {
-        "data": "Signature data"
+        "data": "Signature"
       }
     },
     "button": {

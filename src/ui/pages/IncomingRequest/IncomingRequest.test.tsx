@@ -115,7 +115,6 @@ describe("Sign request", () => {
     expect(
       getByText(requestData.signTransaction.payload.payload)
     ).toBeVisible();
-    expect(getByText(identifierFix[0].displayName)).toBeVisible();
   });
 
   test("Display fallback image when provider logo is empty: BALLOT_TRANSACTION_REQUEST", async () => {

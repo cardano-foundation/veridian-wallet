@@ -1,11 +1,12 @@
 import { IonIcon, IonText } from "@ionic/react";
-import { chevronDownOutline, chevronUpOutline } from "ionicons/icons";
+import {
+  chevronDownOutline,
+  chevronUpOutline,
+  keyOutline,
+} from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import { i18n } from "../../../../i18n";
-import { useAppSelector } from "../../../../store/hooks";
-import { getProfiles } from "../../../../store/reducers/profileCache";
 import { IncomingRequestType } from "../../../../store/reducers/stateCache/stateCache.types";
-import { Avatar } from "../../../components/Avatar";
 import {
   CardBlock,
   CardDetailsAttributes,
@@ -13,7 +14,6 @@ import {
 } from "../../../components/CardDetails";
 import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
-import { ProfileDetailsModal } from "../../../components/ProfileDetailsModal";
 import { Spinner } from "../../../components/Spinner";
 import { Verification } from "../../../components/Verification";
 import { ScrollablePageLayout } from "../../../components/layout/ScrollablePageLayout";
@@ -30,14 +30,11 @@ const SignRequest = ({
   handleCancel,
 }: RequestProps<IncomingRequestType.PEER_CONNECT_SIGN>) => {
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-  const [openIdentifierDetail, setOpenIdentifierDetail] = useState(false);
   const [displayExpandButton, setDisplayExpandButton] = useState(false);
   const [isExpand, setExpand] = useState(false);
   const attributeContainerRef = useRef<HTMLDivElement>(null);
   const attributeRef = useRef<HTMLDivElement>(null);
   const signRequest = requestData.signTransaction;
-  const profiles = useAppSelector(getProfiles);
-  const profile = profiles[signRequest?.payload.identifier || ""];
   const signDetails = (() => {
     if (!requestData.signTransaction) {
       return {};
@@ -148,13 +145,16 @@ const SignRequest = ({
             className="sign-identifier"
             testId="related-profile"
             title={i18n.t("request.sign.identifier")}
-            onClick={() => setOpenIdentifierDetail(true)}
           >
             <CardDetailsItem
-              info={profile.identity.displayName}
-              startSlot={<Avatar id={profile.identity.id} />}
+              info={`${signRequest?.payload.identifier.substring(
+                0,
+                5
+              )}...${signRequest?.payload.identifier.slice(-5)}`}
+              icon={keyOutline}
               className="member"
               testId="related-identifier-detail"
+              mask={false}
             />
           </CardBlock>
           <CardBlock
@@ -205,13 +205,6 @@ const SignRequest = ({
         verifyIsOpen={verifyIsOpen}
         setVerifyIsOpen={(isOpen) => setVerifyIsOpen(isOpen)}
         onVerify={() => handleSign()}
-      />
-      <ProfileDetailsModal
-        isOpen={openIdentifierDetail}
-        setIsOpen={setOpenIdentifierDetail}
-        pageId="profile-details"
-        profileId={signRequest?.payload.identifier}
-        restrictedOptions
       />
     </>
   );
