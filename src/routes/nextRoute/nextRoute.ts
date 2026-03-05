@@ -190,7 +190,16 @@ const getNextCreatePasswordRoute = (data: DataProps) => {
   return { pathname: RoutePath.SSI_AGENT };
 };
 
-const getNextProfileSetupRoute = () => {
+const getNextProfileSetupRoute = (data: DataProps) => {
+  if (data.state?.isGroup && data.state?.id) {
+    return {
+      pathname: RoutePath.GROUP_PROFILE_SETUP.replace(
+        ":id",
+        data.state?.id as string
+      ),
+    };
+  }
+
   return { pathname: TabsRoutePath.HOME };
 };
 
@@ -266,7 +275,7 @@ const nextRoute: Record<string, NextRoute> = {
     updateRedux: [updateStoreAfterCreatePassword],
   },
   [RoutePath.PROFILE_SETUP]: {
-    nextPath: () => getNextProfileSetupRoute(),
+    nextPath: (data: DataProps) => getNextProfileSetupRoute(data),
     updateRedux: [updateStoreAfterSetupProfile],
   },
   [TabsRoutePath.CREDENTIAL_DETAILS]: {

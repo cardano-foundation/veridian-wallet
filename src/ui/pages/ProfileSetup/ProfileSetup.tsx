@@ -219,7 +219,7 @@ export const ProfileSetup = ({
 
       if (isModal) {
         onClose?.();
-        navToCredentials(identifier);
+        navToCredentials(identifier, isGroup);
         return;
       }
 
@@ -248,12 +248,13 @@ export const ProfileSetup = ({
     }
   };
 
-  const navToCredentials = (id?: string) => {
+  const navToCredentials = (id?: string, isGroup?: boolean) => {
     const { nextPath, updateRedux } = getNextRoute(RoutePath.PROFILE_SETUP, {
       store: { stateCache },
       state: {
         isSetupProfile: false,
         id,
+        isGroup,
       },
     });
 
