@@ -81,7 +81,7 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
                 )
               ) {
                 setAlertExistingIsOpen(true);
-                return;
+                return false;
               }
             } catch (error) {
               if (
@@ -124,6 +124,8 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
                 content: { value: hintValue },
               })
             );
+
+            return true;
           } else {
             try {
               const previousHint = (
@@ -137,6 +139,8 @@ const PasswordModule = forwardRef<PasswordModuleRef, PasswordModuleProps>(
                   MiscRecordId.OP_PASS_HINT
                 );
               }
+
+              return true;
             } catch (e) {
               showError(
                 "Unable to delete password hint",

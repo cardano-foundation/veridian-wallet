@@ -56,7 +56,11 @@ const CreatePassword = ({
           showError("Unable to skip set password", e, dispatch);
         });
     } else {
-      await passwordModuleRef.current?.savePassword();
+      const result = await passwordModuleRef.current?.savePassword();
+
+      if (!result) {
+        return;
+      }
     }
 
     if (!isOnboarding) {

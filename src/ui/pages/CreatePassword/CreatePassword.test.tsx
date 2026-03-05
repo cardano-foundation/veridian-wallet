@@ -18,6 +18,7 @@ import { CustomInputProps } from "../../components/CustomInput/CustomInput.types
 import { ToastMsgType } from "../../globals/types";
 import { makeTestStore } from "../../utils/makeTestStore";
 import { CreatePassword } from "./CreatePassword";
+import { Agent } from "../../../core/agent/agent";
 
 jest.mock("../../components/CustomInput", () => ({
   CustomInput: (props: CustomInputProps) => {
@@ -66,6 +67,7 @@ jest.mock("../../components/CustomInput", () => ({
 const createOrUpdateBasicRecordMock = jest.fn((_: unknown) =>
   Promise.resolve(true)
 );
+const verifySecretMock = jest.fn().mockResolvedValue(false);
 jest.mock("../../../core/agent/agent", () => ({
   Agent: {
     agent: {
@@ -76,7 +78,7 @@ jest.mock("../../../core/agent/agent", () => ({
           createOrUpdateBasicRecordMock(arg),
       },
       auth: {
-        verifySecret: jest.fn().mockResolvedValue(true),
+        verifySecret: () => verifySecretMock(),
         storeSecret: jest.fn(),
       },
     },
@@ -411,6 +413,66 @@ describe("Create Password Page", () => {
         expect(dispatchMock).toBeCalledWith(
           setToastMsg(ToastMsgType.PASSWORD_CREATED)
         );
+      });
+    });
+
+    test("Prevent close when password is existing", async () => {
+      const initialStateWithPassword = {
+        stateCache: {
+          routes: [{ path: TabsRoutePath.CREDENTIALS }],
+          authentication: {
+            loggedIn: true,
+            time: Date.now(),
+            passcodeIsSet: true,
+            passwordIsSet: true,
+            passwordIsSkipped: false,
+          },
+        },
+      };
+
+      const dispatchMock = jest.fn();
+      const storeMocked = {
+        ...makeTestStore(initialStateWithPassword),
+        dispatch: dispatchMock,
+      };
+
+      const handleClear = jest.fn();
+      verifySecretMock.mockResolvedValue(true);
+      const { getByTestId, getByText } = render(
+        <Provider store={storeMocked}>
+          <CreatePassword
+            handleClear={handleClear}
+            userAction={{
+              current: "enable",
+            }}
+          />
+        </Provider>
+      );
+
+      const input = getByTestId("create-password-input");
+      const confirmInput = getByTestId("confirm-password-input");
+      const hintInput = getByTestId("create-hint-input");
+
+      act(() => {
+        fireEvent.change(input, { target: { value: "Passsssss1@" } });
+        fireEvent.change(confirmInput, { target: { value: "Passsssss1@" } });
+        fireEvent.change(hintInput, { target: { value: "hint" } });
+      });
+
+      const submitButton = getByTestId("primary-button-create-password");
+
+      act(() => {
+        fireEvent.click(submitButton);
+      });
+
+      await waitFor(() => {
+        expect(
+          getByText(
+            EN_TRANSLATIONS.settings.sections.security.managepassword.page.alert
+              .existingpassword
+          )
+        ).toBeVisible();
+        expect(handleClear).not.toBeCalled();
       });
     });
   });
