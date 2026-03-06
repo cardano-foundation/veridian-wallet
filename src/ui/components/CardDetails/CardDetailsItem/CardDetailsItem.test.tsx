@@ -1,6 +1,11 @@
+jest.mock("../../../utils/clipboard", () => ({
+  writeToClipboard: jest.fn(),
+}));
+import userEvent from "@testing-library/user-event";
 import { render } from "@testing-library/react";
 import { keyOutline } from "ionicons/icons";
 import { Provider } from "react-redux";
+import { writeToClipboard } from "../../../utils/clipboard";
 import { TabsRoutePath } from "../../../../routes/paths";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { CardDetailsItem } from "./CardDetailsItem";
@@ -24,6 +29,23 @@ const storeMocked = {
 };
 
 describe("Card detail item", () => {
+  test("copy button calls clipboard API", async () => {
+    (writeToClipboard as jest.Mock).mockClear();
+    const { findByTestId } = render(
+      <Provider store={storeMocked}>
+        <CardDetailsItem
+          testId="card-test-id"
+          info="Copy this text"
+          copyButton
+          copyContent="Copy this text"
+        />
+      </Provider>
+    );
+    const copyButton = await findByTestId("card-test-id-copy-button");
+    expect(copyButton).toBeEnabled();
+    await userEvent.click(copyButton);
+    expect(writeToClipboard).toHaveBeenCalledWith("Copy this text");
+  });
   test("Card details render", async () => {
     const { getByTestId, getByText } = render(
       <Provider store={storeMocked}>

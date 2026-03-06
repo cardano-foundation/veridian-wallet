@@ -6,6 +6,7 @@ import {
 } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import { i18n } from "../../../../i18n";
+import { JSONObject } from "../../../../core/agent/agent.types";
 import { IncomingRequestType } from "../../../../store/reducers/stateCache/stateCache.types";
 import {
   CardBlock,
@@ -36,7 +37,7 @@ const SignRequest = ({
   const attributeRef = useRef<HTMLDivElement>(null);
   const signRequest = requestData.signTransaction;
   const [isJSON, setIsJSON] = useState(false);
-  const [signDetails, setSignDetails] = useState<any>({});
+  const [signDetails, setSignDetails] = useState<JSONObject | string>({});
 
   useEffect(() => {
     if (!requestData.signTransaction) {
@@ -150,7 +151,7 @@ const SignRequest = ({
         <div className="sign-content">
           <CardBlock
             className="sign-identifier"
-            testId="related-profile"
+            testId="identifier"
             title={i18n.t("request.sign.identifier")}
             copyContent={signRequest?.payload.identifier}
           >
@@ -161,7 +162,7 @@ const SignRequest = ({
               )}...${signRequest?.payload.identifier.slice(-8)}`}
               icon={keyOutline}
               className="member"
-              testId="related-identifier-detail"
+              testId="identifier-detail"
               mask={false}
             />
           </CardBlock>
@@ -179,7 +180,7 @@ const SignRequest = ({
               >
                 {isJSON ? (
                   <CardDetailsAttributes
-                    data={signDetails}
+                    data={signDetails as JSONObject}
                     itemProps={{
                       mask: false,
                       fullText: true,
@@ -196,6 +197,7 @@ const SignRequest = ({
             </div>
             {displayExpandButton && (
               <div
+                data-testid="expand-footer"
                 className="footer"
                 onClick={onExpandData}
               >
