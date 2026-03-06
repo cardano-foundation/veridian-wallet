@@ -318,14 +318,11 @@ describe("Forgot Password Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpassword.title)
-      ).toBeVisible();
-      expect(
         getByText(EN_TRANSLATIONS.forgotauth.newpassword.description)
       ).toBeVisible();
-      expect(
-        getByText(EN_TRANSLATIONS.createpassword.button.continue)
-      ).toBeVisible();
+      expect(getByTestId("primary-button-create-password").innerHTML).toBe(
+        EN_TRANSLATIONS.createpassword.button.continue
+      );
     });
 
     const input = getByTestId("create-password-input");
@@ -344,7 +341,7 @@ describe("Forgot Password Page", () => {
       expect((input as HTMLInputElement).value).toBe("Passssssssss1@");
     });
 
-    fireEvent.click(getByText(EN_TRANSLATIONS.createpassword.button.continue));
+    fireEvent.click(getByTestId("primary-button-create-password"));
 
     await waitFor(() => {
       expect(verifySecret).toBeCalled();
@@ -370,13 +367,9 @@ describe("Forgot Password Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.password.title)
+        getByText(EN_TRANSLATIONS.forgotauth.password.description)
       ).toBeVisible();
     });
-
-    expect(
-      getByText(EN_TRANSLATIONS.forgotauth.password.description)
-    ).toBeVisible();
 
     for (let i = 0; i < SEED_PHRASE_LENGTH; i++) {
       act(() => {
@@ -429,9 +422,7 @@ describe("Forgot Password Page", () => {
       expect(
         getByText(EN_TRANSLATIONS.forgotauth.newpassword.description)
       ).toBeVisible();
-      expect(
-        getByText(EN_TRANSLATIONS.createpassword.button.continue)
-      ).toBeVisible();
+      expect(getByTestId("primary-button-create-password")).toBeVisible();
       expect(
         getByText(EN_TRANSLATIONS.forgotauth.newpassword.skip)
       ).toBeVisible();

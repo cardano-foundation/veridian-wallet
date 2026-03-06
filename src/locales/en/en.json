@@ -14,7 +14,7 @@
         "description": "Control when to present your credentials, keeping your personal data private"
       },
       {
-        "title": "Sign with Group Identity",
+        "title": "Sign with group identity",
         "description": "Sign and verify as an individual or part of a group, whenever needed"
       }
     ],
@@ -313,7 +313,7 @@
     "change": "New password",
     "cancel": "Cancel",
     "description": "Add an extra layer of security for sensitive actions in your wallet by creating an optional password.",
-    "learnmore": "Learn More",
+    "learnmore": "Learn more",
     "input": {
       "first": {
         "symbolguide": "Symbol guide",
@@ -369,7 +369,7 @@
       "name": "Name",
       "listsymbol": {
         "space": "Space",
-        "exclamationmark": "Exclamation Mark",
+        "exclamationmark": "Exclamation mark",
         "numbersign": "Number sign (hash)",
         "dollarsign": "Dollar sign",
         "sterlingsign": "Sterling sign (pound)",
@@ -569,7 +569,7 @@
         "contact": "Veridian support",
         "learnmore": "Learn more about Veridian",
         "terms": {
-          "title": "Terms and Privacy Policy",
+          "title": "Terms and privacy policy",
           "submenu": {
             "title": "Terms & privacy",
             "termsofuse": "Terms of use",
@@ -880,7 +880,7 @@
           "description": "Essential details shared by the issuer, which verify and describe key information in this credential.",
           "details": "Attribute details",
           "issuee": "Issuer",
-          "issuancedate": "Issuance Date Time",
+          "issuancedate": "Issuance date time",
           "lei": "LEI"
         },
         "schemaversion": "Schema version",
@@ -938,8 +938,8 @@
         "cancel": "Cancel",
         "delete": "Delete",
         "restore": "Restore",
-        "oneselected": "1 Credential Selected",
-        "manyselected": "{{amount}} Credentials Selected",
+        "oneselected": "1 credential selected",
+        "manyselected": "{{amount}} credentials selected",
         "archivedtitle": "Archived credentials",
         "revokedtitle": "Revoked credentials",
         "revokedlabel": "Revoked",
@@ -1152,7 +1152,7 @@
             "two": "Open the email subject “Connect with {{connection}} via your Identity Wallet”",
             "three": "Find the QR code within the email",
             "four": "Open the scanner using the button at the bottom of this notification or from the wallet’s navigation tab",
-            "five": "Scan the QR code or paste the Connection ID and advance",
+            "five": "Scan the QR code or paste the connection ID and advance",
             "six": "You're now connected with {{connection}}"
           },
           "button": {
@@ -1690,7 +1690,7 @@
       "description": "Create a group name for other members to join your group, or join an existing group",
       "form": {
         "input": "Group name",
-        "placeholder": "e.g. Company Name",
+        "placeholder": "e.g. company name",
         "or": "or",
         "joingroup": "Join existing group"
       }
@@ -1712,12 +1712,12 @@
     }
   },
   "systemthreats": {
-    "title": "Threats Detected",
+    "title": "Threats detected",
     "description": "The following security threats have been detected on your device.",
     "nothreats": "No security threats detected",
     "initerror": "Security module initialization failed. Critical protections are not active, leaving the application vulnerable.",
     "detected": "Detected",
-    "privilegedaccess": "Privileged Access",
+    "privilegedaccess": "Privileged access",
     "debug": "Debug Mode",
     "simulator": "Simulator/Emulator",
     "appintegrity": "App Integrity",

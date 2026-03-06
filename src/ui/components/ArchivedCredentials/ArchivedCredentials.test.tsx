@@ -164,7 +164,7 @@ describe("Archived and revoked credentials", () => {
       });
 
       await waitFor(() => {
-        expect(getByText("0 Credentials Selected")).toBeVisible();
+        expect(getByText("0 credentials selected")).toBeVisible();
       });
 
       const cardItem = getByTestId(
@@ -174,7 +174,7 @@ describe("Archived and revoked credentials", () => {
 
       await waitFor(() => {
         expect(getByTestId("selected-amount-credentials").innerHTML).toBe(
-          "1 Credential Selected"
+          "1 credential selected"
         );
       });
 
@@ -231,7 +231,7 @@ describe("Archived and revoked credentials", () => {
       });
 
       await waitFor(() => {
-        expect(getByText("0 Credentials Selected")).toBeVisible();
+        expect(getByText("0 credentials selected")).toBeVisible();
       });
 
       const cardItem = getByTestId(
@@ -338,7 +338,7 @@ describe("Archived and revoked credentials", () => {
       });
 
       await waitFor(() => {
-        expect(getByText("0 Credentials Selected")).toBeVisible();
+        expect(getByText("0 credentials selected")).toBeVisible();
       });
 
       const cardItem = getByTestId(
@@ -403,7 +403,7 @@ describe("Archived and revoked credentials", () => {
       });
 
       await waitFor(() => {
-        expect(getByText("0 Credentials Selected")).toBeVisible();
+        expect(getByText("0 credentials selected")).toBeVisible();
       });
 
       const cardItem = getByTestId(
@@ -413,7 +413,7 @@ describe("Archived and revoked credentials", () => {
 
       await waitFor(() => {
         expect(getByTestId("selected-amount-credentials").innerHTML).toBe(
-          "1 Credential Selected"
+          "1 credential selected"
         );
       });
 

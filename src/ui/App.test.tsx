@@ -872,7 +872,7 @@ describe("System threat alert", () => {
 
     await waitFor(() => {
       expect(startFreeRASPMock).toHaveBeenCalled();
-      expect(getByText("Threats Detected")).toBeVisible();
+      expect(getByText("Threats detected")).toBeVisible();
     });
   });
 
@@ -898,7 +898,7 @@ describe("System threat alert", () => {
     });
 
     await waitFor(() => {
-      expect(getByText("Threats Detected")).toBeVisible();
+      expect(getByText("Threats detected")).toBeVisible();
       expect(getByText(Eng_Trans.systemthreats.rules.simulator)).toBeVisible();
     });
   });
@@ -979,7 +979,7 @@ describe("System threat alert", () => {
     });
 
     await waitFor(() => {
-      expect(getByText("Threats Detected")).toBeVisible();
+      expect(getByText("Threats detected")).toBeVisible();
       expect(
         getByText(Eng_Trans.systemthreats.rules.privilegedaccess)
       ).toBeVisible();
