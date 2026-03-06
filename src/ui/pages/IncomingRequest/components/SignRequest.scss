@@ -174,8 +174,10 @@
       }
 
       .card-details-nested-content {
+        margin-top: 0;
+
         & > .card-details-info-block-inner {
-          padding: 1rem;
+          padding: 0 1rem;
         }
       }
 

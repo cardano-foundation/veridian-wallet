@@ -1558,9 +1558,9 @@
   "request": {
     "sign": {
       "title": "Sign",
-      "identifier": "Related profile",
+      "identifier": "Identifier",
       "transaction": {
-        "data": "Signature"
+        "data": "Signature data"
       }
     },
     "button": {

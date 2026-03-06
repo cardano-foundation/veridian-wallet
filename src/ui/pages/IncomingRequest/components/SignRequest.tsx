@@ -152,12 +152,13 @@ const SignRequest = ({
             className="sign-identifier"
             testId="related-profile"
             title={i18n.t("request.sign.identifier")}
+            copyContent={signRequest?.payload.identifier}
           >
             <CardDetailsItem
               info={`${signRequest?.payload.identifier.substring(
                 0,
-                5
-              )}...${signRequest?.payload.identifier.slice(-5)}`}
+                8
+              )}...${signRequest?.payload.identifier.slice(-8)}`}
               icon={keyOutline}
               className="member"
               testId="related-identifier-detail"
