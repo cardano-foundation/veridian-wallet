@@ -263,6 +263,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
             onCheckPermissionFinish={setEnableCameraDirection}
             ref={scanRef}
             displayOnModal
+            customTranslateKey="connectdapp"
           />
         );
       case Step.Confirm:

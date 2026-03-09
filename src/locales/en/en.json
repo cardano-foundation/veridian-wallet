@@ -738,11 +738,13 @@
       "message": "Your connection has been disconnected as you have deleted the chosen identifier paired with this connection. Please choose a new identifier to re-establish this connection.",
       "confirm": "Ok"
     },
-    "inputpidmodal": {
-      "header": "Paste peer ID",
-      "cancel": "Cancel",
-      "confirm": "Confirm",
-      "scanQR": "Scan QR code"
+    "scan": {
+      "inputmodal": {
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "pastecontents": "Paste peer ID",
+        "placeholder": "Peer ID"
+      }
     },
     "connectionhistory": {
       "title": "Connection history",

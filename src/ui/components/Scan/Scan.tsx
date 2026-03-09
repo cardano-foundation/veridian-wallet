@@ -294,6 +294,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
             autofocus={true}
             onChangeInput={setPastedValue}
             value={pastedValue}
+            placeholder={getTranslateText("scan.inputmodal.placeholder")}
           />
         </OptionModal>
       </>
