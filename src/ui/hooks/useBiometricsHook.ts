@@ -72,7 +72,7 @@ const useBiometricAuth = (isLockPage = false) => {
   const [biometricInfo, setBiometricInfo] = useState<AvailableResult>({
     isAvailable: false,
     biometryType: BiometryType.NONE,
-  });
+  } as AvailableResult);
   const [lockoutEndTime, setLockoutEndTime] = useState<number>();
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(0);
   const { passwordIsSet } = useAppSelector(getAuthentication);
@@ -82,7 +82,10 @@ const useBiometricAuth = (isLockPage = false) => {
 
   const checkBiometrics = async () => {
     if (!Capacitor.isNativePlatform()) {
-      const result = { isAvailable: false, biometryType: BiometryType.NONE };
+      const result = {
+        isAvailable: false,
+        biometryType: BiometryType.NONE,
+      } as AvailableResult;
       setBiometricInfo(result);
       return result;
     }
