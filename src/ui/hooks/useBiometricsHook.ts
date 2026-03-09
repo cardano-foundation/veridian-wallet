@@ -1,5 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import {
+  AuthenticationStrength,
   AvailableResult,
   BiometricAuthError,
   BiometryType,
@@ -71,8 +72,11 @@ const isBiometricPluginError = (
 const useBiometricAuth = (isLockPage = false) => {
   const [biometricInfo, setBiometricInfo] = useState<AvailableResult>({
     isAvailable: false,
+    authenticationStrength: AuthenticationStrength.NONE,
     biometryType: BiometryType.NONE,
-  } as AvailableResult);
+    deviceIsSecure: false,
+    strongBiometryIsAvailable: false,
+  });
   const [lockoutEndTime, setLockoutEndTime] = useState<number>();
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(0);
   const { passwordIsSet } = useAppSelector(getAuthentication);
@@ -82,10 +86,13 @@ const useBiometricAuth = (isLockPage = false) => {
 
   const checkBiometrics = async () => {
     if (!Capacitor.isNativePlatform()) {
-      const result = {
+      const result: AvailableResult = {
         isAvailable: false,
+        authenticationStrength: AuthenticationStrength.NONE,
         biometryType: BiometryType.NONE,
-      } as AvailableResult;
+        deviceIsSecure: false,
+        strongBiometryIsAvailable: false,
+      };
       setBiometricInfo(result);
       return result;
     }
