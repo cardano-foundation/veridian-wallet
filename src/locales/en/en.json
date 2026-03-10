@@ -49,7 +49,7 @@
     "description": "Create a PIN to secure your wallet and to continue the onboarding process",
     "reenterdescription": "Re-enter your PIN to make sure it matches",
     "recoverydescription": "Create a PIN to secure your wallet and to continue the recovery process",
-    "reenterpasscode": "Re-enter your PIN",
+    "reenterpasscode": "Re-enter PIN",
     "cancelbtn": "Cancel",
     "backbtn": "Back"
   },
@@ -362,7 +362,7 @@
     },
     "symbolmodal": {
       "title": "Symbol guide",
-      "done": "Done",
+      "done": "Close",
       "text": "Please ensure the symbols you’re using in your password align with the standard US and UK keyboards listed below:",
       "note": "Various operating systems and applications may apply limitations to this set.",
       "symbolcolumn": "Symbol",
@@ -659,7 +659,7 @@
     "delete": {
       "button": "Delete profile",
       "alert": {
-        "title": "Are you sure you want to delete this profile?",
+        "title": "You're about to delete this profile. It can't be undone",
         "confirm": "Yes, I'm sure",
         "cancel": "Cancel"
       }
@@ -752,7 +752,7 @@
         "delete": "Delete"
       },
       "deletealert": {
-        "message": "Are you sure you want to delete this dApp?",
+        "message": "Are you sure you want to delete this connection?",
         "confirm": "Yes, I’m sure",
         "cancel": "Cancel"
       },
@@ -849,7 +849,7 @@
         "title": "Credentials",
         "placeholder": "No credentials yet. They will appear here once a connection issues them.",
         "viewarchived": "Archived & Revoked",
-        "favourites": "Favourites",
+        "favourites": "Favorites",
         "allcreds": "All credentials",
         "pendingcred": "Pending credentials",
         "deletepending": {
@@ -885,7 +885,7 @@
           "issuancedate": "Issuance date time",
           "lei": "LEI"
         },
-        "schemaversion": "Schema version",
+        "schemaversion": "Version",
         "issuer": "Issuer",
         "status": {
           "label": "Status",
@@ -1005,7 +1005,7 @@
           "multisigicp": "<strong>{{connection}}</strong> is requesting to create a group identifier with you",
           "exnipexapply": "<strong>{{connection}}</strong> has requested a credential from you",
           "exnipexgrantrevoke": "Your <strong>{{credential}}</strong> credential has been revoked",
-          "exnipexapplyproposed": "<strong>{{initiator}}</strong> has proposed a credential for the <strong>{{connection}}’s</strong> request",
+          "exnipexapplyproposed": "<strong>{{initiator}}</strong> has proposed a credential for {{connection}}'s request",
           "sign": "<strong>Signing request</strong> for <strong>{{connection}}</strong>",
           "signeventinfo": "<strong>Signing event information</strong>",
           "connectinstructions": "<strong>Check your email for instructions on how to connect with {{connection}}</strong>",
@@ -1121,8 +1121,8 @@
             "instructions": {
               "title": "Instructions",
               "detailtext": "In order to continue and complete the group setup, please follow the instructions below.",
-              "stepone": "Ensure you have scanned all participant's QR codes.",
-              "steptwo": "After scanning, try to open this notification again."
+              "stepone": "Ensure you have scanned all participants' QR codes using the \"Add members\" button.",
+              "steptwo": "After scanning all members, click the \"Continue setup\" button to proceed."
             },
             "help": {
               "title": "Need help?",
@@ -1505,7 +1505,7 @@
     "peeridsuccess": "Peer ID successful",
     "peeriderror": "Peer ID not recognised",
     "setupbiometricsuccess": "Biometrics setup",
-    "rotatekeysuccess": "Key rotated",
+    "rotatekeysuccess": "Key rotated successfully",
     "rotatekeyerror": "Unable to rotate keys",
     "newmultisignmember": "New member added",
     "grouprequestsend": "Group request sent",
@@ -1534,7 +1534,7 @@
     "unknownerror": "Something went wrong, try again",
     "urlerror": "Enter a valid URL",
     "proposalcredaccepted": "Proposal accepted",
-    "proposalcredreject": "Proposal declined",
+    "proposalcredreject": "Proposal rejected",
     "proposalcredfailerror": "Unable to record response",
     "deleteaccounterror": "Unable to delete wallet",
     "deleteaccountsuccess": "Wallet deleted",
@@ -1546,7 +1546,7 @@
     "duplicategroupiderror": "Group already exists",
     "groupmetadatanotfounderror": "Group metadata is missing. Please try again.",
     "unabletoaccepterror": "Unable to accept",
-    "acceptsuccess": "Accepted",
+    "acceptsuccess": "Accepted successfully",
     "connecturlmismatch": "There’s a URL mismatch",
     "invalidbooturlerror": "Incorrect boot url",
     "invalidremovedconnectionurlerror": "Invalid connection removed",
@@ -1555,7 +1555,7 @@
     "invalidconnectionurlerror": "Invalid connection URL",
     "profilenotexisterror": "This profile no longer exists",
     "memberalreadyexisterror": "Member already added",
-    "groupcreated": "Group created"
+    "groupcreated": "Group successfully created"
   },
   "request": {
     "sign": {
