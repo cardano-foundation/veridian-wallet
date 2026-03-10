@@ -109,7 +109,15 @@ jest.mock("@capacitor/core", () => {
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   ...jest.requireActual("@capgo/capacitor-native-biometric"),
   NativeBiometric: {
-    isAvailable: jest.fn(),
+    isAvailable: jest.fn(() =>
+      Promise.resolve({
+        isAvailable: true,
+        biometryType: "fingerprint",
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
+      })
+    ),
     verifyIdentity: jest.fn(),
     getCredentials: jest.fn(),
     setCredentials: jest.fn(),

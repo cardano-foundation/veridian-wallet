@@ -181,6 +181,9 @@ describe("Lock Page", () => {
         isAvailable: true,
         hasCredentials: false,
         biometryType: BiometryType.FINGERPRINT,
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
       },
       handleBiometricAuth: handleBiometricAuthMock,
       setBiometricsIsEnabled: jest.fn(),
@@ -506,6 +509,9 @@ describe("Lock Page: Max login attempt", () => {
         isAvailable: true,
         hasCredentials: false,
         biometryType: BiometryType.FINGERPRINT,
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
       },
       handleBiometricAuth: handleBiometricAuthMock,
       setBiometricsIsEnabled: jest.fn(),

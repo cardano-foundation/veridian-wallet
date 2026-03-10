@@ -66,6 +66,9 @@ describe("Verification", () => {
       biometricInfo: {
         isAvailable: true,
         biometryType: BiometryType.FINGERPRINT,
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
       },
       handleBiometricAuth: handleBiometricAuthMock,
       remainingLockoutSeconds: 0,

@@ -49,6 +49,9 @@ jest.mock("../../../../hooks/useBiometricsHook", () => ({
       isAvailable: false,
       hasCredentials: false,
       biometryType: BiometryType.FINGERPRINT,
+      authenticationStrength: 0, // NONE
+      deviceIsSecure: false,
+      strongBiometryIsAvailable: false,
     },
     handleBiometricAuth: () => handleBiometricAuthMock(),
     setBiometricsIsEnabled: jest.fn(),

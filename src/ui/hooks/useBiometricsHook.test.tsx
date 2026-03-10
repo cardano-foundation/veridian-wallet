@@ -1,9 +1,10 @@
+import { render, waitFor, fireEvent } from "@testing-library/react";
 import {
-  render, 
-  waitFor,
-  fireEvent
-} from "@testing-library/react";
-import { BiometricAuthError, BiometryType, NativeBiometric } from "@capgo/capacitor-native-biometric";
+  AuthenticationStrength,
+  BiometricAuthError,
+  BiometryType,
+  NativeBiometric,
+} from "@capgo/capacitor-native-biometric";
 import { act, useState } from "react";
 import { Provider } from "react-redux";
 import { store } from "../../store";
@@ -104,6 +105,9 @@ describe("useBiometricAuth Hook", () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.FACE_ID,
+      authenticationStrength: AuthenticationStrength.STRONG,
+      deviceIsSecure: true,
+      strongBiometryIsAvailable: true,
     });
     (NativeBiometric.verifyIdentity as jest.Mock).mockResolvedValue(undefined);
     (NativeBiometric.getCredentials as jest.Mock).mockResolvedValue({
@@ -133,6 +137,9 @@ describe("useBiometricAuth Hook", () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: false,
       biometryType: BiometryType.NONE,
+      authenticationStrength: AuthenticationStrength.NONE,
+      deviceIsSecure: false,
+      strongBiometryIsAvailable: false,
     });
 
     const { getByTestId, findByText } = render(
@@ -153,6 +160,9 @@ describe("useBiometricAuth Hook", () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.FACE_ID,
+      authenticationStrength: AuthenticationStrength.STRONG,
+      deviceIsSecure: true,
+      strongBiometryIsAvailable: true,
     });
     (NativeBiometric.verifyIdentity as jest.Mock).mockRejectedValue({
       message: "Authentication failed",
@@ -176,6 +186,9 @@ describe("useBiometricAuth Hook", () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.FACE_ID,
+      authenticationStrength: AuthenticationStrength.STRONG,
+      deviceIsSecure: true,
+      strongBiometryIsAvailable: true,
     });
     (NativeBiometric.verifyIdentity as jest.Mock).mockResolvedValue(undefined);
     (NativeBiometric.getCredentials as jest.Mock).mockRejectedValue({
@@ -195,14 +208,19 @@ describe("useBiometricAuth Hook", () => {
 
     expect(await findByText("Generic Error")).toBeInTheDocument();
   });
-
-  
 });
 
 describe("useBiometricAuth Hook: setupBiometrics", () => {
   const SetupTestComponent = () => {
     const { setupBiometrics } = useBiometricAuth();
-    return <button data-testid="setup-biometric-btn" onClick={setupBiometrics}>Setup</button>;
+    return (
+      <button
+        data-testid="setup-biometric-btn"
+        onClick={setupBiometrics}
+      >
+        Setup
+      </button>
+    );
   };
 
   beforeEach(() => {
@@ -213,8 +231,13 @@ describe("useBiometricAuth Hook: setupBiometrics", () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.FACE_ID,
+      authenticationStrength: AuthenticationStrength.STRONG,
+      deviceIsSecure: true,
+      strongBiometryIsAvailable: true,
     });
-    (NativeBiometric.getCredentials as jest.Mock).mockRejectedValue(new Error("No credentials"));
+    (NativeBiometric.getCredentials as jest.Mock).mockRejectedValue(
+      new Error("No credentials")
+    );
     (NativeBiometric.setCredentials as jest.Mock).mockResolvedValue(undefined);
 
     const { getByTestId } = render(
@@ -237,6 +260,9 @@ describe("useBiometricAuth Hook: setupBiometrics", () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.FACE_ID,
+      authenticationStrength: AuthenticationStrength.STRONG,
+      deviceIsSecure: true,
+      strongBiometryIsAvailable: true,
     });
     (NativeBiometric.getCredentials as jest.Mock).mockResolvedValue({
       username: "test",
@@ -263,6 +289,9 @@ describe("useBiometricAuth Hook: setupBiometrics", () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: false,
       biometryType: BiometryType.NONE,
+      authenticationStrength: AuthenticationStrength.NONE,
+      deviceIsSecure: false,
+      strongBiometryIsAvailable: false,
     });
 
     const { getByTestId } = render(
@@ -285,6 +314,9 @@ describe("useBiometricAuth Hook: setupBiometrics", () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.NONE,
+      authenticationStrength: AuthenticationStrength.STRONG,
+      deviceIsSecure: true,
+      strongBiometryIsAvailable: true,
     });
 
     const { getByTestId } = render(
@@ -307,9 +339,16 @@ describe("useBiometricAuth Hook: setupBiometrics", () => {
     (NativeBiometric.isAvailable as jest.Mock).mockResolvedValue({
       isAvailable: true,
       biometryType: BiometryType.FACE_ID,
+      authenticationStrength: AuthenticationStrength.STRONG,
+      deviceIsSecure: true,
+      strongBiometryIsAvailable: true,
     });
-    (NativeBiometric.getCredentials as jest.Mock).mockRejectedValue(new Error("No credentials"));
-    (NativeBiometric.setCredentials as jest.Mock).mockRejectedValue(new Error("Set credentials failed"));
+    (NativeBiometric.getCredentials as jest.Mock).mockRejectedValue(
+      new Error("No credentials")
+    );
+    (NativeBiometric.setCredentials as jest.Mock).mockRejectedValue(
+      new Error("Set credentials failed")
+    );
 
     const { getByTestId } = render(
       <Provider store={store}>
@@ -331,7 +370,14 @@ describe("useBiometricAuth Hook: setupBiometrics", () => {
 describe("useBiometricAuth Hook: checkBiometrics", () => {
   const CheckBiometricsComponent = () => {
     const { checkBiometrics } = useBiometricAuth();
-    return <button data-testid="check-biometric-btn" onClick={checkBiometrics}>Check</button>;
+    return (
+      <button
+        data-testid="check-biometric-btn"
+        onClick={checkBiometrics}
+      >
+        Check
+      </button>
+    );
   };
 
   beforeEach(() => {
@@ -357,7 +403,9 @@ describe("useBiometricAuth Hook: checkBiometrics", () => {
   });
 
   test("should return not available when isAvailable throws an error", async () => {
-    (NativeBiometric.isAvailable as jest.Mock).mockRejectedValue(new Error("Some error"));
+    (NativeBiometric.isAvailable as jest.Mock).mockRejectedValue(
+      new Error("Some error")
+    );
 
     const { getByTestId, findByText } = render(
       <Provider store={store}>

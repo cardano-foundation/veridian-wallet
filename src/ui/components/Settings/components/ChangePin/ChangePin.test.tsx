@@ -69,7 +69,10 @@ describe("ChangePin Modal", () => {
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.FINGERPRINT
+        biometryType: BiometryType.FINGERPRINT,
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
       },
       handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
       setBiometricsIsEnabled: jest.fn(),
@@ -146,7 +149,10 @@ describe("ChangePin Modal", () => {
       biometricInfo: {
         isAvailable: true,
         hasCredentials: false,
-        biometryType: BiometryType.FINGERPRINT
+        biometryType: BiometryType.FINGERPRINT,
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
       },
       handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
       setBiometricsIsEnabled: jest.fn(),
@@ -201,4 +207,3 @@ describe("ChangePin Modal", () => {
     });
   });
 });
-
