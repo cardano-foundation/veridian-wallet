@@ -174,15 +174,15 @@ export class ProfileSetupScreen {
   }
 
   /** Wait until group is active (user on home) or timeout. */
-  async waitForGroupActive(timeoutMs: number) {
+  async waitForGroupActive(timeout: number) {
     await browser.waitUntil(
       async () => {
         const url = await browser.getUrl();
         return url.includes("/tabs/home") || url.includes("/home");
       },
       {
-        timeout: timeoutMs,
-        timeoutMsg: `Group did not become active within ${timeoutMs}ms (expected redirect to home)`,
+        timeout: timeout,
+        timeoutMsg: `Group did not become active within ${timeout}ms (expected redirect to home)`,
       }
     );
   }

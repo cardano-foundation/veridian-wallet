@@ -9,7 +9,6 @@ import {
   d,
   messagize,
   randomPasscode,
-  ready,
   Siger,
   SignifyClient,
   Tier,
@@ -31,13 +30,6 @@ export interface WitnessesConfig {
   witnesses: WitnessConfig[];
 }
 
-// --- KERIA bootstrap ---
-
-/** Check KERIA is up (e.g. GET boot). Throw with a clear message if not. */
-export type InitKeria = () => Promise<void>;
-
-// --- Backend user (OOBI provider: app is initiator, backend is member) ---
-
 export interface GetOobiOptions {
   role?: string;
   alias?: string;
@@ -45,89 +37,23 @@ export interface GetOobiOptions {
   groupName?: string;
 }
 
-/** Backend user that gives an OOBI for the app to paste (e.g. Bob in Alice-creates-group flow). */
-export interface IBackendUser {
-  getOobi(options?: GetOobiOptions): Promise<string>;
-  getAid(): Promise<string>;
-  /** After Alice sends the request: wait for multisig ICP and accept/join so the group becomes active. */
-  acceptGroupInvitation(timeoutMs?: number): Promise<void>;
-  reset?(): void;
-  waitOperation?(operationId: string, timeoutMs?: number): Promise<void>;
-}
-
-/** Create or get a backend user by alias (e.g. "Bob", "Charlie"). */
-export type SetupBackendUser = (alias: string) => Promise<IBackendUser>;
-
-// --- Remote initiator (backend proposes group, app joins) ---
-
-export interface CreateGroupOptions {
-  isith?: number | string;
-  nsith?: number | string;
+interface CreateGroupOptions {
+  isith: number;
+  nsith: number;
   toad?: number;
   wits?: string[];
 }
 
-/** Backend that can set up a remote initiator, create a group, and propose it to all members. */
-export interface IRemoteInitiator {
-  oobi?: string;
-  getOobi(options?: GetOobiOptions): Promise<string>;
-  getAid(): Promise<string>;
-  generateOobi(role?: string): Promise<void>;
-  resolveOobi(oobi: string, alias: string): Promise<void>;
-  createAndProposeGroup(
-    groupName: string,
-    joinerAids: string[],
-    options?: CreateGroupOptions
-  ): Promise<{ groupId: string }>;
-  waitPendingOperations(type?: string): Promise<void>;
-  authorizeGroupAgents(groupName: string): Promise<void>;
-  processIncomingGroupAgentsEndorcements(groupName: string): Promise<void>;
-}
+const DEFAULT_WITNESSES_CONFIG = { toad: 0, witnesses: [] };
 
-/** One-time setup: connect to KERIA and create the initiator identifier. */
-export type SetupRemoteInitiator = () => Promise<IRemoteInitiator>;
-
-/** Factory to create a standard Joiner (VirtualWallet) */
-export const createBackendUser = async (
-  alias: string,
-  config: KeriaConfig,
-  witnessesConfig: WitnessesConfig
-): Promise<VirtualWallet> => {
-  await ready();
-  const user = new VirtualWallet(alias, config);
-  await user.init(witnessesConfig);
-  return user;
-};
-
-/** Factory to create a Joiner (RemoteJoiner) */
-export const createRemoteJoiner = async (
-  alias: string,
-  config: KeriaConfig,
-  witnessesConfig: WitnessesConfig
-): Promise<RemoteJoiner> => {
-  await ready();
-  const user = new RemoteJoiner(alias, config);
-  await user.init(witnessesConfig);
-  return user;
-};
-
-/** Factory to create an Initiator (RemoteInitiator) */
-export const createRemoteInitiator = async (
-  alias: string,
-  config: KeriaConfig,
-  witnessesConfig: WitnessesConfig
-): Promise<RemoteInitiator> => {
-  await ready();
-  const user = new RemoteInitiator(alias, config);
-  await user.init(witnessesConfig);
-  return user;
-};
+// --- Virtual Wallet ---
 
 export class VirtualWallet {
   public client: SignifyClient;
   public aidName: string;
   public prefix: string | undefined;
   public oobi?: string;
+  private pendingOperations: Operation[] = [];
 
   constructor(
     public alias: string,
@@ -138,28 +64,24 @@ export class VirtualWallet {
     this.aidName = `${alias}_AID`;
   }
 
-  async init(witnesses: WitnessesConfig): Promise<void> {
+  async init(witnesses: WitnessesConfig = DEFAULT_WITNESSES_CONFIG): Promise<void> {
     await this.client.boot();
     await this.client.connect();
 
-    try {
-      const result = await this.client.identifiers().create(this.aidName, witnesses);
-      await this.waitOperation(await result.op());
-      const aid = await this.client.identifiers().get(this.aidName);
-      this.prefix = aid.prefix;
+    const result = await this.client.identifiers().create(this.aidName, witnesses);
+    await this.waitOperation(await result.op());
+    const aid = await this.client.identifiers().get(this.aidName);
+    this.prefix = aid.prefix;
 
-      const agentPre = (this.client as SignifyClient & { agent?: { pre: string } }).agent?.pre;
-      if (agentPre) {
-        try {
-          const roleResult = await this.client.identifiers().addEndRole(this.aidName, "agent", agentPre);
-          await this.waitOperation(await roleResult.op());
-        } catch (err: unknown) {
-          const msg = err instanceof Error ? err.message : String(err);
-          if (!/400/gi.test(msg) || !/already/gi.test(msg)) throw err;
-        }
+    const agentPre = (this.client as SignifyClient & { agent?: { pre: string } }).agent?.pre;
+    if (agentPre) {
+      try {
+        const roleResult = await this.client.identifiers().addEndRole(this.aidName, "agent", agentPre);
+        await this.waitOperation(await roleResult.op());
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (!/400/gi.test(msg) || !/already/gi.test(msg)) throw err;
       }
-    } catch (e) {
-      if (e instanceof Error) console.error(`[${this.alias}] Failed init: ${e.message}`);
     }
   }
 
@@ -170,23 +92,15 @@ export class VirtualWallet {
 
   async resolveOobi(oobi: string, alias: string): Promise<void> {
     console.log(`[${this.alias}] Resolving OOBI for ${alias}...`);
-    try {
-      const op = await this.client.oobis().resolve(oobi, alias);
-      await this.waitOperation(op);
-    } catch (e) {
-      console.warn(`[${this.alias}] OOBI resolution warning (might be resolved). ${e}`);
-    }
-  }
-
-  async generateOobi(role: string = "agent") {
-    console.log(`[${this.alias}] Generating OOBI`);
-    const result = await this.client.oobis().get(this.aidName, role);
-    this.oobi = result.oobis[0];
+    const op = await this.client.oobis().resolve(oobi, alias);
+    await this.waitOperation(op);
   }
 
   async getOobi(options?: GetOobiOptions): Promise<string> {
     const role = options?.role || "agent";
     const result = await this.client.oobis().get(this.aidName, role);
+    if (!result.oobi) this.oobi = result.oobis[0];
+
     let url = result.oobis[0];
     if (!url || typeof url !== "string") {
       throw new Error("KERIA oobis.get returned no OOBI URL");
@@ -226,10 +140,6 @@ export class VirtualWallet {
     }
     throw new Error(`Timeout waiting for notification on route ${route}`);
   }
-}
-
-export class RemoteJoiner extends VirtualWallet {
-  private pendingOperations: Operation[] = [];
 
   public pushOperation(operation: Operation): void {
     this.pendingOperations.push(operation);
@@ -347,18 +257,12 @@ export class RemoteJoiner extends VirtualWallet {
 
       console.log(`[${this.alias}] Authorizing Agent ${agentEid} for Member ${member.aid}`);
 
-      try {
-        const roleHelper = new Role(this, groupName, true);
+      const roleHelper = new Role(this, groupName, true);
 
-
-        await roleHelper.add("agent", agentEid);
-        if (recipients.length > 0) {
-          await roleHelper.send(recipients);
-          console.log(`[${this.alias}] Sent authorization endorsement to ${recipients.length} recipients.`);
-        }
-
-      } catch (e) {
-        console.error(`[${this.alias}] Error authorizing agent for ${member.aid}:`, e);
+      await roleHelper.add("agent", agentEid);
+      if (recipients.length > 0) {
+        await roleHelper.send(recipients);
+        console.log(`[${this.alias}] Sent authorization endorsement to ${recipients.length} recipients.`);
       }
     }
 
@@ -383,7 +287,9 @@ export class RemoteJoiner extends VirtualWallet {
   }
 }
 
-export class RemoteInitiator extends RemoteJoiner {
+export class RemoteJoiner extends VirtualWallet { }
+
+export class RemoteInitiator extends VirtualWallet {
 
   /**
    * Creates a multisig group with all provided member AIDs (joiner AIDs, excluding initiator)
@@ -397,8 +303,13 @@ export class RemoteInitiator extends RemoteJoiner {
   async createAndProposeGroup(
     groupName: string,
     joinerAids: string[],
-    options: { isith?: number | string; nsith?: number | string; toad?: number; wits?: string[] } = {}
+    options: CreateGroupOptions = { isith: 1, nsith: 1, toad: 0, wits: [] }
   ): Promise<{ groupId: string }> {
+    if (!joinerAids.length) {
+      console.warn(`[${this.alias}] No joiner AIDs provided. Creating group with only the initiator as member.`);
+      throw new Error("At least one joiner AID must be provided to create a group");
+    }
+
     const myAid = await this.getAid();
     const allMemberIds = [myAid, ...joinerAids];
 
@@ -410,8 +321,8 @@ export class RemoteInitiator extends RemoteJoiner {
     const group = new Group(this.client, this.aidName, groupName, memberStates);
 
     await group.create({
-      isith: options.isith ?? 1,
-      nsith: options.nsith ?? 1,
+      isith: options.isith,
+      nsith: options.nsith,
       toad: options.toad ?? 0,
       wits: options.wits ?? [],
       rstates: memberStates,
@@ -419,10 +330,7 @@ export class RemoteInitiator extends RemoteJoiner {
 
     const groupId = await group.getPrefix();
     console.log(`[${this.alias}] Created group ${groupName} with id ${groupId}. Proposing to: ${joinerAids.join(", ")}`);
-
-    if (joinerAids.length > 0) {
-      await group.send(joinerAids);
-    }
+    await group.send(joinerAids);
 
     this.pushOperation(group.operation);
 

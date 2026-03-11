@@ -1,20 +1,27 @@
-import { After, Given, When, Then } from "@wdio/cucumber-framework";
+import { Given, When, Then } from "@wdio/cucumber-framework";
 import type { DataTable } from "@cucumber/cucumber";
 import { browser, driver } from "@wdio/globals";
 import ProfileSetupScreen from "../../screen-objects/onboarding/profile-setup.screen.js";
-import {
-  RemoteInitiator,
-  RemoteJoiner,
-  createRemoteInitiator,
-  createRemoteJoiner,
-} from "../../helpers/backend-api.contract.js";
+import { RemoteInitiator, RemoteJoiner } from "../../helpers/virtual-wallet.js";
+import { createRemoteInitiator, createVirtualWallet } from "../../helpers/virtual-wallet.factory.js";
 import {
   getKeriaUrlsForTestRunner,
 } from "../../helpers/ssi-agent-urls.helper.js";
+import {
+  pageShowsMessage,
+  dismissLockScreenIfPresent,
+  waitUpTo,
+  getPendingGroupPrimaryButtonText,
+  getLatestToastMessage,
+  getConnectedMembersProgressText,
+  pasteOobiAndConfirm,
+  assertGroupProfileActiveInProfilesList,
+  extractAidFromOobi,
+  normalizeOobiHostname,
+} from "./group-profile.helpers.js";
 
 const GROUP_ID_MISMATCH_MSG = "Connection not part of this group";
 const GENERIC_CONNECTION_ERROR_MSG = "Something went wrong. Please try again.";
-const DEFAULT_WITNESSES_CONFIG = { toad: 0, witnesses: [] };
 
 // ---------------------------------------------------------------------------
 // World context shared across steps in one scenario
@@ -36,294 +43,31 @@ type BobJoinerWorld = {
 };
 
 // ---------------------------------------------------------------------------
-// Shared UI helpers
-// ---------------------------------------------------------------------------
-
-async function pageShowsMessage(msg: string): Promise<boolean> {
-  return (await browser.execute((m: string) => {
-    const bodyText = document.body?.innerText ?? "";
-    if (bodyText.includes(m)) return true;
-    const toasts = document.querySelectorAll("ion-toast");
-    for (const toast of Array.from(toasts)) {
-      const root = (toast as HTMLElement).shadowRoot;
-      if (!root) continue;
-      const messageEl =
-        root.querySelector(".toast-message") ??
-        root.querySelector("[part='message']");
-      if ((messageEl?.textContent?.trim() ?? "").includes(m)) return true;
-    }
-    return false;
-  }, msg)) as boolean;
-}
-
-/**
- * Dismisses the lock screen if it is currently covering the UI.
- * The lock page's tertiary button intercepts native clicks on any element
- * that shares the same screen coordinates. Call this before every important
- * UI action that might be affected by auto-lock.
- */
-async function dismissLockScreenIfPresent(): Promise<void> {
-  const lockPage = $("[data-testid='tertiary-button-lock-page']");
-  if (await lockPage.isExisting().catch(() => false)) {
-    await browser.execute(() => {
-      const btn = document.querySelector(
-        "[data-testid='tertiary-button-lock-page']"
-      ) as HTMLElement | null;
-      if (btn) btn.click();
-    });
-    await browser.waitUntil(
-      async () =>
-        !(await $("[data-testid='tertiary-button-lock-page']")
-          .isExisting()
-          .catch(() => false)),
-      { timeout: 5000, interval: 200 }
-    );
-  }
-}
-
-/** Wait until condition is true or maxMs elapses (exits as soon as condition is true). */
-async function waitUpTo(
-  condition: () => Promise<boolean>,
-  maxMs: number,
-  intervalMs = 150
-): Promise<void> {
-  await browser.waitUntil(condition, {
-    timeout: maxMs,
-    interval: intervalMs,
-    timeoutMsg: `Condition not met within ${maxMs}ms`,
-  });
-}
-
-async function getPendingGroupPrimaryButtonText(): Promise<string> {
-  return (
-    ((await browser.execute(() => {
-      const btn = document.querySelector(
-        "[data-testid='primary-button-pending-group']"
-      ) as HTMLElement | null;
-      return btn?.innerText?.trim() ?? btn?.textContent?.trim() ?? "";
-    })) as string) || ""
-  );
-}
-
-async function getLatestToastMessage(): Promise<string> {
-  return (
-    ((await browser.execute(() => {
-      const toasts = Array.from(document.querySelectorAll("ion-toast"));
-      for (const toast of toasts.reverse()) {
-        const root = (toast as HTMLElement).shadowRoot;
-        if (!root) continue;
-        const messageEl =
-          root.querySelector(".toast-message") ??
-          root.querySelector("[part='message']");
-        const text = messageEl?.textContent?.trim() ?? "";
-        if (text) return text;
-      }
-      return "";
-    })) as string) || ""
-  );
-}
-
-async function getConnectedMembersProgressText(): Promise<string> {
-  return (
-    ((await browser.execute(() => {
-      const bodyText = document.body?.innerText ?? "";
-      const match = bodyText.match(/\d+\s+out of\s+\d+\s+connected members/i);
-      return match?.[0] ?? "";
-    })) as string) || ""
-  );
-}
-
-async function pasteOobiAndConfirm(oobi: string, useJsClick = false): Promise<void> {
-  const pasteButton = $("[data-testid='paste-content-button']");
-  await pasteButton.waitForDisplayed({ timeout: 15000 });
-  await pasteButton.scrollIntoView?.().catch(() => {});
-  if (useJsClick) {
-    await browser.execute(() => {
-      const btn = document.querySelector("[data-testid='paste-content-button']");
-      if (btn) (btn as HTMLElement).click();
-    });
-  } else {
-    await pasteButton.click();
-  }
-
-  const scanInput = $("[data-testid='scan-input']");
-  await scanInput.waitForDisplayed({ timeout: 5000 });
-  try {
-    await scanInput.setValue(oobi);
-  } catch {
-    await browser.execute(
-      (o: string) => {
-        const el = document.querySelector(
-          "[data-testid='scan-input']"
-        ) as HTMLInputElement & { shadowRoot?: ShadowRoot };
-        if (!el) return;
-        const input = el.shadowRoot?.querySelector("input") ?? el;
-        if (input) {
-          (input as HTMLInputElement).value = o;
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-          input.dispatchEvent(new Event("ionInput", { bubbles: true }));
-        }
-      },
-      oobi
-    );
-  }
-  const confirmBtn = $(
-    "[data-testid='scan-input-modal'] [data-testid='action-button']"
-  );
-  await confirmBtn.waitForDisplayed({ timeout: 5000 });
-  await confirmBtn.click();
-  // Wait for modal to start closing (helps avoid racing the next screen)
-  await $("[data-testid='scan-input-modal']").waitForExist({
-    reverse: true,
-    timeout: 5000,
-  });
-}
-
-async function assertGroupProfileActiveInProfilesList(
-  displayName: string
-): Promise<void> {
-  const avatarBtn = $("[data-testid='avatar-button']");
-  await avatarBtn.waitForDisplayed({ timeout: 10000 });
-  await browser.execute((sel: string) => {
-    const el = document.querySelector(sel) as HTMLElement | null;
-    if (el) el.click();
-  }, "[data-testid='avatar-button']");
-  await waitUpTo(
-    async () =>
-      (await browser.execute(() => {
-        const root = document.querySelector("[data-testid='profiles']");
-        return (
-          !!root &&
-          root.querySelectorAll("[data-testid^='profiles-list-item-']").length > 0
-        );
-      })) as boolean,
-    2000
-  );
-
-  const result = await browser.execute(
-    (name: string) => {
-      const want = (name || "").trim().toLowerCase();
-      const root = document.querySelector("[data-testid='profiles']");
-      if (!root)
-        return {
-          active: false,
-          reason: "profiles panel not found",
-          profileId: null as string | null,
-        };
-      const items = root.querySelectorAll(
-        "[data-testid^='profiles-list-item-']"
-      );
-      for (const item of items) {
-        const nameEl = item.querySelector(".profiles-list-item-name");
-        const currentName = (nameEl?.textContent?.trim() ?? "").toLowerCase();
-        if (currentName !== want) continue;
-        const testId = item.getAttribute("data-testid") ?? "";
-        const id = testId.replace(/^profiles-list-item-/, "");
-        const hasPending = !!item.querySelector(
-          `[data-testid='profiles-list-item-pending-${id}-status']`
-        );
-        const hasAction = !!item.querySelector(
-          `[data-testid='profiles-list-item-action-${id}-status']`
-        );
-        return {
-          active: !hasPending && !hasAction,
-          reason: hasPending ? "pending" : hasAction ? "action_required" : "ok",
-          profileId: id || null,
-        };
-      }
-      return {
-        active: false,
-        reason: "profile not found",
-        profileId: null as string | null,
-      };
-    },
-    displayName
-  );
-
-  if (!result?.active) {
-    throw new Error(
-      `Group profile "${displayName}" is not active in Profiles list (reason: ${result?.reason ?? "unknown"}).`
-    );
-  }
-  if (result?.profileId) {
-    const listItemSelector = `[data-testid='profiles-list-item-${result.profileId}']`;
-    await $(listItemSelector).waitForDisplayed({ timeout: 5000 });
-    await browser.execute((sel: string) => {
-      const el = document.querySelector(sel) as HTMLElement | null;
-      if (el) el.click();
-    }, listItemSelector);
-    await waitUpTo(
-      () =>
-        $("[data-testid='profiles-option-button-manage profile']")
-          .isDisplayed()
-          .catch(() => false),
-      1500
-    );
-  }
-  const manageProfileSelector = "[data-testid='profiles-option-button-manage profile']";
-  await $(manageProfileSelector).waitForDisplayed({ timeout: 5000 });
-  await browser.execute((sel: string) => {
-    const el = document.querySelector(sel) as HTMLElement | null;
-    if (el) el.click();
-  }, manageProfileSelector);
-  // no fixed pause here; next steps will wait on their own conditions
-}
-
-/**
- * Extracts the AID (prefix) from a standard KERIA OOBI URL.
- * Format: http://<host>:<port>/oobi/<aid>/agent/<eid>
- */
-function extractAidFromOobi(oobiUrl: string): string {
-  const url = new URL(oobiUrl);
-  const pathParts = url.pathname.split("/").filter(Boolean);
-  const oobiIdx = pathParts.indexOf("oobi");
-  if (oobiIdx === -1 || oobiIdx >= pathParts.length - 1) {
-    throw new Error(`Cannot extract AID from OOBI URL: ${oobiUrl}`);
-  }
-  return pathParts[oobiIdx + 1];
-}
-
-/**
- * Replace only the hostname in a KERIA OOBI URL so the receiving party
- * can reach KERIA. The port is intentionally preserved from the original URL
- * because KERIA may serve OOBIs on a different port (e.g. 3902) than the
- * connect API (3901).
- *
- * Never use appUrls.connectUrl (10.0.2.2) here: that IP is only meaningful
- * inside the Android emulator and is NOT reachable from Docker containers.
- */
-function normalizeOobiHostname(oobiUrl: string, targetConnectUrl: string): string {
-  const u = new URL(oobiUrl);
-  u.hostname = new URL(targetConnectUrl).hostname;
-  return u.toString();
-}
-
-// ---------------------------------------------------------------------------
 // Step 1 (BACKEND) – Alice creates a pending group so Bob can join
 // ---------------------------------------------------------------------------
 
 Given(
-  /^the remote initiator Alice creates a pending group "([^"]+)"$/,
-  async function (groupName: string) {
+  /^the remote initiator "([^"]+)" creates a pending (\d+)-of-(\d+) group "([^"]+)"$/,
+  async function (initiatorName: string, required: string, recovery: string, baseGroupName: string) {
     const world = this as BobJoinerWorld;
+
+    const groupName = `${baseGroupName}-${required}o${recovery}`;
     world.bobGroupName = groupName;
 
     const testRunnerUrls = getKeriaUrlsForTestRunner();
 
-    const initiator = await createRemoteInitiator(
-      "Alice",
-      testRunnerUrls,
-      DEFAULT_WITNESSES_CONFIG
-    );
+    // Create remote initiator
+    const initiator = await createRemoteInitiator(initiatorName);
     world.remoteInitiator = initiator;
-    await initiator.generateOobi();
 
-    const aliceAid = await initiator.getAid();
-    world.aliceAid = aliceAid;
+    await initiator.getOobi();
+
+    const initiatorAid = await initiator.getAid();
+    world.aliceAid = initiatorAid;
 
     const rawOobi = await initiator.getOobi({
-      alias: "Alice",
-      groupId: aliceAid,
+      alias: initiatorName,
+      groupId: initiatorAid,
       groupName,
     });
 
@@ -413,7 +157,6 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
     }
   );
   console.log("[Bob] Reached group-profile-setup page");
-  // no fixed pause; next wait will synchronize
 
   // ── Capture Bob's OOBI from the Share (Provide) tab ──────────────────────
   await browser.waitUntil(
@@ -464,7 +207,7 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
 
   const shareButton = $(".share-profile-oobi .share-button");
   await shareButton.waitForDisplayed({ timeout: 5000 });
-  await shareButton.scrollIntoView?.().catch(() => {});
+  await shareButton.scrollIntoView?.().catch(() => { });
 
   let bobOobiUrl: string | undefined;
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -476,10 +219,8 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
             (window as unknown as { __lastSharedOobi?: string }).__lastSharedOobi
         )) as string | undefined;
         return (shared?.length ?? 0) > 0;
-      },
-      1200,
-      100
-    ).catch(() => {});
+      }
+    ).catch(() => { });
     bobOobiUrl = (await browser.execute(
       () =>
         (window as unknown as { __lastSharedOobi?: string }).__lastSharedOobi
@@ -500,9 +241,8 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
       const url = await browser.getUrl().catch(() => "");
       if (url.includes("group-profile-setup")) return true;
       return (await $("[data-testid='profiles']").isExisting().catch(() => false));
-    },
-    2000
-  ).catch(() => {});
+    }
+  ).catch(() => { });
 });
 
 // ---------------------------------------------------------------------------
@@ -534,13 +274,9 @@ Given(
     world.extraVirtualMembers = {};
 
     for (const name of extraNames) {
-      const joiner = await createRemoteJoiner(
-        name,
-        testRunnerUrls,
-        DEFAULT_WITNESSES_CONFIG
-      );
+      const joiner = await createVirtualWallet(name);
       world.extraVirtualMembers[name] = joiner;
-      await joiner.generateOobi();
+      await joiner.getOobi();
       console.log(`[${name}] Virtual member created`);
     }
 
@@ -591,17 +327,16 @@ Given(
 
 When(
   /^Alice creates a (\d+)-of-(\d+) multisig group "([^"]+)" and proposes it to all members$/,
-  async function (requiredStr: string, recoveryStr: string, groupName: string) {
+  async function (requiredStr: string, recoveryStr: string, baseGroupName: string) {
     const world = this as BobJoinerWorld;
-    if (!world.remoteInitiator) {
-      throw new Error("Remote initiator (Alice) is not set up.");
-    }
-    if (!world.bobSharedOobi) {
-      throw new Error("Bob's OOBI has not been captured.");
-    }
+    if (!world.remoteInitiator) throw new Error("Remote initiator (Alice) is not set up.");
+    if (!world.bobSharedOobi) throw new Error("Bob's OOBI has not been captured.");
 
     const required = parseInt(requiredStr, 10);
     const recovery = parseInt(recoveryStr, 10);
+
+    const groupName = `${baseGroupName}-${required}o${recovery}`;
+    world.bobGroupName = groupName;
 
     const bobAid = extractAidFromOobi(world.bobSharedOobi);
 
@@ -683,7 +418,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
         $("[data-testid='primary-button-pending-group']")
           .isExisting()
           .catch(() => false),
-      { timeout: 10000, timeoutMsg: "Add members button did not appear" }
+      { timeout: 5000, timeoutMsg: "Add members button did not appear" }
     );
     await browser.execute(() => {
       const btn = document.querySelector(
@@ -694,7 +429,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
     // wait for ShareProfile UI to appear
     await $("[data-testid='scan-profile-segment-button']").waitForExist({
       timeout: 5000,
-    }).catch(() => {});
+    }).catch(() => { });
 
     // ShareProfile opens with Provide tab by default; paste button is on Scan tab
     const scanTab = $("[data-testid='scan-profile-segment-button']");
@@ -711,7 +446,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
     await $("[data-testid='scan-input-modal']").waitForExist({
       reverse: true,
       timeout: 5000,
-    }).catch(() => {});
+    }).catch(() => { });
 
     if (await pageShowsMessage(GENERIC_CONNECTION_ERROR_MSG)) {
       throw new Error(
@@ -731,7 +466,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
       await $("[data-testid='scan-input-modal']").waitForExist({
         reverse: true,
         timeout: 2000,
-      }).catch(() => {});
+      }).catch(() => { });
     }
 
     // After the OOBI is submitted the scan modal closes but ShareProfile screen
@@ -739,10 +474,9 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
     // the "Continue setup" button becomes visible.
     await driver.pressKeyCode(4);
     await browser.waitUntil(
-      async () =>
-        $("[data-testid='primary-button-pending-group']")
-          .isExisting()
-          .catch(() => false),
+      async () => {
+        return $("[data-testid='primary-button-pending-group']").isExisting().catch(() => false);
+      },
       { timeout: 10000, interval: 500, timeoutMsg: "PendingGroup primary button did not reappear after navigating back" }
     );
 
@@ -846,8 +580,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
       );
     },
     5000,
-    200
-  ).catch(() => {});
+  ).catch(() => { });
 
   // After Accept the app may land back on the QR scan/camera overlay on
   // group-profile-setup. The native camera blocks the webview from processing
@@ -866,7 +599,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
         ) as HTMLElement | null;
         if (tab) tab.click();
       });
-      await $(".share-profile-oobi").waitForExist({ timeout: 5000 }).catch(() => {});
+      await $(".share-profile-oobi").waitForExist({ timeout: 5000 }).catch(() => { });
     }
     console.log("[Bob] Camera dismissed, app can now receive group-active notifications");
   }
@@ -938,7 +671,7 @@ Then(/^the group becomes "Active" for the joiner$/, async function () {
         ) as HTMLElement | null;
         if (tab) tab.click();
       });
-      await $(".share-profile-oobi").waitForExist({ timeout: 5000 }).catch(() => {});
+      await $(".share-profile-oobi").waitForExist({ timeout: 5000 }).catch(() => { });
     }
   }
 
@@ -981,8 +714,4 @@ Then(/^the group becomes "Active" for the joiner$/, async function () {
   if (finalUrl.includes("/tabs/home") || finalUrl.includes("/home")) {
     await assertGroupProfileActiveInProfilesList(groupName);
   }
-});
-
-After(function () {
-  // Each scenario uses fresh RemoteInitiator / RemoteJoiner instances — nothing to reset
 });

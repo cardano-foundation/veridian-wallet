@@ -12,7 +12,7 @@ export const config: Options.Testrunner = {
   specFileRetriesDelay: 3,
   specFileRetriesDeferred: false,
   maxInstances: 1,
-  logLevel: "debug",
+  logLevel: "info",
   bail: 0,
   baseUrl: "LACK_OF_BASE_URL",
   waitforTimeout: 45000,
@@ -50,7 +50,7 @@ export const config: Options.Testrunner = {
       "./tests/actions/**/*.ts",
     ],
     tags: "",
-    timeout: 420 * 1000, // 420s – must exceed activeTimeoutMs (3s) in group-profile-joiner.steps.ts
+    timeout: 100 * 1000,
   },
   onPrepare: function (config, capabilities) {
     const screenshotsDir = path.join(process.cwd(), "tests", "screenshots");

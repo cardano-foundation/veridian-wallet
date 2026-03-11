@@ -12,9 +12,9 @@ Feature: Group Profile Multisig (Initiator and Members)
     And user enters connect URL "default"
     And user tap Validate button on SSI Agent Details screen
 
-  @onboarding @profile @group @multisig @alice-initiator
+  @onboarding @profile @group @multisig @initiator
   Scenario Outline: Initiator creates <required>-of-<recovery> multisig group and it becomes active
-    Given Alice creates a group profile as initiator
+    Given Alice creates a group profile as initiator for <required>-of-<recovery> group "MultisigGroup"
     And the following members resolve each others' OOBIs and create member ids:
       | name     |
       | <members> |
