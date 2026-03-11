@@ -50,6 +50,8 @@ import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./ReceiveCredential.scss";
 
 const ANIMATION_DELAY = 2600;
+// Cache viewport height on initial load to prevent issues with mobile browsers resizing the viewport when showing/hiding the keyboard, which can cause unwanted jumps in the animation.
+const INITIAL_VIEWPORT_HEIGHT = window.innerHeight;
 
 const ReceiveCredential = ({
   pageId,
@@ -214,14 +216,12 @@ const ReceiveCredential = ({
     const requestStatus = iconsRowRef.current.querySelector("#request-status");
     if (!requestStatus) return;
 
-    const combinedHeight =
-      iconRow.getBoundingClientRect().bottom -
-      requestStatus.getBoundingClientRect().top;
-
+    const combinedHeight = 28.5 + iconRow.getBoundingClientRect().height;
     const headerHeight = (header as HTMLDivElement).offsetHeight;
-    const viewportHeight = window.innerHeight;
+    const viewportHeight = INITIAL_VIEWPORT_HEIGHT;
 
     const opticalCenter = viewportHeight * 0.5;
+
     const translateY = opticalCenter - headerHeight - combinedHeight / 2;
 
     iconsRowRef.current.style.transform = `translateY(${translateY}px)`;
