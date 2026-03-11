@@ -218,8 +218,8 @@ export const ProfileSetup = ({
       }
 
       if (isModal) {
-        onClose?.();
         navToCredentials(identifier, isGroup);
+        onClose?.();
         return;
       }
 

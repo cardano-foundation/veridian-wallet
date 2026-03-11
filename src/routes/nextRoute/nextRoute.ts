@@ -59,18 +59,13 @@ const getNextRootRoute = (data: DataProps) => {
 
     const profile = currentProfile.identity;
     const isGroupProfile = !!(profile.groupMemberPre || profile.groupMetadata);
-    // We have 2 phrase group profile is pending: after create and after accept to join group
-    // This flag use to check group profile is pending after create
-    const isPendingAfterCreate =
-      profile.creationStatus === CreationStatus.PENDING &&
-      !profile.groupMemberPre;
 
     const isCreatedGroup =
       profile.groupMemberPre &&
       profile.creationStatus === CreationStatus.COMPLETE;
 
     path =
-      isGroupProfile && !isCreatedGroup && !isPendingAfterCreate
+      isGroupProfile && !isCreatedGroup
         ? RoutePath.GROUP_PROFILE_SETUP.replace(
             ":id",
             currentProfile.identity.id
