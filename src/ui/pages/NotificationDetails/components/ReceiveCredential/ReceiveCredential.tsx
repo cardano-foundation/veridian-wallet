@@ -205,7 +205,7 @@ const ReceiveCredential = ({
     }
   };
 
-  function moveContentToCenter() {
+  const moveContentToCenter = () => {
     if (!iconsRowRef.current) return;
     const header = document.getElementsByClassName("page-header")?.[0];
     if (!header) return;
@@ -225,12 +225,12 @@ const ReceiveCredential = ({
     const translateY = opticalCenter - headerHeight - combinedHeight / 2;
 
     iconsRowRef.current.style.transform = `translateY(${translateY}px)`;
-  }
+  };
 
-  function removeContentTranslation() {
+  const removeContentTranslation = () => {
     if (!iconsRowRef.current) return;
     iconsRowRef.current.style.transform = "";
-  }
+  };
 
   const handleAccept = async () => {
     try {
