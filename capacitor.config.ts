@@ -29,7 +29,7 @@ const config: CapacitorConfig = {
     PrivacyScreen: {
       enable: true,
       imageName: "Splashscreen",
-      preventScreenshots: true,
+      preventScreenshots: process.env.ENVIRONMENT === "prod",
     },
     Keyboard: {
       resize: KeyboardResize.Ionic,

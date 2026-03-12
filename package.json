@@ -17,6 +17,7 @@
     "eslint": "eslint 'src/**/*.{ts,tsx}'",
     "test": "jest",
     "wdio:android:s24ultra": "npx wdio tests/config/wdio.emu.android.galaxyS24Ultra.config.ts",
+    "e2e:onboarding": "npm run wdio:android:s24ultra -- --spec ./tests/features/onboarding/onboarding-new-wallet-e2e.feature",
     "wdio:ios:15promax": "npx wdio tests/config/wdio.sim.ios.iphone15ProMax.config.ts",
     "wdio:ios:16promax": "npx wdio tests/config/wdio.sim.ios.iphone16ProMax.config.ts",
     "prepare": "husky install",

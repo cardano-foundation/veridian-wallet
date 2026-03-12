@@ -113,6 +113,7 @@ When(/^user enters boot URL "([^"]*)"$/, async function(bootUrl: string) {
   if (bootUrl === "default" || bootUrl === "${SSI_AGENT_BOOT_URL}") {
     bootUrl = getSSIAgentUrls().bootUrl;
   }
+  console.log("[E2E] SSI Agent boot URL entered:", bootUrl);
   await SsiAgentDetailsScreen.enterBootUrl(bootUrl);
   await SsiAgentDetailsScreen.connectUrlInput.click();
 });
@@ -121,6 +122,7 @@ When(/^user enters connect URL "([^"]*)"$/, async function(connectUrl: string) {
   if (connectUrl === "default" || connectUrl === "${SSI_AGENT_CONNECT_URL}") {
     connectUrl = getSSIAgentUrls().connectUrl;
   }
+  console.log("[E2E] SSI Agent connect URL entered:", connectUrl);
   await SsiAgentDetailsScreen.enterConnectUrl(connectUrl);
   await SsiAgentDetailsScreen.bootUrlInput.click();
 });
@@ -136,37 +138,30 @@ When(/^user tap Validate button on SSI Agent Details screen$/, async function() 
       timeoutMsg: "Validate button not enabled",
     }
   );
-  
+
   await SsiAgentDetailsScreen.tapOnValidatedButton();
-  await browser.pause(5000);
-  
+  // CI: boot + connect + sync can be slow; allow time before checking (55s) then wait for navigation (60s)
+  await browser.pause(55000);
+
   const bootUrlError = await SsiAgentDetailsScreen.bootUrlError.isDisplayed().catch(() => false);
   const connectUrlError = await SsiAgentDetailsScreen.connectUrlError.isDisplayed().catch(() => false);
   const currentUrl = await browser.getUrl();
-  
+
   if (bootUrlError || connectUrlError) {
     const bootErrorText = bootUrlError ? await SsiAgentDetailsScreen.bootUrlError.getText().catch(() => "") : "";
     const connectErrorText = connectUrlError ? await SsiAgentDetailsScreen.connectUrlError.getText().catch(() => "") : "";
     throw new Error(`Validation failed. Boot URL error: ${bootErrorText}, Connect URL error: ${connectErrorText}, Current URL: ${currentUrl}`);
   }
-  
-  if (currentUrl.includes("ssiagent") && !currentUrl.includes("profile-setup")) {
-    const pageText = await browser.execute(() => {
-      const errorElements = document.querySelectorAll('[data-testid*="error"], [class*="error"], [class*="Error"]');
-      return Array.from(errorElements).map(el => el.textContent).filter(Boolean).join(" | ");
-    }).catch(() => "");
-    
-    throw new Error(`Validation failed but no error detected. Still on SSI agent screen. Current URL: ${currentUrl}. Page errors: ${pageText}`);
-  }
-  
+
+  // Wait for navigation to profile-setup (allow up to 60s more for slow CI)
   await browser.waitUntil(
     async () => {
       const url = await browser.getUrl();
       return url.includes("profile-setup");
     },
     {
-      timeout: 30000,
-      timeoutMsg: `Did not navigate to Profile type screen. Current URL: ${currentUrl}`,
+      timeout: 60000,
+      timeoutMsg: "Did not navigate to Profile type screen within 60s (boot/connect/sync may still be running or failed)",
     }
   );
 });

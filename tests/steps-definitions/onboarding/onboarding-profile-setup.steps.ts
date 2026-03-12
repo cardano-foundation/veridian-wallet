@@ -1,6 +1,7 @@
 import { Given, Then, When } from "@wdio/cucumber-framework";
 import { expect } from "expect-webdriverio";
 import { browser } from "@wdio/globals";
+import allure from "@wdio/allure-reporter";
 import ProfileSetupScreen from "../../screen-objects/onboarding/profile-setup.screen.js";
 
 Then(/^user can see "Individual profile" option$/, async function () {
@@ -32,18 +33,37 @@ When(/^user selects Group profile option$/, async function () {
 When(/^user taps Confirm button on Profile type screen$/, async function () {
   await expect(ProfileSetupScreen.confirmButton).toBeDisplayed();
   await ProfileSetupScreen.confirmButton.click();
-  // Wait for either group setup or individual profile setup screen based on selection
-  await browser.waitUntil(
-    async () => {
-      const groupNameInput = await ProfileSetupScreen.groupNameInput.isExisting().catch(() => false);
-      const usernameInput = await ProfileSetupScreen.usernameInput.isExisting().catch(() => false);
-      return groupNameInput || usernameInput;
-    },
-    {
-      timeout: 15000,
-      timeoutMsg: "Did not navigate to setup screen after confirming profile type",
-    }
-  );
+  try {
+    // Wait for either group setup or individual profile setup screen based on selection
+    await browser.waitUntil(
+      async () => {
+        const groupNameInput = await ProfileSetupScreen.groupNameInput.isExisting().catch(() => false);
+        const usernameInput = await ProfileSetupScreen.usernameInput.isExisting().catch(() => false);
+        return groupNameInput || usernameInput;
+      },
+      {
+        timeout: 15000,
+        timeoutMsg: "Did not navigate to setup screen after confirming profile type",
+      }
+    );
+  } catch (e) {
+    // Capture visible errors (toast, error text) so we know if Confirm caused an error
+    const currentUrl = await browser.getUrl().catch(() => "");
+    const pageErrors = await browser
+      .execute(() => {
+        const errorEls = document.querySelectorAll(
+          '[data-testid*="error"], [class*="error"], [class*="Error"], ion-toast .toast-message'
+        );
+        return Array.from(errorEls)
+          .map((el) => el.textContent?.trim())
+          .filter(Boolean)
+          .join(" | ");
+      })
+      .catch(() => "");
+    throw new Error(
+      `Confirm on profile type failed. Did not navigate to setup screen. Current URL: ${currentUrl}. ${pageErrors ? `Page errors/toast: ${pageErrors}` : ""}`
+    );
+  }
   // If group setup screen, wait for it; otherwise wait for profile setup screen
   const isGroupSetup = await ProfileSetupScreen.groupNameInput.isExisting().catch(() => false);
   if (isGroupSetup) {
@@ -123,8 +143,47 @@ Then(/^Confirm button is enabled$/, async function () {
 
 When(/^user taps Confirm button on Profile setup screen$/, async function () {
   await expect(ProfileSetupScreen.confirmButton).toBeDisplayed();
+  const wasEnabled = await ProfileSetupScreen.isConfirmButtonEnabled();
+  if (!wasEnabled) {
+    throw new Error("Confirm button is disabled; cannot click. Ensure username is valid and button is enabled.");
+  }
   await ProfileSetupScreen.confirmButton.click();
-  await ProfileSetupScreen.waitForWelcomeScreen();
+  console.log("[E2E] Confirm button on Profile setup was clicked");
+  // Short pause then check if we're still on profile setup or if any error appeared
+  await browser.pause(2000);
+  const stillOnProfileSetup = await ProfileSetupScreen.usernameInput.isDisplayed().catch(() => false);
+  if (stillOnProfileSetup) {
+    const errorText = await browser
+      .execute(() => {
+        const el = document.querySelectorAll(
+          '[data-testid*="error"], [class*="error"], [class*="Error"], ion-toast .toast-message, [class*="toast"]'
+        );
+        return Array.from(el).map((n) => n.textContent?.trim()).filter(Boolean).join(" | ");
+      })
+      .catch(() => "");
+    const url = await browser.getUrl().catch(() => "");
+    const msg = `Still on Profile setup 2s after Confirm. URL: ${url}. ${errorText ? `Errors/toast: ${errorText}` : "No visible error text."}`;
+    console.warn("[E2E]", msg);
+    allure.addAttachment("Profile setup: state 2s after Confirm", msg, "text/plain");
+  }
+  // Allow time for profile creation to start before waiting for welcome screen (CI can be slow)
+  await browser.pause(5000);
+  try {
+    await ProfileSetupScreen.waitForWelcomeScreen();
+  } catch (e) {
+    const url = await browser.getUrl().catch(() => "");
+    const pageErrors = await browser
+      .execute(() => {
+        const el = document.querySelectorAll(
+          '[data-testid*="error"], [class*="error"], [class*="Error"], ion-toast .toast-message, .finish-setup'
+        );
+        return Array.from(el).map((n) => n.textContent?.trim()).filter(Boolean).join(" | ");
+      })
+      .catch(() => "");
+    const body = `URL: ${url}\nVisible error/feedback: ${pageErrors || "(none)"}`;
+    allure.addAttachment("Profile setup → Welcome failed: page state", body, "text/plain");
+    throw e;
+  }
 });
 
 When(/^user taps Confirm button on Group setup screen$/, async function () {

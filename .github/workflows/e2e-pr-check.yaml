@@ -9,6 +9,9 @@ jobs:
   e2e-onboarding-intro:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: local
+      KERIA_IP: "10.0.2.2"
     steps:
 
       # Running some environment optimization as per https://github.com/ReactiveCircus/android-emulator-runner/issues/324#issuecomment-2009351180
@@ -54,20 +57,83 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project for E2E
-        run: |
-          export LANG=en_US.UTF-8
-          export KERIA_IP=10.0.2.2
-          npm run build:e2e
+      # KERIA runs local to this runner (Docker on the same host), not on dev k8s or any shared cluster.
+      # It must be reachable at 10.0.2.2 (emulator → host). We use host network so the emulator can reach it.
+      - name: Start KERIA (Docker)
+        run: docker compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d keria
 
-      - name: Build Android APK
+      - name: Wait for KERIA to be ready
+        run: npx wait-on --timeout 90000 tcp:127.0.0.1:3901 tcp:127.0.0.1:3903
+
+      - name: Wait for KERIA HTTP to respond
+        run: |
+          for i in $(seq 1 45); do
+            c1=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 http://127.0.0.1:3901/ 2>/dev/null || true)
+            c3=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 http://127.0.0.1:3903/ 2>/dev/null || true)
+            if [ -n "$c1" ] && [ -n "$c3" ]; then echo "KERIA responded: 3901(connect)=$c1 3903(boot)=$c3"; exit 0; fi
+            sleep 2
+          done
+          echo "KERIA did not respond on 3901/3903"; exit 1
+
+      - name: Give KERIA some time to fully initialize
+        run: sleep 15
+
+      - name: Verify KERIA /connect (Signify discovery) responds
+        run: |
+          resp=$(curl -s -w "\n%{http_code}" --connect-timeout 5 http://127.0.0.1:3903/connect) || { echo "::error::KERIA /connect request failed"; exit 1; }
+          body=$(echo "$resp" | head -n -1)
+          code=$(echo "$resp" | tail -n 1)
+          if [ "$code" = "200" ]; then
+            echo "$body" | grep -q "connectUrl" || { echo "::error::KERIA /connect response missing connectUrl"; echo "$body" | head -5; exit 1; }
+            echo "OK: KERIA /connect returns 200 with connectUrl"
+          elif [ "$code" = "404" ]; then
+            echo "OK: KERIA /connect returned 404 (discovery not on this port; E2E uses explicit boot+connect URLs)"
+          else
+            echo "::error::KERIA /connect returned HTTP $code"; echo "$body" | head -5
+            exit 1
+          fi
+
+      - name: Build project for E2E
+        env:
+          LANG: en_US.UTF-8
+        run: npm run build:e2e
+
+      - name: Verify build used KERIA_IP (emulator host)
+        run: |
+          echo "=== Checking built app contains 10.0.2.2 (baked in from KERIA_IP) ==="
+          if ! grep -rq "10.0.2.2" build/ 2>/dev/null; then
+            echo "::error::Build output does not contain 10.0.2.2; app may use 127.0.0.1 and fail on emulator. Check job env KERIA_IP and webpack DefinePlugin."
+            exit 1
+          fi
+          echo "OK: build contains 10.0.2.2 (KERIA_IP was applied)"
+          grep -ro "10.0.2.2" build/ 2>/dev/null | head -5
+
+      - name: Verify cleartext HTTP allowed for emulator (debug)
+        run: |
+          DEBUG_MF="android/app/src/debug/AndroidManifest.xml"
+          NET_SEC="android/app/src/debug/res/xml/network_security_config.xml"
+          [ -f "$DEBUG_MF" ] || { echo "::error::Missing $DEBUG_MF"; exit 1; }
+          grep -q 'networkSecurityConfig\|usesCleartextTraffic' "$DEBUG_MF" || { echo "::error::$DEBUG_MF missing networkSecurityConfig/usesCleartextTraffic"; exit 1; }
+          [ -f "$NET_SEC" ] || { echo "::error::Missing $NET_SEC"; exit 1; }
+          grep -q '10.0.2.2\|cleartextTrafficPermitted' "$NET_SEC" || { echo "::error::$NET_SEC missing cleartext for 10.0.2.2"; exit 1; }
+          echo "OK: cleartext allowed for 10.0.2.2 (debug)"
+
+      - name: Build Android APK (debug)
         run: |
           cd android
           ./gradlew assembleDebug
           cd ..
-          # Dynamically set the APP_PATH for the test runner
+          # Debug APK has cleartext permitted for 10.0.2.2 (emulator host) via app/src/debug/
           APK_PATH=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -1)
+          if [ -z "$APK_PATH" ]; then
+            echo "::error::No APK found under android/app/build/outputs/apk/debug"
+            ls -la android/app/build/outputs/apk/debug 2>/dev/null || true
+            exit 1
+          fi
           echo "APP_PATH=$APK_PATH" >> "$GITHUB_ENV"
+          echo "=== APK selected for emulator ==="
+          echo "APP_PATH=$APK_PATH"
+          ls -la "$APK_PATH"
 
       - name: Start Appium
         run: |
@@ -80,9 +146,14 @@ jobs:
           npx wait-on --timeout 120s http-get://127.0.0.1:4723/status
 
       - name: Run onboarding-intro E2E test
+        id: e2e-test
         uses: reactivecircus/android-emulator-runner@b530d96654c385303d652368551fb075bc2f0b6b # v2.35.0
         env:
-          NODE_OPTIONS: "--max_old_space_size=8192" 
+          NODE_OPTIONS: "--max_old_space_size=8192"
+          KERIA_IP: "10.0.2.2"
+          # Force test helper getSSIAgentUrls() to use 10.0.2.2 (emulator host), not 127.0.0.1
+          ANDROID_EMULATOR: "true"
+          APP_PATH: ${{ env.APP_PATH }}
         with:
           api-level: 31 
           target: google_apis
@@ -93,7 +164,70 @@ jobs:
           disk-size: 6000M
           heap-size: 600M
           script: |
-            npm run wdio:android:s24ultra -- --spec ./tests/features/onboarding/onboarding-intro.feature
+            echo "=== Emulator runner: APK to install ==="
+            echo "APP_PATH=$APP_PATH"
+            ls -la "$APP_PATH" 2>/dev/null || true
+            npm run e2e:onboarding
+            E2E_EXIT=$?
+            echo "=== Dumping wallet (app) logcat ==="
+            LOGDIR="${GITHUB_WORKSPACE:-.}/tests/.reports"
+            mkdir -p "$LOGDIR"
+            adb logcat -d -v time 2>&1 | tail -n 8000 > "$LOGDIR/wallet-logcat.txt" || true
+            ls -la "$LOGDIR/wallet-logcat.txt" 2>/dev/null || true
+            exit $E2E_EXIT
+
+      - name: Dump KERIA logs on E2E failure
+        if: failure() && steps.e2e-test.outcome == 'failure'
+        run: |
+          echo "=== KERIA container logs (last 200 lines) ==="
+          docker compose -f docker-compose.yaml -f docker-compose.ci.yaml logs --tail=200 keria 2>&1 | tee /tmp/keria.log || true
+          echo ""
+          echo "=== KERIA log lines matching error/fail/exception (for debugging) ==="
+          grep -i -E 'error|fail|exception|invalid|refused|timeout|denied|500|503' /tmp/keria.log 2>/dev/null || echo "(none found)"
+          echo "=== Host connectivity check ==="
+          curl -s -o /dev/null -w "127.0.0.1:3901(connect) -> %{http_code}\n" --connect-timeout 2 http://127.0.0.1:3901/ || true
+          curl -s -o /dev/null -w "127.0.0.1:3903(boot) -> %{http_code}\n" --connect-timeout 2 http://127.0.0.1:3903/ || true
+
+      - name: Upload E2E test report (Allure results)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-allure-results
+          path: tests/.reports/allure-results/
+          if-no-files-found: ignore
+          retention-days: 1
+
+      - name: Upload E2E failure screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: tests/screenshots/
+          if-no-files-found: ignore
+          retention-days: 1
+
+      - name: Upload E2E wallet logs (logcat)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-wallet-logs
+          path: tests/.reports/wallet-logcat.txt
+          if-no-files-found: ignore
+          retention-days: 1
+
+      - name: Report E2E test result
+        if: always()
+        run: |
+          if [ "${{ steps.e2e-test.outcome }}" == "success" ]; then
+            echo "E2E onboarding tests passed." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "E2E onboarding tests failed." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "For more detail:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Screenshots:** Download the \`e2e-screenshots\` artifact (failure screenshots)." >> $GITHUB_STEP_SUMMARY
+          echo "- **Wallet logs:** Download the \`e2e-wallet-logs\` artifact (Android logcat)." >> $GITHUB_STEP_SUMMARY
+          echo "- **Allure:** Download \`e2e-allure-results\` and run \`allure serve\` in the extracted folder." >> $GITHUB_STEP_SUMMARY
 
       - name: Cleanup
         if: always()

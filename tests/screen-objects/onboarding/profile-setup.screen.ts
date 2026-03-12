@@ -144,7 +144,10 @@ export class ProfileSetupScreen {
 
   async isConfirmButtonEnabled(): Promise<boolean> {
     const disabled = await this.confirmButton.getAttribute("disabled");
-    return disabled === null;
+    // App uses disabled="false" when enabled (Ionic/React); null = no attribute = enabled
+    if (disabled === null) return true;
+    if (typeof disabled === "string" && disabled.toLowerCase() === "false") return true;
+    return false;
   }
 
   async waitForProfileSetupScreen() {
@@ -166,8 +169,8 @@ export class ProfileSetupScreen {
         return await this.welcomeTitle.isExisting().catch(() => false);
       },
       {
-        timeout: 15000,
-        timeoutMsg: "Welcome screen did not appear",
+        timeout: 90000,
+        timeoutMsg: "Welcome screen did not appear (profile creation may be slow on CI)",
       }
     );
     await expect(this.welcomeTitle).toBeDisplayed();

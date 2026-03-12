@@ -1,0 +1,5 @@
+# CI only: Keria on host network so the Android emulator (10.0.2.2 = host) can reach it.
+# Use: docker compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d keria
+services:
+  keria:
+    network_mode: host

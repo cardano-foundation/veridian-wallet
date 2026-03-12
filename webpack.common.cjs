@@ -92,7 +92,11 @@ const config = {
     }),
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require("./package.json").version),
-      "process.env": JSON.stringify(process.env)
+      // Inject env vars so they are available at runtime (stringifying the whole
+      // process.env makes process.env.KERIA_IP etc. undefined in the bundle).
+      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
+      "process.env.ENVIRONMENT": JSON.stringify(process.env.ENVIRONMENT || "local"),
+      "process.env.KERIA_IP": JSON.stringify(process.env.KERIA_IP || ""),
     }),
     new webpack.ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
