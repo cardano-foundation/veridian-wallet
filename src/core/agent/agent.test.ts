@@ -262,6 +262,21 @@ describe("KERIA connectivity", () => {
     expect(mockBasicStorageService.createOrUpdateBasicRecord).toBeCalledTimes(
       3
     );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.KERIA_BOOT_URL })
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.KERIA_CONNECT_URL })
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.CRITICAL_ACTION_STATE })
+    );
     expect(Agent.isOnline).toBe(true);
     expect(mockAgentServicesProps.eventEmitter.emit).toBeCalledWith({
       type: EventTypes.KeriaStatusChanged,
@@ -294,6 +309,21 @@ describe("KERIA connectivity", () => {
     expect(mockSignifyClient.connect).toHaveBeenCalled();
     expect(mockBasicStorageService.createOrUpdateBasicRecord).toBeCalledTimes(
       3
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.KERIA_BOOT_URL })
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.KERIA_CONNECT_URL })
+    );
+    expect(
+      mockBasicStorageService.createOrUpdateBasicRecord
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MiscRecordId.CRITICAL_ACTION_STATE })
     );
     expect(Agent.isOnline).toBe(true);
     expect(mockAgentServicesProps.eventEmitter.emit).toBeCalledWith({
@@ -804,6 +834,7 @@ describe("Seed Phrase Verification", () => {
   beforeEach(() => {
     agent = Agent.agent;
     (agent as any).basicStorageService = mockBasicStorageService;
+    (agent as any).agentServicesProps = mockAgentServicesProps;
     (agent as any).seedPhraseVerifiedCache = undefined;
   });
 
@@ -868,6 +899,7 @@ describe("Critical Action Tracking", () => {
   beforeEach(() => {
     agent = Agent.agent;
     (agent as any).basicStorageService = mockBasicStorageService;
+    (agent as any).agentServicesProps = mockAgentServicesProps;
     (agent as any).seedPhraseVerifiedCache = undefined;
   });
 

@@ -21,6 +21,7 @@ import { SettingsList } from "./SettingsList";
 const checkBiometricsMock = jest.fn();
 const setupBiometricsMock = jest.fn();
 const getPlatformsMock = jest.fn();
+const handleBiometricAuthMock = jest.fn();
 jest.mock("@capacitor/core", () => ({
   ...jest.requireActual("@capacitor/core"),
   Capacitor: {
@@ -91,10 +92,11 @@ jest.mock("../../Alert", () => ({
   },
 }));
 
-jest.mock("../../Verification", () => ({
-  Verification: ({ verifyIsOpen }: any) =>
-    verifyIsOpen ? (
-      <div data-testid="verification-modal">Verification</div>
+jest.mock("@ionic/react", () => ({
+  ...jest.requireActual("@ionic/react"),
+  IonModal: (props: any) =>
+    props.isOpen ? (
+      <div data-testid={props["data-testid"]}>{props.children}</div>
     ) : null,
 }));
 
@@ -111,6 +113,7 @@ jest.mock("../../../hooks/useBiometricsHook", () => ({
     biometricInfo: { isAvailable: false },
     setupBiometrics: setupBiometricsMock,
     checkBiometrics: checkBiometricsMock,
+    handleBiometricAuth: handleBiometricAuthMock,
     remainingLockoutSeconds: 0,
     lockoutEndTime: null,
   }),
@@ -232,7 +235,7 @@ describe("SettingsList", () => {
     renderComponent();
 
     fireEvent.click(screen.getByTestId("settings-security-list-item-1"));
-    fireEvent.click(screen.getByTestId("delete-button"));
+    fireEvent.click(screen.getAllByTestId("delete-button")[0]);
     expect(screen.getByTestId("delete-account-alert")).toBeInTheDocument();
   });
 
@@ -374,6 +377,47 @@ describe("SettingsList", () => {
 
     await waitFor(() => {
       expect(dispatchSpy).toHaveBeenCalledWith(setEnableBiometricsCache(true));
+    });
+  });
+
+  test("Show passcode verification", async () => {
+    handleBiometricAuthMock.mockResolvedValue(BiometricAuthOutcome.SUCCESS);
+
+    const dispatchMock = jest.fn();
+    const initialState = {
+      stateCache: {
+        routes: [],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: false,
+        },
+      },
+      biometricsCache: {
+        enabled: true,
+      },
+    };
+
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    const { getByTestId } = render(
+      <Provider store={storeMocked}>
+        <MemoryRouter>
+          <SettingsList {...defaultProps} />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    fireEvent.click(
+      getByTestId(`settings-security-list-item-${OptionIndex.ChangePin}`)
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("verify-passcode")).toBeVisible();
     });
   });
 });

@@ -14,6 +14,7 @@ import {
 } from "../../../store/reducers/stateCache/stateCache.types";
 import { getConnectedDApp } from "../../../store/reducers/profileCache";
 import { ToastMsgType } from "../../globals/types";
+import { showError } from "../../utils/error";
 
 const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
   const pageId = "incoming-request";
@@ -86,15 +87,24 @@ const IncomingRequest = ({ open, setOpenPage }: SidePageContentProps) => {
   };
 
   const handleAccept = async () => {
-    if (!incomingRequest) {
-      return handleReset();
+    try {
+      if (!incomingRequest) {
+        return handleReset();
+      }
+      setInitiateAnimation(true);
+      incomingRequest.signTransaction?.payload.approvalCallback(true);
+      setTimeout(() => {
+        handleReset();
+        dispatch(setToastMsg(ToastMsgType.SIGN_SUCCESSFUL));
+      }, ANIMATION_DELAY);
+    } catch (e) {
+      showError(
+        "Unable to sign transaction",
+        e,
+        dispatch,
+        ToastMsgType.SIGN_ERROR
+      );
     }
-    setInitiateAnimation(true);
-    incomingRequest.signTransaction?.payload.approvalCallback(true);
-    setTimeout(() => {
-      handleReset();
-      dispatch(setToastMsg(ToastMsgType.SIGN_SUCCESSFUL));
-    }, ANIMATION_DELAY);
   };
 
   if (!requestData) {

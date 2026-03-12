@@ -4,11 +4,16 @@ import { useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { MiscRecordId } from "../../../core/agent/agent.types";
 import { BasicRecord } from "../../../core/agent/records";
+import { KeyStoreKeys, SecureStorage } from "../../../core/storage";
 import { i18n } from "../../../i18n";
 import { RoutePath } from "../../../routes";
 import { getNextRoute } from "../../../routes/nextRoute";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getStateCache, setToastMsg } from "../../../store/reducers/stateCache";
+import {
+  getStateCache,
+  setAuthentication,
+  setToastMsg,
+} from "../../../store/reducers/stateCache";
 import { updateReduxState } from "../../../store/utils";
 import { Alert } from "../../components/Alert";
 import { PageFooter } from "../../components/PageFooter";
@@ -24,7 +29,8 @@ import { CreatePasswordProps } from "./CreatePassword.types";
 
 const CreatePassword = ({
   handleClear,
-  setPasswordIsSet,
+  showSkip = false,
+  isSetting = false,
   userAction,
 }: CreatePasswordProps) => {
   const pageId = "create-password";
@@ -38,47 +44,71 @@ const CreatePassword = ({
   const [validPassword, setValidPassword] = useState(false);
 
   const handleContinue = async (skipped: boolean) => {
-    if (skipped) {
-      await Agent.agent.basicStorage
-        .createOrUpdateBasicRecord(
-          new BasicRecord({
-            id: MiscRecordId.APP_PASSWORD_SKIPPED,
-            content: { value: skipped },
-          })
-        )
-        .catch((e) => {
-          showError("Unable to skip set password", e, dispatch);
-        });
-    } else {
-      await passwordModuleRef.current?.savePassword();
-    }
-
-    if (!isOnboarding) {
-      setPasswordIsSet(true);
-      userAction?.current === "change" &&
-        dispatch(setToastMsg(ToastMsgType.PASSWORD_UPDATED));
-      userAction?.current === "enable" &&
-        dispatch(setToastMsg(ToastMsgType.PASSWORD_CREATED));
-      handleClear();
-    } else {
-      const { nextPath, updateRedux } = getNextRoute(
-        RoutePath.CREATE_PASSWORD,
-        {
-          store: { stateCache },
-          state: { skipped },
+    try {
+      if (skipped) {
+        await SecureStorage.delete(KeyStoreKeys.APP_OP_PASSWORD);
+        await Agent.agent.basicStorage
+          .createOrUpdateBasicRecord(
+            new BasicRecord({
+              id: MiscRecordId.APP_PASSWORD_SKIPPED,
+              content: { value: skipped },
+            })
+          )
+          .catch((e) => {
+            showError("Unable to skip set password", e, dispatch);
+          });
+      } else {
+        const result = await passwordModuleRef.current?.savePassword();
+        if (!result) {
+          return;
         }
-      );
+      }
 
-      updateReduxState(
-        nextPath.pathname,
-        {
-          store: { stateCache },
-          state: { skipped },
-        },
+      if (!isOnboarding) {
+        dispatch(
+          setAuthentication({
+            ...stateCache.authentication,
+            passwordIsSet: true,
+          })
+        );
+        userAction?.current === "change" &&
+          dispatch(setToastMsg(ToastMsgType.PASSWORD_UPDATED));
+        userAction?.current === "enable" &&
+          dispatch(
+            setToastMsg(
+              isSetting
+                ? ToastMsgType.PASSWORD_SETTING_UPDATE
+                : ToastMsgType.PASSWORD_CREATED
+            )
+          );
+        handleClear();
+      } else {
+        const { nextPath, updateRedux } = getNextRoute(
+          RoutePath.CREATE_PASSWORD,
+          {
+            store: { stateCache },
+            state: { skipped },
+          }
+        );
+
+        updateReduxState(
+          nextPath.pathname,
+          {
+            store: { stateCache },
+            state: { skipped },
+          },
+          dispatch,
+          updateRedux
+        );
+        ionRouter.push(nextPath.pathname, "forward", "push");
+      }
+    } catch (e) {
+      showError(
+        "Unable to set password",
+        e,
         dispatch,
-        updateRedux
+        isSetting ? ToastMsgType.PASSWORD_SETTING_UPDATE_FAIL : undefined
       );
-      ionRouter.push(nextPath.pathname, "forward", "push");
     }
   };
 
@@ -119,7 +149,7 @@ const CreatePassword = ({
                   )}`
                 : undefined
             }
-            actionButton={isOnboarding}
+            actionButton={isOnboarding || showSkip}
             actionButtonLabel={`${i18n.t("createpassword.button.skip")}`}
             actionButtonAction={handleSkip}
           />

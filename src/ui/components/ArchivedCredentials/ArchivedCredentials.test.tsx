@@ -164,7 +164,14 @@ describe("Archived and revoked credentials", () => {
       });
 
       await waitFor(() => {
-        expect(getByText("0 Credentials Selected")).toBeVisible();
+        expect(
+          getByText(
+            EN_TRANSLATIONS.tabs.credentials.archived.manyselected.replace(
+              "{{amount}}",
+              "0"
+            )
+          )
+        ).toBeVisible();
       });
 
       const cardItem = getByTestId(
@@ -174,7 +181,7 @@ describe("Archived and revoked credentials", () => {
 
       await waitFor(() => {
         expect(getByTestId("selected-amount-credentials").innerHTML).toBe(
-          "1 Credential Selected"
+          EN_TRANSLATIONS.tabs.credentials.archived.oneselected
         );
       });
 
@@ -213,6 +220,9 @@ describe("Archived and revoked credentials", () => {
 
       await waitFor(() => {
         expect(getByTestId("action-button")).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.tabs.credentials.archived.archivedtitle)
+        ).toBeVisible();
       });
 
       act(() => {
@@ -228,7 +238,14 @@ describe("Archived and revoked credentials", () => {
       });
 
       await waitFor(() => {
-        expect(getByText("0 Credentials Selected")).toBeVisible();
+        expect(
+          getByText(
+            EN_TRANSLATIONS.tabs.credentials.archived.manyselected.replace(
+              "{{amount}}",
+              "0"
+            )
+          )
+        ).toBeVisible();
       });
 
       const cardItem = getByTestId(
@@ -317,6 +334,9 @@ describe("Archived and revoked credentials", () => {
 
       await waitFor(() => {
         expect(getByTestId("action-button")).toBeVisible();
+        expect(
+          getByText(EN_TRANSLATIONS.tabs.credentials.archived.revokedtitle)
+        ).toBeVisible();
       });
 
       act(() => {
@@ -332,7 +352,14 @@ describe("Archived and revoked credentials", () => {
       });
 
       await waitFor(() => {
-        expect(getByText("0 Credentials Selected")).toBeVisible();
+        expect(
+          getByText(
+            EN_TRANSLATIONS.tabs.credentials.archived.manyselected.replace(
+              "{{amount}}",
+              "0"
+            )
+          )
+        ).toBeVisible();
       });
 
       const cardItem = getByTestId(
@@ -397,7 +424,14 @@ describe("Archived and revoked credentials", () => {
       });
 
       await waitFor(() => {
-        expect(getByText("0 Credentials Selected")).toBeVisible();
+        expect(
+          getByText(
+            EN_TRANSLATIONS.tabs.credentials.archived.manyselected.replace(
+              "{{amount}}",
+              "0"
+            )
+          )
+        ).toBeVisible();
       });
 
       const cardItem = getByTestId(
@@ -407,7 +441,7 @@ describe("Archived and revoked credentials", () => {
 
       await waitFor(() => {
         expect(getByTestId("selected-amount-credentials").innerHTML).toBe(
-          "1 Credential Selected"
+          EN_TRANSLATIONS.tabs.credentials.archived.oneselected
         );
       });
 

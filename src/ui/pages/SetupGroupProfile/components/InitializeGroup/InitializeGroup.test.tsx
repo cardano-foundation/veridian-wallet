@@ -1,6 +1,7 @@
 const createGroupMock = jest.fn();
 
 import { fireEvent, render, waitFor } from "@testing-library/react";
+import { forwardRef, useImperativeHandle } from "react";
 import { Provider } from "react-redux";
 import { ConnectionStatus } from "../../../../../core/agent/agent.types";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
@@ -13,6 +14,25 @@ jest.mock("@ionic/react", () => ({
   ...jest.requireActual("@ionic/react"),
   IonModal: ({ children, isOpen, ...props }: any) =>
     isOpen ? <div data-testid={props["data-testid"]}>{children}</div> : null,
+  IonInput: forwardRef((props: any, ref: any) => {
+    const { onIonBlur, onIonFocus, onIonInput, value } = props;
+    const testId = props["data-testid"];
+
+    useImperativeHandle(ref, () => ({
+      setFocus: jest.fn(),
+    }));
+
+    return (
+      <input
+        ref={ref}
+        value={value}
+        data-testid={testId}
+        onBlur={onIonBlur}
+        onFocus={onIonFocus}
+        onChange={onIonInput}
+      />
+    );
+  }),
 }));
 
 jest.mock("signify-ts", () => ({
@@ -123,12 +143,76 @@ describe("Init group", () => {
     ).toBeVisible();
   });
 
-  test("Config member and signer", async () => {
-    const setStateMock = jest.fn();
+  test("Show setup signer after changing members", async () => {
+    const newState = {
+      ...state,
+      signer: {
+        recoverySigners: 1,
+        requiredSigners: 2,
+      },
+    };
+    const innerFnc = jest.fn();
+    const setStateMock = jest.fn((fn) => {
+      if (typeof fn === "function") {
+        innerFnc(fn(newState));
+      }
+    });
     const { getByText, getByTestId } = render(
       <Provider store={makeTestStore()}>
         <InitializeGroup
-          state={state}
+          state={newState}
+          setState={setStateMock}
+        />
+      </Provider>
+    );
+
+    fireEvent.click(getByTestId("group-member-block"));
+
+    await waitFor(() => {
+      expect(getByTestId("setup-connections-modal")).toBeVisible();
+    });
+
+    // Change a member
+    fireEvent.click(getByTestId(`card-item-${memberConnections[0].id}`));
+
+    fireEvent.click(
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.initgroup.setconnections.button
+          .confirm
+      )
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("setup-signer-modal")).toBeVisible();
+      expect(setStateMock).not.toBeCalled();
+    });
+
+    fireEvent.change(getByTestId("threshold-recoverySigners"), {
+      target: { value: "1" },
+    });
+
+    fireEvent.change(getByTestId("threshold-requiredSigners"), {
+      target: { value: "1" },
+    });
+
+    fireEvent.click(getByTestId("primary-button-setup-signer-modal"));
+
+    expect(setStateMock).toBeCalled();
+  });
+
+  test("Do not show setup signer if members didn't change", async () => {
+    const newState = {
+      ...state,
+      signer: {
+        recoverySigners: 1,
+        requiredSigners: 2,
+      },
+    };
+    const setStateMock = jest.fn();
+    const { getByText, getByTestId, queryByTestId } = render(
+      <Provider store={makeTestStore()}>
+        <InitializeGroup
+          state={newState}
           setState={setStateMock}
         />
       </Provider>
@@ -148,23 +232,8 @@ describe("Init group", () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId("setup-signer-modal")).toBeVisible();
-    });
-
-    fireEvent.click(
-      getByText(
-        EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.button.confirm
-      )
-    );
-
-    await waitFor(() => {
-      expect(setStateMock).toBeCalledWith({
-        ...state,
-        signer: {
-          recoverySigners: null,
-          requiredSigners: null,
-        },
-      });
+      expect(queryByTestId("setup-signer-modal")).toBeNull();
+      expect(setStateMock).not.toBeCalled();
     });
   });
 
@@ -186,7 +255,7 @@ describe("Init group", () => {
 
     expect(
       getByText(
-        EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.members.replace(
+        EN_TRANSLATIONS.setupgroupprofile.initgroup.setsigner.member.replace(
           "{{members}}",
           "1"
         )

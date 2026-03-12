@@ -91,7 +91,21 @@ const initialState = {
         peerConnections: [],
         credentials: [],
         archivedCredentials: [],
-        notifications: [],
+        notifications: [
+          {
+            id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmc",
+            createdAt: "2024-02-11T09:27:58.987Z",
+            a: {
+              r: "/exn/ipex/apply",
+              d: "EMT02ZHUhpnr4gFFk104B-pLwb2bJC8aip2VYmbPztnk",
+              m: "",
+            },
+            connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
+            read: false,
+            groupReplied: false,
+            receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
+          },
+        ],
       },
     },
     defaultProfile: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
@@ -294,7 +308,7 @@ describe("Credential request", () => {
     expect(offerAcdcFromApplyMock).not.toHaveBeenCalled();
   });
 
-  test("Auto-submit when only one suitable credential exists after filtering out revoked", async () => {
+  test("Auto-submit when only one revoke credential exists", async () => {
     const stateWithRevokedCreds = {
       ...initialState,
       profilesCache: {
@@ -322,7 +336,6 @@ describe("Credential request", () => {
       Promise.resolve({
         ...credRequestFix,
         credentials: [
-          credRequestFix.credentials[0],
           {
             connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
             acdc: {
@@ -401,7 +414,21 @@ describe("Credential request: Multisig", () => {
           peerConnections: [],
           credentials: [],
           archivedCredentials: [],
-          notifications: [],
+          notifications: [
+            {
+              id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmc",
+              createdAt: "2024-02-11T09:27:58.987Z",
+              a: {
+                r: "/exn/ipex/apply",
+                d: "EMT02ZHUhpnr4gFFk104B-pLwb2bJC8aip2VYmbPztnk",
+                m: "",
+              },
+              connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
+              read: false,
+              groupReplied: false,
+              receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
+            },
+          ],
         },
       },
       defaultProfile: "id",
@@ -519,7 +546,21 @@ describe("Credential request: Multisig", () => {
             peerConnections: [],
             credentials: [filteredCredsFix[0]],
             archivedCredentials: [],
-            notifications: [],
+            notifications: [
+              {
+                id: "AL3XmFY8BM9F604qmV-l9b0YMZNvshHG7X6CveMWKMmc",
+                createdAt: "2024-02-11T09:27:58.987Z",
+                a: {
+                  r: "/exn/ipex/apply",
+                  d: "EMT02ZHUhpnr4gFFk104B-pLwb2bJC8aip2VYmbPztnk",
+                  m: "",
+                },
+                connectionId: "EMrT7qX0FIMenQoe5pJLahxz_rheks1uIviGW8ch8pfB",
+                read: false,
+                groupReplied: false,
+                receivingPre: "ED4KeyyTKFj-72B008OTGgDCrFo6y7B2B73kfyzu5Inb",
+              },
+            ],
           },
         },
         defaultProfile: "id",

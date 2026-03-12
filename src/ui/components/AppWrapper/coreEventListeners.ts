@@ -56,7 +56,13 @@ const operationCompleteHandler = async (
           creationStatus: CreationStatus.COMPLETE,
         })
       );
-      dispatch(setToastMsg(ToastMsgType.IDENTIFIER_UPDATED));
+      dispatch(
+        setToastMsg(
+          opType === OperationPendingRecordType.Group
+            ? ToastMsgType.GROUP_CREATED
+            : ToastMsgType.IDENTIFIER_UPDATED
+        )
+      );
       break;
   }
 };

@@ -40,7 +40,7 @@
     "@capacitor/share": "^7.0.0",
     "@capacitor/splash-screen": "^7.0.0",
     "@capacitor/status-bar": "^7.0.0",
-    "@capgo/capacitor-native-biometric": "^7.1.13",
+    "@capgo/capacitor-native-biometric": "^7.6.0",
     "@evva/capacitor-secure-storage-plugin": "^3.1.0",
     "@fabianbormann/cardano-peer-connect": "^1.2.18",
     "@ionic/react": "^8.6.0",
@@ -63,7 +63,7 @@
     "react-redux": "^8.0.5",
     "react-router-dom": "^5.3.4",
     "signify-ts": "github:WebOfTrust/signify-ts#62a646f1eb67c30c8f1aecfe628d81dd693b60f2",
-    "swiper": "^11.1.14",
+    "swiper": "^12.1.2",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
@@ -76,7 +76,7 @@
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^12.6.3",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.38",
+    "@types/node": "^20.0.0",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@types/react-router-dom": "^5.1.8",

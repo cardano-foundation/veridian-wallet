@@ -2,9 +2,11 @@ import { AnyAction, Store } from "@reduxjs/toolkit";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
+import { MemoryRouter } from "react-router-dom";
 import TRANSLATIONS from "../../../locales/en/en.json";
-import { showGenericError } from "../../../store/reducers/stateCache";
+import { RoutePath } from "../../../routes";
 import { makeTestStore } from "../../utils/makeTestStore";
+import { TabsRoutePath } from "../navigation/TabsMenu";
 import { NoWitnessAlert } from "./NoWitnessAlert";
 
 const getAvailableWitnessesMock = jest.fn();
@@ -36,15 +38,18 @@ describe("No witness alert", () => {
   });
 
   test("Show witness alert and retry", async () => {
-    const { getByText } = render(
-      <Provider store={mockedStore}>
-        <NoWitnessAlert />
-      </Provider>
+    const { getByText, queryByText } = render(
+      <MemoryRouter initialEntries={[RoutePath.PROFILE_SETUP]}>
+        <Provider store={mockedStore}>
+          <NoWitnessAlert />
+        </Provider>
+      </MemoryRouter>
     );
 
     expect(getByText(TRANSLATIONS.nowitnesserror.title)).toBeVisible();
     expect(getByText(TRANSLATIONS.nowitnesserror.description)).toBeVisible();
     expect(getByText(TRANSLATIONS.nowitnesserror.button)).toBeVisible();
+    expect(queryByText(TRANSLATIONS.nowitnesserror.close)).toBeNull();
 
     act(() => {
       fireEvent.click(getByText(TRANSLATIONS.nowitnesserror.button));
@@ -53,5 +58,17 @@ describe("No witness alert", () => {
     await waitFor(() => {
       expect(getAvailableWitnessesMock).toBeCalledWith();
     });
+  });
+
+  test("Show close button when missing witness outside onboarding", async () => {
+    const { getByText, queryByText } = render(
+      <MemoryRouter initialEntries={[TabsRoutePath.HOME]}>
+        <Provider store={mockedStore}>
+          <NoWitnessAlert />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    expect(getByText(TRANSLATIONS.nowitnesserror.close)).toBeVisible();
   });
 });

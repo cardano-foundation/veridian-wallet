@@ -11,6 +11,7 @@ import { makeTestStore } from "../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { CustomInputProps } from "../../../CustomInput/CustomInput.types";
 import { ManagePassword } from "./ManagePassword";
+import { BiometricAuthOutcome } from "../../../../hooks/useBiometricsHook";
 
 const deletePasswordMock = jest.fn();
 
@@ -37,15 +38,22 @@ jest.mock("../../../../../core/agent/agent", () => ({
   },
 }));
 
+const handleBiometricAuthMock = jest.fn(() =>
+  Promise.resolve(BiometricAuthOutcome.SUCCESS)
+);
 jest.mock("../../../../hooks/useBiometricsHook", () => ({
+  ...jest.requireActual("../../../../hooks/useBiometricsHook"),
   useBiometricAuth: jest.fn(() => ({
     biometricsIsEnabled: false,
     biometricInfo: {
       isAvailable: false,
       hasCredentials: false,
       biometryType: BiometryType.FINGERPRINT,
+      authenticationStrength: 0, // NONE
+      deviceIsSecure: false,
+      strongBiometryIsAvailable: false,
     },
-    handleBiometricAuth: jest.fn(() => Promise.resolve(false)),
+    handleBiometricAuth: () => handleBiometricAuthMock(),
     setBiometricsIsEnabled: jest.fn(),
   })),
 }));
@@ -100,6 +108,10 @@ describe("Manage password", () => {
         getPlatforms: () => ["mobileweb"],
       };
     });
+
+    handleBiometricAuthMock.mockImplementation(() =>
+      Promise.resolve(BiometricAuthOutcome.SUCCESS)
+    );
   });
 
   test("Cancel alert", async () => {
@@ -385,6 +397,108 @@ describe("Manage password", () => {
 
     await waitFor(() => {
       expect(getByTestId("create-password-modal")).toBeVisible();
+    });
+  });
+
+  test("Show password verification", async () => {
+    jest.spyOn(Agent.agent.basicStorage, "findById").mockResolvedValue(
+      new BasicRecord({
+        id: "id",
+        content: {
+          value: "1213213",
+        },
+      })
+    );
+
+    const initialState = {
+      stateCache: {
+        routes: [RoutePath.SSI_AGENT],
+        currentProfileId: "default-profile-id",
+        authentication: {
+          loggedIn: false,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: true,
+          seedPhraseIsSet: false,
+        },
+      },
+      biometricsCache: {
+        enabled: true,
+      },
+    };
+
+    const dispatchMock = jest.fn();
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+    handleBiometricAuthMock.mockResolvedValue(BiometricAuthOutcome.SUCCESS);
+    const { queryByTestId, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ManagePassword />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("settings-item-toggle-password")).toBeVisible();
+      expect(queryByTestId("settings-item-change-password")).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("settings-item-change-password"));
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("verify-password-value")).toBeVisible();
+      expect(getByTestId("forgot-hint-btn")).toBeVisible();
+    });
+  });
+
+  test("Updates state when store changes", async () => {
+    const initialState = {
+      stateCache: {
+        routes: [RoutePath.SSI_AGENT],
+        currentProfileId: "default-profile-id",
+        authentication: {
+          loggedIn: false,
+          time: Date.now(),
+          passcodeIsSet: true,
+          passwordIsSet: true,
+          seedPhraseIsSet: false,
+        },
+      },
+    };
+
+    const store = makeTestStore(initialState);
+
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <ManagePassword />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      const toggle = getByTestId("settings-item-toggle-password").querySelector(
+        "ion-toggle"
+      );
+      expect(toggle).toHaveAttribute("checked", "true");
+    });
+
+    act(() => {
+      store.dispatch({
+        type: "stateCache/setAuthentication",
+        payload: {
+          ...initialState.stateCache.authentication,
+          passwordIsSet: false,
+        },
+      });
+    });
+
+    await waitFor(() => {
+      const toggle = getByTestId("settings-item-toggle-password").querySelector(
+        "ion-toggle"
+      );
+      expect(toggle).toHaveAttribute("checked", "false");
     });
   });
 });

@@ -5,6 +5,7 @@ import {
 } from "@capacitor/local-notifications";
 import { TabsRoutePath } from "../../routes/paths";
 import { showError } from "../../ui/utils/error";
+import { dismissAllModals } from "../../ui/utils/modal";
 import { NotificationPayload } from "./notificationService.types";
 
 const PRIMARY_COLOR =
@@ -165,6 +166,8 @@ class NotificationService {
       this.pendingNotification = notification;
       return;
     }
+
+    await dismissAllModals();
 
     const result = await this.profileSwitcher(profileId);
 

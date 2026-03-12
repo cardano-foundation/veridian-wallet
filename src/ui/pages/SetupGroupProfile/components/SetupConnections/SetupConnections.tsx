@@ -127,8 +127,6 @@ const SetupConnections = ({ setState }: StageProps) => {
   const handleScan = useCallback(
     async (content: string) => {
       if (!groupId) return;
-      // Check if oobi has been scanned, ignore call to core.
-      if (groupConnections.some((item) => item.oobi === content)) return;
 
       const invitation = await resolveGroupConnection(
         content,
@@ -148,7 +146,7 @@ const SetupConnections = ({ setState }: StageProps) => {
         dispatch(setToastMsg(ToastMsgType.NEW_MULTI_SIGN_MEMBER));
       }
     },
-    [dispatch, groupConnections, groupId, handleClose, resolveGroupConnection]
+    [dispatch, groupId, handleClose, resolveGroupConnection]
   );
 
   const handleInit = () => {

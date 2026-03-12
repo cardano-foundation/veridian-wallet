@@ -5,9 +5,12 @@ import {
   refreshOutline,
   warningOutline,
 } from "ionicons/icons";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
-import { CreationStatus } from "../../../../../core/agent/agent.types";
+import {
+  ConnectionShortDetails,
+  CreationStatus,
+} from "../../../../../core/agent/agent.types";
 import { MultiSigService } from "../../../../../core/agent/services";
 import { MultiSigIcpRequestDetails } from "../../../../../core/agent/services/identifier.types";
 import { NotificationRoute } from "../../../../../core/agent/services/keriaNotificationService.types";
@@ -29,10 +32,7 @@ import { InfoCard } from "../../../../components/InfoCard";
 import { ScrollablePageLayout } from "../../../../components/layout/ScrollablePageLayout";
 import { ListHeader } from "../../../../components/ListHeader";
 import { MemberList } from "../../../../components/MemberList";
-import {
-  Member,
-  MemberAcceptStatus,
-} from "../../../../components/MemberList/MemberList.type";
+import { MemberAcceptStatus } from "../../../../components/MemberList/MemberList.type";
 import { PageFooter } from "../../../../components/PageFooter";
 import { PageHeader } from "../../../../components/PageHeader";
 import { ShareProfile } from "../../../../components/ShareProfile";
@@ -87,77 +87,84 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
     setOpenProfiles(true);
   };
 
-  useEffect(() => {
-    const fetchOobi = async () => {
-      const alias =
-        identity?.groupMetadata?.proposedUsername || identity?.groupUsername;
-      const groupId = defaultProfile?.multisigConnections[0]?.groupId;
-      const groupName = identity?.displayName;
-      const identityId = identity?.groupMemberPre || identity?.id;
-
-      if (!alias || !groupId || !groupName || !identityId) return;
-
-      try {
-        const oobiValue = await Agent.agent.connections.getOobi(identityId, {
-          alias,
-          groupId,
-          groupName,
-        });
-        if (oobiValue) {
-          setOobi(oobiValue);
-        }
-      } catch (e) {
-        dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
-      }
-    };
-
+  const fetchOobi = useCallback(async () => {
     if (
       identity?.creationStatus === CreationStatus.COMPLETE &&
       !!identity?.groupMemberPre
     )
       return;
 
-    fetchOobi();
+    const alias =
+      identity?.groupMetadata?.proposedUsername || identity?.groupUsername;
+    const groupId = defaultProfile?.multisigConnections[0]?.groupId;
+    const groupName = identity?.displayName;
+    const identityId = identity?.groupMemberPre || identity?.id;
+
+    if (!alias || !groupId || !groupName || !identityId) return;
+
+    try {
+      const oobiValue = await Agent.agent.connections.getOobi(identityId, {
+        alias,
+        groupId,
+        groupName,
+      });
+      if (oobiValue) {
+        setOobi(oobiValue);
+      }
+    } catch (e) {
+      dispatch(setToastMsg(ToastMsgType.UNKNOWN_ERROR));
+    }
   }, [
     defaultProfile?.multisigConnections,
-    identity?.creationStatus,
     dispatch,
+    identity?.creationStatus,
     identity?.displayName,
     identity?.groupMemberPre,
-    identity?.groupMetadata?.groupId,
     identity?.groupMetadata?.proposedUsername,
     identity?.groupUsername,
     identity?.id,
   ]);
 
+  useOnlineStatusEffect(fetchOobi);
+
+  const getMemberName = useCallback(
+    (connections: ConnectionShortDetails[], id: string) => {
+      return connections.find((con) => con.id === id)?.label;
+    },
+    []
+  );
+
   const members = useMemo(() => {
-    const members = state.selectedConnections?.map((connection): Member => {
-      const name = connection?.label || "";
+    const members = [];
 
-      let hasAccepted = false;
-
-      if (isPendingMember) {
-        // If connection is initiator, hasAccepted alway true
-
-        hasAccepted =
-          connection.id === multisigIcpDetails?.sender.id ||
-          !!multisigIcpDetails?.otherConnections.find(
-            (item) => item.id === connection.id
-          )?.hasAccepted;
-      } else {
-        hasAccepted = !!groupDetails?.members.find(
-          (member) => member.aid === connection.id
-        )?.hasAccepted;
+    if (isPendingMember && multisigIcpDetails) {
+      for (const member of [
+        multisigIcpDetails.sender,
+        ...multisigIcpDetails.otherConnections,
+      ]) {
+        members.push({
+          name: member.label,
+          isCurrentUser: false,
+          status: member.hasAccepted
+            ? MemberAcceptStatus.Accepted
+            : MemberAcceptStatus.Waiting,
+        });
       }
+    } else {
+      for (const member of groupDetails?.members || []) {
+        const memberName = getMemberName(state.scannedConections, member.aid);
 
-      return {
-        name,
-        isCurrentUser: false,
-        status: hasAccepted
-          ? MemberAcceptStatus.Accepted
-          : MemberAcceptStatus.Waiting,
-      };
-    });
+        if (memberName) {
+          members.push({
+            name: memberName,
+            isCurrentUser: false,
+            status: member.hasAccepted
+              ? MemberAcceptStatus.Accepted
+              : MemberAcceptStatus.Waiting,
+          });
+        }
+      }
+    }
 
     members.unshift({
       name:
@@ -335,7 +342,10 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
   const openDeclineAlert = () => setAlertDeclineIsOpen(true);
   const showVerify = () => setVerifyIsOpen(true);
   const intiatorName =
-    multisigIcpDetails?.sender.label || groupDetails?.members[0].name;
+    multisigIcpDetails?.sender.label ||
+    (groupDetails
+      ? getMemberName(state.scannedConections, groupDetails.members[0].aid)
+      : "");
 
   const text = isPendingMember
     ? i18n.t("setupgroupprofile.pending.alert.membertext")
@@ -463,7 +473,9 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
           <CardDetailsContent
             testId="required-signer-key"
             mainContent={`${i18n.t(
-              `setupgroupprofile.initgroup.setsigner.members`,
+              `setupgroupprofile.initgroup.setsigner.${
+                (signingThreshold || 0) > 1 ? "members" : "member"
+              }`,
               {
                 members: signingThreshold || 0,
               }
@@ -481,7 +493,9 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
           <CardDetailsContent
             testId="recovery-signer-key"
             mainContent={`${i18n.t(
-              `setupgroupprofile.initgroup.setsigner.members`,
+              `setupgroupprofile.initgroup.setsigner.${
+                (rotationThreshold || 0) > 1 ? "members" : "member"
+              }`,
               {
                 members: rotationThreshold || 0,
               }

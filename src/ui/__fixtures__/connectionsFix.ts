@@ -4,7 +4,7 @@ import {
   RegularConnectionDetailsFull,
 } from "../../core/agent/agent.types";
 import { ConnectionHistoryType } from "../../core/agent/services/connectionService.types";
-import CardanoLogo from "../assets/images/CardanoLogo.jpg";
+import CardanoLogo from "../assets/images/cardano-logo.svg";
 
 const connectionsFix: RegularConnectionDetailsFull[] = [
   {

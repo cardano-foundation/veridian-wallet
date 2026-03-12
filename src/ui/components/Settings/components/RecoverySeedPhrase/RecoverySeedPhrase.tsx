@@ -13,8 +13,12 @@ import { ConfirmModal } from "./ConfirmModal";
 import "./RecoverySeedPhrase.scss";
 import { RecoverySeedPhraseProps } from "./RecoverySeedPhrase.types";
 import { RecoverySeedPhraseDocumentModal } from "./RecoverySeedPhraseDocumentModal";
+import { ScrollablePageLayout } from "../../../layout/ScrollablePageLayout";
+import { PageHeader } from "../../../PageHeader";
 
 const RecoverySeedPhrase = ({
+  title,
+  showCloseButton = true,
   onClose,
   starVerify,
   mode = "view",
@@ -66,63 +70,85 @@ const RecoverySeedPhrase = ({
 
   return (
     <>
-      <div className="recovery-page-container">
-        <InfoCard
-          className="user-tips"
-          icon={informationCircleOutline}
-        >
-          <div>
-            <p>
-              {i18n.t("settings.sections.security.seedphrase.page.tips.label")}
-            </p>
-            <ol className="tips">
-              <li>
-                {i18n.t("settings.sections.security.seedphrase.page.tips.one")}
-              </li>
-              <li>
-                {i18n.t("settings.sections.security.seedphrase.page.tips.two")}
-              </li>
-              <li>
-                {i18n.t(
-                  "settings.sections.security.seedphrase.page.tips.three"
-                )}
-              </li>
-            </ol>
-          </div>
-        </InfoCard>
-        <SeedPhraseModule
-          testId="seed-phrase-container"
-          seedPhrase={seedPhrase}
-          overlayText={`${i18n.t(
-            "settings.sections.security.seedphrase.page.hiddentext"
-          )}`}
-          hideSeedPhrase={hideSeedPhrase}
-          setHideSeedPhrase={setHideSeedPhrase}
-          showSeedPhraseButton={false}
-        />
-        {isEdit && (
-          <IonButton
-            onClick={() => setOpenDocument(true)}
-            fill="outline"
-            data-testid="recovery-phrase-docs-btn"
-            className="switch-button secondary-button"
+      <ScrollablePageLayout
+        pageId="settings"
+        header={
+          <PageHeader
+            title={title}
+            backButton={mode == "view"}
+            onBack={onClose}
+            closeButton={showCloseButton && mode == "verify"}
+            closeButtonLabel={`${i18n.t("verifyseedphrase.button.back")}`}
+            closeButtonAction={onClose}
+          />
+        }
+        footer={
+          <PageFooter
+            customClass="recovery-seed-phrase-page-footer"
+            pageId={componentId}
+            primaryButtonText={`${footerButtonLabel}`}
+            primaryButtonAction={handleClickPrimaryButton}
+          />
+        }
+      >
+        <div className="recovery-page-container">
+          <InfoCard
+            className="user-tips"
+            icon={informationCircleOutline}
           >
-            <IonIcon
-              slot="start"
-              icon={informationCircleOutline}
-            />
-            {i18n.t(
-              "generateseedphrase.onboarding.button.recoverydocumentation"
-            )}
-          </IonButton>
-        )}
-      </div>
-      <PageFooter
-        customClass="recovery-seed-phrase-page-footer"
-        pageId={componentId}
-        primaryButtonText={`${footerButtonLabel}`}
-        primaryButtonAction={handleClickPrimaryButton}
-      />
+            <div>
+              <p>
+                {i18n.t(
+                  "settings.sections.security.seedphrase.page.tips.label"
+                )}
+              </p>
+              <ol className="tips">
+                <li>
+                  {i18n.t(
+                    "settings.sections.security.seedphrase.page.tips.one"
+                  )}
+                </li>
+                <li>
+                  {i18n.t(
+                    "settings.sections.security.seedphrase.page.tips.two"
+                  )}
+                </li>
+                <li>
+                  {i18n.t(
+                    "settings.sections.security.seedphrase.page.tips.three"
+                  )}
+                </li>
+              </ol>
+            </div>
+          </InfoCard>
+          <SeedPhraseModule
+            testId="seed-phrase-container"
+            seedPhrase={seedPhrase}
+            overlayText={`${i18n.t(
+              "settings.sections.security.seedphrase.page.hiddentext"
+            )}`}
+            hideSeedPhrase={hideSeedPhrase}
+            setHideSeedPhrase={setHideSeedPhrase}
+            showSeedPhraseButton={false}
+          />
+          {isEdit && (
+            <IonButton
+              onClick={() => setOpenDocument(true)}
+              fill="outline"
+              data-testid="recovery-phrase-docs-btn"
+              className="switch-button secondary-button"
+            >
+              <IonIcon
+                slot="start"
+                icon={informationCircleOutline}
+              />
+              {i18n.t(
+                "generateseedphrase.onboarding.button.recoverydocumentation"
+              )}
+            </IonButton>
+          )}
+        </div>
+      </ScrollablePageLayout>
       <ConfirmModal
         isOpen={openConfirmModal}
         setIsOpen={setOpenConfirmModal}

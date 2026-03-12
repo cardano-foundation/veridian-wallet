@@ -1,5 +1,4 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import { act } from "react";
 import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../../locales/en/en.json";
 import { store } from "../../../../store";
@@ -7,8 +6,8 @@ import {
   connectionDetailsFix,
   credsFixAcdc,
 } from "../../../__fixtures__/credsFix";
-import { filteredIdentifierMapFix } from "../../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../../__fixtures__/identifierFix";
+import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -16,7 +15,6 @@ import {
 } from "../../../utils/formatters";
 import { makeTestStore } from "../../../utils/makeTestStore";
 import { CredentialContent } from "./CredentialContent";
-import { profileCacheFixData } from "../../../__fixtures__/storeDataFix";
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -83,7 +81,6 @@ describe("Creds content", () => {
       <Provider store={storeMocked}>
         <CredentialContent
           cardData={credsFixAcdc[0]}
-          joinedCredRequestMembers={[]}
           connectionShortDetails={connectionDetailsFix}
           setOpenConnectionlModal={jest.fn()}
         />
@@ -148,7 +145,6 @@ describe("Creds content", () => {
       <Provider store={store}>
         <CredentialContent
           cardData={credsFixAcdc[0]}
-          joinedCredRequestMembers={[]}
           connectionShortDetails={undefined}
           setOpenConnectionlModal={jest.fn()}
         />

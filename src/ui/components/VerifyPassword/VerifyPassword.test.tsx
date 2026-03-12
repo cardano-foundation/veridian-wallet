@@ -153,8 +153,15 @@ describe("Verify Password", () => {
       fireEvent(
         passwordInput,
         new CustomEvent("ionInput", {
-          detail: { value: "1111" },
+          detail: { value: "1111111111" },
         })
+      );
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("primary-button")).toHaveAttribute(
+        "disabled",
+        "false"
       );
     });
 
@@ -164,6 +171,7 @@ describe("Verify Password", () => {
 
     await waitFor(() => {
       expect(getByTestId("error-message")).toBeVisible();
+      expect(getByTestId("primary-button")).toHaveAttribute("disabled", "true");
     });
   });
 

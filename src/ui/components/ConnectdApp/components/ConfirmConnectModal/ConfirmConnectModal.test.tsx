@@ -73,13 +73,11 @@ describe("Confirm connect modal", () => {
 
     expect(getByText(walletConnectionsFix[0].name as string)).toBeVisible();
     expect(getByText(walletConnectionsFix[0].url || "")).toBeVisible();
-
-    const ellipsisLink =
-      (walletConnectionsFix[0].meerkatId as string).substring(0, 5) +
-      "..." +
-      (walletConnectionsFix[0].meerkatId as string).slice(-5);
-
-    expect(getByText(ellipsisLink)).toBeVisible();
+    expect(
+      getByText(
+        EN_TRANSLATIONS.connectdapp.connectionhistory.confirmconnect.copyid
+      )
+    ).toBeVisible();
 
     act(() => {
       fireEvent.click(getByTestId("connection-id"));

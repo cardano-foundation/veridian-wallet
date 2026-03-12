@@ -7,10 +7,13 @@ import { PageFooter } from "../PageFooter";
 import { SeedPhraseModule } from "../SeedPhraseModule";
 import { VerifyStageProps } from "./VerifySeedPhraseModal.types";
 import "./VerifyStage.scss";
+import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
+import { PageHeader } from "../PageHeader";
 
 const VerifyStage = ({
   seedPhrase: originalSeedPhrase,
   onVerifySuccess,
+  handleClose,
 }: VerifyStageProps) => {
   const pageId = "verify-seed-phrase";
   const [seedPhraseRemaining, setSeedPhraseRemaining] = useState<string[]>([]);
@@ -83,8 +86,31 @@ const VerifyStage = ({
 
   return (
     <>
-      <div className="content-container">
-        <div>
+      <ScrollablePageLayout
+        pageId={pageId}
+        activeStatus
+        header={
+          <PageHeader
+            title={`${i18n.t("verifyseedphrase.title.verify")}`}
+            closeButton
+            closeButtonLabel={`${i18n.t("verifyseedphrase.button.back")}`}
+            closeButtonAction={handleClose}
+          />
+        }
+        footer={
+          <PageFooter
+            pageId={pageId}
+            primaryButtonText={`${i18n.t(
+              "verifyseedphrase.onboarding.button.continue"
+            )}`}
+            primaryButtonAction={() => handleContinue()}
+            primaryButtonDisabled={
+              !(originalSeedPhrase.length == seedPhraseSelected.length)
+            }
+          />
+        }
+      >
+        <div className="content-container">
           <p
             className="paragraph-top"
             data-testid={`${pageId}-paragraph-top`}
@@ -118,17 +144,7 @@ const VerifyStage = ({
             </IonButton>
           )}
         </div>
-        <PageFooter
-          pageId={pageId}
-          primaryButtonText={`${i18n.t(
-            "verifyseedphrase.onboarding.button.continue"
-          )}`}
-          primaryButtonAction={() => handleContinue()}
-          primaryButtonDisabled={
-            !(originalSeedPhrase.length == seedPhraseSelected.length)
-          }
-        />
-      </div>
+      </ScrollablePageLayout>
       <Alert
         isOpen={alertIsOpen}
         setIsOpen={setAlertIsOpen}

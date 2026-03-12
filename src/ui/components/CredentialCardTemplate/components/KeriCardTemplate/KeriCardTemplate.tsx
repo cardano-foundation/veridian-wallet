@@ -88,16 +88,24 @@ const KeriCardTemplate = ({
             <span className="card-footer-column-label card-text">
               {i18n.t("tabs.credentials.layout.issuer")}
             </span>
-            <span className="card-footer-column-value card-text">
-              {connection?.label}
+            <span
+              data-testid="card-connection"
+              className="card-footer-column-value card-text"
+            >
+              {connection?.label || i18n.t("tabs.connections.unknown")}
             </span>
           </div>
           <div className="card-footer-column">
             <span className="card-footer-column-label card-text">
               {i18n.t("tabs.credentials.layout.issued")}
             </span>
-            <span className="card-footer-column-value card-text issued">
-              {cardData.status === CredentialStatus.CONFIRMED ? (
+            <span
+              data-testid="card-issued-date"
+              className="card-footer-column-value card-text issued"
+            >
+              {[CredentialStatus.CONFIRMED, CredentialStatus.REVOKED].includes(
+                cardData.status
+              ) ? (
                 formatShortDate(cardData.issuanceDate)
               ) : (
                 <>&nbsp;</>

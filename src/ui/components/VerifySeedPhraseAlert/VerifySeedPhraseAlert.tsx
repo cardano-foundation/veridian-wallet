@@ -11,8 +11,8 @@ import CircleArrows from "../../assets/images/circle-arrows.svg";
 import MissingMobileImage from "../../assets/images/mobile-question.svg";
 import PasswordImage from "../../assets/images/password-icon.svg";
 
-import "./VerifySeedPhraseAlert.scss";
 import { VerifySeedPhraseModal } from "../VerifySeedPhrase/VerifySeedPhraseModal";
+import "./VerifySeedPhraseAlert.scss";
 
 export const VerifySeedPhraseAlert = () => {
   const pageId = "verify-seedphrase-alert";
@@ -20,7 +20,7 @@ export const VerifySeedPhraseAlert = () => {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState(false);
 
-  const verifySuccess = () => {
+  const verifySuccess = async () => {
     setIsOpen(false);
     dispatch(showVerifySeedPhraseAlert(false));
     dispatch(setSeedPhraseVerified(true));
@@ -31,6 +31,7 @@ export const VerifySeedPhraseAlert = () => {
       <IonModal
         className={pageId}
         isOpen={!!showAlert}
+        backdropDismiss={false}
       >
         <div className="content">
           <img

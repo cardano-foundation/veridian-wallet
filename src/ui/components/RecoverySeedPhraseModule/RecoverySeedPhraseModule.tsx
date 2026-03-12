@@ -226,7 +226,7 @@ const RecoverySeedPhraseModule = forwardRef<
 
     return (
       <>
-        <div className="content-container recovery-seed-phrase-module">
+        <div className="recovery-content-container recovery-seed-phrase-module">
           <div>
             {title && (
               <h2

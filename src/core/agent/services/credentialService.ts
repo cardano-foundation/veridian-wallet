@@ -140,9 +140,7 @@ class CredentialService extends AgentService {
       .delete(id)
       .catch(async (error) => {
         const status = error.message.split(" - ")[1];
-        if (/404/gi.test(status)) {
-          return await this.credentialStorage.deleteCredentialMetadata(id);
-        } else {
+        if (!/404/gi.test(status)) {
           throw error;
         }
       });

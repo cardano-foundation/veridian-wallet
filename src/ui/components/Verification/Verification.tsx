@@ -41,6 +41,11 @@ const Verification = ({
   }, [lockoutEndTime, showMaxAttemptsAlert]);
 
   const handleBiometrics = async () => {
+    if (remainingLockoutSeconds > 0) {
+      setShowMaxAttemptsAlert(true);
+      return;
+    }
+
     if (isInBiometricProcess) return;
 
     try {

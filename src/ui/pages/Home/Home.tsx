@@ -20,6 +20,7 @@ import "./Home.scss";
 import { RotateKeyModal } from "./components/RotateKeyModal";
 import { ScanToLogin } from "./components/ScanToLogin";
 import { VerifySeedPhraseCard } from "../../components/VerifySeedPhrase";
+import { useGetOobi } from "../../hooks/useGetOobi";
 
 const Home = () => {
   const pageId = "home-tab";
@@ -30,7 +31,7 @@ const Home = () => {
   const [connectdApp, setConnectdApp] = useState(false);
   const [openShareCurrentProfile, setOpenShareCurrentProfile] = useState(false);
   const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
-
+  const oobi = useGetOobi(currentProfile?.identity);
   const handleAvatarClick = () => {
     setOpenProfiles(true);
   };
@@ -154,6 +155,7 @@ const Home = () => {
       <ShareProfile
         isOpen={openShareCurrentProfile}
         setIsOpen={setOpenShareCurrentProfile}
+        oobi={oobi}
       />
       <RotateKeyModal
         identifierId={currentProfile?.identity.id || ""}

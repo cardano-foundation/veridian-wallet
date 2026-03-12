@@ -1,9 +1,11 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { alertCircleOutline } from "ionicons/icons";
 import { useCallback, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { Agent } from "../../../core/agent/agent";
 import { IdentifierService } from "../../../core/agent/services";
 import { i18n } from "../../../i18n";
+import { RoutePath } from "../../../routes";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   getShowNoWitnessAlert,
@@ -11,6 +13,7 @@ import {
 } from "../../../store/reducers/stateCache";
 import { showError } from "../../utils/error";
 import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
+import { PageHeader } from "../PageHeader";
 import { Spinner } from "../Spinner";
 import "./NoWitnessAlert.scss";
 
@@ -18,6 +21,7 @@ const NoWitnessAlert = () => {
   const dispatch = useAppDispatch();
   const isShowNoWitnessAlert = useAppSelector(getShowNoWitnessAlert);
   const [loading, setLoading] = useState(false);
+  const history = useHistory();
 
   const checkAgain = useCallback(async () => {
     try {
@@ -51,6 +55,13 @@ const NoWitnessAlert = () => {
       activeStatus
       pageId="no-witness"
       customClass="no-witness-page"
+      header={
+        <PageHeader
+          closeButton={history.location.pathname != RoutePath.PROFILE_SETUP}
+          closeButtonLabel={`${i18n.t("nowitnesserror.close")}`}
+          closeButtonAction={() => dispatch(showNoWitnessAlert(false))}
+        />
+      }
     >
       <div className="page-content-container">
         <div className="page-content">

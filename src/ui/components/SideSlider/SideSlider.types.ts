@@ -8,6 +8,7 @@ interface SideSliderProps {
   renderAsModal?: boolean;
   className?: string;
   animation?: boolean;
+  onClose?: () => void;
 }
 
 export const ANIMATION_DURATION = 300;

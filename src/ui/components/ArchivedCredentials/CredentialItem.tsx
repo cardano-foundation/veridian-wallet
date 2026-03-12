@@ -34,7 +34,7 @@ const CredentialItem = ({
 
   const connectionName =
     connections.find((item) => item.id === credential.connectionId)?.label ||
-    "";
+    i18n.t("tabs.connections.unknown");
 
   return (
     <IonItemSliding>

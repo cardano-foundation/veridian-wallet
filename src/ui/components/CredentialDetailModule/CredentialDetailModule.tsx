@@ -63,7 +63,6 @@ const CredentialDetailModule = ({
   navAnimation = false,
   credDetail,
   viewOnly,
-  joinedCredRequestMembers,
   ...props
 }: CredentialDetailModuleProps) => {
   const { isLightMode } = props;
@@ -430,6 +429,7 @@ const CredentialDetailModule = ({
       <SideSlider
         isOpen={openConnectionlModal && !!connectionShortDetails}
         renderAsModal
+        onClose={() => setOpenConnectionlModal(false)}
       >
         {connectionShortDetails && (
           <ConnectionDetails
@@ -504,7 +504,6 @@ const CredentialDetailModule = ({
                 data-testid="card-details-content"
               >
                 <CredentialContent
-                  joinedCredRequestMembers={joinedCredRequestMembers}
                   cardData={cardData}
                   connectionShortDetails={connectionShortDetails}
                   setOpenConnectionlModal={setOpenConnectionlModal}

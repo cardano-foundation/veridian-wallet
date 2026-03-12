@@ -2,7 +2,7 @@ import { ReactNode, MouseEvent as ReactMouseEvent } from "react";
 
 interface CardItem<T> {
   title: string;
-  subtitle?: string;
+  subtitle?: string | ReactNode;
   image?: string;
   startSlot?: ReactNode;
   id: string | number;

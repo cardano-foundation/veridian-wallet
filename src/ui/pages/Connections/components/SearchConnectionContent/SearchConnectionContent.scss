@@ -1,20 +1,18 @@
 .search-connection-content {
-  padding: 0 1.25rem;
-  margin-top: 0.75rem;
+  padding: 0 1.25rem var(--ion-safe-area-bottom);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
-  .list-header {
-    .list-header-title {
-      font-size: 1rem;
-      font-weight: 500;
-    }
+  &:not(.no-result) {
+    margin-top: 0.75rem;
   }
 
   &.no-result {
-    display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: calc(100vh - 9.5rem);
+    flex: 1;
+    height: 100%;
 
     ion-icon {
       color: var(--ion-color-neutral-400);

@@ -51,7 +51,15 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
   const openCloseAlert = () => setOpenCancelAlert(true);
 
   const handleClose = () => {
-    setState((state) => ({ ...state, stage: Stage.SetupConnection }));
+    setState((state) => ({
+      ...state,
+      signer: {
+        requiredSigners: null,
+        recoverySigners: null,
+      },
+      selectedConnections: [...state.scannedConections],
+      stage: Stage.SetupConnection,
+    }));
   };
 
   const members = useMemo(() => {
@@ -87,13 +95,17 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
 
   const openSignerModal = () => setOpenSigners(true);
 
-  const updateMembers = (data: ConnectionShortDetails[]) => {
+  const updateMembersAndSigners = (
+    data: ConnectionShortDetails[],
+    signerData: SignerData
+  ) => {
     setState((state) => ({
       ...state,
       selectedConnections: [...data],
+      signer: {
+        ...signerData,
+      },
     }));
-
-    openSignerModal();
   };
 
   const updateSigners = (data: SignerData) => {
@@ -101,6 +113,8 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       ...state,
       signer: data,
     });
+
+    setOpenSigners(false);
   };
 
   const createMultisigIdentifier = async () => {
@@ -142,6 +156,14 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
         setLoading(false);
       }
     }
+  };
+
+  const openMemberModal = () => {
+    setOpenEditMembers(true);
+  };
+
+  const handleCloseSignerModal = (value: boolean) => {
+    setOpenSigners(value);
   };
 
   return (
@@ -194,9 +216,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
           testId="group-member-block"
           className="group-members"
           endSlotIcon={pencilOutline}
-          onClick={() => {
-            setOpenEditMembers(true);
-          }}
+          onClick={openMemberModal}
         >
           <MemberList
             members={members}
@@ -245,7 +265,9 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
               <CardDetailsContent
                 testId="required-signer-key"
                 mainContent={`${i18n.t(
-                  `setupgroupprofile.initgroup.setsigner.members`,
+                  `setupgroupprofile.initgroup.setsigner.${
+                    state.signer.requiredSigners > 1 ? "members" : "member"
+                  }`,
                   {
                     members: state.signer.requiredSigners || 0,
                   }
@@ -263,7 +285,9 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
               <CardDetailsContent
                 testId="recovery-signer-key"
                 mainContent={`${i18n.t(
-                  `setupgroupprofile.initgroup.setsigner.members`,
+                  `setupgroupprofile.initgroup.setsigner.${
+                    state.signer.recoverySigners > 1 ? "members" : "member"
+                  }`,
                   {
                     members: state.signer.recoverySigners || 0,
                   }
@@ -279,7 +303,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       />
       <SetupSignerModal
         isOpen={openSigners}
-        setOpen={setOpenSigners}
+        setOpen={handleCloseSignerModal}
         connectionsLength={state.selectedConnections.length + 1}
         currentValue={state.signer}
         onSubmit={updateSigners}
@@ -289,7 +313,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
         setOpen={setOpenEditMembers}
         connections={state.scannedConections}
         currentSelectedConnections={state.selectedConnections}
-        onSubmit={updateMembers}
+        onSubmit={updateMembersAndSigners}
       />
       <Alert
         isOpen={openCancelAlert}

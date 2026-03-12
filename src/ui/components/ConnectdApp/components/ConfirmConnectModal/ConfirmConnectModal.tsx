@@ -1,5 +1,6 @@
 import { IonButton, IonChip, IonIcon } from "@ionic/react";
 import {
+  checkmark,
   copyOutline,
   hourglassOutline,
   personCircleOutline,
@@ -7,8 +8,8 @@ import {
 } from "ionicons/icons";
 import { i18n } from "../../../../../i18n";
 import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
-import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { getPendingDAppConnection } from "../../../../../store/reducers/profileCache";
+import { setToastMsg } from "../../../../../store/reducers/stateCache";
 import { OptionModal } from "../../../../components/OptionsModal";
 import { ToastMsgType } from "../../../../globals/types";
 import { writeToClipboard } from "../../../../utils/clipboard";
@@ -62,12 +63,6 @@ const ConfirmConnectModal = ({
       : "connectdapp.connectionhistory.confirmconnect.disconnectbtn"
   );
 
-  const meerkatId = connectionData?.meerkatId
-    ? connectionData.meerkatId.substring(0, 5) +
-      "..." +
-      connectionData.meerkatId.slice(-5)
-    : "";
-
   const deleteConnection = () => {
     if (!connectionData) return;
 
@@ -82,7 +77,7 @@ const ConfirmConnectModal = ({
 
   const confirmClass = combineClassNames("confirm-connect-submit", {
     "primary-button": isConnectModal,
-    "secondary-button": !isConnectModal,
+    "tertiary-button": !isConnectModal,
   });
 
   return (
@@ -102,10 +97,22 @@ const ConfirmConnectModal = ({
         actionButtonAction: deleteConnection,
       }}
     >
-      {cardImg}
+      <div className="logo-container">
+        {cardImg}
+        {!isConnectModal && (
+          <div className="check-mark">
+            <IonIcon
+              slot="icon-only"
+              icon={checkmark}
+            />
+          </div>
+        )}
+      </div>
       <h3
         data-testid="connect-wallet-title"
-        className="confirm-modal-name-title"
+        className={combineClassNames("confirm-modal-name-title", {
+          "pending-title": !connectionData?.name,
+        })}
       >
         {dAppName}
       </h3>
@@ -118,18 +125,21 @@ const ConfirmConnectModal = ({
         </p>
       )}
       {!isConnectingToDApp && connectionData?.name && (
-        <div
+        <IonButton
           onClick={() => {
             if (!connectionData?.meerkatId) return;
             writeToClipboard(connectionData.meerkatId as string);
             dispatch(setToastMsg(ToastMsgType.COPIED_TO_CLIPBOARD));
           }}
-          className="confirm-modal-id"
+          fill="outline"
           data-testid="connection-id"
+          className="confirm-modal-id secondary-button"
         >
-          <span>{meerkatId}</span>
           <IonIcon icon={copyOutline} />
-        </div>
+          <span>
+            {i18n.t("connectdapp.connectionhistory.confirmconnect.copyid")}
+          </span>
+        </IonButton>
       )}
       {isConnectingToDApp && (
         <IonChip className="pending-chip">

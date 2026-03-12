@@ -16,7 +16,7 @@ interface PasswordModuleProps {
 
 interface PasswordModuleRef {
   clearState: () => void;
-  savePassword: () => Promise<void>;
+  savePassword: () => Promise<boolean | undefined>;
 }
 
 export type {

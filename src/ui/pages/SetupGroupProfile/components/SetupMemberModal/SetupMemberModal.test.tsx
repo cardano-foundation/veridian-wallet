@@ -43,7 +43,7 @@ const memberConnections = [
 
 describe("Setup member modal", () => {
   test("Render modal", async () => {
-    const { getByText, getByTestId } = render(
+    const { getByText } = render(
       <Provider store={makeTestStore()}>
         <SetupMemberModal
           isOpen
@@ -77,7 +77,36 @@ describe("Setup member modal", () => {
     }
   });
 
-  test("Select member and submit", async () => {
+  test("Submit without changes closes modal", async () => {
+    const submit = jest.fn();
+    const setOpen = jest.fn();
+    const { getByText, queryByTestId } = render(
+      <Provider store={makeTestStore()}>
+        <SetupMemberModal
+          isOpen
+          setOpen={setOpen}
+          onSubmit={submit}
+          connections={memberConnections}
+          currentSelectedConnections={[memberConnections[0]]}
+        />
+      </Provider>
+    );
+
+    fireEvent.click(
+      getByText(
+        EN_TRANSLATIONS.setupgroupprofile.initgroup.setconnections.button
+          .confirm
+      )
+    );
+
+    await waitFor(() => {
+      expect(queryByTestId("setup-signer-modal")).toBeNull();
+      expect(submit).not.toBeCalled();
+      expect(setOpen).toBeCalledWith(false);
+    });
+  });
+
+  test("Submit with changes opens signer modal", async () => {
     const submit = jest.fn();
     const { getByText, getByTestId } = render(
       <Provider store={makeTestStore()}>
@@ -91,46 +120,8 @@ describe("Setup member modal", () => {
       </Provider>
     );
 
-    for (const connection of memberConnections) {
-      expect(getByText(connection.label)).toBeVisible();
-    }
-
-    expect(
-      getByText(
-        EN_TRANSLATIONS.setupgroupprofile.initgroup.setconnections.button
-          .confirm
-      ).getAttribute("disabled")
-    ).toBe("false");
-
-    fireEvent.click(getByTestId(`card-item-${memberConnections[0].id}`));
-
-    await waitFor(() => {
-      expect(
-        (
-          getByTestId(
-            "connection-select-" + memberConnections[0].id
-          ) as HTMLInputElement
-        ).checked
-      ).toBe(false);
-    });
-
-    fireEvent.click(getByTestId(`card-item-${memberConnections[0].id}`));
-
-    await waitFor(() => {
-      expect(
-        (
-          getByTestId(
-            "connection-select-" + memberConnections[0].id
-          ) as HTMLInputElement
-        ).checked
-      ).toBe(true);
-      expect(
-        getByText(
-          EN_TRANSLATIONS.setupgroupprofile.initgroup.setconnections.button
-            .confirm
-        ).getAttribute("disabled")
-      ).toBe("false");
-    });
+    // Select another member
+    fireEvent.click(getByTestId(`card-item-${memberConnections[1].id}`));
 
     fireEvent.click(
       getByText(
@@ -139,6 +130,9 @@ describe("Setup member modal", () => {
       )
     );
 
-    expect(submit).toBeCalledWith([memberConnections[0]]);
+    await waitFor(() => {
+      expect(getByTestId("setup-signer-modal")).toBeVisible();
+      expect(submit).not.toHaveBeenCalled();
+    });
   });
 });

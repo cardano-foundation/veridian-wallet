@@ -69,6 +69,7 @@ import {
 } from "../Settings.types";
 import { ChangePin } from "./ChangePin";
 import "./SettingsList.scss";
+import { VerifyPasscode } from "../../VerifyPasscode";
 
 const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const dispatch = useAppDispatch();
@@ -78,6 +79,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
   const { setupBiometrics, checkBiometrics, isInBiometricProcess } =
     useBiometricAuth();
 
+  const [confirmPasscode, setConfirmPasscode] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [changePinIsOpen, setChangePinIsOpen] = useState(false);
   const { disablePrivacy, enablePrivacy } = usePrivacyScreen();
@@ -413,7 +415,7 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         break;
       }
       case OptionIndex.ChangePin: {
-        openVerify();
+        setConfirmPasscode(true);
         break;
       }
       case OptionIndex.ManagePassword: {
@@ -466,10 +468,6 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         biometricAuth();
         break;
       }
-      case 1: {
-        setChangePinIsOpen(true);
-        break;
-      }
       case OptionIndex.DeleteWallet:
         deleteWallet();
         break;
@@ -477,6 +475,10 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         return;
     }
     setOption(null);
+  };
+
+  const openChangePin = () => {
+    setChangePinIsOpen(true);
   };
 
   const closeAlert = () => {
@@ -647,6 +649,11 @@ const SettingsList = ({ switchView, handleClose }: SettingsListProps) => {
         verifyIsOpen={verifyIsOpen}
         setVerifyIsOpen={setVerifyIsOpen}
         onVerify={onVerify}
+      />
+      <VerifyPasscode
+        isOpen={confirmPasscode}
+        setIsOpen={setConfirmPasscode}
+        onVerify={openChangePin}
       />
       <Alert
         isOpen={showNotificationsSettingsAlert}

@@ -87,6 +87,9 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
       isAvailable: true,
       hasCredentials: false,
       biometryType: BiometryType.FINGERPRINT,
+      authenticationStrength: 1, // STRONG
+      deviceIsSecure: true,
+      strongBiometryIsAvailable: true,
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
     setBiometricsIsEnabled: jest.fn(),
@@ -188,10 +191,14 @@ describe("Forgot Passcode Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpasscode.title)
+        getByText(
+          EN_TRANSLATIONS.settings.sections.security.changepin.createpasscode
+        )
       ).toBeVisible();
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpasscode.description)
+        getByText(
+          EN_TRANSLATIONS.settings.sections.security.changepin.description
+        )
       ).toBeVisible();
     });
 
@@ -204,7 +211,7 @@ describe("Forgot Passcode Page", () => {
     });
 
     const text = await findByText(
-      EN_TRANSLATIONS.forgotauth.newpasscode.reenterpasscode
+      EN_TRANSLATIONS.settings.sections.security.changepin.reenterpasscode
     );
 
     await waitFor(() => {
@@ -214,7 +221,7 @@ describe("Forgot Passcode Page", () => {
     await passcodeFiller(getByText, getByTestId, "193212");
 
     await waitFor(() => {
-      expect(onCloseMock).toHaveBeenCalled();
+      expect(onCloseMock).toHaveBeenCalledWith(true);
     });
   }, 10000);
 });
@@ -223,6 +230,7 @@ describe("Forgot Password Page", () => {
   const dispatchMock = jest.fn();
   const initialState = {
     stateCache: {
+      routes: [],
       authentication: {
         loggedIn: true,
         time: Date.now(),
@@ -313,14 +321,11 @@ describe("Forgot Password Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpassword.title)
-      ).toBeVisible();
-      expect(
         getByText(EN_TRANSLATIONS.forgotauth.newpassword.description)
       ).toBeVisible();
-      expect(
-        getByText(EN_TRANSLATIONS.createpassword.button.continue)
-      ).toBeVisible();
+      expect(getByTestId("primary-button-create-password").innerHTML).toBe(
+        EN_TRANSLATIONS.createpassword.button.continue
+      );
     });
 
     const input = getByTestId("create-password-input");
@@ -339,7 +344,7 @@ describe("Forgot Password Page", () => {
       expect((input as HTMLInputElement).value).toBe("Passssssssss1@");
     });
 
-    fireEvent.click(getByText(EN_TRANSLATIONS.createpassword.button.continue));
+    fireEvent.click(getByTestId("primary-button-create-password"));
 
     await waitFor(() => {
       expect(verifySecret).toBeCalled();
@@ -365,13 +370,9 @@ describe("Forgot Password Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.password.title)
+        getByText(EN_TRANSLATIONS.forgotauth.password.description)
       ).toBeVisible();
     });
-
-    expect(
-      getByText(EN_TRANSLATIONS.forgotauth.password.description)
-    ).toBeVisible();
 
     for (let i = 0; i < SEED_PHRASE_LENGTH; i++) {
       act(() => {
@@ -420,15 +421,11 @@ describe("Forgot Password Page", () => {
     });
 
     await waitFor(() => {
-      expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpassword.title)
-      ).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.createpassword.change)).toBeVisible();
       expect(
         getByText(EN_TRANSLATIONS.forgotauth.newpassword.description)
       ).toBeVisible();
-      expect(
-        getByText(EN_TRANSLATIONS.createpassword.button.continue)
-      ).toBeVisible();
+      expect(getByTestId("primary-button-create-password")).toBeVisible();
       expect(
         getByText(EN_TRANSLATIONS.forgotauth.newpassword.skip)
       ).toBeVisible();
@@ -438,12 +435,12 @@ describe("Forgot Password Page", () => {
 
     await waitFor(() => {
       expect(
-        getByText(EN_TRANSLATIONS.forgotauth.newpassword.alert.text)
+        getByText(EN_TRANSLATIONS.createpassword.alert.text)
       ).toBeVisible();
     });
 
     fireEvent.click(
-      getByText(EN_TRANSLATIONS.forgotauth.newpassword.alert.button.confirm)
+      getByText(EN_TRANSLATIONS.createpassword.alert.button.confirm)
     );
 
     expect(SecureStorage.delete).toBeCalledWith(KeyStoreKeys.APP_OP_PASSWORD);

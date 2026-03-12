@@ -120,12 +120,11 @@
   }
 
   .connections-list {
-    --top-space: 12.75rem;
-    height: calc(100vh - (var(--top-space) + var(--ion-safe-area-top)));
-
-    @media screen and (min-width: 250px) and (max-width: 370px) {
-      --top-space: 10.53125rem;
-    }
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
 
     &.md {
       --top-space: calc(8.125rem + var(--ion-safe-area-bottom));
@@ -136,7 +135,13 @@
     }
 
     > ion-grid {
+      height: 100%;
       padding: 0;
+      margin: 0;
+      width: 100%;
+      --ion-grid-padding: 0;
+      --ion-grid-column-padding: 0;
+      box-sizing: border-box;
 
       > ion-row > ion-col {
         padding: 0 0 var(--ion-safe-area-bottom);

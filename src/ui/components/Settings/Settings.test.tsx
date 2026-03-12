@@ -78,7 +78,13 @@ jest.mock("@capacitor/core", () => {
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {
     isAvailable: jest.fn(() =>
-      Promise.resolve({ isAvailable: true, biometryType: "fingerprint" })
+      Promise.resolve({
+        isAvailable: true,
+        biometryType: "fingerprint",
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
+      })
     ),
     verifyIdentity: jest.fn(() => Promise.resolve()),
     getCredentials: jest.fn(() => Promise.reject(new Error("No credentials"))),
@@ -92,6 +98,11 @@ jest.mock("@capgo/capacitor-native-biometric", () => ({
     IRIS_AUTHENTICATION: "iris",
     MULTIPLE: "multiple",
     NONE: "none",
+  },
+  AuthenticationStrength: {
+    NONE: 0,
+    STRONG: 1,
+    WEAK: 2,
   },
   BiometricAuthError: {
     USER_CANCEL: 1,
@@ -214,7 +225,10 @@ describe("Settings page", () => {
     (useBiometricAuth as jest.Mock).mockReturnValue({
       biometricInfo: {
         isAvailable: true,
-        biometryType: BiometryType.FINGERPRINT,
+        biometryType: "fingerprint",
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
       },
       setupBiometrics: jest.fn(),
       handleBiometricAuth: jest.fn(),

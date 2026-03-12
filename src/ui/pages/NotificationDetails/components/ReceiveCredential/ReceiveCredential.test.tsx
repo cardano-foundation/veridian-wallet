@@ -10,18 +10,14 @@ import { KeyStoreKeys } from "../../../../../core/storage";
 import EN_TRANSLATIONS from "../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../routes/paths";
 import { showGenericError } from "../../../../../store/reducers/stateCache";
-import { connectionsForNotificationsValues } from "../../../../__fixtures__/connectionsFix";
 import { credsFixAcdc } from "../../../../__fixtures__/credsFix";
-import {
-  filteredIdentifierFix,
-  filteredIdentifierMapFix,
-} from "../../../../__fixtures__/filteredIdentifierFix";
+import { filteredIdentifierFix } from "../../../../__fixtures__/filteredIdentifierFix";
 import { identifierFix } from "../../../../__fixtures__/identifierFix";
 import { notificationsFix } from "../../../../__fixtures__/notificationsFix";
+import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
+import { makeTestStore } from "../../../../utils/makeTestStore";
 import { passcodeFiller } from "../../../../utils/passcodeFiller";
 import { ReceiveCredential } from "./ReceiveCredential";
-import { makeTestStore } from "../../../../utils/makeTestStore";
-import { profileCacheFixData } from "../../../../__fixtures__/storeDataFix";
 
 jest.useFakeTimers();
 
@@ -476,6 +472,48 @@ describe("Receive credential", () => {
     });
 
     unmount();
+  });
+
+  test("Open relate profile and not show delete button", async () => {
+    const storeMocked = {
+      ...makeTestStore(initialState),
+      dispatch: dispatchMock,
+    };
+
+    getAcdcFromIpexGrantMock.mockResolvedValue({
+      ...credsFixAcdc[0],
+      identifierType: IdentifierType.Individual,
+      identifierId: filteredIdentifierFix[0].id,
+    });
+
+    const { getByText, queryByTestId, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <ReceiveCredential
+          pageId="creadential-request"
+          activeStatus
+          handleBack={jest.fn()}
+          notificationDetails={notificationsFix[0]}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(
+        getByText(
+          EN_TRANSLATIONS.tabs.notifications.details.credential.receive
+            .relatedprofile
+        )
+      ).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("related-profile"));
+    });
+
+    await waitFor(() => {
+      expect(getByTestId("profile-details-page")).toBeVisible();
+      expect(queryByTestId("delete-buttonprofile-details")).toBe(null);
+    });
   });
 });
 

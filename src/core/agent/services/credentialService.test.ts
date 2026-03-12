@@ -965,6 +965,7 @@ describe("Credential service of agent", () => {
 
     expect(credentialStorage.getCredentialMetadata).toBeCalledWith(credId);
     expect(credentialStorage.deleteCredentialMetadata).not.toBeCalled();
+    expect(credentialStorage.deleteCredentialMetadata).toHaveBeenCalledTimes(0);
   });
 
   test("should delele the credential and delete credential", async () => {
@@ -982,6 +983,7 @@ describe("Credential service of agent", () => {
     expect(credentialStorage.deleteCredentialMetadata).toHaveBeenCalledWith(
       "test-credential-id"
     );
+    expect(credentialStorage.deleteCredentialMetadata).toHaveBeenCalledTimes(1);
   });
 
   test("should delete local credential if delete from signify throws a 404 error", async () => {
@@ -1001,6 +1003,7 @@ describe("Credential service of agent", () => {
     expect(credentialStorage.deleteCredentialMetadata).toHaveBeenCalledWith(
       "test-credential-id"
     );
+    expect(credentialStorage.deleteCredentialMetadata).toHaveBeenCalledTimes(1);
   });
 
   test("should throw an error if delete from signify throws a non-404 error", async () => {
@@ -1019,6 +1022,7 @@ describe("Credential service of agent", () => {
 
     expect(deleteCredentialMock).toHaveBeenCalledWith(mockMetadata.id);
     expect(credentialStorage.deleteCredentialMetadata).not.toHaveBeenCalled();
+    expect(credentialStorage.deleteCredentialMetadata).toHaveBeenCalledTimes(0);
   });
 
   test("Should retrieve pending deletions and delete each by ID", async () => {

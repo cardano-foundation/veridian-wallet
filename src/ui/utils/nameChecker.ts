@@ -77,8 +77,8 @@ function uniqueGroupName(desiredName: string, existingNames: string[]): string {
     }
   }
 
-  // Find smallest number >=1 not used
-  let candidate = 1;
+  // Find smallest number >=2 not used
+  let candidate = 2;
   while (numbersUsed.has(candidate)) candidate++;
 
   return `${baseName} #${candidate}`;

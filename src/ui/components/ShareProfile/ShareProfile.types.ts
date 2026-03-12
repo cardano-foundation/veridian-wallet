@@ -1,7 +1,7 @@
 interface ShareProfileProps {
   isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
-  oobi?: string;
+  setIsOpen: (value: boolean, closeModals?: boolean) => void;
+  oobi: string;
   hiddenScan?: boolean;
   defaultTab?: Tab;
   onScan?: (

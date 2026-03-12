@@ -1,7 +1,10 @@
 interface RecoverySeedPhraseProps {
+  title: string;
+  showCloseButton?: boolean;
   onClose: () => void;
   starVerify?: (seedPhrase: string[]) => void;
   mode?: "view" | "verify";
+  pageId: string;
 }
 
 interface ConfirmModalProps {

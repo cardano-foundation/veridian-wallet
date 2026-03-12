@@ -333,7 +333,7 @@ const ArchivedCredentialsContainer = forwardRef<
           />
         }
       >
-        {haveRevokedCreds && haveArchivedCreds && (
+        {haveArchivedCreds && (
           <ListHeader
             title={`${i18n.t("tabs.credentials.archived.archivedtitle")}`}
           />
@@ -361,7 +361,7 @@ const ArchivedCredentialsContainer = forwardRef<
             })}
           </IonList>
         )}
-        {haveRevokedCreds && haveArchivedCreds && (
+        {haveRevokedCreds && (
           <ListHeader
             title={`${i18n.t("tabs.credentials.archived.revokedtitle")}`}
           />

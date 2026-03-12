@@ -90,6 +90,12 @@
     .card-block {
       margin: 0.75rem 0 0;
 
+      .card-detail-stack-item {
+        h2 {
+          font-weight: 700;
+        }
+      }
+
       .identifier-id {
         .card-details-info-content {
           display: block;

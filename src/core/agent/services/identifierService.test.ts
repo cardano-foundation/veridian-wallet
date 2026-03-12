@@ -473,7 +473,6 @@ describe("Retrieval", () => {
 describe("Creation", () => {
   // Input validation
   test("cannot create an identifier if theme is not valid", async () => {
-
     await expect(
       identifierService.createIdentifier({
         displayName: "newDisplayName",
@@ -1385,9 +1384,10 @@ describe("Updates", () => {
       .mockResolvedValue(memberClone);
     getIdentifierMock.mockResolvedValueOnce({
       ...identifierStateKeria,
-      name: `1.2.0.2:${identifierMetadataRecord.theme}:${identifierMetadataRecord.groupMetadata?.proposedUsername ??
+      name: `1.2.0.2:${identifierMetadataRecord.theme}:${
+        identifierMetadataRecord.groupMetadata?.proposedUsername ??
         identifierMetadataRecord.displayName
-        }`,
+      }`,
     });
 
     await identifierService.updateIdentifier(identifierMetadataRecord.id, {
@@ -1511,33 +1511,27 @@ describe("Updates", () => {
       expect(updateIdentifierMock).toBeCalledWith("member-identifier-id", {
         name: `1.2.0.2:2:0:${groupMetadata.groupId}:${newUsername}:Group Name`,
       });
-      expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
-        1,
-        identifierMetadataRecord.id,
-        {
-          groupUsername: newUsername,
-          pendingUpdate: true,
-        }
-      );
-      expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
-        2,
-        "member-identifier-id",
-        {
-          displayName: "Group Name",
-          theme: 2,
-          groupMetadata: {
-            ...memberMetadata.groupMetadata,
-            proposedUsername: newUsername,
-          },
-        }
-      );
-      expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
-        3,
-        identifierMetadataRecord.id,
-        {
-          pendingUpdate: false,
-        }
-      );
+      expect(
+        identifierStorage.updateIdentifierMetadata
+      ).toHaveBeenNthCalledWith(1, identifierMetadataRecord.id, {
+        groupUsername: newUsername,
+        pendingUpdate: true,
+      });
+      expect(
+        identifierStorage.updateIdentifierMetadata
+      ).toHaveBeenNthCalledWith(2, "member-identifier-id", {
+        displayName: "Group Name",
+        theme: 2,
+        groupMetadata: {
+          ...memberMetadata.groupMetadata,
+          proposedUsername: newUsername,
+        },
+      });
+      expect(
+        identifierStorage.updateIdentifierMetadata
+      ).toHaveBeenNthCalledWith(3, identifierMetadataRecord.id, {
+        pendingUpdate: false,
+      });
     });
 
     test("can update group username for partial group (no mHab)", async () => {
@@ -1572,23 +1566,20 @@ describe("Updates", () => {
       expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
         name: `1.2.0.2:1:1:${groupMetadata.groupId}:${newUsername}:Partial Group`,
       });
-      expect(identifierStorage.updateIdentifierMetadata).toHaveBeenNthCalledWith(
-        1,
-        identifierMetadataRecord.id,
-        {
-          groupMetadata: {
-            ...groupMetadata,
-            proposedUsername: newUsername,
-          },
-          pendingUpdate: true,
-        }
-      );
-      expect(identifierStorage.updateIdentifierMetadata).toHaveBeenLastCalledWith(
-        identifierMetadataRecord.id,
-        {
-          pendingUpdate: false,
-        }
-      );
+      expect(
+        identifierStorage.updateIdentifierMetadata
+      ).toHaveBeenNthCalledWith(1, identifierMetadataRecord.id, {
+        groupMetadata: {
+          ...groupMetadata,
+          proposedUsername: newUsername,
+        },
+        pendingUpdate: true,
+      });
+      expect(
+        identifierStorage.updateIdentifierMetadata
+      ).toHaveBeenLastCalledWith(identifierMetadataRecord.id, {
+        pendingUpdate: false,
+      });
     });
 
     test("should throw error when updating username for identifier without groupMetadata", async () => {
@@ -1703,7 +1694,9 @@ describe("Identifier Deletion Logic", () => {
         .mockResolvedValue(undefined);
 
       await expect(
-        identifierService.markIdentifierPendingDelete(identifierMetadataRecord.id)
+        identifierService.markIdentifierPendingDelete(
+          identifierMetadataRecord.id
+        )
       ).rejects.toThrow(new Error("Identifier metadata record does not exist"));
       expect(identifierStorage.updateIdentifierMetadata).not.toBeCalled();
     });
@@ -1711,7 +1704,8 @@ describe("Identifier Deletion Logic", () => {
 
   describe("removeIdentifiersPendingDeletion", () => {
     test("Should retrieve identifiers pending deletion and delete each by ID", async () => {
-      const deleteSpy = jest.spyOn(identifierService, 'deleteIdentifier')
+      const deleteSpy = jest
+        .spyOn(identifierService, "deleteIdentifier")
         .mockResolvedValue(undefined);
 
       identifierStorage.getIdentifiersPendingDeletion.mockResolvedValueOnce([
@@ -1741,7 +1735,9 @@ describe("Identifier Deletion Logic", () => {
       PeerConnection.peerConnection.getConnectingIdentifier = jest
         .fn()
         .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
-      jest.spyOn(utils, "randomSalt").mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
+      jest
+        .spyOn(utils, "randomSalt")
+        .mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
       notificationStorage.findAllByQuery.mockResolvedValue(
         findNotificationsResult
       );
@@ -1761,7 +1757,9 @@ describe("Identifier Deletion Logic", () => {
       expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
         name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[0].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[0].id
       );
@@ -1769,7 +1767,9 @@ describe("Identifier Deletion Logic", () => {
         type: EventTypes.NotificationRemoved,
         payload: { id: findNotificationsResult[0].id },
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[1].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[1].id
       );
@@ -1811,8 +1811,12 @@ describe("Identifier Deletion Logic", () => {
 
       await identifierService.deleteIdentifier(groupMemberMetadataRecord.id);
 
-      expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
+      expect(connections.deleteAllConnectionsForGroup).toBeCalledWith(
+        "group-id"
+      );
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[0].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[0].id
       );
@@ -1820,7 +1824,9 @@ describe("Identifier Deletion Logic", () => {
         type: EventTypes.NotificationRemoved,
         payload: { id: findNotificationsResult[0].id },
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[1].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[1].id
       );
@@ -1864,7 +1870,9 @@ describe("Identifier Deletion Logic", () => {
 
       await identifierService.deleteIdentifier(groupMetadataRecord.id);
 
-      expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
+      expect(connections.deleteAllConnectionsForGroup).toBeCalledWith(
+        "group-id"
+      );
       expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
         groupMemberMetadataRecord.id,
         {
@@ -1872,9 +1880,12 @@ describe("Identifier Deletion Logic", () => {
           pendingDeletion: false,
         }
       );
-      expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-        name: `1.2.0.2:XX-QOP7zdP-kJs8nlwVR290XfyAk:1:group-id:testUser:${groupMemberMetadataRecord.displayName}`,
-      });
+      expect(updateIdentifierMock).toBeCalledWith(
+        groupMemberMetadataRecord.id,
+        {
+          name: `1.2.0.2:XX-QOP7zdP-kJs8nlwVR290XfyAk:1:group-id:testUser:${groupMemberMetadataRecord.displayName}`,
+        }
+      );
       expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
         groupMetadataRecord.id,
         { isDeleted: true, pendingDeletion: false }
@@ -1882,7 +1893,9 @@ describe("Identifier Deletion Logic", () => {
       expect(updateIdentifierMock).toBeCalledWith(groupMetadataRecord.id, {
         name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[0].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[0].id
       );
@@ -1890,7 +1903,9 @@ describe("Identifier Deletion Logic", () => {
         type: EventTypes.NotificationRemoved,
         payload: { id: findNotificationsResult[0].id },
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[1].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[1].id
       );
@@ -1924,7 +1939,9 @@ describe("Identifier Deletion Logic", () => {
       PeerConnection.peerConnection.getConnectingIdentifier = jest
         .fn()
         .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
-      jest.spyOn(utils, "randomSalt").mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
+      jest
+        .spyOn(utils, "randomSalt")
+        .mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
 
       // Mock notifications that need to be cleaned up
       const mockNotifications = [
@@ -1995,7 +2012,9 @@ describe("Identifier Deletion Logic", () => {
       PeerConnection.peerConnection.getConnectingIdentifier = jest
         .fn()
         .mockReturnValue({ id: identifierMetadataRecord.id, oobi: "oobi" });
-      jest.spyOn(utils, "randomSalt").mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
+      jest
+        .spyOn(utils, "randomSalt")
+        .mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
       notificationStorage.findAllByQuery.mockResolvedValue(
         findNotificationsResult
       );
@@ -2026,7 +2045,9 @@ describe("Identifier Deletion Logic", () => {
       expect(updateIdentifierMock).toBeCalledWith(identifierMetadataRecord.id, {
         name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${identifierMetadataRecord.displayName}`,
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[0].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[0].id
       );
@@ -2034,7 +2055,9 @@ describe("Identifier Deletion Logic", () => {
         type: EventTypes.NotificationRemoved,
         payload: { id: findNotificationsResult[0].id },
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[1].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[1].id
       );
@@ -2078,7 +2101,9 @@ describe("Identifier Deletion Logic", () => {
       PeerConnection.peerConnection.getConnectingIdentifier = jest
         .fn()
         .mockReturnValue({ id: groupMemberMetadataRecord.id, oobi: "oobi" });
-      jest.spyOn(utils, "randomSalt").mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
+      jest
+        .spyOn(utils, "randomSalt")
+        .mockReturnValue("0ADQpus-mQmmO4mgWcT3ekDz");
       notificationStorage.findAllByQuery.mockResolvedValue(
         findNotificationsResult
       );
@@ -2106,10 +2131,15 @@ describe("Identifier Deletion Logic", () => {
         groupMemberMetadataRecord.id,
         { isDeleted: true, pendingDeletion: false }
       );
-      expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-        name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:1:${groupMemberMetadataRecord.groupMetadata?.groupId}:${groupMemberMetadataRecord.groupMetadata?.proposedUsername}:${groupMemberMetadataRecord.displayName}`,
-      });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
+      expect(updateIdentifierMock).toBeCalledWith(
+        groupMemberMetadataRecord.id,
+        {
+          name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:1:${groupMemberMetadataRecord.groupMetadata?.groupId}:${groupMemberMetadataRecord.groupMetadata?.proposedUsername}:${groupMemberMetadataRecord.displayName}`,
+        }
+      );
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[0].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[0].id
       );
@@ -2117,7 +2147,9 @@ describe("Identifier Deletion Logic", () => {
         type: EventTypes.NotificationRemoved,
         payload: { id: findNotificationsResult[0].id },
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[1].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[1].id
       );
@@ -2212,7 +2244,9 @@ describe("Identifier Deletion Logic", () => {
           },
         })
       );
-      expect(connections.deleteAllConnectionsForGroup).toBeCalledWith("group-id");
+      expect(connections.deleteAllConnectionsForGroup).toBeCalledWith(
+        "group-id"
+      );
       expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
         groupMemberMetadataRecord.id,
         {
@@ -2220,9 +2254,12 @@ describe("Identifier Deletion Logic", () => {
           pendingDeletion: false,
         }
       );
-      expect(updateIdentifierMock).toBeCalledWith(groupMemberMetadataRecord.id, {
-        name: `1.2.0.2:XX-QOP7zdP-kJs8nlwVR290XfyAk:1:group-id:testUser:${groupMemberMetadataRecord.displayName}`,
-      });
+      expect(updateIdentifierMock).toBeCalledWith(
+        groupMemberMetadataRecord.id,
+        {
+          name: `1.2.0.2:XX-QOP7zdP-kJs8nlwVR290XfyAk:1:group-id:testUser:${groupMemberMetadataRecord.displayName}`,
+        }
+      );
       expect(identifierStorage.updateIdentifierMetadata).toBeCalledWith(
         groupMetadataRecord.id,
         { isDeleted: true, pendingDeletion: false }
@@ -2230,7 +2267,9 @@ describe("Identifier Deletion Logic", () => {
       expect(updateIdentifierMock).toBeCalledWith(groupMetadataRecord.id, {
         name: `1.2.0.2:XX-0ADQpus-mQmmO4mgWcT3ekDz:${groupMetadataRecord.displayName}`,
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[0].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[0].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[0].id
       );
@@ -2238,7 +2277,9 @@ describe("Identifier Deletion Logic", () => {
         type: EventTypes.NotificationRemoved,
         payload: { id: findNotificationsResult[0].id },
       });
-      expect(markNotificationMock).toBeCalledWith(findNotificationsResult[1].id);
+      expect(markNotificationMock).toBeCalledWith(
+        findNotificationsResult[1].id
+      );
       expect(notificationStorage.deleteById).toBeCalledWith(
         findNotificationsResult[1].id
       );
@@ -2268,7 +2309,10 @@ describe("Identifier Deletion Logic", () => {
       );
       operationPendingStorage.deleteById.mockRejectedValueOnce(notFoundError);
 
-      await (identifierService as any).cleanupPendingOperationsForIdentifier(identifierId, operationType);
+      await (identifierService as any).cleanupPendingOperationsForIdentifier(
+        identifierId,
+        operationType
+      );
       expect(operationPendingStorage.deleteById).toBeCalledWith(operationId);
       expect(eventEmitter.emit).not.toBeCalled();
     });

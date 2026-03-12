@@ -1,5 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import {
+  AuthenticationStrength,
   AvailableResult,
   BiometricAuthError,
   BiometryType,
@@ -71,7 +72,10 @@ const isBiometricPluginError = (
 const useBiometricAuth = (isLockPage = false) => {
   const [biometricInfo, setBiometricInfo] = useState<AvailableResult>({
     isAvailable: false,
+    authenticationStrength: AuthenticationStrength.NONE,
     biometryType: BiometryType.NONE,
+    deviceIsSecure: false,
+    strongBiometryIsAvailable: false,
   });
   const [lockoutEndTime, setLockoutEndTime] = useState<number>();
   const [remainingLockoutSeconds, setRemainingLockoutSeconds] = useState(0);
@@ -82,7 +86,13 @@ const useBiometricAuth = (isLockPage = false) => {
 
   const checkBiometrics = async () => {
     if (!Capacitor.isNativePlatform()) {
-      const result = { isAvailable: false, biometryType: BiometryType.NONE };
+      const result: AvailableResult = {
+        isAvailable: false,
+        authenticationStrength: AuthenticationStrength.NONE,
+        biometryType: BiometryType.NONE,
+        deviceIsSecure: false,
+        strongBiometryIsAvailable: false,
+      };
       setBiometricInfo(result);
       return result;
     }
@@ -237,6 +247,7 @@ const useBiometricAuth = (isLockPage = false) => {
       return BiometricAuthOutcome.NOT_AVAILABLE;
     }
 
+    dispatch(setIsInBiometricProcess(true));
     try {
       await NativeBiometric.getCredentials({
         server: BIOMETRIC_SERVER_KEY,
@@ -265,6 +276,8 @@ const useBiometricAuth = (isLockPage = false) => {
       } catch (setCredError) {
         return BiometricAuthOutcome.GENERIC_ERROR;
       }
+    } finally {
+      dispatch(setIsInBiometricProcess(false));
     }
   };
 

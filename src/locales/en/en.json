@@ -10,17 +10,17 @@
         "description": "Your identity is encrypted and stored safely on your device. Only you have access"
       },
       {
-        "title": "Privacy First",
+        "title": "Privacy first",
         "description": "Control when to present your credentials, keeping your personal data private"
       },
       {
-        "title": "Sign with Group Identity",
+        "title": "Sign with group identity",
         "description": "Sign and verify as an individual or part of a group, whenever needed"
       }
     ],
     "getstarted": {
       "button": {
-        "label": "Get Started"
+        "label": "Get started"
       }
     },
     "alreadywallet": {
@@ -49,7 +49,7 @@
     "description": "Create a PIN to secure your wallet and to continue the onboarding process",
     "reenterdescription": "Re-enter your PIN to make sure it matches",
     "recoverydescription": "Create a PIN to secure your wallet and to continue the recovery process",
-    "reenterpasscode": "Re-enter your PIN",
+    "reenterpasscode": "Re-enter PIN",
     "cancelbtn": "Cancel",
     "backbtn": "Back"
   },
@@ -122,7 +122,7 @@
     "privacy": {
       "overlay": {
         "text": "Press the ‘view recovery phrase’ button when you’re ready to see your recovery phrase. Remember to make sure nobody is looking!",
-        "button": "View Recovery Phrase"
+        "button": "View recovery phrase"
       }
     },
     "alert": {
@@ -158,7 +158,7 @@
     "termsandconditions": {
       "text": "I have read and agree to the <0>{{clickableTerms}}</0> and <1>{{clickablePrivacy}}</1>.",
       "terms": "Terms of Use",
-      "privacy": "Privacy Policy"
+      "privacy": "Privacy policy"
     }
   },
   "lockpage": {
@@ -313,7 +313,7 @@
     "change": "New password",
     "cancel": "Cancel",
     "description": "Add an extra layer of security for sensitive actions in your wallet by creating an optional password.",
-    "learnmore": "Learn More",
+    "learnmore": "Learn more",
     "input": {
       "first": {
         "symbolguide": "Symbol guide",
@@ -330,7 +330,7 @@
       }
     },
     "button": {
-      "continue": "Create Password",
+      "continue": "Create password",
       "skip": "Skip"
     },
     "alert": {
@@ -362,14 +362,14 @@
     },
     "symbolmodal": {
       "title": "Symbol guide",
-      "done": "Done",
+      "done": "Close",
       "text": "Please ensure the symbols you’re using in your password align with the standard US and UK keyboards listed below:",
       "note": "Various operating systems and applications may apply limitations to this set.",
       "symbolcolumn": "Symbol",
       "name": "Name",
       "listsymbol": {
         "space": "Space",
-        "exclamationmark": "Exclamation Mark",
+        "exclamationmark": "Exclamation mark",
         "numbersign": "Number sign (hash)",
         "dollarsign": "Dollar sign",
         "sterlingsign": "Sterling sign (pound)",
@@ -569,14 +569,14 @@
         "contact": "Veridian support",
         "learnmore": "Learn more about Veridian",
         "terms": {
-          "title": "Terms and Privacy Policy",
+          "title": "Terms and privacy policy",
           "submenu": {
             "title": "Terms & privacy",
             "termsofuse": "Terms of use",
             "privacy": "Privacy policy"
           }
         },
-        "version": "App Version"
+        "version": "App version"
       },
       "deletewallet": {
         "button": "Delete wallet",
@@ -642,12 +642,14 @@
       },
       "signingkeysthreshold": {
         "title": "Required signers",
-        "member": "{{member}} members",
+        "members": "{{member}} members",
+        "member": "{{member}} member",
         "outof": "out of {{threshold}}"
       },
       "rotationthreshold": {
         "title": "Recovery signers",
-        "member": "{{member}} members",
+        "members": "{{member}} members",
+        "member": "{{member}} member",
         "outof": "out of {{threshold}}"
       },
       "button": {
@@ -657,7 +659,7 @@
     "delete": {
       "button": "Delete profile",
       "alert": {
-        "title": "Are you sure you want to delete this profile?",
+        "title": "You're about to delete this profile. It can't be undone",
         "confirm": "Yes, I'm sure",
         "cancel": "Cancel"
       }
@@ -669,7 +671,6 @@
       "rotatekeys": "Rotate keys",
       "share": "Share",
       "inner": {
-        "label": "Display name",
         "groupLabel": "Group name",
         "usernamelabel": "Username",
         "confirm": "Confirm"
@@ -680,7 +681,7 @@
       "missingoncloud": "We couldn’t locate this profile in the cloud. It might become available again soon, but some information could be lost.\n\nIf you no longer require this profile, tap “Delete profile” to remove it.",
       "nowitness": "There was an issue creating this profile. Please contact your cloud provider for more information. To remove it from your pending list, tap “Delete profile”.",
       "button": {
-        "delete": "Delete Profile",
+        "delete": "Delete profile",
         "retry": "Retry"
       }
     },
@@ -701,25 +702,18 @@
         "hiderotationkey": "Hide {{keys}} rotation key digests"
       },
       "signingthreshold": {
-        "title": "Signing threshold",
+        "title": "Signers",
         "propexplain": {
-          "title": "About signing threshold",
-          "content": "Minimum number of signing keys required to approve a transaction or event within the profile."
+          "title": "About required signers",
+          "content": "This sets the minimum number of group members who must approve an action for it to go ahead."
         },
         "threshold": {
           "title": "Threshold",
-          "text": "{{threshold}} out of {{members}}"
-        }
-      },
-      "rotationthreshold": {
-        "title": "Rotation threshold",
-        "propexplain": {
-          "title": "About rotation threshold",
-          "content": "Provides additional details on this profile for users interested in more technical insights."
-        },
-        "threshold": {
-          "title": "Threshold",
-          "text": "{{threshold}} out of {{members}}"
+          "text": "{{threshold}} out of {{members}}",
+          "recovery": {
+            "explaintitle": "About recovery signers",
+            "explain": "This sets the minimum number of group members needed to recover the group profile if something goes wrong."
+          }
         }
       },
       "groupmember": {
@@ -744,19 +738,21 @@
       "message": "Your connection has been disconnected as you have deleted the chosen identifier paired with this connection. Please choose a new identifier to re-establish this connection.",
       "confirm": "Ok"
     },
-    "inputpidmodal": {
-      "header": "Paste Peer ID",
-      "cancel": "Cancel",
-      "confirm": "Confirm",
-      "scanQR": "Scan QR code"
+    "scan": {
+      "inputmodal": {
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "pastecontents": "Paste peer ID",
+        "placeholder": "Peer ID"
+      }
     },
     "connectionhistory": {
-      "title": "Connection History",
+      "title": "Connection history",
       "action": {
         "delete": "Delete"
       },
       "deletealert": {
-        "message": "Are you sure you want to delete this dApp?",
+        "message": "Are you sure you want to delete this connection?",
         "confirm": "Yes, I’m sure",
         "cancel": "Cancel"
       },
@@ -769,8 +765,9 @@
         "done": "Done",
         "connectbtn": "Connect",
         "disconnectbtn": "Disconnect",
-        "connectingbtn": "Connecting...",
-        "pending": "Pending"
+        "connectingbtn": "Connecting",
+        "pending": "Pending",
+        "copyid": "Copy ID"
       }
     },
     "request": {
@@ -796,12 +793,12 @@
         "title": "Hi, {{name}}",
         "tiles": {
           "scan": {
-            "badge": "Coming Soon",
+            "badge": "Coming soon",
             "title": "Scan to login",
             "text": "Sign in to apps, games, social media, banking, and other services"
           },
           "dapps": {
-            "title": "Cardano Connect",
+            "title": "Cardano connect",
             "text": "Use your Veridian wallet to access Cardano applications online"
           },
           "connections": {
@@ -852,7 +849,7 @@
         "title": "Credentials",
         "placeholder": "No credentials yet. They will appear here once a connection issues them.",
         "viewarchived": "Archived & Revoked",
-        "favourites": "Favourites",
+        "favourites": "Favorites",
         "allcreds": "All credentials",
         "pendingcred": "Pending credentials",
         "deletepending": {
@@ -867,7 +864,6 @@
         "issuer": "Issuer"
       },
       "details": {
-        "joinedmember": "Joined members",
         "done": "Done",
         "restore": "Restore",
         "delete": "Delete",
@@ -886,10 +882,10 @@
           "description": "Essential details shared by the issuer, which verify and describe key information in this credential.",
           "details": "Attribute details",
           "issuee": "Issuer",
-          "issuancedate": "Issuance Date Time",
+          "issuancedate": "Issuance date time",
           "lei": "LEI"
         },
-        "schemaversion": "Schema Version",
+        "schemaversion": "Version",
         "issuer": "Issuer",
         "status": {
           "label": "Status",
@@ -939,13 +935,13 @@
         "title": "History",
         "done": "Done",
         "select": "Select",
-        "selectall": "Select All",
+        "selectall": "Select all",
         "deselectall": "Deselect all",
         "cancel": "Cancel",
         "delete": "Delete",
         "restore": "Restore",
-        "oneselected": "1 Credential Selected",
-        "manyselected": "{{amount}} Credentials Selected",
+        "oneselected": "1 credential selected",
+        "manyselected": "{{amount}} credentials selected",
         "archivedtitle": "Archived credentials",
         "revokedtitle": "Revoked credentials",
         "revokedlabel": "Revoked",
@@ -1009,7 +1005,7 @@
           "multisigicp": "<strong>{{connection}}</strong> is requesting to create a group identifier with you",
           "exnipexapply": "<strong>{{connection}}</strong> has requested a credential from you",
           "exnipexgrantrevoke": "Your <strong>{{credential}}</strong> credential has been revoked",
-          "exnipexapplyproposed": "<strong>{{initiator}}</strong> has proposed a credential for the <strong>{{connection}}’s</strong> request",
+          "exnipexapplyproposed": "<strong>{{initiator}}</strong> has proposed a credential for {{connection}}'s request",
           "sign": "<strong>Signing request</strong> for <strong>{{connection}}</strong>",
           "signeventinfo": "<strong>Signing event information</strong>",
           "connectinstructions": "<strong>Check your email for instructions on how to connect with {{connection}}</strong>",
@@ -1035,8 +1031,8 @@
           "back": "Back",
           "choosecredential": "Choose credential",
           "providecredential": "Provide credential",
-          "presentcredential": "Present Credential",
-          "addcred": "Add Credential",
+          "presentcredential": "Present credential",
+          "addcred": "Add credential",
           "done": "Done",
           "ok": "Ok",
           "delete": "Delete",
@@ -1062,7 +1058,6 @@
                 "textdecline": "Are you sure you want to decline this credential presentation request? You won't be able to change your decision later."
               },
               "groupmember": "Group members",
-              "joinedmembers": "Joined members",
               "reachthreshold": "The threshold has been met, and your group has agreed to your proposed credential presentation.",
               "initiatorselectcred": "The group has been asked to provide a credential. Please review the request and choose to accept or decline it.",
               "initiatorselectedcred": "You've already proposed a credential for this request. It will be sent once the group’s threshold is met.",
@@ -1126,8 +1121,8 @@
             "instructions": {
               "title": "Instructions",
               "detailtext": "In order to continue and complete the group setup, please follow the instructions below.",
-              "stepone": "Ensure you have scanned all participant's QR codes.",
-              "steptwo": "After scanning, try to open this notification again."
+              "stepone": "Ensure you have scanned all participants' QR codes using the \"Add members\" button.",
+              "steptwo": "After scanning all members, click the \"Continue setup\" button to proceed."
             },
             "help": {
               "title": "Need help?",
@@ -1159,7 +1154,7 @@
             "two": "Open the email subject “Connect with {{connection}} via your Identity Wallet”",
             "three": "Find the QR code within the email",
             "four": "Open the scanner using the button at the bottom of this notification or from the wallet’s navigation tab",
-            "five": "Scan the QR code or paste the Connection ID and advance",
+            "five": "Scan the QR code or paste the connection ID and advance",
             "six": "You're now connected with {{connection}}"
           },
           "button": {
@@ -1309,34 +1304,11 @@
       "title": "Forgot password",
       "description": "Please verify your recovery phrase to reset your password. To start typing click on the first option."
     },
-    "newpasscode": {
-      "title": "New PIN",
-      "description": "Create a new PIN to re-secure your wallet and perform operations",
-      "reenterpasscode": "Re-enter PIN"
-    },
     "newpassword": {
       "title": "New password",
       "description": "Create a new password",
-      "skip": "Skip",
-      "alert": {
-        "text": "Are you sure you want to skip? By doing this, you will be required to use your passcode for any protected operations. You can, of course, set this up later if you prefer.",
-        "button": {
-          "confirm": "Yes, skip",
-          "cancel": "Cancel"
-        }
-      }
+      "skip": "Skip"
     }
-  },
-  "shareidentifier": {
-    "title": "Share connection",
-    "subtitle": {
-      "identifier": "To share, either scan the QR code or select from the provided options below",
-      "connection": "Show this QR code to the person you want to connect with, or click the 'More share options' link"
-    },
-    "done": "Done",
-    "divider": "or",
-    "copykey": "Copy connection URL",
-    "more": "More share options"
   },
   "setupgroupprofile": {
     "cancel": "Cancel",
@@ -1441,6 +1413,7 @@
         "recoverysigners": "Recovery signers",
         "recoverysignershelptext": "This sets the minimum number of group members needed to recover the group profile if something goes wrong.",
         "members": "{{members}} members",
+        "member": "{{members}} member",
         "button": {
           "back": "Back",
           "confirm": "Confirm signers"
@@ -1503,47 +1476,47 @@
     "copiedtoclipboard": "Copied to clipboard",
     "identifierrequested": "Profile request pending",
     "identifiercreated": "Profile pending",
-    "identifierupdated": "Profile created",
+    "identifierupdated": "New profile created",
     "identifiernameupdated": "Profile name updated",
     "identifierusernameupdated": "Profile updated",
     "groupnameupdate": "Group updated",
     "groupnameupdateerror": "Unable to update group",
-    "identifierdeleted": "Profile successfully deleted",
-    "credentialdeleted": "Credential deleted successfully",
-    "credentialsdeleted": "Credentials deleted successfully",
-    "credentialarchived": "Credential archived successfully",
-    "credentialrestored": "Credential restored successfully",
-    "credentialsrestored": "Credentials restored successfully",
-    "connectiondeleted": "Connection deleted successfully",
-    "qrsuccess": "QR code scanned successfully",
+    "identifierdeleted": "Profile deleted",
+    "credentialdeleted": "Credential deleted",
+    "credentialsdeleted": "Credentials deleted",
+    "credentialarchived": "Credential archived",
+    "credentialrestored": "Credential restored",
+    "credentialsrestored": "Credentials restored",
+    "connectiondeleted": "Connection deleted",
     "connectionerror": "Something went wrong. Please try again.",
-    "connectionrequestincoming": "New Connection Request",
+    "connectionrequestincoming": "New connection request",
     "connectionrequestpending": "Connection request pending",
     "newconnectionadded": "New connection added",
     "credentialrequestpending": "Credential request pending",
-    "newcredentialadded": "New credential added",
-    "notesupdated": "Notes updated successfully",
-    "noteremoved": "Note removed successfully",
-    "maxfavouritesreached": "Maximum of 5 favourites reached",
-    "dappconnectiondeleted": "dApp deleted successfully",
-    "connectwalletsuccess": "Connected successfully",
-    "disconnectwallet": "Disconnected successfully",
+    "newcredentialadded": "Credential added",
+    "notesupdated": "Notes updated",
+    "noteremoved": "Note deleted",
+    "maxfavouritesreachederror": "Maximum of 5 favorites",
+    "dappconnectiondeleted": "D’App deleted",
+    "dappconnectiondeleteerror": "Unable to delete D’App",
+    "connectwalletsuccess": "Connected",
+    "disconnectwallet": "Disconnected",
     "unableconnectwalleterror": "Unable to connect",
     "peeridsuccess": "Peer ID successful",
     "peeriderror": "Peer ID not recognised",
-    "peeridnotrecognised": "Peer ID not recognised",
-    "setupbiometricsuccess": "Biometrics setup successfully",
-    "rotatekeysuccess": "Individual keys rotated successfully",
+    "setupbiometricsuccess": "Biometrics setup",
+    "rotatekeysuccess": "Key rotated successfully",
     "rotatekeyerror": "Unable to rotate keys",
     "newmultisignmember": "New member added",
     "grouprequestsend": "Group request sent",
     "unablecreategrouperror": "Unable to create group",
     "delegatedidentifiercreated": "Profile added to “For delegates“",
     "passcodeupdated": "PIN updated",
-    "passwordupdated": "Password updated successfully",
-    "passworddisabled": "Password turned off",
-    "passwordcreated": "Password created successfully",
-    "sharecredsuccess": "Credential shared successfully",
+    "passwordupdated": "Password updated",
+    "passwordsettingupdate": "Password settings updated",
+    "passwordsettingupdateerror": "Unable to update password settings",
+    "passwordcreated": "Password created",
+    "sharecredsuccess": "Credential shared",
     "proposedcredsuccess": "Credential proposed to group",
     "sharecrederror": "Unable to propose credential",
     "deleteconnectionerror": "Unable to delete connection",
@@ -1551,6 +1524,7 @@
     "deleteidentifiererror": "Unable to delete profile",
     "archivedcrederror": "Unable to archive credential",
     "signsuccessful": "Sign successful",
+    "signerror": "Unable to sign",
     "savepasswordhinterror": "Unable to delete password hint",
     "editidentifiererror": "Unable to update profile",
     "failedupdateconnectionerror": "Failed to update connection",
@@ -1559,12 +1533,12 @@
     "groupidnotmatcherror": "Connection not part of this group",
     "unknownerror": "Something went wrong, try again",
     "urlerror": "Enter a valid URL",
-    "proposalcredaccepted": "Credential proposal accepted",
-    "proposalcredreject": "Credential proposal rejected",
+    "proposalcredaccepted": "Proposal accepted",
+    "proposalcredreject": "Proposal rejected",
     "proposalcredfailerror": "Unable to record response",
     "deleteaccounterror": "Unable to delete wallet",
-    "deleteaccountsuccess": "Wallet deleted successfully",
-    "remotesignsuccess": "Signed successfully",
+    "deleteaccountsuccess": "Wallet deleted",
+    "remotesignsuccess": "Signed",
     "profileswitched": "Profile switched",
     "unabletoswitchprofile": "Unable to switch profile",
     "notvalidgrouperror": "Not a valid group invitation",
@@ -1572,21 +1546,23 @@
     "duplicategroupiderror": "Group already exists",
     "groupmetadatanotfounderror": "Group metadata is missing. Please try again.",
     "unabletoaccepterror": "Unable to accept",
-    "acceptsuccess": "Accepted Successfully",
+    "acceptsuccess": "Accepted successfully",
     "connecturlmismatch": "There’s a URL mismatch",
     "invalidbooturlerror": "Incorrect boot url",
     "invalidremovedconnectionurlerror": "Invalid connection removed",
     "networkerror": "Unable to reach the cloud",
     "createidentifiererror": "Unable to create profile",
     "invalidconnectionurlerror": "Invalid connection URL",
-    "profilenotexisterror": "This profile no longer exists"
+    "profilenotexisterror": "This profile no longer exists",
+    "memberalreadyexisterror": "Member already added",
+    "groupcreated": "Group successfully created"
   },
   "request": {
     "sign": {
       "title": "Sign",
       "identifier": "Identifier",
       "transaction": {
-        "data": "Data"
+        "data": "Signature data"
       }
     },
     "button": {
@@ -1646,7 +1622,7 @@
     "biometricunavailable": "Biometrics is unavailable at this time. You can set this up later via the settings page.",
     "biometricunavailableconfirm": "Ok",
     "lockoutheader": "Biometrics are temporarily disabled. Please try again in {{seconds}} seconds.",
-    "lockoutconfirm": "Got it",
+    "lockoutconfirm": "Continue without",
     "permanentlockoutheader": "For your security, biometrics are turned off. Lock and unlock your device to turn them back on.",
     "errors": {
       "notAvailable": "Biometry is not available on this device.",
@@ -1664,7 +1640,8 @@
   "nowitnesserror": {
     "title": "Misconfigured cloud agent",
     "description": "Due to your cloud agent being misconfigured, you’re unable to create a profile. Please contact your cloud provider for more information.",
-    "button": "Check again"
+    "button": "Check again",
+    "close": "Close"
   },
   "readmore": {
     "more": "Read more",
@@ -1676,14 +1653,14 @@
     "ios": {
       "os": "Required iOS",
       "youros": "Your iOS",
-      "storage": "Secure Storage"
+      "storage": "Secure storage"
     },
     "android": {
       "os": "Required Android OS",
       "youros": "Your Android OS",
       "webview": "Required WebView",
       "yourwebview": "Your WebView",
-      "storage": "Secure Storage"
+      "storage": "Secure storage"
     },
     "noinfo": "No device information available."
   },
@@ -1716,7 +1693,7 @@
       "description": "Create a group name for other members to join your group, or join an existing group",
       "form": {
         "input": "Group name",
-        "placeholder": "e.g. Company Name",
+        "placeholder": "e.g. company name",
         "or": "or",
         "joingroup": "Join existing group"
       }
@@ -1738,12 +1715,12 @@
     }
   },
   "systemthreats": {
-    "title": "Threats Detected",
+    "title": "Threats detected",
     "description": "The following security threats have been detected on your device.",
     "nothreats": "No security threats detected",
     "initerror": "Security module initialization failed. Critical protections are not active, leaving the application vulnerable.",
     "detected": "Detected",
-    "privilegedaccess": "Privileged Access",
+    "privilegedaccess": "Privileged access",
     "debug": "Debug Mode",
     "simulator": "Simulator/Emulator",
     "appintegrity": "App Integrity",

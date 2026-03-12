@@ -1,16 +1,24 @@
-import { IonText } from "@ionic/react";
-import { useState } from "react";
+import { IonIcon, IonText } from "@ionic/react";
+import {
+  chevronDownOutline,
+  chevronUpOutline,
+  keyOutline,
+} from "ionicons/icons";
+import { useEffect, useRef, useState } from "react";
 import { i18n } from "../../../../i18n";
+import { JSONObject } from "../../../../core/agent/agent.types";
 import { IncomingRequestType } from "../../../../store/reducers/stateCache/stateCache.types";
 import {
+  CardBlock,
   CardDetailsAttributes,
-  CardDetailsBlock,
+  CardDetailsItem,
 } from "../../../components/CardDetails";
 import { PageFooter } from "../../../components/PageFooter";
 import { PageHeader } from "../../../components/PageHeader";
 import { Spinner } from "../../../components/Spinner";
 import { Verification } from "../../../components/Verification";
 import { ScrollablePageLayout } from "../../../components/layout/ScrollablePageLayout";
+import { combineClassNames } from "../../../utils/style";
 import { RequestProps } from "../IncomingRequest.types";
 import "./SignRequest.scss";
 
@@ -23,26 +31,90 @@ const SignRequest = ({
   handleCancel,
 }: RequestProps<IncomingRequestType.PEER_CONNECT_SIGN>) => {
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
-  const signDetails = (() => {
-    if (!requestData.signTransaction) {
-      return {};
-    }
-
-    let signContent;
-    try {
-      signContent = JSON.parse(requestData.signTransaction.payload.payload);
-    } catch (error) {
-      signContent = requestData.signTransaction.payload.payload;
-    }
-    return signContent;
-  })();
-
+  const [displayExpandButton, setDisplayExpandButton] = useState(false);
+  const [isExpand, setExpand] = useState(false);
+  const attributeContainerRef = useRef<HTMLDivElement>(null);
+  const attributeRef = useRef<HTMLDivElement>(null);
   const signRequest = requestData.signTransaction;
+  const [isJSON, setIsJSON] = useState(false);
+  const [signDetails, setSignDetails] = useState<JSONObject | string>({});
+
+  useEffect(() => {
+    if (!requestData.signTransaction) {
+      setSignDetails({});
+      setIsJSON(false);
+      return;
+    }
+    const payload = requestData.signTransaction.payload.payload;
+    try {
+      const parsed = JSON.parse(payload);
+      setSignDetails(parsed);
+      setIsJSON(true);
+    } catch (error) {
+      setSignDetails(payload);
+      setIsJSON(false);
+    }
+  }, [requestData.signTransaction]);
+
   const logo = requestData.peerConnection.iconB64;
 
   const handleSign = () => {
     handleAccept();
   };
+
+  const onExpandData = () => {
+    setExpand((value) => !value);
+  };
+
+  const signContentCss = combineClassNames("sign-data", {
+    expand: isExpand,
+  });
+
+  useEffect(() => {
+    // NOTE: Check attribute section height to show expand/collapse button
+    if (!attributeRef.current || !attributeContainerRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (!attributeRef.current || !attributeContainerRef.current) return;
+
+      const height = attributeRef.current.clientHeight;
+
+      if (height < 1) return;
+
+      const minCollapseHeight = 80; // 5rem
+
+      // NOTE: If attribute section height greater than min height => show button
+      setDisplayExpandButton(minCollapseHeight < height);
+      attributeContainerRef.current.style.height =
+        minCollapseHeight > height ? "auto" : "5rem";
+
+      resizeObserver.disconnect();
+    });
+
+    resizeObserver.observe(attributeRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    function calcHeight() {
+      if (!attributeRef.current || !attributeContainerRef.current) return;
+
+      const height = attributeRef.current.clientHeight;
+      const minCollapseHeight = 80; // 5rem
+
+      if (isExpand) {
+        attributeContainerRef.current.style.height = `${height}px`;
+      } else {
+        attributeContainerRef.current.style.height =
+          minCollapseHeight > height ? "auto" : "5rem";
+      }
+    }
+
+    calcHeight();
+  }, [isExpand, signDetails]);
 
   return (
     <>
@@ -77,34 +149,65 @@ const SignRequest = ({
           <p className="sign-link">{requestData.peerConnection?.url}</p>
         </div>
         <div className="sign-content">
-          <CardDetailsBlock
+          <CardBlock
             className="sign-identifier"
-            title={`${i18n.t("request.sign.identifier")}`}
+            testId="identifier"
+            title={i18n.t("request.sign.identifier")}
+            copyContent={signRequest?.payload.identifier}
           >
-            <IonText className="identifier">
-              {signRequest?.payload.identifier}
-            </IonText>
-          </CardDetailsBlock>
-          <CardDetailsBlock
-            className="sign-data"
+            <CardDetailsItem
+              info={`${signRequest?.payload.identifier.substring(
+                0,
+                8
+              )}...${signRequest?.payload.identifier.slice(-8)}`}
+              icon={keyOutline}
+              className="member"
+              testId="identifier-detail"
+              mask={false}
+            />
+          </CardBlock>
+          <CardBlock
+            className={signContentCss}
             title={i18n.t("request.sign.transaction.data")}
           >
-            {typeof signDetails === "object" ? (
-              <CardDetailsAttributes
-                data={signDetails}
-                itemProps={{
-                  mask: false,
-                  fullText: true,
-                  copyButton: false,
-                  className: "sign-info-item",
-                }}
-              />
-            ) : (
-              <IonText className="sign-string">
-                {signDetails.toString()}
-              </IonText>
+            <div
+              ref={attributeContainerRef}
+              className="content-container"
+            >
+              <div
+                ref={attributeRef}
+                className="content"
+              >
+                {isJSON ? (
+                  <CardDetailsAttributes
+                    data={signDetails as JSONObject}
+                    itemProps={{
+                      mask: false,
+                      fullText: true,
+                      copyButton: false,
+                      className: "sign-info-item",
+                    }}
+                  />
+                ) : (
+                  <IonText className="sign-string">
+                    {signDetails.toString()}
+                  </IonText>
+                )}
+              </div>
+            </div>
+            {displayExpandButton && (
+              <div
+                data-testid="expand-footer"
+                className="footer"
+                onClick={onExpandData}
+              >
+                <IonIcon
+                  className="expand"
+                  icon={isExpand ? chevronUpOutline : chevronDownOutline}
+                />
+              </div>
             )}
-          </CardDetailsBlock>
+          </CardBlock>
         </div>
       </ScrollablePageLayout>
       <Spinner show={initiateAnimation} />

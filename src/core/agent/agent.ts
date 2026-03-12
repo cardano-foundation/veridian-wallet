@@ -327,8 +327,8 @@ class Agent {
       }
 
       await this.connectSignifyClient();
+      await this.initCriticalActionState();
       await this.saveAgentUrls(agentUrls);
-      await this.getCriticalActionState(); // Initialize tracking
       this.markAgentStatus(true);
     }
   }
@@ -535,17 +535,17 @@ class Agent {
   private async saveAgentUrls(agentUrls: AgentUrls): Promise<void> {
     await this.basicStorageService.createOrUpdateBasicRecord(
       new BasicRecord({
-        id: MiscRecordId.KERIA_CONNECT_URL,
+        id: MiscRecordId.KERIA_BOOT_URL,
         content: {
-          url: agentUrls.url,
+          url: agentUrls.bootUrl,
         },
       })
     );
     await this.basicStorageService.createOrUpdateBasicRecord(
       new BasicRecord({
-        id: MiscRecordId.KERIA_BOOT_URL,
+        id: MiscRecordId.KERIA_CONNECT_URL,
         content: {
-          url: agentUrls.bootUrl,
+          url: agentUrls.url,
         },
       })
     );
@@ -701,7 +701,16 @@ class Agent {
       return record.content as CriticalActionState;
     }
 
-    // Initialize if not found (should be done at boot, but safe fallback)
+    // Return default state if not found, without seeding the DB
+    return {
+      actionCount: 0,
+      deadline: new Date(
+        Date.now() + Agent.VERIFICATION_TIME_LIMIT_MS
+      ).toISOString(),
+    };
+  }
+
+  async initCriticalActionState(): Promise<void> {
     const initialState: CriticalActionState = {
       actionCount: 0,
       deadline: new Date(
@@ -715,8 +724,6 @@ class Agent {
         content: initialState,
       })
     );
-
-    return initialState;
   }
 
   async recordCriticalAction(): Promise<void> {

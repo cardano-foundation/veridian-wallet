@@ -68,8 +68,13 @@ const RomeCardTemplate = ({
             <span className="card-footer-column-label card-text">
               {i18n.t("tabs.credentials.layout.issued")}
             </span>
-            <span className="card-footer-column-value card-text">
-              {cardData.status === CredentialStatus.CONFIRMED ? (
+            <span
+              data-testid="card-issued-date"
+              className="card-footer-column-value card-text"
+            >
+              {[CredentialStatus.CONFIRMED, CredentialStatus.REVOKED].includes(
+                cardData.status
+              ) ? (
                 formatShortDate(cardData.issuanceDate)
               ) : (
                 <>&nbsp;</>

@@ -1,13 +1,8 @@
 import { IonLabel, IonModal, IonSegment, IonSegmentButton } from "@ionic/react";
 import { repeatOutline } from "ionicons/icons";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Agent } from "../../../core/agent/agent";
 import { i18n } from "../../../i18n";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getCurrentProfile } from "../../../store/reducers/profileCache";
-import { useOnlineStatusEffect } from "../../hooks";
-import { showError } from "../../utils/error";
 import { PageHeader } from "../PageHeader";
 import { Scan } from "../Scan";
 import { ScanRef } from "../Scan/Scan.types";
@@ -32,55 +27,24 @@ const ShareProfile = ({
   const isScanTab = Tab.Scan === tab;
   const scanRef = useRef<ScanRef>(null);
   const { resolveIndividualConnection } = useScanHandle();
-  const dispatch = useAppDispatch();
-  const currentProfile = useAppSelector(getCurrentProfile);
-  const [displayOobi, setDisplayOobi] = useState("");
   const history = useHistory();
 
   const { cameraDirection, changeCameraDirection, supportMultiCamera } =
     useCameraDirection();
   const [enableCameraDirection, setEnableCameraDirection] = useState(false);
 
-  const fetchOobi = useCallback(async () => {
-    if (!isOpen) return;
+  useEffect(() => {
+    setTab(defaultTab);
+  }, [defaultTab]);
 
-    if (defaultTab) {
-      setTab(defaultTab);
-    }
-
-    if (oobi) {
-      setDisplayOobi(oobi);
-    }
-
-    try {
-      if (!currentProfile?.identity.id || oobi) return;
-
-      const oobiValue = await Agent.agent.connections.getOobi(
-        `${currentProfile.identity.id}`,
-        { alias: currentProfile?.identity.displayName || "" }
-      );
-      if (oobiValue) {
-        setDisplayOobi(oobiValue);
-      }
-    } catch (e) {
-      showError("Unable to fetch connection oobi", e, dispatch);
-    }
-  }, [
-    isOpen,
-    defaultTab,
-    oobi,
-    currentProfile?.identity.id,
-    currentProfile?.identity.displayName,
-    dispatch,
-  ]);
-
-  useOnlineStatusEffect(fetchOobi);
-
-  const handleClose = useCallback(() => {
-    setIsOpen(false);
-    scanRef.current?.stopScan();
-    setTab(Tab.ShareOobi);
-  }, [setIsOpen]);
+  const handleClose = useCallback(
+    (closeModals?: boolean) => {
+      setIsOpen(false, closeModals);
+      scanRef.current?.stopScan();
+      setTab(Tab.ShareOobi);
+    },
+    [setIsOpen]
+  );
 
   const handleScan = useCallback(
     async (content: string) => {
@@ -90,7 +54,7 @@ const ShareProfile = ({
       }
 
       const close = () => {
-        handleClose();
+        handleClose(true);
 
         if (history.location.pathname != TabsRoutePath.CONNECTIONS) {
           history.push(TabsRoutePath.CONNECTIONS);
@@ -112,7 +76,7 @@ const ShareProfile = ({
       className={`${componentId}-modal ${tab}`}
       data-testid={componentId}
       isOpen={isOpen}
-      onDidDismiss={handleClose}
+      onDidDismiss={() => handleClose()}
     >
       <ResponsivePageLayout
         pageId={componentId}
@@ -120,7 +84,7 @@ const ShareProfile = ({
         header={
           <PageHeader
             closeButton={true}
-            closeButtonAction={handleClose}
+            closeButtonAction={() => handleClose()}
             closeButtonLabel={`${i18n.t("shareprofile.buttons.close")}`}
             title={
               tab === Tab.ShareOobi
@@ -139,7 +103,7 @@ const ShareProfile = ({
             <p className="share-profile-subtitle">
               {i18n.t("shareprofile.shareoobi.description")}
             </p>
-            <ShareOobi oobi={displayOobi} />
+            <ShareOobi oobi={oobi} />
           </>
         ) : (
           <>

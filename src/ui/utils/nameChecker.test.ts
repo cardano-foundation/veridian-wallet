@@ -33,7 +33,14 @@ describe("uniqueGroupName", () => {
   });
 
   test("returns next available number if base name exists", () => {
-    const result = uniqueGroupName("Veridian", profiles);
-    expect(result).toBe("Veridian #1");
+    const existing = ["Veridian"];
+    const result = uniqueGroupName("Veridian", existing);
+    expect(result).toBe("Veridian #2");
+  });
+
+  test("returns next available number if #2 exists", () => {
+    const existing = ["Veridian", "Veridian #2"];
+    const result = uniqueGroupName("Veridian", existing);
+    expect(result).toBe("Veridian #3");
   });
 });

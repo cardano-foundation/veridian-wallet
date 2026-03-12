@@ -62,8 +62,12 @@ const LockPageContainer = () => {
   const isBiometricPromptActive = useRef(false);
   const hasTriggeredInitialBiometrics = useRef(false);
 
-  const { handleBiometricAuth, remainingLockoutSeconds, lockoutEndTime } =
-    useBiometricAuth(true);
+  const {
+    handleBiometricAuth,
+    remainingLockoutSeconds,
+    lockoutEndTime,
+    isInBiometricProcess,
+  } = useBiometricAuth(true);
 
   const biometricsCache = useSelector(getBiometricsCache);
   const firstAppLaunch = useSelector(getFirstAppLaunch);
@@ -114,10 +118,19 @@ const LockPageContainer = () => {
   }, [passcodeIncorrect]);
 
   const handleBiometrics = useCallback(async () => {
+    if (isInBiometricProcess) {
+      return;
+    }
+
     let authenResult: BiometricAuthOutcome;
     try {
       await disablePrivacy();
       authenResult = await handleBiometricAuth();
+
+      if (authenResult === BiometricAuthOutcome.SUCCESS) {
+        await resetLoginAttempt();
+      }
+
       preventBiometricOnEvent.current =
         authenResult === BiometricAuthOutcome.USER_CANCELLED ||
         authenResult === BiometricAuthOutcome.SUCCESS;
@@ -142,9 +155,23 @@ const LockPageContainer = () => {
         dispatch(showGenericError(true));
         break;
     }
-  }, [dispatch, handleBiometricAuth, disablePrivacy, enablePrivacy]);
+  }, [
+    isInBiometricProcess,
+    disablePrivacy,
+    handleBiometricAuth,
+    resetLoginAttempt,
+    enablePrivacy,
+    dispatch,
+  ]);
 
   const handleUseBiometrics = useCallback(async () => {
+    if (remainingLockoutSeconds > 0) {
+      setShowMaxAttemptsAlert(true);
+      return;
+    }
+
+    if (isLock) return;
+
     if (biometricsCache.enabled && !isBiometricPromptActive.current) {
       isBiometricPromptActive.current = true;
       try {
@@ -153,14 +180,19 @@ const LockPageContainer = () => {
         isBiometricPromptActive.current = false;
       }
     }
-  }, [biometricsCache.enabled, handleBiometrics]);
+  }, [
+    biometricsCache.enabled,
+    handleBiometrics,
+    isLock,
+    remainingLockoutSeconds,
+  ]);
 
   useEffect(() => {
-    if (firstAppLaunch && !hasTriggeredInitialBiometrics.current) {
+    if (firstAppLaunch && !hasTriggeredInitialBiometrics.current && !isLock) {
       hasTriggeredInitialBiometrics.current = true;
       handleUseBiometrics();
     }
-  }, [firstAppLaunch, handleUseBiometrics]);
+  }, [firstAppLaunch, handleUseBiometrics, isLock]);
 
   const handlePinChange = async (digit: number) => {
     const updatedPasscode = `${passcode}${digit}`;
@@ -269,7 +301,7 @@ const LockPageContainer = () => {
     <ResponsivePageLayout
       pageId={pageId}
       activeStatus={true}
-      customClass={"show animation-off max-overlay"}
+      customClass={"lock-page show animation-off max-overlay"}
     >
       {isLock ? (
         <MaxLoginAttemptAlert lockDuration={lockDuration} />

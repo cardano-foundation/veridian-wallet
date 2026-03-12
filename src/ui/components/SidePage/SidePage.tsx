@@ -56,6 +56,7 @@ const SidePage = () => {
     <SideSlider
       renderAsModal
       isOpen={openSidePage}
+      onClose={() => setOpenSidePage(false)}
     >
       {getContent() || lastContent}
     </SideSlider>

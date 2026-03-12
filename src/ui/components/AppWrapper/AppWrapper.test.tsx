@@ -238,7 +238,21 @@ jest.mock("../../../core/agent/agent", () => {
 
 jest.mock("@capgo/capacitor-native-biometric", () => ({
   NativeBiometric: {
+    isAvailable: jest.fn(() =>
+      Promise.resolve({
+        isAvailable: true,
+        biometryType: "fingerprint",
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
+      })
+    ),
     deleteCredentials: jest.fn(() => Promise.resolve()),
+  },
+  AuthenticationStrength: {
+    NONE: 0,
+    STRONG: 1,
+    WEAK: 2,
   },
   BiometricAuthError: {
     UNKNOWN_ERROR: 0,

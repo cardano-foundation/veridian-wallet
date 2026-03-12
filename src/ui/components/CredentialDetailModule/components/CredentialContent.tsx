@@ -4,10 +4,8 @@ import {
   keyOutline,
 } from "ionicons/icons";
 import { useState } from "react";
-import { IonItem, IonText } from "@ionic/react";
 import { JSONObject } from "../../../../core/agent/agent.types";
 import { i18n } from "../../../../i18n";
-import { useAppSelector } from "../../../../store/hooks";
 import {
   formatShortDate,
   formatTimeToSec,
@@ -16,7 +14,6 @@ import {
 import { Alert } from "../../Alert";
 import {
   CardBlock,
-  CardDetailsBlock,
   CardDetailsExpandAttributes,
   CardDetailsItem,
   FlatBorderType,
@@ -24,55 +21,9 @@ import {
 import { FallbackIcon } from "../../FallbackIcon";
 import { ListHeader } from "../../ListHeader";
 import { ReadMore } from "../../ReadMore";
-import {
-  CredentialContentProps,
-  IssuedIdentifierProps,
-  IssuerProps,
-} from "./CredentialContent.types";
-import { MultisigMember } from "./MultisigMember";
-import { MemberAcceptStatus } from "./MultisigMember.types";
-import { getProfiles } from "../../../../store/reducers/profileCache";
-import { Avatar } from "../../Avatar";
+import { CredentialContentProps, IssuerProps } from "./CredentialContent.types";
 
 const IGNORE_KEYS = ["i", "dt", "d", "u"];
-
-const RelatedProfile = ({ identifierId }: IssuedIdentifierProps) => {
-  const profiles = useAppSelector(getProfiles);
-  const profile = profiles[identifierId];
-
-  return (
-    <>
-      {profile && (
-        <CardDetailsBlock
-          className="related-identifiers"
-          data-testid="related-identifier-section"
-        >
-          <IonItem
-            lines="none"
-            className="related-identifier-label"
-          >
-            <IonText>
-              {i18n.t("tabs.credentials.details.relatedprofile")}
-            </IonText>
-          </IonItem>
-          <IonItem
-            lines="none"
-            className="related-identifier"
-            data-testid="related-identifier-detail"
-          >
-            <Avatar id={profile.identity.id} />
-            <IonText
-              className="identifier-name"
-              data-testid="related-identifier-name"
-            >
-              {profile.identity.displayName}
-            </IonText>
-          </IonItem>
-        </CardDetailsBlock>
-      )}
-    </>
-  );
-};
 
 const Issuer = ({
   connectionShortDetails,
@@ -125,7 +76,6 @@ const Issuer = ({
 
 const CredentialContent = ({
   cardData,
-  joinedCredRequestMembers,
   connectionShortDetails,
   setOpenConnectionlModal,
 }: CredentialContentProps) => {
@@ -152,19 +102,6 @@ const CredentialContent = ({
       >
         <ReadMore content={cardData.s.description} />
       </CardBlock>
-      {joinedCredRequestMembers && joinedCredRequestMembers.length > 0 && (
-        <CardDetailsBlock
-          title={i18n.t("tabs.credentials.details.joinedmember")}
-        >
-          {joinedCredRequestMembers?.map((member) => (
-            <MultisigMember
-              key={member.aid}
-              name={member.name}
-              status={MemberAcceptStatus.Accepted}
-            />
-          ))}
-        </CardDetailsBlock>
-      )}
       <ListHeader title={i18n.t("tabs.credentials.details.attributes.label")} />
       <CardBlock title={i18n.t("tabs.credentials.details.attributes.title")}>
         <CardDetailsExpandAttributes
@@ -236,7 +173,6 @@ const CredentialContent = ({
           )} (${getUTCOffset(cardData.lastStatus.dt)})`}
         </p>
       </CardBlock>
-      <RelatedProfile identifierId={cardData.identifierId} />
     </>
   );
 };

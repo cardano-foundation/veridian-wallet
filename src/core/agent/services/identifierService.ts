@@ -643,7 +643,10 @@ class IdentifierService extends AgentService {
     await this.identifierStorage.deleteIdentifierMetadata(identifier);
   }
 
-  private async cleanupPendingOperationsForIdentifier(identifierId: string, operationType: string): Promise<void> {
+  private async cleanupPendingOperationsForIdentifier(
+    identifierId: string,
+    operationType: string
+  ): Promise<void> {
     const operationId = `${operationType}.${identifierId}`;
 
     try {
@@ -667,7 +670,6 @@ class IdentifierService extends AgentService {
         throw error;
       }
     }
-
   }
 
   @OnlineOnly

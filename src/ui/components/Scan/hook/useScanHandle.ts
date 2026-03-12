@@ -22,11 +22,14 @@ import {
 enum ErrorMessage {
   INVALID_CONNECTION_URL = "Invalid connection url",
   GROUP_ID_NOT_MATCH = "Multisig group id not match",
+  MEMBER_EXIST = "Member already added",
+  SCAN_SELF = "Scan self connection",
 }
 
 const useScanHandle = () => {
   const dispatch = useAppDispatch();
-  const defaultIdentifier = useAppSelector(getCurrentProfile)?.identity.id;
+  const currentProfile = useAppSelector(getCurrentProfile);
+  const defaultIdentifier = currentProfile?.identity.id;
   const profiles = useAppSelector(getProfiles);
   const connections = useAppSelector(getConnectionsCache);
 
@@ -206,9 +209,8 @@ const useScanHandle = () => {
   ) => {
     try {
       const isMultiSigUrl = content.includes(OobiQueryParams.GROUP_ID);
-      const urlGroupId = new URL(content).searchParams.get(
-        OobiQueryParams.GROUP_ID
-      );
+      const url = new URL(content);
+      const urlGroupId = url.searchParams.get(OobiQueryParams.GROUP_ID);
 
       // NOTE: When user scan group connection on group page and group id of url not match with current connection page
       if (!isMultiSigUrl || urlGroupId !== scanGroupId) {
@@ -217,10 +219,29 @@ const useScanHandle = () => {
 
       if (
         (isMultiSigUrl && !isValidHttpUrl(content)) ||
-        (!new URL(content).pathname.match(OOBI_RE) &&
-          !new URL(content).pathname.match(WOOBI_RE))
+        (!url.pathname.match(OOBI_RE) && !url.pathname.match(WOOBI_RE))
       ) {
         throw new Error(ErrorMessage.INVALID_CONNECTION_URL);
+      }
+
+      const contactId = url.pathname.match(/oobi\/([^/]+)\/agent/)?.[1];
+
+      if (
+        currentProfile &&
+        urlGroupId === scanGroupId &&
+        currentProfile.multisigConnections.some(
+          (c) => c.contactId === contactId
+        )
+      ) {
+        throw new Error(ErrorMessage.MEMBER_EXIST);
+      }
+
+      if (
+        currentProfile &&
+        urlGroupId === scanGroupId &&
+        currentProfile.identity.id === contactId
+      ) {
+        throw new Error(ErrorMessage.SCAN_SELF);
       }
 
       const invitation = await Agent.agent.connections.connectByOobiUrl(
@@ -232,6 +253,29 @@ const useScanHandle = () => {
       return invitation;
     } catch (e) {
       const errorMessage = (e as Error).message;
+
+      if (errorMessage === ErrorMessage.SCAN_SELF) {
+        showError(
+          "Scanner Error:",
+          e,
+          dispatch,
+          ToastMsgType.SCAN_SELF_CONNECTION
+        );
+        closeScan?.();
+        return;
+      }
+
+      if (errorMessage === ErrorMessage.MEMBER_EXIST) {
+        closeScan?.();
+        showError(
+          "Scanner Error:",
+          e,
+          dispatch,
+          ToastMsgType.MEMBER_ALREADY_EXIST
+        );
+        reloadScan?.();
+        return;
+      }
 
       if (
         errorMessage.includes(StorageMessage.RECORD_ALREADY_EXISTS_ERROR_MSG)
@@ -254,6 +298,7 @@ const useScanHandle = () => {
           dispatch,
           ToastMsgType.GROUP_ID_NOT_MATCH_ERROR
         );
+        await reloadScan?.();
         return;
       }
 

@@ -138,6 +138,9 @@ describe("SetupBiometrics Page", () => {
         isAvailable: true,
         hasCredentials: false,
         biometryType: BiometryType.FINGERPRINT,
+        authenticationStrength: 1, // STRONG
+        deviceIsSecure: true,
+        strongBiometryIsAvailable: true,
       },
       handleBiometricAuth: jest.fn(),
       setBiometricsIsEnabled: jest.fn(),

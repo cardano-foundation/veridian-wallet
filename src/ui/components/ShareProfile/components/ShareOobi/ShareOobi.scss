@@ -5,6 +5,10 @@
     }
   }
 
+  .text {
+    text-align: center;
+  }
+
   .share-profile-body {
     display: flex;
     flex-direction: column;
@@ -97,6 +101,7 @@
           justify-content: center;
           width: 100%;
           height: 100%;
+          align-items: center;
 
           ion-icon {
             width: 5rem;
@@ -104,6 +109,10 @@
             opacity: 1;
             text-align: center;
             margin: 0 auto;
+          }
+
+          ion-spinner {
+            margin-bottom: 0.5rem;
           }
         }
       }

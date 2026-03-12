@@ -1,7 +1,7 @@
 const verifySecretMock = jest.fn();
 
 import { AnyAction, Store } from "@reduxjs/toolkit";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor, within } from "@testing-library/react";
 import { act } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route } from "react-router-dom";
@@ -228,7 +228,7 @@ describe("Verify Passcode on Cards Details page", () => {
   test("Open forgot password modal", async () => {
     const closeFn = jest.fn();
 
-    const { getByTestId, getByText, getAllByText, queryByText } = render(
+    const { getByTestId, getByText, getAllByTestId, queryByText } = render(
       <Provider store={storeMocked}>
         <VerifyPasscode
           isOpen={true}
@@ -254,16 +254,16 @@ describe("Verify Passcode on Cards Details page", () => {
       expect(getByTestId("forgot-auth-info-modal")).toBeVisible();
     });
 
-    fireEvent.click(getAllByText(EN_TRANSLATIONS.forgotauth.cancel)[0]);
+    fireEvent.click(
+      within(getByTestId("forgot-auth-info-modal")).getByTestId("close-button")
+    );
 
     await waitFor(() => {
-      expect(
-        queryByText(EN_TRANSLATIONS.forgotauth.newpasscode.title)
-      ).toBeNull();
+      expect(queryByText(EN_TRANSLATIONS.forgotauth.passcode.title)).toBeNull();
     });
   });
 
-  test("Open forgot password modal", async () => {
+  test("Close verify passcode modal", async () => {
     const closeFn = jest.fn();
 
     const { getByTestId } = render(

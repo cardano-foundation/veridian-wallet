@@ -7,7 +7,7 @@ import {
   personCircleOutline,
   swapHorizontalOutline,
 } from "ionicons/icons";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import {
   ACDCDetails,
@@ -50,6 +50,8 @@ import { NotificationDetailsProps } from "../../NotificationDetails.types";
 import "./ReceiveCredential.scss";
 
 const ANIMATION_DELAY = 2600;
+// Cache viewport height on initial load to prevent issues with mobile browsers resizing the viewport when showing/hiding the keyboard, which can cause unwanted jumps in the animation.
+const INITIAL_VIEWPORT_HEIGHT = window.innerHeight;
 
 const ReceiveCredential = ({
   pageId,
@@ -60,6 +62,8 @@ const ReceiveCredential = ({
   const dispatch = useAppDispatch();
   const connectionsCache = useAppSelector(getConnectionsCache);
   const multisignConnectionsCache = useAppSelector(getMultisigConnectionsCache);
+
+  const iconsRowRef = useRef<HTMLDivElement>(null);
   const [alertDeclineIsOpen, setAlertDeclineIsOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [isAccepting, setIsAccepting] = useState(false);
@@ -201,10 +205,38 @@ const ReceiveCredential = ({
     }
   };
 
+  const moveContentToCenter = () => {
+    if (!iconsRowRef.current) return;
+    const header = document.getElementsByClassName("page-header")?.[0];
+    if (!header) return;
+    const iconRow = iconsRowRef.current.querySelector("#request-icons-row");
+    if (!iconRow) return;
+    const infoRow = iconsRowRef.current.querySelector("#request-info-row");
+    if (!infoRow) return;
+    const requestStatus = iconsRowRef.current.querySelector("#request-status");
+    if (!requestStatus) return;
+
+    const combinedHeight = 28.5 + iconRow.getBoundingClientRect().height;
+    const headerHeight = (header as HTMLDivElement).offsetHeight;
+    const viewportHeight = INITIAL_VIEWPORT_HEIGHT;
+
+    const opticalCenter = viewportHeight * 0.5;
+
+    const translateY = opticalCenter - headerHeight - combinedHeight / 2;
+
+    iconsRowRef.current.style.transform = `translateY(${translateY}px)`;
+  };
+
+  const removeContentTranslation = () => {
+    if (!iconsRowRef.current) return;
+    iconsRowRef.current.style.transform = "";
+  };
+
   const handleAccept = async () => {
     try {
       const startTime = Date.now();
       setIsAccepting(true);
+      moveContentToCenter();
 
       if (!isMultisig || (isMultisig && isGroupInitiator)) {
         await Agent.agent.ipexCommunications.admitAcdcFromGrant(
@@ -228,6 +260,7 @@ const ReceiveCredential = ({
       }, ANIMATION_DELAY - (finishTime - startTime));
     } catch (e) {
       setIsAccepting(false);
+      removeContentTranslation();
       showError("Unable to accept acdc", e, dispatch);
     }
   };
@@ -392,7 +425,7 @@ const ReceiveCredential = ({
         )}
         {(maxThreshold || multisigMemberStatus.linkedRequest.accepted) && (
           <InfoCard
-            className={`alert${maxThreshold ? " max-threshhold" : undefined}`}
+            className={`alert ${maxThreshold ? " max-threshhold" : ""}`}
             content={i18n.t(
               `tabs.notifications.details.credential.receive.${
                 maxThreshold ? "thresholdmet" : "accepted"
@@ -401,118 +434,132 @@ const ReceiveCredential = ({
             icon={maxThreshold ? checkmarkCircleOutline : undefined}
           />
         )}
-        <div className="request-animation-center">
-          <div className="request-icons-row">
-            <div className="request-user-logo">
-              <IonIcon
-                icon={personCircleOutline}
-                color="light"
-              />
+        <div className="receive-page-container">
+          <div
+            className="request-animation-center"
+            ref={iconsRowRef}
+          >
+            <div
+              id="request-icons-row"
+              className="request-icons-row"
+            >
+              <div className="request-user-logo">
+                <IonIcon
+                  icon={personCircleOutline}
+                  color="light"
+                />
+              </div>
+              <div className="request-swap-logo">
+                <span>
+                  <IonIcon icon={swapHorizontalOutline} />
+                </span>
+              </div>
+              <div className="request-checkmark-logo">
+                <span>
+                  <IonIcon icon={checkmark} />
+                </span>
+              </div>
+              <div className="request-provider-logo">
+                <FallbackIcon
+                  data-testid="credential-request-provider-logo"
+                  alt="request-provider-logo"
+                />
+              </div>
             </div>
-            <div className="request-swap-logo">
-              <span>
-                <IonIcon icon={swapHorizontalOutline} />
-              </span>
-            </div>
-            <div className="request-checkmark-logo">
-              <span>
-                <IonIcon icon={checkmark} />
-              </span>
-            </div>
-            <div className="request-provider-logo">
-              <FallbackIcon
-                data-testid="credential-request-provider-logo"
-                alt="request-provider-logo"
-              />
-            </div>
-          </div>
-          <div className="request-info-row">
-            <IonCol size="12">
-              <span>
-                {i18n.t(
-                  "tabs.notifications.details.credential.receive.receivefrom"
-                )}
-              </span>
-              <strong className="credential-type">
-                {credDetail?.s?.title}
-              </strong>
-              <span className="break-text">
-                {i18n.t("tabs.notifications.details.credential.receive.from")}
-              </span>
-              <span className="issuer-name">
-                <strong>
-                  {connection || i18n.t("tabs.connections.unknown")}
+            <div
+              id="request-info-row"
+              className="request-info-row"
+            >
+              <IonCol size="12">
+                <span>
+                  {i18n.t(
+                    "tabs.notifications.details.credential.receive.receivefrom"
+                  )}
+                </span>
+                <strong className="credential-type">
+                  {credDetail?.s?.title}
                 </strong>
-                {!connection && (
-                  <IonIcon
-                    onClick={() => setShowMissingIssuerModal(true)}
-                    data-testid="show-missing-issuer-icon"
-                    className="missing-connection-icon"
-                    icon={informationCircleOutline}
-                  />
-                )}
-              </span>
-            </IonCol>
-          </div>
-          <div className="request-status">
-            <IonCol size="12">
-              <strong>
+                <span className="break-text">
+                  {i18n.t("tabs.notifications.details.credential.receive.from")}
+                </span>
+                <span className="issuer-name">
+                  <strong>
+                    {connection || i18n.t("tabs.connections.unknown")}
+                  </strong>
+                  {!connection && (
+                    <IonIcon
+                      onClick={() => setShowMissingIssuerModal(true)}
+                      data-testid="show-missing-issuer-icon"
+                      className="missing-connection-icon"
+                      icon={informationCircleOutline}
+                    />
+                  )}
+                </span>
+              </IonCol>
+            </div>
+            <div
+              id="request-status"
+              className="request-status"
+            >
+              <IonCol size="12">
+                <strong>
+                  {i18n.t(
+                    "tabs.notifications.details.credential.receive.credentialpending"
+                  )}
+                </strong>
+              </IonCol>
+            </div>
+            <div className="credential-detail">
+              <IonButton
+                fill="outline"
+                className="credential-button secondary-button"
+                onClick={() => setOpenInfo(true)}
+                data-testid="cred-detail-btn"
+              >
+                <IonIcon
+                  slot="start"
+                  icon={informationCircleOutline}
+                />
                 {i18n.t(
-                  "tabs.notifications.details.credential.receive.credentialpending"
+                  "tabs.notifications.details.credential.receive.credentialdetailbutton"
                 )}
-              </strong>
-            </IonCol>
+              </IonButton>
+            </div>
+            {isMultisig && (
+              <CardBlock
+                className="group-members"
+                testId="group-members-content"
+                title={i18n.t(
+                  "tabs.notifications.details.credential.receive.members"
+                )}
+              >
+                <MemberList
+                  members={members}
+                  bottomText={`${i18n.t(
+                    "tabs.notifications.details.credential.receive.bottom",
+                    { members: members?.length || 0 }
+                  )}`}
+                />
+              </CardBlock>
+            )}
+            {profile && (
+              <CardBlock
+                className="related-identifiers"
+                testId="related-profile"
+                title={i18n.t(
+                  "tabs.notifications.details.credential.receive.relatedprofile"
+                )}
+                onClick={() => setOpenIdentifierDetail(true)}
+              >
+                <CardDetailsItem
+                  info={profile.identity.displayName}
+                  startSlot={<Avatar id={profile.identity.id} />}
+                  className="member"
+                  testId="related-identifier-detail"
+                />
+              </CardBlock>
+            )}
           </div>
-          <div className="credential-detail">
-            <IonButton
-              fill="outline"
-              className="credential-button secondary-button"
-              onClick={() => setOpenInfo(true)}
-              data-testid="cred-detail-btn"
-            >
-              <IonIcon
-                slot="start"
-                icon={informationCircleOutline}
-              />
-              {i18n.t(
-                "tabs.notifications.details.credential.receive.credentialdetailbutton"
-              )}
-            </IonButton>
-          </div>
-          {isMultisig && (
-            <CardBlock
-              className="group-members"
-              testId="group-members-content"
-              title={i18n.t(
-                "tabs.notifications.details.credential.receive.members"
-              )}
-            >
-              <MemberList
-                members={members}
-                bottomText={`${i18n.t(
-                  "tabs.notifications.details.credential.receive.bottom",
-                  { members: members?.length || 0 }
-                )}`}
-              />
-            </CardBlock>
-          )}
-          {profile && (
-            <CardBlock
-              className="related-identifiers"
-              testId="related-profile"
-              title={i18n.t(
-                "tabs.notifications.details.credential.receive.relatedprofile"
-              )}
-              onClick={() => setOpenIdentifierDetail(true)}
-            >
-              <CardDetailsItem
-                info={profile.identity.displayName}
-                startSlot={<Avatar id={profile.identity.id} />}
-                className="member"
-                testId="related-identifier-detail"
-              />
-            </CardBlock>
-          )}
         </div>
       </ScrollablePageLayout>
       <AlertDecline
@@ -565,6 +612,7 @@ const ReceiveCredential = ({
           setIsOpen={setOpenIdentifierDetail}
           pageId="profile-details"
           profileId={credDetail.identifierId}
+          restrictedOptions
         />
       )}
     </>

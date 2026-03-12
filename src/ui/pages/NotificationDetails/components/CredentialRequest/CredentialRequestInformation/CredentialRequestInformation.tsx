@@ -370,7 +370,6 @@ const CredentialRequestInformation = ({
                 "tabs.notifications.details.credential.request.information.proposalfrom"
               )}`}
               className="request-from"
-              showIcon
             >
               <CardDetailsItem
                 info={
@@ -428,7 +427,7 @@ const CredentialRequestInformation = ({
               title={`${i18n.t(
                 "tabs.notifications.details.credential.request.information.requestfrom"
               )}`}
-              onClick={isGroup ? openConnection : undefined}
+              onClick={openConnection}
             >
               <CardDetailsItem
                 info={connection?.label || i18n.t("tabs.connections.unknown")}
@@ -499,7 +498,6 @@ const CredentialRequestInformation = ({
         isOpen={!!viewCredId}
         setIsOpen={handleClose}
         onClose={handleClose}
-        joinedCredRequestMembers={linkedGroup?.memberInfos}
         viewOnly
       />
       <AlertDecline
@@ -546,6 +544,7 @@ const CredentialRequestInformation = ({
       <SideSlider
         isOpen={showConnection && !!connection}
         renderAsModal
+        onClose={() => setShowConnection(false)}
       >
         {connection && (
           <ConnectionDetails

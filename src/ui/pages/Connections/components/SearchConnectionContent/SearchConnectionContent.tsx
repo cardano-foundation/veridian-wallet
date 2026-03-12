@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { IonIcon } from "@ionic/react";
 import { search } from "ionicons/icons";
 import { RegularConnectionDetails } from "../../../../../core/agent/agent.types";
@@ -46,13 +47,15 @@ const SearchConnectionContent = ({
   onItemClick,
   keyword,
 }: SearchConnectionContentProps) => {
-  const connections = mappedConnections.flatMap((item) => {
-    return item.value.filter((item) =>
-      item.label.toLowerCase().includes(keyword.toLowerCase())
+  const filteredConnections = useMemo(() => {
+    return mappedConnections.flatMap((item) =>
+      item.value.filter((connection) =>
+        connection.label.toLowerCase().includes(keyword.toLowerCase())
+      )
     );
-  });
+  }, [mappedConnections, keyword]);
 
-  if (connections.length === 0) {
+  if (filteredConnections.length === 0) {
     return (
       <div
         data-testid="empty-search-connection"
@@ -76,7 +79,7 @@ const SearchConnectionContent = ({
     >
       <SearchConnectionList
         title={`${i18n.t("tabs.connections.tab.search.connections")}`}
-        connections={connections}
+        connections={filteredConnections}
         onItemClick={(item) => onItemClick(item)}
         testId="connection-search"
       />

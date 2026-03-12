@@ -123,7 +123,12 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
 
       dispatch(setToastMsg(ToastMsgType.WALLET_CONNECTION_DELETED));
     } catch (e) {
-      showError("Unable to delete peer connection", e, dispatch);
+      showError(
+        "Unable to delete peer connection",
+        e,
+        dispatch,
+        ToastMsgType.WALLET_CONNECTION_DELETE_ERROR
+      );
     }
   };
 
@@ -230,6 +235,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
       setStep(Step.Confirm);
     } else {
       dispatch(setToastMsg(ToastMsgType.PEER_ID_ERROR));
+      scanRef.current?.registerScanHandler();
     }
   };
 
@@ -242,11 +248,9 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
     return undefined;
   }, [step]);
 
-  const handleAfterConnect = () => {
-    if (!pendingConnection) return;
-
+  const handleAfterConnect = (data: DAppConnection) => {
     setStep(Step.Connections);
-    handleOpenConfirmConnectModal(pendingConnection);
+    handleOpenConfirmConnectModal(data);
   };
 
   const getContent = () => {
@@ -259,6 +263,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
             onCheckPermissionFinish={setEnableCameraDirection}
             ref={scanRef}
             displayOnModal
+            customTranslateKey="connectdapp"
           />
         );
       case Step.Confirm:
@@ -290,6 +295,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
         renderAsModal
         isOpen={isOpen}
         className="connect-dapp-modal"
+        onClose={() => setIsOpen(false)}
       >
         <ScrollablePageLayout
           pageId={pageId}

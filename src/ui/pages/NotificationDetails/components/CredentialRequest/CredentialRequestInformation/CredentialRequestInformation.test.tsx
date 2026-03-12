@@ -5,9 +5,11 @@ import { Provider } from "react-redux";
 import EN_TRANSLATIONS from "../../../../../../locales/en/en.json";
 import { TabsRoutePath } from "../../../../../../routes/paths";
 import { InitializationPhase } from "../../../../../../store/reducers/stateCache/stateCache.types";
+import { connectionsForNotificationsValues } from "../../../../../__fixtures__/connectionsFix";
 import { credRequestFix } from "../../../../../__fixtures__/credRequestFix";
 import { credsFixAcdc } from "../../../../../__fixtures__/credsFix";
 import { filteredCredsFix } from "../../../../../__fixtures__/filteredCredsFix";
+import { filteredIdentifierFix } from "../../../../../__fixtures__/filteredIdentifierFix";
 import { notificationsFix } from "../../../../../__fixtures__/notificationsFix";
 import { profileCacheFixData } from "../../../../../__fixtures__/storeDataFix";
 import { makeTestStore } from "../../../../../utils/makeTestStore";
@@ -97,21 +99,20 @@ describe("Credential request information", () => {
       ...makeTestStore(initialState),
       dispatch: dispatchMock,
     };
-    const { getByText, getByTestId, getAllByText, queryByText, unmount } =
-      render(
-        <Provider store={storeMocked}>
-          <CredentialRequestInformation
-            pageId="multi-sign"
-            activeStatus
-            onBack={jest.fn()}
-            onAccept={jest.fn()}
-            notificationDetails={notificationsFix[4]}
-            credentialRequest={credRequestFix}
-            linkedGroup={null}
-            onReloadData={jest.fn()}
-          />
-        </Provider>
-      );
+    const { getByText, getByTestId, queryByText, unmount } = render(
+      <Provider store={storeMocked}>
+        <CredentialRequestInformation
+          pageId="multi-sign"
+          activeStatus
+          onBack={jest.fn()}
+          onAccept={jest.fn()}
+          notificationDetails={notificationsFix[4]}
+          credentialRequest={credRequestFix}
+          linkedGroup={null}
+          onReloadData={jest.fn()}
+        />
+      </Provider>
+    );
 
     await waitFor(() => {
       expect(
@@ -158,6 +159,90 @@ describe("Credential request information", () => {
 
     unmount();
     document.getElementsByTagName("body")[0].innerHTML = "";
+  });
+
+  test("Open connection modal", async () => {
+    const storeMocked = {
+      ...makeTestStore({
+        stateCache: {
+          routes: [{ path: TabsRoutePath.NOTIFICATIONS }],
+          authentication: {
+            loggedIn: true,
+            time: Date.now(),
+            passcodeIsSet: true,
+            seedPhraseIsSet: true,
+            passwordIsSet: false,
+            passwordIsSkipped: false,
+            ssiAgentIsSet: false,
+            ssiAgentUrl: "",
+            recoveryWalletProgress: false,
+            loginAttempt: {
+              attempts: 0,
+              lockedUntil: Date.now(),
+            },
+            firstAppLaunch: false,
+          },
+          initializationPhase: InitializationPhase.PHASE_ONE,
+          recoveryCompleteNoInterruption: false,
+          isOnline: true,
+          queueIncomingRequest: {
+            isPaused: false,
+            isProcessing: false,
+            queues: [],
+          },
+          toastMsgs: [],
+        },
+
+        profilesCache: {
+          ...profileCacheFixData,
+          profiles: {
+            [filteredIdentifierFix[0].id]: {
+              identity: filteredIdentifierFix[0],
+              connections: connectionsForNotificationsValues,
+              multisigConnections: [],
+            },
+          },
+        },
+        biometricsCache: {
+          enabled: false,
+        },
+      }),
+      dispatch: dispatchMock,
+    };
+    const { getByText, getByTestId } = render(
+      <Provider store={storeMocked}>
+        <CredentialRequestInformation
+          pageId="multi-sign"
+          activeStatus
+          onBack={jest.fn()}
+          onAccept={jest.fn()}
+          notificationDetails={notificationsFix[4]}
+          credentialRequest={credRequestFix}
+          linkedGroup={null}
+          onReloadData={jest.fn()}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(
+        getByText(
+          EN_TRANSLATIONS.tabs.notifications.details.credential.request
+            .information.requestfrom
+        )
+      ).toBeVisible();
+    });
+
+    fireEvent.click(
+      getByText(
+        EN_TRANSLATIONS.tabs.notifications.details.credential.request
+          .information.requestfrom
+      )
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("connection-details-page")).toBeVisible();
+    });
   });
 });
 

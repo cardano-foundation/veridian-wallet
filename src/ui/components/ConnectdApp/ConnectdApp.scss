@@ -96,6 +96,7 @@ body.scan-active {
     --checkbox-background-checked: var(--ion-color-primary-700);
     --checkmark-color: var(--ion-color-primary-100);
     --border-width: 0;
+    --size: 2rem;
     flex: none;
     margin-left: 1rem;
   }
@@ -106,6 +107,10 @@ body.scan-active {
       line-height: 1.25rem;
       margin-bottom: 0.75rem;
       margin-top: 1.25rem;
+    }
+
+    .checkbox {
+      --size: 1rem;
     }
   }
 }

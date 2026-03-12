@@ -24,6 +24,9 @@ jest.mock("../../hooks/useBiometricsHook", () => ({
       isAvailable: true,
       hasCredentials: false,
       biometryType: BiometryType.FINGERPRINT,
+      authenticationStrength: 1, // STRONG
+      deviceIsSecure: true,
+      strongBiometryIsAvailable: true,
     },
     handleBiometricAuth: jest.fn(() => Promise.resolve(true)),
     setBiometricsIsEnabled: jest.fn(),
@@ -72,6 +75,18 @@ describe("Side Page: incoming request", () => {
   };
 
   test("Render incomming request", async () => {
+    global.ResizeObserver = class {
+      observe() {
+        jest.fn();
+      }
+      unobserve() {
+        jest.fn();
+      }
+      disconnect() {
+        jest.fn();
+      }
+    };
+
     const { getByText } = render(
       <Provider store={mockedStore}>
         <SidePage />

@@ -216,26 +216,29 @@ const Notifications = () => {
           ))}
         </div>
         <div className="notifications-tab-content">
-          <NotificationSection
-            title={i18n.t("tabs.notifications.tab.sections.new")}
-            data={notificationsNew}
-            pageId={pageId}
-            onNotificationClick={handleNotificationClick}
-            enableInfiniteScroll={false}
-            testId="notifications-tab-section-new"
-          />
-          <NotificationSection
-            title={i18n.t("tabs.notifications.tab.sections.earlier.title")}
-            data={notificationsEarlier}
-            pageId={pageId}
-            onNotificationClick={handleNotificationClick}
-            enableInfiniteScroll
-            initialDisplayCount={3}
-            loadMoreCount={5}
-            testId="notifications-tab-section-earlier"
-            ref={earlierNotificationRef}
-          />
-          {filteredNotification.length === 0 && (
+          {filteredNotification.length > 0 ? (
+            <>
+              <NotificationSection
+                title={i18n.t("tabs.notifications.tab.sections.new")}
+                data={notificationsNew}
+                pageId={pageId}
+                onNotificationClick={handleNotificationClick}
+                enableInfiniteScroll={false}
+                testId="notifications-tab-section-new"
+              />
+              <NotificationSection
+                title={i18n.t("tabs.notifications.tab.sections.earlier.title")}
+                data={notificationsEarlier}
+                pageId={pageId}
+                onNotificationClick={handleNotificationClick}
+                enableInfiniteScroll
+                initialDisplayCount={3}
+                loadMoreCount={5}
+                testId="notifications-tab-section-earlier"
+                ref={earlierNotificationRef}
+              />
+            </>
+          ) : (
             <p className="notification-empty">
               {i18n.t("tabs.notifications.tab.empty")}
             </p>

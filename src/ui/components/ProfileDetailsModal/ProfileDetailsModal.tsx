@@ -16,6 +16,7 @@ import "../../components/CardDetails/CardDetails.scss";
 import { BackEventPriorityType, ToastMsgType } from "../../globals/types";
 import { useOnlineStatusEffect } from "../../hooks";
 import { useProfile } from "../../hooks/useProfile";
+import { RotateKeyModal } from "../../pages/Home/components/RotateKeyModal";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
 import { Alert } from "../Alert";
@@ -29,7 +30,6 @@ import { Verification } from "../Verification";
 import { ProfileContent } from "./components/ProfileContent";
 import "./ProfileDetailsModal.scss";
 import { IdentifierDetailModalProps } from "./ProfileDetailsModal.types";
-import { RotateKeyModal } from "../../pages/Home/components/RotateKeyModal";
 
 const ProfileDetailsModal = ({
   profileId,
@@ -47,7 +47,6 @@ const ProfileDetailsModal = ({
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [verifyIsOpen, setVerifyIsOpen] = useState(false);
   const [profile, setProfile] = useState<IdentifierDetailsCore | undefined>();
-  const [oobi, setOobi] = useState("");
   const [cloudError, setCloudError] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [openRotateKeyModal, setOpenRotateKeyModal] = useState(false);
@@ -57,21 +56,6 @@ const ProfileDetailsModal = ({
   const handleClose = useCallback(() => {
     setIsOpen(false);
   }, [setIsOpen]);
-
-  const fetchOobi = useCallback(async () => {
-    try {
-      if (!profile?.id || !isOpen) return;
-
-      const oobiValue = await Agent.agent.connections.getOobi(`${profile.id}`, {
-        alias: profile.displayName,
-      });
-      if (oobiValue) {
-        setOobi(oobiValue);
-      }
-    } catch (e) {
-      showError("Unable to fetch oobi", e, dispatch);
-    }
-  }, [profile?.id, profile?.displayName, dispatch, isOpen]);
 
   const getDetails = useCallback(async () => {
     if (!profileId || !isOpen) return;
@@ -96,7 +80,6 @@ const ProfileDetailsModal = ({
   }, [profileId, dispatch, isOpen, handleClose, showProfiles]);
 
   useOnlineStatusEffect(getDetails);
-  useOnlineStatusEffect(fetchOobi);
 
   useIonViewWillEnter(() => {
     dispatch(setCurrentRoute({ path: history.location.pathname }));
@@ -182,6 +165,7 @@ const ProfileDetailsModal = ({
         isOpen={isOpen}
         renderAsModal
         className="profile-detail-modal"
+        onClose={() => setIsOpen(false)}
       >
         {cloudError ? (
           <CloudError
@@ -225,9 +209,9 @@ const ProfileDetailsModal = ({
               <div className="card-details-content">
                 <ProfileContent
                   cardData={profile as IdentifierDetailsCore}
-                  oobi={oobi}
                   setCardData={setProfile}
                   onRotateKey={openRotateModal}
+                  onAfterScan={() => setIsOpen(false, true)}
                 />
                 {!restrictedOptions && (
                   <PageFooter
