@@ -44,15 +44,15 @@ Feature: Onboarding Individual Profile Creation
   @onboarding @profile @individual
   Scenario: User can create individual profile with valid username
     Given user is on Profile setup screen with Individual profile selected
-    When user enters username "AliBob123"
+    When user enters username "Alice"
     And user taps Confirm button on Profile setup screen
-    Then user can see Welcome screen with username "AliBob123"
+    Then user can see Welcome screen with username "Alice"
     And user can see "Your individual profile has been created" description
     And user can see Continue button
 
   @onboarding @profile @individual
   Scenario: User can navigate to homepage from Welcome screen
-    Given user has created individual profile with username "AliBob123"
+    Given user has created individual profile with username "Alice"
     When user taps Continue button on Welcome screen
     Then user can see Homepage
 

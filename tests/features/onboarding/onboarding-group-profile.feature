@@ -41,16 +41,16 @@ Feature: Onboarding Group Profile Creation
   @onboarding @profile @group
   Scenario: User can create group profile with valid group name and username
     Given user is on Group setup screen with Group profile selected
-    When user enters group name "Alice"
+    When user enters group name "MultisigGroup"
     And user taps Confirm button on Group setup screen
     Then user can see Profile setup screen
-    When user enters username "GroupUser123"
+    When user enters username "Alice"
     And user taps Confirm button on Profile setup screen
-    Then user can see Welcome screen with username "GroupUser123"
+    Then user can see Welcome screen with username "Alice"
     And user can see Continue button
 
   @onboarding @profile @group
   Scenario: User can navigate to group profile setup screen from Welcome screen
-    Given user has created group profile with group name "Alice" and username "GroupUser123"
+    Given user has created group profile with group name "Alice" and username "Alice"
     When user taps Continue button on Welcome screen
     Then user can see Group profile setup screen

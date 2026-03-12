@@ -178,7 +178,7 @@ export class ProfileSetupScreen {
     await browser.waitUntil(
       async () => {
         const url = await browser.getUrl();
-        return url.includes("/tabs/home") || url.includes("/home");
+        return url.includes("/tabs/home");
       },
       {
         timeout: timeoutMs,
