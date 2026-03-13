@@ -7,7 +7,7 @@ import { RemoteJoiner } from "../../helpers/virtual-wallet.js";
 import { createVirtualWallet } from "../../helpers/virtual-wallet.factory.js";
 import { getKeriaUrlsForTestRunner } from "../../helpers/ssi-agent-urls.helper.js";
 import {
-  pageShowsMessage,
+  toastContainsText,
   pasteOobiAndConfirm,
   assertGroupProfileActiveInProfilesList,
   waitUpTo,
@@ -139,18 +139,16 @@ When(/^Alice pastes all member OOBIs on the Scan tab$/, async function () {
     await scanTab.waitForDisplayed({ timeout: 10000 });
     await scanTab.click();
 
-    if (!member.oobi) throw new Error(`OOBI missing for member ${name}`);
-
-    const url = new URL(member.oobi);
-
-    // Add required query params
-    url.searchParams.set("groupId", world.aliceInitiatorGroupId!);
-    url.searchParams.set("groupName", world.aliceInitiatorGroupName!);
-    url.searchParams.set("name", name);
-
-    const oobiForApp = url.toString();
+    const oobiForApp = await member.instance.getOobi({
+      groupId: world.aliceInitiatorGroupId!,
+      groupName: world.aliceInitiatorGroupName!,
+      alias: name
+    });
 
     await pasteOobiAndConfirm(oobiForApp);
+    if (await toastContainsText(GROUP_ID_MISMATCH_MSG)) {
+      throw new Error(`Group ID mismatch for member ${name} — scan rejected.`);
+    }
   }
 
 });

@@ -97,26 +97,28 @@ export class VirtualWallet {
   }
 
   async getOobi(options?: GetOobiOptions): Promise<string> {
-    const role = options?.role || "agent";
-    const result = await this.client.oobis().get(this.aidName, role);
-    if (!result.oobi) this.oobi = result.oobis[0];
-
-    let url = result.oobis[0];
-    if (!url || typeof url !== "string") {
+    if (!this.oobi) {
+      const role = options?.role ?? "agent";
+      const result = await this.client.oobis().get(this.aidName, role);
+      this.oobi = result.oobis[0];
+    }
+    if (!this.oobi) {
       throw new Error("KERIA oobis.get returned no OOBI URL");
     }
+
+    let url = this.oobi;
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
       const base = this.config.connectUrl.replace(/\/$/, "");
       url = url.startsWith("/") ? `${base}${url}` : `${base}/${url}`;
     }
-    if (options?.alias != null || options?.groupId != null || options?.groupName != null) {
-      const u = new URL(url);
-      if (options.alias != null) u.searchParams.set("name", options.alias);
-      if (options.groupId != null) u.searchParams.set("groupId", options.groupId);
-      if (options.groupName != null) u.searchParams.set("groupName", options.groupName);
-      url = u.toString();
-    }
-    return url;
+
+    const u = new URL(url);
+    const { alias, groupId, groupName } = options ?? {};
+    if (alias) u.searchParams.set("name", alias);
+    if (groupId) u.searchParams.set("groupId", groupId);
+    if (groupName) u.searchParams.set("groupName", groupName);
+
+    return u.toString();
   }
 
   async waitOperation(operation: any, timeoutMs = 30000) {

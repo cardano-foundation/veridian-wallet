@@ -1,20 +1,35 @@
 import { browser } from "@wdio/globals";
 
-export async function pageShowsMessage(msg: string): Promise<boolean> {
+export async function pageContainsText(msg: string): Promise<boolean> {
   return (await browser.execute((m: string) => {
     const bodyText = document.body?.innerText ?? "";
-    if (bodyText.includes(m)) return true;
-    const toasts = document.querySelectorAll("ion-toast");
-    for (const toast of Array.from(toasts)) {
-      const root = (toast as HTMLElement).shadowRoot;
-      if (!root) continue;
-      const messageEl =
-        root.querySelector(".toast-message") ??
-        root.querySelector("[part='message']");
-      if ((messageEl?.textContent?.trim() ?? "").includes(m)) return true;
-    }
-    return false;
+    return bodyText.includes(m);
   }, msg)) as boolean;
+}
+
+export async function toastContainsText(msg: string): Promise<boolean> {
+  try {
+    return await browser.waitUntil(async () => {
+      return await browser.execute((expectedMsg) => {
+        const toasts = document.querySelectorAll("ion-toast");
+
+        for (const toast of toasts) {
+          const root = toast.shadowRoot || toast;
+          const messageEl = root.querySelector(".toast-message, [part='message']");
+
+          if (messageEl && messageEl.textContent) {
+            if (messageEl.textContent.trim().includes(expectedMsg)) return true;
+          }
+        }
+        return false;
+      }, msg);
+    }, {
+      timeout: 100,
+      interval: 20,
+    });
+  } catch {
+    return false;
+  }
 }
 
 export async function dismissLockScreenIfPresent(): Promise<void> {
@@ -100,23 +115,8 @@ export async function pasteOobiAndConfirm(oobi: string, useJsClick = false): Pro
 
   const scanInput = $("[data-testid='scan-input']");
   await scanInput.waitForDisplayed({ timeout: 2000 });
-  try {
-    await scanInput.setValue(oobi);
-  } catch {
-    await browser.execute(
-      (o: string) => {
-        const el = document.querySelector("[data-testid='scan-input']") as HTMLInputElement & { shadowRoot?: ShadowRoot };
-        if (!el) return;
-        const input = el.shadowRoot?.querySelector("input") ?? el;
-        if (input) {
-          (input as HTMLInputElement).value = o;
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-          input.dispatchEvent(new Event("ionInput", { bubbles: true }));
-        }
-      },
-      oobi
-    );
-  }
+  const nativeInput = await scanInput.shadow$("input");
+  await nativeInput.setValue(oobi);
   const confirmBtn = $("[data-testid='scan-input-modal'] [data-testid='action-button']");
   await confirmBtn.waitForDisplayed({ timeout: 2000 });
   await confirmBtn.click();

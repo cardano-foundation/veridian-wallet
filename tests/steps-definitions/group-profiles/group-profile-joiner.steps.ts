@@ -8,7 +8,8 @@ import {
   getKeriaUrlsForTestRunner,
 } from "../../helpers/ssi-agent-urls.helper.js";
 import {
-  pageShowsMessage,
+  pageContainsText,
+  toastContainsText,
   dismissLockScreenIfPresent,
   waitUpTo,
   getPendingGroupPrimaryButtonText,
@@ -43,7 +44,7 @@ type BobJoinerWorld = {
 };
 
 // ---------------------------------------------------------------------------
-// Step 1 (BACKEND) – Alice creates a pending group so Bob can join
+// Step 1 (BACKEND) - Alice creates a pending group so Bob can join
 // ---------------------------------------------------------------------------
 
 Given(
@@ -79,7 +80,7 @@ Given(
 );
 
 // ---------------------------------------------------------------------------
-// Step 2 (UI) – Bob clicks "Join Group", pastes Alice's OOBI, creates member AID
+// Step 2 (UI) - Bob clicks "Join Group", pastes Alice's OOBI, creates member AID
 // ---------------------------------------------------------------------------
 
 Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
@@ -96,7 +97,7 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
   await ProfileSetupScreen.waitForGroupSetupScreen();
 
   // ── Click "Join Group" → QR scan screen opens ────────────────────────────
-  await ProfileSetupScreen.joinGroupButton.waitForDisplayed({ timeout: 10000 });
+  await ProfileSetupScreen.joinGroupButton.waitForDisplayed({ timeout: 2000 });
   await ProfileSetupScreen.joinGroupButton.click();
 
   // ── Paste Alice's OOBI (with groupId) on the scan screen ─────────────────
@@ -116,14 +117,14 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
         'App did not show "Joined group" confirmation screen after pasting Alice\'s OOBI',
     }
   );
-  console.log("[Bob] GroupSetupConfirm screen detected – clicking Next: setup profile");
+  console.log("[Bob] GroupSetupConfirm screen detected - clicking Next: setup profile");
   await $("[data-testid='primary-button-profile-setup']").click();
 
   // ── Step B: SetupProfile (username input) ────────────────────────────────
   await ProfileSetupScreen.waitForProfileSetupScreen();
   await ProfileSetupScreen.enterUsername("Bob");
   await $("[data-testid='primary-button-profile-setup']").click();
-  console.log("[Bob] Submitted username – waiting for Welcome screen");
+  console.log("[Bob] Submitted username - waiting for Welcome screen");
 
   // ── Step C: FinishSetup (Welcome / Get started) ───────────────────────────
   await browser.waitUntil(
@@ -141,7 +142,7 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
   );
   const urlAfterCreate = await browser.getUrl().catch(() => "");
   if (!urlAfterCreate.includes("group-profile-setup")) {
-    console.log("[Bob] Welcome screen detected – clicking Get started");
+    console.log("[Bob] Welcome screen detected - clicking Get started");
     await $("[data-testid='primary-button-profile-setup']").click();
   }
 
@@ -173,7 +174,7 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
       timeoutMsg: "Could not activate the Provide tab on group-profile-setup",
     }
   );
-  console.log("[Bob] Provide tab activated – waiting for OOBI to load");
+  console.log("[Bob] Provide tab activated - waiting for OOBI to load");
 
   const installShareCapture = `
     (function() {
@@ -203,10 +204,10 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
       timeoutMsg: "Bob's OOBI QR code did not reveal within 30 s (OOBI still loading)",
     }
   );
-  console.log("[Bob] OOBI QR code revealed – clicking share button");
+  console.log("[Bob] OOBI QR code revealed - clicking share button");
 
   const shareButton = $(".share-profile-oobi .share-button");
-  await shareButton.waitForDisplayed({ timeout: 5000 });
+  await shareButton.waitForDisplayed({ timeout: 2000 });
   await shareButton.scrollIntoView?.().catch(() => { });
 
   let bobOobiUrl: string | undefined;
@@ -246,7 +247,7 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
 });
 
 // ---------------------------------------------------------------------------
-// Step 3 (BACKEND) – Alice + extra virtual members resolve Bob's OOBI
+// Step 3 (BACKEND) - Alice + extra virtual members resolve Bob's OOBI
 // ---------------------------------------------------------------------------
 
 Given(
@@ -322,7 +323,7 @@ Given(
 );
 
 // ---------------------------------------------------------------------------
-// Step 4 (BACKEND) – Alice creates the actual KERI group and proposes it
+// Step 4 (BACKEND) - Alice creates the actual KERI group and proposes it
 // ---------------------------------------------------------------------------
 
 When(
@@ -360,7 +361,7 @@ When(
 );
 
 // ---------------------------------------------------------------------------
-// Step 5 (UI) – Bob accepts the group invitation in the app
+// Step 5 (UI) - Bob accepts the group invitation in the app
 // ---------------------------------------------------------------------------
 
 When(/^Bob accepts the group invitation in the app$/, async function () {
@@ -384,7 +385,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
     try {
       await browser.waitUntil(
         async () => {
-          missingConnectionsAlert = await pageShowsMessage(
+          missingConnectionsAlert = await pageContainsText(
             "You are missing one or more connections required for this group request"
           ).catch(() => false);
           return missingConnectionsAlert;
@@ -436,7 +437,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
     if (await scanTab.isExisting().catch(() => false)) {
       await scanTab.click();
       await $("[data-testid='paste-content-button']").waitForDisplayed({
-        timeout: 5000,
+        timeout: 2000,
       });
     }
 
@@ -448,12 +449,12 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
       timeout: 5000,
     }).catch(() => { });
 
-    if (await pageShowsMessage(GENERIC_CONNECTION_ERROR_MSG)) {
+    if (await toastContainsText(GENERIC_CONNECTION_ERROR_MSG)) {
       throw new Error(
         `Scanning ${name}'s OOBI failed with generic connection error. OOBI pasted: ${charlieOobiForApp}`
       );
     }
-    if (await pageShowsMessage(GROUP_ID_MISMATCH_MSG)) {
+    if (await toastContainsText(GROUP_ID_MISMATCH_MSG)) {
       throw new Error(
         `Scanning ${name}'s OOBI failed with group-id mismatch. OOBI pasted: ${charlieOobiForApp}`
       );
@@ -491,8 +492,8 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
           return (
             /continue setup/i.test(primaryButtonText) ||
             connectedMembersAfter !== connectedMembersBefore ||
-            (await pageShowsMessage(GENERIC_CONNECTION_ERROR_MSG)) ||
-            (await pageShowsMessage(GROUP_ID_MISMATCH_MSG))
+            (await toastContainsText(GENERIC_CONNECTION_ERROR_MSG)) ||
+            (await toastContainsText(GROUP_ID_MISMATCH_MSG))
           );
         }, { timeout: 5000, interval: 500 });
       } catch {
@@ -500,12 +501,12 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
       }
     }
 
-    if (await pageShowsMessage(GENERIC_CONNECTION_ERROR_MSG)) {
+    if (await toastContainsText(GENERIC_CONNECTION_ERROR_MSG)) {
       throw new Error(
         `Scanning ${name}'s OOBI did not add the member. toast="${await getLatestToastMessage()}" before="${connectedMembersBefore}" after="${connectedMembersAfter}" oobi="${charlieOobiForApp}"`
       );
     }
-    if (await pageShowsMessage(GROUP_ID_MISMATCH_MSG)) {
+    if (await toastContainsText(GROUP_ID_MISMATCH_MSG)) {
       throw new Error(
         `Scanning ${name}'s OOBI failed with group-id mismatch. before="${connectedMembersBefore}" after="${connectedMembersAfter}" oobi="${charlieOobiForApp}"`
       );
@@ -606,7 +607,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
 });
 
 // ---------------------------------------------------------------------------
-// Step 6 (BACKEND) – All remote members complete the joining ceremony
+// Step 6 (BACKEND) - All remote members complete the joining ceremony
 // ---------------------------------------------------------------------------
 
 When(/^all remote members complete the group joining process$/, async function () {
@@ -643,14 +644,14 @@ When(/^all remote members complete the group joining process$/, async function (
 });
 
 // ---------------------------------------------------------------------------
-// Step 7 (ASSERT) – Group is Active for the joiner
+// Step 7 (ASSERT) - Group is Active for the joiner
 // ---------------------------------------------------------------------------
 
 Then(/^the group becomes "Active" for the joiner$/, async function () {
   const world = this as BobJoinerWorld;
   const groupName = world.bobGroupName ?? "MultisigGroup";
 
-  if (await pageShowsMessage(GROUP_ID_MISMATCH_MSG)) {
+  if (await toastContainsText(GROUP_ID_MISMATCH_MSG)) {
     throw new Error("Connection not part of this group — scan rejected.");
   }
 
@@ -681,7 +682,7 @@ Then(/^the group becomes "Active" for the joiner$/, async function () {
   await browser.waitUntil(
     async () => {
       const url = await browser.getUrl().catch(() => "");
-      if (url.includes("/tabs/home") || url.includes("/home")) return true;
+      if (url.includes("/tabs/home")) return true;
 
       // Some app versions land on profiles instead of home — check for the
       // active group in the profiles list directly.
