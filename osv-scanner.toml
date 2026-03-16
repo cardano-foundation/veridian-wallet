@@ -34,6 +34,6 @@ reason = "glob: Command injection - Conflict with ts-node/rimraf"
 ignoreUntil = 2027-01-11
 
 [[IgnoredVulns]]
-id = "GHSA-v6h2-p8h4-qcjw"
-reason = "brace-expansion: e2e tests or linting - low risk"
+id = "GHSA-gmq8-994r-jv83"
+reason = "yauzl@2.10.0 in native-run@2.0.3 (@capacitor/cli) and extract-zip@2.0.1 (@puppeteer/browsers). Both explicitly require ^2.10.0 and the fix (3.2.1) is a breaking API change (callbacks to async). Dev-only dependencies."
 ignoreUntil = 2027-01-11

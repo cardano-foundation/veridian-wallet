@@ -183,7 +183,16 @@
       "@img/sharp-win32-ia32": "^0.34.5",
       "@img/sharp-win32-x64": "^0.34.5"
     },
-    "flatted": "^3.4.0"
+    "flatted": "^3.4.0",
+    "webdriver": {
+      "undici": "^6.24.0"
+    },
+    "cheerio": {
+      "undici": "^7.24.0"
+    },
+    "@appium/support": {
+      "yauzl": "^3.2.1"
+    }
   },
   "eslintConfig": {
     "extends": [
