@@ -1,0 +1,95 @@
+name: veridian-prod
+
+# There is no need to use an anchor, but having it here makes the witness type init more evident
+x-witness-type: &witness-type
+  file: docker-compose.production.${WITNESS_TYPE}-witnesses.yaml
+
+services:
+
+  keria-init:
+    extends:
+      file: docker-compose.production.keria.yaml
+      service: keria-init
+
+  keria-local:
+    extends:
+      file: docker-compose.production.keria.yaml
+      service: keria-local
+
+  keria:
+    extends:
+      file: docker-compose.production.keria.yaml
+      service: keria
+    ports:
+      - 3901:3901
+      - 3902:3902
+      - 3903:3903
+
+  witness-init:
+    extends:
+      <<: *witness-type
+      service: witness-init
+
+  witness-0:
+    extends:
+      <<: *witness-type
+      service: witness-0
+    ports:
+      - 5642:5642
+
+  witness-1:
+    extends:
+      <<: *witness-type
+      service: witness-1
+    ports:
+      - 5643:5643
+
+  witness-2:
+    extends:
+      <<: *witness-type
+      service: witness-2
+    ports:
+      - 5644:5644
+
+  witness-3:
+    extends:
+      <<: *witness-type
+      service: witness-3
+    ports:
+      - 5645:5645
+
+  witness-4:
+    extends:
+      <<: *witness-type
+      service: witness-4
+    ports:
+      - 5646:5646
+
+  witness-5:
+    extends:
+      <<: *witness-type
+      service: witness-5
+    ports:
+      - 5647:5647
+
+  cred-issuance:
+    extends:
+      file: docker-compose.production.cred-issuance.yaml
+      service: cred-issuance
+    ports:
+      - 3001:3001
+
+  cred-issuance-ui:
+    extends:
+      file: docker-compose.production.cred-issuance.yaml
+      service: cred-issuance-ui
+    ports:
+      - 3002:80
+
+volumes:
+  keria-data:
+  keria-config:
+  issuer-server-data:
+  witnesses-config:
+  node-db:
+  node-ipc:

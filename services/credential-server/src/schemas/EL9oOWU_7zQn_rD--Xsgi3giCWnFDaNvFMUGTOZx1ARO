@@ -1,0 +1,91 @@
+{
+  "$id": "EL9oOWU_7zQn_rD--Xsgi3giCWnFDaNvFMUGTOZx1ARO",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Foundation Employee",
+  "description": "This is a credential issued for a Foundation Employee.",
+  "type": "object",
+  "credentialType": "FoundationEmployeeCredential",
+  "version": "1.0.0",
+  "properties": {
+    "v": {
+      "description": "Version",
+      "type": "string"
+    },
+    "d": {
+      "description": "Credential SAID",
+      "type": "string"
+    },
+    "u": {
+      "description": "One time use nonce",
+      "type": "string"
+    },
+    "i": {
+      "description": "Issuee AID",
+      "type": "string"
+    },
+    "ri": {
+      "description": "Credential status registry",
+      "type": "string"
+    },
+    "s": {
+      "description": "Schema SAID",
+      "type": "string"
+    },
+    "a": {
+      "oneOf": [
+        {
+          "description": "Attributes block SAID",
+          "type": "string"
+        },
+        {
+          "$id": "EBYi_g86fmAt8n7W0I4D2sRVI7fIo1NIwtH_fITN7DaW",
+          "description": "Attributes block",
+          "type": "object",
+          "properties": {
+            "d": {
+              "description": "Attributes block SAID",
+              "type": "string"
+            },
+            "i": {
+              "description": "Issuee AID",
+              "type": "string"
+            },
+            "dt": {
+              "description": "Issuance date time",
+              "type": "string",
+              "format": "date-time"
+            },
+            "email": {
+              "description": "Internal email of the employee",
+              "type": "string"
+            },
+            "firstName": {
+              "description": "First name of the employee",
+              "type": "string"
+            },
+            "lastName": {
+              "description": "Last name of the employee",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "i",
+            "dt",
+            "email",
+            "firstName",
+            "lastName"
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "i",
+    "ri",
+    "s",
+    "d",
+    "a"
+  ]
+}

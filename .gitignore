@@ -37,4 +37,6 @@ resources/android
 resources/ios
 
 services/credential-server/data/brans.json
+
+.env*
 android/app/release/output-metadata.json

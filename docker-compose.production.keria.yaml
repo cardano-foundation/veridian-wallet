@@ -1,0 +1,78 @@
+name: veridian-prod
+
+x-keria-common: &keria-common
+  restart: unless-stopped
+  image: ${KERIA_IMAGE:-cardanofoundation/cf-idw-keria:main}
+  environment:
+    - KERI_AGENT_CORS=${KERI_AGENT_CORS:-true}
+    - KERIA_PASSCODE=${KERIA_PASSCODE:-CHANGEME}
+    - ALLOW_INTRODUCTIONS=${ALLOW_INTRODUCTIONS:-true}
+    - REMOTE_SIGNING=${REMOTE_SIGNING:-true}
+  volumes:
+    - keria-data:/usr/local/var/keri
+    - keria-config:/keria/scripts/keri/cf
+  entrypoint: keria start --config-file backer-oobis --config-dir ./scripts --loglevel INFO
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "1024k"
+      max-file: "200"
+
+services:
+  keria-init:
+    profiles: [keria-init]
+    image: "rcmorano/alpine-bash-jq-curl"
+    environment:
+      - KERIA_PASSCODE=${KERIA_PASSCODE:-DLDRW3f108LaQB2qscJOd}
+      - KERIA_CURLS=${KERIA_CURLS:-http://keria:3902}
+      - KERIA_IURLS=${KERIA_IURLS:-http://witness:5642/oobi/dummy1 http://witness:5643/oobi/dummy2}
+    volumes:
+      - keria-config:/config
+      - $PWD/docker-assets/keria/keria-init.sh:/keria-init.sh
+      - $PWD/docker-assets/keria/backer-oobis.json.tpl:/configmap/backer-oobis.json.tpl
+    entrypoint: ["bash", "/keria-init.sh"]
+
+  keria-local:
+    profiles: [keria-local,local]
+    <<: *keria-common
+    ports:
+      - 3904:3901
+      - 3905:3902
+      - 3906:3903
+
+  keria:
+    profiles: [keria,production]
+    <<: *keria-common
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.keria.rule=Host(`${KERIA_HOST:-keria}`)"
+      - "traefik.http.routers.keria.entrypoints=websecure"
+      - "traefik.http.routers.keria.tls.certresolver=myresolver"
+      - "traefik.http.routers.keria.service=keria"
+      - "traefik.http.services.keria.loadbalancer.server.port=3901"
+      - "traefik.http.routers.keria-http.rule=Host(`${KERIA_HOST:-keria}`)"
+      - "traefik.http.routers.keria-http.entrypoints=web"
+      - "traefik.http.routers.keria-http.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.keria-ext.rule=Host(`${KERIA_EXT_HOST:-keria-ext}`)"
+      - "traefik.http.routers.keria-ext.entrypoints=websecure"
+      - "traefik.http.routers.keria-ext.tls.certresolver=myresolver"
+      - "traefik.http.routers.keria-ext.service=keria-ext"
+      - "traefik.http.services.keria-ext.loadbalancer.server.port=3902"
+      - "traefik.http.routers.keria-ext-http.rule=Host(`${KERIA_EXT_HOST:-keria-ext}`)"
+      - "traefik.http.routers.keria-ext-http.entrypoints=web"
+      - "traefik.http.routers.keria-ext-http.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.keria-boot.rule=Host(`${KERIA_BOOT_HOST:-keria-boot}`)"
+      - "traefik.http.routers.keria-boot.entrypoints=websecure"
+      - "traefik.http.routers.keria-boot.tls.certresolver=myresolver"
+      - "traefik.http.routers.keria-boot.service=keria-boot"
+      - "traefik.http.services.keria-boot.loadbalancer.server.port=3903"
+      - "traefik.http.routers.keria-boot-http.rule=Host(`${KERIA_BOOT_HOST:-keria-boot}`)"
+      - "traefik.http.routers.keria-boot-http.entrypoints=web"
+      - "traefik.http.routers.keria-boot-http.middlewares=redirect-to-https"
+
+volumes:
+  keria-data:
+  keria-config:

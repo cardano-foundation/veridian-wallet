@@ -1,0 +1,53 @@
+name: veridian-prod
+
+services:
+  cred-issuance:
+    profiles: [cred-issuance,production,local]
+    image: ${CRED_IMAGE:-cardanofoundation/cf-cred-issuance:main}
+    restart: unless-stopped
+    environment:
+      - OOBI_ENDPOINT=${CRED_OOBI_ENDPOINT:-http://cred-issuance:3001}
+      - KERIA_ENDPOINT=${CRED_KERIA_ENDPOINT:-http://keria:3901}
+      - KERIA_BOOT_ENDPOINT=${CRED_KERIA_BOOT_ENDPOINT:-http://keria:3903}
+    volumes:
+      - issuer-server-data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.credentials.rule=Host(`${CRED_HOST:-cred-issuance}`)"
+      - "traefik.http.routers.credentials.entrypoints=websecure"
+      - "traefik.http.routers.credentials.tls.certresolver=myresolver"
+      - "traefik.http.services.credentials.loadbalancer.server.port=3001"
+      - "traefik.http.routers.credentials-http.rule=Host(`${CRED_HOST:-cred-issuance}`)"
+      - "traefik.http.routers.credentials-http.entrypoints=web"
+      - "traefik.http.routers.credentials-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024k"
+        max-file: "200"
+
+  cred-issuance-ui:
+    profiles: [cred-issuance,production,local]
+    image: ${CRED_UI_IMAGE:-cardanofoundation/cf-cred-issuance-ui:main}
+    restart: unless-stopped
+    environment:
+      - VITE_SERVER_URL=${CRED_UI_SERVER_URL:-http://localhost:3002}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.credentials-ui.rule=Host(`${CRED_UI_HOST:-cred-issuance-ui}`)"
+      - "traefik.http.routers.credentials-ui.entrypoints=websecure"
+      - "traefik.http.routers.credentials-ui.tls.certresolver=myresolver"
+      - "traefik.http.services.credentials-ui.loadbalancer.server.port=80"
+      - "traefik.http.routers.credentials-ui-http.rule=Host(`${CRED_UI_HOST:-cred-issuance-ui}`)"
+      - "traefik.http.routers.credentials-ui-http.entrypoints=web"
+      - "traefik.http.routers.credentials-ui-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024k"
+        max-file: "200"
+
+volumes:
+  issuer-server-data:
