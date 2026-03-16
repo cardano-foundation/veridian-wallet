@@ -11,6 +11,7 @@ import {
   pasteOobiAndConfirm,
   assertGroupProfileActiveInProfilesList,
   waitUpTo,
+  installShareCapture,
 } from "./group-profile.helpers.js";
 
 const GROUP_ID_MISMATCH_MSG = "Connection not part of this group";
@@ -59,25 +60,12 @@ Given(/^Alice creates a group profile as initiator for (\d+)-of-(\d+) group "([^
 
     // Capture Alice's OOBI for members
     const provideTab = $("[data-testid='share-oobi-segment-button']");
-    await provideTab.waitForDisplayed({ timeout: 10000 });
+    await provideTab.waitForDisplayed();
     await provideTab.click();
-    const installShareCapture = `
-    (function() {
-      window.__lastSharedOobi = undefined;
-      var cap = window.Capacitor;
-      if (!cap || typeof cap.nativePromise !== 'function') return;
-      var orig = cap.nativePromise.bind(cap);
-      cap.nativePromise = function(pluginName, methodName, options) {
-        if (pluginName === 'Share' && methodName === 'share' && options && options.text)
-          window.__lastSharedOobi = options.text;
-        return orig(pluginName, methodName, options);
-      };
-    })();
-  `;
-    await browser.execute(installShareCapture);
+    await installShareCapture();
 
     const shareButton = $(".share-profile-oobi .share-button");
-    await shareButton.waitForDisplayed({ timeout: 5000 });
+    await shareButton.waitForDisplayed();
     await shareButton.scrollIntoView?.().catch(() => { });
     await shareButton.click();
     const aliceOobiUrl = (await browser.execute(() => (window as unknown as { __lastSharedOobi?: string }).__lastSharedOobi)) as string | undefined;
@@ -136,7 +124,7 @@ When(/^Alice pastes all member OOBIs on the Scan tab$/, async function () {
   const scanTab = $("[data-testid='scan-profile-segment-button']");
 
   for (const [name, member] of Object.entries(world.virtualMembers)) {
-    await scanTab.waitForDisplayed({ timeout: 10000 });
+    await scanTab.waitForDisplayed();
     await scanTab.click();
 
     const oobiForApp = await member.instance.getOobi({
@@ -155,13 +143,13 @@ When(/^Alice pastes all member OOBIs on the Scan tab$/, async function () {
 
 When(/^Alice initiates the group identifier$/, async function () {
   const provideTab = $("[data-testid='share-oobi-segment-button']");
-  await provideTab.waitForDisplayed({ timeout: 10000 });
+  await provideTab.waitForDisplayed();
   await provideTab.click();
   const initiateBtn = $("[data-testid='primary-button-setup-group-profile']");
-  await initiateBtn.waitForDisplayed({ timeout: 10000 });
+  await initiateBtn.waitForDisplayed();
   await initiateBtn.click();
   const alertConfirmBtn = $("[data-testid='alert-confirm-init-group-confirm-button']");
-  await alertConfirmBtn.waitForDisplayed({ timeout: 5000 });
+  await alertConfirmBtn.waitForDisplayed();
   await alertConfirmBtn.click();
 
   await waitUpTo(
@@ -194,7 +182,7 @@ When(/^Alice sets required and recovery signers to (\d+) and (\d+)$/, async func
   }
   const requiredIncrease = $("[data-testid='requiredSigners-increase-threshold-button']");
   const recoveryIncrease = $("[data-testid='recoverySigners-increase-threshold-button']");
-  await requiredIncrease.waitForDisplayed({ timeout: 5000 });
+  await requiredIncrease.waitForDisplayed();
   for (let i = 0; i < required; i++) {
     await requiredIncrease.click();
   }
@@ -202,13 +190,13 @@ When(/^Alice sets required and recovery signers to (\d+) and (\d+)$/, async func
     await recoveryIncrease.click();
   }
   const signerModalConfirm = $("[data-testid='primary-button-setup-signer-modal']");
-  await signerModalConfirm.waitForDisplayed({ timeout: 5000 });
+  await signerModalConfirm.waitForDisplayed();
   await signerModalConfirm.click();
 });
 
 When(/^Alice sends the group requests$/, async function () {
   const sendRequestBtn = $("[data-testid='primary-button-init-group']");
-  await sendRequestBtn.waitForDisplayed({ timeout: 10000 });
+  await sendRequestBtn.waitForDisplayed();
   await sendRequestBtn.click();
 });
 
@@ -244,9 +232,11 @@ Then(/^the group status becomes "Active" when the group is ready$/, async functi
   await ProfileSetupScreen.waitForGroupActive(30000);
   await assertGroupProfileActiveInProfilesList(aliceInitiatorGroupName);
   const url = await browser.getUrl();
-  const onHome = url.includes("/tabs/home");
-  if (onHome) {
-    const homeTab = await $("[data-testid='tab-button-home']").isExisting().catch(() => false);
-    expect(homeTab).toBe(true);
+  if (!url.includes("/tabs/home")) {
+    throw new Error(`Expected to be redirected to home after group activation, but current URL is ${url}`);
+  }
+  const homeTab = await $("[data-testid='tab-button-home']").isExisting();
+  if (!homeTab) {
+    throw new Error("Home tab not found after group activation");
   }
 });

@@ -73,50 +73,46 @@ export class TermsAndPrivacyScreen {
 
   async acceptTerms() {
     // Ensure we're in the webview context for mobile apps
-    try {
-      const contexts = await browser.getContexts();
-      if (contexts && contexts.length > 0) {
-        const webviewContext = contexts.find((ctx) => {
-          const ctxStr = typeof ctx === 'string' ? ctx : (ctx as any).id || String(ctx);
-          return ctxStr.includes("WEBVIEW") || ctxStr.includes("webview");
-        });
-        if (webviewContext) {
-          const currentContext = await browser.getContext();
-          const webviewContextStr = typeof webviewContext === 'string' ? webviewContext : (webviewContext as any).id || String(webviewContext);
-          if (currentContext !== webviewContextStr) {
-            await browser.switchContext(webviewContextStr);
-            await browser.pause(1000);
-          }
+    const contexts = await browser.getContexts();
+    if (contexts && contexts.length > 0) {
+      const webviewContext = contexts.find((ctx) => {
+        const ctxStr = typeof ctx === 'string' ? ctx : (ctx as any).id || String(ctx);
+        return ctxStr.includes("WEBVIEW") || ctxStr.includes("webview");
+      });
+      if (webviewContext) {
+        const currentContext = await browser.getContext();
+        const webviewContextStr = typeof webviewContext === 'string' ? webviewContext : (webviewContext as any).id || String(webviewContext);
+        if (currentContext !== webviewContextStr) {
+          await browser.switchContext(webviewContextStr);
+          await browser.pause(1000);
         }
       }
-    } catch (error) {
-      // If context switching fails, continue (might be browser test)
     }
-    
+
     // First ensure terms screen is fully loaded
     await this.loads();
-    
+
     // Scroll to bottom to ensure button is visible (button is in footer at bottom)
     await browser.execute(() => {
       window.scrollTo(0, document.body.scrollHeight);
     });
     await browser.pause(500);
-    
+
     // Try to find and click the button using JavaScript (most reliable for Ionic buttons)
     const clicked = await browser.execute(() => {
       // Try finding button by testid with pageId: primary-button-terms-n-privacy-content
       let button = document.querySelector("ion-button[data-testid='primary-button-terms-n-privacy-content']") as any;
-      
+
       // Try without pageId
       if (!button) {
         button = document.querySelector("ion-button[data-testid='primary-button']") as any;
       }
-      
+
       // Try any primary button
       if (!button) {
         button = document.querySelector("ion-button[data-testid*='primary-button']") as any;
       }
-      
+
       // Try finding by text "I accept"
       if (!button) {
         const allButtons = document.querySelectorAll("ion-button, button");
@@ -128,11 +124,11 @@ export class TermsAndPrivacyScreen {
           }
         }
       }
-      
+
       if (!button) {
         return false;
       }
-      
+
       // Try multiple click methods
       // Method 1: Direct click
       if (button.click) {
@@ -143,7 +139,7 @@ export class TermsAndPrivacyScreen {
           // Continue to other methods
         }
       }
-      
+
       // Method 2: Shadow DOM button
       if (button.shadowRoot) {
         const shadowButton = button.shadowRoot.querySelector("button");
@@ -156,7 +152,7 @@ export class TermsAndPrivacyScreen {
           }
         }
       }
-      
+
       // Method 3: Light DOM button
       const lightButton = button.querySelector("button");
       if (lightButton && (lightButton as any).click) {
@@ -167,7 +163,7 @@ export class TermsAndPrivacyScreen {
           // Continue
         }
       }
-      
+
       // Method 4: Dispatch click event
       try {
         const clickEvent = new MouseEvent('click', {
@@ -182,7 +178,7 @@ export class TermsAndPrivacyScreen {
         return false;
       }
     });
-    
+
     if (!clicked) {
       // Fallback: Try WebdriverIO click
       try {
@@ -192,7 +188,7 @@ export class TermsAndPrivacyScreen {
         throw new Error(`Failed to click Accept button. Error: ${error}`);
       }
     }
-    
+
     // Wait for navigation to start
     await browser.pause(1000);
   }

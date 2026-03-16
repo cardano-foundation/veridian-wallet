@@ -19,6 +19,7 @@ import {
   assertGroupProfileActiveInProfilesList,
   extractAidFromOobi,
   normalizeOobiHostname,
+  installShareCapture,
 } from "./group-profile.helpers.js";
 
 const GROUP_ID_MISMATCH_MSG = "Connection not part of this group";
@@ -97,25 +98,21 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
   await ProfileSetupScreen.waitForGroupSetupScreen();
 
   // ── Click "Join Group" → QR scan screen opens ────────────────────────────
-  await ProfileSetupScreen.joinGroupButton.waitForDisplayed({ timeout: 2000 });
+  await ProfileSetupScreen.joinGroupButton.waitForDisplayed();
   await ProfileSetupScreen.joinGroupButton.click();
 
   // ── Paste Alice's OOBI (with groupId) on the scan screen ─────────────────
   await pasteOobiAndConfirm(world.aliceOobiForJoin);
 
   // ── Step A: GroupSetupConfirm ─────────────────────────────────────────────
-  await browser.waitUntil(
+  await waitUpTo(
     async () => {
       const confirmScreenExists = await $(".join-group-details")
         .isExisting()
         .catch(() => false);
       return confirmScreenExists;
     },
-    {
-      timeout: 20000,
-      timeoutMsg:
-        'App did not show "Joined group" confirmation screen after pasting Alice\'s OOBI',
-    }
+    3000
   );
   console.log("[Bob] GroupSetupConfirm screen detected - clicking Next: setup profile");
   await $("[data-testid='primary-button-profile-setup']").click();
@@ -127,7 +124,7 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
   console.log("[Bob] Submitted username - waiting for Welcome screen");
 
   // ── Step C: FinishSetup (Welcome / Get started) ───────────────────────────
-  await browser.waitUntil(
+  await waitUpTo(
     async () => {
       const welcomeExists = await ProfileSetupScreen.welcomeTitle
         .isExisting()
@@ -135,10 +132,7 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
       const url = await browser.getUrl().catch(() => "");
       return welcomeExists || url.includes("group-profile-setup");
     },
-    {
-      timeout: 20000,
-      timeoutMsg: "App did not show Welcome screen or group-profile-setup after creating Bob's AID",
-    }
+    3000
   );
   const urlAfterCreate = await browser.getUrl().catch(() => "");
   if (!urlAfterCreate.includes("group-profile-setup")) {
@@ -147,20 +141,17 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
   }
 
   // ── Step D: Wait for group-profile-setup page ────────────────────────────
-  await browser.waitUntil(
+  await waitUpTo(
     async () => {
       const url = await browser.getUrl();
       return url.includes("group-profile-setup");
     },
-    {
-      timeout: 20000,
-      timeoutMsg: "Did not reach group-profile-setup after Bob created his member AID",
-    }
+    3000
   );
   console.log("[Bob] Reached group-profile-setup page");
 
   // ── Capture Bob's OOBI from the Share (Provide) tab ──────────────────────
-  await browser.waitUntil(
+  await waitUpTo(
     async () => {
       const provideTab = $("[data-testid='share-oobi-segment-button']");
       const isVisible = await provideTab.isDisplayed().catch(() => false);
@@ -168,46 +159,25 @@ Given(/^Bob scans Alice's group OOBI to join as a member$/, async function () {
       await provideTab.click();
       return $(".share-profile-oobi").isExisting().catch(() => false);
     },
-    {
-      timeout: 15000,
-      interval: 1000,
-      timeoutMsg: "Could not activate the Provide tab on group-profile-setup",
-    }
+    3000
   );
   console.log("[Bob] Provide tab activated - waiting for OOBI to load");
 
-  const installShareCapture = `
-    (function() {
-      window.__lastSharedOobi = undefined;
-      var cap = window.Capacitor;
-      if (!cap || typeof cap.nativePromise !== 'function') return;
-      var orig = cap.nativePromise.bind(cap);
-      cap.nativePromise = function(pluginName, methodName, options) {
-        if (pluginName === 'Share' && methodName === 'share' && options && options.text)
-          window.__lastSharedOobi = options.text;
-        return orig(pluginName, methodName, options);
-      };
-    })();
-  `;
-  await browser.execute(installShareCapture);
+  await installShareCapture();
 
-  await browser.waitUntil(
+  await waitUpTo(
     async () => {
       const revealed = await $(".share-profile-body-component.share-qr.reveal")
         .isExisting()
         .catch(() => false);
       return revealed;
     },
-    {
-      timeout: 30000,
-      interval: 1000,
-      timeoutMsg: "Bob's OOBI QR code did not reveal within 30 s (OOBI still loading)",
-    }
+    3000
   );
   console.log("[Bob] OOBI QR code revealed - clicking share button");
 
   const shareButton = $(".share-profile-oobi .share-button");
-  await shareButton.waitForDisplayed({ timeout: 2000 });
+  await shareButton.waitForDisplayed();
   await shareButton.scrollIntoView?.().catch(() => { });
 
   let bobOobiUrl: string | undefined;
@@ -414,12 +384,11 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
 
     // isDisplayed() can return false even when the button exists (checkVisibility
     // fails due to parent opacity/overflow). Wait for DOM presence then JS-click.
-    await browser.waitUntil(
-      async () =>
-        $("[data-testid='primary-button-pending-group']")
-          .isExisting()
-          .catch(() => false),
-      { timeout: 5000, timeoutMsg: "Add members button did not appear" }
+    await waitUpTo(
+      async () => $("[data-testid='primary-button-pending-group']")
+        .isExisting()
+        .catch(() => false),
+      3000
     );
     await browser.execute(() => {
       const btn = document.querySelector(
@@ -436,9 +405,7 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
     const scanTab = $("[data-testid='scan-profile-segment-button']");
     if (await scanTab.isExisting().catch(() => false)) {
       await scanTab.click();
-      await $("[data-testid='paste-content-button']").waitForDisplayed({
-        timeout: 2000,
-      });
+      await $("[data-testid='paste-content-button']").waitForDisplayed();
     }
 
     // useJsClick: native camera overlay blocks touch; JS click bypasses it
@@ -485,20 +452,17 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
     let primaryButtonText = await getPendingGroupPrimaryButtonText();
 
     if (!/continue setup/i.test(primaryButtonText)) {
-      try {
-        await browser.waitUntil(async () => {
+      await waitUpTo(
+        async () => {
           primaryButtonText = await getPendingGroupPrimaryButtonText();
           connectedMembersAfter = await getConnectedMembersProgressText();
           return (
             /continue setup/i.test(primaryButtonText) ||
-            connectedMembersAfter !== connectedMembersBefore ||
-            (await toastContainsText(GENERIC_CONNECTION_ERROR_MSG)) ||
-            (await toastContainsText(GROUP_ID_MISMATCH_MSG))
+            connectedMembersAfter !== connectedMembersBefore
           );
-        }, { timeout: 5000, interval: 500 });
-      } catch {
-        // handled below with richer diagnostics
-      }
+        },
+        3000
+      );
     }
 
     if (await toastContainsText(GENERIC_CONNECTION_ERROR_MSG)) {
@@ -552,8 +516,8 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
 
   await browser.waitUntil(
     async () => {
-      const spinner = await $(".spinner-overlay").isDisplayed().catch(() => false);
-      return !spinner;
+      const spinner = $(".spinner-overlay");
+      return !(await spinner.isExisting() && await spinner.isDisplayed());
     },
     { timeout: 15000, interval: 500, timeoutMsg: "Spinner did not disappear" }
   );
@@ -568,42 +532,23 @@ When(/^Bob accepts the group invitation in the app$/, async function () {
     ) as HTMLElement | null;
     if (btn) btn.click();
   });
+
   // wait for navigation / URL change after Accept (exits early if it happens)
   await waitUpTo(
     async () => {
-      const u = await browser.getUrl().catch(() => "");
-      if (!u) return false;
-      // Often we land on group-profile-setup, or return home, or stay on pending group briefly.
-      return (
-        u.includes("group-profile-setup") ||
-        u.includes("/tabs/home") ||
-        u.includes("/home")
-      );
+      const url = await browser.getUrl();
+      return url.includes("group-profile-setup");
     },
     5000,
-  ).catch(() => { });
+  );
 
-  // After Accept the app may land back on the QR scan/camera overlay on
-  // group-profile-setup. The native camera blocks the webview from processing
-  // KERI notifications (group-active). Dismiss it now so the app can receive
-  // those notifications while the backend completes the joining ceremony.
-  const url = await browser.getUrl().catch(() => "");
-  if (url.includes("group-profile-setup")) {
-    console.log("[Bob] Still on group-profile-setup after Accept — switching to Provide tab to dismiss camera");
-    // Lock screen may reappear during the pause after Accept
-    await dismissLockScreenIfPresent();
-    const provideTab = $("[data-testid='share-oobi-segment-button']");
-    if (await provideTab.isExisting().catch(() => false)) {
-      await browser.execute(() => {
-        const tab = document.querySelector(
-          "[data-testid='share-oobi-segment-button']"
-        ) as HTMLElement | null;
-        if (tab) tab.click();
-      });
-      await $(".share-profile-oobi").waitForExist({ timeout: 5000 }).catch(() => { });
-    }
-    console.log("[Bob] Camera dismissed, app can now receive group-active notifications");
+  await dismissLockScreenIfPresent();
+  const provideTab = $("[data-testid='share-oobi-segment-button']");
+  if (await provideTab.isExisting()) {
+    await provideTab.click();
+    await $(".share-profile-oobi").waitForExist({ timeout: 5000 });
   }
+  console.log("[Bob] Camera dismissed, app can now receive group-active notifications");
 });
 
 // ---------------------------------------------------------------------------
@@ -651,68 +596,17 @@ Then(/^the group becomes "Active" for the joiner$/, async function () {
   const world = this as BobJoinerWorld;
   const groupName = world.bobGroupName ?? "MultisigGroup";
 
-  if (await toastContainsText(GROUP_ID_MISMATCH_MSG)) {
-    throw new Error("Connection not part of this group — scan rejected.");
-  }
-
   // Lock screen can appear during Step 6 (backend join ceremony). Dismiss first.
   await dismissLockScreenIfPresent();
 
-  // When on group-profile-setup, ensure we're on Provide tab so the webview can
-  // receive KERI notifications. The native camera on Scan tab blocks processing.
-  // Always switch (don't rely on cameraBlocking selectors which may not match).
-  const url = await browser.getUrl().catch(() => "");
-  if (url.includes("group-profile-setup")) {
-    console.log("[Assert] On group-profile-setup — switching to Provide tab to allow KERI notifications");
-    const provideTab = $("[data-testid='share-oobi-segment-button']");
-    if (await provideTab.isExisting().catch(() => false)) {
-      await browser.execute(() => {
-        const tab = document.querySelector(
-          "[data-testid='share-oobi-segment-button']"
-        ) as HTMLElement | null;
-        if (tab) tab.click();
-      });
-      await $(".share-profile-oobi").waitForExist({ timeout: 5000 }).catch(() => { });
-    }
-  }
-
-  // Poll for home URL or profiles-panel availability (the group-active push
-  // may navigate to home OR keep us on profiles with the group shown as Active).
-  const activeTimeoutMs = 3000;
-  await browser.waitUntil(
+  // Wait for the app to navigate to home
+  await waitUpTo(
     async () => {
-      const url = await browser.getUrl().catch(() => "");
-      if (url.includes("/tabs/home")) return true;
-
-      // Some app versions land on profiles instead of home — check for the
-      // active group in the profiles list directly.
-      const groupActive = await browser.execute((name: string) => {
-        const root = document.querySelector("[data-testid='profiles']");
-        if (!root) return false;
-        const items = root.querySelectorAll("[data-testid^='profiles-list-item-']");
-        for (const item of items) {
-          const nameEl = item.querySelector(".profiles-list-item-name");
-          if ((nameEl?.textContent?.trim() ?? "").toLowerCase() !== name.toLowerCase()) continue;
-          const testId = item.getAttribute("data-testid") ?? "";
-          const id = testId.replace(/^profiles-list-item-/, "");
-          const hasPending = !!item.querySelector(`[data-testid='profiles-list-item-pending-${id}-status']`);
-          const hasAction = !!item.querySelector(`[data-testid='profiles-list-item-action-${id}-status']`);
-          return !hasPending && !hasAction;
-        }
-        return false;
-      }, groupName);
-      return groupActive;
+      const url = await browser.getUrl();
+      return url.includes("/tabs/home");
     },
-    {
-      timeout: activeTimeoutMs,
-      interval: 1000,
-      timeoutMsg: `Group did not become active within ${activeTimeoutMs}ms`,
-    }
+    3000,
   );
 
-  // If we reached home, verify the tab bar; otherwise verify via profiles list.
-  const finalUrl = await browser.getUrl().catch(() => "");
-  if (finalUrl.includes("/tabs/home") || finalUrl.includes("/home")) {
-    await assertGroupProfileActiveInProfilesList(groupName);
-  }
+  await assertGroupProfileActiveInProfilesList(groupName);
 });

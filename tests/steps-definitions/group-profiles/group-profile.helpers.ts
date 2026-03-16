@@ -102,7 +102,7 @@ export async function getConnectedMembersProgressText(): Promise<string> {
 
 export async function pasteOobiAndConfirm(oobi: string, useJsClick = false): Promise<void> {
   const pasteButton = $("[data-testid='paste-content-button']");
-  await pasteButton.waitForDisplayed({ timeout: 2000 });
+  await pasteButton.waitForDisplayed();
   await pasteButton.scrollIntoView?.().catch(() => { });
   if (useJsClick) {
     await browser.execute(() => {
@@ -114,18 +114,18 @@ export async function pasteOobiAndConfirm(oobi: string, useJsClick = false): Pro
   }
 
   const scanInput = $("[data-testid='scan-input']");
-  await scanInput.waitForDisplayed({ timeout: 2000 });
+  await scanInput.waitForDisplayed();
   const nativeInput = await scanInput.shadow$("input");
   await nativeInput.setValue(oobi);
   const confirmBtn = $("[data-testid='scan-input-modal'] [data-testid='action-button']");
-  await confirmBtn.waitForDisplayed({ timeout: 2000 });
+  await confirmBtn.waitForDisplayed();
   await confirmBtn.click();
   await $("[data-testid='scan-input-modal']").waitForExist({ reverse: true, timeout: 5000 });
 }
 
 export async function assertGroupProfileActiveInProfilesList(displayName: string): Promise<void> {
   const avatarBtn = $("[data-testid='avatar-button']");
-  await avatarBtn.waitForDisplayed({ timeout: 2000 });
+  await avatarBtn.waitForDisplayed();
   await browser.execute((sel: string) => {
     const el = document.querySelector(sel) as HTMLElement | null;
     if (el) el.click();
@@ -178,7 +178,7 @@ export async function assertGroupProfileActiveInProfilesList(displayName: string
   }
   if (result?.profileId) {
     const listItemSelector = `[data-testid='profiles-list-item-${result.profileId}']`;
-    await $(listItemSelector).waitForDisplayed({ timeout: 2000 });
+    await $(listItemSelector).waitForDisplayed();
     await browser.execute((sel: string) => {
       const el = document.querySelector(sel) as HTMLElement | null;
       if (el) el.click();
@@ -188,7 +188,7 @@ export async function assertGroupProfileActiveInProfilesList(displayName: string
     );
   }
   const manageProfileSelector = "[data-testid='profiles-option-button-manage profile']";
-  await $(manageProfileSelector).waitForDisplayed({ timeout: 2000 });
+  await $(manageProfileSelector).waitForDisplayed();
   await browser.execute((sel: string) => {
     const el = document.querySelector(sel) as HTMLElement | null;
     if (el) el.click();
@@ -209,4 +209,25 @@ export function normalizeOobiHostname(oobiUrl: string, targetConnectUrl: string)
   const u = new URL(oobiUrl);
   u.hostname = new URL(targetConnectUrl).hostname;
   return u.toString();
+}
+
+/*
+  This function injects a script that captures the shared OOBI URL when the Share plugin is used.
+*/
+export async function installShareCapture() {
+  const shareCaptureScript = `
+    (function() {
+      window.__lastSharedOobi = undefined;
+      var cap = window.Capacitor;
+      if (!cap || typeof cap.nativePromise !== 'function') return;
+      var orig = cap.nativePromise.bind(cap);
+      cap.nativePromise = function(pluginName, methodName, options) {
+        if (pluginName === 'Share' && methodName === 'share' && options && options.text)
+          window.__lastSharedOobi = options.text;
+        return orig(pluginName, methodName, options);
+      };
+    })();
+  `;
+
+  await browser.execute(shareCaptureScript);
 }
