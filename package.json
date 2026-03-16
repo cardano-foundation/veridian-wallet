@@ -1,6 +1,6 @@
 {
   "name": "veridian-wallet",
-  "version": "1.2.0",
+  "version": "1.2.0-rc0",
   "private": true,
   "engines": {
     "node": "20.x"
