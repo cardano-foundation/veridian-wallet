@@ -72,6 +72,7 @@ function isExnWithRoute(
 }
 import { ConnectionService } from "./connectionService";
 import { LATEST_CONTACT_VERSION } from "../../storage/sqliteStorage/cloudMigrations";
+import { OperationRetryManager } from "./operationRetryManager";
 
 class KeriaNotificationService extends AgentService {
   static readonly NOTIFICATION_NOT_FOUND = "Notification record not found";
@@ -95,6 +96,8 @@ class KeriaNotificationService extends AgentService {
   protected readonly ipexCommunications: IpexCommunicationService;
   protected readonly credentialService: CredentialService;
   protected readonly connectionService: ConnectionService;
+  protected readonly operationRetryManager: OperationRetryManager;
+
   protected readonly getKeriaOnlineStatus: () => boolean;
   protected readonly markAgentStatus: (online: boolean) => void;
   protected readonly connect: (retryInterval?: number) => Promise<void>;
@@ -131,6 +134,9 @@ class KeriaNotificationService extends AgentService {
     this.ipexCommunications = ipexCommunications;
     this.credentialService = credentialService;
     this.connectionService = connectionService;
+    this.operationRetryManager = new OperationRetryManager(
+      operationPendingStorage
+    );
     this.getKeriaOnlineStatus = getKeriaOnlineStatus;
     this.markAgentStatus = markAgentStatus;
     this.connect = connect;
@@ -143,12 +149,7 @@ class KeriaNotificationService extends AgentService {
     this.props.eventEmitter.on<OperationRemovedEvent>(
       EventTypes.OperationRemoved,
       (event) => {
-        const index = this.pendingOperations.findIndex(
-          (op) => op.id === event.payload.operationId
-        );
-        if (index !== -1) {
-          this.pendingOperations.splice(index, 1);
-        }
+        this._removePendingOperation(event.payload.operationId);
       }
     );
   }
@@ -1088,7 +1089,10 @@ class KeriaNotificationService extends AgentService {
   }
 
   async _pollLongOperations(): Promise<void> {
-    this.pendingOperations = await this.operationPendingStorage.getAll();
+    this.pendingOperations = await this.operationPendingStorage.findAllByQuery({
+      retryLastAttempt: undefined,
+    });
+
     // eslint-disable-next-line no-constant-condition
     while (true) {
       if (!this.loggedIn || !this.getKeriaOnlineStatus()) {
@@ -1098,11 +1102,32 @@ class KeriaNotificationService extends AgentService {
         continue;
       }
 
-      for (const pendingOperation of this.pendingOperations) {
+      if (this.operationRetryManager.shouldFetchFromStorage()) {
         try {
-          await this.processOperation(pendingOperation);
+          const retryableOperations =
+            await this.operationPendingStorage.findAllByQuery({
+              $not: { retryLastAttempt: undefined },
+            });
+
+          for (const op of retryableOperations) {
+            this.pendingOperations.push(op);
+          }
+        } finally {
+          this.operationRetryManager.confirmRetriesFetched();
+        }
+      }
+
+      for (const operationRecord of this.pendingOperations) {
+        try {
+          await this.processOperation(operationRecord);
         } catch (error) {
-          console.error("Error when process a operation", error);
+          if (error instanceof Error) {
+            await this.operationRetryManager.scheduleRetry(
+              operationRecord,
+              error
+            );
+            this._removePendingOperation(operationRecord.id);
+          }
         }
       }
 
@@ -1518,6 +1543,15 @@ class KeriaNotificationService extends AgentService {
         this.pendingOperations.indexOf(operationRecord),
         1
       );
+    }
+  }
+
+  private _removePendingOperation(operationId: string): void {
+    const index = this.pendingOperations.findIndex(
+      (op) => op.id === operationId
+    );
+    if (index !== -1) {
+      this.pendingOperations.splice(index, 1);
     }
   }
 
