@@ -1,11 +1,13 @@
 import {
   IonCheckbox,
+  IonIcon,
   IonItem,
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
   IonLabel,
 } from "@ionic/react";
+import { trashOutline, refreshOutline } from "ionicons/icons";
 import { CredentialStatus } from "../../../core/agent/services/credentialService.types";
 import { IpexCommunicationService } from "../../../core/agent/services/ipexCommunicationService";
 import { i18n } from "../../../i18n";
@@ -16,7 +18,6 @@ import { formatShortDate } from "../../utils/formatters";
 import { CardTheme } from "../CardTheme";
 import "./ArchivedCredentials.scss";
 import { CredentialItemProps } from "./ArchivedCredentials.types";
-
 const CredentialItem = ({
   credential,
   activeList,
@@ -91,8 +92,13 @@ const CredentialItem = ({
             onClick={() => {
               onRestore(credential.id);
             }}
+            className="credential-option-button restore-button"
           >
-            {i18n.t("tabs.credentials.archived.restore")}
+            <IonIcon
+              slot="top"
+              icon={refreshOutline}
+            />
+            <span>{i18n.t("tabs.credentials.archived.restore")}</span>
           </IonItemOption>
         )}
         <IonItemOption
@@ -100,8 +106,13 @@ const CredentialItem = ({
           onClick={() => {
             onDelete(credential.id);
           }}
+          className="credential-option-button"
         >
-          {i18n.t("tabs.credentials.archived.delete")}
+          <IonIcon
+            slot="top"
+            icon={trashOutline}
+          />
+          <span>{i18n.t("tabs.credentials.archived.delete")}</span>
         </IonItemOption>
       </IonItemOptions>
     </IonItemSliding>
