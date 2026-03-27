@@ -1,6 +1,4 @@
-import { Capacitor } from "@capacitor/core";
 import { IonButton, IonCol, IonIcon } from "@ionic/react";
-import { SafeArea } from "capacitor-plugin-safe-area";
 import {
   alertCircleOutline,
   checkmark,
@@ -9,7 +7,7 @@ import {
   personCircleOutline,
   swapHorizontalOutline,
 } from "ionicons/icons";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Agent } from "../../../../../core/agent/agent";
 import {
   ACDCDetails,
@@ -86,22 +84,6 @@ const ReceiveCredential = ({
   const isMultisig = credDetail?.identifierType === IdentifierType.Group;
   const [isRevoked, setIsRevoked] = useState(false);
   const [openIdentifierDetail, setOpenIdentifierDetail] = useState(false);
-  const [viewportHeight, setViewportHeight] = useState(
-    window.visualViewport?.height || window.innerHeight
-  );
-
-  useEffect(() => {
-    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android") {
-      SafeArea.getSafeAreaInsets().then((insets) => {
-        setViewportHeight(
-          (window.visualViewport?.height || window.innerHeight) -
-            insets.insets.bottom -
-            insets.insets.top
-        );
-      });
-    }
-  }, []);
-
   const connection = connectionsCache?.find(
     (c) => c.id === notificationDetails.connectionId
   )?.label;
@@ -233,8 +215,10 @@ const ReceiveCredential = ({
 
     const combinedHeight = 28.5 + iconRow.getBoundingClientRect().height;
     const headerHeight = (header as HTMLDivElement).offsetHeight;
+    const currentViewportHeight =
+      window.visualViewport?.height ?? window.innerHeight;
 
-    const opticalCenter = viewportHeight * 0.5;
+    const opticalCenter = currentViewportHeight * 0.5;
 
     const translateY = opticalCenter - headerHeight - combinedHeight / 2;
 
