@@ -1407,6 +1407,7 @@ describe("Creation of multi-sig", () => {
     expect(result.sender.groupId).toBe(
       "EBHG7UW-48EAF4bMYbaCsPQfSuFk-INidVXLexDMk6pN"
     );
+    expect(result.sender.hasAccepted).toBe(true);
     expect(result.otherConnections.length).toBe(0);
     expect(result.signingThreshold).toBe(3);
     expect(result.rotationThreshold).toBe(2);

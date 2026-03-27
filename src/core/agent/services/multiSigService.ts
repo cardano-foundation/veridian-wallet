@@ -522,6 +522,7 @@ class MultiSigService extends AgentService {
     }
 
     senderContact.groupId = icpMsg[0].exn.a.gid;
+    senderContact.hasAccepted = true;
 
     const linkedConnections = await this.connections.getMultisigLinkedContacts(
       ourIdentifier.groupMetadata.groupId
