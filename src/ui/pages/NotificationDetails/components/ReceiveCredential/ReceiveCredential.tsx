@@ -215,8 +215,7 @@ const ReceiveCredential = ({
 
     const combinedHeight = 28.5 + iconRow.getBoundingClientRect().height;
     const headerHeight = (header as HTMLDivElement).offsetHeight;
-    const currentViewportHeight =
-      window.visualViewport?.height ?? window.innerHeight;
+    const currentViewportHeight = window.innerHeight;
 
     const opticalCenter = currentViewportHeight * 0.5;
 
