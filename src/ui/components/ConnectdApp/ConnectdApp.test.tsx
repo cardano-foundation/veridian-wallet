@@ -399,7 +399,7 @@ describe("Wallet connect: empty history", () => {
 
 describe("Wallet connect", () => {
   test("Wallet connect render", async () => {
-    const { getByText, getByTestId } = render(
+    const { getByText, getByTestId, queryByTestId } = render(
       <Provider store={storeMocked}>
         <ConnectdApp
           isOpen
@@ -422,6 +422,9 @@ describe("Wallet connect", () => {
     expect(getByText(walletConnectionsFix[3].name as string)).toBeVisible();
     expect(getByText(walletConnectionsFix[3].url as string)).toBeVisible();
     expect(getByTestId("connected-wallet-check-mark")).toBeVisible();
+    expect(getByTestId("menu-add-connection-button")).toBeVisible();
+    expect(getByTestId("close-button-icon")).toBeVisible();
+    expect(queryByTestId("close-button-label")).toBeNull();
   });
 
   test("Confirm connect modal render", async () => {
@@ -645,5 +648,106 @@ describe("Wallet connect", () => {
         walletConnectionsFix[1].meerkatId
       );
     });
+  });
+});
+
+describe("Header per step", () => {
+  afterEach(() => {
+    document.getElementsByTagName("body")[0].innerHTML = "";
+  });
+
+  const noConnectedDAppState = {
+    stateCache: {
+      routes: [TabsRoutePath.CREDENTIALS],
+      authentication: {
+        loggedIn: true,
+        time: Date.now(),
+        passcodeIsSet: true,
+        passwordIsSet: false,
+      },
+      toastMsgs: [],
+    },
+    profilesCache: {
+      ...profileCacheFixData,
+    },
+    biometricsCache: {
+      enabled: false,
+    },
+  };
+
+  test("Connections step: renders icon close button and add connection button", async () => {
+    const { getByTestId, queryByTestId } = render(
+      <Provider store={makeTestStore(noConnectedDAppState)}>
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn()}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("menu-add-connection-button")).toBeVisible();
+    });
+
+    expect(getByTestId("close-button-icon")).toBeVisible();
+    expect(queryByTestId("close-button-label")).toBeNull();
+  });
+
+  test("Scan step: renders 'Close' label and hides add connection button", async () => {
+    const { getByTestId, queryByTestId } = render(
+      <Provider store={makeTestStore(noConnectedDAppState)}>
+        <ConnectdApp
+          isOpen
+          setIsOpen={jest.fn()}
+        />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("menu-add-connection-button")).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("menu-add-connection-button"));
+    });
+
+    expect(getByTestId("close-button-label")).toHaveTextContent(
+      EN_TRANSLATIONS.connectdapp.close
+    );
+    expect(queryByTestId("close-button-icon")).toBeNull();
+    expect(queryByTestId("menu-add-connection-button")).toBeNull();
+  });
+
+  test("Confirm step: renders 'Back' label and hides add connection button", async () => {
+    const { getByTestId, getByText, queryByTestId } = render(
+      <MemoryRouter>
+        <Provider store={makeTestStore(noConnectedDAppState)}>
+          <ConnectdApp
+            isOpen
+            setIsOpen={jest.fn()}
+          />
+        </Provider>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("menu-add-connection-button")).toBeVisible();
+    });
+
+    act(() => {
+      fireEvent.click(getByTestId("menu-add-connection-button"));
+    });
+
+    await waitFor(() => {
+      expect(
+        getByText(EN_TRANSLATIONS.connectdapp.request.stageone.message)
+      ).toBeVisible();
+    });
+
+    expect(getByTestId("close-button-label")).toHaveTextContent(
+      EN_TRANSLATIONS.connectdapp.back
+    );
+    expect(queryByTestId("close-button-icon")).toBeNull();
+    expect(queryByTestId("menu-add-connection-button")).toBeNull();
   });
 });
