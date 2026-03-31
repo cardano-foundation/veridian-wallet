@@ -21,6 +21,14 @@ body.scan-active {
 }
 
 .connect-dapp {
+  &.responsive-page-layout {
+    padding-top: 0;
+
+    .scan {
+      margin-top: 0;
+    }
+  }
+
   & .page-header {
     ion-toolbar {
       ion-button.close-button,

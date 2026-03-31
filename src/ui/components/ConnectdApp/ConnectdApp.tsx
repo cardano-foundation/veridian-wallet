@@ -1,6 +1,6 @@
 import { IonButton, IonIcon } from "@ionic/react";
 import { addOutline, arrowBackOutline, repeatOutline } from "ionicons/icons";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ComponentType, useEffect, useMemo, useRef, useState } from "react";
 import { Agent } from "../../../core/agent/agent";
 import { PeerConnection } from "../../../core/cardano/walletConnect/peerConnection";
 import { i18n } from "../../../i18n";
@@ -19,6 +19,8 @@ import { Verification } from "../../components/Verification";
 import { ToastMsgType } from "../../globals/types";
 import { showError } from "../../utils/error";
 import { combineClassNames } from "../../utils/style";
+import { ResponsivePageLayout } from "../layout/ResponsivePageLayout";
+import { ResponsivePageLayoutProps } from "../layout/ResponsivePageLayout/ResponsivePageLayout.types";
 import { ScrollablePageLayout } from "../layout/ScrollablePageLayout";
 import { PageHeader } from "../PageHeader";
 import { Scan } from "../Scan";
@@ -36,6 +38,11 @@ import {
   DAppConnection,
   Step,
 } from "./ConnectdApp.types";
+
+const getPageLayout = (step: Step): ComponentType<ResponsivePageLayoutProps> =>
+  step === Step.Scan || step === Step.Confirm
+    ? ResponsivePageLayout
+    : ScrollablePageLayout;
 
 const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
   const dispatch = useAppDispatch();
@@ -253,6 +260,39 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
     handleOpenConfirmConnectModal(data);
   };
 
+  const getPageHeaderProps = (step: Step) => {
+    if (step === Step.Scan) {
+      return {
+        closeButtonLabel: i18n.t("connectdapp.close"),
+        closeButtonIcon: undefined,
+      };
+    }
+    if (step === Step.Confirm) {
+      return {
+        closeButtonLabel: i18n.t("connectdapp.back"),
+        closeButtonIcon: undefined,
+      };
+    }
+    return {
+      closeButtonLabel: undefined,
+      closeButtonIcon: arrowBackOutline,
+      additionalButtons: (
+        <IonButton
+          shape="round"
+          className="connect-wallet-button"
+          data-testid="menu-add-connection-button"
+          onClick={handleScanQR}
+        >
+          <IonIcon
+            slot="icon-only"
+            icon={addOutline}
+            color="primary"
+          />
+        </IonButton>
+      ),
+    };
+  };
+
   const getContent = () => {
     switch (step) {
       case Step.Scan:
@@ -289,6 +329,8 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
     "connect-dapp-scan": step === Step.Scan,
   });
 
+  const PageLayout = getPageLayout(step);
+
   return (
     <>
       <SideSlider
@@ -297,7 +339,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
         className="connect-dapp-modal"
         onClose={() => setIsOpen(false)}
       >
-        <ScrollablePageLayout
+        <PageLayout
           pageId={pageId}
           activeStatus={isOpen}
           customClass={classes}
@@ -305,24 +347,8 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
             <PageHeader
               closeButton
               closeButtonAction={handleClose}
-              closeButtonIcon={arrowBackOutline}
+              {...getPageHeaderProps(step)}
               title={title}
-              additionalButtons={
-                showScan ? undefined : (
-                  <IonButton
-                    shape="round"
-                    className="connect-wallet-button"
-                    data-testid="menu-add-connection-button"
-                    onClick={handleScanQR}
-                  >
-                    <IonIcon
-                      slot="icon-only"
-                      icon={addOutline}
-                      color="primary"
-                    />
-                  </IonButton>
-                )
-              }
               actionButton={showScan && supportMultiCamera}
               actionButtonIcon={showScan ? repeatOutline : undefined}
               actionButtonAction={showScan ? changeCameraDirection : undefined}
@@ -331,7 +357,7 @@ const ConnectdApp = ({ isOpen, setIsOpen }: ConnectdAppProps) => {
           }
         >
           {getContent()}
-        </ScrollablePageLayout>
+        </PageLayout>
       </SideSlider>
       <ConfirmConnectModal
         isConnectModal={actionInfo.data?.meerkatId !== connectedDApp?.meerkatId}

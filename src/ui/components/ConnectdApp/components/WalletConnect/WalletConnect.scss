@@ -2,7 +2,6 @@
   width: 100%;
   height: 100%;
   background: var(--ion-color-neutral-200);
-  height: calc(100vh - 4rem);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -42,6 +41,7 @@
     .wallet-connect-message {
       text-align: center;
       margin: 0;
+      padding-inline: 3rem;
     }
   }
 }

@@ -728,6 +728,8 @@
   },
   "connectdapp": {
     "title": "Connections",
+    "close": "Close",
+    "back": "Back",
     "connectbtn": "Connect using Cardano",
     "disconnectbeforecreatealert": {
       "message": "You are currently connected. To connect with a new wallet, you will be disconnected from your current selection. Would you like to disconnect and continue?",
@@ -739,6 +741,7 @@
       "confirm": "Ok"
     },
     "scan": {
+      "pastecontents": "Paste peer ID",
       "inputmodal": {
         "cancel": "Cancel",
         "confirm": "Confirm",
@@ -772,7 +775,7 @@
     },
     "request": {
       "stageone": {
-        "title": "Connect dApp",
+        "title": "Cardano connect",
         "message": "Would you like to establish a CIP-45 Connection?",
         "alert": {
           "titleconfirm": "Are you sure you want to decline this connection?",
@@ -1762,7 +1765,7 @@
     "title": "Align the QR code within the frame to scan",
     "permissionalert": "Enable the camera in your device settings to start scanning",
     "cameraunavailable": "We're unable to access your camera.",
-    "pastecontentbutton": "Paste contents",
+    "pastecontents": "Paste contents",
     "inputmodal": {
       "cancel": "Cancel",
       "confirm": "Confirm",

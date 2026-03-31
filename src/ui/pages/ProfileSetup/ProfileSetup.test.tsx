@@ -811,7 +811,7 @@ describe("Profile setup: use as modal", () => {
     fireEvent.click(getByTestId("join-group-button"));
 
     await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontents)).toBeVisible();
     });
 
     await waitFor(() => {
@@ -928,7 +928,7 @@ describe("Profile setup: use as modal", () => {
     fireEvent.click(getByTestId("join-group-button"));
 
     await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontents)).toBeVisible();
     });
 
     await waitFor(() => {
@@ -1141,14 +1141,14 @@ describe("Profile setup: use as modal", () => {
     fireEvent.click(getByTestId("join-group-button"));
 
     await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontents)).toBeVisible();
     });
 
     await waitFor(() => {
       expect(dispatchMock).toBeCalledWith(
         setToastMsg(ToastMsgType.CONNECTION_ERROR)
       );
-      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontents)).toBeVisible();
     });
   });
 
@@ -1164,7 +1164,7 @@ describe("Profile setup: use as modal", () => {
     );
 
     await waitFor(() => {
-      expect(getByText(EN_TRANSLATIONS.scan.pastecontentbutton)).toBeVisible();
+      expect(getByText(EN_TRANSLATIONS.scan.pastecontents)).toBeVisible();
     });
   });
 

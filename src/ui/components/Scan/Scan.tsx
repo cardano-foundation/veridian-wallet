@@ -260,7 +260,7 @@ const Scan = forwardRef<ScanRef, ScanProps>(
                   data-testid="paste-content-button"
                   onClick={() => setPasteModalIsOpen(true)}
                 >
-                  {getTranslateText("scan.pastecontentbutton")}
+                  {getTranslateText("scan.pastecontents")}
                 </IonButton>
               )}
             </>
