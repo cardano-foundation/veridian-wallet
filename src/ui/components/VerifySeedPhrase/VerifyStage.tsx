@@ -123,18 +123,20 @@ const VerifyStage = ({
             emptyWord={!!seedPhraseRemaining.length}
             removeSeedPhraseSelected={removeSeedPhraseSelected}
           />
-          <SeedPhraseModule
-            testId="original-seed-phrase-container"
-            seedPhrase={seedPhraseRemaining}
-            addSeedPhraseSelected={addSeedPhraseSelected}
-            hideSeedNumber
-          />
+          {seedPhraseRemaining.length > 0 && (
+            <SeedPhraseModule
+              testId="original-seed-phrase-container"
+              seedPhrase={seedPhraseRemaining}
+              addSeedPhraseSelected={addSeedPhraseSelected}
+              hideSeedNumber
+            />
+          )}
           {seedPhraseSelected.length > 0 && (
             <IonButton
               onClick={() => setClearAlertOpen(true)}
               fill="outline"
               data-testid="verify-clear-button"
-              className="clear-button secondary-button"
+              className="clear-button secondary-button button-slim"
             >
               <IonIcon
                 slot="start"
