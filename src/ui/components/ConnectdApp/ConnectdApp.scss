@@ -14,7 +14,7 @@ body.scan-active {
       --background: transparent;
     }
 
-    .connect-dapp-scan.scrollable-page-layout {
+    .connect-dapp-scan {
       background: transparent;
     }
   }
@@ -40,7 +40,7 @@ body.scan-active {
 
   &.connect-dapp-scan {
     padding: 0;
-    background: transparent;
+    background: var(--ion-color-neutral-700);
 
     .scrollable-page-content {
       position: static;
