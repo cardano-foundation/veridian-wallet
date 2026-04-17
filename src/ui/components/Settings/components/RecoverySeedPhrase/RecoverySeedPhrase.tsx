@@ -72,6 +72,7 @@ const RecoverySeedPhrase = ({
     <>
       <ScrollablePageLayout
         pageId="settings"
+        activeStatus={isEdit}
         header={
           <PageHeader
             title={title}

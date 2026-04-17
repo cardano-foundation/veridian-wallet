@@ -14,6 +14,7 @@ import {
 } from "../../../store/reducers/profileCache";
 import {
   getIsSyncingData,
+  getShowVerifySeedPhraseAlert,
   setSyncingData,
   setToastMsg,
 } from "../../../store/reducers/stateCache";
@@ -50,6 +51,9 @@ const ProfileStateModal = () => {
   const [isOpenProfiles, setOpenProfiles] = useState(false);
   const isOpen = useAppSelector(getShowProfileState);
   const isSyncing = useAppSelector(getIsSyncingData);
+  const showVerifySeedPhraseAlert = useAppSelector(
+    getShowVerifySeedPhraseAlert
+  );
   const history = useHistory();
   const checkedProfile = useRef<{
     id: string;
@@ -100,6 +104,12 @@ const ProfileStateModal = () => {
   ]);
 
   const checkProfileState = useCallback(() => {
+    // Avoid competing overlay modals during mandatory seed-phrase verification flow.
+    if (showVerifySeedPhraseAlert) {
+      setIsOpen(false);
+      return;
+    }
+
     const isProfileChecked =
       checkedProfile.current.id === currentProfile?.identity.id &&
       checkedProfile.current.status === currentProfile?.identity.creationStatus;
@@ -169,6 +179,7 @@ const ProfileStateModal = () => {
     setIsOpen,
     history.location.pathname,
     isSyncing,
+    showVerifySeedPhraseAlert,
     dispatch,
   ]);
 

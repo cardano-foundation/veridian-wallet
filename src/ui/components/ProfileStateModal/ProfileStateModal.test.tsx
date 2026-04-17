@@ -31,6 +31,60 @@ jest.mock("../../../core/agent/agent", () => ({
 }));
 
 describe("ProfileStateModal - Show profile error states", () => {
+  test("Does not show profile state modal when verify seed phrase alert is active", async () => {
+    const initialStatePendingWithSeedPhraseAlert = {
+      stateCache: {
+        routes: [TabsRoutePath.CREDENTIALS],
+        authentication: {
+          loggedIn: true,
+          time: Date.now(),
+          passcodeIsSet: true,
+        },
+        isOnline: true,
+        showVerifySeedPhraseAlert: true,
+      },
+      seedPhraseCache: {},
+      profilesCache: {
+        ...profileCacheFixData,
+        defaultProfile: filteredIdentifierFix[2].id,
+      },
+      viewTypeCache: {
+        identifier: {
+          viewType: null,
+          favouriteIndex: 0,
+        },
+        credential: {
+          viewType: null,
+          favouriteIndex: 0,
+        },
+      },
+      biometricsCache: {
+        enabled: false,
+      },
+    };
+
+    const storeMocked = {
+      ...makeTestStore(initialStatePendingWithSeedPhraseAlert),
+    };
+
+    const history = createMemoryHistory();
+    history.push(TabsRoutePath.CREDENTIALS);
+
+    const { queryByText } = render(
+      <IonReactMemoryRouter history={history}>
+        <Provider store={storeMocked}>
+          <ProfileStateModal />
+        </Provider>
+      </IonReactMemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(
+        queryByText(EN_TRANSLATIONS.profiledetails.loadprofileerror.pending)
+      ).toBeNull();
+    });
+  });
+
   test("Show pending profile issue", async () => {
     const initialStatePendingEmpty = {
       stateCache: {
