@@ -112,6 +112,8 @@ This command starts the development server and allows you to preview the applica
 
 [http://localhost:3003/](http://localhost:3003/)
 
+For a deeper guide to the local development environment — the Docker backend services and ports, configuration (`ENVIRONMENT`, `.env`, `KERIA_IP`), build variants, and troubleshooting — see the [Development Guide](docs/Development.md).
+
 ## Running in an Emulator
 You can discover how to run the application in an emulator by following this [link](docs/Running-in-an-Emulator.md).
 
