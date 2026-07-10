@@ -45,8 +45,8 @@ For day-to-day development you run two things:
 
 | Tool | Version | Notes |
 |---|---|---|
-| **Node.js** | **20.x** (use the latest 20.x release) | `package.json` pins `engines.node = 20.x`. Some transitive deps request `>=20.18.1`; an older 20.x prints harmless `EBADENGINE` warnings. If your shell defaults to a newer Node, switch with [nvm](https://github.com/nvm-sh/nvm): `nvm install 20 && nvm use 20`. |
-| **npm** | bundled with Node 20 | |
+| **Node.js** | see [README](../README.md) / `engines.node` in `package.json` | Use the version the project pins. If your shell defaults to a newer Node, switch with [nvm](https://github.com/nvm-sh/nvm) (e.g. `nvm install 20 && nvm use 20`). A too-old minor prints harmless `EBADENGINE` warnings. |
+| **npm** | bundled with Node | |
 | **Docker** + **Docker Compose** | recent | Runs the backend services. |
 | **make** | any | `make init` configures the git hooks. |
 | **git** | any | |
@@ -72,8 +72,7 @@ nvm use 20
 npm install
 ```
 
-The first `npm install` is large (it includes the Appium/WebdriverIO E2E stack and builds
-Signify-TS from a pinned git commit) and can take several minutes.
+The first `npm install` can take a few minutes.
 
 ## The dev backend (Docker)
 
