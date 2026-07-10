@@ -23,7 +23,6 @@ aimed at developers who are new to the codebase and want a map before diving in.
 - [Navigation as a state machine](#navigation-as-a-state-machine)
 - [Cross-cutting concerns](#cross-cutting-concerns)
 - [Glossary](#glossary)
-- [Where to go next](#where-to-go-next)
 
 ## The big picture
 
@@ -34,9 +33,6 @@ codebase:
 - as **native iOS and Android apps**, where the same web build runs inside a system WebView
   via **[Capacitor](https://capacitorjs.com/)**. Native capabilities (biometrics, secure
   storage, SQLite, camera/barcode, splash screen, etc.) are reached through Capacitor plugins.
-
-This is *not* React Native — there is no native UI rendering. The UI is web technology
-(React + Ionic) in a WebView; Capacitor is the bridge to device APIs.
 
 Architecturally the app is three layers with a strict dependency direction:
 
@@ -57,8 +53,7 @@ Architecturally the app is three layers with a strict dependency direction:
             KERIA cloud agent  +  KERI witnesses  +  Cardano
 ```
 
-The UI depends on the core (the indexed call graph shows ~214 calls from `ui` → `core`, the
-dominant boundary in the app); the core never depends on the UI. The core communicates with a
+The UI depends on the core; the core never depends on the UI. The core communicates with a
 remote **KERIA cloud agent** through the **Signify-TS** client. Because Signify is stateless
 and many user actions require several remote calls plus local writes, the core is built around
 **idempotent, retryable operations** rather than transactions — see
@@ -66,62 +61,45 @@ and many user actions require several remote calls plus local writes, the core i
 
 ## Technology stack
 
-| Concern | Choice | Notes |
-|---|---|---|
-| Language | TypeScript 5.7 | `strict` config in `tsconfig.json` |
-| UI framework | React 18 + **Ionic React 8** (`@ionic/react`) | Ionic supplies mobile-style components & theming |
-| Native shell | **Capacitor 7** | `capacitor.config.ts`; native projects in `android/`, `ios/` |
-| State | **Redux Toolkit** + `react-redux` | slices in `src/store/reducers` |
-| Routing | `react-router-dom@5` via `@ionic/react-router` | path constants in `src/routes/paths.ts` |
-| Identity client | **Signify-TS** (pinned git commit) | talks to KERIA; see `package.json` |
-| Local DB | `@capacitor-community/sqlite` (SQLCipher, encrypted) on native; `@ionic/storage` (IndexedDB) on web | selected at runtime in `Agent` |
-| Secure secrets | `@evva/capacitor-secure-storage-plugin` | Keychain / Keystore via `SecureStorage` |
-| Biometrics | `@capgo/capacitor-native-biometric` | |
-| Hardening (RASP) | `capacitor-freerasp` | toggled by `security.rasp.enabled` in `configs/*.yaml` |
-| i18n | `i18next` + `react-i18next` | strings in `src/locales/`; see [Localization](#cross-cutting-concerns) |
-| Build | **Webpack 5** | `webpack.{common,dev,prod}.cjs` |
-| Unit tests | **Jest** + Testing Library | `*.test.ts(x)` colocated with source |
-| E2E tests | **WebdriverIO + Appium** (Cucumber) | `tests/`; see [`docs/Testing.md`](./Testing.md) |
+| Concern | Choice |
+|---|---|
+| Language | TypeScript (`strict`) |
+| UI framework | React + **Ionic React** (`@ionic/react`) |
+| Native shell | **Capacitor** (native projects in `android/`, `ios/`) |
+| State | **Redux Toolkit** + `react-redux` |
+| Routing | `react-router-dom` via `@ionic/react-router` |
+| Identity client | **Signify-TS** (talks to KERIA) |
+| Local DB | encrypted SQLite on native; IndexedDB on web — selected at runtime in `Agent` |
+| Secure secrets | Keychain / Keystore via `SecureStorage` |
+| Biometrics | Capacitor native-biometric plugin |
+| Hardening (RASP) | freeRASP, toggled by `security.rasp.enabled` |
+| i18n | `i18next` + `react-i18next` (strings in `src/locales/`) |
+| Build | **Webpack** |
+| Unit tests | **Jest** + Testing Library |
+| E2E tests | **WebdriverIO + Appium** (see [`docs/Testing.md`](./Testing.md)) |
 
-**Node version:** the project targets Node 20.x (`engines` in `package.json`). Note that some
-transitive dependencies request Node `>=20.18.1`, so use a current 20.x release to avoid
-`EBADENGINE` warnings.
+Exact versions and plugin packages live in `package.json` (`engines` pins the Node version).
 
 ## Repository layout
 
 ```
 src/
-├── index.tsx              App entry: loads config, mounts <App/> in the Redux <Provider>
-├── i18n.ts                i18next initialization (currently English only)
-├── locales/               Translation JSON (namespaced)
-├── core/                  ── CORE LAYER ──
-│   ├── agent/
-│   │   ├── agent.ts       Agent singleton: lifecycle + service registry
-│   │   ├── event.ts       CoreEventEmitter (in-process pub/sub)
-│   │   ├── services/      Domain services (identifiers, connections, credentials, IPEX, …)
-│   │   └── records/       Record types + storage repositories (the local DB layer)
-│   ├── storage/           Storage backends: sqliteStorage, ionicStorage, secureStorage
-│   ├── configuration/     Loads configs/<ENV>.yaml at startup
-│   ├── cardano/           Cardano dApp connectivity (CIP-45 peer connect)
-│   └── utils/
-├── store/                 ── STATE LAYER ── Redux Toolkit store + reducers (slices)
-├── routes/                Route paths + the next/back navigation state machine
-├── ui/                    ── UI LAYER ──
-│   ├── App.tsx            Root component; renders by InitializationPhase
-│   ├── components/        ~65 reusable components (incl. AppWrapper, the core↔UI bridge)
-│   ├── pages/             Full screens (Onboarding, Home, Credentials, Profiles, …)
-│   ├── hooks/             Custom React hooks
-│   ├── styles/            Global SCSS + the color palette (colors.scss)
-│   └── globals/           App-wide constants
-├── native/                Push-notification glue
-└── security/              freeRASP initialization
+├── index.tsx    App entry: loads config, mounts <App/> in the Redux <Provider>
+├── core/        ── CORE LAYER ── Agent singleton, domain services, records + storage, KERIA/Signify
+├── store/       ── STATE LAYER ── Redux Toolkit store + reducers (slices)
+├── routes/      Route paths + the next/back navigation state machine
+├── ui/          ── UI LAYER ── App root, pages, components, hooks, styles
+├── native/      Push-notification glue
+└── security/    freeRASP initialization
 
-services/                  Dev/test backends (NOT the wallet): credential issuance
-                           server + its UI, and a CIP-45 sample dApp
-configs/                   Per-environment YAML (local / remote / prod)
-android/, ios/             Capacitor native projects
-tests/                     WebdriverIO/Appium E2E suite
+services/        Dev/test backends (NOT the wallet): credential issuance server + UI, CIP-45 dApp
+configs/         Per-environment YAML (local / remote / prod)
+android/, ios/   Capacitor native projects
+tests/           WebdriverIO/Appium E2E suite
 ```
+
+The three layers are described in the next section; deeper structure is best explored with grep
+or the codebase graph rather than mirrored here.
 
 ## The three layers
 
@@ -269,8 +247,8 @@ sequenceDiagram
     UI->>Svc: Agent.agent.identifiers.createIdentifier(metadata)
     Note over Svc: @OnlineOnly, @SeedPhraseVerified
     Svc->>DB: queue name in IDENTIFIERS_PENDING_CREATION (for retry)
-    Svc->>Sig: identifiers().create(name, {toad, wits}); await op()
-    Svc->>Sig: addEndRole(agent); await op()
+    Svc->>Sig: identifiers().create(name, {toad, wits}) then await op()
+    Svc->>Sig: addEndRole(agent) then await op()
     Svc->>DB: createIdentifierMetadataRecord(creationStatus = PENDING)
     Svc->>Bus: emit IdentifierAdded
     Bus->>AW: identifierAddedHandler(event)
@@ -377,18 +355,3 @@ links in the project `README.md`.)
 | **IPEX** | Issuance and Presentation Exchange — the protocol for exchanging ACDCs (`IpexCommunicationService`) |
 | **CESR** | Composable Event Streaming Representation — the wire encoding KERI/ACDC use |
 | **operation (op)** | A long-running KERIA task; tracked locally via `OperationPendingStorage` and polled to completion |
-
-## Where to go next
-
-A suggested reading path once you've absorbed this document:
-
-1. [`docs/core/DistributedReliability.md`](./core/DistributedReliability.md) — the reliability
-   model the core is built on.
-2. `src/core/agent/agent.ts` — the singleton and service registry.
-3. A service, e.g. `src/core/agent/services/identifierService.ts`, alongside the
-   [identifier flow](#flow-creating-an-identifier-end-to-end) above.
-4. `src/routes/nextRoute/nextRoute.ts` + `src/routes/index.tsx` — navigation.
-5. `src/store/reducers/` — the slices, and `src/ui/components/AppWrapper/` — the bridge.
-6. [`docs/Testing.md`](./Testing.md) and [`docs/Running-in-an-Emulator.md`](./Running-in-an-Emulator.md)
-   for the development workflow.
-```
