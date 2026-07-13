@@ -132,7 +132,6 @@ Thank you for contributing!
 ## Additional Documents
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security](SECURITY.md)
-- [Changelog](CHANGELOG.md)
 
 
 # Troubleshooting
