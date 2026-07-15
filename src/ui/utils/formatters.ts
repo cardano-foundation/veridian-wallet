@@ -6,14 +6,6 @@ const formatShortDate = (date: string) => {
   });
 };
 
-const formatLongDate = (date: string) => {
-  return new Date(date).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-};
-
 const formatShortTime = (date: string) => {
   return new Date(date).toLocaleTimeString("en-GB", {
     hour: "2-digit",
@@ -95,7 +87,6 @@ function getUTCOffset(value?: Date | string | number) {
 
 export {
   formatShortDate,
-  formatLongDate,
   formatShortTime,
   formatTimeToSec,
   timeDifference,
