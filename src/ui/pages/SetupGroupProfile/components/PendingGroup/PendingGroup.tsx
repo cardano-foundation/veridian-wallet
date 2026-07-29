@@ -183,7 +183,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
       ...member,
       avatar: (
         <MemberAvatar
-          firstLetter={member.name.at(0)?.toLocaleUpperCase() || ""}
+          firstLetter={member.name[0]?.toLocaleUpperCase() || ""}
           rank={index >= 0 ? index % 5 : 0}
         />
       ),
@@ -418,7 +418,7 @@ const PendingGroup = ({ state, isPendingGroup }: StageProps) => {
             <CardDetailsItem
               startSlot={
                 <MemberAvatar
-                  firstLetter={intiatorName.at(0)?.toLocaleUpperCase() || ""}
+                  firstLetter={intiatorName[0]?.toLocaleUpperCase() || ""}
                   rank={0}
                 />
               }

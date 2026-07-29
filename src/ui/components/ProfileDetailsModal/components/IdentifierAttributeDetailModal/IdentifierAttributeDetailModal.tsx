@@ -54,7 +54,7 @@ const IdentifierAttributeDetailModal = ({
         isCurrentUser: isCurrent,
         avatar: (
           <MemberAvatar
-            firstLetter={name.at(0)?.toLocaleUpperCase() || ""}
+            firstLetter={name[0]?.toLocaleUpperCase() || ""}
             rank={rank}
           />
         ),

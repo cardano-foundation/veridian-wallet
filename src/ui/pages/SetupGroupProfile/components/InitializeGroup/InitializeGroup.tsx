@@ -83,7 +83,7 @@ const InitializeGroup = ({ state, setState }: StageProps) => {
       ...member,
       avatar: (
         <MemberAvatar
-          firstLetter={member.name.at(0)?.toLocaleUpperCase() || ""}
+          firstLetter={member.name[0]?.toLocaleUpperCase() || ""}
           rank={index >= 0 ? index % 5 : 0}
         />
       ),

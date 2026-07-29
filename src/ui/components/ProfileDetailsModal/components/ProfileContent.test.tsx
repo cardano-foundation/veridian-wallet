@@ -64,7 +64,7 @@ describe("ProfileContent", () => {
       const { getByTestId } = renderComponent();
 
       expect(getByTestId("avatar-button")).toHaveTextContent(
-        identifierFix[0].displayName.at(0) || ""
+        identifierFix[0].displayName[0] || ""
       );
       expect(getByTestId("edit-button")).toBeInTheDocument();
       expect(getByTestId("share-button")).toBeInTheDocument();

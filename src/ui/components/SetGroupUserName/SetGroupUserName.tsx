@@ -127,7 +127,7 @@ const SetGroupUserName = ({ identifier, onClose }: SetGroupNameProps) => {
         <p className="text">{i18n.t("setgroup.text")}</p>
         <div className="group-info">
           <MemberAvatar
-            firstLetter={identifier.displayName.at(0)?.toUpperCase() || ""}
+            firstLetter={identifier.displayName[0]?.toUpperCase() || ""}
             rank={0}
           />
           <p className="group-name">{identifier.displayName}</p>

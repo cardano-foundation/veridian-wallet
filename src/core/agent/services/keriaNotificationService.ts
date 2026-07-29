@@ -960,9 +960,12 @@ class KeriaNotificationService extends AgentService {
     const payload = exchange.exn.a;
 
     const valid = [
-      Object.hasOwn(payload, "m") && typeof payload.m === "string",
-      Object.hasOwn(payload, "t") && typeof payload.t === "string",
-      Object.hasOwn(payload, "st") && typeof payload.st === "string",
+      Object.prototype.hasOwnProperty.call(payload, "m") &&
+        typeof payload.m === "string",
+      Object.prototype.hasOwnProperty.call(payload, "t") &&
+        typeof payload.t === "string",
+      Object.prototype.hasOwnProperty.call(payload, "st") &&
+        typeof payload.st === "string",
       Array.isArray(payload.c) &&
         payload.c.length > 0 &&
         payload.c.every((paragraph: unknown) => typeof paragraph === "string"),

@@ -74,7 +74,7 @@ const CredentialRequestInformation = ({
   const isJoinGroup = linkedGroup?.memberInfos.some(
     (item) => item.aid === userAID && item.joined
   );
-  const groupInitiatorJoined = !!linkedGroup?.memberInfos.at(0)?.joined;
+  const groupInitiatorJoined = !!linkedGroup?.memberInfos[0]?.joined;
   const isMemberPendingState =
     !isGroupInitiator && !groupInitiatorJoined && isGroup;
   const isInitiatorJoined = isGroupInitiator && groupInitiatorJoined;
@@ -373,7 +373,7 @@ const CredentialRequestInformation = ({
             >
               <CardDetailsItem
                 info={
-                  linkedGroup?.memberInfos.at(0)?.name ||
+                  linkedGroup?.memberInfos[0]?.name ||
                   i18n.t("tabs.connections.unknown")
                 }
                 startSlot={<FallbackIcon />}
