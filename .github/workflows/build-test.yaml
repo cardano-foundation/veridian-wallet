@@ -37,3 +37,15 @@ jobs:
 
     - name: 🔨 Build project
       run: npm run build
+
+    - name: Check bundle ES compatibility (Chrome 91 WebView floor)
+      # Pinned CI-only dependency (no package.json entry) per review consensus.
+      # Floor: es2021 + allowList of ES2022 features Chrome 91 already supports.
+      # Raising the min WebView floor later = delete allowList lines whose
+      # Chrome version is now below the floor.
+      #   PrivateClassFields: Chrome 74 (private methods 84)
+      #   ClassStaticBlocks:  Chrome 91
+      #   ErrorCause:         options arg silently ignored pre-93, degrades gracefully
+      run: >
+        npx es-check@9.6.4 es2021 'build/**/*.js' --checkFeatures
+        --allowList=PrivateClassFields,ClassStaticBlocks,ErrorCause
