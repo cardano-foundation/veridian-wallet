@@ -392,15 +392,18 @@ describe("ProfileContent", () => {
           Promise.reject(new Error(ConnectionService.CANNOT_GET_OOBI))
         )
         .mockImplementationOnce(() => Promise.resolve("oobi-value"));
-      jest.spyOn(window, "setTimeout");
 
       renderComponent();
 
-      await new Promise((resolve) => setTimeout(() => resolve(false), 3000));
-
-      await waitFor(() => {
-        expect(getOobiMock).toBeCalledTimes(3);
-      });
+      // useGetOobi retries with real setTimeout delays of RETRY_TIMES[0] (1s)
+      // then RETRY_TIMES[1] (2.5s), so the 3rd call lands around 3.5s in.
+      // Wait directly on the call count instead of a blind sleep.
+      await waitFor(
+        () => {
+          expect(getOobiMock).toBeCalledTimes(3);
+        },
+        { timeout: 6000 }
+      );
     });
   });
 
