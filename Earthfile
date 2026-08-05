@@ -47,8 +47,8 @@ docker-manifests-merge:
 
 keria-src:
   FROM alpine/git
-  RUN git clone $KERIA_GIT_REPO_URL /keria && \
-      cd /keria && \
+  GIT CLONE --branch $KERIA_GIT_REF $KERIA_GIT_REPO_URL /keria
+  RUN cd /keria && \
       git checkout $KERIA_GIT_REF
   SAVE ARTIFACT /keria
 
@@ -88,7 +88,6 @@ idw-keria:
     END
 
     WAIT
-      DO functions+DOCKER_LABELS --LABELS="${DOCKER_IMAGES_LABELS}"
       SAVE IMAGE ${DOCKER_IMAGE_NAME}:${KERIA_UPSTREAM_TAG}
       SAVE IMAGE ${DOCKER_IMAGE_NAME}:latest
     END
@@ -124,7 +123,6 @@ idw-witness:
       ENTRYPOINT kli witness demo
     END
     WAIT
-      DO functions+DOCKER_LABELS --LABELS="${DOCKER_IMAGES_LABELS}"
       SAVE IMAGE ${DOCKER_IMAGE_NAME}:keri-${KERI_DOCKER_IMAGE_TAG}
       SAVE IMAGE ${DOCKER_IMAGE_NAME}:latest
     END
@@ -144,7 +142,6 @@ cred-issuance:
     FROM DOCKERFILE ./services/credential-server
   END
   WAIT
-    DO functions+DOCKER_LABELS --LABELS="${DOCKER_IMAGES_LABELS}"
     SAVE IMAGE ${DOCKER_IMAGE_NAME}
   END
   DO functions+DOCKER_TAG_N_PUSH \
@@ -162,7 +159,6 @@ cred-issuance-ui:
     FROM DOCKERFILE ./services/credential-server-ui
   END
   WAIT
-    DO functions+DOCKER_LABELS --LABELS="${DOCKER_IMAGES_LABELS}"
     SAVE IMAGE ${DOCKER_IMAGE_NAME}
   END
   DO functions+DOCKER_TAG_N_PUSH \
@@ -183,7 +179,6 @@ cip45-sample-dapp:
       FROM DOCKERFILE ./services/cip45-sample-dapp
     END
     WAIT
-      DO functions+DOCKER_LABELS --LABELS="${DOCKER_IMAGES_LABELS}"
       SAVE IMAGE ${DOCKER_IMAGE_NAME}
     END
     DO functions+DOCKER_TAG_N_PUSH \
@@ -202,7 +197,6 @@ keria-passcode-gen:
     FROM DOCKERFILE -f ./services/Dockerfile.keria-passcode-gen ./services
   END
   WAIT
-    DO functions+DOCKER_LABELS --LABELS="${DOCKER_IMAGES_LABELS}"
     SAVE IMAGE ${DOCKER_IMAGE_NAME}
   END
   DO functions+DOCKER_TAG_N_PUSH \
