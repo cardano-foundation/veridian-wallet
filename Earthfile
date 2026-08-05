@@ -4,7 +4,7 @@ IMPORT --allow-privileged github.com/cardano-foundation/cf-gha-workflows/./earth
 
 ARG --global DOCKER_IMAGES_TARGETS="idw-keria idw-witness cred-issuance cred-issuance-ui cip45-sample-dapp"
 
-ARG --global DOCKER_IMAGES_PREFIX="cf"
+ARG --global DOCKER_IMAGES_PREFIX=""
 ARG --global DOCKER_IMAGES_EXTRA_TAGS=""
 ARG --global DOCKER_IMAGES_LABELS=""
 ARG --global DOCKER_REGISTRIES=""
