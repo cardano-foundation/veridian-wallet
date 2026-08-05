@@ -30,8 +30,8 @@ on:
         default: 'all'
         type: choice
         options:
-        - idw-keria
-        - idw-witness
+        - keria
+        - witness
         - cred-issuance
         - cred-issuance-ui
         - cip45-sample-dapp
@@ -118,11 +118,11 @@ jobs:
           if [ "$GH_EVENT_NAME" == "workflow_dispatch" ]
           then
             case "$IMAGES_INPUT" in
-              idw-keria)
-                DOCKER_IMAGES_TARGETS="idw-keria"
+              keria)
+                DOCKER_IMAGES_TARGETS="keria"
                 ;;
-              idw-witness)
-                DOCKER_IMAGES_TARGETS="idw-witness"
+              witness)
+                DOCKER_IMAGES_TARGETS="witness"
                 ;;
               cred-issuance)
                 DOCKER_IMAGES_TARGETS="cred-issuance"
@@ -137,7 +137,7 @@ jobs:
                 DOCKER_IMAGES_TARGETS="keria-passcode-gen"
                 ;;
               all)
-                DOCKER_IMAGES_TARGETS="idw-keria idw-witness cred-issuance cred-issuance-ui cip45-sample-dapp keria-passcode-gen"
+                DOCKER_IMAGES_TARGETS="keria witness cred-issuance cred-issuance-ui cip45-sample-dapp keria-passcode-gen"
                 ;;
               *)
                 echo "Invalid option, exiting..."
@@ -171,12 +171,12 @@ jobs:
             DOCKER_IMAGES_TARGETS="$( \
               ( git log --pretty=format:'%h' -n 1 Earthfile | grep -q ${PR_GIT_SHORT_COMMIT} ) && \
               ( git log --patch -n1 Earthfile | grep -q "^[+-]ARG.*global.*KERIA_" ) && \
-              echo idw-keria
+              echo keria
             )"
             DOCKER_IMAGES_TARGETS="$DOCKER_IMAGES_TARGETS $( \
                 ( git log --pretty=format:'%h' -n 1 Earthfile | grep -q ${PR_GIT_SHORT_COMMIT} ) && \
                 ( git log --patch -n1 Earthfile | grep -q "^[+-]ARG.*global.*KERI_DOCKER" ) && \
-                echo idw-witness
+                echo witness
             )"
             DOCKER_IMAGES_TARGETS="$DOCKER_IMAGES_TARGETS $( \
                 ( git log --pretty=format:'%h' -n 1 services/credential-server | grep -q ${PR_GIT_SHORT_COMMIT} ) && \
