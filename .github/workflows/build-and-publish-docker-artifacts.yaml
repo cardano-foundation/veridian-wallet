@@ -198,7 +198,7 @@ jobs:
             STRIPPED_DOCKER_IMAGES_TARGETS=$(echo $DOCKER_IMAGES_TARGETS | tr -s ' ' | sed -e 's|^ ||' -e 's| $||')
             if [ ! -z "${STRIPPED_DOCKER_IMAGES_TARGETS}" ]; then
               echo "DOCKER_IMAGES_TARGETS=${STRIPPED_DOCKER_IMAGES_TARGETS}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
-              echo "DOCKER_IMAGES_TARGETS_$(echo ${{ matrix.platform }} | sed 's|/|_|g')=${STRIPPED_DOCKER_IMAGES_TARGETS}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
+              echo "DOCKER_IMAGES_TARGETS_$(echo $MATRIX_PLATFORM | sed 's|/|_|g')=${STRIPPED_DOCKER_IMAGES_TARGETS}" | tee -a "$GITHUB_ENV" | tee -a "$GITHUB_OUTPUT"
             fi
 
             if [ "$IS_PR_FROM_FORK" == "true" ]; then
@@ -307,7 +307,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⛮ cf-gha-baseline
-        uses: cardano-foundation/cf-gha-workflows/actions/cf-gha-baseline@27ed10ed269f89d937edb58ceff0076e1d73bfd9 # main at 14/11/2025
+        uses: cardano-foundation/cf-gha-workflows/actions/cf-gha-baseline@3888021a734e8844b52d23a1f9a32a34750ada5f # main at 20/05/2026
         id: cf-gha-baseline
         with:
           setup_docker_buildx: false
