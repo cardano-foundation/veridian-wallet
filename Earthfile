@@ -48,8 +48,6 @@ docker-manifests-merge:
 keria-src:
   FROM alpine/git
   GIT CLONE --branch $KERIA_GIT_REF $KERIA_GIT_REPO_URL /keria
-  RUN cd /keria && \
-      git checkout $KERIA_GIT_REF
   SAVE ARTIFACT /keria
 
 idw-keria:
