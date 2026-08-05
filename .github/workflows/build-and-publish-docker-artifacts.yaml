@@ -100,8 +100,9 @@ jobs:
           curl -LO "https://github.com/EarthBuild/earthbuild/releases/latest/download/earth-linux-${ARCH}"
           chmod +x "earth-linux-${ARCH}"
           sudo mv "earth-linux-${ARCH}" /usr/local/bin/earth
-          docker rm -f earth-buildkitd
           earth bootstrap
+          docker exec earth-buildkitd sh -c \
+                      'printf "#!/bin/sh\nexec \"\$@\"\n" > /usr/bin/earth_debugger && chmod +x /usr/bin/earth_debugger'
 
       - name: Set docker image targets based on path changes from last commit
         id: metadata
