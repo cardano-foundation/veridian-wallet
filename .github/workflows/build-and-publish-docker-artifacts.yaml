@@ -94,7 +94,8 @@ jobs:
 
       - name: Setup earthbuild
         run: |
-          ARCH=amd64
+          MATRIX_PLATFORM=${{ matrix.platform }}
+          ARCH=${MATRIX_PLATFORM#linux/}
           curl -LO "https://github.com/EarthBuild/earthbuild/releases/latest/download/earth-linux-${ARCH}"
           chmod +x "earth-linux-${ARCH}"
           sudo mv "earth-linux-${ARCH}" /usr/local/bin/earth
