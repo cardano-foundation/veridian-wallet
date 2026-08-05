@@ -63,7 +63,8 @@ jobs:
     permissions:
       contents: read
       packages: write
-    runs-on: ${{ fromJson(vars.RUNS_ON) }}
+    # add suffix "-arm" to runs-on if matrix.platform is linux/arm64
+    runs-on: ${{ fromJSON(format('["{0}{1}"]', fromJSON(vars.RUNS_ON)[0], matrix.platform == 'linux/arm64' && '-arm' || '')) }}
     strategy:
       matrix: ${{fromJson(needs.set-matrix.outputs.matrix)}}
     steps:
