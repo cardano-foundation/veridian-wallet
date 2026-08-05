@@ -80,7 +80,8 @@ idw-keria:
           FROM ${KERIA_DOCKER_IMAGE_REPO}:${KERIA_DOCKER_IMAGE_TAG}
       END
 
-      RUN apk add --verbose --no-cache jq envsubst
+      RUN apk add --verbose --no-cache jq envsubst &>/tmp/apk-output || true
+      RUN cat /tmp/apk-output
       ENTRYPOINT keria start --config-file backer-oobis --config-dir ./scripts
 
     END
