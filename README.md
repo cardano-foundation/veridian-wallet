@@ -129,7 +129,10 @@ Please feel free to open a new thread on the issue tracker or submit a new pull 
 Please read [Contributing](CONTRIBUTING.md) in advance.
 Thank you for contributing!
 
+New to the codebase? The [Architecture Overview](docs/Architecture.md) explains how the app is structured (layers, core/UI/state, navigation, and key data flows) and is the best starting point before making changes.
+
 ## Additional Documents
+- [Architecture Overview](docs/Architecture.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security](SECURITY.md)
 
