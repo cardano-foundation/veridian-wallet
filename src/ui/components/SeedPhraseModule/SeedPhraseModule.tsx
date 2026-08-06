@@ -48,7 +48,7 @@ const SeedPhraseModule = forwardRef<SeedPhraseModuleRef, SeedPhraseModuleProps>(
 
     useImperativeHandle(ref, () => ({
       focusInputByIndex: (index) => {
-        const input = seedInputs.current.at(index);
+        const input = seedInputs.current[index];
         if (!input) return;
 
         (

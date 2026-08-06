@@ -148,7 +148,7 @@ const ShareConnections = ({ group, oobi, profile }: SetupConnectionsProps) => {
               <IonItem key={connection.id}>
                 <IonLabel className="connection-item">
                   <div className={`connection-avatar rank-${index % 5}`}>
-                    <span>{connection.label.at(0)?.toLocaleUpperCase()}</span>
+                    <span>{connection.label[0]?.toLocaleUpperCase()}</span>
                   </div>
                   <span className="connection-name">{connection.label}</span>
                 </IonLabel>
