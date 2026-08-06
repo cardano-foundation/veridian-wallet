@@ -186,17 +186,17 @@ describe("SetPasscode Page", () => {
 
     await passcodeFiller(getByText, getByTestId, "193214");
 
-    await waitFor(
-      () =>
-        expect(queryByText(EN_TRANSLATIONS.createpasscodemodule.errornomatch))
-          .toBeVisible
+    await waitFor(() =>
+      expect(
+        queryByText(EN_TRANSLATIONS.createpasscodemodule.errornomatch)
+      ).toBeVisible()
     );
   });
 
   test("Entering an existing passcode returns an error", async () => {
     verifySecretMock.mockResolvedValue(true);
     require("@ionic/react");
-    const { getByText, queryByText, getByTestId } = render(
+    const { getByText, getByTestId } = render(
       <Provider store={storeMocked}>
         <CreatePasscodeModule
           title={EN_TRANSLATIONS.setpasscode.reenterpasscode}
@@ -209,10 +209,10 @@ describe("SetPasscode Page", () => {
 
     await passcodeFiller(getByText, getByTestId, "193213");
 
-    await waitFor(
-      () =>
-        expect(queryByText(EN_TRANSLATIONS.createpasscodemodule.errornomatch))
-          .toBeVisible
+    await waitFor(() =>
+      expect(
+        getByText(EN_TRANSLATIONS.createpasscodemodule.errormatch)
+      ).toBeVisible()
     );
   });
 
@@ -232,10 +232,10 @@ describe("SetPasscode Page", () => {
 
     await passcodeFiller(getByText, getByTestId, "193213");
 
-    await waitFor(
-      () =>
-        expect(queryByText(EN_TRANSLATIONS.createpasscodemodule.repeat))
-          .toBeVisible
+    await waitFor(() =>
+      expect(
+        queryByText(EN_TRANSLATIONS.createpasscodemodule.repeat)
+      ).toBeVisible()
     );
   });
 
@@ -255,10 +255,10 @@ describe("SetPasscode Page", () => {
 
     await passcodeFiller(getByText, getByTestId, "193213");
 
-    await waitFor(
-      () =>
-        expect(queryByText(EN_TRANSLATIONS.createpasscodemodule.consecutive))
-          .toBeVisible
+    await waitFor(() =>
+      expect(
+        queryByText(EN_TRANSLATIONS.createpasscodemodule.consecutive)
+      ).toBeVisible()
     );
   });
 });

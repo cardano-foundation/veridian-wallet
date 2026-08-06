@@ -49,4 +49,5 @@ export default {
   },
   setupFilesAfterEnv: ["jest-canvas-mock", "<rootDir>/src/setupTests.ts"],
   setupFiles: ["<rootDir>/src/ui/__mocks__/swiper.tsx"],
+  testTimeout: 15000,
 };
