@@ -418,7 +418,7 @@
       "title": "Connect to Veridian",
       "description": "Veridian Wallet requires connecting to a Cloud Agent. As part of the onboarding process, you need to scan a QR code which establishes a secure connection.",
       "seconddescription": "For more information and to assist with this process, visit our website.",
-      "bottomdescription": "If you’re ready and understand, please click the “Proceed to scan” button. This will open a scanner where you scan the QR code or manually enter the URL.",
+      "bottomdescription": "If you’re ready and understand, please click the “Get connected” button. This will open a scanner where you scan the QR code or manually enter the URL.",
       "buttons": {
         "connected": "Get connected",
         "onboardingdocumentation": "Visit our documentation",
